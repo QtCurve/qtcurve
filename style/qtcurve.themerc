@@ -1,0 +1,7 @@
+[Misc]
+Name=QtCurve
+Comment=Clean and elegant style
+ConfigPage=kstyle_qtcurve_config
+[KDE]
+WidgetStyle=QtCurve
+
