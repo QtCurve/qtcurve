@@ -1,0 +1,32 @@
+--new--
+
+KDE: Better konqueror active (?) icon border.
+KDE: Combobox popup should be drawn as a popup menu - ala Gtk.
+ALL: Highlight tab bar? Not sure Gtk can do this :-( (qt gtk theme engine doesn't!)
+ALL: Add edit highlight to non-bordered style.
+GTK1: Shading/recolouring of menubars disabled, as the menu items need to be shaded, etc,
+      and cant be bothered for Gtk1
+--app specific--
+
+OO.o:
+KDE: 1.x menubar colour is wrong. Works OK in 2.x
+KDE: 2.x menu item text stays black when selected...
+KDE: 2.x no highlight on combofocus.
+
+Firefox:
+GTK: Combobox is not drawn correctly, and doesnt hightlight on focus,
+     but neither do other styles - think this is a firefox issue.
+
+--old--
+
+KDE: Combo box has a lighter grey when disabled
+GTK1: Mozilla - tab bar seems to let tabs overlap? This also affects Geramik,
+      think the problem is with Mozilla.
+KDE: Slight re-draw error on tabs if width of all tabs= width of tab bar -- but
+     all KDE themes seem to suffer from this.
+KDE: Mising white pixel when last tab is selected, if its added then the above 
+     suffers even more!
+KDE: V3 Combobox list needs to be rounded in rounded mode - missing pixels, etc.
+     Also take into account scrollbar pos? i.e. draw line 1 pixel less on right?
+ALL: AA selected/gradient radios - in high contrast looks very sharp
+ALL: GTK/KDE have different disabled text behaviour when contrast setting changed!

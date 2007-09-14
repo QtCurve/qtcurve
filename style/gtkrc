@@ -1,0 +1,165 @@
+style "qtcurve-default"
+{
+  GtkButton::default_border = { 0, 0, 0, 0 }
+  GtkButton::default_outside_border = { 0, 0, 0, 0 }
+  GtkMenuItem::selected_shadow_type = out
+  GtkWidget::interior_focus = 1
+  GtkButton::child_displacement_x   = 1
+  GtkButton::child_displacement_y   = 1
+
+  GtkRange::trough_border = 0
+  GtkWidget::focus-padding = 1
+  GtkButton::focus-padding = 2
+  GtkOptionMenu::focus-padding = 1
+  GtkCheckButton::focus-padding = 1
+  GtkRadioButton::focus-padding = 1
+  GtkSpinButton::focus-padding = 1
+  GtkPaned::handle_size = 6
+  GtkPaned::handle_width = 6
+  GtkRange::slider_width = 15
+  GtkRange::slider_length = 24
+  GtkRange::stepper_size = 15
+  GtkScale::slider_length = 21
+  GtkScale::slider_width = 13
+  GtkScrollbar::min_slider_length = 16
+  GtkCheckButton::indicator_size = 13
+  GtkMenuBar::internal-padding = 0
+  GtkNotebook::tab-overlap = 2
+  GtkNotebook::tab-curvature = 4
+  GtkStatusbar::shadow-type = 0
+  GtkComboBoxEntry::appears-as-list = 1
+  GtkTreeView::allow-rules = 1
+
+  xthickness = 1
+  ythickness = 1
+
+  engine "qtcurve" 
+  {
+  }
+}
+
+style "qtcurve-toolbar" = "qtcurve-default"
+{
+  GtkButton::default_border = { 0, 0, 0, 0 }
+  GtkButton::default_outside_border = { 0, 0, 0, 0 }
+  GtkWidget::interior_focus = 1
+  GtkButton::child_displacement_x   = 1
+  GtkButton::child_displacement_y   = 1
+  GtkOptionMenu::focus-padding = 0
+  GtkWidget::focus-padding = 1
+}
+
+style "qtcurve-toolbarbutton" = "qtcurve-toolbar"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "qtcurve-sptoolbar" = "qtcurve-default"
+{
+  GtkButton::default_border = { 0, 0, 0, 0 }
+  GtkButton::default_outside_border = { 0, 0, 0, 0 }
+  GtkWidget::interior_focus = 1
+  GtkButton::child_displacement_x   = 1
+  GtkButton::child_displacement_y   = 1
+  GtkOptionMenu::focus-padding = 0
+  GtkWidget::focus-padding = 1
+  xthickness = 2
+  ythickness = 3
+}
+
+style "qtcurve-sptoolbarbutton" = "qtcurve-sptoolbar"
+{
+  xthickness = 4
+  ythickness = 5
+}
+
+style "qtcurve-h2" = "qtcurve-default"
+{
+  xthickness = 1
+  ythickness = 2
+}
+
+style "qtcurve-w2" = "qtcurve-default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "qtcurve-w2b" = "qtcurve-default"
+{
+  xthickness = 2
+  ythickness = 3
+}
+
+style "qtcurve-tasklist" = "qtcurve-default"
+{
+  xthickness = 5
+  ythickness = 3
+}
+
+style "qtcurve-tooltips" = "qtcurve-default"
+{
+  xthickness = 4
+  ythickness = 4
+  bg[NORMAL] = { 1.0,1.0,0.75 }
+  fg[NORMAL] = { 0.0,0.0,0.0 }
+}
+
+style "qtcurve-menuitem" = "qtcurve-default"
+{
+  xthickness = 1
+  ythickness = 3
+}
+
+style "qtcurve-menubar" = "qtcurve-default"
+{
+  xthickness = 2
+  ythickness = 3
+}
+
+style "qtcurve-menubaritem" = "qtcurve-default"
+{
+  xthickness = 0
+  ythickness = 2
+}
+
+style "qtcurve-swt-combo" = "qtcurve-default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+class "*GtkWidget" style "qtcurve-default"
+class "*GtkNotebook" style "qtcurve-w2"
+class "*Button" style "qtcurve-h2"
+class "*GtkOptionMenu" style "qtcurve-h2"
+class "*GtkRange" style "qtcurve-w2b"
+class "*GtkMenu" style "qtcurve-w2"
+class "*GtkScrolledWindow" style "qtcurve-w2"
+class "*MenuBar" style "qtcurve-menubar"
+class "*MenuItem" style "qtcurve-menuitem"
+widget_class "*MenuBar*MenuItem" style "qtcurve-menubaritem"
+class "*GtkFrame" style "qtcurve-w2"
+class "*GtkStatusbar" style "qtcurve-default"
+class "*GtkRadioButton" style "qtcurve-default"
+class "*GtkCheckButton" style "qtcurve-default"
+class "*GtkSpinButton" style "qtcurve-w2b"
+widget_class "*.GtkMenuItem.*" style "qtcurve-default"
+widget_class "*.GtkAccelMenuItem.*" style "qtcurve-default"
+widget_class "*.GtkRadioMenuItem.*" style "qtcurve-default"
+widget_class "*.GtkCheckMenuItem.*" style "qtcurve-default"
+widget_class "*.GtkImageMenuItem.*" style "qtcurve-default"
+widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-default"
+class "*GtkEntry" style "qtcurve-w2b"
+widget_class "*.tooltips.*.GtkToggleButton" style "qtcurve-tasklist"
+widget_class "*Tree*GtkButton" style "qtcurve-default"
+widget_class "*List*GtkButton" style "qtcurve-default"
+widget_class "BasePWidget.GtkEventBox.GtkTable.GtkFrame" style "qtcurve-w2"
+widget "gtk-tooltips*" style "qtcurve-tooltips"
+widget_class "*Toolbar*" style "qtcurve-toolbar"
+widget_class "*Toolbar*Button" style "qtcurve-toolbarbutton"
+widget_class "*HandleBox*HBox*SPDesktopWidget" style "qtcurve-sptoolbar"
+widget_class "*HandleBox*SPButton" style "qtcurve-sptoolbarbutton"
+widget_class "*.SwtFixed.GtkCombo.GtkButton" style "qtcurve-swt-combo"
+widget_class "*.SwtFixed.GtkCombo.GtkEntry" style "qtcurve-swt-combo"

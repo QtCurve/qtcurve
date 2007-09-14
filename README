@@ -1,0 +1,37 @@
+Installation
+------------
+To build and install:
+
+1. mkdir build
+2. cd build
+3. cmake ..
+4. make
+5. make install
+
+The following options may supplied to cmake:
+
+    -DQTC_ADD_EVENT_FILTER=true
+        Enable receiving of KDE style change events
+
+   -DQTC_MODIFY_MOZILLA=true
+        Enable mods to userChrome.css (setting KDE button order)
+
+    -DQTC_MODIFY_MOZILLA_USER_JS=true
+        Enable mods to user.js (setting of instant apply, and
+        move ~/.mime.types and ~/.mailcap into ~/.mozilla)
+
+
+
+pixmaps.h
+---------
+
+To regenerate this, run the following:
+
+    gdk-pixbuf-csource --raw --name radio_frame radio_frame.png > pixmaps.h
+    gdk-pixbuf-csource --raw --name radio_light radio_light.png >> pixmaps.h
+    gdk-pixbuf-csource --raw --name radio_on radio_on.png >> pixmaps.h
+    gdk-pixbuf-csource --raw --name check_on check_on.png >> pixmaps.h
+    gdk-pixbuf-csource --raw --name slider slider.png >> pixmaps.h
+    gdk-pixbuf-csource --raw --name slider_light slider_light.png >> pixmaps.h
+    gdk-pixbuf-csource --raw --name slider_v slider_v.png >> pixmaps.h
+    gdk-pixbuf-csource --raw --name slider_light_v slider_light_v.png >> pixmaps.h
