@@ -661,6 +661,11 @@ void QtCurveStyle::polish(QPalette &palette)
     palette.setColor(QPalette::Inactive, QPalette::WindowText, palette.color(QPalette::Active, QPalette::WindowText));
     palette.setColor(QPalette::Disabled, QPalette::Light, itsBackgroundCols[0]);
     palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[5]);
+
+    // Fix KDE4's palette...
+    for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)
+        if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
+            palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i, palette.color(QPalette::Active, (QPalette::ColorRole)i));
 }
 
 void QtCurveStyle::polish(QWidget *widget)

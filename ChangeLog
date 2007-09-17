@@ -1,3 +1,10 @@
+0.53.1
+------
+1. Qt4 build now uses CMake also. i.e. CMake will determine if to compile
+   KDE4 config dialog or not.
+2. Fix for KDE4's setting of inactive palette!=active palette
+   (Left highlight and highlighted text as configurable)
+
 0.53
 ----
  1. Removed 'Shadow buttons' option, and replaced with none/shadow/etch setting
