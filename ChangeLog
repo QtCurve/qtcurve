@@ -3,6 +3,7 @@
 1. Converted buildsystem to CMake.
 2. Fix broken 'Thinner Menuitems' option.
 3. Better code for alternate list view background.
+4. Also read in Qt's inactive palette.
 
 0.53
 ----

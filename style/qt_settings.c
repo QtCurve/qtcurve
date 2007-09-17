@@ -34,6 +34,7 @@
 #include <sys/unistd.h>
 #include <stdio.h>
 
+#define QTC_READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
 #define QTC_DEFAULT_TO_KDE3   /* Should we default to KDE3, or KDE4 settings when not running under KDE? */
 
 #define toQtColor(col) \
@@ -70,7 +71,7 @@ static int strcmp_i(const char *s1, const char *s2)
     return (int)c2-(int)c1;
 }
 
-struct qt_icons
+struct QtIcons
 {
     int smlTbSize,
         tbSize,
@@ -80,7 +81,7 @@ struct qt_icons
         dlgSize;
 };
 
-enum qt_fcolor
+enum QtColorRoles
 {
     COLOR_BACKGROUND,
     COLOR_BUTTON,
@@ -110,15 +111,27 @@ typedef enum
     /*GTK_APP_GAIM*/
 } EGtkApp;
 
+enum QtPallete
+{
+    PAL_ACTIVE,
+    PAL_INACTIVE
+#ifndef QTC_READ_INACTIVE_PAL
+        = PAL_ACTIVE
+#endif
+    ,
+
+    PAL_NUMPALS
+};
+
 struct QtData
 {
-    GdkColor        colors[COLOR_NUMCOLORS];
+    GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS];
     char            *font,
                     *icons,
                     *boldfont;
     GtkToolbarStyle toolbarStyle;
-    struct qt_icons iconSizes;
-    gboolean        button_icons;
+    struct QtIcons  iconSizes;
+    gboolean        buttonIcons;
     EGtkApp         app;
     gboolean        qt4;
 };
@@ -132,7 +145,14 @@ struct QtData
 #include <pwd.h>
 #include <sys/types.h>
 
-#define DEFAULT_KDE_COLORS "active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
+#define DEFAULT_KDE_ACT_PAL \
+"active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
+
+#ifdef QTC_READ_INACTIVE_PAL
+#define DEFAULT_KDE_INACT_PAL \
+"inactive=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
+#endif
+
 #define DEFAULT_KDE_FONT      "Sans Serif"
 #define DEFAULT_KDE_FONT_SIZE 10.0
 #define MAX_LINE_LEN 1024
@@ -141,19 +161,15 @@ struct QtData qtSettings;
 
 static gboolean useQt3Settings()
 {
-    static const char *full=NULL;
     static const char *vers=NULL;
 
-    if(!full)
-        full=getenv("KDE_FULL_SESSION");
-
-    if(full && !vers)
+    if(!vers)
         vers=getenv("KDE_SESSION_VERSION");
 
 #ifdef QTC_DEFAULT_TO_KDE3
-    return !full || (!vers || atoi(vers)<4);
+    return !vers || atoi(vers)<4;
 #else
-    return full && (!vers || atoi(vers)<4);
+    return vers && atoi(vers)<4);
 #endif
 }
 
@@ -215,9 +231,10 @@ static const char * italicStr(int i)
 
 enum
 {
-    RD_PALETTE           = 0x0001,
-    RD_FONT              = 0x0002,
-    RD_CONTRAST          = 0x0004,
+    RD_ACT_PALETTE       = 0x0001,
+    RD_INACT_PALETTE     = 0x0002,
+    RD_FONT              = 0x0004,
+    RD_CONTRAST          = 0x0008,
     RD_ICONS             = 0x0010,
     RD_TOOLBAR_STYLE     = 0x0020,
     RD_TOOLBAR_ICON_SIZE = 0x0040,
@@ -254,7 +271,7 @@ static char * getKdeHome()
     return kdeHome;
 }
 
-static void parseQtColors(char *line)
+static void parseQtColors(char *line, int p)
 {
     int  n=-1;
     char *l=strtok(line, "#");
@@ -265,31 +282,31 @@ static void parseQtColors(char *line)
             switch(n)
             {
                 case 0:
-                    setRgb(&qtSettings.colors[COLOR_FOREGROUND], l);
+                    setRgb(&qtSettings.colors[p][COLOR_FOREGROUND], l);
                     break;
                 case 1:
-                    setRgb(&qtSettings.colors[COLOR_BUTTON], l);
+                    setRgb(&qtSettings.colors[p][COLOR_BUTTON], l);
                     break;
                 case 5:
-                    setRgb(&qtSettings.colors[COLOR_MID], l);
+                    setRgb(&qtSettings.colors[p][COLOR_MID], l);
                     break;
                 case 6:
-                    setRgb(&qtSettings.colors[COLOR_TEXT], l);
+                    setRgb(&qtSettings.colors[p][COLOR_TEXT], l);
                     break;
                 case 8:
-                    setRgb(&qtSettings.colors[COLOR_BUTTON_TEXT], l);
+                    setRgb(&qtSettings.colors[p][COLOR_BUTTON_TEXT], l);
                     break;
                 case 9:
-                    setRgb(&qtSettings.colors[COLOR_BACKGROUND], l);
+                    setRgb(&qtSettings.colors[p][COLOR_BACKGROUND], l);
                     break;
                 case 10:
-                    setRgb(&qtSettings.colors[COLOR_WINDOW], l);
+                    setRgb(&qtSettings.colors[p][COLOR_WINDOW], l);
                     break;
                 case 12:
-                    setRgb(&qtSettings.colors[COLOR_SELECTED], l);
+                    setRgb(&qtSettings.colors[p][COLOR_SELECTED], l);
                     break;
                 case 13:
-                    setRgb(&qtSettings.colors[COLOR_TEXT_SELECTED], l);
+                    setRgb(&qtSettings.colors[p][COLOR_TEXT_SELECTED], l);
                     break;
                 default:
                     break;
@@ -434,7 +451,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
 
                     if(eq && ++eq)
                     {
-                        qtSettings.button_icons=0==memcmp(eq, "true", 4);
+                        qtSettings.buttonIcons=0==memcmp(eq, "true", 4);
                         found|=RD_BUTTON_ICONS;
                     }
                 }
@@ -451,21 +468,29 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                 else if(SECT_GENERAL==section && rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
                         0==memcmp(line, "alternateBackground=", 20))
                 {
-                    sscanf(&line[20], "%d,%d,%d\n", &qtSettings.colors[COLOR_LV].red,
-                                                    &qtSettings.colors[COLOR_LV].green,
-                                                    &qtSettings.colors[COLOR_LV].blue);
-                    qtSettings.colors[COLOR_LV].red=toGtkColor(qtSettings.colors[COLOR_LV].red);
-                    qtSettings.colors[COLOR_LV].green=toGtkColor(qtSettings.colors[COLOR_LV].green);
-                    qtSettings.colors[COLOR_LV].blue=toGtkColor(qtSettings.colors[COLOR_LV].blue);
+                    sscanf(&line[20], "%d,%d,%d\n", &qtSettings.colors[PAL_ACTIVE][COLOR_LV].red,
+                                                    &qtSettings.colors[PAL_ACTIVE][COLOR_LV].green,
+                                                    &qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue);
+                    qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=toGtkColor(qtSettings.colors[PAL_ACTIVE][COLOR_LV].red);
+                    qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=toGtkColor(qtSettings.colors[PAL_ACTIVE][COLOR_LV].green);
+                    qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=toGtkColor(qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue);
 
                     found|=RD_LIST_COLOR;
                 }
-                else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_PALETTE && !(found&RD_PALETTE) &&
+                else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
                         (qt4 ? 0==memcmp(line, "Palette\\active=", 15) : 0==memcmp(line, "active=", 7)))
                 {
-                    parseQtColors(line);
-                    found|=RD_PALETTE;
+                    parseQtColors(line, PAL_ACTIVE);
+                    found|=RD_ACT_PALETTE;
                 }
+#ifdef QTC_READ_INACTIVE_PAL
+                else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
+                        (qt4 ? 0==memcmp(line, "Palette\\inactive=", 17) : 0==memcmp(line, "inactive=", 9)))
+                {
+                    parseQtColors(line, PAL_INACTIVE);
+                    found|=RD_INACT_PALETTE;
+                }
+#endif
                 else if (( !qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==memcmp(line, "font=", 5)) ||
                          ( qt4 && SECT_QT & rd&RD_FONT && !(found&RD_FONT) &&
@@ -571,12 +596,21 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
         }
     }
 
-    if(rd&RD_PALETTE && !(found&RD_PALETTE))
+    if(rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE))
     {
-        strncpy(line, DEFAULT_KDE_COLORS, QTC_MAX_INPUT_LINE_LEN);
+        strncpy(line, DEFAULT_KDE_ACT_PAL, QTC_MAX_INPUT_LINE_LEN);
         line[QTC_MAX_INPUT_LINE_LEN]='\0';
-        parseQtColors(line);
+        parseQtColors(line, PAL_ACTIVE);
     }
+
+#ifdef QTC_READ_INACTIVE_PAL
+    if(rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE))
+    {
+        strncpy(line, DEFAULT_KDE_INACT_PAL, QTC_MAX_INPUT_LINE_LEN);
+        line[QTC_MAX_INPUT_LINE_LEN]='\0';
+        parseQtColors(line, PAL_INACTIVE);
+    }
+#endif
 
     if(rd&RD_FONT && (found&RD_FONT || setDefaultFont))  /* No need to check if read in */
     {
@@ -631,7 +665,7 @@ printf("REQUEST FONT: %s\n", qtSettings.font);
     if(rd&RD_TOOLBAR_STYLE && !(found&RD_TOOLBAR_STYLE))
         qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
     if(rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS))
-        qtSettings.button_icons=TRUE;
+        qtSettings.buttonIcons=TRUE;
 
     return found;
 }
@@ -1234,7 +1268,7 @@ static gboolean qtInit(Options *opts)
             qtSettings.iconSizes.btnSize=16;
             qtSettings.iconSizes.mnuSize=16;
             qtSettings.iconSizes.dlgSize=22;
-            qtSettings.colors[COLOR_LV].red=qtSettings.colors[COLOR_LV].green=qtSettings.colors[COLOR_LV].blue=0;
+            qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=0;
 
             lastRead=now;
 
@@ -1244,9 +1278,9 @@ static gboolean qtInit(Options *opts)
             if(useQt3Settings())
             {
                 qtSettings.qt4=FALSE;
-                readRc("/etc/qt/qtrc", RD_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, FALSE, FALSE);
-                readRc("/etc/qt3/qtrc", RD_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, FALSE, FALSE);
-                readRc(".qt/qtrc", RD_PALETTE|RD_FONT|RD_CONTRAST, opts, FALSE, TRUE, FALSE);
+                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, FALSE, FALSE);
+                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, FALSE, FALSE);
+                readRc(".qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, FALSE, TRUE, FALSE);
             }
             else
             {
@@ -1255,7 +1289,7 @@ static gboolean qtInit(Options *opts)
                 char *confFile=(char *)malloc(strlen(xdg)+strlen(constQt4ConfFile)+2);
 
                 sprintf(confFile, "%s/%s", xdg, constQt4ConfFile);
-                readRc(confFile, RD_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, TRUE, TRUE);
+                readRc(confFile, RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, TRUE, TRUE);
                 free(confFile);
                 qtSettings.qt4=TRUE;
             }
@@ -1270,7 +1304,7 @@ static gboolean qtInit(Options *opts)
 #ifdef QTC_MODIFY_MOZILLA
                     GdkColor *menu_col=SHADE_CUSTOM==opts->shadeMenubars
                                         ? &opts->customMenubarsColor
-                                        : &qtSettings.colors[COLOR_SELECTED];
+                                        : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
                     gboolean add_menu_colors=FALSE;
 
                     if(SHADE_BLEND_SELECTED==opts->shadeMenubars || (SHADE_CUSTOM==opts->shadeMenubars &&
@@ -1315,9 +1349,9 @@ static gboolean qtInit(Options *opts)
 
                 sprintf(version, "#%02d%02X%02X%02X",
                                     constFileVersion,
-                                    toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].red),
-                                    toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].green),
-                                    toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].blue));
+                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
+                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
+                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
 
                 getGtk2CfgFile(&tmpStr, xdg, "qtcurve.gtk-colors");
 
@@ -1338,12 +1372,12 @@ static gboolean qtInit(Options *opts)
                                 "class \"*MenuItem\" style \"QtCTxtFix\" "
                                 "widget_class \"*.*ProgressBar\" style \"QtCTxtFix\"",
                                 version,
-                                toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].red),
-                                toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].green),
-                                toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].blue),
-                                toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].red),
-                                toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].green),
-                                toQtColor(qtSettings.colors[COLOR_TEXT_SELECTED].blue));
+                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
+                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
+                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
+                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
+                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
+                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
                     fclose(f);
                 }
 
@@ -1377,7 +1411,7 @@ static gboolean qtInit(Options *opts)
                     if(!locale)
                         locale = setlocale(LC_NUMERIC, "C");
 #endif
-                    shade(&qtSettings.colors[COLOR_WINDOW], &col, POPUPMENU_LIGHT_FACTOR);
+                    shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, POPUPMENU_LIGHT_FACTOR);
                     sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
                     gtk_rc_parse_string(tmpStr);
                 }
@@ -1446,9 +1480,9 @@ static gboolean qtInit(Options *opts)
 #endif
                 if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
                 {
-                    g_value_set_long(&svalue.value, qtSettings.button_icons);
+                    g_value_set_long(&svalue.value, qtSettings.buttonIcons);
 #ifdef QTC_DEBUG
-                    printf("gtk-button-images %d\n", qtSettings.button_icons);
+                    printf("gtk-button-images %d\n", qtSettings.buttonIcons);
 #endif
                     gtk_settings_set_property_value(settings, "gtk-button-images", &svalue);
 
@@ -1564,12 +1598,12 @@ static gboolean qtInit(Options *opts)
                                                     "class \"*\" style \"QtCCrsr\"";
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
 
-                sprintf(tmpStr, constStrFormat, qtSettings.colors[COLOR_TEXT].red>>8,
-                                                qtSettings.colors[COLOR_TEXT].green>>8,
-                                                qtSettings.colors[COLOR_TEXT].blue>>8,
-                                                qtSettings.colors[COLOR_TEXT].red>>8,
-                                                qtSettings.colors[COLOR_TEXT].green>>8,
-                                                qtSettings.colors[COLOR_TEXT].blue>>8);
+                sprintf(tmpStr, constStrFormat, qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
+                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
+                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8,
+                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
+                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
+                                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8);
                 gtk_rc_parse_string(tmpStr);
             }
             if(tmpStr)
@@ -1603,7 +1637,7 @@ static void qtExit()
 }
 
 #define SET_COLOR(st, rc, itm, ITEM, state, QTP_COL) \
-    st->itm[state]=rc->color_flags[state]&ITEM ? rc->itm[state] : qtSettings.colors[QTP_COL];
+    st->itm[state]=rc->color_flags[state]&ITEM ? rc->itm[state] : qtSettings.colors[GTK_STATE_ACTIVE==state ? PAL_INACTIVE : PAL_ACTIVE][QTP_COL];
 
 static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
 {

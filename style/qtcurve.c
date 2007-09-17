@@ -154,9 +154,9 @@ static gboolean useButtonColor(const gchar *detail)
 
 #define QT_CUSTOM_COLOR_BUTTON(style) \
     (style && \
-    !(QTC_COL_EQ(qtSettings.colors[COLOR_WINDOW].red,(style->bg[GTK_STATE_NORMAL].red)) && \
-      QTC_COL_EQ(qtSettings.colors[COLOR_WINDOW].green,(style->bg[GTK_STATE_NORMAL].green)) && \
-      QTC_COL_EQ(qtSettings.colors[COLOR_WINDOW].blue,(style->bg[GTK_STATE_NORMAL].blue))))
+    !(QTC_COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].red,(style->bg[GTK_STATE_NORMAL].red)) && \
+      QTC_COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].green,(style->bg[GTK_STATE_NORMAL].green)) && \
+      QTC_COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].blue,(style->bg[GTK_STATE_NORMAL].blue))))
 
 #define QTC_EQUAL_COLOR(A, B) \
    (QTC_COL_EQ(A.red, B.red) && QTC_COL_EQ(A.green, B.green) && QTC_COL_EQ(A.blue, B.blue))
@@ -4154,11 +4154,13 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         debugDisplayWidget(widget, 3);
 #endif
 
+#ifndef QTC_READ_INACTIVE_PAL /* If we reead the inactive palette, then there is no need for the following... */
         /* The following fixes the text in list views... if not used, when an item is selected it
            gets the selected text color - but when the window changes focus it gets the normal
            text color! */
-        if(DETAIL("cellrenderertext") && GTK_STATE_ACTIVE==state)
-            state=GTK_STATE_SELECTED;
+         if(DETAIL("cellrenderertext") && GTK_STATE_ACTIVE==state)
+             state=GTK_STATE_SELECTED;
+#endif
 
         if(opts.shadeMenubarOnlyWhenActive)
         {
@@ -5380,9 +5382,9 @@ static void styleRealize(GtkStyle *style)
 
     generateColors(qtcurveStyle);
 
-    qtcurveStyle->button_text_gc=realizeColors(style, &qtSettings.colors[COLOR_BUTTON_TEXT]);
-    if(0!=qtSettings.colors[COLOR_LV].red || 0!=qtSettings.colors[COLOR_LV].green || 0!=qtSettings.colors[COLOR_LV].blue)
-        qtcurveStyle->listview_alternate_gc=realizeColors(style, &qtSettings.colors[COLOR_LV]);
+    qtcurveStyle->button_text_gc=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]);
+    if(0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].red || 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green || 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue)
+        qtcurveStyle->listview_alternate_gc=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_LV]);
     else
         qtcurveStyle->listview_alternate_gc=NULL;
     QTC_GEN_GCS(style, qtcurveStyle->background, qtcurveStyle->background_gc);
@@ -5492,9 +5494,9 @@ static void styleUnrealize(GtkStyle *style)
 
 static void generateColors(QtCurveStyle *qtcurveStyle)
 {
-    shadeColors(&qtSettings.colors[COLOR_WINDOW], qtcurveStyle->background);
-    shadeColors(&qtSettings.colors[COLOR_BUTTON], qtcurveStyle->button);
-    shadeColors(&qtSettings.colors[COLOR_SELECTED], qtcurveStyle->menuitem);
+    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], qtcurveStyle->background);
+    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON], qtcurveStyle->button);
+    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED], qtcurveStyle->menuitem);
 
     if(SHADE_CUSTOM==opts.shadeMenubars)
         shadeColors(&opts.customMenubarsColor, qtcurveStyle->menubar);
@@ -5563,11 +5565,11 @@ static void generateColors(QtCurveStyle *qtcurveStyle)
     switch(opts.shadeCheckRadio)
     {
         default:
-            qtcurveStyle->check_radio=&qtSettings.colors[COLOR_BUTTON_TEXT];
+            qtcurveStyle->check_radio=&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT];
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
-            qtcurveStyle->check_radio=&qtSettings.colors[COLOR_SELECTED];
+            qtcurveStyle->check_radio=&qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
             break;
         case SHADE_CUSTOM:
             qtcurveStyle->check_radio=&opts.customCheckRadioColor;
