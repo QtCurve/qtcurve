@@ -1,9 +1,15 @@
-0.53.1
-------
+0.54
+----
 1. Converted buildsystem to CMake.
-2. Fix broken 'Thinner Menuitems' option.
-3. Better code for alternate list view background.
-4. Also read in Qt's inactive palette.
+2. New option 'inactiveHighlight', if set then use a mix of highlight and background
+   colour as highlight for inactive windows/elements.
+3. Fix broken 'Thinner Menuitems' option.
+4. Better code for alternate list view background.
+5. Also read in Qt's inactive palette.
+6. If read a font setting from /etc/qt3/qtrc, and there is not font setting
+   in ~/.qt/qtrc - then use the setting from /etc/qt3/qtrc, as opposed to setting
+   a default.
+7. When reading Qt4 settings, also read /etc/xdg/Trolltech.conf
 
 0.53
 ----
@@ -106,7 +112,7 @@
       Listview appearance
       Slider appearance
 2. If KDE_SESSION_VERSION is set to >=4, then read settings from
-   $XDG_CONFIG_HOME/TrollTech.conf
+   $XDG_CONFIG_HOME/Trolltech.conf
 3. Lighten focus rectangle.
 4. Fixed tab shift for GTK 2.10.11. Possibly should be applied to an earlier 
     version, but not sure.

@@ -612,7 +612,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
     }
 #endif
 
-    if(rd&RD_FONT && (found&RD_FONT || setDefaultFont))  /* No need to check if read in */
+    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.font && setDefaultFont)))  /* No need to check if read in */
     {
         if(qtSettings.font)
         {
@@ -1278,18 +1278,24 @@ static gboolean qtInit(Options *opts)
             if(useQt3Settings())
             {
                 qtSettings.qt4=FALSE;
-                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, FALSE, FALSE);
-                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, FALSE, FALSE);
-                readRc(".qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, FALSE, TRUE, FALSE);
+                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                       opts, TRUE, FALSE, FALSE);
+                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                       opts, TRUE, FALSE, FALSE);
+                readRc(".qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                       opts, FALSE, TRUE, FALSE);
             }
             else
             {
-                static const char *constQt4ConfFile="Trolltech.conf";
+                #define QT4_CFG_FILE "Trolltech.conf"
 
-                char *confFile=(char *)malloc(strlen(xdg)+strlen(constQt4ConfFile)+2);
+                char *confFile=(char *)malloc(strlen(xdg)+strlen(QT4_CFG_FILE)+2);
 
-                sprintf(confFile, "%s/%s", xdg, constQt4ConfFile);
-                readRc(confFile, RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST, opts, TRUE, TRUE, TRUE);
+                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                       opts, TRUE, FALSE, TRUE);
+                sprintf(confFile, "%s/"QT4_CFG_FILE, xdg);
+                readRc(confFile, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                       opts, TRUE, TRUE, TRUE);
                 free(confFile);
                 qtSettings.qt4=TRUE;
             }
@@ -1636,8 +1642,11 @@ static void qtExit()
     }
 }
 
+#define SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL) \
+    st->itm[state]=rc->color_flags[state]&ITEM ? rc->itm[state] : qtSettings.colors[PAL][QTP_COL];
+
 #define SET_COLOR(st, rc, itm, ITEM, state, QTP_COL) \
-    st->itm[state]=rc->color_flags[state]&ITEM ? rc->itm[state] : qtSettings.colors[GTK_STATE_ACTIVE==state ? PAL_INACTIVE : PAL_ACTIVE][QTP_COL];
+    SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE)
 
 static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
 {
@@ -1650,13 +1659,31 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_NORMAL, COLOR_BACKGROUND)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_SELECTED, COLOR_SELECTED)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_INSENSITIVE, COLOR_WINDOW)
-    SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED)
+    /*SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED)*/
+    if(opts->inactiveHighlight)
+    {
+        GdkColor midColor;
+
+        generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
+                         &(qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]),
+                         &midColor, INACTIVE_HIGHLIGHT_FACTOR);
+        style->base[GTK_STATE_ACTIVE]=midColor;
+    }
+    else
+        SET_COLOR_PAL(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED, PAL_INACTIVE)
+
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_PRELIGHT, COLOR_SELECTED)
 
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_NORMAL, COLOR_TEXT)
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_SELECTED, COLOR_TEXT_SELECTED)
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_INSENSITIVE, COLOR_MID)
-    SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED)
+    /*SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED)*/
+
+    if(opts->inactiveHighlight)
+        SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT)
+    else
+        SET_COLOR_PAL(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED, PAL_INACTIVE)
+
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_PRELIGHT, COLOR_TEXT)
 
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_NORMAL, COLOR_FOREGROUND)
