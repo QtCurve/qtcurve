@@ -673,6 +673,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(darkerBorders)
             QTC_CFG_READ_BOOL(vArrows)
             QTC_CFG_READ_BOOL(framelessGroupBoxes)
+            QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
 #ifdef __cplusplus
             QTC_CFG_READ_BOOL(stdSidebarButtons)
@@ -805,6 +806,7 @@ static void defaultSettings(Options *opts)
     opts->vArrows=false;
     opts->framelessGroupBoxes=false;
     opts->colorMenubarMouseOver=false;
+    opts->inactiveHighlight=false;
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
     opts->gtkScrollViews=false;
@@ -1132,6 +1134,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(darkerBorders)
         CFG_WRITE_ENTRY(vArrows)
         CFG_WRITE_ENTRY(framelessGroupBoxes)
+        CFG_WRITE_ENTRY(inactiveHighlight)
 #ifdef __cplusplus
         CFG_WRITE_ENTRY(stdSidebarButtons)
 #endif

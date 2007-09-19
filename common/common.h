@@ -235,7 +235,7 @@ typedef GdkColor color;
 #define MIN_HIGHLIGHT_FACTOR        -50
 #define MENUBAR_DARK_FACTOR        0.97
 #define POPUPMENU_LIGHT_FACTOR     1.15
-/*#define INACTIVE_HIGHLIGHT_FACTOR  1.15*/
+#define INACTIVE_HIGHLIGHT_FACTOR  1.20
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9
@@ -847,7 +847,8 @@ typedef struct
                      colorMenubarMouseOver,
                      darkerBorders,
                      vArrows,
-                     framelessGroupBoxes;
+                     framelessGroupBoxes,
+                     inactiveHighlight;
     EMouseOver       coloredMouseOver;
     ETBarBorder      toolbarBorders;
     EDefBtnIndicator defBtnIndicator;

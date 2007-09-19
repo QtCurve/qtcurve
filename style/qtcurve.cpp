@@ -331,7 +331,7 @@ static void readPal(QString &line, QPalette::ColorGroup grp, QPalette &pal)
             QColor col;
 
             setRgb(&col, (*it).toLatin1().constData());
-            pal.setBrush(grp, (QPalette::ColorRole)i, col);
+            pal.setColor(grp, (QPalette::ColorRole)i, col);
         }
     }
 
@@ -455,16 +455,6 @@ QtCurveStyle::QtCurveStyle()
 
     if(EFFECT_NONE==opts.buttonEffect)
         CEtchCheck::disable();
-
-    QPalette pal;
-    QFont    font;
-
-    // Set palette from Qt3 settings. NOTE: This will only affect Qt-only apps.
-    if(readQt3(pal, font))
-    {
-        QApplication::setPalette(pal);
-        QApplication::setFont(font);
-    }
 
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMenuitemCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Background), itsBackgroundCols);
@@ -594,6 +584,16 @@ void QtCurveStyle::polish(QPalette &palette)
         newContrast=true;
     }
 
+    QPalette pal;
+    QFont    font;
+
+    // Set palette from Qt3 settings.
+    if(readQt3(pal, font))
+    {
+        palette=pal;
+        QApplication::setFont(font);
+    }
+
     bool newMenu(newContrast ||
                  itsMenuitemCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Highlight)),
          newGray(newContrast ||
@@ -666,6 +666,14 @@ void QtCurveStyle::polish(QPalette &palette)
     for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)
         if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
             palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i, palette.color(QPalette::Active, (QPalette::ColorRole)i));
+
+    if(opts.inactiveHighlight)
+    {
+        palette.setColor(QPalette::Inactive, QPalette::Highlight,
+                          midColor(palette.color(QPalette::Active, QPalette::Window),
+                                   palette.color(QPalette::Active, QPalette::Highlight), INACTIVE_HIGHLIGHT_FACTOR));
+        palette.setColor(QPalette::Inactive, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::WindowText));
+    }
 }
 
 void QtCurveStyle::polish(QWidget *widget)
@@ -697,7 +705,15 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->inherits("Q3DockWindowResizeHandle")))
         widget->setAttribute(Qt::WA_Hover, true);
     else if (qobject_cast<QProgressBar *>(widget))
+    {
+        if(widget->palette().color(QPalette::Inactive, QPalette::HighlightedText)!=widget->palette().color(QPalette::Active, QPalette::HighlightedText))
+        {
+            QPalette pal(widget->palette());
+            pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
+            widget->setPalette(pal);
+        }
         widget->installEventFilter(this);
+    }
     else if (widget->inherits("Q3Header"))
     {
         widget->setMouseTracking(true);
@@ -1543,12 +1559,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_Frame:
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
             {
-                QLinearGradient grad(0, 0, r.width(), r.height());
+                QLinearGradient grad(0, 0, r.width(), 1);
 
-                grad.setColorAt(0, palette.base().color());
+                grad.setColorAt(0, palette.text().color());
                 grad.setColorAt(1, palette.background().color());
                 painter->save();
-                painter->fillRect(r, QBrush(grad));
+                painter->fillRect(QRect(r.x(), (r.y()+r.height())-3, r.width(), 2), QBrush(grad));
                 painter->restore();
             }
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
@@ -2564,14 +2580,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     else if (indicatorPos > r.width())
                         painter->setPen(palette.text().color());
                     else
-                        painter->setPen(palette.base().color());
+                        painter->setPen(palette.highlightedText().color());
                 }
                 else
                 {
                     if (progressIndicatorPos >= 0 && progressIndicatorPos <= r.width())
                         leftRect = QRect(r.left(), r.top(), progressIndicatorPos, r.height());
                     else if (progressIndicatorPos > r.width())
-                        painter->setPen(palette.base().color());
+                        painter->setPen(palette.highlightedText().color());
                     else
                         painter->setPen(palette.text().color());
                 }
@@ -2579,7 +2595,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->drawText(r, bar->text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 if (!leftRect.isNull())
                 {
-                    painter->setPen(flip ? palette.text().color() : palette.base().color());
+                    painter->setPen(flip ? palette.text().color() : palette.highlightedText().color());
                     painter->setClipRect(leftRect, Qt::IntersectClip);
                     painter->drawText(r, bar->text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 }
@@ -4656,7 +4672,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_SpinBox:
             //newSize.setHeight(sizeFromContents(CT_LineEdit, option, size, widget).height());
-            newSize.rheight() -= 2+(1 - newSize.rheight() & 1);
+            newSize.rheight() -= (1 - newSize.rheight() & 1);
             break;
         case CT_ToolButton:
             newSize.rheight() += 3;

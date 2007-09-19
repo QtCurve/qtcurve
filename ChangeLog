@@ -1,9 +1,15 @@
-0.53.1
-------
+0.54
+----
 1. Qt4 build now uses CMake also. i.e. CMake will determine if to compile
    KDE4 config dialog or not.
-2. Fix for KDE4's setting of inactive palette!=active palette
-   (Left highlight and highlighted text as configurable)
+2. New option 'inactiveHighlight', if set then use a mix of highlight and background
+   colour as highlight for inactive windows/elements.
+3. Set KDE4 colours from Q3 settings if running under KDE3.
+4. Fix for KDE4's setting of inactive palette!=active palette
+   (Left highlight and highlightedText as configurable)
+5. Use 'highlightedText' for highlighted part of progressbar label.
+6. Increase height of spinboxes.
+7. Alter KTitleWidget (again!)
 
 0.53
 ----

@@ -646,24 +646,27 @@
        <string>Advanced</string>
       </attribute>
       <layout class="QGridLayout" >
-       <property name="leftMargin" >
-        <number>9</number>
-       </property>
-       <property name="topMargin" >
-        <number>9</number>
-       </property>
-       <property name="rightMargin" >
-        <number>9</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>9</number>
-       </property>
-       <property name="horizontalSpacing" >
-        <number>6</number>
-       </property>
-       <property name="verticalSpacing" >
-        <number>6</number>
-       </property>
+       <item row="0" column="0" colspan="3" >
+        <widget class="QCheckBox" name="gtkComboMenus" >
+         <property name="text" >
+          <string>Gtk style comboboxes (KDE4 only)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3" >
+        <widget class="QCheckBox" name="gtkScrollViews" >
+         <property name="text" >
+          <string>Gtk style scrollviews (KDE3 and KDE4 only)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="3" >
+        <widget class="QCheckBox" name="gtkButtonOrder" >
+         <property name="text" >
+          <string>Gtk button order</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="0" >
         <widget class="QCheckBox" name="mapKdeIcons" >
          <property name="text" >
@@ -685,20 +688,34 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1" >
+       <item row="5" column="0" colspan="2" >
+        <widget class="QCheckBox" name="inactiveHighlight" >
+         <property name="whatsThis" >
+          <string>&lt;h2>&lt;font color="#ff0000">Warning: Experimental!&lt;/font>&lt;/h1>&lt;p>&lt;p>Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p>
+
+&lt;p>If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent.&lt;/p>
+
+&lt;p>&lt;b>Note:&lt;/b> This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p></string>
+         </property>
+         <property name="text" >
+          <string>Use blended background/highlight colour for highlight of inactive elements</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>Character to use for password entries:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1" >
         <widget class="QPushButton" name="passwordChar" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" >
-        <widget class="QLabel" name="label" >
-         <property name="text" >
-          <string>Character to use for password entries:</string>
          </property>
         </widget>
        </item>
@@ -717,27 +734,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="1" column="0" colspan="3" >
-        <widget class="QCheckBox" name="gtkScrollViews" >
-         <property name="text" >
-          <string>Gtk style scrollviews (KDE3 and KDE4 only)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="3" >
-        <widget class="QCheckBox" name="gtkComboMenus" >
-         <property name="text" >
-          <string>Gtk style comboboxes (KDE4 only)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="3" >
-        <widget class="QCheckBox" name="gtkButtonOrder" >
-         <property name="text" >
-          <string>Gtk button order</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -847,6 +843,7 @@
   <tabstop>gtkButtonOrder</tabstop>
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>
+  <tabstop>inactiveHighlight</tabstop>
   <tabstop>passwordChar</tabstop>
   <tabstop>optionBtn</tabstop>
  </tabstops>
