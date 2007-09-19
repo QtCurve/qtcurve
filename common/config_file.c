@@ -219,7 +219,6 @@ static EEffect toEffect(const char *str, EEffect def)
     return def;
 }
 
-#ifndef QTC_CONFIG_DIALOG
 static EShading toShading(const char * str, EShading def)
 {
     if(str)
@@ -234,7 +233,6 @@ static EShading toShading(const char * str, EShading def)
 
     return def;
 }
-#endif
 
 #endif
 
@@ -574,8 +572,13 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_EFFECT(ENTRY) \
     opts->ENTRY=toEffect(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#ifdef QTC_CONFIG_DIALOG
+#define QTC_CFG_READ_SHADING(ENTRY, UNUSED) \
+    opts->ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+#else
 #define QTC_CFG_READ_SHADING(ENTRY, DEF) \
     ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
+#endif
 
 #ifdef __cplusplus
 static bool readConfig(const QString &file, Options *opts, Options *def)
@@ -690,9 +693,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
 #endif
-#ifndef QTC_CONFIG_DIALOG
             QTC_CFG_READ_SHADING(shading, shading);
-#endif
 
 #ifndef __cplusplus
             releaseConfig(cfg);
@@ -807,6 +808,9 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=false;
     opts->colorMenubarMouseOver=false;
     opts->inactiveHighlight=false;
+#ifdef QTC_CONFIG_DIALOG
+    opts->shading=SHADING_HSL;
+#endif
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
     opts->gtkScrollViews=false;
@@ -1001,7 +1005,6 @@ static QString toStr(const QColor &col)
     return colorStr;
 }
 
-#if 0
 static const char *toStr(EShading s)
 {
     switch(s)
@@ -1015,7 +1018,6 @@ static const char *toStr(EShading s)
             return "hsv";
     }
 }
-#endif
 
 #if QT_VERSION >= 0x040000
 #define CFG config
@@ -1143,10 +1145,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(gtkComboMenus)
         CFG_WRITE_ENTRY(gtkButtonOrder)
         CFG_WRITE_ENTRY(mapKdeIcons)
-#if 0
-        if(!exportingStyle)
-            CFG_WRITE_ENTRY_FORCE(shading);
-#endif
+        CFG_WRITE_ENTRY(shading)
         cfg->sync();
         return true;
     }

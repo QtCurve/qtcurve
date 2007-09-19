@@ -874,6 +874,9 @@ typedef struct
                      customMenuNormTextColor,
                      customMenuSelTextColor,
                      customCheckRadioColor;
+    #ifdef QTC_CONFIG_DIALOG
+    EShading         shading;
+    #endif
 #ifndef __cplusplus
 } Options;
 #else

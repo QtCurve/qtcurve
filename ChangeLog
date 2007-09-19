@@ -10,6 +10,7 @@
 5. Use 'highlightedText' for highlighted part of progressbar label.
 6. Increase height of spinboxes.
 7. Alter KTitleWidget (again!)
+8. Add gui to set shading option.
 
 0.53
 ----
