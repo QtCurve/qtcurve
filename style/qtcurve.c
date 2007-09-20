@@ -248,7 +248,7 @@ static GdkGC * setMidColor(GtkStyle *style, GdkRectangle *area, int num, double 
                            GdkColor *a, GdkColor *b, GdkWindow *window)
 {
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
-    GdkColor mid_color=*b;
+    GdkColor     mid_color=*b;
 
     generateMidColor(a, b, &mid_color, factor);
     gdk_rgb_find_color(style->colormap, &mid_color);
@@ -4487,7 +4487,7 @@ debugDisplayWidget(widget, 3);
                     *outer = qtcurveStyle->background_gc[5],
                     *selGc1= qtcurveStyle->menuitem_gc[0],
                     *selGc2= qtcurveStyle->menuitem_gc[IS_FLAT(opts.appearance) ? 0 : 3],
-                    *midgc=NULL;
+                    *midgc = selGc1;
         int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
         gboolean    firstTab=notebook ? FALSE : TRUE,
                     lastTab=notebook ? FALSE : TRUE,
@@ -4640,7 +4640,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    gdk_draw_line(window, selGc1, x+1, y+height-3, x+width-2, y+height-3);
+                    midgc=QTC_SET_MID_COLOR(col, &(qtcurveStyle->menuitem[0]));
+                    gdk_draw_line(window, midgc, x+1, y+height-3, x+width-2, y+height-3);
                     gdk_draw_line(window, selGc1, x+1, y+height-2, x+width-2, y+height-2);
 
                     clipArea.y=y+height-3;
@@ -4683,7 +4684,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    gdk_draw_line(window, selGc1, x+1, y+2, x+width-2, y+2);
+                    midgc=QTC_SET_MID_COLOR_FACTOR(col, &(qtcurveStyle->menuitem[0]), IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2);
+                    gdk_draw_line(window, midgc, x+1, y+2, x+width-2, y+2);
                     gdk_draw_line(window, selGc1, x+1, y+1, x+width-2, y+1);
 
                     clipArea.y=y;
@@ -4722,7 +4724,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    gdk_draw_line(window, selGc1, x+width-3, y+1, x+width-3, y+height-2);
+                    midgc=QTC_SET_MID_COLOR(col, &(qtcurveStyle->menuitem[0]));
+                    gdk_draw_line(window, midgc, x+width-3, y+1, x+width-3, y+height-2);
                     gdk_draw_line(window, selGc1, x+width-2, y+1, x+width-2, y+height-2);
 
                     clipArea.x=x+width-3;
@@ -4766,7 +4769,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    gdk_draw_line(window, selGc1, x+2, y+1, x+2, y+height-2);
+                    midgc=QTC_SET_MID_COLOR_FACTOR(col, &(qtcurveStyle->menuitem[0]), IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2);
+                    gdk_draw_line(window, midgc, x+2, y+1, x+2, y+height-2);
                     gdk_draw_line(window, selGc1, x+1, y+1, x+1, y+height-2);
 
                     clipArea.x=x;

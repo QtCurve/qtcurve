@@ -10,6 +10,7 @@
    in ~/.qt/qtrc - then use the setting from /etc/qt3/qtrc, as opposed to setting
    a default.
 7. When reading Qt4 settings, also read /etc/xdg/Trolltech.conf
+8. Nicer look for selected tab highlight.
 
 0.53
 ----
