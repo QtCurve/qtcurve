@@ -3229,6 +3229,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setPen(itsMenuitemCols[0]);
                                 painter->drawLine(r.left()+1, r.top()+1, r.right()-1, r.top()+1);
+                                painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2));
                                 painter->drawLine(r.left()+1, r.top()+2, r.right()-1, r.top()+2);
 
                                 painter->setClipRect(QRect(r.x(), r.y(), r.width(), 3));
@@ -3288,6 +3289,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setPen(itsMenuitemCols[0]);
                                 painter->drawLine(r.left()+1, r.bottom()-1, r.right()-1, r.bottom()-1);
+                                painter->setPen(midColor(fill, itsMenuitemCols[0]));
                                 painter->drawLine(r.left()+1, r.bottom()-2, r.right()-1, r.bottom()-2);
 
                                 painter->setClipRect(QRect(r.x(), r.y()+r.height()-3, r.width(), r.y()+r.height()-1));
@@ -3347,6 +3349,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setPen(itsMenuitemCols[0]);
                                 painter->drawLine(r.left()+1, r.top()+1, r.left()+1, r.bottom()-1);
+                                painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2));
                                 painter->drawLine(r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
 
                                 painter->setClipRect(QRect(r.x(), r.y(), 3, r.height()));
@@ -3406,6 +3409,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setPen(itsMenuitemCols[0]);
                                 painter->drawLine(r.right()-1, r.top()+1, r.right()-1, r.bottom()-1);
+                                painter->setPen(midColor(fill, itsMenuitemCols[0]));
                                 painter->drawLine(r.right()-2, r.top()+1, r.right()-2, r.bottom()-1);
 
                                 painter->setClipRect(QRect(r.x()+r.width()-3, r.y(), r.x()+r.width()-1, r.height()));
