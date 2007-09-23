@@ -11,6 +11,7 @@
    a default.
 7. When reading Qt4 settings, also read /etc/xdg/Trolltech.conf
 8. Nicer look for selected tab highlight.
+9. realloc() fix - thanks to 'hoodedone'
 
 0.53
 ----

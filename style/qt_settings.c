@@ -1209,8 +1209,7 @@ static void qtcAddEventFilter() /* GdkWindow *widget) */
 
 static void getGtk2CfgFile(char **tmpStr, const char *xdg, const char *f)
 {
-    *tmpStr=(char *)realloc(*tmpStr, strlen(xdg)+1+
-                                      +strlen(f)+1);
+    *tmpStr=(char *)realloc(*tmpStr, strlen(xdg)+1+strlen(f)+1);
     sprintf(*tmpStr, "%s/%s", xdg, f);
 }
 
@@ -1523,7 +1522,7 @@ static gboolean qtInit(Options *opts)
                                                              "widget_class \"*Statusbar.*Frame.GtkLabel\" style \"QtCFnt\"";
                     tmpStr=(char *)realloc(tmpStr, strlen(constStdPrefix)+strlen(qtSettings.font)+strlen(constStdSuffix)+
                                                    strlen(constBoldPrefix)+strlen(qtSettings.boldfont)+strlen(constBoldSuffix)+
-                                                   strlen(constGrpBoxBoldSuffix));
+                                                   strlen(constGrpBoxBoldSuffix)+1);
 
                     sprintf(tmpStr, "%s%s%s%s%s%s%s",
                                     constStdPrefix, qtSettings.font, constStdSuffix,
@@ -1532,7 +1531,7 @@ static gboolean qtInit(Options *opts)
                 }
                 else
                 {
-                    tmpStr=(char *)realloc(tmpStr, strlen(constBoldPrefix)+strlen(qtSettings.boldfont)+strlen(constBoldSuffix));
+                    tmpStr=(char *)realloc(tmpStr, strlen(constBoldPrefix)+strlen(qtSettings.boldfont)+strlen(constBoldSuffix)+1);
                     sprintf(tmpStr, "%s%s%s", constBoldPrefix, qtSettings.boldfont, constBoldSuffix);
                 }
 
