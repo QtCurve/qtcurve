@@ -1,3 +1,7 @@
+0.54.1
+------
+1. Fix compilation when cmake is called with -DQTC_MODIFY_MOZILLA=true
+
 0.54
 ----
 1. Converted buildsystem to CMake.
