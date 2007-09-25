@@ -1,6 +1,8 @@
 0.54.1
 ------
-1. Fix compilation when cmake is called with -DQTC_MODIFY_MOZILLA=true
+1. Supply a simple 'mkpkg' script to create packages with checkinstall.
+2. Fix compilation when cmake is called with -DQTC_MODIFY_MOZILLA=true
+3. Dont free() the values returned from gtk_widget_style_get()
 
 0.54
 ----
