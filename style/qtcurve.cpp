@@ -655,12 +655,12 @@ void QtCurveStyle::polish(QPalette &palette)
     }
 
     palette.setColor(QPalette::Active, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[5]);
+    palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
     palette.setColor(QPalette::Inactive, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Inactive, QPalette::Dark, itsBackgroundCols[5]);
+    palette.setColor(QPalette::Inactive, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
     palette.setColor(QPalette::Inactive, QPalette::WindowText, palette.color(QPalette::Active, QPalette::WindowText));
     palette.setColor(QPalette::Disabled, QPalette::Light, itsBackgroundCols[0]);
-    palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[5]);
+    palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
 
     // Fix KDE4's palette...
     for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)
@@ -1545,7 +1545,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if (frameV2.features & QStyleOptionFrameV2::Flat)
                 {
                     QPen oldPen = painter->pen();
-                    painter->setPen(itsBackgroundCols[5]);
+                    painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                     painter->drawLine(frameV2.rect.topLeft(), frameV2.rect.topRight());
                     painter->setPen(oldPen);
                 }
@@ -2122,7 +2122,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 for (int i = 0; i < 4; ++i) {
                     painter->setPen(QPen(itsBackgroundCols[0], 1));
                     painter->drawLine(x, sy - 1 , sx + 1, sw);
-                    painter->setPen(QPen(itsBackgroundCols[5], 1));
+                    painter->setPen(QPen(itsBackgroundCols[QT_STD_BORDER], 1));
                     painter->drawLine(x, sy, sx, sw);
                     sx -= s;
                     sy += s;
@@ -2133,7 +2133,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 {
                     painter->setPen(QPen(itsBackgroundCols[0], 1));
                     painter->drawLine(sx - 1, sw, sw, sy - 1);
-                    painter->setPen(QPen(itsBackgroundCols[5], 1));
+                    painter->setPen(QPen(itsBackgroundCols[QT_STD_BORDER], 1));
                     painter->drawLine(sx, sw, sw, sy);
                     sx += s;
                     sy += s;
@@ -2351,7 +2351,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            painter->setPen(itsBackgroundCols[5]);
+                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                             painter->drawLine(r.x()+r.width()-2, r.y()+5, r.x()+r.width()-2, r.y()+r.height()-6);
                             painter->setPen(itsBackgroundCols[0]);
                             painter->drawLine(r.x()+r.width()-1, r.y()+5, r.x()+r.width()-1, r.y()+r.height()-6);
@@ -2372,7 +2372,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            painter->setPen(itsBackgroundCols[5]);
+                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                             painter->drawLine(r.x()+5, r.y()+r.height()-2, r.x()+r.width()-6,
                                         r.y()+r.height()-2);
                             painter->setPen(itsBackgroundCols[0]);
@@ -2678,7 +2678,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     bool reverse = menuItem->direction == Qt::RightToLeft;
 
-                    painter->setPen(itsBackgroundCols[5]);
+                    painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                     painter->drawLine(menuItem->rect.left() + 4 + (reverse ? 0 : w), menuItem->rect.center().y(),
                                     menuItem->rect.right() - 4 - (reverse ? w : 0), menuItem->rect.center().y());
 
@@ -3556,7 +3556,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
 #endif
                 {
-                    painter->setPen(use[5]);
+                    painter->setPen(use[QT_STD_BORDER]);
                     painter->drawLine(r.left(), r.top(), r.right(), r.top());
                     painter->drawLine(r.left(), r.bottom(), r.right(), r.bottom());
 
@@ -3588,7 +3588,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
                 {
 
-                    painter->setPen(use[5]);
+                    painter->setPen(use[QT_STD_BORDER]);
                     painter->drawLine(r.left(), r.top(), r.left(), r.bottom());
                     painter->drawLine(r.right(), r.top(), r.right(), r.bottom());
 
@@ -3959,7 +3959,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if (option->subControls & SC_SliderTickmarks)
                 {
                     QPen oldPen = painter->pen();
-                    painter->setPen(backgroundColors(option)[5]);
+                    painter->setPen(backgroundColors(option)[QT_STD_BORDER]);
                     int tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
                         available(pixelMetric(PM_SliderSpaceAvailable, slider, widget)),
                         interval(slider->tickInterval);
@@ -4452,7 +4452,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #if !defined QTC_SIMPLE_SCROLLBARS
                     if(noButtons && (!atMin || !atMax))
                     {
-                        painter->setPen(backgroundColors(option)[5]);
+                        painter->setPen(backgroundColors(option)[QT_STD_BORDER]);
 
                         if(horiz)
                         {
@@ -5827,13 +5827,13 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
     else
     {
-        p->setPen(itsMenuitemCols[5]);
+        p->setPen(itsMenuitemCols[QT_STD_BORDER]);
         p->setBrush(itsMenuitemCols[ORIGINAL_SHADE]);
         drawRect(p, r);
     }
     if(QTC_ROUNDED && r.width()>2 && ROUNDED_ALL!=round)
     {
-        p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[5]));
+        p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[QT_STD_BORDER]));
         if(!(round&CORNER_TL) || !drawFull)
             p->drawPoint(r.x(), r.y());
         if(!(round&CORNER_BL) || !drawFull)

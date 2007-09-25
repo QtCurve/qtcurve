@@ -9,4 +9,17 @@ To build and install:
 5. make install
 
 
-I you have KDE4 installed, then cmake will detect this, and compile QtCurve's config dialog.
+If you have KDE4 installed, then cmake will detect this, and compile QtCurve's config dialog.
+
+
+Creating Distribution Packages
+------------------------------
+
+CMake (as of v2.4.x) does not support building rpm or deb packages, and a simple
+checkinstall will not work. CMake 2.6 should support rpm and deb packages, but until
+then I have supplied a simple shell script to build a package with checkinstall.
+To use this:
+
+1. Install QtCurve as described above
+2. From within the 'build' folder from step 2 above, call ../common/mkpkg
+3. Answer the checkinstall questions.
