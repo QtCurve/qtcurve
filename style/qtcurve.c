@@ -479,6 +479,11 @@ static void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size
                              NULL);
     *indicator_size= tmp_size ? *tmp_size : defaultOptionIndicatorSize;
     *indicator_spacing = tmp_spacing ? *tmp_spacing : defaultOptionIndicatorSpacing;
+
+    if (tmp_size)
+        gtk_requisition_free(tmp_size);
+    if (tmp_spacing)
+        gtk_border_free(tmp_spacing);
 }
 
 static gboolean withinRect(GdkRectangle *rect, int x, int y)
