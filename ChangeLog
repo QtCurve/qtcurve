@@ -3,6 +3,7 @@
 1. Supply a simple 'mkpkg' script to create packages with checkinstall.
 2. Fix compilation when cmake is called with -DQTC_MODIFY_MOZILLA=true
 3. Dont free() the values returned from gtk_widget_style_get()
+4. Fix frameless groupboxes in Gimp 2.4
 
 0.54
 ----

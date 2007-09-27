@@ -4250,15 +4250,17 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         if(GTK_IS_LABEL(widget) && GTK_IS_FRAME(widget->parent) && !isOnStatusBar(widget, 0))
         {
+
+            int diff=widget->allocation.x-widget->parent->allocation.x;
             if(opts.framelessGroupBoxes)
-                x-=QTC_MIN(x, 6);
+                x-=QTC_MAX(0, QTC_MIN(diff, 6));
             else
                 x+=5;
             if(area)
             {
                 area2=*area;
                 if(opts.framelessGroupBoxes)
-                    area2.x-=QTC_MIN(area2.x, 6);
+                    area2.x-=QTC_MAX(0, QTC_MIN(diff, 6));
                 else
                     area2.x+=5;
                 area=&area2;
