@@ -1151,7 +1151,6 @@ static Atom kipcCommAtom;
 static Atom desktopWindowAtom;
 static Atom knwmCommAtom;
 
-static gboolean init();
 static void qtExit();
 static GdkFilterReturn qtGdkEventFilter(GdkXEvent *xevent, GdkEvent *gevent, gpointer data)
 {
