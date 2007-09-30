@@ -2604,30 +2604,24 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             }
             break;
         case CE_MenuBarItem:
-        {
-            bool down(state&(State_On|state&State_Sunken)),
-                 active(state&State_Enabled && (down || (state&State_Selected && opts.menubarMouseOver)));
-            int  pad(pixelMetric(PM_MenuBarVMargin));
-
-            painter->save();
-
-            QStyleOption opt(*option);
-
-            opt.rect.adjust(0, -pad, 0, pad);
-            drawMenuOrToolBarBackground(painter, opt.rect, &opt);
-
-            if(active)
-                drawMenuItem(painter, r, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
-                             opts.colorMenubarMouseOver || down ? itsMenuitemCols : itsBackgroundCols);
-
             if (const QStyleOptionMenuItem *mbi = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
+                bool down(state&(State_On|state&State_Sunken)),
+                     active(state&State_Enabled && (down || (state&State_Selected && opts.menubarMouseOver)));
                 uint alignment(Qt::AlignCenter|Qt::TextShowMnemonic|Qt::TextDontClip|Qt::TextSingleLine);
 
                 if (!styleHint(SH_UnderlineShortcut, mbi, widget))
                     alignment|=Qt::TextHideMnemonic;
 
                 QPixmap pix(mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), (mbi->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled));
+
+                painter->save();
+
+                drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
+
+                if(active)
+                    drawMenuItem(painter, r, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
+                                opts.colorMenubarMouseOver || down ? itsMenuitemCols : itsBackgroundCols);
 
                 if (!pix.isNull())
                     drawItemPixmap(painter, mbi->rect, alignment, pix);
@@ -2652,11 +2646,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->setPen(col);
                     painter->drawText(r, alignment, mbi->text);
                 }
+                painter->restore();
             }
-
-            painter->restore();
             break;
-        }
         case CE_MenuItem:
             if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {

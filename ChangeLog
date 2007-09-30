@@ -1,6 +1,7 @@
 0.54.1
 ------
 1. Supply a simple 'mkpkg' script to create packages with checkinstall.
+2. Fix drawing of menubar on KDE4's konqueror.
 
 0.54
 ----
