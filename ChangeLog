@@ -1,3 +1,7 @@
+0.55
+----
+1. Ability to create custom themes. qtc_<name>.themerc
+
 0.54.1
 ------
 1. Supply a simple 'mkpkg' script to create packages with checkinstall.

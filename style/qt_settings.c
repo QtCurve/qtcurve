@@ -18,8 +18,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include "common.h"
 #include "config.h"
+#include "common.h"
 #define CONFIG_READ
 #include "config_file.c"
 #include <gtk/gtk.h>
@@ -128,7 +128,8 @@ struct QtData
     GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS];
     char            *font,
                     *icons,
-                    *boldfont;
+                    *boldfont,
+                    *styleName;
     GtkToolbarStyle toolbarStyle;
     struct QtIcons  iconSizes;
     gboolean        buttonIcons;
@@ -241,6 +242,7 @@ enum
     RD_BUTTON_ICONS      = 0x0080,
     RD_SMALL_ICON_SIZE   = 0x0100,
     RD_LIST_COLOR        = 0x0200,
+    RD_STYLE             = 0x0400
 };
 
 static char * getKdeHome()
@@ -250,7 +252,7 @@ static char * getKdeHome()
 
     if(!kdeHome)
     {
-        char *env=getenv("KDEHOME");
+        char *env=getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
 
         if(env)
             kdeHome=env;
@@ -269,6 +271,23 @@ static char * getKdeHome()
     }
 
     return kdeHome;
+}
+
+static char * themeFile(const char *prefix, const char *name, char **tmpStr)
+{
+    *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(QTC_THEME_DIR)+1+strlen(name)+strlen(QTC_THEME_SUFFIX)+1);
+
+    if(*tmpStr)
+    {
+        struct stat st;
+
+        sprintf(*tmpStr, "%s/%s/%s%s", prefix, QTC_THEME_DIR, name, QTC_THEME_SUFFIX);
+
+        if(0==stat(*tmpStr, &st))
+            return *tmpStr;
+    }
+
+    return NULL;
 }
 
 static void parseQtColors(char *line, int p)
@@ -491,6 +510,14 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     found|=RD_INACT_PALETTE;
                 }
 #endif
+                else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==memcmp(line, "style=", 6))
+                {
+                    int len=strlen(line);
+                    qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1);
+                    if('\n'==line[len-1])
+                        line[len-1]='\0';
+                    strcpy(qtSettings.styleName, &line[6]);
+                }
                 else if (( !qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==memcmp(line, "font=", 5)) ||
                          ( qt4 && SECT_QT & rd&RD_FONT && !(found&RD_FONT) &&
@@ -793,10 +820,7 @@ static char * getIconPath()
     len++;
 
     if(path && len!=(strlen(path)+1))
-    {
         free(path);
-        path=NULL;
-    }
 
     if(!path)
         path=(char *)malloc(len+1);
@@ -1256,7 +1280,8 @@ static gboolean qtInit(Options *opts)
 #ifdef HAVE_LOCALE_H
                         *locale=NULL,
 #endif
-                        *tmpStr=NULL;
+                        *tmpStr=NULL,
+                        *rcFile=NULL;
             GtkSettings *settings=NULL;
             const char  *xdg=xdgConfigFolder();
 
@@ -1270,20 +1295,20 @@ static gboolean qtInit(Options *opts)
             qtSettings.iconSizes.mnuSize=16;
             qtSettings.iconSizes.dlgSize=22;
             qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=0;
+            qtSettings.styleName=NULL;
 
             lastRead=now;
 
             defaultSettings(opts);
-            readConfig(NULL, opts, opts);
 
             if(useQt3Settings())
             {
                 qtSettings.qt4=FALSE;
-                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, FALSE);
-                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, FALSE);
-                readRc(".qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                readRc(".qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, FALSE, TRUE, FALSE);
             }
             else
@@ -1292,14 +1317,32 @@ static gboolean qtInit(Options *opts)
 
                 char *confFile=(char *)malloc(strlen(xdg)+strlen(QT4_CFG_FILE)+2);
 
-                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, TRUE);
                 sprintf(confFile, "%s/"QT4_CFG_FILE, xdg);
-                readRc(confFile, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST,
+                readRc(confFile, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, TRUE, TRUE);
                 free(confFile);
                 qtSettings.qt4=TRUE;
             }
+
+            /* Is the user using a non-default QtCurve style? */
+            if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, QTC_THEME_PREFIX))
+            {
+#ifdef QTC_DEBUG
+                printf("Look for themerc file for %s\n", qtSettings.styleName);
+#endif
+                rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
+
+                if(!rcFile)
+                {
+                    rcFile=themeFile(KDE_PREFIX(qtSettings.qt4 ? 4 : 3), qtSettings.styleName, &tmpStr);
+                    if(!rcFile)
+                        rcFile=themeFile(KDE_PREFIX(qtSettings.qt4 ? 3 : 4), qtSettings.styleName, &tmpStr);
+                }
+            }
+
+            readConfig(rcFile, opts, opts);
 
             /* Check if we're firefox... */
             if((app=getAppName()))
@@ -1700,7 +1743,7 @@ static void qtSetFont(GtkRcStyle *rc_style)
     if(qtSettings.font)
     {
         if (rc_style->font_desc)
-            pango_font_description_free(rc_style->font_desc);
+            pango_font_description_free (rc_style->font_desc);
 
         rc_style->font_desc = pango_font_description_from_string (qtSettings.font);
     }

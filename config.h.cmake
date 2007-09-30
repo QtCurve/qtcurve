@@ -4,6 +4,8 @@
 #define VERSION           "@QTCURVE_VERSION_FULL@"
 #define KDE3_ICONS_PREFIX "@KDE3_ICONS_PREFIX@"
 #define KDE4_ICONS_PREFIX "@KDE4_ICONS_PREFIX@"
+#define KDE3PREFIX        "@KDE3PREFIX@"
+#define KDE4PREFIX        "@KDE4PREFIX@"
 #define GTK_THEME_DIR     "@GTK_THEME_DIR@/gtk-2.0"
 
 #cmakedefine QTC_ADD_EVENT_FILTER

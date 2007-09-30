@@ -21,6 +21,34 @@ The following options may supplied to cmake:
         move ~/.mime.types and ~/.mailcap into ~/.mozilla)
 
 
+Themes
+------
+As of v0.55, you can create QtCurve based themes. These will appear with KDE's style
+control panel's combobox of styles. To create a new theme, select 'QtCurve' from
+within KDE's style panel, then configure QtCurve as required. After this, in QtCurve's
+config dialog, select 'Export theme' from the options menu button. You will then be
+prompted to give your new 'theme' a name, and a comment. QtCurve will then create a file
+named 'qtc_<name>.themerc (e.g. qtc_klearlooks.themerc) - this will have the following
+format:
+
+    [Misc]
+    Name=KlearLooks
+    Comment=Clearlooks inspired style
+    [KDE]
+    WidgetStyle=qtc_klearlooks
+    [Settings]
+    animatedProgress=false
+    appearance=gradient
+    ....rest of qtcurve settings...
+
+To use this theme, either copy qtc_<name>.themerc to
+$KDEHOME/share/apps/kstyle/themes/ (usually ~/.kdee/share/apps/kstyle/themes/)
+or copy to <kde install prefix>/share/apps/kstyle/themes/ (usually
+/usr/share/apps/kstyle/themes/)
+
+When KDE's style panel is restarted, your new theme should appear in the list.
+
+
 Creating Distribution Packages
 ------------------------------
 
