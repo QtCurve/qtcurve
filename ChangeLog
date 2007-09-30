@@ -5,6 +5,7 @@
 3. Dont free() the values returned from gtk_widget_style_get(), use
    gtk_requisition_free() and gtk_border_free()
 4. Fix frameless groupboxes in Gimp 2.4
+5. After free'ing memory, set var to NULL.
 
 0.54
 ----
