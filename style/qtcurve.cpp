@@ -106,6 +106,50 @@ static const int constProgressBarFps = 20;
 
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
+static QString readEnvPath(const char *env)
+{
+   QByteArray path=getenv(env);
+
+   return path.isEmpty() ? QString::null : QFile::decodeName(path);
+}
+
+static QString kdeHome()
+{
+    QString env(readEnvPath(getuid() ? "KDEHOME" : "KDEROOTHOME"));
+
+    return env.isEmpty()
+                ? QDir::homePath()+"/.kde"
+                : env;
+}
+
+static void getStyles(const QString &dir, QStringList &styles)
+{
+    QDir        d(dir+QTC_THEME_DIR);
+    QStringList filters;
+
+    filters << QString(QTC_THEME_PREFIX"*"QTC_THEME_SUFFIX);
+    d.setNameFilters(filters);
+
+    QStringList                entries(d.entryList());
+    QStringList::ConstIterator it(entries.begin()),
+                               end(entries.end());
+
+    for(; it!=end; ++it)
+    {
+        QString style((*it).left((*it).lastIndexOf(QTC_THEME_SUFFIX)));
+
+        if(!styles.contains(style))
+            styles.append(style);
+    }
+}
+
+static QString themeFile(const QString &dir, const QString &n)
+{
+    QString name(dir+QTC_THEME_DIR+n+QTC_THEME_SUFFIX);
+
+    return QFile(name).exists() ? name : QString();
+}
+
 class QtCurveStylePlugin : public QStylePlugin
 {
     public:
@@ -115,12 +159,23 @@ class QtCurveStylePlugin : public QStylePlugin
 
     QStringList keys() const
     {
-        return QStringList() << "QtCurve";
+        QStringList list;
+        list << "QtCurve";
+
+        getStyles(kdeHome(), list);
+        getStyles(KDE_PREFIX(3), list);
+        getStyles(KDE_PREFIX(4), list);
+
+        return list;
     }
 
     QStyle * create(const QString &key)
     {
-        return (key.toLower() == "qtcurve") ? new QtCurveStyle : 0;
+        return "qtcurve"==key.toLower()
+                    ? new QtCurveStyle
+                    : 0==key.indexOf(QTC_THEME_PREFIX)
+                        ? new QtCurveStyle(key)
+                        : 0;
     }
 };
 
@@ -432,7 +487,7 @@ static bool readQt3(QPalette &pal, QFont &font)
 #define QTC_SKIP_TASKBAR  (APP_SKIP_TASKBAR==theThemedApp || APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp)
 #define QTC_CAN_DO_EFFECT (QTC_DO_EFFECT && CEtchCheck::canEtch())
 
-QtCurveStyle::QtCurveStyle()
+QtCurveStyle::QtCurveStyle(const QString &name)
             : itsSliderCols(NULL),
               itsDefBtnCols(NULL),
               itsMouseOverCols(NULL),
@@ -447,8 +502,22 @@ QtCurveStyle::QtCurveStyle()
               itsPos(-1, -1),
               itsHoverWidget(NULL)
 {
+    QString rcFile;
+
     defaultSettings(&opts);
-    readConfig(NULL, &opts, &opts);
+    if(!name.isEmpty())
+    {
+        rcFile=themeFile(kdeHome(), name);
+
+        if(rcFile.isEmpty())
+        {
+            rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), name);
+            if(rcFile.isEmpty())
+                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), name);
+        }
+    }
+
+    readConfig(rcFile, &opts, &opts);
     opts.contrast=QSettings().value("/Qt/KDE/contrast", 7).toInt();
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=7;

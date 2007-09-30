@@ -60,7 +60,7 @@ class QtCurveStyle : public QWindowsStyle
 
     public:
 
-    QtCurveStyle();
+    QtCurveStyle(const QString &name=QString());
     ~QtCurveStyle();
 
     void polish(QApplication *app);

@@ -7,8 +7,8 @@ set(DEBIAN_PACKAGE_DESCRIPTION "QtCurve for Qt4/KDE4")
 set(DEBIAN_PACKAGE_SECTION "kde4")
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "54")
-set(CPACK_PACKAGE_VERSION_PATCH "1")
+set(CPACK_PACKAGE_VERSION_MINOR "55")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_PACKAGE_CONTACT "Craig Drummond <Craig.Drummond@lycos.co.uk>")
 set(QTCURVE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
 set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
@@ -21,6 +21,17 @@ set(OLD_CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 # Try to find kde4-config...
 file(TO_CMAKE_PATH "$ENV{KDEDIRS}" _KDEDIRS)
 
+find_program(KDE3CONFIG_EXECUTABLE NAMES kde-config
+             PATHS $ENV{KDEDIR}/bin /opt/kde3/bin /opt/kde/bin NO_DEFAULT_PATH)
+
+find_program(KDE3CONFIG_EXECUTABLE kde-config)
+
+if(KDE3CONFIG_EXECUTABLE)
+    exec_program(${KDE3CONFIG_EXECUTABLE}
+                    ARGS --prefix
+                    OUTPUT_VARIABLE KDE3PREFIX)
+endif(KDE3CONFIG_EXECUTABLE)
+
 find_program(KDE4_KDECONFIG_EXECUTABLE NAMES kde4-config
              PATHS ${CMAKE_INSTALL_PREFIX}/bin ${_KDEDIRS} /opt/kde4/bin NO_DEFAULT_PATH)
 
@@ -30,11 +41,29 @@ endif (NOT KDE4_KDECONFIG_EXECUTABLE)
 
 # Then set install prefix...
 if (KDE4_KDECONFIG_EXECUTABLE)
-    exec_program(kde4-config
+    exec_program(${KDE4_KDECONFIG_EXECUTABLE}
                  ARGS --prefix
                  OUTPUT_VARIABLE CMAKE_INSTALL_PREFIX)
+    exec_program(${KDE4_KDECONFIG_EXECUTABLE}
+                    ARGS --prefix
+                    OUTPUT_VARIABLE KDE4PREFIX)
 endif (KDE4_KDECONFIG_EXECUTABLE)
 
+if(NOT KDE3PREFIX)
+    if(KDE4PREFIX)
+        set(KDE3PREFIX ${KDE4PREFIX})
+    else(KDE4PREFIX)
+        set(KDE3PREFIX /usr)
+    endif(KDE4PREFIX)
+endif(NOT KDE3PREFIX)
+
+if(NOT KDE4PREFIX)
+    if(KDE3PREFIX)
+        set(KDE4PREFIX ${KDE3PREFIX})
+    else(KDE3PREFIX)
+        set(KDE4PREFIX /usr)
+    endif(KDE3PREFIX)
+endif(NOT KDE4PREFIX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules )
 

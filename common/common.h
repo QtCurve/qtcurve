@@ -88,7 +88,14 @@ typedef GdkColor color;
 #endif
 
 #define QTC_GROUP        "Settings"
-#define QTC_DESCR_GROUP  "Description"
+/*#define QTC_DESCR_GROUP  "Description"*/
+
+/* qtc_<theme name>.themerc support */
+#define KDE_PREFIX(V) ((4==(V)) ? KDE4PREFIX : KDE3PREFIX)
+#define QTC_THEME_DIR    "/share/apps/kstyle/themes/"
+#define QTC_THEME_PREFIX "qtc_"
+#define QTC_THEME_SUFFIX ".themerc"
+
 
 #define QTC_CHECK_SIZE   13
 #define QTC_RADIO_SIZE   13
