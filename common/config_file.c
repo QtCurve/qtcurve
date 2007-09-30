@@ -640,6 +640,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_LINE(sliderThumbs)
             QTC_CFG_READ_LINE(handles)
             QTC_CFG_READ_BOOL(highlightTab)
+            QTC_CFG_READ_BOOL(colorSelTab)
             QTC_CFG_READ_SHADE(shadeSliders, false)
             QTC_CFG_READ_SHADE(shadeMenubars, true)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false)
@@ -768,6 +769,7 @@ static void defaultSettings(Options *opts)
     opts->animatedProgress=true;
     opts->stripedProgress=true;
     opts->highlightTab=true;
+    opts->colorSelTab=false;
     opts->embolden=false;
     opts->appearance=APPEARANCE_DULL_GLASS;
     opts->lvAppearance=APPEARANCE_BEVELLED;
@@ -1100,6 +1102,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_B(sliderThumbs, true)
         CFG_WRITE_ENTRY_B(handles, false)
         CFG_WRITE_ENTRY(highlightTab)
+        CFG_WRITE_ENTRY(colorSelTab)
         CFG_WRITE_ENTRY_SHADE(shadeSliders, false, false)
         CFG_WRITE_ENTRY_SHADE(shadeMenubars, true, false)
         CFG_WRITE_ENTRY_SHADE(shadeCheckRadio, false, true)
