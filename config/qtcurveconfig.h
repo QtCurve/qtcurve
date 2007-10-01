@@ -31,6 +31,7 @@
 
 class QMenu;
 class QAction;
+class CExportThemeDialog;
 
 class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 {
@@ -60,6 +61,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void updateChanged();
     void importStyle();
     void exportStyle();
+    void exportTheme();
     void emboldenToggled();
     void dbiChanged();
     void shadeSlidersChanged();
@@ -67,6 +69,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void shadeCheckRadioChanged();
     void customMenuTextColorChanged();
     void stripedProgressChanged();
+    void tabAppearanceChanged();
     void passwordCharClicked();
 
     private:
@@ -82,6 +85,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     Options                  currentStyle,
                              defaultStyle;
     QMap<QAction *, QString> styles;
+    CExportThemeDialog       *exportDialog;
 };
 
 #endif

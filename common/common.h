@@ -388,7 +388,8 @@ typedef enum
 {
     LINE_SUNKEN,
     LINE_DOTS,
-    LINE_DASHES
+    LINE_DASHES,
+    LINE_FLAT
 } ELine;
 
 #define LINE_NONE LINE_DASHES
@@ -856,6 +857,7 @@ typedef struct
                      colorMenubarMouseOver,
                      darkerBorders,
                      vArrows,
+                     xCheck,
                      framelessGroupBoxes,
                      inactiveHighlight;
     EMouseOver       coloredMouseOver;

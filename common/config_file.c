@@ -95,6 +95,8 @@ static ELine toLine(const char *str, ELine def)
             return LINE_SUNKEN;
         if(0==memcmp(str, "dots", 4))
             return LINE_DOTS;
+        if(0==memcmp(str, "flat", 4))
+            return LINE_FLAT;
     }
     return def;
 }
@@ -676,6 +678,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(gradientPbGroove)
             QTC_CFG_READ_BOOL(darkerBorders)
             QTC_CFG_READ_BOOL(vArrows)
+            QTC_CFG_READ_BOOL(xCheck)
             QTC_CFG_READ_BOOL(framelessGroupBoxes)
             QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
@@ -807,6 +810,7 @@ static void defaultSettings(Options *opts)
     opts->gradientPbGroove=true;
     opts->darkerBorders=false;
     opts->vArrows=false;
+    opts->xCheck=false;
     opts->framelessGroupBoxes=false;
     opts->colorMenubarMouseOver=false;
     opts->inactiveHighlight=false;
@@ -878,6 +882,8 @@ static const char *toStr(ELine ind, bool none)
             return "dots";
         case LINE_DASHES:
             return none ? "none" : "dashes";
+        case LINE_FLAT:
+            return "flat";
         default:
             return "sunken";
     }
@@ -1138,6 +1144,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(gradientPbGroove)
         CFG_WRITE_ENTRY(darkerBorders)
         CFG_WRITE_ENTRY(vArrows)
+        CFG_WRITE_ENTRY(xCheck)
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(inactiveHighlight)
 #ifdef __cplusplus

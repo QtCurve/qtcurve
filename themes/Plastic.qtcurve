@@ -50,4 +50,4 @@ toolbarAppearance=flat
 toolbarBorders=light-all
 toolbarSeparators=sunken
 vArrows=false
-
+xCheck=true

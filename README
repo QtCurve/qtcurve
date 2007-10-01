@@ -23,7 +23,7 @@ named 'qtc_<name>.themerc (e.g. qtc_klearlooks.themerc) - this will have the fol
 format:
 
     [Misc]
-    Name=KlearLooks
+    Name=Klearlooks
     Comment=Clearlooks inspired style
     [KDE]
     WidgetStyle=qtc_klearlooks
