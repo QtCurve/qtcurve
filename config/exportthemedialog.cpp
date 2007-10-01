@@ -68,28 +68,30 @@ void CExportThemeDialog::slotButtonClicked(int button)
 
         if(name.isEmpty())
             KMessageBox::error(this, i18n("Name is empty!"));
-
-        QString fileName(themeUrl->url().path()+"/qtc_"+name+".themerc");
-
-        KConfig cfg(fileName, KConfig::NoGlobals);
-        bool    rv(KConfig::ReadWrite==cfg.getConfigState());
-
-        if(rv)
-        {
-            cfg.group("Misc").writeEntry("Name", themeName->text().trimmed());
-            cfg.group("Misc").writeEntry("Comment", themeComment->text());
-            cfg.group("KDE").writeEntry("WidgetStyle", "qtc_"+name);
-
-            rv=writeConfig(&cfg, opts, opts, true);
-        }
-
-        if(rv)
-        {
-            KMessageBox::information(this, i18n("Succesfully created:\n%1", fileName));
-            QDialog::accept();
-        }
         else
-            KMessageBox::error(this, i18n("Failed to create file: %1", fileName));
+        {
+            QString fileName(themeUrl->url().path()+"/qtc_"+name+".themerc");
+
+            KConfig cfg(fileName, KConfig::NoGlobals);
+            bool    rv(KConfig::ReadWrite==cfg.getConfigState());
+
+            if(rv)
+            {
+                cfg.group("Misc").writeEntry("Name", themeName->text().trimmed());
+                cfg.group("Misc").writeEntry("Comment", themeComment->text());
+                cfg.group("KDE").writeEntry("WidgetStyle", "qtc_"+name);
+
+                rv=writeConfig(&cfg, opts, opts, true);
+            }
+
+            if(rv)
+            {
+                QDialog::accept();
+                KMessageBox::information(this, i18n("Succesfully created:\n%1", fileName));
+            }
+            else
+                KMessageBox::error(this, i18n("Failed to create file: %1", fileName));
+        }
     }
     else
         QDialog::reject();
