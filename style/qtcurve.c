@@ -1175,7 +1175,7 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
             res=gdk_pixbuf_new_from_inline(-1, radio_on, TRUE, NULL);
             break;
         case PIX_CHECK:
-            res=gdk_pixbuf_new_from_inline(-1, check_on, TRUE, NULL);
+            res=gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :check_on, TRUE, NULL);
             break;
         case PIX_SLIDER:
             res=gdk_pixbuf_new_from_inline(-1, slider, TRUE, NULL);
@@ -1307,10 +1307,11 @@ static void drawBevelGradient(GtkStyle *style, GdkWindow *window,  GdkRectangle 
     EAppearance app=APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w
                         ? bevApp
                         : APPEARANCE_GRADIENT;
+    gboolean    selected=opts.colorSelTab && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w) ? false : sel;
 
     if(IS_FLAT(bevApp))
         drawAreaColor(style, window, area, region, base, x, y, width, height);
-    else if(!sel && IS_GLASS(app))
+    else if(!selected && IS_GLASS(app))
     {
         if(WIDGET_TAB_BOT==w)
         {
@@ -1357,7 +1358,7 @@ static void drawBevelGradient(GtkStyle *style, GdkWindow *window,  GdkRectangle 
                         horiz, increase);
         }
     }
-    else if(!sel && APPEARANCE_BEVELLED==app &&
+    else if(!selected && APPEARANCE_BEVELLED==app &&
             ((horiz ? height : width) > (((WIDGET_BUTTON(w) ? 2 : 1)*BEVEL_BORDER(w))+4)))
     {
         if(WIDGET_LISTVIEW_HEADER==w)
@@ -1429,16 +1430,27 @@ static void drawBevelGradient(GtkStyle *style, GdkWindow *window,  GdkRectangle 
     {
         GdkColor top,
                  bot,
+                 tabBaseCol,
+                 *baseTopCol=base,
                  *t,
                  *b;
 
-        top.pixel=bot.pixel=0;
+        top.pixel=bot.pixel=tabBaseCol.pixel=0;
+
+
+        if(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w))
+        {
+            QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+
+            generateMidColor(base, &(qtcurveStyle->menuitem[0]), &tabBaseCol, QTC_COLOR_SEL_TAB_FACTOR);
+            baseTopCol=&tabBaseCol;
+        }
 
         if(equal(1.0, shade_top))
-            t=base;
+            t=baseTopCol;
         else
         {
-            shade(base, &top, shade_top);
+            shade(baseTopCol, &top, shade_top);
             t=&top;
         }
         if(equal(1.0, shade_bot))
@@ -1892,10 +1904,11 @@ static void drawLightBevel(GtkStyle *style, GdkWindow *window, GtkStateType stat
 }
 
 static void drawLines(GdkWindow *window, int rx, int ry, int rwidth, int rheight, gboolean horiz,
-                      int n_lines, int offset, GdkGC *gcs[], GdkRectangle *area, int dark, int etchedDisp)
+                      int n_lines, int offset, GdkGC *gcs[], GdkRectangle *area, int dark, int etchedDisp,
+                      gboolean light)
 {
-    int   space =(n_lines*2)+(etchedDisp ? (n_lines-1) : 0),
-          step = etchedDisp ? 3 : 2,
+    int   space =(n_lines*2)+(etchedDisp || !light ? (n_lines-1) : 0),
+          step = etchedDisp || !light ? 3 : 2,
           x = horiz ? rx : rx+((rwidth-space)>>1),
           y = horiz ? ry+((rheight-space)>>1) : ry,
           x2 = rx + rwidth-1,
@@ -1914,16 +1927,18 @@ static void drawLines(GdkWindow *window, int rx, int ry, int rwidth, int rheight
         for(i=0; i<space; i+=step)
             gdk_draw_line(window, gc1, x+offset, y+i, x2-(offset+etchedDisp), y+i);
 
-        for(i=1; i<space; i+=step)
-             gdk_draw_line(window, gc2, x+offset+etchedDisp, y+i, x2-offset, y+i);
+        if(light)
+            for(i=1; i<space; i+=step)
+                gdk_draw_line(window, gc2, x+offset+etchedDisp, y+i, x2-offset, y+i);
     }
     else
     {
         for(i=0; i<space; i+=step)
             gdk_draw_line(window, gc1, x+i, y+offset, x+i, y2-(offset+etchedDisp));
 
-        for(i=1; i<space; i+=step)
-            gdk_draw_line(window, gc2, x+i, y+offset+etchedDisp, x+i, y2-offset);
+        if(light)
+            for(i=1; i<space; i+=step)
+                gdk_draw_line(window, gc2, x+i, y+offset+etchedDisp, x+i, y2-offset);
     }
     if(area)
     {
@@ -2277,11 +2292,11 @@ debugDisplayWidget(widget, 3);
                 break;
             case LINE_SUNKEN:
                 drawLines(window, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
-                          gcs, area, 3, 1);
+                          gcs, area, 3, 1, TRUE);
                 break;
             case LINE_DASHES:
                 drawLines(window, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
-                          gcs, area, 3, 0);
+                          gcs, area, 3, 0, TRUE);
         }
     }
     else if((DETAIL("handlebox") && widget && GTK_IS_HANDLE_BOX(widget)) || DETAIL("dockitem") || paf)
@@ -2327,14 +2342,14 @@ debugDisplayWidget(widget, 3);
             case LINE_DASHES:
                 if(height>width)
                     drawLines(window, x+3, y, 5, height, TRUE, (height-8)/3, 0,
-                              gcs, area, 5, 1);
+                              gcs, area, 5, 1, TRUE);
                 else
                     drawLines(window, x, y+3, width, 5, FALSE, (width-8)/3, 0,
-                              gcs, area, 5, 1);
+                              gcs, area, 5, 1, TRUE);
                 break;
             default:
                 drawLines(window, x, y, width, height, height<width, 2, 4, gcs,
-                          area, 3, 1);
+                          area, 3, 1, TRUE);
         }
     }
 }
@@ -4445,7 +4460,7 @@ static void fillTab(GtkStyle *style, GdkWindow *window, GdkRectangle *area, GtkS
                           : SHADE_BOTTOM_TAB_SEL_LIGHT;
 
             drawBevelGradient(style, window, area, NULL, x, y, width, height,
-                              col, s1, s2, horiz, increase, FALSE, app, tab);
+                              col, s1, s2, horiz, increase, GTK_STATE_NORMAL==state, app, tab);
         }
         else
         {
@@ -4861,9 +4876,13 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
             switch(opts.sliderThumbs)
             {
+                case LINE_FLAT:
+                    drawLines(window, x, y, width, height,
+                              GTK_ORIENTATION_HORIZONTAL!=orientation, 3, 5, gcs, area, 5, 0, FALSE);
+                    break;
                 case LINE_SUNKEN:
                     drawLines(window, x, y, width, height,
-                              GTK_ORIENTATION_HORIZONTAL!=orientation,4, 3, gcs, area, 3, 1);
+                              GTK_ORIENTATION_HORIZONTAL!=orientation, 4, 3, gcs, area, 3, 1, TRUE);
                     break;
                 default:
                 case LINE_DOTS:
@@ -5007,6 +5026,7 @@ debugDisplayWidget(widget, 3);
 
         switch(opts.toolbarSeparators)
         {
+            default:
             case LINE_DOTS:
                 drawDots(window, x1, y, x2-x1, 2, FALSE, (((x2-x1)/3.0)+0.5), 0,
                          qtcurveStyle->background_gc, area, 0, 5);

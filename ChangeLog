@@ -1,6 +1,8 @@
 0.55
 ----
-1. Ability to create custom themes. qtc_<name>.themerc
+1. Ability to create custom themes. See Theme details in 'README' file.
+2. Allow 'flat' lines in scrollbar handles.
+3. Option for 'X' style checkmarks.
 
 0.54.1
 ------
