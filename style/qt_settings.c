@@ -24,9 +24,6 @@
 #include "config_file.c"
 #include <gtk/gtk.h>
 #include <time.h>
-#ifdef HAVE_LOCALE_H
-#include <locale.h>
-#endif
 #include <gdk/gdkcolor.h>
 #include <gtk/gtkenums.h>
 #include <sys/types.h>
@@ -125,7 +122,8 @@ enum QtPallete
 
 struct QtData
 {
-    GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS];
+    GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS],
+                    inactiveSelectCol;
     char            *font,
                     *icons,
                     *boldfont,
@@ -1277,9 +1275,6 @@ static gboolean qtInit(Options *opts)
         {
             char        *app=NULL,
                         *path=NULL,
-#ifdef HAVE_LOCALE_H
-                        *locale=NULL,
-#endif
                         *tmpStr=NULL,
                         *rcFile=NULL;
             GtkSettings *settings=NULL;
@@ -1344,6 +1339,13 @@ static gboolean qtInit(Options *opts)
 
             readConfig(rcFile, opts, opts);
 
+            if(opts->inactiveHighlight)
+                generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
+                                &(qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]),
+                                &qtSettings.inactiveSelectCol, INACTIVE_HIGHLIGHT_FACTOR);
+            else
+                qtSettings.inactiveSelectCol=qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
+
             /* Check if we're firefox... */
             if((app=getAppName()))
             {
@@ -1391,43 +1393,66 @@ static gboolean qtInit(Options *opts)
             /*if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)*/
             {
                 /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
+                /* ...and inactive highlight!!! */
                 static const int constFileVersion=2;
-                static const int constVersionLen=9+1;
+                static const int constVersionLen=1+2+(6*3)+1+1;
 
-                FILE *f=NULL;
-                char version[constVersionLen];
+                FILE     *f=NULL;
+                char     version[constVersionLen];
+                GdkColor inactiveHighlightTextCol=opts->inactiveHighlight
+                                            ? qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]
+                                            : qtSettings.colors[PAL_INACTIVE][COLOR_TEXT_SELECTED];
 
-                sprintf(version, "#%02d%02X%02X%02X",
+                sprintf(version, "#%02d%02X%02X%02X%02X%02X%02X%02X%02X%02X%01X",
                                     constFileVersion,
                                     toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
                                     toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
-                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
+                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
+
+                                    toQtColor(qtSettings.inactiveSelectCol.red),
+                                    toQtColor(qtSettings.inactiveSelectCol.green),
+                                    toQtColor(qtSettings.inactiveSelectCol.blue),
+
+                                    toQtColor(inactiveHighlightTextCol.red),
+                                    toQtColor(inactiveHighlightTextCol.green),
+                                    toQtColor(inactiveHighlightTextCol.blue),
+
+                                    opts->inactiveHighlight);
 
                 getGtk2CfgFile(&tmpStr, xdg, "qtcurve.gtk-colors");
 
                 if(!checkFileVersion(tmpStr, version, constVersionLen) && (f=fopen(tmpStr, "w")))
                 {
-#ifdef HAVE_LOCALE_H
-                    /* We need to switch to the C locale in order
-                        to have decimal separator recognized by gtkrc engine */
-                    if(!locale)
-                        locale = setlocale(LC_NUMERIC, "C");
-#endif
                     fprintf(f, "%s\n"
                                 "# Fix for KDE's \"apply colors to non-KDE"
                                 " apps\" setting\n"
                                 "style \"QtCTxtFix\" "
                                 "{fg[ACTIVE]=\"#%02X%02X%02X\""
-                                " fg[PRELIGHT]=\"#%02X%02X%02X\"} "
+                                " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
                                 "class \"*MenuItem\" style \"QtCTxtFix\" "
                                 "widget_class \"*.*ProgressBar\" style \"QtCTxtFix\"",
                                 version,
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
+
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
+
+                    if(opts->inactiveHighlight)
+                        fprintf(f, "style \"QtCHlFix\" "
+                                    "{base[ACTIVE]=\"#%02X%02X%02X\""
+                                    " text[ACTIVE]=\"#%02X%02X%02X\"}"
+                                    "class \"*\" style \"QtCHlFix\"",
+
+                                    toQtColor(qtSettings.inactiveSelectCol.red),
+                                    toQtColor(qtSettings.inactiveSelectCol.green),
+                                    toQtColor(qtSettings.inactiveSelectCol.blue),
+
+                                    toQtColor(inactiveHighlightTextCol.red),
+                                    toQtColor(inactiveHighlightTextCol.green),
+                                    toQtColor(inactiveHighlightTextCol.blue));
                     fclose(f);
                 }
 
@@ -1455,12 +1480,6 @@ static gboolean qtInit(Options *opts)
                 {
                     GdkColor col;
 
-#ifdef HAVE_LOCALE_H
-                   /* We need to switch to the C locale in order
-                      to have decimal separator recognized by gtkrc engine */
-                    if(!locale)
-                        locale = setlocale(LC_NUMERIC, "C");
-#endif
                     shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, POPUPMENU_LIGHT_FACTOR);
                     sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
                     gtk_rc_parse_string(tmpStr);
@@ -1658,11 +1677,6 @@ static gboolean qtInit(Options *opts)
             }
             if(tmpStr)
                 free(tmpStr);
-
-#ifdef HAVE_LOCALE_H
-            if(locale)
-                setlocale(LC_NUMERIC, locale);
-#endif
         }
         return TRUE;
     }
@@ -1705,18 +1719,7 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_SELECTED, COLOR_SELECTED)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_INSENSITIVE, COLOR_WINDOW)
     /*SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED)*/
-    if(opts->inactiveHighlight)
-    {
-        GdkColor midColor;
-
-        generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
-                         &(qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]),
-                         &midColor, INACTIVE_HIGHLIGHT_FACTOR);
-        style->base[GTK_STATE_ACTIVE]=midColor;
-    }
-    else
-        SET_COLOR_PAL(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED, PAL_INACTIVE)
-
+    style->base[GTK_STATE_ACTIVE]=qtSettings.inactiveSelectCol;
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_PRELIGHT, COLOR_SELECTED)
 
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_NORMAL, COLOR_TEXT)
