@@ -2293,6 +2293,9 @@ debugDisplayWidget(widget, 3);
             case LINE_SUNKEN:
                 drawLines(window, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
                           gcs, area, 3, 1, TRUE);
+            case LINE_FLAT:
+                drawLines(window, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 3,
+                          gcs, area, 3, 0, FALSE);
                 break;
             case LINE_DASHES:
                 drawLines(window, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
@@ -2346,6 +2349,10 @@ debugDisplayWidget(widget, 3);
                 else
                     drawLines(window, x, y+3, width, 5, FALSE, (width-8)/3, 0,
                               gcs, area, 5, 1, TRUE);
+                break;
+            case LINE_FLAT:
+                drawLines(window, x, y, width, height, height<width, 2, 4, gcs,
+                          area, 3, 0, FALSE);
                 break;
             default:
                 drawLines(window, x, y, width, height, height<width, 2, 4, gcs,
@@ -5012,7 +5019,7 @@ static void gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
     gboolean tbar=DETAIL("toolbar");
     int      light=0,
-             dark=5;
+             dark=tbar ? 3 : 5;
     FN_CHECK
 
 #ifdef QTC_DEBUG
@@ -5020,40 +5027,40 @@ printf("Draw hline %d %d %d %d %s  ", state, x1, x2, y, detail ? detail : "NULL"
 debugDisplayWidget(widget, 3);
 #endif
 
-    if(tbar)
-    {
-        dark=3;
-
-        switch(opts.toolbarSeparators)
-        {
-            default:
-            case LINE_DOTS:
-                drawDots(window, x1, y, x2-x1, 2, FALSE, (((x2-x1)/3.0)+0.5), 0,
-                         qtcurveStyle->background_gc, area, 0, 5);
-                return;
-            case LINE_NONE:
-                return;
-        }
-    }
-
     if(area)
     {
         gdk_gc_set_clip_rectangle(qtcurveStyle->background_gc[light], area);
         gdk_gc_set_clip_rectangle(qtcurveStyle->background_gc[dark], area);
     }
 
-    if(DETAIL("label"))
+    if(tbar)
+    {
+        switch(opts.toolbarSeparators)
+        {
+            default:
+            case LINE_DOTS:
+                drawDots(window, x1, y, x2-x1, 2, FALSE, (((x2-x1)/3.0)+0.5), 0,
+                         qtcurveStyle->background_gc, area, 0, 5);
+                break;
+            case LINE_NONE:
+                break;
+            case LINE_FLAT:
+            case LINE_SUNKEN:
+            {
+                gdk_draw_line(window, qtcurveStyle->background_gc[dark], x1, y, x2, y);
+                if(LINE_SUNKEN==opts.toolbarSeparators)
+                    gdk_draw_line(window, qtcurveStyle->background_gc[light], x1 + 1, y + 1, x2 + 1, y + 1);
+            }
+        }
+    }
+    else if(DETAIL("label"))
     {
         if(state == GTK_STATE_INSENSITIVE)
             gdk_draw_line(window, qtcurveStyle->background_gc[light], x1 + 1, y + 1, x2 + 1, y + 1);
-        gdk_draw_line(window, style->text_gc[state], x1, y, x2, y);     
+        gdk_draw_line(window, style->text_gc[state], x1, y, x2, y); 
     }
     else
-    {
         gdk_draw_line(window, qtcurveStyle->background_gc[dark], x1, y, x2, y);
-        if(tbar)/* || DETAIL("menuitem")) */
-            gdk_draw_line(window, qtcurveStyle->background_gc[light], x1, y+1, x2, y+1);
-    }
 
     if(area)
     {
@@ -5076,24 +5083,9 @@ debugDisplayWidget(widget, 3);
 
     if(!(DETAIL("vseparator") && isOnCombo(widget, 0))) /* CPD: Combo handled in drawBox */
     {
-        int      dark=5,
-                 light=0;
         gboolean tbar=DETAIL("toolbar");
-
-        if(tbar)
-        {
-            dark=3;
-
-            switch(opts.toolbarSeparators)
-            {
-                case LINE_DOTS:
-                    drawDots(window, x, y1, 2, y2-y1, TRUE, (((y2-y1)/3.0)+0.5), 0,
-                             qtcurveStyle->background_gc, area, 0, 5);
-                    return;
-                case LINE_NONE:
-                    return;
-            }
-        }
+        int      dark=tbar ? 3 : 5,
+                 light=0;
 
         if(area)
         {
@@ -5101,10 +5093,28 @@ debugDisplayWidget(widget, 3);
             gdk_gc_set_clip_rectangle(qtcurveStyle->background_gc[light], area);
         }
 
-        gdk_draw_line(window, qtcurveStyle->background_gc[dark], x, y1, x, y2 - 1);
-
         if(tbar)
-            gdk_draw_line(window, qtcurveStyle->background_gc[light], x+1, y1, x+1, y2 - 1);
+        {
+            switch(opts.toolbarSeparators)
+            {
+                default:
+                case LINE_DOTS:
+                    drawDots(window, x, y1, 2, y2-y1, TRUE, (((y2-y1)/3.0)+0.5), 0,
+                             qtcurveStyle->background_gc, area, 0, 5);
+                    break;
+                case LINE_NONE:
+                    break;
+                case LINE_FLAT:
+                case LINE_SUNKEN:
+                {
+                    gdk_draw_line(window, qtcurveStyle->background_gc[dark], x, y1, x, y2 - 1);
+                    if(LINE_SUNKEN==opts.toolbarSeparators)
+                        gdk_draw_line(window, qtcurveStyle->background_gc[light], x+1, y1, x+1, y2 - 1);
+                }
+            }
+        }
+        else
+            gdk_draw_line(window, qtcurveStyle->background_gc[dark], x, y1, x, y2 - 1);
 
         if(area)
         {

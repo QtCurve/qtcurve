@@ -1,8 +1,10 @@
 0.55
 ----
 1. Ability to create custom themes. See Theme details in 'README' file.
-2. Allow 'flat' lines in scrollbar handles.
+2. Allow 'flat' lines in scrollbar handles, toolbar handles, toolbar
+   separators, and splitters.
 3. Option for 'X' style checkmarks.
+4. Fix for 'inactiveHighlight' and KDE's apply colours to non-KDE apps.
 
 0.54.1
 ------
