@@ -387,9 +387,9 @@ typedef enum
 typedef enum
 {
     LINE_SUNKEN,
+    LINE_FLAT,
     LINE_DOTS,
-    LINE_DASHES,
-    LINE_FLAT
+    LINE_DASHES
 } ELine;
 
 #define LINE_NONE LINE_DASHES

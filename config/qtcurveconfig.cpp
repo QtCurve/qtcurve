@@ -131,13 +131,12 @@ static void insertAppearanceEntries(QComboBox *combo, bool raised, bool bev)
     }
 }
 
-static void insertLineEntries(QComboBox *combo, bool none, bool flat=false)
+static void insertLineEntries(QComboBox *combo, bool none)
 {
     combo->insertItem(LINE_SUNKEN, i18n("Sunken lines"));
+    combo->insertItem(i18n("Flat lines"));
     combo->insertItem(LINE_DOTS, i18n("Dots"));
     combo->insertItem(LINE_DASHES, none ? i18n("None") : i18n("Dashes"));
-    if(flat)
-        combo->insertItem(LINE_FLAT, i18n("Flat"));
 }
 
 static void insertDefBtnEntries(QComboBox *combo)
@@ -212,7 +211,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(progressAppearance, true, true);
     insertAppearanceEntries(menuitemAppearance, true, true);
     insertLineEntries(handles, false);
-    insertLineEntries(sliderThumbs, true, true);
+    insertLineEntries(sliderThumbs, true);
     insertLineEntries(toolbarSeparators, true);
     insertLineEntries(splitters, false);
     insertDefBtnEntries(defBtnIndicator);

@@ -1578,23 +1578,24 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         }
         case PE_IndicatorToolBarSeparator:
         {
-            int light=0,
-                dark=3;
-
             painter->save();
             switch(opts.toolbarSeparators)
             {
                 case LINE_NONE:
                     break;
+                case LINE_FLAT:
                 case LINE_SUNKEN:
                     if(r.width()<r.height())
                     {
                         int x(r.x()+((r.width()-2) / 2));
 
-                        painter->setPen(itsBackgroundCols[dark]);
+                        painter->setPen(itsBackgroundCols[3]);
                         painter->drawLine(x, r.y()+6, x, r.y()+r.height()-7);
-                        painter->setPen(itsBackgroundCols[light]);
-                        painter->drawLine(x+1, r.y()+6, x+1, r.y()+r.height()-7);
+                        if(LINE_SUNKEN==opts.toolbarSeparators)
+                        {
+                            painter->setPen(itsBackgroundCols[0]);
+                            painter->drawLine(x+1, r.y()+6, x+1, r.y()+r.height()-7);
+                        }
                     }
                     else
                     {
@@ -1602,8 +1603,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                         painter->setPen(itsBackgroundCols[3]);
                         painter->drawLine(r.x()+6, y, r.x()+r.width()-7, y);
-                        painter->setPen(itsBackgroundCols[0]);
-                        painter->drawLine(r.x()+6, y+1, r.x()+r.width()-7, y+1);
+                        if(LINE_SUNKEN==opts.toolbarSeparators)
+                        {
+                            painter->setPen(itsBackgroundCols[0]);
+                            painter->drawLine(r.x()+6, y+1, r.x()+r.width()-7, y+1);
+                        }
                     }
                     break;
                 default:
@@ -2169,6 +2173,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     break;
                 case LINE_SUNKEN:
                     drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 3);
+                    break;
+                case LINE_FLAT:
+                    drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 3, border, 0, 3, 0, false);
                     break;
                 case LINE_DASHES:
                     drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 3, 0);
@@ -6225,8 +6232,7 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
     {
         case LINE_DOTS:
             drawDots(p, r, !(option->state&State_Horizontal), 2,
-                     /*APP_KICKER==theThemedApp ? 1 :*/ tb ? 5 : 3, border,
-                     /*APP_KICKER==theThemedApp ? 1 :*/ tb ? -2 : 0, 5);
+                     tb ? 5 : 3, border, tb ? -2 : 0, 5);
             break;
         case LINE_DASHES:
             if(option->state&State_Horizontal)
@@ -6244,10 +6250,13 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
                           tb ? 0 : (r.height()-5)/2, border, 0, 5);
             }
             break;
+        case LINE_FLAT:
+            drawLines(p, r, !(option->state&State_Horizontal), 2,
+                      tb ? 4 : 2, border, tb ? -2 : 0, 3, 0, false);
+            break;
         default:
             drawLines(p, r, !(option->state&State_Horizontal), 2,
-                      /*APP_KICKER==theThemedApp ? 1 :*/ tb ? 4 : 2, border,
-                      /*APP_KICKER==theThemedApp ? 1 :*/ tb ? -2 : 0, 3);
+                      tb ? 4 : 2, border, tb ? -2 : 0, 3);
     }
 }
 

@@ -2,7 +2,8 @@
 ----
 1. Ability to create custom themes. See Theme details in 'README' file.
 2. Supply a 'Klearlooks' QtCurve theme.
-3. Allow 'flat' lines in scrollbar handles.
+3. Allow 'flat' lines in scrollbar handles, toolbar handles, toolbar
+   separators, and splitters.
 4. Option for 'X' style checkmarks.
 
 0.54.1
