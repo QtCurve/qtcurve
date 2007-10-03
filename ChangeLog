@@ -5,6 +5,9 @@
 3. Allow 'flat' lines in scrollbar handles, toolbar handles, toolbar
    separators, and splitters.
 4. Option for 'X' style checkmarks.
+5. Modify default style: flat splitter lines, flat slider thumbs, no
+   toolbar separators.
+6. Use alternating dark/light for dashed toolbar handles.
 
 0.54.1
 ------
