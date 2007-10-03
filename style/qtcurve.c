@@ -2344,15 +2344,15 @@ debugDisplayWidget(widget, 3);
                 break;
             case LINE_DASHES:
                 if(height>width)
-                    drawLines(window, x+3, y, 5, height, TRUE, (height-8)/3, 0,
-                              gcs, area, 5, 1, TRUE);
+                    drawLines(window, x+3, y, 3, height, TRUE, (height-8)/2, 0,
+                              gcs, area, 5, 0, TRUE);
                 else
-                    drawLines(window, x, y+3, width, 5, FALSE, (width-8)/3, 0,
-                              gcs, area, 5, 1, TRUE);
+                    drawLines(window, x, y+3, width, 3, FALSE, (width-8)/2, 0,
+                              gcs, area, 5, 0, TRUE);
                 break;
             case LINE_FLAT:
                 drawLines(window, x, y, width, height, height<width, 2, 4, gcs,
-                          area, 3, 0, FALSE);
+                          area, 4, 0, FALSE);
                 break;
             default:
                 drawLines(window, x, y, width, height, height<width, 2, 4, gcs,
@@ -4652,7 +4652,7 @@ debugDisplayWidget(widget, 3);
                                         : lastTab
                                             ? ROUNDED_BOTTOMRIGHT
                                             : ROUNDED_NONE,
-                                active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
+                                active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -4696,7 +4696,7 @@ debugDisplayWidget(widget, 3);
                                         : lastTab
                                             ? ROUNDED_TOPRIGHT
                                             : ROUNDED_NONE,
-                                active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
+                                active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -4736,7 +4736,7 @@ debugDisplayWidget(widget, 3);
                                         : lastTab
                                             ? ROUNDED_BOTTOMRIGHT
                                             : ROUNDED_NONE,
-                                active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
+                                active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -4781,7 +4781,7 @@ debugDisplayWidget(widget, 3);
                                         : lastTab
                                             ? ROUNDED_BOTTOMLEFT
                                             : ROUNDED_NONE,
-                                active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
+                                active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5019,7 +5019,7 @@ static void gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
     gboolean tbar=DETAIL("toolbar");
     int      light=0,
-             dark=tbar ? 3 : 5;
+             dark=tbar ? (LINE_FLAT==opts.toolbarSeparators ? 4 : 3) : 5;
     FN_CHECK
 
 #ifdef QTC_DEBUG
