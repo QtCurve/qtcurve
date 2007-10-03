@@ -1589,7 +1589,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         int x(r.x()+((r.width()-2) / 2));
 
-                        painter->setPen(itsBackgroundCols[3]);
+                        painter->setPen(itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4]);
                         painter->drawLine(x, r.y()+6, x, r.y()+r.height()-7);
                         if(LINE_SUNKEN==opts.toolbarSeparators)
                         {
@@ -1601,7 +1601,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         int y(r.y()+((r.height()-2) / 2));
 
-                        painter->setPen(itsBackgroundCols[3]);
+                        painter->setPen(itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4]);
                         painter->drawLine(r.x()+6, y, r.x()+r.width()-7, y);
                         if(LINE_SUNKEN==opts.toolbarSeparators)
                         {
@@ -3279,7 +3279,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_TOPRIGHT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_TOP, selected ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
 
                         if(selected)
                         {
@@ -3339,7 +3339,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_BOTTOMRIGHT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_BOT, selected ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
 
                         if(selected)
                         {
@@ -3399,7 +3399,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_BOTTOMLEFT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_TOP, selected ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
 
                         if(selected)
                         {
@@ -3459,7 +3459,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_BOTTOMRIGHT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_BOT, selected ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
 
                         if(selected)
                         {
@@ -6237,22 +6237,22 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
         case LINE_DASHES:
             if(option->state&State_Horizontal)
             {
-                QRect r1(r.x()+(tb ? 2 : (r.width()-6)/2), r.y(), 5, r.height());
+                QRect r1(r.x()+(tb ? 2 : (r.width()-6)/2), r.y(), 3, r.height());
 
-                drawLines(p, r1, true, (r.height()-8)/3,
-                          tb ? 0 : (r.width()-5)/2, border, 0, 5);
+                drawLines(p, r1, true, (r.height()-8)/2,
+                          tb ? 0 : (r.width()-5)/2, border, 0, 5, 0);
             }
             else
             {
-                QRect r1(r.x(), r.y()+(tb ? 2 : (r.height()-6)/2), r.width(), 5);
+                QRect r1(r.x(), r.y()+(tb ? 2 : (r.height()-6)/2), r.width(), 3);
 
-                drawLines(p, r1, false, (r.width()-8)/3,
-                          tb ? 0 : (r.height()-5)/2, border, 0, 5);
+                drawLines(p, r1, false, (r.width()-8)/2,
+                          tb ? 0 : (r.height()-5)/2, border, 0, 5, 0);
             }
             break;
         case LINE_FLAT:
             drawLines(p, r, !(option->state&State_Horizontal), 2,
-                      tb ? 4 : 2, border, tb ? -2 : 0, 3, 0, false);
+                      tb ? 4 : 2, border, tb ? -2 : 0, 4, 0, false);
             break;
         default:
             drawLines(p, r, !(option->state&State_Horizontal), 2,
