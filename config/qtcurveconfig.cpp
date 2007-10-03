@@ -134,7 +134,7 @@ static void insertAppearanceEntries(QComboBox *combo, bool raised, bool bev)
 static void insertLineEntries(QComboBox *combo, bool none)
 {
     combo->insertItem(LINE_SUNKEN, i18n("Sunken lines"));
-    combo->insertItem(i18n("Flat lines"));
+    combo->insertItem(LINE_FLAT, i18n("Flat lines"));
     combo->insertItem(LINE_DOTS, i18n("Dots"));
     combo->insertItem(LINE_DASHES, none ? i18n("None") : i18n("Dashes"));
 }
