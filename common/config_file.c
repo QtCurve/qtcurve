@@ -783,14 +783,14 @@ static void defaultSettings(Options *opts)
     opts->toolbarAppearance=APPEARANCE_GRADIENT;
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
     opts->defBtnIndicator=IND_COLORED;
-    opts->sliderThumbs=LINE_DOTS;
+    opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_DOTS;
     opts->shadeSliders=SHADE_BLEND_SELECTED;
     opts->shadeMenubars=SHADE_DARKEN;
     opts->shadeCheckRadio=SHADE_NONE;
     opts->toolbarBorders=TB_NONE;
-    opts->toolbarSeparators=LINE_DOTS;
-    opts->splitters=LINE_DOTS;
+    opts->toolbarSeparators=LINE_NONE;
+    opts->splitters=LINE_FLAT;
     opts->fixParentlessDialogs=false;
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_PLASTIK;
