@@ -13,18 +13,29 @@
    <string>Form1</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="titleLabel" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>title</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0" colspan="2" >
     <widget class="QTabWidget" name="optionsTab" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
+      <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -37,39 +48,226 @@
        <string>General</string>
       </attribute>
       <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="11" column="2" colspan="4" >
-        <widget class="QCheckBox" name="stdSidebarButtons" >
+       <item row="0" column="0" >
+        <widget class="QLabel" name="textLabel1_7" >
          <property name="text" >
-          <string>Standard buttons for sidebars</string>
+          <string>Appearance:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="9" column="4" colspan="2" >
-        <widget class="QCheckBox" name="xCheck" >
-         <property name="text" >
-          <string>'X' style checkmarks</string>
+       <item row="0" column="1" >
+        <widget class="QComboBox" name="appearance" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="whatsThis" >
+          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="2" colspan="3" >
-        <widget class="QCheckBox" name="vArrows" >
+       <item row="0" column="2" >
+        <widget class="QComboBox" name="round" />
+       </item>
+       <item row="0" column="3" colspan="2" >
+        <widget class="QComboBox" name="buttonEffect" />
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="textLabel1_6" >
          <property name="text" >
-          <string>'V' style arrows</string>
+          <string>Splitters:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="8" column="4" colspan="2" >
-        <widget class="QCheckBox" name="colorSelTab" >
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="splitters" />
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="textLabel1_2_3_2" >
          <property name="text" >
-          <string>Color selected</string>
+          <string>Sliders:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
          </property>
         </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QComboBox" name="sliderAppearance" />
+       </item>
+       <item row="2" column="2" >
+        <widget class="QComboBox" name="shadeSliders" />
+       </item>
+       <item row="2" column="3" colspan="2" >
+        <widget class="KColorButton" name="customSlidersColor" >
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5" >
+        <widget class="QComboBox" name="sliderStyle" />
+       </item>
+       <item row="2" column="6" >
+        <widget class="QCheckBox" name="fillSlider" >
+         <property name="text" >
+          <string>Fill used</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="textLabel1_2_3" >
+         <property name="text" >
+          <string>Scrollbars:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QComboBox" name="scrollbarType" />
+       </item>
+       <item row="3" column="2" >
+        <widget class="QComboBox" name="sliderThumbs" />
+       </item>
+       <item row="4" column="0" >
+        <widget class="QLabel" name="textLabel1" >
+         <property name="text" >
+          <string>Progress bars:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QComboBox" name="progressAppearance" >
+         <property name="whatsThis" >
+          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" colspan="2" >
+        <widget class="QCheckBox" name="gradientPbGroove" >
+         <property name="text" >
+          <string>Gradient groove</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4" >
+        <widget class="QComboBox" name="stripedProgress" />
+       </item>
+       <item row="4" column="5" >
+        <widget class="QCheckBox" name="animatedProgress" >
+         <property name="text" >
+          <string>Animated</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" >
+        <widget class="QLabel" name="textLabel1_3" >
+         <property name="text" >
+          <string>Default button:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" >
+        <widget class="QCheckBox" name="embolden" >
+         <property name="text" >
+          <string>Bold text, and</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2" >
+        <widget class="QComboBox" name="defBtnIndicator" />
+       </item>
+       <item row="6" column="0" >
+        <widget class="QLabel" name="textLabel1_3_2" >
+         <property name="text" >
+          <string>Mouse-over:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1" >
+        <widget class="QComboBox" name="coloredMouseOver" >
+         <property name="whatsThis" >
+          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2" >
+        <widget class="QLabel" name="textLabel1_8" >
+         <property name="whatsThis" >
+          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
+         </property>
+         <property name="text" >
+          <string>Highlight by:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3" colspan="2" >
+        <widget class="QSpinBox" name="highlightFactor" >
+         <property name="suffix" >
+          <string>%</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" >
+        <widget class="QLabel" name="textLabel1_8_2" >
+         <property name="whatsThis" >
+          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
+         </property>
+         <property name="text" >
+          <string>Listviews:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1" >
+        <widget class="QComboBox" name="lvAppearance" />
+       </item>
+       <item row="7" column="2" colspan="5" >
+        <widget class="QCheckBox" name="lvLines" >
+         <property name="text" >
+          <string>Lines</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" >
+        <widget class="QLabel" name="textLabel1_8_2_2" >
+         <property name="whatsThis" >
+          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
+         </property>
+         <property name="text" >
+          <string>Tabs:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1" >
+        <widget class="QComboBox" name="tabAppearance" />
        </item>
        <item row="8" column="2" colspan="2" >
         <widget class="QCheckBox" name="highlightTab" >
@@ -78,6 +276,88 @@
          </property>
          <property name="text" >
           <string>Highlight selected</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="4" >
+        <widget class="QCheckBox" name="colorSelTab" >
+         <property name="text" >
+          <string>Color selected</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" >
+        <widget class="QLabel" name="textLabel1_8_2_2_2" >
+         <property name="whatsThis" >
+          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
+         </property>
+         <property name="text" >
+          <string>Checks/radios:</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1" >
+        <widget class="QComboBox" name="shadeCheckRadio" />
+       </item>
+       <item row="9" column="2" >
+        <widget class="KColorButton" name="customCheckRadioColor" >
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="3" colspan="4" >
+        <widget class="QCheckBox" name="xCheck" >
+         <property name="text" >
+          <string>'X' style checkmarks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="2" >
+        <widget class="QCheckBox" name="stdFocus" >
+         <property name="whatsThis" >
+          <string>Some applications, such as Qt Designer, and Krita, make use of 'dock windows' These have a handle strip along the top - enabling this option will draw the name of the window in the handle strip.</string>
+         </property>
+         <property name="text" >
+          <string>Dotted focus rectangle</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2" colspan="4" >
+        <widget class="QCheckBox" name="vArrows" >
+         <property name="text" >
+          <string>'V' style arrows</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2" >
+        <widget class="QCheckBox" name="drawStatusBarFrames" >
+         <property name="text" >
+          <string>Draw statusbar frames</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="2" colspan="5" >
+        <widget class="QCheckBox" name="stdSidebarButtons" >
+         <property name="text" >
+          <string>Standard buttons for sidebars</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0" colspan="2" >
+        <widget class="QCheckBox" name="framelessGroupBoxes" >
+         <property name="text" >
+          <string>Frameless groupboxes</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="2" colspan="4" >
+        <widget class="QCheckBox" name="darkerBorders" >
+         <property name="text" >
+          <string>Darker borders</string>
          </property>
         </widget>
        </item>
@@ -97,284 +377,6 @@
          </property>
         </spacer>
        </item>
-       <item row="12" column="2" colspan="3" >
-        <widget class="QCheckBox" name="darkerBorders" >
-         <property name="text" >
-          <string>Darker borders</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0" colspan="2" >
-        <widget class="QCheckBox" name="framelessGroupBoxes" >
-         <property name="text" >
-          <string>Frameless groupboxes</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0" colspan="2" >
-        <widget class="QCheckBox" name="drawStatusBarFrames" >
-         <property name="text" >
-          <string>Draw statusbar frames</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0" colspan="2" >
-        <widget class="QCheckBox" name="stdFocus" >
-         <property name="whatsThis" >
-          <string>Some applications, such as Qt Designer, and Krita, make use of 'dock windows' These have a handle strip along the top - enabling this option will draw the name of the window in the handle strip.</string>
-         </property>
-         <property name="text" >
-          <string>Dotted focus rectangle</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="2" >
-        <widget class="KColorButton" name="customCheckRadioColor" >
-         <property name="text" >
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1" >
-        <widget class="QComboBox" name="shadeCheckRadio" />
-       </item>
-       <item row="9" column="0" >
-        <widget class="QLabel" name="textLabel1_8_2_2_2" >
-         <property name="whatsThis" >
-          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
-         </property>
-         <property name="text" >
-          <string>Checks/radios:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1" >
-        <widget class="QComboBox" name="tabAppearance" />
-       </item>
-       <item row="8" column="0" >
-        <widget class="QLabel" name="textLabel1_8_2_2" >
-         <property name="whatsThis" >
-          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
-         </property>
-         <property name="text" >
-          <string>Tabs:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="2" colspan="4" >
-        <widget class="QCheckBox" name="lvLines" >
-         <property name="text" >
-          <string>Lines</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1" >
-        <widget class="QComboBox" name="lvAppearance" />
-       </item>
-       <item row="7" column="0" >
-        <widget class="QLabel" name="textLabel1_8_2" >
-         <property name="whatsThis" >
-          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
-         </property>
-         <property name="text" >
-          <string>Listviews:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="3" colspan="3" >
-        <widget class="QSpinBox" name="highlightFactor" >
-         <property name="suffix" >
-          <string>%</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2" >
-        <widget class="QLabel" name="textLabel1_8" >
-         <property name="whatsThis" >
-          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
-         </property>
-         <property name="text" >
-          <string>Highlight by:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1" >
-        <widget class="QComboBox" name="coloredMouseOver" >
-         <property name="whatsThis" >
-          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" >
-        <widget class="QLabel" name="textLabel1_3_2" >
-         <property name="text" >
-          <string>Mouse-over:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2" >
-        <widget class="QComboBox" name="defBtnIndicator" />
-       </item>
-       <item row="5" column="1" >
-        <widget class="QCheckBox" name="embolden" >
-         <property name="text" >
-          <string>Bold text, and</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" >
-        <widget class="QLabel" name="textLabel1_3" >
-         <property name="text" >
-          <string>Default button:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="5" >
-        <widget class="QCheckBox" name="animatedProgress" >
-         <property name="text" >
-          <string>Animated</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="4" >
-        <widget class="QCheckBox" name="stripedProgress" >
-         <property name="text" >
-          <string>Striped</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2" colspan="2" >
-        <widget class="QCheckBox" name="gradientPbGroove" >
-         <property name="text" >
-          <string>Gradient groove</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1" >
-        <widget class="QComboBox" name="progressAppearance" >
-         <property name="whatsThis" >
-          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" >
-        <widget class="QLabel" name="textLabel1" >
-         <property name="text" >
-          <string>Progress bars:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2" >
-        <widget class="QComboBox" name="sliderThumbs" />
-       </item>
-       <item row="3" column="1" >
-        <widget class="QComboBox" name="scrollbarType" />
-       </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="textLabel1_2_3" >
-         <property name="text" >
-          <string>Scrollbars:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="5" >
-        <widget class="QCheckBox" name="fillSlider" >
-         <property name="text" >
-          <string>Fill used</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="4" >
-        <widget class="KColorButton" name="customSlidersColor" >
-         <property name="text" >
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2" >
-        <widget class="QComboBox" name="shadeSliders" />
-       </item>
-       <item row="2" column="1" >
-        <widget class="QComboBox" name="sliderAppearance" />
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="textLabel1_2_3_2" >
-         <property name="text" >
-          <string>Sliders:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="splitters" />
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="textLabel1_6" >
-         <property name="text" >
-          <string>Splitters:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4" colspan="2" >
-        <widget class="QComboBox" name="buttonEffect" />
-       </item>
-       <item row="0" column="2" colspan="2" >
-        <widget class="QComboBox" name="round" />
-       </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="appearance" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>0</hsizetype>
-           <vsizetype>0</vsizetype>
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis" >
-          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="textLabel1_7" >
-         <property name="text" >
-          <string>Appearance:</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab" >
@@ -382,10 +384,22 @@
        <string>Menus &amp;&amp; Toolbars</string>
       </attribute>
       <layout class="QGridLayout" >
-       <property name="margin" >
+       <property name="leftMargin" >
         <number>11</number>
        </property>
-       <property name="spacing" >
+       <property name="topMargin" >
+        <number>11</number>
+       </property>
+       <property name="rightMargin" >
+        <number>11</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>11</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
         <number>6</number>
        </property>
        <item row="0" column="0" >
@@ -436,12 +450,6 @@
           <bool>true</bool>
          </property>
          <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>11</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
           <item row="0" column="0" >
            <widget class="QLabel" name="textLabel1_4_2" >
             <property name="text" >
@@ -452,7 +460,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
+          <item row="0" column="1" colspan="3" >
            <widget class="QComboBox" name="menubarAppearance" />
           </item>
           <item row="1" column="0" >
@@ -465,17 +473,17 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
+          <item row="1" column="1" colspan="3" >
            <widget class="QComboBox" name="shadeMenubars" />
           </item>
-          <item row="1" column="2" >
+          <item row="1" column="4" >
            <widget class="KColorButton" name="customMenubarsColor" >
             <property name="text" >
              <string/>
             </property>
            </widget>
           </item>
-          <item row="1" column="3" >
+          <item row="1" column="5" >
            <widget class="QCheckBox" name="shadeMenubarOnlyWhenActive" >
             <property name="text" >
              <string>Active window only</string>
@@ -485,9 +493,7 @@
           <item row="2" column="0" colspan="2" >
            <widget class="QCheckBox" name="customMenuTextColor" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>0</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -511,14 +517,14 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="4" >
+          <item row="3" column="0" colspan="6" >
            <widget class="QCheckBox" name="menubarMouseOver" >
             <property name="text" >
              <string>Enable mouse-over for menubar items</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="4" >
+          <item row="4" column="0" colspan="6" >
            <widget class="QCheckBox" name="roundMbTopOnly" >
             <property name="text" >
              <string>Round selected menubar items on top only</string>
@@ -538,21 +544,21 @@
           <item row="5" column="1" >
            <widget class="QComboBox" name="menuitemAppearance" />
           </item>
-          <item row="5" column="2" >
+          <item row="5" column="2" colspan="3" >
            <widget class="QCheckBox" name="borderMenuitems" >
             <property name="text" >
              <string>Border</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="4" >
+          <item row="6" column="0" colspan="6" >
            <widget class="QCheckBox" name="lighterPopupMenuBgnd" >
             <property name="text" >
              <string>Lighter popup-menu background</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0" colspan="3" >
+          <item row="7" column="0" colspan="5" >
            <widget class="QCheckBox" name="thinnerMenuItems" >
             <property name="text" >
              <string>Thinner menu items</string>
@@ -571,10 +577,22 @@
           <bool>true</bool>
          </property>
          <layout class="QGridLayout" >
-          <property name="margin" >
+          <property name="leftMargin" >
            <number>11</number>
           </property>
-          <property name="spacing" >
+          <property name="topMargin" >
+           <number>11</number>
+          </property>
+          <property name="rightMargin" >
+           <number>11</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>11</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing" >
            <number>6</number>
           </property>
           <item row="0" column="4" >
@@ -642,10 +660,22 @@
        <string>Advanced</string>
       </attribute>
       <layout class="QGridLayout" >
-       <property name="margin" >
+       <property name="leftMargin" >
         <number>11</number>
        </property>
-       <property name="spacing" >
+       <property name="topMargin" >
+        <number>11</number>
+       </property>
+       <property name="rightMargin" >
+        <number>11</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>11</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
         <number>6</number>
        </property>
        <item row="0" column="0" colspan="4" >
@@ -714,9 +744,7 @@
        <item row="6" column="1" >
         <widget class="QPushButton" name="passwordChar" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>0</hsizetype>
-           <vsizetype>0</vsizetype>
+          <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -763,13 +791,6 @@
      </widget>
     </widget>
    </item>
-   <item row="2" column="1" >
-    <widget class="QPushButton" name="optionBtn" >
-     <property name="text" >
-      <string>Options</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0" >
     <spacer>
      <property name="orientation" >
@@ -783,24 +804,10 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="titleLabel" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+   <item row="2" column="1" >
+    <widget class="QPushButton" name="optionBtn" >
      <property name="text" >
-      <string>title</string>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="wordWrap" >
-      <bool>false</bool>
+      <string>Options</string>
      </property>
     </widget>
    </item>
@@ -824,6 +831,7 @@
   <tabstop>sliderAppearance</tabstop>
   <tabstop>shadeSliders</tabstop>
   <tabstop>customSlidersColor</tabstop>
+  <tabstop>sliderStyle</tabstop>
   <tabstop>fillSlider</tabstop>
   <tabstop>scrollbarType</tabstop>
   <tabstop>sliderThumbs</tabstop>

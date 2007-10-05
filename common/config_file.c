@@ -139,6 +139,8 @@ static EAppearance toAppearance(const char *str, EAppearance def)
             return APPEARANCE_RAISED;
         if(0==memcmp(str, "gradient", 8) || 0==memcmp(str, "lightgradient", 13))
             return APPEARANCE_GRADIENT;
+        if(0==memcmp(str, "splitgradient", 13))
+            return APPEARANCE_SPLIT_GRADIENT;
         if(0==memcmp(str, "glass", 5) || 0==memcmp(str, "shinyglass", 10))
             return APPEARANCE_SHINY_GLASS;
         if(0==memcmp(str, "dullglass", 9))
@@ -231,6 +233,34 @@ static EShading toShading(const char * str, EShading def)
             return SHADING_HSL;
         if(0==memcmp(str, "hsv", 3))
             return SHADING_HSV;
+    }
+
+    return def;
+}
+
+static EStripe toStripe(const char * str, EStripe def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "plain", 5) || 0==memcmp(str, "true", 4))
+            return STRIPE_PLAIN;
+        if(0==memcmp(str, "none", 4) || 0==memcmp(str, "false", 5))
+            return STRIPE_NONE;
+        if(0==memcmp(str, "diagonal", 8))
+            return STRIPE_DIAGONAL;
+    }
+
+    return def;
+}
+
+static ESliderStyle toSlider(const char * str, ESliderStyle def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "round", 5))
+            return SLIDER_ROUND;
+        if(0==memcmp(str, "plain", 5))
+            return SLIDER_PLAIN;
     }
 
     return def;
@@ -559,6 +589,12 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 */
 
+#define QTC_CFG_READ_STRIPE(ENTRY) \
+    opts->ENTRY=toStripe(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
+#define QTC_CFG_READ_SLIDER(ENTRY) \
+    opts->ENTRY=toSlider(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 #define QTC_CFG_READ_DEF_BTN(ENTRY) \
     opts->ENTRY=toInd(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
@@ -634,7 +670,8 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, def->appearance)
             QTC_CFG_READ_BOOL(fixParentlessDialogs)
-            QTC_CFG_READ_BOOL(stripedProgress)
+            QTC_CFG_READ_STRIPE(stripedProgress)
+            QTC_CFG_READ_SLIDER(sliderStyle)
             QTC_CFG_READ_BOOL(animatedProgress)
             QTC_CFG_READ_BOOL(lighterPopupMenuBgnd)
             QTC_CFG_READ_BOOL(embolden)
@@ -770,7 +807,8 @@ static void defaultSettings(Options *opts)
     opts->round=ROUND_FULL;
     opts->lighterPopupMenuBgnd=true;
     opts->animatedProgress=true;
-    opts->stripedProgress=true;
+    opts->stripedProgress=STRIPE_PLAIN;
+    opts->sliderStyle=SLIDER_ROUND;
     opts->highlightTab=true;
     opts->colorSelTab=false;
     opts->embolden=false;
@@ -929,6 +967,8 @@ static const char *toStr(EAppearance exp)
             return "raised";
         case APPEARANCE_GRADIENT:
             return "gradient";
+        case APPEARANCE_SPLIT_GRADIENT:
+            return "splitgradient";
         case APPEARANCE_DULL_GLASS:
             return "dullglass";
         case APPEARANCE_BEVELLED:
@@ -1027,6 +1067,32 @@ static const char *toStr(EShading s)
     }
 }
 
+static const char *toStr(EStripe s)
+{
+    switch(s)
+    {
+        default:
+        case STRIPE_PLAIN:
+            return "plain";
+        case STRIPE_NONE:
+            return "none";
+        case STRIPE_DIAGONAL:
+            return "diagonal";
+    }
+}
+
+static const char *toStr(ESliderStyle s)
+{
+    switch(s)
+    {
+        case SLIDER_PLAIN:
+            return "plain";
+        default:
+        case SLIDER_ROUND:
+            return "round";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #define CFG config
 #else
@@ -1101,6 +1167,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(appearance)
         CFG_WRITE_ENTRY(fixParentlessDialogs)
         CFG_WRITE_ENTRY(stripedProgress)
+        CFG_WRITE_ENTRY(sliderStyle)
         CFG_WRITE_ENTRY(animatedProgress)
         CFG_WRITE_ENTRY(lighterPopupMenuBgnd)
         CFG_WRITE_ENTRY(embolden)

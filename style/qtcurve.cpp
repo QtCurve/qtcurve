@@ -5218,7 +5218,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
 
             QPainter pixPainter(pix);
 
-            if(!selected && IS_GLASS(app))
+            if(!selected && (IS_GLASS(app) || APPEARANCE_SPLIT_GRADIENT==app))
             {
                 if(WIDGET_TAB_BOT==w)
                 {
@@ -5227,10 +5227,26 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
                     shadeBot=t;
                 }
 
-                double shadeTopA(WIDGET_TAB_BOT==w ? 1.0 : shadeTop*SHADE_GLASS_TOP_A(app, w)),
-                       shadeTopB(WIDGET_TAB_BOT==w ? 1.0 : shadeTop*SHADE_GLASS_TOP_B(app, w)),
-                       shadeBotA(WIDGET_TAB_TOP==w ? 1.0 : shadeBot*SHADE_GLASS_BOT_A(app)),
-                       shadeBotB(WIDGET_TAB_TOP==w ? 1.0 : shadeBot*SHADE_GLASS_BOT_B(app));
+                double shadeTopA(WIDGET_TAB_BOT==w
+                                    ? 1.0
+                                    : APPEARANCE_SPLIT_GRADIENT==app
+                                        ? shadeTop
+                                        : shadeTop*SHADE_GLASS_TOP_A(app, w)),
+                       shadeTopB(WIDGET_TAB_BOT==w
+                                    ? 1.0
+                                    : APPEARANCE_SPLIT_GRADIENT==app
+                                        ? shadeTop-((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
+                                        : shadeTop*SHADE_GLASS_TOP_B(app, w)),
+                       shadeBotA(WIDGET_TAB_TOP==w
+                                    ? 1.0
+                                    : APPEARANCE_SPLIT_GRADIENT==app
+                                        ? shadeBot+((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
+                                        : shadeBot*SHADE_GLASS_BOT_A(app)),
+                       shadeBotB(WIDGET_TAB_TOP==w
+                                    ? 1.0
+                                    : APPEARANCE_SPLIT_GRADIENT==app
+                                        ? shadeBot
+                                        : shadeBot*SHADE_GLASS_BOT_B(app));
 
                 QColor topA, topB, botA, botB;
                 QRect  r1(r), r2(r), r3(r);
@@ -5873,16 +5889,43 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
             else
                 animShift += (itsAnimateStep/2) % (PROGRESS_CHUNK_WIDTH*2);
 
-        if(opts.stripedProgress)
-            for(int offset=0; offset<(r.width()+PROGRESS_CHUNK_WIDTH);
-                offset+=(PROGRESS_CHUNK_WIDTH*2))
-            {
-                QRegion inner(vertical
-                                ? QRect(r.x(), r.y()+offset+animShift, r.width(), PROGRESS_CHUNK_WIDTH)
-                                : QRect(r.x()+offset+animShift, r.y(), PROGRESS_CHUNK_WIDTH, r.height()));
+        switch(opts.stripedProgress)
+        {
+            default:
+            case STRIPE_NONE:
+                break;
+            case STRIPE_PLAIN:
+                for(int offset=0; offset<(measure+PROGRESS_CHUNK_WIDTH); offset+=(PROGRESS_CHUNK_WIDTH*2))
+                {
+                    QRegion inner(vertical
+                                    ? QRect(r.x(), r.y()+offset+animShift, r.width(), PROGRESS_CHUNK_WIDTH)
+                                    : QRect(r.x()+offset+animShift, r.y(), PROGRESS_CHUNK_WIDTH, r.height()));
 
-                outer=outer.subtract(inner);
+                    outer=outer.subtract(inner);
+                }
+                break;
+            case STRIPE_DIAGONAL:
+            {
+                QPolygon a;
+                int      shift(vertical ? r.width() : r.height());
+
+                for(int offset=0; offset<(measure+shift+2); offset+=(PROGRESS_CHUNK_WIDTH*2))
+                {
+                    if(vertical)
+                        a.setPoints(4, r.x(),             r.y()+offset+animShift,
+                                       r.x()+r.width()-1, (r.y()+offset+animShift)-shift,
+                                       r.x()+r.width()-1, (r.y()+offset+animShift+PROGRESS_CHUNK_WIDTH)-shift,
+                                       r.x(),             r.y()+offset+animShift+PROGRESS_CHUNK_WIDTH);
+                    else
+                        a.setPoints(4, r.x()+offset+animShift,                              r.y(),
+                                       r.x()+offset+animShift+PROGRESS_CHUNK_WIDTH,         r.y(),
+                                       (r.x()+offset+animShift+PROGRESS_CHUNK_WIDTH)-shift, r.y()+r.height()-1,
+                                       (r.x()+offset+animShift)-shift,                      r.y()+r.height()-1);
+
+                    outer=outer.eor(QRegion(a));
+                }
             }
+        }
     }
 
     if(drawFull)
@@ -5984,9 +6027,10 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, const QStyleOption *op
                             : option->palette.mid().color(), small);
 }
 
-void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleOption *option) const
+void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const
 {
     QStyleOption opt(*option);
+    QRect        r(rOrig);
 
     if(opt.state&(State_Sunken|State_On))
         opt.state|=State_MouseOver;
@@ -6004,18 +6048,23 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleO
     int          min(MIN_SLIDER_SIZE(opts.sliderThumbs));
     const QColor *use(sliderColors(&opt));
 
-    drawLightBevel(p, r, &opt,
+    drawLightBevel(p, r, &opt, slider
 #ifndef QTC_SIMPLE_SCROLLBARS
-                   SCROLLBAR_NONE==opts.scrollbarType ? ROUNDED_ALL :
+                   || SCROLLBAR_NONE==opts.scrollbarType
 #endif
-                   ROUNDED_NONE,
+                    ? ROUNDED_ALL : ROUNDED_NONE,
                    getFill(&opt, use), use, true, WIDGET_SB_SLIDER);
 
     const QColor *markers(/*opts.coloredMouseOver && opt.state&State_MouseOver
                               ? SHADE_NONE==shade ? itsMouseOverCols : itsBackgroundCols
                               : */use);
 
-    if(LINE_NONE!=opts.sliderThumbs && ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min))
+    if(opt.state&State_Horizontal)
+        r.setX(r.x()+1);
+    else
+        r.setY(r.y()+1);
+
+    if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)))
         switch(opts.sliderThumbs)
         {
             case LINE_FLAT:
@@ -6026,7 +6075,7 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleO
                 break;
             case LINE_DOTS:
             default:
-                drawDots(p, r, !(opt.state&State_Horizontal), 5, 2, markers, 0, 5);
+                drawDots(p, r, !(opt.state&State_Horizontal), slider ? 3 : 5, slider ? 5 : 2, markers, 0, 5);
         }
 }
 
@@ -6034,7 +6083,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 {
     bool horiz(r.width()>r.height());
 
-    if(ROUND_FULL==opts.round)
+    if(SLIDER_ROUND==opts.sliderStyle && ROUND_FULL==opts.round)
     {
         QStyleOption opt(*option);
 
@@ -6128,7 +6177,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 //         else
 //             sr.adjust(1, 0, 0, 0);
 
-        drawSbSliderHandle(p, r, option);
+        drawSbSliderHandle(p, r, option, true);
 /*    }*/
 }
 
@@ -6266,14 +6315,15 @@ void QtCurveStyle::fillTab(QPainter *p, const QRect &r, const QStyleOption *opti
         p->fillRect(r, option->palette.background().color());
     else
     {
-        EAppearance app=option->state&State_Selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP;
+        bool        selected(option->state&State_Selected);
+        EAppearance app(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP);
 
         if(!IS_FLAT(app))
         {
-            double s1=increase
+            double s1=WIDGET_TAB_TOP==tab || (selected && opts.colorSelTab)
                           ? SHADE_TAB_SEL_LIGHT
                           : SHADE_BOTTOM_TAB_SEL_DARK,
-                   s2=increase
+                   s2=WIDGET_TAB_TOP==tab || (selected && opts.colorSelTab)
                           ? SHADE_TAB_SEL_DARK
                           : SHADE_BOTTOM_TAB_SEL_LIGHT;
 

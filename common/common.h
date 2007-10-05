@@ -194,6 +194,8 @@ typedef GdkColor color;
 #define SHADE_BOTTOM_TAB_SEL_LIGHT  1.0
 #define SHADE_BOTTOM_TAB_SEL_DARK   0.96
 
+#define SPLIT_GRADIENT_FACTOR       0.415
+
 #if !defined QTC_GLASS_SHADING || QTC_GLASS_SHADING==0
 
     #define SHADE_GLASS_TOP_A(A, W) (APPEARANCE_DULL_GLASS==A \
@@ -273,7 +275,8 @@ typedef GdkColor color;
 #define PROGRESS_ANIMATION 100
 #define MIN_SLIDER_SIZE(A) (LINE_DOTS==A ? 24 : 20)
 
-#define QTC_NORM_TAB_APP (APPEARANCE_BEVELLED==opts.tabAppearance ? APPEARANCE_GRADIENT : opts.tabAppearance)
+#define QTC_NORM_TAB_APP (APPEARANCE_BEVELLED==opts.tabAppearance || APPEARANCE_SPLIT_GRADIENT==opts.appearance \
+                            ? APPEARANCE_GRADIENT : opts.tabAppearance)
 #define QTC_SEL_TAB_APP (APPEARANCE_INVERTED==opts.tabAppearance ? APPEARANCE_FLAT : (QTC_NORM_TAB_APP))
 #define QTC_SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
 #define QTC_SLIDER_MO_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
@@ -346,11 +349,12 @@ typedef enum
 typedef enum
 {
     APPEARANCE_FLAT,
+    APPEARANCE_RAISED,
     APPEARANCE_DULL_GLASS,
     APPEARANCE_SHINY_GLASS,
     APPEARANCE_GRADIENT,
     APPEARANCE_INVERTED,
-    APPEARANCE_RAISED,
+    APPEARANCE_SPLIT_GRADIENT,
     APPEARANCE_BEVELLED
 } EAppearance;
 
@@ -446,6 +450,19 @@ typedef enum
     MO_COLORED,
     MO_PLASTIK
 } EMouseOver;
+
+typedef enum
+{
+    STRIPE_NONE,
+    STRIPE_PLAIN,
+    STRIPE_DIAGONAL
+} EStripe;
+
+typedef enum
+{
+    SLIDER_PLAIN,
+    SLIDER_ROUND
+} ESliderStyle;
 
 #define DEF_IND_STR                "fontcolor"
 #define DEF_LINE_STR               "dots"
@@ -823,7 +840,6 @@ typedef struct
                      lighterPopupMenuBgnd,
                      highlightTab,
                      colorSelTab,
-                     stripedProgress,
                      animatedProgress,
                      fixParentlessDialogs,
                      customMenuTextColor,
@@ -860,6 +876,8 @@ typedef struct
                      xCheck,
                      framelessGroupBoxes,
                      inactiveHighlight;
+    EStripe          stripedProgress;
+    ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
     ETBarBorder      toolbarBorders;
     EDefBtnIndicator defBtnIndicator;
