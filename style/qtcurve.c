@@ -144,6 +144,7 @@ static gboolean useButtonColor(const gchar *detail)
                        0==strcmp(detail, "spinbutton_up") ||
                        0==strcmp(detail, "spinbutton_down") ||
                        0==strcmp(detail, "slider") ||
+                       0==strcmp(detail, "qtc-slider") ||
                        0==strcmp(detail, "vscrollbar") ||
                        0==strcmp(detail, "hscrollbar") ||
                        0==strcmp(detail, "stepper") ||
@@ -597,7 +598,8 @@ static int getRound(const char *detail, GtkWidget *widget, int x, int y, gboolea
                     SCROLLBAR_NONE==opts.scrollbarType ? ROUNDED_ALL :
 #endif
                     ROUNDED_NONE;
-        else if(0==strcmp(detail, "splitter") || 0==strcmp(detail, "optionmenu")  ||
+        else if(0==strcmp(detail, "qtc-slider") ||
+                0==strcmp(detail, "splitter") || 0==strcmp(detail, "optionmenu")  ||
                 0==strcmp(detail, "togglebutton") || 0==strcmp(detail, "hscale") ||
                 0==strcmp(detail, "vscale") || 0==strcmp(detail, QTC_CHECKBOX)
                 /* || 0==strcmp(detail, "paned") || 0==strcmp(detail, QTC_PANED)*/ )
@@ -1299,10 +1301,9 @@ static void drawGradient(GdkWindow *window, GtkStyle *style, GdkRectangle *area,
 }
 
 static void drawBevelGradient(GtkStyle *style, GdkWindow *window,  GdkRectangle *area,
-                              GdkRegion *region, int x, int y, int width,
-                              int height, GdkColor *base, double shade_top, double shade_bot,
-                              gboolean horiz, gboolean increase, gboolean sel, EAppearance bevApp,
-                              EWidget w)
+                              GdkRegion *region, int x, int y, int width, int height, GdkColor *base,
+                              double shadeTop, double shadeBot, gboolean horiz, gboolean increase,
+                              gboolean sel, EAppearance bevApp, EWidget w)
 {
     EAppearance app=APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w
                         ? bevApp
@@ -1311,20 +1312,36 @@ static void drawBevelGradient(GtkStyle *style, GdkWindow *window,  GdkRectangle 
 
     if(IS_FLAT(bevApp))
         drawAreaColor(style, window, area, region, base, x, y, width, height);
-    else if(!selected && IS_GLASS(app))
+    else if(!selected && (IS_GLASS(app) || APPEARANCE_SPLIT_GRADIENT==app))
     {
         if(WIDGET_TAB_BOT==w)
         {
-            double t=shade_top;
-            shade_top=shade_bot;
-            shade_bot=t;
+            double t=shadeTop;
+            shadeTop=shadeBot;
+            shadeBot=t;
         }
 
         {  /* C variable scoping */
-        double   shadeTopA=WIDGET_TAB_BOT==w ? 1.0 : shade_top*SHADE_GLASS_TOP_A(app, w),
-                 shadeTopB=WIDGET_TAB_BOT==w ? 1.0 : shade_top*SHADE_GLASS_TOP_B(app, w),
-                 shadeBotA=WIDGET_TAB_TOP==w ? 1.0 : shade_bot*SHADE_GLASS_BOT_A(app),
-                 shadeBotB=WIDGET_TAB_TOP==w ? 1.0 : shade_bot*SHADE_GLASS_BOT_B(app);
+        double  shadeTopA=WIDGET_TAB_BOT==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeTop
+                                : shadeTop*SHADE_GLASS_TOP_A(app, w),
+                 shadeTopB=WIDGET_TAB_BOT==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeTop-((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
+                                : shadeTop*SHADE_GLASS_TOP_B(app, w),
+                 shadeBotA=WIDGET_TAB_TOP==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeBot+((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
+                                : shadeBot*SHADE_GLASS_BOT_A(app),
+                 shadeBotB=WIDGET_TAB_TOP==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeBot
+                                : shadeBot*SHADE_GLASS_BOT_B(app);
         GdkColor topA,
                  topB,
                  botA,
@@ -1446,18 +1463,18 @@ static void drawBevelGradient(GtkStyle *style, GdkWindow *window,  GdkRectangle 
             baseTopCol=&tabBaseCol;
         }
 
-        if(equal(1.0, shade_top))
+        if(equal(1.0, shadeTop))
             t=baseTopCol;
         else
         {
-            shade(baseTopCol, &top, shade_top);
+            shade(baseTopCol, &top, shadeTop);
             t=&top;
         }
-        if(equal(1.0, shade_bot))
+        if(equal(1.0, shadeBot))
             b=base;
         else
         {
-            shade(base, &bot, shade_bot);
+            shade(base, &bot, shadeBot);
             b=&bot;
         }
 
@@ -2558,7 +2575,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     gboolean custom_c = FALSE,
              pbar=DETAIL("bar") && GTK_IS_PROGRESS_BAR(widget),
              qtc_paned=!pbar && IS_QTC_PANED,
-             slider=!qtc_paned && DETAIL("slider"),
+             slider=!qtc_paned && (DETAIL("slider") || DETAIL("qtc-slider")),
              hscale=!slider && DETAIL("hscale"),
              vscale=!hscale && DETAIL("vscale"),
              menubar=!vscale && DETAIL("menubar"),
@@ -3368,7 +3385,7 @@ debugDisplayWidget(widget, 3);
                    horizPbar=isHorizontalProgressbar(widget);
         int        animShift=-PROGRESS_CHUNK_WIDTH;
 
-        if(pbar && opts.stripedProgress)
+        if(pbar && STRIPE_NONE!=opts.stripedProgress)
         {
             GdkRectangle rect={x, y, width-2, height-2};
             int          stripeOffset;
@@ -3384,37 +3401,72 @@ debugDisplayWidget(widget, 3);
             constrainRect(&rect, area);
             region=gdk_region_rectangle(&rect);
 
-            if(horizPbar)
-                for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH);
-                    stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    GdkRectangle inner_rect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
+            switch(opts.stripedProgress)
+            {
+                default:
+                case STRIPE_PLAIN:
+                    if(horizPbar)
+                        for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                        {
+                            GdkRectangle inner_rect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
 
-                    constrainRect(&inner_rect, area);
-                    if(inner_rect.width>0 && inner_rect.height>0)
+                            constrainRect(&inner_rect, area);
+                            if(inner_rect.width>0 && inner_rect.height>0)
+                            {
+                                GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+
+                                gdk_region_xor(region, inner_region);
+                                gdk_region_destroy(inner_region);
+                            }
+                        }
+                    else
+                        for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                        {
+                            GdkRectangle inner_rect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
+
+                            /*constrainRect(&inner_rect, area);*/
+                            if(inner_rect.width>0 && inner_rect.height>0)
+                            {
+                                GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+
+                                gdk_region_xor(region, inner_region);
+                                gdk_region_destroy(inner_region);
+                            }
+                        }
+                    break;
+                case STRIPE_DIAGONAL:
+                    if(horizPbar)
+                        for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                        {
+                            GdkPoint  a[4]={ {x+stripeOffset+animShift,                               y},
+                                             {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
+                                             {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
+                                             {(x+stripeOffset+animShift)-height,                      y+height-1}};
+                            GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
+
+                            gdk_region_xor(region, inner_region);
+                            gdk_region_destroy(inner_region);
+                        }
+                    else
+                        for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                        {
+                            GdkPoint  a[4]={{x,         y+stripeOffset+animShift},
+                                            {x+width-1, (y+stripeOffset+animShift)-width},
+                                            {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
+                                            {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
+                            GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
+
+                            gdk_region_xor(region, inner_region);
+                            gdk_region_destroy(inner_region);
+                        }
+                    if(area)
                     {
-                        GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+                        GdkRegion *outer_region=gdk_region_rectangle(area);
 
-                        gdk_region_xor(region, inner_region);
-                        gdk_region_destroy(inner_region);
+                        gdk_region_intersect(region, outer_region);
+                        gdk_region_destroy(outer_region);
                     }
-                }
-            else
-                for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH);
-                    stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    GdkRectangle inner_rect={x+1, y+stripeOffset+animShift, width-2,
-                                            PROGRESS_CHUNK_WIDTH};
-
-                    /*constrainRect(&inner_rect, area);*/
-                    if(inner_rect.width>0 && inner_rect.height>0)
-                    {
-                        GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
-
-                        gdk_region_xor(region, inner_region);
-                        gdk_region_destroy(inner_region);
-                    }
-                }
+            }
         }
 
         {
@@ -4455,14 +4507,15 @@ static void fillTab(GtkStyle *style, GdkWindow *window, GdkRectangle *area, GtkS
     }
     else
     {
-        EAppearance app=GTK_STATE_NORMAL==state ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP;
+        gboolean    selected=GTK_STATE_NORMAL==state;
+        EAppearance app=selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP;
 
         if(grad && !IS_FLAT(app))
         {
-            double s1=increase
+            double s1=WIDGET_TAB_TOP==tab || (selected && opts.colorSelTab)
                           ? SHADE_TAB_SEL_LIGHT
                           : SHADE_BOTTOM_TAB_SEL_DARK,
-                   s2=increase
+                   s2=WIDGET_TAB_TOP==tab || (selected && opts.colorSelTab)
                           ? SHADE_TAB_SEL_DARK
                           : SHADE_BOTTOM_TAB_SEL_LIGHT;
 
@@ -4833,8 +4886,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
     gboolean custom_c = FALSE,
              scrollbar=DETAIL("slider"),
-             hscale=DETAIL("hscale"),
-             vscale=DETAIL("vscale");
+             scale=DETAIL("hscale") || DETAIL("vscale");
     GdkColor new_colors[TOTAL_SHADES+1],
              *btn_colors;
     GdkGC    *new_gcs[TOTAL_SHADES+1],
@@ -4846,7 +4898,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     if(useButtonColor(detail))
     {
-        if(scrollbar|hscale|vscale && GTK_STATE_INSENSITIVE==state)
+        if(scrollbar|scale && GTK_STATE_INSENSITIVE==state)
         {
             btn_gcs=qtcurveStyle->background_gc;
             btn_colors=qtcurveStyle->background;
@@ -4860,26 +4912,33 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
             btn_colors=new_colors;
         }
         else
-            QTC_SET_BTN_COL_AND_GCS(scrollbar, hscale||vscale, FALSE)
+            QTC_SET_BTN_COL_AND_GCS(scrollbar, scale, FALSE)
     }
 
     FN_CHECK
     sanitizeSize(window, &width, &height);
 
-    if(scrollbar || ROUND_FULL!=opts.round)
+    if(scrollbar || ROUND_FULL!=opts.round || SLIDER_PLAIN==opts.sliderStyle)
     {
-        gtk_paint_box(style, window, state, shadow_type, area, widget, "slider", x, y, width, height);
+        gtk_paint_box(style, window, state, shadow_type, area, widget,
+                      !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height);
 
        /* Orientation is always vertical with Mozilla, why? Anyway this hack should be OK - as we only draw
           dashes when slider is larger than 'min' pixels... */
         orientation=width<height ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL;
         if(LINE_NONE!=opts.sliderThumbs &&
-           ((GTK_ORIENTATION_HORIZONTAL==orientation && width>=min) || height>=min))
+           (scale || ((GTK_ORIENTATION_HORIZONTAL==orientation && width>=min) || height>=min)))
         {
             GdkGC  **gcs=/*opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
                             ? SHADE_NONE==opts.shadeSliders && !custom_c
                                   ? qtcurveStyle->mouseover_gc : qtcurveStyle->background_gc
                             : */ btn_gcs;
+
+            if(LINE_SUNKEN!=opts.sliderThumbs)
+                if(GTK_ORIENTATION_HORIZONTAL==orientation)
+                    x++;
+                else
+                    y++;
 
             switch(opts.sliderThumbs)
             {
@@ -4894,7 +4953,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                 default:
                 case LINE_DOTS:
                     drawDots(window, x, y, width, height,
-                             GTK_ORIENTATION_HORIZONTAL!=orientation, 5, 2, gcs, area, 0, 5);
+                             GTK_ORIENTATION_HORIZONTAL!=orientation, scale ? 3 : 5, scale ? 4 : 2, gcs, area, 0, 5);
             }
         }
     }
