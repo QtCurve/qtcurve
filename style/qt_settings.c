@@ -1568,10 +1568,14 @@ static gboolean qtInit(Options *opts)
                                             " \"QtCSBar\"");
 #endif
                 }
+
                 /* The following settings only apply for GTK>=2.6.0 */
                 if(!opts->gtkButtonOrder && NULL==gtk_check_version(2, 6, 0))
                     g_object_set(settings, "gtk-alternative-button-order", TRUE, NULL);
             }
+
+            if(SLIDER_TRIANGULAR==opts->sliderStyle)
+                gtk_rc_parse_string("style \"QtCSldr\" {GtkScale::slider_length = 11 GtkScale::slider_width = 18} class \"*\" style \"QtCSldr\"");
 
             if(qtSettings.boldfont)
             {

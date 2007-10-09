@@ -4959,20 +4959,55 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
     else
     {
-        gboolean coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
-                 horiz=width>height;
-        int      bgnd=getFill(state, FALSE),
-                      xo=horiz ? 8 : 0,
-                      yo=horiz ? 0 : 8;
-        GdkGC    **gcs=coloredMouseOver
-                    ? qtcurveStyle->mouseover_gc
-                    : btn_gcs;
-        GdkColor *colors=coloredMouseOver
-                    ? qtcurveStyle->mouseover
-                    : btn_colors;
-        GdkPoint  clip[8]= {{x,       y+8+yo},  {x,       y+4},     {x+4,    y},        {x+8+xo, y},
-                           { x+12+xo, y+4},     {x+12+xo, y+8+yo},  {x+8+xo, y+12+yo},  {x+4, y+12+yo} };
-        GdkRegion *region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
+        gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
+                    horiz=SLIDER_TRIANGULAR==opts.sliderStyle ? height>width : width>height;
+        int         bgnd=getFill(state, FALSE),
+                    xo=horiz ? 8 : 0,
+                    yo=horiz ? 0 : 8,
+                    light=APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0;
+        GdkGC       **gcs=coloredMouseOver
+                       ? qtcurveStyle->mouseover_gc
+                       : btn_gcs;
+        GdkColor    *colors=coloredMouseOver
+                       ? qtcurveStyle->mouseover
+                       : btn_colors;
+        GdkRegion    *region=NULL;
+        GdkPoint     clip[8];
+        GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
+        gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver ||
+                                       (SLIDER_ROUND==opts.sliderStyle &&
+                                       (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders));
+
+        if(SLIDER_TRIANGULAR==opts.sliderStyle)
+        {
+            switch(direction)
+            {
+                case GTK_ARROW_UP:
+                default:
+                case GTK_ARROW_DOWN:
+                    y+=2;
+                    {
+                        GdkPoint pts[]={{x, y+2}, {x+2, y}, {x+8, y}, {x+10, y+2}, {x+10, y+9}, {x+5, y+14}, {x, y+9}};
+                        memcpy(&clip, &pts, sizeof(GdkPoint)*7);
+                    }
+                    break;
+                case GTK_ARROW_RIGHT:
+                case GTK_ARROW_LEFT:
+                    x+=2;
+                    {
+                        GdkPoint pts[]={{x+2, y}, {x, y+2}, {x, y+8}, {x+2, y+10}, {x+9, y+10}, {x+14, y+5}, {x+9, y}};
+                        memcpy(&clip, &pts, sizeof(GdkPoint)*7);
+                    }
+            }
+            region=gdk_region_polygon(clip, 7, GDK_EVEN_ODD_RULE);
+        }
+        else
+        {
+            GdkPoint  clip[8]= {{x,       y+8+yo},  {x,       y+4},     {x+4,    y},        {x+8+xo, y},
+                               { x+12+xo, y+4},     {x+12+xo, y+8+yo},  {x+8+xo, y+12+yo},  {x+4, y+12+yo} };
+
+            region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
+        }
 
         if(APPEARANCE_FLAT==opts.appearance || APPEARANCE_RAISED==opts.appearance)
         {
@@ -5033,6 +5068,53 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         gdk_region_destroy(region);
 
+        if(SLIDER_TRIANGULAR==opts.sliderStyle)
+        {
+            GdkGC *aaGc=QTC_SET_MID_COLOR(&colors[QT_STD_BORDER], &style->bg[GTK_STATE_NORMAL])
+
+            if(area)
+            {
+                gdk_gc_set_clip_rectangle(gcs[QT_STD_BORDER], area);
+                gdk_gc_set_clip_rectangle(gcs[light], area);
+            }
+
+            switch(direction)
+            {
+                case GTK_ARROW_UP:
+                default:
+                case GTK_ARROW_DOWN:
+                {
+                    GdkPoint aa[]={{x, y+1},  {x+1, y}, {x+9, y}, {x+10, y+1}, {x+10, y+10}, {x+6, y+14}, {x+4, y+14}, {x, y+10}};
+                    gdk_draw_polygon(window, aaGc, FALSE, aa, 8);
+                    if(drawLight)
+                    {
+                        gdk_draw_line(window, gcs[light], x+1, y+9,  x+1, y+1);
+                        gdk_draw_line(window, gcs[light], x+1, y+1, x+8, y+1);
+                    }
+                    break;
+                }
+                case GTK_ARROW_RIGHT:
+                case GTK_ARROW_LEFT:
+                {
+                    GdkPoint aa[]={{x+1, y}, {x, y+1}, {x, y+9}, {x+1, y+10}, {x+10, y+10}, {x+14, y+6}, {x+14, y+4}, {x+10, y}};
+                    gdk_draw_polygon(window, aaGc, FALSE, aa, 8);
+                    if(drawLight)
+                    {
+                        gdk_draw_line(window, gcs[light], x+1, y+8, x+1, y+1);
+                        gdk_draw_line(window, gcs[light], x+1, y+1, x+9, y+1);
+                    }
+                    break;
+                }
+            }
+
+            gdk_draw_polygon(window, gcs[QT_STD_BORDER], FALSE, clip, 7);
+            if(area)
+            {
+                gdk_gc_set_clip_rectangle(gcs[QT_STD_BORDER], NULL);
+                gdk_gc_set_clip_rectangle(gcs[light], NULL);
+            }
+        }
+        else
         {
             GdkPixbuf *border=getPixbuf(&colors[coloredMouseOver ? 4 : QT_BORDER(GTK_STATE_INSENSITIVE!=state)],
                                         horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8);
@@ -5040,7 +5122,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
             gdk_draw_pixbuf(window, btn_gcs[bgnd], border, 0, 0, x, y, gdk_pixbuf_get_width(border),
                             gdk_pixbuf_get_height(border), GDK_RGB_DITHER_MAX, 0, 0);
 
-            if(MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver)
+            if(drawLight)
             {
                 GdkPixbuf *light=getPixbuf(&colors[0], horiz ? PIX_SLIDER_LIGHT : PIX_SLIDER_LIGHT_V, 1.0);
 

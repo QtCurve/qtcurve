@@ -1,16 +1,18 @@
 0.55
 ----
-1. Ability to create custom themes. See Theme details in 'README' file.
-2. Fix for 'inactiveHighlight' and KDE's apply colours to non-KDE apps.
-3. Allow 'flat' lines in scrollbar handles, toolbar handles, toolbar
-   separators, and splitters.
-4. Option for 'X' style checkmarks.
-5. Option to have colour the selcted tab.
-6. Optional diagonal progressbar sripes.
-7. Modify default style: flat splitter lines, flat slider thumbs, no
-   toolbar separators.
-8. Use alternating dark/light for dashed toolbar handles.
-9. New 'split' style gradient.
+ 1. Ability to create custom themes. See Theme details in 'README' file.
+ 2. Fix for 'inactiveHighlight' and KDE's apply colours to non-KDE apps.
+ 3. Allow 'flat' lines in scrollbar handles, toolbar handles, toolbar
+    separators, and splitters.
+ 4. Option for 'X' style checkmarks.
+ 5. Option to have colour the selcted tab.
+ 6. Optional diagonal progressbar sripes.
+ 7. Modify default style: flat splitter lines, flat slider thumbs, no
+    toolbar separators.
+ 8. Use alternating dark/light for dashed toolbar handles.
+ 9. New 'split' style gradient.
+10. Option to specift slider style: plain, round (only when appearance=round),
+    and triangular (plastik-ish)
 
 0.54.1
 ------
