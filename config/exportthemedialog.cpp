@@ -70,7 +70,7 @@ void CExportThemeDialog::slotButtonClicked(int button)
             KMessageBox::error(this, i18n("Name is empty!"));
         else
         {
-            QString fileName(themeUrl->url().path()+"/qtc_"+name+".themerc");
+            QString fileName(themeUrl->url().path()+"/"QTC_THEME_PREFIX+name+".themerc");
 
             KConfig cfg(fileName, KConfig::NoGlobals);
             bool    rv(KConfig::ReadWrite==cfg.getConfigState());
@@ -79,7 +79,7 @@ void CExportThemeDialog::slotButtonClicked(int button)
             {
                 cfg.group("Misc").writeEntry("Name", themeName->text().trimmed());
                 cfg.group("Misc").writeEntry("Comment", themeComment->text());
-                cfg.group("KDE").writeEntry("WidgetStyle", "qtc_"+name);
+                cfg.group("KDE").writeEntry("WidgetStyle", QTC_THEME_PREFIX+name);
 
                 rv=writeConfig(&cfg, opts, opts, true);
             }
