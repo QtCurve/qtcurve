@@ -39,6 +39,7 @@ shadeMenubarOnlyWhenActive=false
 shadeMenubars=none
 shadeSliders=none
 sliderAppearance=raised
+sliderStyle=plain
 sliderThumbs=sunken
 splitters=sunken
 stdFocus=true

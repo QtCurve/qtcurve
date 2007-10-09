@@ -280,7 +280,7 @@ typedef GdkColor color;
 #define QTC_SEL_TAB_APP (APPEARANCE_INVERTED==opts.tabAppearance ? APPEARANCE_FLAT : (QTC_NORM_TAB_APP))
 #define QTC_SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
 #define QTC_SLIDER_MO_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
-#define QTC_SLIDER_MO_LEN (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3)
+#define QTC_SLIDER_MO_LEN (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
 #define QTC_SB_SLIDER_MO_LEN(A) ((A)<22 && ROUND_FULL!=opts.round \
                                     ? 2 \
                                     : ((A)<32 || (SHADE_SELECTED!=opts.shadeSliders && SHADE_BLEND_SELECTED!=opts.shadeSliders) \
@@ -461,7 +461,8 @@ typedef enum
 typedef enum
 {
     SLIDER_PLAIN,
-    SLIDER_ROUND
+    SLIDER_ROUND,
+    SLIDER_TRIANGULAR,
 } ESliderStyle;
 
 #define DEF_IND_STR                "fontcolor"

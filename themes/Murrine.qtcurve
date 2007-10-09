@@ -39,6 +39,7 @@ shadeMenubarOnlyWhenActive=false
 shadeMenubars=selected
 shadeSliders=origselected
 sliderAppearance=dullglass
+sliderStyle=plain
 sliderThumbs=sunken
 splitters=dashes
 stdFocus=true

@@ -1192,13 +1192,14 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_SliderThickness:
             return 21;
         case PM_SliderControlThickness:
-            return 13;
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : 13;
          case PM_SliderTickmarkOffset:
-             return 4;
+             return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
-                int size = 13;
+                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13);
+
                 if (slider->tickPosition & QSlider::TicksBelow)
                     ++size;
                 if (slider->tickPosition & QSlider::TicksAbove)
@@ -1207,7 +1208,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             }
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
         case PM_SliderLength:
-            return 21;
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : 21;
         case PM_ScrollBarExtent:
             return /*APP_KPRESENTER==theThemedApp ||
                    ((APP_KONQUEROR==theThemedApp || APP_KONTACT==theThemedApp) && (!widget || isFormWidget(widget)))
@@ -5072,42 +5073,104 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
             break;
         case CC_Slider:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
-            {
-                int  tickOffset(slider->tickPosition&QSlider::TicksAbove ||
-                                slider->tickPosition&QSlider::TicksBelow
-                                    ? pixelMetric(PM_SliderTickmarkOffset, slider, widget)
-                                    : pixelMetric(PM_SliderTickmarkOffset, slider, widget)/2),
-                     thickness(pixelMetric(PM_SliderControlThickness, slider, widget));
-                bool horizontal(Qt::Horizontal==slider->orientation);
-
-                switch (subControl)
+                if(SLIDER_TRIANGULAR==opts.sliderStyle)
                 {
-                    case SC_SliderHandle:
-                    {
-                        int len(pixelMetric(PM_SliderLength, slider, widget)),
-                            sliderPos(sliderPositionFromValue(slider->minimum, slider->maximum,
-                                                            slider->sliderPosition,
-                                                            (horizontal ? slider->rect.width()
-                                                                        : slider->rect.height()) - len,
-                                                            slider->upsideDown));
+                    int   tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget));
+                    QRect rect(QTC_BASE_STYLE::subControlRect(control, option, subControl, widget));
 
-                        if (horizontal)
-                            r.setRect(slider->rect.x() + sliderPos, slider->rect.y() + tickOffset, len, thickness);
-                        else
-                            r.setRect(slider->rect.x() + tickOffset, slider->rect.y() + sliderPos, thickness, len);
-                        break;
+                    switch (subControl)
+                    {
+                        case SC_SliderHandle:
+                            if (slider->orientation == Qt::Horizontal)
+                            {
+                                rect.setWidth(11);
+                                rect.setHeight(15);
+                                int centerY(r.center().y() - rect.height() / 2);
+                                if (slider->tickPosition & QSlider::TicksAbove)
+                                    centerY += tickSize;
+                                if (slider->tickPosition & QSlider::TicksBelow)
+                                    centerY -= tickSize;
+                                rect.moveTop(centerY);
+                            }
+                            else
+                            {
+                                rect.setWidth(15);
+                                rect.setHeight(11);
+                                int centerX(r.center().x() - rect.width() / 2);
+                                if (slider->tickPosition & QSlider::TicksAbove)
+                                    centerX += tickSize;
+                                if (slider->tickPosition & QSlider::TicksBelow)
+                                    centerX -= tickSize;
+                                rect.moveLeft(centerX);
+                            }
+                            break;
+                        case SC_SliderGroove:
+                        {
+                            QPoint grooveCenter(r.center());
+
+                            if (Qt::Horizontal==slider->orientation)
+                            {
+                                rect.setHeight(13);
+                                --grooveCenter.ry();
+                                if (slider->tickPosition & QSlider::TicksAbove)
+                                    grooveCenter.ry() += (tickSize+2);
+                                if (slider->tickPosition & QSlider::TicksBelow)
+                                    grooveCenter.ry() -= tickSize;
+                            }
+                            else
+                            {
+                                rect.setWidth(13);
+                                --grooveCenter.rx();
+                                if (slider->tickPosition & QSlider::TicksAbove)
+                                    grooveCenter.rx() += (tickSize+2);
+                                if (slider->tickPosition & QSlider::TicksBelow)
+                                    grooveCenter.rx() -= tickSize;
+                            }
+                            rect.moveCenter(grooveCenter);
+                            break;
+                        }
+                        default:
+                            break;
                     }
-                    case SC_SliderGroove:
-                        if (horizontal)
-                            r.setRect(slider->rect.x(), slider->rect.y() + tickOffset, slider->rect.width(), thickness);
-                        else
-                            r.setRect(slider->rect.x() + tickOffset, slider->rect.y(), thickness, slider->rect.height());
-                        break;
-                    default:
-                        break;
+                    return rect;
                 }
-                return visualRect(slider->direction, slider->rect, r);
-            }
+                else
+                {
+                    int  tickOffset(slider->tickPosition&QSlider::TicksAbove ||
+                                    slider->tickPosition&QSlider::TicksBelow
+                                        ? pixelMetric(PM_SliderTickmarkOffset, slider, widget)
+                                        : pixelMetric(PM_SliderTickmarkOffset, slider, widget)/2),
+                         thickness(pixelMetric(PM_SliderControlThickness, slider, widget));
+                    bool horizontal(Qt::Horizontal==slider->orientation);
+
+                    switch (subControl)
+                    {
+                        case SC_SliderHandle:
+                        {
+                            int len(pixelMetric(PM_SliderLength, slider, widget)),
+                                sliderPos(sliderPositionFromValue(slider->minimum, slider->maximum,
+                                                                slider->sliderPosition,
+                                                                (horizontal ? r.width()
+                                                                            : r.height()) - len,
+                                                                slider->upsideDown));
+
+                            if (horizontal)
+                                r.setRect(r.x() + sliderPos, r.y() + tickOffset, len, thickness);
+                            else
+                                r.setRect(r.x() + tickOffset, r.y() + sliderPos, thickness, len);
+                            break;
+                        }
+                        case SC_SliderGroove:
+                            if (horizontal)
+                                r.setRect(r.x(), r.y() + tickOffset, r.width(), thickness);
+                            else
+                                r.setRect(r.x() + tickOffset, r.y(), thickness, r.height());
+                            break;
+                        default:
+                            break;
+                    }
+                    return visualRect(slider->direction, r, r);
+                }
             break;
         case CC_GroupBox:
             if(opts.framelessGroupBoxes && (SC_GroupBoxCheckBox==subControl || SC_GroupBoxLabel==subControl))
@@ -6081,9 +6144,9 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
 
 void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const
 {
-    bool horiz(r.width()>r.height());
+    bool horiz(SLIDER_TRIANGULAR==opts.sliderStyle ? r.height()>r.width() : r.width()>r.height());
 
-    if(SLIDER_ROUND==opts.sliderStyle && ROUND_FULL==opts.round)
+    if(SLIDER_PLAIN!=opts.sliderStyle && ROUND_FULL==opts.round)
     {
         QStyleOption opt(*option);
 
@@ -6095,17 +6158,45 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
         opt.state|=State_Raised;
 
-        const QColor *use(sliderColors(&opt));
-        const QColor &fill(getFill(&opt, use));
-        int          x(r.x()),
-                     y(r.y()),
-                     xo(horiz ? 8 : 0),
-                     yo(horiz ? 0 : 8);
+        const QColor     *use(sliderColors(&opt));
+        const QColor     &fill(getFill(&opt, use));
+        int              x(r.x()),
+                         y(r.y()),
+                         xo(horiz ? 8 : 0),
+                         yo(horiz ? 0 : 8);
+        PrimitiveElement direction(horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight);
+        QPolygon         clipRegion;
+        bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver) ||
+                                   (SLIDER_ROUND==opts.sliderStyle &&
+                                   (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders)));
+        QRect            fillRect(r);
 
-        QPolygon clipRegion;
+        if(SLIDER_TRIANGULAR==opts.sliderStyle)
+        {
+            if(option->tickPosition & QSlider::TicksBelow)
+                direction=horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight;
+            else if(option->tickPosition & QSlider::TicksAbove)
+                direction=horiz ? PE_IndicatorArrowUp : PE_IndicatorArrowLeft;
 
-        clipRegion.setPoints(8, x,       y+8+yo,  x,       y+4,     x+4,    y,        x+8+xo, y,
-                                x+12+xo, y+4,     x+12+xo, y+8+yo,  x+8+xo, y+12+yo,  x+4,    y+12+yo);
+            switch(direction)
+            {
+                default:
+                case PE_IndicatorArrowDown:
+                    clipRegion.setPoints(7,   x, y+2,    x+2, y,   x+8, y,    x+10, y+2,   x+10, y+9,   x+5, y+14,    x, y+9);
+                    break;
+                case PE_IndicatorArrowUp:
+                    clipRegion.setPoints(7,   x, y+12,   x+2, y+14,   x+8, y+14,   x+10, y+12,   x+10, y+5,   x+5, y,    x, y+5);
+                    break;
+                case PE_IndicatorArrowLeft:
+                    clipRegion.setPoints(7,   x+12, y,   x+14, y+2,   x+14, y+8,   x+12, y+10,   x+5, y+10,    x, y+5,    x+5, y );
+                    break;
+                case PE_IndicatorArrowRight:
+                    clipRegion.setPoints(7,   x+2, y,    x, y+2,   x, y+8,    x+2, y+10,   x+9, y+10,   x+14, y+5,    x+9, y);
+            }
+        }
+        else
+            clipRegion.setPoints(8, x,       y+8+yo,  x,       y+4,     x+4,    y,        x+8+xo, y,
+                                 x+12+xo, y+4,     x+12+xo, y+8+yo,  x+8+xo, y+12+yo,  x+4,    y+12+yo);
 
         p->save();
         p->setClipRegion(QRegion(clipRegion)); // , QPainter::CoordPainter);
@@ -6160,12 +6251,53 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
         p->setClipping(false);
 
-        p->drawPixmap(x, y,
-                      *getPixmap(use[opts.coloredMouseOver && opt.state&State_MouseOver ? 4 : QT_BORDER(opt.state&State_Enabled)],
-                                 horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8));
+        if(SLIDER_TRIANGULAR==opts.sliderStyle)
+        {
+            QPolygon aa,
+                     light;
+            //QColor   aaCol(use[QT_STD_BORDER]);
 
-        if(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver))
-            p->drawPixmap(x, y, *getPixmap(use[0], horiz ? PIX_SLIDER_LIGHT : PIX_SLIDER_LIGHT_V));
+            switch(direction)
+            {
+                default:
+                case PE_IndicatorArrowDown:
+                    aa.setPoints(8,   x, y+1,    x+1, y,   x+9, y,    x+10, y+1,   x+10, y+10,   x+6, y+14,  x+4, y+14,  x, y+10);
+                    light.setPoints(3, x+1, y+9,   x+1, y+1,  x+8, y+1);
+                    break;
+                case PE_IndicatorArrowUp:
+                    aa.setPoints(8,   x, y+13,   x+1, y+14,   x+9, y+14,   x+10, y+13,   x+10, y+4,   x+6, y,  x+4, y,  x, y+4);
+                    light.setPoints(3, x+1, y+13,   x+1, y+5,  x+5, y+1);
+                    break;
+                case PE_IndicatorArrowLeft:
+                    aa.setPoints(8,   x+13, y,   x+14, y+1,   x+14, y+9,   x+13, y+10,   x+4, y+10,   x, y+6,  x, y+4,  x+4, y);
+                    light.setPoints(3, x+1, y+5,   x+5, y+1,  x+13, y+1);
+                    break;
+                case PE_IndicatorArrowRight:
+                    aa.setPoints(8,   x+1, y,    x, y+1,   x, y+9,    x+1, y+10,   x+10, y+10,   x+14, y+6, x+14, y+4,  x+10, y);
+                    light.setPoints(3, x+1, y+8,   x+1, y+1,  x+9, y+1);
+            }
+
+            //aaCol.setAlphaF(0.50);
+            //p->setPen(aaCol);
+            p->setPen(midColor(use[QT_STD_BORDER], option->palette.background().color()));
+            p->drawPolygon(aa);
+            if(drawLight)
+            {
+                p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                p->drawPolyline(light);
+            }
+            p->setPen(use[QT_STD_BORDER]);
+            p->drawPolygon(clipRegion);
+        }
+        else
+        {
+            p->drawPixmap(x, y,
+                          *getPixmap(use[opts.coloredMouseOver && opt.state&State_MouseOver ? 4 : QT_BORDER(opt.state&State_Enabled)],
+                                     horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8));
+
+            if(drawLight)
+                p->drawPixmap(x, y, *getPixmap(use[0], horiz ? PIX_SLIDER_LIGHT : PIX_SLIDER_LIGHT_V));
+        }
         p->restore();
     }
     else
