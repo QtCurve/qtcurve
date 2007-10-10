@@ -6169,7 +6169,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver) ||
                                    (SLIDER_ROUND==opts.sliderStyle &&
                                    (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders)));
-        QRect            fillRect(r);
+        int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13);
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)
         {
@@ -6211,19 +6211,19 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
                 if(horiz)
                 {
-                    p->fillRect(QRect(x+1, y+1, len, r.height()-2), itsMouseOverCols[col]);
+                    p->fillRect(QRect(x+1, y+1, len, size-2), itsMouseOverCols[col]);
                     p->fillRect(QRect(x+r.width()-(1+len), y+1, len, r.height()-2), itsMouseOverCols[col]);
                 }
                 else
                 {
-                    p->fillRect(QRect(x+1, y+1, r.width()-2, len), itsMouseOverCols[col]);
+                    p->fillRect(QRect(x+1, y+1, size-2, len), itsMouseOverCols[col]);
                     p->fillRect(QRect(x+1, y+r.height()-(1+len), r.width()-2, len), itsMouseOverCols[col]);
                 }
             }
         }
         else
         {
-            drawBevelGradient(fill, true, p, QRect(x+1, y+1, r.width()-2, r.height()-2),
+            drawBevelGradient(fill, true, p, QRect(x, y, horiz ? r.width()-1 : size, horiz ? size : r.height()-1),
                               horiz, SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                               false, opts.sliderAppearance);
 
@@ -6234,16 +6234,16 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
                 if(horiz)
                 {
-                    drawBevelGradient(itsMouseOverCols[col], true, p, QRect(x+1, y+1, len, r.height()-2),
+                    drawBevelGradient(itsMouseOverCols[col], true, p, QRect(x+1, y+1, len, size-2),
                                       horiz, SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK, false, opts.sliderAppearance);
-                    drawBevelGradient(itsMouseOverCols[col], true, p,  QRect(x+r.width()-(1+len), y+1, len, r.height()-2),
+                    drawBevelGradient(itsMouseOverCols[col], true, p,  QRect(x+r.width()-(1+len), y+1, len, size-2),
                                       horiz,SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK, false, opts.sliderAppearance);
                 }
                 else
                 {
-                    drawBevelGradient(itsMouseOverCols[col], true, p, QRect(x+1, y+1, r.width()-2, len),
+                    drawBevelGradient(itsMouseOverCols[col], true, p, QRect(x+1, y+1, size-2, len),
                                       horiz, SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK, false, opts.sliderAppearance);
-                    drawBevelGradient(itsMouseOverCols[col], true, p,QRect(x+1, y+r.height()-(1+len), r.width()-2, len),
+                    drawBevelGradient(itsMouseOverCols[col], true, p,QRect(x+1, y+r.height()-(1+len), size-2, len),
                                       horiz, SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK, false, opts.sliderAppearance);
                 }
             }
