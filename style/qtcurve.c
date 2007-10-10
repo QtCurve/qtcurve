@@ -4964,6 +4964,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         int         bgnd=getFill(state, FALSE),
                     xo=horiz ? 8 : 0,
                     yo=horiz ? 0 : 8,
+                    size=SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13,
                     light=APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0;
         GdkGC       **gcs=coloredMouseOver
                        ? qtcurveStyle->mouseover_gc
@@ -5023,20 +5024,20 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                 gdk_gc_set_clip_region(qtcurveStyle->mouseover_gc[col], region);
                 if(horiz)
                 {
-                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+1, y+1, len, height-2);
-                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+width-(1+len), y+1, len, height-2);
+                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+1, y+1, len, size-2);
+                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+width-(1+len), y+1, len, size-2);
                 }
                 else
                 {
-                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+1, y+1, width-2, len);
-                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+1, y+height-(1+len), width-2, len);
+                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+1, y+1, size-2, len);
+                    gdk_draw_rectangle(window, qtcurveStyle->mouseover_gc[col], TRUE, x+1, y+height-(1+len), size-2, len);
                 }
                 gdk_gc_set_clip_region(qtcurveStyle->mouseover_gc[col], NULL);
             }
         }
         else
         {
-            drawBevelGradient(style, window, NULL, region, x+1, y+1, width-2, height-2, &colors[bgnd],
+            drawBevelGradient(style, window, NULL, region, x, y, horiz ? width-1 : size, horiz ? size : height-1, &colors[bgnd],
                               SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                               horiz, TRUE, FALSE, opts.sliderAppearance, WIDGET_OTHER);
 
@@ -5047,19 +5048,19 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
                 if(horiz)
                 {
-                    drawBevelGradient(style, window, NULL, region, x+1, y+1, len, height-2, &qtcurveStyle->mouseover[col],
+                    drawBevelGradient(style, window, NULL, region, x+1, y+1, len, size-2, &qtcurveStyle->mouseover[col],
                                       SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                                       horiz, TRUE, FALSE, opts.sliderAppearance, WIDGET_OTHER);
-                    drawBevelGradient(style, window, NULL, region, x+width-(1+len), y+1, len, height-2, &qtcurveStyle->mouseover[col],
+                    drawBevelGradient(style, window, NULL, region, x+width-(1+len), y+1, len, size-2, &qtcurveStyle->mouseover[col],
                                       SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                                       horiz, TRUE, FALSE, opts.sliderAppearance, WIDGET_OTHER);
                 }
                 else
                 {
-                    drawBevelGradient(style, window, NULL, region, x+1, y+1, width-2, len, &qtcurveStyle->mouseover[col],
+                    drawBevelGradient(style, window, NULL, region, x+1, y+1, size-2, len, &qtcurveStyle->mouseover[col],
                                       SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                                       horiz, TRUE, FALSE, opts.sliderAppearance, WIDGET_OTHER);
-                    drawBevelGradient(style, window, NULL, region, x+1, y+height-(1+len), width-2, len, &qtcurveStyle->mouseover[col],
+                    drawBevelGradient(style, window, NULL, region, x+1, y+height-(1+len), size-2, len, &qtcurveStyle->mouseover[col],
                                       SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                                       horiz, TRUE, FALSE, opts.sliderAppearance, WIDGET_OTHER);
                 }
