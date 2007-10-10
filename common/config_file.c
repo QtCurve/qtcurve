@@ -810,7 +810,7 @@ static void defaultSettings(Options *opts)
     opts->lighterPopupMenuBgnd=true;
     opts->animatedProgress=true;
     opts->stripedProgress=STRIPE_PLAIN;
-    opts->sliderStyle=SLIDER_ROUND;
+    opts->sliderStyle=SLIDER_TRIANGULAR;
     opts->highlightTab=true;
     opts->colorSelTab=false;
     opts->embolden=false;
