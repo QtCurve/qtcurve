@@ -12,7 +12,7 @@
  9. Option to specift slider style: plain, round (only when appearance=round),
     and triangular (plastik-ish)
 10. Modify default style: flat splitter lines, flat slider thumbs, no
-    toolbar separators, triangular slider.
+    toolbar separators, triangular slider, diagonal progressbar stripes.
 
 0.54.1
 ------
