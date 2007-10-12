@@ -1198,7 +1198,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
-                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13);
+                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : 13);
 
                 if (slider->tickPosition & QSlider::TicksBelow)
                     ++size;
@@ -5089,7 +5089,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                                 if (slider->tickPosition & QSlider::TicksAbove)
                                     centerY += tickSize;
                                 if (slider->tickPosition & QSlider::TicksBelow)
-                                    centerY -= tickSize;
+                                    centerY -= (tickSize-1);
                                 rect.moveTop(centerY);
                             }
                             else
@@ -5100,7 +5100,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                                 if (slider->tickPosition & QSlider::TicksAbove)
                                     centerX += tickSize;
                                 if (slider->tickPosition & QSlider::TicksBelow)
-                                    centerX -= tickSize;
+                                    centerX -= (tickSize-1);
                                 rect.moveLeft(centerX);
                             }
                             break;
@@ -5115,7 +5115,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                                 if (slider->tickPosition & QSlider::TicksAbove)
                                     grooveCenter.ry() += (tickSize+2);
                                 if (slider->tickPosition & QSlider::TicksBelow)
-                                    grooveCenter.ry() -= tickSize;
+                                    grooveCenter.ry() -= (tickSize-1);
                             }
                             else
                             {
@@ -5124,7 +5124,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                                 if (slider->tickPosition & QSlider::TicksAbove)
                                     grooveCenter.rx() += (tickSize+2);
                                 if (slider->tickPosition & QSlider::TicksBelow)
-                                    grooveCenter.rx() -= tickSize;
+                                    grooveCenter.rx() -= (tickSize-1);
                             }
                             rect.moveCenter(grooveCenter);
                             break;
