@@ -354,18 +354,13 @@ void QtCurveConfig::save()
     writeConfig(NULL, opts, defaultStyle);
 
     // This is only read by KDE3...
-    KSharedConfigPtr cfg=KGlobal::config();
-    bool             useGlobals(cfg->forceGlobal());
-    KConfigGroup     grp(cfg, "KDE");
-
-    cfg->setForceGlobal(true);
+    KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
+    KConfigGroup grp(&kglobals, "KDE");
 
     if(opts.gtkButtonOrder)
         grp.writeEntry("ButtonLayout", 2);
     else
         grp.deleteEntry("ButtonLayout");
-    cfg->sync();
-    cfg->setForceGlobal(useGlobals);
 }
 
 void QtCurveConfig::defaults()
