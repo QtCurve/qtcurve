@@ -1,3 +1,7 @@
+0.55.1
+------
+1. Only allow coloured selected tabs if tab appearance is set to gradient.
+
 0.55
 ----
  1. Ability to create custom themes. See Theme details in 'README' file.

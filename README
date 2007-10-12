@@ -42,7 +42,7 @@ format:
     ....rest of qtcurve settings...
 
 To use this theme, either copy qtc_<name>.themerc to
-$KDEHOME/share/apps/kstyle/themes/ (usually ~/.kdee/share/apps/kstyle/themes/)
+$KDEHOME/share/apps/kstyle/themes/ (usually ~/.kde/share/apps/kstyle/themes/)
 or copy to <kde install prefix>/share/apps/kstyle/themes/ (usually
 /usr/share/apps/kstyle/themes/)
 
