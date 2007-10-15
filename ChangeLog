@@ -1,6 +1,7 @@
 0.55.1
 ------
 1. Only allow coloured selected tabs if tab appearance is set to gradient.
+2. Allow triangular sliders when not rounding.
 
 0.55
 ----
