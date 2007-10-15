@@ -1,9 +1,10 @@
 0.55.1
 ------
 1. Only allow coloured selected tabs if tab appearance is set to gradient.
-2. Fix KDE4 cmake hassle - find KDE4 package before trying to find Qt4 package.
-3. Fix clipping of triangular slider in konqueror's settings.
-4. Remove usage of deprecated KConfig functions.
+2. Allow triangular sliders when not rounding.
+3. Fix KDE4 cmake hassle - find KDE4 package before trying to find Qt4 package.
+4. Fix clipping of triangular slider in konqueror's settings.
+5. Remove usage of deprecated KConfig functions.
 
 0.55
 ----
