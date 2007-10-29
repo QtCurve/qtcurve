@@ -1,3 +1,7 @@
+0.55.2
+------
+1. Add warning to -DQTC_ADD_EVENT_FILTER option.
+
 0.55.1
 ------
 1. Only allow coloured selected tabs if tab appearance is set to gradient.
