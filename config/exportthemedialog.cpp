@@ -72,8 +72,8 @@ void CExportThemeDialog::slotButtonClicked(int button)
         {
             QString fileName(themeUrl->url().path()+"/"QTC_THEME_PREFIX+name+".themerc");
 
-            KConfig cfg(fileName, KConfig::NoGlobals);
-            bool    rv(KConfig::ReadWrite==cfg.getConfigState());
+            KConfig cfg(fileName, KConfig::SimpleConfig);
+            bool    rv(cfg.isConfigWritable(false));
 
             if(rv)
             {

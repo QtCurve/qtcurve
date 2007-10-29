@@ -1,3 +1,8 @@
+0.55.2
+------
+1. Try to prevent skiny toolbar buttons (such as konqueror's 'Up' button)
+2. Sync with latest KDE4.
+
 0.55.1
 ------
 1. Only allow coloured selected tabs if tab appearance is set to gradient.

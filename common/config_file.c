@@ -1152,7 +1152,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             sprintf(filename, "%s/"QTC_FILE, xdg);
 
 #if QT_VERSION >= 0x040000
-            KConfig defCfg(filename, KConfig::OnlyLocal);
+            KConfig defCfg(filename, KConfig::SimpleConfig);
 #else
             KConfig defCfg(filename, false, false);
 #endif
