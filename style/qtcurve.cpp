@@ -4756,9 +4756,35 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             newSize.rheight() -= (1 - newSize.rheight() & 1);
             break;
         case CT_ToolButton:
+        {
             newSize.rheight() += 3;
             newSize.rwidth() += 3;
+
+            // -- from kstyle & oxygen --
+            // We want to avoid super-skiny buttons, for things like "up" when icons + text
+            // For this, we would like to make width >= height.
+            // However, once we get here, QToolButton may have already put in the menu area
+            // (PM_MenuButtonIndicator) into the width. So we may have to take it out, fix things
+            // up, and add it back in. So much for class-independent rendering...
+
+            int menuAreaWidth(0);
+
+            if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
+            {
+                if ((!tbOpt->icon.isNull()) && (!tbOpt->text.isEmpty()) && tbOpt->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
+                    newSize.setHeight(newSize.height()-7);
+
+                if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
+                    menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
+            }
+
+            newSize.setWidth(newSize.width() - menuAreaWidth);
+            if (newSize.width() < newSize.height())
+                newSize.setWidth(newSize.height());
+            newSize.setWidth(newSize.width() + menuAreaWidth);
+
             break;
+        }
         case CT_ComboBox:
         {
             const int constMinH(QTC_CAN_DO_EFFECT ? 26 : 24);
