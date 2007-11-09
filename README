@@ -12,6 +12,8 @@ The following options may supplied to cmake:
 
     -DQTC_ADD_EVENT_FILTER=true
         Enable receiving of KDE style change events
+        NOTE: This has been reported to interfere with firefox, and
+              crash some apps. Use at your own risk.
 
    -DQTC_MODIFY_MOZILLA=true
         Enable mods to userChrome.css (setting KDE button order)
@@ -20,6 +22,10 @@ The following options may supplied to cmake:
         Enable mods to user.js (setting of instant apply, and
         move ~/.mime.types and ~/.mailcap into ~/.mozilla)
 
+    -DQTC_REORDER_GTK_DIALOG_BUTTONS=true
+       When set QtCurve will try to manually re-order the buttons of Gtk
+       dialogs. Note: This will cause errors to be printed to the console,
+       and is only an experiment!
 
 Themes
 ------

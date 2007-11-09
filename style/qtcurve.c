@@ -2165,11 +2165,11 @@ debugDisplayWidget(widget, 3);
 
 #define QTC_MODAL_HACK_NAME  "--kgtk-modal-dialog-hack--"
 #define QTC_MENU_HACK_NAME   "--kgtk-menu-hack--"
-#if 0
+#ifdef QTC_REORDER_GTK_DIALOG_BUTTONS
 #define QTC_BUTTON_HACK_NAME "--kgtk-button-hack--"
 
 #if GTK_CHECK_VERSION(2, 6, 0)
-    if(opts.setDialogButtonOrder && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
+    if(!opts.gtkButtonOrder && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 

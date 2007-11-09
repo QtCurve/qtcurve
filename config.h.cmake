@@ -11,5 +11,6 @@
 #cmakedefine QTC_ADD_EVENT_FILTER
 #cmakedefine QTC_MODIFY_MOZILLA
 #cmakedefine QTC_MODIFY_MOZILLA_USER_JS
+#cmakedefine QTC_REORDER_GTK_DIALOG_BUTTONS
 
 #endif

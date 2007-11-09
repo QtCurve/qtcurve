@@ -1,6 +1,10 @@
 0.55.2
 ------
 1. Add warning to -DQTC_ADD_EVENT_FILTER option.
+2. Add cmake option: -DQTC_REORDER_GTK_DIALOG_BUTTONS
+   When set QtCurve will try to manually re-order the buttons of Gtk
+   dialogs. Note: This will cause errors to be printed to the console,
+   and is only an experiment!
 
 0.55.1
 ------
