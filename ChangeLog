@@ -1,7 +1,8 @@
 0.55.2
 ------
-1. Try to prevent skiny toolbar buttons (such as konqueror's 'Up' button)
-2. Sync with latest KDE4.
+1. Add ability to import qtc_*.themerc settings into config dialog.
+2. Try to prevent skiny toolbar buttons (such as konqueror's 'Up' button)
+3. Sync with latest KDE4.
 
 0.55.1
 ------

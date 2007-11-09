@@ -330,9 +330,8 @@ QtCurveConfig::~QtCurveConfig()
 
 void QtCurveConfig::loadStyles(QMenu *menu)
 {
-    QStringList           files=KGlobal::dirs()->findAllResources("data",
-                                                                  "QtCurve/*"QTC_EXTENSION,
-                                                                  KStandardDirs::NoDuplicates);
+    QStringList files(KGlobal::dirs()->findAllResources("data", "QtCurve/*"QTC_EXTENSION, KStandardDirs::NoDuplicates));
+
     files.sort();
 
     QStringList::Iterator it(files.begin()),
@@ -457,7 +456,9 @@ void QtCurveConfig::updateChanged()
 
 void QtCurveConfig::importStyle()
 {
-    QString file(KFileDialog::getOpenFileName(KUrl(), "*"QTC_EXTENSION, this));
+    QString file(KFileDialog::getOpenFileName(KUrl(),
+                                              i18n("*"QTC_EXTENSION"|QtCurve Settings Files\n"
+                                                   QTC_THEME_PREFIX"*"QTC_THEME_SUFFIX"|QtCurve KDE Theme Files"), this));
 
     if(!file.isEmpty())
         loadStyle(file);
@@ -465,7 +466,7 @@ void QtCurveConfig::importStyle()
 
 void QtCurveConfig::exportStyle()
 {
-    QString file(KFileDialog::getSaveFileName(KUrl(), "*"QTC_EXTENSION, this));
+    QString file(KFileDialog::getSaveFileName(KUrl(), i18n("*"QTC_EXTENSION"|QtCurve Settings Files"), this));
 
     if(!file.isEmpty())
     {
