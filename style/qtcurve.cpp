@@ -491,6 +491,17 @@ static bool readQt3(QPalette &pal, QFont &font)
     return false;
 }
 
+static const QPushButton * getButton(const QWidget *w, const QPainter *p)
+{
+    const QWidget *widget=w ? w : (p && p->device() ? dynamic_cast<const QWidget *>(p->device()) : 0L);
+    return widget ? ::qobject_cast<const QPushButton *>(widget) : 0L;
+}
+
+inline bool isMultiTabBarTab(const QPushButton *button)
+{
+    return button && button->isFlat() && button->inherits("KMultiTabBarTab");
+}
+
 #define QTC_SKIP_TASKBAR  (APP_SKIP_TASKBAR==theThemedApp || APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp)
 #define QTC_CAN_DO_EFFECT (QTC_DO_EFFECT && CEtchCheck::canEtch())
 
@@ -1814,8 +1825,75 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->restore();
             break;
         }
-        case PE_IndicatorButtonDropDown: // This should never be called, but just in case - draw as a normal toolbutton...
         case PE_PanelButtonTool:
+            if(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)))
+            {
+                QRect        r2(r);
+                QStyleOption opt(*option);
+
+                if(r2.height()>r2.width())
+                    opt.state&=~State_Horizontal;
+                else
+                    opt.state|=State_Horizontal;
+
+                const QColor *use(opt.state&State_On ? getSidebarButtons() : buttonColors(option));
+                bool         horiz(opt.state&State_Horizontal);
+
+                painter->save();
+                if((opt.state&State_On ) || opt.state&State_MouseOver)
+                {
+                    r2.adjust(-1, -1, 1, 1);
+                    drawLightBevel(painter, r2, &opt, ROUNDED_NONE, getFill(&opt, use), use, false, WIDGET_MENU_ITEM);
+                }
+                else
+                    painter->fillRect(r2, palette.background().color());
+
+                if(opt.state&State_MouseOver && opts.coloredMouseOver)
+                {
+                    r2=r;
+                    if(MO_PLASTIK==opts.coloredMouseOver)
+                        if(horiz)
+                            r2.adjust(0, 1, 0, -1);
+                        else
+                            r2.adjust(1, 0, -1, 0);
+                    else
+                        r2.adjust(1, 1, -1, -1);
+
+                    painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
+
+                    if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                    {
+                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+                        painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
+                    }
+
+                    if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                    {
+                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+                        painter->drawLine(r2.x(), r2.y(), r2.x(), r2.y()+r2.height()-1);
+                        if(MO_PLASTIK!=opts.coloredMouseOver)
+                            painter->setPen(itsMouseOverCols[opt.state&State_On ? 1 : 2]);
+                    }
+
+                    if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                    {
+                        painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                        painter->drawLine(r2.x(), r2.y()+r2.height()-1, r2.x()+r2.width()-1,
+                                          r2.y()+r2.height()-1);
+                    }
+
+                    if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                    {
+                        painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                        painter->drawLine(r2.x()+r2.width()-1, r2.y(), r2.x()+r2.width()-1,
+                                        r2.y()+r2.height()-1);
+                    }
+                }
+
+                painter->restore();
+                break;
+            }
+        case PE_IndicatorButtonDropDown: // This should never be called, but just in case - draw as a normal toolbutton...
         {
             bool dwt(widget && widget->inherits("QDockWidgetTitleButton"));
 
@@ -2039,13 +2117,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(PE_PanelButtonBevel==element)
                 opt.state|=State_Enabled;
 
-            if(opts.stdSidebarButtons && !noEtch)
-            {
-                const QPushButton *button(widget ? static_cast<const QPushButton *>(widget) : NULL);
-
-                if(button && button->isFlat() && button->inherits("KMultiTabBarTab"))
-                    noEtch=true;
-            }
+#if 0 // KDE4 draw mult tab bar tabs via PE_PanelButtonTool
+            if(opts.stdSidebarButtons && !noEtch && isMultiTabBarTab(getButton(widget, painter)))
+                noEtch=true;
+#endif
 
             if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
@@ -2945,9 +3020,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                const QPushButton *button(widget ? static_cast<const QPushButton *>(widget) : NULL);
+#if 0 // -- KDE4 no longer draws multi tab bar tabs this way!
+                //const QPushButton *button(widget ? static_cast<const QPushButton *>(widget) : NULL);
 
-                if(!opts.stdSidebarButtons && button && button->isFlat() && button->inherits("KMultiTabBarTab"))
+                if(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)))
                 {
                     QRect        r2(r);
                     QStyleOption opt(*option);
@@ -2955,7 +3031,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     //flags|=QTC_TOGGLE_BUTTON;
                     //if(button->isOn())
                     //    opt.state|=State_On;
-                    if(button->underMouse())
+                    if(widget->underMouse())
                         opt.state|=State_MouseOver;
 
                     opt.state|=State_Horizontal;
@@ -3009,6 +3085,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     drawControl(CE_PushButtonLabel, &subopt, painter, widget);
                 }
                 else
+#endif
                 {
                     CEtchCheck check(widget);
 
@@ -3122,11 +3199,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     r.adjust(0, 0, -(pixelMetric(PM_MenuButtonIndicator, button, widget)-4), 0);
 
                 int                 num(opts.embolden && button->features&QStyleOptionButton::DefaultButton ? 2 : 1);
-                const QPushButton   *btn(widget ? static_cast<const QPushButton *>(widget) : NULL);
-                QPalette::ColorRole textCol(!opts.stdSidebarButtons && btn && btn->isFlat() && btn->inherits("KMultiTabBarTab") &&
+                //const QPushButton   *btn(widget ? static_cast<const QPushButton *>(widget) : NULL);
+#if 0 // -- KDE4 no longer draws tab bar tabs this way
+                QPalette::ColorRole textCol(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)) &&
                                             (/*button->isOn() || */state&State_On)
                                                 ? QPalette::HighlightedText
                                                 : QPalette::ButtonText);
+#else
+                QPalette::ColorRole textCol(QPalette::ButtonText);
+#endif
 
                 for(int i=0; i<num; ++i)
                     drawItemText(painter, r.adjusted(i, 0, i, 0), tf, palette, (state&State_Enabled),
@@ -4690,6 +4771,20 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             QTC_BASE_STYLE::drawComplexControl(control, option, painter, widget);
             break;
     }
+}
+
+void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
+                                QPalette::ColorRole textRole) const
+{
+    if(QPalette::ButtonText==textRole)
+    {
+        const QPushButton *button=getButton(0L, painter);
+
+        if(button && isMultiTabBarTab(button) && button->isChecked())
+            textRole=QPalette::HighlightedText;
+    }
+
+    QTC_BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
 QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
