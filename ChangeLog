@@ -5,6 +5,8 @@
    When set QtCurve will try to manually re-order the buttons of Gtk
    dialogs. Note: This will cause errors to be printed to the console,
    and is only an experiment!
+3. Style Gtk2.12 tooltips
+4. Improve look of edit field under firefox3
 
 0.55.1
 ------

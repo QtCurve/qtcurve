@@ -2051,6 +2051,7 @@ debugDisplayWidget(widget, 3);
     else
         midgc=style->base_gc[state];
 
+    gdk_draw_rectangle(window, style->base_gc[state], TRUE, x+1, y+1, width-2, height-2);
     gdk_draw_line(window, midgc, x+1, y+1, x+1, y+height-2);
     gdk_draw_line(window, midgc, x+1, y+1, x+width-1, y+1);
 
@@ -2174,15 +2175,15 @@ debugDisplayWidget(widget, 3);
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 
         if(topLevel && GTK_IS_DIALOG(topLevel) && (!topLevel->name || 0==strcmp(topLevel->name, QTC_MODAL_HACK_NAME)))
-        {
-            gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
-                                                    GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
-                                                    GTK_RESPONSE_REJECT, GTK_RESPONSE_CLOSE, GTK_RESPONSE_NO, GTK_RESPONSE_CANCEL, -1);
+            {
+                gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
+                                                        GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
+                                                        GTK_RESPONSE_REJECT, GTK_RESPONSE_CLOSE, GTK_RESPONSE_NO, GTK_RESPONSE_CANCEL, -1);
 
-            if(!topLevel->name)
-                gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME);
-            else
-                gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME QTC_MODAL_HACK_NAME);
+                if(!topLevel->name)
+                    gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME);
+                else
+                    gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME QTC_MODAL_HACK_NAME);
         }
     }
 #endif
@@ -2921,6 +2922,10 @@ debugDisplayWidget(widget, 3);
                 }
                 else if(IND_COLORED==opts.defBtnIndicator && (COLORED_BORDER_SIZE>2))
                 {
+                    GdkGC     **gcs=qtcurveStyle->mouseover_gc[0] && GTK_STATE_PRELIGHT==state
+                                        ? qtcurveStyle->mouseover_gc : qtcurveStyle->defbtn_gc;
+                    GdkColor  *cols=qtcurveStyle->mouseover_gc[0] && GTK_STATE_PRELIGHT==state
+                                        ? qtcurveStyle->mouseover : qtcurveStyle->defbtn;
                     int       o=QTC_DO_EFFECT ? 1 : 0; // offset needed because of etch
                     GdkPoint  outer[4]={ {x, y}, {x+width, y}, {x+width, y+height},
                                          {x, y+height} },
@@ -2934,8 +2939,7 @@ debugDisplayWidget(widget, 3);
                     gdk_region_xor(inner_region, outer_region);
 
                     drawLightBevel(style, window, state, NULL, inner_region, x, y, width, height,
-                                   &qtcurveStyle->defbtn[QTC_MO_DEF_BTN], NULL, qtcurveStyle->defbtn_gc,
-                                   qtcurveStyle->defbtn, NULL, round, WIDGET_DEF_BUTTON,
+                                   &cols[QTC_MO_DEF_BTN], NULL, gcs, cols, NULL, round, WIDGET_DEF_BUTTON,
                                    BORDER_FLAT, DF_LARGE_ARC|
                                    /*(draw_inside ? DF_DRAW_INSIDE : 0) |*/
                                    DF_DO_CORNERS|(sunken ? DF_SUNKEN : 0)|
