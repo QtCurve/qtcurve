@@ -51,13 +51,6 @@ class QtCurveStyle : public QWindowsStyle
 {
     Q_OBJECT
 
-    enum EBlend
-    {
-        BLEND_NONE,
-        BLEND_BGND,
-        BLEND_BASE
-    };
-
     public:
 
     QtCurveStyle(const QString &name=QString());
@@ -66,6 +59,7 @@ class QtCurveStyle : public QWindowsStyle
     void polish(QApplication *app);
     void polish(QPalette &palette);
     void polish(QWidget *widget);
+    void unpolish(QApplication *app) { QTC_BASE_STYLE::unpolish(app); }
     void unpolish(QWidget *widget);
     bool eventFilter(QObject *object, QEvent *event);
     void timerEvent(QTimerEvent *event);
@@ -94,9 +88,8 @@ class QtCurveStyle : public QWindowsStyle
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *option, */bool top, bool bot, bool raised=false) const;
-    void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
-                    int round, const QColor *custom=0, EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT,
-                    EBlend blend=BLEND_BGND, int borderVal=QT_STD_BORDER) const;
+    void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
+                    EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
     void drawEntryField(QPainter *p, const QRect &rx, const QStyleOption *option, int round, EWidget w=WIDGET_OTHER) const;
     void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const;

@@ -1695,13 +1695,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                 ? BORDER_SUNKEN
                                                 : state&State_Raised
                                                     ? BORDER_RAISED
-                                                    : BORDER_FLAT,
-                               state&State_Enabled || state&State_HasFocus
-                                ? widget && (qobject_cast<const QAbstractScrollArea *>(widget) ||
-                                             widget->inherits("Q3ScrollView"))
-                                    ? BLEND_BASE
-                                    : BLEND_BGND
-                                : BLEND_NONE);
+                                                    : BORDER_FLAT);
                     painter->restore();
                 }
             }
@@ -2097,7 +2091,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         drawRect(painter, r);
                     }
                     else
-                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_OTHER, BORDER_FLAT, BLEND_BGND, QT_FOCUS);
+                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_OTHER, BORDER_FLAT, QT_FOCUS);
                 }
 #endif
             }
@@ -2157,8 +2151,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
                     case IND_COLORED:
                     {
-                        QRegion outer(r);
-                        QRect   r2(r);
+                        const QColor *cols=itsMouseOverCols && opt.state&State_MouseOver ? itsMouseOverCols : itsDefBtnCols;
+                        QRegion      outer(r);
+                        QRect        r2(r);
 
                         if(QTC_CAN_DO_EFFECT)
                             r2.adjust(0, 1, 0, -1);
@@ -2170,8 +2165,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                         painter->setClipRegion(outer.subtract(inner));
 
-                        drawLightBevel(painter, r, option, ROUNDED_ALL, itsDefBtnCols[QTC_MO_DEF_BTN],
-                                       itsDefBtnCols, true, WIDGET_DEF_BUTTON);
+                        drawLightBevel(painter, r, option, ROUNDED_ALL, cols[QTC_MO_DEF_BTN],
+                                       cols, true, WIDGET_DEF_BUTTON);
 
                         painter->setClipping(false);
                     }
@@ -2190,7 +2185,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_FrameTabWidget:
             painter->save();
-            drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED, BLEND_NONE);
+            drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED, false);
             painter->restore();
             break;
         default:
@@ -3361,7 +3356,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_TOPRIGHT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -3391,7 +3386,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->drawLine(r.left()+1, r.top()+2, r.right()-1, r.top()+2);
 
                                 painter->setClipRect(QRect(r.x(), r.y(), r.width(), 3));
-                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, BLEND_NONE, 3);
+                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
                         }
                         else if(state&State_MouseOver && opts.coloredMouseOver)
@@ -3421,7 +3416,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_BOTTOMRIGHT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -3451,7 +3446,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->drawLine(r.left()+1, r.bottom()-2, r.right()-1, r.bottom()-2);
 
                                 painter->setClipRect(QRect(r.x(), r.y()+r.height()-3, r.width(), r.y()+r.height()-1));
-                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_BOT, BORDER_FLAT, BLEND_NONE, 3);
+                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_BOT, BORDER_FLAT, false, 3);
                             }
                         }
                         else if(state&State_MouseOver && opts.coloredMouseOver)
@@ -3481,7 +3476,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_BOTTOMLEFT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -3511,7 +3506,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->drawLine(r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
 
                                 painter->setClipRect(QRect(r.x(), r.y(), 3, r.height()));
-                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, BLEND_NONE, 3);
+                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
                         }
                         else if(state&State_MouseOver && opts.coloredMouseOver)
@@ -3541,7 +3536,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : lastTab
                                                 ? ROUNDED_BOTTOMRIGHT
                                                 : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, BLEND_NONE);
+                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -3571,7 +3566,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->drawLine(r.right()-2, r.top()+1, r.right()-2, r.bottom()-1);
 
                                 painter->setClipRect(QRect(r.x()+r.width()-3, r.y(), r.x()+r.width()-1, r.height()));
-                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, BLEND_NONE, 3);
+                                drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
                         }
                         else if(state&State_MouseOver && opts.coloredMouseOver)
@@ -4866,8 +4861,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
             {
-                if ((!tbOpt->icon.isNull()) && (!tbOpt->text.isEmpty()) && tbOpt->toolButtonStyle == Qt::ToolButtonTextUnderIcon)
-                    newSize.setHeight(newSize.height()-7);
+                if ((!tbOpt->icon.isNull()) && (!tbOpt->text.isEmpty()) && Qt::ToolButtonTextUnderIcon==tbOpt->toolButtonStyle)
+                    newSize.setHeight(newSize.height()-5);
 
                 if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
                     menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
@@ -5809,7 +5804,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *o
 
 void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
                               int round, const QColor *custom, EWidget w,
-                              EBorder borderProfile, EBlend blend, int borderVal) const
+                              EBorder borderProfile, bool doBlend, int borderVal) const
 {
     EAppearance  app(widgetApp(w, &opts));
     State        state(option->state);
@@ -5834,24 +5829,27 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             break;
         case BORDER_RAISED:
         case BORDER_SUNKEN:
+        {
+            QColor tl(cols[BORDER_RAISED==borderProfile ? 0 : QT_FRAME_DARK_SHADOW]),
+                   br(cols[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0]);
+
+            if(doBlend)
+            {
+                tl.setAlphaF(0.7);
+                br.setAlphaF(0.7);
+            }
+
             p->setPen(enabled && (BORDER_RAISED==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
-                            ? BLEND_NONE!=blend
-                                ? midColor(BLEND_BGND==blend ? option->palette.background().color()
-                                                             : option->palette.base().color(),
-                                          cols[BORDER_RAISED==borderProfile ? 0 : QT_FRAME_DARK_SHADOW])
-                                : cols[BORDER_RAISED==borderProfile ? 0 : QT_FRAME_DARK_SHADOW]
+                            ? tl
                             : option->palette.background().color());
             p->drawLine(r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
             p->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
             p->setPen(enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
-                            ? BLEND_NONE!=blend
-                               ? midColor(BLEND_BGND==blend ? option->palette.background().color()
-                                                            : option->palette.base().color(),
-                                          cols[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0])
-                               : cols[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0]
+                            ? br
                             : option->palette.background().color());
             p->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
             p->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
+        }
     }
 
     if(QTC_ROUNDED && ROUNDED_NONE!=round)
@@ -5998,10 +5996,10 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
     if(doEtch)
         r.adjust(0, 1, 0, -1);
 
-    p->fillRect(QRect(rx.x()+2, rx.y()+2, rx.x()+rx.width()-4, rx.y()+rx.height()-4),
+    p->fillRect(QRect(rx.x()+1, rx.y()+1, rx.x()+rx.width()-2, rx.y()+rx.height()-2),
                 option->state&State_Enabled ? option->palette.base().color() : option->palette.background().color());
 
-    drawBorder(p, r, option, round, NULL, WIDGET_ENTRY, BORDER_SUNKEN, BLEND_BASE);
+    drawBorder(p, r, option, round, NULL, WIDGET_ENTRY, BORDER_SUNKEN);
     if(doEtch)
     {
         r=rx;
@@ -6041,7 +6039,7 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
                                   getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
                                   getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
                                   false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-            drawBorder(p, r, &opt, round, cols, WIDGET_MENU_ITEM, BORDER_FLAT, BLEND_NONE, 0);
+            drawBorder(p, r, &opt, round, cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, 0);
         }
     }
     else

@@ -4,6 +4,8 @@
 2. Try to prevent skiny toolbar buttons (such as konqueror's 'Up' button)
 3. Sync with latest KDE4.
 4. Improve styled KMultiTabBarTabs
+5. Use alpha for blending frame borders. (Fixes problem with dolphin's
+   column view)
 
 0.55.1
 ------
