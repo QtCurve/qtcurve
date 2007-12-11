@@ -104,6 +104,7 @@ if (GTK_INCLUDE_DIR)
                 "         reported to interfere with firefox and crash some\n"
                 "         applications\n"
                 "**************************************************************\n\n\n")
+    endif(QTC_ADD_EVENT_FILTER)
     if(QTC_REORDER_GTK_DIALOG_BUTTONS)
         message("\n\n**************************************************************\n"
                 "Warning: You have enabled the option for QtCurve to try to manually\n"
@@ -111,7 +112,7 @@ if (GTK_INCLUDE_DIR)
                 "         errors to be printed to the console, and is only an\n"
                 "         experiment!\n"
                 "**************************************************************\n\n\n")
-    endif(QTC_ADD_EVENT_FILTER)
+    endif(QTC_REORDER_GTK_DIALOG_BUTTONS)
 else (GTK_INCLUDE_DIR)
     message(FATAL_ERROR "Could not locate Gtk2 include files")
 endif (GTK_INCLUDE_DIR)
