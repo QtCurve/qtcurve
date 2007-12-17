@@ -1,12 +1,13 @@
 0.55.2
 ------
-1. Add warning to -DQTC_ADD_EVENT_FILTER option.
-2. Add cmake option: -DQTC_REORDER_GTK_DIALOG_BUTTONS
+1. Fix look of disabled entry fields.
+2. Add warning to -DQTC_ADD_EVENT_FILTER option.
+3. Add cmake option: -DQTC_REORDER_GTK_DIALOG_BUTTONS
    When set QtCurve will try to manually re-order the buttons of Gtk
    dialogs. Note: This will cause errors to be printed to the console,
    and is only an experiment!
-3. Style Gtk2.12 tooltips
-4. Improve look of edit field under firefox3
+4. Style Gtk2.12 tooltips
+5. Improve look of edit field under firefox3
 
 0.55.1
 ------

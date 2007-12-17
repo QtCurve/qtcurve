@@ -2020,7 +2020,8 @@ static void drawEntryField(GtkStyle *style, GdkWindow *window, GtkStateType stat
                            gint height, int round, gboolean isCombo)
 {
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
-    gboolean highlight=widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app,
+    gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget))),
+             highlight=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app,
              doEtch=QTC_DO_EFFECT;
     GdkGC    **gcs=highlight ? qtcurveStyle->menuitem_gc : qtcurveStyle->button_gc,
              *bgnd_gc=style->bg_gc[state],
@@ -2051,25 +2052,26 @@ debugDisplayWidget(widget, 3);
     else
         midgc=style->base_gc[state];
 
-    gdk_draw_rectangle(window, style->base_gc[state], TRUE, x+1, y+1, width-2, height-2);
+    gdk_draw_rectangle(window, enabled ? style->base_gc[state] : style->bg_gc[GTK_STATE_INSENSITIVE],
+                       TRUE, x, y, width, height);
     gdk_draw_line(window, midgc, x+1, y+1, x+1, y+height-2);
     gdk_draw_line(window, midgc, x+1, y+1, x+width-1, y+1);
 
-    if(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget)))
-        gc=style->bg_gc[state];
-    else
+    if(enabled)
     {
         midgc=QTC_SET_MID_COLOR(&style->base[state], &colors[0])
         gc=midgc;
     }
+    else
+        gc=style->bg_gc[state];
 
     gdk_draw_line(window, gc, x+width-2, y+1, x+width-2, y+height-2);
     gdk_draw_line(window, gc, x+1, y+height-2, x+width-2, y+height-2);
-
     gdk_draw_point(window, bgnd_gc, x, y);
     gdk_draw_point(window, bgnd_gc, x+width-1, y);
     gdk_draw_point(window, bgnd_gc, x, y+height-1);
     gdk_draw_point(window, bgnd_gc, x+width-1, y+height-1);
+
     drawBorder(style, window, state, area, NULL, x, y, width, height, NULL,
                gcs, colors, round, BORDER_FLAT, WIDGET_OTHER, DF_LARGE_ARC|DF_DO_CORNERS);
 
