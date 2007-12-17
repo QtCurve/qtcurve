@@ -5839,7 +5839,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 br.setAlphaF(0.7);
             }
 
-            p->setPen(enabled && (BORDER_RAISED==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
+            p->setPen((enabled || BORDER_SUNKEN==borderProfile) &&
+                      (BORDER_RAISED==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
                             ? tl
                             : option->palette.background().color());
             p->drawLine(r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
