@@ -1908,7 +1908,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_FrameLineEdit:
-        //case PE_PanelLineEdit:
+        case PE_PanelLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
                 if (lineEdit->lineWidth>0 &&
