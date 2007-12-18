@@ -28,6 +28,7 @@
 #include <QPalette>
 #include <QMap>
 #include <QCache>
+#include <QColor>
 #include <QStyleOption>
 #ifdef QTC_INT_CACHE_KEY
 #include <Q_UINT64>
@@ -80,6 +81,11 @@ class QtCurveStyle : public QWindowsStyle
 
     private:
 
+    static QColor shadowColor(const QColor col)
+    {
+        return qGray(col.rgb()) < 100 ? QColor(255, 255, 255, 75) : QColor(0, 0, 0, 75);
+    }
+
     void drawBevelGradient(const QColor &base, bool increase, QPainter *p, QRect const &r,
                            bool horiz, double shadeTop, double shadeBot, bool sel, EAppearance bevApp,
                            EWidget w=WIDGET_OTHER) const;
@@ -91,6 +97,8 @@ class QtCurveStyle : public QWindowsStyle
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
+    void drawMdiIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const;
+    void drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const;
     void drawEntryField(QPainter *p, const QRect &rx, const QStyleOption *option, int round, EWidget w=WIDGET_OTHER) const;
     void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const;
     void drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical=false, bool reverse=false) const;

@@ -4195,17 +4195,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 font.setBold(true);
                 painter->setFont(font);
-                painter->setPen(textColor);
 
-                // Attempt to align left if there is not enough room for the title
-                // text. Otherwise, align center. QWorkspace does elliding for us,
-                // and it doesn't know about the bold title, so we need to work
-                // around some of the width mismatches.
-                bool tooWide((QFontMetrics(font).width(titleBar->text) > textRect.width()));
-
-                QTextOption textOpt((tooWide ? Qt::AlignLeft : Qt::AlignHCenter) | Qt::AlignVCenter);
+                QTextOption textOpt(Qt::AlignLeft | Qt::AlignVCenter);
                 textOpt.setWrapMode(QTextOption::NoWrap);
 
+                painter->setPen(shadowColor(textColor));
+                painter->drawText(textRect.adjusted(1, 1, 1, 1), titleBar->text, textOpt);
+                painter->setPen(textColor);
                 painter->drawText(textRect, titleBar->text, textOpt);
 
                 // min button
@@ -4221,16 +4217,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarMinButton) && (titleBar->state & State_MouseOver),
                                       sunken, buttonColors);
-
-                        if(sunken)
-                            rect.adjust(1, 1, 1, 1);
-
-                        rect.adjust(buttonMargin ,buttonMargin , -buttonMargin, -buttonMargin);
-                        painter->setPen(textColor);
-                        painter->drawLine(rect.center().x() - 2, rect.center().y() + 3, rect.center().x() + 3, rect.center().y() + 3);
-                        painter->drawLine(rect.center().x() - 2, rect.center().y() + 4, rect.center().x() + 3, rect.center().y() + 4);
-                        painter->drawLine(rect.center().x() - 3, rect.center().y() + 3, rect.center().x() - 3, rect.center().y() + 4);
-                        painter->drawLine(rect.center().x() + 4, rect.center().y() + 3, rect.center().x() + 4, rect.center().y() + 4);
+                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarMinButton);
                     }
                 }
                 // max button
@@ -4246,18 +4233,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarMaxButton) && (titleBar->state & State_MouseOver),
                                       sunken, buttonColors);
-
-                        if(sunken)
-                            rect.adjust(1, 1, 1, 1);
-
-                        rect.adjust(buttonMargin, buttonMargin, -buttonMargin, -buttonMargin);
-                        painter->setPen(textColor);
-                        painter->drawRect(rect.adjusted(0, 0, -1, -1));
-                        painter->drawLine(rect.left() + 1, rect.top() + 1,  rect.right() - 1, rect.top() + 1);
-                        painter->drawPoint(rect.topLeft());
-                        painter->drawPoint(rect.topRight());
-                        painter->drawPoint(rect.bottomLeft());
-                        painter->drawPoint(rect.bottomRight());
+                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarMaxButton);
                     }
                 }
 
@@ -4273,22 +4249,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_MouseOver),
                                       sunken, buttonColors);
-
-                        if(sunken)
-                            rect.adjust(1, 1, 1, 1);
-
-                        rect.adjust(buttonMargin, buttonMargin, -buttonMargin, -buttonMargin);
-                        painter->drawLine(rect.left() + 1, rect.top(), rect.right(), rect.bottom() - 1);
-                        painter->drawLine(rect.left(), rect.top() + 1, rect.right() - 1, rect.bottom());
-                        painter->drawLine(rect.right() - 1, rect.top(), rect.left(), rect.bottom() - 1);
-                        painter->drawLine(rect.right(), rect.top() + 1, rect.left() + 1, rect.bottom());
-                        painter->drawPoint(rect.topLeft());
-                        painter->drawPoint(rect.topRight());
-                        painter->drawPoint(rect.bottomLeft());
-                        painter->drawPoint(rect.bottomRight());
-                        painter->setPen(textColor);
-                        painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right() - 1, rect.bottom() - 1);
-                        painter->drawLine(rect.left() + 1, rect.bottom() - 1, rect.right() - 1, rect.top() + 1);
+                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarCloseButton);
                     }
                 }
 
@@ -4309,33 +4270,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarNormalButton) && (titleBar->state & State_MouseOver),
                                       sunken, buttonColors);
-
-                        rect = normalButtonIconRect.adjusted(0, 3, -3, 0);
-                        if(sunken)
-                            rect.adjust(1, 1, 1, 1);
-
-                        painter->setPen(textColor);
-                        painter->drawRect(rect.adjusted(0, 0, -1, -1));
-                        painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right() - 1, rect.top() + 1);
-                        painter->drawPoint(rect.topLeft());
-                        painter->drawPoint(rect.topRight());
-                        painter->drawPoint(rect.bottomLeft());
-                        painter->drawPoint(rect.bottomRight());
-
-                        QRect   backWindowRect(normalButtonIconRect.adjusted(3, 0, 0, -3));
-                        QRegion clipRegion(backWindowRect);
-
-                        clipRegion -= rect;
-                        painter->setPen(textColor);
-                        if(sunken)
-                            backWindowRect.adjust(1, 1, 1, 1);
-                        painter->drawRect(backWindowRect.adjusted(0, 0, -1, -1));
-                        painter->drawLine(backWindowRect.left() + 1, backWindowRect.top() + 1,
-                                         backWindowRect.right() - 1, backWindowRect.top() + 1);
-                        painter->drawPoint(backWindowRect.topLeft());
-                        painter->drawPoint(backWindowRect.topRight());
-                        painter->drawPoint(backWindowRect.bottomLeft());
-                        painter->drawPoint(backWindowRect.bottomRight());
+                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarNormalButton);
                     }
                 }
 
@@ -4376,11 +4311,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarShadeButton) && (titleBar->state & State_MouseOver),
                                       sunken, buttonColors);
-
-                        if(sunken)
-                            rect.adjust(1, 1, 1, 1);
-
-                        drawArrow(painter, rect, PE_IndicatorArrowUp, textColor);
+                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarShadeButton);
                     }
                 }
 
@@ -4396,11 +4327,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarUnshadeButton) && (titleBar->state & State_MouseOver),
                                       sunken, buttonColors);
-
-                        if(sunken)
-                            rect.adjust(1, 1, 1, 1);
-
-                        drawArrow(painter, rect, PE_IndicatorArrowDown, textColor);
+                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarUnshadeButton);
                     }
                 }
 
@@ -5976,16 +5903,102 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 
 void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const
 {
-    QStyleOption opt;
+    if(hover || sunken)
+    {
+        QStyleOption opt;
 
-    opt.rect=r.adjusted(1, 1, -1, -1);
-    opt.state=State_Enabled|State_Horizontal|State_Raised;
-    if(hover)
-        opt.state|=State_MouseOver;
+        opt.rect=r.adjusted(1, 1, -1, -1);
+        opt.state=State_Enabled|State_Horizontal|State_Raised;
+        if(hover)
+            opt.state|=State_MouseOver;
+        if(sunken)
+            opt.state|=State_Sunken;
+
+        drawLightBevel(painter, opt.rect, &opt, ROUNDED_ALL, getFill(&opt, cols), cols, true, WIDGET_NO_ETCH_BTN);
+    }
+}
+
+void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const
+{
+    drawWindowIcon(painter, shadowColor(color), r.adjusted(1, 1, 1, 1), sunken, margin, button);
+    drawWindowIcon(painter, color, r, sunken, margin, button);
+}
+
+void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const
+{
+    QRect rect(r);
+
     if(sunken)
-        opt.state|=State_Sunken;
+        rect.adjust(1, 1, 1, 1);
 
-    drawLightBevel(painter, opt.rect, &opt, ROUNDED_ALL, getFill(&opt, cols), cols, true, WIDGET_NO_ETCH_BTN);
+    if(margin)
+        rect.adjust(margin, margin, -margin, -margin);
+
+    painter->setPen(color);
+
+    switch(button)
+    {
+        case SC_TitleBarMinButton:
+            painter->drawLine(rect.center().x() - 2, rect.center().y() + 3, rect.center().x() + 3, rect.center().y() + 3);
+            painter->drawLine(rect.center().x() - 2, rect.center().y() + 4, rect.center().x() + 3, rect.center().y() + 4);
+            painter->drawLine(rect.center().x() - 3, rect.center().y() + 3, rect.center().x() - 3, rect.center().y() + 4);
+            painter->drawLine(rect.center().x() + 4, rect.center().y() + 3, rect.center().x() + 4, rect.center().y() + 4);
+            break;
+        case SC_TitleBarMaxButton:
+            painter->drawRect(rect.adjusted(0, 0, -1, -1));
+            painter->drawLine(rect.left() + 1, rect.top() + 1,  rect.right() - 1, rect.top() + 1);
+            painter->drawPoint(rect.topLeft());
+            painter->drawPoint(rect.topRight());
+            painter->drawPoint(rect.bottomLeft());
+            painter->drawPoint(rect.bottomRight());
+            break;
+        case SC_TitleBarCloseButton:
+            painter->drawLine(rect.left() + 1, rect.top(), rect.right(), rect.bottom() - 1);
+            painter->drawLine(rect.left(), rect.top() + 1, rect.right() - 1, rect.bottom());
+            painter->drawLine(rect.right() - 1, rect.top(), rect.left(), rect.bottom() - 1);
+            painter->drawLine(rect.right(), rect.top() + 1, rect.left() + 1, rect.bottom());
+            painter->drawPoint(rect.topLeft());
+            painter->drawPoint(rect.topRight());
+            painter->drawPoint(rect.bottomLeft());
+            painter->drawPoint(rect.bottomRight());
+            painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right() - 1, rect.bottom() - 1);
+            painter->drawLine(rect.left() + 1, rect.bottom() - 1, rect.right() - 1, rect.top() + 1);
+            break;
+        case SC_TitleBarNormalButton:
+        {
+            QRect r2 = rect.adjusted(0, 3, -3, 0);
+
+            painter->drawRect(r2.adjusted(0, 0, -1, -1));
+            painter->drawLine(r2.left() + 1, r2.top() + 1, r2.right() - 1, r2.top() + 1);
+            painter->drawPoint(r2.topLeft());
+            painter->drawPoint(r2.topRight());
+            painter->drawPoint(r2.bottomLeft());
+            painter->drawPoint(r2.bottomRight());
+
+            QRect   backWindowRect(rect.adjusted(3, 0, 0, -3));
+            QRegion clipRegion(backWindowRect);
+
+            clipRegion -= r2;
+            if(sunken)
+                backWindowRect.adjust(1, 1, 1, 1);
+            painter->drawRect(backWindowRect.adjusted(0, 0, -1, -1));
+            painter->drawLine(backWindowRect.left() + 1, backWindowRect.top() + 1,
+                            backWindowRect.right() - 1, backWindowRect.top() + 1);
+            painter->drawPoint(backWindowRect.topLeft());
+            painter->drawPoint(backWindowRect.topRight());
+            painter->drawPoint(backWindowRect.bottomLeft());
+            painter->drawPoint(backWindowRect.bottomRight());
+            break;
+        }
+        case SC_TitleBarShadeButton:
+             drawArrow(painter, rect, PE_IndicatorArrowUp, color);
+            break;
+        case SC_TitleBarUnshadeButton:
+            drawArrow(painter, rect, PE_IndicatorArrowDown, color);
+        default:
+            break;
+
+    }
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOption *option,
