@@ -1234,7 +1234,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                     return opts.highlightTab ? 12 : 10;
             return opts.highlightTab ? 10 : 8;
         case PM_TitleBarHeight:
-            return 26;
+            return qMax(widget ? widget->fontMetrics().lineSpacing()
+                               : option ? option->fontMetrics.lineSpacing()
+                                        : 0, 28);
         default:
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
     }
@@ -2179,10 +2181,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_FrameDefaultButton:
             break;
         case PE_FrameWindow:
-            painter->save();
-            drawBorder(painter, r, option, ROUNDED_NONE, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED);
-            painter->restore();
+        {
+            const QColor *borderCols(getMdiColors(option, state&State_Active));
+            QStyleOption opt(*option);
+
+            opt.state=State_Horizontal|State_Enabled|State_Raised;
+            drawBorder(painter, r, &opt, ROUNDED_BOTTOM, borderCols, WIDGET_MDI_WINDOW, BORDER_RAISED);
             break;
+        }
         case PE_FrameTabWidget:
             painter->save();
             drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED, false);
@@ -4184,25 +4190,36 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 const int    buttonMargin(6);
                 bool         active(titleBar->titleBarState & State_Active);
-                const QColor *buttonColors(getMdiColors(titleBar));
+                const QColor *buttonColors(getMdiColors(titleBar, active));
                 QColor       textColor(active ? itsActiveMdiTextColor : itsMdiTextColor);
-                QFont        font(painter->font());
                 QStyleOption opt(*option);
-                QRect        textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised;
-                drawLightBevel(painter, r, &opt, ROUNDED_TOP, buttonColors[2], buttonColors);
+                drawLightBevel(painter, r, &opt,
+                               titleBar->titleBarState&State_Raised
+                                ? ROUNDED_NONE
+                                : titleBar->titleBarState&State_Enabled
+                                    ? ROUNDED_ALL
+                                    : ROUNDED_TOP,
+                               buttonColors[2], buttonColors/*, true, WIDGET_MDI_WINDOW*/);
 
-                font.setBold(true);
-                painter->setFont(font);
+                if(!titleBar->text.isEmpty())
+                {
+                    QFont  font(painter->font());
+                    QRect  textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel,
+                                                   widget));
 
-                QTextOption textOpt(Qt::AlignLeft | Qt::AlignVCenter);
-                textOpt.setWrapMode(QTextOption::NoWrap);
+                    font.setBold(true);
+                    painter->setFont(font);
 
-                painter->setPen(shadowColor(textColor));
-                painter->drawText(textRect.adjusted(1, 1, 1, 1), titleBar->text, textOpt);
-                painter->setPen(textColor);
-                painter->drawText(textRect, titleBar->text, textOpt);
+                    QTextOption textOpt(Qt::AlignLeft | Qt::AlignVCenter);
+                    textOpt.setWrapMode(QTextOption::NoWrap);
+
+                    painter->setPen(shadowColor(textColor));
+                    painter->drawText(textRect.adjusted(1, 1, 1, 1), titleBar->text, textOpt);
+                    painter->setPen(textColor);
+                    painter->drawText(textRect, titleBar->text, textOpt);
+                }
 
                 // min button
                 if ((titleBar->subControls & SC_TitleBarMinButton) && (titleBar->titleBarFlags & Qt::WindowMinimizeButtonHint) &&
@@ -4244,11 +4261,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if (rect.isValid())
                     {
-                        bool sunken((titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_Sunken));
+  
+                        bool   sunken((titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_Sunken));
+                        QColor closeCols[TOTAL_SHADES+1];
 
+                        shadeColors(midColor(buttonColors[ORIGINAL_SHADE], QColor(180,64,32)), closeCols);
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_MouseOver),
-                                      sunken, buttonColors);
+                                      sunken, closeCols);
                         drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarCloseButton);
                     }
                 }
@@ -4335,6 +4355,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     QRect rect = subControlRect(CC_TitleBar, titleBar, SC_TitleBarSysMenu, widget);
                     if (rect.isValid())
+                    {
+                        drawMdiButton(painter, rect,
+                                      (titleBar->activeSubControls & SC_TitleBarSysMenu) && (titleBar->state & State_MouseOver),
+                                      (titleBar->activeSubControls & SC_TitleBarSysMenu) && (titleBar->state & State_Sunken), buttonColors);
+
                         if (!titleBar->icon.isNull())
                             titleBar->icon.paint(painter, rect);
                         else
@@ -4347,6 +4372,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             drawItemPixmap(painter, rect, Qt::AlignCenter, standardIcon(SP_TitleBarMenuButton, &tool, widget).pixmap(16, 16));
                             painter->restore();
                         }
+                    }
                 }
                 painter->restore();
             }
@@ -5816,8 +5842,11 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         QColor largeArcMid(border),
                aaColor(border);
 
-        largeArcMid.setAlphaF(0.50);
-        aaColor.setAlphaF(0.30);
+        if(WIDGET_MDI_WINDOW!=w)
+        {
+            largeArcMid.setAlphaF(0.50);
+            aaColor.setAlphaF(0.30);
+        }
 
         if(round&CORNER_TL)
         {
@@ -5928,6 +5957,13 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QRe
 void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const
 {
     QRect rect(r);
+
+    // Icons look best at 22x22...
+    if(rect.height()>22)
+    {
+        int diff=(rect.height()-22)/2;
+        rect.adjust(diff, diff, -diff, -diff);
+    }
 
     if(sunken)
         rect.adjust(1, 1, 1, 1);
@@ -6689,7 +6725,7 @@ void QtCurveStyle::setMenuColors(const QColor &bgnd)
     }
 }
 
-const QColor * QtCurveStyle::getMdiColors(const QStyleOptionTitleBar *option) const
+const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool active) const
 {
     if(!itsActiveMdiColors)
     {
@@ -6755,7 +6791,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOptionTitleBar *option) co
             itsMdiColors=(QColor *)itsBackgroundCols;
     }
 
-    return option->titleBarState&State_Active ? itsActiveMdiColors : itsMdiColors;
+    return active ? itsActiveMdiColors : itsMdiColors;
 }
 
 const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *use) const

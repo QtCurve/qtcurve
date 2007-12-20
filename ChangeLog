@@ -7,6 +7,7 @@
 5. Improve styled KMultiTabBarTabs
 6. Use alpha for blending frame borders. (Fixes problem with dolphin's
    column view)
+7. Supply a KWin decoration.
 
 0.55.1
 ------

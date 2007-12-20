@@ -119,7 +119,7 @@ class QtCurveStyle : public QWindowsStyle
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
     void setMenuColors(const QColor &bgnd);
-    const QColor * getMdiColors(const QStyleOptionTitleBar *option) const;
+    const QColor * getMdiColors(const QStyleOption *option, bool active) const;
     const QColor & getFill(const QStyleOption *option, const QColor *use) const;
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
