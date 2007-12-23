@@ -65,7 +65,7 @@ typedef enum
     SHADING_HSV=2
 } EShading;
 
-#ifndef QTC_CONFIG_DIALOG
+#if (!defined QTC_CONFIG_DIALOG) && (!defined QTC_KWIN)
 static EShading shading=SHADING_HSL;
 #endif
 
@@ -296,6 +296,14 @@ typedef GdkColor color;
 #define QTC_MO_STD_LIGHT(W, S) QTC_MO_PLASTIK_LIGHT(W) /*(WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 2 : (S ? 1 : 0))*/
 
 #define QTC_DO_EFFECT          (ROUND_FULL==opts.round && EFFECT_NONE!=opts.buttonEffect)
+
+#ifdef __cplusplus
+#include <qstyle.h>
+typedef enum
+{
+    QtC_Round = QStyle::PM_CustomBase
+} QtCMetrics;
+#endif
 
 typedef enum
 {
