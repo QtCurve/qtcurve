@@ -1237,6 +1237,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return qMax(widget ? widget->fontMetrics().lineSpacing()
                                : option ? option->fontMetrics.lineSpacing()
                                         : 0, 28);
+        case QtC_Round:
+            return (int)opts.round;
         default:
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
     }
@@ -4201,7 +4203,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 : titleBar->titleBarState&State_Enabled
                                     ? ROUNDED_ALL
                                     : ROUNDED_TOP,
-                               buttonColors[2], buttonColors/*, true, WIDGET_MDI_WINDOW*/);
+                               buttonColors[2], buttonColors, true, WIDGET_MDI_WINDOW);
 
                 if(!titleBar->text.isEmpty())
                 {
@@ -5563,7 +5565,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                  br(r);
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
-                 lightBorder(QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
+                 lightBorder(WIDGET_MDI_WINDOW!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
                  doColouredMouseOver(doBorder && option->state&State_Enabled &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
                                      (!IS_SLIDER(w) || (WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver)) &&
@@ -5588,7 +5590,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     if(!colouredMouseOver && lightBorder)
         br.adjust(1, 1,-1,-1);
-    else if(colouredMouseOver || (!IS_GLASS(app) && !sunken && option->state&State_Raised))
+    else if(colouredMouseOver || WIDGET_MDI_WINDOW==w ||
+            (!IS_GLASS(app) && !sunken && option->state&State_Raised))
     {
         if(colouredMouseOver)
             p->setPen(border[QTC_MO_STD_LIGHT(w, sunken)]);
