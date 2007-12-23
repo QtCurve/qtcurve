@@ -30,6 +30,7 @@
 #include <QPixmap>
 #include <QStyleFactory>
 #include <QStyle>
+#include <QSettings>
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
@@ -45,10 +46,17 @@ namespace KWinQtCurve
 
 QtCurveHandler::QtCurveHandler()
 {
-    memset(itsBitmaps, 0, sizeof(QBitmap*)*NumButtonIcons*2);
+    QSettings settings(QSettings::UserScope, QLatin1String("Trolltech"));
 
-    // Create an instance of the new style...
-    itsStyle = QStyleFactory::create("QtCurve");
+    settings.beginGroup(QLatin1String("Qt"));
+
+    QString styleName(settings.value(QLatin1String("style")).toString().toLower());
+
+    itsStyle= styleName!="qtcurve" && 0!=styleName.indexOf("qtc_")
+                ? QStyleFactory::create("QtCurve")
+                : NULL;
+
+    memset(itsBitmaps, 0, sizeof(QBitmap*)*NumButtonIcons*2);
     reset(0);
 }
 

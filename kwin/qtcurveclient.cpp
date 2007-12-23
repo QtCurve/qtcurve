@@ -39,6 +39,8 @@
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
+#define QTC_KWIN
+#include "common.h"
 
 namespace KWinQtCurve
 {
@@ -137,31 +139,36 @@ void QtCurveClient::init()
 
 QRegion QtCurveClient::cornerShape(WindowCorner corner)
 {
+    int round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
+
+    if(ROUND_NONE==round)
+        return QRegion();
+
     int w(widget()->width()),
         h(widget()->height());
 
     switch (corner)
     {
         case WC_TopLeft:
-            if (layoutMetric(LM_TitleEdgeLeft) > 0)
-                return QRegion(0, 0, 1, 2) + QRegion(1, 0, 1, 1);
-            else
-                return QRegion();
+            return layoutMetric(LM_TitleEdgeLeft) > 0
+                ? ROUND_FULL==round
+                    ? QRegion(0, 0, 1, 2) + QRegion(1, 0, 1, 1)
+                    : QRegion(0, 0, 1, 1)
+                : QRegion();
         case WC_TopRight:
-            if (layoutMetric(LM_TitleEdgeRight) > 0)
-                return QRegion(w-1, 0, 1, 2) + QRegion(w-2, 0, 1, 1);
-            else
-                return QRegion();
+            return layoutMetric(LM_TitleEdgeRight) > 0
+                ? ROUND_FULL==round
+                    ? QRegion(w-1, 0, 1, 2) + QRegion(w-2, 0, 1, 1)
+                    : QRegion(w-1, 0, 1, 1)
+                : QRegion();
         case WC_BottomLeft:
-            if (layoutMetric(LM_BorderBottom) > 0)
-                return QRegion(0, h-1, 1, 1);
-            else
-                return QRegion();
+            return layoutMetric(LM_BorderBottom) > 0
+                ? QRegion(0, h-1, 1, 1)
+                : QRegion();
         case WC_BottomRight:
-            if (layoutMetric(LM_BorderBottom) > 0)
-                return QRegion(w-1, h-1, 1, 1);
-            else
-                return QRegion();
+            return layoutMetric(LM_BorderBottom) > 0
+                ? QRegion(w-1, h-1, 1, 1)
+                : QRegion();
         default:
             return QRegion();
     }
