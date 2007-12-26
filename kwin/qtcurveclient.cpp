@@ -190,16 +190,16 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
-    QRegion              region(e->region());
     QPainter             painter(widget());
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
     bool                 active(isActive());
-    const int            titleHeight = layoutMetric(LM_TitleHeight),
-                         titleEdgeTop = layoutMetric(LM_TitleEdgeTop),
-                         titleEdgeBottom = layoutMetric(LM_TitleEdgeBottom),
-                         titleEdgeLeft = layoutMetric(LM_TitleEdgeLeft),
-                         titleEdgeRight = layoutMetric(LM_TitleEdgeRight);
+    const int            titleHeight(layoutMetric(LM_TitleHeight)),
+                         titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
+                         titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
+                         titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
+                         titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
+                         borderWidth(layoutMetric(LM_BorderLeft));
     int                  rectX, rectY, rectX2, rectY2;
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
@@ -209,8 +209,15 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                         rectX2-titleEdgeRight-buttonsRightWidth()-(rectX+titleEdgeLeft+buttonsLeftWidth()),
                         titleEdgeBottomBottom-(rectY+titleEdgeTop));
 
-    painter.setClipRegion(region);
-    painter.fillRect(r.adjusted(1, 1, -1, -1), widget()->palette().background());
+    painter.setClipRegion(e->region());
+
+    if(borderWidth)
+    {
+        painter.fillRect(rectX, rectY, rectX+borderWidth, rectY2, widget()->palette().background());
+        painter.fillRect(rectX2-borderWidth, rectY, rectX2, rectY2, widget()->palette().background());
+        painter.fillRect(rectX, rectY2-borderWidth, rectX2, rectY2, widget()->palette().background());
+    }
+
     opt.init(widget());
 
     if(MaximizeFull==maximizeMode())
