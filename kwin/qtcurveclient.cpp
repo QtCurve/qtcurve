@@ -199,12 +199,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
                          titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
-                         borderWidth(layoutMetric(LM_BorderLeft));
+                         borderWidth(layoutMetric(LM_BorderLeft)),
+                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+
+                                        (MaximizeFull==maximizeMode() ? 3 : 0));
     int                  rectX, rectY, rectX2, rectY2;
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
-    const int titleEdgeBottomBottom = rectY+titleEdgeTop+titleHeight+titleEdgeBottom-1;
+    const int titleEdgeBottomBottom(rectY+titleEdgeTop+titleHeight+titleEdgeBottom);
     QRect     titleRect(rectX+titleEdgeLeft+buttonsLeftWidth(), rectY+titleEdgeTop,
                         rectX2-titleEdgeRight-buttonsRightWidth()-(rectX+titleEdgeLeft+buttonsLeftWidth()),
                         titleEdgeBottomBottom-(rectY+titleEdgeTop));
@@ -213,9 +215,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(borderWidth)
     {
-        painter.fillRect(rectX, rectY, rectX+borderWidth, rectY2, widget()->palette().background());
-        painter.fillRect(rectX2-borderWidth, rectY, rectX2, rectY2, widget()->palette().background());
-        painter.fillRect(rectX, rectY2-borderWidth, rectX2, rectY2, widget()->palette().background());
+        painter.fillRect(rectX+2, titleEdgeBottomBottom, borderWidth-2,
+                        (rectY2-titleEdgeBottomBottom)-2,
+                         widget()->palette().background());
+        painter.fillRect(rectX2-borderWidth, titleEdgeBottomBottom, borderWidth-1,
+                         (rectY2-titleEdgeBottomBottom)-2, widget()->palette().background());
+        painter.fillRect(rectX+2, rectY2-borderWidth, (rectX2-rectX)-3, borderWidth-1,
+                         widget()->palette().background());
     }
 
     opt.init(widget());
@@ -226,10 +232,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None);
 
+    painter.setClipRect(QRect(rectX, titleEdgeBottomBottom, (rectX2-rectX)+1, (rectY2-titleEdgeBottomBottom)+1));
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
+    painter.setClipping(false);
 
-    opt.rect=QRect(r.x(), r.y(), r.width(), titleHeight+titleEdgeTop+titleEdgeBottom+
-                                            (MaximizeFull==maximizeMode() ? 3 : 0));
+    opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
     Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
 
@@ -262,19 +269,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
 QRect QtCurveClient::captionRect() const
 {
-    QRect r = widget()->rect();
-
-    const int titleHeight = layoutMetric(LM_TitleHeight),
-              titleEdgeBottom = layoutMetric(LM_TitleEdgeBottom),
-              titleEdgeTop = layoutMetric(LM_TitleEdgeTop),
-              titleEdgeLeft = layoutMetric(LM_TitleEdgeLeft),
-              marginLeft = layoutMetric(LM_TitleBorderLeft),
-              marginRight = layoutMetric(LM_TitleBorderRight),
-              titleLeft = r.left() + titleEdgeLeft + buttonsLeftWidth() + marginLeft,
-              titleWidth = r.width() -
+    QRect     r(widget()->rect());
+    const int titleHeight(layoutMetric(LM_TitleHeight)),
+              titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
+              titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
+              titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
+              marginLeft(layoutMetric(LM_TitleBorderLeft)),
+              marginRight(layoutMetric(LM_TitleBorderRight)),
+              titleLeft(r.left() + titleEdgeLeft + buttonsLeftWidth() + marginLeft),
+              titleWidth(r.width() -
                            titleEdgeLeft - layoutMetric(LM_TitleEdgeRight) -
                            buttonsLeftWidth() - buttonsRightWidth() -
-                           marginLeft - marginRight;
+                           marginLeft - marginRight);
 
     return QRect(titleLeft, r.top()+titleEdgeTop, titleWidth, titleHeight+titleEdgeBottom);
 }
