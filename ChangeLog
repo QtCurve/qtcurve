@@ -8,6 +8,7 @@
 6. Use alpha for blending frame borders. (Fixes problem with dolphin's
    column view)
 7. Supply a KWin decoration.
+8. Smaller MDI window titlebars - emphasises difference with KWin.
 
 0.55.1
 ------

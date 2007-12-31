@@ -1236,7 +1236,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_TitleBarHeight:
             return qMax(widget ? widget->fontMetrics().lineSpacing()
                                : option ? option->fontMetrics.lineSpacing()
-                                        : 0, 28);
+                                        : 0, 24);
         case QtC_Round:
             return (int)opts.round;
         default:
