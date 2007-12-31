@@ -194,14 +194,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
     bool                 active(isActive());
-    const int            titleHeight(layoutMetric(LM_TitleHeight)),
+    const int            maximiseOffset(MaximizeFull==maximizeMode() ? 3 : 0),
+                         titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
                          titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
                          borderWidth(layoutMetric(LM_BorderLeft)),
-                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+
-                                        (MaximizeFull==maximizeMode() ? 3 : 0));
+                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+maximiseOffset);
     int                  rectX, rectY, rectX2, rectY2;
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
@@ -236,34 +236,39 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
     painter.setClipping(false);
 
-    opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
+    QPixmap  *pix=new QPixmap(r.width(), titleBarHeight);
+    QPainter pixPainter(pix);
+
+    opt.rect=QRect(0, 0, r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
-    Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
+    Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &pixPainter, widget());
 
     itsCaptionRect = captionRect(); // also update itsCaptionRect!
 
     if(!caption().isEmpty())
     {
-        const int maxCaptionLength = 300; // truncate captions longer than this!
-        QString c(caption());
-        if (c.length() > maxCaptionLength)
+        const int constMaxCaptionLength = 300; // truncate captions longer than this!
+        QString   c(caption());
+
+        if (c.length() > constMaxCaptionLength)
         {
-            c.truncate(maxCaptionLength);
+            c.truncate(constMaxCaptionLength);
             c.append(" [...]");
         }
 
         QFontMetrics fm(itsTitleFont);
-        int          captionHeight(fm.height());
 
-        painter.setFont(itsTitleFont);
-        QPoint tp(itsCaptionRect.x(), itsCaptionRect.y()+captionHeight-3);
+        pixPainter.setFont(itsTitleFont);
+        QPoint tp(itsCaptionRect.x()+maximiseOffset, itsCaptionRect.y()+maximiseOffset+fm.height()-3);
 
-        painter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
-        painter.drawText(tp+QPoint(1, 1), c);
-        painter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
-        painter.drawText(tp, c);
+        pixPainter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
+        pixPainter.drawText(tp+QPoint(1, 1), c);
+        pixPainter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
+        pixPainter.drawText(tp, c);
     }
-    painter.setClipping(false);
+    pixPainter.end();
+    painter.drawPixmap(r.x(), r.y(), r.width(), titleBarHeight, *pix);
+    delete pix;
     painter.end();
 }
 
