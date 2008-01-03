@@ -857,7 +857,14 @@ void QtCurveStyle::polish(QWidget *widget)
                  widget->installEventFilter(this);
 
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
+            {
                 frame->setBackgroundRole(QPalette::Background);
+
+                QLayout *layout(frame->layout());
+
+                if(layout)
+                    layout->setMargin(0);
+            }
 
             QWidget *p=NULL;
 
@@ -934,7 +941,14 @@ void QtCurveStyle::unpolish(QWidget *widget)
                  widget->removeEventFilter(this);
 
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
+            {
                 frame->setBackgroundRole(QPalette::Base);
+
+                QLayout *layout(frame->layout());
+
+                if(layout)
+                    layout->setMargin(6);
+            }
         }
 
    if (qobject_cast<QMenuBar *>(widget) ||
@@ -1656,12 +1670,15 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_Frame:
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
             {
-                QLinearGradient grad(0, 0, r.width(), 1);
+                static const int constLineHeight=1;  // Match with SystemSettings, etc.
 
-                grad.setColorAt(0, palette.text().color());
+                QLinearGradient grad(0, 0, r.width(), 1);
+                const QColor    *use(backgroundColors(option));
+
+                grad.setColorAt(0, use[QT_STD_BORDER]); // palette.text().color());
                 grad.setColorAt(1, palette.background().color());
                 painter->save();
-                painter->fillRect(QRect(r.x(), (r.y()+r.height())-3, r.width(), 2), QBrush(grad));
+                painter->fillRect(QRect(r.x(), (r.y()+r.height())-(constLineHeight+1), r.width(), constLineHeight), QBrush(grad));
                 painter->restore();
             }
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
@@ -2114,11 +2131,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(PE_PanelButtonBevel==element)
                 opt.state|=State_Enabled;
-
-#if 0 // KDE4 draw mult tab bar tabs via PE_PanelButtonTool
-            if(opts.stdSidebarButtons && !noEtch && isMultiTabBarTab(getButton(widget, painter)))
-                noEtch=true;
-#endif
 
             if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
@@ -3023,92 +3035,24 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-#if 0 // -- KDE4 no longer draws multi tab bar tabs this way!
-                //const QPushButton *button(widget ? static_cast<const QPushButton *>(widget) : NULL);
+                CEtchCheck check(widget);
 
-                if(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)))
+                drawControl(CE_PushButtonBevel, btn, painter, widget);
+
+                QStyleOptionButton subopt(*btn);
+
+                subopt.rect = subElementRect(SE_PushButtonContents, btn, widget);
+                drawControl(CE_PushButtonLabel, &subopt, painter, widget);
+
+                if (btn->state & State_HasFocus)
                 {
-                    QRect        r2(r);
-                    QStyleOption opt(*option);
+                    QStyleOptionFocusRect fropt;
+                    fropt.QStyleOption::operator=(*btn);
+                    fropt.rect = subElementRect(SE_PushButtonFocusRect, btn, widget);
 
-                    //flags|=QTC_TOGGLE_BUTTON;
-                    //if(button->isOn())
-                    //    opt.state|=State_On;
-                    if(widget->underMouse())
-                        opt.state|=State_MouseOver;
-
-                    opt.state|=State_Horizontal;
-
-                    const QColor *use(opt.state&State_On ? getSidebarButtons() : buttonColors(option));
-
-                    painter->save();
-                    if((opt.state&State_On ) || opt.state&State_MouseOver)
-                    {
-                        r2.adjust(-1, -1, 1, 1);
-                        drawLightBevel(painter, r2, &opt, ROUNDED_NONE, getFill(&opt, use), use, false, WIDGET_MENU_ITEM);
-                    }
-                    else
-                        painter->fillRect(r2, palette.background().color());
-
-                    if(opt.state&State_MouseOver && opts.coloredMouseOver)
-                    {
-                        r2=r;
-                        if(MO_PLASTIK==opts.coloredMouseOver)
-                            r2.adjust(0, 1, 0, -1);
-                        else
-                            r2.adjust(1, 1, -1, -1);
-
-                        painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
-                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
-
-                        if(MO_PLASTIK!=opts.coloredMouseOver)
-                        {
-                            painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-                            painter->drawLine(r2.x(), r2.y(), r2.x(), r2.y()+r2.height()-1);
-                            painter->setPen(itsMouseOverCols[opt.state&State_On ? 1 : 2]);
-                        }
-
-                        painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->drawLine(r2.x(), r2.y()+r2.height()-1, r2.x()+r2.width()-1,
-                                          r2.y()+r2.height()-1);
-
-                        if(MO_PLASTIK!=opts.coloredMouseOver)
-                        {
-                            painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
-                            painter->drawLine(r2.x()+r2.width()-1, r2.y(), r2.x()+r2.width()-1,
-                                              r2.y()+r2.height()-1);
-                        }
-                    }
-
-                    painter->restore();
-                    QStyleOptionButton subopt(*btn);
-
-                    subopt.rect = subElementRect(SE_PushButtonContents, btn, widget);
-                    drawControl(CE_PushButtonLabel, &subopt, painter, widget);
-                }
-                else
-#endif
-                {
-                    CEtchCheck check(widget);
-
-                    drawControl(CE_PushButtonBevel, btn, painter, widget);
-
-                    QStyleOptionButton subopt(*btn);
-
-                    subopt.rect = subElementRect(SE_PushButtonContents, btn, widget);
-                    drawControl(CE_PushButtonLabel, &subopt, painter, widget);
-
-                    if (btn->state & State_HasFocus)
-                    {
-                        QStyleOptionFocusRect fropt;
-                        fropt.QStyleOption::operator=(*btn);
-                        fropt.rect = subElementRect(SE_PushButtonFocusRect, btn, widget);
-
-                        if(QTC_CAN_DO_EFFECT)
-                            fropt.rect.adjust(0, 1, 0, -1);
-                        drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
-                    }
+                    if(QTC_CAN_DO_EFFECT)
+                        fropt.rect.adjust(0, 1, 0, -1);
+                    drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
                 }
             }
             break;
@@ -3133,88 +3077,98 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     tmpBtn.rect = r;
                     drawPrimitive(PE_PanelButtonCommand, &tmpBtn, painter, widget);
                 }
-                if (btn->features & QStyleOptionButton::HasMenu)
-                {
-                    int                mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
-                    QRect              ir(btn->rect);
-                    QStyleOptionButton newBtn(*btn);
-
-                    newBtn.rect = QRect(ir.right() - mbi + 2, ir.height()/2 - mbi/2 + 3, mbi - 6, mbi - 6);
-                    drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
-                }
+//                 if (btn->features & QStyleOptionButton::HasMenu)
+//                 {
+//                     int                mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
+//                     QRect              ir(btn->rect);
+//                     QStyleOptionButton newBtn(*btn);
+// 
+//                     newBtn.rect = QRect(ir.right() - mbi + 2, ir.height()/2 - mbi/2 + 3, mbi - 6, mbi - 6);
+//                     drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
+//                 }
             }
             break;
         case CE_PushButtonLabel:
             if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
                 uint tf(Qt::AlignVCenter | Qt::TextShowMnemonic);
-                int  hShift=state & (State_On | State_Sunken)
-                                ? pixelMetric(PM_ButtonShiftHorizontal, option, widget) : 0;
 
-                if (!styleHint(SH_UnderlineShortcut, option, widget))
+                if (!styleHint(SH_UnderlineShortcut, button, widget))
                     tf |= Qt::TextHideMnemonic;
-
-                if (state & (State_On | State_Sunken))
-                    r.translate(hShift,
-                                pixelMetric(PM_ButtonShiftVertical, option, widget));
 
                 if (!button->icon.isNull())
                 {
                     //Center both icon and text
-                    QIcon::Mode mode(state&State_Enabled ? QIcon::Normal : QIcon::Disabled);
+                    QIcon::Mode mode(button->state&State_Enabled ? QIcon::Normal : QIcon::Disabled);
 
-                    if (mode == QIcon::Normal && state&State_HasFocus)
+                    if (QIcon::Normal==mode && button->state&State_HasFocus)
                         mode = QIcon::Active;
 
-                    QPixmap pixmap(button->icon.pixmap(button->iconSize, mode, state&State_On ? QIcon::On : QIcon::Off));
-                    int     w(pixmap.width()),
-                            h(pixmap.height());
+                    QIcon::State state(button->state&State_On ? QIcon::On : QIcon::Off);
+                    QPixmap      pixmap(button->icon.pixmap(button->iconSize, mode, state));
+                    int          labelWidth(pixmap.width()),
+                                 labelHeight(pixmap.height()),
+                                 iconSpacing (4),//### 4 is currently hardcoded in QPushButton::sizeHint()
+                                 textWidth(button->fontMetrics.boundingRect(option->rect, tf, button->text).width());
 
                     if (!button->text.isEmpty())
-                        w += button->fontMetrics.width(button->text)-2; // + 2;
+                        labelWidth += (textWidth + iconSpacing);
 
-                    QPoint point(r.x() + r.width() / 2 - w / 2,
-                                 r.y() + r.height() / 2 - h / 2);
+                    QRect iconRect(r.x() + (r.width() - labelWidth) / 2,
+                                r.y() + (r.height() - labelHeight) / 2,
+                                pixmap.width(), pixmap.height());
 
-                    if (button->direction == Qt::RightToLeft)
-                        point.rx() += pixmap.width();
+                    iconRect = visualRect(button->direction, r, iconRect);
 
-                    painter->drawPixmap(visualPos(button->direction, button->rect, point), pixmap);
+                    tf |= Qt::AlignLeft; //left align, we adjust the text-rect instead
 
-                    if (button->direction == Qt::RightToLeft)
-                        r.translate(-point.x() - 2, 0);
+                    if (Qt::RightToLeft==button->direction)
+                        r.setRight(iconRect.left() - iconSpacing);
                     else
-                        r.translate(point.x() + pixmap.width() - hShift, 0);
+                        r.setLeft(iconRect.left() + iconRect.width() + iconSpacing);
 
-                    // left-align text if there is
-                    if (!button->text.isEmpty())
-                        tf |= Qt::AlignLeft;
+                    if (button->state & (State_On|State_Sunken))
+                        iconRect.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
+                                        pixelMetric(PM_ButtonShiftVertical, option, widget));
+                    painter->drawPixmap(iconRect, pixmap);
                 }
                 else
                     tf |= Qt::AlignHCenter;
+
+                if (button->state & (State_On|State_Sunken))
+                    r.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
+                                pixelMetric(PM_ButtonShiftVertical, option, widget));
 
                 //this tweak ensures the font is perfectly centered on small sizes
                 //but slightly downward to make it more gnomeish if not
                 if (button->fontMetrics.height() > 14)
                     r.translate(0, 1);
 
-                if (button->features & QStyleOptionButton::HasMenu)
-                    r.adjust(0, 0, -(pixelMetric(PM_MenuButtonIndicator, button, widget)-4), 0);
+                if (button->features&QStyleOptionButton::HasMenu)
+                {
+                    int indicatorSize(pixelMetric(PM_MenuButtonIndicator, button, widget));
 
-                int                 num(opts.embolden && button->features&QStyleOptionButton::DefaultButton ? 2 : 1);
-                //const QPushButton   *btn(widget ? static_cast<const QPushButton *>(widget) : NULL);
-#if 0 // -- KDE4 no longer draws tab bar tabs this way
-                QPalette::ColorRole textCol(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)) &&
-                                            (/*button->isOn() || */state&State_On)
-                                                ? QPalette::HighlightedText
-                                                : QPalette::ButtonText);
-#else
-                QPalette::ColorRole textCol(QPalette::ButtonText);
-#endif
+                    if (Qt::LeftToRight==button->direction)
+                        r = r.adjusted(0, 0, -indicatorSize, 0);
+                    else
+                        r = r.adjusted(indicatorSize, 0, 0, 0);
+
+                    QRect              ir(button->rect);
+                    QStyleOptionButton newBtn(*button);
+
+                    newBtn.rect = QRect(Qt::LeftToRight==button->direction
+                                            ? ir.right() - indicatorSize + 2
+                                            : ir.x() + 6,
+                                        ir.height()/2 - indicatorSize/2 + 3,
+                                        indicatorSize - 6, indicatorSize - 6);
+                    drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
+                }
+
+                int num(opts.embolden && button->features&QStyleOptionButton::DefaultButton ? 2 : 1);
 
                 for(int i=0; i<num; ++i)
-                    drawItemText(painter, r.adjusted(i, 0, i, 0), tf, palette, (state&State_Enabled),
-                                 button->text, textCol);
+                    drawItemText(painter, r.adjusted(i, 0, i, 0), tf, button->palette, (button->state&State_Enabled),
+                                button->text, QPalette::ButtonText);
             }
             break;
         case CE_ComboBoxLabel:

@@ -1,14 +1,16 @@
 0.55.2
 ------
-1. Fix look of disabled entry fields.
-2. Add ability to import qtc_*.themerc settings into config dialog.
-3. Try to prevent skiny toolbar buttons (such as konqueror's 'Up' button)
-4. Sync with latest KDE4.
-5. Improve styled KMultiTabBarTabs
-6. Use alpha for blending frame borders. (Fixes problem with dolphin's
-   column view)
-7. Supply a KWin decoration.
-8. Smaller MDI window titlebars - emphasises difference with KWin.
+ 1. Fix look of disabled entry fields.
+ 2. Add ability to import qtc_*.themerc settings into config dialog.
+ 3. Try to prevent skiny toolbar buttons (such as konqueror's 'Up' button)
+ 4. Sync with latest KDE4.
+ 5. Improve styled KMultiTabBarTabs
+ 6. Use alpha for blending frame borders. (Fixes problem with dolphin's
+    column view)
+ 7. Supply a KWin decoration.
+ 8. Smaller MDI window titlebars - emphasises difference with KWin.
+ 9. Fix text of buttons in KListView
+10. Better menu button indicator code for RTL.
 
 0.55.1
 ------
