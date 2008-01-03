@@ -44,10 +44,9 @@ namespace KWinQtCurve
 {
 
 QtCurveHandler::QtCurveHandler()
+              : itsStyle(NULL)
 {
-    itsStyle=qstrcmp(QApplication::style()->metaObject()->className(), "QtCurveStyle")
-                ? QStyleFactory::create("QtCurve")
-                : NULL;
+    setStyle();
 
     memset(itsBitmaps, 0, sizeof(QBitmap*)*NumButtonIcons*2);
     reset(0);
@@ -59,6 +58,20 @@ QtCurveHandler::~QtCurveHandler()
         for (int i=0; i < NumButtonIcons; ++i)
             delete itsBitmaps[t][i];
     delete itsStyle;
+}
+
+void QtCurveHandler::setStyle()
+{
+    if(!qstrcmp(QApplication::style()->metaObject()->className(), "QtCurveStyle")) // The user has select QtCurve...
+    {
+        if(itsStyle) // ...but it wasn't QtCurve before, so delete our QtC instance...
+        {
+            delete itsStyle;
+            itsStyle=NULL;
+        }
+    }
+    else if(!itsStyle) // ...user has not selected QtC, so need to create a QtC instance...
+        itsStyle=QStyleFactory::create("QtCurve");
 }
 
 bool QtCurveHandler::reset(unsigned long changed)

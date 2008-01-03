@@ -155,14 +155,16 @@ void QtCurveButton::drawButton(QPainter *painter)
     }
     else
     {
-        int dX,dY;
-        const QBitmap &icon = Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow());
-        dX = r.x()+(r.width()-icon.width())/2;
-        dY = r.y()+(r.height()-icon.height())/2;
-        if (isDown())
-            dY++;
+        const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
+        int           dX(r.x()+(r.width()-icon.width())/2),
+                      dY(r.y()+(r.height()-icon.height())/2);
 
-        if(!isDown())
+        if(isDown())
+        {
+            dY++;
+            dX++;
+        }
+        else
         {
             bP.setPen(QtCurveClient::shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
             bP.drawPixmap(dX+1, dY+1, icon);

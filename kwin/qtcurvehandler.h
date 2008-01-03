@@ -63,6 +63,7 @@ class QtCurveHandler : public QObject, public KDecorationFactory
 
     QtCurveHandler();
     ~QtCurveHandler();
+    void setStyle();
     virtual bool reset( unsigned long changed );
 
     virtual KDecoration * createDecoration( KDecorationBridge* );

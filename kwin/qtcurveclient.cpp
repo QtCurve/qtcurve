@@ -258,13 +258,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
         QFontMetrics fm(itsTitleFont);
 
+        pixPainter.setClipRect(titleRect);
         pixPainter.setFont(itsTitleFont);
-        QPoint tp(itsCaptionRect.x()+maximiseOffset, itsCaptionRect.y()+maximiseOffset+fm.height()-3);
-
         pixPainter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
-        pixPainter.drawText(tp+QPoint(1, 1), c);
+        pixPainter.drawText(itsCaptionRect.adjusted(1, 1, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, c);
         pixPainter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
-        pixPainter.drawText(tp, c);
+        pixPainter.drawText(itsCaptionRect, Qt::AlignLeft | Qt::AlignVCenter, c);
     }
     pixPainter.end();
     painter.drawPixmap(r.x(), r.y(), r.width(), titleBarHeight, *pix);
@@ -276,7 +275,6 @@ QRect QtCurveClient::captionRect() const
 {
     QRect     r(widget()->rect());
     const int titleHeight(layoutMetric(LM_TitleHeight)),
-              titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
               titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
               titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
               marginLeft(layoutMetric(LM_TitleBorderLeft)),
@@ -287,7 +285,7 @@ QRect QtCurveClient::captionRect() const
                            buttonsLeftWidth() - buttonsRightWidth() -
                            marginLeft - marginRight);
 
-    return QRect(titleLeft, r.top()+titleEdgeTop, titleWidth, titleHeight+titleEdgeBottom);
+    return QRect(titleLeft, r.top()+titleEdgeTop, titleWidth, titleHeight);
 }
 
 void QtCurveClient::updateCaption()
@@ -300,6 +298,14 @@ void QtCurveClient::updateCaption()
         widget()->update(oldCaptionRect|itsCaptionRect);
     else
         widget()->update();
+}
+
+bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
+{
+    if(QEvent::StyleChange==e->type())
+        Handler()->setStyle();
+
+    return KCommonDecoration::eventFilter(o, e);
 }
 
 void QtCurveClient::reset(unsigned long changed)
