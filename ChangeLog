@@ -9,6 +9,7 @@
 4. Style Gtk2.12 tooltips
 5. Improve look of edit field under firefox3
 6. Fix menubar items for Firefox 3
+7. Fix KDE4 icon mapping to match KDE4.0
 
 0.55.1
 ------
