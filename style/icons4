@@ -38,7 +38,7 @@ gtk-go-forward actions/go-next.png
 gtk-go-up actions/go-up.png
 gtk-harddisk devices/drive-harddisk.png
 gtk-help actions/help-contents.png
-gtk-home places/user-home.png
+gtk-home actions/go-home.png
 gtk-indent actions/format-indent-more.png
 gtk-index actions/help-contents.png
 gtk-info actions/help-about.png
