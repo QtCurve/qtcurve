@@ -3387,7 +3387,7 @@ debugDisplayWidget(widget, 3);
     {
         GdkRegion  *region=NULL;
         GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
-        gboolean   active_mb=mb ? GTK_MENU_SHELL(mb)->active : FALSE,
+        gboolean   active_mb=GTK_APP_MOZILLA || (mb ? GTK_MENU_SHELL(mb)->active : FALSE),
                    horizPbar=isHorizontalProgressbar(widget);
         int        animShift=-PROGRESS_CHUNK_WIDTH;
 
