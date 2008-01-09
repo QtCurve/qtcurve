@@ -48,12 +48,12 @@ class QtCurveClient : public KCommonDecoration
     bool                      decorationBehaviour(DecorationBehaviour behaviour) const;
     int                       layoutMetric(LayoutMetric lm, bool respectWindowState = true,
                                            const KCommonDecorationButton *btn= 0) const;
-    QRegion                   cornerShape(WindowCorner corner);
     KCommonDecorationButton * createButton(ButtonType type);
     void                      init();
     void                      reset(unsigned long changed);
     void                      drawBtnBgnd(QPainter *p, const QRect &r, bool active);
     void                      paintEvent(QPaintEvent *e);
+    void                      doShape();
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
 

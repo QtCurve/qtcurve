@@ -84,7 +84,7 @@ bool QtCurveHandler::reset(unsigned long changed)
     switch(KDecoration::options()->preferredBorderSize(this))
     {
         case BorderTiny:
-            itsBorderSize = 3;
+            itsBorderSize = 2;
             break;
         case BorderLarge:
             itsBorderSize = 8;

@@ -27,6 +27,7 @@
 #include <QTime>
 #include <QPalette>
 #include <QMap>
+#include <QList>
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
@@ -89,8 +90,10 @@ class QtCurveStyle : public QWindowsStyle
     void drawBevelGradient(const QColor &base, bool increase, QPainter *p, QRect const &r,
                            bool horiz, double shadeTop, double shadeBot, bool sel, EAppearance bevApp,
                            EWidget w=WIDGET_OTHER) const;
+#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
     void drawGradient(const QColor &top, const QColor &bot, bool increase, QPainter *p,
                       const QRect &r, bool horiz=true) const;
+#endif
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *option, */bool top, bool bot, bool raised=false) const;
@@ -120,6 +123,7 @@ class QtCurveStyle : public QWindowsStyle
     const QColor * getSidebarButtons() const;
     void setMenuColors(const QColor &bgnd);
     const QColor * getMdiColors(const QStyleOption *option, bool active) const;
+    void           readMdiPositions() const;
     const QColor & getFill(const QStyleOption *option, const QColor *use) const;
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
@@ -155,6 +159,8 @@ class QtCurveStyle : public QWindowsStyle
                                        itsAnimateStep;
     QTime                              itsTimer;
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
+    mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
+
     // Required for Q3Header hover...
     QPoint                             itsPos;
     QWidget                            *itsHoverWidget;

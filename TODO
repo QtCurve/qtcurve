@@ -1,8 +1,3 @@
-* MDI Button order from kwinrc
-
-* Konqueror's sidebar buttons don't work very well. Because inactive ones are 
-drawn without text, its impossible to know orientation!
-
 * right to left!
     - kde style scrollbars. when pressing > buttons, both depress.
     - qt file selector (other styles (Cleanlooks) have some issues too...)

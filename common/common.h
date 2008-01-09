@@ -348,6 +348,7 @@ typedef enum
 #ifdef __cplusplus
     WIDGET_CHECKBUTTON,  // Qt4 only
     WIDGET_MDI_WINDOW,   // Qt4 only
+    WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_ENTRY,
     WIDGET_FRAME,
     WIDGET_NO_ETCH_BTN,

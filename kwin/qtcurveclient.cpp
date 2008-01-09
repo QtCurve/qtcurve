@@ -63,7 +63,7 @@ bool QtCurveClient::decorationBehaviour(DecorationBehaviour behaviour) const
         case DB_MenuClose:
             return true; // Handler()->menuClose();
         case DB_WindowMask:
-            return true;
+            return false;
         default:
             return KCommonDecoration::decorationBehaviour(behaviour);
     }
@@ -72,7 +72,7 @@ bool QtCurveClient::decorationBehaviour(DecorationBehaviour behaviour) const
 int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
                                 const KCommonDecorationButton *btn) const
 {
-    bool maximized = maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();
+    bool maximized(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
 
     switch (lm)
     {
@@ -95,7 +95,7 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
         case LM_TitleHeight:
             return respectWindowState && isToolWindow() ? Handler()->titleHeightTool() : Handler()->titleHeight();
         case LM_ButtonSpacing:
-            return 1;
+            return 0;
         case LM_ButtonMarginTop:
             return 0;
         default:
@@ -137,43 +137,6 @@ void QtCurveClient::init()
     KCommonDecoration::init();
 }
 
-QRegion QtCurveClient::cornerShape(WindowCorner corner)
-{
-    int round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-
-    if(ROUND_NONE==round)
-        return QRegion();
-
-    int w(widget()->width()),
-        h(widget()->height());
-
-    switch (corner)
-    {
-        case WC_TopLeft:
-            return layoutMetric(LM_TitleEdgeLeft) > 0
-                ? ROUND_FULL==round
-                    ? QRegion(0, 0, 1, 2) + QRegion(1, 0, 1, 1)
-                    : QRegion(0, 0, 1, 1)
-                : QRegion();
-        case WC_TopRight:
-            return layoutMetric(LM_TitleEdgeRight) > 0
-                ? ROUND_FULL==round
-                    ? QRegion(w-1, 0, 1, 2) + QRegion(w-2, 0, 1, 1)
-                    : QRegion(w-1, 0, 1, 1)
-                : QRegion();
-        case WC_BottomLeft:
-            return layoutMetric(LM_BorderBottom) > 0
-                ? QRegion(0, h-1, 1, 1)
-                : QRegion();
-        case WC_BottomRight:
-            return layoutMetric(LM_BorderBottom) > 0
-                ? QRegion(w-1, h-1, 1, 1)
-                : QRegion();
-        default:
-            return QRegion();
-    }
-}
-
 void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 {
     QRect                br(r);
@@ -185,11 +148,14 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
+    opt.palette.setColor(QPalette::Button, KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, p, widget());
 }
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
+    doShape();
+
     QPainter             painter(widget());
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
@@ -210,31 +176,31 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QRect     titleRect(rectX+titleEdgeLeft+buttonsLeftWidth(), rectY+titleEdgeTop,
                         rectX2-titleEdgeRight-buttonsRightWidth()-(rectX+titleEdgeLeft+buttonsLeftWidth()),
                         titleEdgeBottomBottom-(rectY+titleEdgeTop));
+    QColor    col(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
 
     painter.setClipRegion(e->region());
 
-    if(borderWidth)
+    if(borderWidth>1)
     {
-        painter.fillRect(rectX+2, titleEdgeBottomBottom, borderWidth-2,
-                        (rectY2-titleEdgeBottomBottom)-2,
-                         widget()->palette().background());
-        painter.fillRect(rectX2-borderWidth, titleEdgeBottomBottom, borderWidth-1,
-                         (rectY2-titleEdgeBottomBottom)-2, widget()->palette().background());
-        painter.fillRect(rectX+2, rectY2-borderWidth, (rectX2-rectX)-3, borderWidth-1,
-                         widget()->palette().background());
+        painter.fillRect(rectX+1, titleEdgeBottomBottom, borderWidth-1,
+                        (rectY2-titleEdgeBottomBottom)-1,
+                         col);
+        painter.fillRect(rectX2-(borderWidth-1), titleEdgeBottomBottom, borderWidth-1,
+                         (rectY2-titleEdgeBottomBottom)-1, col);
+        painter.fillRect(rectX+1, rectY2-borderWidth, (rectX2-rectX)-2, borderWidth-1,
+                         col);
     }
 
     opt.init(widget());
 
     if(MaximizeFull==maximizeMode())
         r.adjust(-3, -3, 3, 0);
+    opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y()+4, r.width(), r.height()-4);
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None);
 
-    painter.setClipRect(QRect(rectX, titleEdgeBottomBottom, (rectX2-rectX)+1, (rectY2-titleEdgeBottomBottom)+1));
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
-    painter.setClipping(false);
 
     QPixmap  *pix=new QPixmap(r.width(), titleBarHeight);
     QPainter pixPainter(pix);
@@ -247,28 +213,62 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(!caption().isEmpty())
     {
-        const int constMaxCaptionLength = 300; // truncate captions longer than this!
-        QString   c(caption());
+        pixPainter.setFont(itsTitleFont);
 
-        if (c.length() > constMaxCaptionLength)
-        {
-            c.truncate(constMaxCaptionLength);
-            c.append(" [...]");
-        }
-
-        QFontMetrics fm(itsTitleFont);
+        QRect   captRect(itsCaptionRect.adjusted(maximiseOffset, (maximiseOffset*2), 0, 0));
+        QString str(pixPainter.fontMetrics().elidedText(caption(), Qt::ElideRight, captRect.width(), QPalette::WindowText));
 
         pixPainter.setClipRect(titleRect);
-        pixPainter.setFont(itsTitleFont);
         pixPainter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
-        pixPainter.drawText(itsCaptionRect.adjusted(1, 1, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, c);
+        pixPainter.drawText(captRect.adjusted(1, 1, 1, 1), Qt::AlignLeft | Qt::AlignVCenter, str);
         pixPainter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
-        pixPainter.drawText(itsCaptionRect, Qt::AlignLeft | Qt::AlignVCenter, c);
+        pixPainter.drawText(captRect, Qt::AlignLeft | Qt::AlignVCenter, str);
     }
     pixPainter.end();
     painter.drawPixmap(r.x(), r.y(), r.width(), titleBarHeight, *pix);
     delete pix;
     painter.end();
+}
+
+void QtCurveClient::doShape()
+{
+    int  round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
+         w(widget()->width()),
+         h(widget()->height());
+    bool maximized(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
+
+    if(maximized)
+        round=ROUND_NONE;
+
+    switch(round)
+    {
+        case ROUND_NONE:
+        {
+            QRegion mask(0, 0, w, h);
+            setMask(mask);
+            break;
+        }
+        case ROUND_SLIGHT:
+        {
+            QRegion mask(1, 0, w-2, h);
+            mask += QRegion(0, 1, 1, h-2);
+            mask += QRegion(w-1, 1, 1, h-2);
+
+            setMask(mask);
+            break;
+        }
+        default: // ROUND_FULL
+        {
+            //commented out values would make bottoms fully rounded as well...
+            QRegion mask(2, 0, w-4, h);
+            mask += QRegion(0, 2, 1, h-3); // 4);
+            mask += QRegion(1, 1, 1, h-1); // 2);
+            mask += QRegion(w-1, 2, 1, h-3); // 4);
+            mask += QRegion(w-2, 1, 1, h-1); // 2);
+
+            setMask(mask);
+        }
+    }
 }
 
 QRect QtCurveClient::captionRect() const
