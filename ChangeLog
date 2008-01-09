@@ -1,15 +1,22 @@
 0.55.2
 ------
-1. Fix look of disabled entry fields.
-2. Add warning to -DQTC_ADD_EVENT_FILTER option.
-3. Add cmake option: -DQTC_REORDER_GTK_DIALOG_BUTTONS
-   When set QtCurve will try to manually re-order the buttons of Gtk
-   dialogs. Note: This will cause errors to be printed to the console,
-   and is only an experiment!
-4. Style Gtk2.12 tooltips
-5. Improve look of edit field under firefox3
-6. Fix menubar items for Firefox 3
-7. Fix KDE4 icon mapping to match KDE4.0
+ 1. Fix look of disabled entry fields.
+ 2. Add warning to -DQTC_ADD_EVENT_FILTER option.
+ 3. Add cmake option: -DQTC_REORDER_GTK_DIALOG_BUTTONS
+    When set QtCurve will try to manually re-order the buttons of Gtk
+    dialogs. Note: This will cause errors to be printed to the console,
+    and is only an experiment!
+ 4. Style Gtk2.12 tooltips
+ 5. Improve look of edit field under firefox3
+ 6. Fix menubar items for Firefox 3
+ 7. Fix KDE4 icon mapping to match KDE4.0
+ 8. Use 32x32 as dialog icon size.
+ 9. Nicer tabs for Firefox 3
+10. Better (not perfect) scrollbar types for Firefox3. For the moment you must
+    set QTC_NEW_MOZILLA (any value) before starting firefox so that QtCurve
+    knows its the newer version. e.g.
+        QTC_NEW_MOZILLA=1 firefox
+11. Fixed reading of Qt4 font.
 
 0.55.1
 ------

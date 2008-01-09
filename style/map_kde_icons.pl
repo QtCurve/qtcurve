@@ -12,8 +12,8 @@ $numSizes=$#iconSizes+1;
 printf "#%s %02X%02X%02X%02X%02X%02X%02X\n", $ARGV[9], $ARGV[2], $ARGV[3], $ARGV[4], $ARGV[5], $ARGV[6], $ARGV[7], $ARGV[8];
 printf "#This file is created, and used by, QtCurve. Alterations may be overwritten.\n";
 print "gtk-icon-sizes=\"gtk-small-toolbar=$ARGV[3],$ARGV[3]:gtk-large-toolbar=$ARGV[4],$ARGV[4]:";
-#print "gtk-dnd=$ARGV[5],$ARGV[5]:gtk-button=$ARGV[6],$ARGV[6]:gtk-menu=$ARGV[7],$ARGV[7]:gtk-dialog=$ARGV[8],$ARGV[8]\"\n";
-print "gtk-dnd=$ARGV[5],$ARGV[5]:gtk-button=$ARGV[6],$ARGV[6]:gtk-menu=$ARGV[7],$ARGV[7]\"\n";
+print "gtk-dnd=$ARGV[5],$ARGV[5]:gtk-button=$ARGV[6],$ARGV[6]:gtk-menu=$ARGV[7],$ARGV[7]:gtk-dialog=$ARGV[8],$ARGV[8]\"\n";
+#print "gtk-dnd=$ARGV[5],$ARGV[5]:gtk-button=$ARGV[6],$ARGV[6]:gtk-menu=$ARGV[7],$ARGV[7]\"\n";
 
 if ($ARGV[1])
 {

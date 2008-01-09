@@ -99,6 +99,7 @@ typedef enum
 {
     GTK_APP_UNKNOWN,
     GTK_APP_MOZILLA,
+    GTK_APP_NEW_MOZILLA, /* For firefox3 */
     GTK_APP_OPEN_OFFICE,
     GTK_APP_VMPLAYER,
     GTK_APP_GIMP,
@@ -157,6 +158,11 @@ struct QtData
 #define MAX_LINE_LEN 1024
 
 struct QtData qtSettings;
+
+static gboolean isMozilla()
+{
+    return GTK_APP_MOZILLA==qtSettings.app || GTK_APP_NEW_MOZILLA==qtSettings.app;
+}
 
 static gboolean useQt3Settings()
 {
@@ -518,7 +524,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                 }
                 else if (( !qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==memcmp(line, "font=", 5)) ||
-                         ( qt4 && SECT_QT & rd&RD_FONT && !(found&RD_FONT) &&
+                         ( qt4 && SECT_QT==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==memcmp(line, "font=\"", 6)) )
                 {
                     int   n=-1,
@@ -1288,7 +1294,7 @@ static gboolean qtInit(Options *opts)
             qtSettings.iconSizes.dndSize=32;
             qtSettings.iconSizes.btnSize=16;
             qtSettings.iconSizes.mnuSize=16;
-            qtSettings.iconSizes.dlgSize=22;
+            qtSettings.iconSizes.dlgSize=32;
             qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=0;
             qtSettings.styleName=NULL;
 
@@ -1370,7 +1376,9 @@ static gboolean qtInit(Options *opts)
                     else if(0==strcmp(app, "mozilla-thunderbird-bin"))
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
 #endif
-                    qtSettings.app=GTK_APP_MOZILLA;
+                    qtSettings.app=NULL==getenv("QTC_NEW_MOZILLA")
+                                    ? GTK_APP_MOZILLA
+                                    : GTK_APP_NEW_MOZILLA;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
@@ -1390,7 +1398,7 @@ static gboolean qtInit(Options *opts)
             if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
                 qtSettings.app=GTK_APP_JAVA_SWT;
 
-            /*if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)*/
+            /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             {
                 /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
                 /* ...and inactive highlight!!! */
