@@ -855,6 +855,7 @@ void QtCurveStyle::polish(QWidget *widget)
         qobject_cast<QScrollBar *>(widget) ||
         qobject_cast<QHeaderView *>(widget) ||
         qobject_cast<QTabBar *>(widget) ||
+        qobject_cast<QDockWidget *>(widget) ||
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("QDockSeparator") ||
         widget->inherits("QDockWidgetSeparator") ||
@@ -978,6 +979,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
        qobject_cast<QScrollBar *>(widget) ||
        qobject_cast<QHeaderView *>(widget) ||
        qobject_cast<QTabBar *>(widget) ||
+       qobject_cast<QDockWidget *>(widget) ||
        widget->inherits("QWorkspaceTitleBar") ||
        widget->inherits("QDockSeparator") ||
        widget->inherits("QDockWidgetSeparator") ||
@@ -2477,25 +2479,28 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
                 QRect handleRect(titleRect);
 
-/*
-                if(IS_FLAT(opts.appearance))
-*/
-#if QT_VERSION >= 0x040300
-                    painter->fillRect(r, palette.background().color().darker(110));
-#else
-                    painter->fillRect(r, palette.background().color().dark(110));
-#endif
-/*
-                else
+                if(state&State_MouseOver)
                 {
-                    const QColor *use(backgroundColors(option));
+    /*
+                    if(IS_FLAT(opts.appearance))
+    */
+    #if QT_VERSION >= 0x040300
+                        painter->fillRect(r, palette.background().color().darker(105));
+    #else
+                        painter->fillRect(r, palette.background().color().dark(105));
+    #endif
+    /*
+                    else
+                    {
+                        const QColor *use(backgroundColors(option));
 
-                    drawBevelGradient(use[ORIGINAL_SHADE], true, painter, r, true,
-                                      getWidgetShade(WIDGET_STD_BUTTON, true, false, opts.appearance),
-                                      getWidgetShade(WIDGET_STD_BUTTON, false, false, opts.appearance),
-                                      false, opts.appearance, WIDGET_STD_BUTTON);
+                        drawBevelGradient(use[ORIGINAL_SHADE], true, painter, r, true,
+                                        getWidgetShade(WIDGET_STD_BUTTON, true, false, opts.appearance),
+                                        getWidgetShade(WIDGET_STD_BUTTON, false, false, opts.appearance),
+                                        false, opts.appearance, WIDGET_STD_BUTTON);
+                    }
+    */
                 }
-*/
                 if (!dwOpt->title.isEmpty())
                 {
 //                     int textWidth=option->fontMetrics.width(dwOpt->title);
@@ -4769,6 +4774,18 @@ void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags,
     QTC_BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
+#if 0 // Not sure about this...
+void QtCurveStyle::drawItemPixmap(QPainter *painter, const QRect &rect, int alignment, const QPixmap &pixmap) const
+{
+    QWidget *widget=dynamic_cast<QWidget *>(painter->device());
+
+    if(widget && widget->parentWidget() && widget->inherits("QDockWidgetTitleButton") && !widget->parentWidget()->underMouse())
+        return;
+
+    QTC_BASE_STYLE::drawItemPixmap(painter, rect, alignment, pixmap);
+}
+#endif
+
 QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
     QSize newSize(QTC_BASE_STYLE::sizeFromContents(type, option, size, widget));
@@ -6496,7 +6513,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         if(r.width()>r.height())
             opt.state|=State_Horizontal;
         opt.state&=~(State_Sunken|State_On);
-        if(!(option->activeSubControls&SC_SliderHandle))
+        if(!(option->activeSubControls&SC_SliderHandle) || !(opt.state&State_Enabled))
             opt.state&=~State_MouseOver;
 
         opt.state|=State_Raised;

@@ -75,7 +75,8 @@ class QtCurveHandler : public QObject, public KDecorationFactory
     const QFont &   titleFont()             { return itsTitleFont; }
     const QFont &   titleFontTool()         { return itsTitleFontTool; }
     int             borderSize() const      { return itsBorderSize; }
-    bool            reverseLayout() const   { return itsReverse; }
+    bool            coloredBorder() const   { return itsColoredBorder; }
+    bool            menuClose() const       { return itsMenuClose; }
     QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
@@ -86,7 +87,8 @@ class QtCurveHandler : public QObject, public KDecorationFactory
 
     private:
 
-    bool    itsReverse;
+    bool    itsColoredBorder,
+            itsMenuClose;
     int     itsBorderSize,
             itsTitleHeight,
             itsTitleHeightTool;

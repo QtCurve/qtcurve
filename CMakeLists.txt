@@ -90,6 +90,7 @@ if (KDE4_FOUND)
 
     if (KWINCONFIG_H)
         add_subdirectory(kwin)
+        add_subdirectory(kwinconfig)
     else (KWINCONFIG_H)
         message("** KWin headers not found - KWin decoration will not be built")
     endif (KWINCONFIG_H)

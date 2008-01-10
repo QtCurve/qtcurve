@@ -106,9 +106,6 @@ bool QtCurveHandler::reset(unsigned long changed)
             itsBorderSize = 4;
     }
 
-    // check if we are in reverse layout mode
-    itsReverse = QApplication::isRightToLeft();
-
     // read in the configuration
     readConfig();
 
@@ -189,6 +186,9 @@ void QtCurveHandler::readConfig()
     // have an even title/button size so the button icons are fully centered...
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;
+
+    itsColoredBorder = config.readEntry("ColoredBorder", true);
+    itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
 }
 
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)

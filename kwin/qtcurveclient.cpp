@@ -61,7 +61,7 @@ bool QtCurveClient::decorationBehaviour(DecorationBehaviour behaviour) const
     switch (behaviour)
     {
         case DB_MenuClose:
-            return true; // Handler()->menuClose();
+            return Handler()->menuClose();
         case DB_WindowMask:
             return false;
         default:
@@ -182,13 +182,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(borderWidth>1)
     {
+        QColor borderCol(Handler()->coloredBorder() ? col : widget()->palette().color(QPalette::Window));
+
         painter.fillRect(rectX+1, titleEdgeBottomBottom, borderWidth-1,
-                        (rectY2-titleEdgeBottomBottom)-1,
-                         col);
+                        (rectY2-titleEdgeBottomBottom)-1, borderCol);
         painter.fillRect(rectX2-(borderWidth-1), titleEdgeBottomBottom, borderWidth-1,
-                         (rectY2-titleEdgeBottomBottom)-1, col);
-        painter.fillRect(rectX+1, rectY2-borderWidth, (rectX2-rectX)-2, borderWidth-1,
-                         col);
+                         (rectY2-titleEdgeBottomBottom)-1, borderCol);
+        painter.fillRect(rectX+1, rectY2-borderWidth, (rectX2-rectX)-2, borderWidth-1, borderCol);
     }
 
     opt.init(widget());
