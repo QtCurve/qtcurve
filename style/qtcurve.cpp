@@ -1926,7 +1926,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool         horiz(opt.state&State_Horizontal);
 
                 painter->save();
-                if((opt.state&State_On ) || opt.state&State_MouseOver)
+                if(opt.state&State_On || opt.state&State_MouseOver)
                 {
                     r2.adjust(-1, -1, 1, 1);
                     drawLightBevel(painter, r2, &opt, ROUNDED_NONE, getFill(&opt, use), use, false, WIDGET_MENU_ITEM);
@@ -2194,7 +2194,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
                          isFlat(false),
-                         isDown((state&State_Sunken) || (state&State_On)),
+                         isDown(state&State_Sunken || state&State_On),
                          isOnListView(widget && qobject_cast<const QTreeView *>(widget)),
                          noEtch(isOnListView);
             QStyleOption opt(*option);
@@ -2220,7 +2220,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             drawLightBevel(painter, r, &opt, ROUNDED_ALL, getFill(&opt, use), use,
                            true, noEtch ? WIDGET_NO_ETCH_BTN : WIDGET_STD_BUTTON);
 
-            if (isDefault && state & State_Enabled)
+            if (isDefault && state&State_Enabled)
                 switch(opts.defBtnIndicator)
                 {
                     case IND_CORNER:
@@ -5734,6 +5734,10 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                                   bool doBorder, EWidget w) const
 {
     EAppearance  app(widgetApp(w, &opts));
+
+    if(APPEARANCE_RAISED==app && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w))
+        app=APPEARANCE_FLAT;
+
     QRect        r(rOrig),
                  br(r);
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w) && APPEARANCE_BEVELLED==app),
@@ -5789,8 +5793,13 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         {
             //Left & top
             p->drawLine(br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-(WIDGET_MDI_WINDOW_TITLE==w ? 1 : 2));
-            p->drawLine(br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
-            br.adjust(2, 2,-1,-1);
+            if((WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w) && APPEARANCE_SHINY_GLASS==app)
+                br.adjust(2, 1, -1, -1);
+            else
+            {
+                p->drawLine(br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
+                br.adjust(2, 2,-1,-1);
+            }
         }
     }
     else
@@ -5952,6 +5961,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                           ? option->palette.buttonText().color()
                           : cols[!enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
                                     ? QT_DISABLED_BORDER : borderVal]);
+
+    if(APPEARANCE_FLAT==app && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w))
+        app=APPEARANCE_RAISED;
 
     switch(borderProfile)
     {

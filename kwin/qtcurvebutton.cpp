@@ -139,11 +139,9 @@ void QtCurveButton::drawButton(QPainter *painter)
 
         opt.init(this);
         opt.rect=QRect(0, 0, width(), height());
-        if(isDown())
-            opt.state|=QStyle::State_Sunken;
-
+        opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised)|QStyle::State_MouseOver|QStyle::State_Horizontal;
         opt.palette.setColor(QPalette::Button, buttonColor);
-        Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonTool, &opt, &bP, 0L);
+        Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
     }
 
     if (MenuButton==type())
