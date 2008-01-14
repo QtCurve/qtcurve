@@ -139,17 +139,32 @@ void QtCurveClient::init()
 
 void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 {
-    QRect                br(r);
-    QStyleOptionTitleBar opt;
+    int    state(active ? 1 : 0);
+    QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
+    bool   diffSize(itsButtonBackground[state].pix.width()!=r.width() ||
+                    itsButtonBackground[state].pix.height()!=r.height());
 
-    br.adjust(-3, -3, 3, 3);
-    opt.rect=br;
+    if(diffSize || itsButtonBackground[state].col!=col)
+    {
+        if(diffSize)
+            itsButtonBackground[state].pix=QPixmap(r.width(), r.height());
 
-    opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
-             (active ? QStyle::State_Active : QStyle::State_None);
-    opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
-    opt.palette.setColor(QPalette::Button, KDecoration::options()->color(KDecoration::ColorTitleBar, active));
-    Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, p, widget());
+        QRect                br(r);
+        QStyleOptionTitleBar opt;
+        QPainter             pixPainter(&(itsButtonBackground[state].pix));
+
+        br.adjust(-3, -3, 3, 3);
+        opt.rect=br;
+
+        opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
+                 (active ? QStyle::State_Active : QStyle::State_None);
+        opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
+        opt.palette.setColor(QPalette::Button, col);
+        Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &pixPainter, widget());
+        itsButtonBackground[state].col=col;
+    }
+
+    p->drawPixmap(r, itsButtonBackground[state].pix);
 }
 
 void QtCurveClient::paintEvent(QPaintEvent *e)

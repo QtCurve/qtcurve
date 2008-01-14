@@ -1,6 +1,8 @@
 0.55.3
 ------
 1. Fix issues with flat/raised style and titlebars.
+2. Fix black square (where maximise icon would be) flashing when a
+   window is maximised.
 
 0.55.2
 ------

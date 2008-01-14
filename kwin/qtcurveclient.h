@@ -28,6 +28,8 @@
 #define QTCURVECLIENT_H
 
 #include <kcommondecoration.h>
+#include <QtGui/QPixmap>
+#include <QtGui/QColor>
 
 namespace KWinQtCurve
 {
@@ -63,8 +65,15 @@ class QtCurveClient : public KCommonDecoration
 
     private:
 
-    QRect   itsCaptionRect;
-    QString itsOldCaption;
+    struct ButtonBgnd
+    {
+        QPixmap pix;
+        QColor  col;
+    };
+
+    ButtonBgnd itsButtonBackground[2];
+    QRect      itsCaptionRect;
+    QString    itsOldCaption;
     QFont   itsTitleFont;
 };
 
