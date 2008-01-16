@@ -15,7 +15,6 @@ set(QTCURVE_VERSION_FULL "${QTCURVE_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${QTCURVE_VERSION_FULL}")
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${QTCURVE_VERSION_FULL}")
 include(CPack)
-include(CheckIncludeFiles)
 
 set(OLD_CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
@@ -85,15 +84,14 @@ if (KDE4_FOUND)
     add_subdirectory(config)
     add_subdirectory(themes)
 
-    set(CMAKE_REQUIRED_INCLUDES ${KDE4_INCLUDES})
-    check_include_files(kwinconfig.h KWINCONFIG_H) # kwinconfig.h is new for KDE4
+    find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES}) # kwinglobals.h is new for KDE4
 
-    if (KWINCONFIG_H)
+    if (KWINGLOBALS_H)
         add_subdirectory(kwin)
         add_subdirectory(kwinconfig)
-    else (KWINCONFIG_H)
+    else (KWINGLOBALS_H)
         message("** KWin headers not found - KWin decoration will not be built")
-    endif (KWINCONFIG_H)
+    endif (KWINGLOBALS_H)
 else (KDE4_FOUND)
     set(CMAKE_INSTALL_PREFIX ${OLD_CMAKE_INSTALL_PREFIX})
     add_definitions(${QT_DEFINITIONS})
