@@ -68,13 +68,14 @@ class QtCurveClient : public KCommonDecoration
     struct ButtonBgnd
     {
         QPixmap pix;
+        int     app;
         QColor  col;
     };
 
     ButtonBgnd itsButtonBackground[2];
     QRect      itsCaptionRect;
     QString    itsOldCaption;
-    QFont   itsTitleFont;
+    QFont      itsTitleFont;
 };
 
 }

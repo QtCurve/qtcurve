@@ -297,12 +297,17 @@ typedef GdkColor color;
 
 #define QTC_DO_EFFECT          (ROUND_FULL==opts.round && EFFECT_NONE!=opts.buttonEffect)
 
-#ifdef __cplusplus
+#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+
 #include <qstyle.h>
 typedef enum
 {
-    QtC_Round = QStyle::PM_CustomBase
+    QtC_Round = QStyle::PM_CustomBase,
+    QtC_Appearance
 } QtCMetrics;
+
+#define QtC_StateKWin QStyle::State_Top
+
 #endif
 
 typedef enum

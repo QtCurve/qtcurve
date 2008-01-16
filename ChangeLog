@@ -3,6 +3,9 @@
 1. Fix issues with flat/raised style and titlebars.
 2. Fix black square (where maximise icon would be) flashing when a
    window is maximised.
+3. More rounded titlebars when fully rounded.
+4. Fix 'font colour' default button indicator.
+5. Look for kwinglobals.h to tell if KDE4's kwin is installed.
 
 0.55.2
 ------

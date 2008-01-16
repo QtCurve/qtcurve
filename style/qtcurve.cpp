@@ -1324,6 +1324,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                                         : 0, 24);
         case QtC_Round:
             return (int)opts.round;
+        case QtC_Appearance:
+            return (int)opts.appearance;
         default:
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
     }
@@ -2195,8 +2197,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             bool         isDefault(false),
                          isFlat(false),
                          isDown(state&State_Sunken || state&State_On),
-                         isOnListView(widget && qobject_cast<const QTreeView *>(widget)),
-                         noEtch(isOnListView);
+                         isOnListView(widget && qobject_cast<const QTreeView *>(widget));
             QStyleOption opt(*option);
             CEtchCheck   check(widget);
 
@@ -2218,7 +2219,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 opt.state|=State_Horizontal|State_Raised;
 
             drawLightBevel(painter, r, &opt, ROUNDED_ALL, getFill(&opt, use), use,
-                           true, noEtch ? WIDGET_NO_ETCH_BTN : WIDGET_STD_BUTTON);
+                           true, isOnListView
+                                    ? WIDGET_NO_ETCH_BTN
+                                    : isDefault && state&State_Enabled && IND_FONT_COLOR==opts.defBtnIndicator
+                                        ? WIDGET_DEF_BUTTON
+                                        : WIDGET_STD_BUTTON);
 
             if (isDefault && state&State_Enabled)
                 switch(opts.defBtnIndicator)
@@ -4221,7 +4226,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 painter->save();
 
                 const int    buttonMargin(6);
-                bool         active(titleBar->titleBarState & State_Active);
+                bool         active(state & State_Active),
+                             roundKWinFull(ROUND_FULL==opts.round &&
+                                            ((APP_KWIN==theThemedApp && !(titleBar->titleBarState&State_Raised)) ||
+                                              titleBar->titleBarState&QtC_StateKWin));
                 const QColor *btnCols(theThemedApp==APP_KWIN
                                         ? buttonColors(option)
                                         : getMdiColors(titleBar, active));
@@ -4233,6 +4241,24 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 QStyleOption opt(*option);
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised;
+
+                if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
+                {
+                    int     x(r.x()), y(r.y()), w(r.width()), h(r.height());
+                    QRegion mask(x+5, y+0, w-10, h);
+
+                    mask += QRegion(x+0, y+5, 1, h-6);
+                    mask += QRegion(x+1, y+3, 1, h-3);
+                    mask += QRegion(x+2, y+2, 1, h-2);
+                    mask += QRegion(x+3, y+1, 2, h-1);
+
+                    mask += QRegion(x+w-1, y+5, 1, h-6);
+                    mask += QRegion(x+w-2, y+3, 1, h-3);
+                    mask += QRegion(x+w-3, y+2, 1, h-2);
+                    mask += QRegion(x+w-5, y+1, 2, h-1);
+                    painter->setClipRegion(mask);
+                }
+
                 drawLightBevel(painter, r, &opt,
                                titleBar->titleBarState&State_Raised
                                 ? ROUNDED_NONE
@@ -4241,6 +4267,22 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                     : ROUNDED_TOP,
                                btnCols[2], btnCols, true,
                                titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
+
+                if(roundKWinFull)
+                {
+                    painter->setPen(btnCols[QT_STD_BORDER]);
+                    painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
+                    painter->drawPoint(r.x()+2, r.y()+2);
+                    painter->drawLine(r.x()+3, r.y()+1, r.x()+4, r.y()+1);
+                    painter->drawLine(r.x()+r.width()-2, r.y()+4, r.x()+r.width()-2, r.y()+3);
+                    painter->drawPoint(r.x()+r.width()-3, r.y()+2);
+                    painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
+                    painter->setPen(btnCols[0]);
+                    painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
+                    painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
+                    //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
+                    painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
+                }
 
                 if(!titleBar->text.isEmpty())
                 {
