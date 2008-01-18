@@ -90,10 +90,11 @@ class QtCurveStyle : public QWindowsStyle
     void drawBevelGradient(const QColor &base, bool increase, QPainter *p, QRect const &r,
                            bool horiz, double shadeTop, double shadeBot, bool sel, EAppearance bevApp,
                            EWidget w=WIDGET_OTHER) const;
-#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
+    void drawBevelGradientReal(const QColor &base, bool increase, QPainter *p,
+                               const QRect &r, bool horiz, double shadeTop,
+                               double shadeBot, bool sel, EAppearance bevApp, EWidget w, bool useQ) const;
     void drawGradient(const QColor &top, const QColor &bot, bool increase, QPainter *p,
-                      const QRect &r, bool horiz=true) const;
-#endif
+                      const QRect &r, bool horiz, bool useQt) const;
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *option, */bool top, bool bot, bool raised=false) const;

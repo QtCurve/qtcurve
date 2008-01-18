@@ -5,7 +5,16 @@
    window is maximised.
 3. More rounded titlebars when fully rounded.
 4. Fix 'font colour' default button indicator.
-5. Look for kwinglobals.h to tell if KDE4's kwin is installed.
+5. 'Fix' for plasma and NVIDIA cards (an my system at least). Buttons,
+   scrollbars, etc., in plasma's dialogs have redraw errors on NVIDIA
+   (but not on my works integrated intel chip). So, by default gradients
+   on plasma widgets (of the Qt variety) are drawn directly, and not cached
+   to pixmaps. To revert to the previous method, edit
+    $XDG_CONFIG_HOME/qtcurvestylerc (e.g. ~/.config/qtcurvestylerc)
+
+   ...and add
+
+    plasmaHack=false
 
 0.55.2
 ------

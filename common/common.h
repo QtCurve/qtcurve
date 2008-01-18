@@ -919,6 +919,9 @@ typedef struct
                      customMenuNormTextColor,
                      customMenuSelTextColor,
                      customCheckRadioColor;
+#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+    bool             plasmaHack;
+#endif
     #ifdef QTC_CONFIG_DIALOG
     EShading         shading;
     #endif

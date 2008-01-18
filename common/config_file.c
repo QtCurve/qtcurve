@@ -736,6 +736,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
 #endif
+#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+            QTC_CFG_READ_BOOL(plasmaHack)
+#endif
             QTC_CFG_READ_SHADING(shading, shading);
 
 #ifndef __cplusplus
@@ -885,6 +888,9 @@ static void defaultSettings(Options *opts)
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->gtkButtonOrder=false;
+#endif
+#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+    opts->plasmaHack=true;
 #endif
 
     /* Read system config file... */

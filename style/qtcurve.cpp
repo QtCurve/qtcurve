@@ -714,11 +714,11 @@ void QtCurveStyle::polish(QApplication *app)
     else
         theThemedApp=APP_OTHER;
 
-    if(APP_OTHER==theThemedApp && EFFECT_NONE!=opts.buttonEffect && "plasma"==appName)
-        theThemedApp=APP_PLASMA;
-
-    if(APP_OTHER==theThemedApp && "kwin"==appName)
-        theThemedApp=APP_KWIN;
+    if(APP_OTHER==theThemedApp)
+        if("plasma"==appName)
+            theThemedApp=APP_PLASMA;
+        else if("kwin"==appName)
+            theThemedApp=APP_KWIN;
 
     QPalette pal(app->palette());
 
@@ -5511,201 +5511,183 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
                             ? bevApp
                             : APPEARANCE_GRADIENT);
 
-        bool    selected(opts.colorSelTab && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w) ? false : sel);
-        QRect   r(0, 0, horiz ? QTC_PIXMAP_DIMENSION : origRect.width(),
-                        horiz ? origRect.height() : QTC_PIXMAP_DIMENSION);
-        QtcKey  key(createKey(horiz ? r.height() : r.width(), base.rgb(), horiz, increase,
-                              app2App(app, sel), w, shadeTop, shadeBot));
-        QPixmap *pix(itsPixmapCache.object(key));
-
-        if(!pix)
+        if(APP_PLASMA!=theThemedApp || !opts.plasmaHack)
         {
-            pix=new QPixmap(r.width(), r.height());
+            QRect   r(0, 0, horiz ? QTC_PIXMAP_DIMENSION : origRect.width(),
+                            horiz ? origRect.height() : QTC_PIXMAP_DIMENSION);
+            QtcKey  key(createKey(horiz ? r.height() : r.width(), base.rgb(), horiz, increase,
+                                app2App(app, sel), w, shadeTop, shadeBot));
+            QPixmap *pix(itsPixmapCache.object(key));
 
-            QPainter pixPainter(pix);
-
-            if(!selected && (IS_GLASS(app) || APPEARANCE_SPLIT_GRADIENT==app))
+            if(!pix)
             {
-                if(WIDGET_TAB_BOT==w)
-                {
-                    double t(shadeTop);
-                    shadeTop=shadeBot;
-                    shadeBot=t;
-                }
+                pix=new QPixmap(r.width(), r.height());
 
-                double shadeTopA(WIDGET_TAB_BOT==w
-                                    ? 1.0
-                                    : APPEARANCE_SPLIT_GRADIENT==app
-                                        ? shadeTop
-                                        : shadeTop*SHADE_GLASS_TOP_A(app, w)),
-                       shadeTopB(WIDGET_TAB_BOT==w
-                                    ? 1.0
-                                    : APPEARANCE_SPLIT_GRADIENT==app
-                                        ? shadeTop-((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
-                                        : shadeTop*SHADE_GLASS_TOP_B(app, w)),
-                       shadeBotA(WIDGET_TAB_TOP==w
-                                    ? 1.0
-                                    : APPEARANCE_SPLIT_GRADIENT==app
-                                        ? shadeBot+((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
-                                        : shadeBot*SHADE_GLASS_BOT_A(app)),
-                       shadeBotB(WIDGET_TAB_TOP==w
-                                    ? 1.0
-                                    : APPEARANCE_SPLIT_GRADIENT==app
-                                        ? shadeBot
-                                        : shadeBot*SHADE_GLASS_BOT_B(app));
+                QPainter pixPainter(pix);
 
-                QColor topA, topB, botA, botB;
-
-                shade(base, &topA, shadeTopA);
-                shade(base, &topB, shadeTopB);
-                shade(base, &botA, shadeBotA);
-                shade(base, &botB, shadeBotB);
-
-#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
-                QRect r1(r), r2(r);
-
-                if(horiz)
-                {
-                    r1.setHeight(r1.height()/2);
-                    r2.setY(r2.y()+r1.height());
-                }
-                else
-                {
-                    r1.setWidth(r1.width()/2);
-                    r2.setX(r2.x()+r1.width());
-                }
-
-                drawGradient(topA, topB, increase, &pixPainter, r1, horiz);
-                drawGradient(botA, botB, increase, &pixPainter, r2, horiz);
-#else
-                QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
-
-                grad.setColorAt(0, increase ? topA : topB);
-                grad.setColorAt(0.499999999999999999, increase ? topB : topA);
-                grad.setColorAt(0.5, increase ? botA : botB);
-                grad.setColorAt(1, increase ? botB : botA);
-                pixPainter.fillRect(r, QBrush(grad));
-#endif
+                drawBevelGradientReal(base, increase, &pixPainter, r, horiz, shadeTop, shadeBot, sel, app, w, true);
+                pixPainter.end();
+                itsPixmapCache.insert(key, pix, pix->width()*pix->height()*(pix->depth()/8));
             }
-            else if(!selected && APPEARANCE_BEVELLED==app &&
-                    ((horiz ? r.height()
-                            : r.width()) > (((WIDGET_BUTTON(w) ? 2 : 1)*BEVEL_BORDER(w))+4)))
-            {
-                if(WIDGET_LISTVIEW_HEADER==w)
-                {
-                    QColor bot;
-                    QRect  r1(r), r2(r);
-
-                    if(horiz)
-                    {
-                        r2.setHeight(BEVEL_BORDER(w));
-                        r1.setHeight(r.height()-r2.height());
-                        r2.moveTop(r.y()+r1.height());
-                    }
-                    else
-                    {
-                        r2.setWidth(BEVEL_BORDER(w));
-                        r1.setWidth(r.width()-r2.width());
-                        r2.moveLeft(r.x()+r1.width());
-                    }
-                    shade(base, &bot, SHADE_BEVEL_BOT(w));
-                    pixPainter.fillRect(r1, base);
-#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
-                    drawGradient(base, bot, true, &pixPainter, r2, horiz);
-#else
-                    QLinearGradient grad(r2.topLeft(), horiz ? r2.bottomLeft() : r2.topRight());
-
-                    grad.setColorAt(0, base);
-                    grad.setColorAt(1, bot);
-                    pixPainter.fillRect(r2, QBrush(grad));
-#endif
-                }
-                else
-                {
-                    QColor bot, midTop, midBot, top;
-
-                    shade(base, &top, SHADE_BEVEL_TOP);
-                    shade(base, &midTop, SHADE_BEVEL_MID_TOP);
-                    shade(base, &midBot, SHADE_BEVEL_MID_BOT);
-                    shade(base, &bot, SHADE_BEVEL_BOT(w));
-#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
-                    QRect  r1(r), r2(r), r3(r);
-
-                    if(horiz)
-                    {
-                        r1.setHeight(BEVEL_BORDER(w));
-                        r3.setHeight(BEVEL_BORDER(w));
-                        r2.setHeight(r.height()-(r1.height()+r3.height()));
-                        r2.moveTop(r.y()+r1.height());
-                        r3.moveTop(r.y()+r1.height()+r2.height());
-                    }
-                    else
-                    {
-                        r1.setWidth(BEVEL_BORDER(w));
-                        r3.setWidth(BEVEL_BORDER(w));
-                        r2.setWidth(r.width()-(r1.width()+r3.width()));
-                        r2.moveLeft(r.x()+r1.width());
-                        r3.moveLeft(r.x()+r1.width()+r2.width());
-                    }
-
-                    drawGradient(top, midTop, true, &pixPainter, r1, horiz);
-                    drawGradient(midTop, midBot, true, &pixPainter, r2, horiz);
-                    drawGradient(midBot, bot, true, &pixPainter, r3, horiz);
-#else
-                    qreal           borderSize(BEVEL_BORDER(w)/((qreal)(horiz ? r.height() : r.width())));
-                    QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
-
-                    grad.setColorAt(0, top);
-                    grad.setColorAt(borderSize, midTop);
-                    grad.setColorAt(1.0-borderSize, midBot);
-                    grad.setColorAt(1, bot);
-                    pixPainter.fillRect(r, QBrush(grad));
-#endif
-                }
-            }
-            else
-            {
-                QColor top,
-                       bot,
-                       baseTopCol(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
-                                      ? midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR) : base);
-
-                if(equal(1.0, shadeTop))
-                    top=baseTopCol;
-                else
-                    shade(baseTopCol, &top, shadeTop);
-                if(equal(1.0, shadeBot))
-                    bot=base;
-                else
-                    shade(base, &bot, shadeBot);
-
-#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
-                drawGradient(top, bot, sel || APPEARANCE_INVERTED!=app ? increase : !increase,
-                             &pixPainter, r, horiz);
-#else
-                bool            inc(sel || APPEARANCE_INVERTED!=app ? increase : !increase);
-                QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
-
-                grad.setColorAt(0, inc ? top : bot);
-                grad.setColorAt(1, inc ? bot : top);
-                pixPainter.fillRect(r, QBrush(grad));
-#endif
-            }
-            pixPainter.end();
-            itsPixmapCache.insert(key, pix, pix->width()*pix->height()*(pix->depth()/8));
+            p->drawTiledPixmap(origRect, *pix);
         }
-        p->drawTiledPixmap(origRect, *pix);
+        else
+            drawBevelGradientReal(base, increase, p, origRect, horiz, shadeTop, shadeBot, sel, app, w, false);
     }
 }
 
-#ifdef QTC_USE_CUSTOM_GRADIENT_ROUTINE
+void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPainter *p,
+                                         const QRect &r, bool horiz, double shadeTop,
+                                         double shadeBot, bool sel, EAppearance app, EWidget w, bool useQt) const
+{
+    bool selected(opts.colorSelTab && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w) ? false : sel);
+
+    if(!selected && (IS_GLASS(app) || APPEARANCE_SPLIT_GRADIENT==app))
+    {
+        if(WIDGET_TAB_BOT==w)
+        {
+            double t(shadeTop);
+            shadeTop=shadeBot;
+            shadeBot=t;
+        }
+
+        double shadeTopA(WIDGET_TAB_BOT==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeTop
+                                : shadeTop*SHADE_GLASS_TOP_A(app, w)),
+                shadeTopB(WIDGET_TAB_BOT==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeTop-((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
+                                : shadeTop*SHADE_GLASS_TOP_B(app, w)),
+                shadeBotA(WIDGET_TAB_TOP==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeBot+((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
+                                : shadeBot*SHADE_GLASS_BOT_A(app)),
+                shadeBotB(WIDGET_TAB_TOP==w
+                            ? 1.0
+                            : APPEARANCE_SPLIT_GRADIENT==app
+                                ? shadeBot
+                                : shadeBot*SHADE_GLASS_BOT_B(app));
+
+        QColor topA, topB, botA, botB;
+
+        shade(base, &topA, shadeTopA);
+        shade(base, &topB, shadeTopB);
+        shade(base, &botA, shadeBotA);
+        shade(base, &botB, shadeBotB);
+
+        QRect r1(r), r2(r);
+
+        if(horiz)
+        {
+            r1.setHeight(r1.height()/2);
+            r2.setY(r2.y()+r1.height());
+        }
+        else
+        {
+            r1.setWidth(r1.width()/2);
+            r2.setX(r2.x()+r1.width());
+        }
+
+        drawGradient(topA, topB, increase, p, r1, horiz, useQt);
+        drawGradient(botA, botB, increase, p, r2, horiz, useQt);
+    }
+    else if(!selected && APPEARANCE_BEVELLED==app &&
+            ((horiz ? r.height()
+                    : r.width()) > (((WIDGET_BUTTON(w) ? 2 : 1)*BEVEL_BORDER(w))+4)))
+    {
+        if(WIDGET_LISTVIEW_HEADER==w)
+        {
+            QColor bot;
+            QRect  r1(r), r2(r);
+
+            if(horiz)
+            {
+                r2.setHeight(BEVEL_BORDER(w));
+                r1.setHeight(r.height()-r2.height());
+                r2.moveTop(r.y()+r1.height());
+            }
+            else
+            {
+                r2.setWidth(BEVEL_BORDER(w));
+                r1.setWidth(r.width()-r2.width());
+                r2.moveLeft(r.x()+r1.width());
+            }
+            shade(base, &bot, SHADE_BEVEL_BOT(w));
+            p->fillRect(r1, base);
+            drawGradient(base, bot, true, p, r2, horiz, useQt);
+        }
+        else
+        {
+            QColor bot, midTop, midBot, top;
+
+            shade(base, &top, SHADE_BEVEL_TOP);
+            shade(base, &midTop, SHADE_BEVEL_MID_TOP);
+            shade(base, &midBot, SHADE_BEVEL_MID_BOT);
+            shade(base, &bot, SHADE_BEVEL_BOT(w));
+            QRect  r1(r), r2(r), r3(r);
+
+            if(horiz)
+            {
+                r1.setHeight(BEVEL_BORDER(w));
+                r3.setHeight(BEVEL_BORDER(w));
+                r2.setHeight(r.height()-(r1.height()+r3.height()));
+                r2.moveTop(r.y()+r1.height());
+                r3.moveTop(r.y()+r1.height()+r2.height());
+            }
+            else
+            {
+                r1.setWidth(BEVEL_BORDER(w));
+                r3.setWidth(BEVEL_BORDER(w));
+                r2.setWidth(r.width()-(r1.width()+r3.width()));
+                r2.moveLeft(r.x()+r1.width());
+                r3.moveLeft(r.x()+r1.width()+r2.width());
+            }
+
+            drawGradient(top, midTop, true, p, r1, horiz, useQt);
+            drawGradient(midTop, midBot, true, p, r2, horiz, useQt);
+            drawGradient(midBot, bot, true, p, r3, horiz, useQt);
+        }
+    }
+    else
+    {
+        QColor top,
+                bot,
+                baseTopCol(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                ? midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR) : base);
+
+        if(equal(1.0, shadeTop))
+            top=baseTopCol;
+        else
+            shade(baseTopCol, &top, shadeTop);
+        if(equal(1.0, shadeBot))
+            bot=base;
+        else
+            shade(base, &bot, shadeBot);
+
+        drawGradient(top, bot, sel || APPEARANCE_INVERTED!=app ? increase : !increase,
+                        p, r, horiz, useQt);
+    }
+}
+
 void QtCurveStyle::drawGradient(const QColor &top, const QColor &bot, bool increase,
-                                QPainter *p, QRect const &r, bool horiz) const
+                                QPainter *p, QRect const &r, bool horiz, bool useQt) const
 {
     if(r.width()>0 && r.height()>0)
     {
         if(top==bot)
             p->fillRect(r, top);
+        else if (useQt)
+        {
+            QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+
+            grad.setColorAt(0, increase ? top : bot);
+            grad.setColorAt(1, increase ? bot : top);
+            p->fillRect(r, QBrush(grad));
+        }
         else
         {
             int rh(r.height()), rw(r.width()),
@@ -5769,7 +5751,6 @@ void QtCurveStyle::drawGradient(const QColor &top, const QColor &bot, bool incre
         }
     }
 }
-#endif
 
 void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleOption *option,
                                   int round, const QColor &fill, const QColor *custom,
