@@ -855,7 +855,7 @@ void QtCurveStyle::polish(QWidget *widget)
         qobject_cast<QScrollBar *>(widget) ||
         qobject_cast<QHeaderView *>(widget) ||
         qobject_cast<QTabBar *>(widget) ||
-        qobject_cast<QDockWidget *>(widget) ||
+//        qobject_cast<QDockWidget *>(widget) ||
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("QDockSeparator") ||
         widget->inherits("QDockWidgetSeparator") ||
@@ -979,7 +979,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
        qobject_cast<QScrollBar *>(widget) ||
        qobject_cast<QHeaderView *>(widget) ||
        qobject_cast<QTabBar *>(widget) ||
-       qobject_cast<QDockWidget *>(widget) ||
+//       qobject_cast<QDockWidget *>(widget) ||
        widget->inherits("QWorkspaceTitleBar") ||
        widget->inherits("QDockSeparator") ||
        widget->inherits("QDockWidgetSeparator") ||
@@ -2484,7 +2484,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
                 QRect handleRect(titleRect);
 
-                if(state&State_MouseOver)
+//                if(state&State_MouseOver)
                 {
     /*
                     if(IS_FLAT(opts.appearance))
