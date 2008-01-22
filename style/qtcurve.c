@@ -3479,6 +3479,9 @@ debugDisplayWidget(widget, 3);
             }
         }
 
+        /* The following 'if' is just a hack for a menubar item problem with pidgin. Sometime, a 12pix width
+           empty menubar item is drawn on the right - and doesnt disappear! */
+        if(!mb || width>12)
         {
             GdkColor *itemCols=!opts.colorMenubarMouseOver && mb && !active_mb ? qtcurveStyle->background : qtcurveStyle->menuitem;
             GdkGC    **itemGcs=!opts.colorMenubarMouseOver && mb && !active_mb ? qtcurveStyle->background_gc : qtcurveStyle->menuitem_gc;
@@ -3486,10 +3489,10 @@ debugDisplayWidget(widget, 3);
                             ? &qtcurveStyle->menubar[ORIGINAL_SHADE] : NULL;
             int      round=pbar ? progressbarRound(widget, rev)
                                 : mb
-                                ? active_mb && opts.roundMbTopOnly
+                                    ? active_mb && opts.roundMbTopOnly
                                         ? ROUNDED_TOP
                                         : ROUNDED_ALL
-                                : ROUNDED_ALL,
+                                    : ROUNDED_ALL,
                      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
             gboolean border=pbar || menuitem || mb,
                      stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,
