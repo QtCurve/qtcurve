@@ -715,10 +715,15 @@ void QtCurveStyle::polish(QApplication *app)
         theThemedApp=APP_OTHER;
 
     if(APP_OTHER==theThemedApp)
-        if("plasma"==appName)
+        if("plasma"==appName || "krunner"==appName)
             theThemedApp=APP_PLASMA;
         else if("kwin"==appName)
             theThemedApp=APP_KWIN;
+
+    // If the user has enabled the plasmaHack, but this is not plasma/krunner, or its
+    // not running composite - then disable the hack.
+    if(opts.plasmaHack && (APP_PLASMA!=theThemedApp || QX11Info::appDefaultColormap()))
+        opts.plasmaHack=false;
 
     QPalette pal(app->palette());
 
@@ -2214,6 +2219,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 return;
 
             painter->save();
+            checkPlasma(painter, palette, r);
 
             if(isOnListView)
                 opt.state|=State_Horizontal|State_Raised;
@@ -2535,6 +2541,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
             opt.state&=~State_MouseOver;
             painter->save();
+            checkPlasma(painter, palette, r);
+
             drawBevelGradient(getFill(&opt, itsBackgroundCols), true, painter, r, horiz,
                               SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                               false, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
@@ -4518,6 +4526,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 }
 #endif
 
+                painter->save();
+                checkPlasma(painter, palette, r);
 #ifndef QTC_SIMPLE_SCROLLBARS
                 painter->fillRect(sbRect, palette.background().color());
 #endif
@@ -4684,12 +4694,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(!(option->subControls&SC_ScrollBarSlider))
                         painter->setClipping(false);
                 }
+                painter->restore();
             }
             break;
         case CC_ComboBox:
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
                 painter->save();
+                checkPlasma(painter, palette, r);
+
                 QRect           frame(subControlRect(CC_ComboBox, option, SC_ComboBoxFrame, widget)),
                                 arrow(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget)),
                                 field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
@@ -5499,6 +5512,24 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
     return QTC_BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
 }
 
+void QtCurveStyle::checkPlasma(QPainter *painter, const QPalette &palette, const QRect &r) const
+{
+    if(opts.plasmaHack)
+    {
+        //painter->setCompositionMode(QPainter::CompositionMode_Source);
+        //painter->fillRect(r, palette.background());
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+        if(ROUND_NONE==opts.round)
+            painter->fillRect(r, palette.background()); // Qt::transparent);
+        else
+        {
+            painter->fillRect(r.adjusted(1, 0, -1, 0), palette.background()); // Qt::transparent);
+            painter->fillRect(r.adjusted(0, 1, 0, -1), palette.background()); //Qt::transparent);
+        }
+        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+    }
+}
+
 void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter *p,
                                      const QRect &origRect, bool horiz, double shadeTop,
                                      double shadeBot, bool sel, EAppearance bevApp, EWidget w) const
@@ -5511,7 +5542,9 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
                             ? bevApp
                             : APPEARANCE_GRADIENT);
 
-        if(APP_PLASMA!=theThemedApp || !opts.plasmaHack)
+        if(opts.plasmaHack)
+            drawBevelGradientReal(base, increase, p, origRect, horiz, shadeTop, shadeBot, sel, app, w, false);
+        else
         {
             QRect   r(0, 0, horiz ? QTC_PIXMAP_DIMENSION : origRect.width(),
                             horiz ? origRect.height() : QTC_PIXMAP_DIMENSION);
@@ -5531,8 +5564,6 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
             }
             p->drawTiledPixmap(origRect, *pix);
         }
-        else
-            drawBevelGradientReal(base, increase, p, origRect, horiz, shadeTop, shadeBot, sel, app, w, false);
     }
 }
 
