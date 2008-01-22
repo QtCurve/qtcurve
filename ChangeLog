@@ -16,6 +16,7 @@
 
     plasmaHack=false
 6. Dont do mouse over for dockwidget title area.
+7. Fix some slight tab drawing errors.
 
 0.55.2
 ------
