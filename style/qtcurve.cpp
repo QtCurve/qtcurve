@@ -2059,6 +2059,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                 : palette.background().color());
 
             painter->save();
+            checkPlasma(painter, r);
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(QRect(r.x()+1, r.y()+1, r.width()-2, r.height()-2), bgnd);
             else
@@ -2112,7 +2113,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                            marg(lv->itemMargin);
 
                 if (state & State_Selected && !lv->rootIsDecorated && !(item.features & QStyleOptionQ3ListViewItem::ParentControl))
-                    painter->fillRect(0, 0, x + marg + w + 4, item.height, palette.brush(QPalette::Highlight));
+                    painter->fillRect(0, 0, x + marg + w + 4, item.height, palette.brush(QPalette::Highlight));            checkPlasma(painter, r);
+
             }
 
             r.setX(r.x()+((r.width()-QTC_RADIO_SIZE)/2)-1);
@@ -2138,6 +2140,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->save();
             painter->setClipRegion(QRegion(clipRegion));
+            checkPlasma(painter, r);
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(QRect(x+1, y+1, r.width()-2, r.height()-2), bgnd);
             else
@@ -2219,7 +2222,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 return;
 
             painter->save();
-            checkPlasma(painter, palette, r);
+            checkPlasma(painter, r);
 
             if(isOnListView)
                 opt.state|=State_Horizontal|State_Raised;
@@ -2541,7 +2544,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
             opt.state&=~State_MouseOver;
             painter->save();
-            checkPlasma(painter, palette, r);
+            checkPlasma(painter, r);
 
             drawBevelGradient(getFill(&opt, itsBackgroundCols), true, painter, r, horiz,
                               SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
@@ -4527,7 +4530,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #endif
 
                 painter->save();
-                checkPlasma(painter, palette, r);
+                checkPlasma(painter, r);
 #ifndef QTC_SIMPLE_SCROLLBARS
                 painter->fillRect(sbRect, palette.background().color());
 #endif
@@ -4701,7 +4704,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
                 painter->save();
-                checkPlasma(painter, palette, r);
+                checkPlasma(painter, r);
 
                 QRect           frame(subControlRect(CC_ComboBox, option, SC_ComboBoxFrame, widget)),
                                 arrow(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget)),
@@ -5512,19 +5515,17 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
     return QTC_BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
 }
 
-void QtCurveStyle::checkPlasma(QPainter *painter, const QPalette &palette, const QRect &r) const
+void QtCurveStyle::checkPlasma(QPainter *painter, const QRect &r) const
 {
     if(opts.plasmaHack)
     {
-        //painter->setCompositionMode(QPainter::CompositionMode_Source);
-        //painter->fillRect(r, palette.background());
         painter->setCompositionMode(QPainter::CompositionMode_Source);
         if(ROUND_NONE==opts.round)
-            painter->fillRect(r, palette.background()); // Qt::transparent);
+            painter->fillRect(r, Qt::transparent);
         else
         {
-            painter->fillRect(r.adjusted(1, 0, -1, 0), palette.background()); // Qt::transparent);
-            painter->fillRect(r.adjusted(0, 1, 0, -1), palette.background()); //Qt::transparent);
+            painter->fillRect(r.adjusted(1, 0, -1, 0), Qt::transparent);
+            painter->fillRect(r.adjusted(0, 1, 0, -1), Qt::transparent);
         }
         painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     }
@@ -6096,7 +6097,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         QColor largeArcMid(border),
                aaColor(border);
 
-        if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w)
+        if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w &&
+           !(opts.plasmaHack && (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w ||
+                                 WIDGET_TOGGLE_BUTTON==w || WIDGET_ENTRY==w)))
         {
             largeArcMid.setAlphaF(0.50);
             aaColor.setAlphaF(0.30);
