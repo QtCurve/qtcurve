@@ -3926,7 +3926,7 @@ debugDisplayWidget(widget, 3);
         {
             GdkGC *bgndGc=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state
                             ? style->bg_gc[GTK_STATE_NORMAL]
-                            : GTK_STATE_PRELIGHT==state
+                            : !mnu && GTK_STATE_PRELIGHT==state
                                 ? gcs[QTC_CR_MO_FILL]
                                 : style->base_gc[GTK_STATE_NORMAL];
 
@@ -3941,7 +3941,7 @@ debugDisplayWidget(widget, 3);
         {
             GdkColor *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state
                                 ? &style->bg[GTK_STATE_NORMAL]
-                                : GTK_STATE_PRELIGHT==state
+                                : !mnu && GTK_STATE_PRELIGHT==state
                                     ? &colors[QTC_CR_MO_FILL]
                                     : &style->base[GTK_STATE_NORMAL];
 
@@ -4117,7 +4117,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             {
                 GdkGC *bgndGc=GTK_STATE_INSENSITIVE==state
                                 ? style->bg_gc[GTK_STATE_NORMAL]
-                                : GTK_STATE_PRELIGHT==state
+                                : !mnu && GTK_STATE_PRELIGHT==state
                                     ? gcs[QTC_CR_MO_FILL]
                                     : style->base_gc[GTK_STATE_NORMAL];
                 if(area)
@@ -4131,7 +4131,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             {
                 GdkColor *bgndCol=GTK_STATE_INSENSITIVE==state
                                     ? &style->bg[GTK_STATE_NORMAL]
-                                    : GTK_STATE_PRELIGHT==state
+                                    : !mnu && GTK_STATE_PRELIGHT==state
                                         ? &colors[QTC_CR_MO_FILL]
                                         : &style->base[GTK_STATE_NORMAL];
 
