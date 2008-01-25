@@ -3,6 +3,7 @@
 1. Hack around a slight menubar problem with pidgin.
 2. Dont use mouseover colour for highlighted checks and radios
    in menus.
+3. Fix kde4-config usage.
 
 0.55.2
 ------
