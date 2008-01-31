@@ -3391,6 +3391,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 const QColor &fill(getTabFill(selected, state&State_MouseOver, itsBackgroundCols));
 
                 painter->save();
+                checkPlasma(painter, r);
                 switch(tab->shape)
                 {
                     case QTabBar::RoundedNorth:
