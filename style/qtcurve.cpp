@@ -696,6 +696,40 @@ static QString getFile(const QString &f)
     return d;
 }
 
+static bool isNvidia() // Read xorg.conf to see if we are using nvidia driver...
+{
+    QFile f("/etc/X11/xorg.conf");
+    bool  nvidia(false);
+
+    if(f.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&f);
+        bool        inDevice(false);
+
+        while (!in.atEnd())
+        {
+            QString line(in.readLine());
+            int     a, b;
+
+            if(inDevice)
+            {
+                if(-1!=(a=line.indexOf("Driver")) && -1!=(b=line.indexOf("\"nvidia\"")) && a<b)
+                {
+                    nvidia=true;
+                    break;
+                }
+                else if(-1!=line.indexOf("EndSection"))
+                    break;
+            }
+            else if(-1!=(a=line.indexOf("Section")) && -1!=(b=line.indexOf("\"Device\"")) && a<b)
+                inDevice=true;
+        }
+        f.close();
+    }
+
+    return nvidia;
+}
+
 void QtCurveStyle::polish(QApplication *app)
 {
     QString appName(getFile(app->argv()[0]));
@@ -721,9 +755,12 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KWIN;
 
     // If the user has enabled the plasmaHack, but this is not plasma/krunner, or its
-    // not running composite - then disable the hack.
-    if(opts.plasmaHack && (APP_PLASMA!=theThemedApp || QX11Info::appDefaultColormap()))
+    // not running composite, or user is not using nvidia - then disable the hack.
+    if(opts.plasmaHack && (APP_PLASMA!=theThemedApp || QX11Info::appDefaultColormap() || !isNvidia()))
         opts.plasmaHack=false;
+
+    if(opts.plasmaHack)
+        qWarning("QtCurve - Working around plasma/krunner re-draw errors on nvidia cards");
 
     QPalette pal(app->palette());
 
