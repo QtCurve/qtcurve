@@ -17,6 +17,7 @@
     plasmaHack=false
 6. Dont do mouse over for dockwidget title area.
 7. Fix some slight tab drawing errors.
+8. Reduced CPU usage of animated progressbars.
 
 0.55.2
 ------

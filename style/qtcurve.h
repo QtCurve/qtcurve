@@ -88,6 +88,8 @@ class QtCurveStyle : public QWindowsStyle
     }
 
     void checkPlasma(QPainter *painter, const QRect &r) const;
+    void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,
+                                   double shadeBot, EAppearance bevApp) const;
     void drawBevelGradient(const QColor &base, bool increase, QPainter *p, QRect const &r,
                            bool horiz, double shadeTop, double shadeBot, bool sel, EAppearance bevApp,
                            EWidget w=WIDGET_OTHER) const;

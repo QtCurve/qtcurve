@@ -39,6 +39,7 @@
 //Konsole:               KTabBar::QWidget
 
 #define WINDOWTITLE_SPACER 0x10000000
+#define QTC_STATE_REVERSE  State_Mini
 
 static enum
 {
@@ -1255,7 +1256,7 @@ void QtCurveStyle::timerEvent(QTimerEvent *event)
     {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
         foreach (QProgressBar *bar, itsProgressBars)
-            if (opts.animatedProgress || (0==bar->minimum() && 0==bar->maximum()))
+            if ((opts.animatedProgress && 0==itsAnimateStep%2) || (0==bar->minimum() && 0==bar->maximum()))
                 bar->update();
     }
 
@@ -2792,7 +2793,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
 /*                            if(reverse || inverted)*/
                                 drawProgress(painter, QRect(cr.x(), cr.y()+(cr.height()-height), cr.width(), height),
-                                             option, height==cr.height() ? ROUNDED_NONE : ROUNDED_TOP, true, WIDGET_PROGRESSBAR);
+                                             option, height==cr.height() ? ROUNDED_NONE : ROUNDED_TOP, true, true);
 //                             else
 //                                 drawProgress(painter, QRect(cr.x(), cr.y(), cr.width(), height), option,
 //                                             height==cr.height() ?  ROUNDED_NONE : ROUNDED_TOP);
@@ -5569,6 +5570,96 @@ void QtCurveStyle::checkPlasma(QPainter *painter, const QRect &r) const
     }
 }
 
+void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,
+                                             double shadeBot, EAppearance bevApp) const
+{
+    bool    vertical(!horiz);
+    int     size(STRIPE_DIAGONAL==opts.stripedProgress ? (vertical ? origRect.width() : origRect.height()) : PROGRESS_CHUNK_WIDTH*2);
+    QRect   r(0, 0, horiz ? size : origRect.width(),
+                    horiz ? origRect.height() : size);
+    QtcKey  key(createKey(horiz ? r.height() : r.width(), itsMenuitemCols[ORIGINAL_SHADE].rgb(), horiz, true,
+                          app2App(bevApp, false), WIDGET_PROGRESSBAR, shadeTop, shadeBot));
+    QPixmap *pix(itsPixmapCache.object(key));
+
+    if(!pix)
+    {
+        pix=new QPixmap(r.width(), r.height());
+
+        QPainter pixPainter(pix);
+
+        if(IS_FLAT(bevApp))
+            pixPainter.fillRect(r, itsMenuitemCols[ORIGINAL_SHADE]);
+        else
+            drawBevelGradientReal(itsMenuitemCols[ORIGINAL_SHADE], true, &pixPainter, r, horiz, shadeTop, shadeBot, false,
+                                  bevApp, WIDGET_PROGRESSBAR, true);
+
+        switch(opts.stripedProgress)
+        {
+            default:
+            case STRIPE_NONE:
+                break;
+            case STRIPE_PLAIN:
+                drawBevelGradientReal(itsMenuitemCols[1], true, &pixPainter,
+                                        horiz
+                                        ? QRect(r.x(), r.y(), PROGRESS_CHUNK_WIDTH, r.height())
+                                        : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH),
+                                        horiz, shadeTop, shadeBot, false, bevApp, WIDGET_PROGRESSBAR, true);
+                break;
+            case STRIPE_DIAGONAL:
+            {
+                QRegion  reg;
+
+                for(int offset=0; offset<size+2; offset+=(PROGRESS_CHUNK_WIDTH*2))
+                {
+                    QPolygon a;
+
+                    if(vertical)
+                        a.setPoints(4, r.x(),           r.y()+offset,
+                                       r.x()+r.width(), (r.y()+offset)-size,
+                                       r.x()+r.width(), (r.y()+offset+PROGRESS_CHUNK_WIDTH)-size,
+                                       r.x(),           r.y()+offset+PROGRESS_CHUNK_WIDTH);
+                    else
+                        a.setPoints(4, r.x()+offset,                             r.y(),
+                                       r.x()+offset+PROGRESS_CHUNK_WIDTH,        r.y(),
+                                       (r.x()+offset+PROGRESS_CHUNK_WIDTH)-size, r.y()+r.height(),
+                                       (r.x()+offset)-size,                      r.y()+r.height());
+
+                    reg+=QRegion(a);
+                }
+
+                pixPainter.setClipRegion(reg);
+                if(IS_FLAT(bevApp))
+                    pixPainter.fillRect(r, itsMenuitemCols[1]);
+                else
+                    drawBevelGradientReal(itsMenuitemCols[1], true, &pixPainter, r,
+                                          horiz, shadeTop, shadeBot, false, bevApp, WIDGET_PROGRESSBAR, true);
+            }
+        }
+
+        pixPainter.end();
+        itsPixmapCache.insert(key, pix, pix->width()*pix->height()*(pix->depth()/8));
+    }
+    p->setClipRect(origRect);
+    QRect fillRect(origRect);
+
+    if(opts.animatedProgress)
+    {
+        int animShift=vertical || option->state&QTC_STATE_REVERSE ? PROGRESS_CHUNK_WIDTH : -PROGRESS_CHUNK_WIDTH;
+
+        if(vertical || option->state&QTC_STATE_REVERSE)
+            animShift -= (itsAnimateStep/2) % (PROGRESS_CHUNK_WIDTH*2);
+        else
+            animShift += (itsAnimateStep/2) % (PROGRESS_CHUNK_WIDTH*2);
+
+        if(horiz)
+            fillRect.adjust(animShift-PROGRESS_CHUNK_WIDTH, 0, PROGRESS_CHUNK_WIDTH, 0);
+        else
+            fillRect.adjust(0, animShift-PROGRESS_CHUNK_WIDTH, 0, PROGRESS_CHUNK_WIDTH);
+    }
+    p->drawTiledPixmap(fillRect, *pix);
+    p->setClipping(false);
+}
+
 void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter *p,
                                      const QRect &origRect, bool horiz, double shadeTop,
                                      double shadeBot, bool sel, EAppearance bevApp, EWidget w) const
@@ -5581,7 +5672,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
                             ? bevApp
                             : APPEARANCE_GRADIENT);
 
-        if(opts.plasmaHack)
+        if(opts.plasmaHack || WIDGET_PROGRESSBAR==w)
             drawBevelGradientReal(base, increase, p, origRect, horiz, shadeTop, shadeBot, sel, app, w, false);
         else
         {
@@ -5918,66 +6009,72 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     // fill
     if(br.width()>0 && br.height()>0)
     {
-        drawBevelGradient(fill, !sunken, p, WIDGET_MDI_WINDOW_TITLE==w ? br.adjusted(0, 0, 0, 1) : br, horiz,
-                          getWidgetShade(w, true, sunken, app),
-                          getWidgetShade(w, false, sunken, app), sunken, app, w);
-
-        if(plastikMouseOver)
+        if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
+            drawProgressBevelGradient(p, br, option, horiz, getWidgetShade(w, true, sunken, app),
+                                      getWidgetShade(w, false, sunken, app), app);
+        else
         {
-            if(WIDGET_SB_SLIDER==w)
-            {
-                int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())),
-                    so(lightBorder ? QTC_SLIDER_MO_BORDER : 1),
-                    eo(len+so),
-                    col(QTC_SLIDER_MO_SHADE);
+            drawBevelGradient(fill, !sunken, p, WIDGET_MDI_WINDOW_TITLE==w ? br.adjusted(0, 0, 0, 1) : br, horiz,
+                              getWidgetShade(w, true, sunken, app),
+                              getWidgetShade(w, false, sunken, app), sunken, app, w);
 
-                if(horiz)
-                {
-                    drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+so, r.y(), len, r.height()), horiz,
-                                      getWidgetShade(w, true, sunken, app),
-                                      getWidgetShade(w, false, sunken, app), sunken, app, w);
-                    drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+r.width()-eo, r.y(), len, r.height()), horiz,
-                                      getWidgetShade(w, true, sunken, app),
-                                      getWidgetShade(w, false, sunken, app), sunken, app, w);
-                }
-                else
-                {
-                    drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+so, r.width(), len), horiz,
-                                      getWidgetShade(w, true, sunken, app),
-                                      getWidgetShade(w, false, sunken, app), sunken, app, w);
-                    drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+r.height()-eo, r.width(), len), horiz,
-                                      getWidgetShade(w, true, sunken, app),
-                                      getWidgetShade(w, false, sunken, app), sunken, app, w);
-                }
-            }
-            else
+            if(plastikMouseOver)
             {
-                bool horizontal((horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w)),
-                     thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16));
+                if(WIDGET_SB_SLIDER==w)
+                {
+                    int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())),
+                        so(lightBorder ? QTC_SLIDER_MO_BORDER : 1),
+                        eo(len+so),
+                        col(QTC_SLIDER_MO_SHADE);
 
-                p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_DARK(w)]);
-                if(horizontal)
-                {
-                    p->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
-                    p->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
-                }
-                else
-                {
-                    p->drawLine(r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
-                    p->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
-                }
-                if(!thin)
-                {
-                    p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_LIGHT(w)]);
-                    if(horizontal)
+                    if(horiz)
                     {
-                        p->drawLine(r.x()+1, r.y()+2, r.x()+r.width()-2, r.y()+2);
-                        p->drawLine(r.x()+1, r.y()+r.height()-3, r.x()+r.width()-2, r.y()+r.height()-3);
+                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+so, r.y(), len, r.height()), horiz,
+                                        getWidgetShade(w, true, sunken, app),
+                                        getWidgetShade(w, false, sunken, app), sunken, app, w);
+                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+r.width()-eo, r.y(), len, r.height()), horiz,
+                                        getWidgetShade(w, true, sunken, app),
+                                        getWidgetShade(w, false, sunken, app), sunken, app, w);
                     }
                     else
                     {
-                        p->drawLine(r.x()+2, r.y()+1, r.x()+2, r.y()+r.height()-2);
-                        p->drawLine(r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
+                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+so, r.width(), len), horiz,
+                                        getWidgetShade(w, true, sunken, app),
+                                        getWidgetShade(w, false, sunken, app), sunken, app, w);
+                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+r.height()-eo, r.width(), len), horiz,
+                                        getWidgetShade(w, true, sunken, app),
+                                        getWidgetShade(w, false, sunken, app), sunken, app, w);
+                    }
+                }
+                else
+                {
+                    bool horizontal((horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w)),
+                        thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16));
+
+                    p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_DARK(w)]);
+                    if(horizontal)
+                    {
+                        p->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
+                        p->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
+                    }
+                    else
+                    {
+                        p->drawLine(r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
+                        p->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
+                    }
+                    if(!thin)
+                    {
+                        p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_LIGHT(w)]);
+                        if(horizontal)
+                        {
+                            p->drawLine(r.x()+1, r.y()+2, r.x()+r.width()-2, r.y()+2);
+                            p->drawLine(r.x()+1, r.y()+r.height()-3, r.x()+r.width()-2, r.y()+r.height()-3);
+                        }
+                        else
+                        {
+                            p->drawLine(r.x()+2, r.y()+1, r.x()+2, r.y()+r.height()-2);
+                            p->drawLine(r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
+                        }
                     }
                 }
             }
@@ -6399,93 +6496,26 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
 
 void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical, bool reverse) const
 {
-    int measure(vertical ? r.height() : r.width());
+    QStyleOption opt(*option);
 
-    if(measure<1)
-        return;
+    opt.state|=State_Raised;
 
-    int     min(3);
-    bool    drawFull(measure>min),
-            drawStripe(measure>(min*1.5));
-    QRegion outer(r);
-
-    if(drawStripe)
-    {
-        int animShift=vertical || reverse ? PROGRESS_CHUNK_WIDTH : -PROGRESS_CHUNK_WIDTH;
-
-        if (opts.animatedProgress)
-            if(vertical || reverse)
-                animShift -= (itsAnimateStep/2) % (PROGRESS_CHUNK_WIDTH*2);
-            else
-                animShift += (itsAnimateStep/2) % (PROGRESS_CHUNK_WIDTH*2);
-
-        switch(opts.stripedProgress)
-        {
-            default:
-            case STRIPE_NONE:
-                break;
-            case STRIPE_PLAIN:
-                for(int offset=0; offset<(measure+PROGRESS_CHUNK_WIDTH); offset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    QRegion inner(vertical
-                                    ? QRect(r.x(), r.y()+offset+animShift, r.width(), PROGRESS_CHUNK_WIDTH)
-                                    : QRect(r.x()+offset+animShift, r.y(), PROGRESS_CHUNK_WIDTH, r.height()));
-
-                    outer=outer.subtract(inner);
-                }
-                break;
-            case STRIPE_DIAGONAL:
-            {
-                QPolygon a;
-                int      shift(vertical ? r.width() : r.height());
-
-                for(int offset=0; offset<(measure+shift+2); offset+=(PROGRESS_CHUNK_WIDTH*2))
-                {
-                    if(vertical)
-                        a.setPoints(4, r.x(),             r.y()+offset+animShift,
-                                       r.x()+r.width()-1, (r.y()+offset+animShift)-shift,
-                                       r.x()+r.width()-1, (r.y()+offset+animShift+PROGRESS_CHUNK_WIDTH)-shift,
-                                       r.x(),             r.y()+offset+animShift+PROGRESS_CHUNK_WIDTH);
-                    else
-                        a.setPoints(4, r.x()+offset+animShift,                              r.y(),
-                                       r.x()+offset+animShift+PROGRESS_CHUNK_WIDTH,         r.y(),
-                                       (r.x()+offset+animShift+PROGRESS_CHUNK_WIDTH)-shift, r.y()+r.height()-1,
-                                       (r.x()+offset+animShift)-shift,                      r.y()+r.height()-1);
-
-                    outer=outer.eor(QRegion(a));
-                }
-            }
-        }
-    }
-
-    if(drawFull)
-    {
-        QStyleOption opt(*option);
-
-        opt.state|=State_Raised;
-
-        if(vertical)
-            opt.state&=~State_Horizontal;
-        else
-            opt.state|=State_Horizontal;
-
-        drawLightBevel(p, r, &opt, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, true, WIDGET_PROGRESSBAR);
-
-        if(drawStripe && opts.stripedProgress)
-        {
-            p->setClipRegion(outer);
-            drawLightBevel(p, r, &opt, round, itsMenuitemCols[1], itsMenuitemCols, true, WIDGET_PROGRESSBAR);
-            p->setClipping(false);
-        }
-    }
+    if(vertical)
+        opt.state&=~State_Horizontal;
     else
-    {
-        p->setPen(itsMenuitemCols[QT_STD_BORDER]);
-        p->setBrush(itsMenuitemCols[ORIGINAL_SHADE]);
-        drawRect(p, r);
-    }
+        opt.state|=State_Horizontal;
+
+    if(reverse)
+        opt.state|=QTC_STATE_REVERSE;
+    else
+        opt.state&=~QTC_STATE_REVERSE;
+
+    drawLightBevel(p, r, &opt, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, true, WIDGET_PROGRESSBAR);
+
     if(QTC_ROUNDED && r.width()>2 && ROUNDED_ALL!=round)
     {
+        bool drawFull((vertical ? r.height() : r.width()) > 3);
+
         p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[QT_STD_BORDER]));
         if(!(round&CORNER_TL) || !drawFull)
             p->drawPoint(r.x(), r.y());
