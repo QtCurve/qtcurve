@@ -3711,6 +3711,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
     {
         gboolean frame=!detail || 0==strcmp(detail, "frame"),
                  profiledFrame=DETAIL("scrolled_window"),
+                 viewport=!profiledFrame && detail && NULL!=strstr(detail, "viewport"),
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
                             ? frame : isStatusBarFrame(widget);
 
@@ -3722,13 +3723,17 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         sanitizeSize(window, &width, &height);
 
-        if(!statusBar && (frame || profiledFrame) && QTC_ROUNDED)
+        if(!statusBar && (frame || profiledFrame || viewport) && QTC_ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
-              drawBorder(style, window, state, area, NULL, x, y, width, height, NULL,
-                         NULL, NULL, ROUNDED_ALL, profiledFrame ? BORDER_SUNKEN : BORDER_FLAT,
-                         WIDGET_OTHER, DF_LARGE_ARC|DF_BLEND|DF_DO_CORNERS);
+            {
+                if(viewport)
+                    gdk_draw_rectangle(window, qtcurveStyle->background_gc[ORIGINAL_SHADE], FALSE, x, y, width, height);
+                drawBorder(style, window, state, area, NULL, x, y, width, height, NULL,
+                           NULL, NULL, ROUNDED_ALL, profiledFrame ? BORDER_SUNKEN : BORDER_FLAT,
+                           WIDGET_OTHER, DF_LARGE_ARC|DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
+            }
         }
         else if(!statusBar || opts.drawStatusBarFrames)
         {

@@ -478,8 +478,9 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                         found|=RD_BUTTON_ICONS;
                     }
                 }
-                else if(SECT_KDE==section && rd&RD_CONTRAST && !(found&RD_CONTRAST) &&
-                        0==memcmp(line, "contrast=", 9))
+                else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) &&
+                         ( (!qt4 && SECT_KDE==section && 0==memcmp(line, "contrast=", 9)) ||
+                           ( qt4 && SECT_QT==section  && 0==memcmp(line, "KDE\\contrast=", 13))))
                 {
                     char *l=strchr(line, '=');
                     l++;

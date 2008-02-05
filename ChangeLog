@@ -4,6 +4,9 @@
 2. Dont use mouseover colour for highlighted checks and radios
    in menus.
 3. Fix kde4-config usage.
+4. Draw borders for GtkViewports - fixes mising frame in compiz settings
+   manager.
+5. Read contrast setting from TrollTech.conf if running under KDE4.
 
 0.55.2
 ------
