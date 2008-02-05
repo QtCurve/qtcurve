@@ -471,17 +471,19 @@ static void parseWindowLine(const QString &line, QList<int> &data)
         }
 }
 
-static bool readQt3(QFile &f, QPalette &pal, QFont &font)
+static bool readQt3(QFile &f, QPalette &pal, QFont &font, int *contrast)
 {
     enum ESect
     {
         SECT_NONE,
         SECT_GEN,
-        SECT_PAL
+        SECT_PAL,
+        SECT_KDE
     } sect=SECT_NONE;
 
     bool gotPal(false),
-         gotFont(false);
+         gotFont(false),
+         gotContrast(false);
 
     if(f.open(QIODevice::ReadOnly))
     {
@@ -501,32 +503,42 @@ static bool readQt3(QFile &f, QPalette &pal, QFont &font)
                 else if(0==line.indexOf("inactive=#"))
                     readPal(line, QPalette::Inactive, pal);
                 else if (0==line.indexOf('['))
-                {
                     sect=SECT_NONE;
-                    if(gotFont)
-                        break;
-                }
             }
             else if(SECT_GEN==sect)
             {
                 if(0==line.indexOf("font="))
                     gotFont=font.fromString(line.mid(5));
                 else if (0==line.indexOf('['))
-                {
                     sect=SECT_NONE;
-                    if(gotPal)
-                        break;
-                }
             }
-            else if(0==line.indexOf("[Palette]"))
-                sect=SECT_PAL;
-            else if(0==line.indexOf("[General]"))
-                sect=SECT_GEN;
+            else if(SECT_KDE==sect)
+            {
+                if(0==line.indexOf("contrast="))
+                {
+                    *contrast=line.mid(9).toInt();
+                    gotContrast=true;
+                }
+                else if (0==line.indexOf('['))
+                    sect=SECT_NONE;
+            }
+
+            if(SECT_NONE==sect)
+            {
+                if(0==line.indexOf("[Palette]"))
+                    sect=SECT_PAL;
+                else if(0==line.indexOf("[General]"))
+                    sect=SECT_GEN;
+                else if(contrast && 0==line.indexOf("[KDE]"))
+                    sect=SECT_KDE;
+                if(gotPal && gotFont && (!contrast || gotContrast))
+                    break;
+            }
         }
         f.close();
     }
 
-    return gotPal && gotFont;
+    return gotPal && gotFont && (!contrast || gotContrast);
 }
 
 static bool useQt3Settings()
@@ -537,19 +549,19 @@ static bool useQt3Settings()
     return full && (!vers || atoi(vers)<4);
 }
 
-static bool readQt3(QPalette &pal, QFont &font)
+static bool readQt3(QPalette &pal, QFont &font, int *contrast)
 {
     if(useQt3Settings())
     {
         QFile file(QDir::homePath()+QLatin1String("/.qt/qtrc"));
 
-        if(!file.exists() || !readQt3(file, pal, font))
+        if(!file.exists() || !readQt3(file, pal, font, contrast))
         {
             file.setFileName("/etc/qt3/qtrc");
-            if(!file.exists() || !readQt3(file, pal,font))
+            if(!file.exists() || !readQt3(file, pal,font, contrast))
             {
                 file.setFileName("/etc/qt/qtrc");
-                if(!file.exists() || !readQt3(file, pal, font))
+                if(!file.exists() || !readQt3(file, pal, font, contrast))
                     return false;
             }
         }
@@ -603,7 +615,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     }
 
     readConfig(rcFile, &opts, &opts);
-    opts.contrast=QSettings().value("/Qt/KDE/contrast", 7).toInt();
+    opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=7;
 
@@ -771,26 +783,27 @@ void QtCurveStyle::polish(QApplication *app)
 
 void QtCurveStyle::polish(QPalette &palette)
 {
-    int  c(QSettings().value("/Qt/KDE/contrast", 7).toInt());
-    bool newContrast(false);
-
-    if(c<0 || c>10)
-        c=7;
-
-    if(c!=opts.contrast)
-    {
-        opts.contrast=c;
-        newContrast=true;
-    }
-
+    int      contrast(7);
+    bool     newContrast(false);
     QPalette pal;
     QFont    font;
 
     // Set palette from Qt3 settings.
-    if(readQt3(pal, font))
+    if(readQt3(pal, font, &contrast))
     {
         palette=pal;
         QApplication::setFont(font);
+    }
+    else
+        contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
+
+    if(contrast<0 || contrast>10)
+        contrast=7;
+
+    if(contrast!=opts.contrast)
+    {
+        opts.contrast=contrast;
+        newContrast=true;
     }
 
     bool newMenu(newContrast ||
@@ -1473,7 +1486,7 @@ QPalette QtCurveStyle::standardPalette() const
     QPalette palette;
     QFont    font;
 
-    if(!readQt3(palette, font))
+    if(!readQt3(palette, font, NULL))
     {
         palette.setBrush(QPalette::Disabled, QPalette::WindowText, QColor(QRgb(0xff808080)));
         palette.setBrush(QPalette::Disabled, QPalette::Button, QColor(QRgb(0xffdddfe4)));

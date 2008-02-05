@@ -1,23 +1,25 @@
 0.55.3
 ------
-1. Fix issues with flat/raised style and titlebars.
-2. Fix black square (where maximise icon would be) flashing when a
-   window is maximised.
-3. More rounded titlebars when fully rounded.
-4. Fix 'font colour' default button indicator.
-5. 'Fix' for plasma and NVIDIA cards (an my system at least). Buttons,
-   scrollbars, etc., in plasma's dialogs have redraw errors on NVIDIA
-   (but not on my works integrated intel chip). So, by default gradients
-   on plasma widgets (of the Qt variety) are drawn directly, and not cached
-   to pixmaps. To revert to the previous method, edit
-    $XDG_CONFIG_HOME/qtcurvestylerc (e.g. ~/.config/qtcurvestylerc)
+ 1. Fix issues with flat/raised style and titlebars.
+ 2. Fix black square (where maximise icon would be) flashing when a
+    window is maximised.
+ 3. More rounded titlebars when fully rounded.
+ 4. Fix 'font colour' default button indicator.
+ 5. 'Fix' for plasma and NVIDIA cards (on my system at least). Buttons,
+    scrollbars, etc., in plasma's dialogs have redraw errors on NVIDIA
+    (but not on my works integrated intel chip). So, by default gradients
+    on plasma widgets (of the Qt variety) are drawn directly, and not cached
+    to pixmaps. To revert to the previous method, edit
+     $XDG_CONFIG_HOME/qtcurvestylerc (e.g. ~/.config/qtcurvestylerc)
 
-   ...and add
+    ...and add
 
-    plasmaHack=false
-6. Dont do mouse over for dockwidget title area.
-7. Fix some slight tab drawing errors.
-8. Reduced CPU usage of animated progressbars.
+     plasmaHack=false
+ 6. Dont do mouse over for dockwidget title area.
+ 7. Fix some slight tab drawing errors.
+ 8. Reduced CPU usage of animated progressbars.
+ 9. Correct reading in of contrast setting from Trolltech.conf
+10. Read KDE3's contrast setting if not running under KDE4.
 
 0.55.2
 ------
