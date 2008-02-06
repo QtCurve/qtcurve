@@ -20,6 +20,7 @@
  8. Reduced CPU usage of animated progressbars.
  9. Correct reading in of contrast setting from Trolltech.conf
 10. Read KDE3's contrast setting if not running under KDE4.
+11. Fix arrows on gwenview's scrollbar buttons sometime being white.
 
 0.55.2
 ------

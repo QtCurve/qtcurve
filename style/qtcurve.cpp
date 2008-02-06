@@ -3784,6 +3784,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             drawLightBevel(painter, br, &opt, round, getFill(&opt, use), use, true, WIDGET_SB_BUTTON);
 
             opt.rect = ar;
+            // The following fixes gwenviews scrollbars...
+            if(opt.palette.text().color()!=opt.palette.buttonText().color())
+                opt.palette.setColor(QPalette::Text, opt.palette.buttonText().color());
             drawPrimitive(pe, &opt, painter, widget);
             painter->restore();
             break;
