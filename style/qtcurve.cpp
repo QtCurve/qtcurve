@@ -5586,11 +5586,19 @@ void QtCurveStyle::checkPlasma(QPainter *painter, const QRect &r) const
     }
 }
 
+static int getStripedPbarSize(int width)
+{
+    int chunk2(PROGRESS_CHUNK_WIDTH*2);
+
+    return ((width/chunk2)+((width%chunk2) ? 1 : 0))*chunk2;
+}
+
 void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,
                                              double shadeBot, EAppearance bevApp) const
 {
     bool    vertical(!horiz);
-    int     size(STRIPE_DIAGONAL==opts.stripedProgress ? (vertical ? origRect.width() : origRect.height()) : PROGRESS_CHUNK_WIDTH*2);
+    int     size(STRIPE_DIAGONAL==opts.stripedProgress ? getStripedPbarSize(vertical ? origRect.width() : origRect.height())
+                                                       : PROGRESS_CHUNK_WIDTH*2);
     QRect   r(0, 0, horiz ? size : origRect.width(),
                     horiz ? origRect.height() : size);
     QtcKey  key(createKey(horiz ? r.height() : r.width(), itsMenuitemCols[ORIGINAL_SHADE].rgb(), horiz, true,
@@ -5625,7 +5633,7 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
             {
                 QRegion  reg;
 
-                for(int offset=0; offset<size+2; offset+=(PROGRESS_CHUNK_WIDTH*2))
+                for(int offset=0; offset<(size*2); offset+=(PROGRESS_CHUNK_WIDTH*2))
                 {
                     QPolygon a;
 
