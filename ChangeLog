@@ -1,3 +1,11 @@
+0.56
+----
+1. Change default settings:
+        Dont animate progressbars
+        Frameless groupboxes
+2. Correctly position corner indicator.
+3. Use mouse over colours for corner indicator.
+
 0.55.3
 ------
 1. Hack around a slight menubar problem with pidgin.

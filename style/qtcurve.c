@@ -2913,10 +2913,11 @@ debugDisplayWidget(widget, 3);
             if(defBtn)
                 if(IND_CORNER==opts.defBtnIndicator)
                 {
-                    int      offset=sunken ? 4 : 3;
-                    GdkGC    *gc=btn_gcs[GTK_STATE_ACTIVE==state ? 0 : 4];
-                    GdkPoint points[3] = { { x+offset, y+offset+1 }, { x+offset+6, y+offset+1},
-                                           { x+offset, y+offset+7}};
+                    int      offset=sunken ? 5 : 4,
+                             etchOffset=QTC_DO_EFFECT ? 1 : 0;
+                    GdkGC    *gc=qtcurveStyle->mouseover_gc[GTK_STATE_ACTIVE==state ? 0 : 4];
+                    GdkPoint points[3] = { { x+offset, y+offset+etchOffset }, { x+offset+6, y+offset+etchOffset},
+                                           { x+offset, y+offset+6+etchOffset}};
 
                     if(area)
                         gdk_gc_set_clip_rectangle(gc, area);
