@@ -223,6 +223,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(tabAppearance, false);
     insertAppearanceEntries(progressAppearance);
     insertAppearanceEntries(menuitemAppearance);
+    insertAppearanceEntries(titlebarAppearance);
     insertLineEntries(handles, false);
     insertLineEntries(sliderThumbs, true);
     insertLineEntries(toolbarSeparators, true);
@@ -272,6 +273,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(menuitemAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
+    connect(titlebarAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(shadeCheckRadio, SIGNAL(activated(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
 
@@ -561,6 +563,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.borderMenuitems=borderMenuitems->isChecked();
     opts.progressAppearance=(EAppearance)progressAppearance->currentIndex();
     opts.menuitemAppearance=(EAppearance)menuitemAppearance->currentIndex();
+    opts.titlebarAppearance=(EAppearance)titlebarAppearance->currentIndex();
     opts.shadeCheckRadio=(EShade)shadeCheckRadio->currentIndex();
     opts.customCheckRadioColor=customCheckRadioColor->color();
     opts.shading=(EShading)shading->currentIndex();
@@ -634,6 +637,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     borderMenuitems->setChecked(opts.borderMenuitems);
     progressAppearance->setCurrentIndex(opts.progressAppearance);
     menuitemAppearance->setCurrentIndex(opts.menuitemAppearance);
+    titlebarAppearance->setCurrentIndex(opts.titlebarAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
 
@@ -692,6 +696,7 @@ bool QtCurveConfig::settingsChanged()
          tabAppearance->currentIndex()!=currentStyle.tabAppearance ||
          progressAppearance->currentIndex()!=currentStyle.progressAppearance ||
          menuitemAppearance->currentIndex()!=currentStyle.menuitemAppearance ||
+         titlebarAppearance->currentIndex()!=currentStyle.titlebarAppearance ||
          toolbarSeparators->currentIndex()!=currentStyle.toolbarSeparators ||
          splitters->currentIndex()!=currentStyle.splitters ||
 

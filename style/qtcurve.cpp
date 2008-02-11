@@ -2291,13 +2291,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     case IND_CORNER:
                     {
                         QPolygon points;
-                        int      offset(isDown ? 4 : 3);
+                        int      offset(isDown ? 5 : 4),
+                                 etchOffset(QTC_CAN_DO_EFFECT ? 1 : 0);
 
-                        points.setPoints(3, r.x()+offset, r.y()+offset+1, r.x()+offset+6, r.y()+offset+1,
-                                            r.x()+offset, r.y()+offset+7);
+                        points.setPoints(3,r.x()+offset, r.y()+offset+etchOffset, r.x()+offset+6, r.y()+offset+etchOffset,
+                                        r.x()+offset, r.y()+offset+6+etchOffset);
 
-                        painter->setBrush(use[isDown ? 0 : 4]);
-                        painter->setPen(use[isDown ? 0 : 4]);
+                        painter->setBrush(itsMouseOverCols[isDown ? 0 : 4]);
+                        painter->setPen(itsMouseOverCols[isDown ? 0 : 4]);
                         painter->drawPolygon(points);
                         break;
                     }
@@ -6345,7 +6346,14 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     else
     {
         p->setPen(border);
-        drawRect(p, r);
+        if(WIDGET_MDI_WINDOW_TITLE!=w)
+            drawRect(p, r);
+        else
+        {
+            p->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+            p->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+            p->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+        }
     }
 }
 

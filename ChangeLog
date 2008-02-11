@@ -1,7 +1,16 @@
-0.55.4
-------
-1. Fix for diagonal striped progressbars whose height!=20 (such as in
+0.56
+----
+1. Change default settings:
+        Dont animate progressbars
+        Frameless groupboxes
+        Gradient KDE4 window titlebars
+2. Correctly position corner indicator.
+3. Use mouse over colours for corner indicator.
+4. Add option to control window titlebar appearance - default to
+   gradient.
+5. Fix for diagonal striped progressbars whose height!=20 (such as in
    konqueror's statusbar)
+6. Dont draw line between window titlebar and contents when not rounded.
 
 0.55.3
 ------

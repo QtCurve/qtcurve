@@ -908,6 +908,9 @@ typedef struct
                      lvAppearance,
                      tabAppearance,
                      sliderAppearance,
+#ifdef __cplusplus
+                     titlebarAppearance,
+#endif
                      progressAppearance;
     EShade           shadeSliders,
                      shadeMenubars,
@@ -919,7 +922,7 @@ typedef struct
                      customMenuNormTextColor,
                      customMenuSelTextColor,
                      customCheckRadioColor;
-#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
     bool             plasmaHack;
 #endif
     #ifdef QTC_CONFIG_DIALOG
@@ -949,6 +952,11 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
             return opts->menuitemAppearance;
         case WIDGET_PROGRESSBAR:
             return opts->progressAppearance;
+#ifdef __cplusplus
+        case WIDGET_MDI_WINDOW:
+        case WIDGET_MDI_WINDOW_TITLE:
+            return opts->titlebarAppearance;
+#endif
         case WIDGET_SLIDER_TROUGH:
             return APPEARANCE_FLAT==opts->appearance || APPEARANCE_RAISED==opts->appearance
                     ? APPEARANCE_FLAT : APPEARANCE_GRADIENT;
