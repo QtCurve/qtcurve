@@ -138,7 +138,7 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     bool   diffSize(itsButtonBackground[state].pix.width()!=r.width() ||
                     itsButtonBackground[state].pix.height()!=r.height());
-    int    app(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Appearance, NULL, NULL));
+    int    app(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarAppearance, NULL, NULL));
 
     if(diffSize || itsButtonBackground[state].col!=col || itsButtonBackground[state].app!=app)
     {

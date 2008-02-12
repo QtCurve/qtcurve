@@ -303,7 +303,7 @@ typedef GdkColor color;
 typedef enum
 {
     QtC_Round = QStyle::PM_CustomBase,
-    QtC_Appearance
+    QtC_TitleBarAppearance
 } QtCMetrics;
 
 #define QtC_StateKWin QStyle::State_Top
@@ -351,9 +351,10 @@ typedef enum
 #endif
     WIDGET_SPIN,
 #ifdef __cplusplus
-    WIDGET_CHECKBUTTON,  // Qt4 only
-    WIDGET_MDI_WINDOW,   // Qt4 only
+    WIDGET_CHECKBUTTON,        // Qt4 only
+    WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
+    WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
     WIDGET_ENTRY,
     WIDGET_FRAME,
     WIDGET_NO_ETCH_BTN,
@@ -955,6 +956,7 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #ifdef __cplusplus
         case WIDGET_MDI_WINDOW:
         case WIDGET_MDI_WINDOW_TITLE:
+        case WIDGET_MDI_WINDOW_BUTTON:
             return opts->titlebarAppearance;
 #endif
         case WIDGET_SLIDER_TROUGH:

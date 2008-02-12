@@ -33,6 +33,8 @@
 #include <QPixmap>
 #include <QTimer>
 #include "qtcurveclient.h"
+#define QTC_KWIN
+#include "common.h"
 
 namespace KWinQtCurve
 {
@@ -139,7 +141,7 @@ void QtCurveButton::drawButton(QPainter *painter)
 
         opt.init(this);
         opt.rect=QRect(0, 0, width(), height());
-        opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised)|QStyle::State_MouseOver|QStyle::State_Horizontal;
+        opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised)|QStyle::State_MouseOver|QStyle::State_Horizontal|QtC_StateKWin;
         opt.palette.setColor(QPalette::Button, buttonColor);
         Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
     }

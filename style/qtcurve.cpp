@@ -1380,8 +1380,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                                         : 0, 24);
         case QtC_Round:
             return (int)opts.round;
-        case QtC_Appearance:
-            return (int)opts.appearance;
+        case QtC_TitleBarAppearance:
+            return (int)opts.titlebarAppearance;
         default:
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
     }
@@ -2255,8 +2255,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
                          isFlat(false),
+                         isKWin(state&QtC_StateKWin),
                          isDown(state&State_Sunken || state&State_On),
-                         isOnListView(widget && qobject_cast<const QTreeView *>(widget));
+                         isOnListView(!isKWin && widget && qobject_cast<const QTreeView *>(widget));
             QStyleOption opt(*option);
             CEtchCheck   check(widget);
 
@@ -2279,11 +2280,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 opt.state|=State_Horizontal|State_Raised;
 
             drawLightBevel(painter, r, &opt, ROUNDED_ALL, getFill(&opt, use), use,
-                           true, isOnListView
-                                    ? WIDGET_NO_ETCH_BTN
-                                    : isDefault && state&State_Enabled && IND_FONT_COLOR==opts.defBtnIndicator
-                                        ? WIDGET_DEF_BUTTON
-                                        : WIDGET_STD_BUTTON);
+                           true, isKWin
+                                    ? WIDGET_MDI_WINDOW_BUTTON
+                                    : isOnListView
+                                        ? WIDGET_NO_ETCH_BTN
+                                        : isDefault && state&State_Enabled && IND_FONT_COLOR==opts.defBtnIndicator
+                                            ? WIDGET_DEF_BUTTON
+                                            : WIDGET_STD_BUTTON);
 
             if (isDefault && state&State_Enabled)
                 switch(opts.defBtnIndicator)
@@ -6370,7 +6373,8 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
         if(sunken)
             opt.state|=State_Sunken;
 
-        drawLightBevel(painter, opt.rect, &opt, ROUNDED_ALL, getFill(&opt, cols), cols, true, WIDGET_NO_ETCH_BTN);
+        drawLightBevel(painter, opt.rect, &opt, ROUNDED_ALL, getFill(&opt, cols), cols, true,
+                       WIDGET_MDI_WINDOW_BUTTON);
     }
 }
 
@@ -6455,7 +6459,7 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
             break;
         }
         case SC_TitleBarShadeButton:
-             drawArrow(painter, rect, PE_IndicatorArrowUp, color);
+            drawArrow(painter, rect, PE_IndicatorArrowUp, color);
             break;
         case SC_TitleBarUnshadeButton:
             drawArrow(painter, rect, PE_IndicatorArrowDown, color);
