@@ -115,7 +115,7 @@ static void insertShadeEntries(QComboBox *combo, bool withDarken, bool checkRadi
     }
 }
 
-static void insertAppearanceEntries(QComboBox *combo, bool all=true)
+static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=true)
 {
     combo->insertItem(APPEARANCE_FLAT, i18n("Flat"));
     combo->insertItem(APPEARANCE_RAISED, i18n("Raised"));
@@ -123,10 +123,11 @@ static void insertAppearanceEntries(QComboBox *combo, bool all=true)
     combo->insertItem(APPEARANCE_SHINY_GLASS, i18n("Shiny glass"));
     combo->insertItem(APPEARANCE_GRADIENT, i18n("Gradient"));
     combo->insertItem(APPEARANCE_INVERTED, i18n("Inverted gradient"));
-    if(all)
+    if(split)
     {
         combo->insertItem(APPEARANCE_SPLIT_GRADIENT, i18n("Split gradient"));
-        combo->insertItem(APPEARANCE_BEVELLED, i18n("Bevelled"));
+        if(bev)
+            combo->insertItem(APPEARANCE_BEVELLED, i18n("Bevelled"));
     }
 }
 
