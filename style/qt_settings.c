@@ -1400,6 +1400,7 @@ static gboolean qtInit(Options *opts)
                 qtSettings.app=GTK_APP_JAVA_SWT;
 
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
+            if(GTK_APP_JAVA!=qtSettings.app)
             {
                 /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
                 /* ...and inactive highlight!!! */

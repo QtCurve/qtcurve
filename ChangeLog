@@ -5,6 +5,8 @@
         Frameless groupboxes
 2. Correctly position corner indicator.
 3. Use mouse over colours for corner indicator.
+4. Fix for text of selected check/radios on menubars in Java swing apps.
+5. Fix for toolbar handles of Java swing apps.
 
 0.55.3
 ------
