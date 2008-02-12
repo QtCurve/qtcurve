@@ -741,6 +741,10 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance)
+            if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
+                opts->titlebarAppearance=APPEARANCE_GRADIENT;
+            else if(APPEARANCE_RAISED==opts->titlebarAppearance)
+                opts->titlebarAppearance=APPEARANCE_FLAT;
 #endif
             QTC_CFG_READ_SHADING(shading, shading);
 
@@ -1235,6 +1239,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(inactiveHighlight)
 #ifdef __cplusplus
         CFG_WRITE_ENTRY(stdSidebarButtons)
+        CFG_WRITE_ENTRY_FORCE(titlebarAppearance)
 #endif
 
         CFG_WRITE_ENTRY(gtkScrollViews)
