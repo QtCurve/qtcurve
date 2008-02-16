@@ -2329,9 +2329,7 @@ debugDisplayWidget(widget, 3);
     /* Note: I'm not sure why the 'widget && GTK_IS_HANDLE_BOX(widget)' is in the following 'if' - its been there for a while.
              But this breaks the toolbar handles for Java Swing apps. I'm leaving it in for non Java apps, as there must've been
              a reason for it.... */
-    else if((DETAIL("handlebox") &&
-               (GTK_APP_JAVA==GTK_APP_JAVA==qtSettings.app ||
-               (widget && GTK_IS_HANDLE_BOX(widget)))) ||
+    else if((DETAIL("handlebox") && (GTK_APP_JAVA==qtSettings.app || (widget && GTK_IS_HANDLE_BOX(widget)))) ||
             DETAIL("dockitem") || paf)
     {
 #ifdef QTC_MOUSEOVER_HANDLES
