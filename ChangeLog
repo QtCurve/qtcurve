@@ -8,6 +8,7 @@
 4. Fix for text of selected check/radios on menubars in Java swing apps.
 5. Fix for toolbar handles of Java swing apps.
 6. Fix for GtkEntry's within toolbars.
+7. OpenOffice.org fixes - entry fields, menubar items, checks in menus.
 
 0.55.3
 ------

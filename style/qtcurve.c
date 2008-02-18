@@ -502,54 +502,6 @@ struct _GtkRangeLayout
                  stepper_d;
 };
 
-static gboolean isStepperA(GtkWidget *widget, gint x, gint y)
-{
-    if (GTK_IS_RANGE(widget))
-    {
-        GtkRange * range = GTK_RANGE(widget);
-        return range->has_stepper_a && withinRect(&(range->layout->stepper_a),
-                                                  x-widget->allocation.x, y-widget->allocation.y);
-    }
-
-    return FALSE;
-}
-
-static gboolean isStepperB(GtkWidget *widget, gint x, gint y)
-{
-    if (GTK_IS_RANGE(widget))
-    {
-        GtkRange * range = GTK_RANGE(widget);
-        return range->has_stepper_b && withinRect(&(range->layout->stepper_b),
-                                                  x-widget->allocation.x, y-widget->allocation.y);
-    }
-
-    return FALSE;
-}
-
-static gboolean isStepperC(GtkWidget *widget, gint x, gint y)
-{
-    if (GTK_IS_RANGE(widget))
-    {
-        GtkRange * range = GTK_RANGE(widget);
-        return range->has_stepper_c && withinRect(&(range->layout->stepper_c),
-                                                  x-widget->allocation.x, y-widget->allocation.y);
-    }
-
-    return FALSE;
-}
-
-static gboolean isStepperD(GtkWidget *widget, gint x, gint y)
-{
-    if (GTK_IS_RANGE(widget))
-    {
-        GtkRange *range = GTK_RANGE(widget);
-        return range->has_stepper_d && withinRect(&(range->layout->stepper_d),
-                                                  x-widget->allocation.x, y-widget->allocation.y);
-    }
-
-    return FALSE;
-}
-
 typedef enum
 {
     QTC_STEPPER_A,
@@ -563,15 +515,19 @@ static EStepper getStepper(GtkWidget *widget, int x, int y)
 {
     if(GTK_IS_RANGE(widget))
     {
-        if(isStepperA(widget, x, y))
+        GtkRange *range=GTK_RANGE(widget);
+        int      xa=x-widget->allocation.x,
+                 ya=y-widget->allocation.y;
+
+        if(range->has_stepper_a && withinRect(&(range->layout->stepper_a), xa, ya))
             return GTK_APP_NEW_MOZILLA==qtSettings.app && (x>10 || y>10)
                 ? QTC_STEPPER_C
                 : QTC_STEPPER_A;
-        else if(isStepperB(widget, x, y))
+        else if(range->has_stepper_b && withinRect(&(range->layout->stepper_b), xa, ya))
             return QTC_STEPPER_B;
-        else if(isStepperC(widget, x, y))
+        else if(range->has_stepper_c && withinRect(&(range->layout->stepper_c), xa, ya))
             return QTC_STEPPER_C;
-        else if(isStepperD(widget, x, y))
+        else if(range->has_stepper_d && withinRect(&(range->layout->stepper_d), xa, ya))
             return GTK_APP_NEW_MOZILLA==qtSettings.app && (x<18 && y<18)
                 ? QTC_STEPPER_B
                 : QTC_STEPPER_D;
@@ -2057,7 +2013,7 @@ debugDisplayWidget(widget, 3);
         midgc=style->base_gc[state];
 
     gdk_draw_rectangle(window, enabled ? style->base_gc[state] : style->bg_gc[GTK_STATE_INSENSITIVE],
-                       TRUE, x, y, width, height);
+                       TRUE, x+2, y+2, width-4, height-4);
     gdk_draw_line(window, midgc, x+1, y+1, x+1, y+height-2);
     gdk_draw_line(window, midgc, x+1, y+1, x+width-1, y+1);
 
@@ -3488,8 +3444,9 @@ debugDisplayWidget(widget, 3);
            empty menubar item is drawn on the right - and doesnt disappear! */
         if(!mb || width>12)
         {
-            GdkColor *itemCols=!opts.colorMenubarMouseOver && mb && !active_mb ? qtcurveStyle->background : qtcurveStyle->menuitem;
-            GdkGC    **itemGcs=!opts.colorMenubarMouseOver && mb && !active_mb ? qtcurveStyle->background_gc : qtcurveStyle->menuitem_gc;
+            gboolean grayItem=!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app;
+            GdkColor *itemCols=grayItem ? qtcurveStyle->background : qtcurveStyle->menuitem;
+            GdkGC    **itemGcs=grayItem ? qtcurveStyle->background_gc : qtcurveStyle->menuitem_gc;
             GdkColor *bgnd=qtcurveStyle->menubar_gc[0] && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
                             ? &qtcurveStyle->menubar[ORIGINAL_SHADE] : NULL;
             int      round=pbar ? progressbarRound(widget, rev)
@@ -3894,7 +3851,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
 
 #ifdef QTC_DEBUG
-printf("Draw check %d %d %d %s  ", state, shadow_type, mnu, detail ? detail : "NULL");
+printf("Draw check %d %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height, mnu, detail ? detail : "NULL");
 debugDisplayWidget(widget, 3);
 #endif
 
@@ -3913,6 +3870,12 @@ debugDisplayWidget(widget, 3);
     }
     else
 #endif
+    if(mnu && GTK_APP_OPEN_OFFICE==qtSettings.app)
+    {
+        x+=2;
+        y-=2;
+    }
+
     if(!mnu || qtSettings.qt4)
     {
         gboolean coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver;
