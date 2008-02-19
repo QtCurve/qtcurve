@@ -234,6 +234,15 @@ static void generateMidColor(GdkColor *a, GdkColor *b, GdkColor *mid, double fac
     mid->blue=(a->blue+limit(b->blue*factor))>>1;
 }
 
+static void tintColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor)
+{
+    *mid=*b;
+
+    mid->red=limit((a->red+(factor*b->red))/(1+factor));
+    mid->green=limit((a->green+(factor*b->green))/(1+factor));
+    mid->blue=limit((a->blue+(factor*b->blue))/(1+factor));
+}
+
 static GdkGC * getTempGc(QtCurveStyle *qtcurveStyle, int num, GdkWindow *window)
 {
     if(!qtcurveStyle->temp_gc[num])
@@ -2838,6 +2847,12 @@ debugDisplayWidget(widget, 3);
                     }
                 }
 #endif
+
+                if(defBtn && !custom_c && IND_TINT==opts.defBtnIndicator)
+                {
+                    btn_gcs=qtcurveStyle->defbtn_gc;
+                    btn_colors=qtcurveStyle->defbtn;
+                }
 
                 drawLightBevel(style, window, state, area, NULL, x, y, width, height,
                                &btn_colors[bgnd], NULL, btn_gcs, btn_colors, NULL, round, widgetType,
@@ -5572,7 +5587,7 @@ static void styleRealize(GtkStyle *style)
     }
 
     qtcurveStyle->defbtn_gc[0]=NULL;
-    if(IND_COLORED==opts.defBtnIndicator)
+    if(IND_COLORED==opts.defBtnIndicator || IND_TINT==opts.defBtnIndicator)
     {
         if(SHADE_BLEND_SELECTED==opts.shadeSliders)
             memcpy(qtcurveStyle->defbtn_gc, qtcurveStyle->slider_gc,
@@ -5694,7 +5709,15 @@ static void generateColors(QtCurveStyle *qtcurveStyle)
             break;
     }
 
-    if(IND_COLORED==opts.defBtnIndicator)
+    if(IND_TINT==opts.defBtnIndicator)
+    {
+        GdkColor col;
+
+        tintColor(&qtcurveStyle->button[ORIGINAL_SHADE],
+                  &qtcurveStyle->menuitem[ORIGINAL_SHADE], &col, 0.2);
+        shadeColors(&col, qtcurveStyle->defbtn);
+    }
+    else if(IND_COLORED==opts.defBtnIndicator)
     {
         if(SHADE_BLEND_SELECTED==opts.shadeSliders)
             memcpy(qtcurveStyle->defbtn, qtcurveStyle->slider, sizeof(GdkColor)*(TOTAL_SHADES+1));

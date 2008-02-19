@@ -9,6 +9,7 @@
 5. Fix for toolbar handles of Java swing apps.
 6. Fix for GtkEntry's within toolbars.
 7. OpenOffice.org fixes - entry fields, menubar items, checks in menus.
+8. Option to tint the default button colour.
 
 0.55.3
 ------
