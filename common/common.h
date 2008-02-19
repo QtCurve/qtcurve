@@ -401,6 +401,7 @@ typedef enum
     IND_CORNER,
     IND_FONT_COLOR,
     IND_COLORED,
+    IND_TINT,
     IND_NONE
 } EDefBtnIndicator;
 

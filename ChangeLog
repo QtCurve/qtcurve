@@ -11,6 +11,8 @@
 5. Fix for diagonal striped progressbars whose height!=20 (such as in
    konqueror's statusbar)
 6. Dont draw line between window titlebar and contents when not rounded.
+7. Option to tint the default button colour.
+8. Fix for very slim progressbars.
 
 0.55.3
 ------

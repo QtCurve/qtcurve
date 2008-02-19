@@ -327,6 +327,13 @@ inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
                   (a.blue()+limit(b.blue()*factor))>>1);
 }
 
+inline QColor tint(const QColor &a, const QColor &b, double factor=0.2)
+{
+    return QColor((int)((a.red()+(factor*b.red()))/(1+factor)),
+                  (int)((a.green()+(factor*b.green()))/(1+factor)),
+                  (int)((a.blue()+(factor*b.blue()))/(1+factor)));
+}
+
 static QColor shade(const QColor &a, float k)
 {
     QColor mod;
@@ -638,7 +645,14 @@ QtCurveStyle::QtCurveStyle(const QString &name)
                     itsSliderCols);
     }
 
-/*    if(IND_COLORED==opts.defBtnIndicator)*/
+    if(IND_TINT==opts.defBtnIndicator)
+    {
+        itsDefBtnCols=new QColor [TOTAL_SHADES+1];
+        shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
+                         itsMenuitemCols[ORIGINAL_SHADE]), itsDefBtnCols);
+    }
+    else/* if(IND_COLORED==opts.defBtnIndicator)*/
+    {
         if(SHADE_BLEND_SELECTED==opts.shadeSliders)
             itsDefBtnCols=itsSliderCols;
         else
@@ -647,6 +661,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
             shadeColors(midColor(itsMenuitemCols[ORIGINAL_SHADE],
                                  itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
         }
+    }
 
     if(opts.coloredMouseOver)
         if(itsDefBtnCols)
@@ -814,8 +829,9 @@ void QtCurveStyle::polish(QPalette &palette)
                    itsButtonCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Button)),
          newSlider(itsSliderCols && SHADE_BLEND_SELECTED==opts.shadeSliders &&
                    (newContrast || newButton || newMenu)),
-         newDefBtn(itsDefBtnCols && IND_COLORED==opts.defBtnIndicator &&
-                   SHADE_BLEND_SELECTED!=opts.shadeSliders &&
+         newDefBtn(itsDefBtnCols && ( (IND_COLORED==opts.defBtnIndicator &&
+                                       SHADE_BLEND_SELECTED!=opts.shadeSliders) ||
+                                      (IND_TINT==opts.defBtnIndicator) ) &&
                    (newContrast || newButton || newMenu)),
          newMouseOver(itsMouseOverCols && itsMouseOverCols!=itsDefBtnCols &&
                       itsMouseOverCols!=itsSliderCols &&
@@ -837,8 +853,12 @@ void QtCurveStyle::polish(QPalette &palette)
                     itsButtonCols[ORIGINAL_SHADE]), itsSliderCols);
 
     if(newDefBtn)
-        shadeColors(midColor(itsMenuitemCols[ORIGINAL_SHADE],
-                    itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
+        if(IND_TINT==opts.defBtnIndicator)
+            shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
+                        itsMenuitemCols[ORIGINAL_SHADE]), itsDefBtnCols);
+        else
+            shadeColors(midColor(itsMenuitemCols[ORIGINAL_SHADE],
+                        itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
 
     if(newMouseOver)
         shadeColors(midColor(itsMenuitemCols[ORIGINAL_SHADE],
@@ -2278,6 +2298,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(isOnListView)
                 opt.state|=State_Horizontal|State_Raised;
+
+            if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
+                use=itsDefBtnCols;
 
             drawLightBevel(painter, r, &opt, ROUNDED_ALL, getFill(&opt, use), use,
                            true, isKWin
@@ -6546,12 +6569,30 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     else
         opt.state&=~QTC_STATE_REVERSE;
 
-    drawLightBevel(p, r, &opt, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, true, WIDGET_PROGRESSBAR);
+    if(r.width()<1)
+        return;
 
-    if(QTC_ROUNDED && r.width()>2 && ROUNDED_ALL!=round)
+    int  length(vertical ? r.height() : r.width());
+    bool drawFull(length > 3);
+
+    if(drawFull)
+        drawLightBevel(p, r, &opt, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, true, WIDGET_PROGRESSBAR);
+    else
     {
-        bool drawFull((vertical ? r.height() : r.width()) > 3);
+        p->setPen(itsMenuitemCols[QT_STD_BORDER]);
+        if(length>1)
+        {
+            p->setBrush(itsMenuitemCols[ORIGINAL_SHADE]);
+            drawRect(p, r);
+        }
+        else if(vertical)
+            p->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+        else
+            p->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+    }
 
+    if(QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
+    {
         p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[QT_STD_BORDER]));
         if(!(round&CORNER_TL) || !drawFull)
             p->drawPoint(r.x(), r.y());

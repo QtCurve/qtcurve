@@ -78,6 +78,8 @@ static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
             return IND_CORNER;
         if(0==memcmp(str, "colored", 7))
             return IND_COLORED;
+        if(0==memcmp(str, "tint", 4))
+            return IND_TINT;
     }
 
     return def;
@@ -928,6 +930,8 @@ static const char *toStr(EDefBtnIndicator ind)
             return "fontcolor";
         case IND_CORNER:
             return "corner";
+        case IND_TINT:
+            return "tint";
         default:
             return "colored";
     }
