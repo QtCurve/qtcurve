@@ -664,7 +664,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     }
 
     if(opts.coloredMouseOver)
-        if(itsDefBtnCols)
+        if(itsDefBtnCols && IND_TINT!=opts.defBtnIndicator)
             itsMouseOverCols=itsDefBtnCols;
         else
         {
