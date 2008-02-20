@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2007 Craig.Drummond@lycos.co.uk
+  QtCurve (C) Craig Drummond, 2003 - 2008 Craig.Drummond@lycos.co.uk
 
   ----
 
@@ -32,6 +32,12 @@
 #include "animation.c"
 #include "pixmaps.h"
 #include "config.h"
+
+/*
+ * Menu stripe is disabled for Gtk2, as I'm not sure what todo about combobox menus,
+ * and menus without icons!
+#define QTC_MENU_STRIPE
+*/
 
 /*
  * Disabled, for the moment, due to not working very well...
@@ -1130,6 +1136,32 @@ static gboolean pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
            a->col.blue==b->col.blue;
 }
 
+#ifdef QTC_MENU_STRIPE
+#ifdef __SUNPRO_C
+#pragma align 4 (my_pixbuf)
+#endif
+#ifdef __GNUC__
+static const guint8 blank16x16[] __attribute__ ((__aligned__ (4))) =
+#else
+static const guint8 blank16x16[] =
+#endif
+{ ""
+  /* Pixbuf magic (0x47646b50) */
+  "GdkP"
+  /* length: header (24) + pixel_data (15) */
+  "\0\0\0'"
+  /* pixdata_type (0x2010002) */
+  "\2\1\0\2"
+  /* rowstride (64) */
+  "\0\0\0@"
+  /* width (16) */
+  "\0\0\0\20"
+  /* height (16) */
+  "\0\0\0\20"
+  /* pixel_data: */
+  "\377\0\0\0\0\377\0\0\0\0\202\0\0\0\0"};
+#endif
+
 static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
 {
     GdkPixbuf *res=NULL;
@@ -1160,6 +1192,10 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
         case PIX_SLIDER_LIGHT_V:
             res=gdk_pixbuf_new_from_inline(-1, slider_light_v, TRUE, NULL);
             break;
+#ifdef QTC_MENU_STRIPE
+        case PIX_BLANK:
+            return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
+#endif
     }
 
     adjustPix(gdk_pixbuf_get_pixels(res), gdk_pixbuf_get_n_channels(res), gdk_pixbuf_get_width(res),
@@ -3371,6 +3407,25 @@ debugDisplayWidget(widget, 3);
                    horizPbar=isHorizontalProgressbar(widget);
         int        animShift=-PROGRESS_CHUNK_WIDTH;
 
+#ifdef QTC_MENU_STRIPE /* This hack doesnt work! not all items are gtkImageMenuItems's
+         -> and if tey are they're drawn first incorrectly :-( */
+        if(!mb && menuitem && GTK_IS_IMAGE_MENU_ITEM(widget) &&
+           (0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)) ||
+            (GTK_IS_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))) &&
+             GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))))))
+        {
+            // Give it a blank icon - so that menuStripe looks ok, plus this matched KDE style!
+            if(0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))
+            {
+                gtk_image_menu_item_set_image(GTK_IS_IMAGE_MENU_ITEM(widget),
+                                              gtk_image_new_from_pixbuf(getPixbuf(qtcurveStyle->check_radio, PIX_BLANK, 1.0)));
+            }
+            else
+            gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))),
+                                        getPixbuf(qtcurveStyle->check_radio, PIX_BLANK, 1.0));
+        }
+#endif
+
         if(pbar && STRIPE_NONE!=opts.stripedProgress)
         {
             GdkRectangle rect={x, y, width-2, height-2};
@@ -3582,6 +3637,15 @@ debugDisplayWidget(widget, 3);
                 gdk_gc_set_clip_rectangle(qtcurveStyle->background_gc[0], NULL);
             }
         }
+
+#ifdef QTC_MENU_STRIPE
+        if(opts.menuStripe) /* && (!widget || !widget->name || strcmp(widget->name, "gtk-combobox-popup-menu"))) */
+            drawBevelGradient(style, window, area, NULL, x+2, y+2, isMozilla() ? 18 : 22, height-4,
+                              &qtcurveStyle->background[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3],
+                              getWidgetShade(WIDGET_OTHER, TRUE, FALSE, opts.appearance),
+                              getWidgetShade(WIDGET_OTHER, FALSE, FALSE, opts.appearance),
+                              FALSE, TRUE, FALSE, opts.appearance, WIDGET_OTHER);
+#endif
 
         if(area)
             gdk_gc_set_clip_rectangle(qtcurveStyle->background_gc[QT_STD_BORDER], area);
@@ -4043,6 +4107,10 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         x+=(width-QTC_RADIO_SIZE)>>1;
         y+=(height-QTC_RADIO_SIZE)>>1;
+
+        /* For some reason, radios dont look aligned properly - most noticeable with menuStripe set */
+        if(!isMozilla())
+            x-=3;
 
 /*
         if(list)
