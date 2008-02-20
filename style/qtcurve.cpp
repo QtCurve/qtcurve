@@ -2999,6 +2999,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuItem:
             if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
+                bool comboMenu(qobject_cast<const QComboBox*>(widget));
+
                 painter->save();
 
                 if (QStyleOptionMenuItem::Separator==menuItem->menuItemType)
@@ -3006,7 +3008,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
 
-                    if(opts.menuStripe)
+                    if(opts.menuStripe && !comboMenu)
                         drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
                                         QRect(r.x(), r.y(), constMenuPixmapWidth, r.height()), false,
                                         getWidgetShade(WIDGET_OTHER, true, false, opts.appearance),
@@ -3047,7 +3049,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 {
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
-                    if(opts.menuStripe)
+                    if(opts.menuStripe && !comboMenu)
                         drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
                                         QRect(r.x(), r.y(), constMenuPixmapWidth, r.height()), false,
                                         getWidgetShade(WIDGET_OTHER, true, false, opts.appearance),
@@ -3055,7 +3057,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         false, opts.appearance, WIDGET_OTHER);
                 }
 
-                if(qobject_cast<const QComboBox*>(widget))
+                if(comboMenu)
                 {
                     if (menuItem->icon.isNull())
                         checkcol = 0;
@@ -3127,7 +3129,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                            : menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode));
 
                     int   pixw(pixmap.width()),
-                        pixh(pixmap.height());
+                          pixh(pixmap.height());
                     QRect pmr(0, 0, pixw, pixh);
 
                     pmr.moveCenter(vCheckRect.center());
