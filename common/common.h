@@ -2,7 +2,7 @@
 #define __COMMON_H__
 
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2007 Craig.Drummond@lycos.co.uk
+  QtCurve (C) Craig Drummond, 2003 - 2008 Craig.Drummond@lycos.co.uk
 
   ----
 
@@ -327,6 +327,9 @@ typedef enum
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
     PIX_SLIDER_LIGHT_V
+#ifndef __cplusplus
+    , PIX_BLANK
+#endif
 } EPixmap;
 
 typedef enum
@@ -893,7 +896,8 @@ typedef struct
                      vArrows,
                      xCheck,
                      framelessGroupBoxes,
-                     inactiveHighlight;
+                     inactiveHighlight,
+                     menuStripe;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;

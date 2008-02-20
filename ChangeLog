@@ -12,7 +12,8 @@
    konqueror's statusbar)
 6. Dont draw line between window titlebar and contents when not rounded.
 7. Option to tint the default button colour.
-8. Fix for very slim progressbars.
+8. Option to draw a stripe on the left hand side of popupmenus.
+9. Fix for very slim progressbars.
 
 0.55.3
 ------

@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2007 Craig.Drummond@lycos.co.uk
+  QtCurve (C) Craig Drummond, 2007-2008 Craig.Drummond@lycos.co.uk
 
   ----
 
@@ -213,7 +213,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
                exportDialog(NULL)
 {
     setupUi(this);
-    titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2007");
+    titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2008");
     insertShadeEntries(shadeSliders, false);
     insertShadeEntries(shadeMenubars, true);
     insertShadeEntries(shadeCheckRadio, false, true);
@@ -244,6 +244,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     highlightFactor->setValue(((int)(DEFAULT_HIGHLIGHT_FACTOR*100))-100);
 
     connect(lighterPopupMenuBgnd, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(menuStripe, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(round, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(toolbarBorders, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(sliderThumbs, SIGNAL(activated(int)), SLOT(updateChanged()));
@@ -532,6 +533,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.animatedProgress=animatedProgress->isChecked();
     opts.stripedProgress=(EStripe)stripedProgress->currentIndex();
     opts.lighterPopupMenuBgnd=lighterPopupMenuBgnd->isChecked();
+    opts.menuStripe=menuStripe->isChecked();
     opts.embolden=embolden->isChecked();
     opts.scrollbarType=(EScrollbar)scrollbarType->currentIndex();
     opts.defBtnIndicator=(EDefBtnIndicator)defBtnIndicator->currentIndex();
@@ -583,6 +585,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     round->setCurrentIndex(opts.round);
     scrollbarType->setCurrentIndex(opts.scrollbarType);
     lighterPopupMenuBgnd->setChecked(opts.lighterPopupMenuBgnd);
+    menuStripe->setChecked(opts.menuStripe);
     toolbarBorders->setCurrentIndex(opts.toolbarBorders);
     sliderThumbs->setCurrentIndex(opts.sliderThumbs);
     handles->setCurrentIndex(opts.handles);
@@ -672,6 +675,7 @@ bool QtCurveConfig::settingsChanged()
          animatedProgress->isChecked()!=currentStyle.animatedProgress ||
          stripedProgress->currentIndex()!=currentStyle.stripedProgress ||
          lighterPopupMenuBgnd->isChecked()!=currentStyle.lighterPopupMenuBgnd ||
+         menuStripe->isChecked()!=currentStyle.menuStripe ||
          embolden->isChecked()!=currentStyle.embolden ||
          fillSlider->isChecked()!=currentStyle.fillSlider ||
          sliderStyle->currentIndex()!=currentStyle.sliderStyle ||

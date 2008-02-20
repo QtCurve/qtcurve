@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2007 Craig.Drummond@lycos.co.uk
+  QtCurve (C) Craig Drummond, 2007-2008 Craig.Drummond@lycos.co.uk
 
   ----
 
@@ -40,6 +40,8 @@
 
 #define WINDOWTITLE_SPACER 0x10000000
 #define QTC_STATE_REVERSE  State_Mini
+
+static const int constMenuPixmapWidth=22;
 
 static enum
 {
@@ -3004,6 +3006,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
 
+                    if(opts.menuStripe)
+                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
+                                        QRect(r.x(), r.y(), constMenuPixmapWidth, r.height()), false,
+                                        getWidgetShade(WIDGET_OTHER, true, false, opts.appearance),
+                                        getWidgetShade(WIDGET_OTHER, false, false, opts.appearance),
+                                        false, opts.appearance, WIDGET_OTHER);
+
                     int w = 0;
                     if (!menuItem->text.isEmpty())
                     {
@@ -3035,8 +3044,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (selected && enabled)
                     drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL, itsMenuitemCols);
                 else
+                {
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
+                    if(opts.menuStripe)
+                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
+                                        QRect(r.x(), r.y(), constMenuPixmapWidth, r.height()), false,
+                                        getWidgetShade(WIDGET_OTHER, true, false, opts.appearance),
+                                        getWidgetShade(WIDGET_OTHER, false, false, opts.appearance),
+                                        false, opts.appearance, WIDGET_OTHER);
+                }
 
                 if(qobject_cast<const QComboBox*>(widget))
                 {

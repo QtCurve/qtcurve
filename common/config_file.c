@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2007 Craig.Drummond@lycos.co.uk
+  QtCurve (C) Craig Drummond, 2003 - 2008 Craig.Drummond@lycos.co.uk
 
   ----
 
@@ -723,6 +723,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(framelessGroupBoxes)
             QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
+            QTC_CFG_READ_BOOL(menuStripe)
 #ifdef __cplusplus
             QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkScrollViews)
@@ -869,6 +870,7 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=true;
     opts->colorMenubarMouseOver=false;
     opts->inactiveHighlight=false;
+    opts->menuStripe=false;
 #ifdef QTC_CONFIG_DIALOG
     opts->shading=SHADING_HSL;
 #endif
@@ -1241,6 +1243,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(xCheck)
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(inactiveHighlight)
+        CFG_WRITE_ENTRY(menuStripe)
 #ifdef __cplusplus
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)
