@@ -34,9 +34,9 @@
 #include "config.h"
 
 /*
- * Menu stripe is disabled for Gtk2, as I'm not sure what todo about combobox menus,
- * and menus without icons!
+ * Menu stripe is disabled for Gtk2, as I'm not sure what todo about menus without icons!
 #define QTC_MENU_STRIPE
+#define QTC_MENU_STRIPE_HACK_MENU 
 */
 
 /*
@@ -64,6 +64,23 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        const gchar *detail, gint x, gint y, gint width, gint height);
 
 #ifdef QTC_DEBUG
+static void dumpChildren(GtkWidget *widget, int level)
+{
+    if(level<5)
+    {
+        GList *child=GTK_BOX(widget)->children;
+
+        for(; child; child=child->next)
+        {
+            GtkBoxChild *boxChild=(GtkBoxChild *)child->data;
+
+            printf(":[%d]%s:", level, gtk_type_name(GTK_WIDGET_TYPE(boxChild->widget)));
+            if(GTK_IS_BOX(boxChild->widget))
+                dumpChildren(boxChild->widget, ++level);
+        }
+    }
+}
+
 static void debugDisplayWidget(GtkWidget *widget, int level)
 {
     if(level>=0)
@@ -74,6 +91,22 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
             printf("[%d, %dx%d : %d,%d , %0X] ", widget->state, widget->allocation.x,
                    widget->allocation.y,
                    widget->allocation.width, widget->allocation.height, widget->window);*/
+#ifdef QTC_MENU_STRIPE
+        if(GTK_IS_WINDOW(widget))
+        {
+            printf("{%X}", (int)GTK_WINDOW(widget)->transient_parent);
+            if(GTK_WINDOW(widget)->transient_parent && GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child)
+            {
+                printf("/%s(%s)[%x]/",
+                          gtk_type_name(GTK_WIDGET_TYPE(GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child)),
+                          GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child->name
+                             ? GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child->name : "NULL",
+                         (int)GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child);
+                if(GTK_IS_BOX(GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child))
+                    dumpChildren(GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child, 0);
+            }
+        }
+#endif
         if(widget && widget->parent)
             debugDisplayWidget(widget->parent, --level);
         else
@@ -628,6 +661,42 @@ static gboolean isHorizontalProgressbar(GtkWidget *widget)
     }
 }
 
+static gboolean isComboboxPopupWindow(GtkWidget *widget)
+{
+    return widget && widget->name && GTK_IS_WINDOW(widget) &&
+           0==strcmp(widget->name, "gtk-combobox-popup-window");
+}
+
+static gboolean isComboList(GtkWidget *widget)
+{
+    return widget && widget->parent && GTK_IS_FRAME(widget) && isComboboxPopupWindow(widget->parent);
+}
+
+#ifdef QTC_MENU_STRIPE
+static gboolean isComboMenu(GtkWidget *widget)
+{
+    if(widget && widget->name && GTK_IS_MENU(widget) && 0==strcmp(widget->name, "gtk-combobox-popup-menu"))
+        return TRUE;
+    else
+    {
+        GtkWidget *top=gtk_widget_get_toplevel(widget);
+
+        return top && (isComboboxPopupWindow(GTK_BIN(top)->child) ||
+                       GTK_IS_DIALOG(top) || /* Dialogs should not have menus! */
+                       (GTK_IS_WINDOW(top) && GTK_WINDOW(top)->transient_parent &&
+                        GTK_BIN(GTK_WINDOW(top)->transient_parent)->child &&
+                        isComboMenu(GTK_BIN(GTK_WINDOW(top)->transient_parent)->child)));
+    }
+}
+#endif
+
+#if 0
+static gboolean isComboFrame(GtkWidget *widget)
+{
+    return !GTK_IS_COMBO_BOX_ENTRY(widget) && GTK_IS_FRAME(widget) && widget->parent && GTK_IS_COMBO_BOX(widget->parent);
+}
+#endif
+
 static int progressbarRound(GtkWidget *widget, gboolean rev)
 {
     if(!widget || !GTK_IS_PROGRESS_BAR(widget) || isMozilla() ||
@@ -1136,7 +1205,7 @@ static gboolean pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
            a->col.blue==b->col.blue;
 }
 
-#ifdef QTC_MENU_STRIPE
+#ifdef QTC_MENU_STRIPE_HACK_MENU
 #ifdef __SUNPRO_C
 #pragma align 4 (my_pixbuf)
 #endif
@@ -1192,7 +1261,7 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
         case PIX_SLIDER_LIGHT_V:
             res=gdk_pixbuf_new_from_inline(-1, slider_light_v, TRUE, NULL);
             break;
-#ifdef QTC_MENU_STRIPE
+#ifdef QTC_MENU_STRIPE_HACK_MENU
         case PIX_BLANK:
             return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
 #endif
@@ -3407,7 +3476,7 @@ debugDisplayWidget(widget, 3);
                    horizPbar=isHorizontalProgressbar(widget);
         int        animShift=-PROGRESS_CHUNK_WIDTH;
 
-#ifdef QTC_MENU_STRIPE /* This hack doesnt work! not all items are gtkImageMenuItems's
+#ifdef QTC_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
          -> and if tey are they're drawn first incorrectly :-( */
         if(!mb && menuitem && GTK_IS_IMAGE_MENU_ITEM(widget) &&
            (0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)) ||
@@ -3639,7 +3708,7 @@ debugDisplayWidget(widget, 3);
         }
 
 #ifdef QTC_MENU_STRIPE
-        if(opts.menuStripe) /* && (!widget || !widget->name || strcmp(widget->name, "gtk-combobox-popup-menu"))) */
+        if(opts.menuStripe && !isComboMenu(widget))
             drawBevelGradient(style, window, area, NULL, x+2, y+2, isMozilla() ? 18 : 22, height-4,
                               &qtcurveStyle->background[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3],
                               getWidgetShade(WIDGET_OTHER, TRUE, FALSE, opts.appearance),
@@ -3704,19 +3773,6 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     drawBox(style, window, state, shadow_type, area, widget, detail, x, y, width, height,
             GTK_STATE_ACTIVE==state || (GTK_IS_BUTTON(widget) && GTK_BUTTON(widget)->depressed));
 }
-
-static int isComboList(GtkWidget *widget)
-{
-    return widget && widget->parent && widget->parent->name && GTK_IS_FRAME(widget) && GTK_IS_WINDOW(widget->parent) &&
-           0==strcmp(widget->parent->name, "gtk-combobox-popup-window");
-}
-
-#if 0
-static int isComboFrame(GtkWidget *widget)
-{
-    return !GTK_IS_COMBO_BOX_ENTRY(widget) && GTK_IS_FRAME(widget) && widget->parent && GTK_IS_COMBO_BOX(widget->parent);
-}
-#endif
 
 static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                           GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
