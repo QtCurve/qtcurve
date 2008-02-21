@@ -18,6 +18,12 @@
   Boston, MA 02110-1301, USA.
  */
 
+/*
+ * Menu stripe is disabled for Gtk2, as I'm not sure what todo about menus without icons!
+#define QTC_GTK2_MENU_STRIPE
+#define QTC_GTK2_MENU_STRIPE_HACK_MENU
+*/
+
 #include <gmodule.h>
 #include <gtk/gtk.h>
 #include <gtk/gtkstyle.h>
@@ -32,12 +38,6 @@
 #include "animation.c"
 #include "pixmaps.h"
 #include "config.h"
-
-/*
- * Menu stripe is disabled for Gtk2, as I'm not sure what todo about menus without icons!
-#define QTC_MENU_STRIPE
-#define QTC_MENU_STRIPE_HACK_MENU 
-*/
 
 /*
  * Disabled, for the moment, due to not working very well...
@@ -91,7 +91,7 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
             printf("[%d, %dx%d : %d,%d , %0X] ", widget->state, widget->allocation.x,
                    widget->allocation.y,
                    widget->allocation.width, widget->allocation.height, widget->window);*/
-#ifdef QTC_MENU_STRIPE
+#ifdef QTC_GTK2_MENU_STRIPE
         if(GTK_IS_WINDOW(widget))
         {
             printf("{%X}", (int)GTK_WINDOW(widget)->transient_parent);
@@ -672,7 +672,7 @@ static gboolean isComboList(GtkWidget *widget)
     return widget && widget->parent && GTK_IS_FRAME(widget) && isComboboxPopupWindow(widget->parent);
 }
 
-#ifdef QTC_MENU_STRIPE
+#ifdef QTC_GTK2_MENU_STRIPE
 static gboolean isComboMenu(GtkWidget *widget)
 {
     if(widget && widget->name && GTK_IS_MENU(widget) && 0==strcmp(widget->name, "gtk-combobox-popup-menu"))
@@ -1205,7 +1205,7 @@ static gboolean pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
            a->col.blue==b->col.blue;
 }
 
-#ifdef QTC_MENU_STRIPE_HACK_MENU
+#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU
 #ifdef __SUNPRO_C
 #pragma align 4 (my_pixbuf)
 #endif
@@ -1261,7 +1261,7 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
         case PIX_SLIDER_LIGHT_V:
             res=gdk_pixbuf_new_from_inline(-1, slider_light_v, TRUE, NULL);
             break;
-#ifdef QTC_MENU_STRIPE_HACK_MENU
+#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU
         case PIX_BLANK:
             return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
 #endif
@@ -3476,7 +3476,7 @@ debugDisplayWidget(widget, 3);
                    horizPbar=isHorizontalProgressbar(widget);
         int        animShift=-PROGRESS_CHUNK_WIDTH;
 
-#ifdef QTC_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
+#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
          -> and if tey are they're drawn first incorrectly :-( */
         if(!mb && menuitem && GTK_IS_IMAGE_MENU_ITEM(widget) &&
            (0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)) ||
@@ -3707,7 +3707,7 @@ debugDisplayWidget(widget, 3);
             }
         }
 
-#ifdef QTC_MENU_STRIPE
+#ifdef QTC_GTK2_MENU_STRIPE
         if(opts.menuStripe && !isComboMenu(widget))
             drawBevelGradient(style, window, area, NULL, x+2, y+2, isMozilla() ? 18 : 22, height-4,
                               &qtcurveStyle->background[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3],
