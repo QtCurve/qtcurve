@@ -566,7 +566,7 @@
           <item row="8" column="0" >
            <widget class="QCheckBox" name="menuStripe" >
             <property name="text" >
-             <string>Menu stripe</string>
+             <string>Menu stripe (KDE3 and KDE4 only)</string>
             </property>
            </widget>
           </item>

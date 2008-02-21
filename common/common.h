@@ -327,7 +327,7 @@ typedef enum
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
     PIX_SLIDER_LIGHT_V
-#ifndef __cplusplus
+#if !defined __cplusplus && defined QTC_GTK2_MENU_STRIPE_HACK_MENU
     , PIX_BLANK
 #endif
 } EPixmap;
@@ -896,8 +896,10 @@ typedef struct
                      vArrows,
                      xCheck,
                      framelessGroupBoxes,
-                     inactiveHighlight,
-                     menuStripe;
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
+                     menuStripe,
+#endif
+                     inactiveHighlight;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;

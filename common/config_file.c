@@ -723,7 +723,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(framelessGroupBoxes)
             QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
+#endif
 #ifdef __cplusplus
             QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkScrollViews)
@@ -870,7 +872,9 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=true;
     opts->colorMenubarMouseOver=false;
     opts->inactiveHighlight=false;
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
+#endif
 #ifdef QTC_CONFIG_DIALOG
     opts->shading=SHADING_HSL;
 #endif
@@ -1244,10 +1248,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(inactiveHighlight)
         CFG_WRITE_ENTRY(menuStripe)
-#ifdef __cplusplus
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)
-#endif
 
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
