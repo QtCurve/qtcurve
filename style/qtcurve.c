@@ -2126,8 +2126,9 @@ debugDisplayWidget(widget, 3);
     else
         midgc=style->base_gc[state];
 
-    gdk_draw_rectangle(window, enabled ? style->base_gc[state] : style->bg_gc[GTK_STATE_INSENSITIVE],
-                       TRUE, x+2, y+2, width-4, height-4);
+    if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
+        gdk_draw_rectangle(window, enabled ? style->base_gc[state] : style->bg_gc[GTK_STATE_INSENSITIVE],
+                           TRUE, x+2, y+2, width-4, height-4);
     gdk_draw_line(window, midgc, x+1, y+1, x+1, y+height-2);
     gdk_draw_line(window, midgc, x+1, y+1, x+width-1, y+1);
 
