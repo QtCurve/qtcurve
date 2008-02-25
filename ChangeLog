@@ -1,3 +1,8 @@
+0.56.1
+------
+1. Fix crash when using corner default button indicator and no coloured
+   mouse over.
+
 0.56
 ----
 1. Change default settings:
