@@ -1,6 +1,8 @@
 0.56.1
 ------
-1. Fix for OpenOffice.org blanking combobox text when mouse over arrow.
+1. Fix errors when using corner default button indicator and no coloured
+   mouse over.
+2. Fix for OpenOffice.org blanking combobox text when mouse over arrow.
 
 0.56
 ----

@@ -5722,7 +5722,7 @@ static void styleRealize(GtkStyle *style)
     }
 
     qtcurveStyle->mouseover_gc[0]=NULL;
-    if(opts.coloredMouseOver)
+    if(opts.coloredMouseOver || IND_CORNER==opts.defBtnIndicator)
     {
         if(qtcurveStyle->defbtn_gc[0])
             memcpy(qtcurveStyle->mouseover_gc, qtcurveStyle->defbtn_gc,
@@ -5856,7 +5856,7 @@ static void generateColors(QtCurveStyle *qtcurveStyle)
         }
     }
 
-    if(opts.coloredMouseOver)
+    if(opts.coloredMouseOver || IND_CORNER==opts.defBtnIndicator)
     {
         if(IND_COLORED==opts.defBtnIndicator)
             memcpy(qtcurveStyle->mouseover, qtcurveStyle->defbtn, sizeof(GdkColor)*(TOTAL_SHADES+1));
