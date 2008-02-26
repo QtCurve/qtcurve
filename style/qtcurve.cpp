@@ -505,25 +505,25 @@ static bool readQt3(QFile &f, QPalette &pal, QFont &font, int *contrast)
             if(SECT_PAL==sect)
             {
                 gotPal=true;
-                if(0==line.indexOf("active=#"))
+                if(0==line.indexOf("active=#", Qt::CaseInsensitive))
                     readPal(line, QPalette::Active, pal);
-                else if(0==line.indexOf("disabled=#"))
+                else if(0==line.indexOf("disabled=#", Qt::CaseInsensitive))
                     readPal(line, QPalette::Disabled, pal);
-                else if(0==line.indexOf("inactive=#"))
+                else if(0==line.indexOf("inactive=#", Qt::CaseInsensitive))
                     readPal(line, QPalette::Inactive, pal);
                 else if (0==line.indexOf('['))
                     sect=SECT_NONE;
             }
             else if(SECT_GEN==sect)
             {
-                if(0==line.indexOf("font="))
+                if(0==line.indexOf("font=", Qt::CaseInsensitive))
                     gotFont=font.fromString(line.mid(5));
                 else if (0==line.indexOf('['))
                     sect=SECT_NONE;
             }
             else if(SECT_KDE==sect)
             {
-                if(0==line.indexOf("contrast="))
+                if(0==line.indexOf("contrast=", Qt::CaseInsensitive))
                 {
                     *contrast=line.mid(9).toInt();
                     gotContrast=true;
@@ -534,11 +534,11 @@ static bool readQt3(QFile &f, QPalette &pal, QFont &font, int *contrast)
 
             if(SECT_NONE==sect)
             {
-                if(0==line.indexOf("[Palette]"))
+                if(0==line.indexOf("[Palette]", Qt::CaseInsensitive))
                     sect=SECT_PAL;
-                else if(0==line.indexOf("[General]"))
+                else if(0==line.indexOf("[General]", Qt::CaseInsensitive))
                     sect=SECT_GEN;
-                else if(contrast && 0==line.indexOf("[KDE]"))
+                else if(contrast && 0==line.indexOf("[KDE]", Qt::CaseInsensitive))
                     sect=SECT_KDE;
                 if(gotPal && gotFont && (!contrast || gotContrast))
                     break;
@@ -7171,7 +7171,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
 
                     if(inPal)
                     {
-                        if(!itsActiveMdiColors && 0==line.indexOf("activeBackground=#"))
+                        if(!itsActiveMdiColors && 0==line.indexOf("activeBackground=#", Qt::CaseInsensitive))
                         {
                             QColor col;
 
@@ -7183,7 +7183,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
                                 shadeColors(col, itsActiveMdiColors);
                             }
                         }
-                        else if(!itsMdiColors && 0==line.indexOf("inactiveBackground=#"))
+                        else if(!itsMdiColors && 0==line.indexOf("inactiveBackground=#", Qt::CaseInsensitive))
                         {
                             QColor col;
 
@@ -7194,14 +7194,14 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
                                 shadeColors(col, itsMdiColors);
                             }
                         }
-                        else if(0==line.indexOf("activeForeground=#"))
+                        else if(0==line.indexOf("activeForeground=#", Qt::CaseInsensitive))
                             setRgb(&itsActiveMdiTextColor, line.mid(17).toLatin1().constData());
-                        else if(0==line.indexOf("inactiveForeground=#"))
+                        else if(0==line.indexOf("inactiveForeground=#", Qt::CaseInsensitive))
                             setRgb(&itsMdiTextColor, line.mid(19).toLatin1().constData());
                         else if (-1!=line.indexOf('['))
                             break;
                     }
-                    else if(0==line.indexOf("[KWinPalette]"))
+                    else if(0==line.indexOf("[KWinPalette]", Qt::CaseInsensitive))
                         inPal=true;
                 }
                 f.close();
@@ -7222,7 +7222,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
 
                     if(inPal)
                     {
-                        if(!itsActiveMdiColors && 0==line.indexOf("activeBackground="))
+                        if(!itsActiveMdiColors && 0==line.indexOf("activeBackground=", Qt::CaseInsensitive))
                         {
                             QColor col;
 
@@ -7234,7 +7234,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
                                 shadeColors(col, itsActiveMdiColors);
                             }
                         }
-                        else if(!itsMdiColors && 0==line.indexOf("inactiveBackground="))
+                        else if(!itsMdiColors && 0==line.indexOf("inactiveBackground=", Qt::CaseInsensitive))
                         {
                             QColor col;
 
@@ -7245,14 +7245,14 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
                                 shadeColors(col, itsMdiColors);
                             }
                         }
-                        else if(0==line.indexOf("activeForeground="))
+                        else if(0==line.indexOf("activeForeground=", Qt::CaseInsensitive))
                             setRgb(&itsActiveMdiTextColor, line.mid(17).split(QLatin1String(",")));
-                        else if(0==line.indexOf("inactiveForeground="))
+                        else if(0==line.indexOf("inactiveForeground=", Qt::CaseInsensitive))
                             setRgb(&itsMdiTextColor, line.mid(19).split(QLatin1String(",")));
                         else if (-1!=line.indexOf('['))
                             break;
                     }
-                    else if(0==line.indexOf("[WM]"))
+                    else if(0==line.indexOf("[WM]", Qt::CaseInsensitive))
                         inPal=true;
                 }
                 f.close();
@@ -7296,12 +7296,12 @@ void QtCurveStyle::readMdiPositions() const
 
                 if(inStyle)
                 {
-                    if(0==line.indexOf("ButtonsOnLeft="))
+                    if(0==line.indexOf("ButtonsOnLeft=", Qt::CaseInsensitive))
                     {
                         itsMdiButtons[0].clear();
                         parseWindowLine(line.mid(14), itsMdiButtons[0]);
                     }
-                    else if(0==line.indexOf("ButtonsOnRight="))
+                    else if(0==line.indexOf("ButtonsOnRight=", Qt::CaseInsensitive))
                     {
                         itsMdiButtons[1].clear();
                         parseWindowLine(line.mid(15), itsMdiButtons[1]);
@@ -7309,7 +7309,7 @@ void QtCurveStyle::readMdiPositions() const
                     else if (-1!=line.indexOf('['))
                         break;
                 }
-                else if(0==line.indexOf("[Style]"))
+                else if(0==line.indexOf("[Style]", Qt::CaseInsensitive))
                     inStyle=true;
             }
             f.close();
