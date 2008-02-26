@@ -2,6 +2,7 @@
 ------
 1. Use case-insesitive string compares when checking Qt and KDE config files.
 2. Fix some issues wth Firefox 3beta4.
+3. Fix mouse over for up spin button.
 
 0.56.1
 ------

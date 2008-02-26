@@ -1865,6 +1865,11 @@ static void drawLightBevel(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
         if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
         {
+            if(EFFECT_NONE!=opts.buttonEffect && WIDGET_SPIN_UP==widget && horiz)
+            {
+                height--; bh-=4;
+            }
+
             /* Right and bottom edge */
             gdk_draw_line(window, gc2, x + 1, y + height - 2, x + width - 2, y + height - 2);
             gdk_draw_line(window, gc2, x + width - 2, y + 1, x + width - 2, y + height - 2);
@@ -1940,7 +1945,7 @@ static void drawLightBevel(GtkStyle *style, GdkWindow *window, GtkStateType stat
                     thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN_UP==widget || WIDGET_SPIN_DOWN==widget ||
                         ((horiz ? height : width)<16);
 
-                if(WIDGET_SPIN_UP==widget && horiz)
+                if(EFFECT_NONE!=opts.buttonEffect && WIDGET_SPIN_UP==widget && horiz)
                     mh--;
                 setClipping(gc, area, region);
                 if(horizontal)
