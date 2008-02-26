@@ -130,7 +130,7 @@ typedef struct
     double   shade;
 } QtCPixKey;
 
-static GtkStyleClass  *parent_class;
+static GtkStyleClass  *parent_class=NULL;
 static Options        opts;
 static GtkRequisition defaultOptionIndicatorSize    = { 6, 13 };
 static GtkBorder      defaultOptionIndicatorSpacing = { 7, 5, 1, 1 };
@@ -2548,7 +2548,17 @@ debugDisplayWidget(widget, 3);
 #endif
     if(DETAIL("arrow"))
     {
-        if(!isOnComboEntry(widget, 0) && !isOnCombo(widget, 0))
+        gboolean combo=isOnCombo(widget, 0),
+                 combo_entry=isOnComboEntry(widget, 0);
+
+        if(combo && !combo_entry)
+        {
+            drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_UP,
+                      x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE);
+            drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
+                      x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE);
+        }
+        else
             drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
                       x+(width>>1), y+(height>>1), FALSE);
     }
@@ -3125,24 +3135,6 @@ debugDisplayWidget(widget, 3);
                     gdk_gc_set_clip_rectangle(btn_gcs[0], NULL);
                 }
             }
-            if(GTK_STATE_ACTIVE==state)
-            {
-                vx++;
-                y++;
-            }
-            if(combo && !combo_entry)
-            {
-                drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area, GTK_ARROW_UP,
-                          rev ? vx : vx+(vwidth>>1),
-                          y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE);
-                drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area, GTK_ARROW_DOWN,
-                          rev ? vx : vx+(vwidth>>1),
-                          y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE);
-            }
-            else
-                drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area, GTK_ARROW_DOWN,
-                          rev ? vx : vx+(vwidth>>1),
-                           y+(height>>1), FALSE);
         }
     }
     else if(detail && (0==strcmp(detail, "buttondefault") ||
@@ -4657,6 +4649,12 @@ static void fillTab(GtkStyle *style, GdkWindow *window, GdkRectangle *area, GtkS
     }
 }
 
+static gboolean isMozillaTab(GtkWidget *widget)
+{
+    return isMozilla() && widget && widget->parent && widget->parent->parent &&
+           GTK_IS_NOTEBOOK(widget) && GTK_IS_FIXED(widget->parent) && GTK_IS_WINDOW(widget->parent->parent);
+}
+
 static void gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state,
                              GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                              const gchar *detail, gint x, gint y, gint width,
@@ -4689,7 +4687,8 @@ debugDisplayWidget(widget, 3);
                     vertical=GTK_POS_LEFT==gap_side || GTK_POS_RIGHT==gap_side,
                     active=GTK_STATE_NORMAL==state, /* Normal -> active tab? */
                     rev=(GTK_POS_TOP==gap_side || GTK_POS_BOTTOM==gap_side) &&
-                        reverseLayout(widget->parent);
+                        reverseLayout(widget->parent),
+                    mozTab=isMozillaTab(widget);
         GdkColor    *col=active
                             ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcurveStyle->background[2]);
         GdkRectangle clipArea;
@@ -4697,12 +4696,13 @@ debugDisplayWidget(widget, 3);
         FN_CHECK
 
         /* Hacky fix for tabs in Thunderbird */
-        if(isMozilla() && area && area->x<(x-10))
+
+        if(mozTab && area && area->x<(x-10))
             return;
 
         /* f'in mozilla apps dont really use Gtk widgets - they just paint to a pixmap. So, no way of knowing
         the position of a tab! The 'best' look seems to be to round both corners. Not nice, but... */
-        if(isMozilla() || GTK_APP_JAVA==qtSettings.app)
+        if(mozTab || GTK_APP_JAVA==qtSettings.app)
             firstTab=lastTab=TRUE;
         else if(notebook)
         {
@@ -4758,7 +4758,7 @@ debugDisplayWidget(widget, 3);
             firstTab=oldLast;
         }
 
-        if(!isMozilla() && GTK_APP_JAVA!=qtSettings.app && !highlightTab && highlightingEnabled)
+        if(!mozTab && GTK_APP_JAVA!=qtSettings.app && !highlightTab && highlightingEnabled)
         {
             lookupTabHash(widget, TRUE); /* Create hash entry... */
             gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK);
@@ -4795,7 +4795,7 @@ debugDisplayWidget(widget, 3);
 
         /* In addition to the above, doing this section only for the active mozilla tab seems to fix some drawing errors
            with firefox3...*/
-        if(!isMozilla() || active)
+        if(!mozTab || active)
         {
             clipArea.x=x;
             clipArea.y=y;
@@ -5792,6 +5792,7 @@ static void styleUnrealize(GtkStyle *style)
     QTC_RELEASE_GCS(qtcurveStyle->background_gc);
     QTC_RELEASE_GCS(qtcurveStyle->button_gc);
     QTC_RELEASE_GCS(qtcurveStyle->menuitem_gc);
+    parent_class->unrealize(style);
 }
 
 static void generateColors(QtCurveStyle *qtcurveStyle)
@@ -5988,7 +5989,6 @@ GType qtcurve_type_style = 0;
 
 static void qtcurve_style_init(QtCurveStyle *style)
 {
-    ;
 }
 
 void qtcurve_style_register_type(GTypeModule *module)
@@ -6021,7 +6021,6 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 
 static void qtcurve_rc_style_finalize(GObject *object)
 {
-    qtExit();
     qtc_animation_cleanup();
 }
 

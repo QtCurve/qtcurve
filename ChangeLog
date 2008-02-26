@@ -1,3 +1,8 @@
+0.56.2
+------
+1. Use case-insesitive string compares when checking Qt and KDE config files.
+2. Fix some issues wth Firefox 3beta4.
+
 0.56.1
 ------
 1. Fix errors when using corner default button indicator and no coloured

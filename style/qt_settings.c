@@ -47,12 +47,13 @@
 
 static void generateMidColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor);
 
-static int strcmp_i(const char *s1, const char *s2)
+static int strncmp_i(const char *s1, const char *s2, int num)
 {
     char c1,
          c2;
+    int  i;
 
-    for(;;)
+    for(i=0; -1==num || i<num; ++i)
     {
         c1=*s1++;
         c2=*s2++;
@@ -67,6 +68,8 @@ static int strcmp_i(const char *s1, const char *s2)
     }
     return (int)c2-(int)c1;
 }
+
+#define strcmp_i(A, B) strncmp_i(A, B, -1)
 
 struct QtIcons
 {
@@ -378,30 +381,30 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                 if(line[0]=='[')
                 {
                     if(qt4)
-                        if(0==memcmp(line, "[Qt]", 4))
+                        if(0==strncmp_i(line, "[Qt]", 4))
                             section=SECT_QT;
                         else
                             section=SECT_NONE;
                     else
-                        if(0==memcmp(line, "[Palette]", 9))
+                        if(0==strncmp_i(line, "[Palette]", 9))
                             section=SECT_PALETTE;
-                        else if(0==memcmp(line, "[General]", 9))
+                        else if(0==strncmp_i(line, "[General]", 9))
                             section=SECT_GENERAL;
-                        else if(0==memcmp(line, "[KDE]", 5))
+                        else if(0==strncmp_i(line, "[KDE]", 5))
                             section=SECT_KDE;
-                        else if(opts->mapKdeIcons && 0==memcmp(line, "[Icons]", 7))
+                        else if(opts->mapKdeIcons && 0==strncmp_i(line, "[Icons]", 7))
                             section=SECT_ICONS;
-                        else if(0==memcmp(line, "[Toolbar style]", 15))
+                        else if(0==strncmp_i(line, "[Toolbar style]", 15))
                             section=SECT_TOOLBAR_STYLE;
-                        else if(opts->mapKdeIcons && 0==memcmp(line, "[MainToolbarIcons]", 18))
+                        else if(opts->mapKdeIcons && 0==strncmp_i(line, "[MainToolbarIcons]", 18))
                             section=SECT_MAIN_TOOLBAR_ICONS;
-                        else if(opts->mapKdeIcons && 0==memcmp(line, "[SmallIcons]", 12))
+                        else if(opts->mapKdeIcons && 0==strncmp_i(line, "[SmallIcons]", 12))
                             section=SECT_SMALL_ICONS;
                         else
                             section=SECT_NONE;
                 }
                 else if (SECT_ICONS==section && rd&RD_ICONS && !(found&RD_ICONS) &&
-                         0==memcmp(line, "Theme=", 6))
+                         0==strncmp_i(line, "Theme=", 6))
                 {
                     char *eq=strstr(line, "=");
 
@@ -424,7 +427,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     found|=RD_ICONS;
                 }
                 else if (SECT_SMALL_ICONS==section && rd&RD_SMALL_ICON_SIZE && !(found&RD_SMALL_ICON_SIZE) &&
-                         0==memcmp(line, "Size=", 5))
+                         0==strncmp_i(line, "Size=", 5))
                 {
                     char *eq=strstr(line, "=");
 
@@ -439,25 +442,25 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     }
                 }
                 else if (SECT_TOOLBAR_STYLE==section && rd&RD_TOOLBAR_STYLE &&
-                         !(found&RD_TOOLBAR_STYLE) && 0==memcmp(line, "IconText=", 9))
+                         !(found&RD_TOOLBAR_STYLE) && 0==strncmp_i(line, "IconText=", 9))
                 {
                     char *eq=strstr(line, "=");
 
                     if(eq && ++eq)
                     {
-                        if(0==memcmp(eq, "IconOnly", 8))
+                        if(0==strncmp_i(eq, "IconOnly", 8))
                             qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
-                        else if(0==memcmp(eq, "TextOnly", 8))
+                        else if(0==strncmp_i(eq, "TextOnly", 8))
                             qtSettings.toolbarStyle=GTK_TOOLBAR_TEXT;
-                        else if(0==memcmp(eq, "IconTextRight", 13))
+                        else if(0==strncmp_i(eq, "IconTextRight", 13))
                             qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH_HORIZ;
-                        else if(0==memcmp(eq, "IconTextBottom", 14))
+                        else if(0==strncmp_i(eq, "IconTextBottom", 14))
                             qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH;
                         found|=RD_TOOLBAR_STYLE;
                     }
                 }
                 else if (SECT_MAIN_TOOLBAR_ICONS==section && rd&RD_TOOLBAR_ICON_SIZE &&
-                         !(found&RD_TOOLBAR_ICON_SIZE) && 0==memcmp(line, "Size=", 5))
+                         !(found&RD_TOOLBAR_ICON_SIZE) && 0==strncmp_i(line, "Size=", 5))
                 {
                     char *eq=strstr(line, "=");
 
@@ -468,19 +471,19 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     }
                 }
                 else if (SECT_KDE==section && rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS) &&
-                         0==memcmp(line, "ShowIconsOnPushButtons=", 23))
+                         0==strncmp_i(line, "ShowIconsOnPushButtons=", 23))
                 {
                     char *eq=strstr(line, "=");
 
                     if(eq && ++eq)
                     {
-                        qtSettings.buttonIcons=0==memcmp(eq, "true", 4);
+                        qtSettings.buttonIcons=0==strncmp_i(eq, "true", 4);
                         found|=RD_BUTTON_ICONS;
                     }
                 }
                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) &&
-                         ( (!qt4 && SECT_KDE==section && 0==memcmp(line, "contrast=", 9)) ||
-                           ( qt4 && SECT_QT==section  && 0==memcmp(line, "KDE\\contrast=", 13))))
+                         ( (!qt4 && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9)) ||
+                           ( qt4 && SECT_QT==section  && 0==strncmp_i(line, "KDE\\contrast=", 13))))
                 {
                     char *l=strchr(line, '=');
                     l++;
@@ -490,7 +493,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     found|=RD_CONTRAST;
                 }
                 else if(SECT_GENERAL==section && rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
-                        0==memcmp(line, "alternateBackground=", 20))
+                        0==strncmp_i(line, "alternateBackground=", 20))
                 {
                     sscanf(&line[20], "%d,%d,%d\n", &qtSettings.colors[PAL_ACTIVE][COLOR_LV].red,
                                                     &qtSettings.colors[PAL_ACTIVE][COLOR_LV].green,
@@ -502,20 +505,20 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     found|=RD_LIST_COLOR;
                 }
                 else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
-                        (qt4 ? 0==memcmp(line, "Palette\\active=", 15) : 0==memcmp(line, "active=", 7)))
+                        (qt4 ? 0==strncmp_i(line, "Palette\\active=", 15) : 0==strncmp_i(line, "active=", 7)))
                 {
                     parseQtColors(line, PAL_ACTIVE);
                     found|=RD_ACT_PALETTE;
                 }
 #ifdef QTC_READ_INACTIVE_PAL
                 else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
-                        (qt4 ? 0==memcmp(line, "Palette\\inactive=", 17) : 0==memcmp(line, "inactive=", 9)))
+                        (qt4 ? 0==strncmp_i(line, "Palette\\inactive=", 17) : 0==strncmp_i(line, "inactive=", 9)))
                 {
                     parseQtColors(line, PAL_INACTIVE);
                     found|=RD_INACT_PALETTE;
                 }
 #endif
-                else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==memcmp(line, "style=", 6))
+                else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6))
                 {
                     int len=strlen(line);
                     qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1);
@@ -524,9 +527,9 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     strcpy(qtSettings.styleName, &line[6]);
                 }
                 else if (( !qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
-                            0==memcmp(line, "font=", 5)) ||
+                            0==strncmp_i(line, "font=", 5)) ||
                          ( qt4 && SECT_QT==section && rd&RD_FONT && !(found&RD_FONT) &&
-                            0==memcmp(line, "font=\"", 6)) )
+                            0==strncmp_i(line, "font=\"", 6)) )
                 {
                     int   n=-1,
                           rc_weight=WEIGHT_NORMAL,
@@ -1630,6 +1633,10 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string(tmpStr);
             }
 */
+            /* For some reason Firefox 3beta4 goes mad if GtkComboBoxEntry::appears-as-list = 1 !!!! */
+            if(isMozilla())
+                gtk_rc_parse_string("style \"QtcMz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \"QtcMz\"");
+
             if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
                 opts->scrollbarType=SCROLLBAR_WINDOWS;
             else
