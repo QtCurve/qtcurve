@@ -39,6 +39,11 @@
 #include "pixmaps.h"
 #include "config.h"
 
+#ifdef QTC_USE_CAIRO
+#include <cairo.h>
+#define M_PI 3.14159265358979323846
+#endif
+
 /*
  * Disabled, for the moment, due to not working very well...
  *    1. Seems to mouse over for the whole toolbar
@@ -535,6 +540,7 @@ static void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size
         gtk_border_free(tmp_spacing);
 }
 
+#if 0
 static gboolean withinRect(GdkRectangle *rect, int x, int y)
 {
     return x>=rect->x && x<=(rect->x+rect->width-1) &&
@@ -568,7 +574,7 @@ static EStepper getStepper(GtkWidget *widget, int x, int y)
                  ya=y-widget->allocation.y;
 
         if(range->has_stepper_a && withinRect(&(range->layout->stepper_a), xa, ya))
-            return GTK_APP_NEW_MOZILLA==qtSettings.app && (x>10 || y>10)
+            return GTK_APP_NEW_MOZILLA==qtSettings.app && (x>15 || y>15)
                 ? QTC_STEPPER_C
                 : QTC_STEPPER_A;
         else if(range->has_stepper_b && withinRect(&(range->layout->stepper_b), xa, ya))
@@ -582,7 +588,68 @@ static EStepper getStepper(GtkWidget *widget, int x, int y)
     }
     return QTC_STEPPER_NONE;
 }
+#endif
 
+typedef enum
+{
+    QTC_STEPPER_A,
+    QTC_STEPPER_B,
+    QTC_STEPPER_C,
+    QTC_STEPPER_D,
+    QTC_STEPPER_NONE
+} EStepper;
+
+static EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
+{
+    if(GTK_IS_RANGE(widget))
+    {
+        GdkRectangle   tmp;
+        GdkRectangle   check_rectangle,
+                    stepper;
+        GtkOrientation orientation=GTK_RANGE(widget)->orientation;
+
+        stepper.x=x;
+        stepper.y=y;
+        stepper.width=width;
+        stepper.height=height;
+        check_rectangle.x      = widget->allocation.x;
+        check_rectangle.y      = widget->allocation.y;
+        check_rectangle.width  = stepper.width;
+        check_rectangle.height = stepper.height;
+
+        if (-1==widget->allocation.x && -1==widget->allocation.y)
+            return QTC_STEPPER_NONE;
+
+        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+            return QTC_STEPPER_A;
+
+        if (orientation == GTK_ORIENTATION_HORIZONTAL)
+            check_rectangle.x = widget->allocation.x + stepper.width;
+        else
+            check_rectangle.y = widget->allocation.y + stepper.height;
+
+        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+            return QTC_STEPPER_B;
+
+        if (GTK_ORIENTATION_HORIZONTAL==orientation)
+            check_rectangle.x = widget->allocation.x + widget->allocation.width - (stepper.width * 2);
+        else
+            check_rectangle.y = widget->allocation.y + widget->allocation.height - (stepper.height * 2);
+
+        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+            return QTC_STEPPER_C;
+
+        if (GTK_ORIENTATION_HORIZONTAL==orientation)
+            check_rectangle.x = widget->allocation.x + widget->allocation.width - stepper.width;
+        else
+            check_rectangle.y = widget->allocation.y + widget->allocation.height - stepper.height;
+
+        if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
+            return QTC_STEPPER_D;
+    }
+
+    return QTC_STEPPER_NONE;
+}
 static int getFill(GtkStateType state, gboolean set/*, gboolean allow_mouse_over_set*/)
 {
     return GTK_STATE_INSENSITIVE==state
@@ -596,7 +663,7 @@ static int getFill(GtkStateType state, gboolean set/*, gboolean allow_mouse_over
                        : ORIGINAL_SHADE;
 }
 
-static int getRound(const char *detail, GtkWidget *widget, int x, int y, gboolean rev)
+static int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int height, gboolean rev)
 {
     if(detail)
     {
@@ -619,7 +686,7 @@ static int getRound(const char *detail, GtkWidget *widget, int x, int y, gboolea
         else if(0==strcmp(detail, "vscrollbar") || 0==strcmp(detail, "hscrollbar") ||
                 0==strcmp(detail, "stepper"))
         {
-            EStepper s=getStepper(widget, x, y);
+            EStepper s=getStepper(widget, x, y, width, height);
             return QTC_STEPPER_A==s
                        ? 'h'==detail[0]
                            ? ROUNDED_LEFT
@@ -727,9 +794,9 @@ static GdkGC * parentBgGc(GtkWidget *widget)
                : NULL;
 }
 
-static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down, int x, int y)
+static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down)
 {
-    if(!isMozilla()) /* && GTK_STATE_INSENSITIVE!=*state)*/
+    if(GTK_APP_MOZILLA!=qtSettings.app)
     {
         GtkRange *range=GTK_RANGE(widget);
 
@@ -775,19 +842,12 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down,
 
             if(disableLeft && disableRight)
                 *state=GTK_STATE_INSENSITIVE;
-            else
-                if(disableLeft || disableRight)
-                {
-                    EStepper s=getStepper(widget, x, y);
-
-                    if( (disableLeft && (QTC_STEPPER_A==s || QTC_STEPPER_C==s)) ||
-                        (disableRight && (QTC_STEPPER_B==s || QTC_STEPPER_D==s)) )
-                    {
-                        *state=GTK_STATE_NORMAL;
-                        if(btn_down)
-                            *btn_down=FALSE;
-                    }
-                }
+            else if(GTK_STATE_INSENSITIVE==*state)
+            {
+                *state=GTK_STATE_NORMAL;
+                if(btn_down)
+                    *btn_down=FALSE;
+            }
         }
     }
 }
@@ -1579,7 +1639,7 @@ static void realDrawBorder(GtkStyle *style, GdkWindow *window, GtkStateType stat
     EAppearance  app=widgetApp(widget, &opts);
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
     gboolean     enabled=GTK_STATE_INSENSITIVE!=state,
-                 useText=WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled;
+                 useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled;
     int          useBorderVal=!enabled && WIDGET_BUTTON(widget) ? QT_DISABLED_BORDER : borderVal;
     GdkColor     *colors=c_colors ? c_colors : qtcurveStyle->background,
                  *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
@@ -1645,6 +1705,53 @@ static void realDrawBorder(GtkStyle *style, GdkWindow *window, GtkStateType stat
         gdk_draw_rectangle(window, border_gc, FALSE, x, y, width - 1, height - 1);
     else
     {
+#ifdef QTC_USE_CAIRO
+        double  radius=flags&DF_LARGE_ARC ? 2.0 : 1.0,
+                xd=0.5,
+                yd=0.5;
+        cairo_t *cr=(cairo_t*)gdk_cairo_create(window);
+
+        if (area)
+        {
+            cairo_rectangle(cr, area->x, area->y, area->width, area->height);
+            cairo_clip(cr);
+            cairo_new_path(cr);
+        }
+
+        cairo_set_line_width(cr, 1.0);
+        cairo_translate(cr, x, y);
+        cairo_set_source_rgb(cr, border_col->red/65535.0, border_col->green/65535.0, border_col->blue/65535.0);
+
+        width--;
+        height--;
+        if (round&CORNER_TL)
+            cairo_move_to(cr, xd+radius, 0.5);
+        else
+            cairo_move_to(cr, xd, yd);
+
+        if (round&CORNER_TR)
+            cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
+        else
+            cairo_line_to(cr, xd+width, yd);
+
+        if (round&CORNER_BR)
+            cairo_arc(cr, xd+width-radius, yd+height-radius, radius, 0, M_PI * 0.5);
+        else
+            cairo_line_to(cr, xd+width, yd+height);
+
+        if (round&CORNER_BL)
+            cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.5, M_PI);
+        else
+            cairo_line_to(cr, xd, yd+height);
+
+        if (round&CORNER_TL)
+            cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
+        else
+            cairo_line_to(cr, xd, yd);
+
+        cairo_stroke(cr);
+        cairo_destroy(cr);
+#else
         GdkGC *midgc2=style->bg_gc[GTK_STATE_NORMAL];
 
         midgc=QTC_SET_MID_COLOR(border_col, bgnd ? bgnd : &style->bg[GTK_STATE_NORMAL])
@@ -1707,6 +1814,7 @@ static void realDrawBorder(GtkStyle *style, GdkWindow *window, GtkStateType stat
         }
         else
             gdk_draw_point(window, border_gc, x, y+height-1);
+#endif
     }
 
     if(area || region)
@@ -2581,8 +2689,8 @@ debugDisplayWidget(widget, 3);
             state=GTK_STATE_NORMAL;
 #else
 */
-        if(GTK_IS_RANGE(widget))
-            setState(widget, &state, NULL, x, y);
+        if(GTK_IS_RANGE(widget) && sbar)
+            setState(widget, &state, NULL);
 /*
 #endif
 */
@@ -2626,7 +2734,7 @@ debugDisplayWidget(widget, 3);
         }
 
         if(sbar)
-            switch(getStepper(widget, x, y))
+            switch(getStepper(widget, x, y, width, height))
             {
                 default:
                 case QTC_STEPPER_A:
@@ -2665,8 +2773,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
                               0==strcmp(detail, "stepper"));
 
-    if(GTK_IS_RANGE(widget))
-        setState(widget, &state, &btn_down, x, y);
+    if(GTK_IS_RANGE(widget) && sbar)
+        setState(widget, &state, &btn_down);
     {
 
     gboolean custom_c = FALSE,
@@ -2692,7 +2800,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     GdkColor new_cols[TOTAL_SHADES+1],
              *btn_colors;
     int      bgnd=getFill(state, btn_down/*, DETAIL(QTC_CHECKBOX)*/),
-             round=getRound(detail, widget, x, y, rev);
+             round=getRound(detail, widget, x, y, width, height, rev);
     gboolean lvh=isListViewHeader(widget),
              sunken=btn_down ||(GTK_IS_BUTTON(widget) && GTK_BUTTON(widget)->depressed) ||
                     GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
@@ -2810,7 +2918,7 @@ debugDisplayWidget(widget, 3);
                                : (slider && width<height) || vscrollbar || vscale
                                    ? FALSE
                                    : TRUE,
-                     defBtn=(button || togglebutton) && GTK_WIDGET_HAS_DEFAULT(widget);
+                     defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && GTK_WIDGET_HAS_DEFAULT(widget);
 
             if(lvh)
             {
@@ -2851,7 +2959,7 @@ debugDisplayWidget(widget, 3);
             }
             else
             {
-                EStepper step=getStepper(widget, x, y);
+                EStepper step=getStepper(widget, x, y, width, height);
                 EWidget  widgetType=slider
                                 ? WIDGET_SB_SLIDER
                                 : hscale||vscale
@@ -5030,8 +5138,8 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
              **btn_gcs;
     int      min=MIN_SLIDER_SIZE(opts.sliderThumbs);
 
-    if(GTK_IS_RANGE(widget))
-        setState(widget, &state, NULL, x, y);
+    if(GTK_IS_RANGE(widget) && scrollbar)
+        setState(widget, &state, NULL);
 
     if(useButtonColor(detail))
     {

@@ -3,6 +3,10 @@
 1. Use case-insesitive string compares when checking Qt and KDE config files.
 2. Fix some issues wth Firefox 3beta4.
 3. Fix mouse over for up spin button.
+4. To aid testing with Firefox 3, edit your qtcurvestylerc and add the following
+   line:
+        newFirefox=true
+6. Don't indicate default button if it is disabled.
 
 0.56.1
 ------

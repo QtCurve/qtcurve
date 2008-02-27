@@ -1359,9 +1359,13 @@ static gboolean qtInit(Options *opts)
             /* Check if we're firefox... */
             if((app=getAppName()))
             {
-                if((0==strcmp(app, "firefox-bin") || 0==strcmp(app, "thunderbird-bin") ||
-                    0==strcmp(app, "iceweasel-bin") ||
-                    0==strcmp(app, "swiftfox-bin") || 0==strcmp(app, "mozilla-thunderbird-bin")))
+                gboolean firefox=0==strcmp(app, "firefox-bin") ||
+                                 0==strcmp(app, "iceweasel-bin") ||
+                                  0==strcmp(app, "swiftfox-bin"),
+                         thunderbird=!firefox && 0==strcmp(app, "thunderbird-bin"),
+                         mozThunderbird=!thunderbird && !firefox && 0==strcmp(app, "mozilla-thunderbird-bin");
+
+                if(firefox || thunderbird || mozThunderbird)
                 {
 #ifdef QTC_MODIFY_MOZILLA
                     GdkColor *menu_col=SHADE_CUSTOM==opts->shadeMenubars
@@ -1373,16 +1377,18 @@ static gboolean qtInit(Options *opts)
                                                                TOO_DARK(*menu_col) ))
                         add_menu_colors=TRUE;
 
-                    if(0==strcmp(app, "firefox-bin") || 0==strcmp(app, "swiftfox-bin") || 0==strcmp(app, "iceweasel-bin"))
+                    if(firefox)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "firefox", TRUE);
-                    else if(0==strcmp(app, "thunderbird-bin"))
+                    else if(thunderbird)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
-                    else if(0==strcmp(app, "mozilla-thunderbird-bin"))
+                    else if(mozThunderbird
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
 #endif
-                    qtSettings.app=NULL==getenv("QTC_NEW_MOZILLA")
-                                    ? GTK_APP_MOZILLA
-                                    : GTK_APP_NEW_MOZILLA;
+                    qtSettings.app= (firefox && opts->newFirefox) ||
+                                    ((thunderbird || mozThunderbird) && opts->newThunderbird) ||
+                                    NULL!=getenv("QTC_NEW_MOZILLA")
+                                        ? GTK_APP_NEW_MOZILLA
+                                        : GTK_APP_MOZILLA;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
