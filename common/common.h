@@ -933,6 +933,10 @@ typedef struct
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     bool             plasmaHack;
 #endif
+#ifndef __cplusplus
+    bool             newFirefox,
+                     newThunderbird;
+#endif
     #ifdef QTC_CONFIG_DIALOG
     EShading         shading;
     #endif

@@ -744,6 +744,10 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             QTC_CFG_READ_BOOL(plasmaHack)
 #endif
+#ifndef __cplusplus
+            QTC_CFG_READ_BOOL(newFirefox)
+            QTC_CFG_READ_BOOL(newThunderbird)
+#endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance)
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
@@ -907,7 +911,10 @@ static void defaultSettings(Options *opts)
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->plasmaHack=true;
 #endif
-
+#ifndef __cplusplus
+    opts->newFirefox=false;
+    opts->newThunderbird=false;
+#endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_GRADIENT;
 #endif
