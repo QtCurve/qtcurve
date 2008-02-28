@@ -1,3 +1,10 @@
+0.56.3
+------
+1. Fix tabs on Firefox 3 beta4
+2. Fix slight re-draw errors with scrollbar slider.
+3. Nicer positioning of down/right scrollbar arrows.
+4. Fix colours of titned default button.
+
 0.56.2
 ------
 1. Use case-insesitive string compares when checking Qt and KDE config files.
