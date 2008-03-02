@@ -1381,7 +1381,7 @@ static gboolean qtInit(Options *opts)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "firefox", TRUE);
                     else if(thunderbird)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
-                    else if(mozThunderbird
+                    else if(mozThunderbird)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
 #endif
                     qtSettings.app= (firefox && opts->newFirefox) ||

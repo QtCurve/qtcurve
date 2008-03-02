@@ -4,6 +4,7 @@
 2. Fix slight re-draw errors with scrollbar slider.
 3. Nicer positioning of down/right scrollbar arrows.
 4. Fix colours of tinted default button.
+5. QTC_MODIFY_MOZILLA compile fix - thanks to Ben de Groot.
 
 0.56.2
 ------
