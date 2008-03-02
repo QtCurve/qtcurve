@@ -779,7 +779,7 @@ static gboolean isComboboxPopupWindow(GtkWidget *widget)
 
 static gboolean isComboList(GtkWidget *widget)
 {
-    return widget && widget->parent && GTK_IS_FRAME(widget) && isComboboxPopupWindow(widget->parent);
+    return widget && widget->parent && /*GTK_IS_FRAME(widget) && */isComboboxPopupWindow(widget->parent);
 }
 
 #ifdef QTC_GTK2_MENU_STRIPE
@@ -2245,7 +2245,7 @@ static void drawLightBevel(GtkStyle *style, GdkWindow *window, GtkStateType stat
         drawBorder(style, window, state, area, region, x, y, width, height, bgnd, gcs, colors,
                    round, borderProfile, widget, flags);
 
-    if(doEtch && WIDGET_DEF_BUTTON!=widget)
+    if(doEtch) /* && WIDGET_DEF_BUTTON!=widget) */
     {
         if(WIDGET_SPIN_DOWN!=widget)
             y--;
@@ -4426,8 +4426,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                  set=on||tri;
         int      ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL;
 
-        x+=(width-QTC_RADIO_SIZE)>>1;
-        y+=(height-QTC_RADIO_SIZE)>>1;
+        x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
+        y+=((height-QTC_RADIO_SIZE)>>1)+1;
 
         /* For some reason, radios dont look aligned properly - most noticeable with menuStripe set */
         if(!isMozilla())
