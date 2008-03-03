@@ -6793,7 +6793,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
         p->save();
         p->setClipRegion(QRegion(clipRegion)); // , QPainter::CoordPainter);
-        if(IS_FLAT(opts.appearance))
+        if(IS_FLAT(opts.sliderAppearance))
         {
             p->fillRect(r, fill);
 
