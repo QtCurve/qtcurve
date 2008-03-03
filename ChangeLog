@@ -1,10 +1,15 @@
 0.56.3
 ------
-1. Fix tabs on Firefox 3 beta4
-2. Fix slight re-draw errors with scrollbar slider.
-3. Nicer positioning of down/right scrollbar arrows.
-4. Fix colours of tinted default button.
-5. QTC_MODIFY_MOZILLA compile fix - thanks to Ben de Groot.
+ 1. Fix tabs on Firefox 3 beta4
+ 2. Fix slight re-draw errors with scrollbar slider.
+ 3. Nicer positioning of down/right scrollbar arrows.
+ 4. Fix colours of tinted default button.
+ 5. QTC_MODIFY_MOZILLA compile fix - thanks to Ben de Groot.
+ 6. Don't set sliders to flat just because appearance is flat.
+ 7. Map gtk-go-back-ltr, gtk-go-back-rtl, gtk-go-forward-ltr, and gtk-go-forward-rtl.
+ 8. Modify gtk-about and gtk-home KDE icons mappings.
+ 9. Fix checkbox shadow.
+10. Dont allow Mozilla scrollbars to be disabled.
 
 0.56.2
 ------

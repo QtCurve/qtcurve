@@ -1,4 +1,4 @@
-gtk-about places/start-here-kde.png
+gtk-about actions/help-about.png places/start-here-kde.png
 gtk-add actions/list-add.png
 gtk-apply actions/dialog-ok-apply.png
 gtk-bold actions/format-text-bold.png
@@ -33,8 +33,12 @@ gtk-goto-first actions/go-first.png
 gtk-goto-last actions/go-last.png
 gtk-goto-top actions/go-top.png
 gtk-go-back actions/go-previous.png
+gtk-go-back-ltr actions/go-previous.png
+gtk-go-back-rtl actions/go-next.png
 gtk-go-down actions/go-down.png
 gtk-go-forward actions/go-next.png
+gtk-go-forward-ltr actions/go-next.png
+gtk-go-forward-rtl actions/go-previous.png
 gtk-go-up actions/go-up.png
 gtk-harddisk devices/drive-harddisk.png
 gtk-help actions/help-contents.png

@@ -790,60 +790,71 @@ static GdkGC * parentBgGc(GtkWidget *widget)
                : NULL;
 }
 
+static gboolean isMozillaWidget(GtkWidget *widget)
+{
+    return isMozilla() && widget && widget->parent && widget->parent->parent &&
+           GTK_IS_FIXED(widget->parent) && GTK_IS_WINDOW(widget->parent->parent);
+}
+
 static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down)
 {
-    if(GTK_APP_MOZILLA!=qtSettings.app)
+    if(isMozillaWidget(widget))
     {
-        GtkRange *range=GTK_RANGE(widget);
-
-        if(range->adjustment)
+        if(GTK_STATE_INSENSITIVE==*state)
         {
+            *state=GTK_STATE_NORMAL;
+            if(btn_down)
+                *btn_down=FALSE;
+        }
+    }
+    else
+    {
 #define BTN_SIZE 15
 
-            gboolean horiz=range->orientation,
-                     disableLeft=FALSE,
-                     disableRight=FALSE;
-            int      max=horiz ? range->range_rect.height
-                               : range->range_rect.width,
-                     leftBtns=0,
-                     rightBtns=0;
-
-            switch(opts.scrollbarType)
-            {
-                case SCROLLBAR_KDE:
-                    leftBtns=BTN_SIZE;
-                    rightBtns=BTN_SIZE*2;
-                    break;
-                default:
-                case SCROLLBAR_WINDOWS:
-                    leftBtns=BTN_SIZE;
-                    rightBtns=BTN_SIZE;
-                    break;
-                case SCROLLBAR_PLATINUM:
-                    leftBtns=0;
-                    rightBtns=BTN_SIZE*2;
-                    break;
-                case SCROLLBAR_NEXT:
-                    leftBtns=BTN_SIZE*2;
+        GtkRange *range=GTK_RANGE(widget);
+        gboolean horiz=range->orientation,
+                    disableLeft=FALSE,
+                    disableRight=FALSE;
+        int      max=horiz ? range->range_rect.height
+                            : range->range_rect.width,
+                    leftBtns=0,
                     rightBtns=0;
-                    break;
-                case SCROLLBAR_NONE:
-                    break;
-            }
 
-            if(range->slider_start==leftBtns)
-                disableLeft=TRUE;
-            if(range->slider_end+rightBtns==max)
-                disableRight=TRUE;
+        switch(opts.scrollbarType)
+        {
+            case SCROLLBAR_KDE:
+                leftBtns=BTN_SIZE;
+                rightBtns=BTN_SIZE*2;
+                break;
+            default:
+            case SCROLLBAR_WINDOWS:
+                leftBtns=BTN_SIZE;
+                rightBtns=BTN_SIZE;
+                break;
+            case SCROLLBAR_PLATINUM:
+                leftBtns=0;
+                rightBtns=BTN_SIZE*2;
+                break;
+            case SCROLLBAR_NEXT:
+                leftBtns=BTN_SIZE*2;
+                rightBtns=0;
+                break;
+            case SCROLLBAR_NONE:
+                break;
+        }
 
-            if(disableLeft && disableRight)
-                *state=GTK_STATE_INSENSITIVE;
-            else if(GTK_STATE_INSENSITIVE==*state)
-            {
-                *state=GTK_STATE_NORMAL;
-                if(btn_down)
-                    *btn_down=FALSE;
-            }
+        if(range->slider_start==leftBtns)
+            disableLeft=TRUE;
+        if(range->slider_end+rightBtns==max)
+            disableRight=TRUE;
+
+        if(disableLeft && disableRight)
+            *state=GTK_STATE_INSENSITIVE;
+        else if(GTK_STATE_INSENSITIVE==*state)
+        {
+            *state=GTK_STATE_NORMAL;
+            if(btn_down)
+                *btn_down=FALSE;
         }
     }
 }
@@ -2187,9 +2198,12 @@ debugDisplayWidget(widget, 3);
     else
         midgc=style->base_gc[state];
 
+/*
     if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
         gdk_draw_rectangle(window, enabled ? style->base_gc[state] : style->bg_gc[GTK_STATE_INSENSITIVE],
                            TRUE, x+2, y+2, width-4, height-4);
+*/
+
     gdk_draw_line(window, midgc, x+1, y+1, x+1, y+height-2);
     gdk_draw_line(window, midgc, x+1, y+1, x+width-1, y+1);
 
@@ -4075,7 +4089,8 @@ debugDisplayWidget(widget, 3);
         gboolean coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver;
         GdkGC    **gcs=coloredMouseOver
                     ? qtcurveStyle->mouseover_gc
-                    : btn_gcs;
+                    : btn_gcs,
+                 *midgc;
         GdkColor *colors=coloredMouseOver
                     ? qtcurveStyle->mouseover
                     : btn_colors;
@@ -4119,8 +4134,12 @@ debugDisplayWidget(widget, 3);
                               TRUE, FALSE, FALSE, APPEARANCE_GRADIENT, WIDGET_TROUGH);
         }
 
+        midgc=QTC_SET_MID_COLOR(GTK_STATE_INSENSITIVE==state ? &style->bg[GTK_STATE_NORMAL] : &style->base[GTK_STATE_NORMAL], &(colors[3]));
+        gdk_draw_line(window, midgc, x+1, y+1, x+1, y+height-2);
+        gdk_draw_line(window, midgc, x+1, y+1, x+width-2, y+1);
+
         drawBorder(style, window, state, area, NULL, x, y, width, height,
-                   NULL, gcs, colors, ROUNDED_ALL, BORDER_SUNKEN, WIDGET_CHECKBOX,
+                   NULL, gcs, colors, ROUNDED_ALL, BORDER_FLAT, WIDGET_CHECKBOX,
                    (list || mnu ? 0 : DF_DO_CORNERS));
     }
 
@@ -5209,7 +5228,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
             region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
         }
 
-        if(APPEARANCE_FLAT==opts.appearance || APPEARANCE_RAISED==opts.appearance)
+        if(IS_FLAT(opts.sliderAppearance))
         {
             gdk_gc_set_clip_region(gcs[bgnd], region);
             gdk_draw_rectangle(window, gcs[bgnd], TRUE, x+1, y+1, width-2, height-2);

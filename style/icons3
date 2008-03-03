@@ -1,4 +1,4 @@
-gtk-about actions/about_kde.png
+gtk-about actions/info.png actions/about_kde.png
 gtk-add actions/add.png
 gtk-apply actions/apply.png
 gtk-bold actions/text_bold.png
@@ -33,12 +33,16 @@ gtk-goto-first actions/start.png
 gtk-goto-last actions/finish.png
 gtk-goto-top actions/top.png
 gtk-go-back actions/back.png
+gtk-go-back-ltr actions/back.png
+gtk-go-back-rtl actions/forward.png
 gtk-go-down actions/down.png
 gtk-go-forward actions/forward.png
+gtk-go-forward-ltr actions/forward.png
+gtk-go-forward-rtl actions/back.png
 gtk-go-up actions/up.png
 gtk-harddisk devices/hdd_unmount.png
 gtk-help actions/help.png
-gtk-home filesystems/folder_home.png
+gtk-home actions/gohome.png filesystems/folder_home.png
 gtk-indent actions/indent.png
 gtk-index actions/contents.png
 gtk-info actions/info.png
