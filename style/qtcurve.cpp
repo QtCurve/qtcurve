@@ -41,6 +41,8 @@
 #define WINDOWTITLE_SPACER 0x10000000
 #define QTC_STATE_REVERSE  State_Mini
 
+#define M_PI 3.14159265358979323846
+
 static const int constMenuPixmapWidth=22;
 
 static enum
@@ -2223,9 +2225,18 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                   false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
             painter->setClipping(false);
 
+/*
+            painter->setRenderHint(QPainter::Antialiasing, true);
+            QPainterPath path;
+            path.moveTo(12, 12);
+            path.arcTo(0.5, 6.5, 12, 12, 0, 360);
+            painter->drawPath(path);
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            painter->setPen(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)]);
+            painter->drawPath(path);
+*/
             painter->drawPixmap(x, y, *getPixmap(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)],
                                 PIX_RADIO_BORDER, 0.8));
-
             if(state&State_On)
                 painter->drawPixmap(x, y, *getPixmap(state&State_Enabled
                                                         ? /*state&State_Selected
@@ -6255,150 +6266,58 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         }
     }
 
-    if(QTC_ROUNDED && ROUNDED_NONE!=round)
-    {
-        bool largeArc(ROUND_FULL==opts.round && WIDGET_CHECKBOX!=w &&
-                      r.width()>=QTC_MIN_BTN_SIZE && r.height()>=QTC_MIN_BTN_SIZE);
+    QPainterPath path;
+    double       xd(r.x()+0.5),
+                 yd(r.y()+0.5),
+                 radius(ROUND_FULL==opts.round && WIDGET_CHECKBOX!=w &&
+                        r.width()>=QTC_MIN_BTN_SIZE && r.height()>=QTC_MIN_BTN_SIZE
+                            ? 2.5 : 1.5),
+                 diameter(radius*2);
+    int          width(r.width()-1),
+                 height(r.height()-1);
 
-        p->setPen(border);
-        p->drawLine(r.x()+2, r.y(), r.x()+r.width()-3, r.y());
-        if(WIDGET_MDI_WINDOW_TITLE==w)
-        {
-            p->drawLine(r.x(), r.y()+2, r.x(), r.y()+r.height()-1);
-            p->drawLine(r.x()+r.width()-1, r.y()+2, r.x()+r.width()-1, r.y()+r.height()-1);
-        }
-        else
-        {
-            p->drawLine(r.x()+2, r.y()+r.height()-1, r.x()+r.width()-3, r.y()+r.height()-1);
-            p->drawLine(r.x(), r.y()+2, r.x(), r.y()+r.height()-3);
-            p->drawLine(r.x()+r.width()-1, r.y()+2, r.x()+r.width()-1, r.y()+r.height()-3);
-        }
-
-        // If not rounding a corner need to draw the missing pixels!
-        if(!(round&CORNER_TL) || !largeArc)
-        {
-            p->drawPoint(r.x()+1, r.y());
-            p->drawPoint(r.x(), r.y()+1);
-        }
-        if(!(round&CORNER_TR) || !largeArc)
-        {
-            p->drawPoint(r.x()+r.width()-2, r.y());
-            p->drawPoint(r.x()+r.width()-1, r.y()+1);
-        }
-
-        if(WIDGET_MDI_WINDOW_TITLE!=w)
-        {
-            if(!(round&CORNER_BR) || !largeArc)
-            {
-                p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
-                p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
-            }
-            if(!(round&CORNER_BL) || !largeArc)
-            {
-                p->drawPoint(r.x()+1, r.y()+r.height()-1);
-                p->drawPoint(r.x(), r.y()+r.height()-2);
-            }
-        }
-        QColor largeArcMid(border),
-               aaColor(border);
-
-        if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w &&
-           !(opts.plasmaHack && (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w ||
-                                 WIDGET_TOGGLE_BUTTON==w || WIDGET_ENTRY==w)))
-        {
-            largeArcMid.setAlphaF(0.50);
-            aaColor.setAlphaF(0.30);
-        }
-
-        if(round&CORNER_TL)
-        {
-            if(largeArc)
-            {
-                p->drawPoint(r.x()+1, r.y()+1);
-                p->setPen(largeArcMid);
-                p->drawPoint(r.x(), r.y()+1);
-                p->drawPoint(r.x()+1, r.y());
-            }
-            else
-            {
-                p->setPen(aaColor);
-                p->drawPoint(r.x(), r.y());
-            }
-        }
-        else
-            p->drawPoint(r.x(), r.y());
-
-        p->setPen(border);
-        if(round&CORNER_TR)
-        {
-            if(largeArc)
-            {
-                p->drawPoint(r.x()+r.width()-2, r.y()+1);
-                p->setPen(largeArcMid);
-                p->drawPoint(r.x()+r.width()-2, r.y());
-                p->drawPoint(r.x()+r.width()-1, r.y()+1);
-            }
-            else
-            {
-                p->setPen(aaColor);
-                p->drawPoint(r.x()+r.width()-1, r.y());
-            }
-        }
-        else
-            p->drawPoint(r.x()+r.width()-1, r.y());
-
-        if(WIDGET_MDI_WINDOW_TITLE!=w)
-        {
-            p->setPen(border);
-            if(round&CORNER_BR)
-            {
-                if(largeArc)
-                {
-                    p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-2);
-                    p->setPen(largeArcMid);
-                    p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
-                    p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
-                }
-                else
-                {
-                    p->setPen(aaColor);
-                    p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-1);
-                }
-            }
-            else
-                p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-1);
-
-            p->setPen(border);
-            if(round&CORNER_BL)
-            {
-                if(largeArc)
-                {
-                    p->drawPoint(r.x()+1, r.y()+r.height()-2);
-                    p->setPen(largeArcMid);
-                    p->drawPoint(r.x(), r.y()+r.height()-2);
-                    p->drawPoint(r.x()+1, r.y()+r.height()-1);
-                }
-                else
-                {
-                    p->setPen(aaColor);
-                    p->drawPoint(r.x(), r.y()+r.height()-1);
-                }
-            }
-            else
-                p->drawPoint(r.x(), r.y()+r.height()-1);
-        }
-    }
+    if (round&CORNER_TR)
+        path.moveTo(xd+width-radius, yd);
     else
+        path.moveTo(xd+width, yd);
+
+    if (round&CORNER_TL)
+        path.arcTo(xd, yd, diameter, diameter, 90, 90);
+    else
+        path.lineTo(xd, yd);
+
+    if (round&CORNER_BL)
+        path.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 90);
+    else
+        path.lineTo(xd, yd+height);
+
+    if (round&CORNER_BR)
+        path.arcTo(xd+width-diameter, yd+height-diameter, diameter, diameter, 270, 90);
+    else
+        path.lineTo(xd+width, yd+height);
+
+    if (round&CORNER_TR)
+        path.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 90);
+    else
+        path.lineTo(xd+width, yd);
+
+    if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w)
+        p->setRenderHint(QPainter::Antialiasing, true);
+    p->setPen(border);
+    p->drawPath(path);
+    if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w)
+        p->setRenderHint(QPainter::Antialiasing, false);
+
+    if(ROUND_FULL==opts.round && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w))
     {
-        p->setPen(border);
-        if(WIDGET_MDI_WINDOW_TITLE!=w)
-            drawRect(p, r);
-        else
-        {
-            p->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-            p->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-            p->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
-        }
+        p->drawPoint(r.x()+2, r.y());
+        p->drawPoint(r.x(), r.y()+2);
+        p->drawPoint(r.x(), r.y()+r.height()-2);
+        p->drawPoint(r.x()+1, r.y()+r.height()-1);
+        p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
+        p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
+        p->drawPoint(r.x()+r.width()-1, r.y()+2);
+        p->drawPoint(r.x()+r.width()-3, r.y());
     }
 }
 
@@ -6846,41 +6765,88 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)
         {
-            QPolygon aa,
-                     light;
-            //QColor   aaCol(use[QT_STD_BORDER]);
+            QPainterPath path;
+            double       xd(r.x()+0.5),
+                         yd(r.y()+0.5),
+                         radius(2.5),
+                         diameter(radius*2);
 
             switch(direction)
             {
                 default:
                 case PE_IndicatorArrowDown:
-                    aa.setPoints(8,   x, y+1,    x+1, y,   x+9, y,    x+10, y+1,   x+10, y+10,   x+6, y+14,  x+4, y+14,  x, y+10);
-                    light.setPoints(3, x+1, y+9,   x+1, y+1,  x+8, y+1);
+                    path.moveTo(xd+10-radius, yd);
+                    path.arcTo(xd, yd, diameter, diameter, 90, 90);
+                    path.lineTo(xd, yd+9);
+                    path.lineTo(xd+5, yd+14);
+                    path.lineTo(xd+10, yd+9);
+                    path.arcTo(xd+10-diameter, yd, diameter, diameter, 0, 90);
+                    p->setPen(use[QT_STD_BORDER]);
+                    p->setRenderHint(QPainter::Antialiasing, true);
+                    p->drawPath(path);
+                    p->setRenderHint(QPainter::Antialiasing, false);
+                    if(drawLight)
+                    {
+                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                        p->drawLine(r.x()+1, r.y()+2, r.x()+1, r.y()+8);
+                        p->drawLine(r.x()+2, r.y()+1, r.x()+7, r.y()+1);
+                    }
                     break;
                 case PE_IndicatorArrowUp:
-                    aa.setPoints(8,   x, y+13,   x+1, y+14,   x+9, y+14,   x+10, y+13,   x+10, y+4,   x+6, y,  x+4, y,  x, y+4);
-                    light.setPoints(3, x+1, y+13,   x+1, y+5,  x+5, y+1);
+                    path.moveTo(xd, yd+5);
+                    path.arcTo(xd, yd+14-diameter, diameter, diameter, 180, 90);
+                    path.arcTo(xd+10-diameter, yd+14-diameter, diameter, diameter, 270, 90);
+                    path.lineTo(xd+10, yd+5);
+                    path.lineTo(xd+5, yd);
+                    path.lineTo(xd, yd+5);
+                    p->setPen(use[QT_STD_BORDER]);
+                    p->setRenderHint(QPainter::Antialiasing, true);
+                    p->drawPath(path);
+                    p->setRenderHint(QPainter::Antialiasing, false);
+                    if(drawLight)
+                    {
+                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                        p->drawLine(r.x()+5, r.y()+1, r.x()+1, r.y()+5);
+                        p->drawLine(r.x()+1, r.y()+5, r.x()+1, r.y()+11);
+                    }
                     break;
                 case PE_IndicatorArrowLeft:
-                    aa.setPoints(8,   x+13, y,   x+14, y+1,   x+14, y+9,   x+13, y+10,   x+4, y+10,   x, y+6,  x, y+4,  x+4, y);
-                    light.setPoints(3, x+1, y+5,   x+5, y+1,  x+13, y+1);
+                    path.moveTo(xd+5, yd+10);
+                    path.arcTo(xd+14-diameter, yd+10-diameter, diameter, diameter, 270, 90);
+                    path.arcTo(xd+14-diameter, yd, diameter, diameter, 0, 90);
+                    path.lineTo(xd+5, yd);
+                    path.lineTo(xd, yd+5);
+                    path.lineTo(xd+5, yd+10);
+                    p->setPen(use[QT_STD_BORDER]);
+                    p->setRenderHint(QPainter::Antialiasing, true);
+                    p->drawPath(path);
+                    p->setRenderHint(QPainter::Antialiasing, false);
+                    if(drawLight)
+                    {
+                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                        p->drawLine(r.x()+1, r.y()+5, r.x()+5, r.y()+1);
+                        p->drawLine(r.x()+5, r.y()+1, r.x()+11, r.y()+1);
+                    }
                     break;
                 case PE_IndicatorArrowRight:
-                    aa.setPoints(8,   x+1, y,    x, y+1,   x, y+9,    x+1, y+10,   x+10, y+10,   x+14, y+6, x+14, y+4,  x+10, y);
-                    light.setPoints(3, x+1, y+8,   x+1, y+1,  x+9, y+1);
+                    path.moveTo(xd+9, yd);
+                    path.arcTo(xd, yd, diameter, diameter, 90, 90);
+                    path.arcTo(xd, yd+diameter, diameter, diameter, 180, 90);
+                    path.lineTo(xd+9, yd+10);
+                    path.lineTo(xd+14, yd+5);
+                    path.lineTo(xd+9, yd);
+                    p->setPen(use[QT_STD_BORDER]);
+                    p->setRenderHint(QPainter::Antialiasing, true);
+                    p->drawPath(path);
+                    p->setRenderHint(QPainter::Antialiasing, false);
+                    if(drawLight)
+                    {
+                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                        p->drawLine(r.x()+2, r.y()+1, r.x()+7, r.y()+1);
+                        p->drawLine(r.x()+1, r.y()+2, r.x()+1, r.y()+8);
+                    }
+                    break;
             }
-
-            //aaCol.setAlphaF(0.50);
-            //p->setPen(aaCol);
-            p->setPen(midColor(use[QT_STD_BORDER], option->palette.background().color()));
-            p->drawPolygon(aa);
-            if(drawLight)
-            {
-                p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
-                p->drawPolyline(light);
-            }
-            p->setPen(use[QT_STD_BORDER]);
-            p->drawPolygon(clipRegion);
         }
         else
         {
