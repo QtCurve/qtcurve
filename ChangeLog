@@ -1,3 +1,7 @@
+0.56.4
+------
+1. Use cairo for all drawing.
+
 0.56.3
 ------
  1. Fix tabs on Firefox 3 beta4

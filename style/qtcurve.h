@@ -62,26 +62,8 @@ void qtcurve_rc_style_register_type (GTypeModule *module);
 typedef struct 
 {
     GtkStyle parent_instance;
-
-    GdkColor background[TOTAL_SHADES+1],
-             button[TOTAL_SHADES+1],
-             slider[TOTAL_SHADES+1],
-             defbtn[TOTAL_SHADES+1],
-             mouseover[TOTAL_SHADES+1],
-             menubar[TOTAL_SHADES+1],
-             menuitem[TOTAL_SHADES+1],
-             *check_radio;
-    GdkGC    *background_gc[TOTAL_SHADES+1],
-             *button_gc[TOTAL_SHADES+1],
-             *slider_gc[TOTAL_SHADES+1],
-             *defbtn_gc[TOTAL_SHADES+1],
-             *mouseover_gc[TOTAL_SHADES+1],
-             *menubar_gc[TOTAL_SHADES+1],
-             *menuitem_gc[TOTAL_SHADES+1],
-             *button_text_gc,
-             *menutext_gc[2],
-             *listview_alternate_gc,
-             *temp_gc[2];
+    GdkGC   *button_text_gc,
+            *menutext_gc[2];
 } QtCurveStyle;
 
 struct _QtCurveStyleClass
