@@ -1798,9 +1798,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 grad.setColorAt(0, use[QT_STD_BORDER]); // palette.text().color());
                 grad.setColorAt(1, palette.background().color());
-                painter->save();
                 painter->fillRect(QRect(r.x(), (r.y()+r.height())-(constLineHeight+1), r.width(), constLineHeight), QBrush(grad));
-                painter->restore();
             }
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
             {
@@ -1811,7 +1809,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     const QColor *use(backgroundColors(option));
 
                     painter->save();
-
                     painter->setPen(use[QT_STD_BORDER]);
                     drawRect(painter, r);
                     painter->setPen(palette.base().color());
@@ -2371,7 +2368,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
     switch(element)
     {
         case CE_MenuScroller:
-            painter->save();
             painter->fillRect(r, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                            : itsBackgroundCols[ORIGINAL_SHADE]);
                 //QStyleOption arrowOpt = *opt;
@@ -2379,7 +2375,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
             painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
             drawRect(painter, r);
-            painter->restore();
             drawPrimitive(((state&State_DownArrow) ? PE_IndicatorArrowDown : PE_IndicatorArrowUp),
                            option, painter, widget);
             break;
@@ -6510,7 +6505,6 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, c
     p->strokePath(path, col);
     p->fillPath(path, col);
     p->setRenderHint(QPainter::HighQualityAntialiasing, false);
-    p->restore();
 }
 
 void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, const QStyleOption *option,
