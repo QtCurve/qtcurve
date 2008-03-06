@@ -6134,12 +6134,12 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                          botPath;
             double       radiusi(getRadius(opts.round, r.width(), r.height(), w, true)),
                          diameteri(radiusi*2),
-                         xdi(xd+1),
-                         ydi(yd+1);
+                         xdi(window ? r.x()+1 : xd+1),
+                         ydi(window ? r.y()+1 : yd+1);
             int          widthi(width-2),
                          heighti(height-2);
 
-            if(doBlend)
+            if(doBlend && !window)
             {
                 tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
                 br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
@@ -6163,8 +6163,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             else
                 topPath.lineTo(xdi, ydi);
 
-            topPath.lineTo(xdi, round&CORNER_BL ? ydi+heighti-radiusi : ydi+heighti);
-            botPath.moveTo(xdi, round&CORNER_BL ? ydi+heighti-radiusi : ydi+heighti);
+            topPath.lineTo(xdi, !window && round&CORNER_BL ? ydi+heighti-radiusi : ydi+heighti);
+            botPath.moveTo(xdi, !window && round&CORNER_BL ? ydi+heighti-radiusi : ydi+heighti);
             if (!window && round&CORNER_BL)
                 botPath.arcTo(xdi, ydi+heighti-diameteri, diameteri, diameteri, 180, 90);
 
@@ -6218,16 +6218,26 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w)
         p->setRenderHint(QPainter::Antialiasing, false);
 
-    if(ROUND_FULL==opts.round && WIDGET_MDI_WINDOW==w)
+    if(ROUND_FULL==opts.round && window)
     {
-//         p->drawPoint(r.x()+2, r.y());
-//         p->drawPoint(r.x(), r.y()+2);
-        p->drawPoint(r.x(), r.y()+r.height()-2);
-        p->drawPoint(r.x()+1, r.y()+r.height()-1);
-        p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
-        p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
-//         p->drawPoint(r.x()+r.width()-1, r.y()+2);
-//         p->drawPoint(r.x()+r.width()-3, r.y());
+        if(WIDGET_MDI_WINDOW==w)
+        {
+            p->drawPoint(r.x(), r.y()+r.height()-2);
+            p->drawPoint(r.x()+1, r.y()+r.height()-1);
+            p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
+            p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
+        }
+
+        if(WIDGET_MDI_WINDOW_TITLE==w)
+        {
+            p->drawPoint(r.x()+2, r.y());
+            p->drawPoint(r.x(), r.y()+2);
+            p->drawPoint(r.x()+r.width()-1, r.y()+2);
+            p->drawPoint(r.x()+r.width()-3, r.y());
+            p->setPen(cols[0]);
+            p->drawPoint(r.x()+1, r.y()+2);
+            p->drawPoint(r.x()+2, r.y()+1);
+        }
     }
 }
 
