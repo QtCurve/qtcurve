@@ -1,6 +1,10 @@
 0.56.4
 ------
 1. Use QPainterPath to draw borders and triangular sliders.
+2. Removed plasmaHack. Drawing glitches improved by using antialising
+   for certain lines.
+3. Fix for kwin and Qt4.4 - thanks to Franz Fellner.
+4. Don't allow to select bevelled for titlebar appearance.
 
 0.56.3
 ------

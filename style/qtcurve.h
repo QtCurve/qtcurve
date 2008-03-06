@@ -87,7 +87,6 @@ class QtCurveStyle : public QWindowsStyle
         return qGray(col.rgb()) < 100 ? QColor(255, 255, 255, 75) : QColor(0, 0, 0, 75);
     }
 
-    void checkPlasma(QPainter *painter, const QRect &r) const;
     void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,
                                    double shadeBot, EAppearance bevApp) const;
     void drawBevelGradient(const QColor &base, bool increase, QPainter *p, QRect const &r,
@@ -95,9 +94,7 @@ class QtCurveStyle : public QWindowsStyle
                            EWidget w=WIDGET_OTHER) const;
     void drawBevelGradientReal(const QColor &base, bool increase, QPainter *p,
                                const QRect &r, bool horiz, double shadeTop,
-                               double shadeBot, bool sel, EAppearance bevApp, EWidget w, bool useQ) const;
-    void drawGradient(const QColor &top, const QColor &bot, bool increase, QPainter *p,
-                      const QRect &r, bool horiz, bool useQt) const;
+                               double shadeBot, bool sel, EAppearance bevApp, EWidget w) const;
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *option, */bool top, bool bot, bool raised=false) const;

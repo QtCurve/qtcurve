@@ -741,9 +741,6 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
 #endif
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            QTC_CFG_READ_BOOL(plasmaHack)
-#endif
 #ifndef __cplusplus
             QTC_CFG_READ_BOOL(newFirefox)
             QTC_CFG_READ_BOOL(newThunderbird)
@@ -907,9 +904,6 @@ static void defaultSettings(Options *opts)
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->gtkButtonOrder=false;
-#endif
-#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
-    opts->plasmaHack=true;
 #endif
 #ifndef __cplusplus
     opts->newFirefox=false;
