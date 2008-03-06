@@ -225,7 +225,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(tabAppearance, false);
     insertAppearanceEntries(progressAppearance);
     insertAppearanceEntries(menuitemAppearance);
-    insertAppearanceEntries(titlebarAppearance);
+    insertAppearanceEntries(titlebarAppearance, true, false);
     insertLineEntries(handles, false);
     insertLineEntries(sliderThumbs, true);
     insertLineEntries(toolbarSeparators, true);

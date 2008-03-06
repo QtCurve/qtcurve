@@ -55,7 +55,7 @@ class QtCurveClient : public KCommonDecoration
     void                      reset(unsigned long changed);
     void                      drawBtnBgnd(QPainter *p, const QRect &r, bool active);
     void                      paintEvent(QPaintEvent *e);
-    void                      doShape();
+    void                      updateWindowShape();
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
 

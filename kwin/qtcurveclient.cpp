@@ -166,8 +166,6 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
-    doShape();
-
     QPainter             painter(widget());
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
@@ -226,7 +224,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     painter.end();
 }
 
-void QtCurveClient::doShape()
+void QtCurveClient::updateWindowShape()
 {
     int  round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
          w(widget()->width()),
