@@ -1,6 +1,9 @@
-0.56.4
-------
-1. Use cairo for all drawing.
+0.57
+----
+1. Modify defaults:
+     Turn off shade menubar only of active window
+     Set default button indicator to tint
+2. Use cairo for all drawing.
 
 0.56.3
 ------
