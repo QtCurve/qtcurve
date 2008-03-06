@@ -841,7 +841,7 @@ static void defaultSettings(Options *opts)
     opts->menuitemAppearance=APPEARANCE_DULL_GLASS;
     opts->toolbarAppearance=APPEARANCE_GRADIENT;
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
-    opts->defBtnIndicator=IND_COLORED;
+    opts->defBtnIndicator=IND_TINT;
     opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_DOTS;
     opts->shadeSliders=SHADE_BLEND_SELECTED;
@@ -854,7 +854,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_PLASTIK;
     opts->menubarMouseOver=true;
-    opts->shadeMenubarOnlyWhenActive=true;
+    opts->shadeMenubarOnlyWhenActive=false;
     opts->thinnerMenuItems=false;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_NONE;
