@@ -1374,6 +1374,20 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return (int)opts.round;
         case QtC_TitleBarAppearance:
             return (int)opts.titlebarAppearance;
+
+// The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
+// ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
+// asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
+//.........
+        case PM_TabBarBaseHeight:
+            if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
+                return 10;
+            return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
+        case PM_TabBarBaseOverlap:
+            if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
+                return 0;
+            // Fall through!
+//.........
         default:
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
     }
@@ -2348,10 +2362,46 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_FrameTabWidget:
+        {
+            int round(ROUNDED_ALL);
+
+            if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
+            {
+                const QTabWidget *tw((const QTabWidget *)widget);
+
+                if(0==tw->currentIndex())
+                    if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
+                    {
+                        bool reverse(Qt::RightToLeft==twf->direction);
+
+                        switch(tw->tabPosition())
+                        {
+                            case QTabWidget::North:
+                                if(reverse && twf->rightCornerWidgetSize.isEmpty())
+                                    round-=CORNER_TR;
+                                else if(!reverse && twf->leftCornerWidgetSize.isEmpty())
+                                    round-=CORNER_TL;
+                                break;
+                            case QTabWidget::South:
+                                if(reverse && twf->rightCornerWidgetSize.isEmpty())
+                                    round-=CORNER_BR;
+                                else if(!reverse && twf->leftCornerWidgetSize.isEmpty())
+                                    round-=CORNER_BL;
+                                break;
+                            case QTabWidget::West:
+                                round-=CORNER_TL;
+                                break;
+                            case QTabWidget::East:
+                                round-=CORNER_TR;
+                                break;
+                        }
+                    }
+            }
             painter->save();
-            drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED, false);
+            drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED, false);
             painter->restore();
             break;
+        }
         default:
             QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
             break;

@@ -8,6 +8,7 @@
    for certain lines.
 4. Fix for kwin and Qt4.4 - thanks to Franz Fellner.
 5. Don't allow to select bevelled for titlebar appearance.
+6. 'Fix' for konqueror's 'show close button on tab' setting.
 
 0.56.3
 ------
