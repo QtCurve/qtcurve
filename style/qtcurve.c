@@ -1619,7 +1619,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                 if (round&CORNER_BL)
                     cairo_arc(cr, xdi+radiusi, ydi+heighti-radiusi, radiusi, M_PI * 0.5, M_PI);
                 else
-                    cairo_line_to(cr, xdi, yd+heighti);
+                    cairo_line_to(cr, xdi, ydi+heighti);
                 cairo_stroke(cr);
             }
         }
@@ -3707,9 +3707,30 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
     sanitizeSize(window, &width, &height);
 
     if(GTK_SHADOW_NONE!=shadow_type)
+    {
+        int round=ROUNDED_ALL;
+
+        if(gap_x<=0)
+            switch(gap_side)
+            {
+                case GTK_POS_TOP:
+                    round=CORNER_TR|CORNER_BL|CORNER_BR;
+                    break;
+                case GTK_POS_BOTTOM:
+                    round=CORNER_BR|CORNER_TL|CORNER_TR;
+                    break;
+                case GTK_POS_LEFT:
+                    round=CORNER_TR|CORNER_BL|CORNER_BR;
+                    break;
+                case GTK_POS_RIGHT:
+                    round=CORNER_TL|CORNER_BL|CORNER_BR;
+                    break;
+            }
+
         drawBorder(cr, widget && widget->parent ? widget->parent->style : style, state,
-                   area, NULL, x, y, width, height, NULL, NULL, ROUNDED_ALL,
+                   area, NULL, x, y, width, height, NULL, NULL, round,
                    borderProfile, WIDGET_OTHER, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
+    }
 
     if(gap_width>0)
     {
