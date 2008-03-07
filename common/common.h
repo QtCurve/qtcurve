@@ -986,6 +986,19 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 };
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+
+#if defined __cplusplus
+#define QTC_FULL_INNER_RADIUS   1.5
+#define QTC_FULL_OUTER_RADIUS   2.5
+#define QTC_SLIGHT_INNER_RADIUS 0.5
+#define QTC_SLIGHT_OUTER_RADIUS 1.5
+#else
+#define QTC_FULL_INNER_RADIUS   2
+#define QTC_FULL_OUTER_RADIUS   3
+#define QTC_SLIGHT_INNER_RADIUS 1
+#define QTC_SLIGHT_OUTER_RADIUS 2
+#endif
+
 static double getRadius(ERound r, int w, int h, EWidget widget, bool internal)
 {
     if(WIDGET_CHECKBOX==widget && ROUND_NONE!=r)
@@ -995,9 +1008,9 @@ static double getRadius(ERound r, int w, int h, EWidget widget, bool internal)
     {
         case ROUND_FULL:
             if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
-                return internal ? 1.5 : 2.5;
+                return internal ? QTC_FULL_INNER_RADIUS : QTC_FULL_OUTER_RADIUS;
         case ROUND_SLIGHT:
-            return internal ? 0.5 : 1.5;
+            return internal ? QTC_SLIGHT_INNER_RADIUS : QTC_SLIGHT_OUTER_RADIUS;
         case ROUND_NONE:
             return 0;
     }
