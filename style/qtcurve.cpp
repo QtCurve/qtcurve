@@ -2290,6 +2290,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
                 use=itsDefBtnCols;
 
+            // This section fixes some drawng issues with krunner's buttons on nvidia
+            painter->setRenderHint(QPainter::Antialiasing, true);
+            painter->fillRect(r.adjusted(1, 1, -1, -1), palette.background().color());
+            painter->setRenderHint(QPainter::Antialiasing, false);
+
             drawLightBevel(painter, r, &opt, ROUNDED_ALL, getFill(&opt, use), use,
                            true, isKWin
                                     ? WIDGET_MDI_WINDOW_BUTTON
@@ -4867,6 +4872,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 //                     painter->setPen(cg.background());
 //                     drawRect(painter, r);
 //                 }
+
+                // This section fixes some drawng issues with krunner's combo on nvidia
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
+                painter->setRenderHint(QPainter::Antialiasing, false);
 
                 if(/*comboBox->frame &&*/ frame.isValid())
                 {
