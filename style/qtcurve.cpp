@@ -6575,9 +6575,17 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, c
     for(int i=1; i<a.size(); ++i)
         path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
     path.lineTo(a[0].x()+0.5, a[0].y()+0.5);
+
+    // This all looks like overkill - but seems to fix issues with plasma and nvidia
+    // Just using 'aa' and drawing the arrows would be fine - but this makes them look
+    // slightly blurry, and I dont like that.
+    p->setRenderHint(QPainter::Antialiasing, true);
+    p->fillPath(path, col);
+    p->setRenderHint(QPainter::Antialiasing, false);
     p->setRenderHint(QPainter::HighQualityAntialiasing, true);
     p->strokePath(path, col);
-    p->fillPath(path, col);
+    p->setPen(col);
+    p->drawPath(path);
     p->setRenderHint(QPainter::HighQualityAntialiasing, false);
 }
 
