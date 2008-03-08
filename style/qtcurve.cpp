@@ -3532,6 +3532,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             r.adjust(-tabOverlap, 0, 0, 0);
                         fillTab(painter, r.adjusted(1, 0, -1, 0), option, fill, true, true, WIDGET_TAB_TOP);
 
+                        // This slipping helps with plasma's tabs and nvidia
+                        if(selected)
+                            painter->setClipRect(r2.adjusted(0, 0, 0, -1));
                         drawBorder(painter, r.adjusted(0, 0, 0, 4), option,
                                     selected || onlyTab
                                         ? ROUNDED_TOP
@@ -3544,6 +3547,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(selected)
                         {
+                            painter->setClipping(false);
                             painter->setPen(itsBackgroundCols[0]);
                             if(!fixLeft)
                                 painter->drawLine(r2.left()-1, r2.bottom(), r2.left(), r2.bottom());
