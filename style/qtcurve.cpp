@@ -3549,7 +3549,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setClipping(false);
                             painter->setPen(itsBackgroundCols[0]);
-                            if(!fixLeft)
+
+                            // The point drawn below is because of the clipping above...
+                            if(fixLeft)
+                                painter->drawPoint(r2.x()+1, r2.y()+r2.height()-1);
+                            else
                                 painter->drawLine(r2.left()-1, r2.bottom(), r2.left(), r2.bottom());
                             if(!fixRight)
                                 painter->drawLine(r2.right()-1, r2.bottom(), r2.right(), r2.bottom());
