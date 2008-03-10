@@ -237,14 +237,9 @@ static inline void drawRect(QPainter *p, const QRect &r)
     p->drawRect(r.x(), r.y(), r.width()-1, r.height()-1);
 }
 
-static inline void drawHLine(QPainter *p, int x1, int y1, int x2, int y2)
+static inline void drawAaLine(QPainter *p, int x1, int y1, int x2, int y2)
 {
-    p->drawLine(QLineF(x1, y1+0.5, x2, y2+0.5));
-}
-
-static inline void drawVLine(QPainter *p, int x1, int y1, int x2, int y2)
-{
-    p->drawLine(QLineF(x1+0.5, y1, x2+0.5, y2));
+    p->drawLine(QLineF(x1+0.5, y1+0.5, x2+0.5, y2+0.5));
 }
 
 static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
@@ -2664,16 +2659,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 painter->setPen(itsBackgroundCols[4]);
                 if(horiz)
-                    drawVLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1, r.y()+r.height()-2);
+                    drawAaLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1, r.y()+r.height()-2);
                 else
-                    drawHLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
+                    drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
             }
 
             painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
             if(horiz)
-                drawHLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
             else
-                drawVLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
             painter->setRenderHint(QPainter::Antialiasing, false);
             painter->restore();
             break;
@@ -2707,9 +2702,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     {
                         painter->setPen(itsBackgroundCols[4]);
                         if(Qt::Horizontal==ho->orientation)
-                            drawHLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1, r.y()+r.height()-2);
+                            drawAaLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1, r.y()+r.height()-2);
                         else
-                            drawVLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
+                            drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
                     }
 
                     const QColor *border(borderColors(&opt, NULL));
@@ -2719,21 +2714,21 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(border)
                         {
                             painter->setPen(border[ORIGINAL_SHADE]);
-                            drawHLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1,
+                            drawAaLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1,
                                       r.y()+r.height()-2);
                             painter->setPen(border[QT_STD_BORDER]);
                         }
                         else
                             painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                        drawHLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                        drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
 
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
                             painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                            drawVLine(painter, r.x()+r.width()-2, r.y()+5, r.x()+r.width()-2, r.y()+r.height()-6);
+                            drawAaLine(painter, r.x()+r.width()-2, r.y()+5, r.x()+r.width()-2, r.y()+r.height()-6);
                             painter->setPen(itsBackgroundCols[0]);
-                            drawVLine(painter, r.x()+r.width()-1, r.y()+5, r.x()+r.width()-1, r.y()+r.height()-6);
+                            drawAaLine(painter, r.x()+r.width()-1, r.y()+5, r.x()+r.width()-1, r.y()+r.height()-6);
                         }
                     }
                     else
@@ -2741,21 +2736,21 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(border)
                         {
                             painter->setPen(border[ORIGINAL_SHADE]);
-                            drawVLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
+                            drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
                             painter->setPen(border[QT_STD_BORDER]);
                         }
                         else
                             painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                        drawVLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                        drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
 
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
                             painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                            drawHLine(painter, r.x()+5, r.y()+r.height()-2, r.x()+r.width()-6,
+                            drawAaLine(painter, r.x()+5, r.y()+r.height()-2, r.x()+r.width()-6,
                                       r.y()+r.height()-2);
                             painter->setPen(itsBackgroundCols[0]);
-                            drawHLine(painter, r.x()+5, r.y()+r.height()-1, r.x()+r.width()-6,
+                            drawAaLine(painter, r.x()+5, r.y()+r.height()-1, r.x()+r.width()-6,
                                       r.y()+r.height()-1);
                         }
                     }
@@ -3574,9 +3569,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsMenuitemCols[0]);
-                                drawHLine(painter, r.left()+1, r.top()+1, r.right()-1, r.top()+1);
+                                drawAaLine(painter, r.left()+1, r.top()+1, r.right()-1, r.top()+1);
                                 painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2));
-                                drawHLine(painter, r.left()+1, r.top()+2, r.right()-1, r.top()+2);
+                                drawAaLine(painter, r.left()+1, r.top()+2, r.right()-1, r.top()+2);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                                 painter->setClipRect(QRect(r.x(), r.y(), r.width(), 3));
@@ -3587,10 +3582,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawHLine(painter, r.x()+(firstTab ? opts.round : 1), r.y()+1,
+                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.y()+1,
                                               r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.y()+1);
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawHLine(painter, r.x()+(firstTab ? opts.round : 1), r.y(),
+                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.y(),
                                               r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.y());
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
@@ -3638,9 +3633,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsMenuitemCols[0]);
-                                drawHLine(painter, r.left()+1, r.bottom()-1, r.right()-1, r.bottom()-1);
+                                drawAaLine(painter, r.left()+1, r.bottom()-1, r.right()-1, r.bottom()-1);
                                 painter->setPen(midColor(fill, itsMenuitemCols[0]));
-                                drawHLine(painter, r.left()+1, r.bottom()-2, r.right()-1, r.bottom()-2);
+                                drawAaLine(painter, r.left()+1, r.bottom()-2, r.right()-1, r.bottom()-2);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                                 painter->setClipRect(QRect(r.x(), r.y()+r.height()-3, r.width(), r.y()+r.height()-1));
@@ -3651,10 +3646,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawHLine(painter, r.x()+(firstTab ? opts.round : 1), r.bottom()-1,
+                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.bottom()-1,
                                               r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.bottom()-1);
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawHLine(painter, r.x()+(firstTab ? opts.round : 1), r.bottom(),
+                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.bottom(),
                                               r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.bottom());
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
@@ -3702,9 +3697,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsMenuitemCols[0]);
-                                drawVLine(painter, r.left()+1, r.top()+1, r.left()+1, r.bottom()-1);
+                                drawAaLine(painter, r.left()+1, r.top()+1, r.left()+1, r.bottom()-1);
                                 painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2));
-                                drawVLine(painter, r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
+                                drawAaLine(painter, r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                                 painter->setClipRect(QRect(r.x(), r.y(), 3, r.height()));
@@ -3715,10 +3710,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawVLine(painter, r.x()+1, r.y()+(firstTab ? opts.round : 1),
+                            drawAaLine(painter, r.x()+1, r.y()+(firstTab ? opts.round : 1),
                                               r.x()+1, r.y()+r.height()-((lastTab ? opts.round : 0)+1));
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawVLine(painter, r.x(), r.y()+(firstTab ? opts.round : 1),
+                            drawAaLine(painter, r.x(), r.y()+(firstTab ? opts.round : 1),
                                               r.x(), r.y()+r.height()-((lastTab ? opts.round : 0)+1));
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
@@ -3766,9 +3761,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsMenuitemCols[0]);
-                                drawVLine(painter, r.right()-1, r.top()+1, r.right()-1, r.bottom()-1);
+                                drawAaLine(painter, r.right()-1, r.top()+1, r.right()-1, r.bottom()-1);
                                 painter->setPen(midColor(fill, itsMenuitemCols[0]));
-                                drawVLine(painter, r.right()-2, r.top()+1, r.right()-2, r.bottom()-1);
+                                drawAaLine(painter, r.right()-2, r.top()+1, r.right()-2, r.bottom()-1);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                                 painter->setClipRect(QRect(r.x()+r.width()-3, r.y(), r.x()+r.width()-1, r.height()));
@@ -3779,10 +3774,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawVLine(painter, r.right()-1, r.y()+(firstTab ? opts.round : 1),
+                            drawAaLine(painter, r.right()-1, r.y()+(firstTab ? opts.round : 1),
                                               r.right()-1, r.y()+r.height()-((lastTab ? opts.round : 0)+1));
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawVLine(painter, r.right(), r.y()+(firstTab ? opts.round : 1),
+                            drawAaLine(painter, r.right(), r.y()+(firstTab ? opts.round : 1),
                                               r.right(), r.y()+r.height()-((lastTab ? opts.round : 0)+1));
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
@@ -6077,26 +6072,26 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                     p->setRenderHint(QPainter::Antialiasing, true);
                     if(horizontal)
                     {
-                        drawHLine(p, r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
-                        drawHLine(p, r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
+                        drawAaLine(p, r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
+                        drawAaLine(p, r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
                     }
                     else
                     {
-                        drawVLine(p, r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
-                        drawVLine(p, r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
+                        drawAaLine(p, r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
+                        drawAaLine(p, r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
                     }
                     if(!thin)
                     {
                         p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_LIGHT(w)]);
                         if(horizontal)
                         {
-                            drawHLine(p, r.x()+1, r.y()+2, r.x()+r.width()-2, r.y()+2);
-                            drawHLine(p, r.x()+1, r.y()+r.height()-3, r.x()+r.width()-2, r.y()+r.height()-3);
+                            drawAaLine(p, r.x()+1, r.y()+2, r.x()+r.width()-2, r.y()+2);
+                            drawAaLine(p, r.x()+1, r.y()+r.height()-3, r.x()+r.width()-2, r.y()+r.height()-3);
                         }
                         else
                         {
-                            drawVLine(p, r.x()+2, r.y()+1, r.x()+2, r.y()+r.height()-2);
-                            drawVLine(p, r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
+                            drawAaLine(p, r.x()+2, r.y()+1, r.x()+2, r.y()+r.height()-2);
+                            drawAaLine(p, r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
                         }
                     }
                     p->setRenderHint(QPainter::Antialiasing, false);
