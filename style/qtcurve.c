@@ -2273,7 +2273,8 @@ debugDisplayWidget(widget, 3);
             }
         }
     }
-    if( ( GTK_STATE_PRELIGHT==state && (detail && 0==strcmp(detail, QTC_PANED) ) ) )
+    if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
+                                                  (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, opts.highlightFactor, x, y, width, height);
     else if (haveAlternareListViewCol() && GTK_STATE_SELECTED!=state &&
              GTK_IS_TREE_VIEW(widget) && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_even"))
@@ -2418,13 +2419,14 @@ debugDisplayWidget(widget, 3);
     QTC_CAIRO_END
 }
 
-static void drawArrowPolygon(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GdkPoint *points, int npoints)
+static void drawArrowPolygon(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
     if(area)
         gdk_gc_set_clip_rectangle(gc, area);
 
     gdk_draw_polygon(window, gc, FALSE, points, npoints);
-    gdk_draw_polygon(window, gc, TRUE, points, npoints);
+    if(fill)
+        gdk_draw_polygon(window, gc, TRUE, points, npoints);
 
     if(area)
         gdk_gc_set_clip_rectangle(gc, NULL);
@@ -2445,7 +2447,7 @@ static void drawArrowPolygon(GdkWindow *window, GdkGC *gc, GdkRectangle *area, G
 }
 
 static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrowType arrow_type,
-                      gint x, gint y, gboolean small)
+                      gint x, gint y, gboolean small, gboolean fill)
 {
     if(small)
         switch(arrow_type)
@@ -2453,25 +2455,25 @@ static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrow
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x-1,y}, {x+1,y}, {x+2,y+1}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x-1,y}, {x+1,y}, {x+2,y-1}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x,y+1}, {x,y-1}, {x-1,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x,y+1}, {x,y-1}, {x+1,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
                 break;
             }
             default:
@@ -2483,25 +2485,25 @@ static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrow
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-2, y+2},  {x,y},  {x+2,y+2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-2,y-2},  {x,y}, {x+2,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x-1,y-3},  {x+2,y},  {x-1,y+3},   {x-2,y+2}, {x,y}, {x-2,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+2}, {x,y}, {x+2,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3);
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             default:
@@ -2528,13 +2530,13 @@ debugDisplayWidget(widget, 3);
         if(combo && !combo_entry)
         {
             drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_UP,
-                      x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE);
+                      x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
             drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
-                      x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE);
+                      x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
         }
         else
             drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
-                      x+(width>>1), y+(height>>1), FALSE);
+                      x+(width>>1), y+(height>>1), FALSE, TRUE);
     }
     else
     {
@@ -2625,7 +2627,7 @@ debugDisplayWidget(widget, 3);
 
         drawArrow(window, style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
                            ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)],
-                  area, arrow_type, x, y, isSpinButton);
+                  area, arrow_type, x, y, isSpinButton, TRUE);
     }
     //QTC_CAIRO_END
 }
@@ -4182,9 +4184,9 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     //QTC_CAIRO_BEGIN
     drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_UP, x,
-              y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE);
+              y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
     drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_DOWN, x,
-              y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE);
+              y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
     //QTC_CAIRO_END
 }
 
@@ -5270,18 +5272,21 @@ static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType sta
 printf("Draw expander %d %s  ", state, detail ? detail : "NULL");
 debugDisplayWidget(widget, 5);
 #endif
+    gboolean isExpander=widget && GTK_IS_EXPANDER(widget),
+             fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;
+    GdkGC    *gc=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
+                    ? style->base_gc[GTK_STATE_PRELIGHT]
+                    : style->text_gc[QTC_ARROW_STATE(state)];
 
     x-=QTC_LV_SIZE>>1;
     y-=QTC_LV_SIZE>>1;
 
     //QTC_CAIRO_BEGIN
     if(GTK_EXPANDER_COLLAPSED==expander_style)
-        drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,
-                  reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
-                  x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE);
+        drawArrow(window, gc, area, reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
+                  x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
     else
-        drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area, GTK_ARROW_DOWN,
-                  x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE);
+        drawArrow(window, gc, area, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
     //QTC_CAIRO_END
 }
 

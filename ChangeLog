@@ -3,7 +3,9 @@
 1. Modify defaults:
      Turn off shade menubar only of active window
      Set default button indicator to tint
-2. Use cairo for all drawing.
+2. Re-added option to highlight background of check/radio text on mouseover.
+3. Use cairo for all drawing.
+4. Highlight expander arrows on mouse over.
 
 0.56.3
 ------
