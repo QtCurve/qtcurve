@@ -723,6 +723,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(framelessGroupBoxes)
             QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
+            QTC_CFG_READ_BOOL(crHighlight)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
 #endif
@@ -873,6 +874,7 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=true;
     opts->colorMenubarMouseOver=false;
     opts->inactiveHighlight=false;
+    opts->crHighlight=false;
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
 #endif
@@ -1248,6 +1250,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(xCheck)
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(inactiveHighlight)
+        CFG_WRITE_ENTRY(crHighlight)
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)

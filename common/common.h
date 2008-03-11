@@ -907,7 +907,8 @@ typedef struct
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripe,
 #endif
-                     inactiveHighlight;
+                     inactiveHighlight,
+                     crHighlight;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;

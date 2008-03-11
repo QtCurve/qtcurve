@@ -3965,6 +3965,30 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             drawSbSliderHandle(painter, r, option);
             painter->restore();
             break;
+        case CE_RadioButton:
+        case CE_CheckBox:
+            if (opts.crHighlight)
+                if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton *>(option))
+                {
+                    QStyleOptionButton copy(*button);
+
+                    copy.rect.adjust(2, 0, -2, 0);
+
+                    if(button->state&State_MouseOver && button->state&State_Enabled)
+                    {
+                        QRect highlightRect(subElementRect(CE_RadioButton==element ? SE_RadioButtonFocusRect : SE_CheckBoxFocusRect,
+                                                           option, widget));
+
+                        if(Qt::RightToLeft==button->direction)
+                            highlightRect.setRight(r.right());
+                        else
+                            highlightRect.setX(r.x());
+                        painter->fillRect(highlightRect, shade(palette.background().color(), opts.highlightFactor));
+                    }
+                    QTC_BASE_STYLE::drawControl(element, &copy, painter, widget);
+                    break;
+                }
+            // Fall through!
         default:
             QTC_BASE_STYLE::drawControl(element, option, painter, widget);
     }
