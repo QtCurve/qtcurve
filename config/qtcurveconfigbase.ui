@@ -309,10 +309,17 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="4" colspan="5" >
+       <item row="9" column="4" colspan="3" >
         <widget class="QCheckBox" name="xCheck" >
          <property name="text" >
           <string>'X' style checkmarks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="7" colspan="2" >
+        <widget class="QCheckBox" name="crHighlight" >
+         <property name="text" >
+          <string>Highlight background</string>
          </property>
         </widget>
        </item>
@@ -856,6 +863,7 @@
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck</tabstop>
+  <tabstop>crHighlight</tabstop>
   <tabstop>titlebarAppearance</tabstop>
   <tabstop>stdFocus</tabstop>
   <tabstop>framelessGroupBoxes</tabstop>
