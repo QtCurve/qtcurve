@@ -5571,6 +5571,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     }
                     return r;
                 }
+        break;
     case CC_TitleBar:
         if (const QStyleOptionTitleBar *tb = qstyleoption_cast<const QStyleOptionTitleBar *>(option))
         {
@@ -6178,6 +6179,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                               int round, const QColor *custom, EWidget w,
                               EBorder borderProfile, bool doBlend, int borderVal) const
 {
+    if(ROUND_NONE==opts.round)
+        round=ROUNDED_NONE;
+
     EAppearance  app(widgetApp(w, &opts));
     State        state(option->state);
     bool         enabled(state&State_Enabled),
