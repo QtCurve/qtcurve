@@ -1,6 +1,7 @@
 0.57.1
 ------
 1. Fix border drawing when not rounding.
+2. Fix for menu stripe and large icons.
 
 0.57
 ----
