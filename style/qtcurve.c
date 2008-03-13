@@ -532,56 +532,6 @@ static void optionMenuGetProps(GtkWidget *widget, GtkRequisition *indicator_size
         gtk_border_free(tmp_spacing);
 }
 
-#if 0
-static gboolean withinRect(GdkRectangle *rect, int x, int y)
-{
-    return x>=rect->x && x<=(rect->x+rect->width-1) &&
-           y>=rect->y && y<=(rect->y+rect->height-1);
-}
-
-/* CPD Another HACK!!! */
-struct _GtkRangeLayout
-{
-    GdkRectangle stepper_a,
-                 stepper_b,
-                 stepper_c,
-                 stepper_d;
-};
-
-typedef enum
-{
-    QTC_STEPPER_A,
-    QTC_STEPPER_B,
-    QTC_STEPPER_C,
-    QTC_STEPPER_D,
-    QTC_STEPPER_NONE
-} EStepper;
-
-static EStepper getStepper(GtkWidget *widget, int x, int y)
-{
-    if(GTK_IS_RANGE(widget))
-    {
-        GtkRange *range=GTK_RANGE(widget);
-        int      xa=x-widget->allocation.x,
-                 ya=y-widget->allocation.y;
-
-        if(range->has_stepper_a && withinRect(&(range->layout->stepper_a), xa, ya))
-            return GTK_APP_NEW_MOZILLA==qtSettings.app && (x>15 || y>15)
-                ? QTC_STEPPER_C
-                : QTC_STEPPER_A;
-        else if(range->has_stepper_b && withinRect(&(range->layout->stepper_b), xa, ya))
-            return QTC_STEPPER_B;
-        else if(range->has_stepper_c && withinRect(&(range->layout->stepper_c), xa, ya))
-            return QTC_STEPPER_C;
-        else if(range->has_stepper_d && withinRect(&(range->layout->stepper_d), xa, ya))
-            return GTK_APP_NEW_MOZILLA==qtSettings.app && (x<18 && y<18)
-                ? QTC_STEPPER_B
-                : QTC_STEPPER_D;
-    }
-    return QTC_STEPPER_NONE;
-}
-#endif
-
 typedef enum
 {
     QTC_STEPPER_A,
@@ -597,7 +547,7 @@ static EStepper getStepper(GtkWidget *widget, int x, int y, int width, int heigh
     {
         GdkRectangle   tmp;
         GdkRectangle   check_rectangle,
-                    stepper;
+                       stepper;
         GtkOrientation orientation=GTK_RANGE(widget)->orientation;
 
         stepper.x=x;
@@ -615,7 +565,7 @@ static EStepper getStepper(GtkWidget *widget, int x, int y, int width, int heigh
         if (gdk_rectangle_intersect(&stepper, &check_rectangle, &tmp))
             return QTC_STEPPER_A;
 
-        if (orientation == GTK_ORIENTATION_HORIZONTAL)
+        if (GTK_ORIENTATION_HORIZONTAL==orientation)
             check_rectangle.x = widget->allocation.x + stepper.width;
         else
             check_rectangle.y = widget->allocation.y + stepper.height;
@@ -679,16 +629,15 @@ static int getRound(const char *detail, GtkWidget *widget, int x, int y, int wid
         else if(0==strcmp(detail, "vscrollbar") || 0==strcmp(detail, "hscrollbar") ||
                 0==strcmp(detail, "stepper"))
         {
-            EStepper s=getStepper(widget, x, y, width, height);
-            return QTC_STEPPER_A==s
-                       ? 'h'==detail[0]
-                           ? ROUNDED_LEFT
-                           : ROUNDED_TOP
-                       : QTC_STEPPER_D==s
-                           ? 'v'==detail[0]
-                               ? ROUNDED_BOTTOM
-                               : ROUNDED_RIGHT
-                           : ROUNDED_NONE;
+            switch(getStepper(widget, x, y, width, height))
+            {
+                case QTC_STEPPER_A:
+                    return 'h'==detail[0] ? ROUNDED_LEFT : ROUNDED_TOP;
+                case QTC_STEPPER_D:
+                    return 'v'==detail[0]  ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
+                default:
+                    return ROUNDED_NONE;
+            }
         }
         else if(0==strcmp(detail, "button"))
         {
@@ -2545,6 +2494,7 @@ debugDisplayWidget(widget, 3);
                  a_height=LARGE_ARR_HEIGHT;
         gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
                                   0==strcmp(detail, "stepper"));
+        int      stepper=sbar ? getStepper(widget, x, y, 15, 15) : QTC_STEPPER_NONE;
 
 /*
 #if GTK_CHECK_VERSION(2, 10, 0)
@@ -2601,28 +2551,21 @@ debugDisplayWidget(widget, 3);
         }
 
         if(sbar)
-            switch(getStepper(widget, x, y, width, height))
+            switch(stepper)
             {
-                default:
-                case QTC_STEPPER_A:
-                    break;
                 case QTC_STEPPER_B:
                     if(GTK_ARROW_RIGHT==arrow_type)
-                        x-=2;
+                        x--;
                     else
-                        y-=2;
+                        y--;
                     break;
                 case QTC_STEPPER_C:
                     if(GTK_ARROW_LEFT==arrow_type)
                         x++;
                     else
                         y++;
+                default:
                     break;
-                case QTC_STEPPER_D:
-                    if(GTK_ARROW_RIGHT==arrow_type)
-                        x--;
-                    else
-                        y--;
             }
 
         drawArrow(window, style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
@@ -2807,7 +2750,6 @@ debugDisplayWidget(widget, 3);
             }
             else
             {
-                EStepper step=getStepper(widget, x, y, width, height);
                 EWidget  widgetType=slider
                                 ? WIDGET_SB_SLIDER
                                 : hscale||vscale
@@ -2835,26 +2777,26 @@ debugDisplayWidget(widget, 3);
                     bgnd=getFill(state, btn_down);
                 }
                 else if(WIDGET_SB_BUTTON==widgetType && GTK_APP_MOZILLA!=qtSettings.app)
-                {
-                    if(QTC_STEPPER_B==step)
+                    switch(getStepper(widget, x, y, width, height))
                     {
-                        if(horiz)
-                        {
-                            x--; width++;
-                        }
-                        else
-                        {
-                            y--; height++;
-                        }
+                        case QTC_STEPPER_B:
+                            if(horiz)
+                            {
+                                x--; width++;
+                            }
+                            else
+                            {
+                                y--; height++;
+                            }
+                            break;
+                        case QTC_STEPPER_C:
+                            if(horiz)
+                                width++;
+                            else
+                                height++;
+                        default:
+                            break;
                     }
-                    else if(QTC_STEPPER_C==step)
-                    {
-                        if(horiz)
-                            width++;
-                        else
-                            height++;
-                    }
-                }
 
                 if(GTK_APP_MOZILLA!=qtSettings.app && slider && SCROLLBAR_NONE==opts.scrollbarType)
                 {
