@@ -1433,13 +1433,12 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
                 }
             }
             return 1;
-            break;
         case SH_TitleBar_NoBorder:
             return 1;
         case SH_TitleBar_AutoRaise:
             return 1;
         case SH_ItemView_ShowDecorationSelected:
-            return true;
+            return false; // Controls whether the highlighting of listview/treeview items highlights whole line.
         case SH_ToolBox_SelectedPageTitleBold:
         case SH_ScrollBar_MiddleClickAbsolutePosition:
             return true;
@@ -1479,7 +1478,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return 0;
         default:
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);
-    }
+   }
 }
 
 QPalette QtCurveStyle::standardPalette() const
@@ -3040,9 +3039,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(opts.menuStripe && !comboMenu)
                         drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
                                         QRect(r.x(), r.y(), qMax(checkcol, constMenuPixmapWidth), r.height()), false,
-                                        getWidgetShade(WIDGET_OTHER, true, false, opts.appearance),
-                                        getWidgetShade(WIDGET_OTHER, false, false, opts.appearance),
-                                        false, opts.appearance, WIDGET_OTHER);
+                                        getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
+                                        getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
+                                        false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                     int w = 0;
                     if (!menuItem->text.isEmpty())
@@ -3080,9 +3079,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(opts.menuStripe && !comboMenu)
                         drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
                                         QRect(r.x(), r.y(), qMax(checkcol, constMenuPixmapWidth), r.height()), false,
-                                        getWidgetShade(WIDGET_OTHER, true, false, opts.appearance),
-                                        getWidgetShade(WIDGET_OTHER, false, false, opts.appearance),
-                                        false, opts.appearance, WIDGET_OTHER);
+                                        getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
+                                        getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
+                                        false, opts.menuStripeAppearance, WIDGET_OTHER);
                 }
 
                 if(comboMenu)

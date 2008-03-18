@@ -1,3 +1,9 @@
+0.58
+----
+1. Add a config option for menu stripe appearance - defaults to gradient.
+2. Add a config option for selection appearance - defaults to flat. Gtk2 only.
+3. Make list/tree view highlight more KDE3-like.
+
 0.57.1
 ------
 1. Fix border drawing when not rounding.

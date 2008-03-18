@@ -51,3 +51,7 @@ toolbarAppearance=gradient
 toolbarBorders=none
 toolbarSeparators=dots
 vArrows=false
+menuStripe=true
+menuStripeAppearance=gradient
+titlebarAppearance=gradient
+selectionAppearance=gradient

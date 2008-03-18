@@ -59,3 +59,7 @@ toolbarBorders=light
 toolbarSeparators=sunken
 vArrows=true
 windowApperance=gradient
+menuStripe=false
+menuStripeAppearance=flat
+titlebarAppearance=gradient
+selectionAppearance=gradient

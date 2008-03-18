@@ -52,3 +52,7 @@ toolbarBorders=light-all
 toolbarSeparators=sunken
 vArrows=false
 xCheck=true
+menuStripe=false
+menuStripeAppearance=flat
+titlebarAppearance=gradient
+selectionAppearance=flat

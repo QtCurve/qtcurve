@@ -51,4 +51,7 @@ toolbarAppearance=inverted
 toolbarBorders=none
 toolbarSeparators=dots
 vArrows=false
-
+menuStripe=true
+menuStripeAppearance=inverted
+titlebarAppearance=inverted
+selectionAppearance=inverted

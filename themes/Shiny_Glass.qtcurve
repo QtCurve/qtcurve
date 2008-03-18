@@ -51,3 +51,7 @@ toolbarAppearance=shinyglass
 toolbarBorders=none
 toolbarSeparators=dots
 vArrows=false
+menuStripe=false
+menuStripeAppearance=flat
+titlebarAppearance=shinyglass
+selectionAppearance=gradient

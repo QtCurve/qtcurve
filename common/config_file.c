@@ -690,6 +690,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, def->menubarAppearance)
             QTC_CFG_READ_APPEARANCE(menuitemAppearance, opts->appearance)
             QTC_CFG_READ_APPEARANCE(toolbarAppearance, def->toolbarAppearance)
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+            QTC_CFG_READ_APPEARANCE(selectionAppearance, def->selectionAppearance)
+#endif
             QTC_CFG_READ_LINE(toolbarSeparators)
             QTC_CFG_READ_LINE(splitters)
             QTC_CFG_READ_BOOL(customMenuTextColor)
@@ -726,6 +729,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(crHighlight)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
+            QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance)
 #endif
 #ifdef __cplusplus
             QTC_CFG_READ_BOOL(stdSidebarButtons)
@@ -781,6 +785,18 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             if(APPEARANCE_BEVELLED==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_GRADIENT;
 
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+            if(APPEARANCE_RAISED==opts->selectionAppearance)
+                opts->selectionAppearance=APPEARANCE_FLAT;
+            else if(APPEARANCE_BEVELLED==opts->selectionAppearance)
+                opts->selectionAppearance=APPEARANCE_GRADIENT;
+#endif
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
+            if(APPEARANCE_RAISED==opts->menuStripeAppearance)
+                opts->menuStripeAppearance=APPEARANCE_FLAT;
+            else if(APPEARANCE_BEVELLED==opts->menuStripeAppearance)
+                opts->menuStripeAppearance=APPEARANCE_GRADIENT;
+#endif
             if(opts->highlightFactor<((100.0+MIN_HIGHLIGHT_FACTOR)/100.0) ||
                opts->highlightFactor>((100.0+MAX_HIGHLIGHT_FACTOR)/100.0))
                 opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
@@ -877,10 +893,16 @@ static void defaultSettings(Options *opts)
     opts->crHighlight=false;
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
+    opts->menuStripeAppearance=APPEARANCE_GRADIENT;
 #endif
 #ifdef QTC_CONFIG_DIALOG
     opts->shading=SHADING_HSL;
 #endif
+
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+    opts->selectionAppearance=APPEARANCE_FLAT;
+#endif
+
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
     opts->gtkScrollViews=false;
@@ -1218,6 +1240,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(menubarAppearance)
         CFG_WRITE_ENTRY_FORCE(menuitemAppearance)
         CFG_WRITE_ENTRY_FORCE(toolbarAppearance)
+        CFG_WRITE_ENTRY_FORCE(selectionAppearance)
+        CFG_WRITE_ENTRY_FORCE(menuStripeAppearance)
         CFG_WRITE_ENTRY_B(toolbarSeparators, true)
         CFG_WRITE_ENTRY_B(splitters, false)
         CFG_WRITE_ENTRY(customMenuTextColor)

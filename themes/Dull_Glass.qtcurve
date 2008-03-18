@@ -51,3 +51,7 @@ toolbarAppearance=flat
 toolbarBorders=none
 toolbarSeparators=dots
 vArrows=false
+menuStripe=true
+menuStripeAppearance=gradient
+titlebarAppearance=dullglass
+selectionAppearance=gradient

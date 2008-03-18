@@ -51,4 +51,8 @@ toolbarAppearance=flat
 toolbarBorders=light
 toolbarSeparators=sunken
 vArrows=false
+menuStripe=false
+menuStripeAppearance=flat
+titlebarAppearance=dullglass
+selectionAppearance=dullglass
 
