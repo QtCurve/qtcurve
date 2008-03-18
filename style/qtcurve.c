@@ -2015,6 +2015,27 @@ static void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gbool
     unsetCairoClipping(cr);
 }
 
+void getParentBgCol(const GtkWidget *widget, GdkColor *color)
+{
+    const GtkWidget *parent;
+
+    if (!widget)
+    {
+        color->red=color->green=color->blue = 65535;
+        return;
+    }
+
+    parent = widget->parent;
+
+    while (parent && GTK_WIDGET_NO_WINDOW(parent))
+        parent = parent->parent;
+
+    if (!parent)
+        parent = widget;
+
+    *color = parent->style->bg[GTK_WIDGET_STATE(parent)];
+}
+
 static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            GtkWidget *widget, GdkRectangle *area, gint x, gint y, gint width,
                            gint height, int round, gboolean isCombo)
@@ -2042,6 +2063,19 @@ debugDisplayWidget(widget, 3);
             width++;
     }
 
+    if(ROUND_NONE!=opts.round)
+    {
+        GdkColor parentBgCol;
+
+        getParentBgCol(widget, &parentBgCol);
+        setCairoClipping(cr, area, NULL);
+        cairo_set_source_rgb(cr, QTC_CAIRO_COL(parentBgCol));
+        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+        cairo_rectangle(cr, x+1.5, y+1.5, width-3, height-3);
+        cairo_set_line_width(cr, 1);
+        cairo_stroke(cr);
+        unsetCairoClipping(cr);
+    }
 /*
     if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
         drawAreaColor(cr, area, NULL, enabled ? &style->base[state] : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);

@@ -1,6 +1,7 @@
 0.58
 ----
 1. Add a config option for selection appearance - defaults to flat.
+2. Fix entry fields and dark colour schemes.
 
 0.57.1
 ------
