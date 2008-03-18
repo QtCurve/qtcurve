@@ -259,7 +259,7 @@
           <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
          </property>
          <property name="text" >
-          <string>Selection (Gtk2 only):</string>
+          <string>Selection (KDE4 &amp; Gtk2):</string>
          </property>
          <property name="wordWrap" >
           <bool>false</bool>

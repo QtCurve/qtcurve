@@ -1270,6 +1270,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
             return 3;
+        case PM_MenuHMargin:
+        case PM_MenuVMargin:
+            return 0;
         case PM_MenuButtonIndicator:
             return 15;
         case PM_ButtonMargin:
@@ -2401,6 +2404,23 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->restore();
             break;
         }
+#if QT_VERSION >= 0x040400
+        case PE_PanelItemViewItem:
+            if(APPEARANCE_FLAT!=opts.selectionAppearance && state&State_Selected)
+            {
+                drawBevelGradient(palette.color(state&State_Enabled
+                                                    ? state&State_Active
+                                                        ? QPalette::Active
+                                                        : QPalette::Inactive
+                                                    : QPalette::Disabled,
+                                                QPalette::Highlight), true, painter, r, true,
+                                  getWidgetShade(WIDGET_SELECTION, true, false, opts.selectionAppearance),
+                                  getWidgetShade(WIDGET_SELECTION, false, false, opts.selectionAppearance),
+                                  false, opts.lvAppearance, WIDGET_SELECTION);
+                break;
+            }
+            // Fall through intentional...
+#endif
         default:
             QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
             break;
@@ -5875,7 +5895,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
         QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
 
         grad.setColorAt(0, increase ? topA : topB);
-        grad.setColorAt(0.499999999999999999, increase ? topB : topA);
+        grad.setColorAt(0.4999, increase ? topB : topA);
         grad.setColorAt(0.5, increase ? botA : botB);
         grad.setColorAt(1, increase ? botB : botA);
         p->fillRect(r, QBrush(grad));
@@ -6198,9 +6218,14 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                           ? option->palette.buttonText().color()
                           : cols[!enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
                                     ? QT_DISABLED_BORDER : borderVal]);
+#if QT_VERSION >= 0x040400
+    double       xd(window ? r.x() : (r.x()+0.5)),
+                 yd(window ? r.y() : (r.y()+0.5));
+#else
     double       xd(r.x()+0.5),
-                 yd(r.y()+0.5),
-                 radius(getRadius(opts.round, r.width(), r.height(), w, false)),
+                 yd(r.y()+0.5);
+#endif
+    double       radius(getRadius(opts.round, r.width(), r.height(), w, false)),
                  diameter(radius*2);
     int          width(r.width()-1),
                  height(r.height()-1);
@@ -6208,7 +6233,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     if(APPEARANCE_FLAT==app && window)
         app=APPEARANCE_RAISED;
 
-    if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w)
+    if(!window)
         p->setRenderHint(QPainter::Antialiasing, true);
 
     switch(borderProfile)
@@ -6305,7 +6330,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 
     p->setPen(border);
     p->drawPath(path);
-    if(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w)
+    if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
 
     if(ROUND_FULL==opts.round && window)
@@ -6605,14 +6630,14 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, c
     // This all looks like overkill - but seems to fix issues with plasma and nvidia
     // Just using 'aa' and drawing the arrows would be fine - but this makes them look
     // slightly blurry, and I dont like that.
+    p->save();
+    p->setPen(col);
+    p->setBrush(col);
     p->setRenderHint(QPainter::Antialiasing, true);
     p->fillPath(path, col);
     p->setRenderHint(QPainter::Antialiasing, false);
-    p->setRenderHint(QPainter::HighQualityAntialiasing, true);
-    p->strokePath(path, col);
-    p->setPen(col);
-    p->drawPath(path);
-    p->setRenderHint(QPainter::HighQualityAntialiasing, false);
+    p->drawPolygon(a);
+    p->restore();
 }
 
 void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, const QStyleOption *option,
