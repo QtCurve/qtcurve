@@ -2,6 +2,9 @@
 ----
 1. Add a config option for selection appearance - defaults to flat.
 2. Fix entry fields and dark colour schemes.
+3. Use background colour for disabled scrollbar buttons.
+4. Make custom styles work under Qt4 as well.
+5. Make 'slight' rounding more 'slight' -  as per pre-cairo version.
 
 0.57.1
 ------

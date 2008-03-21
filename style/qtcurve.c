@@ -726,16 +726,6 @@ static int progressbarRound(GtkWidget *widget, gboolean rev)
     }
 }
 
-static GdkColor * parentBgCol(GtkWidget *widget)
-{
-    if(GTK_IS_SCROLLBAR(widget))
-        widget=widget->parent;
-
-    return widget && widget->parent && widget->parent->style
-               ? &(widget->parent->style->bg[widget->parent->state])
-               : NULL;
-}
-
 static gboolean isMozillaWidget(GtkWidget *widget)
 {
     return isMozilla() && widget && widget->parent && widget->parent->parent &&
@@ -814,10 +804,20 @@ static void drawAreaColor(cairo_t *cr, GdkRectangle *area, GdkRegion *region, Gd
     unsetCairoClipping(cr);
 }
 
+static GdkColor * getParentBgCol(GtkWidget *widget)
+{
+    if(GTK_IS_SCROLLBAR(widget))
+        widget=widget->parent;
+
+    return widget && widget->parent && widget->parent->style
+               ? &(widget->parent->style->bg[widget->parent->state])
+               : NULL;
+}
+
 static void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
                      GdkRectangle *area, int x, int y, int width, int height)
 {
-    GdkColor *parent_col=parentBgCol(widget),
+    GdkColor *parent_col=getParentBgCol(widget),
              *bgnd_col=parent_col ? parent_col : col;
 
     drawAreaColor(cr, area, NULL, parent_col ? parent_col : col, x, y, width, height);
@@ -2015,7 +2015,7 @@ static void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gbool
     unsetCairoClipping(cr);
 }
 
-void getParentBgCol(const GtkWidget *widget, GdkColor *color)
+void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
 {
     const GtkWidget *parent;
 
@@ -2067,7 +2067,7 @@ debugDisplayWidget(widget, 3);
     {
         GdkColor parentBgCol;
 
-        getParentBgCol(widget, &parentBgCol);
+        getEntryParentBgCol(widget, &parentBgCol);
         setCairoClipping(cr, area, NULL);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(parentBgCol));
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
@@ -2668,7 +2668,7 @@ debugDisplayWidget(widget, 3);
 
     if(useButtonColor(detail))
     {
-        if(slider|hscale|vscale && GTK_STATE_INSENSITIVE==state)
+        if(slider|hscale|vscale|sbar && GTK_STATE_INSENSITIVE==state)
             btn_colors=qtcPalette.background;
         else if(QT_CUSTOM_COLOR_BUTTON(style))
         {

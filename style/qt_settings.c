@@ -518,7 +518,9 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     found|=RD_INACT_PALETTE;
                 }
 #endif
-                else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6))
+                else if (((!qt4 && SECT_GENERAL==section) || (qt4 && SECT_QT==section)) &&
+                         rd&RD_STYLE && !(found&RD_STYLE)&& 0==strncmp_i(line, "style=", 6))
+
                 {
                     int len=strlen(line);
                     qtSettings.styleName=realloc(qtSettings.styleName, strlen(&line[6])+1);
