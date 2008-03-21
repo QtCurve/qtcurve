@@ -53,6 +53,7 @@ static enum
     APP_KDIALOGD,
     APP_PLASMA,
     APP_KWIN,
+    APP_SYSTEMSETTINGS,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -756,6 +757,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_PLASMA;
         else if("kwin"==appName)
             theThemedApp=APP_KWIN;
+        else if("systemsettings"==appName)
+            theThemedApp=APP_SYSTEMSETTINGS;
 
     QPalette pal(app->palette());
 
@@ -1001,6 +1004,13 @@ void QtCurveStyle::polish(QWidget *widget)
 
     if(!IS_FLAT(opts.toolbarAppearance) && onToolBar)
         widget->setAutoFillBackground(false);
+
+    if(APP_SYSTEMSETTINGS==theThemedApp &&
+       widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+       qobject_cast<QFrame *>(widget) && QFrame::NoFrame!=((QFrame *)widget)->frameShape() &&
+       qobject_cast<QFrame *>(widget->parentWidget()) &&
+       qobject_cast<QTabWidget *>(widget->parentWidget()->parentWidget()))
+        ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
 }
 
 void QtCurveStyle::unpolish(QWidget *widget)
@@ -2700,10 +2710,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(state & (State_Raised | State_Sunken))
                 {
-                    bool         sunken(state &(/*State_Down |*/ State_On | State_Sunken)),
+                    bool         sunken(state &(/*State_Down |*/ /*State_On | */State_Sunken)),
                                  q3Header(widget && widget->inherits("Q3Header"));
                     QStyleOption opt(*option);
 
+                    opt.state&=~State_On;
                     if(q3Header && widget && widget->underMouse() && itsHoverWidget && r.contains(itsPos))
                         opt.state|=State_MouseOver;
 
@@ -3531,8 +3542,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
                                    (rtlHorTabs && Qt::AlignLeft==tabBarAlignment)),
                      fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab),
-                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab);
-                const QColor &fill(getTabFill(selected, state&State_MouseOver, itsBackgroundCols));
+                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab),
+                     mouseOver(state&State_Enabled && state&State_MouseOver);
+                const QColor &fill(getTabFill(selected, mouseOver, itsBackgroundCols));
 
                 painter->save();
                 switch(tab->shape)
@@ -3546,7 +3558,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             r.adjust(-tabOverlap, 0, 0, 0);
                         fillTab(painter, r.adjusted(1, 0, -1, 0), option, fill, true, true, WIDGET_TAB_TOP);
 
-                        // This slipping helps with plasma's tabs and nvidia
+                        // This clipping helps with plasma's tabs and nvidia
                         if(selected)
                             painter->setClipRect(r2.adjusted(0, 0, 0, -1));
                         drawBorder(painter, r.adjusted(0, 0, 0, 4), option,
@@ -3597,7 +3609,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
                         }
-                        else if(state&State_MouseOver && opts.coloredMouseOver)
+                        else if(mouseOver && opts.coloredMouseOver)
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
@@ -3661,7 +3673,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_BOT, BORDER_FLAT, false, 3);
                             }
                         }
-                        else if(state&State_MouseOver && opts.coloredMouseOver)
+                        else if(mouseOver && opts.coloredMouseOver)
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
@@ -3725,7 +3737,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
                         }
-                        else if(state&State_MouseOver && opts.coloredMouseOver)
+                        else if(mouseOver && opts.coloredMouseOver)
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
@@ -3789,7 +3801,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsMenuitemCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
                         }
-                        else if(state&State_MouseOver && opts.coloredMouseOver)
+                        else if(mouseOver && opts.coloredMouseOver)
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
@@ -3810,7 +3822,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         {
             QRect        br(r),
                          ar(r);
-            const QColor *use(itsButtonCols); // buttonColors(option));
+            const QColor *use(state&State_Enabled ? itsButtonCols : itsBackgroundCols); // buttonColors(option));
             bool         reverse(option && Qt::RightToLeft==option->direction);
             PrimitiveElement pe=state&State_Horizontal
                    ? CE_ScrollBarAddLine==element ? (reverse ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight)
@@ -4672,8 +4684,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                    maxed(scrollbar->minimum == scrollbar->maximum),
                                    atMin(maxed || scrollbar->sliderValue==scrollbar->minimum),
                                    atMax(maxed || scrollbar->sliderValue==scrollbar->maximum);
-                State              sState((horiz ? State_Horizontal : State_None) |
-                                          (maxed ? State_None : State_Enabled));
                 QRect              subline(subControlRect(control, option, SC_ScrollBarSubLine, widget)),
                                    addline(subControlRect(control, option, SC_ScrollBarAddLine, widget)),
                                    subpage(subControlRect(control, option, SC_ScrollBarSubPage, widget)),
@@ -4746,6 +4756,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     opt.rect=subline;
                     opt.state=scrollbar->state;
+                    if(maxed)
+                        opt.state&=~State_Enabled;
                     if (!(scrollbar->activeSubControls & SC_ScrollBarSubLine) ||
                         (useThreeButtonScrollBar && itsSbWidget && itsSbWidget==widget))
                         opt.state &= ~(State_Sunken | State_MouseOver);
@@ -4756,6 +4768,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         opt.rect=subline2;
                         opt.state=scrollbar->state;
+                        if(maxed)
+                            opt.state&=~State_Enabled;
                         if ((!(scrollbar->activeSubControls & SC_ScrollBarSubLine)) || (itsSbWidget && itsSbWidget!=widget))
                             opt.state &= ~(State_Sunken | State_MouseOver);
 
@@ -4767,6 +4781,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     opt.rect=addline;
                     opt.state=scrollbar->state;
+                    if(maxed)
+                        opt.state&=~State_Enabled;
                     if (!(scrollbar->activeSubControls & SC_ScrollBarAddLine))
                         opt.state &= ~(State_Sunken | State_MouseOver);
                     drawControl(CE_ScrollBarAddLine, &opt, painter, widget);
@@ -7118,7 +7134,7 @@ const QColor * QtCurveStyle::backgroundColors(const QColor &col) const
 
 const QColor * QtCurveStyle::borderColors(const QStyleOption *option, const QColor *use) const
 {
-    return itsMouseOverCols && opts.coloredMouseOver && option && option->state&State_MouseOver
+    return itsMouseOverCols && opts.coloredMouseOver && option && option->state&State_MouseOver && option->state&State_Enabled
                ? itsMouseOverCols : use;
 }
 

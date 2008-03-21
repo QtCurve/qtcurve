@@ -2,8 +2,13 @@
 ----
 1. Add a config option for menu stripe appearance - defaults to gradient.
 2. Add a config option for selection appearance - defaults to flat. (Qt4.4+)
-3. Make list/tree view highlight more KDE3-like.
-4. Qt4.4 fixes.
+3. Use background colour for disabled scrollbar buttons.
+4. Remove some frames from systemsettings.
+5. Make list/tree view highlight more KDE3-like.
+6. Qt4.4 fixes.
+7. Fix blurry arrow on KDE's colour dialog.
+8. Don't show table headers as sunken unless they actually are.
+9. Don't do mouseover for disabled listviews, treeviews, or tabs.
 
 0.57.1
 ------

@@ -1013,8 +1013,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #else
 #define QTC_FULL_INNER_RADIUS   2
 #define QTC_FULL_OUTER_RADIUS   3
-#define QTC_SLIGHT_INNER_RADIUS 1
-#define QTC_SLIGHT_OUTER_RADIUS 2
+#define QTC_SLIGHT_INNER_RADIUS 0.5
+#define QTC_SLIGHT_OUTER_RADIUS 1.5
 #endif
 
 static double getRadius(ERound r, int w, int h, EWidget widget, bool internal)
