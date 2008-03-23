@@ -102,7 +102,7 @@ if (GTK_INCLUDE_DIR)
         message("\n\n**************************************************************\n"
                 "Warning: You have enabled the KDE event filter, this has been\n"
                 "         reported to interfere with firefox and crash some\n"
-                "         applications\n"
+                "         applications. USE AT YOUR OWN RISK!\n"
                 "**************************************************************\n\n\n")
     endif(QTC_ADD_EVENT_FILTER)
     if(QTC_REORDER_GTK_DIALOG_BUTTONS)

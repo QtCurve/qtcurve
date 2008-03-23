@@ -5,6 +5,8 @@
 3. Use background colour for disabled scrollbar buttons.
 4. Make custom styles work under Qt4 as well.
 5. Make 'slight' rounding more 'slight' -  as per pre-cairo version.
+6. Help with temporary Gtk window beeing seen when QtCurve is
+   configured with -DQTC_ADD_EVENT_FILTER=true
 
 0.57.1
 ------
