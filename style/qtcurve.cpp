@@ -6353,6 +6353,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             path.lineTo(xd+width, yd+height);
     }
 
+    p->setBrush(Qt::NoBrush);
     p->setPen(border);
     p->drawPath(path);
     if(!window)
