@@ -61,7 +61,9 @@ static struct
     setCairoClipping(cr, area, NULL); \
     cairo_set_line_width(cr, 1.0);
 
-#define QTC_CAIRO_END }
+#define QTC_CAIRO_END \
+    cairo_destroy(cr); \
+    }
 
 /*
  * Disabled, for the moment, due to not working very well...

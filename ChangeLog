@@ -7,6 +7,7 @@
 5. Make 'slight' rounding more 'slight' -  as per pre-cairo version.
 6. Help with temporary Gtk window beeing seen when QtCurve is
    configured with -DQTC_ADD_EVENT_FILTER=true
+7. Fix memory leak - forgot to call cairo_destroy
 
 0.57.1
 ------
