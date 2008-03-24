@@ -3057,24 +3057,29 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuItem:
             if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
-                bool comboMenu(qobject_cast<const QComboBox*>(widget));
-                int  checkcol(qMax(menuItem->maxIconWidth, 20));
+                bool comboMenu(qobject_cast<const QComboBox*>(widget)),
+                     reverse(Qt::RightToLeft==menuItem->direction);
+                int  checkcol(qMax(menuItem->maxIconWidth, 20)),
+                     stripeWidth(qMax(checkcol, constMenuPixmapWidth));
 
                 painter->save();
 
                 if (QStyleOptionMenuItem::Separator==menuItem->menuItemType)
                 {
+
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
 
                     if(opts.menuStripe && !comboMenu)
-                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
-                                        QRect(r.x(), r.y(), qMax(checkcol, constMenuPixmapWidth), r.height()), false,
+                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true,
+                                          painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
+                                                         stripeWidth, r.height()), false,
                                         getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
                                         getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
                                         false, opts.menuStripeAppearance, WIDGET_OTHER);
 
-                    int w = 0;
+                    int w(0);
+
                     if (!menuItem->text.isEmpty())
                     {
                         painter->setFont(menuItem->font);
@@ -3083,11 +3088,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         w = menuItem->fontMetrics.width(menuItem->text) + 5;
                     }
 
-                    bool reverse = menuItem->direction == Qt::RightToLeft;
-
                     painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                    painter->drawLine(menuItem->rect.left() + 4 + (reverse ? 0 : w), menuItem->rect.center().y(),
-                                    menuItem->rect.right() - 4 - (reverse ? w : 0), menuItem->rect.center().y());
+                    painter->drawLine(menuItem->rect.left() + 4 + (reverse ? 0 : w) +
+                                        (!reverse && opts.menuStripe ? stripeWidth : 0), 
+                                      menuItem->rect.center().y(),
+                                      menuItem->rect.right() - 4 - (reverse ? w : 0) -
+                                        (reverse && opts.menuStripe ? stripeWidth : 0),
+                                      menuItem->rect.center().y());
 
 //                     painter->setPen(itsBackgroundCols[0]);
 //                     painter->drawLine(menuItem->rect.left() + 4 + (reverse ? 0 : w), menuItem->rect.center().y()+1,
@@ -3108,8 +3115,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
                     if(opts.menuStripe && !comboMenu)
-                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true, painter,
-                                        QRect(r.x(), r.y(), qMax(checkcol, constMenuPixmapWidth), r.height()), false,
+                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true,
+                                        painter,
+                                        QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth,
+                                              r.height()), false,
                                         getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
                                         getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
                                         false, opts.menuStripeAppearance, WIDGET_OTHER);
