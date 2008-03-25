@@ -135,7 +135,7 @@ static const int windowsItemFrame    =  2; // menu item frame width
 static const int windowsItemHMargin  =  3; // menu item hor text margin
 static const int windowsItemVMargin  =  2; // menu item ver text margin
 static const int windowsRightBorder  = 15; // right border on windows
-
+static const int windowsArrowHMargin =  6; // arrow horizontal margin
 static const int constProgressBarFps = 20;
 
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
@@ -5230,7 +5230,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
         case CT_MenuItem:
             if (const QStyleOptionMenuItem *mi = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
-                int h(size.height());
+                int h(newSize.height()-8); // Fix mainly for Qt4.4
 
                 if (QStyleOptionMenuItem::Separator==mi->menuItemType)
                     h = mi->text.isEmpty() ? (opts.thinnerMenuItems ? 6 : 8) : mi->fontMetrics.lineSpacing();
@@ -5240,8 +5240,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                     if (!mi->icon.isNull())
                         h = qMax(h, mi->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal).height());
 
-                    if (h < 16)
-                        h = 16;
+                    if (h < 18)
+                        h = 18;
                     h+=(opts.thinnerMenuItems ? 2 : 4);
                 }
 
