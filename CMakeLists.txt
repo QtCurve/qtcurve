@@ -83,6 +83,7 @@ if (KDE4_FOUND)
     set(QTCURVE_STYLE_DIR ${PLUGIN_INSTALL_DIR}/plugins/styles/)
     add_subdirectory(config)
     add_subdirectory(themes)
+    add_subdirectory(colors)
 
     find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES}) # kwinglobals.h is new for KDE4
 
