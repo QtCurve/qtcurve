@@ -3963,9 +3963,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_ScrollBarSubPage:
         case CE_ScrollBarAddPage:
         {
-            const QColor *use(backgroundColors(option));
+            const QColor *use(itsBackgroundCols); // backgroundColors(option));
 
             painter->save();
+#ifndef QTC_SIMPLE_SCROLLBARS
+            if(QTC_ROUNDED && SCROLLBAR_NONE==opts.scrollbarType)
+                painter->fillRect(r, palette.background().color());
+#endif
+
             if(state&State_Horizontal)
             {
                 if(IS_FLAT(opts.appearance))
@@ -3978,7 +3983,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && SCROLLBAR_NONE==opts.scrollbarType)
                 {
-                    painter->fillRect(r, palette.background().color());
                     if(CE_ScrollBarAddPage==element)
                         drawBorder(painter, r.adjusted(-5, 0, 0, 0), option, ROUNDED_RIGHT, use);
                     else
@@ -4009,7 +4013,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && SCROLLBAR_NONE==opts.scrollbarType)
                 {
-                    painter->fillRect(r, palette.background().color());
                     if(CE_ScrollBarAddPage==element)
                         drawBorder(painter, r.adjusted(0, -5, 0, 0), option, ROUNDED_BOTTOM, use);
                     else
@@ -4762,8 +4765,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 }
 
                 // Draw trough...
-                const QColor *trough(itsBackgroundCols); // backgroundColors(option));
-                bool  noButtons(SCROLLBAR_NONE==opts.scrollbarType);
+                //const QColor *trough(itsBackgroundCols); // backgroundColors(option));
+                bool  noButtons(QTC_ROUNDED && SCROLLBAR_NONE==opts.scrollbarType);
                 QRect s2(subpage), a2(addpage);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
@@ -4777,8 +4780,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 painter->save();
 #ifndef QTC_SIMPLE_SCROLLBARS
-                painter->fillRect(sbRect, palette.background().color());
+                if(noButtons)
+                    painter->fillRect(sbRect, palette.background().color());
 #endif
+#if 0
                 painter->setClipRegion(QRegion(s2)+QRegion(addpage));
 
                 opt.rect=sbRect;
@@ -4792,6 +4797,25 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             ROUNDED_NONE,
                             trough[2], trough, true, WIDGET_TROUGH);
                 painter->setClipping(false);
+#endif
+
+                if((option->subControls&SC_ScrollBarSubPage) && subpage.isValid())
+                {
+                    opt.state=scrollbar->state;
+                    opt.rect = subpage;
+                    if (!(scrollbar->activeSubControls&SC_ScrollBarSubPage))
+                        opt.state &= ~(State_Sunken | State_MouseOver);
+                    drawControl(CE_ScrollBarSubPage, &opt, painter, widget);
+                }
+
+                if((option->subControls&SC_ScrollBarAddPage) && addpage.isValid())
+                {
+                    opt.state=scrollbar->state;
+                    opt.rect = addpage;
+                    if (!(scrollbar->activeSubControls&SC_ScrollBarAddPage))
+                        opt.state &= ~(State_Sunken | State_MouseOver);
+                    drawControl(CE_ScrollBarAddPage, &opt, painter, widget);
+                }
 
                 if((option->subControls&SC_ScrollBarSubLine) && subline.isValid())
                 {
@@ -4853,7 +4877,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     // of the slider that overlaps with the trough. So, once again set the clipping
                     // region...
                     if(!(option->subControls&SC_ScrollBarSlider))
-                        painter->setClipRegion(QRegion(s2)+QRegion(addpage));
+                        painter->setClipRegion(QRegion(s2)+QRegion(a2));
 #ifdef QTC_INCREASE_SB_SLIDER
                     else
                     {
@@ -4885,7 +4909,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             }
                     }
 #endif
-
                     opt.rect=slider;
                     opt.state=scrollbar->state;
                     if (!(scrollbar->activeSubControls & SC_ScrollBarSlider))
@@ -4900,7 +4923,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawPrimitive(PE_FrameFocusRect, &opt, painter, widget);
                     }
 
-#if !defined QTC_SIMPLE_SCROLLBARS
+#ifndef QTC_SIMPLE_SCROLLBARS
                     if(noButtons && (!atMin || !atMax))
                     {
                         painter->setPen(backgroundColors(option)[QT_STD_BORDER]);
