@@ -5,12 +5,16 @@
  3. Use background colour for disabled scrollbar buttons.
  4. Remove some frames from systemsettings.
  5. Make list/tree view highlight more KDE3-like.
- 5. Don't draw menu separators through stripe.
- 6. Draw menu stripe on the right for RTL languages.
- 7. Qt4.4 fixes.
- 8. Fix blurry arrow on KDE's colour dialog.
- 9. Don't show table headers as sunken unless they actually are.
-10. Don't do mouseover for disabled listviews, treeviews, or tabs.
+ 6. Don't draw menu separators through stripe.
+ 7. Draw menu stripe on the right for RTL languages.
+ 8. Qt4.4 fixes.
+ 9. Fix blurry arrow on KDE's colour dialog.
+10. Don't show table headers as sunken unless they actually are.
+11. Don't do mouseover for disabled listviews, treeviews, or tabs.
+12. Right-align QMessageBox buttons - more KDE like.
+13. Supply a QtCurve colors file.
+14. Lighter menustripe when not lightening menus.
+15. Lighter menu separators.
 
 0.57.1
 ------

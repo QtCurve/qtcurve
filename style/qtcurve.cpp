@@ -238,9 +238,35 @@ static inline void drawRect(QPainter *p, const QRect &r)
     p->drawRect(r.x(), r.y(), r.width()-1, r.height()-1);
 }
 
+static void drawPathRect(QPainter *p, const QRect &r, const QColor &col)
+{
+    double       xd(r.x()+0.5),
+                 yd(r.y()+0.5);
+    int          width(r.width()-1),
+                 height(r.height()-1);
+    QPainterPath path;
+
+    path.moveTo(xd+width, yd+height);
+    path.lineTo(xd+width, yd);
+    path.lineTo(xd, yd);
+    path.lineTo(xd, yd+height);
+    path.lineTo(xd+width, yd+height);
+
+    p->setRenderHint(QPainter::Antialiasing, true);
+    p->setBrush(Qt::NoBrush);
+    p->setPen(col);
+    p->drawPath(path);
+    p->setRenderHint(QPainter::Antialiasing, false);
+}
+
 static inline void drawAaLine(QPainter *p, int x1, int y1, int x2, int y2)
 {
     p->drawLine(QLineF(x1+0.5, y1+0.5, x2+0.5, y2+0.5));
+}
+
+static inline void drawAaPoint(QPainter *p, int x, int y)
+{
+    p->drawPoint(QPointF(x+0.5, y+0.5));
 }
 
 static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
@@ -255,6 +281,7 @@ static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int o
         y2(r.y()+r.height()-1),
         i;
 
+    p->setRenderHint(QPainter::Antialiasing, true);
     if(horiz)
     {
         if(startOffset && y+startOffset>0)
@@ -262,13 +289,13 @@ static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int o
 
         p->setPen(cols[dark]);
         for(i=0; i<space; i+=step)
-            p->drawLine(x+offset, y+i, x2-(offset+etchedDisp), y+i);
+            drawAaLine(p, x+offset, y+i, x2-(offset+etchedDisp), y+i);
 
         if(light)
         {
             p->setPen(cols[0]);
             for(i=1; i<space; i+=step)
-                p->drawLine(x+offset+etchedDisp, y+i, x2-offset, y+i);
+                drawAaLine(p, x+offset+etchedDisp, y+i, x2-offset, y+i);
         }
     }
     else
@@ -278,15 +305,16 @@ static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int o
 
         p->setPen(cols[dark]);
         for(i=0; i<space; i+=step)
-            p->drawLine(x+i, y+offset, x+i, y2-(offset+etchedDisp));
+            drawAaLine(p, x+i, y+offset, x+i, y2-(offset+etchedDisp));
 
         if(light)
         {
             p->setPen(cols[0]);
             for(i=1; i<space; i+=step)
-                p->drawLine(x+i, y+offset+etchedDisp, x+i, y2-offset);
+                drawAaLine(p, x+i, y+offset+etchedDisp, x+i, y2-offset);
         }
     }
+    p->setRenderHint(QPainter::Antialiasing, false);
 }
 
 static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
@@ -298,6 +326,7 @@ static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int of
         i, j,
         numDots((horiz ? (r.width()-(2*offset))/3 : (r.height()-(2*offset))/3)+1);
 
+    p->setRenderHint(QPainter::Antialiasing, true);
     if(horiz)
     {
         if(startOffset && y+startOffset>0)
@@ -306,12 +335,12 @@ static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int of
         p->setPen(cols[dark]);
         for(i=0; i<space; i+=3)
             for(j=0; j<numDots; j++)
-                p->drawPoint(x+offset+(3*j), y+i);
+                drawAaPoint(p, x+offset+(3*j), y+i);
 
         p->setPen(cols[0]);
         for(i=1; i<space; i+=3)
             for(j=0; j<numDots; j++)
-                p->drawPoint(x+offset+1+(3*j), y+i);
+                drawAaPoint(p, x+offset+1+(3*j), y+i);
     }
     else
     {
@@ -321,13 +350,14 @@ static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int of
         p->setPen(cols[dark]);
         for(i=0; i<space; i+=3)
             for(j=0; j<numDots; j++)
-                p->drawPoint(x+i, y+offset+(3*j));
+                drawAaPoint(p, x+i, y+offset+(3*j));
 
         p->setPen(cols[0]);
         for(i=1; i<space; i+=3)
             for(j=0; j<numDots; j++)
-                p->drawPoint(x+i, y+offset+1+(3*j));
+                drawAaPoint(p, x+i, y+offset+1+(3*j));
     }
+    p->setRenderHint(QPainter::Antialiasing, false);
 }
 
 inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
@@ -1412,6 +1442,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return Qt::AlignLeft;
         case SH_Header_ArrowAlignment:
             return Qt::AlignLeft;
+        case SH_MessageBox_CenterButtons:
+            return false;
         case SH_ProgressDialog_CenterCancelButton:
             return false;
         case SH_PrintDialog_RightAlignButtons:
@@ -3071,7 +3103,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
 
                     if(opts.menuStripe && !comboMenu)
-                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true,
+                        drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
                                           painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
                                                          stripeWidth, r.height()), false,
                                         getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
@@ -3088,11 +3120,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         w = menuItem->fontMetrics.width(menuItem->text) + 5;
                     }
 
-                    painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                    painter->drawLine(menuItem->rect.left() + 4 + (reverse ? 0 : w) +
+                    painter->setPen(itsBackgroundCols[QTC_MENU_SEP_SHADE]);
+                    painter->drawLine(menuItem->rect.left() + 3 + (reverse ? 0 : w) +
                                         (!reverse && opts.menuStripe ? stripeWidth : 0), 
                                       menuItem->rect.center().y(),
-                                      menuItem->rect.right() - 4 - (reverse ? w : 0) -
+                                      menuItem->rect.right() - 3 - (reverse ? w : 0) -
                                         (reverse && opts.menuStripe ? stripeWidth : 0),
                                       menuItem->rect.center().y());
 
@@ -3115,7 +3147,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
                     if(opts.menuStripe && !comboMenu)
-                        drawBevelGradient(itsBackgroundCols[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3], true,
+                        drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
                                         painter,
                                         QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth,
                                               r.height()), false,
@@ -6077,12 +6109,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     if(!colouredMouseOver && lightBorder && br.width()>0 && br.height()>0)
     {
-        QColor col(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
-
-        p->setPen(col);
-        br=r;
-        br.adjust(1,1,-1,-1);
-        drawRect(p, br);
+        br=r.adjusted(1,1,-1,-1);
+        drawPathRect(p, br, cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
 
         if(WIDGET_PROGRESSBAR==w && !IS_GLASS(app))
             br.adjust(1,1,-1,-1);
@@ -6226,7 +6254,6 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
-    EAppearance  app(widgetApp(w, &opts));
     State        state(option->state);
     bool         enabled(state&State_Enabled),
                  hasFocus(state&State_HasFocus),
@@ -6238,8 +6265,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                             : WIDGET_ENTRY==w
                                 ? buttonColors(option)
                                 : itsBackgroundCols);
-    QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator &&
-                        (option->state&State_Enabled)
+    QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
                           : cols[!enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
                                     ? QT_DISABLED_BORDER : borderVal]);
@@ -6255,9 +6281,6 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     int          width(r.width()-1),
                  height(r.height()-1);
 
-    if(APPEARANCE_FLAT==app && window)
-        app=APPEARANCE_RAISED;
-
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, true);
 
@@ -6268,6 +6291,11 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         case BORDER_RAISED:
         case BORDER_SUNKEN:
         {
+            EAppearance  app(widgetApp(w, &opts));
+
+            if(APPEARANCE_FLAT==app && window)
+                app=APPEARANCE_RAISED;
+
             QColor       tl(cols[BORDER_RAISED==borderProfile ? 0 : QT_FRAME_DARK_SHADOW]),
                          br(cols[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0]);
             QPainterPath topPath,
