@@ -130,6 +130,13 @@ style "qtcurve-swt-combo" = "qtcurve-default"
   ythickness = 2
 }
 
+style "qtcurve-separator" = "qtcurve-default"
+{
+  GtkMenuItem::horizontal-padding = 1
+  xthickness = 0
+  ythickness = 3
+}
+
 class "*GtkWidget" style "qtcurve-default"
 class "*GtkNotebook" style "qtcurve-w2"
 class "*Button" style "qtcurve-h2"
@@ -139,6 +146,7 @@ class "*GtkMenu" style "qtcurve-w2"
 class "*GtkScrolledWindow" style "qtcurve-w2"
 class "*GtkViewport" style "qtcurve-w2"
 class "*MenuBar" style "qtcurve-menubar"
+class "*SeparatorMenuItem" style "qtcurve-separator"
 class "*MenuItem" style "qtcurve-menuitem"
 widget_class "*MenuBar*MenuItem" style "qtcurve-menubaritem"
 class "*GtkFrame" style "qtcurve-w2"
@@ -151,7 +159,7 @@ widget_class "*.GtkAccelMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkRadioMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkCheckMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkImageMenuItem.*" style "qtcurve-default"
-widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-default"
+widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-separator"
 class "*GtkEntry" style "qtcurve-w2b"
 widget_class "*.tooltips.*.GtkToggleButton" style "qtcurve-tasklist"
 widget_class "*Tree*GtkButton" style "qtcurve-default"

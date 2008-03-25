@@ -8,6 +8,7 @@
 6. Help with temporary Gtk window beeing seen when QtCurve is
    configured with -DQTC_ADD_EVENT_FILTER=true
 7. Fix memory leak - forgot to call cairo_destroy
+8. Lighter menu separators.
 
 0.57.1
 ------

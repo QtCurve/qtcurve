@@ -3495,7 +3495,7 @@ debugDisplayWidget(widget, 3);
 #ifdef QTC_GTK2_MENU_STRIPE
         if(opts.menuStripe && !isComboMenu(widget))
             drawBevelGradient(cr, style, area, NULL, x+2, y+2, isMozilla() ? 18 : 22, height-4,
-                              &qtcPalette.background[opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 3],
+                              &qtcPalette.background[QTC_MENU_STRIPE_SHADE],
                               getWidgetShade(WIDGET_OTHER, TRUE, FALSE, opts.menuStripeAppearance),
                               getWidgetShade(WIDGET_OTHER, FALSE, FALSE, opts.menuStripeAppearance),
                               FALSE, TRUE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
@@ -4915,6 +4915,8 @@ debugDisplayWidget(widget, 3);
             drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, (x1<x2 ? x1 : x2)+1, y+1, abs(x2-x1));
         drawHLine(cr, QTC_CAIRO_COL(style->text[state]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
     }
+    else if(DETAIL("menuitem"))
+        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QTC_MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
     else
         drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
 
