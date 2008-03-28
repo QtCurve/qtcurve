@@ -410,11 +410,12 @@ Cache key:
     app        3
     horiz      1
     increase   1
+    alpha      8
     blue       8
     green      8
     red        8
     ------------
-              64
+              72 :-(
 */
 #ifdef QTC_INT_CACHE_KEY
 static qulonglong double2int(double d) { return (qulonglong)(d*100); }
@@ -422,35 +423,35 @@ static qulonglong double2int(double d) { return (qulonglong)(d*100); }
 static int double2int(double d) { return (int)(d*100); }
 #endif
 
-static QtcKey createKey(qulonglong size, QRgb color, bool horiz, bool increase=false, int app=0,
+static QtcKey createKey(qulonglong size, const QColor &color, bool horiz, bool increase=false, int app=0,
                         EWidget w=WIDGET_OTHER, double shadeTop=0.0, double shadeBot=0.0)
 {
     if(WIDGET_DEF_BUTTON==w && !IS_GLASS(app)) // Glass uses different shading for def button...
         w=WIDGET_STD_BUTTON;
 
 #ifdef QTC_INT_CACHE_KEY
-    return (color&RGB_MASK)+
+    return color.rgba()+
            ((horiz ? 1 : 0)<<24)+((increase ? 1 : 0)<<25)+((((qulonglong)app)&0x7)<<26)+
            ((size&0x7FFF)<<29)+((double2int(shadeTop)&0x7F)<<44)+((double2int(shadeBot)&0x7F)<<51)+
            ((((qulonglong)w)&0x1F)<<58)+0;
 #else
     QString key;
 
-    QTextStream(&key) << size << color << horiz << increase << app << (int)w
+    QTextStream(&key) << size << ' ' << color.rgba() << ' ' << horiz << increase << ' ' << app << ' ' << (int)w
                       << ' ' << double2int(shadeTop) << ' ' << double2int(shadeBot);
 
     return key;
 #endif
 }
 
-static QtcKey createKey(QRgb color, EPixmap p)
+static QtcKey createKey(const QColor &color, EPixmap p)
 {
 #ifdef QTC_INT_CACHE_KEY
-    return (((qulonglong)0xFFFFFFFF)<<32)|((p&0xFF)<<24)|(color&RGB_MASK);
+    return (((qulonglong)0xFFFFFFFF)<<32)|((p&0xFF)<<24)|(color.rgb()&RGB_MASK);
 #else
     QString key;
 
-    QTextStream(&key) << 'P' << color << p;
+    QTextStream(&key) << 'P' << color.rgba() << p;
 
     return key;
 #endif
@@ -920,6 +921,10 @@ void QtCurveStyle::polish(QWidget *widget)
         theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
+
+    // Enable hover effects in all itemviews
+    if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
+        itemView->viewport()->setAttribute(Qt::WA_Hover);
 
     if(enableMouseOver &&
        (qobject_cast<QPushButton *>(widget) ||
@@ -2295,7 +2300,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         drawRect(painter, r);
                     }
                     else
-                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_OTHER, BORDER_FLAT, QT_FOCUS);
+                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_FOCUS, BORDER_FLAT, QT_FOCUS);
                 }
 #endif
             }
@@ -2451,20 +2456,79 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         }
 #if QT_VERSION >= 0x040400
         case PE_PanelItemViewItem:
-            if(APPEARANCE_FLAT!=opts.selectionAppearance && state&State_Selected)
-            {
-                drawBevelGradient(palette.color(state&State_Enabled
-                                                    ? state&State_Active
-                                                        ? QPalette::Active
-                                                        : QPalette::Inactive
-                                                    : QPalette::Disabled,
-                                                QPalette::Highlight), true, painter, r, true,
-                                  getWidgetShade(WIDGET_SELECTION, true, false, opts.selectionAppearance),
-                                  getWidgetShade(WIDGET_SELECTION, false, false, opts.selectionAppearance),
-                                  false, opts.lvAppearance, WIDGET_SELECTION);
+        {
+            const QStyleOptionViewItemV4 *v4Opt(qstyleoption_cast<const QStyleOptionViewItemV4*>(option));
+
+            if (v4Opt) //  && (v4Opt->features & QStyleOptionViewItemV2::Alternate))
+                painter->fillRect(option->rect, v4Opt->backgroundBrush);
+
+            if (!(state & (State_Selected|State_MouseOver)))
                 break;
+
+            const QAbstractItemView *view (qobject_cast<const QAbstractItemView *>(widget));
+            bool hover((state&State_MouseOver) && (!view || view->selectionMode() != QAbstractItemView::NoSelection));
+
+            if (!hover && !(state&State_Selected))
+                break;
+
+            QPalette::ColorGroup cg(state&State_Enabled
+                                        ? state&State_Active
+                                            ? QPalette::Normal
+                                            : QPalette::Inactive
+
+                                        : QPalette::Disabled);
+
+            QColor color(palette.color(cg, QPalette::Highlight));
+            QRect  r2(r);
+
+            if (hover)
+                if (!(state&State_Selected))
+                    color.setAlphaF(0.20);
+                else
+                    color=color.lighter(110);
+
+            bool   listView(qobject_cast<const QListView *>(widget));
+            double outerRadius(0.0),
+                   innerRadius(0.0);
+
+            if(listView)
+            {
+                r2.adjust(2, 2, -2, -2);
+                if(r.height()>48 && r.width()>48)
+                {
+                    outerRadius=3.0;
+                    innerRadius=2.5;
+                }
+                else if(r.height()>24 && r.width()>24)
+                {
+                    outerRadius=QTC_FULL_OUTER_RADIUS;
+                    innerRadius=QTC_FULL_INNER_RADIUS;
+                }
+                else
+                {
+                    outerRadius=QTC_SLIGHT_OUTER_RADIUS;
+                    innerRadius=QTC_SLIGHT_INNER_RADIUS;
+                }
             }
-            // Fall through intentional...
+
+            drawBevelGradient(color, true, painter, r2, true,
+                                getWidgetShade(WIDGET_SELECTION, true, false, opts.selectionAppearance),
+                                getWidgetShade(WIDGET_SELECTION, false, false, opts.selectionAppearance),
+                                false, opts.selectionAppearance, WIDGET_SELECTION);
+
+            if(listView)
+            {
+                painter->save();
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setBrush(Qt::NoBrush);
+                painter->setPen(color);
+                painter->drawPath(buildPath(r, WIDGET_SELECTION, ROUNDED_ALL, outerRadius));
+                painter->setPen(color.lighter(APPEARANCE_SHINY_GLASS==opts.selectionAppearance ? 180 : 125));
+                painter->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SELECTION, ROUNDED_ALL, innerRadius));
+                painter->restore();
+            }
+            break;
+        }
 #endif
         default:
             QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
@@ -3101,11 +3165,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if (QStyleOptionMenuItem::Separator==menuItem->menuItemType)
                 {
+                    bool isMenu(!widget || qobject_cast<const QMenu*>(widget)),
+                         doStripe(isMenu && opts.menuStripe && !comboMenu);
 
-                    painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
-                                                                                : itsBackgroundCols[ORIGINAL_SHADE]);
+                    if(isMenu)
+                        painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
+                                                                                    : itsBackgroundCols[ORIGINAL_SHADE]);
 
-                    if(opts.menuStripe && !comboMenu)
+                    if(doStripe)
                         drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
                                           painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
                                                          stripeWidth, r.height()), false,
@@ -3125,15 +3192,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     painter->setPen(itsBackgroundCols[QTC_MENU_SEP_SHADE]);
                     painter->drawLine(menuItem->rect.left() + 3 + (reverse ? 0 : w) +
-                                        (!reverse && opts.menuStripe ? stripeWidth : 0), 
+                                        (!reverse && doStripe ? stripeWidth : 0),
                                       menuItem->rect.center().y(),
                                       menuItem->rect.right() - 3 - (reverse ? w : 0) -
-                                        (reverse && opts.menuStripe ? stripeWidth : 0),
+                                        (reverse && doStripe ? stripeWidth : 0),
                                       menuItem->rect.center().y());
 
-//                     painter->setPen(itsBackgroundCols[0]);
-//                     painter->drawLine(menuItem->rect.left() + 4 + (reverse ? 0 : w), menuItem->rect.center().y()+1,
-//                                     menuItem->rect.right() - 4 - (reverse ? w : 0), menuItem->rect.center().y()+1);
                     painter->restore();
                     break;
                 }
@@ -3278,7 +3342,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         QRect vShortcutRect(visualRect(option->direction, menuItem->rect,
                                                     QRect(textRect.topRight(), QPoint(menuItem->rect.right(), textRect.bottom()))));
 
-                        if (dis && !act)
+                        if (dis) //  && !act)
                         {
                             painter->setPen(palette.light().color());
                             painter->drawText(vShortcutRect.adjusted(1, 1, 1, 1), textFlags, s.mid(t + 1));
@@ -3294,7 +3358,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         font.setBold(true);
 
                     painter->setFont(font);
-                    if (dis && !act)
+                    if (dis) //  && !act)
                     {
                         painter->setPen(palette.light().color());
                         painter->drawText(vTextRect.adjusted(1, 1, 1, 1), textFlags, s.left(t));
@@ -5815,7 +5879,7 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
                                                        : PROGRESS_CHUNK_WIDTH*2);
     QRect   r(0, 0, horiz ? size : origRect.width(),
                     horiz ? origRect.height() : size);
-    QtcKey  key(createKey(horiz ? r.height() : r.width(), itsMenuitemCols[ORIGINAL_SHADE].rgb(), horiz, true,
+    QtcKey  key(createKey(horiz ? r.height() : r.width(), itsMenuitemCols[ORIGINAL_SHADE], horiz, true,
                           app2App(bevApp, false), WIDGET_PROGRESSBAR, shadeTop, shadeBot));
     QPixmap *pix(itsPixmapCache.object(key));
 
@@ -5916,13 +5980,14 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
         {
             QRect   r(0, 0, horiz ? QTC_PIXMAP_DIMENSION : origRect.width(),
                             horiz ? origRect.height() : QTC_PIXMAP_DIMENSION);
-            QtcKey  key(createKey(horiz ? r.height() : r.width(), base.rgb(), horiz, increase,
+            QtcKey  key(createKey(horiz ? r.height() : r.width(), base, horiz, increase,
                                   app2App(app, sel), w, shadeTop, shadeBot));
             QPixmap *pix(itsPixmapCache.object(key));
 
             if(!pix)
             {
                 pix=new QPixmap(r.width(), r.height());
+                pix->fill(Qt::transparent);
 
                 QPainter pixPainter(pix);
 
@@ -5980,6 +6045,14 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
 
         QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
 
+        if(WIDGET_SELECTION==w)
+        {
+            topA.setAlphaF(base.alphaF());
+            topB.setAlphaF(base.alphaF());
+            botA.setAlphaF(base.alphaF());
+            botB.setAlphaF(base.alphaF());
+        }
+
         grad.setColorAt(0, increase ? topA : topB);
         grad.setColorAt(0.4999, increase ? topB : topA);
         grad.setColorAt(0.5, increase ? botA : botB);
@@ -6012,6 +6085,9 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
 
             QLinearGradient grad(r2.topLeft(), horiz ? r2.bottomLeft() : r2.topRight());
 
+            if(WIDGET_SELECTION==w)
+                bot.setAlphaF(base.alphaF());
+
             grad.setColorAt(0, base);
             grad.setColorAt(1, bot);
             p->fillRect(r2, QBrush(grad));
@@ -6027,6 +6103,14 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
 
             qreal           borderSize(BEVEL_BORDER(w)/((qreal)(horiz ? r.height() : r.width())));
             QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+
+            if(WIDGET_SELECTION==w)
+            {
+                bot.setAlphaF(base.alphaF());
+                midTop.setAlphaF(base.alphaF());
+                midBot.setAlphaF(base.alphaF());
+                top.setAlphaF(base.alphaF());
+            }
 
             grad.setColorAt(0, top);
             grad.setColorAt(borderSize, midTop);
@@ -6053,6 +6137,12 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
 
         bool            inc(sel || APPEARANCE_INVERTED!=app ? increase : !increase);
         QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+
+        if(WIDGET_SELECTION==w)
+        {
+            bot.setAlphaF(base.alphaF());
+            top.setAlphaF(base.alphaF());
+        }
 
         grad.setColorAt(0, inc ? top : bot);
         grad.setColorAt(1, inc ? bot : top);
@@ -6236,22 +6326,10 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
 void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *option, */bool top, bool bot, bool raised) const
 {
-    double          xd(r.x()+0.5),
-                    yd(r.y()+0.5);
-    double          radius(getRadius(opts.round, r.width(), r.height(), WIDGET_STD_BUTTON, false)),
-                    diameter(radius*2);
-    int             width(r.width()-1),
-                    height(r.height()-1);
-    QPainterPath    path;
     QLinearGradient grad(r.topLeft(), r.bottomLeft());
     QColor          topCol(Qt::black),
                     botCol(raised ? Qt::black : Qt::white);
 
-    path.moveTo(xd+width, yd+height-radius);
-    path.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 90);
-    path.arcTo(xd, yd, diameter, diameter, 90, 90);
-    path.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 90);
-    path.arcTo(xd+width-diameter, yd+height-diameter, diameter, diameter, 270, 90);
 
     topCol.setAlphaF(!top || raised ? 0.0 : QTC_ETCH_TOP_MIDDLE_ALPHA);
     botCol.setAlphaF(bot ? (raised ? QTC_ETCH_TOP_MIDDLE_ALPHA : QTC_ETCH_BOTTOM_MIDDLE_ALPHA) : 0.0);
@@ -6259,9 +6337,60 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *o
     grad.setColorAt(1, botCol);
     p->save();
     p->setRenderHint(QPainter::Antialiasing, true);
-    p->strokePath(path, QPen(QBrush(grad), 1.0));
+    p->strokePath(buildPath(r, WIDGET_STD_BUTTON, ROUNDED_ALL,
+                            getRadius(opts.round, r.width(), r.height(), WIDGET_STD_BUTTON, false)),
+                  QPen(QBrush(grad), 1.0));
     p->setRenderHint(QPainter::Antialiasing, false);
     p->restore();
+}
+
+QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius) const
+{
+    if(ROUND_NONE==opts.round)
+        round=ROUNDED_NONE;
+
+
+#if QT_VERSION >= 0x040400
+    bool         window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
+    double       xd(window ? r.x() : (r.x()+0.5)),
+                 yd(window ? r.y() : (r.y()+0.5));
+#else
+    double       xd(r.x()+0.5),
+                 yd(r.y()+0.5);
+#endif
+    double       diameter(radius*2);
+    int          width(r.width()-1),
+                 height(r.height()-1);
+
+    QPainterPath path;
+
+    if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BR)
+        path.moveTo(xd+width, yd+height-radius);
+    else
+        path.moveTo(xd+width, yd+height);
+
+    if (round&CORNER_TR)
+        path.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 90);
+    else
+        path.lineTo(xd+width, yd);
+
+    if (round&CORNER_TL)
+        path.arcTo(xd, yd, diameter, diameter, 90, 90);
+    else
+        path.lineTo(xd, yd);
+
+    if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BL)
+        path.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 90);
+    else
+        path.lineTo(xd, yd+height);
+
+    if(WIDGET_MDI_WINDOW_TITLE!=w)
+        if (round&CORNER_BR)
+            path.arcTo(xd+width-diameter, yd+height-diameter, diameter, diameter, 270, 90);
+        else
+            path.lineTo(xd+width, yd+height);
+
+    return path;
 }
 
 void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
@@ -6286,17 +6415,6 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                           ? option->palette.buttonText().color()
                           : cols[!enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
                                     ? QT_DISABLED_BORDER : borderVal]);
-#if QT_VERSION >= 0x040400
-    double       xd(window ? r.x() : (r.x()+0.5)),
-                 yd(window ? r.y() : (r.y()+0.5));
-#else
-    double       xd(r.x()+0.5),
-                 yd(r.y()+0.5);
-#endif
-    double       radius(getRadius(opts.round, r.width(), r.height(), w, false)),
-                 diameter(radius*2);
-    int          width(r.width()-1),
-                 height(r.height()-1);
 
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, true);
@@ -6319,10 +6437,10 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                          botPath;
             double       radiusi(getRadius(opts.round, r.width(), r.height(), w, true)),
                          diameteri(radiusi*2),
-                         xdi(window ? r.x()+1 : xd+1),
-                         ydi(window ? r.y()+1 : yd+1);
-            int          widthi(width-2),
-                         heighti(height-2);
+                         xdi(r.x()+(window ? 1.0 : 1.5)),
+                         ydi(r.y()+(window ? 1.0 : 1.5));
+            int          widthi(r.width()-3),
+                         heighti(r.height()-3);
 
             if(doBlend && !window)
             {
@@ -6368,39 +6486,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         }
     }
 
-    QPainterPath path;
-
-    if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BR)
-        path.moveTo(xd+width, yd+height-radius);
-    else
-        path.moveTo(xd+width, yd+height);
-
-    if (round&CORNER_TR)
-        path.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 90);
-    else
-        path.lineTo(xd+width, yd);
-
-    if (round&CORNER_TL)
-        path.arcTo(xd, yd, diameter, diameter, 90, 90);
-    else
-        path.lineTo(xd, yd);
-
-    if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BL)
-        path.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 90);
-    else
-        path.lineTo(xd, yd+height);
-
-    if(WIDGET_MDI_WINDOW_TITLE!=w)
-    {
-        if (round&CORNER_BR)
-            path.arcTo(xd+width-diameter, yd+height-diameter, diameter, diameter, 270, 90);
-        else
-            path.lineTo(xd+width, yd+height);
-    }
-
     p->setBrush(Qt::NoBrush);
     p->setPen(border);
-    p->drawPath(path);
+    p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, false)));
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
 
@@ -7443,8 +7531,7 @@ const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *u
 
 QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) const
 {
-    QRgb    rgb(col.rgb());
-    QtcKey  key(createKey(rgb, p));
+    QtcKey  key(createKey(col, p));
     QPixmap *pix=itsPixmapCache.object(key);
 
     if(!pix)

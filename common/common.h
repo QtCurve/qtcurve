@@ -375,6 +375,7 @@ typedef enum
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     WIDGET_SELECTION,
 #endif
+    WIDGET_FOCUS,
     WIDGET_OTHER
 } EWidget;
 
@@ -1021,7 +1022,7 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 
 static double getRadius(ERound r, int w, int h, EWidget widget, bool internal)
 {
-    if(WIDGET_CHECKBOX==widget && ROUND_NONE!=r)
+    if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
 
     switch(r)

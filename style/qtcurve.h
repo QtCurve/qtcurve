@@ -21,7 +21,8 @@
   Boston, MA 02110-1301, USA.
 */
 
-#define QTC_INT_CACHE_KEY  // Use 64bit ints as cache index - should be faster than strings!
+// Cant use int cache, as not enough bits! :-(
+//#define QTC_INT_CACHE_KEY  // Use 64bit ints as cache index - should be faster than strings!
 
 #include <QProgressBar>
 #include <QTime>
@@ -98,6 +99,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawEtch(QPainter *p, const QRect &r, /*const QStyleOption *option, */bool top, bool bot, bool raised=false) const;
+    QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
