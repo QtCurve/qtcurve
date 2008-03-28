@@ -5020,7 +5020,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         else
             realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                            qtcPalette.background, ROUNDED_ALL, BORDER_FLAT,
-                           WIDGET_OTHER, 0, QT_FOCUS);
+                           WIDGET_FOCUS, 0, QT_FOCUS);
         QTC_CAIRO_END
     }
 #endif
