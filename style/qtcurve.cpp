@@ -1444,8 +1444,6 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
-          //case SH_ItemView_ChangeHighlightOnFocus: // Gray out selected items when losing focus.
-          //  return true;
         case SH_TabBar_Alignment:
             return Qt::AlignLeft;
         case SH_Header_ArrowAlignment:
@@ -1490,6 +1488,10 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return 1;
         case SH_TitleBar_AutoRaise:
             return 1;
+//        case SH_ItemView_ArrowKeysNavigateIntoChildren:
+//            return false;
+//         case SH_ItemView_ChangeHighlightOnFocus: // gray out selected items when losing focus.
+//             return true;
         case SH_ItemView_ShowDecorationSelected:
             return false; // Controls whether the highlighting of listview/treeview items highlights whole line.
         case SH_ToolBox_SelectedPageTitleBold:
@@ -1514,8 +1516,6 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             }
             else
                 return '\0';
-//        case SH_ItemView_ArrowKeysNavigateIntoChildren:
-//            return false;
         case SH_MenuBar_MouseTracking:
             return opts.menubarMouseOver ? 1 : 0;
         case SH_ScrollView_FrameOnlyAroundContents:
