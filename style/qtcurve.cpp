@@ -2300,7 +2300,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         drawRect(painter, r);
                     }
                     else
-                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_FOCUS, BORDER_FLAT, QT_FOCUS);
+                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_FOCUS, BORDER_FLAT,
+                                   false, QT_FOCUS);
                 }
 #endif
             }
