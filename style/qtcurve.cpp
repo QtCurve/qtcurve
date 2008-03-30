@@ -972,7 +972,7 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->installEventFilter(this);
 
         if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
-           (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
+           (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
         {
             QPalette pal(widget->palette());
 
@@ -1538,7 +1538,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             else
                 return '\0';
         case SH_MenuBar_MouseTracking:
-            return opts.menubarMouseOver ? 1 : 0;
+            // Always return 1, as setting to 0 dissables the effect when a menu is shown.
+            return 1; // opts.menubarMouseOver ? 1 : 0;
         case SH_ScrollView_FrameOnlyAroundContents:
             return opts.gtkScrollViews && (!widget || !widget->inherits("QComboBoxListView"));
         case SH_ComboBox_Popup:
