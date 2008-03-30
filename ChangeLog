@@ -8,7 +8,8 @@
 5. Round listview selections.
 6. Enable hover effects in all itemviews.
 7. Fix spearator's on dolphin 4.1's info sidebar.
-8. Fix mouseover of disabled menu items - visuble when not lightening menu background.
+8. Fix mouseover of disabled menu items - visible when not
+   lightening menu background.
 
 0.58
 ----
