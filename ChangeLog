@@ -1,11 +1,13 @@
 0.58.1
 ------
 1. When drawing gray focus rect, draw only slightly rounded.
-2. Fix selection appearance usage.
-3. Round listview selections.
-4. Enable hover effects in all itemviews.
-5. Fix spearator's on dolphin 4.1's info sidebar.
-6. Fix mouseover of disabled menu items - visuble when not lightening menu background.
+2. When coloring menubars, correctly draw menubar text colour
+   of inactive windows.
+3. Fix selection appearance usage.
+4. Round listview selections.
+5. Enable hover effects in all itemviews.
+6. Fix spearator's on dolphin 4.1's info sidebar.
+7. Fix mouseover of disabled menu items - visuble when not lightening menu background.
 
 0.58
 ----

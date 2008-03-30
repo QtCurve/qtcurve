@@ -970,6 +970,23 @@ void QtCurveStyle::polish(QWidget *widget)
 
         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->installEventFilter(this);
+
+        if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
+           (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
+        {
+            QPalette pal(widget->palette());
+
+            pal.setBrush(QPalette::Active, QPalette::Foreground, opts.customMenuTextColor
+                                                   ? opts.customMenuNormTextColor
+                                                   : pal.highlightedText().color());
+
+            if(!opts.shadeMenubarOnlyWhenActive)
+                pal.setBrush(QPalette::Inactive, QPalette::Foreground, opts.customMenuTextColor
+                                                   ? opts.customMenuNormTextColor
+                                                   : pal.highlightedText().color());
+
+            widget->setPalette(pal);
+        }
     }
     else if(opts.fixParentlessDialogs)
         if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
@@ -1093,6 +1110,10 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->removeEventFilter(this);
+
+        if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
+           (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
+            widget->setPalette(QApplication::palette());
     }
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
@@ -3137,15 +3158,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             ? opts.customMenuTextColor
                                                 ? opts.customMenuSelTextColor
                                                 : palette.highlightedText().color()
-                                            : itsActive
-                                                ? opts.customMenuTextColor
-                                                    ? opts.customMenuNormTextColor
-                                                    : SHADE_BLEND_SELECTED==opts.shadeMenubars ||
-                                                        (SHADE_CUSTOM==opts.shadeMenubars &&
-                                                        TOO_DARK(itsMenubarCols[ORIGINAL_SHADE]))
-                                                        ? palette.highlightedText().color()
-                                                        : palette.foreground().color()
-                                                : palette.foreground().color()
+                                            : palette.foreground().color()
                                         : palette.foreground().color();
 
                     painter->setPen(col);
