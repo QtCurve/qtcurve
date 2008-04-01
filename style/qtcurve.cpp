@@ -1374,11 +1374,11 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 //                 return 1;
 //            if (qobject_cast<const QMenu *>(widget))
 //                return 1;
-//             if(QTC_CAN_DO_EFFECT && widget && // !isFormWidget(widget) &&
-//                (::qobject_cast<const QLineEdit *>(widget) || // ::qobject_cast<const QDateTimeEditBase*>(widget) ||
-//                 ::qobject_cast<const QTextEdit*>(widget)))
-//                 return 3;
-//             else
+            if(QTC_CAN_DO_EFFECT && widget && // !isFormWidget(widget) &&
+               (::qobject_cast<const QLineEdit *>(widget) ||
+                ::qobject_cast<const QAbstractScrollArea*>(widget)))
+                return 3;
+            else
                 return 2;
         case PM_SpinBoxFrameWidth:
             return QTC_CAN_DO_EFFECT ? 3 : 2;
@@ -1880,6 +1880,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     painter->restore();
                 }
             }
+            else if(::qobject_cast<const QAbstractScrollArea *>(widget))
+                drawPrimitive(PE_FrameLineEdit, option, painter, widget);
             else
             {
                 const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
@@ -3541,10 +3543,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else if(!comboBox->currentIcon.isNull())
                 {
                     QRect editRect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxEditField, widget);
-                    if (comboBox->direction == Qt::RightToLeft)
-                        editRect.adjust(0, 2, -2, -2);
-                    else
-                        editRect.adjust(2, 2, 0, -2);
                     painter->save();
                     painter->setClipRect(editRect);
                     if (!comboBox->currentIcon.isNull())
@@ -5067,23 +5065,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 CEtchCheck      check(widget);
                 bool            doEtch(QTC_CAN_DO_EFFECT);
 
-//                 if(sunken)
-//                 {
-//                     fillFlags|=State_Sunken;
-//                     if(fillFlags&State_MouseOver)
-//                         fillFlags-=State_MouseOver;
-//                 }
-
-//                 if(comboBox->editable)
-//                 {
-//                     painter->setPen(cg.background());
-//                     drawRect(painter, r);
-//                 }
-
                 if(doEtch)
                 {
-                    frame.adjust( 1, 1, -1, -1);
-                    field.adjust(reverse ? 0 : 1, 1, reverse ? -1 : 0, -1);
+                    frame.adjust(1, 1, -1, -1);
 
                     drawEtch(painter, widget ? widget->rect() : r, WIDGET_COMBO,
                              !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
@@ -5115,11 +5099,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
                 {
-                    if(reverse)
-                        arrow.adjust(-1, 0, 0, 0);
-                    else
-                        arrow.adjust(1, 0, 0, 0);
-
                     if(sunken)
                         arrow.adjust(1, 1, 1, 1);
 
@@ -5138,25 +5117,23 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     if(comboBox->editable)
                     {
-                        field.adjust(-1,-1, 0, 1);
+                        //field.adjust(-1,-1, 0, 1);
                         painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
                         drawRect(painter, field);
-                        field.adjust(-2,-2, 2, 2);
+                        // 4 because 2 for frame width, and 2 for adjustments done in subControlRect
+                        field.adjust(-4,-4, 4, 4);
                         drawEntryField(painter, field, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, WIDGET_COMBO);
                     }
                     else 
                     {
-                        field.adjust(1, sunken ? 2 : 1, sunken ? 2 : 1, -1);
-                        if(reverse)
-                            field.adjust(4, 0, 4, 0);
                         painter->setPen(use[QT_BORDER(state&State_Enabled)]);
-                        painter->drawLine(reverse ? field.left()-3 : field.right(), field.top(),
-                                          reverse ? field.left()-3 : field.right(), field.bottom());
+                        painter->drawLine(reverse ? arrow.right()+1 : arrow.x()-1, arrow.top()+2,
+                                          reverse ? arrow.right()+1 : arrow.x()-1, arrow.bottom()-2);
                         if(!sunken)
                         {
                             painter->setPen(use[0]);
-                            painter->drawLine(reverse ? field.left()-2 : field.right()+1, field.top(),
-                                              reverse ? field.left()-2 : field.right()+1, field.bottom());
+                            painter->drawLine(reverse ? arrow.right()+2 : arrow.x(), arrow.top()+2,
+                                              reverse ? arrow.right()+2 : arrow.x(), arrow.bottom()-2);
                         }
                     }
 
@@ -5165,9 +5142,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         QStyleOptionFocusRect focus;
 
-                        focus.rect=doEtch
-                                    ? field.adjusted(reverse ? 0 : -3, -1, -3, 1)
-                                    : field.adjusted(reverse ? 0 : -2, -1, reverse ? -5 : -3, 1);
+                        focus.rect=reverse
+                                    ? field.adjusted(0, -1, 1, 1)
+                                    : field.adjusted(-1, -1, 0, 1);
 
                         drawPrimitive(PE_FrameFocusRect, &focus, painter, widget);
                     }
@@ -5385,27 +5362,40 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
         case CC_ComboBox:
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
-                QRect r(QTC_BASE_STYLE::subControlRect(control, option, subControl, widget));
+                bool doEtch(QTC_CAN_DO_EFFECT),
+                     ed(comboBox->editable);
+                int  x(r.x()),
+                     y(r.y()),
+                     w(r.width()),
+                     h(r.height()),
+                     margin(comboBox->frame ? 3 : 0),
+                     bmarg(comboBox->frame ? 2 : 0);
 
-                if(SC_ComboBoxFrame==subControl)
+                switch (subControl)
                 {
-                    if(comboBox->editable)
-                        if(reverse)
-                            r=QRect(r.x(), r.y(), 19, r.height());
-                        else
-                            r=QRect((r.x()+r.width()-1)-18, r.y(), 19, r.height());
+                    case SC_ComboBoxFrame:
+                        if(ed)
+                        {
+                            int btnWidth(doEtch ? 20 : 19);
+
+                            r=QRect(x+w-btnWidth, y, btnWidth, h);
+                        }
+                        break;
+                    case SC_ComboBoxArrow:
+                        r.setRect(x + w - bmarg - (doEtch ? 17 : 16), y + bmarg, 16, h - 2*bmarg);
+                        if(ed)
+                            r.adjust(2, 0, 0, 0);
+                        break;
+                    case SC_ComboBoxEditField:
+                        r.setRect(x + margin +1, y + margin + 1, w - 2 * margin - 19, h - 2 * margin -2);
+                        if(doEtch)
+                            r.adjust(1, 1, -1, -1);
+                        break;
+                    case SC_ComboBoxListBoxPopup:
+                    default:
+                        break;
                 }
-                else if (SC_ComboBoxEditField==subControl)
-                    if(QTC_CAN_DO_EFFECT)
-                        if(reverse)
-                            r.adjust(2, 0, -2, 0);
-                        else
-                            r.adjust(2, 0, 0, 0);
-                    else if(reverse)
-                            r.adjust(2, 0, 0, 0);
-                        else
-                            r.adjust(1, 0, 0, 0);
-                return r;
+                return visualRect(comboBox->direction, comboBox->rect, r);
             }
             break;
         case CC_SpinBox:
