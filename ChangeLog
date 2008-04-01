@@ -1,14 +1,16 @@
 0.58.1
 ------
 1. When drawing gray focus rect, draw only slightly rounded.
-2. When coloring menubars, correctly draw menubar text colour
+2. Etch/shadow effect now applied to widget sides as well as
+   top/bottom.
+3. When coloring menubars, correctly draw menubar text colour
    of inactive windows.
-3. Fix menubar tracking when menubarMouseOver set to false.
-4. Fix selection appearance usage.
-5. Round listview selections.
-6. Enable hover effects in all itemviews.
-7. Fix spearator's on dolphin 4.1's info sidebar.
-8. Fix mouseover of disabled menu items - visible when not
+4. Fix menubar tracking when menubarMouseOver set to false.
+5. Fix selection appearance usage.
+6. Round listview selections.
+7. Enable hover effects in all itemviews.
+8. Fix spearator's on dolphin 4.1's info sidebar.
+9. Fix mouseover of disabled menu items - visible when not
    lightening menu background.
 
 0.58

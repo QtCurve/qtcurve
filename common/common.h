@@ -260,12 +260,11 @@ typedef GdkColor color;
 
 #define NUM_SPLITTER_DASHES 21
 
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w)
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || WIDGET_COMBO==w)
 #ifdef __cplusplus
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w)
 #else
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || \
-                        WIDGET_SPIN_UP==w || WIDGET_SPIN_DOWN==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_COMBO==w)
 #endif
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
@@ -356,6 +355,7 @@ typedef enum
     WIDGET_TROUGH,
     WIDGET_CHECKBOX,
     WIDGET_TOGGLE_BUTTON,
+    WIDGET_COMBO,
     WIDGET_MENU_ITEM,
     WIDGET_PROGRESSBAR,
 #ifndef __cplusplus
@@ -1011,29 +1011,66 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #if defined __cplusplus
 #define QTC_FULL_INNER_RADIUS   1.5
 #define QTC_FULL_OUTER_RADIUS   2.5
+#define QTC_FULL_ETCH_RADIUS    3.5
 #define QTC_SLIGHT_INNER_RADIUS 0.5
 #define QTC_SLIGHT_OUTER_RADIUS 1.5
+#define QTC_SLIGHT_ETCH_RADIUS  2.5
 #else
 #define QTC_FULL_INNER_RADIUS   2
 #define QTC_FULL_OUTER_RADIUS   3
+#define QTC_FULL_ETCH_RADIUS    4
 #define QTC_SLIGHT_INNER_RADIUS 0.5
 #define QTC_SLIGHT_OUTER_RADIUS 1.5
+#define QTC_SLIGHT_ETCH_RADIUS  2.5
 #endif
 
-static double getRadius(ERound r, int w, int h, EWidget widget, bool internal)
+typedef enum
+{
+    RADIUS_INTERNAL,
+    RADIUS_EXTERNAL,
+    RADIUS_ETCH
+} ERadius;
+
+static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 {
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
 
-    switch(r)
+    switch(rad)
     {
-        case ROUND_FULL:
-            if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
-                return internal ? QTC_FULL_INNER_RADIUS : QTC_FULL_OUTER_RADIUS;
-        case ROUND_SLIGHT:
-            return internal ? QTC_SLIGHT_INNER_RADIUS : QTC_SLIGHT_OUTER_RADIUS;
-        case ROUND_NONE:
-            return 0;
+        case RADIUS_INTERNAL:
+            switch(r)
+            {
+                case ROUND_FULL:
+                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                        return QTC_FULL_INNER_RADIUS;
+                case ROUND_SLIGHT:
+                    return QTC_SLIGHT_INNER_RADIUS;
+                case ROUND_NONE:
+                    return 0;
+            }
+        case RADIUS_EXTERNAL:
+            switch(r)
+            {
+                case ROUND_FULL:
+                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                        return QTC_FULL_OUTER_RADIUS;
+                case ROUND_SLIGHT:
+                    return QTC_SLIGHT_OUTER_RADIUS;
+                case ROUND_NONE:
+                    return 0;
+            }
+        case RADIUS_ETCH:
+            switch(r)
+            {
+                case ROUND_FULL:
+                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                        return QTC_FULL_ETCH_RADIUS;
+                case ROUND_SLIGHT:
+                    return QTC_SLIGHT_ETCH_RADIUS;
+                case ROUND_NONE:
+                    return 0;
+            }
     }
 
     return 0;
