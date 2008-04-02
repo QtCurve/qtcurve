@@ -40,6 +40,7 @@
 
 #define WINDOWTITLE_SPACER 0x10000000
 #define QTC_STATE_REVERSE  State_Mini
+#define QTC_STATE_MENU     State_Mini
 
 #define M_PI 3.14159265358979323846
 
@@ -130,6 +131,8 @@ class CEtchCheck
 };
 
 bool CEtchCheck::theirStatus=true;
+
+#define QTC_CAN_ETCH(widget) (widget && !qobject_cast<const QAbstractItemView *>(widget))
 
 // from windows style
 static const int windowsItemFrame    =  2; // menu item frame width
@@ -1343,7 +1346,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuVMargin:
             return 0;
         case PM_MenuButtonIndicator:
-            return 15;
+            return QTC_CAN_DO_EFFECT ? 16 : 15;
         case PM_ButtonMargin:
             return 3;
         case PM_TabBarTabShiftVertical:
@@ -1384,7 +1387,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return QTC_CAN_DO_EFFECT ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
-            return QTC_CHECK_SIZE;
+            return QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget) ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
             return QTC_RADIO_SIZE;
@@ -2153,6 +2156,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setY(r.y()+((r.height()-QTC_CHECK_SIZE)/2)-1);
             r.setWidth(QTC_CHECK_SIZE);
             r.setHeight(QTC_CHECK_SIZE);
+        case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
             const QColor *bc(borderColors(option, NULL)),
@@ -2163,20 +2167,25 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     ? use[QTC_CR_MO_FILL]
                                     : palette.base().color()
                                 : palette.background().color());
+            CEtchCheck    check(widget);
+            bool          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU) && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
+            QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
 
             painter->save();
             if(IS_FLAT(opts.appearance))
-                painter->fillRect(QRect(r.x()+1, r.y()+1, r.width()-2, r.height()-2), bgnd);
+                painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
             else
-                drawBevelGradient(bgnd, false, painter, QRect(r.x()+1, r.y()+1, r.width()-2, r.height()-2), true,
+                drawBevelGradient(bgnd, false, painter, rect.adjusted(1, 1, -1, -1), true,
                                   getWidgetShade(WIDGET_TROUGH, true, false, APPEARANCE_GRADIENT),
                                   getWidgetShade(WIDGET_TROUGH, false, false, APPEARANCE_GRADIENT),
                                   false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
             painter->setPen(midColor(state&State_Enabled ? palette.base().color() : palette.background().color(), use[3]));
-            painter->drawLine(r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
-            painter->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
+            painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
+            painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
 
-            drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
+            drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
+            if(doEtch)
+                drawEtch(painter, r, WIDGET_CHECKBOX);
 
             if(state&State_On)
             {
@@ -2227,15 +2236,17 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(QTC_RADIO_SIZE);
         case PE_IndicatorRadioButton:
         {
-            int      x(r.x()), y(r.y());
+            bool     doEtch(!(state&QTC_STATE_MENU) && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
+            QRect    rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+            int      x(rect.x()), y(rect.y());
             QPolygon clipRegion;
 
             clipRegion.setPoints(8,  x,    y+8,     x,    y+4,     x+4, y,      x+8, y,
                                      x+12, y+4,     x+12, y+8,     x+8, y+12,   x+4, y+12);
 
             const QColor *bc(borderColors(option, NULL)),
-                            *btn(buttonColors(option)),
-                            *use(bc ? bc : btn);
+                         *btn(buttonColors(option)),
+                         *use(bc ? bc : btn);
             const QColor &bgnd(state&State_Enabled
                                 ? state&State_MouseOver
                                     ? use[QTC_CR_MO_FILL]
@@ -2243,28 +2254,37 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                 : palette.background().color());
 
             painter->save();
+
             painter->setClipRegion(QRegion(clipRegion));
             if(IS_FLAT(opts.appearance))
-                painter->fillRect(QRect(x+1, y+1, r.width()-2, r.height()-2), bgnd);
+                painter->fillRect(rect, bgnd);
             else
-                drawBevelGradient(bgnd, false, painter, QRect(x+1, y+1, r.width()-2, r.height()-2), true,
+                drawBevelGradient(bgnd, false, painter, rect, true,
                                   getWidgetShade(WIDGET_TROUGH, true, false, APPEARANCE_GRADIENT),
                                   getWidgetShade(WIDGET_TROUGH, false, false, APPEARANCE_GRADIENT),
                                   false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
             painter->setClipping(false);
 
-/*
-            painter->setRenderHint(QPainter::Antialiasing, true);
-            QPainterPath path;
-            path.moveTo(12, 12);
-            path.arcTo(0.5, 6.5, 12, 12, 0, 360);
-            painter->drawPath(path);
-            painter->setRenderHint(QPainter::Antialiasing, false);
-            painter->setPen(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)]);
-            painter->drawPath(path);
-*/
             painter->drawPixmap(x, y, *getPixmap(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)],
                                 PIX_RADIO_BORDER, 0.8));
+
+            if(doEtch)
+            {
+                QColor topCol(Qt::black),
+                       botCol(Qt::white);
+
+                topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+                botCol.setAlphaF(QTC_ETCH_RADIO_BOTTOM_ALPHA);
+
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setBrush(Qt::NoBrush);
+                painter->setPen(topCol);
+                painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
+                painter->setPen(botCol);
+                painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
+                painter->setRenderHint(QPainter::Antialiasing, false);
+            }
+
             if(state&State_On)
                 painter->drawPixmap(x, y, *getPixmap(state&State_Enabled
                                                         ? /*state&State_Selected
@@ -2314,14 +2334,18 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonBevel:
         case PE_PanelButtonCommand:
         {
+            // The wantToEtch/canEtch stuff below is to stop buttons in listviews from being etched, and these dont look good
+            CEtchCheck   check(widget);
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
                          isFlat(false),
                          isKWin(state&QtC_StateKWin),
                          isDown(state&State_Sunken || state&State_On),
-                         isOnListView(!isKWin && widget && qobject_cast<const QTreeView *>(widget));
+                         isOnListView(!isKWin && widget && qobject_cast<const QAbstractItemView *>(widget)),
+                         wantToEtch(QTC_CAN_DO_EFFECT),
+                         canEtch(QTC_CAN_ETCH(widget)),
+                         doEtch(wantToEtch && canEtch);
             QStyleOption opt(*option);
-            CEtchCheck   check(widget);
 
             if(PE_PanelButtonBevel==element)
                 opt.state|=State_Enabled;
@@ -2337,7 +2361,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->save();
 
-            if(isOnListView)
+            if(isOnListView || (wantToEtch && !canEtch))
                 opt.state|=State_Horizontal|State_Raised;
 
             if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
@@ -2345,7 +2369,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             // This section fixes some drawng issues with krunner's buttons on nvidia
             painter->setRenderHint(QPainter::Antialiasing, true);
-            painter->fillRect(r.adjusted(1, 1, -1, -1), palette.background().color());
+            painter->fillRect(doEtch ? r.adjusted(2, 2, -2, -2) : r.adjusted(1, 1, -1, -1), palette.background().color());
             painter->setRenderHint(QPainter::Antialiasing, false);
 
             drawLightBevel(painter, r, &opt, ROUNDED_ALL, getFill(&opt, use), use,
@@ -2355,7 +2379,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         ? WIDGET_NO_ETCH_BTN
                                         : isDefault && state&State_Enabled && IND_FONT_COLOR==opts.defBtnIndicator
                                             ? WIDGET_DEF_BUTTON
-                                            : WIDGET_STD_BUTTON);
+                                            : wantToEtch && !canEtch ? WIDGET_NO_ETCH_BTN : WIDGET_STD_BUTTON);
 
             if (isDefault && state&State_Enabled)
                 switch(opts.defBtnIndicator)
@@ -2364,7 +2388,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         QPainterPath path;
                         int          offset(isDown ? 5 : 4),
-                                     etchOffset(QTC_CAN_DO_EFFECT ? 1 : 0);
+                                     etchOffset(doEtch ? 1 : 0);
                         double       xd(r.x()+0.5),
                                      yd(r.y()+0.5);
 
@@ -2385,7 +2409,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         QRegion      outer(r);
                         QRect        r2(r);
 
-                        if(QTC_CAN_DO_EFFECT)
+                        if(doEtch)
                             r2.adjust(1, 1, -1, -1);
 
                         r2.adjust(COLORED_BORDER_SIZE, COLORED_BORDER_SIZE, -COLORED_BORDER_SIZE,
@@ -3239,7 +3263,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             QStyleOptionButton button;
                             button.rect = checkRect;
-                            button.state = menuItem->state;
+                            button.state = menuItem->state|QTC_STATE_MENU;
                             if (checked)
                                 button.state |= State_On;
                             button.palette = palette;
@@ -3251,7 +3275,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             {
                                 QStyleOptionButton button;
                                 button.rect = checkRect;
-                                button.state = menuItem->state;
+                                button.state = menuItem->state|QTC_STATE_MENU;
                                 if (checked)
                                     button.state |= State_On;
                                 button.palette = palette;
@@ -4181,6 +4205,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if (toolbutton->subControls & SC_ToolButtonMenu)
                 {
+                    if(etched)
+                        if(reverse)
+                            menuarea.adjust(1, 1, 0, -1);
+                        else
+                            menuarea.adjust(0, 1, -1, -1);
+
                     tool.rect = menuarea;
                     tool.state = mflags|State_Horizontal;
 
@@ -4190,7 +4220,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                         if(mflags&State_Sunken)
                             tool.state&=~State_MouseOver;
-                        drawLightBevel(painter, menuarea.adjusted(0, etched ? 1 : 0, 0, etched ? -1 : 0), &tool,
+
+                        drawLightBevel(painter, menuarea, &tool,
                                        reverse ? ROUNDED_LEFT : ROUNDED_RIGHT, getFill(&tool, use), use, true, WIDGET_NO_ETCH_BTN);
                     }
 
@@ -5332,7 +5363,8 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                               QTC_BASE_STYLE::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
             break;
         case SE_ProgressBarContents:
-            return option->rect.adjusted(2, 2, -2, -2);
+            if(!opts.fillProgress)
+                return option->rect.adjusted(2, 2, -2, -2);
         case SE_ProgressBarGroove:
         case SE_ProgressBarLabel:
             return option->rect;
@@ -6347,8 +6379,8 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, EWidget w, bool raised)
 
     buildSplitPath(r, w, ROUNDED_ALL, getRadius(opts.round, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
 
-    topCol.setAlphaF(raised ? 0.0 : QTC_ETCH_TOP_MIDDLE_ALPHA);
-    botCol.setAlphaF(raised ? QTC_ETCH_TOP_MIDDLE_ALPHA : QTC_ETCH_BOTTOM_MIDDLE_ALPHA);
+    topCol.setAlphaF(raised ? 0.0 : QTC_ETCH_TOP_ALPHA);
+    botCol.setAlphaF(raised ? QTC_ETCH_TOP_ALPHA : QTC_ETCH_BOTTOM_ALPHA);
 
     p->setBrush(Qt::NoBrush);
     p->setRenderHint(QPainter::Antialiasing, true);
@@ -6423,7 +6455,7 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
 
     if (!window && round&CORNER_TR)
     {
-        tl.moveTo(xd+width-radius, yd+radius);
+        tl.moveTo(xd+width-(radius/2), yd+(radius/2));
         tl.arcTo(xd+width-diameter, yd, diameter, diameter, 45, 45);
     }
     else
@@ -6743,8 +6775,8 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     int  length(vertical ? r.height() : r.width());
     bool drawFull(length > 3);
 
-    if(drawFull)
-        drawLightBevel(p, r, &opt, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, true, WIDGET_PROGRESSBAR);
+    if(opts.fillProgress || drawFull)
+        drawLightBevel(p, r, &opt, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, !opts.fillProgress, WIDGET_PROGRESSBAR);
     else
     {
         p->setPen(itsMenuitemCols[QT_STD_BORDER]);
@@ -6759,7 +6791,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
             p->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
     }
 
-    if(QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
+    if(!opts.fillProgress && QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
     {
         p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[QT_STD_BORDER]));
         if(!(round&CORNER_TL) || !drawFull)
@@ -7135,12 +7167,18 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
         int dh=(grv.height()-5)>>1;
         grv.adjust(0, dh, 0, -dh);
         opt.state|=State_Horizontal;
+
+        if(QTC_CAN_DO_EFFECT)
+            grv.adjust(0, -1, 0, 1);
     }
     else
     {
         int dw=(grv.width()-5)>>1;
         grv.adjust(dw, 0, -dw, 0);
         opt.state&=~State_Horizontal;
+
+        if(QTC_CAN_DO_EFFECT)
+            grv.adjust(-1, 0, 1, 0);
     }
 
     if(grv.height()>0 && grv.width()>0)
@@ -7148,7 +7186,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
         drawLightBevel(p, grv, &opt, ROUNDED_ALL, itsBackgroundCols[slider->state&State_Enabled ? 2 : ORIGINAL_SHADE],
                        itsBackgroundCols, true, WIDGET_SLIDER_TROUGH);
 
-        if(opts. fillSlider && slider->maximum!=slider->minimum && slider->state&State_Enabled)
+        if(opts.fillSlider && slider->maximum!=slider->minimum && slider->state&State_Enabled)
         {
             const QColor &usedCol=itsSliderCols
                                    ? itsSliderCols[ORIGINAL_SHADE]
