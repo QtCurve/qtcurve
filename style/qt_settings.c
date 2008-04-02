@@ -1721,6 +1721,12 @@ static gboolean qtInit(Options *opts)
                                     "class \"*GtkEntry\" style  \"QtcEtch\" "
                                     "widget_class \"*Toolbar*Entry\" style \"QtcEtch\" "
                                     "class \"*GtkWidget\" style \"QtcEtchI\"");
+
+            if(!opts->gtkScrollViews && NULL==gtk_check_version(2, 12, 0))
+                gtk_rc_parse_string("style \"QtcSV\""
+                                    " { GtkScrolledWindow::scrollbar-spacing = 0 "
+                                      " GtkScrolledWindow::scrollbars-within-bevel = 1 } "
+                                    "class \"*GtkWidget\" style \"QtcSV\"");
         }
         return TRUE;
     }

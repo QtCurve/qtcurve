@@ -5,6 +5,8 @@
    top/bottom.
 3. Add etching to checks, radios, slider grooves, and progressbars.
 4. Option to have progress fill groove - default to true.
+5. If using Gtk2 >= 2.12, then respect the 'Gtk style scrollviews'
+   setting.
 
 0.58
 ----
