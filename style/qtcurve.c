@@ -3130,7 +3130,12 @@ debugDisplayWidget(widget, 3);
         }
         else if(pbar)
         {
+            gboolean doEtch=QTC_DO_EFFECT;
+
             drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+
+            if(doEtch)
+                x++, y++, width-=2, height-=2;
 
             if(opts.gradientPbGroove)
                 drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2,
@@ -3146,6 +3151,9 @@ debugDisplayWidget(widget, 3);
                        state, area, NULL, x, y, width, height,
                        NULL, ROUNDED_ALL, BORDER_SUNKEN, WIDGET_OTHER,
                        DF_BLEND|DF_DO_CORNERS);
+
+            if(doEtch)
+                 drawEtch(cr, style, area, NULL, x-1, y-1, width+2, height+2, FALSE);
         }
         else /* Scrollbars... */
         {
@@ -3313,15 +3321,24 @@ debugDisplayWidget(widget, 3);
         {
             // Give it a blank icon - so that menuStripe looks ok, plus this matched KDE style!
             if(0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))
-            {
                 gtk_image_menu_item_set_image(GTK_IS_IMAGE_MENU_ITEM(widget),
                                               gtk_image_new_from_pixbuf(getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0)));
-            }
             else
-            gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))),
-                                        getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
+                gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))),
+                                          getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
         }
 #endif
+
+        if(pbar)
+        {
+            if(QTC_DO_EFFECT)
+                x++, y++, width-=2, height-=2;
+
+            if(opts.fillProgress)
+                x--, y--, width+=2, height+=2;
+            else
+                x++, y++, width-=2, height-=2;
+        }
 
         if(pbar && STRIPE_NONE!=opts.stripedProgress)
         {
@@ -3426,14 +3443,7 @@ debugDisplayWidget(widget, 3);
                      stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,
                      horiz=horizPbar || menuitem;
 
-            if(pbar)
-            {
-                if(opts.fillProgress)
-                    x--, y--, width+=2, height+=2;
-                else
-                    x++, y++, width-=2, height-=2;
-            }
-            else if(!border)
+            if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
             if(!opts.borderMenuitems && (mb || menuitem))
