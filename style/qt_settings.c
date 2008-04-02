@@ -1710,6 +1710,17 @@ static gboolean qtInit(Options *opts)
             }
             if(tmpStr)
                 free(tmpStr);
+
+            if(ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
+                gtk_rc_parse_string("style \"QtcEtch\" "
+                                    "{ xthickness = 3 ythickness = 3 } "
+                                    "style \"QtcEtchI\" "
+                                    "{ GtkCheckButton::indicator_size = 15 } "
+                                    "class \"*GtkRange\" style \"QtcEtch\" "
+                                    "class \"*GtkSpinButton\" style \"QtcEtch\" "
+                                    "class \"*GtkEntry\" style  \"QtcEtch\" "
+                                    "widget_class \"*Toolbar*Entry\" style \"QtcEtch\" "
+                                    "class \"*GtkWidget\" style \"QtcEtchI\"");
         }
         return TRUE;
     }

@@ -1,6 +1,10 @@
-0.58.1
-------
+0.59
+----
 1. When drawing gray focus rect, draw only slightly rounded.
+2. Etch/shadow effect now applied to widget sides as well as
+   top/bottom.
+3. Add etching to checks, radios, and slider grooves.
+4. Option to have progress fill groove - default to true.
 
 0.58
 ----
