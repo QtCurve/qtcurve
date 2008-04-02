@@ -14,6 +14,7 @@ darkerBorders=false
 defBtnIndicator=colored
 drawStatusBarFrames=false
 embolden=false
+fillProgress=true
 fillSlider=true
 framelessGroupBoxes=true
 gradientPbGroove=true
