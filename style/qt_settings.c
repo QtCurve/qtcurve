@@ -134,7 +134,8 @@ struct QtData
                     *styleName;
     GtkToolbarStyle toolbarStyle;
     struct QtIcons  iconSizes;
-    gboolean        buttonIcons;
+    gboolean        buttonIcons,
+                    shadeSortedList;
     EGtkApp         app;
     gboolean        qt4;
 };
@@ -249,7 +250,8 @@ enum
     RD_BUTTON_ICONS      = 0x0080,
     RD_SMALL_ICON_SIZE   = 0x0100,
     RD_LIST_COLOR        = 0x0200,
-    RD_STYLE             = 0x0400
+    RD_STYLE             = 0x0400,
+    RD_LIST_SHADE        = 0x0800
 };
 
 static char * getKdeHome()
@@ -504,6 +506,17 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
 
                     found|=RD_LIST_COLOR;
                 }
+                else if(SECT_GENERAL==section && rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE) &&
+                        0==strncmp_i(line, "shadeSortColumn=", 16))
+                {
+                    char *eq=strstr(line, "=");
+
+                    if(eq && ++eq)
+                    {
+                        qtSettings.shadeSortedList=0==strncmp_i(eq, "true", 4);
+                        found|=RD_LIST_SHADE;
+                    }
+                }
                 else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
                         (qt4 ? 0==strncmp_i(line, "Palette\\active=", 15) : 0==strncmp_i(line, "active=", 7)))
                 {
@@ -703,7 +716,8 @@ printf("REQUEST FONT: %s\n", qtSettings.font);
         qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
     if(rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS))
         qtSettings.buttonIcons=TRUE;
-
+    if(rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE))
+        qtSettings.shadeSortedList=TRUE;
     return found;
 }
 
@@ -1489,7 +1503,7 @@ static gboolean qtInit(Options *opts)
                 opts->shadeMenubars=SHADE_NONE;
 
             readRc(kdeGlobals(),
-                   (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR,
+                   (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE,
                     opts, TRUE, FALSE, FALSE);
 
             /* Tear off menu items dont seem to draw they're background, and the default background

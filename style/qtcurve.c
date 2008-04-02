@@ -311,6 +311,47 @@ static void tintColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor)
     mid->blue=limit((a->blue+(factor*b->blue))/(1+factor));
 }
 
+static GdkColor * getCellCol(GdkColor *std, const gchar *detail)
+{
+    static GdkColor shaded;
+
+    if(!qtSettings.shadeSortedList || !strstr(detail, "_sorted"))
+        return std;
+
+    shaded=*std;
+
+    if(QTC_IS_BLACK(shaded))
+        shaded.red=shaded.green=shaded.blue=55<<8;
+    else
+    {
+        double r=shaded.red/65535.0,
+               g=shaded.green/65535.0,
+               b=shaded.blue/65535.0;
+        double h, s, v;
+
+        rgbToHsv(r, g, b, &h, &s, &v);
+
+        if (v > 175.0/255.0)
+            v*=100.0/104.0;
+        else
+            v*=120.0/100.0;
+
+        if (v > 1.0)
+        {
+            s -= v - 1.0;
+            if (s < 0)
+                s = 0;
+            v = 1.0;
+        }
+
+        hsvToRgb(&r, &g, &b, h, s, v);
+        shaded.red=r*65535.0;
+        shaded.green=g*65535.0;
+        shaded.blue=b*65535.0;
+    }
+    return &shaded;
+}
+
 #define QTC_ARROW_STATE(state) (GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL)
 /* (GTK_STATE_ACTIVE==state ? GTK_STATE_NORMAL : state) */
 
@@ -2262,10 +2303,11 @@ debugDisplayWidget(widget, 3);
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, opts.highlightFactor, x, y, width, height);
     else if (haveAlternareListViewCol() && GTK_STATE_SELECTED!=state &&
              GTK_IS_TREE_VIEW(widget) && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_even"))
-        drawAreaColor(cr, area, NULL, &style->base[GTK_STATE_NORMAL], x, y, width, height);
+        drawAreaColor(cr, area, NULL, getCellCol(&style->base[GTK_STATE_NORMAL], detail), x, y, width, height);
     else if (haveAlternareListViewCol() && GTK_STATE_SELECTED!=state &&
              GTK_IS_TREE_VIEW(widget) && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_odd"))
-        drawAreaColor(cr, area, NULL, &qtSettings.colors[PAL_ACTIVE][COLOR_LV], x, y, width, height);
+        drawAreaColor(cr, area, NULL, getCellCol(&qtSettings.colors[PAL_ACTIVE][COLOR_LV], detail),
+                      x, y, width, height);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x+1, y+1,
