@@ -2170,7 +2170,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     : palette.base().color()
                                 : palette.background().color());
             CEtchCheck    check(widget);
-            bool          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU) && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
+            bool          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
+                                 && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
+                                 && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
             QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
 
             painter->save();
@@ -2239,7 +2241,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorRadioButton:
         {
             CEtchCheck check(widget);
-            bool       doEtch(!(state&QTC_STATE_MENU) && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
+            bool       doEtch(!(state&QTC_STATE_MENU)
+                              && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
+                              && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
             QRect      rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
             int        x(rect.x()), y(rect.y());
             QPolygon   clipRegion;
