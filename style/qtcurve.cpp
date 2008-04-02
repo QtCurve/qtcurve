@@ -2117,8 +2117,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             drawControl(CE_Splitter, &dockWidgetHandle, painter, widget);
             break;
         }
-        case PE_FrameLineEdit:
         case PE_PanelLineEdit:
+        case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
                 if (lineEdit->lineWidth>0 &&
@@ -2132,9 +2132,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         opt.state^=State_Enabled;
 
                     painter->save();
-
                     CEtchCheck check(widget);
-                    drawEntryField(painter, r, &opt, ROUNDED_ALL);
+                    drawEntryField(painter, r, &opt, ROUNDED_ALL, PE_PanelLineEdit==element);
                     painter->restore();
                 }
             }
@@ -4502,7 +4501,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         frame.setX(frame.x()-1);
                     else
                         frame.setWidth(frame.width()+1);
-                    drawEntryField(painter, frame, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, WIDGET_SPIN);
+                    drawEntryField(painter, frame, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, WIDGET_SPIN);
                 }
             }
             break;
@@ -5171,7 +5170,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawRect(painter, field);
                         // 4 because 2 for frame width, and 2 for adjustments done in subControlRect
                         field.adjust(-4,-4, 4, 4);
-                        drawEntryField(painter, field, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, WIDGET_COMBO);
+                        drawEntryField(painter, field, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true,
+                                       WIDGET_COMBO);
                     }
                     else 
                     {
@@ -6715,7 +6715,7 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOption *option,
-                                  int round, EWidget w) const
+                                  int round, bool fill, EWidget w) const
 {
     QRect r(rx);
     bool  doEtch(WIDGET_SPIN!=w && WIDGET_COMBO!=w && QTC_CAN_DO_EFFECT);
@@ -6723,8 +6723,10 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
     if(doEtch)
         r.adjust(1, 1, -1, -1);
 
-    p->fillRect(QRect(rx.x()+1, rx.y()+1, rx.x()+rx.width()-2, rx.y()+rx.height()-2),
-                option->state&State_Enabled ? option->palette.base().color() : option->palette.background().color());
+    if(fill)
+        p->fillRect(rx.adjusted(1, 1, -1, -1),
+                    option->state&State_Enabled ? option->palette.base().color()
+                                                : option->palette.background().color());
 
     if(doEtch)
     {
