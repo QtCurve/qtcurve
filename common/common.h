@@ -262,9 +262,9 @@ typedef GdkColor color;
 
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || WIDGET_COMBO==w)
 #ifdef __cplusplus
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w)
 #else
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_COMBO==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || WIDGET_COMBO==w)
 #endif
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
@@ -300,10 +300,15 @@ typedef GdkColor color;
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define QTC_BORDER_BLEND_ALPHA       0.7
-#define QTC_ETCH_TOP_MIDDLE_ALPHA    0.055
-#define QTC_ETCH_TOP_SIDES_ALPHA     0.0275
-#define QTC_ETCH_BOTTOM_MIDDLE_ALPHA 0.80
-#define QTC_ETCH_BOTTOM_SIDES_ALPHA  0.45
+#define QTC_ETCH_TOP_ALPHA           0.055
+#define QTC_ETCH_BOTTOM_ALPHA        0.80
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+#define QTC_ETCH_RADIO_TOP_ALPHA     0.055
+#define QTC_ETCH_RADIO_BOTTOM_ALPHA  0.80
+#else
+#define QTC_ETCH_RADIO_TOP_ALPHA     0.09
+#define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
+#endif
 #endif
 
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -918,7 +923,8 @@ typedef struct
                      menuStripe,
 #endif
                      inactiveHighlight,
-                     crHighlight;
+                     crHighlight,
+                     fillProgress;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
