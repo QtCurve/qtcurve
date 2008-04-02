@@ -271,6 +271,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sliderStyle, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(gradientPbGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(fillProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(vArrows, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xCheck, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -565,6 +566,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sliderStyle=(ESliderStyle)sliderStyle->currentIndex();
     opts.roundMbTopOnly=roundMbTopOnly->isChecked();
     opts.gradientPbGroove=gradientPbGroove->isChecked();
+    opts.fillProgress=fillProgress->isChecked();
     opts.darkerBorders=darkerBorders->isChecked();
     opts.vArrows=vArrows->isChecked();
     opts.xCheck=xCheck->isChecked();
@@ -643,6 +645,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sliderStyle->setCurrentIndex(opts.sliderStyle);
     roundMbTopOnly->setChecked(opts.roundMbTopOnly);
     gradientPbGroove->setChecked(opts.gradientPbGroove);
+    fillProgress->setChecked(opts.fillProgress);
     darkerBorders->setChecked(opts.darkerBorders);
     vArrows->setChecked(opts.vArrows);
     xCheck->setChecked(opts.xCheck);
@@ -693,6 +696,7 @@ bool QtCurveConfig::settingsChanged()
          sliderStyle->currentIndex()!=currentStyle.sliderStyle ||
          roundMbTopOnly->isChecked()!=currentStyle.roundMbTopOnly ||
          gradientPbGroove->isChecked()!=currentStyle.gradientPbGroove ||
+         fillProgress->isChecked()!=currentStyle.fillProgress ||
          darkerBorders->isChecked()!=currentStyle.darkerBorders ||
          vArrows->isChecked()!=currentStyle.vArrows ||
          xCheck->isChecked()!=currentStyle.xCheck ||
