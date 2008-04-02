@@ -732,9 +732,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(menuStripe)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance)
 #endif
+            QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
             QTC_CFG_READ_BOOL(stdSidebarButtons)
-            QTC_CFG_READ_BOOL(gtkScrollViews)
             QTC_CFG_READ_BOOL(gtkComboMenus)
 /*
 #else

@@ -898,9 +898,9 @@ typedef struct
                      fillSlider,
                      roundMbTopOnly,
                      gradientPbGroove,
+                     gtkScrollViews,
 #ifdef __cplusplus
                      stdSidebarButtons,
-                     gtkScrollViews,
                      gtkComboMenus,
 /*
 #else
