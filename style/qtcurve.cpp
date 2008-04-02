@@ -2945,7 +2945,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 //             }
 //             break;
         case CE_ProgressBarGroove:
+        {
+            bool doEtch(QTC_CAN_DO_EFFECT);
+
             painter->save();
+
+            if(doEtch)
+                r.adjust(1, 1, -1, -1);
+
             if(opts.gradientPbGroove)
             {
                 bool horiz(true);
@@ -2961,9 +2968,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             }
             else
                 painter->fillRect(r.adjusted(1, 1, -1, -1), state&State_Enabled ? palette.base().color() : palette.background().color());
+            if(doEtch)
+                drawEtch(painter, r.adjusted(-1, -1, 1, 1), WIDGET_OTHER);
+
             drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER, BORDER_SUNKEN);
             painter->restore();
             break;
+        }
         case CE_ProgressBarContents:
             if (const QStyleOptionProgressBar *bar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
@@ -5363,8 +5374,13 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                               QTC_BASE_STYLE::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
             break;
         case SE_ProgressBarContents:
-            if(!opts.fillProgress)
-                return option->rect.adjusted(2, 2, -2, -2);
+          return opts.fillProgress
+                    ? QTC_DO_EFFECT
+                        ? option->rect.adjusted(1, 1, -1, -1)
+                        : option->rect
+                    : QTC_DO_EFFECT
+                        ? option->rect.adjusted(3, 3, -3, -3)
+                        : option->rect.adjusted(2, 2, -2, -2);
         case SE_ProgressBarGroove:
         case SE_ProgressBarLabel:
             return option->rect;

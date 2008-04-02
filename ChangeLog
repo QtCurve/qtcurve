@@ -3,7 +3,7 @@
  1. When drawing gray focus rect, draw only slightly rounded.
  2. Etch/shadow effect now applied to widget sides as well as
     top/bottom.
- 3. Add etching to checks, radios, and slider grooves.
+ 3. Add etching to checks, radios, slider grooves, and progressbars.
  4. Option to have progress fill groove - default to true.
  5. When coloring menubars, correctly draw menubar text colour
     of inactive windows.
