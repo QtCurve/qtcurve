@@ -1387,10 +1387,12 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return QTC_CAN_DO_EFFECT ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
-            return QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget) ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
+            return QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget) && !theNoEtchWidgets.contains(widget)
+                        ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
-            return QTC_RADIO_SIZE;
+            return QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget) && !theNoEtchWidgets.contains(widget)
+                        ? QTC_RADIO_SIZE+2 : QTC_RADIO_SIZE;
         case PM_TabBarTabOverlap:
             return 1;
         case PM_ProgressBarChunkWidth:
@@ -2236,10 +2238,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(QTC_RADIO_SIZE);
         case PE_IndicatorRadioButton:
         {
-            bool     doEtch(!(state&QTC_STATE_MENU) && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
-            QRect    rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
-            int      x(rect.x()), y(rect.y());
-            QPolygon clipRegion;
+            CEtchCheck check(widget);
+            bool       doEtch(!(state&QTC_STATE_MENU) && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
+            QRect      rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+            int        x(rect.x()), y(rect.y());
+            QPolygon   clipRegion;
 
             clipRegion.setPoints(8,  x,    y+8,     x,    y+4,     x+4, y,      x+8, y,
                                      x+12, y+4,     x+12, y+8,     x+8, y+12,   x+4, y+12);
