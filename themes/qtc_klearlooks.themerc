@@ -20,6 +20,7 @@ darkerBorders=false
 defBtnIndicator=fontcolor
 drawStatusBarFrames=false
 embolden=false
+fillProgress=true
 fillSlider=true
 fixParentlessDialogs=true
 framelessGroupBoxes=true
