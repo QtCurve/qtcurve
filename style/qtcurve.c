@@ -2291,7 +2291,7 @@ debugDisplayWidget(widget, 3);
                       x, y, width, height);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
-        parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x+1, y+1,
+        parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x, y,
                                     width, height);
 
         /* For SWT (e.g. eclipse) apps. For some reason these only seem to allow a ythickness of at max 2 - but
