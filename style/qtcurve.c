@@ -2063,7 +2063,8 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         setCairoClipping(cr, area, NULL);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(parentBgCol));
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        //cairo_rectangle(cr, x+1.5, y+1.5, width-3, height-3);
+        if(doEtch)
+            cairo_rectangle(cr, x+1.5, y+1.5, width-3, height-3);
         cairo_set_line_width(cr, 1);
         cairo_stroke(cr);
         unsetCairoClipping(cr);
