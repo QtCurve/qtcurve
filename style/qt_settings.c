@@ -1291,6 +1291,22 @@ static gboolean checkFileVersion(const char *fname, const char *versionStr, int 
     return !diff;
 }
 
+static gboolean isMozApp(const char *app, const char *check)
+{
+    if(0==strcmp(app, check))
+        return TRUE;
+    else if(app==strstr(app, check))
+    {
+        int app_len=strlen(app),
+            check_len=strlen(check);
+
+        if(check_len+4 == app_len && 0==strcmp(&app[check_len], "-bin"))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 static gboolean qtInit(Options *opts)
 {
     if(0==qt_refs++)
@@ -1379,11 +1395,9 @@ static gboolean qtInit(Options *opts)
             /* Check if we're firefox... */
             if((app=getAppName()))
             {
-                gboolean firefox=0==strcmp(app, "firefox-bin") ||
-                                 0==strcmp(app, "iceweasel-bin") ||
-                                  0==strcmp(app, "swiftfox-bin"),
-                         thunderbird=!firefox && 0==strcmp(app, "thunderbird-bin"),
-                         mozThunderbird=!thunderbird && !firefox && 0==strcmp(app, "mozilla-thunderbird-bin");
+                gboolean firefox=isMozApp(app, "firefox") || isMozApp(app, "iceweasel") || isMozApp(app, "swiftfox"),
+                         thunderbird=!firefox && isMozApp(app, "thunderbird"),
+                         mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird");
 
                 if(firefox || thunderbird || mozThunderbird)
                 {
@@ -1707,7 +1721,7 @@ static gboolean qtInit(Options *opts)
             }
 
             /* Set cursor colours... */
-            {
+            { /* C-Scope */
                 static const char *constStrFormat="style \"QtCCrsr\" "
                                                     "{ GtkWidget::cursor-color=\"#%02X%02X%02X\" "
                                                       "GtkWidget::secondary-cursor-color=\"#%02X%02X%02X\" } "
@@ -1721,11 +1735,12 @@ static gboolean qtInit(Options *opts)
                                                 qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green>>8,
                                                 qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue>>8);
                 gtk_rc_parse_string(tmpStr);
-            }
-            if(tmpStr)
-                free(tmpStr);
+            } /* C-Scope */
 
-            if(ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
+            { /* C-Scope */
+            bool doEffect=ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect;
+
+            if(doEffect)
                 gtk_rc_parse_string("style \"QtcEtch\" "
                                     "{ xthickness = 3 ythickness = 3 } "
                                     "style \"QtcEtchI\" "
@@ -1741,6 +1756,27 @@ static gboolean qtInit(Options *opts)
                                     " { GtkScrolledWindow::scrollbar-spacing = 0 "
                                       " GtkScrolledWindow::scrollbars-within-bevel = 1 } "
                                     "class \"*GtkWidget\" style \"QtcSV\"");
+
+            { /* C-Scope */
+                static const char *constStrFormat="style \"QtcPbar\" "
+                                                    "{ xthickness = %d ythickness = %d } "
+                                                      "widget_class \"*GtkProgressBar\" style \"QtcPbar\"";
+                int pthickness=opts->fillProgress
+                                ? doEffect
+                                    ? 2
+                                    : 1
+                                : doEffect
+                                    ? 3
+                                    : 2;
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                sprintf(tmpStr, constStrFormat, pthickness, pthickness);
+                gtk_rc_parse_string(tmpStr);
+            } /* C-Scope */
+            } /* C-Scope 'doEffect' */
+
+            if(tmpStr)
+                free(tmpStr);
         }
         return TRUE;
     }
