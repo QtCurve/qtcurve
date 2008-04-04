@@ -29,6 +29,9 @@ style "qtcurve-default"
   GtkStatusbar::shadow-type = 0
   GtkComboBoxEntry::appears-as-list = 1
   GtkTreeView::allow-rules = 1
+  GtkMenu::vertical-padding = 0
+  GtkMenu::horizontal-offset = -4
+  GtkMenu::vertical-offset = 4
 
   xthickness = 1
   ythickness = 1
