@@ -51,6 +51,10 @@
 */
 
 /*
+    Control whether toolbar, window decoration, and dock window, buttons should have coloured mouse-over
+*/
+#define QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
+/*
     Control shading used for glass variants.
     0 => As used in 0.51.1 +
     1 => As used in 0.51
@@ -260,18 +264,21 @@ typedef GdkColor color;
 
 #define NUM_SPLITTER_DASHES 21
 
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || WIDGET_COMBO==w)
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
+                          WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
 #ifdef __cplusplus
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
+                        WIDGET_UNCOLOURED_MO_BUTTON==w)
 #else
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || WIDGET_COMBO==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
+                        WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
 #endif
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define QTC_DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
     ((!SUKEN && IS_GLASS(APP) && WIDGET_MENU_ITEM!=WIDGET && WIDGET_DEF_BUTTON!=WIDGET) || \
                           (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
-                           APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP))
+                           APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
 
 #define PROGRESS_ANIMATION 100
 #define MIN_SLIDER_SIZE(A) (LINE_DOTS==A ? 24 : 20)
@@ -352,6 +359,7 @@ typedef enum
     WIDGET_TAB_BOT,
     WIDGET_STD_BUTTON,
     WIDGET_DEF_BUTTON,
+    WIDGET_UNCOLOURED_MO_BUTTON,
     WIDGET_LISTVIEW_HEADER,
     WIDGET_SLIDER,
     WIDGET_SLIDER_TROUGH,
