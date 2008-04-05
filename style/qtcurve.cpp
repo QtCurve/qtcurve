@@ -276,6 +276,11 @@ static inline void drawAaPoint(QPainter *p, int x, int y)
     p->drawPoint(QPointF(x+0.5, y+0.5));
 }
 
+static inline void drawAaRect(QPainter *p, const QRect &r)
+{
+    p->drawRect(QRectF(r.x()+0.5, r.y()+0.5, r.width()-1, r.height()-1));
+}
+
 static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
                       const QColor *cols, int startOffset, int dark, int etchedDisp=1,
                       bool light=true)
@@ -2198,9 +2203,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(MO_NONE!=opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
             {
+                painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(use[QTC_CR_MO_FILL]);
-                drawRect(painter, rect.adjusted(1, 1, -1, -1));
-                drawRect(painter, rect.adjusted(2, 2, -2, -2));
+                drawAaRect(painter, rect.adjusted(1, 1, -1, -1));
+                drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
+                painter->setRenderHint(QPainter::Antialiasing, false);
             }
             else
             {
