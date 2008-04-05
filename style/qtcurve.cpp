@@ -2672,43 +2672,79 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         }
         case CE_SizeGrip:
         {
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing, true);
             int x, y, w, h;
             r.getRect(&x, &y, &w, &h);
 
-            int sw(qMin(h, w));
-
-            painter->save();
             if (h > w)
                 painter->translate(0, h - w);
             else
                 painter->translate(w - h, 0);
 
-            int sx(x),
+            int sw(qMin(h, w)),
+                sx(x),
                 sy(y),
-                s(4);
+                s(sw / 4),
+                dark(QT_BORDER(state&State_Enabled));
 
-            if (option->direction == Qt::RightToLeft)
-            {
-                sx = x + sw;
-                for (int i = 0; i < 4; ++i) {
-                    painter->setPen(QPen(itsBackgroundCols[0], 1));
-                    painter->drawLine(x, sy - 1 , sx + 1, sw);
-                    painter->setPen(QPen(itsBackgroundCols[QT_STD_BORDER], 1));
-                    painter->drawLine(x, sy, sx, sw);
-                    sx -= s;
-                    sy += s;
-                }
-            }
+            Qt::Corner corner;
+            if (const QStyleOptionSizeGrip *sgrp = qstyleoption_cast<const QStyleOptionSizeGrip *>(option))
+                corner = sgrp->corner;
+            else if (Qt::RightToLeft==option->direction)
+                corner = Qt::BottomLeftCorner;
             else
-                for (int i = 0; i < 4; ++i)
-                {
-                    painter->setPen(QPen(itsBackgroundCols[0], 1));
-                    painter->drawLine(sx - 1, sw, sw, sy - 1);
-                    painter->setPen(QPen(itsBackgroundCols[QT_STD_BORDER], 1));
-                    painter->drawLine(sx, sw, sw, sy);
-                    sx += s;
-                    sy += s;
-                }
+                corner = Qt::BottomRightCorner;
+
+            switch(corner)
+            {
+                case Qt::BottomLeftCorner:
+                    sx = x + sw;
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        painter->setPen(QPen(itsBackgroundCols[0], 1));
+                        painter->drawLine(x, sy - 1 , sx + 1, sw);
+                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
+                        painter->drawLine(x, sy, sx, sw);
+                        sx -= s;
+                        sy += s;
+                    }
+                    break;
+                case Qt::BottomRightCorner:
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        painter->setPen(QPen(itsBackgroundCols[0], 1));
+                        painter->drawLine(sx - 1, sw, sw, sy - 1);
+                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
+                        painter->drawLine(sx, sw, sw, sy);
+                        sx += s;
+                        sy += s;
+                    }
+                    break;
+                case Qt::TopRightCorner:
+                    sy = y + sw;
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        painter->setPen(QPen(itsBackgroundCols[0], 1));
+                        painter->drawLine(sx - 1, y, sw, sy + 1);
+                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
+                        painter->drawLine(sx, y, sw, sy);
+                        sx += s;
+                        sy -= s;
+                    }
+                    break;
+                case Qt::TopLeftCorner:
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        painter->setPen(QPen(itsBackgroundCols[0], 1));
+                        painter->drawLine(x, sy - 1, sx - 1, y);
+                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
+                        painter->drawLine(x, sy, sx, y);
+                        sx += s;
+                        sy += s;
+                    }
+            }
+            painter->setRenderHint(QPainter::Antialiasing, false);
             painter->restore();
             break;
         }
