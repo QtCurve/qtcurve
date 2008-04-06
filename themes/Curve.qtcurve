@@ -4,6 +4,7 @@ appearance=raised
 borderMenuitems=true
 buttonEffect=none
 coloredMouseOver=none
+crHighlight=true
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000
 customMenuSelTextColor=#000000

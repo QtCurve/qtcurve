@@ -4,6 +4,7 @@ appearance=gradient
 borderMenuitems=true
 buttonEffect=none
 coloredMouseOver=plastik
+crHighlight=false
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000
 customMenuSelTextColor=#000000
