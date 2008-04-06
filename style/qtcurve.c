@@ -3846,7 +3846,7 @@ debugDisplayWidget(widget, 3);
                     : btn_colors;
         GdkColor *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state
                             ? &style->bg[GTK_STATE_NORMAL]
-                            : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver
+                            : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                 ? &btn_colors[QTC_CR_MO_FILL]
                                 : &style->base[GTK_STATE_NORMAL],
                  mid;
@@ -3993,7 +3993,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                         : btn_colors;
             GdkColor *bgndCol=GTK_STATE_INSENSITIVE==state
                                 ? &style->bg[GTK_STATE_NORMAL]
-                                : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver
+                                : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                     ? &colors[QTC_CR_MO_FILL]
                                     : &style->base[GTK_STATE_NORMAL];
 
