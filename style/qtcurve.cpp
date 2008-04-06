@@ -2182,7 +2182,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
             const QColor &bgnd(state&State_Enabled
-                                ? MO_NONE==opts.coloredMouseOver && state&State_MouseOver
+                                ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight &&
+                                  state&State_MouseOver
                                     ? use[QTC_CR_MO_FILL]
                                     : palette.base().color()
                                 : palette.background().color());
@@ -2285,7 +2286,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
             const QColor &bgnd(state&State_Enabled
-                                ? MO_NONE==opts.coloredMouseOver && state&State_MouseOver
+                                ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight &&
+                                  state&State_MouseOver
                                     ? use[QTC_CR_MO_FILL]
                                     : palette.base().color()
                                 : palette.background().color());

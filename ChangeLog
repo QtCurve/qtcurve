@@ -8,17 +8,19 @@
  5. Dont do coloured mouse over for mdi buttons, dock widget buttons,
     toolbar buttons, or kwin button.
  6. Better colored mouse over for checks and radios.
- 7. When coloring menubars, correctly draw menubar text colour
+ 7. Don't use background colour for non-coloured mouse over of
+    check/radios if highlighting text backgroud.
+ 8. When coloring menubars, correctly draw menubar text colour
     of inactive windows.
- 8. Fix potential crash when using pixmap cache.
- 9. Fix menubar tracking when menubarMouseOver set to false.
-10. Fix selection appearance usage.
-11. Round listview selections.
-12. Enable hover effects in all itemviews.
-13. Fix spearator's on dolphin 4.1's info sidebar.
-14. Fix mouseover of disabled menu items - visible when not
+ 9. Fix potential crash when using pixmap cache.
+10. Fix menubar tracking when menubarMouseOver set to false.
+11. Fix selection appearance usage.
+12. Round listview selections.
+13. Enable hover effects in all itemviews.
+14. Fix spearator's on dolphin 4.1's info sidebar.
+15. Fix mouseover of disabled menu items - visible when not
     lightening menu background.
-15. Implement all size grips.
+16. Implement all size grips.
 
 0.58
 ----
