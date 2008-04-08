@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>834</width>
-    <height>550</height>
+    <height>574</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -407,7 +407,14 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0" >
+       <item row="13" column="0" colspan="2" >
+        <widget class="QCheckBox" name="comboSplitter" >
+         <property name="text" >
+          <string>Combo splitter</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -417,8 +424,8 @@
          </property>
          <property name="sizeHint" >
           <size>
-           <width>102</width>
-           <height>21</height>
+           <width>76</width>
+           <height>20</height>
           </size>
          </property>
         </spacer>
@@ -899,6 +906,7 @@
   <tabstop>drawStatusBarFrames</tabstop>
   <tabstop>vArrows</tabstop>
   <tabstop>darkerBorders</tabstop>
+  <tabstop>comboSplitter</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>handles</tabstop>
   <tabstop>menubarAppearance</tabstop>

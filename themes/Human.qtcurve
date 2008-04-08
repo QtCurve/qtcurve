@@ -4,6 +4,7 @@ appearance=dullglass
 borderMenuitems=true
 buttonEffect=shadow
 coloredMouseOver=plastik
+comboSplitter=true
 crHighlight=false
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000

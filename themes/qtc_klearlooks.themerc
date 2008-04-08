@@ -10,6 +10,7 @@ borderMenuitems=true
 buttonEffect=shadow
 coloredMouseOver=none
 colorSelTab=true
+comboSplitter=true
 crHighlight=false
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000

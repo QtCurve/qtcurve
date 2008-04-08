@@ -3775,7 +3775,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      lastTab((tab->position == (Qt::LeftToRight==tab->direction  || !horiz ?
                                   QStyleOptionTab::End : QStyleOptionTab::Beginning)) || onlyTab);
                 int  tabBarAlignment(styleHint(SH_TabBar_Alignment, tab, widget)),
-                     tabOverlap(onlyTab ? 0 : pixelMetric(PM_TabBarTabOverlap, option, widget));
+                     tabOverlap(onlyTab ? 0 : pixelMetric(PM_TabBarTabOverlap, option, widget)),
+                     moOffset(ROUNDED_NONE==opts.round ? 1 : opts.round);
                 bool leftAligned((!rtlHorTabs && Qt::AlignLeft==tabBarAlignment) ||
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
                      rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
@@ -3798,8 +3799,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillTab(painter, r.adjusted(1, 0, -1, 0), option, fill, true, true, WIDGET_TAB_TOP);
 
                         // This clipping helps with plasma's tabs and nvidia
-                        if(selected)
-                            painter->setClipRect(r2.adjusted(0, 0, 0, -1));
+                        // TODO: This messes up non-rounded tabs!!!
+                        // if(selected)
+                        //     painter->setClipRect(r2.adjusted(0, 0, 0, -1));
                         drawBorder(painter, r.adjusted(0, 0, 0, 4), option,
                                     selected || onlyTab
                                         ? ROUNDED_TOP
@@ -3852,11 +3854,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.y()+1,
-                                              r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.y()+1);
+                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.y()+1,
+                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.y()+1);
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.y(),
-                                              r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.y());
+                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.y(),
+                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.y());
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
@@ -3916,11 +3918,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.bottom()-1,
-                                              r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.bottom()-1);
+                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.bottom()-1,
+                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.bottom()-1);
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x()+(firstTab ? opts.round : 1), r.bottom(),
-                                              r.x()+r.width()-((lastTab ? opts.round : 0)+1), r.bottom());
+                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.bottom(),
+                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.bottom());
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
@@ -3980,11 +3982,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+1, r.y()+(firstTab ? opts.round : 1),
-                                              r.x()+1, r.y()+r.height()-((lastTab ? opts.round : 0)+1));
+                            drawAaLine(painter, r.x()+1, r.y()+(firstTab ? moOffset : 1),
+                                              r.x()+1, r.y()+r.height()-((lastTab ? moOffset : 0)+1));
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x(), r.y()+(firstTab ? opts.round : 1),
-                                              r.x(), r.y()+r.height()-((lastTab ? opts.round : 0)+1));
+                            drawAaLine(painter, r.x(), r.y()+(firstTab ? moOffset : 1),
+                                              r.x(), r.y()+r.height()-((lastTab ? moOffset : 0)+1));
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
@@ -4044,11 +4046,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.right()-1, r.y()+(firstTab ? opts.round : 1),
-                                              r.right()-1, r.y()+r.height()-((lastTab ? opts.round : 0)+1));
+                            drawAaLine(painter, r.right()-1, r.y()+(firstTab ? moOffset : 1),
+                                              r.right()-1, r.y()+r.height()-((lastTab ? moOffset : 0)+1));
                             painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.right(), r.y()+(firstTab ? opts.round : 1),
-                                              r.right(), r.y()+r.height()-((lastTab ? opts.round : 0)+1));
+                            drawAaLine(painter, r.right(), r.y()+(firstTab ? moOffset : 1),
+                                              r.right(), r.y()+r.height()-((lastTab ? moOffset : 0)+1));
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
@@ -5270,7 +5272,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         field.adjust(-4,-4, 4, 4);
                         drawEntryField(painter, field, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
-                    else 
+                    else if(opts.comboSplitter)
                     {
                         painter->setPen(use[QT_BORDER(state&State_Enabled)]);
                         painter->drawLine(reverse ? arrow.right()+1 : arrow.x()-1, arrow.top()+2,
@@ -5288,9 +5290,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         QStyleOptionFocusRect focus;
 
-                        focus.rect=reverse
-                                    ? field.adjusted(0, -1, 1, 1)
-                                    : field.adjusted(-1, -1, 0, 1);
+                        if(opts.comboSplitter)
+                            focus.rect=reverse
+                                        ? field.adjusted(0, -1, 1, 1)
+                                        : field.adjusted(-1, -1, 0, 1);
+                        else
+                            focus.rect=frame.adjusted(3, 3, -3, -3);
 
                         drawPrimitive(PE_FrameFocusRect, &focus, painter, widget);
                     }

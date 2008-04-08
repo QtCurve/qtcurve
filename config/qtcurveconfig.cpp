@@ -273,6 +273,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(gradientPbGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(vArrows, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xCheck, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(crHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -568,6 +569,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.gradientPbGroove=gradientPbGroove->isChecked();
     opts.fillProgress=fillProgress->isChecked();
     opts.darkerBorders=darkerBorders->isChecked();
+    opts.comboSplitter=comboSplitter->isChecked();
     opts.vArrows=vArrows->isChecked();
     opts.xCheck=xCheck->isChecked();
     opts.crHighlight=crHighlight->isChecked();
@@ -647,6 +649,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     gradientPbGroove->setChecked(opts.gradientPbGroove);
     fillProgress->setChecked(opts.fillProgress);
     darkerBorders->setChecked(opts.darkerBorders);
+    comboSplitter->setChecked(opts.comboSplitter);
     vArrows->setChecked(opts.vArrows);
     xCheck->setChecked(opts.xCheck);
     crHighlight->setChecked(opts.crHighlight);
@@ -698,6 +701,7 @@ bool QtCurveConfig::settingsChanged()
          gradientPbGroove->isChecked()!=currentStyle.gradientPbGroove ||
          fillProgress->isChecked()!=currentStyle.fillProgress ||
          darkerBorders->isChecked()!=currentStyle.darkerBorders ||
+         comboSplitter->isChecked()!=currentStyle.comboSplitter ||
          vArrows->isChecked()!=currentStyle.vArrows ||
          xCheck->isChecked()!=currentStyle.xCheck ||
          crHighlight->isChecked()!=currentStyle.crHighlight ||

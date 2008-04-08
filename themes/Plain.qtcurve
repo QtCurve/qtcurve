@@ -4,6 +4,7 @@ appearance=flat
 borderMenuitems=true
 buttonEffect=shadow
 coloredMouseOver=none
+comboSplitter=true
 crHighlight=true
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000

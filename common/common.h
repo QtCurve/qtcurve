@@ -932,7 +932,8 @@ typedef struct
 #endif
                      inactiveHighlight,
                      crHighlight,
-                     fillProgress;
+                     fillProgress,
+                     comboSplitter;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;

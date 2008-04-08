@@ -4,6 +4,7 @@ appearance=bevelled
 borderMenuitems=true
 buttonEffect=etch
 coloredMouseOver=plastik
+comboSplitter=false
 crHighlight=false
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000
