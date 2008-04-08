@@ -540,6 +540,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     if('\n'==line[len-1])
                         line[len-1]='\0';
                     strcpy(qtSettings.styleName, &line[6]);
+                    found|=RD_STYLE;
                 }
                 else if (( !qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==strncmp_i(line, "font=", 5)) ||
@@ -1367,6 +1368,20 @@ static gboolean qtInit(Options *opts)
                 qtSettings.qt4=TRUE;
             }
 
+            /* Only for testing - allows me to simulate Qt's -style parameter. e.g start Gtk2 app as follows:
+
+                QTC_STYLE=qtc_klearlooks gtk-demo
+            */
+            {
+                const char *env=getenv("QTC_STYLE");
+
+                if(env)
+                {
+                    qtSettings.styleName=realloc(qtSettings.styleName, strlen(env));
+                    strcpy(qtSettings.styleName, env);
+                }
+            }
+
             /* Is the user using a non-default QtCurve style? */
             if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, QTC_THEME_PREFIX))
             {
@@ -1749,6 +1764,8 @@ static gboolean qtInit(Options *opts)
                                     "class \"*GtkSpinButton\" style \"QtcEtch\" "
                                     "class \"*GtkEntry\" style  \"QtcEtch\" "
                                     "widget_class \"*Toolbar*Entry\" style \"QtcEtch\" "
+                                    "class \"*Button\" style \"QtcEtch\""
+                                    "class \"*GtkOptionMenu\" style \"QtcEtch\""
                                     "class \"*GtkWidget\" style \"QtcEtchI\"");
 
             if(!opts->gtkScrollViews && NULL==gtk_check_version(2, 12, 0))
