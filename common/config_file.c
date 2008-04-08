@@ -978,7 +978,7 @@ static const char *toStr(EDefBtnIndicator ind)
         case IND_TINT:
             return "tint";
         case IND_GLOW:
-            return "gloe";
+            return "glow";
         default:
             return "colored";
     }
