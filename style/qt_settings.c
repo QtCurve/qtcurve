@@ -1766,7 +1766,7 @@ static gboolean qtInit(Options *opts)
                                     "widget_class \"*Toolbar*Entry\" style \"QtcEtch\" "
                                     "class \"*Button\" style \"QtcEtch\""
                                     "class \"*GtkOptionMenu\" style \"QtcEtch\""
-                                    "class \"*GtkWidget\" style \"QtcEtchI\"");
+                                    /*"class \"*GtkWidget\" style \"QtcEtchI\""*/);
 
             if(!opts->gtkScrollViews && NULL==gtk_check_version(2, 12, 0))
                 gtk_rc_parse_string("style \"QtcSV\""

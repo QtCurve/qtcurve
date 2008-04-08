@@ -19,6 +19,9 @@
 13. Fix tab coloured mouse-over when not rounded.
 14. Add a QTC_STYLE env var - used to quickly test qtc_<name>.themerc
     files.
+15. New mouse over effect - glow. Only applicable if etching or shadowing.
+16. New default button indicator - glow. Only applicable if etching
+    or shadowing.
 
 0.58
 ----
