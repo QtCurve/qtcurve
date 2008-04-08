@@ -80,6 +80,8 @@ static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
             return IND_COLORED;
         if(0==memcmp(str, "tint", 4))
             return IND_TINT;
+        if(0==memcmp(str, "glow", 4))
+            return IND_GLOW;
     }
 
     return def;
@@ -125,6 +127,8 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
             return MO_COLORED;
         if(0==memcmp(str, "plastik", 7))
             return MO_PLASTIK;
+        if(0==memcmp(str, "glow", 4))
+            return MO_GLOW;
         if(0==memcmp(str, "false", 4) || 0==memcmp(str, "none", 4))
             return MO_NONE;
     }
@@ -812,6 +816,12 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
                 opts->colorMenubarMouseOver=true;
 
+            if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || ROUND_FULL!=opts->round))
+                opts->coloredMouseOver=MO_COLORED;
+
+            if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || ROUND_FULL!=opts->round))
+                opts->defBtnIndicator=IND_TINT;
+
             return true;
         }
     }
@@ -967,6 +977,8 @@ static const char *toStr(EDefBtnIndicator ind)
             return "corner";
         case IND_TINT:
             return "tint";
+        case IND_GLOW:
+            return "gloe";
         default:
             return "colored";
     }
@@ -1012,6 +1024,8 @@ static const char *toStr(EMouseOver mo)
             return "colored";
         case MO_NONE:
             return "none";
+        case MO_GLOW:
+            return "glow";
         default:
             return "plastik";
     }

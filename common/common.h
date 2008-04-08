@@ -155,6 +155,9 @@ typedef GdkColor color;
 
 #define QTC_SIMPLE_SHADING (!shading)
 
+#define QTC_GLOW_MO        1
+#define QTC_GLOW_DEFBTN    0
+
 #define QT_STD_BORDER      5
 #define QT_DISABLED_BORDER QT_STD_BORDER /*3*/
 #define QT_BORDER(E) (/*(E) ?*/ QT_STD_BORDER/* : QT_DISABLED_BORDER*/)
@@ -265,7 +268,7 @@ typedef GdkColor color;
 #define NUM_SPLITTER_DASHES 21
 
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
-                          WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
+                          WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
 #ifdef __cplusplus
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
                         WIDGET_UNCOLOURED_MO_BUTTON==w)
@@ -369,6 +372,7 @@ typedef enum
     WIDGET_CHECKBOX,
     WIDGET_TOGGLE_BUTTON,
     WIDGET_COMBO,
+    WIDGET_COMBO_BUTTON,
     WIDGET_MENU_ITEM,
     WIDGET_PROGRESSBAR,
 #ifndef __cplusplus
@@ -432,6 +436,7 @@ typedef enum
     IND_FONT_COLOR,
     IND_COLORED,
     IND_TINT,
+    IND_GLOW,
     IND_NONE
 } EDefBtnIndicator;
 
@@ -495,7 +500,8 @@ typedef enum
 {
     MO_NONE,
     MO_COLORED,
-    MO_PLASTIK
+    MO_PLASTIK,
+    MO_GLOW
 } EMouseOver;
 
 typedef enum
