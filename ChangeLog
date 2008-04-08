@@ -24,6 +24,9 @@
 17. Implement all size grips.
 18. Fix border of non-rounded, selected tabs.
 19. Fix tab coloured mouse-over when not rounded.
+20. New mouse over effect - glow. Only applicable if etching or shadowing.
+21. New default button indicator - glow. Only applicable if etching
+    or shadowing.
 
 0.58
 ----

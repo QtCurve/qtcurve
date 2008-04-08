@@ -2190,7 +2190,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             CEtchCheck    check(widget);
             bool          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
                                  && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
-                                 && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget));
+                                 && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget)),
+                          glow(doEtch && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled);
             QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
 
             painter->save();
@@ -2202,7 +2203,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                   getWidgetShade(WIDGET_TROUGH, false, false, APPEARANCE_GRADIENT),
                                   false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
 
-            if(MO_NONE!=opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
+            if(MO_NONE!=opts.coloredMouseOver && !glow && state&State_MouseOver && state&State_Enabled)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(use[QTC_CR_MO_FILL]);
@@ -2219,7 +2220,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
             if(doEtch)
-                drawEtch(painter, r, WIDGET_CHECKBOX);
+                if(glow)
+                    drawGlow(painter, r, WIDGET_CHECKBOX);
+                else
+                    drawEtch(painter, r, WIDGET_CHECKBOX);
 
             if(state&State_On)
             {
@@ -2274,7 +2278,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             bool       doEtch(!(state&QTC_STATE_MENU)
                               && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
                               && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget)),
-                       coloredMo(MO_NONE!=opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled);
+                       glow(doEtch && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled),
+                       coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && state&State_MouseOver && state&State_Enabled);
             QRect      rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
             int        x(rect.x()), y(rect.y());
             QPolygon   clipRegion;
@@ -2315,25 +2320,29 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->setClipping(false);
 
-            painter->drawPixmap(x, y, *getPixmap(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)],
-                                PIX_RADIO_BORDER, 0.8));
-
             if(doEtch)
             {
-                QColor topCol(Qt::black),
+                QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
                        botCol(Qt::white);
 
-                topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                botCol.setAlphaF(QTC_ETCH_RADIO_BOTTOM_ALPHA);
+                if(!glow)
+                {
+                    topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+                    botCol.setAlphaF(QTC_ETCH_RADIO_BOTTOM_ALPHA);
+                }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
                 painter->setPen(topCol);
                 painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
-                painter->setPen(botCol);
+                if(!glow)
+                    painter->setPen(botCol);
                 painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
+
+            painter->drawPixmap(x, y, *getPixmap(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)],
+                                PIX_RADIO_BORDER, 0.8));
 
             if(state&State_On)
                 painter->drawPixmap(x, y, *getPixmap(state&State_Enabled
@@ -2433,7 +2442,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                || state&QTC_STATE_TBAR_BUTTON
 #endif
                                                 ? WIDGET_UNCOLOURED_MO_BUTTON
-                                                : isDefault && state&State_Enabled && IND_FONT_COLOR==opts.defBtnIndicator
+                                                : isDefault && state&State_Enabled
                                                     ? WIDGET_DEF_BUTTON
                                                     : wantToEtch && !canEtch ? WIDGET_NO_ETCH_BTN : WIDGET_STD_BUTTON);
 
@@ -5217,8 +5226,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     frame.adjust(1, 1, -1, -1);
 
-                    drawEtch(painter, widget ? widget->rect() : r, WIDGET_COMBO,
-                             !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
+                    if(MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && !comboBox->editable)
+                        drawGlow(painter, widget ? widget->rect() : r, WIDGET_COMBO);
+                    else
+                        drawEtch(painter, widget ? widget->rect() : r, WIDGET_COMBO,
+                                 !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
                 }
 
                 // This section fixes some drawng issues with krunner's combo on nvidia
@@ -5242,7 +5254,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     drawLightBevel(painter, frame, &frameOpt,
                                    comboBox->editable ? (reverse ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL,
-                                   getFill(&frameOpt, use), use, true, WIDGET_COMBO);
+                                   getFill(&frameOpt, use), use, true, comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
                 }
 
                 if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
@@ -6350,11 +6362,14 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                  doColouredMouseOver(doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w && WIDGET_UNCOLOURED_MO_BUTTON!=w &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
-                                     (!IS_SLIDER(w) || (WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver)) &&
+                                     (!IS_SLIDER(w) || (WIDGET_SB_SLIDER==w && opts.coloredMouseOver)) &&
                                      WIDGET_PROGRESSBAR!=w &&
                                      (/*option->state&QTC_TOGGLE_BUTTON ||*/ !sunken)),
-                 plastikMouseOver(doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver),
-                 colouredMouseOver(doColouredMouseOver && MO_COLORED==opts.coloredMouseOver),
+                 plastikMouseOver(doColouredMouseOver && (MO_PLASTIK==opts.coloredMouseOver || WIDGET_SB_SLIDER==w)),
+                 colouredMouseOver(doColouredMouseOver && WIDGET_SB_SLIDER!=w &&
+                                       (MO_COLORED==opts.coloredMouseOver ||
+                                              (MO_GLOW==opts.coloredMouseOver &&
+                                              ((WIDGET_COMBO!=w && !ETCH_WIDGET(w)) || !QTC_CAN_DO_EFFECT)))),
                  doEtch(doBorder && ETCH_WIDGET(w) && QTC_CAN_DO_EFFECT),
                  horiz(isHoriz(option, w));
     int          dark(bevelledButton ? 2 : 4),
@@ -6369,7 +6384,11 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         r.adjust(1, 1, -1, -1);
         br=r;
 
-        drawEtch(p, rOrig, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
+        if( (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
+            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator))
+            drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
+        else
+            drawEtch(p, rOrig, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
     }
 
     if(!colouredMouseOver && lightBorder)
@@ -6506,6 +6525,15 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         drawBorder(p, r, option, round, cols, w);
 
     p->restore();
+}
+
+void QtCurveStyle::drawGlow(QPainter *p, const QRect &r, EWidget w) const
+{
+    p->setBrush(Qt::NoBrush);
+    p->setRenderHint(QPainter::Antialiasing, true);
+    p->setPen(itsMouseOverCols[WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator ? QTC_GLOW_DEFBTN : QTC_GLOW_MO]);
+    p->drawPath(buildPath(r, w, ROUNDED_ALL, getRadius(opts.round, r.width(), r.height(), w, RADIUS_ETCH)));
+    p->setRenderHint(QPainter::Antialiasing, false);
 }
 
 void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, EWidget w, bool raised) const
@@ -7119,7 +7147,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         {
             p->fillRect(r, fill);
 
-            if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver)
+            if(opts.coloredMouseOver && opt.state&State_MouseOver)
             {
                 int col(QTC_SLIDER_MO_SHADE),
                     len(QTC_SLIDER_MO_LEN);
@@ -7142,7 +7170,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                               horiz, SHADE_BEVEL_GRAD_LIGHT, SHADE_BEVEL_GRAD_DARK,
                               false, opts.sliderAppearance);
 
-            if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver)
+            if(opts.coloredMouseOver && opt.state&State_MouseOver)
             {
                 int col(QTC_SLIDER_MO_SHADE),
                     len(QTC_SLIDER_MO_LEN);
