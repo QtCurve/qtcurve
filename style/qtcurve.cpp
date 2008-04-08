@@ -3099,7 +3099,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     inverted = bar2->invertedAppearance;
                 }
 
-                if (!indeterminate && bar->progress == -1)
+                if (!indeterminate && -1==bar->progress)
                     break;
 
                 bool reverse = (!vertical && (bar->direction == Qt::RightToLeft)) || vertical;
@@ -3123,11 +3123,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(vertical)
                         opt.state^=State_Horizontal;
 
-                    drawLightBevel(painter, vertical
+                    drawProgress(painter, vertical
                                                 ? QRect(r.x(), r.y()+step, r.width(), PROGRESS_CHUNK_WIDTH)
                                                 : QRect(r.x()+step, r.y(), PROGRESS_CHUNK_WIDTH, r.height()),
-                                   &opt, ROUNDED_ALL,
-                                   itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, !opts.fillProgress, WIDGET_PROGRESSBAR);
+                                 option, ROUNDED_ALL);
                 }
                 else
                 {
