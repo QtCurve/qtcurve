@@ -391,7 +391,7 @@ void QtCurveConfig::setStyle(QAction *s)
 void QtCurveConfig::emboldenToggled()
 {
     if(!embolden->isChecked() && IND_NONE==defBtnIndicator->currentIndex())
-        defBtnIndicator->setCurrentIndex(IND_COLORED);
+        defBtnIndicator->setCurrentIndex(IND_TINT);
     updateChanged();
 }
 
