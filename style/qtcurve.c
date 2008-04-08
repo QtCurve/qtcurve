@@ -2064,7 +2064,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(parentBgCol));
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
         if(doEtch)
-            cairo_rectangle(cr, x+1.5, y+1.5, width-3, height-3);
+            cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-3);
         cairo_set_line_width(cr, 1);
         cairo_stroke(cr);
         unsetCairoClipping(cr);
@@ -2532,11 +2532,11 @@ debugDisplayWidget(widget, 3);
 #endif
     if(DETAIL("arrow"))
     {
-        gboolean combo=isOnCombo(widget, 0),
+        gboolean combo=isOnCombo(widget, 0) ,
                  combo_entry=isOnComboEntry(widget, 0);
 
-        if(QTC_DO_EFFECT && 0==strcmp(detail, "optionmenu"))
-            x-=2;
+        if(combo)
+            x++;
 
         if(combo && !combo_entry)
         {
@@ -2629,6 +2629,12 @@ debugDisplayWidget(widget, 3);
                 default:
                     break;
             }
+
+        if(isSpinButton && !QTC_DO_EFFECT)
+            if(GTK_ARROW_UP==arrow_type)
+                y--;
+            else
+                y++;
 
         drawArrow(window, style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
                            ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)],
@@ -3000,63 +3006,69 @@ debugDisplayWidget(widget, 3);
                 }
         }
 
-        if(optionmenu)
+        if(opts.comboSplitter)
         {
-            GtkRequisition indicator_size;
-            GtkBorder      indicator_spacing;
-            int            cx=x, cy=y, cheight=height, cwidth=width,
-                           ind_width=0,
-                           darkLine=QT_BORDER(GTK_STATE_INSENSITIVE!=state);
-
-            optionMenuGetProps(widget, &indicator_size, &indicator_spacing);
-
-            ind_width=indicator_size.width+indicator_spacing.left+indicator_spacing.right;
-
-            if(QTC_DO_EFFECT)
-                cx--;
-
-    #if (GTK_MAJOR_VERSION>1) && (GTK_MINOR_VERSION<2)
-            cy++;
-            cheight-=2;
-    #endif
-            cy+=3;
-            cheight-=6;
-
-            if(sunken)
-                cx++, cy++, cheight--;
-
-            drawVLine(cr, QTC_CAIRO_COL(btn_colors[darkLine]), 1.0,
-                      cx + (rev ? ind_width+QT_STYLE->xthickness
-                                : (cwidth - ind_width - QT_STYLE->xthickness)),
-                      cy + QT_STYLE->ythickness-1, cheight-2);
-
-            if(!sunken)
-                drawVLine(cr, QTC_CAIRO_COL(btn_colors[0]), 1.0,
-                        cx + (rev ? ind_width+QT_STYLE->xthickness
-                                    : (cwidth - ind_width - QT_STYLE->xthickness))+1,
-                        cy + QT_STYLE->ythickness-1, cheight-2);
-        }
-        else if((button || togglebutton) && (combo || combo_entry))
-        {
-            int vx=x+(width - (1 + (combo_entry ? 24 : 20))),
-                vwidth=width-(vx-x),
-                darkLine=QT_BORDER(GTK_STATE_INSENSITIVE!=state);
-
-            if(rev)
+            if(optionmenu)
             {
-                vx=x+LARGE_ARR_WIDTH;
-                if(combo_entry)
-                    vx+=2;
-            }
+                GtkRequisition indicator_size;
+                GtkBorder      indicator_spacing;
+                int            cx=x, cy=y, cheight=height, cwidth=width,
+                               ind_width=0,
+                               darkLine=QT_BORDER(GTK_STATE_INSENSITIVE!=state);
 
-            if(!combo_entry)
-            {
+                optionMenuGetProps(widget, &indicator_size, &indicator_spacing);
+
+                ind_width=indicator_size.width+indicator_spacing.left+indicator_spacing.right;
+
+                if(QTC_DO_EFFECT)
+                    cx--;
+
+        #if (GTK_MAJOR_VERSION>1) && (GTK_MINOR_VERSION<2)
+                cy++;
+                cheight-=2;
+        #endif
+                cy+=3;
+                cheight-=6;
+
+                if(sunken)
+                    cx++, cy++, cheight--;
+
                 drawVLine(cr, QTC_CAIRO_COL(btn_colors[darkLine]), 1.0,
-                          vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, height-8);
+                        cx + (rev ? ind_width+QT_STYLE->xthickness
+                                    : (cwidth - ind_width - QT_STYLE->xthickness)),
+                        cy + QT_STYLE->ythickness-1, cheight-3);
 
                 if(!sunken)
                     drawVLine(cr, QTC_CAIRO_COL(btn_colors[0]), 1.0,
-                              vx+(rev ? LARGE_ARR_WIDTH+4 : 0)+1, y+4, height-8);
+                            cx + (rev ? ind_width+QT_STYLE->xthickness
+                                        : (cwidth - ind_width - QT_STYLE->xthickness))+1,
+                            cy + QT_STYLE->ythickness-1, cheight-3);
+            }
+            else if((button || togglebutton) && (combo || combo_entry))
+            {
+                int vx=x+(width - (1 + (combo_entry ? 24 : 20))),
+                    vwidth=width-(vx-x),
+                    darkLine=QT_BORDER(GTK_STATE_INSENSITIVE!=state);
+
+                if(rev)
+                {
+                    vx=x+LARGE_ARR_WIDTH;
+                    if(combo_entry)
+                        vx+=2;
+                }
+
+                if(QTC_DO_EFFECT)
+                    vx-=2;
+
+                if(!combo_entry)
+                {
+                    drawVLine(cr, QTC_CAIRO_COL(btn_colors[darkLine]), 1.0,
+                            vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, height-8);
+
+                    if(!sunken)
+                        drawVLine(cr, QTC_CAIRO_COL(btn_colors[0]), 1.0,
+                                vx+(rev ? LARGE_ARR_WIDTH+4 : 0)+1, y+4, height-8);
+                }
             }
         }
     }
@@ -4257,8 +4269,8 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height)
 {
-    if(QTC_DO_EFFECT)
-        x--;
+    //if(QTC_DO_EFFECT)
+    //    x--;
 
     if(isActiveCombo(widget))
         x++, y++;
@@ -4397,7 +4409,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
                               col, s1, s2, horiz, increase, GTK_STATE_NORMAL==state, app, tab);
         }
         else
-            drawAreaColor(cr, area, NULL, &style->bg[GTK_STATE_NORMAL], x, y, width, height);
+            drawAreaColor(cr, area, NULL, col, x, y, width, height);
     }
 }
 
@@ -4423,7 +4435,8 @@ debugDisplayWidget(widget, 3);
         gboolean    highlightingEnabled=notebook && (opts.highlightFactor>1.0 || opts.coloredMouseOver);
         QtCTab      *highlightTab=highlightingEnabled ? lookupTabHash(widget, FALSE) : NULL;
         gboolean    highlight=FALSE;
-        int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
+        int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW,
+                    moOffset=ROUNDED_NONE==opts.round ? 1 : opts.round;
         gboolean    firstTab=notebook ? FALSE : TRUE,
                     lastTab=notebook ? FALSE : TRUE,
                     vertical=GTK_POS_LEFT==gap_side || GTK_POS_RIGHT==gap_side,
@@ -4572,8 +4585,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                 {
-                    int sx=x+(firstTab ? opts.round : 1),
-                        sw=width-((lastTab ? opts.round : 1)+1);
+                    int sx=x+(firstTab ? moOffset : 1),
+                        sw=width-((lastTab ? moOffset : 1)+1);
 
                     drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, sx, y+height-2, sw);
                     drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, sx, y+height-1, sw);
@@ -4619,8 +4632,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                 {
-                    int sx=x+(firstTab ? opts.round : 1),
-                        sw=width-((lastTab ? opts.round : 1)+1);
+                    int sx=x+(firstTab ? moOffset : 1),
+                        sw=width-((lastTab ? moOffset : 1)+1);
 
                     drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, sx, y+1, sw);
                     drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, sx, y, sw);
@@ -4662,8 +4675,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                 {
-                    int sy=y+(firstTab ? opts.round : 1),
-                        sh=height-((lastTab ? opts.round : 1)+1);
+                    int sy=y+(firstTab ? moOffset : 1),
+                        sh=height-((lastTab ? moOffset : 1)+1);
 
                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, x+width-2, sy, sh);
                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x+width-1, sy, sh);
@@ -4708,8 +4721,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                 {
-                    int sy=y+(firstTab ? opts.round : 1),
-                        sh=height-((lastTab ? opts.round : 1)+1);
+                    int sy=y+(firstTab ? moOffset : 1),
+                        sh=height-((lastTab ? moOffset : 1)+1);
 
                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, x+1, sy, sh);
                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x, sy, sh);
@@ -5068,26 +5081,27 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          GdkRectangle *area, GtkWidget *widget, const gchar *detail,
                          gint x, gint y, gint width, gint height)
 {
-    gboolean doEtch=QTC_DO_EFFECT;
-
     if(GTK_IS_EDITABLE(widget))
         return;
 
     sanitizeSize(window, &width, &height);
 
 #ifdef QTC_DEBUG
-    printf("Draw focus %d %d %d %d %d %s ", state, x, y, width, height, detail ? detail : "NULL");
+    printf("Draw focus %d %d %d %d %d %s \n", state, x, y, width, height, detail ? detail : "NULL");
     debugDisplayWidget(widget, 3);
 #endif
 
-    if(isComboBox(widget))
+    {
+    gboolean doEtch=QTC_DO_EFFECT;
+
+    if(opts.comboSplitter && isComboBox(widget))
     {
 /*
         x++;
         y++;
         height-=2;
 */
-        width+=(doEtch ? 3 : 2); /* Remove if re-add the above */
+        width+=2; /* Remove if re-add the above */
 
         if(widget && reverseLayout(widget->parent))
             x+=20;
@@ -5097,20 +5111,18 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             x+=2, y+=2, width-=4, height-=4;
     }
     else if(GTK_IS_OPTION_MENU(widget))
-        x++, y++, width-=(doEtch ? 1 : 2), height-=2;
+    {
+        if(!opts.comboSplitter && widget && widget->allocation.width>width)
+            width=widget->allocation.width-(doEtch ? 8 : 4);
 
-    /* If we're not full rounded, then we need to remove the offset that was required for the etching... */
+        x++, y++, width-=2, height-=2;
+    }
+
     if(GTK_IS_BUTTON(widget) && !GTK_IS_RADIO_BUTTON(widget) && !GTK_IS_CHECK_BUTTON(widget))
     {
+        y--, height+=2;
         if(doEtch)
-        {
-            gboolean dummy;
-
-            if(!isButtonOnToolbar(widget, &dummy))
-                width-=2, x++;
-        }
-        else
-            y--, height+=2;
+            x--, width+=2;
     }
 
 #ifndef QTC_PLAIN_FOCUS_ONLY
@@ -5137,6 +5149,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         QTC_CAIRO_END
     }
 #endif
+    }
 }
 
 static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType state,

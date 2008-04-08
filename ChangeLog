@@ -5,15 +5,20 @@
     top/bottom.
  3. Add etching to checks, radios, slider grooves, and progressbars.
  4. Option to have progress fill groove - default to true.
- 5. Dont do coloured mouse over for toolbar buttons.
- 6. Better colored mouse over for checks and radios.
- 7. Don't use background colour for non-coloured mouse over of
+ 5. Option to display non-editable combo splitter - defaults to false.
+ 6. Dont do coloured mouse over for toolbar buttons.
+ 7. Better colored mouse over for checks and radios.
+ 8. Don't use background colour for non-coloured mouse over of
     check/radios if highlighting text backgroud.
- 8. If using Gtk2 >= 2.12, then respect the 'Gtk style scrollviews'
+ 9. If using Gtk2 >= 2.12, then respect the 'Gtk style scrollviews'
     setting.
- 9. Respect KDE's shade sorted list column setting.
-10. When checking if app is firefox, check against 'firefox' as
+10. Respect KDE's shade sorted list column setting.
+11. When checking if app is firefox, check against 'firefox' as
     well as 'firefox-bin'
+12. Fix background of non-selected flat tabs.
+13. Fix tab coloured mouse-over when not rounded.
+14. Add a QTC_STYLE env var - used to quickly test qtc_<name>.themerc
+    files.
 
 0.58
 ----
