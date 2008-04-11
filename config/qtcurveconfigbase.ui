@@ -1049,6 +1049,12 @@ p, li { white-space: pre-wrap; }
   <tabstop>inactiveHighlight</tabstop>
   <tabstop>passwordChar</tabstop>
   <tabstop>shading</tabstop>
+  <tabstop>gradCombo</tabstop>
+  <tabstop>gradStops</tabstop>
+  <tabstop>gradLightBorder</tabstop>
+  <tabstop>addButton</tabstop>
+  <tabstop>removeButton</tabstop>
+  <tabstop>previewColor</tabstop>
   <tabstop>optionBtn</tabstop>
  </tabstops>
  <includes>
