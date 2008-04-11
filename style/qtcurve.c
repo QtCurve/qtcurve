@@ -1475,6 +1475,27 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 cairo_pattern_add_color_stop_rgb(pt, 1.0, QTC_CAIRO_COL(bot));
             }
         }
+        else if(!selected && IS_CUSTOM(app))
+        {
+            CustomGradient *grad=opts.customGradient[app-APPEARANCE_CUSTOM1];
+
+            if(grad)
+            {
+                int i=0;
+
+                for(i=0; i<grad->numGrad; ++i)
+                {
+                    GdkColor col;
+                    shade(base, &col, grad->grad[i].val);
+                    cairo_pattern_add_color_stop_rgb(pt, grad->grad[i].pos, QTC_CAIRO_COL(col));
+                }
+            }
+            else
+            {
+                cairo_pattern_add_color_stop_rgb(pt, 0, QTC_CAIRO_COL(*base));
+                cairo_pattern_add_color_stop_rgb(pt, 1.00, QTC_CAIRO_COL(*base));
+            }
+        }
         else
         {
             GdkColor top,
@@ -1770,7 +1791,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
     if(!colouredMouseOver && lightBorder)
     {
-        if(WIDGET_PROGRESSBAR==widget && (!IS_GLASS(app) || opts.fillProgress))
+        if(IS_CUSTOM(app) || (WIDGET_PROGRESSBAR==widget && (!IS_GLASS(app) || opts.fillProgress)))
             by+=2,  bx+=2,  bw-=4,  bh-=4;
         else if(!horiz)
             by+=2,  bx++,  bw-=3,  bh-=4;
