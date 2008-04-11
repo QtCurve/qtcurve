@@ -4347,7 +4347,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             tool.state&=~State_MouseOver;
 
                         drawLightBevel(painter, menuarea, &tool,
-                                       reverse ? ROUNDED_LEFT : ROUNDED_RIGHT, getFill(&tool, use), use, true, WIDGET_NO_ETCH_BTN);
+                                       reverse ? ROUNDED_LEFT : ROUNDED_RIGHT, getFill(&tool, use), use, true,
+                                       MO_GLOW==opts.coloredMouseOver ? WIDGET_MENU_BUTTON : WIDGET_NO_ETCH_BTN);
                     }
 
                     drawPrimitive(PE_IndicatorArrowDown, &tool, painter, widget);
@@ -6155,7 +6156,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, bool increase, QPainter
         p->fillRect(origRect, base);
     else
     {
-        EAppearance app(APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w || WIDGET_NO_ETCH_BTN==w
+        EAppearance app(APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w
                             ? bevApp
                             : APPEARANCE_GRADIENT);
 
@@ -6376,11 +6377,12 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     QRect        r(rOrig),
                  br(r);
-    bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w) && APPEARANCE_BEVELLED==app),
+    bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  lightBorder(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
                  doColouredMouseOver(doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w && WIDGET_UNCOLOURED_MO_BUTTON!=w &&
+                                     WIDGET_MENU_BUTTON!=w &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
                                      (!IS_SLIDER(w) || (WIDGET_SB_SLIDER==w && opts.coloredMouseOver)) &&
                                      WIDGET_PROGRESSBAR!=w &&
