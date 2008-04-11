@@ -27,6 +27,7 @@
 20. New mouse over effect - glow. Only applicable if etching or shadowing.
 21. New default button indicator - glow. Only applicable if etching
     or shadowing.
+22. Allow up to 5 custom defined gradients.
 
 0.58
 ----

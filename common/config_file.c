@@ -155,6 +155,14 @@ static EAppearance toAppearance(const char *str, EAppearance def)
             return APPEARANCE_INVERTED;
         if(0==memcmp(str, "bevelled", 8))
             return APPEARANCE_BEVELLED;
+
+        if(0==memcmp(str, "customgradient", 14) && strlen(str)>14)
+        {
+            int i=atoi(&str[14]);
+
+            if(i>=1 && i<(QTC_NUM_CUSTOM_GRAD+1))
+                return (EAppearance)(APPEARANCE_CUSTOM1+(i-1));
+        }
     }
     return def;
 }
@@ -407,7 +415,7 @@ class QtCConfig
     QtCConfig(const QString &filename);
 
     bool            ok() const { return values.count()>0; }
-    const QString & readEntry(const char *key, const QString &def=QString::null);
+    const QString & readEntry(const QString &key, const QString &def=QString::null);
 
     private:
 
@@ -442,24 +450,24 @@ QtCConfig::QtCConfig(const QString &filename)
     }
 }
 
-inline const QString & QtCConfig::readEntry(const char *key, const QString &def)
+inline const QString & QtCConfig::readEntry(const QString &key, const QString &def)
 {
     return values.contains(key) ? values[key] : def;
 }
 
-inline QString readStringEntry(QtCConfig &cfg, const char *key)
+inline QString readStringEntry(QtCConfig &cfg, const QString &key)
 {
     return cfg.readEntry(key);
 }
 
-static int readNumEntry(QtCConfig &cfg, const char *key, int def)
+static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
 {
     const QString &val(readStringEntry(cfg, key));
 
     return val.isEmpty() ? def : val.toInt();
 }
 
-static bool readBoolEntry(QtCConfig &cfg, const char *key, bool def)
+static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
 {
     const QString &val(readStringEntry(cfg, key));
 
@@ -626,6 +634,22 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
 #endif
 
+static void checkAppearance(EAppearance *ap, Options *opts)
+{
+    if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
+    {
+#ifdef __cplusplus
+        if(opts->customGradient.end()==opts->customGradient.find(*ap))
+#else
+        if(!opts->customGradient[*ap-APPEARANCE_CUSTOM1])
+#endif
+            if(ap==&opts->appearance)
+                *ap=APPEARANCE_GRADIENT;
+            else
+                *ap=opts->appearance;
+    }
+}
+
 #ifdef __cplusplus
 static bool readConfig(const QString &file, Options *opts, Options *def)
 #else
@@ -672,6 +696,8 @@ static bool readConfig(const char *file, Options *opts, Options *def)
         if(cfg)
         {
 #endif
+            int i;
+
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
             QTC_CFG_READ_DI(highlightFactor)
@@ -765,6 +791,163 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #endif
             QTC_CFG_READ_SHADING(shading, shading);
 
+#ifdef __cplusplus
+            for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
+            {
+                QString gradKey;
+
+                gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
+
+#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                QStringList vals(readStringEntry(cfg, gradKey).split(',', QString::SkipEmptyParts));
+#else
+                QStringList vals(QStringList::split(',', readStringEntry(cfg, gradKey)));
+#endif
+
+                if(vals.size())
+                    opts->customGradient.erase((EAppearance)i);
+
+                if(vals.size()>=5 && vals.size()%2) // Need odd number...
+                {
+                    QStringList::ConstIterator it(vals.begin()),
+                                               end(vals.end());
+                    bool                       ok(true);
+                    CustomGradient             grad;
+
+                    if((*it)=="true")
+                        grad.lightBorder=true;
+                    else if((*it)=="false")
+                        grad.lightBorder=false;
+                    else
+                        ok=false;
+
+                    if(ok)
+                    {
+                        int j;
+
+                        for(++it, j=0; it!=end && ok; ++it, ++j)
+                        {
+                            double pos=(*it).toDouble(&ok),
+                                   val=ok ? (*(++it)).toDouble(&ok) : 0.0;
+
+                            if(ok)
+                                ok=(pos>=0 && pos<=1.0) &&
+                                   (val>=0.0 && val<=2.0);
+
+                            if(ok)
+                                grad.grad.insert(Gradient(pos, val));
+                        }
+                    }
+
+                    if(ok)
+                        opts->customGradient[(EAppearance)i]=grad;
+                }
+            }
+#else
+            for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+            {
+                char gradKey[16];
+                char *str;
+
+                sprintf(gradKey, "customgradient%d", i+1);
+                if((str=readStringEntry(cfg, gradKey)))
+                {
+                    int j,
+                        comma=0;
+
+                    for(j=0; str[j]; ++j)
+                        if(','==str[j])
+                            comma++;
+
+                    if(comma && opts->customGradient[i])
+                    {
+                        if(opts->customGradient[i]->grad)
+                            free(opts->customGradient[i]->grad);
+                        free(opts->customGradient[i]);
+                        opts->customGradient[i]=0L;
+                    }
+
+                    if(comma>=4 && 0==comma%2)
+                    {
+                        char *c=strchr(str, ',');
+
+                        if(c)
+                        {
+                            bool lb=false,
+                                 ok=true;
+
+                            *c='\0';
+                            if(0==memcmp(str, "true", 4))
+                                lb=true;
+                            else if(0==memcmp(str, "false", 4))
+                                lb=false;
+                            else
+                                ok=false;
+
+                            if(ok)
+                            {
+                                opts->customGradient[i]=malloc(sizeof(CustomGradient));
+                                opts->customGradient[i]->numGrad=comma/2;
+                                opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad);
+
+                                str=c+1;
+                                for(j=0; j<comma && str && ok; j+=2)
+                                {
+                                    c=strchr(str, ',');
+
+                                    if(c)
+                                    {
+                                        *c='\0';
+                                        opts->customGradient[i]->grad[j/2].pos=atof(str);
+                                        str=c+1;
+                                        c=str ? strchr(str, ',') : 0L;
+
+                                        if(c || str)
+                                        {
+                                            if(c)
+                                                *c='\0';
+                                            opts->customGradient[i]->grad[j/2].val=atof(str);
+                                            str=c ? c+1 : c;
+                                        }
+                                        else
+                                            ok=false;
+                                    }
+                                    else
+                                        ok=false;
+                                }
+
+                                if(!ok)
+                                {
+                                    free(opts->customGradient[i]->grad);
+                                    free(opts->customGradient[i]);
+                                    opts->customGradient[i]=0L;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+#endif
+
+            /* **Must** check appearance first, as the rest will default to this */
+            checkAppearance(&opts->appearance, opts);
+            checkAppearance(&opts->menubarAppearance, opts);
+            checkAppearance(&opts->menuitemAppearance, opts);
+            checkAppearance(&opts->toolbarAppearance, opts);
+            checkAppearance(&opts->lvAppearance, opts);
+            checkAppearance(&opts->tabAppearance, opts);
+            checkAppearance(&opts->sliderAppearance, opts);
+#ifdef __cplusplus
+            checkAppearance(&opts->titlebarAppearance, opts);
+#endif
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+            checkAppearance(&opts->selectionAppearance, opts);
+#endif
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
+            checkAppearance(&opts->menuStripeAppearance, opts);
+#endif
+            checkAppearance(&opts->progressAppearance, opts);
+
 #ifndef __cplusplus
             releaseConfig(cfg);
 #endif
@@ -851,6 +1034,13 @@ static const char * getSystemConfigFile()
 static void defaultSettings(Options *opts)
 {
     /* Set hard-coded defaults... */
+#ifndef __cplusplus
+    int i;
+
+    for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+        opts->customGradient[i]=0L;
+#endif
+
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
@@ -1031,7 +1221,7 @@ static const char *toStr(EMouseOver mo)
     }
 }
 
-static const char *toStr(EAppearance exp)
+static QString toStr(EAppearance exp)
 {
     switch(exp)
     {
@@ -1049,8 +1239,15 @@ static const char *toStr(EAppearance exp)
             return "bevelled";
         case APPEARANCE_INVERTED:
             return "inverted";
-        default:
+        case APPEARANCE_SHINY_GLASS:
             return "shinyglass";
+        default:
+        {
+            QString app;
+
+            app.sprintf("customgradient%d", (exp-APPEARANCE_CUSTOM1)+QTC_NUM_CUSTOM_GRAD);
+            return app;
+        }
     }
 }
 
@@ -1170,6 +1367,7 @@ static const char *toStr(ESliderStyle s)
 }
 
 #if QT_VERSION >= 0x040000
+#include <QTextStream>
 #define CFG config
 #else
 #define CFG (*cfg)
@@ -1304,6 +1502,36 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(gtkButtonOrder)
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)
+
+        for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
+        {
+            CustomGradientCont::const_iterator cg(opts.customGradient.find((EAppearance)i));
+            QString                            gradKey;
+
+            gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
+
+            if(cg==opts.customGradient.end())
+                CFG.deleteEntry(gradKey);
+            else
+            {
+                QString     gradVal;
+#if QT_VERSION >= 0x040000
+                QTextStream str(&gradVal);
+#else
+                QTextStream str(&gradVal, IO_WriteOnly);
+#endif
+
+                str << (const char *)((*cg).second.lightBorder ? "true" : "false");
+
+                GradientCont::const_iterator it((*cg).second.grad.begin()),
+                                             end((*cg).second.grad.end());
+
+                for(; it!=end; ++it)
+                    str << ',' << (*it).pos << ',' << (*it).val;
+                CFG.writeEntry(gradKey, gradVal);
+            }
+        }
+
         cfg->sync();
         return true;
     }

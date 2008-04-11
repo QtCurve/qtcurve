@@ -6313,6 +6313,27 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
             p->fillRect(r, QBrush(grad));
         }
     }
+    else if(!selected && IS_CUSTOM(app))
+    {
+        CustomGradientCont::const_iterator cg(opts.customGradient.find(app));
+
+        if(cg!=opts.customGradient.end())
+        {
+            QLinearGradient              grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+            GradientCont::const_iterator it((*cg).second.grad.begin()),
+                                         end((*cg).second.grad.end());
+
+            for(; it!=end; ++it)
+            {
+                QColor col;
+                shade(base, &col, (*it).val);
+                grad.setColorAt((*it).pos, col);
+            }
+            p->fillRect(r, QBrush(grad));
+        }
+        else
+            p->fillRect(r, base);
+    }
     else
     {
         QColor top,
@@ -6435,7 +6456,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         br=r.adjusted(1,1,-1,-1);
         drawPathRect(p, br, cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
 
-        if(WIDGET_PROGRESSBAR==w && (!IS_GLASS(app) || opts.fillProgress))
+        if(IS_CUSTOM(app) || (WIDGET_PROGRESSBAR==w && (!IS_GLASS(app) || opts.fillProgress)))
             br.adjust(1,1,-1,-1);
         else if(horiz)
             br.adjust(1,0,-1,-1);

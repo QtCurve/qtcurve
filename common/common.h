@@ -69,7 +69,7 @@ typedef enum
     SHADING_HSV=2
 } EShading;
 
-#if (!defined QTC_CONFIG_DIALOG) && (!defined QTC_KWIN)
+#if (!defined QTC_KWIN)
 static EShading shading=SHADING_HSL;
 #endif
 
@@ -78,6 +78,8 @@ static EShading shading=SHADING_HSL;
 #ifdef QTC_CONFIG_DIALOG
 #include <qapplication.h>
 #endif
+#include <map>
+#include <set>
 #else
 #include <glib.h>
 #endif
@@ -237,6 +239,7 @@ typedef GdkColor color;
 #endif
 
 #define IS_GLASS(A) (APPEARANCE_DULL_GLASS==A || APPEARANCE_SHINY_GLASS==A)
+#define IS_CUSTOM(A) (A>=APPEARANCE_CUSTOM1 && A<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
 #define IS_FLAT(A)  (APPEARANCE_FLAT==A || APPEARANCE_RAISED==A)
 #define SHADE_SELECION_LIGHT 1.15
 #define SHADE_SELECION_DARK  0.90
@@ -279,7 +282,7 @@ typedef GdkColor color;
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define QTC_DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    ((!SUKEN && IS_GLASS(APP) && WIDGET_MENU_ITEM!=WIDGET && WIDGET_DEF_BUTTON!=WIDGET) || \
+    ((!SUKEN && (IS_GLASS(APP) || customHasLightBorder((Options *)&opts, APP)) && WIDGET_MENU_ITEM!=WIDGET && WIDGET_DEF_BUTTON!=WIDGET) || \
                           (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
                            APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
 
@@ -398,7 +401,15 @@ typedef enum
 
 typedef enum
 {
-    APPEARANCE_FLAT,
+    APPEARANCE_CUSTOM1,
+    APPEARANCE_CUSTOM2,
+    APPEARANCE_CUSTOM3,
+    APPEARANCE_CUSTOM4,
+    APPEARANCE_CUSTOM5,
+
+        QTC_NUM_CUSTOM_GRAD,
+
+    APPEARANCE_FLAT = QTC_NUM_CUSTOM_GRAD,
     APPEARANCE_RAISED,
     APPEARANCE_DULL_GLASS,
     APPEARANCE_SHINY_GLASS,
@@ -529,7 +540,15 @@ typedef enum
 #define DEF_COLOR_STR              "background"
 #define DEF_TOOLBAR_SHADE_STR      "none"
 
+#if defined QTC_COMMON_FUNCTIONS || defined QTC_CONFIG_DIALOG
+static bool equal(double d1, double d2)
+{
+    return (fabs(d1 - d2) < 0.0001);
+}
+#endif
+
 #ifdef QTC_COMMON_FUNCTIONS
+#if (!defined QTC_CONFIG_DIALOG)
 static double getWidgetShade(EWidget w, bool light, bool sunken, EAppearance app)
 {
     switch(w)
@@ -555,14 +574,11 @@ static double getWidgetShade(EWidget w, bool light, bool sunken, EAppearance app
                         : SHADE_BEVEL_GRAD_DARK;
     }
 }
+#endif
 
 #define QTC_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define QTC_MAX(a, b) ((b) < (a) ? (a) : (b))
 
-static bool equal(double d1, double d2)
-{
-    return (fabs(d1 - d2) < 0.0001);
-}
 
 /* Taken from rgb->hsl routines taken from KColor
     Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
@@ -834,6 +850,7 @@ static void shade(const color *ca, color *cb, double k)
         }
 }
 
+#if (!defined QTC_CONFIG_DIALOG)
 static unsigned char checkBounds(int num)
 {
     return num < 0   ? 0   :
@@ -882,14 +899,94 @@ static void adjustPix(unsigned char *data, int numChannels, int w, int h, int st
         offset+=stride;
     }
 }
+#endif
 #endif /* QTC_COMMON_NO_FUNCTIONS */
 
 #ifdef __cplusplus
+struct Gradient
+#else
+typedef struct
+#endif
+{
+#ifdef __cplusplus
+    Gradient(double p=0.0, double v=0.0) : pos(p), val(v) { }
+
+#ifdef QTC_CONFIG_DIALOG
+    bool operator==(const Gradient &o) const
+    {
+        return equal(pos, o.pos) && equal(val, o.val);
+    }
+#endif
+    bool operator<(const Gradient &o) const
+    {
+        return pos<o.pos || (equal(pos, o.pos) && val<o.val);
+    }
+#endif
+
+    double pos,
+           val;
+
+}
+#ifndef __cplusplus
+Gradient
+#endif
+;
+
+#ifdef __cplusplus
+typedef std::set<Gradient> GradientCont;
+struct CustomGradient
+#else
+typedef struct
+#endif
+{
+#ifdef __cplusplus
+    CustomGradient & operator=(const CustomGradient &o)
+    {
+        if(&o!=this)
+        {
+            grad=o.grad;
+            lightBorder=o.lightBorder;
+        }
+
+        return *this;
+    }
+#ifdef QTC_CONFIG_DIALOG
+    bool operator==(const CustomGradient &o) const
+    {
+        return lightBorder==o.lightBorder && grad==o.grad;
+    }
+#endif
+#endif
+    bool         lightBorder;
+#ifdef __cplusplus
+    GradientCont grad;
+#else
+    int          numGrad;
+    Gradient     *grad;
+#endif
+}
+#ifndef __cplusplus
+CustomGradient
+#endif
+;
+
+#ifdef __cplusplus
+typedef std::map<EAppearance, CustomGradient> CustomGradientCont;
 struct Options
 #else
 typedef struct
 #endif
 {
+#ifdef __cplusplus
+    Options & operator=(const Options &o)
+    {
+        if(&o!=this)
+            customGradient=o.customGradient;
+
+        return *this;
+    }
+
+#endif
     int              contrast,
                      passwordChar;
     double           highlightFactor;
@@ -983,6 +1080,11 @@ typedef struct
     #ifdef QTC_CONFIG_DIALOG
     EShading         shading;
     #endif
+#ifdef __cplusplus
+    CustomGradientCont customGradient;
+#else
+    CustomGradient     *customGradient[QTC_NUM_CUSTOM_GRAD];
+#endif
 #ifndef __cplusplus
 } Options;
 #else
@@ -990,6 +1092,19 @@ typedef struct
 #endif
 
 #if defined QTC_COMMON_FUNCTIONS && !defined QTC_CONFIG_DIALOG
+static bool customHasLightBorder(Options *opts, EAppearance app)
+{
+    if(IS_CUSTOM(app))
+#ifdef __cplusplus
+        return opts->customGradient[app].lightBorder;
+#else
+        if(opts->customGradient[app])
+            return opts->customGradient[app]->lightBorder;
+#endif
+
+    return false;
+}
+
 static EAppearance widgetApp(EWidget w, const Options *opts)
 {
     switch(w)

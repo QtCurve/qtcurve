@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
+    <width>868</width>
     <height>574</height>
    </rect>
   </property>
@@ -834,6 +834,116 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="gradientsTab" >
+      <attribute name="title" >
+       <string>Custom Gradients</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QComboBox" name="gradCombo" />
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Settings</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item rowspan="2" row="0" column="0" >
+           <widget class="QTreeWidget" name="gradStops" >
+            <column>
+             <property name="text" >
+              <string>Position</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Value</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="3" >
+           <widget class="QLabel" name="label_3" >
+            <property name="text" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">NOTE:&lt;/span>&lt;span style=" font-style:italic;"> &lt;/span>&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">&lt;span style=" text-decoration: underline;">Position&lt;/span> has a range of 0.0 to 1.0 - 0.0 being top/left, and 1.0 being bottom/right.&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">&lt;span style=" text-decoration: underline;">Value&lt;/span> has a range of 0.0 to 2.0. A value of 1.2 implies lightening by 20%, and a value of 0.8 implies darkening by 20%&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="KPushButton" name="addButton" />
+          </item>
+          <item row="1" column="2" >
+           <widget class="KPushButton" name="removeButton" />
+          </item>
+          <item row="1" column="3" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Minimum</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QCheckBox" name="gradLightBorder" >
+            <property name="text" >
+             <string>Light border</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="gradPreviewBox" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title" >
+          <string>Preview</string>
+         </property>
+         <layout class="QHBoxLayout" >
+          <item>
+           <widget class="QWidget" native="1" name="previewWidgetContainer" />
+          </item>
+          <item>
+           <widget class="KColorButton" name="previewColor" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item row="2" column="0" >
@@ -865,6 +975,11 @@
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KPushButton</class>
+   <extends>QPushButton</extends>
+   <header>kpushbutton.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

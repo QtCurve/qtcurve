@@ -30,6 +30,11 @@
 #include <QMenu>
 #include <QFileInfo>
 #include <QBoxLayout>
+#include <QGridLayout>
+#include <QTreeWidget>
+#include <QPainter>
+#include <KGuiItem>
+#include <KInputDialog>
 #include <klocale.h>
 #include <kcolorbutton.h>
 #include <kconfig.h>
@@ -88,6 +93,61 @@ class CharSelectDialog : public KDialog
     KCharSelect *itsSelector;
 };
 
+CGradientPreview::CGradientPreview(QWidget *p)
+                : QWidget(p)
+{
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+}
+
+QSize CGradientPreview::sizeHint() const
+{
+    return QSize(64, 64);
+}
+
+QSize CGradientPreview::minimumSizeHint() const
+{
+    return sizeHint();
+}
+
+void CGradientPreview::paintEvent(QPaintEvent *)
+{
+    QRect    r(rect());
+    QPainter p(this);
+
+    if(stops.size())
+    {
+        QLinearGradient              grad(r.topLeft(), r.bottomLeft());
+        GradientCont::const_iterator it(stops.begin()),
+                                     end(stops.end());
+
+        for(; it!=end; ++it)
+        {
+            QColor col;
+            shade(color, &col, (*it).val);
+            grad.setColorAt((*it).pos, col);
+        }
+        p.fillRect(r, QBrush(grad));
+    }
+    else
+        p.fillRect(r, color);
+    p.end();
+}
+
+void CGradientPreview::setGrad(const GradientCont &s)
+{
+    stops=s;
+    repaint();
+}
+
+void CGradientPreview::setColor(const QColor &col)
+{
+    if(col!=color)
+    {
+        color=col;
+        repaint();
+    }
+}
+
 static int toInt(const QString &str)
 {
     return str.length()>1 ? str[0].unicode() : 0;
@@ -117,6 +177,9 @@ static void insertShadeEntries(QComboBox *combo, bool withDarken, bool checkRadi
 
 static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=true)
 {
+    for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
+        combo->insertItem(i, i18n("Custom %1", (i-APPEARANCE_CUSTOM1)+1));
+
     combo->insertItem(APPEARANCE_FLAT, i18n("Flat"));
     combo->insertItem(APPEARANCE_RAISED, i18n("Raised"));
     combo->insertItem(APPEARANCE_DULL_GLASS, i18n("Dull glass"));
@@ -309,7 +372,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(shadeMenubars, SIGNAL(activated(int)), SLOT(shadeMenubarsChanged()));
     connect(highlightFactor, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(scrollbarType, SIGNAL(activated(int)), SLOT(updateChanged()));
-    connect(shading, SIGNAL(activated(int)), SLOT(updateChanged()));
+    connect(shading, SIGNAL(activated(int)), SLOT(shadingChanged()));
     connect(gtkScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(gtkComboMenus, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(gtkButtonOrder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -336,6 +399,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addSeparator();
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
     loadStyles(subMenu);
+    setupPreviewTab();
 }
 
 QtCurveConfig::~QtCurveConfig()
@@ -468,6 +532,12 @@ void QtCurveConfig::tabAppearanceChanged()
     updateChanged();
 }
 
+void QtCurveConfig::shadingChanged()
+{
+    ::shading=(EShading)shading->currentIndex();
+    updateChanged();
+}
+
 void QtCurveConfig::passwordCharClicked()
 {
     int              cur(toInt(passwordChar->text()));
@@ -475,6 +545,189 @@ void QtCurveConfig::passwordCharClicked()
 
     if(QDialog::Accepted==dlg.exec() && dlg.currentChar()!=cur)
         setPasswordChar(dlg.currentChar());
+}
+
+void QtCurveConfig::gradChanged(int i)
+{
+    CustomGradientCont::const_iterator it(customGradient.find((EAppearance)i));
+
+    gradStops->clear();
+
+    if(it!=customGradient.end())
+    {
+        gradPreview->setGrad((*it).second.grad);
+        gradLightBorder->setChecked((*it).second.lightBorder);
+
+        GradientCont::const_iterator git((*it).second.grad.begin()),
+                                     gend((*it).second.grad.end());
+
+        for(; git!=gend; ++git)
+        {
+            QStringList details;
+
+            details << QString().setNum((*git).pos)
+                    << QString().setNum((*git).val);
+
+            QTreeWidgetItem *i=new QTreeWidgetItem(gradStops, details);
+
+            i->setFlags(i->flags()|Qt::ItemIsEditable);
+        }
+    }
+    else
+    {
+        gradPreview->setGrad(GradientCont());
+        gradLightBorder->setChecked(false);
+    }
+}
+
+static double prev=0.0;
+
+void QtCurveConfig::editItem(QTreeWidgetItem *i, int col)
+{
+    bool   ok;
+    prev=i->text(col).toDouble(&ok);
+    if(!ok)
+        prev=0.0;
+
+    gradStops->editItem(i, col);
+}
+
+void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
+{
+    bool   ok;
+    double val=i->text(col).toDouble(&ok);
+
+    if(!ok || (0==col && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
+        i->setText(col, QString().setNum(prev));
+    else
+    {
+        double other=i->text(col ? 0 : 1).toDouble(&ok);
+
+        CustomGradientCont::iterator it=customGradient.find((EAppearance)gradCombo->currentIndex());
+
+        if(it!=customGradient.end())
+        {
+            (*it).second.grad.erase(Gradient(col ? other : prev, col ? prev : other));
+            (*it).second.grad.insert(Gradient(col ? other : val, col ? val : other));
+            gradPreview->setGrad((*it).second.grad);
+            i->setText(col, QString().setNum(val));
+            emit changed(true);
+        }
+    }
+}
+
+void QtCurveConfig::addGradStop()
+{
+    CustomGradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
+
+    if(cg!=customGradient.end())
+    {
+        bool    ok;
+        QString val(KInputDialog::getText(i18n("New Gradient Stops"),
+                                          i18n("Please enter a set of new \"position value\" pairs\n"
+                                               "(e.g. \"0.0 0.8 1.0 1.1\")"),
+                                          QString(), &ok, this/*, QValidator *validator*/));
+
+        if(ok)
+        {
+            QStringList list(val.split(QRegExp("[\\s,]"), QString::SkipEmptyParts));
+
+            if(list.size() && 0==list.size()%2)
+            {
+                GradientCont                grads;
+                QStringList::const_iterator it(list.begin()),
+                                            end(list.end());
+
+                for(; it!=end && ok; ++it)
+                {
+                    double pos=(*it).toDouble(&ok),
+                           val=ok ? (*(++it)).toDouble(&ok) : 0.0;
+
+                    if(ok && pos>=0.0 && pos<=1.0 &&  val>=0.0 && val<=2.0)
+                        grads.insert(Gradient(pos, val));
+                }
+
+                if(ok)
+                    ok=grads.size()>0;
+
+                if(ok)
+                {
+                    unsigned int                 b4=(*cg).second.grad.size();
+                    GradientCont::const_iterator git(grads.begin()),
+                                                 gend(grads.end());
+
+                    for(; git!=gend; ++git)
+                        (*cg).second.grad.insert(*git);
+
+                    ok=(*cg).second.grad.size()!=b4;
+                }
+            }
+            else
+                ok=false;
+        }
+
+        if(ok)
+        {
+            gradChanged(gradCombo->currentIndex());
+            emit changed(true);
+        }
+    }
+}
+
+void QtCurveConfig::removeGradStop()
+{
+    QTreeWidgetItem *cur=gradStops->currentItem();
+
+    if(cur)
+    {
+        QTreeWidgetItem *next=gradStops->itemBelow(cur);
+
+        if(!next)
+            next=gradStops->itemAbove(cur);
+
+        CustomGradientCont::iterator it=customGradient.find((EAppearance)gradCombo->currentIndex());
+
+        if(it!=customGradient.end())
+        {
+            bool   ok;
+            double pos=cur->text(0).toDouble(&ok),
+                   val=cur->text(1).toDouble(&ok);
+
+            (*it).second.grad.erase(Gradient(pos, val));
+            gradPreview->setGrad((*it).second.grad);
+            emit changed(true);
+
+            delete cur;
+            if(next)
+                gradStops->setCurrentItem(next);
+        }
+    }
+}
+
+void QtCurveConfig::setupPreviewTab()
+{
+    for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
+        gradCombo->insertItem(i-APPEARANCE_CUSTOM1, i18n("Custom %1", (i-APPEARANCE_CUSTOM1)+1));
+    gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
+
+    gradPreview=new CGradientPreview(previewWidgetContainer);
+    QBoxLayout *layout=new QBoxLayout(QBoxLayout::TopToBottom, previewWidgetContainer);
+    layout->addWidget(gradPreview);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    QColor col(palette().color(QPalette::Active, QPalette::Button));
+    previewColor->setColor(col);
+    gradPreview->setColor(col);
+    gradChanged(APPEARANCE_CUSTOM1);
+    addButton->setGuiItem(KGuiItem(i18n("Add"), "list_add"));
+    removeButton->setGuiItem(KGuiItem(i18n("Remove"), "list_remove"));
+
+    connect(gradCombo, SIGNAL(currentIndexChanged(int)), SLOT(gradChanged(int)));
+    connect(previewColor, SIGNAL(changed(const QColor &)), gradPreview, SLOT(setColor(const QColor &)));
+    connect(gradStops, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT(editItem(QTreeWidgetItem *, int)));
+    connect(gradStops, SIGNAL(itemChanged(QTreeWidgetItem *, int)), SLOT(itemChanged(QTreeWidgetItem *, int)));
+    connect(addButton, SIGNAL(clicked(bool)), SLOT(addGradStop()));
+    connect(removeButton, SIGNAL(clicked(bool)), SLOT(removeGradStop()));
 }
 
 void QtCurveConfig::setPasswordChar(int ch)
@@ -617,6 +870,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.passwordChar=toInt(passwordChar->text());
     opts.framelessGroupBoxes=framelessGroupBoxes->isChecked();
     opts.inactiveHighlight=inactiveHighlight->isChecked();
+    opts.customGradient=customGradient;
 }
 
 void QtCurveConfig::setWidgetOptions(const Options &opts)
@@ -698,6 +952,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     setPasswordChar(opts.passwordChar);
     framelessGroupBoxes->setChecked(opts.framelessGroupBoxes);
     inactiveHighlight->setChecked(opts.inactiveHighlight);
+    customGradient=opts.customGradient;
+    gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
 }
 
 bool QtCurveConfig::settingsChanged()
@@ -776,7 +1032,9 @@ bool QtCurveConfig::settingsChanged()
          (customMenuTextColor->isChecked() &&
                customMenuNormTextColor->color()!=currentStyle.customMenuNormTextColor) ||
          (customMenuTextColor->isChecked() &&
-               customMenuSelTextColor->color()!=currentStyle.customMenuSelTextColor);
+               customMenuSelTextColor->color()!=currentStyle.customMenuSelTextColor) ||
+
+         customGradient!=currentStyle.customGradient;
 }
 
 #include "qtcurveconfig.moc"

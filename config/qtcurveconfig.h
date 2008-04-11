@@ -21,9 +21,8 @@
   Boston, MA 02110-1301, USA.
 */
 
-#define QTC_COMMON_ONLY_COVERTERS
+#define QTC_COMMON_FUNCTIONS
 #define QTC_CONFIG_DIALOG
-
 
 #include <ui_qtcurveconfigbase.h>
 #include <QMap>
@@ -31,7 +30,31 @@
 
 class QMenu;
 class QAction;
+class QComboBox;
 class CExportThemeDialog;
+
+class CGradientPreview : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+    CGradientPreview(QWidget *p);
+
+    QSize sizeHint() const;
+    QSize minimumSizeHint() const;
+    void paintEvent(QPaintEvent *);
+    void setGrad(const GradientCont &s);
+
+    public Q_SLOTS:
+
+    void setColor(const QColor &col);
+
+    private:
+
+    QColor       color;
+    GradientCont stops;
+};
 
 class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 {
@@ -42,7 +65,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     QtCurveConfig(QWidget *parent);
     virtual ~QtCurveConfig();
 
-    signals:
+    Q_SIGNALS:
 
     void changed(bool);
 
@@ -50,12 +73,12 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     void loadStyles(QMenu *menu);
 
-    public slots:
+    public Q_SLOTS:
 
     void save();
     void defaults();
 
-    private slots:
+    private Q_SLOTS:
 
     void setStyle(QAction *s);
     void updateChanged();
@@ -72,10 +95,18 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void customMenuTextColorChanged();
     void stripedProgressChanged();
     void tabAppearanceChanged();
+    void shadingChanged();
     void passwordCharClicked();
+
+    void gradChanged(int i);
+    void editItem(QTreeWidgetItem *i, int col);
+    void itemChanged(QTreeWidgetItem *i, int col);
+    void addGradStop();
+    void removeGradStop();
 
     private:
 
+    void setupPreviewTab();
     void setPasswordChar(int ch);
     void loadStyle(const QString &file);
     void setOptions(Options &opts);
@@ -88,6 +119,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
                              defaultStyle;
     QMap<QAction *, QString> styles;
     CExportThemeDialog       *exportDialog;
+    CGradientPreview         *gradPreview;
+    CustomGradientCont       customGradient;
 };
 
 #endif
