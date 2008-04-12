@@ -792,6 +792,25 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_SHADING(shading, shading);
 
 #ifdef __cplusplus
+#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
+            QStringList shades(readStringEntry(cfg, "customShades").split(',', QString::SkipEmptyParts));
+#else
+            QStringList shades(QStringList::split(',', readStringEntry(cfg, "customShades")));
+#endif
+
+            if(NUM_STD_SHADES==shades.size())
+            {
+                QStringList::ConstIterator it(shades.begin());
+                bool                       ok(true);
+
+                opts->customShades.resize(NUM_STD_SHADES);
+                for(i=0; i<NUM_STD_SHADES && ok; ++i, ++it)
+                    opts->customShades[i]=(*it).toDouble(&ok);
+
+                if(!ok)
+                    opts->customShades.clear();
+            }
+
             for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
             {
                 QString gradKey;
@@ -844,6 +863,44 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                 }
             }
 #else
+            {
+            char *str=readStringEntry(cfg, "customShades");
+
+            if(str)
+            {
+                int j,
+                    comma=0;
+
+                for(j=0; str[j]; ++j)
+                    if(','==str[j])
+                        comma++;
+
+                if((NUM_STD_SHADES-1)==comma)
+                {
+                    opts->customShades=malloc(sizeof(double)*NUM_STD_SHADES);
+
+                    for(j=0; j<comma+1 && str && ok; ++j)
+                    {
+                        c=strchr(str, ',');
+
+                        if(c)
+                        {
+                            *c='\0';
+                            opts->customShades[j]=atof(str);
+                            str=c+1;
+                        }
+                        else
+                            ok=false;
+                    }
+
+                    if(!ok)
+                    {
+                        free(opts->customShades)
+                        opts->customShades=0L;
+                    }
+                }
+            }
+
             for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
             {
                 char gradKey[16];
@@ -1039,6 +1096,8 @@ static void defaultSettings(Options *opts)
 
     for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
         opts->customGradient[i]=0L;
+
+    opts->customShades=0L;
 #endif
 
     opts->contrast=7;
@@ -1531,6 +1590,28 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
                 CFG.writeEntry(gradKey, gradVal);
             }
         }
+
+        if(NUM_STD_SHADES==opts.customShades.size())
+        {
+            QString     shadeVal;
+#if QT_VERSION >= 0x040000
+            QTextStream str(&shadeVal);
+#else
+            QTextStream str(&shadeVal, IO_WriteOnly);
+#endif
+
+            ShadesCont::const_iterator it(opts.customShades.begin()),
+                                       end(opts.customShades.end());
+
+            for(int i=0; it!=end; ++it, ++i)
+                if(0==i)
+                    str << *it;
+                else
+                    str << ',' << *it;
+            CFG.writeEntry("customShades", shadeVal);
+        }
+        else
+            CFG.deleteEntry("customShades");
 
         cfg->sync();
         return true;

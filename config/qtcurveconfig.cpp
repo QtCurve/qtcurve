@@ -43,6 +43,7 @@
 #include <kpushbutton.h>
 #include <kcharselect.h>
 #include <kdialog.h>
+#include <knuminput.h>
 #include <unistd.h>
 #include "config.h"
 #define CONFIG_READ
@@ -385,6 +386,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     if(!readConfig(NULL, &currentStyle, &defaultStyle))
         currentStyle=defaultStyle;
 
+    setupShadesTab();
     setWidgetOptions(currentStyle);
 
     QMenu *menu=new QMenu(this),
@@ -399,7 +401,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addSeparator();
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
     loadStyles(subMenu);
-    setupPreviewTab();
+    setupGradientsTab();
 }
 
 QtCurveConfig::~QtCurveConfig()
@@ -704,7 +706,7 @@ void QtCurveConfig::removeGradStop()
     }
 }
 
-void QtCurveConfig::setupPreviewTab()
+void QtCurveConfig::setupGradientsTab()
 {
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
         gradCombo->insertItem(i-APPEARANCE_CUSTOM1, i18n("Custom %1", (i-APPEARANCE_CUSTOM1)+1));
@@ -728,6 +730,51 @@ void QtCurveConfig::setupPreviewTab()
     connect(gradStops, SIGNAL(itemChanged(QTreeWidgetItem *, int)), SLOT(itemChanged(QTreeWidgetItem *, int)));
     connect(addButton, SIGNAL(clicked(bool)), SLOT(addGradStop()));
     connect(removeButton, SIGNAL(clicked(bool)), SLOT(removeGradStop()));
+}
+
+void QtCurveConfig::setupShadesTab()
+{
+    int shade(0);
+
+    setupShade(shade0, shade++);
+    setupShade(shade1, shade++);
+    setupShade(shade2, shade++);
+    setupShade(shade3, shade++);
+    setupShade(shade4, shade++);
+    setupShade(shade5, shade++);
+    connect(customShading, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+}
+
+void QtCurveConfig::setupShade(KDoubleNumInput *w, int shade)
+{
+    w->setRange(0.0, 2.0, 0.05, false);
+    connect(w, SIGNAL(valueChanged(double)), SLOT(updateChanged()));
+    shades[shade]=w;
+}
+
+void QtCurveConfig::populateShades(const Options &opts)
+{
+    customShading->setChecked(opts.customShades.size());
+
+    if(opts.customShades.size())
+        for(int i=0; i<NUM_STD_SHADES; ++i)
+            shades[i]->setValue(opts.customShades[i]);
+}
+
+bool QtCurveConfig::diffShades(const Options &opts)
+{
+    if( (0==opts.customShades.size() && customShading->isChecked()) ||
+        (opts.customShades.size() && !customShading->isChecked()) )
+        return true;
+
+    if(customShading->isChecked())
+    {
+        for(int i=0; i<NUM_STD_SHADES; ++i)
+            if(!equal(shades[i]->value(), opts.customShades[i]))
+                return true;
+    }
+
+    return false;
 }
 
 void QtCurveConfig::setPasswordChar(int ch)
@@ -871,6 +918,15 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.framelessGroupBoxes=framelessGroupBoxes->isChecked();
     opts.inactiveHighlight=inactiveHighlight->isChecked();
     opts.customGradient=customGradient;
+
+    if(customShading->isChecked())
+    {
+        opts.customShades.resize(NUM_STD_SHADES);
+        for(int i=0; i<NUM_STD_SHADES; ++i)
+            opts.customShades[i]=shades[i]->value();
+    }
+    else
+        opts.customShades.clear();
 }
 
 void QtCurveConfig::setWidgetOptions(const Options &opts)
@@ -954,6 +1010,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     inactiveHighlight->setChecked(opts.inactiveHighlight);
     customGradient=opts.customGradient;
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
+
+    populateShades(opts);
 }
 
 bool QtCurveConfig::settingsChanged()
@@ -1034,7 +1092,9 @@ bool QtCurveConfig::settingsChanged()
          (customMenuTextColor->isChecked() &&
                customMenuSelTextColor->color()!=currentStyle.customMenuSelTextColor) ||
 
-         customGradient!=currentStyle.customGradient;
+         customGradient!=currentStyle.customGradient ||
+
+         diffShades(currentStyle);
 }
 
 #include "qtcurveconfig.moc"

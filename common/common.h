@@ -80,6 +80,7 @@ static EShading shading=SHADING_HSL;
 #endif
 #include <map>
 #include <set>
+#include <vector>
 #else
 #include <glib.h>
 #endif
@@ -973,8 +974,10 @@ CustomGradient
 
 #ifdef __cplusplus
 typedef std::map<EAppearance, CustomGradient> CustomGradientCont;
+typedef std::vector<double> ShadesCont;
 struct Options
 #else
+typedef double * ShadesCont;
 typedef struct
 #endif
 {
@@ -1086,6 +1089,7 @@ typedef struct
 #else
     CustomGradient     *customGradient[QTC_NUM_CUSTOM_GRAD];
 #endif
+    ShadesCont       customShades;
 #ifndef __cplusplus
 } Options;
 #else
