@@ -126,7 +126,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     CExportThemeDialog       *exportDialog;
     CGradientPreview         *gradPreview;
     CustomGradientCont       customGradient;
-    KDoubleNumInput          *shades[NUM_STD_SHADES];
+    KDoubleNumInput          *shadeVals[NUM_STD_SHADES];
 };
 
 #endif

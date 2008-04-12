@@ -33,6 +33,7 @@
 #include <QGridLayout>
 #include <QTreeWidget>
 #include <QPainter>
+#include <QSettings>
 #include <KGuiItem>
 #include <KInputDialog>
 #include <klocale.h>
@@ -749,16 +750,26 @@ void QtCurveConfig::setupShade(KDoubleNumInput *w, int shade)
 {
     w->setRange(0.0, 2.0, 0.05, false);
     connect(w, SIGNAL(valueChanged(double)), SLOT(updateChanged()));
-    shades[shade]=w;
+    shadeVals[shade]=w;
 }
 
 void QtCurveConfig::populateShades(const Options &opts)
 {
+    QTC_SHADES
+    int contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
+
+    if(contrast<0 || contrast>10)
+        contrast=7;
+
     customShading->setChecked(opts.customShades.size());
 
-    if(opts.customShades.size())
-        for(int i=0; i<NUM_STD_SHADES; ++i)
-            shades[i]->setValue(opts.customShades[i]);
+    for(int i=0; i<NUM_STD_SHADES; ++i)
+        shadeVals[i]->setValue(opts.customShades.size()
+                                  ? opts.customShades[i]
+                                  : shades[SHADING_SIMPLE==shading->currentIndex()
+                                            ? 1 : 0]
+                                          [contrast]
+                                          [i]);
 }
 
 bool QtCurveConfig::diffShades(const Options &opts)
@@ -770,7 +781,7 @@ bool QtCurveConfig::diffShades(const Options &opts)
     if(customShading->isChecked())
     {
         for(int i=0; i<NUM_STD_SHADES; ++i)
-            if(!equal(shades[i]->value(), opts.customShades[i]))
+            if(!equal(shadeVals[i]->value(), opts.customShades[i]))
                 return true;
     }
 
@@ -923,7 +934,7 @@ void QtCurveConfig::setOptions(Options &opts)
     {
         opts.customShades.resize(NUM_STD_SHADES);
         for(int i=0; i<NUM_STD_SHADES; ++i)
-            opts.customShades[i]=shades[i]->value();
+            opts.customShades[i]=shadeVals[i]->value();
     }
     else
         opts.customShades.clear();
