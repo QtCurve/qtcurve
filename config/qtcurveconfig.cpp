@@ -621,39 +621,48 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
 
 void QtCurveConfig::addGradStop()
 {
-    CustomGradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
+    bool    ok;
+    QString val(KInputDialog::getText(i18n("New Gradient Stops"),
+                                      i18n("Please enter a set of new \"position value\" pairs\n"
+                                           "(e.g. \"0.0 0.8 1.0 1.1\")"),
+                                      QString(), &ok, this/*, QValidator *validator*/));
 
-    if(cg!=customGradient.end())
+    if(ok)
     {
-        bool    ok;
-        QString val(KInputDialog::getText(i18n("New Gradient Stops"),
-                                          i18n("Please enter a set of new \"position value\" pairs\n"
-                                               "(e.g. \"0.0 0.8 1.0 1.1\")"),
-                                          QString(), &ok, this/*, QValidator *validator*/));
+        QStringList list(val.split(QRegExp("[\\s,]"), QString::SkipEmptyParts));
 
-        if(ok)
+        if(list.size() && 0==list.size()%2)
         {
-            QStringList list(val.split(QRegExp("[\\s,]"), QString::SkipEmptyParts));
+            GradientCont                grads;
+            QStringList::const_iterator it(list.begin()),
+                                        end(list.end());
 
-            if(list.size() && 0==list.size()%2)
+            for(; it!=end && ok; ++it)
             {
-                GradientCont                grads;
-                QStringList::const_iterator it(list.begin()),
-                                            end(list.end());
+                double pos=(*it).toDouble(&ok),
+                        val=ok ? (*(++it)).toDouble(&ok) : 0.0;
 
-                for(; it!=end && ok; ++it)
+                if(ok && pos>=0.0 && pos<=1.0 &&  val>=0.0 && val<=2.0)
+                    grads.insert(Gradient(pos, val));
+            }
+
+            if(ok)
+                ok=grads.size()>0;
+
+            if(ok)
+            {
+                CustomGradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
+
+                if(cg==customGradient.end())
                 {
-                    double pos=(*it).toDouble(&ok),
-                           val=ok ? (*(++it)).toDouble(&ok) : 0.0;
+                    CustomGradient cust;
 
-                    if(ok && pos>=0.0 && pos<=1.0 &&  val>=0.0 && val<=2.0)
-                        grads.insert(Gradient(pos, val));
+                    cust.lightBorder=gradLightBorder->isChecked();
+                    cust.grad=grads;
+                    customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
+                    ok=true;
                 }
-
-                if(ok)
-                    ok=grads.size()>0;
-
-                if(ok)
+                else
                 {
                     unsigned int                 b4=(*cg).second.grad.size();
                     GradientCont::const_iterator git(grads.begin()),
@@ -665,15 +674,15 @@ void QtCurveConfig::addGradStop()
                     ok=(*cg).second.grad.size()!=b4;
                 }
             }
-            else
-                ok=false;
         }
+        else
+            ok=false;
+    }
 
-        if(ok)
-        {
-            gradChanged(gradCombo->currentIndex());
-            emit changed(true);
-        }
+    if(ok)
+    {
+        gradChanged(gradCombo->currentIndex());
+        emit changed(true);
     }
 }
 
