@@ -23,6 +23,7 @@
 16. New default button indicator - glow. Only applicable if etching
     or shadowing.
 17. Allow up to 5 custom defined gradients.
+18. Allow custom shades to be specified.
 
 0.58
 ----

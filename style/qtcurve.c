@@ -261,10 +261,11 @@ static void shadeColors(GdkColor *base, GdkColor *vals)
 {
     QTC_SHADES
 
-    int i;
+    int      i;
+    gboolean useCustom=0L!=opts.customShades;
 
     for(i=0; i<NUM_STD_SHADES; ++i)
-        shade(base, &vals[i], QTC_SHADE(opts.contrast, i));
+        shade(base, &vals[i], useCustom ? opts.customShades[i] : QTC_SHADE(opts.contrast, i));
     shade(base, &vals[SHADE_ORIG_HIGHLIGHT], opts.highlightFactor);
     shade(&vals[4], &vals[SHADE_4_HIGHLIGHT], opts.highlightFactor);
     shade(&vals[2], &vals[SHADE_2_HIGHLIGHT], opts.highlightFactor);
