@@ -877,15 +877,18 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 
                 if((NUM_STD_SHADES-1)==comma)
                 {
+                    bool ok=true;
+
                     opts->customShades=malloc(sizeof(double)*NUM_STD_SHADES);
 
                     for(j=0; j<comma+1 && str && ok; ++j)
                     {
-                        c=strchr(str, ',');
+                        char *c=strchr(str, ',');
 
-                        if(c)
+                        if(c || (str && NUM_STD_SHADES-1==comma))
                         {
-                            *c='\0';
+                            if(c)
+                                *c='\0';
                             opts->customShades[j]=atof(str);
                             str=c+1;
                         }
@@ -895,10 +898,11 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 
                     if(!ok)
                     {
-                        free(opts->customShades)
+                        free(opts->customShades);
                         opts->customShades=0L;
                     }
                 }
+            }
             }
 
             for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
