@@ -2136,6 +2136,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_PanelLineEdit:
+            painter->fillRect(r.adjusted(1, 1, -1, -1), palette.base());
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
