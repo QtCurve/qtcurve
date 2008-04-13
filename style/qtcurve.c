@@ -1502,7 +1502,9 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         }
         else
         {
-            if(selected && NULL!=opts.customGradient[APPEARANCE_SUNKEN])
+            if(selected && WIDGET_TROUGH!=w & WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w &&
+               WIDGET_SLIDER_TROUGH!=w &&
+               NULL!=opts.customGradient[APPEARANCE_SUNKEN])
                 createCustomGradient(pt, base, opts.customGradient[APPEARANCE_SUNKEN]);
             else
             {
