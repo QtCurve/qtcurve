@@ -316,13 +316,13 @@ typedef GdkColor color;
 #define QTC_BORDER_BLEND_ALPHA       0.7
 #define QTC_ETCH_TOP_ALPHA           0.055
 #define QTC_ETCH_BOTTOM_ALPHA        0.80
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#define QTC_ETCH_RADIO_TOP_ALPHA     0.055
-#define QTC_ETCH_RADIO_BOTTOM_ALPHA  0.80
-#else
+// #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+// #define QTC_ETCH_RADIO_TOP_ALPHA     0.055
+// #define QTC_ETCH_RADIO_BOTTOM_ALPHA  0.80
+// #else
 #define QTC_ETCH_RADIO_TOP_ALPHA     0.09
 #define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
-#endif
+// #endif
 #endif
 
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
