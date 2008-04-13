@@ -1368,6 +1368,18 @@ static gboolean sanitizeSize(GdkWindow *window, gint *width, gint *height)
   return set_bg;
 }
 
+static void createCustomGradient(cairo_pattern_t *pt, GdkColor *base, CustomGradient *grad)
+{
+    int i=0;
+
+    for(i=0; i<grad->numGrad; ++i)
+    {
+        GdkColor col;
+        shade(base, &col, grad->grad[i].val);
+        cairo_pattern_add_color_stop_rgb(pt, grad->grad[i].pos, QTC_CAIRO_COL(col));
+    }
+}
+
 static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                               GdkRegion *region, int x, int y, int width, int height, GdkColor *base,
                               double shadeTop, double shadeBot, gboolean horiz, gboolean increase,
@@ -1481,16 +1493,7 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             CustomGradient *grad=opts.customGradient[app-APPEARANCE_CUSTOM1];
 
             if(grad)
-            {
-                int i=0;
-
-                for(i=0; i<grad->numGrad; ++i)
-                {
-                    GdkColor col;
-                    shade(base, &col, grad->grad[i].val);
-                    cairo_pattern_add_color_stop_rgb(pt, grad->grad[i].pos, QTC_CAIRO_COL(col));
-                }
-            }
+                createCustomGradient(pt, base, grad);
             else
             {
                 cairo_pattern_add_color_stop_rgb(pt, 0, QTC_CAIRO_COL(*base));
@@ -1499,45 +1502,50 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         }
         else
         {
-            GdkColor top,
-                     bot,
-                     tabBaseCol,
-                     *baseTopCol=base,
-                     *t,
-                     *b;
-
-            top.pixel=bot.pixel=tabBaseCol.pixel=0;
-
-            if(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w))
-            {
-                generateMidColor(base, &(qtcPalette.menuitem[0]), &tabBaseCol, QTC_COLOR_SEL_TAB_FACTOR);
-                baseTopCol=&tabBaseCol;
-            }
-
-            if(equal(1.0, shadeTop))
-                t=baseTopCol;
+            if(selected && NULL!=opts.customGradient[APPEARANCE_SUNKEN])
+                createCustomGradient(pt, base, opts.customGradient[APPEARANCE_SUNKEN]);
             else
             {
-                shade(baseTopCol, &top, shadeTop);
-                t=&top;
-            }
-            if(equal(1.0, shadeBot))
-                b=base;
-            else
-            {
-                shade(base, &bot, shadeBot);
-                b=&bot;
-            }
+                GdkColor top,
+                         bot,
+                         tabBaseCol,
+                         *baseTopCol=base,
+                         *t,
+                         *b;
 
-            if(selected || APPEARANCE_INVERTED!=app ? increase : !increase)
-            {
-                cairo_pattern_add_color_stop_rgb(pt, 0.0, QTC_CAIRO_COL(*t));
-                cairo_pattern_add_color_stop_rgb(pt, 1.0, QTC_CAIRO_COL(*b));
-            }
-            else
-            {
-                cairo_pattern_add_color_stop_rgb(pt, 0.0, QTC_CAIRO_COL(*b));
-                cairo_pattern_add_color_stop_rgb(pt, 1.0, QTC_CAIRO_COL(*t));
+                top.pixel=bot.pixel=tabBaseCol.pixel=0;
+
+                if(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w))
+                {
+                    generateMidColor(base, &(qtcPalette.menuitem[0]), &tabBaseCol, QTC_COLOR_SEL_TAB_FACTOR);
+                    baseTopCol=&tabBaseCol;
+                }
+
+                if(equal(1.0, shadeTop))
+                    t=baseTopCol;
+                else
+                {
+                    shade(baseTopCol, &top, shadeTop);
+                    t=&top;
+                }
+                if(equal(1.0, shadeBot))
+                    b=base;
+                else
+                {
+                    shade(base, &bot, shadeBot);
+                    b=&bot;
+                }
+
+                if(selected || APPEARANCE_INVERTED!=app ? increase : !increase)
+                {
+                    cairo_pattern_add_color_stop_rgb(pt, 0.0, QTC_CAIRO_COL(*t));
+                    cairo_pattern_add_color_stop_rgb(pt, 1.0, QTC_CAIRO_COL(*b));
+                }
+                else
+                {
+                    cairo_pattern_add_color_stop_rgb(pt, 0.0, QTC_CAIRO_COL(*b));
+                    cairo_pattern_add_color_stop_rgb(pt, 1.0, QTC_CAIRO_COL(*t));
+                }
             }
         }
 
