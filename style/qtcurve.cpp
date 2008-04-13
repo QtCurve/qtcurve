@@ -6320,51 +6320,62 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
         CustomGradientCont::const_iterator cg(opts.customGradient.find(app));
 
         if(cg!=opts.customGradient.end())
-        {
-            QLinearGradient              grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
-            GradientCont::const_iterator it((*cg).second.grad.begin()),
-                                         end((*cg).second.grad.end());
-
-            for(; it!=end; ++it)
-            {
-                QColor col;
-                shade(base, &col, (*it).val);
-                grad.setColorAt((*it).pos, col);
-            }
-            p->fillRect(r, QBrush(grad));
-        }
+            drawCustomGradient(p, r, horiz, base, cg);
         else
             p->fillRect(r, base);
     }
     else
     {
-        QColor top,
-               bot,
-               baseTopCol(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
-                                ? midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR) : base);
+        CustomGradientCont::const_iterator cg;
 
-        if(equal(1.0, shadeTop))
-            top=baseTopCol;
+        if(sel && (cg=opts.customGradient.find(APPEARANCE_SUNKEN))!=opts.customGradient.end())
+            drawCustomGradient(p, r, horiz, base, cg);
         else
-            shade(baseTopCol, &top, shadeTop);
-        if(equal(1.0, shadeBot))
-            bot=base;
-        else
-            shade(base, &bot, shadeBot);
-
-        bool            inc(sel || APPEARANCE_INVERTED!=app ? increase : !increase);
-        QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
-
-        if(WIDGET_SELECTION==w)
         {
-            bot.setAlphaF(base.alphaF());
-            top.setAlphaF(base.alphaF());
-        }
+            QColor top,
+                bot,
+                baseTopCol(opts.colorSelTab && sel && (WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                               ? midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR) : base);
 
-        grad.setColorAt(0, inc ? top : bot);
-        grad.setColorAt(1, inc ? bot : top);
-        p->fillRect(r, QBrush(grad));
+            if(equal(1.0, shadeTop))
+                top=baseTopCol;
+            else
+                shade(baseTopCol, &top, shadeTop);
+            if(equal(1.0, shadeBot))
+                bot=base;
+            else
+                shade(base, &bot, shadeBot);
+
+            bool            inc(sel || APPEARANCE_INVERTED!=app ? increase : !increase);
+            QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+
+            if(WIDGET_SELECTION==w)
+            {
+                bot.setAlphaF(base.alphaF());
+                top.setAlphaF(base.alphaF());
+            }
+
+            grad.setColorAt(0, inc ? top : bot);
+            grad.setColorAt(1, inc ? bot : top);
+            p->fillRect(r, QBrush(grad));
+        }
     }
+}
+
+void QtCurveStyle::drawCustomGradient(QPainter *p, const QRect &r, bool horiz, const QColor &base,
+                                      CustomGradientCont::const_iterator &cg) const
+{
+    QLinearGradient              grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+    GradientCont::const_iterator it((*cg).second.grad.begin()),
+                                 end((*cg).second.grad.end());
+
+    for(; it!=end; ++it)
+    {
+        QColor col;
+        shade(base, &col, (*it).val);
+        grad.setColorAt((*it).pos, col);
+    }
+    p->fillRect(r, QBrush(grad));
 }
 
 void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleOption *option,

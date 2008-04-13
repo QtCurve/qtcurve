@@ -411,6 +411,8 @@ typedef enum
 
         QTC_NUM_CUSTOM_GRAD,
 
+    APPEARANCE_SUNKEN = QTC_NUM_CUSTOM_GRAD,
+
     APPEARANCE_FLAT = QTC_NUM_CUSTOM_GRAD,
     APPEARANCE_RAISED,
     APPEARANCE_DULL_GLASS,
@@ -1087,7 +1089,7 @@ typedef struct
 #ifdef __cplusplus
     CustomGradientCont customGradient;
 #else
-    CustomGradient     *customGradient[QTC_NUM_CUSTOM_GRAD];
+    CustomGradient     *customGradient[QTC_NUM_CUSTOM_GRAD+1];
 #endif
     ShadesCont       customShades;
 #ifndef __cplusplus

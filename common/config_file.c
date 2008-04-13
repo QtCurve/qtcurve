@@ -811,11 +811,14 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                     opts->customShades.clear();
             }
 
-            for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
+            for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
             {
                 QString gradKey;
 
-                gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
+                if(i==QTC_NUM_CUSTOM_GRAD)
+                    gradKey="sunkengradient";
+                else
+                    gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
 
 #if (defined QT_VERSION && (QT_VERSION >= 0x040000))
                 QStringList vals(readStringEntry(cfg, gradKey).split(',', QString::SkipEmptyParts));
@@ -905,12 +908,15 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             }
             }
 
-            for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+            for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
             {
                 char gradKey[16];
                 char *str;
 
-                sprintf(gradKey, "customgradient%d", i+1);
+                if(i==QTC_NUM_CUSTOM_GRAD)
+                    sprintf(gradKey, "sunkengradient");
+                else
+                    sprintf(gradKey, "customgradient%d", i+1);
                 if((str=readStringEntry(cfg, gradKey)))
                 {
                     int j,
@@ -1098,7 +1104,7 @@ static void defaultSettings(Options *opts)
 #ifndef __cplusplus
     int i;
 
-    for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+    for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
         opts->customGradient[i]=0L;
 
     opts->customShades=0L;
@@ -1566,12 +1572,15 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)
 
-        for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
+        for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
         {
             CustomGradientCont::const_iterator cg(opts.customGradient.find((EAppearance)i));
             QString                            gradKey;
 
-            gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
+            if(i==(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
+                gradKey="sunkengradient";
+            else
+                gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
 
             if(cg==opts.customGradient.end())
                 CFG.deleteEntry(gradKey);

@@ -96,6 +96,8 @@ class QtCurveStyle : public QWindowsStyle
     void drawBevelGradientReal(const QColor &base, bool increase, QPainter *p,
                                const QRect &r, bool horiz, double shadeTop,
                                double shadeBot, bool sel, EAppearance bevApp, EWidget w) const;
+    void drawCustomGradient(QPainter *p, const QRect &r, bool horiz, const QColor &base,
+                            CustomGradientCont::const_iterator &cg) const;
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;

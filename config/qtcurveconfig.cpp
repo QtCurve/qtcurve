@@ -720,6 +720,8 @@ void QtCurveConfig::setupGradientsTab()
 {
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
         gradCombo->insertItem(i-APPEARANCE_CUSTOM1, i18n("Custom %1", (i-APPEARANCE_CUSTOM1)+1));
+    gradCombo->insertItem(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD, i18n("Sunken"));
+
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
 
     gradPreview=new CGradientPreview(previewWidgetContainer);
