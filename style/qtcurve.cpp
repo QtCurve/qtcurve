@@ -2161,7 +2161,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_PanelLineEdit:
-            painter->fillRect(r.adjusted(1, 1, -1, -1), palette.base());
+            painter->fillRect(QTC_CAN_DO_EFFECT
+                                ? r.adjusted(2, 2, -2, -2)
+                                : r.adjusted(1, 1, -1, -1), palette.base());
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
@@ -5270,10 +5272,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                  !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
                 }
 
-                // This section fixes some drawng issues with krunner's combo on nvidia
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
-                painter->setRenderHint(QPainter::Antialiasing, false);
+//                 // This section fixes some drawng issues with krunner's combo on nvidia
+//                 painter->setRenderHint(QPainter::Antialiasing, true);
+//                 painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
+//                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                 if(/*comboBox->frame &&*/ frame.isValid())
                 {
