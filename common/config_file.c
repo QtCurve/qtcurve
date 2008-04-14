@@ -1314,7 +1314,7 @@ static QString toStr(EAppearance exp)
         {
             QString app;
 
-            app.sprintf("customgradient%d", (exp-APPEARANCE_CUSTOM1)+QTC_NUM_CUSTOM_GRAD);
+            app.sprintf("customgradient%d", (exp-APPEARANCE_CUSTOM1)+1);
             return app;
         }
     }
