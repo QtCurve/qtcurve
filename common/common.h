@@ -159,7 +159,7 @@ typedef GdkColor color;
 #define QTC_SIMPLE_SHADING (!shading)
 
 #define QTC_GLOW_MO        1
-#define QTC_GLOW_DEFBTN    ORIGINAL_SHADE
+#define QTC_GLOW_DEFBTN    0
 
 #define QT_STD_BORDER      5
 #define QT_DISABLED_BORDER QT_STD_BORDER /*3*/
@@ -302,7 +302,7 @@ typedef GdkColor color;
                                         ? 4 \
                                         : 6))
 
-#define QTC_CR_MO_FILL          (SHADE_BLEND_SELECTED==opts.shadeCheckRadio || SHADE_SELECTED==opts.shadeCheckRadio ? 1 : 2)
+#define QTC_CR_MO_FILL          1
 #define QTC_MO_DEF_BTN          2
 #define QTC_MO_PLASTIK_DARK(W)  (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 3 : 2) /*? 2 : 1) */
 #define QTC_MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
@@ -544,12 +544,15 @@ typedef enum
 #define DEF_COLOR_STR              "background"
 #define DEF_TOOLBAR_SHADE_STR      "none"
 
-#if defined QTC_COMMON_FUNCTIONS || defined QTC_CONFIG_DIALOG
-static bool equal(double d1, double d2)
+#ifdef __cplusplus
+inline
+#else
+static
+#endif
+bool equal(double d1, double d2)
 {
     return (fabs(d1 - d2) < 0.0001);
 }
-#endif
 
 #ifdef QTC_COMMON_FUNCTIONS
 #if (!defined QTC_CONFIG_DIALOG)
@@ -915,12 +918,11 @@ typedef struct
 #ifdef __cplusplus
     Gradient(double p=0.0, double v=0.0) : pos(p), val(v) { }
 
-#ifdef QTC_CONFIG_DIALOG
     bool operator==(const Gradient &o) const
     {
         return equal(pos, o.pos) && equal(val, o.val);
     }
-#endif
+
     bool operator<(const Gradient &o) const
     {
         return pos<o.pos || (equal(pos, o.pos) && val<o.val);
@@ -944,6 +946,8 @@ typedef struct
 #endif
 {
 #ifdef __cplusplus
+    CustomGradient() : lightBorder(false) { }
+
     CustomGradient & operator=(const CustomGradient &o)
     {
         if(&o!=this)
