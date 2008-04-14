@@ -3843,7 +3843,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         // This clipping helps with plasma's tabs and nvidia
                         if(selected)
-                            painter->setClipRect(r2.adjusted(-1, 1, 1, -1));
+                            painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
                         drawBorder(painter, r.adjusted(0, 0, 0, 4), option,
                                     selected || onlyTab
                                         ? ROUNDED_TOP
