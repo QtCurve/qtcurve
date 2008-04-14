@@ -581,6 +581,8 @@ void QtCurveConfig::gradChanged(int i)
         gradPreview->setGrad(GradientCont());
         gradLightBorder->setChecked(false);
     }
+
+    gradLightBorder->setEnabled(APPEARANCE_SUNKEN!=i);
 }
 
 static double prev=0.0;
@@ -733,8 +735,8 @@ void QtCurveConfig::setupGradientsTab()
     previewColor->setColor(col);
     gradPreview->setColor(col);
     gradChanged(APPEARANCE_CUSTOM1);
-    addButton->setGuiItem(KGuiItem(i18n("Add"), "list_add"));
-    removeButton->setGuiItem(KGuiItem(i18n("Remove"), "list_remove"));
+    addButton->setGuiItem(KGuiItem(i18n("Add"), "list-add"));
+    removeButton->setGuiItem(KGuiItem(i18n("Remove"), "list-remove"));
 
     connect(gradCombo, SIGNAL(currentIndexChanged(int)), SLOT(gradChanged(int)));
     connect(previewColor, SIGNAL(changed(const QColor &)), gradPreview, SLOT(setColor(const QColor &)));
