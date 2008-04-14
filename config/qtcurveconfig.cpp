@@ -568,8 +568,8 @@ void QtCurveConfig::gradChanged(int i)
         {
             QStringList details;
 
-            details << QString().setNum((*git).pos)
-                    << QString().setNum((*git).val);
+            details << QString().setNum((*git).pos*100.0)
+                    << QString().setNum((*git).val*100.0);
 
             QTreeWidgetItem *i=new QTreeWidgetItem(gradStops, details);
 
@@ -600,13 +600,13 @@ void QtCurveConfig::editItem(QTreeWidgetItem *i, int col)
 void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
 {
     bool   ok;
-    double val=i->text(col).toDouble(&ok);
+    double val=i->text(col).toDouble(&ok)/100.0;
 
     if(!ok || (0==col && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
         i->setText(col, QString().setNum(prev));
     else
     {
-        double other=i->text(col ? 0 : 1).toDouble(&ok);
+        double other=i->text(col ? 0 : 1).toDouble(&ok)/100.0;
 
         CustomGradientCont::iterator it=customGradient.find((EAppearance)gradCombo->currentIndex());
 
@@ -623,65 +623,42 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
 
 void QtCurveConfig::addGradStop()
 {
-    bool    ok;
-    QString val(KInputDialog::getText(i18n("New Gradient Stops"),
-                                      i18n("Please enter a set of new \"position value\" pairs\n"
-                                           "(e.g. \"0.0 0.8 1.0 1.1\")"),
-                                      QString(), &ok, this/*, QValidator *validator*/));
+    bool added(false);
 
-    if(ok)
+    CustomGradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
+
+    if(cg==customGradient.end())
     {
-        QStringList list(val.split(QRegExp("[\\s,]"), QString::SkipEmptyParts));
+        CustomGradient cust;
 
-        if(list.size() && 0==list.size()%2)
-        {
-            GradientCont                grads;
-            QStringList::const_iterator it(list.begin()),
-                                        end(list.end());
+        cust.lightBorder=gradLightBorder->isChecked();
+        cust.grad.insert(Gradient(stopPosition->value(), stopValue->value()));
+        customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
+        added=true;
+    }
+    else
+    {
+        GradientCont::const_iterator it((*cg).second.grad.begin()),
+                                     end((*cg).second.grad.end());
+        double                       pos(stopPosition->value()/100.0),
+                                     val(stopValue->value()/100.0);
 
-            for(; it!=end && ok; ++it)
-            {
-                double pos=(*it).toDouble(&ok),
-                        val=ok ? (*(++it)).toDouble(&ok) : 0.0;
-
-                if(ok && pos>=0.0 && pos<=1.0 &&  val>=0.0 && val<=2.0)
-                    grads.insert(Gradient(pos, val));
-            }
-
-            if(ok)
-                ok=grads.size()>0;
-
-            if(ok)
-            {
-                CustomGradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
-
-                if(cg==customGradient.end())
-                {
-                    CustomGradient cust;
-
-                    cust.lightBorder=gradLightBorder->isChecked();
-                    cust.grad=grads;
-                    customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
-                    ok=true;
-                }
+        for(; it!=end; ++it)
+            if(equal(pos, (*it).pos))
+                if(equal(val, (*it).val))
+                    return;
                 else
                 {
-                    unsigned int                 b4=(*cg).second.grad.size();
-                    GradientCont::const_iterator git(grads.begin()),
-                                                 gend(grads.end());
-
-                    for(; git!=gend; ++git)
-                        (*cg).second.grad.insert(*git);
-
-                    ok=(*cg).second.grad.size()!=b4;
+                    (*cg).second.grad.erase(it);
+                    break;
                 }
-            }
-        }
-        else
-            ok=false;
+
+        unsigned int b4=(*cg).second.grad.size();
+        (*cg).second.grad.insert(Gradient(pos, val));
+        added=(*cg).second.grad.size()!=b4;
     }
 
-    if(ok)
+    if(added)
     {
         gradChanged(gradCombo->currentIndex());
         emit changed(true);
@@ -718,6 +695,20 @@ void QtCurveConfig::removeGradStop()
     }
 }
 
+void QtCurveConfig::stopSelected(QTreeWidgetItem *i, int)
+{
+    if(i)
+    {
+        stopPosition->setValue(i->text(0).toDouble());
+        stopValue->setValue(i->text(1).toDouble());
+    }
+    else
+    {
+        stopPosition->setValue(0.0);
+        stopValue->setValue(0.0);
+    }
+}
+
 void QtCurveConfig::setupGradientsTab()
 {
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
@@ -737,13 +728,15 @@ void QtCurveConfig::setupGradientsTab()
     gradChanged(APPEARANCE_CUSTOM1);
     addButton->setGuiItem(KGuiItem(i18n("Add"), "list-add"));
     removeButton->setGuiItem(KGuiItem(i18n("Remove"), "list-remove"));
-
+    stopPosition->setRange(0.0, 100.0, 5.0);
+    stopValue->setRange(0.0, 200.0, 5.0);
     connect(gradCombo, SIGNAL(currentIndexChanged(int)), SLOT(gradChanged(int)));
     connect(previewColor, SIGNAL(changed(const QColor &)), gradPreview, SLOT(setColor(const QColor &)));
     connect(gradStops, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT(editItem(QTreeWidgetItem *, int)));
     connect(gradStops, SIGNAL(itemChanged(QTreeWidgetItem *, int)), SLOT(itemChanged(QTreeWidgetItem *, int)));
     connect(addButton, SIGNAL(clicked(bool)), SLOT(addGradStop()));
     connect(removeButton, SIGNAL(clicked(bool)), SLOT(removeGradStop()));
+    connect(gradStops, SIGNAL(itemActivated(QTreeWidgetItem *, int)), SLOT(stopSelected(QTreeWidgetItem *, int)));
 }
 
 void QtCurveConfig::setupShadesTab()

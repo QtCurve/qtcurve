@@ -104,6 +104,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void itemChanged(QTreeWidgetItem *i, int col);
     void addGradStop();
     void removeGradStop();
+    void stopSelected(QTreeWidgetItem *i, int);
 
     private:
 
