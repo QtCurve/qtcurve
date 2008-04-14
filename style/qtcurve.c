@@ -1964,8 +1964,14 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                     EFFECT_SHADOW==opts.buttonEffect && WIDGET_COMBO_BUTTON!=widget && WIDGET_BUTTON(widget) && !sunken);
 
     if(flags&DF_DO_BORDER && width>2 && height>2)
-        drawBorder(cr, style, state, area, region, x, y, width, height, colors,
-                   round, borderProfile, widget, flags);
+        if(doEtch && (WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
+                      MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
+                     (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator))
+            drawBorder(cr, style, state, area, region, x, y, width, height, qtcPalette.mouseover,
+                       round, borderProfile, widget, flags);
+        else
+            drawBorder(cr, style, state, area, region, x, y, width, height, colors,
+                       round, borderProfile, widget, flags);
     }
 
     unsetCairoClipping(cr);
@@ -3943,7 +3949,7 @@ debugDisplayWidget(widget, 3);
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[QTC_CR_MO_FILL]));
             cairo_rectangle(cr, x+1.5, y+1.5, QTC_CHECK_SIZE-3, QTC_CHECK_SIZE-3);
-            cairo_rectangle(cr, x+2.5, y+2.5, QTC_CHECK_SIZE-5, QTC_CHECK_SIZE-5);
+            //cairo_rectangle(cr, x+2.5, y+2.5, QTC_CHECK_SIZE-5, QTC_CHECK_SIZE-5);
             cairo_stroke(cr);
         }
         else
@@ -4887,7 +4893,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         GdkRegion    *region=NULL;
         GdkPoint     clip[8];
         GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
-        gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver ||
+        gboolean     drawLight=(MO_GLOW!=opts.coloredMouseOver && MO_PLASTIK!=opts.coloredMouseOver) || !coloredMouseOver ||
                                        (SLIDER_ROUND==opts.sliderStyle &&
                                        (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders));
 
@@ -5575,7 +5581,7 @@ static void generateColors()
         }
     }
 
-    if(opts.coloredMouseOver || IND_CORNER==opts.defBtnIndicator)
+    if(opts.coloredMouseOver || IND_CORNER==opts.defBtnIndicator || IND_GLOW==opts.defBtnIndicator)
     {
         if(IND_COLORED==opts.defBtnIndicator)
             qtcPalette.mouseover=qtcPalette.defbtn;
