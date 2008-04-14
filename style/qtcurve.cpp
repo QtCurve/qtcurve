@@ -55,14 +55,14 @@ static enum
     APP_KPRINTER,
     APP_KDIALOG,
     APP_KDIALOGD,
+#ifdef QTC_DO_ETCH_CHECK
     APP_PLASMA,
     APP_KRUNNER,
+#endif
     APP_KWIN,
     APP_SYSTEMSETTINGS,
     APP_OTHER
 } theThemedApp=APP_OTHER;
-
-static QSet<const QWidget *> theNoEtchWidgets;
 
 int static toHint(int sc)
 {
@@ -87,6 +87,9 @@ int static toHint(int sc)
             return 0;
     }
 }
+
+#ifdef QTC_DO_ETCH_CHECK
+static QSet<const QWidget *> theNoEtchWidgets;
 
 //
 // OK, Etching looks cr*p on plasma widgets, and khtml...
@@ -136,6 +139,11 @@ class CEtchCheck
 bool CEtchCheck::theirStatus=true;
 
 #define QTC_CAN_ETCH(widget) (widget && !qobject_cast<const QAbstractItemView *>(widget))
+#define QTC_CAN_DO_EFFECT (APP_KRUNNER!=theThemedApp && QTC_DO_EFFECT && CEtchCheck::canEtch())
+#else
+#define QTC_CAN_ETCH(A)   true
+#define QTC_CAN_DO_EFFECT QTC_DO_EFFECT
+#endif
 
 // from windows style
 static const int windowsItemFrame    =  2; // menu item frame width
@@ -642,7 +650,6 @@ inline bool isMultiTabBarTab(const QPushButton *button)
 }
 
 #define QTC_SKIP_TASKBAR  (APP_SKIP_TASKBAR==theThemedApp || APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp)
-#define QTC_CAN_DO_EFFECT (APP_KRUNNER!=theThemedApp && QTC_DO_EFFECT && CEtchCheck::canEtch())
 
 QtCurveStyle::QtCurveStyle(const QString &name)
             : itsSliderCols(NULL),
@@ -679,8 +686,10 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=7;
 
+#ifdef QTC_DO_ETCH_CHECK
     if(EFFECT_NONE==opts.buttonEffect)
         CEtchCheck::disable();
+#endif
 
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMenuitemCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Background), itsBackgroundCols);
@@ -796,14 +805,16 @@ void QtCurveStyle::polish(QApplication *app)
         theThemedApp=APP_OTHER;
 
     if(APP_OTHER==theThemedApp)
-        if("plasma"==appName)
-            theThemedApp=APP_PLASMA;
-        else if("krunner"==appName)
-            theThemedApp=APP_KRUNNER;
-        else if("kwin"==appName)
+        if("kwin"==appName)
             theThemedApp=APP_KWIN;
         else if("systemsettings"==appName)
             theThemedApp=APP_SYSTEMSETTINGS;
+#ifdef QTC_DO_ETCH_CHECK
+        else if("plasma"==appName)
+            theThemedApp=APP_PLASMA;
+        else if("krunner"==appName)
+            theThemedApp=APP_KRUNNER;
+#endif
 
     QPalette pal(app->palette());
 
@@ -927,11 +938,13 @@ void QtCurveStyle::polish(QWidget *widget)
 {
     bool enableMouseOver(!equal(opts.highlightFactor, 1.0) || opts.coloredMouseOver);
 
+#ifdef QTC_DO_ETCH_CHECK
     if(EFFECT_NONE!=opts.buttonEffect && CEtchCheck::isNoEtchWidget(widget))
     {
         theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
+#endif
 
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
@@ -1081,11 +1094,13 @@ void QtCurveStyle::polish(QWidget *widget)
 
 void QtCurveStyle::unpolish(QWidget *widget)
 {
+#ifdef QTC_DO_ETCH_CHECK
     if(EFFECT_NONE!=opts.buttonEffect && theNoEtchWidgets.contains(widget))
     {
         theNoEtchWidgets.remove(static_cast<const QWidget *>(widget));
         disconnect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
+#endif
 
     if(qobject_cast<QPushButton *>(widget) ||
        qobject_cast<QComboBox *>(widget) ||
@@ -1395,12 +1410,22 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return QTC_CAN_DO_EFFECT ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
+#ifdef QTC_DO_ETCH_CHECK
             return QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget) && !theNoEtchWidgets.contains(widget)
                         ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
+#else
+            return QTC_CAN_DO_EFFECT
+                        ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
+#endif
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
+#ifdef QTC_DO_ETCH_CHECK
             return QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget) && !theNoEtchWidgets.contains(widget)
                         ? QTC_RADIO_SIZE+2 : QTC_RADIO_SIZE;
+#else
+            return QTC_CAN_DO_EFFECT
+                        ? QTC_RADIO_SIZE+2 : QTC_RADIO_SIZE;
+#endif
         case PM_TabBarTabOverlap:
             return 1;
         case PM_ProgressBarChunkWidth:
@@ -2151,7 +2176,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         opt.state^=State_Enabled;
 
                     painter->save();
+#ifdef QTC_DO_ETCH_CHECK
                     CEtchCheck check(widget);
+#endif
                     drawEntryField(painter, r, &opt, ROUNDED_ALL, PE_PanelLineEdit==element, QTC_CAN_DO_EFFECT);
                     painter->restore();
                 }
@@ -2188,7 +2215,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     ? use[QTC_CR_MO_FILL]
                                     : palette.base().color()
                                 : palette.background().color());
+#ifdef QTC_DO_ETCH_CHECK
             CEtchCheck    check(widget);
+#endif
             bool          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
                                  && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
                                  && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget)),
@@ -2275,7 +2304,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(QTC_RADIO_SIZE);
         case PE_IndicatorRadioButton:
         {
+#ifdef QTC_DO_ETCH_CHECK
             CEtchCheck check(widget);
+#endif
             bool       doEtch(!(state&QTC_STATE_MENU)
                               && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
                               && QTC_CAN_DO_EFFECT && QTC_CAN_ETCH(widget)),
@@ -2396,7 +2427,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonCommand:
         {
             // The wantToEtch/canEtch stuff below is to stop buttons in listviews from being etched, and these dont look good
+#ifdef QTC_DO_ETCH_CHECK
             CEtchCheck   check(widget);
+#endif
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
                          isFlat(false),
@@ -3533,8 +3566,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
+#ifdef QTC_DO_ETCH_CHECK
                 CEtchCheck check(widget);
-
+#endif
                 drawControl(CE_PushButtonBevel, btn, painter, widget);
 
                 QStyleOptionButton subopt(*btn);
@@ -4556,8 +4590,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
         case CC_SpinBox:
             if (const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option))
             {
+#ifdef QTC_DO_ETCH_CHECK
                 CEtchCheck check(widget);
-
+#endif
                 QRect frame(subControlRect(CC_SpinBox, option, SC_SpinBoxFrame, widget)),
                       up(subControlRect(CC_SpinBox, option, SC_SpinBoxUp, widget)),
                       down(subControlRect(CC_SpinBox, option, SC_SpinBoxDown, widget));;
@@ -5219,7 +5254,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
                 const QColor    *use(buttonColors(option));
                 bool            sunken(state&State_On); // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
+#ifdef QTC_DO_ETCH_CHECK
                 CEtchCheck      check(widget);
+#endif
                 bool            doEtch(QTC_CAN_DO_EFFECT);
 
                 if(doEtch)
@@ -7860,9 +7897,13 @@ const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QCol
                 : use[2];
 }
 
+#ifdef QTC_DO_ETCH_CHECK
 void QtCurveStyle::widgetDestroyed(QObject *o)
 {
     theNoEtchWidgets.remove(static_cast<const QWidget *>(o));
 }
 
 #include "qtcurve.moc"
+
+#endif
+

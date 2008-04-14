@@ -52,7 +52,9 @@ class QStyleOptionSlider;
 
 class QtCurveStyle : public QWindowsStyle
 {
-    Q_OBJECT
+#ifdef QTC_DO_ETCH_CHECK
+    Q_OBJECT_XXX DISABLED!
+#endif
 
     public:
 
@@ -136,9 +138,11 @@ class QtCurveStyle : public QWindowsStyle
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
 
-    private Q_SLOTS:
+#ifdef QTC_DO_ETCH_CHECK
+    private Q_SLOTS_XXX DISABLED:
 
     void           widgetDestroyed(QObject *o);
+#endif
 
     private:
 
