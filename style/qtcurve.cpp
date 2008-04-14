@@ -716,7 +716,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
         }
     }
 
-    if(opts.coloredMouseOver || IND_CORNER==opts.defBtnIndicator)
+    if(opts.coloredMouseOver || IND_CORNER==opts.defBtnIndicator || IND_GLOW==opts.defBtnIndicator)
         if(itsDefBtnCols && IND_TINT!=opts.defBtnIndicator)
             itsMouseOverCols=itsDefBtnCols;
         else
@@ -2209,7 +2209,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(use[QTC_CR_MO_FILL]);
                 drawAaRect(painter, rect.adjusted(1, 1, -1, -1));
-                drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
+//                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
             else
@@ -3808,9 +3808,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillTab(painter, r.adjusted(1, 0, -1, 0), option, fill, true, true, WIDGET_TAB_TOP);
 
                         // This clipping helps with plasma's tabs and nvidia
-                        // TODO: This messes up non-rounded tabs!!!
-                        // if(selected)
-                        //     painter->setClipRect(r2.adjusted(0, 0, 0, -1));
+                        if(selected)
+                            painter->setClipRect(r2.adjusted(-1, 1, 1, -1));
                         drawBorder(painter, r.adjusted(0, 0, 0, 4), option,
                                     selected || onlyTab
                                         ? ROUNDED_TOP
@@ -6558,7 +6557,12 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     }
 
     if(doBorder)
-        drawBorder(p, r, option, round, cols, w);
+        if(((doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) &&
+                        MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
+           (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator))
+            drawBorder(p, r, option, round, itsMouseOverCols, w);
+        else
+            drawBorder(p, r, option, round, cols, w);
 
     p->restore();
 }
@@ -7145,7 +7149,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                          yo(horiz ? 0 : 8);
         PrimitiveElement direction(horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight);
         QPolygon         clipRegion;
-        bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver) ||
+        bool             drawLight((MO_GLOW!=opts.coloredMouseOver && MO_PLASTIK!=opts.coloredMouseOver) || !(opt.state&State_MouseOver) ||
                                    (SLIDER_ROUND==opts.sliderStyle &&
                                    (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders)));
         int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13);
