@@ -52,9 +52,7 @@ class QStyleOptionSlider;
 
 class QtCurveStyle : public QWindowsStyle
 {
-#ifdef QTC_DO_ETCH_CHECK
-    Q_OBJECT_XXX DISABLED!
-#endif
+    Q_OBJECT
 
     public:
 
@@ -100,7 +98,7 @@ class QtCurveStyle : public QWindowsStyle
                                double shadeBot, bool sel, EAppearance bevApp, EWidget w) const;
     void drawCustomGradient(QPainter *p, const QRect &r, bool horiz, const QColor &base,
                             CustomGradientCont::const_iterator &cg) const;
-    void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor &fill,
+    void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;
     void drawEtch(QPainter *p, const QRect &r, EWidget w, bool raised=false) const;
@@ -119,7 +117,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawArrow(QPainter *p, const QRect &r, const QStyleOption *option, PrimitiveElement pe, bool small=false, bool checkActive=false) const;
     void drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleOption *option, bool slider=false) const;
     void drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const;
-    void drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle, const QStyleOptionSlider *slider) const;
+    void drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle, const QStyleOptionSlider *slider, const QWidget *widget) const;
     void drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu=true, bool horiz=true) const;
     void drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOption *option, bool tb, ELine handles) const;
     void fillTab(QPainter *p, const QRect &r, const QStyleOption *option, const QColor &fill, bool horiz, bool increase, EWidget tab) const;
@@ -138,11 +136,9 @@ class QtCurveStyle : public QWindowsStyle
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
 
-#ifdef QTC_DO_ETCH_CHECK
-    private Q_SLOTS_XXX DISABLED:
+    private Q_SLOTS:
 
     void           widgetDestroyed(QObject *o);
-#endif
 
     private:
 

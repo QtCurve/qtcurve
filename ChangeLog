@@ -29,7 +29,7 @@
     or shadowing.
 22. Allow up to 5 custom defined gradients.
 23. Allow custom shades to be specified.
-24. Enable etch/shadow for HTML and krunner.
+24. Enable shadow for HTML and krunner.
 
 0.58
 ----
