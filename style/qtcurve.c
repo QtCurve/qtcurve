@@ -3882,7 +3882,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     GdkColor new_colors[TOTAL_SHADES+1],
              *btn_colors;
     int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL,
-             checkSpace=doEtch && !list && !mnu ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
+             checkSpace=doEtch && /*!list && */!mnu ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
 
     QTC_CAIRO_BEGIN
 
@@ -3932,8 +3932,8 @@ debugDisplayWidget(widget, 3);
 
         if(mnu)
             x--, y--, width=QTC_CHECK_SIZE, height=QTC_CHECK_SIZE;
-        else if(list)
-            y++, width=QTC_CHECK_SIZE, height=QTC_CHECK_SIZE;
+        /*else if(list)
+            y++, width=QTC_CHECK_SIZE, height=QTC_CHECK_SIZE;*/
 
         if(IS_FLAT(opts.appearance))
             drawAreaColor(cr, area, NULL, bgndCol, x+1, y+1, QTC_CHECK_SIZE-2, QTC_CHECK_SIZE-2);
@@ -3966,7 +3966,7 @@ debugDisplayWidget(widget, 3);
             cairo_stroke(cr);
         }
 
-        if(doEtch && !list && !mnu)
+        if(doEtch && (!list || glow) && !mnu)
         {
             if(glow)
                 drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, WIDGET_STD_BUTTON);
@@ -4107,7 +4107,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 cairo_stroke(cr);
             }
 
-            if(doEtch && !mnu)
+            if(doEtch && !mnu && (!list || glow))
             {
                 double radius=(QTC_RADIO_SIZE+1)/2.0;
 
