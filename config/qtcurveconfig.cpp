@@ -544,6 +544,26 @@ void QtCurveConfig::passwordCharClicked()
         setPasswordChar(dlg.currentChar());
 }
 
+class CGradItem : public QTreeWidgetItem
+{
+    public:
+
+    CGradItem(QTreeWidget *p, const QStringList &vals)
+        : QTreeWidgetItem(p, vals)
+    {
+        setFlags(flags()|Qt::ItemIsEditable);
+    }
+
+    virtual ~CGradItem() { }
+
+    bool operator<(const QTreeWidgetItem &i) const
+    {
+        return text(0).toDouble()<i.text(0).toDouble() ||
+               (equal(text(0).toDouble(), i.text(0).toDouble()) &&
+               text(1).toDouble()<i.text(1).toDouble());
+    }
+};
+
 void QtCurveConfig::gradChanged(int i)
 {
     CustomGradientCont::const_iterator it(customGradient.find((EAppearance)i));
@@ -565,10 +585,10 @@ void QtCurveConfig::gradChanged(int i)
             details << QString().setNum((*git).pos*100.0)
                     << QString().setNum((*git).val*100.0);
 
-            QTreeWidgetItem *i=new QTreeWidgetItem(gradStops, details);
-
-            i->setFlags(i->flags()|Qt::ItemIsEditable);
+            new CGradItem(gradStops, details);
         }
+
+        gradStops->sortItems(0, Qt::AscendingOrder);
     }
     else
     {
@@ -632,6 +652,8 @@ void QtCurveConfig::addGradStop()
         cust.grad.insert(Gradient(stopPosition->value(), stopValue->value()));
         customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
         added=true;
+        gradChanged(gradCombo->currentIndex());
+        emit changed(true);
     }
     else
     {
@@ -652,13 +674,20 @@ void QtCurveConfig::addGradStop()
 
         unsigned int b4=(*cg).second.grad.size();
         (*cg).second.grad.insert(Gradient(pos, val));
-        added=(*cg).second.grad.size()!=b4;
-    }
+        if((*cg).second.grad.size()!=b4)
+        {
+            gradPreview->setGrad((*cg).second.grad);
 
-    if(added)
-    {
-        gradChanged(gradCombo->currentIndex());
-        emit changed(true);
+            QStringList details;
+
+            details << QString().setNum(pos*100.0)
+                    << QString().setNum(val*100.0);
+
+            QTreeWidgetItem *i=new CGradItem(gradStops, details);
+
+            gradStops->setCurrentItem(i);
+            gradStops->sortItems(0, Qt::AscendingOrder);
+        }
     }
 }
 
