@@ -897,7 +897,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item rowspan="2" row="0" column="1" colspan="3" >
+             <item rowspan="2" row="0" column="1" colspan="4" >
               <widget class="KDoubleNumInput" name="stopPosition" >
                <property name="maximum" >
                 <double>100.000000000000000</double>
@@ -914,7 +914,7 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
-             <item row="2" column="1" colspan="3" >
+             <item row="2" column="1" colspan="4" >
               <widget class="KDoubleNumInput" name="stopValue" >
                <property name="maximum" >
                 <double>200.000000000000000</double>
@@ -948,6 +948,16 @@ p, li { white-space: pre-wrap; }
               </widget>
              </item>
              <item row="3" column="3" >
+              <widget class="KPushButton" name="updateButton" >
+               <property name="sizePolicy" >
+                <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="4" >
               <widget class="KPushButton" name="removeButton" >
                <property name="sizePolicy" >
                 <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
@@ -1263,7 +1273,10 @@ p, li { white-space: pre-wrap; }
   <tabstop>gradCombo</tabstop>
   <tabstop>gradStops</tabstop>
   <tabstop>gradLightBorder</tabstop>
+  <tabstop>stopPosition</tabstop>
+  <tabstop>stopValue</tabstop>
   <tabstop>addButton</tabstop>
+  <tabstop>updateButton</tabstop>
   <tabstop>removeButton</tabstop>
   <tabstop>previewColor</tabstop>
   <tabstop>shading</tabstop>

@@ -602,6 +602,9 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
     bool   ok;
     double val=i->text(col).toDouble(&ok)/100.0;
 
+    if(ok && equal(val, prev))
+        return;
+
     if(!ok || (0==col && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
         i->setText(col, QString().setNum(prev));
     else
@@ -615,7 +618,7 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
             (*it).second.grad.erase(Gradient(col ? other : prev, col ? prev : other));
             (*it).second.grad.insert(Gradient(col ? other : val, col ? val : other));
             gradPreview->setGrad((*it).second.grad);
-            i->setText(col, QString().setNum(val));
+            i->setText(col, QString().setNum(val*100.0));
             emit changed(true);
         }
     }
@@ -681,8 +684,8 @@ void QtCurveConfig::removeGradStop()
         if(it!=customGradient.end())
         {
             bool   ok;
-            double pos=cur->text(0).toDouble(&ok),
-                   val=cur->text(1).toDouble(&ok);
+            double pos=cur->text(0).toDouble(&ok)/100.0,
+                   val=cur->text(1).toDouble(&ok)/100.0;
 
             (*it).second.grad.erase(Gradient(pos, val));
             gradPreview->setGrad((*it).second.grad);
@@ -695,8 +698,41 @@ void QtCurveConfig::removeGradStop()
     }
 }
 
-void QtCurveConfig::stopSelected(QTreeWidgetItem *i, int)
+void QtCurveConfig::updateGradStop()
 {
+    QTreeWidgetItem *i=gradStops->selectedItems().size() ? *(gradStops->selectedItems().begin()) : 0L;
+
+    CustomGradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
+
+    if(i)
+    {
+        double curPos=i->text(0).toDouble()/100.0,
+               curVal=i->text(1).toDouble()/100.0,
+               newPos(stopPosition->value()/100.0),
+               newVal(stopValue->value()/100.0);
+
+        if(!equal(newPos, curPos) || !equal(newVal, curVal))
+        {
+            (*cg).second.grad.erase(Gradient(curPos, curVal));
+            (*cg).second.grad.insert(Gradient(newPos, newVal));
+
+            i->setText(0, QString().setNum(stopPosition->value()));
+            i->setText(1, QString().setNum(stopValue->value()));
+            gradPreview->setGrad((*cg).second.grad);
+            emit changed(true);
+        }
+    }
+    else
+        addGradStop();
+}
+
+void QtCurveConfig::stopSelected()
+{
+    QTreeWidgetItem *i=gradStops->selectedItems().size() ? *(gradStops->selectedItems().begin()) : 0L;
+
+    removeButton->setEnabled(i);
+    updateButton->setEnabled(i);
+
     if(i)
     {
         stopPosition->setValue(i->text(0).toDouble());
@@ -728,15 +764,20 @@ void QtCurveConfig::setupGradientsTab()
     gradChanged(APPEARANCE_CUSTOM1);
     addButton->setGuiItem(KGuiItem(i18n("Add"), "list-add"));
     removeButton->setGuiItem(KGuiItem(i18n("Remove"), "list-remove"));
+    updateButton->setGuiItem(KGuiItem(i18n("Update"), "dialog-ok"));
+
     stopPosition->setRange(0.0, 100.0, 5.0);
     stopValue->setRange(0.0, 200.0, 5.0);
+    removeButton->setEnabled(false);
+    updateButton->setEnabled(false);
     connect(gradCombo, SIGNAL(currentIndexChanged(int)), SLOT(gradChanged(int)));
     connect(previewColor, SIGNAL(changed(const QColor &)), gradPreview, SLOT(setColor(const QColor &)));
     connect(gradStops, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT(editItem(QTreeWidgetItem *, int)));
     connect(gradStops, SIGNAL(itemChanged(QTreeWidgetItem *, int)), SLOT(itemChanged(QTreeWidgetItem *, int)));
     connect(addButton, SIGNAL(clicked(bool)), SLOT(addGradStop()));
     connect(removeButton, SIGNAL(clicked(bool)), SLOT(removeGradStop()));
-    connect(gradStops, SIGNAL(itemActivated(QTreeWidgetItem *, int)), SLOT(stopSelected(QTreeWidgetItem *, int)));
+    connect(updateButton, SIGNAL(clicked(bool)), SLOT(updateGradStop()));
+    connect(gradStops, SIGNAL(itemSelectionChanged()), SLOT(stopSelected()));
 }
 
 void QtCurveConfig::setupShadesTab()
