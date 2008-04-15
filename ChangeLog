@@ -28,6 +28,7 @@
 20. Apply 'border menuitems' only to popup menus.
 21. If lightening popup menus, and not bordering menuitems, then remove 1
     pix border arund popup menus.
+22. Change default to not border menuitems.
 
 0.58
 ----
