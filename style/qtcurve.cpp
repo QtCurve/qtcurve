@@ -3863,7 +3863,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsMenuitemCols[0]);
                                 drawAaLine(painter, r.left()+1, r.top()+1, r.right()-1, r.top()+1);
-                                painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2));
+                                painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
                                 drawAaLine(painter, r.left()+1, r.top()+2, r.right()-1, r.top()+2);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
@@ -3991,7 +3991,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsMenuitemCols[0]);
                                 drawAaLine(painter, r.left()+1, r.top()+1, r.left()+1, r.bottom()-1);
-                                painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.tabAppearance) ? 1.0 : 1.2));
+                                painter->setPen(midColor(fill, itsMenuitemCols[0], IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
                                 drawAaLine(painter, r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
