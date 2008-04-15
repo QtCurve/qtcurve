@@ -1979,9 +1979,10 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     }
 
     if(doEtch) //  && WIDGET_DEF_BUTTON!=widget)
-        if((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
-            MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
-           (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator))
+        if(!sunken &&
+            ((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
+             MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
+            (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
             drawGlow(cr, area, region, x-(WIDGET_COMBO==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), y-1,
                                        width+(WIDGET_COMBO==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), height+2,
                      WIDGET_DEF_BUTTON==widget && GTK_STATE_PRELIGHT==state ? WIDGET_STD_BUTTON : widget);
@@ -1991,9 +1992,10 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                     EFFECT_SHADOW==opts.buttonEffect && WIDGET_COMBO_BUTTON!=widget && WIDGET_BUTTON(widget) && !sunken);
 
     if(flags&DF_DO_BORDER && width>2 && height>2)
-        if(doEtch && (WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
+        if(!sunken &&
+            (doEtch && (WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
                       MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
-                     (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator))
+                     (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(cr, style, state, area, region, x, y, width, height, qtcPalette.mouseover,
                        round, borderProfile, widget, flags);
         else
