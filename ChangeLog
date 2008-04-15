@@ -32,6 +32,9 @@
 24. Enable shadow for HTML and krunner.
 25. Add option to specify active tab appearance.
 26. Don't do coloured mouse-overs for sunken buttons.
+27. Apply 'border menuitems' only to popup menus.
+28. If lightening popup menus, and not bordering menuitems, then remove 1
+    pix border arund popup menus.
 
 0.58
 ----

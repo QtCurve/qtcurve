@@ -1,7 +1,7 @@
 [Settings]
 animatedProgress=true
 appearance=gradient
-borderMenuitems=true
+borderMenuitems=false
 buttonEffect=none
 coloredMouseOver=plastik
 comboSplitter=true

@@ -1398,8 +1398,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_DefaultFrameWidth:
 //             if (widget && widget->inherits("QComboBoxPrivateContainer"))
 //                 return 1;
-//            if (qobject_cast<const QMenu *>(widget))
-//                return 1;
+            if (opts.lighterPopupMenuBgnd && !opts.borderMenuitems &&
+                qobject_cast<const QMenu *>(widget))
+                return 1;
+
             if(QTC_DO_EFFECT && (!widget || // !isFormWidget(widget) &&
                (::qobject_cast<const QLineEdit *>(widget) ||
                 ::qobject_cast<const QAbstractScrollArea*>(widget))))
@@ -6943,7 +6945,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
 
 void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const
 {
-    if(opts.borderMenuitems)
+    if(mbi || opts.borderMenuitems)
     {
         bool stdColor(!mbi || SHADE_BLEND_SELECTED!=opts.shadeMenubars);
 
