@@ -739,6 +739,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_EFFECT(buttonEffect)
             QTC_CFG_READ_APPEARANCE(lvAppearance, opts->appearance)
             QTC_CFG_READ_APPEARANCE(tabAppearance, opts->appearance)
+            QTC_CFG_READ_APPEARANCE(activeTabAppearance, opts->tabAppearance)
             QTC_CFG_READ_APPEARANCE(sliderAppearance, opts->appearance)
             QTC_CFG_READ_APPEARANCE(progressAppearance, opts->appearance)
 #ifndef QTC_PLAIN_FOCUS_ONLY
@@ -1003,6 +1004,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             checkAppearance(&opts->toolbarAppearance, opts);
             checkAppearance(&opts->lvAppearance, opts);
             checkAppearance(&opts->tabAppearance, opts);
+            checkAppearance(&opts->activeTabAppearance, opts);
             checkAppearance(&opts->sliderAppearance, opts);
 #ifdef __cplusplus
             checkAppearance(&opts->titlebarAppearance, opts);
@@ -1041,6 +1043,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             if(APPEARANCE_BEVELLED==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_GRADIENT;
 
+            if(APPEARANCE_BEVELLED==opts->activeTabAppearance)
+                opts->activeTabAppearance=APPEARANCE_GRADIENT;
+
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             if(APPEARANCE_RAISED==opts->selectionAppearance)
                 opts->selectionAppearance=APPEARANCE_FLAT;
@@ -1059,9 +1064,6 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 
             if(opts->animatedProgress && !opts->stripedProgress)
                 opts->animatedProgress=false;
-
-            if(opts->colorSelTab && APPEARANCE_GRADIENT!=opts->tabAppearance)
-                opts->colorSelTab=false;
 
             if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
                 opts->colorMenubarMouseOver=true;
@@ -1124,6 +1126,7 @@ static void defaultSettings(Options *opts)
     opts->appearance=APPEARANCE_DULL_GLASS;
     opts->lvAppearance=APPEARANCE_BEVELLED;
     opts->tabAppearance=APPEARANCE_GRADIENT;
+    opts->activeTabAppearance=APPEARANCE_GRADIENT;
     opts->sliderAppearance=APPEARANCE_DULL_GLASS;
     opts->menubarAppearance=APPEARANCE_GRADIENT;
     opts->menuitemAppearance=APPEARANCE_DULL_GLASS;
@@ -1543,6 +1546,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(buttonEffect)
         CFG_WRITE_ENTRY_FORCE(lvAppearance)
         CFG_WRITE_ENTRY_FORCE(tabAppearance)
+        CFG_WRITE_ENTRY_FORCE(activeTabAppearance)
         CFG_WRITE_ENTRY_FORCE(sliderAppearance)
         CFG_WRITE_ENTRY_FORCE(progressAppearance)
 #ifndef QTC_PLAIN_FOCUS_ONLY

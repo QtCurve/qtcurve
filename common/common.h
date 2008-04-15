@@ -290,9 +290,11 @@ typedef GdkColor color;
 #define PROGRESS_ANIMATION 100
 #define MIN_SLIDER_SIZE(A) (LINE_DOTS==A ? 24 : 20)
 
-#define QTC_NORM_TAB_APP (APPEARANCE_BEVELLED==opts.tabAppearance || APPEARANCE_SPLIT_GRADIENT==opts.appearance \
-                            ? APPEARANCE_GRADIENT : opts.tabAppearance)
-#define QTC_SEL_TAB_APP (APPEARANCE_INVERTED==opts.tabAppearance ? APPEARANCE_FLAT : (QTC_NORM_TAB_APP))
+#define QTC_TAB_APP(A)   (APPEARANCE_BEVELLED==A || APPEARANCE_SPLIT_GRADIENT==A \
+                            ? APPEARANCE_GRADIENT : A)
+#define QTC_NORM_TAB_APP QTC_TAB_APP(opts.tabAppearance)
+#define QTC_SEL_TAB_APP  QTC_TAB_APP(opts.activeTabAppearance)
+
 #define QTC_SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
 #define QTC_SLIDER_MO_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
 #define QTC_SLIDER_MO_LEN (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
@@ -1062,6 +1064,7 @@ typedef struct
                      toolbarAppearance,
                      lvAppearance,
                      tabAppearance,
+                     activeTabAppearance,
                      sliderAppearance,
 #ifdef __cplusplus
                      titlebarAppearance,

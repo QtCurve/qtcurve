@@ -282,7 +282,7 @@
           <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
          </property>
          <property name="text" >
-          <string>Tabs:</string>
+          <string>Tabs (active/normal):</string>
          </property>
          <property name="wordWrap" >
           <bool>false</bool>
@@ -290,9 +290,12 @@
         </widget>
        </item>
        <item row="8" column="1" colspan="2" >
+        <widget class="QComboBox" name="activeTabAppearance" />
+       </item>
+       <item row="8" column="3" colspan="2" >
         <widget class="QComboBox" name="tabAppearance" />
        </item>
-       <item row="8" column="3" colspan="5" >
+       <item row="8" column="5" colspan="3" >
         <widget class="QCheckBox" name="highlightTab" >
          <property name="whatsThis" >
           <string>This will cause a coloured stripe to be drawn over the current tab.</string>
@@ -1229,6 +1232,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>lvAppearance</tabstop>
   <tabstop>lvLines</tabstop>
   <tabstop>selectionAppearance</tabstop>
+  <tabstop>activeTabAppearance</tabstop>
   <tabstop>tabAppearance</tabstop>
   <tabstop>highlightTab</tabstop>
   <tabstop>colorSelTab</tabstop>
