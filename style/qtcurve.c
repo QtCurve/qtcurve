@@ -3079,13 +3079,13 @@ debugDisplayWidget(widget, 3);
                 {
                     GdkColor  *cols=qtcPalette.mouseover && GTK_STATE_PRELIGHT==state
                                         ? qtcPalette.mouseover : qtcPalette.defbtn;
-                    int       o=QTC_DO_EFFECT ? 1 : 0; // offset needed because of etch
+                    int       o=COLORED_BORDER_SIZE+(QTC_DO_EFFECT ? 1 : 0); // offset needed because of etch
                     GdkPoint  outer[4]={ {x, y}, {x+width, y}, {x+width, y+height},
                                          {x, y+height} },
-                              inner[4]={ {x+COLORED_BORDER_SIZE,       y+(COLORED_BORDER_SIZE+o) },
-                                         {x+width-(COLORED_BORDER_SIZE+(o*2)), y+(COLORED_BORDER_SIZE+o)},
-                                         {x+width-(COLORED_BORDER_SIZE+(o*2)), y+height-(COLORED_BORDER_SIZE+o)},
-                                         {x+COLORED_BORDER_SIZE,       y+height-(COLORED_BORDER_SIZE+o)} };
+                              inner[4]={ {x+o,       y+o       },
+                                         {x+width-o, y+o       },
+                                         {x+width-o, y+height-o},
+                                         {x+o,       y+height-o} };
                     GdkRegion *outer_region=gdk_region_polygon(outer, 4, GDK_EVEN_ODD_RULE),
                               *inner_region=gdk_region_polygon(inner, 4, GDK_EVEN_ODD_RULE);
 
