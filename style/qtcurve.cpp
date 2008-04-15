@@ -5234,7 +5234,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(QTC_DO_EFFECT)
                 {
-                    if(MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && !comboBox->editable)
+                    if(!sunken && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && !comboBox->editable)
                         drawGlow(painter, r, WIDGET_COMBO);
                     else if(QTC_DRAW_ETCH(widget, !sunken))
                         drawEtch(painter, r, WIDGET_COMBO,
@@ -6417,7 +6417,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  lightBorder(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
-                 doColouredMouseOver(doBorder && option->state&State_Enabled &&
+                 doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w && WIDGET_UNCOLOURED_MO_BUTTON!=w &&
                                      WIDGET_MENU_BUTTON!=w &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
@@ -6443,8 +6443,9 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         r.adjust(1, 1, -1, -1);
         br=r;
 
-        if( (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
-            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator))
+        if( !sunken &&
+            ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
+            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
         else if(QTC_DRAW_ETCH(widget, !sunken))
             drawEtch(p, rOrig, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
@@ -6515,7 +6516,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                               getWidgetShade(w, true, sunken, app),
                               getWidgetShade(w, false, sunken, app), sunken, app, w);
 
-            if(plastikMouseOver)
+            if(plastikMouseOver && !sunken)
             {
                 if(WIDGET_SB_SLIDER==w)
                 {
@@ -6581,9 +6582,10 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     }
 
     if(doBorder)
-        if(((doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) &&
+        if(!sunken &&
+            (((doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) &&
                         MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
-           (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator))
+            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(p, r, option, round, itsMouseOverCols, w);
         else
             drawBorder(p, r, option, round, cols, w);
