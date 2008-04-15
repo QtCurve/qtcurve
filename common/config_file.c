@@ -1156,7 +1156,7 @@ static void defaultSettings(Options *opts)
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;
     opts->roundMbTopOnly=true;
-    opts->borderMenuitems=true;
+    opts->borderMenuitems=false;
     opts->gradientPbGroove=true;
     opts->darkerBorders=false;
     opts->vArrows=false;
