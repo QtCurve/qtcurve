@@ -1792,6 +1792,10 @@ static gboolean qtInit(Options *opts)
             } /* C-Scope */
             } /* C-Scope 'doEffect' */
 
+            if(opts->lighterPopupMenuBgnd && !opts->borderMenuitems)
+                gtk_rc_parse_string("style \"QtCM\" { xthickness=1 ythickness=1 }\n"
+                                    "class \"*GtkMenu\" style \"QtCM\"");
+
             if(tmpStr)
                 free(tmpStr);
         }

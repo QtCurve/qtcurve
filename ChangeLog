@@ -25,6 +25,9 @@
 17. Allow up to 5 custom defined gradients.
 18. Allow custom shades to be specified.
 19. Add option to specify active tab appearance.
+20. Apply 'border menuitems' only to popup menus.
+21. If lightening popup menus, and not bordering menuitems, then remove 1
+    pix border arund popup menus.
 
 0.58
 ----

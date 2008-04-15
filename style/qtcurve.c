@@ -3570,7 +3570,7 @@ debugDisplayWidget(widget, 3);
             if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
-            if(!opts.borderMenuitems && (mb || menuitem))
+            if(!opts.borderMenuitems && !mb && menuitem)
                 drawBevelGradient(cr, style, area, region, x, y, width, height,
                                     &itemCols[ORIGINAL_SHADE],
                                     getWidgetShade(WIDGET_MENU_ITEM, TRUE, FALSE, opts.menuitemAppearance),
