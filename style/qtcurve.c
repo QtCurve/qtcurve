@@ -1402,13 +1402,13 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         if(WIDGET_TAB_TOP==w)
         {
             shadeBot=1.0;
-            if(sel && APPEARANCE_INVERTED==app)
-                shadeTop=0.8;
+            if(APPEARANCE_INVERTED==app)
+                shadeTop=SHADE_INVERTED_TAB_TOP;
         }
         else if(WIDGET_TAB_BOT==w)
         {
-            if(sel && APPEARANCE_INVERTED==app)
-                shadeBot=1.2;
+            if(APPEARANCE_INVERTED==app)
+                shadeBot=SHADE_INVERTED_TAB_BOT;
             else
                 shadeBot-=fabs(shadeTop-shadeBot);
             shadeTop=1.0;
@@ -3932,7 +3932,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     if(mnu)
     {
         y+=2;
-        if(isMozilla() || GTK_APP_JAVA==qtSettings.app)
+        if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
             x+=2;
         else
             x-=2;
@@ -3953,7 +3953,7 @@ debugDisplayWidget(widget, 3);
         GdkColor *colors=coloredMouseOver
                     ? qtcPalette.mouseover
                     : btn_colors;
-        GdkColor *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state
+        GdkColor *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
                             ? &style->bg[GTK_STATE_NORMAL]
                             : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                 ? &btn_colors[QTC_CR_MO_FILL]
@@ -4079,7 +4079,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             x++, y++;
 
         /* For some reason, radios dont look aligned properly - most noticeable with menuStripe set */
-        if(!isMozilla())
+        if(GTK_APP_MOZILLA!=qtSettings.app)
             x-=3;
 
         {
@@ -4105,7 +4105,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             GdkColor *colors=coloredMouseOver
                         ? qtcPalette.mouseover
                         : btn_colors;
-            GdkColor *bgndCol=GTK_STATE_INSENSITIVE==state
+            GdkColor *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
                                 ? &style->bg[GTK_STATE_NORMAL]
                                 : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                     ? &colors[QTC_CR_MO_FILL]
@@ -5269,7 +5269,7 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
                               GdkRectangle *area, GtkWidget *widget, const gchar *detail,
                               GdkWindowEdge edge, gint x, gint y, gint width, gint height)
 {
-    int dark=QT_BORDER(GTK_STATE_INSENSITIVE!=state);
+    int dark=4; /* QT_BORDER(GTK_STATE_INSENSITIVE!=state); */
 
     FN_CHECK
     QTC_CAIRO_BEGIN
@@ -5356,11 +5356,13 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
             while(xi < x + width)
             {
+/*
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
                 cairo_move_to(cr, xi, y);
                 cairo_line_to(cr, xi, y + height);
                 cairo_stroke(cr);
+*/
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
                 xi++;
@@ -5378,11 +5380,13 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
             while(yi < y + height)
             {
+/*
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
                 cairo_move_to(cr, x, yi);
                 cairo_line_to(cr, x + width, yi);
                 cairo_stroke(cr);
+*/
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
                 yi++;
@@ -5400,11 +5404,13 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
             while(xi > x + 3)
             {
+/*
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
                 cairo_move_to(cr, xi, y);
                 cairo_line_to(cr, x, yi);
                 cairo_stroke(cr);
+*/
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
                 --xi; --yi;
@@ -5422,11 +5428,13 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
             while(xi <(x + width - 3))
             {
+/*
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
                 cairo_move_to(cr, xi, y);
                 cairo_line_to(cr, x + width, yi);
                 cairo_stroke(cr);
+*/
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
                 ++xi; --yi;
@@ -5444,11 +5452,13 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
             while(xi > x + 3)
             {
+/*
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
                 cairo_move_to(cr, x, yi);
                 cairo_line_to(cr, xi, y + height);
                 cairo_stroke(cr);
+*/
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
                 --xi; ++yi;
@@ -5466,11 +5476,13 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
             while(xi <(x + width - 3))
             {
+/*
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
                 cairo_move_to(cr, xi, y + height);
                 cairo_line_to(cr, x + width, yi);
                 cairo_stroke(cr);
+*/
                 cairo_new_path(cr);
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
                 xi++; yi++;
