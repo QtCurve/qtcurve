@@ -1065,6 +1065,10 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             if(opts->animatedProgress && !opts->stripedProgress)
                 opts->animatedProgress=false;
 
+            if(opts->colorSelTab && APPEARANCE_GRADIENT!=opts->activeTabAppearance &&
+                                    APPEARANCE_INVERTED!=opts->activeTabAppearance)
+                opts->colorSelTab=false;
+
             if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
                 opts->colorMenubarMouseOver=true;
 
