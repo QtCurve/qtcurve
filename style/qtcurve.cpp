@@ -924,6 +924,8 @@ void QtCurveStyle::polish(QPalette &palette)
     palette.setColor(QPalette::Disabled, QPalette::Light, itsBackgroundCols[0]);
     palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
 
+    palette.setColor(QPalette::Disabled, QPalette::Base, palette.color(QPalette::Active, QPalette::Background));
+
     // Fix KDE4's palette...
     for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)
         if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
@@ -2198,22 +2200,23 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
-            const QColor *bc(borderColors(option, NULL)),
+            CEtchCheck    check(widget);
+            bool          sunken(state&State_Sunken),
+                          mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
+                                 && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
+                                 && QTC_DO_EFFECT),
+                          glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
+            QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+            const QColor *bc(sunken ? NULL : borderColors(option, NULL)),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
-            const QColor &bgnd(state&State_Enabled
+            const QColor &bgnd(state&State_Enabled && !sunken
                                 ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight &&
-                                  state&State_MouseOver
+                                  mo
                                     ? use[QTC_CR_MO_FILL]
                                     : palette.base().color()
                                 : palette.background().color());
-            CEtchCheck    check(widget);
-            bool          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
-                                 && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
-                                 && QTC_DO_EFFECT),
-                          glow(doEtch && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled);
-            QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
-
             painter->save();
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
@@ -2223,7 +2226,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                   getWidgetShade(WIDGET_TROUGH, false, false, APPEARANCE_GRADIENT),
                                   false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
 
-            if(MO_NONE!=opts.coloredMouseOver && !glow && state&State_MouseOver && state&State_Enabled)
+            if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(use[QTC_CR_MO_FILL]);
@@ -2295,11 +2298,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorRadioButton:
         {
             CEtchCheck check(widget);
-            bool       doEtch(!(state&QTC_STATE_MENU)
+            bool       sunken(state&State_Sunken),
+                       mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                       doEtch(!(state&QTC_STATE_MENU)
                               && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
                               && QTC_DO_EFFECT),
-                       glow(doEtch && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled),
-                       coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && state&State_MouseOver && state&State_Enabled);
+                       glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
+                       coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo);
             QRect      rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
             int        x(rect.x()), y(rect.y());
             QPolygon   clipRegion;
@@ -2307,12 +2312,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
 
-            const QColor *bc(borderColors(option, NULL)),
+            const QColor *bc(mo ? NULL : borderColors(option, NULL)),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
-            const QColor &bgnd(state&State_Enabled
+            const QColor &bgnd(state&State_Enabled && !sunken
                                 ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight &&
-                                  state&State_MouseOver
+                                  mo
                                     ? use[QTC_CR_MO_FILL]
                                     : palette.base().color()
                                 : palette.background().color());
@@ -2721,7 +2726,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 sx(x),
                 sy(y),
                 s(sw / 4),
-                dark(QT_BORDER(state&State_Enabled));
+                dark(4); // QT_BORDER(state&State_Enabled));
 
             Qt::Corner corner;
             if (const QStyleOptionSizeGrip *sgrp = qstyleoption_cast<const QStyleOptionSizeGrip *>(option))
@@ -2737,8 +2742,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     sx = x + sw;
                     for (int i = 0; i < 4; ++i)
                     {
-                        painter->setPen(QPen(itsBackgroundCols[0], 1));
-                        painter->drawLine(x, sy - 1 , sx + 1, sw);
+//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
+//                         painter->drawLine(x, sy - 1 , sx + 1, sw);
                         painter->setPen(QPen(itsBackgroundCols[dark], 1));
                         painter->drawLine(x, sy, sx, sw);
                         sx -= s;
@@ -2748,8 +2753,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 case Qt::BottomRightCorner:
                     for (int i = 0; i < 4; ++i)
                     {
-                        painter->setPen(QPen(itsBackgroundCols[0], 1));
-                        painter->drawLine(sx - 1, sw, sw, sy - 1);
+//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
+//                         painter->drawLine(sx - 1, sw, sw, sy - 1);
                         painter->setPen(QPen(itsBackgroundCols[dark], 1));
                         painter->drawLine(sx, sw, sw, sy);
                         sx += s;
@@ -2760,8 +2765,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     sy = y + sw;
                     for (int i = 0; i < 4; ++i)
                     {
-                        painter->setPen(QPen(itsBackgroundCols[0], 1));
-                        painter->drawLine(sx - 1, y, sw, sy + 1);
+//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
+//                         painter->drawLine(sx - 1, y, sw, sy + 1);
                         painter->setPen(QPen(itsBackgroundCols[dark], 1));
                         painter->drawLine(sx, y, sw, sy);
                         sx += s;
@@ -2771,8 +2776,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 case Qt::TopLeftCorner:
                     for (int i = 0; i < 4; ++i)
                     {
-                        painter->setPen(QPen(itsBackgroundCols[0], 1));
-                        painter->drawLine(x, sy - 1, sx - 1, y);
+//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
+//                         painter->drawLine(x, sy - 1, sx - 1, y);
                         painter->setPen(QPen(itsBackgroundCols[dark], 1));
                         painter->drawLine(x, sy, sx, y);
                         sx += s;
@@ -6219,13 +6224,13 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
     if(WIDGET_TAB_TOP==w)
     {
         shadeBot=1.0;
-        if(sel && APPEARANCE_INVERTED==app)
-            shadeTop=0.8;
+        if(APPEARANCE_INVERTED==app)
+            shadeTop=SHADE_INVERTED_TAB_TOP;
     }
     else if(WIDGET_TAB_BOT==w)
     {
-        if(sel && APPEARANCE_INVERTED==app)
-            shadeBot=1.2;
+        if(APPEARANCE_INVERTED==app)
+            shadeBot=SHADE_INVERTED_TAB_BOT;
         else
             shadeBot-=fabs(shadeTop-shadeBot);
         shadeTop=1.0;
@@ -6934,9 +6939,8 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
         r.adjust(1, 1, -1, -1);
 
     if(fill)
-        p->fillRect(r.adjusted(1, 1, -1, -1),
-                    option->state&State_Enabled ? option->palette.base().color()
-                                                : option->palette.background().color());
+        p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.base().color());
+
     if(doEtch)
         drawEtch(p, rx, WIDGET_ENTRY, false);
 
