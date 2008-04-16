@@ -29,6 +29,7 @@
 21. If lightening popup menus, and not bordering menuitems, then remove 1
     pix border arund popup menus.
 22. Change default to not border menuitems.
+23. Assume 'xulrunner' is also Firefox.
 
 0.58
 ----

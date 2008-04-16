@@ -1410,7 +1410,8 @@ static gboolean qtInit(Options *opts)
             /* Check if we're firefox... */
             if((app=getAppName()))
             {
-                gboolean firefox=isMozApp(app, "firefox") || isMozApp(app, "iceweasel") || isMozApp(app, "swiftfox"),
+                gboolean firefox=isMozApp(app, "firefox") || isMozApp(app, "iceweasel") ||
+                                 isMozApp(app, "swiftfox") || isMozApp(app, "xulrunner"),
                          thunderbird=!firefox && isMozApp(app, "thunderbird"),
                          mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird");
 
