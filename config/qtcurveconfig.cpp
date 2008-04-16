@@ -716,7 +716,7 @@ void QtCurveConfig::addGradStop()
         CustomGradient cust;
 
         cust.lightBorder=gradLightBorder->isChecked();
-        cust.grad.insert(Gradient(stopPosition->value(), stopValue->value()));
+        cust.grad.insert(Gradient(stopPosition->value()/100.0, stopValue->value()/100.0));
         customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
         added=true;
         gradChanged(gradCombo->currentIndex());
