@@ -95,6 +95,48 @@ class CharSelectDialog : public KDialog
     KCharSelect *itsSelector;
 };
 
+class CGradItem : public QTreeWidgetItem
+{
+    public:
+
+    CGradItem(QTreeWidget *p, const QStringList &vals)
+        : QTreeWidgetItem(p, vals)
+    {
+        setFlags(flags()|Qt::ItemIsEditable);
+    }
+
+    virtual ~CGradItem() { }
+
+    bool operator<(const QTreeWidgetItem &i) const
+    {
+        return text(0).toDouble()<i.text(0).toDouble() ||
+               (equal(text(0).toDouble(), i.text(0).toDouble()) &&
+               text(1).toDouble()<i.text(1).toDouble());
+    }
+};
+
+class CStackItem : public QListWidgetItem
+{
+    public:
+
+    CStackItem(QListWidget *p, const QString &text, int s)
+        : QListWidgetItem(text, p),
+          stackId(s)
+    {
+    }
+
+    bool operator<(const QListWidgetItem &o) const
+    {
+        return stackId<((CStackItem &)o).stackId;
+    }
+
+    int stack() { return stackId; }
+
+    private:
+
+    int stackId;
+};
+
 CGradientPreview::CGradientPreview(QWidget *p)
                 : QWidget(p)
 {
@@ -332,7 +374,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(lvAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(sliderAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(tabAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
-    connect(activeTabAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
+    connect(activeTabAppearance, SIGNAL(activated(int)), SLOT(activeTabAppearanceChanged()));
     connect(toolbarSeparators, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(splitters, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -405,6 +447,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
     loadStyles(subMenu);
     setupGradientsTab();
+    setupStack();
 }
 
 QtCurveConfig::~QtCurveConfig()
@@ -529,6 +572,16 @@ void QtCurveConfig::stripedProgressChanged()
     updateChanged();
 }
 
+void QtCurveConfig::activeTabAppearanceChanged()
+{
+    int current(activeTabAppearance->currentIndex());
+
+    if(colorSelTab->isChecked() && APPEARANCE_GRADIENT!=current && APPEARANCE_INVERTED!=current)
+        colorSelTab->setChecked(false);
+    colorSelTab->setEnabled(APPEARANCE_GRADIENT==current || APPEARANCE_INVERTED==current);
+    updateChanged();
+}
+
 void QtCurveConfig::shadingChanged()
 {
     ::shading=(EShading)shading->currentIndex();
@@ -544,25 +597,39 @@ void QtCurveConfig::passwordCharClicked()
         setPasswordChar(dlg.currentChar());
 }
 
-class CGradItem : public QTreeWidgetItem
+void QtCurveConfig::setupStack()
 {
-    public:
+    int i=0;
+    CStackItem *first=new CStackItem(stackList, i18n("General"), i++);
+    new CStackItem(stackList, i18n("Splitters"), i++);
+    new CStackItem(stackList, i18n("Sliders and Scrollbars"), i++);
+    new CStackItem(stackList, i18n("Progressbars"), i++);
+    new CStackItem(stackList, i18n("Default Button"),i++);
+    new CStackItem(stackList, i18n("Mouse-over"), i++);
+    new CStackItem(stackList, i18n("Listviews"), i++);
+    new CStackItem(stackList, i18n("Tabs"), i++);
+    new CStackItem(stackList, i18n("Checks and Radios"), i++);
+    new CStackItem(stackList, i18n("Titlebars"), i++);
+    new CStackItem(stackList, i18n("Menus and Toolbars"), i++);
+    new CStackItem(stackList, i18n("Advanced Settings"), i++);
+    new CStackItem(stackList, i18n("Custom Gradients"), i++);
+    new CStackItem(stackList, i18n("Custom Shades"), i++);
 
-    CGradItem(QTreeWidget *p, const QStringList &vals)
-        : QTreeWidgetItem(p, vals)
-    {
-        setFlags(flags()|Qt::ItemIsEditable);
-    }
+    stackList->setSelectionMode(QAbstractItemView::SingleSelection);
+    first->setSelected(true);
+    connect(stackList, SIGNAL(itemSelectionChanged()), SLOT(changeStack()));
+}
 
-    virtual ~CGradItem() { }
+void QtCurveConfig::changeStack()
+{
+    CStackItem *item=(CStackItem *)(stackList->currentItem());
 
-    bool operator<(const QTreeWidgetItem &i) const
-    {
-        return text(0).toDouble()<i.text(0).toDouble() ||
-               (equal(text(0).toDouble(), i.text(0).toDouble()) &&
-               text(1).toDouble()<i.text(1).toDouble());
-    }
-};
+    if(item && !item->isSelected())
+        item->setSelected(true);
+
+    if(item)
+        stack->setCurrentIndex(item->stack());
+}
 
 void QtCurveConfig::gradChanged(int i)
 {

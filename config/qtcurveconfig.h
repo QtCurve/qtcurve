@@ -96,8 +96,10 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void customMenuTextColorChanged();
     void stripedProgressChanged();
     void shadingChanged();
+    void activeTabAppearanceChanged();
     void passwordCharClicked();
 
+    void changeStack();
     void gradChanged(int i);
     void editItem(QTreeWidgetItem *i, int col);
     void itemChanged(QTreeWidgetItem *i, int col);
@@ -108,6 +110,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     private:
 
+    void setupStack();
     void setupGradientsTab();
     void setupShadesTab();
     void setupShade(KDoubleNumInput *w, int shade);
