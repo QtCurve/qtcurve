@@ -4157,7 +4157,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
             gdk_region_destroy(region);
 
-            if(doEtch && !mnu && coloredMouseOver && !glow)
+            if(!mnu && coloredMouseOver && !glow)
             {
                 double radius=(QTC_RADIO_SIZE-2)/2.0;
 
