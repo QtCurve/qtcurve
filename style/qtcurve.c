@@ -3602,7 +3602,8 @@ debugDisplayWidget(widget, 3);
                 else
                     drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
                                 width, height, &itemCols[ORIGINAL_SHADE],
-                                itemCols, round, pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
+                                itemCols, pbar && opts.fillProgress ? ROUNDED_NONE : round,
+                                pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
                                 DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
                                 ((!pbar || !opts.fillProgress) && border && stdColors ? DF_DO_BORDER : 0)|
                                 (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS));
@@ -3623,18 +3624,25 @@ debugDisplayWidget(widget, 3);
             if(pbar && opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
                             width, height, &qtcPalette.menuitem[1],
-                            qtcPalette.menuitem, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
+                            qtcPalette.menuitem, opts.fillProgress ? ROUNDED_NONE : round,
+                            WIDGET_PROGRESSBAR, BORDER_FLAT,
                             DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
                             (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS));
 
-            if(!opts.fillProgress && pbar && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
+            if(pbar && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
             {
                 /*if(!isMozilla())
                 {
                     x--; y--; width+=2; height+=2;
                 }*/
                 cairo_new_path(cr);
-                cairo_set_source_rgba(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]), 0.75);
+                if(opts.fillProgress)
+                {
+                    x++, y++, width-=2, height-=2;
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+                }
+                else
+                    cairo_set_source_rgba(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]), 0.75);
                 if(!(round&CORNER_TL))
                     cairo_rectangle(cr, x, y, 1, 1);
                 if(!(round&CORNER_TR))
