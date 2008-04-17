@@ -760,6 +760,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(crHighlight)
             QTC_CFG_READ_BOOL(fillProgress)
             QTC_CFG_READ_BOOL(comboSplitter)
+            QTC_CFG_READ_BOOL(squareScrollViews)
+            QTC_CFG_READ_BOOL(highlightScrollViews)
+            QTC_CFG_READ_BOOL(sunkenScrollViews)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance)
@@ -1078,6 +1081,12 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || ROUND_FULL!=opts->round))
                 opts->defBtnIndicator=IND_TINT;
 
+            if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
+                opts->sunkenScrollViews=false;
+
+            if(opts->squareScrollViews)
+                opts->highlightScrollViews=false;
+
             return true;
         }
     }
@@ -1171,6 +1180,9 @@ static void defaultSettings(Options *opts)
     opts->crHighlight=false;
     opts->fillProgress=true;
     opts->comboSplitter=false;
+    opts->squareScrollViews=false;
+    opts->highlightScrollViews=false;
+    opts->sunkenScrollViews=false;
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
@@ -1570,6 +1582,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(crHighlight)
         CFG_WRITE_ENTRY(fillProgress)
         CFG_WRITE_ENTRY(comboSplitter)
+        CFG_WRITE_ENTRY(squareScrollViews)
+        CFG_WRITE_ENTRY(highlightScrollViews)
+        CFG_WRITE_ENTRY(sunkenScrollViews)
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)

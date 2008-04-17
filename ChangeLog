@@ -37,6 +37,8 @@
     pix border arund popup menus.
 29. Change default to not border menuitems.
 30. Re-arrange config GUI.
+31. Remove frame from kwrite.
+32. Scrolview options: allow sunken, highlight, and square.
 
 0.58
 ----

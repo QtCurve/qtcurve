@@ -988,10 +988,8 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->setMouseTracking(true);
         widget->installEventFilter(this);
     }
-#ifdef QTC_HIGHLIGHT_SCROLVIEWS
-    else if(widget->inherits("Q3ScrollView"))
+    else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
         widget->installEventFilter(this);
-#endif
     else if(qobject_cast<QMenuBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover, true);
@@ -1128,10 +1126,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->setMouseTracking(false);
         widget->removeEventFilter(this);
     }
-#ifdef QTC_HIGHLIGHT_SCROLVIEWS
-    else if(widget->inherits("Q3ScrollView"))
+    else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
         widget->removeEventFilter(this);
-#endif
     else if(qobject_cast<QMenuBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover, false);
@@ -1295,13 +1291,11 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             }
             break;
         }
-#ifdef QTC_HIGHLIGHT_SCROLVIEWS
         case QEvent::FocusIn:
         case QEvent::FocusOut:
-            if(object->isWidgetType() && object->inherits("Q3ScrollView"))
+            if(opts.highlightScrollViews && object->isWidgetType() && object->inherits("Q3ScrollView"))
                 ((QWidget *)object)->repaint();
             break;
-#endif
         case QEvent::WindowActivate:
             if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars && qobject_cast<QMenuBar *>(object))
             {
@@ -1400,13 +1394,22 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_DefaultFrameWidth:
 //             if (widget && widget->inherits("QComboBoxPrivateContainer"))
 //                 return 1;
+
+            if (widget && widget->parentWidget() &&
+                ::qobject_cast<const QFrame *>(widget) &&
+                widget->parentWidget()->inherits("KateView"))
+                return 0;
+
+            if (opts.squareScrollViews && widget && ::qobject_cast<const QAbstractScrollArea *>(widget))
+                return opts.gtkScrollViews ? 1 : 2;
+
             if (opts.lighterPopupMenuBgnd && !opts.borderMenuitems &&
                 qobject_cast<const QMenu *>(widget))
                 return 1;
 
             if(QTC_DO_EFFECT && (!widget || // !isFormWidget(widget) &&
                (::qobject_cast<const QLineEdit *>(widget) ||
-                ::qobject_cast<const QAbstractScrollArea*>(widget))))
+                (opts.sunkenScrollViews && ::qobject_cast<const QAbstractScrollArea*>(widget)))))
                 return 3;
             else
                 return 2;
@@ -1912,28 +1915,55 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     painter->restore();
                 }
             }
-            else if(::qobject_cast<const QAbstractScrollArea *>(widget))
-                drawPrimitive(PE_FrameLineEdit, option, painter, widget);
             else
             {
-                const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
+                bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
+                        (widget && widget->inherits("Q3ScrollView")));
 
-                if (fo && fo->lineWidth>0)
+                if(sv && (opts.sunkenScrollViews || opts.squareScrollViews))
                 {
-                    painter->save();
+                    if(opts.squareScrollViews)
+                    {
+                        const QColor *use(backgroundColors(option));
+                        painter->setPen(use[QT_STD_BORDER]);
+                        drawRect(painter, r);
+                    }
+                    else
+                    {
+                        const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
 
-                    QStyleOption opt(*option);
-#ifndef QTC_HIGHLIGHT_SCROLVIEWS
-                    opt.state&=~State_HasFocus;
-#endif
+                        if(!opts.highlightScrollViews && fo)
+                        {
+                            QStyleOptionFrame opt(*fo);
+                            opt.state&=~State_HasFocus;
+                            drawEntryField(painter, r, &opt, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
+                        }
+                        else
+                            drawEntryField(painter, r, option, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
+                    }
+                }
+                else
+                {
+                    const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
 
-                    drawBorder(painter, r, &opt, ROUNDED_ALL, backgroundColors(option),
-                               WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
-                                                ? BORDER_SUNKEN
-                                                : state&State_Raised
-                                                    ? BORDER_RAISED
-                                                    : BORDER_FLAT);
-                    painter->restore();
+                    if (fo && fo->lineWidth>0)
+                    {
+                        QStyleOption opt(*option);
+
+                        painter->save();
+
+                        if(!opts.highlightScrollViews)
+                            opt.state&=~State_HasFocus;
+
+                        drawBorder(painter, r, &opt,
+                                ROUNDED_ALL, backgroundColors(option),
+                                WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
+                                                    ? BORDER_SUNKEN
+                                                    : state&State_Raised
+                                                        ? BORDER_RAISED
+                                                        : BORDER_FLAT);
+                        painter->restore();
+                    }
                 }
             }
             break;
@@ -3358,7 +3388,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->drawLine(menuItem->rect.left() + 3 + (reverse ? 0 : w) +
                                         (!reverse && doStripe ? stripeWidth : 0),
                                       menuItem->rect.center().y(),
-                                      menuItem->rect.right() - 3 - (reverse ? w : 0) -
+                                      menuItem->rect.right() - 4 - (reverse ? w : 0) -
                                         (reverse && doStripe ? stripeWidth : 0),
                                       menuItem->rect.center().y());
 
@@ -6362,17 +6392,37 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
         {
             QColor top,
                    bot,
-                   baseTopCol(opts.colorSelTab && sel && tab
-                               ? midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR) : base);
+                   baseTopCol(base),
+                   baseBotCol(base);
+
+            if(opts.colorSelTab && sel && tab)
+            {
+                if(WIDGET_TAB_BOT==w)
+                    baseBotCol=midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR);
+                else
+                    baseTopCol=midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR);
+
+                if((WIDGET_TAB_TOP==w && APPEARANCE_INVERTED!=app) ||
+                    (WIDGET_TAB_BOT==w && APPEARANCE_INVERTED==app))
+                {
+                    shadeTop=SHADE_COLOR_SEL_TAP_TOP;
+                    shadeBot=1.0;
+                }
+                else
+                {
+                    shadeTop=1.0;
+                    shadeBot=SHADE_COLOR_SEL_TAP_TOP;
+                }
+            }
 
             if(equal(1.0, shadeTop))
                 top=baseTopCol;
             else
                 shade(baseTopCol, &top, shadeTop);
             if(equal(1.0, shadeBot))
-                bot=base;
+                bot=baseBotCol;
             else
-                shade(base, &bot, shadeBot);
+                shade(baseBotCol, &bot, shadeBot);
 
             bool            inc(selected || tab || APPEARANCE_INVERTED!=app ? increase : !increase);
             QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());

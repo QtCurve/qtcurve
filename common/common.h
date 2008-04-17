@@ -46,11 +46,6 @@
 #define QTC_INCREASE_SB_SLIDER
 
 /*
-    Enable this to do focus highlighting for scrollviews... NOTE: Gtk2 currently does not do this.
-#define QTC_HIGHLIGHT_SCROLVIEWS
-*/
-
-/*
     Control whether toolbar, window decoration, and dock window, buttons should have coloured mouse-over
 */
 #define QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
@@ -179,6 +174,7 @@ typedef GdkColor color;
 
 #define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
 #define QTC_COLOR_SEL_TAB_FACTOR 1.2
+#define SHADE_COLOR_SEL_TAP_TOP  1.1
 
 #define QTC_ROUNDED (ROUND_NONE!=opts.round)
 
@@ -1051,7 +1047,10 @@ typedef struct
                      inactiveHighlight,
                      crHighlight,
                      fillProgress,
-                     comboSplitter;
+                     comboSplitter,
+                     squareScrollViews,
+                     highlightScrollViews,
+                     sunkenScrollViews;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;

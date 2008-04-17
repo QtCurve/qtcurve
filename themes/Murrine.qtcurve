@@ -25,6 +25,7 @@ gtkComboMenus=false
 gtkButtonOrder=false
 handles=sunken
 highlightFactor=5
+highlightScrollViews=false
 highlightTab=true
 lighterPopupMenuBgnd=true
 lvAppearance=dullglass
@@ -58,4 +59,5 @@ menuStripe=false
 menuStripeAppearance=flat
 titlebarAppearance=dullglass
 selectionAppearance=dullglass
-
+squareScrollViews=true
+sunkenScrollViews=false
