@@ -30,6 +30,7 @@
     pix border arund popup menus.
 22. Change default to not border menuitems.
 23. Assume 'xulrunner' is also Firefox.
+24. Option to have squared scrollviews.
 
 0.58
 ----

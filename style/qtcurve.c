@@ -1535,6 +1535,7 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                          bot,
                          tabBaseCol,
                          *baseTopCol=base,
+                         *baseBotCol=base,
                          *t,
                          *b;
                 gboolean inc=selected || APPEARANCE_INVERTED!=app ? increase : !increase;
@@ -1544,7 +1545,22 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 if(opts.colorSelTab && sel && tab)
                 {
                     generateMidColor(base, &(qtcPalette.menuitem[0]), &tabBaseCol, QTC_COLOR_SEL_TAB_FACTOR);
-                    baseTopCol=&tabBaseCol;
+                    if(WIDGET_TAB_BOT==w)
+                        baseBotCol=&tabBaseCol;
+                    else
+                        baseTopCol=&tabBaseCol;
+
+                    if((WIDGET_TAB_TOP==w && APPEARANCE_INVERTED!=app) ||
+                       (WIDGET_TAB_BOT==w && APPEARANCE_INVERTED==app))
+                    {
+                        shadeTop=SHADE_COLOR_SEL_TAP_TOP;
+                        shadeBot=1.0;
+                    }
+                    else
+                    {
+                        shadeTop=1.0;
+                        shadeBot=SHADE_COLOR_SEL_TAP_TOP;
+                    }
                 }
 
                 if(equal(1.0, shadeTop))
@@ -1555,10 +1571,10 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                     t=&top;
                 }
                 if(equal(1.0, shadeBot))
-                    b=base;
+                    b=baseBotCol;
                 else
                 {
-                    shade(base, &bot, shadeBot);
+                    shade(baseBotCol, &bot, shadeBot);
                     b=&bot;
                 }
 
@@ -3738,8 +3754,8 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
     else
     {
         gboolean frame=!detail || 0==strcmp(detail, "frame"),
-                 profiledFrame=DETAIL("scrolled_window"),
-                 viewport=!profiledFrame && detail && NULL!=strstr(detail, "viewport"),
+                 scrolledWindow=DETAIL("scrolled_window"),
+                 viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
                             ? frame : isStatusBarFrame(widget);
 
@@ -3751,11 +3767,27 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         sanitizeSize(window, &width, &height);
 
-        if(!statusBar && (frame || profiledFrame || viewport) && QTC_ROUNDED)
+        if(!statusBar && (frame || scrolledWindow || viewport) && QTC_ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
             {
+                gboolean doBorder=!viewport;
+
+                if(scrolledWindow)
+                {
+                    if(opts.squareScrollViews)
+                    {
+                        drawBorder(cr, style, state, area, NULL, x, y, width, height,
+                                   NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_OTHER, 0);
+                        doBorder=false;
+                    }
+                    else if(opts.sunkenScrollViews)
+                    {
+                        drawEtch(cr, area, NULL, x, y, width, height, FALSE);
+                        x++, y++, width-=2, height-=2;
+                    }
+                }
                 if(viewport)
                 {
                     cairo_new_path(cr);
@@ -3763,9 +3795,10 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]));
                     cairo_stroke(cr);
                 }
-                drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                           NULL, ROUNDED_ALL, profiledFrame ? BORDER_SUNKEN : BORDER_FLAT,
-                           WIDGET_OTHER, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
+                if(doBorder)
+                    drawBorder(cr, style, state, area, NULL, x, y, width, height,
+                               NULL, ROUNDED_ALL, scrolledWindow ? BORDER_SUNKEN : BORDER_FLAT,
+                               WIDGET_OTHER, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
             }
         }
         else if(!statusBar || opts.drawStatusBarFrames)

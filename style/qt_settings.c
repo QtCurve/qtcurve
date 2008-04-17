@@ -1753,8 +1753,12 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
 
+            if(!opts->gtkScrollViews && NULL!=gtk_check_version(2, 12, 0))
+                opts->gtkScrollViews=true;
+
             { /* C-Scope */
             bool doEffect=ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect;
+            int  thickness=2;
 
             if(doEffect)
                 gtk_rc_parse_string("style \"QtcEtch\" "
@@ -1769,11 +1773,27 @@ static gboolean qtInit(Options *opts)
                                     "class \"*GtkOptionMenu\" style \"QtcEtch\""
                                     /*"class \"*GtkWidget\" style \"QtcEtchI\""*/);
 
-            if(!opts->gtkScrollViews && NULL==gtk_check_version(2, 12, 0))
+            if(!opts->gtkScrollViews)
                 gtk_rc_parse_string("style \"QtcSV\""
                                     " { GtkScrolledWindow::scrollbar-spacing = 0 "
                                       " GtkScrolledWindow::scrollbars-within-bevel = 1 } "
                                     "class \"*GtkWidget\" style \"QtcSV\"");
+
+            /* Scrolled windows */
+            if(opts->squareScrollViews)
+                thickness=opts->gtkScrollViews ? 1 : 2;
+            else if(opts->sunkenScrollViews)
+                thickness=3;
+
+            { /* C-Scope */
+                static const char *constStrFormat="style \"QtcSVt\" "
+                                                    "{ xthickness = %d ythickness = %d } "
+                                                      "class \"*GtkScrolledWindow\" style \"QtcSVt\"";
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                sprintf(tmpStr, constStrFormat, thickness, thickness);
+                gtk_rc_parse_string(tmpStr);
+            } /* C-Scope */
 
             { /* C-Scope */
                 static const char *constStrFormat="style \"QtcPbar\" "
