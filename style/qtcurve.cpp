@@ -2334,7 +2334,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                               && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
                               && QTC_DO_EFFECT),
                        glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
-                       coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo);
+                       coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
             QRect      rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
             int        x(rect.x()), y(rect.y());
             QPolygon   clipRegion;
@@ -2342,7 +2342,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
 
-            const QColor *bc(mo ? NULL : borderColors(option, NULL)),
+            const QColor *bc(coloredMo ? borderColors(option, NULL) : NULL),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
             const QColor &bgnd(state&State_Enabled && !sunken
@@ -2396,8 +2396,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
 
-            painter->drawPixmap(x, y, *getPixmap(use[opts.coloredMouseOver && state&State_MouseOver ? 4 : QT_BORDER(state&State_Enabled)],
-                                PIX_RADIO_BORDER, 0.8));
+            painter->drawPixmap(x, y, *getPixmap(use[QT_BORDER(state&State_Enabled)], PIX_RADIO_BORDER, 0.8));
 
             if(state&State_On)
                 painter->drawPixmap(x, y, *getPixmap(state&State_Enabled
@@ -5592,7 +5591,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     case SC_ComboBoxFrame:
                         if(ed)
                         {
-                            int btnWidth(doEtch ? 20 : 19);
+                            int btnWidth(doEtch ? 20 : 18);
 
                             r=QRect(x+w-btnWidth, y, btnWidth, h);
                         }
