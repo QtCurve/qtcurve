@@ -115,17 +115,24 @@ class CGradItem : public QTreeWidgetItem
     }
 };
 
-class CStackItem : public QListWidgetItem
+static QStringList toList(const QString &str)
+{
+    QStringList lst;
+    lst.append(str);
+    return lst;
+}
+
+class CStackItem : public QTreeWidgetItem
 {
     public:
 
-    CStackItem(QListWidget *p, const QString &text, int s)
-        : QListWidgetItem(text, p),
+    CStackItem(QTreeWidget *p, const QString &text, int s)
+        : QTreeWidgetItem(p, toList(text)),
           stackId(s)
     {
     }
 
-    bool operator<(const QListWidgetItem &o) const
+    bool operator<(const QTreeWidgetItem &o) const
     {
         return stackId<((CStackItem &)o).stackId;
     }

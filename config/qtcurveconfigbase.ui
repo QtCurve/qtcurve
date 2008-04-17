@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>534</width>
+    <width>503</width>
     <height>554</height>
    </rect>
   </property>
@@ -32,20 +32,16 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QListWidget" name="stackList" >
-     <property name="minimumSize" >
-      <size>
-       <width>160</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
    <item rowspan="2" row="1" column="1" >
     <widget class="QStackedWidget" name="stack" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>13</number>
      </property>
      <widget class="QWidget" name="page" >
       <layout class="QGridLayout" >
@@ -1138,6 +1134,12 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="indentation" >
+             <number>0</number>
+            </property>
+            <property name="rootIsDecorated" >
+             <bool>false</bool>
+            </property>
             <column>
              <property name="text" >
               <string>Position (%)</string>
@@ -1457,6 +1459,33 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
+   <item row="1" column="0" >
+    <widget class="QTreeWidget" name="stackList" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>150</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="indentation" >
+      <number>0</number>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Category</string>
+      </property>
+     </column>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11" />
@@ -1484,7 +1513,6 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>stackList</tabstop>
   <tabstop>appearance</tabstop>
   <tabstop>round</tabstop>
   <tabstop>buttonEffect</tabstop>
