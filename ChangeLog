@@ -27,7 +27,7 @@
 20. New mouse over effect - glow. Only applicable if etching or shadowing.
 21. New default button indicator - glow. Only applicable if etching
     or shadowing.
-22. Allow up to 5 custom defined gradients.
+22. Allow up to 10 custom defined gradients.
 23. Allow custom shades to be specified.
 24. Enable shadow for HTML and krunner.
 25. Add option to specify active tab appearance.
