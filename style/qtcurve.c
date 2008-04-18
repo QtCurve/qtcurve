@@ -1906,8 +1906,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     {
         drawBevelGradient(cr, style, area, region, bx, by, bw, bh, base,
                           getWidgetShade(widget, TRUE, sunken, app), getWidgetShade(widget, FALSE, sunken, app),
-                          horiz, !sunken, sunken, app,
-                          widget);
+                          horiz, !sunken, sunken, app, widget);
 
         if(plastikMouseOver)
         {
@@ -1922,23 +1921,19 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 {
                     drawBevelGradient(cr, style, area, region, x+so, y, len, height, &qtcPalette.mouseover[col],
                                       getWidgetShade(widget, TRUE, sunken, app), getWidgetShade(widget, FALSE, sunken, app),
-                                      horiz, !sunken, sunken, app,
-                                      widget);
+                                      horiz, !sunken, sunken, app, widget);
                     drawBevelGradient(cr, style, area, region, x+width-eo, y, len, height, &qtcPalette.mouseover[col],
                                       getWidgetShade(widget, TRUE, sunken, app), getWidgetShade(widget, FALSE, sunken, app),
-                                      horiz, !sunken, sunken, app,
-                                      widget);
+                                      horiz, !sunken, sunken, app, widget);
                 }
                 else
                 {
                     drawBevelGradient(cr, style, area, region, x, y+so, width, len, &qtcPalette.mouseover[col],
                                       getWidgetShade(widget, TRUE, sunken, app), getWidgetShade(widget, FALSE, sunken, app),
-                                      horiz, !sunken, sunken, app,
-                                      widget);
+                                      horiz, !sunken, sunken, app, widget);
                     drawBevelGradient(cr, style, area, region, x, y+height-eo, width, len, &qtcPalette.mouseover[col],
                                       getWidgetShade(widget, TRUE, sunken, app), getWidgetShade(widget, FALSE, sunken, app),
-                                      horiz, !sunken, sunken, app,
-                                      widget);
+                                      horiz, !sunken, sunken, app, widget);
                 }
             }
             else
@@ -3279,26 +3274,36 @@ debugDisplayWidget(widget, 3);
         else if(pbar)
         {
             gboolean doEtch=QTC_DO_EFFECT;
+            GdkColor *col=&style->base[state];
+
+            switch(opts.progressGrooveColor)
+            {
+                default:
+                case ECOLOR_BASE:
+                    col=&style->base[state];
+                    break;
+                case ECOLOR_BACKGROUND:
+                    col=&qtcPalette.background[ORIGINAL_SHADE];
+                    break;
+                case ECOLOR_DARK:
+                    col=&qtcPalette.background[2];
+            }
 
             drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
             if(doEtch)
                 x++, y++, width-=2, height-=2;
 
-            if(opts.gradientPbGroove)
-                drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2,
-                                  GTK_STATE_INSENSITIVE==state ? &(qtcPalette.background[ORIGINAL_SHADE])
-                                                               : &(style->base[state]),
-                                  getWidgetShade(WIDGET_TROUGH, TRUE, FALSE, opts.progressAppearance),
-                                  getWidgetShade(WIDGET_TROUGH, FALSE, FALSE, opts.progressAppearance),
-                                  horiz, FALSE, FALSE, APPEARANCE_GRADIENT, WIDGET_TROUGH);
-            else if(GTK_STATE_INSENSITIVE!=state)
-                drawAreaColor(cr, area, NULL, &style->base[state], x+2, y+2, width-4, height-4);
+            drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
+                              getWidgetShade(WIDGET_PBAR_TROUGH, TRUE, FALSE, opts.progressGrooveAppearance),
+                              getWidgetShade(WIDGET_PBAR_TROUGH, FALSE, FALSE, opts.progressGrooveAppearance),
+                              horiz, TRUE, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
             drawBorder(cr, widget && widget->parent ? widget->parent->style : style,
                        state, area, NULL, x, y, width, height,
-                       NULL, ROUNDED_ALL, opts.gradientPbGroove ? BORDER_FLAT : BORDER_SUNKEN, WIDGET_OTHER,
-                       DF_BLEND|DF_DO_CORNERS);
+                       NULL, ROUNDED_ALL,
+                       IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT,
+                       WIDGET_OTHER, DF_BLEND|DF_DO_CORNERS);
 
             if(doEtch)
                  drawEtch(cr, area, NULL, x-1, y-1, width+2, height+2, FALSE);
@@ -3568,7 +3573,8 @@ debugDisplayWidget(widget, 3);
            empty menubar item is drawn on the right - and doesnt disappear! */
         if(!mb || width>12)
         {
-            gboolean grayItem=!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app;
+            gboolean grayItem=(!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app) ||
+                              (pbar && GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor);
             GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.menuitem;
             GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
                             ? &qtcPalette.menubar[ORIGINAL_SHADE] : NULL;
@@ -3623,7 +3629,7 @@ debugDisplayWidget(widget, 3);
             }
             if(pbar && opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
-                            width, height, &qtcPalette.menuitem[1],
+                            width, height, &itemCols[1],
                             qtcPalette.menuitem, opts.fillProgress ? ROUNDED_NONE : round,
                             WIDGET_PROGRESSBAR, BORDER_FLAT,
                             DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
