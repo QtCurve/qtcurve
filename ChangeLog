@@ -5,7 +5,7 @@
     top/bottom.
  3. Add etching to checks, radios, slider grooves, and progressbars.
  4. Option to have progress fill groove - default to true.
- 5. Option to display non-editable combo splitter - defaults to false.
+ 5. Option to display non-editable combo splitter - defaults to true.
  6. Dont do coloured mouse over for mdi buttons, dock widget buttons,
     toolbar buttons, or kwin button.
  7. Better colored mouse over for checks and radios.
@@ -39,6 +39,7 @@
 30. Re-arrange config GUI.
 31. Remove frame from kwrite.
 32. Scrolview options: allow sunken, highlight, and square.
+33. Option to specify progressbar groove appearance.
 
 0.58
 ----

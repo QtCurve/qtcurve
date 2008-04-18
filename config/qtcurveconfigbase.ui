@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>503</width>
+    <width>704</width>
     <height>554</height>
    </rect>
   </property>
@@ -41,7 +41,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>13</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page" >
       <layout class="QGridLayout" >
@@ -304,7 +304,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_16" >
          <property name="text" >
-          <string>Appearance:</string>
+          <string>Bar:</string>
          </property>
         </widget>
        </item>
@@ -338,21 +338,27 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" colspan="4" >
-        <widget class="QCheckBox" name="gradientPbGroove" >
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label_24" >
          <property name="text" >
-          <string>Gradient groove</string>
+          <string>Groove:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="4" >
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="progressGrooveAppearance" />
+       </item>
+       <item row="1" column="2" >
+        <widget class="QComboBox" name="progressGrooveColor" />
+       </item>
+       <item row="1" column="3" >
         <widget class="QCheckBox" name="fillProgress" >
          <property name="text" >
-          <string>Fill groove</string>
+          <string>Fill</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
+       <item row="2" column="1" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1045,11 +1051,15 @@
        <item row="3" column="0" colspan="4" >
         <widget class="QCheckBox" name="fixParentlessDialogs" >
          <property name="whatsThis" >
-          <string>&lt;h2>&lt;font color="#ff0000">Warning: Experimental!&lt;/font>&lt;/h1>&lt;p>&lt;p>Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p>
-
-&lt;p>If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent.&lt;/p>
-
-&lt;p>&lt;b>Note:&lt;/b> This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p></string>
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#ff0000;">Warning: Experimental!&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window. &lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Note:&lt;/span> This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p>&lt;/body>&lt;/html></string>
          </property>
          <property name="text" >
           <string>'Fix' parentless dialogs</string>
@@ -1534,7 +1544,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>progressAppearance</tabstop>
   <tabstop>stripedProgress</tabstop>
   <tabstop>animatedProgress</tabstop>
-  <tabstop>gradientPbGroove</tabstop>
+  <tabstop>progressGrooveAppearance</tabstop>
+  <tabstop>progressGrooveColor</tabstop>
   <tabstop>fillProgress</tabstop>
   <tabstop>embolden</tabstop>
   <tabstop>defBtnIndicator</tabstop>

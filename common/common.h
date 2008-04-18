@@ -193,6 +193,9 @@ typedef GdkColor color;
 #define SHADE_SBAR_LIGHT            1.02
 #define SHADE_SBAR_DARK             0.95
 
+#define SHADE_PBAR_TROUGH_LIGHT     1.03
+#define SHADE_PBAR_TROUGH_DARK      0.94
+
 #define SHADE_MENU_LIGHT            1.02
 #define SHADE_MENU_DARK             0.96
 
@@ -380,6 +383,7 @@ typedef enum
     WIDGET_COMBO_BUTTON,
     WIDGET_MENU_ITEM,
     WIDGET_PROGRESSBAR,
+    WIDGET_PBAR_TROUGH,
 #ifndef __cplusplus
     WIDGET_SPIN_UP,
     WIDGET_SPIN_DOWN,
@@ -498,6 +502,13 @@ typedef enum
 
 typedef enum
 {
+    ECOLOR_BASE,
+    ECOLOR_BACKGROUND,
+    ECOLOR_DARK,
+} EColor;
+
+typedef enum
+{
     ROUND_NONE,
     ROUND_SLIGHT,
     ROUND_FULL
@@ -572,6 +583,9 @@ static double getWidgetShade(EWidget w, bool light, bool sunken, EAppearance app
         case WIDGET_MENU_ITEM:
             if(APPEARANCE_DULL_GLASS!=app && APPEARANCE_SHINY_GLASS!=app)
                 return light ? SHADE_BEVEL_MENU_ITEM_LIGHT : SHADE_BEVEL_MENU_ITEM_DARK;
+        case WIDGET_PBAR_TROUGH:
+            if(APPEARANCE_GRADIENT==app || APPEARANCE_INVERTED==app)
+                return light ? SHADE_PBAR_TROUGH_LIGHT : SHADE_PBAR_TROUGH_DARK;
         default:
             return light
                     ? sunken
@@ -1019,7 +1033,6 @@ typedef struct
                      drawStatusBarFrames,
                      fillSlider,
                      roundMbTopOnly,
-                     gradientPbGroove,
                      gtkScrollViews,
 #ifdef __cplusplus
                      stdSidebarButtons,
@@ -1077,10 +1090,12 @@ typedef struct
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripeAppearance,
 #endif
-                     progressAppearance;
+                     progressAppearance,
+                     progressGrooveAppearance;
     EShade           shadeSliders,
                      shadeMenubars,
                      shadeCheckRadio;
+    EColor           progressGrooveColor;
     EEffect          buttonEffect;
     EScrollbar       scrollbarType;
     color            customMenubarsColor,
@@ -1138,6 +1153,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
             return opts->menuitemAppearance;
         case WIDGET_PROGRESSBAR:
             return opts->progressAppearance;
+        case WIDGET_PBAR_TROUGH:
+            return opts->progressGrooveAppearance;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
         case WIDGET_SELECTION:
             return opts->selectionAppearance;

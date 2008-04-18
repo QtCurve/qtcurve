@@ -237,7 +237,7 @@ static EEffect toEffect(const char *str, EEffect def)
     return def;
 }
 
-static EShading toShading(const char * str, EShading def)
+static EShading toShading(const char *str, EShading def)
 {
     if(str)
     {
@@ -252,7 +252,7 @@ static EShading toShading(const char * str, EShading def)
     return def;
 }
 
-static EStripe toStripe(const char * str, EStripe def)
+static EStripe toStripe(const char *str, EStripe def)
 {
     if(str)
     {
@@ -267,7 +267,7 @@ static EStripe toStripe(const char * str, EStripe def)
     return def;
 }
 
-static ESliderStyle toSlider(const char * str, ESliderStyle def)
+static ESliderStyle toSlider(const char *str, ESliderStyle def)
 {
     if(str)
     {
@@ -277,6 +277,21 @@ static ESliderStyle toSlider(const char * str, ESliderStyle def)
             return SLIDER_PLAIN;
         if(0==memcmp(str, "triangular", 10))
             return SLIDER_TRIANGULAR;
+    }
+
+    return def;
+}
+
+static EColor toEColor(const char *str, EColor def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "base", 4))
+            return ECOLOR_BASE;
+        if(0==memcmp(str, "dark", 4))
+            return ECOLOR_DARK;
+        if(0==memcmp(str, "background", 10))
+            return ECOLOR_BACKGROUND;
     }
 
     return def;
@@ -634,6 +649,9 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
 #endif
 
+#define QTC_CFG_READ_ECOLOR(ENTRY, DEF) \
+    opts->ENTRY=toEColor(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
     if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
@@ -742,6 +760,8 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_APPEARANCE(activeTabAppearance, opts->tabAppearance)
             QTC_CFG_READ_APPEARANCE(sliderAppearance, opts->appearance)
             QTC_CFG_READ_APPEARANCE(progressAppearance, opts->appearance)
+            QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, APPEARANCE_INVERTED)
+            QTC_CFG_READ_ECOLOR(progressGrooveColor, opts->progressGrooveColor)
 #ifndef QTC_PLAIN_FOCUS_ONLY
             QTC_CFG_READ_BOOL(stdFocus)
 #endif
@@ -750,7 +770,6 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(fillSlider)
             QTC_CFG_READ_BOOL(roundMbTopOnly)
             QTC_CFG_READ_BOOL(borderMenuitems)
-            QTC_CFG_READ_BOOL(gradientPbGroove)
             QTC_CFG_READ_BOOL(darkerBorders)
             QTC_CFG_READ_BOOL(vArrows)
             QTC_CFG_READ_BOOL(xCheck)
@@ -1019,6 +1038,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             checkAppearance(&opts->menuStripeAppearance, opts);
 #endif
             checkAppearance(&opts->progressAppearance, opts);
+            checkAppearance(&opts->progressGrooveAppearance, opts);
 
 #ifndef __cplusplus
             releaseConfig(cfg);
@@ -1145,6 +1165,8 @@ static void defaultSettings(Options *opts)
     opts->menuitemAppearance=APPEARANCE_DULL_GLASS;
     opts->toolbarAppearance=APPEARANCE_GRADIENT;
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
+    opts->progressGrooveAppearance=APPEARANCE_INVERTED;
+    opts->progressGrooveColor=ECOLOR_BASE;
     opts->defBtnIndicator=IND_TINT;
     opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_DOTS;
@@ -1170,7 +1192,6 @@ static void defaultSettings(Options *opts)
     opts->fillSlider=true;
     opts->roundMbTopOnly=true;
     opts->borderMenuitems=false;
-    opts->gradientPbGroove=true;
     opts->darkerBorders=false;
     opts->vArrows=false;
     opts->xCheck=false;
@@ -1179,7 +1200,7 @@ static void defaultSettings(Options *opts)
     opts->inactiveHighlight=false;
     opts->crHighlight=false;
     opts->fillProgress=true;
-    opts->comboSplitter=false;
+    opts->comboSplitter=true;
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->sunkenScrollViews=false;
@@ -1454,6 +1475,20 @@ static const char *toStr(ESliderStyle s)
     }
 }
 
+static const char *toStr(EColor s)
+{
+    switch(s)
+    {
+        case ECOLOR_BACKGROUND:
+            return "background";
+        case ECOLOR_DARK:
+            return "dark";
+        default:
+        case ECOLOR_BASE:
+            return "base";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -1565,6 +1600,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(activeTabAppearance)
         CFG_WRITE_ENTRY_FORCE(sliderAppearance)
         CFG_WRITE_ENTRY_FORCE(progressAppearance)
+        CFG_WRITE_ENTRY_FORCE(progressGrooveAppearance)
+        CFG_WRITE_ENTRY(progressGrooveColor)
 #ifndef QTC_PLAIN_FOCUS_ONLY
         CFG_WRITE_ENTRY(stdFocus)
 #endif
@@ -1573,7 +1610,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(fillSlider)
         CFG_WRITE_ENTRY(roundMbTopOnly)
         CFG_WRITE_ENTRY(borderMenuitems)
-        CFG_WRITE_ENTRY(gradientPbGroove)
         CFG_WRITE_ENTRY(darkerBorders)
         CFG_WRITE_ENTRY(vArrows)
         CFG_WRITE_ENTRY(xCheck)

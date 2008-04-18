@@ -629,19 +629,43 @@ static bool readQt3(QPalette &pal, QFont &font, int *contrast)
 {
     if(useQt3Settings())
     {
-        QFile file(QDir::homePath()+QLatin1String("/.qt/qtrc"));
+        static QPalette qt3Pal;
+        static QFont    qt3Font;
+        static bool     read(false);
 
-        if(!file.exists() || !readQt3(file, pal, font, contrast))
+        if(read)
         {
-            file.setFileName("/etc/qt3/qtrc");
-            if(!file.exists() || !readQt3(file, pal,font, contrast))
-            {
-                file.setFileName("/etc/qt/qtrc");
-                if(!file.exists() || !readQt3(file, pal, font, contrast))
-                    return false;
-            }
+            pal=qt3Pal;
+            font=qt3Font;
         }
-        return true;
+        else
+        {
+            QFile file(QDir::homePath()+QLatin1String("/.qt/qtrc"));
+            bool  ok(true);
+
+            read=true;
+            qt3Pal=pal;
+            qt3Font=font;
+
+            if(!file.exists() || !readQt3(file, pal, font, contrast))
+            {
+                file.setFileName("/etc/qt3/qtrc");
+                if(!file.exists() || !readQt3(file, pal,font, contrast))
+                {
+                    file.setFileName("/etc/qt/qtrc");
+                    if(!file.exists() || !readQt3(file, pal, font, contrast))
+                        ok=false;
+                }
+            }
+
+            if(ok)
+            {
+                qt3Pal=pal;
+                qt3Font=font;
+            }
+
+            return ok;
+        }
     }
     return false;
 }
@@ -3097,42 +3121,42 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 //             break;
         case CE_ProgressBarGroove:
         {
-            bool doEtch(QTC_DO_EFFECT);
+            bool   doEtch(QTC_DO_EFFECT),
+                   horiz(true);
+            QColor col;
+
+            if (const QStyleOptionProgressBarV2 *bar = qstyleoption_cast<const QStyleOptionProgressBarV2 *>(option))
+                horiz = Qt::Horizontal==bar->orientation;
 
             painter->save();
 
             if(doEtch)
                 r.adjust(1, 1, -1, -1);
 
-            if(opts.gradientPbGroove)
+            switch(opts.progressGrooveColor)
             {
-                bool horiz(true);
-
-                if (const QStyleOptionProgressBarV2 *bar = qstyleoption_cast<const QStyleOptionProgressBarV2 *>(option))
-                    horiz = Qt::Horizontal==bar->orientation;
-
-#if 0 // Draw progressbar groove using the same gradient as the progress?
-                if(opts.fillProgress)
-                    drawBevelGradient(state&State_Enabled ? palette.base().color() : palette.background().color(), true,
-                                    painter, r.adjusted(1, 1, -1, -1), horiz,
-                                    getWidgetShade(WIDGET_PROGRESSBAR, true, false, opts.progressAppearance),
-                                    getWidgetShade(WIDGET_PROGRESSBAR, false, false, opts.progressAppearance),
-                                    false, opts.progressAppearance, WIDGET_PROGRESSBAR);
-                else
-#endif
-                    drawBevelGradient(state&State_Enabled ? palette.base().color() : palette.background().color(), false,
-                                    painter, r.adjusted(1, 1, -1, -1), horiz,
-                                    getWidgetShade(WIDGET_TROUGH, true, false, opts.progressAppearance),
-                                    getWidgetShade(WIDGET_TROUGH, false, false, opts.progressAppearance),
-                                    false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
+                default:
+                case ECOLOR_BASE:
+                    col=palette.base().color();
+                    break;
+                case ECOLOR_BACKGROUND:
+                    col=palette.background().color();
+                    break;
+                case ECOLOR_DARK:
+                    col=itsBackgroundCols[2];
             }
-            else
-                painter->fillRect(r.adjusted(1, 1, -1, -1), state&State_Enabled ? palette.base().color() : palette.background().color());
+
+            drawBevelGradient(col, true,
+                              painter, r.adjusted(1, 1, -1, -1), horiz,
+                              getWidgetShade(WIDGET_PBAR_TROUGH, true, false, opts.progressGrooveAppearance),
+                              getWidgetShade(WIDGET_PBAR_TROUGH, false, false, opts.progressGrooveAppearance),
+                              false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
+
             if(doEtch && QTC_DRAW_ETCH(widget, false))
                 drawEtch(painter, r.adjusted(-1, -1, 1, 1), WIDGET_OTHER);
 
             drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER,
-                       opts.gradientPbGroove ? BORDER_FLAT : BORDER_SUNKEN);
+                       IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT);
             painter->restore();
             break;
         }
@@ -3170,14 +3194,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         step = 2 * (measure-PROGRESS_CHUNK_WIDTH) - step;
 
                     opt.state|=State_Raised|State_Horizontal;
-
-                    if(vertical)
-                        opt.state^=State_Horizontal;
-
                     drawProgress(painter, vertical
                                                 ? QRect(r.x(), r.y()+step, r.width(), PROGRESS_CHUNK_WIDTH)
                                                 : QRect(r.x()+step, r.y(), PROGRESS_CHUNK_WIDTH, r.height()),
-                                 option, ROUNDED_ALL);
+                                 option, ROUNDED_ALL, vertical);
                 }
                 else
                 {
@@ -3191,12 +3211,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             int height(qMin(cr.height(), (int)(pg * cr.height())));
 
-/*                            if(reverse || inverted)*/
+                            if(inverted)
+                                drawProgress(painter, QRect(cr.x(), cr.y(), cr.width(), height), option,
+                                            height==cr.height() ?  ROUNDED_NONE : ROUNDED_BOTTOM, true);
+                            else
                                 drawProgress(painter, QRect(cr.x(), cr.y()+(cr.height()-height), cr.width(), height),
-                                             option, height==cr.height() ? ROUNDED_NONE : ROUNDED_TOP, true, true);
-//                             else
-//                                 drawProgress(painter, QRect(cr.x(), cr.y(), cr.width(), height), option,
-//                                             height==cr.height() ?  ROUNDED_NONE : ROUNDED_TOP);
+                                             option, height==cr.height() ? ROUNDED_NONE : ROUNDED_TOP, true);
                         }
                         else
                         {
@@ -6098,11 +6118,12 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
 void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,
                                              double shadeBot, EAppearance bevApp) const
 {
+    const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor ? itsMenuitemCols : itsBackgroundCols;
     bool    vertical(!horiz),
             inCache(true);
     QRect   r(0, 0, horiz ? PROGRESS_CHUNK_WIDTH*2 : origRect.width(),
                     horiz ? origRect.height() : PROGRESS_CHUNK_WIDTH*2);
-    QtcKey  key(createKey(horiz ? r.height() : r.width(), itsMenuitemCols[ORIGINAL_SHADE], horiz, true,
+    QtcKey  key(createKey(horiz ? r.height() : r.width(), use[ORIGINAL_SHADE], horiz, true,
                           app2App(bevApp, false), WIDGET_PROGRESSBAR, shadeTop, shadeBot));
     QPixmap *pix(itsPixmapCache.object(key));
 
@@ -6113,9 +6134,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
         QPainter pixPainter(pix);
 
         if(IS_FLAT(bevApp))
-            pixPainter.fillRect(r, itsMenuitemCols[ORIGINAL_SHADE]);
+            pixPainter.fillRect(r, use[ORIGINAL_SHADE]);
         else
-            drawBevelGradientReal(itsMenuitemCols[ORIGINAL_SHADE], true, &pixPainter, r, horiz, shadeTop, shadeBot, false,
+            drawBevelGradientReal(use[ORIGINAL_SHADE], true, &pixPainter, r, horiz, shadeTop, shadeBot, false,
                                   bevApp, WIDGET_PROGRESSBAR);
 
         switch(opts.stripedProgress)
@@ -6124,7 +6145,7 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
             case STRIPE_NONE:
                 break;
             case STRIPE_PLAIN:
-                drawBevelGradientReal(itsMenuitemCols[1], true, &pixPainter,
+                drawBevelGradientReal(use[1], true, &pixPainter,
                                         horiz
                                         ? QRect(r.x(), r.y(), PROGRESS_CHUNK_WIDTH, r.height())
                                         : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH),
@@ -6155,9 +6176,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
 
                 pixPainter.setClipRegion(reg);
                 if(IS_FLAT(bevApp))
-                    pixPainter.fillRect(r, itsMenuitemCols[1]);
+                    pixPainter.fillRect(r, use[1]);
                 else
-                    drawBevelGradientReal(itsMenuitemCols[1], true, &pixPainter, r,
+                    drawBevelGradientReal(use[1], true, &pixPainter, r,
                                           horiz, shadeTop, shadeBot, false, bevApp, WIDGET_PROGRESSBAR);
             }
         }
