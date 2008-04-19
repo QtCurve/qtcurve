@@ -6473,7 +6473,7 @@ void QtCurveStyle::drawCustomGradient(QPainter *p, const QRect &r, bool horiz, c
     for(; it!=end; ++it)
     {
         QColor col;
-        shade(base, &col, (*it).val);
+        shade(base, &col, rev ? 1.0+(1.0-(*it).val) : (*it).val);
         grad.setColorAt(rev ? 1.0-(*it).pos : (*it).pos, col);
     }
     p->fillRect(r, base);
