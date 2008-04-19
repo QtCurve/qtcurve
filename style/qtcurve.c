@@ -1376,7 +1376,7 @@ static void createCustomGradient(cairo_pattern_t *pt, GdkColor *base, CustomGrad
     for(i=0; i<grad->numGrad; ++i)
     {
         GdkColor col;
-        shade(base, &col, grad->grad[i].val);
+        shade(base, &col, rev ? 1.0+(1.0-grad->grad[i].val) : grad->grad[i].val);
         cairo_pattern_add_color_stop_rgb(pt, rev ? 1.0-grad->grad[i].pos : grad->grad[i].pos,
                                          QTC_CAIRO_COL(col));
     }
@@ -1397,7 +1397,7 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
     {
         cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
         gboolean        tab=WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w,
-                       selected=tab ? false : sel;
+                        selected=tab ? false : sel;
 
         if(WIDGET_TAB_TOP==w)
         {
