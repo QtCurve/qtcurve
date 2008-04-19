@@ -153,7 +153,7 @@ typedef GdkColor color;
 
 #define QTC_SIMPLE_SHADING (!shading)
 
-#define QTC_GLOW_MO        1
+#define QTC_GLOW_MO        ORIGINAL_SHADE
 #define QTC_GLOW_DEFBTN    0
 
 #define QT_STD_BORDER      5
@@ -311,8 +311,12 @@ typedef GdkColor color;
 #define QTC_MO_PLASTIK_DARK(W)  (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 3 : 2) /*? 2 : 1) */
 #define QTC_MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
 
-#define QTC_MO_STD_DARK(W)     QTC_MO_PLASTIK_DARK(W)  /*(WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 4 : 1) */
-#define QTC_MO_STD_LIGHT(W, S) QTC_MO_PLASTIK_LIGHT(W) /*(WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 2 : (S ? 1 : 0))*/
+#define QTC_MO_STD_DARK(W)     (MO_GLOW==opts.coloredMouseOver \
+                                    ? QTC_GLOW_MO \
+                                    : QTC_MO_PLASTIK_DARK(W))
+#define QTC_MO_STD_LIGHT(W, S) (MO_GLOW==opts.coloredMouseOver \
+                                    ? QTC_GLOW_MO \
+                                    : QTC_MO_PLASTIK_LIGHT(W))
 
 #define QTC_DO_EFFECT          (ROUND_FULL==opts.round && EFFECT_NONE!=opts.buttonEffect)
 
