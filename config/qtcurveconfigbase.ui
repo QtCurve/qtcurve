@@ -131,6 +131,12 @@
        </item>
        <item row="7" column="0" colspan="2" >
         <widget class="QCheckBox" name="stdSidebarButtons" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, drawn as per normal buttons - otherwise they will be drawn in a more flat style.&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
          <property name="text" >
           <string>Standard buttons for sidebars</string>
          </property>
@@ -145,6 +151,12 @@
        </item>
        <item row="9" column="0" colspan="2" >
         <widget class="QCheckBox" name="comboSplitter" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This option controls whether a line is drawn near non-editable combo box arrows.&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
          <property name="text" >
           <string>Combo splitter</string>
          </property>
@@ -215,7 +227,14 @@
         </widget>
        </item>
        <item row="0" column="1" >
-        <widget class="QComboBox" name="sliderAppearance" />
+        <widget class="QComboBox" name="sliderAppearance" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This appearance setting affects both scrollbar sliders, and other sliders.&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0" >
         <widget class="QLabel" name="label_12" >
@@ -225,7 +244,14 @@
         </widget>
        </item>
        <item row="1" column="1" >
-        <widget class="QComboBox" name="shadeSliders" />
+        <widget class="QComboBox" name="shadeSliders" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This color setting affects both scrollbar sliders, and other sliders.&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="2" >
         <widget class="KColorButton" name="customSlidersColor" >
@@ -255,7 +281,14 @@
         </widget>
        </item>
        <item row="2" column="1" >
-        <widget class="QComboBox" name="sliderStyle" />
+        <widget class="QComboBox" name="sliderStyle" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This setting only affects standard sliders - i.e. not scrollbar sliders. 'Triangular' is a very similar style to plastik's sliders. &lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0" colspan="2" >
         <widget class="QCheckBox" name="fillSlider" >
@@ -272,7 +305,21 @@
         </widget>
        </item>
        <item row="4" column="1" >
-        <widget class="QComboBox" name="scrollbarType" />
+        <widget class="QComboBox" name="scrollbarType" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This controls the position, and number, of buttons on a scrollbar.&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">KDE - 1 button at the top/left, and two at the bottom/right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Windows - 1 botton at each end&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Platinum -  no buttons at the top/left, two at bottom/right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Next - two buttons at the top/left, none at bottom/right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">None - no buttons, only the slider&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
        </item>
        <item row="5" column="0" >
         <widget class="QLabel" name="label_15" >
@@ -309,11 +356,7 @@
         </widget>
        </item>
        <item row="0" column="1" >
-        <widget class="QComboBox" name="progressAppearance" >
-         <property name="whatsThis" >
-          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
-         </property>
-        </widget>
+        <widget class="QComboBox" name="progressAppearance" />
        </item>
        <item row="0" column="2" >
         <widget class="QComboBox" name="stripedProgress" />
@@ -430,11 +473,7 @@
         </widget>
        </item>
        <item row="0" column="2" >
-        <widget class="QComboBox" name="coloredMouseOver" >
-         <property name="whatsThis" >
-          <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
-         </property>
-        </widget>
+        <widget class="QComboBox" name="coloredMouseOver" />
        </item>
        <item row="0" column="3" >
         <spacer>
@@ -566,7 +605,7 @@
        <item>
         <widget class="QCheckBox" name="squareScrollViews" >
          <property name="text" >
-          <string>Don't round</string>
+          <string>Always draw with a square frame - regardless of the general round setting.</string>
          </property>
         </widget>
        </item>
@@ -701,7 +740,7 @@
        <item row="2" column="0" colspan="4" >
         <widget class="QCheckBox" name="crHighlight" >
          <property name="text" >
-          <string>Highlight background</string>
+          <string>Highlight text background</string>
          </property>
         </widget>
        </item>
@@ -1029,6 +1068,12 @@
       <layout class="QGridLayout" >
        <item row="0" column="0" colspan="4" >
         <widget class="QCheckBox" name="gtkComboMenus" >
+         <property name="whatsThis" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
          <property name="text" >
           <string>Gtk style comboboxes (KDE4)</string>
          </property>
@@ -1069,14 +1114,13 @@ p, li { white-space: pre-wrap; }
        <item row="4" column="0" colspan="4" >
         <widget class="QCheckBox" name="inactiveHighlight" >
          <property name="whatsThis" >
-          <string>&lt;h2>&lt;font color="#ff0000">Warning: Experimental!&lt;/font>&lt;/h1>&lt;p>&lt;p>Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p>
-
-&lt;p>If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent.&lt;/p>
-
-&lt;p>&lt;b>Note:&lt;/b> This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p></string>
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Selecting this option will cause the highlight colour of inactive items (e.g. those in inactive windows) to be drawn using a blen of the background and highlight colors.&lt;/p>&lt;/body>&lt;/html></string>
          </property>
          <property name="text" >
-          <string>Use blended background/highlight colour for highlight of inactive elements</string>
+          <string>Use blended background/highlight color for highlight of inactive elements</string>
          </property>
         </widget>
        </item>
