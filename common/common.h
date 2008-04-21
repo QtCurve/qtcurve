@@ -273,12 +273,13 @@ typedef GdkColor color;
 
 #define NUM_SPLITTER_DASHES 21
 
+#ifdef __cplusplus
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
+                          WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w)
+#else
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
                           WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
-#ifdef __cplusplus
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
-                        WIDGET_UNCOLOURED_MO_BUTTON==w)
-#else
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
                         WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
 #endif
@@ -374,7 +375,6 @@ typedef enum
     WIDGET_TAB_BOT,
     WIDGET_STD_BUTTON,
     WIDGET_DEF_BUTTON,
-    WIDGET_UNCOLOURED_MO_BUTTON,
     WIDGET_LISTVIEW_HEADER,
     WIDGET_SLIDER,
     WIDGET_SLIDER_TROUGH,
@@ -391,6 +391,7 @@ typedef enum
 #ifndef __cplusplus
     WIDGET_SPIN_UP,
     WIDGET_SPIN_DOWN,
+    WIDGET_UNCOLOURED_MO_BUTTON,
 #endif
     WIDGET_SPIN,
 #ifdef __cplusplus

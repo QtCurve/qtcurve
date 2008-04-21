@@ -39,10 +39,11 @@
 //Konsole:               KTabBar::QWidget
 
 #define WINDOWTITLE_SPACER    0x10000000
-#define QTC_STATE_REVERSE     State_Mini
-#define QTC_STATE_MENU        State_Mini
+#define QTC_STATE_REVERSE     (QStyle::StateFlag)0x10000000
+#define QTC_STATE_MENU        (QStyle::StateFlag)0x20000000
+#define QTC_STATE_KWIN_BUTTON (QStyle::StateFlag)0x40000000
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
-#define QTC_STATE_TBAR_BUTTON State_Mini
+#define QTC_STATE_TBAR_BUTTON (QStyle::StateFlag)0x80000000
 #endif
 
 #define M_PI 3.14159265358979323846
@@ -2502,6 +2503,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
                 use=itsDefBtnCols;
 
+            if(isKWin)
+                opt.state|=QTC_STATE_KWIN_BUTTON;
+
             // This section fixes some drawng issues with krunner's buttons on nvidia
             painter->setRenderHint(QPainter::Antialiasing, true);
             painter->fillRect(doEtch ? r.adjusted(2, 2, -2, -2) : r.adjusted(1, 1, -1, -1), palette.background().color());
@@ -2512,14 +2516,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     ? WIDGET_MDI_WINDOW_BUTTON
                                     : isOnListView
                                         ? WIDGET_NO_ETCH_BTN
-                                            : isKWin
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
-                                               || state&QTC_STATE_TBAR_BUTTON
-#endif
-                                                ? WIDGET_UNCOLOURED_MO_BUTTON
-                                                : isDefault && state&State_Enabled
-                                                    ? WIDGET_DEF_BUTTON
-                                                    : WIDGET_STD_BUTTON);
+                                        : isDefault && state&State_Enabled
+                                            ? WIDGET_DEF_BUTTON
+                                            : WIDGET_STD_BUTTON);
 
             if (isDefault && state&State_Enabled)
                 switch(opts.defBtnIndicator)
@@ -4376,6 +4375,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if (toolbutton->activeSubControls & SC_ToolButton)
                     bflags |= State_Sunken;
 
+#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
+                if(state&State_AutoRaise)
+                    bflags|=QTC_STATE_TBAR_BUTTON;
+#endif
                 State mflags(bflags);
 
                 if (toolbutton->activeSubControls & SC_ToolButtonMenu)
@@ -4386,9 +4389,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised)))
                 {
                     tool.rect = toolbutton->subControls & SC_ToolButtonMenu ? button.united(menuarea) : button;
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
-                    bflags|=QTC_STATE_TBAR_BUTTON;
-#endif
                     tool.state = bflags;
 
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
@@ -6495,14 +6495,17 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  lightBorder(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
-                                     WIDGET_MDI_WINDOW_BUTTON!=w && WIDGET_UNCOLOURED_MO_BUTTON!=w &&
-                                     WIDGET_MENU_BUTTON!=w &&
+                                     WIDGET_MDI_WINDOW_BUTTON!=w &&
+                                     !(option->state&QTC_STATE_KWIN_BUTTON) &&
+#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
+                                     !(option->state&QTC_STATE_TBAR_BUTTON) &&
+#endif
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
                                      (!IS_SLIDER(w) || (WIDGET_SB_SLIDER==w && opts.coloredMouseOver)) &&
                                      WIDGET_PROGRESSBAR!=w &&
                                      (/*option->state&QTC_TOGGLE_BUTTON ||*/ !sunken)),
                  plastikMouseOver(doColouredMouseOver && (MO_PLASTIK==opts.coloredMouseOver || WIDGET_SB_SLIDER==w)),
-                 colouredMouseOver(doColouredMouseOver && WIDGET_SB_SLIDER!=w &&
+                 colouredMouseOver(doColouredMouseOver && WIDGET_SB_SLIDER!=w && WIDGET_MENU_BUTTON!=w &&
                                        (MO_COLORED==opts.coloredMouseOver ||
                                               (MO_GLOW==opts.coloredMouseOver &&
                                               ((WIDGET_COMBO!=w && !ETCH_WIDGET(w)) || !QTC_DO_EFFECT)))),
@@ -6660,7 +6663,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     if(doBorder)
         if(!sunken &&
-            (((doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) &&
+            (( ( (doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) ||
+                  WIDGET_MENU_BUTTON==w ) &&
                         MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
             (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(p, r, option, round, itsMouseOverCols, w);
