@@ -1303,6 +1303,13 @@ static gboolean isMozApp(const char *app, const char *check)
 
         if(check_len+4 == app_len && 0==strcmp(&app[check_len], "-bin"))
             return TRUE;
+
+        /* OK check for xulrunner-1.9 */
+        {
+        double dummy;
+        if(app_len>(check_len+1) && 1==sscanf(&app[check_len+1], "%f", &dummy))
+            return TRUE;
+        }
     }
 
     return FALSE;
