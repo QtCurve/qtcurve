@@ -2473,6 +2473,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonBevel:
         case PE_PanelButtonCommand:
         {
+            // This fixes the "Sign in" button at mail.lycos.co.uk
+            // ...basically if KHTML gices us a fully transparent background colour, then
+            // dont paint the button.
+            if(0==option->palette.button().color().alpha())
+                return;
+
             CEtchCheck   check(widget);
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
