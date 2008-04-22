@@ -2473,11 +2473,17 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonBevel:
         case PE_PanelButtonCommand:
         {
+            bool doEtch(QTC_DO_EFFECT);
+
             // This fixes the "Sign in" button at mail.lycos.co.uk
             // ...basically if KHTML gices us a fully transparent background colour, then
             // dont paint the button.
             if(0==option->palette.button().color().alpha())
+            {
+                if(state&State_MouseOver && MO_GLOW==opts.coloredMouseOver && doEtch)
+                    drawGlow(painter, r, WIDGET_STD_BUTTON);
                 return;
+            }
 
             CEtchCheck   check(widget);
             const QColor *use(buttonColors(option));
@@ -2485,8 +2491,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                          isFlat(false),
                          isKWin(state&QtC_StateKWin),
                          isDown(state&State_Sunken || state&State_On),
-                         isOnListView(!isKWin && widget && qobject_cast<const QAbstractItemView *>(widget)),
-                         doEtch(QTC_DO_EFFECT);
+                         isOnListView(!isKWin && widget && qobject_cast<const QAbstractItemView *>(widget));
             QStyleOption opt(*option);
 
             if(PE_PanelButtonBevel==element)
@@ -3191,17 +3196,22 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(indeterminate) //Busy indicator
                 {
-                    int          measure(vertical ? r.height() : r.width()),
-                                 step(itsAnimateStep % ((measure-PROGRESS_CHUNK_WIDTH) * 2));
+                    int chunkSize(PROGRESS_CHUNK_WIDTH*3),
+                        measure(vertical ? r.height() : r.width());
+
+                    if(chunkSize>(measure/2))
+                        chunkSize=measure/2;
+
+                    int          step(itsAnimateStep % ((measure-chunkSize) * 2));
                     QStyleOption opt(*option);
 
-                    if (step > (measure-PROGRESS_CHUNK_WIDTH))
-                        step = 2 * (measure-PROGRESS_CHUNK_WIDTH) - step;
+                    if (step > (measure-chunkSize))
+                        step = 2 * (measure-chunkSize) - step;
 
                     opt.state|=State_Raised|State_Horizontal;
                     drawProgress(painter, vertical
-                                                ? QRect(r.x(), r.y()+step, r.width(), PROGRESS_CHUNK_WIDTH)
-                                                : QRect(r.x()+step, r.y(), PROGRESS_CHUNK_WIDTH, r.height()),
+                                                ? QRect(r.x(), r.y()+step, r.width(), chunkSize)
+                                                : QRect(r.x()+step, r.y(), chunkSize, r.height()),
                                  option, ROUNDED_ALL, vertical);
                 }
                 else
@@ -3719,7 +3729,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (button->features&QStyleOptionButton::HasMenu)
                 {
                     int indicatorHeight(pixelMetric(PM_MenuButtonIndicator, button, widget)),
-                        indicatorWidth=indicatorHeight+(QTC_DO_EFFECT ? 1 : 0);
+                        indicatorWidth=indicatorHeight;
 
                     if (Qt::LeftToRight==button->direction)
                         r = r.adjusted(0, 0, -indicatorWidth, 0);
@@ -3732,8 +3742,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     newBtn.rect = QRect(Qt::LeftToRight==button->direction
                                             ? ir.right() - indicatorWidth + 2
                                             : ir.x() + 6,
-                                        ir.height()/2 - indicatorHeight/2 + 3,
-                                        indicatorWidth - 6, indicatorHeight - 6);
+                                        ((ir.height() - indicatorHeight)/2) + 2,
+                                        indicatorWidth - 6, indicatorHeight);
                     drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
                 }
 
@@ -6277,26 +6287,11 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
     bool tab(WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w),
          selected(tab ? false : sel);
 
-    if(WIDGET_TAB_TOP==w)
-    {
-        shadeBot=1.0;
-        if(APPEARANCE_INVERTED==app)
-            shadeTop=SHADE_INVERTED_TAB_TOP;
-    }
-    else if(WIDGET_TAB_BOT==w)
-    {
-        if(APPEARANCE_INVERTED==app)
-            shadeBot=SHADE_INVERTED_TAB_BOT;
-        else
-            shadeBot-=fabs(shadeTop-shadeBot);
-        shadeTop=1.0;
-    }
-
     if(!selected && (IS_GLASS(app) || APPEARANCE_SPLIT_GRADIENT==app))
     {
-        double shadeTopA(WIDGET_TAB_BOT==w
+        double shadeTopA(/*WIDGET_TAB_BOT==w
                             ? 1.0
-                            : APPEARANCE_SPLIT_GRADIENT==app
+                            : */APPEARANCE_SPLIT_GRADIENT==app
                                 ? shadeTop
                                 : shadeTop*SHADE_GLASS_TOP_A(app, w)),
                shadeTopB(WIDGET_TAB_BOT==w
@@ -6304,9 +6299,9 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
                             : APPEARANCE_SPLIT_GRADIENT==app
                                 ? shadeTop-((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
                                 : shadeTop*SHADE_GLASS_TOP_B(app, w)),
-               shadeBotA(WIDGET_TAB_TOP==w
+               shadeBotA(/*WIDGET_TAB_TOP==w
                             ? 1.0
-                            : APPEARANCE_SPLIT_GRADIENT==app
+                            : */APPEARANCE_SPLIT_GRADIENT==app
                                 ? shadeBot+((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
                                 : shadeBot*SHADE_GLASS_BOT_A(app)),
                shadeBotB(WIDGET_TAB_TOP==w
@@ -6418,26 +6413,29 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
         {
             QColor top,
                    bot,
-                   baseTopCol(base),
-                   baseBotCol(base);
+                   baseTopCol(base);
 
-            if(opts.colorSelTab && sel && tab)
+            if(tab)
             {
+                if(APPEARANCE_INVERTED==app)
+                {
+                    w=WIDGET_TAB_TOP==w ? WIDGET_TAB_BOT : WIDGET_TAB_TOP;
+                    app=APPEARANCE_GRADIENT;
+                }
+
+                shadeBot=1.0;
                 if(WIDGET_TAB_BOT==w)
-                    baseBotCol=midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR);
-                else
+                    shadeTop=INVERT_SHADE(shadeTop);
+
+                if(opts.colorSelTab && sel)
+                {
                     baseTopCol=midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR);
 
-                if((WIDGET_TAB_TOP==w && APPEARANCE_INVERTED!=app) ||
-                    (WIDGET_TAB_BOT==w && APPEARANCE_INVERTED==app))
-                {
-                    shadeTop=SHADE_COLOR_SEL_TAP_TOP;
-                    shadeBot=1.0;
-                }
-                else
-                {
-                    shadeTop=1.0;
-                    shadeBot=SHADE_COLOR_SEL_TAP_TOP;
+                    if((WIDGET_TAB_TOP==w && APPEARANCE_INVERTED!=app) ||
+                        (WIDGET_TAB_BOT==w && APPEARANCE_INVERTED==app))
+                        shadeTop=SHADE_COLOR_SEL_TAB_TOP;
+                    else
+                        shadeTop=SHADE_COLOR_SEL_TAB_BOT;
                 }
             }
 
@@ -6446,11 +6444,11 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
             else
                 shade(baseTopCol, &top, shadeTop);
             if(equal(1.0, shadeBot))
-                bot=baseBotCol;
+                bot=base;
             else
-                shade(baseBotCol, &bot, shadeBot);
+                shade(base, &bot, shadeBot);
 
-            bool            inc(selected || tab || APPEARANCE_INVERTED!=app ? increase : !increase);
+            bool            inc(selected || APPEARANCE_INVERTED!=app ? increase : !increase);
             QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
 
             if(WIDGET_SELECTION==w)
@@ -6458,9 +6456,6 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, bool increase, QPai
                 bot.setAlphaF(base.alphaF());
                 top.setAlphaF(base.alphaF());
             }
-
-            if(WIDGET_TAB_BOT==w)
-                inc=!inc;
 
             grad.setColorAt(0, inc ? top : bot);
             grad.setColorAt(1, inc ? bot : top);
@@ -6479,7 +6474,7 @@ void QtCurveStyle::drawCustomGradient(QPainter *p, const QRect &r, bool horiz, c
     for(; it!=end; ++it)
     {
         QColor col;
-        shade(base, &col, rev ? 1.0+(1.0-(*it).val) : (*it).val);
+        shade(base, &col, rev ? INVERT_SHADE((*it).val) : (*it).val);
         grad.setColorAt(rev ? 1.0-(*it).pos : (*it).pos, col);
     }
     p->fillRect(r, base);
