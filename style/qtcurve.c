@@ -1376,7 +1376,7 @@ static void createCustomGradient(cairo_pattern_t *pt, GdkColor *base, CustomGrad
     for(i=0; i<grad->numGrad; ++i)
     {
         GdkColor col;
-        shade(base, &col, rev ? 1.0+(1.0-grad->grad[i].val) : grad->grad[i].val);
+        shade(base, &col, rev ? INVERT_SHADE(grad->grad[i].val) : grad->grad[i].val);
         cairo_pattern_add_color_stop_rgb(pt, rev ? 1.0-grad->grad[i].pos : grad->grad[i].pos,
                                          QTC_CAIRO_COL(col));
     }
@@ -1399,36 +1399,14 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         gboolean        tab=WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w,
                         selected=tab ? false : sel;
 
-        if(WIDGET_TAB_TOP==w)
-        {
-            shadeBot=1.0;
-            if(APPEARANCE_INVERTED==app)
-                shadeTop=SHADE_INVERTED_TAB_TOP;
-        }
-        else if(WIDGET_TAB_BOT==w)
-        {
-            if(APPEARANCE_INVERTED==app)
-                shadeBot=SHADE_INVERTED_TAB_BOT;
-            else
-                shadeBot-=fabs(shadeTop-shadeBot);
-            shadeTop=1.0;
-        }
-
         setCairoClipping(cr, area, region);
 
         if(!selected && (IS_GLASS(app) || APPEARANCE_SPLIT_GRADIENT==app))
         {
-            if(WIDGET_TAB_BOT==w)
-            {
-                double t=shadeTop;
-                shadeTop=shadeBot;
-                shadeBot=t;
-            }
-
             {  /* C variable scoping */
-            double  shadeTopA=WIDGET_TAB_BOT==w
+            double  shadeTopA=/*WIDGET_TAB_BOT==w
                                 ? 1.0
-                                : APPEARANCE_SPLIT_GRADIENT==app
+                                : */APPEARANCE_SPLIT_GRADIENT==app
                                     ? shadeTop
                                     : shadeTop*SHADE_GLASS_TOP_A(app, w),
                     shadeTopB=WIDGET_TAB_BOT==w
@@ -1436,9 +1414,9 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                                 : APPEARANCE_SPLIT_GRADIENT==app
                                     ? shadeTop-((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
                                     : shadeTop*SHADE_GLASS_TOP_B(app, w),
-                    shadeBotA=WIDGET_TAB_TOP==w
+                    shadeBotA=/*WIDGET_TAB_TOP==w
                                 ? 1.0
-                                : APPEARANCE_SPLIT_GRADIENT==app
+                                : */APPEARANCE_SPLIT_GRADIENT==app
                                     ? shadeBot+((shadeTop-shadeBot)*SPLIT_GRADIENT_FACTOR)
                                     : shadeBot*SHADE_GLASS_BOT_A(app),
                     shadeBotB=WIDGET_TAB_TOP==w
@@ -1535,33 +1513,38 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                          bot,
                          tabBaseCol,
                          *baseTopCol=base,
-                         *baseBotCol=base,
                          *t,
                          *b;
-                gboolean inc=selected || APPEARANCE_INVERTED!=app ? increase : !increase;
 
                 top.pixel=bot.pixel=tabBaseCol.pixel=0;
 
-                if(opts.colorSelTab && sel && tab)
+                if(tab)
                 {
-                    generateMidColor(base, &(qtcPalette.menuitem[0]), &tabBaseCol, QTC_COLOR_SEL_TAB_FACTOR);
+                    if(APPEARANCE_INVERTED==app)
+                    {
+                        w=WIDGET_TAB_TOP==w ? WIDGET_TAB_BOT : WIDGET_TAB_TOP;
+                        app=APPEARANCE_GRADIENT;
+                    }
+
+                    shadeBot=1.0;
                     if(WIDGET_TAB_BOT==w)
-                        baseBotCol=&tabBaseCol;
-                    else
+                        shadeTop=INVERT_SHADE(shadeTop);
+
+                    if(opts.colorSelTab && sel)
+                    {
+                        generateMidColor(base, &(qtcPalette.menuitem[0]), &tabBaseCol, QTC_COLOR_SEL_TAB_FACTOR);
                         baseTopCol=&tabBaseCol;
 
-                    if((WIDGET_TAB_TOP==w && APPEARANCE_INVERTED!=app) ||
-                       (WIDGET_TAB_BOT==w && APPEARANCE_INVERTED==app))
-                    {
-                        shadeTop=SHADE_COLOR_SEL_TAP_TOP;
-                        shadeBot=1.0;
-                    }
-                    else
-                    {
-                        shadeTop=1.0;
-                        shadeBot=SHADE_COLOR_SEL_TAP_TOP;
+                        if((WIDGET_TAB_TOP==w && APPEARANCE_INVERTED!=app) ||
+                           (WIDGET_TAB_BOT==w && APPEARANCE_INVERTED==app))
+                            shadeTop=SHADE_COLOR_SEL_TAB_TOP;
+                        else
+                            shadeTop=SHADE_COLOR_SEL_TAB_BOT;
                     }
                 }
+
+                {
+                gboolean inc=selected || APPEARANCE_INVERTED!=app ? increase : !increase;
 
                 if(equal(1.0, shadeTop))
                     t=baseTopCol;
@@ -1571,15 +1554,12 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                     t=&top;
                 }
                 if(equal(1.0, shadeBot))
-                    b=baseBotCol;
+                    b=base;
                 else
                 {
-                    shade(baseBotCol, &bot, shadeBot);
+                    shade(base, &bot, shadeBot);
                     b=&bot;
                 }
-
-                if(WIDGET_TAB_BOT==w)
-                    inc=!inc;
 
                 if(inc)
                 {
@@ -1590,6 +1570,7 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 {
                     cairo_pattern_add_color_stop_rgb(pt, 0.0, QTC_CAIRO_COL(*b));
                     cairo_pattern_add_color_stop_rgb(pt, 1.0, QTC_CAIRO_COL(*t));
+                }
                 }
             }
         }
