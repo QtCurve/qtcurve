@@ -175,7 +175,7 @@ typedef GdkColor color;
 #define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
 #define QTC_COLOR_SEL_TAB_FACTOR 1.2
 #define SHADE_COLOR_SEL_TAB_TOP  1.1
-#define SHADE_COLOR_SEL_TAB_BOT  0.95
+#define SHADE_COLOR_SEL_TAB_BOT  0.98
 
 #define INVERT_SHADE(A) (1.0+(1.0-A))
 
@@ -270,9 +270,6 @@ typedef GdkColor color;
 #define SHADE_BEVEL_MID_TOP  1.03
 #define SHADE_BEVEL_MID_BOT  0.975
 #define SHADE_BEVEL_BOT(w)   (WIDGET_LISTVIEW_HEADER==(w) ? 0.88 : 0.90)
-
-#define SHADE_INVERTED_TAB_TOP 0.85
-#define SHADE_INVERTED_TAB_BOT 1.15
 
 #define NUM_SPLITTER_DASHES 21
 
