@@ -933,7 +933,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 
             for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
             {
-                char gradKey[16];
+                char gradKey[18];
                 char *str;
 
                 if(i==QTC_NUM_CUSTOM_GRAD)
