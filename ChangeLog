@@ -1,3 +1,8 @@
+0.59.1
+------
+1. Fix appearance of shiny glass defult buttons.
+2. Give glass default buttons a light border.
+
 0.59
 ----
  1. When drawing gray focus rect, draw only slightly rounded.
