@@ -2941,7 +2941,7 @@ debugDisplayWidget(widget, 3);
                                                             : checkbox
                                                                 ? WIDGET_CHECKBOX
                                                                     : button
-                                                                        ? defBtn
+                                                                        ? defBtn && IND_COLORED!=opts.defBtnIndicator
                                                                             ? WIDGET_DEF_BUTTON
                                                                             : WIDGET_STD_BUTTON
                                                                         : stepper || sbar
