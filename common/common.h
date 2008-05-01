@@ -213,10 +213,10 @@ typedef GdkColor color;
 #if !defined QTC_GLASS_SHADING || QTC_GLASS_SHADING==0
 
     #define SHADE_GLASS_TOP_A(A, W) (APPEARANCE_DULL_GLASS==A \
-                                        ? (WIDGET_DEF_BUTTON==W ? 0.99 : 0.98) \
-                                        : (WIDGET_DEF_BUTTON==W ? 1.08 : 1.55))
+                                        ? (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 0.99 : 0.98) \
+                                        : (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 1.08 : 1.55))
     #define SHADE_GLASS_TOP_B(A, W) (APPEARANCE_DULL_GLASS==A \
-                                        ? (WIDGET_DEF_BUTTON==W ? 0.94 : 0.92) \
+                                        ? (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 0.94 : 0.92) \
                                         : 0.92)
     #define SHADE_GLASS_BOT_A(A) (APPEARANCE_DULL_GLASS==A ? 1.02 : 0.99)
     #define SHADE_GLASS_BOT_B(A) (APPEARANCE_DULL_GLASS==A ? 1.10 : 1.16)
@@ -224,8 +224,8 @@ typedef GdkColor color;
 #elif QTC_GLASS_SHADING==1
 
     #define SHADE_GLASS_TOP_A(A, W) (APPEARANCE_DULL_GLASS==A \
-                                        ? (WIDGET_DEF_BUTTON==W ? 1.0 : 1.0) \
-                                        : (WIDGET_DEF_BUTTON==W ? 1.08 : 1.7))
+                                        ? (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 1.0 : 1.0) \
+                                        : (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 1.08 : 1.7))
     #define SHADE_GLASS_TOP_B(A, W) (APPEARANCE_DULL_GLASS==A ? 0.96 : 0.96)
     #define SHADE_GLASS_BOT_A(A) 0.99
     #define SHADE_GLASS_BOT_B(A) (APPEARANCE_DULL_GLASS==A ? 1.08 : 1.16)
@@ -233,8 +233,8 @@ typedef GdkColor color;
 #else
 
     #define SHADE_GLASS_TOP_A(A, W) (APPEARANCE_DULL_GLASS==A \
-                                        ? (WIDGET_DEF_BUTTON==W ? 1.05 : 1.05) \
-                                        : (WIDGET_DEF_BUTTON==W ? 1.08 : 1.7))
+                                        ? (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 1.05 : 1.05) \
+                                        : (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 1.08 : 1.7))
     #define SHADE_GLASS_TOP_B(A, W) 0.96
     #define SHADE_GLASS_BOT_A(A) 0.99
     #define SHADE_GLASS_BOT_B(A) (APPEARANCE_DULL_GLASS==A ? 1.08 : 1.16)
