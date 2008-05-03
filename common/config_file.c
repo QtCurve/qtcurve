@@ -1243,8 +1243,13 @@ static void defaultSettings(Options *opts)
     opts->gtkButtonOrder=false;
 #endif
 #ifndef __cplusplus
+#ifdef QTC_NEW_MOZILLA
+    opts->newFirefox=true;
+    opts->newThunderbird=true;
+#else
     opts->newFirefox=false;
     opts->newThunderbird=false;
+#endif
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_GRADIENT;
