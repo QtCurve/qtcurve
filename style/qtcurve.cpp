@@ -1250,8 +1250,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         case QEvent::Destroy:
         case QEvent::Hide:
         {
-            QProgressBar *bar = qobject_cast<QProgressBar *>(object);
-
             if(itsHoverWidget && object==itsHoverWidget)
             {
                 itsPos.setX(-1);
@@ -1259,9 +1257,12 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 itsHoverWidget=NULL;
             }
 
-            if(bar && !itsProgressBars.isEmpty())
+            // The Destroy event is sent from ~QWidget, which happens after
+            // ~QProgressBar - therefore, we can't cast to a QProgressBar.
+            // So we have to check on object.
+            if(object && !itsProgressBars.isEmpty())
             {
-                itsProgressBars.removeAll(bar);
+                itsProgressBars.removeAll(reinterpret_cast<QProgressBar*>(object));
                 if (itsProgressBars.isEmpty())
                 {
                     killTimer(itsProgressBarAnimateTimer);

@@ -2,6 +2,8 @@
 ------
 1. Fix appearance of shiny glass defult buttons.
 2. Give glass default buttons a light border.
+3. Fix crash when apps delete progressbars before hiding - thanks
+   to Dirk Mueller.
 
 0.59
 ----
