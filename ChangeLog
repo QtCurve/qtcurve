@@ -2,6 +2,12 @@
 ------
 1. Fix appearance of shiny glass defult buttons.
 2. Give glass default buttons a light border.
+3. New cmake option:
+
+    -DQTC_NEW_MOZILLA=true
+        When Firefox, and thunderbird, are being themed - treat them as if they
+        are the newer versions. This sets 'newFirefox' and 'newThunderbird' to true
+        by default.
 
 0.59.1
 ------

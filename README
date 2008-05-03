@@ -10,6 +10,11 @@ To build and install:
 
 The following options may supplied to cmake:
 
+    -DQTC_NEW_MOZILLA=true
+        When Firefox, and thunderbird, are being themed - treat them as if they
+        are the newer versions. This sets 'newFirefox' and 'newThunderbird' to true
+        by default.
+
     -DQTC_ADD_EVENT_FILTER=true
         Enable receiving of KDE style change events
         NOTE: This has been reported to interfere with firefox, and
