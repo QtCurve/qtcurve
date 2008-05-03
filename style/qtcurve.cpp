@@ -1612,6 +1612,16 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
                     return !cmb->editable;
             }
             return 0;
+#if QT_VERSION >= 0x040400
+        // per HIG, align the contents in a form layout to the left
+        case SH_FormLayoutFormAlignment:
+            return Qt::AlignLeft | Qt::AlignTop;
+        // per HIG, align the labels in a form layout to the right
+        case SH_FormLayoutLabelAlignment:
+            return Qt::AlignRight;
+        case SH_FormLayoutFieldGrowthPolicy:
+            return QFormLayout::ExpandingFieldsGrow;
+#endif
         default:
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);
    }
