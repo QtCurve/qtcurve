@@ -115,11 +115,11 @@ if (GTK_INCLUDE_DIR)
     endif(QTC_REORDER_GTK_DIALOG_BUTTONS)
     if(QTC_NEW_MOZILLA)
         message("\n\n**************************************************************\n"
-                "Information: Defaulting to treating Firefox as Firefox >= 3.0 "
+                "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
                 "**************************************************************\n\n\n")
     else(QTC_NEW_MOZILLA)
         message("\n\n**************************************************************\n"
-                "Information: Defaulting to treating Firefox as Firefox < 3.0 "
+                "Information: Defaulting to treating Firefox as Firefox < 3.0\n"
                 "**************************************************************\n\n\n")
     endif(QTC_REORDER_GTK_DIALOG_BUTTONS)
 else (GTK_INCLUDE_DIR)
