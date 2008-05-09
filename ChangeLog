@@ -1,3 +1,7 @@
+0.59.2
+------
+1. Also check in share/kde4/apps/kstyle/themes for qtc_*.themerc files.
+
 0.59.1
 ------
 1. Fix appearance of shiny glass defult buttons.

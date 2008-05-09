@@ -95,6 +95,7 @@ typedef GdkColor color;
 /* qtc_<theme name>.themerc support */
 #define KDE_PREFIX(V) ((4==(V)) ? KDE4PREFIX : KDE3PREFIX)
 #define QTC_THEME_DIR    "/share/apps/kstyle/themes/"
+#define QTC_THEME_DIR4   "/share/kde4/apps/kstyle/themes/"
 #define QTC_THEME_PREFIX "qtc_"
 #define QTC_THEME_SUFFIX ".themerc"
 
