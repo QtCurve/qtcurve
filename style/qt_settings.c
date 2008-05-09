@@ -282,21 +282,31 @@ static char * getKdeHome()
     return kdeHome;
 }
 
-static char * themeFile(const char *prefix, const char *name, char **tmpStr)
+static char * themeFileSub(const char *prefix, const char *name, char **tmpStr, const char *sub)
 {
-    *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(QTC_THEME_DIR)+1+strlen(name)+strlen(QTC_THEME_SUFFIX)+1);
+    *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(sub)+1+strlen(name)+strlen(QTC_THEME_SUFFIX)+1);
 
     if(*tmpStr)
     {
         struct stat st;
 
-        sprintf(*tmpStr, "%s/%s/%s%s", prefix, QTC_THEME_DIR, name, QTC_THEME_SUFFIX);
+        sprintf(*tmpStr, "%s/%s/%s%s", prefix, sub, name, QTC_THEME_SUFFIX);
 
         if(0==stat(*tmpStr, &st))
             return *tmpStr;
     }
 
     return NULL;
+}
+
+static char * themeFile(const char *prefix, const char *name, char **tmpStr)
+{
+    char *f=themeFileSub(prefix, name, tmpStr, QTC_THEME_DIR);
+
+    if(!f)
+        f=themeFileSub(prefix, name, tmpStr, QTC_THEME_DIR4);
+
+    return f;
 }
 
 static void parseQtColors(char *line, int p)
