@@ -1,6 +1,9 @@
 0.59.3
 ------
 1. Also check in share/kde4/apps/kstyle/themes for qtc_*.themerc files.
+2. Fix evolution calendar crash.
+3. Fix evolution listview headers.
+4. Slightly better check/radio positioning.
 
 0.59.2
 ------

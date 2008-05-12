@@ -442,6 +442,16 @@ static gboolean isListViewHeader(GtkWidget *widget)
     return widget && GTK_IS_BUTTON(widget) && widget->parent && isList(widget->parent);
 }
 
+static gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail)
+{
+    return GTK_APP_EVOLUTION==qtSettings.app &&
+           widget && widget->parent && widget->parent->parent && DETAIL("button") &&
+           0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget)), "ECanvas") &&
+           (0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "ETree") ||
+            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "ETable"));
+
+}
+
 static gboolean isComboBoxButton(GtkWidget *widget)
 {
     return widget && GTK_IS_BUTTON(widget) && widget->parent &&
@@ -2192,7 +2202,7 @@ debugDisplayWidget(widget, 3);
         drawAreaColor(cr, area, NULL, enabled ? &style->base[state] : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
 */
 
-    drawBorder(cr, style, GTK_WIDGET_IS_SENSITIVE(widget) ? state : GTK_STATE_INSENSITIVE, area, NULL, x, y, width, height,
+    drawBorder(cr, style, !widget || GTK_WIDGET_IS_SENSITIVE(widget) ? state : GTK_STATE_INSENSITIVE, area, NULL, x, y, width, height,
                colors, round, BORDER_SUNKEN, WIDGET_OTHER, DF_DO_CORNERS|DF_BLEND);
     if(doEtch)
     {
@@ -2763,7 +2773,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
              *btn_colors;
     int      bgnd=getFill(state, btn_down/*, DETAIL(QTC_CHECKBOX)*/),
              round=getRound(detail, widget, x, y, width, height, rev);
-    gboolean lvh=isListViewHeader(widget),
+    gboolean lvh=isListViewHeader(widget) || isEvolutionListViewHeader(widget, detail),
              sunken=btn_down ||(GTK_IS_BUTTON(widget) && GTK_BUTTON(widget)->depressed) ||
                     GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
 
@@ -3951,19 +3961,19 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else
         btn_colors=qtcPalette.button;
 
-    x+=(width-checkSpace)>>1;
-    y+=(height-checkSpace)>>1;
-
-    if(doEtch)
-        x++, y++;
-
+//     x+=(width-checkSpace)>>1;
+//     y+=(height-checkSpace)>>1;
+// 
+//     if(doEtch)
+//         x++, y++;
+// 
     if(mnu)
     {
         y+=2;
-        if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
-            x+=2;
-        else
-            x-=2;
+//         if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
+//             x+=2;
+//         else
+//             x-=2;
     }
 
 #ifdef QTC_DEBUG
@@ -4100,15 +4110,18 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                  glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
         int      ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL;
 
-        x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
-        y+=((height-QTC_RADIO_SIZE)>>1)+1;
+//         x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
+//         y+=((height-QTC_RADIO_SIZE)>>1)+1;
+// 
+//         if(doEtch)
+//             x++, y++;
+// 
+//         /* For some reason, radios dont look aligned properly - most noticeable with menuStripe set */
+//         if(GTK_APP_MOZILLA!=qtSettings.app)
+//             x-=3;
 
-        if(doEtch)
-            x++, y++;
-
-        /* For some reason, radios dont look aligned properly - most noticeable with menuStripe set */
-        if(GTK_APP_MOZILLA!=qtSettings.app)
-            x-=3;
+        if(mnu)
+            y++;
 
         {
             GdkColor  new_colors[TOTAL_SHADES+1],
