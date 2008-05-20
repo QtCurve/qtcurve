@@ -5127,10 +5127,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #endif
 
                 painter->save();
-#ifndef QTC_SIMPLE_SCROLLBARS
-                if(noButtons)
-                    painter->fillRect(sbRect, palette.background().color());
-#endif
+                painter->fillRect(r, palette.background());
 #if 0
                 //painter->setClipRegion(QRegion(s2)+QRegion(addpage));
 
