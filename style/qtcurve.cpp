@@ -2242,7 +2242,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelLineEdit:
             painter->fillRect(QTC_DO_EFFECT
                                 ? r.adjusted(2, 2, -2, -2)
-                                : r.adjusted(1, 1, -1, -1), palette.base());
+                                : r.adjusted(1, 1, -1, -1), palette.brush(QPalette::Base));
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
@@ -7041,7 +7041,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
         r.adjust(1, 1, -1, -1);
 
     if(fill)
-        p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.base().color());
+        p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.brush(QPalette::Base));
 
     if(doEtch)
         drawEtch(p, rx, WIDGET_ENTRY, false);
