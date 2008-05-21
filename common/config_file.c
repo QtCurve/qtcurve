@@ -979,7 +979,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                                 opts->customGradient[i]=malloc(sizeof(CustomGradient));
                                 opts->customGradient[i]->numGrad=comma/2;
                                 opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad);
-                                opts->customGradient[i]->numGrad=lb;
+                                opts->customGradient[i]->lightBorder=lb;
 
                                 str=c+1;
                                 for(j=0; j<comma && str && ok; j+=2)
