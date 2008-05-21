@@ -1,3 +1,7 @@
+0.59.4
+------
+1. Fix reading in of lightBorder for custom gradients.
+
 0.59.3
 ------
 1. Also check in share/kde4/apps/kstyle/themes for qtc_*.themerc files.
