@@ -1,6 +1,18 @@
 0.59.3
 ------
 1. Fix Arora location field.
+2. Added an experiment to replace the Qt file dialogs in pure Qt
+   applications with KDE ones. NOTE: This is only an experitment,
+   and seems to crash Qt Designer when 'Open...' is selected frmo the
+   'New Form' dialog the first time its used.
+
+   To enable this option, call cmake with:
+
+    -DQTC_MODIFY_QFILEDIALOG_CALLS=true
+
+   And when running apps, set the QTC_QFD_OVERRIDE env var. e.g.:
+
+    QTC_QFD_OVERRIDE=1 designer-qt4
 
 0.59.2
 ------
