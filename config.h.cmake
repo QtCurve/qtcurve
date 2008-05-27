@@ -5,4 +5,7 @@
 #define KDE3PREFIX        "@KDE3PREFIX@"
 #define KDE4PREFIX        "@KDE4PREFIX@"
 
+#cmakedefine KDE4_FOUND 1
+#cmakedefine QTC_MODIFY_QFILEDIALOG_CALLS
+
 #endif

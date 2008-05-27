@@ -26,10 +26,37 @@
 #define CONFIG_READ
 #include "config_file.c"
 
+#ifdef KDE4_FOUND
+#include <KDE/KGlobalSettings>
+#include <KDE/KConfig>
+#include <KDE/KConfigGroup>
+#include <KDE/KIconLoader>
+#include <KDE/KComponentData>
+
+static KComponentData *theKComponentData=0;
+static int            theInstanceCount=0;
+
+static void checkKComponentData()
+{
+    if(!theKComponentData && !KGlobal::hasMainComponent())
+    {
+        //printf("Creating KComponentData\n");
+
+        QString name(QApplication::applicationName());
+
+        if(name.isEmpty())
+            name=qAppName();
+
+        if(name.isEmpty())
+            name="QtApp";
+
+        theKComponentData=new KComponentData(name.toLatin1(), name.toLatin1());
+    }
+}
+
 #ifdef QTC_MODIFY_QFILEDIALOG_CALLS
 #include <KDE/KFileDialog>
 #include <KDE/KDirSelectDialog>
-#include <KDE/KComponentData>
 #include <KDE/KGlobal>
 
 typedef QString (*_qt_filedialog_existing_directory_hook)(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options);
@@ -92,26 +119,6 @@ static void kde2QtFilter(const QString &orig, const QString &kde, QString *sel)
     }
 }
 
-static KComponentData *kCompData=0;
-
-static void checkKComponentData()
-{
-    if(!kCompData && !KGlobal::hasMainComponent())
-    {
-        printf("Creating KComponentData\n");
-
-        QString name(QApplication::applicationName());
-
-        if(name.isEmpty())
-            name=qAppName();
-
-        if(name.isEmpty())
-            name="QtApp";
-
-        kCompData=new KComponentData(name.toLatin1(), name.toLatin1());
-    }
-}
-
 static QString getExistingDirectory(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options)
 {
     checkKComponentData();
@@ -127,7 +134,6 @@ static QString getExistingDirectory(QWidget *parent, const QString &caption, con
 static QString getOpenFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter,
                                QFileDialog::Options)
 {
-printf("getOpenFileName\n");
     checkKComponentData();
 
     KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
@@ -142,14 +148,12 @@ printf("getOpenFileName\n");
     if(!rv.isEmpty())
         kde2QtFilter(filter, dlg.currentFilter(), selectedFilter);
 
-printf("RV:%s\n", rv.toLatin1().constData());
     return rv;
 }
 
 static QStringList getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QString &filter,
                                     QString *selectedFilter, QFileDialog::Options)
 {
-printf("getOpenFileNames\n");
     checkKComponentData();
 
     KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
@@ -163,7 +167,6 @@ printf("getOpenFileNames\n");
 
     if(rv.count())
         kde2QtFilter(filter, dlg.currentFilter(), selectedFilter);
-printf("RV:%d %s\n", rv.count(), rv.count() ? rv[0].toLatin1().constData() : "<>");
 
     return rv;
 }
@@ -171,7 +174,6 @@ printf("RV:%d %s\n", rv.count(), rv.count() ? rv[0].toLatin1().constData() : "<>
 static QString getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter,
                                QFileDialog::Options)
 {
-printf("getSaveFileName\n");
     checkKComponentData();
 
     KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
@@ -186,16 +188,12 @@ printf("getSaveFileName\n");
     if(!rv.isEmpty())
         kde2QtFilter(filter, dlg.currentFilter(), selectedFilter);
 
-printf("RV:%s\n", rv.toLatin1().constData());
-
     return rv;
 }
 
-static int            count=0;
-
 static void setFileDialogs()
 {
-    if(0==count++)
+    if(1==theInstanceCount)
     {
         if(!qt_filedialog_existing_directory_hook)
             qt_filedialog_existing_directory_hook=&getExistingDirectory;
@@ -210,7 +208,7 @@ static void setFileDialogs()
 
 static void unsetFileDialogs()
 {
-    if(0==--count)
+    if(0==theInstanceCount)
     {
         if(qt_filedialog_existing_directory_hook==&getExistingDirectory)
             qt_filedialog_existing_directory_hook=0;
@@ -220,12 +218,12 @@ static void unsetFileDialogs()
             qt_filedialog_open_filenames_hook=0;
         if(qt_filedialog_save_filename_hook==&getSaveFileName)
             qt_filedialog_save_filename_hook=0;
-        delete kCompData;
-        kCompData=0;
     }
 }
 
 #endif
+
+#endif // KDE4_FOUND
 
 // The tabs used in multi-dock widgets, and KDE's properties dialog, look odd,
 // as the QTabBar is not a child of a QTabWidget! the QTC_STYLE_QTABBAR controls
@@ -730,11 +728,13 @@ static void readPal(QString &line, QPalette::ColorGroup grp, QPalette &pal)
 #endif
 }
 
+#ifndef KDE4_FOUND
 static void setRgb(QColor *col, const QStringList &rgb)
 {
     if(3==rgb.size())
         *col=QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
 }
+#endif
 
 static void parseWindowLine(const QString &line, QList<int> &data)
 {
@@ -919,9 +919,11 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsPos(-1, -1),
               itsHoverWidget(NULL)
 {
+#ifdef KDE4_FOUND
+    theInstanceCount++;
 #ifdef QTC_MODIFY_QFILEDIALOG_CALLS
-    if(getenv("QTC_QFD_OVERRIDE"))
-        setFileDialogs();
+    setFileDialogs();
+#endif
 #endif
 
     QString rcFile;
@@ -1013,9 +1015,15 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
 QtCurveStyle::~QtCurveStyle()
 {
+#ifdef KDE4_FOUND
+    if(0==--theInstanceCount && theKComponentData)
+    {
+        delete theKComponentData;
+        theKComponentData=0L;
+    }
 #ifdef QTC_MODIFY_QFILEDIALOG_CALLS
-    if(getenv("QTC_QFD_OVERRIDE"))
-        unsetFileDialogs();
+    unsetFileDialogs();
+#endif
 #endif
 
     if(itsSidebarButtonsCols &&
@@ -1852,6 +1860,11 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_FormLayoutFieldGrowthPolicy:
             return QFormLayout::ExpandingFieldsGrow;
 #endif
+#ifdef KDE4_FOUND
+        case SH_DialogButtonBox_ButtonsHaveIcons:
+            checkKComponentData();
+            return KGlobalSettings::showIconsOnPushButtons();
+#endif
         default:
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);
    }
@@ -1859,81 +1872,268 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 
 QPalette QtCurveStyle::standardPalette() const
 {
-    QPalette palette;
-    QFont    font;
-
-    if(!readQt3(palette, font, NULL))
-    {
-        palette.setBrush(QPalette::Disabled, QPalette::WindowText, QColor(QRgb(0xff808080)));
-        palette.setBrush(QPalette::Disabled, QPalette::Button, QColor(QRgb(0xffdddfe4)));
-        palette.setBrush(QPalette::Disabled, QPalette::Light, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::Midlight, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::Dark, QColor(QRgb(0xff555555)));
-        palette.setBrush(QPalette::Disabled, QPalette::Mid, QColor(QRgb(0xffc7c7c7)));
-        palette.setBrush(QPalette::Disabled, QPalette::Text, QColor(QRgb(0xffc7c7c7)));
-        palette.setBrush(QPalette::Disabled, QPalette::BrightText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::ButtonText, QColor(QRgb(0xff808080)));
-        palette.setBrush(QPalette::Disabled, QPalette::Base, QColor(QRgb(0xffefefef)));
-#if QT_VERSION >= 0x040300
-        palette.setBrush(QPalette::Disabled, QPalette::AlternateBase, palette.color(QPalette::Disabled, QPalette::Base).darker(110));
-#else
-        palette.setBrush(QPalette::Disabled, QPalette::AlternateBase, palette.color(QPalette::Disabled, QPalette::Base).dark(110));
-#endif
-        palette.setBrush(QPalette::Disabled, QPalette::Window, QColor(QRgb(0xffefefef)));
-        palette.setBrush(QPalette::Disabled, QPalette::Shadow, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Disabled, QPalette::Highlight, QColor(QRgb(0xff567594)));
-        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::Link, QColor(QRgb(0xff0000ee)));
-        palette.setBrush(QPalette::Disabled, QPalette::LinkVisited, QColor(QRgb(0xff52188b)));
-        palette.setBrush(QPalette::Active, QPalette::WindowText, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Active, QPalette::Button, QColor(QRgb(0xffdddfe4)));
-        palette.setBrush(QPalette::Active, QPalette::Light, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Active, QPalette::Midlight, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Active, QPalette::Dark, QColor(QRgb(0xff555555)));
-        palette.setBrush(QPalette::Active, QPalette::Mid, QColor(QRgb(0xffc7c7c7)));
-        palette.setBrush(QPalette::Active, QPalette::Text, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Active, QPalette::BrightText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Active, QPalette::ButtonText, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Active, QPalette::Base, QColor(QRgb(0xffffffff)));
-#if QT_VERSION >= 0x040300
-        palette.setBrush(QPalette::Active, QPalette::AlternateBase, palette.color(QPalette::Active, QPalette::Base).darker(110));
-#else
-        palette.setBrush(QPalette::Active, QPalette::AlternateBase, palette.color(QPalette::Active, QPalette::Base).dark(110));
-#endif
-        palette.setBrush(QPalette::Active, QPalette::Window, QColor(QRgb(0xffefefef)));
-        palette.setBrush(QPalette::Active, QPalette::Shadow, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Active, QPalette::Highlight, QColor(QRgb(0xff678db2)));
-        palette.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Active, QPalette::Link, QColor(QRgb(0xff0000ee)));
-        palette.setBrush(QPalette::Active, QPalette::LinkVisited, QColor(QRgb(0xff52188b)));
-        palette.setBrush(QPalette::Inactive, QPalette::WindowText, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Inactive, QPalette::Button, QColor(QRgb(0xffdddfe4)));
-        palette.setBrush(QPalette::Inactive, QPalette::Light, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Inactive, QPalette::Midlight, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Inactive, QPalette::Dark, QColor(QRgb(0xff555555)));
-        palette.setBrush(QPalette::Inactive, QPalette::Mid, QColor(QRgb(0xffc7c7c7)));
-        palette.setBrush(QPalette::Inactive, QPalette::Text, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Inactive, QPalette::BrightText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Inactive, QPalette::ButtonText, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Inactive, QPalette::Base, QColor(QRgb(0xffffffff)));
-#if QT_VERSION >= 0x040300
-        palette.setBrush(QPalette::Inactive, QPalette::AlternateBase, palette.color(QPalette::Inactive, QPalette::Base).darker(110));
-#else
-        palette.setBrush(QPalette::Inactive, QPalette::AlternateBase, palette.color(QPalette::Inactive, QPalette::Base).dark(110));
-#endif
-        palette.setBrush(QPalette::Inactive, QPalette::Window, QColor(QRgb(0xffefefef)));
-        palette.setBrush(QPalette::Inactive, QPalette::Shadow, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Inactive, QPalette::Highlight, QColor(QRgb(0xff678db2)));
-        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Inactive, QPalette::Link, QColor(QRgb(0xff0000ee)));
-        palette.setBrush(QPalette::Inactive, QPalette::LinkVisited, QColor(QRgb(0xff52188b)));
-    }
-    return palette;
+    return QCommonStyle::standardPalette();
 }
 
-QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opttion, const QWidget *widget) const
+QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
-    return QTC_BASE_STYLE::standardPixmap(pix, opttion, widget);
+#ifdef KDE4_FOUND
+if(getenv("QTC_DO_ICONS"))
+{
+    checkKComponentData();
+
+    bool fd(widget && qobject_cast<const QFileDialog *>(widget));
+
+    switch(pix)
+    {
+//         case SP_TitleBarMenuButton:
+//         case SP_TitleBarMinButton:
+//         case SP_TitleBarMaxButton:
+//         case SP_TitleBarCloseButton:
+//         case SP_TitleBarNormalButton:
+//         case SP_TitleBarShadeButton:
+//         case SP_TitleBarUnshadeButton:
+//         case SP_TitleBarContextHelpButton:
+//         case SP_DockWidgetCloseButton:
+        case SP_MessageBoxInformation:
+            return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
+        case SP_MessageBoxWarning:
+            return KIconLoader::global()->loadIcon("dialog-warning", KIconLoader::Dialog, 32);
+        case SP_MessageBoxCritical:
+            return KIconLoader::global()->loadIcon("dialog-error", KIconLoader::Dialog, 32);
+        case SP_MessageBoxQuestion:
+            return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
+//         case SP_DesktopIcon:
+//             return KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 16);
+//         case SP_TrashIcon:
+//             return KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 16);
+//         case SP_ComputerIcon:
+//             return KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 16);
+//         case SP_DriveFDIcon:
+//             return KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 16);
+//         case SP_DriveHDIcon:
+//             return KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 16);
+//         case SP_DriveCDIcon:
+//         case SP_DriveDVDIcon:
+//             return KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 16);
+//         case SP_DriveNetIcon:
+//             return KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 16);
+//         case SP_DirOpenIcon:
+//             return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
+//         case SP_DirIcon:
+//         case SP_DirClosedIcon:
+//             return KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16);
+//         case SP_DirLinkIcon:
+//         {
+//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 16));
+//             if (!overlay.isNull())
+//             {
+//                 QPixmap icon(KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16));
+// 
+//                 if (!icon.isNull())
+//                 {
+//                     QPainter(&icon).drawPixmap(0, 0, 16, 16, overlay);
+//                     return icon;
+//                 }
+//             }
+//             break;
+//         }
+//         case SP_FileIcon:
+//             return KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16);
+//         case SP_FileLinkIcon:
+//         {
+//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 16));
+//             if (!overlay.isNull())
+//             {
+//                 QPixmap icon(KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16));
+// 
+//                 if (!icon.isNull())
+//                 {
+//                     QPainter(&icon).drawPixmap(0, 0, 16, 16, overlay);
+//                     return icon;
+//                 }
+//             }
+//             break;
+//         }
+//         case SP_ToolBarHorizontalExtensionButton:
+//         case SP_ToolBarVerticalExtensionButton:
+        case SP_FileDialogStart:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-edn" : "go-first", KIconLoader::Small, 16);
+        case SP_FileDialogEnd:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-first" : "go-end", KIconLoader::Small, 16);
+        case SP_FileDialogToParent:
+            return KIconLoader::global()->loadIcon("go-up", KIconLoader::Small, 16);
+        case SP_FileDialogNewFolder:
+            return KIconLoader::global()->loadIcon("folder-new", KIconLoader::Small, 16);
+        case SP_FileDialogDetailedView:
+            return KIconLoader::global()->loadIcon("view-list-details", KIconLoader::Small, 16);
+//         case SP_FileDialogInfoView:
+//             return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+//         case SP_FileDialogContentsView:
+//             return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+        case SP_FileDialogListView:
+            return KIconLoader::global()->loadIcon("view-list-icons", KIconLoader::Small, 16);
+        case SP_FileDialogBack:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-next" : "go-previous", KIconLoader::Small, 16);
+        case SP_DialogOkButton:
+            return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+        case SP_DialogCancelButton:
+            return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
+        case SP_DialogHelpButton:
+            return KIconLoader::global()->loadIcon("help-contents", KIconLoader::Small, 16);
+        case SP_DialogOpenButton:
+            return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
+        case SP_DialogSaveButton:
+            return KIconLoader::global()->loadIcon("document-save", KIconLoader::Small, 16);
+        case SP_DialogCloseButton:
+            return KIconLoader::global()->loadIcon("dialog-close", KIconLoader::Small, 16);
+        case SP_DialogApplyButton:
+            return KIconLoader::global()->loadIcon("dialog-ok-apply", KIconLoader::Small, 16);
+        case SP_DialogResetButton:
+            return KIconLoader::global()->loadIcon("document-revert", KIconLoader::Small, 16);
+//         case SP_DialogDiscardButton:
+//              return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
+        case SP_DialogYesButton:
+            return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+        case SP_DialogNoButton:
+            return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
+        case SP_ArrowUp:
+            return KIconLoader::global()->loadIcon("arrow-up", KIconLoader::Dialog, 32);
+        case SP_ArrowDown:
+            return KIconLoader::global()->loadIcon("arrow-down", KIconLoader::Dialog, 32);
+        case SP_ArrowLeft:
+            return KIconLoader::global()->loadIcon("arrow-left", KIconLoader::Dialog, 32);
+        case SP_ArrowRight:
+            return KIconLoader::global()->loadIcon("arrow-right", KIconLoader::Dialog, 32);
+        case SP_ArrowBack:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                     ? (fd ? "go-next" : "arrow-right")
+                                                     : (fd ? "go-previous" : "arrow-left"), KIconLoader::Dialog, 32);
+        case SP_ArrowForward:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                     ? (fd ? "go-previous" : "arrow-left")
+                                                     : (fd ? "go-next" : "arrow-right"), KIconLoader::Dialog, 32);
+//         case SP_DirHomeIcon:
+//             return KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 16);
+//         case SP_CommandLink:
+//         case SP_VistaShield:
+        case SP_BrowserReload:
+            return KIconLoader::global()->loadIcon("view-refresh", KIconLoader::Small, 16);
+        case SP_BrowserStop:
+            return KIconLoader::global()->loadIcon("process-stop", KIconLoader::Small, 16);
+        case SP_MediaPlay:
+            return KIconLoader::global()->loadIcon("media-playback-start", KIconLoader::Small, 16);
+        case SP_MediaStop:
+            return KIconLoader::global()->loadIcon("media-playback-stop", KIconLoader::Small, 16);
+        case SP_MediaPause:
+            return KIconLoader::global()->loadIcon("media-playback-pause", KIconLoader::Small, 16);
+        case SP_MediaSkipForward:
+            return KIconLoader::global()->loadIcon("media-skip-forward", KIconLoader::Small, 16);
+        case SP_MediaSkipBackward:
+            return KIconLoader::global()->loadIcon("media-skip-backward", KIconLoader::Small, 16);
+        case SP_MediaSeekForward:
+            return KIconLoader::global()->loadIcon("media-seek-forward", KIconLoader::Small, 16);
+        case SP_MediaSeekBackward:
+            return KIconLoader::global()->loadIcon("media-seek-backward", KIconLoader::Small, 16);
+        case SP_MediaVolume:
+            return KIconLoader::global()->loadIcon("player-volume", KIconLoader::Small, 16);
+        case SP_MediaVolumeMuted:
+            return KIconLoader::global()->loadIcon("player-volume-muted", KIconLoader::Small, 16);
+        default:
+            break;
+    }
+}
+#endif
+    return QTC_BASE_STYLE::standardPixmap(pix, option, widget);
+}
+
+QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
+{
+#ifdef KDE4_FOUND
+    return standardPixmap(pix, option, widget);
+#if 0
+    if (!qApp->desktopSettingsAware())
+        return QWindowsStyle::standardIconImplementation(pix, option, widget);
+
+    QIcon icon(standardPixmap(pix, option, widget));
+
+    switch (pix)
+    {
+//         case SP_DesktopIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 32));
+//             break;
+//         case SP_TrashIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 32));
+//             break;
+//         case SP_ComputerIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 32));
+//             break;
+//         case SP_DriveFDIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 32));
+//             break;
+//         case SP_DriveHDIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 32));
+//             break;
+//         case SP_DriveCDIcon:
+//         case SP_DriveDVDIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 32));
+//             break;
+//         case SP_DriveNetIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 32));
+//             break;
+//         case SP_DirOpenIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 32));
+//             break;
+//         case SP_DirHomeIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 32));
+//             break;
+//         case SP_DirClosedIcon:
+//         case SP_DirIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 32));
+//             break;
+//         case SP_FileIcon:
+//             icon.addPixmap(KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 32));
+//             break;
+//         case SP_FileLinkIcon:
+//         {
+//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 32));
+//             if (!overlay.isNull())
+//             {
+//                 QPixmap icn(KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 32));
+// 
+//                 if (!icn.isNull())
+//                 {
+//                     QPainter(&icn).drawPixmap(0, 0, 32, 32, overlay);
+//                     icon.addPixmap(icn);
+//                 }
+//             }
+//             break;
+//         }
+//         case SP_DirLinkIcon:
+//         {
+//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 32));
+//             if (!overlay.isNull())
+//             {
+//                 QPixmap icn(KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 32));
+// 
+//                 if (!icn.isNull())
+//                 {
+//                     QPainter(&icn).drawPixmap(0, 0, 32, 32, overlay);
+//                     icon.addPixmap(icn);
+//                 }
+//             }
+//             break;
+//         }
+        default:
+            break;
+    }
+    return icon;
+#endif
+#endif
+    return QTC_BASE_STYLE::standardIconImplementation(pix, option, widget);
 }
 
 void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
@@ -8009,6 +8209,29 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
         }
         else // KDE4
         {
+#ifdef KDE4_FOUND
+            checkKComponentData();
+
+            QColor col;
+
+            col=KGlobalSettings::activeTitleColor();
+
+            if(col!=itsMenuitemCols[ORIGINAL_SHADE])
+            {
+                itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
+                shadeColors(col, itsActiveMdiColors);
+            }
+
+            col=KGlobalSettings::inactiveTitleColor();
+            if(col!=itsButtonCols[ORIGINAL_SHADE])
+            {
+                itsMdiColors=new QColor [TOTAL_SHADES+1];
+                shadeColors(col, itsMdiColors);
+            }
+
+            itsActiveMdiTextColor=KGlobalSettings::activeTextColor();
+            itsMdiTextColor=KGlobalSettings::inactiveTextColor();
+#else
             QFile f(kdeHome()+QLatin1String("/share/config/kdeglobals"));
 
             if(f.open(QIODevice::ReadOnly))
@@ -8057,6 +8280,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
                 }
                 f.close();
             }
+#endif
         }
 
         if(!itsActiveMdiColors)
@@ -8082,6 +8306,27 @@ void QtCurveStyle::readMdiPositions() const
         itsMdiButtons[1].append(WINDOWTITLE_SPACER);
         itsMdiButtons[1].append(SC_TitleBarCloseButton);
 
+#ifdef KDE4_FOUND
+        checkKComponentData();
+
+        KConfig      cfg("kwinrc");
+        KConfigGroup grp(&cfg, "Style");
+        QString      val;
+
+        val=grp.readEntry("ButtonsOnLeft");
+        if(!val.isEmpty())
+        {
+            itsMdiButtons[0].clear();
+            parseWindowLine(val, itsMdiButtons[0]);
+        }
+
+        val=grp.readEntry("ButtonsOnRight");
+        if(!val.isEmpty())
+        {
+            itsMdiButtons[1].clear();
+            parseWindowLine(val, itsMdiButtons[1]);
+        }
+#else
         // Read in KWin settings...
         QFile f(kdeHome()+QLatin1String("/share/config/kwinrc"));
 
@@ -8114,6 +8359,7 @@ void QtCurveStyle::readMdiPositions() const
             }
             f.close();
         }
+#endif
 
         // Designer uses shade buttons, not min/max - so if we dont have shade in our kwin config. then add this
         // button near the max button...
