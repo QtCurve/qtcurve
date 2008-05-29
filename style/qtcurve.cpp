@@ -1082,11 +1082,6 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_PLASMA;
         else if("krunner"==appName)
             theThemedApp=APP_KRUNNER;
-
-    QPalette pal(app->palette());
-
-    polish(pal);
-    app->setPalette(pal);
 }
 
 void QtCurveStyle::polish(QPalette &palette)
@@ -1878,8 +1873,6 @@ QPalette QtCurveStyle::standardPalette() const
 QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
 #ifdef KDE4_FOUND
-if(getenv("QTC_DO_ICONS"))
-{
     checkKComponentData();
 
     bool fd(widget && qobject_cast<const QFileDialog *>(widget));
@@ -2045,7 +2038,6 @@ if(getenv("QTC_DO_ICONS"))
         default:
             break;
     }
-}
 #endif
     return QTC_BASE_STYLE::standardPixmap(pix, option, widget);
 }
