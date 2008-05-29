@@ -3345,65 +3345,40 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 painter->save();
 
-#if QT_VERSION >= 0x040300
-                const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
-                bool verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
-
-                QRect titleRect(subElementRect(SE_DockWidgetTitleBarText, option, widget));
-
-                if (verticalTitleBar)
-                {
-                    QRect rVert(r);
-                    QSize s(rVert.size());
-
-                    s.transpose();
-                    rVert.setSize(s);
-
-                    titleRect = QRect(rVert.left() + r.bottom() - titleRect.bottom(),
-                                      rVert.top() + titleRect.left() - r.left(),
-                                      titleRect.height(), titleRect.width());
-
-                    painter->translate(rVert.left(), rVert.top() + rVert.width());
-                    painter->rotate(-90);
-                    painter->translate(-rVert.left(), -rVert.top());
-                }
-#else
-/*                bool  verticalTitleBar(false);*/
-                const int margin(4);
-                QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
-#endif
-                QRect handleRect(titleRect);
-
-//                if(state&State_MouseOver)
-                {
-    /*
-                    if(IS_FLAT(opts.appearance))
-    */
     #if QT_VERSION >= 0x040300
-                        painter->fillRect(r, palette.background().color().darker(105));
+                painter->fillRect(r, palette.background().color().darker(105));
     #else
-                        painter->fillRect(r, palette.background().color().dark(105));
+                painter->fillRect(r, palette.background().color().dark(105));
     #endif
-    /*
-                    else
-                    {
-                        const QColor *use(backgroundColors(option));
 
-                        drawBevelGradient(use[ORIGINAL_SHADE], true, painter, r, true,
-                                        getWidgetShade(WIDGET_STD_BUTTON, true, false, opts.appearance),
-                                        getWidgetShade(WIDGET_STD_BUTTON, false, false, opts.appearance),
-                                        false, opts.appearance, WIDGET_STD_BUTTON);
-                    }
-    */
-                }
                 if (!dwOpt->title.isEmpty())
                 {
-//                     int textWidth=option->fontMetrics.width(dwOpt->title);
-// 
-//                     if(verticalTitleBar)
-//                         handleRect.adjust(0, textWidth+margin, 0, -margin);
-//                     else
-//                         handleRect.adjust(reverse ? margin : textWidth+margin, 0, reversde ? -(textWidth+margin) : -margin, 0);
+#if QT_VERSION >= 0x040300
+                    const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
+                    bool verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
+
+                    QRect titleRect(subElementRect(SE_DockWidgetTitleBarText, option, widget));
+
+                    if (verticalTitleBar)
+                    {
+                        QRect rVert(r);
+                        QSize s(rVert.size());
+
+                        s.transpose();
+                        rVert.setSize(s);
+
+                        titleRect = QRect(rVert.left() + r.bottom() - titleRect.bottom(),
+                                        rVert.top() + titleRect.left() - r.left(),
+                                        titleRect.height(), titleRect.width());
+
+                        painter->translate(rVert.left(), rVert.top() + rVert.width());
+                        painter->rotate(-90);
+                        painter->translate(-rVert.left(), -rVert.top());
+                    }
+#else
+                    const int margin(4);
+                    QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
+#endif
 
                     drawItemText(painter, titleRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic, palette,
                                  dwOpt->state&State_Enabled,
@@ -3411,8 +3386,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                  QPalette::WindowText));
                 }
 
-//                 if(handleRect.isValid())
-//                     drawHandleMarkers(painter, handleRect, option, false, opts.handles);
                 painter->restore();
             }
             break;
