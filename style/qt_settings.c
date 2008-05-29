@@ -937,6 +937,13 @@ static char * getIconPath()
 
     strcat(path, "\"");
 
+    {
+    int plen=strlen(path);
+
+    if(path[plen - 1] == ':')
+        path[plen - 1] = '\0';
+    }
+
     return path;
 }
 

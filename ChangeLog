@@ -1,6 +1,7 @@
 0.59.4
 ------
 1. Fix reading in of lightBorder for custom gradients.
+2. Icon path fix by Ilya Paramonov.
 
 0.59.3
 ------
