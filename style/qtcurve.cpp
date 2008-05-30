@@ -4972,6 +4972,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     drawPrimitive(PE_IndicatorArrowDown, &tool, painter, widget);
                 }
+                else if (toolbutton->features & QStyleOptionToolButton::HasMenu)
+                {
+                    QRect arrow(r.right()-(SMALL_ARR_WIDTH+(etched ? 3 : 2)),
+                                r.bottom()-(SMALL_ARR_HEIGHT+(etched ? 4 : 3)),
+                                SMALL_ARR_WIDTH, SMALL_ARR_HEIGHT);
+
+                    if(bflags&State_Sunken)
+                        arrow.adjust(1, 1, 0, 0);
+
+                    drawArrow(painter, arrow, option, PE_IndicatorArrowDown, true, false);
+                }
 
                 if (toolbutton->state & State_HasFocus)
                 {
