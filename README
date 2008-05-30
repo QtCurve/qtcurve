@@ -11,6 +11,11 @@ To build and install:
 
 If you have KDE4 installed, then cmake will detect this, and compile QtCurve's config dialog.
 
+The following options may be supplied to cmake:
+
+    -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
+        Do not override Qt's file dialogs with KDE ones.
+
 
 Themes
 ------
