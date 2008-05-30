@@ -10,6 +10,10 @@
 3. Link to KDE libraries (if KDE4 is installed) to read kwin settings,
    control the icons on buttons setting, and to load some icons.
 4. Fix vertical dockwidget titlebars.
+5. Make busy progress thinner.
+6. Left align tab text - or right align for RTL.
+7. Fix positioning of tab icon for RTL.
+8. Allow tabs to be recoloured.
 
 0.59.2
 ------

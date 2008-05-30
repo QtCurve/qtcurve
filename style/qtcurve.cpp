@@ -31,6 +31,7 @@
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KIconLoader>
+#include <KDE/KIcon>
 #include <KDE/KComponentData>
 
 static KComponentData *theKComponentData=0;
@@ -1721,11 +1722,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MaximumDragDistance:
             return -1;
         case PM_TabBarTabHSpace:
-            return 20;
+            return 18;
         case PM_TabBarTabVSpace:
-            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
-                if (!tab->icon.isNull())
-                    return opts.highlightTab ? 12 : 10;
             return opts.highlightTab ? 10 : 8;
         case PM_TitleBarHeight:
             return qMax(widget ? widget->fontMetrics().lineSpacing()
@@ -1917,37 +1915,9 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
 //         case SP_DirClosedIcon:
 //             return KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16);
 //         case SP_DirLinkIcon:
-//         {
-//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 16));
-//             if (!overlay.isNull())
-//             {
-//                 QPixmap icon(KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16));
-// 
-//                 if (!icon.isNull())
-//                 {
-//                     QPainter(&icon).drawPixmap(0, 0, 16, 16, overlay);
-//                     return icon;
-//                 }
-//             }
-//             break;
-//         }
 //         case SP_FileIcon:
 //             return KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16);
 //         case SP_FileLinkIcon:
-//         {
-//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 16));
-//             if (!overlay.isNull())
-//             {
-//                 QPixmap icon(KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16));
-// 
-//                 if (!icon.isNull())
-//                 {
-//                     QPainter(&icon).drawPixmap(0, 0, 16, 16, overlay);
-//                     return icon;
-//                 }
-//             }
-//             break;
-//         }
 //         case SP_ToolBarHorizontalExtensionButton:
 //         case SP_ToolBarVerticalExtensionButton:
         case SP_FileDialogStart:
@@ -2045,85 +2015,140 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
 #ifdef KDE4_FOUND
-    return standardPixmap(pix, option, widget);
-#if 0
-    if (!qApp->desktopSettingsAware())
-        return QWindowsStyle::standardIconImplementation(pix, option, widget);
+    checkKComponentData();
 
-    QIcon icon(standardPixmap(pix, option, widget));
-
-    switch (pix)
+    switch(pix)
     {
+//         case SP_TitleBarMenuButton:
+//         case SP_TitleBarMinButton:
+//         case SP_TitleBarMaxButton:
+//         case SP_TitleBarCloseButton:
+//         case SP_TitleBarNormalButton:
+//         case SP_TitleBarShadeButton:
+//         case SP_TitleBarUnshadeButton:
+//         case SP_TitleBarContextHelpButton:
+//         case SP_DockWidgetCloseButton:
+        case SP_MessageBoxInformation:
+            return KIcon("dialog-information");
+        case SP_MessageBoxWarning:
+            return KIcon("dialog-warning");
+        case SP_MessageBoxCritical:
+            return KIcon("dialog-error");
+        case SP_MessageBoxQuestion:
+            return KIcon("dialog-information");
 //         case SP_DesktopIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("user-desktop");
 //         case SP_TrashIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("user-trash");
 //         case SP_ComputerIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("computer");
 //         case SP_DriveFDIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("media-floppy");
 //         case SP_DriveHDIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("drive-harddisk");
 //         case SP_DriveCDIcon:
 //         case SP_DriveDVDIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("media-optical");
 //         case SP_DriveNetIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 32));
-//             break;
+//             return KIcon("network-server");
 //         case SP_DirOpenIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 32));
-//             break;
-//         case SP_DirHomeIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 32));
-//             break;
-//         case SP_DirClosedIcon:
+//             return KIcon("document-open");
 //         case SP_DirIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 32));
-//             break;
-//         case SP_FileIcon:
-//             icon.addPixmap(KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 32));
-//             break;
-//         case SP_FileLinkIcon:
-//         {
-//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 32));
-//             if (!overlay.isNull())
-//             {
-//                 QPixmap icn(KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 32));
-// 
-//                 if (!icn.isNull())
-//                 {
-//                     QPainter(&icn).drawPixmap(0, 0, 32, 32, overlay);
-//                     icon.addPixmap(icn);
-//                 }
-//             }
-//             break;
-//         }
+//         case SP_DirClosedIcon:
+//             return KIcon("folder");
 //         case SP_DirLinkIcon:
-//         {
-//             QPixmap overlay(KIconLoader::global()->loadIcon("emblem-symbolic-link", KIconLoader::Small, 32));
-//             if (!overlay.isNull())
-//             {
-//                 QPixmap icn(KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 32));
-// 
-//                 if (!icn.isNull())
-//                 {
-//                     QPainter(&icn).drawPixmap(0, 0, 32, 32, overlay);
-//                     icon.addPixmap(icn);
-//                 }
-//             }
-//             break;
-//         }
+//         case SP_FileIcon:
+//             return KIcon("application-x-zerosize");
+//         case SP_FileLinkIcon:
+//         case SP_ToolBarHorizontalExtensionButton:
+//         case SP_ToolBarVerticalExtensionButton:
+        case SP_FileDialogStart:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-edn" : "go-first");
+        case SP_FileDialogEnd:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-first" : "go-end");
+        case SP_FileDialogToParent:
+            return KIcon("go-up");
+        case SP_FileDialogNewFolder:
+            return KIcon("folder-new");
+        case SP_FileDialogDetailedView:
+            return KIcon("view-list-details");
+//         case SP_FileDialogInfoView:
+//             return KIcon("dialog-ok");
+//         case SP_FileDialogContentsView:
+//             return KIcon("dialog-ok");
+        case SP_FileDialogListView:
+            return KIcon("view-list-icons");
+        case SP_FileDialogBack:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-next" : "go-previous");
+        case SP_DialogOkButton:
+            return KIcon("dialog-ok");
+        case SP_DialogCancelButton:
+            return KIcon("dialog-cancel");
+        case SP_DialogHelpButton:
+            return KIcon("help-contents");
+        case SP_DialogOpenButton:
+            return KIcon("document-open");
+        case SP_DialogSaveButton:
+            return KIcon("document-save");
+        case SP_DialogCloseButton:
+            return KIcon("dialog-close");
+        case SP_DialogApplyButton:
+            return KIcon("dialog-ok-apply");
+        case SP_DialogResetButton:
+            return KIcon("document-revert");
+//         case SP_DialogDiscardButton:
+//              return KIcon("dialog-cancel");
+        case SP_DialogYesButton:
+            return KIcon("dialog-ok");
+        case SP_DialogNoButton:
+            return KIcon("dialog-cancel");
+        case SP_ArrowUp:
+            return KIcon("arrow-up");
+        case SP_ArrowDown:
+            return KIcon("arrow-down");
+        case SP_ArrowLeft:
+            return KIcon("arrow-left");
+        case SP_ArrowRight:
+            return KIcon("arrow-right");
+        case SP_ArrowBack:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                     ? "go-next" : "go-previous");
+        case SP_ArrowForward:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                     ? "go-previous"
+                                                     : "go-next");
+//         case SP_DirHomeIcon:
+//             return KIcon("user-home");
+//         case SP_CommandLink:
+//         case SP_VistaShield:
+        case SP_BrowserReload:
+            return KIcon("view-refresh");
+        case SP_BrowserStop:
+            return KIcon("process-stop");
+        case SP_MediaPlay:
+            return KIcon("media-playback-start");
+        case SP_MediaStop:
+            return KIcon("media-playback-stop");
+        case SP_MediaPause:
+            return KIcon("media-playback-pause");
+        case SP_MediaSkipForward:
+            return KIcon("media-skip-forward");
+        case SP_MediaSkipBackward:
+            return KIcon("media-skip-backward");
+        case SP_MediaSeekForward:
+            return KIcon("media-seek-forward");
+        case SP_MediaSeekBackward:
+            return KIcon("media-seek-backward");
+        case SP_MediaVolume:
+            return KIcon("player-volume");
+        case SP_MediaVolumeMuted:
+            return KIcon("player-volume-muted");
         default:
             break;
     }
-    return icon;
-#endif
 #endif
     return QTC_BASE_STYLE::standardIconImplementation(pix, option, widget);
 }
@@ -3602,7 +3627,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(indeterminate) //Busy indicator
                 {
-                    int chunkSize(PROGRESS_CHUNK_WIDTH*3),
+                    int chunkSize(PROGRESS_CHUNK_WIDTH),
                         measure(vertical ? r.height() : r.width());
 
                     if(chunkSize>(measure/2))
@@ -4228,6 +4253,108 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->restore();
             }
             break;
+        case CE_TabBarTabLabel:
+            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
+            {
+                QStyleOptionTabV2 tabV2(*tab);
+                bool              verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
+                                               QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape),
+                                  selected(state&State_Selected),
+                                  reverse(Qt::RightToLeft==option->direction);
+
+                if (verticalTabs)
+                {
+                    painter->save();
+                    int newX, newY, newRot;
+                    if (QTabBar::RoundedEast==tabV2.shape || QTabBar::TriangularEast==tabV2.shape)
+                    {
+                        newX = r.width();
+                        newY = r.y();
+                        newRot = 90;
+                    }
+                    else
+                    {
+                        newX = 0;
+                        newY = r.y() + r.height();
+                        newRot = -90;
+                    }
+                    r.setRect(0, 0, r.height(), r.width());
+
+                    QTransform m;
+                    m.translate(newX, newY);
+                    m.rotate(newRot);
+                    painter->setTransform(m, true);
+                }
+
+                r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
+                               pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+
+                if (selected)
+                {
+                    r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+                    r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
+                }
+
+                int alignment(Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic);
+
+                if (!styleHint(SH_UnderlineShortcut, option, widget))
+                    alignment |= Qt::TextHideMnemonic;
+
+                if (!tabV2.icon.isNull())
+                {
+                    QSize iconSize(tabV2.iconSize);
+                    if (!iconSize.isValid())
+                    {
+                        int iconExtent(pixelMetric(PM_SmallIconSize));
+                        iconSize = QSize(iconExtent, iconExtent);
+                    }
+
+                    QPixmap tabIcon(tabV2.icon.pixmap(iconSize,
+                                                      (state&State_Enabled) ? QIcon::Normal
+                                                                            : QIcon::Disabled));
+
+                    static const int constIconPad=6;
+
+                    if(reverse)
+                    {
+                        painter->drawPixmap(r.right() - (iconSize.width() + constIconPad),
+                                            r.center().y() - tabIcon.height() / 2, tabIcon);
+                        r.setRight(r.right() - (iconSize.width() + constIconPad));
+                    }
+                    else
+                    {
+                        painter->drawPixmap(r.left() + constIconPad, r.center().y() - tabIcon.height() / 2, tabIcon);
+                        r.setLeft(r.left() + iconSize.width() + constIconPad);
+                    }
+                }
+
+                if(!tab->text.isEmpty())
+                {
+                    static const int constBorder=6;
+
+                    r.adjust(constBorder, 0, -constBorder, 0);
+                    drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text, QPalette::WindowText);
+                }
+
+                if (verticalTabs)
+                    painter->restore();
+
+                if (tabV2.state & State_HasFocus)
+                {
+                    const int constOffset = 1 + pixelMetric(PM_DefaultFrameWidth);
+
+                    int x1, x2;
+                    x1 = tabV2.rect.left();
+                    x2 = tabV2.rect.right() - 1;
+
+                    QStyleOptionFocusRect fropt;
+                    fropt.QStyleOption::operator=(*tab);
+                    fropt.rect.setRect(x1 + 1 + constOffset, tabV2.rect.y() + constOffset,
+                                    x2 - x1 - 2*constOffset, tabV2.rect.height() - 2*constOffset);
+                    drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
+                }
+            }
+            break;
         case CE_TabBarTabShape:
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             {
@@ -4283,7 +4410,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab),
                      fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab),
                      mouseOver(state&State_Enabled && state&State_MouseOver);
-                const QColor &fill(getTabFill(selected, mouseOver, itsBackgroundCols));
+                const QColor *use(backgroundColors(option));
+                const QColor &fill(getTabFill(selected, mouseOver, use));
 
                 painter->save();
                 switch(tab->shape)
@@ -4313,7 +4441,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(selected)
                         {
                             painter->setClipping(false);
-                            painter->setPen(itsBackgroundCols[0]);
+                            painter->setPen(use[0]);
 
                             // The point drawn below is because of the clipping above...
                             if(fixLeft)
@@ -4327,9 +4455,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             int l(fixLeft ? r2.left()+2 : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right()+1);
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.bottom()-1, r, r2.bottom()-1);
-                            painter->setPen(itsBackgroundCols[0]);
+                            painter->setPen(use[0]);
                             painter->drawLine(l, r2.bottom(), r, r2.bottom());
                         }
 
@@ -4381,7 +4509,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(selected)
                         {
-                            painter->setPen(itsBackgroundCols[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
                             if(!fixLeft)
                                 painter->drawPoint(r2.left()-1, r2.top());
                             if(!fixRight)
@@ -4391,9 +4519,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             int l(fixLeft ? r2.left()+2 : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right());
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.top()+1, r, r2.top()+1);
-                            painter->setPen(itsBackgroundCols[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
                             painter->drawLine(l, r2.top(), r, r2.top());
                         }
 
@@ -4445,7 +4573,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(selected)
                         {
-                            painter->setPen(itsBackgroundCols[0]);
+                            painter->setPen(use[0]);
                             if(!firstTab)
                                 painter->drawPoint(r2.right(), r2.top()-1);
                             painter->drawLine(r2.right(), r2.bottom()-1, r2.right(), r2.bottom());
@@ -4455,9 +4583,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             int t(firstTab ? r2.top()+2 : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(r2.right()-1, t, r2.right()-1, b);
-                            painter->setPen(itsBackgroundCols[0]);
+                            painter->setPen(use[0]);
                             painter->drawLine(r2.right(), t, r2.right(), b);
                         }
 
@@ -4509,7 +4637,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(selected)
                         {
-                            painter->setPen(itsBackgroundCols[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
                             if(!firstTab)
                                 painter->drawPoint(r2.left(), r2.top()-1);
                             painter->drawLine(r2.left(), r2.bottom()-1, r2.left(), r2.bottom());
@@ -4519,9 +4647,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             int t(firstTab ? r2.top()+2 : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(r2.left()+1, t, r2.left()+1, b);
-                            painter->setPen(itsBackgroundCols[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
                             painter->drawLine(r2.left(), t, r2.left(), b);
                         }
 
