@@ -6,6 +6,6 @@
 #define KDE4PREFIX        "@KDE4PREFIX@"
 
 #cmakedefine KDE4_FOUND 1
-#cmakedefine QTC_MODIFY_QFILEDIALOG_CALLS
+#cmakedefine QTC_DISABLE_KDEFILEDIALOG_CALLS
 
 #endif

@@ -55,7 +55,7 @@ static void checkKComponentData()
     }
 }
 
-#ifdef QTC_MODIFY_QFILEDIALOG_CALLS
+#if defined KDE4_FOUND && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
 #include <KDE/KFileDialog>
 #include <KDE/KDirSelectDialog>
 #include <KDE/KGlobal>
@@ -922,7 +922,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 {
 #ifdef KDE4_FOUND
     theInstanceCount++;
-#ifdef QTC_MODIFY_QFILEDIALOG_CALLS
+#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
     setFileDialogs();
 #endif
 #endif
@@ -1022,7 +1022,7 @@ QtCurveStyle::~QtCurveStyle()
         delete theKComponentData;
         theKComponentData=0L;
     }
-#ifdef QTC_MODIFY_QFILEDIALOG_CALLS
+#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
     unsetFileDialogs();
 #endif
 #endif
