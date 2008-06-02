@@ -7624,15 +7624,17 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
 
     int  length(vertical ? r.height() : r.width());
     bool drawFull(length > 3);
+    const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor
+                    ? itsMenuitemCols : itsBackgroundCols;
 
     if(opts.fillProgress || drawFull)
-        drawLightBevel(p, r, &opt, 0L, round, itsMenuitemCols[ORIGINAL_SHADE], itsMenuitemCols, !opts.fillProgress, WIDGET_PROGRESSBAR);
+        drawLightBevel(p, r, &opt, 0L, round, use[ORIGINAL_SHADE], use, !opts.fillProgress, WIDGET_PROGRESSBAR);
     else
     {
-        p->setPen(itsMenuitemCols[QT_STD_BORDER]);
+        p->setPen(use[QT_STD_BORDER]);
         if(length>1)
         {
-            p->setBrush(itsMenuitemCols[ORIGINAL_SHADE]);
+            p->setBrush(use[ORIGINAL_SHADE]);
             drawRect(p, r);
         }
         else if(vertical)
@@ -7647,9 +7649,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
 
         if(opts.fillProgress)
         {
-            const QColor *use(backgroundColors(option));
-
-            p->setPen(use[QT_STD_BORDER]);
+            p->setPen(backgroundColors(option)[QT_STD_BORDER]);
             rb.adjust(1, 1, -1, -1);
         }
         else

@@ -21,6 +21,7 @@
 10. Fix missing pixels on scrollbars when slider is 1 pix away from
     buttons.
 11. Fix custom itemview background painting.
+12. Fix border of disabled progressbars.
 
 0.59.2
 ------
