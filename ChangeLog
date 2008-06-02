@@ -7,7 +7,11 @@
      -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
 
  3. Link to KDE libraries (if KDE4 is installed) to read kwin settings,
-    control the icons on buttons setting, and to load some icons.
+    control the icons on buttons setting, and to load some icons. Disable
+    bycalling cmake with:
+
+     -DQTC_NO_KDE4_LINKING=true
+
  4. Fix vertical dockwidget titlebars.
  5. Make busy progress thinner.
  6. Left align tab text - or right align for RTL.

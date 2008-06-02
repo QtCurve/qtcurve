@@ -26,7 +26,11 @@
 #define CONFIG_READ
 #include "config_file.c"
 
-#ifdef KDE4_FOUND
+#if defined KDE4_FOUND && !defined QTC_NO_KDE4_LINKING
+#define QTC_USE_KDE4
+#endif
+
+#ifdef QTC_USE_KDE4
 #include <KDE/KGlobalSettings>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
@@ -55,7 +59,7 @@ static void checkKComponentData()
     }
 }
 
-#if defined KDE4_FOUND && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
+#if defined QTC_USE_KDE4 && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
 #include <KDE/KFileDialog>
 #include <KDE/KDirSelectDialog>
 #include <KDE/KGlobal>
@@ -224,7 +228,7 @@ static void unsetFileDialogs()
 
 #endif
 
-#endif // KDE4_FOUND
+#endif // QTC_USE_KDE4
 
 // The tabs used in multi-dock widgets, and KDE's properties dialog, look odd,
 // as the QTabBar is not a child of a QTabWidget! the QTC_STYLE_QTABBAR controls
@@ -729,7 +733,7 @@ static void readPal(QString &line, QPalette::ColorGroup grp, QPalette &pal)
 #endif
 }
 
-#ifndef KDE4_FOUND
+#ifndef QTC_USE_KDE4
 static void setRgb(QColor *col, const QStringList &rgb)
 {
     if(3==rgb.size())
@@ -920,7 +924,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsPos(-1, -1),
               itsHoverWidget(NULL)
 {
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
     theInstanceCount++;
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
     setFileDialogs();
@@ -1016,7 +1020,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
 QtCurveStyle::~QtCurveStyle()
 {
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
     if(0==--theInstanceCount && theKComponentData)
     {
         delete theKComponentData;
@@ -1853,7 +1857,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_FormLayoutFieldGrowthPolicy:
             return QFormLayout::ExpandingFieldsGrow;
 #endif
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
         case SH_DialogButtonBox_ButtonsHaveIcons:
             checkKComponentData();
             return KGlobalSettings::showIconsOnPushButtons();
@@ -1870,7 +1874,7 @@ QPalette QtCurveStyle::standardPalette() const
 
 QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
     checkKComponentData();
 
     bool fd(widget && qobject_cast<const QFileDialog *>(widget));
@@ -2014,7 +2018,7 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
 
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
     checkKComponentData();
 
     switch(pix)
@@ -8314,7 +8318,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
         }
         else // KDE4
         {
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
             checkKComponentData();
 
             QColor col;
@@ -8411,7 +8415,7 @@ void QtCurveStyle::readMdiPositions() const
         itsMdiButtons[1].append(WINDOWTITLE_SPACER);
         itsMdiButtons[1].append(SC_TitleBarCloseButton);
 
-#ifdef KDE4_FOUND
+#ifdef QTC_USE_KDE4
         checkKComponentData();
 
         KConfig      cfg("kwinrc");
