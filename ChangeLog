@@ -1,19 +1,21 @@
 0.59.3
 ------
-1. Fix Arora location field.
-2. Override Qt file dialogs iwth KDE ones. This can be disabled by
-   calling cmake with:
+ 1. Fix Arora location field.
+ 2. Override Qt file dialogs iwth KDE ones. This can be disabled by
+    calling cmake with:
 
-    -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
+     -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
 
-3. Link to KDE libraries (if KDE4 is installed) to read kwin settings,
-   control the icons on buttons setting, and to load some icons.
-4. Fix vertical dockwidget titlebars.
-5. Make busy progress thinner.
-6. Left align tab text - or right align for RTL.
-7. Fix positioning of tab icon for RTL.
-8. Allow tabs to be recoloured.
-9. Draw arrow on toolbar buttons with menus.
+ 3. Link to KDE libraries (if KDE4 is installed) to read kwin settings,
+    control the icons on buttons setting, and to load some icons.
+ 4. Fix vertical dockwidget titlebars.
+ 5. Make busy progress thinner.
+ 6. Left align tab text - or right align for RTL.
+ 7. Fix positioning of tab icon for RTL.
+ 8. Allow tabs to be recoloured.
+ 9. Draw arrow on toolbar buttons with menus.
+10. Fix missing pixels on scrollbars when slider is 1 pix away from
+    buttons.
 
 0.59.2
 ------

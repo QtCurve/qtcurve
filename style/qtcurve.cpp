@@ -4790,12 +4790,30 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_ScrollBarAddPage:
         {
             const QColor *use(itsBackgroundCols); // backgroundColors(option));
+            int          borderAdjust(0);
 
             painter->save();
 #ifndef QTC_SIMPLE_SCROLLBARS
             if(QTC_ROUNDED && SCROLLBAR_NONE==opts.scrollbarType)
                 painter->fillRect(r, palette.background().color());
 #endif
+
+            switch(opts.scrollbarType)
+            {
+                case SCROLLBAR_KDE:
+                case SCROLLBAR_WINDOWS:
+                    borderAdjust=1;
+                    break;
+                case SCROLLBAR_PLATINUM:
+                    if(CE_ScrollBarAddPage==element)
+                        borderAdjust=1;
+                    break;
+                case SCROLLBAR_NEXT:
+                    if(CE_ScrollBarSubPage==element)
+                        borderAdjust=1;
+                default:
+                    break;
+            }
 
             if(state&State_Horizontal)
             {
@@ -4816,18 +4834,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
                 else
 #endif
-                {
-                    painter->setPen(use[QT_STD_BORDER]);
-                    painter->setRenderHint(QPainter::Antialiasing, true);
-                    drawAaLine(painter, r.left(), r.top(), r.right(), r.top());
-                    drawAaLine(painter, r.left(), r.bottom(), r.right(), r.bottom());
-
-                    if(CE_ScrollBarAddPage==element && SCROLLBAR_NEXT==opts.scrollbarType)
-                        drawAaLine(painter, r.right(), r.top(), r.right(), r.bottom());
-                    else if(CE_ScrollBarSubPage==element && SCROLLBAR_PLATINUM==opts.scrollbarType)
-                        drawAaLine(painter, r.left(), r.top(), r.left(), r.bottom());
-                    painter->setRenderHint(QPainter::Antialiasing, false);
-                }
+                    if(CE_ScrollBarAddPage==element)
+                        drawBorder(painter, r.adjusted(-5, 0, borderAdjust, 0), option, ROUNDED_NONE, use);
+                    else
+                        drawBorder(painter, r.adjusted(-borderAdjust, 0, 5, 0), option, ROUNDED_NONE, use);
             }
             else
             {
@@ -4848,19 +4858,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
                 else
 #endif
-                {
-
-                    painter->setPen(use[QT_STD_BORDER]);
-                    painter->setRenderHint(QPainter::Antialiasing, true);
-                    drawAaLine(painter, r.left(), r.top(), r.left(), r.bottom());
-                    drawAaLine(painter, r.right(), r.top(), r.right(), r.bottom());
-
-                    if(CE_ScrollBarAddPage==element && (SCROLLBAR_NEXT==opts.scrollbarType || SCROLLBAR_NONE==opts.scrollbarType))
-                        drawAaLine(painter, r.left(), r.bottom(), r.right(), r.bottom());
-                    else if(CE_ScrollBarSubPage==element && (SCROLLBAR_PLATINUM==opts.scrollbarType || SCROLLBAR_NONE==opts.scrollbarType))
-                        drawAaLine(painter, r.left(), r.top(), r.right(), r.top());
-                    painter->setRenderHint(QPainter::Antialiasing, false);
-                }
+                    if(CE_ScrollBarAddPage==element)
+                        drawBorder(painter, r.adjusted(0, -5, 0, borderAdjust), option, ROUNDED_NONE, use);
+                    else
+                        drawBorder(painter, r.adjusted(0, -borderAdjust, 0, 5), option, ROUNDED_NONE, use);
             }
             painter->restore();
             break;
