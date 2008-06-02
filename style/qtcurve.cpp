@@ -3097,7 +3097,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         {
             const QStyleOptionViewItemV4 *v4Opt(qstyleoption_cast<const QStyleOptionViewItemV4*>(option));
 
-            if (v4Opt && v4Opt->features&QStyleOptionViewItemV2::Alternate)
+            if (v4Opt/* && v4Opt->features&QStyleOptionViewItemV2::Alternate*/)
                 painter->fillRect(option->rect, v4Opt->backgroundBrush);
 
             if (!(state & (State_Selected|State_MouseOver)))
