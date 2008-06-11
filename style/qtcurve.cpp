@@ -1861,6 +1861,9 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_DialogButtonBox_ButtonsHaveIcons:
             checkKComponentData();
             return KGlobalSettings::showIconsOnPushButtons();
+        case SH_ItemView_ActivateItemOnSingleClick:
+            checkKComponentData();
+            return KGlobalSettings::singleClick();
 #endif
         default:
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);

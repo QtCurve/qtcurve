@@ -1,14 +1,19 @@
+0.59.4
+------
+1. If linked against KDE, honour the single/double click setting for
+   listviews.
+
 0.59.3
 ------
  1. Fix Arora location field.
- 2. Override Qt file dialogs iwth KDE ones. This can be disabled by
+ 2. Override Qt file dialogs with KDE ones. This can be disabled by
     calling cmake with:
 
      -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
 
  3. Link to KDE libraries (if KDE4 is installed) to read kwin settings,
     control the icons on buttons setting, and to load some icons. Disable
-    bycalling cmake with:
+    by calling cmake with:
 
      -DQTC_NO_KDE4_LINKING=true
 
