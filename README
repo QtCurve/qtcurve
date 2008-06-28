@@ -15,11 +15,6 @@ The following options may be supplied to cmake:
         are the newer versions. This sets 'newFirefox' and 'newThunderbird' to true
         by default.
 
-    -DQTC_ADD_EVENT_FILTER=true
-        Enable receiving of KDE style change events
-        NOTE: This has been reported to interfere with firefox, and
-              crash some apps. Use at your own risk.
-
    -DQTC_MODIFY_MOZILLA=true
         Enable mods to userChrome.css (setting KDE button order)
 

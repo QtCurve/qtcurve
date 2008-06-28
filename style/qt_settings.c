@@ -1208,7 +1208,7 @@ static void processMozillaApp(gboolean add_css, gboolean add_menu_colors, char *
 }
 #endif
 
-#ifdef QTC_ADD_EVENT_FILTER
+#ifdef QTC_ADD_EVENT_FILTER____DISABLED
 /* ... Taken from Qt engine ... */
 
 #include <gdk/gdkx.h>

@@ -5942,7 +5942,7 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     if(qtInit(&opts))
         generateColors();
-#ifdef QTC_ADD_EVENT_FILTER
+#ifdef QTC_ADD_EVENT_FILTER____DISABLED
     qtcAddEventFilter();
 #endif
 }
