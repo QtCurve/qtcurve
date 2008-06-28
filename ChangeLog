@@ -1,3 +1,10 @@
+0.59.5
+------
+1. Draw disabled icons desaturated - more KDE like.
+2. 'Fix' pixelation of firefox dialog icons. They look
+   slightly blurry, due to being scaled, but this is nicer
+   than the previous pixelated icons.
+
 0.59.4
 ------
 1. Fix reading in of lightBorder for custom gradients.

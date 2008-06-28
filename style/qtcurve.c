@@ -4412,6 +4412,125 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
 }
 
+static GdkPixbuf * scaleOrRef(GdkPixbuf *src, int width, int height)
+{
+    if (width == gdk_pixbuf_get_width(src) && height == gdk_pixbuf_get_height(src))
+        return g_object_ref (src);
+    else
+        return gdk_pixbuf_scale_simple(src, width, height, GDK_INTERP_BILINEAR);
+}
+
+static GdkPixbuf * setTransparency(const GdkPixbuf *pixbuf, gdouble alpha_percent)
+{
+    GdkPixbuf *target;
+
+    g_return_val_if_fail(pixbuf != NULL, NULL);
+    g_return_val_if_fail(GDK_IS_PIXBUF (pixbuf), NULL);
+
+    /* Returns a copy of pixbuf with it's non-completely-transparent pixels to
+        have an alpha level "alpha_percent" of their original value. */
+
+    target = gdk_pixbuf_add_alpha (pixbuf, FALSE, 0, 0, 0);
+
+    if (alpha_percent == 1.0)
+        return target;
+    else
+    {
+        guint  width = gdk_pixbuf_get_width(target),
+               height = gdk_pixbuf_get_height(target),
+               rowstride = gdk_pixbuf_get_rowstride(target);
+        guchar *data = gdk_pixbuf_get_pixels(target),
+               *current;
+        int    x, y;
+
+        for (y = 0; y < height; y++)
+            for (x = 0; x < width; x++)
+            {
+                /* The "4" is the number of chars per pixel, in this case, RGBA,
+                   the 3 means "skip to the alpha" */
+                current = data + (y * rowstride) + (x * 4) + 3;
+                *(current) = (guchar) (*(current) * alpha_percent);
+            }
+    }
+
+    return target;
+}
+
+static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDirection direction,
+                                 GtkStateType state, GtkIconSize size, GtkWidget *widget, const char *detail)
+{
+    int         width = 1,
+                height = 1;
+    GdkPixbuf   *scaled,
+                *stated,
+                *base_pixbuf;
+    GdkScreen   *screen;
+    GtkSettings *settings;
+    gboolean    scaleMozilla=opts.mapKdeIcons && isMozilla() && GTK_ICON_SIZE_DIALOG==size;
+
+    /* Oddly, style can be NULL in this function, because GtkIconSet can be used without a style and if so
+     * it uses this function. */
+    base_pixbuf = gtk_icon_source_get_pixbuf(source);
+
+    g_return_val_if_fail(base_pixbuf != NULL, NULL);
+
+    if(widget && gtk_widget_has_screen(widget))
+    {
+        screen = gtk_widget_get_screen(widget);
+        settings = gtk_settings_get_for_screen(screen);
+    }
+    else if(style->colormap)
+    {
+        screen = gdk_colormap_get_screen(style->colormap);
+        settings = gtk_settings_get_for_screen(screen);
+    }
+    else
+    {
+        settings = gtk_settings_get_default();
+        GTK_NOTE(MULTIHEAD, g_warning("Using the default screen for gtk_default_render_icon()"));
+    }
+
+    if(scaleMozilla)
+        width=height=48;
+    else if(size !=(GtkIconSize) -1 && !gtk_icon_size_lookup_for_settings(settings, size, &width, &height))
+    {
+        g_warning(G_STRLOC ": invalid icon size '%d'", size);
+        return NULL;
+    }
+
+    /* If the size was wildcarded, and we're allowed to scale, then scale; otherwise,
+     * leave it alone. */
+    if(scaleMozilla || (size !=(GtkIconSize)-1 && gtk_icon_source_get_size_wildcarded(source)))
+        scaled = scaleOrRef(base_pixbuf, width, height);
+    else
+        scaled = g_object_ref(base_pixbuf);
+
+    /* If the state was wildcarded, then generate a state. */
+    if(gtk_icon_source_get_state_wildcarded(source))
+    {
+        if(GTK_STATE_INSENSITIVE==state)
+        {
+            stated = setTransparency(scaled, 0.5);
+            gdk_pixbuf_saturate_and_pixelate(stated, stated, 0.0, FALSE);
+            g_object_unref(scaled);
+        }
+#if 0 /* KDE does not highlight icons */
+        else if(GTK_STATE_PRELIGHT==state)
+        {
+            stated = gdk_pixbuf_copy(scaled);
+            gdk_pixbuf_saturate_and_pixelate(scaled, stated, 1.2, FALSE);
+            g_object_unref(scaled);
+        }
+#endif
+        else
+            stated = scaled;
+    }
+    else
+        stated = scaled;
+
+    return stated;
+}
+
 static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height)
@@ -5726,6 +5845,7 @@ void qtcurve_style_class_init(QtCurveStyleClass *klass)
     style_class->draw_vline = gtkDrawVLine;
     style_class->draw_focus = gtkDrawFocus;
     style_class->draw_layout = gtkDrawLayout;
+    style_class->render_icon = gtkRenderIcon;
 }
 
 static GtkRcStyleClass *parent_rc_class;
