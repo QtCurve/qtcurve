@@ -5,7 +5,7 @@
    slightly blurry, due to being scaled, but this is nicer
    than the previous pixelated icons.
 3. Removed KDE event filter (QTC_ADD_EVENT_FILTER cmake option)
-   - cuases way too many errors.
+   - causes way too many errors.
 
 0.59.4
 ------
