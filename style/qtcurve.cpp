@@ -1227,7 +1227,6 @@ void QtCurveStyle::polish(QWidget *widget)
         qobject_cast<QRadioButton *>(widget) ||
         qobject_cast<QSplitterHandle *>(widget) ||
         qobject_cast<QSlider *>(widget) ||
-        qobject_cast<QScrollBar *>(widget) ||
         qobject_cast<QHeaderView *>(widget) ||
         qobject_cast<QTabBar *>(widget) ||
 //        qobject_cast<QDockWidget *>(widget) ||
@@ -1236,6 +1235,13 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->inherits("QDockWidgetSeparator") ||
         widget->inherits("Q3DockWindowResizeHandle")))
         widget->setAttribute(Qt::WA_Hover, true);
+    else if (qobject_cast<QScrollBar *>(widget))
+    {
+        if(enableMouseOver)
+            widget->setAttribute(Qt::WA_Hover, true);
+        if(QTC_ROUNDED)
+            widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
+    }
     else if (qobject_cast<QProgressBar *>(widget))
     {
         if(widget->palette().color(QPalette::Inactive, QPalette::HighlightedText)!=widget->palette().color(QPalette::Active, QPalette::HighlightedText))
@@ -1373,7 +1379,6 @@ void QtCurveStyle::unpolish(QWidget *widget)
        qobject_cast<QRadioButton *>(widget) ||
        qobject_cast<QSplitterHandle *>(widget) ||
        qobject_cast<QSlider *>(widget) ||
-       qobject_cast<QScrollBar *>(widget) ||
        qobject_cast<QHeaderView *>(widget) ||
        qobject_cast<QTabBar *>(widget) ||
 //       qobject_cast<QDockWidget *>(widget) ||
@@ -1382,6 +1387,12 @@ void QtCurveStyle::unpolish(QWidget *widget)
        widget->inherits("QDockWidgetSeparator") ||
        widget->inherits("Q3DockWindowResizeHandle"))
         widget->setAttribute(Qt::WA_Hover, false);
+    else if (qobject_cast<QScrollBar *>(widget))
+    {
+        widget->setAttribute(Qt::WA_Hover, false);
+        if(QTC_ROUNDED)
+            widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+    }
     else if (qobject_cast<QProgressBar *>(widget))
         widget->removeEventFilter(this);
     else if (widget->inherits("Q3Header"))
@@ -4767,7 +4778,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             }
 
             painter->save();
-            painter->fillRect(r, palette.background());
+            if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
+                painter->fillRect(r, palette.brush(QPalette::Background));
 
             QStyleOption opt(*option);
 
@@ -5650,7 +5662,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #endif
 
                 painter->save();
-                painter->fillRect(r, palette.background());
+
+                if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
+                    painter->fillRect(r, palette.brush(QPalette::Background));
 #if 0
                 //painter->setClipRegion(QRegion(s2)+QRegion(addpage));
 
