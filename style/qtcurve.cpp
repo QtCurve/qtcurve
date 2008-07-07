@@ -1876,6 +1876,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             checkKComponentData();
             return KGlobalSettings::singleClick();
 #endif
+        case SH_MenuBar_AltKeyNavigation:
+            return false;
         default:
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);
    }
