@@ -1,6 +1,8 @@
 0.59.5
 ------
 1. Fix corners of scrolbars in plasma 4.1's folderview.
+2. Fix the dock widget titlebar buttons in KOffice 2
+3. Dont darken dock widget titlebar.
 
 0.59.4
 ------

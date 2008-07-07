@@ -2657,7 +2657,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
         case PE_IndicatorButtonDropDown: // This should never be called, but just in case - draw as a normal toolbutton...
         {
-            bool dwt(widget && widget->inherits("QDockWidgetTitleButton"));
+            bool dwt(widget && (widget->inherits("QDockWidgetTitleButton") ||
+                                (widget->parentWidget() && widget->parentWidget()->inherits("KoDockWidgetTitleBar"))));
 
             if( ((state&State_Enabled) || !(state&State_AutoRaise)) &&
                (!widget || !dwt || (state&State_MouseOver)) )
@@ -3387,13 +3388,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             if (const QStyleOptionDockWidget *dwOpt = qstyleoption_cast<const QStyleOptionDockWidget *>(option))
             {
                 painter->save();
-
+#if 0
     #if QT_VERSION >= 0x040300
                 painter->fillRect(r, palette.background().color().darker(105));
     #else
                 painter->fillRect(r, palette.background().color().dark(105));
     #endif
-
+#endif
                 if (!dwOpt->title.isEmpty())
                 {
 #if QT_VERSION >= 0x040300
