@@ -3389,14 +3389,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_DockWidgetTitle:
             if (const QStyleOptionDockWidget *dwOpt = qstyleoption_cast<const QStyleOptionDockWidget *>(option))
             {
+                // This section fixes the look of KOffice's dock widget titlebars...
+                QRect fillRect(r);
+                if(widget && widget->inherits("KoDockWidgetTitleBar"))
+                    fillRect.adjust(-r.x(), -r.y(), r.x(), r.y());
+
                 painter->save();
-#if 0
     #if QT_VERSION >= 0x040300
-                painter->fillRect(r, palette.background().color().darker(105));
+                painter->fillRect(fillRect, palette.background().color().darker(105));
     #else
-                painter->fillRect(r, palette.background().color().dark(105));
+                painter->fillRect(fillRect, palette.background().color().dark(105));
     #endif
-#endif
                 if (!dwOpt->title.isEmpty())
                 {
 #if QT_VERSION >= 0x040300
