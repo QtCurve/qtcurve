@@ -1840,6 +1840,11 @@ static gboolean qtInit(Options *opts)
             } /* C-Scope */
             } /* C-Scope 'doEffect' */
 
+            if(GTK_APP_JAVA_SWT==qtSettings.app && ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
+                gtk_rc_parse_string("style \"QtcSwt\" { xthickness = 3 ythickness = 2 }"
+                                    "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \"QtcSwt\""
+                                    "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \"QtcSwt\"");
+
             if(opts->lighterPopupMenuBgnd && !opts->borderMenuitems)
                 gtk_rc_parse_string("style \"QtCM\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \"QtCM\"");
