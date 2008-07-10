@@ -477,12 +477,14 @@ static gboolean isComboBoxEntryButton(GtkWidget *widget)
            GTK_IS_COMBO_BOX_ENTRY(widget->parent);
 }
 
+/*
 static gboolean isSwtComboBoxEntry(GtkWidget *widget)
 {
     return GTK_APP_JAVA_SWT==qtSettings.app &&
            isComboBoxEntry(widget) &&
            widget->parent->parent && 0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent->parent)), "SwtFixed");
 }
+*/
 
 static gboolean isGimpCombo(GtkWidget *widget)
 {
@@ -800,7 +802,7 @@ static gboolean isMozillaWidget(GtkWidget *widget)
            GTK_IS_FIXED(widget->parent) && GTK_IS_WINDOW(widget->parent->parent);
 }
 
-static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down)
+static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down, int sliderWidth, int sliderHeight)
 {
     if(isMozillaWidget(widget))
     {
@@ -814,15 +816,15 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down)
     else
     {
 #define BTN_SIZE 15
-
         GtkRange *range=GTK_RANGE(widget);
         gboolean horiz=range->orientation,
-                    disableLeft=FALSE,
-                    disableRight=FALSE;
-        int      max=horiz ? range->range_rect.height
-                            : range->range_rect.width,
-                    leftBtns=0,
-                    rightBtns=0;
+                 disableLeft=FALSE,
+                 disableRight=FALSE;
+        int      len=horiz ? sliderHeight : sliderWidth,
+                 max=horiz ? range->range_rect.height
+                           : range->range_rect.width,
+                leftBtns=0,
+                rightBtns=0;
 
         switch(opts.scrollbarType)
         {
@@ -846,11 +848,17 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down)
             case SCROLLBAR_NONE:
                 break;
         }
-
-        if(range->slider_start==leftBtns)
-            disableLeft=TRUE;
-        if(range->slider_end+rightBtns==max)
-            disableRight=TRUE;
+        if(-1!=len)
+            disableLeft=disableRight=len==(max-(leftBtns+rightBtns));
+        else if(/*GTK_APP_JAVA_SWT!=qtSettings.app || */!widget || !widget->parent || !widget->parent->parent ||
+                !GTK_IS_FIXED(widget->parent) || !widget->parent->parent->name ||
+                strcmp(widget->parent->parent->name, "MozillaGtkWidget"))
+        {
+            if(range->slider_start==leftBtns)
+                disableLeft=TRUE;
+            if(range->slider_end+rightBtns==max)
+                disableRight=TRUE;
+        }
 
         if(disableLeft && disableRight)
             *state=GTK_STATE_INSENSITIVE;
@@ -2400,12 +2408,14 @@ debugDisplayWidget(widget, 3);
         /* For SWT (e.g. eclipse) apps. For some reason these only seem to allow a ythickness of at max 2 - but
            for etching we need 3. So we fake this by drawing the 3rd lines here...*/
 
+/*
         if(QTC_DO_EFFECT && GTK_STATE_INSENSITIVE!=state && DETAIL("entry_bg") &&
            isSwtComboBoxEntry(widget) && GTK_WIDGET_HAS_FOCUS(widget))
         {
             drawHLine(cr, QTC_CAIRO_COL(qtcPalette.menuitem[QT_FRAME_DARK_SHADOW]), 1.0, x, y, width);
             drawHLine(cr, QTC_CAIRO_COL(qtcPalette.menuitem[0]), 1.0, x, y+height-1, width);
         }
+*/
     }
     QTC_CAIRO_END
 }
@@ -2663,7 +2673,7 @@ debugDisplayWidget(widget, 3);
 #else
 */
         if(GTK_IS_RANGE(widget) && sbar)
-            setState(widget, &state, NULL);
+            setState(widget, &state, NULL, -1, -1);
 /*
 #endif
 */
@@ -2750,7 +2760,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                               0==strcmp(detail, "stepper"));
 
     if(GTK_IS_RANGE(widget) && sbar)
-        setState(widget, &state, &btn_down);
+        setState(widget, &state, &btn_down, -1, -1);
     {
 
     gboolean pbar=DETAIL("bar") && GTK_IS_PROGRESS_BAR(widget),
@@ -2966,12 +2976,13 @@ debugDisplayWidget(widget, 3);
 #endif
 
                 /* For some reason SWT combo's dont un-prelight when activated! So dont pre-light at all! */
+/*
                 if(GTK_APP_JAVA_SWT==qtSettings.app && WIDGET_STD_BUTTON==widgetType && GTK_STATE_PRELIGHT==state && WIDGET_COMBO==widgetType)
                 {
                     state=GTK_STATE_NORMAL;
                     bgnd=getFill(state, btn_down);
                 }
-                else if(WIDGET_SB_BUTTON==widgetType && GTK_APP_MOZILLA!=qtSettings.app)
+                else */ if(WIDGET_SB_BUTTON==widgetType && GTK_APP_MOZILLA!=qtSettings.app)
                     switch(getStepper(widget, x, y, width, height))
                     {
                         case QTC_STEPPER_B:
@@ -5015,7 +5026,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     QTC_CAIRO_BEGIN
 
     if(GTK_IS_RANGE(widget) && scrollbar)
-        setState(widget, &state, NULL);
+        setState(widget, &state, NULL, width, height);
 
     if(useButtonColor(detail))
     {

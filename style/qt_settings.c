@@ -108,7 +108,7 @@ typedef enum
     GTK_APP_GIMP,
     GTK_APP_GIMP_PLUGIN,
     GTK_APP_JAVA,
-    GTK_APP_JAVA_SWT,
+    /*GTK_APP_JAVA_SWT,*/
     GTK_APP_EVOLUTION
     /*GTK_APP_GAIM*/
 } EGtkApp;
@@ -715,7 +715,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     (int)size);
         }
 #ifdef QTC_DEBUG
-printf("REQUEST FONT: %s\n", qtSettings.font);
+        printf("REQUEST FONT: %s\n", qtSettings.font);
 #endif
     }
 
@@ -1477,13 +1477,15 @@ static gboolean qtInit(Options *opts)
                     qtSettings.app=GTK_APP_JAVA;
                 else if(0==strcmp(app, "evolution"))
                     qtSettings.app=GTK_APP_EVOLUTION;
+                /*else if(0==strcmp(app, "eclipse"))
+                    qtSettings.app=GTK_APP_JAVA_SWT;*/
                 /*else if(app==strstr(app, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }
 
             /* Eclipse sets a application name, so if this is set then we're not a Swing java app */
-            if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
-                qtSettings.app=GTK_APP_JAVA_SWT;
+            /*if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
+                qtSettings.app=GTK_APP_JAVA_SWT;*/
 
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
@@ -1840,10 +1842,10 @@ static gboolean qtInit(Options *opts)
             } /* C-Scope */
             } /* C-Scope 'doEffect' */
 
-            if(GTK_APP_JAVA_SWT==qtSettings.app && ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
-                gtk_rc_parse_string("style \"QtcSwt\" { xthickness = 3 ythickness = 2 }"
-                                    "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \"QtcSwt\""
-                                    "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \"QtcSwt\"");
+            if(ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
+                gtk_rc_parse_string("style \"QtCSwt\" { xthickness = 3 ythickness = 2 }"
+                                    "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \"QtCSwt\""
+                                    "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \"QtCSwt\"");
 
             if(opts->lighterPopupMenuBgnd && !opts->borderMenuitems)
                 gtk_rc_parse_string("style \"QtCM\" { xthickness=1 ythickness=1 }\n"
