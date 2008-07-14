@@ -4086,11 +4086,13 @@ debugDisplayWidget(widget, 3);
     }
     else if (tri)
     {
-        int tx=x+(QTC_CHECK_SIZE/2),
-            ty=y+(QTC_CHECK_SIZE/2);
+        int      ty=y+(QTC_CHECK_SIZE/2);
+        GdkColor *col=GTK_STATE_INSENSITIVE==state
+                        ? &style->text[ind_state]
+                        : qtcPalette.check_radio;
 
-        drawHLine(cr, QTC_CAIRO_COL(style->text[ind_state]), 1.0, tx-3, ty, 6);
-        drawHLine(cr, QTC_CAIRO_COL(style->text[ind_state]), 1.0, tx-3, ty+1, 6);
+        drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty, QTC_CHECK_SIZE-4);
+        drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty+1, QTC_CHECK_SIZE-4);
     }
 
     QTC_CAIRO_END
@@ -4235,11 +4237,14 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else if(tri)
         {
-            int tx=x+(QTC_RADIO_SIZE/2),
-                ty=y+(QTC_RADIO_SIZE/2);
+            int ty=y+(QTC_RADIO_SIZE/2);
 
-            drawHLine(cr, QTC_CAIRO_COL(style->text[ind_state]), 1.0, tx-3, ty, 6);
-            drawHLine(cr, QTC_CAIRO_COL(style->text[ind_state]), 1.0, tx-3, ty+1, 6);
+            GdkColor *col=GTK_STATE_INSENSITIVE==state
+                            ? &style->text[ind_state]
+                            : qtcPalette.check_radio;
+
+            drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty, QTC_RADIO_SIZE-4);
+            drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty+1, QTC_RADIO_SIZE-4);
         }
     }
     QTC_CAIRO_END

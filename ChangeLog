@@ -1,6 +1,7 @@
 0.59.6
 ------
 1. Improve appearance of SWT scrollbars.
+2. Fix colour of tri-state checkboxes.
 
 0.59.5
 ------
