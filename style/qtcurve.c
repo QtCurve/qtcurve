@@ -4091,8 +4091,8 @@ debugDisplayWidget(widget, 3);
                         ? &style->text[ind_state]
                         : qtcPalette.check_radio;
 
-        drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty, QTC_CHECK_SIZE-4);
-        drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty+1, QTC_CHECK_SIZE-4);
+        drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty, QTC_CHECK_SIZE-6);
+        drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty+1, QTC_CHECK_SIZE-6);
     }
 
     QTC_CAIRO_END
@@ -4243,8 +4243,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                             ? &style->text[ind_state]
                             : qtcPalette.check_radio;
 
-            drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty, QTC_RADIO_SIZE-4);
-            drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+2, ty+1, QTC_RADIO_SIZE-4);
+            drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty, QTC_RADIO_SIZE-6);
+            drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty+1, QTC_RADIO_SIZE-6);
         }
     }
     QTC_CAIRO_END
