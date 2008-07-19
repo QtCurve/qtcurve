@@ -7107,6 +7107,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     else if(colouredMouseOver || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
             (!IS_GLASS(app) && !sunken && option->state&State_Raised))
     {
+        p->setRenderHint(QPainter::Antialiasing, true);
         if(colouredMouseOver)
             p->setPen(border[QTC_MO_STD_LIGHT(w, sunken)]);
         else
@@ -7114,30 +7115,31 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
         {
             //Left & top
-            p->drawLine(br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-3);
-            p->drawLine(br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
+            drawAaLine(p, br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-3);
+            drawAaLine(p, br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
 
             if(colouredMouseOver)
                 p->setPen(border[QTC_MO_STD_DARK(w)]);
             else
                 p->setPen(border[sunken ? 0 : dark]);
             //Right & bottom
-            p->drawLine(br.x()+br.width()-2, br.y()+1, br.x()+br.width()-2, br.y()+br.height()-3);
-            p->drawLine(br.x()+1, br.y()+br.height()-2, br.x()+br.width()-2, br.y()+br.height()-2);
+            drawAaLine(p, br.x()+br.width()-2, br.y()+1, br.x()+br.width()-2, br.y()+br.height()-3);
+            drawAaLine(p, br.x()+1, br.y()+br.height()-2, br.x()+br.width()-2, br.y()+br.height()-2);
             br.adjust(2, 2,-2,-2);
         }
         else
         {
             //Left & top
-            p->drawLine(br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-(WIDGET_MDI_WINDOW_TITLE==w ? 1 : 2));
+            drawAaLine(p, br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-(WIDGET_MDI_WINDOW_TITLE==w ? 1 : 2));
             if((WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w) && APPEARANCE_SHINY_GLASS==app)
                 br.adjust(2, 1, -1, -1);
             else
             {
-                p->drawLine(br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
+                drawAaLine(p, br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
                 br.adjust(2, 2,-1,-1);
             }
         }
+        p->setRenderHint(QPainter::Antialiasing, false);
     }
     else
         br.adjust(1, 1,-1,-1);
