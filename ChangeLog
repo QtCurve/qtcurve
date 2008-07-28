@@ -4,6 +4,7 @@
    and place it on the 'Bar' line.
 2. Fix some drawing issues with menuitems and NVIDIA.
 3. 'Fix' Skype's menu buttons.
+4. Only do icon mapping for KDE apps. Fixes crash with qt-recordMyDesktop.
 
 0.59.5
 ------
