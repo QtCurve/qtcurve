@@ -930,6 +930,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
     setFileDialogs();
 #endif
+    QTimer::singleShot(0, this, SLOT(setupKde4()));
 #endif
 
     QString rcFile;
@@ -8618,6 +8619,13 @@ const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QCol
 void QtCurveStyle::widgetDestroyed(QObject *o)
 {
     theNoEtchWidgets.remove(static_cast<const QWidget *>(o));
+}
+
+void QtCurveStyle::setupKde4()
+{
+#ifdef QTC_USE_KDE4
+    checkKComponentData();
+#endif
 }
 
 #include "qtcurve.moc"
