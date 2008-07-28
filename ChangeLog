@@ -3,6 +3,7 @@
 1. In config dialog, rename the 'Fill' progressbar option to 'No border',
    and place it on the 'Bar' line.
 2. Fix some drawing issues with menuitems and NVIDIA.
+3. 'Fix' Skype's menu buttons.
 
 0.59.5
 ------

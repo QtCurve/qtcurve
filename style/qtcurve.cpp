@@ -264,6 +264,7 @@ static enum
     APP_KRUNNER,
     APP_KWIN,
     APP_SYSTEMSETTINGS,
+    APP_SKYPE,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1087,6 +1088,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_PLASMA;
         else if("krunner"==appName)
             theThemedApp=APP_KRUNNER;
+        else if("skype"==appName)
+            theThemedApp=APP_SKYPE;
 }
 
 void QtCurveStyle::polish(QPalette &palette)
@@ -4114,15 +4117,19 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     tmpBtn.rect = r;
                     drawPrimitive(PE_PanelButtonCommand, &tmpBtn, painter, widget);
                 }
-//                 if (btn->features & QStyleOptionButton::HasMenu)
-//                 {
-//                     int                mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
-//                     QRect              ir(btn->rect);
-//                     QStyleOptionButton newBtn(*btn);
-// 
-//                     newBtn.rect = QRect(ir.right() - mbi + 2, ir.height()/2 - mbi/2 + 3, mbi - 6, mbi - 6);
-//                     drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
-//                 }
+                if (btn->features & QStyleOptionButton::HasMenu)
+                {
+                    int                mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
+                    QRect              ir(btn->rect);
+                    QStyleOptionButton newBtn(*btn);
+
+                    newBtn.rect = QRect(Qt::LeftToRight==btn->direction
+                                            ? ir.right() - mbi
+                                            : ir.x() + 6,
+                                        ((ir.height() - mbi)/2),
+                                        mbi - 6, mbi);
+                    drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
+                }
             }
             break;
         case CE_PushButtonLabel:
@@ -4183,23 +4190,36 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if (button->features&QStyleOptionButton::HasMenu)
                 {
-                    int indicatorHeight(pixelMetric(PM_MenuButtonIndicator, button, widget)),
-                        indicatorWidth=indicatorHeight;
+                    int mbi(pixelMetric(PM_MenuButtonIndicator, button, widget));
 
                     if (Qt::LeftToRight==button->direction)
-                        r = r.adjusted(0, 0, -indicatorWidth, 0);
+                        r = r.adjusted(0, 0, -mbi, 0);
                     else
-                        r = r.adjusted(indicatorWidth, 0, 0, 0);
+                        r = r.adjusted(mbi, 0, 0, 0);
 
-                    QRect              ir(button->rect);
-                    QStyleOptionButton newBtn(*button);
+                    if(APP_SKYPE==theThemedApp)
+                    {
+                        // Skype seems to draw a blurry arrow in the lower right corner,
+                        // ...draw over this with a nicer sharper arrow...
+                        QRect ar(button->rect.x()+(button->rect.width()-(LARGE_ARR_WIDTH+3)),
+                                 button->rect.y()+(button->rect.height()-(LARGE_ARR_HEIGHT+2)),
+                                 LARGE_ARR_WIDTH,
+                                 LARGE_ARR_HEIGHT);
 
-                    newBtn.rect = QRect(Qt::LeftToRight==button->direction
-                                            ? ir.right() - indicatorWidth + 2
-                                            : ir.x() + 6,
-                                        ((ir.height() - indicatorHeight)/2) + 2,
-                                        indicatorWidth - 6, indicatorHeight);
-                    drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
+                        if(option->state &(State_On | State_Sunken))
+                            ar.adjust(1, 1, 1, 1);
+                        drawArrow(painter, ar, option, PE_IndicatorArrowDown);
+                    }
+
+//                     QRect              ir(button->rect);
+//                     QStyleOptionButton newBtn(*button);
+// 
+//                     newBtn.rect = QRect(Qt::LeftToRight==button->direction
+//                                             ? ir.right() - mbi + 2
+//                                             : ir.x() + 6,
+//                                         ((ir.height() - mbi)/2) + 2,
+//                                         mbi - 6, mbi);
+//                     drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
                 }
 
                 int num(opts.embolden && button->features&QStyleOptionButton::DefaultButton ? 2 : 1);
