@@ -1,3 +1,7 @@
+0.59.7
+------
+1. Read tooltip colours from qt config file.
+
 0.59.6
 ------
 1. Improve appearance of SWT scrollbars.

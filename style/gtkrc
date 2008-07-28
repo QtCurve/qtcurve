@@ -95,13 +95,6 @@ style "qtcurve-tasklist" = "qtcurve-default"
   ythickness = 3
 }
 
-style "qtcurve-tooltips" = "qtcurve-default"
-{
-  xthickness = 4
-  ythickness = 4
-  bg[NORMAL] = { 1.0,1.0,0.75 }
-  fg[NORMAL] = { 0.0,0.0,0.0 }
-}
 
 style "qtcurve-menuitem" = "qtcurve-default"
 {
@@ -168,8 +161,6 @@ widget_class "*.tooltips.*.GtkToggleButton" style "qtcurve-tasklist"
 widget_class "*Tree*GtkButton" style "qtcurve-default"
 widget_class "*List*GtkButton" style "qtcurve-default"
 widget_class "BasePWidget.GtkEventBox.GtkTable.GtkFrame" style "qtcurve-w2"
-widget "gtk-tooltips*" style "qtcurve-tooltips"
-widget "gtk-tooltip*" style "qtcurve-tooltips"
 widget_class "*Toolbar*" style "qtcurve-toolbar"
 widget_class "*Toolbar*Button" style "qtcurve-toolbarbutton"
 widget_class "*HandleBox*HBox*SPDesktopWidget" style "qtcurve-sptoolbar"

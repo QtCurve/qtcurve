@@ -94,6 +94,10 @@ enum QtColorRoles
     COLOR_TEXT_SELECTED,
     COLOR_BUTTON_TEXT,
     COLOR_LV,
+
+    COLOR_TOOLTIP,
+    COLOR_TOOLTIP_TEXT,
+
     COLOR_NONE,
     COLOR_NUMCOLORS=COLOR_NONE  /* NONE does not count! */
 };
@@ -346,6 +350,12 @@ static void parseQtColors(char *line, int p)
                     break;
                 case 13:
                     setRgb(&qtSettings.colors[p][COLOR_TEXT_SELECTED], l);
+                    break;
+                case 18:
+                    setRgb(&qtSettings.colors[p][COLOR_TOOLTIP], l);
+                    break;
+                case 19:
+                    setRgb(&qtSettings.colors[p][COLOR_TOOLTIP_TEXT], l);
                     break;
                 default:
                     break;
@@ -1361,7 +1371,15 @@ static gboolean qtInit(Options *opts)
             qtSettings.iconSizes.btnSize=16;
             qtSettings.iconSizes.mnuSize=16;
             qtSettings.iconSizes.dlgSize=32;
-            qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=0;
+            qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=
+                qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=
+                qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=0;
+            qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red=
+                qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green=
+                qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue=0;
+            qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red=0xFFFF;
+            qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green=0xFFFF;
+            qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue=toGtkColor(192);
             qtSettings.styleName=NULL;
 
             lastRead=now;
@@ -1841,6 +1859,23 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
             } /* C-Scope 'doEffect' */
+
+            { /* C-Scope */
+                static const char *constStrFormat="style \"QtcTT\" "
+                                                    "{ xthickness = 4 ythickness = 4 bg[NORMAL] = \"#%02X%02X%02X\" fg[NORMAL] = \"#%02X%02X%02X\"} "
+                                                    "widget \"gtk-tooltips*\" style \"QtcTT\" "
+                                                    "widget \"gtk-tooltip*\" style \"QtcTT\"";
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                sprintf(tmpStr, constStrFormat,
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].blue));
+                gtk_rc_parse_string(tmpStr);
+            } /* C-Scope */
 
             if(ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
                 gtk_rc_parse_string("style \"QtCSwt\" { xthickness = 3 ythickness = 2 }"
