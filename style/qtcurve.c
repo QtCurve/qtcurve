@@ -3185,7 +3185,7 @@ debugDisplayWidget(widget, 3);
                        0==strcmp(detail, "togglebuttondefault")))
     {
     }
-    else if(widget && DETAIL("trough"))
+    else if(widget && detail && (0==strcmp(detail, "trough") || detail==strstr(detail, "trough-")))
     {
         gboolean pbar=GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
@@ -3205,6 +3205,13 @@ debugDisplayWidget(widget, 3);
             gboolean      inverted=gtk_range_get_inverted(GTK_RANGE(widget)),
                           doEtch=QTC_DO_EFFECT;
             int           troughSize=SLIDER_TROUGH_SIZE+(doEtch ? 2 : 0);
+            GdkColor      *usedcol=opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE
+                                    ? qtcPalette.slider
+                                        ? &qtcPalette.slider[ORIGINAL_SHADE]
+                                        : qtcPalette.mouseover
+                                            ? &qtcPalette.mouseover[ORIGINAL_SHADE]
+                                            : &qtcPalette.menuitem[1]
+                                    : bgndcol;
 
             if(horiz && rev)
                 inverted=!inverted;
@@ -3232,13 +3239,15 @@ debugDisplayWidget(widget, 3);
 
             if(GTK_STATE_INSENSITIVE==state)
                 bgndcol=&qtcPalette.background[ORIGINAL_SHADE];
+            else if (0==strcmp(detail, "trough-lower"))
+                bgndcol=usedcol;
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
                            bgndcol, qtcPalette.background,
                            ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT));
 
-            if(opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE)
+            if(opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE && 0==strcmp(detail, "trough"))
             {
                 if(horiz)
                 {
@@ -3259,12 +3268,6 @@ debugDisplayWidget(widget, 3);
 
                 if(used_w>0 && used_h>0)
                 {
-                    GdkColor *usedcol=qtcPalette.slider
-                                        ? &qtcPalette.slider[ORIGINAL_SHADE]
-                                        : qtcPalette.mouseover
-                                            ? &qtcPalette.mouseover[ORIGINAL_SHADE]
-                                            : &qtcPalette.menuitem[1];
-
                     drawLightBevel(cr, style, window, state, area, NULL, used_x, used_y, used_w, used_h,
                                    usedcol, qtcPalette.background,
                                    ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
