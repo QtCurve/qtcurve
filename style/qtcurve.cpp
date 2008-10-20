@@ -298,6 +298,29 @@ int static toHint(int sc)
     }
 }
 
+static QWidget * getActiveWindow(QWidget *widget)
+{
+    QWidget *activeWindow=QApplication::activeWindow();
+
+//    if(!activeWindow)
+//    {
+//        QWidgetList::ConstIterator it(QApplication::topLevelWidgets().begin()),
+//                                    end(QApplication::topLevelWidgets().end());
+//
+//        for(; it!=end; ++it)
+//            if((*it)->isVisible() && *it!=widget->window())
+//                if(!activeWindow)
+//                    activeWindow=*it;
+//                else
+//                {
+//                    activeWindow=0L;
+//                    break;
+//                }
+//    }
+
+    return activeWindow && activeWindow!=widget ? activeWindow : 0L;
+}
+
 static QSet<const QWidget *> theNoEtchWidgets;
 
 //
@@ -1313,9 +1336,9 @@ void QtCurveStyle::polish(QWidget *widget)
         else if(qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
                 (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
         {
-            QWidget *activeWindow=qApp->activeWindow();
+            QWidget *activeWindow=getActiveWindow(widget);
 
-            if(activeWindow && activeWindow!=widget)
+            if(activeWindow)
             {
                 itsReparentedDialogs[widget]=widget->parentWidget();
                 widget->setParent(activeWindow, widget->windowFlags());
@@ -1607,9 +1630,9 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 // picture dialog!
                 if(dlg && dlg->windowFlags()&Qt::WindowType_Mask && (!dlg->parentWidget() || dlg->parentWidget()->isHidden()))
                 {
-                    QWidget *activeWindow=qApp->activeWindow();
+                    QWidget *activeWindow=getActiveWindow((QWidget *)object);
 
-                    if(activeWindow && activeWindow!=dlg)
+                    if(activeWindow)
                     {
                         dlg->removeEventFilter(this);
                         dlg->setParent(activeWindow, dlg->windowFlags());
