@@ -1,6 +1,7 @@
 0.59.8
 ------
 1. Fix "trough-lower" and "tought-upper" style slider troughs.
+2. Fix reading of listview colours under KDE4.
 
 0.59.7
 ------

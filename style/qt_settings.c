@@ -168,6 +168,12 @@ struct QtData
 
 struct QtData qtSettings;
 
+static bool haveAlternareListViewCol()
+{
+    return 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].red || 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green ||
+           0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue;
+}
+
 static gboolean isMozilla()
 {
     return GTK_APP_MOZILLA==qtSettings.app || GTK_APP_NEW_MOZILLA==qtSettings.app;
@@ -202,6 +208,8 @@ enum
     SECT_TOOLBAR_STYLE,
     SECT_MAIN_TOOLBAR_ICONS,
     SECT_SMALL_ICONS,
+
+    SECT_COLORS_VIEW, // KDE4!
     SECT_QT
 };
 
@@ -423,6 +431,8 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                             section=SECT_MAIN_TOOLBAR_ICONS;
                         else if(opts->mapKdeIcons && 0==strncmp_i(line, "[SmallIcons]", 12))
                             section=SECT_SMALL_ICONS;
+                        else if(qt4 && 0==strncmp_i(line, "[Colors:View]", 13))
+                            section=SECT_COLORS_VIEW;
                         else
                             section=SECT_NONE;
                 }
@@ -515,8 +525,9 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                         opts->contrast=7;
                     found|=RD_CONTRAST;
                 }
-                else if(SECT_GENERAL==section && rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
-                        0==strncmp_i(line, "alternateBackground=", 20))
+                else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
+                        ( (!qt4 && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20)) ||
+                           (qt4 && SECT_COLORS_VIEW==section && 0==strncmp_i(line, "BackgroundAlternate=", 20)) ) )
                 {
                     sscanf(&line[20], "%d,%d,%d\n", &qtSettings.colors[PAL_ACTIVE][COLOR_LV].red,
                                                     &qtSettings.colors[PAL_ACTIVE][COLOR_LV].green,
@@ -1886,6 +1897,22 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string("style \"QtCM\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \"QtCM\"");
 
+            { /* C-Scope */
+                static const char *constStrFormat="style \"QtcTree\" "
+                                                    "{ GtkTreeView::even-row-color = \"#%02X%02X%02X\" GtkTreeView::even-odd-color = \"#%02X%02X%02X\"} "
+                                                    "widget \"*GtkTreeView*\" style \"QtcTree\"";
+                int alt=haveAlternareListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                sprintf(tmpStr, constStrFormat,
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].blue),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].blue));
+                gtk_rc_parse_string(tmpStr);
+            } /* C-Scope */
             if(tmpStr)
                 free(tmpStr);
         }
