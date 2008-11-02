@@ -379,7 +379,15 @@ static void parseQtColors(char *line, int p)
     }
 }
 
-static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboolean setDefaultFont, gboolean qt4)
+typedef enum 
+{
+    QT3,
+    QT4,
+    KDE3,
+    KDE4
+} FileType;
+
+static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboolean setDefaultFont, FileType ft)
 {
     const char *home=absolute ? NULL : getHome();
     int        found=0,
@@ -411,7 +419,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
             while(found!=rd && NULL!=fgets(line, QTC_MAX_INPUT_LINE_LEN, f))
                 if(line[0]=='[')
                 {
-                    if(qt4)
+                    if(QT4==ft)
                         if(0==strncmp_i(line, "[Qt]", 4))
                             section=SECT_QT;
                         else
@@ -431,7 +439,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                             section=SECT_MAIN_TOOLBAR_ICONS;
                         else if(opts->mapKdeIcons && 0==strncmp_i(line, "[SmallIcons]", 12))
                             section=SECT_SMALL_ICONS;
-                        else if(qt4 && 0==strncmp_i(line, "[Colors:View]", 13))
+                        else if(KDE4==ft && 0==strncmp_i(line, "[Colors:View]", 13))
                             section=SECT_COLORS_VIEW;
                         else
                             section=SECT_NONE;
@@ -515,8 +523,8 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     }
                 }
                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) &&
-                         ( (!qt4 && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9)) ||
-                           ( qt4 && SECT_QT==section  && 0==strncmp_i(line, "KDE\\contrast=", 13))))
+                         ( (QT3==ft && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9)) ||
+                           (QT4==ft && SECT_QT==section  && 0==strncmp_i(line, "KDE\\contrast=", 13))))
                 {
                     char *l=strchr(line, '=');
                     l++;
@@ -526,8 +534,8 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     found|=RD_CONTRAST;
                 }
                 else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
-                        ( (!qt4 && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20)) ||
-                           (qt4 && SECT_COLORS_VIEW==section && 0==strncmp_i(line, "BackgroundAlternate=", 20)) ) )
+                        ( (KDE3==ft && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20)) ||
+                          (KDE4==ft && SECT_COLORS_VIEW==section && 0==strncmp_i(line, "BackgroundAlternate=", 20)) ) )
                 {
                     sscanf(&line[20], "%d,%d,%d\n", &qtSettings.colors[PAL_ACTIVE][COLOR_LV].red,
                                                     &qtSettings.colors[PAL_ACTIVE][COLOR_LV].green,
@@ -549,21 +557,21 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                         found|=RD_LIST_SHADE;
                     }
                 }
-                else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
-                        (qt4 ? 0==strncmp_i(line, "Palette\\active=", 15) : 0==strncmp_i(line, "active=", 7)))
+                else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
+                          (QT4==ft ? 0==strncmp_i(line, "Palette\\active=", 15) : 0==strncmp_i(line, "active=", 7)))
                 {
                     parseQtColors(line, PAL_ACTIVE);
                     found|=RD_ACT_PALETTE;
                 }
 #ifdef QTC_READ_INACTIVE_PAL
-                else if(( (!qt4 && SECT_PALETTE==section) || (qt4 && SECT_QT==section)) && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
-                        (qt4 ? 0==strncmp_i(line, "Palette\\inactive=", 17) : 0==strncmp_i(line, "inactive=", 9)))
+                else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
+                          (QT4==ft ? 0==strncmp_i(line, "Palette\\inactive=", 17) : 0==strncmp_i(line, "inactive=", 9)))
                 {
                     parseQtColors(line, PAL_INACTIVE);
                     found|=RD_INACT_PALETTE;
                 }
 #endif
-                else if (((!qt4 && SECT_GENERAL==section) || (qt4 && SECT_QT==section)) &&
+                else if (((QT3==ft && SECT_GENERAL==section) || (QT4==ft && SECT_QT==section)) &&
                          rd&RD_STYLE && !(found&RD_STYLE)&& 0==strncmp_i(line, "style=", 6))
 
                 {
@@ -574,9 +582,9 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     strcpy(qtSettings.styleName, &line[6]);
                     found|=RD_STYLE;
                 }
-                else if (( !qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
+                else if (( QT3==ft && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==strncmp_i(line, "font=", 5)) ||
-                         ( qt4 && SECT_QT==section && rd&RD_FONT && !(found&RD_FONT) &&
+                         ( QT4==ft && SECT_QT==section && rd&RD_FONT && !(found&RD_FONT) &&
                             0==strncmp_i(line, "font=\"", 6)) )
                 {
                     int   n=-1,
@@ -588,7 +596,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                           *rc_family=NULL,
                           *rc_foundry=NULL;
 
-                    if(qt4) /* Convert Qt4's font= syntax to Qt3 style... */
+                    if(QT4==ft) /* Convert Qt4's font= syntax to Qt3 style... */
                     {
                         int len=strlen(line),
                             i;
@@ -1401,11 +1409,11 @@ static gboolean qtInit(Options *opts)
             {
                 qtSettings.qt4=FALSE;
                 readRc("/etc/qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
-                       opts, TRUE, FALSE, FALSE);
+                       opts, TRUE, FALSE, QT3);
                 readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
-                       opts, TRUE, FALSE, FALSE);
+                       opts, TRUE, FALSE, QT3);
                 readRc(".qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
-                       opts, FALSE, TRUE, FALSE);
+                       opts, FALSE, TRUE, QT3);
             }
             else
             {
@@ -1414,10 +1422,10 @@ static gboolean qtInit(Options *opts)
                 char *confFile=(char *)malloc(strlen(xdg)+strlen(QT4_CFG_FILE)+2);
 
                 readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
-                       opts, TRUE, FALSE, TRUE);
+                       opts, TRUE, FALSE, QT4);
                 sprintf(confFile, "%s/"QT4_CFG_FILE, xdg);
                 readRc(confFile, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
-                       opts, TRUE, TRUE, TRUE);
+                       opts, TRUE, TRUE, QT4);
                 free(confFile);
                 qtSettings.qt4=TRUE;
             }
@@ -1592,7 +1600,7 @@ static gboolean qtInit(Options *opts)
 
             readRc(kdeGlobals(),
                    (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE,
-                    opts, TRUE, FALSE, FALSE);
+                    opts, TRUE, FALSE, qtSettings.qt4 ? KDE4 : KDE3);
 
             /* Tear off menu items dont seem to draw they're background, and the default background
                is drawn :-(  Fix/hack this by making that background the correct color */
@@ -1899,7 +1907,7 @@ static gboolean qtInit(Options *opts)
 
             { /* C-Scope */
                 static const char *constStrFormat="style \"QtcTree\" "
-                                                    "{ GtkTreeView::even-row-color = \"#%02X%02X%02X\" GtkTreeView::even-odd-color = \"#%02X%02X%02X\"} "
+                                                    "{ GtkTreeView::odd-row-color = \"#%02X%02X%02X\" GtkTreeView::even-row-color = \"#%02X%02X%02X\"} "
                                                     "widget \"*GtkTreeView*\" style \"QtcTree\"";
                 int alt=haveAlternareListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
 
