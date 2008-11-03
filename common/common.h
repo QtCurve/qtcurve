@@ -34,11 +34,6 @@
 */
 
 /*
-    The following #define disables the custom focus rectangle
-#define QTC_PLAIN_FOCUS_ONLY
-*/
-
-/*
     The following #define controls whether a scrollbar's slider should overlap
     the scrollbar buttons when at min/max. This removes the thick looking line
     between the slider and the buttons.
@@ -324,6 +319,7 @@ typedef GdkColor color;
 #define QTC_DO_EFFECT          (ROUND_FULL==opts.round && EFFECT_NONE!=opts.buttonEffect)
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#define QTC_FOCUS_ALPHA              0.08
 #define QTC_BORDER_BLEND_ALPHA       0.7
 #define QTC_ETCH_TOP_ALPHA           0.055
 #define QTC_ETCH_BOTTOM_ALPHA        0.80
@@ -556,6 +552,14 @@ typedef enum
     SLIDER_ROUND,
     SLIDER_TRIANGULAR,
 } ESliderStyle;
+
+typedef enum
+{
+    FOCUS_STANDARD,
+    FOCUS_HIGHLIGHT,
+    FOCUS_FILLED,
+    FOCUS_BACKGROUND
+} EFocus;
 
 #define DEF_IND_STR                "fontcolor"
 #define DEF_LINE_STR               "dots"
@@ -1041,9 +1045,6 @@ typedef struct
                      menubarMouseOver,
                      shadeMenubarOnlyWhenActive,
                      thinnerMenuItems,
-#ifndef QTC_PLAIN_FOCUS_ONLY
-                     stdFocus,
-#endif
                      lvLines,
                      drawStatusBarFrames,
                      fillSlider,
@@ -1113,6 +1114,7 @@ typedef struct
     EColor           progressGrooveColor;
     EEffect          buttonEffect;
     EScrollbar       scrollbarType;
+    EFocus           focus;
     color            customMenubarsColor,
                      customSlidersColor,
                      customMenuNormTextColor,

@@ -2953,29 +2953,39 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                  if (!(focusFrame->state&State_KeyboardFocusChange))
                      return;
 
-#ifndef QTC_PLAIN_FOCUS_ONLY
-                if(opts.stdFocus)
-#endif
-                    QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
-#ifndef QTC_PLAIN_FOCUS_ONLY
+                if(FOCUS_STANDARD==opts.focus)
+                        QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
                 else
                 {
                     //Figuring out in what beast we are painting...
-                    const QColor *use(backgroundColors(option));
+                    const QColor *use(FOCUS_BACKGROUND==opts.focus ?  backgroundColors(option) : itsMenuitemCols);
+                    bool         drawRounded(QTC_ROUNDED);
 
-                    if(r.width()<4 || r.height()<4 ||
-                       (widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) || widget->inherits("Q3ScrollView"))) ||
-                       (widget && widget->parent() && ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
-                                                       widget->parent()->inherits("Q3ScrollView"))))
+                    if(drawRounded &&
+                       (r.width()<4 || r.height()<4 ||
+                        (widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) || widget->inherits("Q3ScrollView"))) ||
+                        (widget && widget->parent() && ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
+                                                       widget->parent()->inherits("Q3ScrollView")))))
+                        drawRounded=false;
+
+                    painter->save();
+                    QColor c(use[FOCUS_FILLED==opts.focus ? ORIGINAL_SHADE : QT_FOCUS]);
+                    painter->setPen(c);
+                    if(FOCUS_FILLED==opts.focus)
                     {
-                        painter->setPen(use[QT_FOCUS]);
-                        drawRect(painter, r);
+                        c.setAlphaF(QTC_FOCUS_ALPHA);
+                        painter->setBrush(c);
+                    }
+                    if(QTC_ROUNDED)
+                    {
+                        painter->setRenderHint(QPainter::Antialiasing, true);
+                        painter->drawPath(buildPath(r, WIDGET_SELECTION, ROUNDED_ALL,
+                                                    getRadius(opts.round, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION)));
                     }
                     else
-                        drawBorder(painter, r, option, ROUNDED_ALL, use, WIDGET_FOCUS, BORDER_FLAT,
-                                   false, QT_FOCUS);
+                        drawRect(painter, r);
+                    painter->restore();
                 }
-#endif
             }
             break;
         case PE_PanelButtonBevel:

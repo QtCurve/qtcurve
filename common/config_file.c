@@ -297,6 +297,23 @@ static EColor toEColor(const char *str, EColor def)
     return def;
 }
 
+static EFocus toFocus(const char *str, EFocus def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "standard", 8))
+            return FOCUS_STANDARD;
+        if(0==memcmp(str, "highlight", 9))
+            return FOCUS_HIGHLIGHT;
+        if(0==memcmp(str, "background", 10))
+            return FOCUS_BACKGROUND;
+        if(0==memcmp(str, "filled", 6))
+            return FOCUS_FILLED;
+    }
+
+    return def;
+}
+
 #endif
 
 #ifdef CONFIG_WRITE
@@ -649,8 +666,11 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
 #endif
 
-#define QTC_CFG_READ_ECOLOR(ENTRY, DEF) \
+#define QTC_CFG_READ_ECOLOR(ENTRY) \
     opts->ENTRY=toEColor(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
+#define QTC_CFG_READ_FOCUS(ENTRY) \
+    opts->ENTRY=toFocus(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
@@ -761,10 +781,8 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_APPEARANCE(sliderAppearance, opts->appearance)
             QTC_CFG_READ_APPEARANCE(progressAppearance, opts->appearance)
             QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, APPEARANCE_INVERTED)
-            QTC_CFG_READ_ECOLOR(progressGrooveColor, opts->progressGrooveColor)
-#ifndef QTC_PLAIN_FOCUS_ONLY
-            QTC_CFG_READ_BOOL(stdFocus)
-#endif
+            QTC_CFG_READ_ECOLOR(progressGrooveColor)
+            QTC_CFG_READ_FOCUS(focus)
             QTC_CFG_READ_BOOL(lvLines)
             QTC_CFG_READ_BOOL(drawStatusBarFrames)
             QTC_CFG_READ_BOOL(fillSlider)
@@ -1185,9 +1203,7 @@ static void defaultSettings(Options *opts)
     opts->thinnerMenuItems=false;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_NONE;
-#ifndef QTC_PLAIN_FOCUS_ONLY
-    opts->stdFocus=true;
-#endif
+    opts->focus=FOCUS_STANDARD;
     opts->lvLines=false;
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;
@@ -1265,6 +1281,11 @@ static void defaultSettings(Options *opts)
     if(systemFilename)
         readConfig(systemFilename, opts, opts);
     }
+
+#if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION < 0x040000)
+    if(FOCUS_FILLED==opts->focus)
+        opts->focus=FOCUS_HIGHLIGHT;
+#endif
 }
 
 #endif
@@ -1495,6 +1516,22 @@ static const char *toStr(EColor s)
     }
 }
 
+static const char *toStr(EFocus f)
+{
+    switch(f)
+    {
+        default:
+        case FOCUS_STANDARD:
+            return "standard";
+        case FOCUS_HIGHLIGHT:
+            return "highlight";
+        case FOCUS_BACKGROUND:
+            return "background";
+        case FOCUS_FILLED:
+            return "filled";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -1608,9 +1645,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(progressAppearance)
         CFG_WRITE_ENTRY_FORCE(progressGrooveAppearance)
         CFG_WRITE_ENTRY(progressGrooveColor)
-#ifndef QTC_PLAIN_FOCUS_ONLY
-        CFG_WRITE_ENTRY(stdFocus)
-#endif
+        CFG_WRITE_ENTRY(focus)
         CFG_WRITE_ENTRY(lvLines)
         CFG_WRITE_ENTRY(drawStatusBarFrames)
         CFG_WRITE_ENTRY(fillSlider)
