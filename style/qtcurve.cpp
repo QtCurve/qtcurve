@@ -2954,7 +2954,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                      return;
 
                 if(FOCUS_STANDARD==opts.focus)
-                        QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
+                    QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
                 else
                 {
                     //Figuring out in what beast we are painting...
