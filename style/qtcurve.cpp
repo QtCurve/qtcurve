@@ -2950,8 +2950,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_FrameFocusRect:
             if (const QStyleOptionFocusRect *focusFrame = qstyleoption_cast<const QStyleOptionFocusRect *>(option))
             {
-                 if (!(focusFrame->state&State_KeyboardFocusChange))
-                     return;
+                if (!(focusFrame->state&State_KeyboardFocusChange))
+                    return;
 
                 if(FOCUS_STANDARD==opts.focus)
                     QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
