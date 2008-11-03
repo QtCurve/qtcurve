@@ -245,8 +245,8 @@ typedef GdkColor color;
 #define IS_GLASS(A) (APPEARANCE_DULL_GLASS==A || APPEARANCE_SHINY_GLASS==A)
 #define IS_CUSTOM(A) (A>=APPEARANCE_CUSTOM1 && A<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
 #define IS_FLAT(A)  (APPEARANCE_FLAT==A || APPEARANCE_RAISED==A)
-#define SHADE_SELECION_LIGHT 1.15
-#define SHADE_SELECION_DARK  0.90
+#define SHADE_SELECION_LIGHT 1.3
+#define SHADE_SELECION_DARK  1.0
 
 #ifdef __cplusplus
 #define MENUBAR_DARK_LIMIT 160
@@ -882,6 +882,9 @@ static void shade(const color *ca, color *cb, double k)
     #endif
             }
         }
+#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+    cb->setAlpha(ca.alpha());
+#endif
 }
 
 #if (!defined QTC_CONFIG_DIALOG)
@@ -1207,6 +1210,7 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 
 typedef enum
 {
+    RADIUS_SELECTION,
     RADIUS_INTERNAL,
     RADIUS_EXTERNAL,
     RADIUS_ETCH
@@ -1219,6 +1223,19 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 
     switch(rad)
     {
+        case RADIUS_SELECTION:
+            switch(r)
+            {
+                case ROUND_FULL:
+                    if(w>48 && h>48)
+                        return 3.0;
+                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                        return QTC_FULL_OUTER_RADIUS;
+                case ROUND_SLIGHT:
+                    return QTC_SLIGHT_OUTER_RADIUS;
+                case ROUND_NONE:
+                    return 0;
+            }
         case RADIUS_INTERNAL:
             switch(r)
             {

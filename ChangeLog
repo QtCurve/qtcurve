@@ -1,5 +1,10 @@
 0.59.7
 ------
+1. If appearance is rounded, also round the 'rubber band' selection.
+2. Dont draw light border around selection.
+3. Round all view selections.
+4. Fix mouse-over selections with custom gradient.
+5. Fix KDE app checking.
 
 0.59.6
 ------
