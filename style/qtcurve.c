@@ -2378,24 +2378,76 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if(APPEARANCE_FLAT!=opts.selectionAppearance && GTK_STATE_SELECTED==state && GTK_IS_TREE_VIEW(widget))
-        drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                          &style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
-                          getWidgetShade(WIDGET_SELECTION, TRUE, FALSE, opts.selectionAppearance),
-                          getWidgetShade(WIDGET_SELECTION, FALSE, FALSE, opts.selectionAppearance),
-                          TRUE, TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION);
+    if(widget && GTK_IS_TREE_VIEW(widget))
+    {
+    /*
+        int px, py;
+        gtk_widget_get_pointer(widget, &px, &py);
+        if(px>=x && px<(x+width) && py>y && py<(y+height))
+            state=GTK_STATE_PRELIGHT;
+    */
+
+        if(GTK_STATE_SELECTED==state)
+        {
+            double   radius=QTC_ROUNDED
+                                    ? height>48 && width>48
+                                        ? 3.0
+                                        : height>24 && width>24
+                                            ? QTC_FULL_OUTER_RADIUS
+                                            : QTC_SLIGHT_OUTER_RADIUS
+                                    : 0.0,
+                     xd=x+0.5,
+                     yd=y+0.5;
+            int      round=detail
+                                ? 0!=strstr(detail, "_start")
+                                    ? ROUNDED_LEFT
+                                    : 0!=strstr(detail, "_end")
+                                        ? ROUNDED_RIGHT
+                                        : 0!=strstr(detail, "_middle")
+                                            ? ROUNDED_NONE
+                                            : ROUNDED_ALL
+                                : ROUNDED_NONE,
+                     xo=x, yo=y, widtho=width;
+            GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
+
+            if(detail && ROUNDED_ALL!=round)
+            {
+                if(!(round&ROUNDED_LEFT))
+                {
+                    xd-=2;
+                    x-=2;
+                    width+2;
+                }
+                if(!(round&ROUNDED_RIGHT))
+                    width+=2;
+            }
+
+            if(!QTC_ROUNDED)
+                round=ROUNDED_NONE;
+
+            drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
+                            getWidgetShade(WIDGET_SELECTION, TRUE, FALSE, opts.selectionAppearance),
+                            getWidgetShade(WIDGET_SELECTION, FALSE, FALSE, opts.selectionAppearance),
+                            TRUE, TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION);
+
+            cairo_save(cr);
+            cairo_rectangle(cr, xo, yo, widtho, height);
+            cairo_clip(cr);
+            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), GTK_STATE_PRELIGHT==state ? 0.20 : 1.0);
+            createPath(cr, xd, yd, width-1, height-1,  getRadius(opts.round, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
+            cairo_stroke(cr);
+            cairo_restore(cr);
+        }
+        else
+            drawAreaColor(cr, area, NULL,
+                          getCellCol(haveAlternareListViewCol() && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_odd")
+                                        ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
+                                        : &style->base[GTK_STATE_NORMAL], detail),
+                              x, y, width, height);
+    }
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, opts.highlightFactor, x, y, width, height);
-/*
-    else if (haveAlternareListViewCol() && GTK_STATE_SELECTED!=state &&
-             GTK_IS_TREE_VIEW(widget) && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_even"))
-        drawAreaColor(cr, area, NULL, getCellCol(&style->base[GTK_STATE_NORMAL], detail), x, y, width, height);
-    else if (haveAlternareListViewCol() && GTK_STATE_SELECTED!=state &&
-             GTK_IS_TREE_VIEW(widget) && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_odd"))
-        drawAreaColor(cr, area, NULL, getCellCol(&qtSettings.colors[PAL_ACTIVE][COLOR_LV], detail),
-                      x, y, width, height);
-*/
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x, y,
