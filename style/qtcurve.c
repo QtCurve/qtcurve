@@ -5465,30 +5465,39 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             x--, width+=2;
     }
 
-#ifndef QTC_PLAIN_FOCUS_ONLY
-    if(opts.stdFocus)
-#endif
+    if(FOCUS_STANDARD==opts.focus)
         parent_class->draw_focus(style, window, state, area, widget, detail, x, y, width, height);
-#ifndef QTC_PLAIN_FOCUS_ONLY
     else
     {
+        gboolean drawRounded=QTC_ROUNDED;
+        GdkColor *cols=FOCUS_BACKGROUND==opts.focus ? qtcPalette.background : qtcPalette.menuitem;
+        GdkColor *col=&cols[FOCUS_FILLED==opts.focus ? ORIGINAL_SHADE : QT_FOCUS];
+
         QTC_CAIRO_BEGIN
 
         if(isList(widget) || width<3 || height < 3)
+            drawRounded=FALSE;
+
+        cairo_new_path(cr);
+
+        if(FOCUS_FILLED==opts.focus)
         {
-            height--;
+            if(drawRounded)
+                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), ROUNDED_ALL);
+            else
+                cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
+            cairo_fill(cr);
             cairo_new_path(cr);
-            cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_FOCUS]));
-            cairo_rectangle(cr, x+0.5, y+0.5, width, height);
-            cairo_stroke(cr);
         }
+        if(drawRounded)
+            createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), ROUNDED_ALL);
         else
-            realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                           qtcPalette.background, ROUNDED_ALL, BORDER_FLAT,
-                           WIDGET_FOCUS, 0, QT_FOCUS);
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+        cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+        cairo_stroke(cr);
         QTC_CAIRO_END
     }
-#endif
     }
 }
 
