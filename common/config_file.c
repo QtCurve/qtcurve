@@ -772,6 +772,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(customMenuTextColor)
             QTC_CFG_READ_MOUSE_OVER(coloredMouseOver)
             QTC_CFG_READ_BOOL(menubarMouseOver)
+            QTC_CFG_READ_BOOL(useHighlightForMenu)
             QTC_CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
             QTC_CFG_READ_BOOL(thinnerMenuItems)
             QTC_CFG_READ_COLOR(customSlidersColor)
@@ -1117,8 +1118,11 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                                     APPEARANCE_INVERTED!=opts->activeTabAppearance)
                 opts->colorSelTab=false;
 
+/*
+??
             if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
                 opts->colorMenubarMouseOver=true;
+*/
 
             if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || ROUND_FULL!=opts->round))
                 opts->coloredMouseOver=MO_COLORED;
@@ -1205,6 +1209,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_PLASTIK;
     opts->menubarMouseOver=true;
+    opts->useHighlightForMenu=true;
     opts->shadeMenubarOnlyWhenActive=false;
     opts->thinnerMenuItems=false;
     opts->scrollbarType=SCROLLBAR_KDE;
@@ -1219,7 +1224,7 @@ static void defaultSettings(Options *opts)
     opts->vArrows=false;
     opts->xCheck=false;
     opts->framelessGroupBoxes=true;
-    opts->colorMenubarMouseOver=false;
+    opts->colorMenubarMouseOver=true;
     opts->inactiveHighlight=false;
     opts->crHighlight=false;
     opts->fillProgress=true;
@@ -1635,6 +1640,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(customMenuTextColor)
         CFG_WRITE_ENTRY(coloredMouseOver)
         CFG_WRITE_ENTRY(menubarMouseOver)
+        CFG_WRITE_ENTRY(useHighlightForMenu)
         CFG_WRITE_ENTRY(shadeMenubarOnlyWhenActive)
         CFG_WRITE_ENTRY(thinnerMenuItems)
         CFG_WRITE_ENTRY(customSlidersColor)

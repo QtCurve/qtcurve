@@ -3885,14 +3885,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(active)
                     drawMenuItem(painter, r, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
-                                opts.colorMenubarMouseOver || down ? itsMenuitemCols : itsBackgroundCols);
+                                 opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down)
+                                    ? itsMenuitemCols : itsBackgroundCols);
 
                 if (!pix.isNull())
                     drawItemPixmap(painter, mbi->rect, alignment, pix);
                 else
                 {
                     const QColor &col=state&State_Enabled
-                                        ? (opts.colorMenubarMouseOver && active) || (!opts.colorMenubarMouseOver && down)
+                                        ? ((opts.colorMenubarMouseOver && active) || (!opts.colorMenubarMouseOver && down)) &&
+                                           opts.useHighlightForMenu
                                             ? opts.customMenuTextColor
                                                 ? opts.customMenuSelTextColor
                                                 : palette.highlightedText().color()
@@ -3962,7 +3964,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      enabled(state&State_Enabled);
 
                 if (selected && enabled)
-                    drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL, itsMenuitemCols);
+                    drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL,
+                                 opts.useHighlightForMenu ? itsMenuitemCols : itsBackgroundCols);
                 else
                 {
 /*
@@ -4062,7 +4065,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->drawPixmap(pmr.topLeft(), pixmap);
                 }
 
-                painter->setPen(selected ? palette.highlightedText().color() : palette.foreground().color());
+                painter->setPen(selected && opts.useHighlightForMenu ? palette.highlightedText().color() : palette.foreground().color());
 
                 int    x, y, w, h,
                        tab(menuItem->tabWidth);
@@ -4127,13 +4130,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 // Arrow
                 if (QStyleOptionMenuItem::SubMenu==menuItem->menuItemType) // draw sub menu arrow
                 {
+                    QStyleOption     arropt(*option);
                     int              dim((menuItem->rect.height() - 4) / 2),
                                      xpos(menuItem->rect.left() + menuItem->rect.width() - 6 - 2 - dim);
                     PrimitiveElement arrow(Qt::RightToLeft==option->direction ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight);
                     QRect            vSubMenuRect(visualRect(option->direction, menuItem->rect,
                                                              QRect(xpos, menuItem->rect.top() + menuItem->rect.height() / 2 - dim / 2, dim, dim)));
 
-                    drawArrow(painter, vSubMenuRect, option, arrow, false, true);
+                    if(!opts.useHighlightForMenu)
+                        arropt.state&=~State_Selected;
+                    drawArrow(painter, vSubMenuRect, &arropt, arrow, false, true);
                 }
 
                 painter->restore();
@@ -7666,33 +7672,29 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
 
 void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const
 {
+    int fill=opts.useHighlightForMenu && (!mbi || itsMenuitemCols==cols) ? ORIGINAL_SHADE : 4;
+
     if(mbi || opts.borderMenuitems)
     {
-        bool stdColor(!mbi || SHADE_BLEND_SELECTED!=opts.shadeMenubars);
-
         QStyleOption opt(*option);
 
         opt.state|=State_Horizontal|State_Raised;
         opt.state&=~(State_Sunken|State_On);
 
-        if(stdColor)
-            drawLightBevel(p, r, &opt, 0L, round, cols[ORIGINAL_SHADE], cols, stdColor, WIDGET_MENU_ITEM);
-        else
-        {
-            QRect fr(r);
+        QRect fr(r);
+        int   border=opts.borderMenuitems ? 0 : fill;
 
-            fr.adjust(1, 1, -1, -1);
+        fr.adjust(1, 1, -1, -1);
 
-            if(fr.width()>0 && fr.height()>0)
-                drawBevelGradient(cols[ORIGINAL_SHADE], true, p, fr, true,
-                                  getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
-                                  getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
-                                  false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-            drawBorder(p, r, &opt, round, cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, 0);
-        }
+        if(fr.width()>0 && fr.height()>0)
+            drawBevelGradient(cols[fill], true, p, fr, true,
+                            getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
+                            getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
+                            false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+        drawBorder(p, r, &opt, round, cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, border);
     }
     else
-        drawBevelGradient(cols[ORIGINAL_SHADE], true, p, r, true,
+        drawBevelGradient(cols[fill], true, p, r, true,
                           getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
                           getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
                           false, opts.menuitemAppearance, WIDGET_MENU_ITEM);

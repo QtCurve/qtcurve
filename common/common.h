@@ -1048,6 +1048,7 @@ typedef struct
                      fixParentlessDialogs,
                      customMenuTextColor,
                      menubarMouseOver,
+                     useHighlightForMenu,
                      shadeMenubarOnlyWhenActive,
                      thinnerMenuItems,
                      lvLines,
