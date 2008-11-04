@@ -5992,9 +5992,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawArrow(painter, arrow, option, PE_IndicatorArrowDown);
                     else
                     {
-                        QRect ar=QRect(arrow.x(), arrow.y()+(arrow.height()>>1)-(LARGE_ARR_HEIGHT+1), arrow.width(), LARGE_ARR_HEIGHT);
+                        int middle=arrow.y()+(arrow.height()>>1);
+                        
+                        QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+(opts.vArrows ? 2 : 1)), arrow.width(), LARGE_ARR_HEIGHT);
                         drawArrow(painter, ar, option, PE_IndicatorArrowUp);
-                        ar=QRect(arrow.x(), arrow.y()+(arrow.height()>>1)+(LARGE_ARR_HEIGHT-3), arrow.width(), LARGE_ARR_HEIGHT);
+                        ar=QRect(arrow.x(), middle+1, arrow.width(), LARGE_ARR_HEIGHT);
                         drawArrow(painter, ar, option, PE_IndicatorArrowDown);
                     }
                 }

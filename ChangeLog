@@ -7,6 +7,8 @@
 5. Fix KDE app checking.
 6. New focus rect options - standard, highlight, background, filled.
 7. Add the ability to specify popup menu light factor.
+8. Put more space between arrows on combos if using Gtk combo menus and
+   V arrows.
 
 0.59.6
 ------
