@@ -1,4 +1,5 @@
 [Settings]
+activeTabAppearance=flat
 animatedProgress=true
 appearance=gradient
 borderMenuitems=false
@@ -27,7 +28,7 @@ handles=dots
 highlightFactor=-2
 highlightScrollViews=false
 highlightTab=true
-lighterPopupMenuBgnd=true
+lighterPopupMenuBgnd=2
 lvAppearance=gradient
 lvLines=false
 mapKdeIcons=true

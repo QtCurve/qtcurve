@@ -623,6 +623,12 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_DI(ENTRY) \
     opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, ((int)(def->ENTRY*100))-100)+100))/100.0;
 
+#define QTC_CFG_READ_DI_BOOL(ENTRY) \
+    if(readBoolEntry(cfg, #ENTRY, false)) \
+        opts->ENTRY=def->ENTRY; \
+    else \
+        opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, ((int)(def->ENTRY*100))-100)+100))/100.0;
+    
 #define QTC_CFG_READ_TB_BORDER(ENTRY) \
     opts->ENTRY=toTBarBorder(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
@@ -745,7 +751,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_STRIPE(stripedProgress)
             QTC_CFG_READ_SLIDER(sliderStyle)
             QTC_CFG_READ_BOOL(animatedProgress)
-            QTC_CFG_READ_BOOL(lighterPopupMenuBgnd)
+            QTC_CFG_READ_DI_BOOL(lighterPopupMenuBgnd)
             QTC_CFG_READ_BOOL(embolden)
             QTC_CFG_READ_DEF_BTN(defBtnIndicator)
             QTC_CFG_READ_LINE(sliderThumbs)
@@ -1168,7 +1174,7 @@ static void defaultSettings(Options *opts)
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
     opts->round=ROUND_FULL;
-    opts->lighterPopupMenuBgnd=true;
+    opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
     opts->stripedProgress=STRIPE_DIAGONAL;
     opts->sliderStyle=SLIDER_TRIANGULAR;
@@ -1609,7 +1615,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(stripedProgress)
         CFG_WRITE_ENTRY(sliderStyle)
         CFG_WRITE_ENTRY(animatedProgress)
-        CFG_WRITE_ENTRY(lighterPopupMenuBgnd)
+        CFG_WRITE_ENTRY_D(lighterPopupMenuBgnd)
         CFG_WRITE_ENTRY(embolden)
         CFG_WRITE_ENTRY(defBtnIndicator)
         CFG_WRITE_ENTRY_B(sliderThumbs, true)

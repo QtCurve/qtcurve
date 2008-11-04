@@ -158,8 +158,8 @@ typedef GdkColor color;
 
 #define QT_FRAME_DARK_SHADOW 2
 #define QT_FOCUS              (FOCUS_FILLED==opts.focus ? ORIGINAL_SHADE : 3)
-#define QTC_MENU_STRIPE_SHADE (opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 2)
-#define QTC_MENU_SEP_SHADE    (opts.lighterPopupMenuBgnd ? 4 : 3)
+#define QTC_MENU_STRIPE_SHADE (USE_LIGHTER_POPUP_MENU ? ORIGINAL_SHADE : 2)
+#define QTC_MENU_SEP_SHADE    (USE_LIGHTER_POPUP_MENU ? 4 : 3)
 
 #define QTC_SHADE(c, s) \
     (c>10 || c<0 || s>=NUM_STD_SHADES || s<0 \
@@ -257,6 +257,11 @@ typedef GdkColor color;
 #define MENUBAR_DARK_FACTOR        0.97
 #define POPUPMENU_LIGHT_FACTOR     1.15
 #define INACTIVE_HIGHLIGHT_FACTOR  1.20
+#define DEF_POPUPMENU_LIGHT_FACTOR 1.15
+#define MIN_LIGHTER_POPUP_MENU        0
+#define MAX_LIGHTER_POPUP_MENU      100
+
+#define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd>1)
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9
@@ -1033,10 +1038,10 @@ typedef struct
 #endif
     int              contrast,
                      passwordChar;
-    double           highlightFactor;
+    double           highlightFactor,
+                     lighterPopupMenuBgnd;
     ERound           round;
     bool             embolden,
-                     lighterPopupMenuBgnd,
                      highlightTab,
                      colorSelTab,
                      animatedProgress,

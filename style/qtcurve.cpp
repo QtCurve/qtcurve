@@ -1026,9 +1026,9 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
     setMenuColors(QApplication::palette().color(QPalette::Active, QPalette::Background));
 
-    if(opts.lighterPopupMenuBgnd)
+    if(USE_LIGHTER_POPUP_MENU)
         itsLighterPopupMenuBgndCol=shade(itsBackgroundCols[ORIGINAL_SHADE],
-                                         POPUPMENU_LIGHT_FACTOR);
+                                         opts.lighterPopupMenuBgnd);
 
     switch(opts.shadeCheckRadio)
     {
@@ -1190,9 +1190,9 @@ void QtCurveStyle::polish(QPalette &palette)
         shadeColors(midColor(itsMenuitemCols[ORIGINAL_SHADE],
                    itsButtonCols[ORIGINAL_SHADE]), itsSidebarButtonsCols);
 
-    if(opts.lighterPopupMenuBgnd && newGray)
+    if(USE_LIGHTER_POPUP_MENU && newGray)
         itsLighterPopupMenuBgndCol=shade(itsBackgroundCols[ORIGINAL_SHADE],
-                                         POPUPMENU_LIGHT_FACTOR);
+                                         opts.lighterPopupMenuBgnd);
 
     switch(opts.shadeCheckRadio)
     {
@@ -1367,7 +1367,7 @@ void QtCurveStyle::polish(QWidget *widget)
             {
                 QPalette pal(widget->palette());
 
-                pal.setBrush(QPalette::Active, QPalette::Base, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE]);
+                pal.setBrush(QPalette::Active, QPalette::Base, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE]);
                 widget->setPalette(pal);
             }
         }
@@ -1706,7 +1706,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if (opts.squareScrollViews && widget && ::qobject_cast<const QAbstractScrollArea *>(widget))
                 return opts.gtkScrollViews ? 1 : 2;
 
-            if (opts.lighterPopupMenuBgnd && !opts.borderMenuitems &&
+            if (USE_LIGHTER_POPUP_MENU && !opts.borderMenuitems &&
                 qobject_cast<const QMenu *>(widget))
                 return 1;
 
@@ -2587,7 +2587,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->setPen(use[QT_STD_BORDER]);
             drawRect(painter, r);
 
-            if(opts.lighterPopupMenuBgnd)
+            if(USE_LIGHTER_POPUP_MENU)
             {
                 painter->setPen(itsLighterPopupMenuBgndCol);
                 drawRect(painter, r.adjusted(1, 1, -1, -1));
@@ -3255,8 +3255,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
     switch(element)
     {
         case CE_MenuScroller:
-            painter->fillRect(r, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
-                                                           : itsBackgroundCols[ORIGINAL_SHADE]);
+            painter->fillRect(r, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
+                                                        : itsBackgroundCols[ORIGINAL_SHADE]);
                 //QStyleOption arrowOpt = *opt;
                 //arrowOpt.state |= State_Enabled;
 
@@ -3911,8 +3911,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                          doStripe(isMenu && opts.menuStripe && !comboMenu);
 
                     if(isMenu)
-                        painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
-                                                                                    : itsBackgroundCols[ORIGINAL_SHADE]);
+                        painter->fillRect(menuItem->rect, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
+                                                                                 : itsBackgroundCols[ORIGINAL_SHADE]);
 
                     if(doStripe)
                         drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
@@ -3953,8 +3953,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL, itsMenuitemCols);
                 else
                 {
-                    painter->fillRect(menuItem->rect, opts.lighterPopupMenuBgnd ? itsLighterPopupMenuBgndCol
-                                                                                : itsBackgroundCols[ORIGINAL_SHADE]);
+                    painter->fillRect(menuItem->rect, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
+                                                                             : itsBackgroundCols[ORIGINAL_SHADE]);
                     if(opts.menuStripe && !comboMenu)
                         drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
                                         painter,
