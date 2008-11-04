@@ -4146,8 +4146,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     fropt.QStyleOption::operator=(*btn);
                     fropt.rect = subElementRect(SE_PushButtonFocusRect, btn, widget);
 
-                    if(QTC_DO_EFFECT)
-                        fropt.rect.adjust(1, 1, -1, -1);
                     drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
                 }
             }
@@ -6241,6 +6239,11 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                     rect.setTop(rect.top() + 2);    // eat the top margin a little bit
             break;
 #endif
+        case SE_PushButtonFocusRect:
+            rect=QTC_BASE_STYLE::subElementRect(element, option, widget);
+            if(QTC_DO_EFFECT)
+                 rect.adjust(1, 1, -1, -1);
+            return rect;
         default:
             return QTC_BASE_STYLE::subElementRect(element, option, widget);
     }
