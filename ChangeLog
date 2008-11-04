@@ -5,6 +5,7 @@
 3. If appearance is rounded, round view selections.
 4. New focus rect options - standard, highlight, background, filled.
 5. Add the ability to specify popup menu light factor.
+6. Put more space between arrows on combos if using V arrows.
 
 0.59.7
 ------
