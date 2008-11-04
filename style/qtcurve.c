@@ -3719,8 +3719,8 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("menu"))
     {
-        if(opts.lighterPopupMenuBgnd)
-            drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], POPUPMENU_LIGHT_FACTOR, x, y, width, height);
+        if(USE_LIGHTER_POPUP_MENU)
+            drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], opts.lighterPopupMenuBgnd, x, y, width, height);
         else
         {
             drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+1, width-2);

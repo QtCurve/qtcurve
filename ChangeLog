@@ -4,6 +4,7 @@
 2. Fix reading of listview colours under KDE4.
 3. If appearance is rounded, round view selections.
 4. New focus rect options - standard, highlight, background, filled.
+5. Add the ability to specify popup menu light factor.
 
 0.59.7
 ------
