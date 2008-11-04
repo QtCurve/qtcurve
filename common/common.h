@@ -157,7 +157,7 @@ typedef GdkColor color;
 #define QT_BORDER(E) (/*(E) ?*/ QT_STD_BORDER/* : QT_DISABLED_BORDER*/)
 
 #define QT_FRAME_DARK_SHADOW 2
-#define QT_FOCUS             3
+#define QT_FOCUS              (FOCUS_FILLED==opts.focus ? ORIGINAL_SHADE : 3)
 #define QTC_MENU_STRIPE_SHADE (opts.lighterPopupMenuBgnd ? ORIGINAL_SHADE : 2)
 #define QTC_MENU_SEP_SHADE    (opts.lighterPopupMenuBgnd ? 4 : 3)
 

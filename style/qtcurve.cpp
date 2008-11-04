@@ -2969,7 +2969,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         drawRounded=false;
 
                     painter->save();
-                    QColor c(use[FOCUS_FILLED==opts.focus ? ORIGINAL_SHADE : QT_FOCUS]);
+                    QColor c(use[QT_FOCUS]);
                     painter->setPen(c);
                     if(FOCUS_FILLED==opts.focus)
                     {
