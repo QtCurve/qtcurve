@@ -25,6 +25,7 @@ embolden=false
 fillProgress=true
 fillSlider=true
 fixParentlessDialogs=true
+focus=filled
 framelessGroupBoxes=true
 gtkScrollViews=false
 gtkComboMenus=false
