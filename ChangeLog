@@ -7,6 +7,7 @@
 5. Add the ability to specify popup menu light factor.
 6. Put more pace between arrows on combos if using V arrows.
 7. Add option to use darkened background colour for menuitem selection.
+8. Add 'fade' to menuitem appearance.
 
 0.59.7
 ------

@@ -49,6 +49,7 @@ static struct
              *mouseover,
              menubar[TOTAL_SHADES+1],
              menuitem[TOTAL_SHADES+1],
+             menu,
              *check_radio;
 } qtcPalette;
 
@@ -3648,7 +3649,35 @@ debugDisplayWidget(widget, 3);
             if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
-            if(!opts.borderMenuitems && !mb && menuitem)
+            if(!mb && menuitem &&  APPEARANCE_FADE==opts.menuitemAppearance)
+            {
+                gboolean reverse=FALSE; /* TODO !!! */
+                int      roundOffet=QTC_ROUNDED ? 1 : 0,
+                         mainX=x+(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1),
+                         mainY=y+roundOffet+1,
+                         mainWidth=width-(reverse ? roundOffet+1 : 1+MENUITEM_FADE_SIZE),
+                         fadeX=reverse ? x+1 : width-MENUITEM_FADE_SIZE;
+
+                drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(roundOffet+2));
+
+                if(QTC_ROUNDED)
+                    realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
+                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_OTHER, 0, fillVal);
+
+                {
+                    GdkColor        *left=reverse ? &qtcPalette.menu : &itemCols[fillVal],
+                                    *right=reverse ? &itemCols[fillVal] : &qtcPalette.menu;
+                    cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
+
+                    cairo_pattern_add_color_stop_rgb(pt, 0, QTC_CAIRO_COL(*left));
+                    cairo_pattern_add_color_stop_rgb(pt, 1.00, QTC_CAIRO_COL(*right));
+                    cairo_set_source(cr, pt);
+                    cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
+                    cairo_fill(cr);
+                    cairo_pattern_destroy (pt);
+                }
+            }
+            else if(!opts.borderMenuitems && !mb && menuitem)
                 drawBevelGradient(cr, style, area, region, x, y, width, height,
                                     &itemCols[fillVal],
                                     getWidgetShade(WIDGET_MENU_ITEM, TRUE, FALSE, opts.menuitemAppearance),
@@ -3680,8 +3709,7 @@ debugDisplayWidget(widget, 3);
                                     TRUE, TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
 
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT,
-                               WIDGET_OTHER, 0, borderVal);
+                               itemCols, round, BORDER_FLAT, WIDGET_OTHER, 0, borderVal);
             }
             if(pbar && opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
@@ -3723,7 +3751,7 @@ debugDisplayWidget(widget, 3);
     else if(DETAIL("menu"))
     {
         if(USE_LIGHTER_POPUP_MENU)
-            drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], opts.lighterPopupMenuBgnd, x, y, width, height);
+            drawAreaColor(cr, area, NULL, &qtcPalette.menu, x, y, width, height);
         else
         {
             drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+1, width-2);
@@ -5893,6 +5921,8 @@ static void generateColors()
         case SHADE_CUSTOM:
             qtcPalette.check_radio=&opts.customCheckRadioColor;
     }
+
+    shade(&qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, opts.lighterPopupMenuBgnd);
 }
 
 static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)
