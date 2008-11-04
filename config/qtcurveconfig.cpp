@@ -453,6 +453,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(passwordChar, SIGNAL(clicked()), SLOT(passwordCharClicked()));
     connect(framelessGroupBoxes, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(inactiveHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(colorMenubarMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(useHighlightForMenu, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 
     defaultSettings(&defaultStyle);
     if(!readConfig(NULL, &currentStyle, &defaultStyle))
@@ -1097,6 +1099,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.framelessGroupBoxes=framelessGroupBoxes->isChecked();
     opts.inactiveHighlight=inactiveHighlight->isChecked();
     opts.customGradient=customGradient;
+    opts.colorMenubarMouseOver=colorMenubarMouseOver->isChecked();
+    opts.useHighlightForMenu=useHighlightForMenu->isChecked();
 
     if(customShading->isChecked())
     {
@@ -1178,6 +1182,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
+    colorMenubarMouseOver->setChecked(opts.colorMenubarMouseOver);
+    useHighlightForMenu->setChecked(opts.useHighlightForMenu);
 
     shading->setCurrentIndex(opts.shading);
     gtkScrollViews->setChecked(opts.gtkScrollViews);
@@ -1250,6 +1256,8 @@ bool QtCurveConfig::settingsChanged()
          selectionAppearance->currentIndex()!=currentStyle.selectionAppearance ||
          toolbarSeparators->currentIndex()!=currentStyle.toolbarSeparators ||
          splitters->currentIndex()!=currentStyle.splitters ||
+         colorMenubarMouseOver->isChecked()!=currentStyle.colorMenubarMouseOver ||
+         useHighlightForMenu->isChecked()!=currentStyle.useHighlightForMenu ||
 
          shading->currentIndex()!=(int)currentStyle.shading ||
          gtkScrollViews->isChecked()!=currentStyle.gtkScrollViews ||
