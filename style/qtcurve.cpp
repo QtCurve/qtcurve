@@ -7746,7 +7746,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
 }
 
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, const QColor &col, bool small) const
+void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small) const
 {
     QPolygon     a;
     QPainterPath path;
@@ -7799,6 +7799,7 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, c
     // Just using 'aa' and drawing the arrows would be fine - but this makes them look
     // slightly blurry, and I dont like that.
     p->save();
+    col.setAlpha(255);
     p->setPen(col);
     p->setBrush(col);
     p->setRenderHint(QPainter::Antialiasing, true);
