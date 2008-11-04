@@ -3230,9 +3230,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->save();
             if(ROUND_FULL==opts.round && r.width()>QTC_MIN_BTN_SIZE && r.height()>QTC_MIN_BTN_SIZE)
-                painter->setClipRegion(QRegion(border.adjusted(2, 1, -2, -1)).united(border.adjusted(1, 2, -1, -2)));
+                painter->setClipRegion(QRegion(border.adjusted(2, 1, -2, -1)).united(border.adjusted(1, 2, -1, -2)).intersect(r));
             else
-                painter->setClipRect(border.adjusted(1, 1, -1, -1));
+                painter->setClipRect(border.adjusted(1, 1, -1, -1).intersect(r));
             drawBevelGradient(color, true, painter, border.adjusted(1, 1, -1, -1), true,
                               getWidgetShade(WIDGET_SELECTION, true, false, opts.selectionAppearance),
                               getWidgetShade(WIDGET_SELECTION, false, false, opts.selectionAppearance),
