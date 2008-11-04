@@ -1111,6 +1111,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                opts->highlightFactor>((100.0+MAX_HIGHLIGHT_FACTOR)/100.0))
                 opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
 
+            if(opts->lighterPopupMenuBgnd>((100.0+MAX_LIGHTER_POPUP_MENU)/100.0))
+                opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
+
             if(opts->animatedProgress && !opts->stripedProgress)
                 opts->animatedProgress=false;
 
