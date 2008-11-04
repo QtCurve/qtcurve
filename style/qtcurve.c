@@ -4077,6 +4077,9 @@ debugDisplayWidget(widget, 3);
     if(mnu && GTK_APP_OPEN_OFFICE==qtSettings.app)
         x+=2, y-=2;
 
+    if(mnu && GTK_STATE_PRELIGHT==state)
+        state=GTK_STATE_NORMAL;
+
     if(!mnu || qtSettings.qt4)
     {
         gboolean coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
@@ -4193,6 +4196,9 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
              list=!mnu && isList(widget);
 
     QTC_CAIRO_BEGIN
+
+    if(mnu && GTK_STATE_PRELIGHT==state)
+        state=GTK_STATE_NORMAL;
 
     if(!qtSettings.qt4 && mnu)
         gtkDrawCheck(style, window, state, shadow_type, area, widget, "check", x, y, width, height);
