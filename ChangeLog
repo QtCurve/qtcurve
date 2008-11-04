@@ -1,15 +1,16 @@
 0.60
 ----
-1. If appearance is rounded, also round the 'rubber band' selection.
-2. Dont draw light border around selection.
-3. Round all view selections.
-4. Fix mouse-over selections with custom gradient.
-5. Fix KDE app checking.
-6. New focus rect options - standard, highlight, background, filled.
-7. Add the ability to specify popup menu light factor.
-8. Put more pace between arrows on combos if using Gtk combo menus and
-   V arrows.
-9. Fix blurry arrows in url navigator.
+ 1. If appearance is rounded, also round the 'rubber band' selection.
+ 2. Dont draw light border around selection.
+ 3. Round all view selections.
+ 4. Fix mouse-over selections with custom gradient.
+ 5. Fix KDE app checking.
+ 6. New focus rect options - standard, highlight, background, filled.
+ 7. Add the ability to specify popup menu light factor.
+ 8. Put more pace between arrows on combos if using Gtk combo menus and
+    V arrows.
+ 9. Fix blurry arrows in url navigator.
+10. Set menu palette.
 
 0.59.6
 ------
