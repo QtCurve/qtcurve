@@ -135,7 +135,7 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
     return def;
 }
 
-static EAppearance toAppearance(const char *str, EAppearance def)
+static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade)
 {
     if(str)
     {
@@ -155,6 +155,8 @@ static EAppearance toAppearance(const char *str, EAppearance def)
             return APPEARANCE_INVERTED;
         if(0==memcmp(str, "bevelled", 8))
             return APPEARANCE_BEVELLED;
+        if(allowFade && 0==memcmp(str, "fade", 4))
+            return APPEARANCE_FADE;
 
         if(0==memcmp(str, "customgradient", 14) && strlen(str)>14)
         {
@@ -635,8 +637,8 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_MOUSE_OVER(ENTRY) \
     opts->ENTRY=toMouseOver(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#define QTC_CFG_READ_APPEARANCE(ENTRY, DEF) \
-    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
+#define QTC_CFG_READ_APPEARANCE(ENTRY, DEF, ALLOW_FADE) \
+    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF, ALLOW_FADE);
 
 /*
 #define QTC_CFG_READ_APPEARANCE(ENTRY) \
@@ -746,7 +748,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_ROUND(round)
             QTC_CFG_READ_DI(highlightFactor)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
-            QTC_CFG_READ_APPEARANCE(appearance, def->appearance)
+            QTC_CFG_READ_APPEARANCE(appearance, def->appearance, false)
             QTC_CFG_READ_BOOL(fixParentlessDialogs)
             QTC_CFG_READ_STRIPE(stripedProgress)
             QTC_CFG_READ_SLIDER(sliderStyle)
@@ -761,11 +763,11 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_SHADE(shadeSliders, false)
             QTC_CFG_READ_SHADE(shadeMenubars, true)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false)
-            QTC_CFG_READ_APPEARANCE(menubarAppearance, def->menubarAppearance)
-            QTC_CFG_READ_APPEARANCE(menuitemAppearance, opts->appearance)
-            QTC_CFG_READ_APPEARANCE(toolbarAppearance, def->toolbarAppearance)
+            QTC_CFG_READ_APPEARANCE(menubarAppearance, def->menubarAppearance, false)
+            QTC_CFG_READ_APPEARANCE(menuitemAppearance, opts->appearance, true)
+            QTC_CFG_READ_APPEARANCE(toolbarAppearance, def->toolbarAppearance, false)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-            QTC_CFG_READ_APPEARANCE(selectionAppearance, def->selectionAppearance)
+            QTC_CFG_READ_APPEARANCE(selectionAppearance, def->selectionAppearance, false)
 #endif
             QTC_CFG_READ_LINE(toolbarSeparators)
             QTC_CFG_READ_LINE(splitters)
@@ -782,12 +784,12 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_COLOR(customCheckRadioColor)
             QTC_CFG_READ_SCROLLBAR(scrollbarType)
             QTC_CFG_READ_EFFECT(buttonEffect)
-            QTC_CFG_READ_APPEARANCE(lvAppearance, opts->appearance)
-            QTC_CFG_READ_APPEARANCE(tabAppearance, def->tabAppearance)
-            QTC_CFG_READ_APPEARANCE(activeTabAppearance, opts->tabAppearance)
-            QTC_CFG_READ_APPEARANCE(sliderAppearance, opts->appearance)
-            QTC_CFG_READ_APPEARANCE(progressAppearance, opts->appearance)
-            QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, APPEARANCE_INVERTED)
+            QTC_CFG_READ_APPEARANCE(lvAppearance, opts->appearance, false)
+            QTC_CFG_READ_APPEARANCE(tabAppearance, def->tabAppearance, false)
+            QTC_CFG_READ_APPEARANCE(activeTabAppearance, opts->tabAppearance, false)
+            QTC_CFG_READ_APPEARANCE(sliderAppearance, opts->appearance, false)
+            QTC_CFG_READ_APPEARANCE(progressAppearance, opts->appearance, false)
+            QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, APPEARANCE_INVERTED, false)
             QTC_CFG_READ_ECOLOR(progressGrooveColor)
             QTC_CFG_READ_FOCUS(focus)
             QTC_CFG_READ_BOOL(lvLines)
@@ -809,7 +811,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(sunkenScrollViews)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
-            QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance)
+            QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance, false)
 #endif
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
@@ -831,7 +833,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(newThunderbird)
 #endif
 #ifdef __cplusplus
-            QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance)
+            QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance, false)
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->titlebarAppearance)

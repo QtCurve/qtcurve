@@ -3963,10 +3963,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      checked(menuItem->checked),
                      enabled(state&State_Enabled);
 
-                if (selected && enabled)
-                    drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL,
-                                 opts.useHighlightForMenu ? itsMenuitemCols : itsBackgroundCols);
-                else
+
+                if(!(selected && enabled) || APPEARANCE_FADE==opts.menuitemAppearance)
                 {
 /*
                     painter->fillRect(menuItem->rect, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
@@ -3981,6 +3979,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
                                         false, opts.menuStripeAppearance, WIDGET_OTHER);
                 }
+
+                if (selected && enabled)
+                    drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL,
+                                 opts.useHighlightForMenu ? itsMenuitemCols : itsBackgroundCols);
 
                 if(comboMenu)
                 {
@@ -7674,7 +7676,33 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
 {
     int fill=opts.useHighlightForMenu && (!mbi || itsMenuitemCols==cols) ? ORIGINAL_SHADE : 4;
 
-    if(mbi || opts.borderMenuitems)
+    if(!mbi && APPEARANCE_FADE==opts.menuitemAppearance)
+    {
+        bool  reverse=Qt::RightToLeft==option->direction;
+        int   roundOffet=QTC_ROUNDED ? 1 : 0;
+        QRect main(r.adjusted(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1, roundOffet+1,
+                              reverse ? -(roundOffet+1) : -(1+MENUITEM_FADE_SIZE), -(roundOffet+1))),
+              fade(reverse ? r.x()+1 : r.width()-MENUITEM_FADE_SIZE, r.y()+1, MENUITEM_FADE_SIZE, r.height()-2);
+
+        p->fillRect(main, cols[fill]);
+        if(QTC_ROUNDED)
+        {
+            QStyleOption opt(*option);
+
+            opt.state|=State_Horizontal|State_Raised;
+            opt.state&=~(State_Sunken|State_On);
+
+            drawBorder(p, main.adjusted(-1, -1, 1, 1), &opt, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT,
+                       cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, fill);
+        }
+
+        QLinearGradient grad(fade.topLeft(), fade.topRight());
+
+        grad.setColorAt(0, reverse ? option->palette.background().color() : cols[fill]);
+        grad.setColorAt(1, reverse ? cols[fill] : option->palette.background().color());
+        p->fillRect(fade, QBrush(grad));
+    }
+    else if(mbi || opts.borderMenuitems)
     {
         QStyleOption opt(*option);
 

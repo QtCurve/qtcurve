@@ -12,6 +12,7 @@
  9. Fix blurry arrows in url navigator.
 10. Set menu palette.
 11. Add option to use darkened background colour for menuitem selection.
+12. Add 'fade' to menuitem appearance.
 
 0.59.6
 ------
