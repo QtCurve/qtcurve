@@ -3265,10 +3265,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
     switch(element)
     {
         case CE_MenuScroller:
-            /*
             painter->fillRect(r, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
                                                         : itsBackgroundCols[ORIGINAL_SHADE]);
-            */
                 //QStyleOption arrowOpt = *opt;
                 //arrowOpt.state |= State_Enabled;
 
