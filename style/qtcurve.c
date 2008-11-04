@@ -3627,6 +3627,7 @@ debugDisplayWidget(widget, 3);
         if(!mb || width>12)
         {
             gboolean grayItem=(!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app) ||
+                              (!opts.useHighlightForMenu && (mb || menuitem)) ||
                               (pbar && GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor);
             GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.menuitem;
             GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
@@ -3639,19 +3640,21 @@ debugDisplayWidget(widget, 3);
                                     : ROUNDED_ALL,
                      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
             gboolean border=pbar || menuitem || mb,
-                     stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,
+                     /*stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,*/
                      horiz=horizPbar || menuitem;
+            int      fillVal=grayItem && !pbar ? 4 : ORIGINAL_SHADE,
+                     borderVal=pbar || opts.borderMenuitems ? 0 : fillVal;
 
             if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
             if(!opts.borderMenuitems && !mb && menuitem)
                 drawBevelGradient(cr, style, area, region, x, y, width, height,
-                                    &itemCols[ORIGINAL_SHADE],
+                                    &itemCols[fillVal],
                                     getWidgetShade(WIDGET_MENU_ITEM, TRUE, FALSE, opts.menuitemAppearance),
                                     getWidgetShade(WIDGET_MENU_ITEM, FALSE, FALSE, opts.menuitemAppearance),
                                     TRUE, TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-            else if(stdColors)
+            else /*if(stdColors)
             {
                 if(pbar && (horizPbar ? width : height)<3)
                 {
@@ -3667,18 +3670,18 @@ debugDisplayWidget(widget, 3);
                                 ((!pbar || !opts.fillProgress) && border && stdColors ? DF_DO_BORDER : 0)|
                                 (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS));
             }
-            else
+            else*/
             {
                 if(width>2 && height>2)
                     drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2,
-                                    &itemCols[ORIGINAL_SHADE],
+                                    &itemCols[fillVal],
                                     getWidgetShade(WIDGET_MENU_ITEM, TRUE, FALSE, opts.menuitemAppearance),
                                     getWidgetShade(WIDGET_MENU_ITEM, FALSE, FALSE, opts.menuitemAppearance),
                                     TRUE, TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
 
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                                itemCols, round, BORDER_FLAT,
-                               WIDGET_OTHER, 0, 0);
+                               WIDGET_OTHER, 0, borderVal);
             }
             if(pbar && opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
@@ -4314,7 +4317,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean     isMenuItem=QTC_IS_MENU_ITEM(widget);
         GtkMenuBar   *mb=isMenuItem ? isMenubar(widget, 0) : NULL;
         gboolean     activeMb=mb ? GTK_MENU_SHELL(mb)->active : FALSE,
-                     selectedText=isMenuItem &&
+                     selectedText=opts.useHighlightForMenu && isMenuItem &&
                                   (opts.colorMenubarMouseOver
                                       ? GTK_STATE_PRELIGHT==state
                                       : ((!mb || activeMb) && GTK_STATE_PRELIGHT==state)),
@@ -4465,6 +4468,9 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                 area=&area2;
             }
         }
+
+        if(!opts.useHighlightForMenu && (isMenuItem || mb) && GTK_STATE_INSENSITIVE!=state)
+            state=GTK_STATE_NORMAL;
 
         parent_class->draw_layout(style, window, selectedText ? GTK_STATE_SELECTED : state,
                                   use_text || selectedText, area, widget, detail, x, y, layout);

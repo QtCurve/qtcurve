@@ -1604,7 +1604,7 @@ static gboolean qtInit(Options *opts)
 
             /* Tear off menu items dont seem to draw they're background, and the default background
                is drawn :-(  Fix/hack this by making that background the correct color */
-            if(opts->lighterPopupMenuBgnd)
+            if(opts->lighterPopupMenuBgnd>1)
             {
                 static const char *format="style \"QtCLMnu\" "
                                           "{bg[NORMAL]=\"#%02X%02X%02X\"} "
@@ -1615,7 +1615,7 @@ static gboolean qtInit(Options *opts)
                 {
                     GdkColor col;
 
-                    shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, POPUPMENU_LIGHT_FACTOR);
+                    shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, opts->lighterPopupMenuBgnd);
                     sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
                     gtk_rc_parse_string(tmpStr);
                 }
@@ -1921,6 +1921,30 @@ static gboolean qtInit(Options *opts)
                         toQtColor(qtSettings.colors[PAL_ACTIVE][alt].blue));
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
+
+            if(!opts->useHighlightForMenu)
+            {
+                static const char *constStrFormat="style \"QtcMnu\" "
+                                                  "{ text[ACTIVE] = \"#%02X%02X%02X\" "
+                                                  " text[SELECTED] = \"#%02X%02X%02X\" } "
+                                                  " class \"*MenuItem\" style \"QtcMnu\""
+                                                  " widget_class \"*MenuBar*MenuItem\" style \"QtcMnu\""
+                                                  " widget_class \"*.GtkAccelMenuItem\" style \"QtcMnu\""
+                                                  " widget_class \"*.GtkRadioMenuItem\" style \"QtcMnu\""
+                                                  " widget_class \"*.GtkCheckMenuItem\" style \"QtcMnu\""
+                                                  " widget_class \"*.GtkImageMenuItem\" style \"QtcMnu\"";
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                sprintf(tmpStr, constStrFormat,
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue));
+                gtk_rc_parse_string(tmpStr);
+            }
+
             if(tmpStr)
                 free(tmpStr);
         }
