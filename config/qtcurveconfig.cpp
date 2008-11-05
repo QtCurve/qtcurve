@@ -342,7 +342,7 @@ static void insertFocusEntries(QComboBox *combo)
 {
     combo->insertItem(FOCUS_STANDARD, i18n("Standard (dotted)"));
     combo->insertItem(FOCUS_HIGHLIGHT, i18n("Highlight color"));
-    combo->insertItem(FOCUS_FILLED, i18n("Background color, and fill (Gtk2 & KDE4 only)"));
+    combo->insertItem(FOCUS_FILLED, i18n("Highlight color, and fill (Gtk2 & KDE4 only)"));
     combo->insertItem(FOCUS_BACKGROUND, i18n("Background color"));
 }
 
