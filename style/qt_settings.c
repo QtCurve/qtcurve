@@ -1782,6 +1782,7 @@ static gboolean qtInit(Options *opts)
                 switch(opts->scrollbarType)
                 {
                     default:
+                    case SCROLLBAR_OXYGEN:
                     case SCROLLBAR_KDE:
                         sprintf(tmpStr, constSbStrFormat, 1, 1, 1, 0);
                         break;

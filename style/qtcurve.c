@@ -684,7 +684,7 @@ static int getRound(const char *detail, GtkWidget *widget, int x, int y, int wid
         if(0==strcmp(detail, "slider"))
             return
 #ifndef QTC_SIMPLE_SCROLLBARS
-                    SCROLLBAR_NONE==opts.scrollbarType ? ROUNDED_ALL :
+                    SCROLLBAR_NONE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType ? ROUNDED_ALL :
 #endif
                     ROUNDED_NONE;
         else if(0==strcmp(detail, "qtc-slider") ||
@@ -829,6 +829,7 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down,
 
         switch(opts.scrollbarType)
         {
+            case SCROLLBAR_OXYGEN:
             case SCROLLBAR_KDE:
                 leftBtns=BTN_SIZE;
                 rightBtns=BTN_SIZE*2;
@@ -2763,7 +2764,7 @@ debugDisplayWidget(widget, 3);
             y++;
 */
 
-        if(GTK_STATE_ACTIVE==state && (sbar || isSpinButton))
+        if(GTK_STATE_ACTIVE==state && ((sbar && SCROLLBAR_OXYGEN!=opts.scrollbarType) || isSpinButton))
         {
             x++;
             y++;
@@ -3049,7 +3050,8 @@ debugDisplayWidget(widget, 3);
                             break;
                     }
 
-                if(GTK_APP_MOZILLA!=qtSettings.app && slider && SCROLLBAR_NONE==opts.scrollbarType)
+                if(GTK_APP_MOZILLA!=qtSettings.app && slider &&
+                    (SCROLLBAR_NONE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType))
                 {
                     GdkRectangle troughArea;
 
@@ -3089,7 +3091,7 @@ debugDisplayWidget(widget, 3);
                 }
 
 #ifdef QTC_INCREASE_SB_SLIDER
-                if(slider && widget && GTK_IS_RANGE(widget))
+                if(slider && widget && GTK_IS_RANGE(widget) && SCROLLBAR_OXYGEN!=opts.scrollbarType)
                 {
                     GtkAdjustment *adj = GTK_RANGE(widget)->adjustment;
                     gboolean      horizontal = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
@@ -3116,11 +3118,12 @@ debugDisplayWidget(widget, 3);
                 if(defBtn && IND_TINT==opts.defBtnIndicator)
                     btn_colors=qtcPalette.defbtn;
 
-                drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                               &btn_colors[bgnd], btn_colors, round, widgetType,
-                               BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
-                                            (lvh ? 0 : DF_DO_BORDER)|
-                                            (horiz ? 0 : DF_VERT));
+                if(SCROLLBAR_OXYGEN!=opts.scrollbarType || WIDGET_SB_BUTTON!=widgetType)
+                    drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
+                                   &btn_colors[bgnd], btn_colors, round, widgetType,
+                                   BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
+                                                (lvh ? 0 : DF_DO_BORDER)|
+                                                (horiz ? 0 : DF_VERT));
             }
 
             if(defBtn)
@@ -3379,7 +3382,13 @@ debugDisplayWidget(widget, 3);
 #ifdef QTC_SIMPLE_SCROLLBARS
                 case SCROLLBAR_NONE:
                     sbarRound=ROUNDED_NONE;
+                    break;
 #endif
+                case SCROLLBAR_OXYGEN:
+                    if(horiz)
+                        x+=16, width-=48;
+                    else
+                        y+=16, height-=48;
             }
 
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
