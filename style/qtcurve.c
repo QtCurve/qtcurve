@@ -5153,7 +5153,8 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     FN_CHECK
     sanitizeSize(window, &width, &height);
 
-    if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle || (SLIDER_ROUND==opts.sliderStyle && ROUND_FULL==opts.round)))
+    if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle ||
+       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && ROUND_FULL==opts.round)))
     {
         gtk_paint_box(style, window, state, shadow_type, area, widget,
                       !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height);
@@ -5196,14 +5197,14 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                     yo=horiz ? 0 : 8,
                     size=SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13,
                     light=APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0;
-        GdkColor    *colors=coloredMouseOver
+        GdkColor    *colors=/*coloredMouseOver
                        ? qtcPalette.mouseover
-                       : btn_colors;
+                       : */btn_colors;
         GdkRegion    *region=NULL;
         GdkPoint     clip[8];
         GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
-        gboolean     drawLight=(MO_GLOW!=opts.coloredMouseOver && MO_PLASTIK!=opts.coloredMouseOver) || !coloredMouseOver ||
-                                       (SLIDER_ROUND==opts.sliderStyle &&
+        gboolean     drawLight=/*(MO_GLOW!=opts.coloredMouseOver && MO_PLASTIK!=opts.coloredMouseOver) || */!coloredMouseOver ||
+                                       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) &&
                                        (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders));
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)

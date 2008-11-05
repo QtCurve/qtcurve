@@ -1711,7 +1711,8 @@ static gboolean qtInit(Options *opts)
 
             if(SLIDER_TRIANGULAR==opts->sliderStyle)
                 gtk_rc_parse_string("style \"QtCSldr\" {GtkScale::slider_length = 11 GtkScale::slider_width = 18} class \"*\" style \"QtCSldr\"");
-
+            else if(SLIDER_PLAIN_ROTATED==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle)
+                gtk_rc_parse_string("style \"QtCSldr\" {GtkScale::slider_length = 13 GtkScale::slider_width = 21} class \"*\" style \"QtCSldr\"");
             if(qtSettings.boldfont)
             {
                 static const char *constBoldPrefix="style \"QtCBFnt\"{font_name=\"";
