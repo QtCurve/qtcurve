@@ -7674,8 +7674,13 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
 
 void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const
 {
-    int fill=opts.useHighlightForMenu && (!mbi || itsMenuitemCols==cols) ? ORIGINAL_SHADE : 4;
+    int fill=opts.useHighlightForMenu && (!mbi || itsMenuitemCols==cols) ? ORIGINAL_SHADE : 4,
+        border=opts.borderMenuitems ? 0 : fill;
 
+    if(itsMenuitemCols!=cols && mbi && !(option->state&(State_On|option->state&State_Sunken)) &&
+       !opts.colorMenubarMouseOver && (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+        fill=ORIGINAL_SHADE;
+    
     if(!mbi && APPEARANCE_FADE==opts.menuitemAppearance)
     {
         bool  reverse=Qt::RightToLeft==option->direction;
@@ -7704,28 +7709,35 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
     }
     else if(mbi || opts.borderMenuitems)
     {
+        bool stdColor(!mbi || SHADE_BLEND_SELECTED!=opts.shadeMenubars);
+
         QStyleOption opt(*option);
 
         opt.state|=State_Horizontal|State_Raised;
         opt.state&=~(State_Sunken|State_On);
 
-        QRect fr(r);
-        int   border=opts.borderMenuitems ? 0 : fill;
+        if(stdColor && opts.borderMenuitems)
+            drawLightBevel(p, r, &opt, 0L, round, cols[fill], cols, stdColor, WIDGET_MENU_ITEM);
+        else
+        {
+            QRect fr(r);
 
-        fr.adjust(1, 1, -1, -1);
+            fr.adjust(1, 1, -1, -1);
 
-        if(fr.width()>0 && fr.height()>0)
-            drawBevelGradient(cols[fill], true, p, fr, true,
-                            getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
-                            getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
-                            false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-        drawBorder(p, r, &opt, round, cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, border);
+            if(fr.width()>0 && fr.height()>0)
+                drawBevelGradient(cols[fill], true, p, fr, true,
+                                  getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
+                                  getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
+                                  false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+            drawBorder(p, r, &opt, round, cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, border);
+        }
     }
     else
         drawBevelGradient(cols[fill], true, p, r, true,
                           getWidgetShade(WIDGET_MENU_ITEM, true, false, opts.menuitemAppearance),
                           getWidgetShade(WIDGET_MENU_ITEM, false, false, opts.menuitemAppearance),
                           false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+
 }
 
 void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical, bool reverse) const
