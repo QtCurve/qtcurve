@@ -1918,6 +1918,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                     eo=len+so,
                     col=QTC_SLIDER_MO_SHADE;
 
+                cairo_rectangle(cr, x+1, y+1, width-2, height-2);
+                cairo_clip(cr);
+
                 if(horiz)
                 {
                     drawBevelGradient(cr, style, area, region, x+so, y, len, height, &qtcPalette.mouseover[col],
@@ -1936,6 +1939,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                                       getWidgetShade(widget, TRUE, sunken, app), getWidgetShade(widget, FALSE, sunken, app),
                                       horiz, !sunken, sunken, app, widget);
                 }
+
+                cairo_restore(cr);
             }
             else
             {
