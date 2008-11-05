@@ -5,6 +5,7 @@ appearance=gradient
 borderMenuitems=false
 buttonEffect=none
 coloredMouseOver=plastik
+colorMenubarMouseOver=false
 comboSplitter=true
 crHighlight=false
 customCheckRadioColor=#000000
