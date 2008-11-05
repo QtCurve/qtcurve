@@ -536,8 +536,11 @@ typedef enum
     SCROLLBAR_WINDOWS,
     SCROLLBAR_PLATINUM,
     SCROLLBAR_NEXT,
+    SCROLLBAR_OXYGEN,
     SCROLLBAR_NONE
 } EScrollbar;
+
+#define QTC_THREEBUTTON_SBAR (SCROLLBAR_KDE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType)
 
 typedef enum
 {

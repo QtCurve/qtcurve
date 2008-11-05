@@ -217,6 +217,8 @@ static EScrollbar toScrollbar(const char *str, EScrollbar def)
             return SCROLLBAR_PLATINUM;
         if(0==memcmp(str, "next", 4))
             return SCROLLBAR_NEXT;
+        if(0==memcmp(str, "oxygen", 6))
+            return SCROLLBAR_OXYGEN;
         if(0==memcmp(str, "none", 4))
             return SCROLLBAR_NONE;
     }
@@ -1447,6 +1449,8 @@ static const char *toStr(EScrollbar sb)
             return "platinum";
         case SCROLLBAR_NEXT:
             return "next";
+        case SCROLLBAR_OXYGEN:
+            return "oxygen";
         case SCROLLBAR_NONE:
             return "none";
     }
