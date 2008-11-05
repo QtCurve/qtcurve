@@ -279,6 +279,10 @@ static ESliderStyle toSlider(const char *str, ESliderStyle def)
             return SLIDER_ROUND;
         if(0==memcmp(str, "plain", 5))
             return SLIDER_PLAIN;
+        if(0==memcmp(str, "r-round", 7))
+            return SLIDER_ROUND_ROTATED;
+        if(0==memcmp(str, "r-plain", 7))
+            return SLIDER_PLAIN_ROTATED;
         if(0==memcmp(str, "triangular", 10))
             return SLIDER_TRIANGULAR;
     }
@@ -1516,6 +1520,10 @@ static const char *toStr(ESliderStyle s)
             return "plain";
         case SLIDER_TRIANGULAR:
             return "triangular";
+        case SLIDER_ROUND_ROTATED:
+            return "r-round";
+        case SLIDER_PLAIN_ROTATED:
+            return "r-plain";
         default:
         case SLIDER_ROUND:
             return "round";

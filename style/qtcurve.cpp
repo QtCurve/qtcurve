@@ -1748,15 +1748,15 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ScrollBarSliderMin:
             return 16;
         case PM_SliderThickness:
-            return 21;
+            return QTC_ROTATED_SLIDER ? 23 : 21;
         case PM_SliderControlThickness:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : 13;
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_ROTATED_SLIDER ? 21 : 13);
          case PM_SliderTickmarkOffset:
              return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
-                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : 13);
+                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : (QTC_ROTATED_SLIDER ? 21 : 13));
 
                 if (slider->tickPosition & QSlider::TicksBelow)
                     ++size;
@@ -1766,7 +1766,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             }
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
         case PM_SliderLength:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : 21;
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_ROTATED_SLIDER ? 13 : 21);
         case PM_ScrollBarExtent:
             return /*APP_KPRESENTER==theThemedApp ||
                    ((APP_KONQUEROR==theThemedApp || APP_KONTACT==theThemedApp) && (!widget || isFormWidget(widget)))
@@ -7268,6 +7268,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                         eo(len+so),
                         col(QTC_SLIDER_MO_SHADE);
 
+                    p->setClipRect(r.adjusted(1, 1, -1, -1));
                     if(horiz)
                     {
                         drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+so, r.y(), len, r.height()-1), horiz,
@@ -7286,6 +7287,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                                          getWidgetShade(w, true, sunken, app),
                                          getWidgetShade(w, false, sunken, app), sunken, app, w);
                     }
+                    p->setClipping(false);
                 }
                 else
                 {
@@ -7943,7 +7945,8 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 {
     bool horiz(SLIDER_TRIANGULAR==opts.sliderStyle ? r.height()>r.width() : r.width()>r.height());
 
-    if(SLIDER_TRIANGULAR==opts.sliderStyle || (SLIDER_ROUND==opts.sliderStyle && ROUND_FULL==opts.round))
+    if(SLIDER_TRIANGULAR==opts.sliderStyle ||
+       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && ROUND_FULL==opts.round))
     {
         QStyleOption opt(*option);
 
@@ -7963,7 +7966,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                          yo(horiz ? 0 : 8);
         PrimitiveElement direction(horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight);
         QPolygon         clipRegion;
-        bool             drawLight((MO_GLOW!=opts.coloredMouseOver && MO_PLASTIK!=opts.coloredMouseOver) || !(opt.state&State_MouseOver) ||
+        bool             drawLight(/*(MO_GLOW!=opts.coloredMouseOver && MO_PLASTIK!=opts.coloredMouseOver) || */!(opt.state&State_MouseOver) ||
                                    (SLIDER_ROUND==opts.sliderStyle &&
                                    (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders)));
         int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13);
@@ -8145,7 +8148,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         p->restore();
     }
     else
-//     {
+    {
 //         QRect sr(r);
 // 
 //         if(horiz)
@@ -8153,8 +8156,13 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 //         else
 //             sr.adjust(1, 0, 0, 0);
 
-        drawSbSliderHandle(p, r, option, true);
-/*    }*/
+        QStyleOption opt(*option);
+
+        if(QTC_ROTATED_SLIDER)
+            opt.state^=State_Horizontal;
+            
+        drawSbSliderHandle(p, r, &opt, true);
+   }
 }
 
 void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle,

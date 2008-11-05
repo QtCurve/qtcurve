@@ -7,13 +7,14 @@
  5. Fix KDE app checking.
  6. New focus rect options - standard, highlight, background, filled.
  7. Add the ability to specify popup menu light factor.
- 8. Put more pace between arrows on combos if using Gtk combo menus and
+ 8. Put more space between arrows on combos if using Gtk combo menus and
     V arrows.
  9. Fix blurry arrows in url navigator.
 10. Set menu palette.
 11. Add option to use darkened background colour for menuitem selection.
 12. Add 'fade' to menuitem appearance.
 13. Add new scrollbar type - oxygen.
+14. New slider styles - plain rotated, and round rotated.
 
 0.59.6
 ------

@@ -561,8 +561,12 @@ typedef enum
 {
     SLIDER_PLAIN,
     SLIDER_ROUND,
+    SLIDER_PLAIN_ROTATED,
+    SLIDER_ROUND_ROTATED,
     SLIDER_TRIANGULAR,
 } ESliderStyle;
+
+#define QTC_ROTATED_SLIDER (SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
 
 typedef enum
 {
