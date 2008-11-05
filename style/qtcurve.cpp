@@ -5773,7 +5773,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
                     painter->fillRect(r, palette.brush(QPalette::Background));
-#if 1
+#if 0
                 if(noButtons)
                 {
                     //painter->setClipRegion(QRegion(s2)+QRegion(addpage));
@@ -5877,7 +5877,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         if(atMax)
                             switch(opts.scrollbarType)
                             {
-                                case SCROLLBAR_OXYGEN:
                                 case SCROLLBAR_KDE:
                                 case SCROLLBAR_WINDOWS:
                                 case SCROLLBAR_PLATINUM:
@@ -5891,7 +5890,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         if(atMin)
                             switch(opts.scrollbarType)
                             {
-                                case SCROLLBAR_OXYGEN:
                                 case SCROLLBAR_KDE:
                                 case SCROLLBAR_WINDOWS:
                                 case SCROLLBAR_NEXT:
