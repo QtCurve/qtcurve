@@ -3649,7 +3649,7 @@ debugDisplayWidget(widget, 3);
             if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
-            if(grayItem && mb && !active_mb !opts.colorMenubarMouseOver &&
+            if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
                (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
                 fillVal=ORIGINAL_SHADE;
 
