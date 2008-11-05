@@ -3641,13 +3641,17 @@ debugDisplayWidget(widget, 3);
                                     : ROUNDED_ALL,
                      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
             gboolean border=pbar || menuitem || mb,
-                     /*stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,*/
+                     stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,
                      horiz=horizPbar || menuitem;
             int      fillVal=grayItem && !pbar ? 4 : ORIGINAL_SHADE,
                      borderVal=pbar || opts.borderMenuitems ? 0 : fillVal;
 
             if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
+
+            if(grayItem && mb && !active_mb !opts.colorMenubarMouseOver &&
+               (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+                fillVal=ORIGINAL_SHADE;
 
             if(!mb && menuitem &&  APPEARANCE_FADE==opts.menuitemAppearance)
             {
@@ -3683,23 +3687,23 @@ debugDisplayWidget(widget, 3);
                                     getWidgetShade(WIDGET_MENU_ITEM, TRUE, FALSE, opts.menuitemAppearance),
                                     getWidgetShade(WIDGET_MENU_ITEM, FALSE, FALSE, opts.menuitemAppearance),
                                     TRUE, TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-            else /*if(stdColors)
+            else if(stdColors && opts.borderMenuitems)
             {
                 if(pbar && (horizPbar ? width : height)<3)
                 {
                     if((!pbar || !opts.fillProgress) && border && stdColors)
-                        drawAreaColor(cr, area, NULL, &itemCols[ORIGINAL_SHADE], x, y, width, height);
+                        drawAreaColor(cr, area, NULL, &itemCols[fillVal], x, y, width, height);
                 }
                 else
                     drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
-                                width, height, &itemCols[ORIGINAL_SHADE],
+                                width, height, &itemCols[fillVal],
                                 itemCols, pbar && opts.fillProgress ? ROUNDED_NONE : round,
                                 pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
                                 DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
                                 ((!pbar || !opts.fillProgress) && border && stdColors ? DF_DO_BORDER : 0)|
                                 (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS));
             }
-            else*/
+            else
             {
                 if(width>2 && height>2)
                     drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2,
