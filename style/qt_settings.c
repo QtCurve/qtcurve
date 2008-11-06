@@ -1437,7 +1437,7 @@ static gboolean qtInit(Options *opts)
             {
                 const char *env=getenv("QTC_STYLE");
 
-                if(env)
+                if(env && strlen(env))
                 {
                     qtSettings.styleName=realloc(qtSettings.styleName, strlen(env));
                     strcpy(qtSettings.styleName, env);

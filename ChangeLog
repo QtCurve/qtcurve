@@ -10,6 +10,7 @@
  8. Add 'fade' to menuitem appearance.
  9. Add new scrollbar type - oxygen.
 10. New slider styles - plain rotated, and round rotated.
+11. Fix crash if QTC_STYLE is set, but is empty.
 
 0.59.7
 ------
