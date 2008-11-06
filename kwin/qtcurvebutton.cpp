@@ -336,12 +336,37 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
         }
         case OnAllDesktopsIcon:
         {
+            int lineWidth = 1;
+            if (r.width() > 16)
+                lineWidth = 3;
+            else if (r.width() > 4)
+                lineWidth = 2;
+
+            int rounding=!style || ROUND_NONE==style->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL) ? 0 : 1;
+
+            drawObject(p, HorizontalLine, r.x()+rounding, r.top(), r.width()-(2*rounding), lineWidth);
+            drawObject(p, HorizontalLine, r.x()+rounding, r.bottom()-(lineWidth-1), r.width()-(2*rounding), lineWidth);
+            drawObject(p, VerticalLine, r.x(), r.top()+rounding, r.height()-(2*rounding), lineWidth);
+            drawObject(p, VerticalLine, r.right()-(lineWidth-1), r.top()+rounding, r.height()-(2*rounding), lineWidth);
+            
+#if 0
+            // <> style
+            int len=(r.width()/2)+1;
+
+            drawObject(p, DiagonalLine, r.x()+(r.width()/2), r.y(), len, lineWidth);
+            drawObject(p, DiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
+            drawObject(p, CrossDiagonalLine, r.x()+(r.width()/2), r.bottom(), len, lineWidth);
+            drawObject(p, CrossDiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
+#endif
+#if 0
+            // original plastik style
             // horizontal bars
             drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.y(), r.width()-2*lwTitleBar, lwTitleBar);
             drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.bottom()-(lwTitleBar-1), r.width()-2*lwTitleBar, lwTitleBar);
             // vertical bars
             drawObject(p, VerticalLine, r.x(), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
             drawObject(p, VerticalLine, r.right()-(lwTitleBar-1), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
+#endif
             break;
         }
         case NoKeepAboveIcon:

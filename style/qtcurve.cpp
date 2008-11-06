@@ -1748,7 +1748,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ScrollBarSliderMin:
             return 16;
         case PM_SliderThickness:
-            return QTC_ROTATED_SLIDER ? 23 : 21;
+            return QTC_ROTATED_SLIDER ? 26 : 21;
         case PM_SliderControlThickness:
             return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_ROTATED_SLIDER ? 21 : 13);
          case PM_SliderTickmarkOffset:
@@ -2980,7 +2980,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         drawRounded=false;
 
                     painter->save();
-                    QColor c(use[QT_FOCUS]);
+                    QColor c(use[FOCUS_BACKGROUND!=opts.focus && state&State_Selected ? 3 : QT_FOCUS]);
                     painter->setPen(c);
                     if(FOCUS_FILLED==opts.focus)
                     {
@@ -5773,24 +5773,24 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
                     painter->fillRect(r, palette.brush(QPalette::Background));
-#if 0
-                if(noButtons)
-                {
-                    //painter->setClipRegion(QRegion(s2)+QRegion(addpage));
 
-                    opt.rect=sbRect;
+                if(noButtons && slider.isValid())
+                {
+                    // Paint part of trough under slider, so as to paint corners.
+                    painter->setClipRegion(slider);
+
+                    opt.rect=subpage.united(addpage);
                     opt.state=scrollbar->state|State_On;
                     opt.state&=~State_MouseOver;
 
-                    drawLightBevel(painter, sbRect, &opt, widget,
+                    drawLightBevel(painter, opt.rect, &opt, widget,
     #ifndef QTC_SIMPLE_SCROLLBARS
                                 SCROLLBAR_NONE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType ? ROUNDED_ALL :
     #endif
                                 ROUNDED_NONE,
                                 itsBackgroundCols[2], itsBackgroundCols, true, WIDGET_TROUGH);
-                    //painter->setClipping(false);
+                    painter->setClipping(false);
                 }
-#endif
 
                 if((option->subControls&SC_ScrollBarSubPage) && subpage.isValid())
                 {
@@ -6844,12 +6844,18 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
             case STRIPE_NONE:
                 break;
             case STRIPE_PLAIN:
-                drawBevelGradientReal(use[1], true, &pixPainter,
-                                        horiz
-                                        ? QRect(r.x(), r.y(), PROGRESS_CHUNK_WIDTH, r.height())
-                                        : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH),
-                                        horiz, shadeTop, shadeBot, false, bevApp, WIDGET_PROGRESSBAR);
+            {
+                QRect r2(horiz
+                            ? QRect(r.x(), r.y(), PROGRESS_CHUNK_WIDTH, r.height())
+                            : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH));
+                                                
+                if(IS_FLAT(bevApp))
+                    pixPainter.fillRect(r2, use[1]);
+                else
+                    drawBevelGradientReal(use[1], true, &pixPainter, r2, horiz, shadeTop, shadeBot, false, bevApp,
+                                          WIDGET_PROGRESSBAR);
                 break;
+            }
             case STRIPE_DIAGONAL:
             {
                 QRegion reg;
