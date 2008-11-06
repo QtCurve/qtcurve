@@ -3022,6 +3022,7 @@ debugDisplayWidget(widget, 3);
                                                                         : stepper || sbar
                                                                             ? WIDGET_SB_BUTTON
                                                                             : WIDGET_OTHER;
+                int xo=x, yo=y, wo=width, ho=height;
 
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                 /* Try and guess if this button is a toolbar button... */
@@ -3123,7 +3124,9 @@ debugDisplayWidget(widget, 3);
                 if(defBtn && IND_TINT==opts.defBtnIndicator)
                     btn_colors=qtcPalette.defbtn;
 
-                if(SCROLLBAR_OXYGEN!=opts.scrollbarType || WIDGET_SB_BUTTON!=widgetType)
+                if(SCROLLBAR_OXYGEN==opts.scrollbarType && WIDGET_SB_BUTTON==widgetType)
+                    drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
+                else
                     drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
                                    &btn_colors[bgnd], btn_colors, round, widgetType,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
@@ -3391,9 +3394,33 @@ debugDisplayWidget(widget, 3);
 #endif
                 case SCROLLBAR_OXYGEN:
                     if(horiz)
-                        x+=16, width-=48;
+                        x+=15, width-=45;
                     else
-                        y+=16, height-=48;
+                        y+=15, height-=45;
+            }
+
+            if(isMozilla())
+            {
+                GdkColor *parent_col=getParentBgCol(widget),
+                         *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
+
+                setCairoClipping(cr, area, NULL);
+
+                if(horiz)
+                {
+                    if(ROUNDED_LEFT==sbarRound || ROUNDED_ALL==sbarRound)
+                        drawVLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y, height);
+                    if(ROUNDED_RIGHT==sbarRound || ROUNDED_ALL==sbarRound)
+                        drawVLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x+width-1, y, height);
+                }
+                else
+                {
+                    if(ROUNDED_TOP==sbarRound || ROUNDED_ALL==sbarRound)
+                        drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y, width);
+                    if(ROUNDED_BOTTOM==sbarRound || ROUNDED_ALL==sbarRound)
+                        drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y+height-1, width);
+                }
+                unsetCairoClipping(cr);
             }
 
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
@@ -5530,7 +5557,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         gboolean drawRounded=QTC_ROUNDED;
         GdkColor *cols=FOCUS_BACKGROUND==opts.focus ? qtcPalette.background : qtcPalette.menuitem;
-        GdkColor *col=&cols[QT_FOCUS];
+        GdkColor *col=&cols[FOCUS_BACKGROUND!=opts.focus && GTK_STATE_SELECTED==state ? 3 : QT_FOCUS];
 
         QTC_CAIRO_BEGIN
 
