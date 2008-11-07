@@ -40,6 +40,8 @@
 #include "config.h"
 #include <cairo.h>
 
+#define SBAR_BTN_SIZE 15
+
 static struct
 {
     GdkColor background[TOTAL_SHADES+1],
@@ -684,7 +686,7 @@ static int getRound(const char *detail, GtkWidget *widget, int x, int y, int wid
         if(0==strcmp(detail, "slider"))
             return
 #ifndef QTC_SIMPLE_SCROLLBARS
-                    SCROLLBAR_NONE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType ? ROUNDED_ALL :
+                    SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons ? ROUNDED_ALL :
 #endif
                     ROUNDED_NONE;
         else if(0==strcmp(detail, "qtc-slider") ||
@@ -816,7 +818,6 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down,
     }
     else
     {
-#define BTN_SIZE 15
         GtkRange *range=GTK_RANGE(widget);
         gboolean horiz=range->orientation,
                  disableLeft=FALSE,
@@ -829,22 +830,21 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down,
 
         switch(opts.scrollbarType)
         {
-            case SCROLLBAR_OXYGEN:
             case SCROLLBAR_KDE:
-                leftBtns=BTN_SIZE;
-                rightBtns=BTN_SIZE*2;
+                leftBtns=SBAR_BTN_SIZE;
+                rightBtns=SBAR_BTN_SIZE*2;
                 break;
             default:
             case SCROLLBAR_WINDOWS:
-                leftBtns=BTN_SIZE;
-                rightBtns=BTN_SIZE;
+                leftBtns=SBAR_BTN_SIZE;
+                rightBtns=SBAR_BTN_SIZE;
                 break;
             case SCROLLBAR_PLATINUM:
                 leftBtns=0;
-                rightBtns=BTN_SIZE*2;
+                rightBtns=SBAR_BTN_SIZE*2;
                 break;
             case SCROLLBAR_NEXT:
-                leftBtns=BTN_SIZE*2;
+                leftBtns=SBAR_BTN_SIZE*2;
                 rightBtns=0;
                 break;
             case SCROLLBAR_NONE:
@@ -2769,7 +2769,7 @@ debugDisplayWidget(widget, 3);
             y++;
 */
 
-        if(GTK_STATE_ACTIVE==state && ((sbar && SCROLLBAR_OXYGEN!=opts.scrollbarType) || isSpinButton))
+        if(GTK_STATE_ACTIVE==state && ((sbar && !opts.flatSbarButtons) || isSpinButton))
         {
             x++;
             y++;
@@ -3057,7 +3057,7 @@ debugDisplayWidget(widget, 3);
                     }
 
                 if(GTK_APP_MOZILLA!=qtSettings.app && slider &&
-                    (SCROLLBAR_NONE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType))
+                    (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
                 {
                     GdkRectangle troughArea;
 
@@ -3097,7 +3097,7 @@ debugDisplayWidget(widget, 3);
                 }
 
 #ifdef QTC_INCREASE_SB_SLIDER
-                if(slider && widget && GTK_IS_RANGE(widget) && SCROLLBAR_OXYGEN!=opts.scrollbarType)
+                if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons)
                 {
                     GtkAdjustment *adj = GTK_RANGE(widget)->adjustment;
                     gboolean      horizontal = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
@@ -3124,7 +3124,7 @@ debugDisplayWidget(widget, 3);
                 if(defBtn && IND_TINT==opts.defBtnIndicator)
                     btn_colors=qtcPalette.defbtn;
 
-                if(SCROLLBAR_OXYGEN==opts.scrollbarType && WIDGET_SB_BUTTON==widgetType)
+                if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                     drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
                 else
                     drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
@@ -3377,27 +3377,51 @@ debugDisplayWidget(widget, 3);
         {
             int sbarRound=ROUNDED_ALL;
 
-            switch(opts.scrollbarType)
-            {
-                default:
-                    break;
-                case SCROLLBAR_NEXT:
-                    sbarRound=horiz ? ROUNDED_LEFT : ROUNDED_TOP;
-                    break;
-                case SCROLLBAR_PLATINUM:
-                    sbarRound=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
-                    break;
-#ifdef QTC_SIMPLE_SCROLLBARS
-                case SCROLLBAR_NONE:
-                    sbarRound=ROUNDED_NONE;
-                    break;
-#endif
-                case SCROLLBAR_OXYGEN:
-                    if(horiz)
-                        x+=15, width-=45;
-                    else
-                        y+=15, height-=45;
-            }
+            if(opts.flatSbarButtons)
+                switch(opts.scrollbarType)
+                {
+                    case SCROLLBAR_KDE:
+                        if(horiz)
+                            x+=SBAR_BTN_SIZE, width-=SBAR_BTN_SIZE*3;
+                        else
+                            y+=SBAR_BTN_SIZE, height-=SBAR_BTN_SIZE*3;
+                        break;
+                    case SCROLLBAR_WINDOWS:
+                        if(horiz)
+                            x+=SBAR_BTN_SIZE, width-=SBAR_BTN_SIZE*2;
+                        else
+                            y+=SBAR_BTN_SIZE, height-=SBAR_BTN_SIZE*2;
+                        break;
+                    case SCROLLBAR_NEXT:
+                        if(horiz)
+                            x+=SBAR_BTN_SIZE*2, width-=SBAR_BTN_SIZE*2;
+                        else
+                            y+=SBAR_BTN_SIZE*2, height-=SBAR_BTN_SIZE*2;
+                        break;
+                    case SCROLLBAR_PLATINUM:
+                        if(horiz)
+                            width-=SBAR_BTN_SIZE*2;
+                        else
+                            height-=SBAR_BTN_SIZE*2;
+                        break;
+                }
+            else
+                switch(opts.scrollbarType)
+                {
+                    default:
+                        break;
+                    case SCROLLBAR_NEXT:
+                        sbarRound=horiz ? ROUNDED_LEFT : ROUNDED_TOP;
+                        break;
+                    case SCROLLBAR_PLATINUM:
+                        sbarRound=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM;
+                        break;
+    #ifdef QTC_SIMPLE_SCROLLBARS
+                    case SCROLLBAR_NONE:
+                        sbarRound=ROUNDED_NONE;
+                        break;
+    #endif
+                }
 
             if(isMozilla())
             {
