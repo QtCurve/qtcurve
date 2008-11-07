@@ -1669,6 +1669,12 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
+        case PM_DefaultTopLevelMargin:
+            return 11;
+        case PM_DefaultChildMargin:
+            return 4;
+        case PM_DefaultLayoutSpacing:
+            return 4;
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
             return 3;
