@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>743</width>
-    <height>621</height>
+    <width>733</width>
+    <height>630</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -245,7 +245,7 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="page_3" >
-      <layout class="QGridLayout" >
+      <layout class="QGridLayout" name="gridLayout_6" >
        <item row="0" column="0" >
         <widget class="QLabel" name="label_11" >
          <property name="text" >
@@ -345,6 +345,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Next - two buttons at the top/left, none at bottom/right&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">None - no buttons, only the slider&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" colspan="2" >
+        <widget class="QCheckBox" name="flatSbarButtons" >
+         <property name="text" >
+          <string>Flat</string>
          </property>
         </widget>
        </item>
@@ -1625,6 +1632,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>sliderStyle</tabstop>
   <tabstop>fillSlider</tabstop>
   <tabstop>scrollbarType</tabstop>
+  <tabstop>flatSbarButtons</tabstop>
   <tabstop>sliderThumbs</tabstop>
   <tabstop>progressAppearance</tabstop>
   <tabstop>stripedProgress</tabstop>

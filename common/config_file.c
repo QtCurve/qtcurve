@@ -217,8 +217,6 @@ static EScrollbar toScrollbar(const char *str, EScrollbar def)
             return SCROLLBAR_PLATINUM;
         if(0==memcmp(str, "next", 4))
             return SCROLLBAR_NEXT;
-        if(0==memcmp(str, "oxygen", 6))
-            return SCROLLBAR_OXYGEN;
         if(0==memcmp(str, "none", 4))
             return SCROLLBAR_NONE;
     }
@@ -815,6 +813,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             QTC_CFG_READ_BOOL(squareScrollViews)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(sunkenScrollViews)
+            QTC_CFG_READ_BOOL(flatSbarButtons)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance, false)
@@ -1243,6 +1242,7 @@ static void defaultSettings(Options *opts)
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->sunkenScrollViews=false;
+    opts->flatSbarButtons=false;
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
@@ -1453,8 +1453,6 @@ static const char *toStr(EScrollbar sb)
             return "platinum";
         case SCROLLBAR_NEXT:
             return "next";
-        case SCROLLBAR_OXYGEN:
-            return "oxygen";
         case SCROLLBAR_NONE:
             return "none";
     }
@@ -1691,6 +1689,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareScrollViews)
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(sunkenScrollViews)
+        CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)

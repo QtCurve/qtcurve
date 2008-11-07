@@ -13,7 +13,7 @@
 10. Set menu palette.
 11. Add option to use darkened background colour for menuitem selection.
 12. Add 'fade' to menuitem appearance.
-13. Add new scrollbar type - oxygen.
+13. Option to have flat scrollbar buttons.
 14. New slider styles - plain rotated, and round rotated.
 15. Modified window decorations's 'on all desktops' button.
 16. Fix plain stripes on flat progressbar.

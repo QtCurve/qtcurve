@@ -536,11 +536,8 @@ typedef enum
     SCROLLBAR_WINDOWS,
     SCROLLBAR_PLATINUM,
     SCROLLBAR_NEXT,
-    SCROLLBAR_OXYGEN,
     SCROLLBAR_NONE
 } EScrollbar;
-
-#define QTC_THREEBUTTON_SBAR (SCROLLBAR_KDE==opts.scrollbarType || SCROLLBAR_OXYGEN==opts.scrollbarType)
 
 typedef enum
 {
@@ -1095,7 +1092,8 @@ typedef struct
                      comboSplitter,
                      squareScrollViews,
                      highlightScrollViews,
-                     sunkenScrollViews;
+                     sunkenScrollViews,
+                     flatSbarButtons;
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
