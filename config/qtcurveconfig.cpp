@@ -363,7 +363,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(activeTabAppearance, false);
     insertAppearanceEntries(progressAppearance);
     insertAppearanceEntries(progressGrooveAppearance);
-    insertAppearanceEntries(menuitemAppearance);
+    insertAppearanceEntries(menuitemAppearance, true, true, true);
     insertAppearanceEntries(titlebarAppearance, true, false);
     insertAppearanceEntries(selectionAppearance, true, false);
     insertAppearanceEntries(menuStripeAppearance, true, false);

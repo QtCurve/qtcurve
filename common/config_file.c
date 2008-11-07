@@ -1399,6 +1399,8 @@ static QString toStr(EAppearance exp)
             return "inverted";
         case APPEARANCE_SHINY_GLASS:
             return "shinyglass";
+        case APPEARANCE_FADE:
+            return "fade";
         default:
         {
             QString app;
