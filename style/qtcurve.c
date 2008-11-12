@@ -3727,7 +3727,7 @@ debugDisplayWidget(widget, 3);
                          mainWidth=width-(reverse ? roundOffet+1 : 1+MENUITEM_FADE_SIZE),
                          fadeX=reverse ? x+1 : width-MENUITEM_FADE_SIZE;
 
-                drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(roundOffet+2));
+                drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(roundOffet+3));
 
                 if(QTC_ROUNDED)
                     realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
@@ -4131,7 +4131,9 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
 // 
     if(mnu)
     {
-        y+=2;
+        y++;
+        if(GTK_APP_OPEN_OFFICE==qtSettings.app)
+            y+=2;
 //         if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
 //             x+=2;
 //         else
@@ -4290,8 +4292,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 //         if(GTK_APP_MOZILLA!=qtSettings.app)
 //             x-=3;
 
-        if(mnu)
-            y++;
+//         if(mnu)
+//             y++;
 
         {
             GdkColor  new_colors[TOTAL_SHADES+1],
