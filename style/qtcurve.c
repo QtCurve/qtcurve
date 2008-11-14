@@ -3752,7 +3752,7 @@ debugDisplayWidget(widget, 3);
                                     getWidgetShade(WIDGET_MENU_ITEM, TRUE, FALSE, opts.menuitemAppearance),
                                     getWidgetShade(WIDGET_MENU_ITEM, FALSE, FALSE, opts.menuitemAppearance),
                                     TRUE, TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-            else if(stdColors && opts.borderMenuitems)
+            else if(stdColors && (pbar || opts.borderMenuitems))
             {
                 if(pbar && (horizPbar ? width : height)<3)
                 {
