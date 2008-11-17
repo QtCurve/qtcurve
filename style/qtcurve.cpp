@@ -1150,9 +1150,9 @@ void QtCurveStyle::polish(QPalette &palette)
                    itsButtonCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Button)),
          newSlider(itsSliderCols /*&& SHADE_BLEND_SELECTED==opts.shadeSliders*/ &&
                    (newContrast || newButton || newMenu)),
-         newDefBtn(itsDefBtnCols /*&& ( (IND_COLORED==opts.defBtnIndicator &&
-                                       SHADE_BLEND_SELECTED!=opts.shadeSliders) ||
-                                      (IND_TINT==opts.defBtnIndicator) )*/ &&
+         newDefBtn(itsDefBtnCols && /*( (IND_COLORED==opts.defBtnIndicator &&*/
+                                       SHADE_BLEND_SELECTED!=opts.shadeSliders/*) ||*/ // If so, def btn == slider!
+                                      /*(IND_TINT==opts.defBtnIndicator) )*/ &&
                    (newContrast || newButton || newMenu)),
          newMouseOver(itsMouseOverCols && itsMouseOverCols!=itsDefBtnCols &&
                       itsMouseOverCols!=itsSliderCols &&
