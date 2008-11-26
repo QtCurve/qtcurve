@@ -5522,7 +5522,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 : titleBar->titleBarState&State_Enabled
                                     ? ROUNDED_ALL
                                     : ROUNDED_TOP,
-                               btnCols[2], btnCols, true,
+                               btnCols[ORIGINAL_SHADE], btnCols, true,
                                titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
 
                 if(roundKWinFull)
