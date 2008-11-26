@@ -20,6 +20,7 @@
 17. Fix large border in kontact.
 18. Use lighter shade for titlebar fill.
 19. Add option to specify appearance of titlebar buttons.
+20. Add option to specify appearance of inactive titlebars.
 
 0.59.6
 ------

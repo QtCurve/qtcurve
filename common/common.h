@@ -1113,6 +1113,7 @@ typedef struct
                      sliderAppearance,
 #ifdef __cplusplus
                      titlebarAppearance,
+                     inactiveTitlebarAppearance,
                      titlebarButtonAppearance,
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
@@ -1168,7 +1169,11 @@ static bool customHasLightBorder(Options *opts, EAppearance app)
     return false;
 }
 
+#ifdef __cplusplus
+static EAppearance widgetApp(EWidget w, const Options *opts, bool active=true)
+#else
 static EAppearance widgetApp(EWidget w, const Options *opts)
+#endif
 {
     switch(w)
     {
@@ -1194,7 +1199,7 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #ifdef __cplusplus
         case WIDGET_MDI_WINDOW:
         case WIDGET_MDI_WINDOW_TITLE:
-            return opts->titlebarAppearance;
+            return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
         case WIDGET_MDI_WINDOW_BUTTON:
             return opts->titlebarButtonAppearance;
 #endif

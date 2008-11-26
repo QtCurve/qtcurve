@@ -821,7 +821,7 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="0" >
         <widget class="QLabel" name="label_23" >
          <property name="text" >
-          <string>Titlebar appearance:</string>
+          <string>Active appearance:</string>
          </property>
         </widget>
        </item>
@@ -842,16 +842,26 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item row="1" column="0" >
+        <widget class="QLabel" name="label_28" >
+         <property name="text" >
+          <string>Inactive appearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="inactiveTitlebarAppearance" />
+       </item>
+       <item row="2" column="0" >
         <widget class="QLabel" name="label_27" >
          <property name="text" >
           <string>Button appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
+       <item row="2" column="1" >
         <widget class="QComboBox" name="titlebarButtonAppearance" />
        </item>
-       <item row="2" column="0" >
+       <item row="3" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1599,10 +1609,6 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
   </layout>
-  <zorder>titleLabel</zorder>
-  <zorder>stackList</zorder>
-  <zorder>optionBtn</zorder>
-  <zorder>stack</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
@@ -1674,6 +1680,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>xCheck</tabstop>
   <tabstop>crHighlight</tabstop>
   <tabstop>titlebarAppearance</tabstop>
+  <tabstop>inactiveTitlebarAppearance</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>handles</tabstop>

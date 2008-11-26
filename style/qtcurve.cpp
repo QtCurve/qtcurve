@@ -5496,7 +5496,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                             : itsMdiTextColor);
                 QStyleOption opt(*option);
 
-                opt.state=State_Horizontal|State_Enabled|State_Raised;
+                opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
 
                 if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
                 {
@@ -7150,7 +7150,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                                   const QWidget *widget, int round, const QColor &fill, const QColor *custom,
                                   bool doBorder, EWidget w) const
 {
-    EAppearance  app(widgetApp(w, &opts));
+    EAppearance  app(widgetApp(w, &opts, option->state&State_Active));
 
     if(APPEARANCE_RAISED==app && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w))
         app=APPEARANCE_FLAT;
@@ -7508,12 +7508,13 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         case BORDER_SUNKEN:
         {
             EAppearance  app(widgetApp(w, &opts));
+            int          dark=window ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
 
             if(APPEARANCE_FLAT==app && window)
                 app=APPEARANCE_RAISED;
 
-            QColor       tl(cols[BORDER_RAISED==borderProfile ? 0 : QT_FRAME_DARK_SHADOW]),
-                         br(cols[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0]);
+            QColor       tl(cols[BORDER_RAISED==borderProfile ? 0 : dark]),
+                         br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
             QPainterPath topPath,
                          botPath;
 

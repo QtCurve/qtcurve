@@ -839,11 +839,18 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance, false)
+            QTC_CFG_READ_APPEARANCE(inactiveTitlebarAppearance, opts->titlebarAppearance, false)
             QTC_CFG_READ_APPEARANCE(titlebarButtonAppearance, opts->titlebarAppearance, false)
+
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_FLAT;
+
+            if(APPEARANCE_BEVELLED==opts->inactiveTitlebarAppearance)
+                opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
+            else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
+                opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
 #endif
             QTC_CFG_READ_SHADING(shading, shading);
 
@@ -1064,6 +1071,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             checkAppearance(&opts->sliderAppearance, opts);
 #ifdef __cplusplus
             checkAppearance(&opts->titlebarAppearance, opts);
+            checkAppearance(&opts->inactiveTitlebarAppearance, opts);
             checkAppearance(&opts->titlebarButtonAppearance, opts);
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
@@ -1294,6 +1302,7 @@ static void defaultSettings(Options *opts)
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_GRADIENT;
+    opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
     opts->titlebarButtonAppearance=APPEARANCE_GRADIENT;
 #endif
     /* Read system config file... */
@@ -1698,6 +1707,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)
+        CFG_WRITE_ENTRY_FORCE(inactiveTitlebarAppearance)
+        CFG_WRITE_ENTRY_FORCE(titlebarButtonAppearance)
 
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
