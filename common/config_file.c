@@ -839,6 +839,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance, false)
+            QTC_CFG_READ_APPEARANCE(titlebarButtonAppearance, opts->titlebarAppearance, false)
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->titlebarAppearance)
@@ -1063,6 +1064,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             checkAppearance(&opts->sliderAppearance, opts);
 #ifdef __cplusplus
             checkAppearance(&opts->titlebarAppearance, opts);
+            checkAppearance(&opts->titlebarButtonAppearance, opts);
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             checkAppearance(&opts->selectionAppearance, opts);
@@ -1292,6 +1294,7 @@ static void defaultSettings(Options *opts)
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_GRADIENT;
+    opts->titlebarButtonAppearance=APPEARANCE_GRADIENT;
 #endif
     /* Read system config file... */
     {

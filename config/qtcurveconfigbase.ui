@@ -59,6 +59,13 @@
      </column>
     </widget>
    </item>
+   <item row="2" column="0" >
+    <widget class="QPushButton" name="optionBtn" >
+     <property name="text" >
+      <string>Options</string>
+     </property>
+    </widget>
+   </item>
    <item rowspan="2" row="1" column="1" >
     <widget class="QStackedWidget" name="stack" >
      <property name="sizePolicy" >
@@ -810,11 +817,11 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="page_10" >
-      <layout class="QGridLayout" >
+      <layout class="QGridLayout" name="gridLayout_7" >
        <item row="0" column="0" >
         <widget class="QLabel" name="label_23" >
          <property name="text" >
-          <string>Appearance:</string>
+          <string>Titlebar appearance:</string>
          </property>
         </widget>
        </item>
@@ -835,6 +842,16 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item row="1" column="0" >
+        <widget class="QLabel" name="label_27" >
+         <property name="text" >
+          <string>Button appearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="titlebarButtonAppearance" />
+       </item>
+       <item row="2" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1581,14 +1598,11 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QPushButton" name="optionBtn" >
-     <property name="text" >
-      <string>Options</string>
-     </property>
-    </widget>
-   </item>
   </layout>
+  <zorder>titleLabel</zorder>
+  <zorder>stackList</zorder>
+  <zorder>optionBtn</zorder>
+  <zorder>stack</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
@@ -1660,6 +1674,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>xCheck</tabstop>
   <tabstop>crHighlight</tabstop>
   <tabstop>titlebarAppearance</tabstop>
+  <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>handles</tabstop>
   <tabstop>menubarAppearance</tabstop>

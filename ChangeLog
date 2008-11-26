@@ -19,6 +19,7 @@
 16. Fix plain stripes on flat progressbar.
 17. Fix large border in kontact.
 18. Use lighter shade for titlebar fill.
+19. Add option to specify appearance of titlebar buttons.
 
 0.59.6
 ------
