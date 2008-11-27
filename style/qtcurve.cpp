@@ -7879,7 +7879,7 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
     // Just using 'aa' and drawing the arrows would be fine - but this makes them look
     // slightly blurry, and I dont like that.
     p->save();
-    col.setAlpha(255);
+    //col.setAlpha(255);
     p->setPen(col);
     p->setBrush(col);
     p->setRenderHint(QPainter::Antialiasing, true);
