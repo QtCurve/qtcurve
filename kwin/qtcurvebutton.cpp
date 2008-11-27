@@ -130,8 +130,8 @@ void QtCurveButton::drawButton(QPainter *painter)
     QPixmap  buffer(width(), height());
     QPainter bP(&buffer);
 
-    if(CloseButton==type())
-        buttonColor=midColor(QColor(180,64,32), buttonColor);
+//     if(CloseButton==type())
+//         buttonColor=midColor(QColor(180,64,32), buttonColor);
 
     itsClient->drawBtnBgnd(&bP, r, active);
 
@@ -156,6 +156,7 @@ void QtCurveButton::drawButton(QPainter *painter)
     else
     {
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
+        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
 
@@ -166,11 +167,14 @@ void QtCurveButton::drawButton(QPainter *painter)
         }
         else
         {
-            bP.setPen(QtCurveClient::shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
+            bP.setPen(QtCurveClient::shadowColor(col));
             bP.drawPixmap(dX+1, dY+1, icon);
         }
 
-        bP.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
+        if(CloseButton==type() && itsHover)
+            col=CLOSE_COLOR;
+            
+        bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);
     }
 
@@ -424,7 +428,7 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             opt.rect=r;
             opt.state=QStyle::State_Enabled;
 
-            opt.palette.setColor(QPalette::Button, Qt::red);
+            //opt.palette.setColor(QPalette::Button, Qt::red);
             style->drawPrimitive(ShadeIcon==icon ? QStyle::PE_IndicatorArrowUp
                                                  : QStyle::PE_IndicatorArrowDown,
                                  &opt, &p, 0L);

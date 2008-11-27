@@ -83,7 +83,7 @@ class QtCurveStyle : public QWindowsStyle
 
     private:
 
-    static QColor shadowColor(const QColor col)
+    static QColor shadowColor(const QColor &col)
     {
         return qGray(col.rgb()) < 100 ? QColor(255, 255, 255, 75) : QColor(0, 0, 0, 75);
     }
@@ -107,7 +107,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
-    void drawMdiIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const;
+    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r, bool sunken, int margin, SubControl button) const;
     void drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const;
     void drawEntryField(QPainter *p, const QRect &rx, const QStyleOption *option, int round,
                         bool fill, bool doEtch) const;

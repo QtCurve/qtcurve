@@ -5493,7 +5493,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         ? option->palette.color(QPalette::WindowText)
                                         : active
                                             ? itsActiveMdiTextColor
-                                            : itsMdiTextColor);
+                                            : itsMdiTextColor),
+                             shadow(shadowColor(textColor));
                 QStyleOption opt(*option);
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
@@ -5533,11 +5534,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->drawLine(r.x()+r.width()-2, r.y()+4, r.x()+r.width()-2, r.y()+3);
                     painter->drawPoint(r.x()+r.width()-3, r.y()+2);
                     painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
-                    painter->setPen(btnCols[0]);
-                    painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
-                    painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
-                    //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
-                    painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
+                    if(APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance))
+                    {
+                        painter->setPen(btnCols[0]);
+                        painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
+                        painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
+                        //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
+                        painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
+                    }
                 }
 
                 if(!titleBar->text.isEmpty())
@@ -5552,7 +5556,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     QString str(painter->fontMetrics().elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
 
-                    painter->setPen(shadowColor(textColor));
+                    painter->setPen(shadow);
                     painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
@@ -5571,7 +5575,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarMinButton) && (titleBar->state & State_MouseOver),
                                       sunken, btnCols);
-                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarMinButton);
+                        drawMdiIcon(painter, textColor, shadow, rect, sunken, buttonMargin, SC_TitleBarMinButton);
                     }
                 }
                 // max button
@@ -5587,7 +5591,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarMaxButton) && (titleBar->state & State_MouseOver),
                                       sunken, btnCols);
-                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarMaxButton);
+                        drawMdiIcon(painter, textColor, shadow, rect, sunken, buttonMargin, SC_TitleBarMaxButton);
                     }
                 }
 
@@ -5598,15 +5602,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if (rect.isValid())
                     {
-  
-                        bool   sunken((titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_Sunken));
-                        QColor closeCols[TOTAL_SHADES+1];
 
-                        shadeColors(midColor(btnCols[ORIGINAL_SHADE], QColor(180,64,32)), closeCols);
-                        drawMdiButton(painter, rect,
-                                      (titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_MouseOver),
-                                      sunken, closeCols);
-                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarCloseButton);
+                        bool sunken((titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_Sunken)),
+                             hover((titleBar->activeSubControls & SC_TitleBarCloseButton) && (titleBar->state & State_MouseOver));
+
+                        drawMdiButton(painter, rect, hover, sunken, btnCols);
+                        drawMdiIcon(painter, hover || sunken ? CLOSE_COLOR : textColor, shadow, rect, sunken, buttonMargin, SC_TitleBarCloseButton);
                     }
                 }
 
@@ -5627,7 +5628,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarNormalButton) && (titleBar->state & State_MouseOver),
                                       sunken, btnCols);
-                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarNormalButton);
+                        drawMdiIcon(painter, textColor, shadow, rect, sunken, buttonMargin, SC_TitleBarNormalButton);
                     }
                 }
 
@@ -5668,7 +5669,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarShadeButton) && (titleBar->state & State_MouseOver),
                                       sunken, btnCols);
-                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarShadeButton);
+                        drawMdiIcon(painter, textColor, shadow, rect, sunken, buttonMargin, SC_TitleBarShadeButton);
                     }
                 }
 
@@ -5684,7 +5685,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawMdiButton(painter, rect,
                                       (titleBar->activeSubControls & SC_TitleBarUnshadeButton) && (titleBar->state & State_MouseOver),
                                       sunken, btnCols);
-                        drawMdiIcon(painter, textColor, rect, sunken, buttonMargin, SC_TitleBarUnshadeButton);
+                        drawMdiIcon(painter, textColor, shadow, rect, sunken, buttonMargin, SC_TitleBarUnshadeButton);
                     }
                 }
 
@@ -7552,6 +7553,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             p->drawPoint(r.x()+1, r.y()+r.height()-1);
             p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
             p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
+            p->setPen(cols[ORIGINAL_SHADE]);
+            p->drawPoint(r.x()+1, r.y()+r.height()-2);
         }
 
         if(WIDGET_MDI_WINDOW_TITLE==w)
@@ -7585,10 +7588,11 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
     }
 }
 
-void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const
+void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r,
+                               bool sunken, int margin, SubControl button) const
 {
     if(!sunken)
-        drawWindowIcon(painter, shadowColor(color), r.adjusted(1, 1, 1, 1), sunken, margin, button);
+        drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, margin, button);
     drawWindowIcon(painter, color, r, sunken, margin, button);
 }
 

@@ -21,7 +21,7 @@
 18. Use lighter shade for titlebar fill.
 19. Add option to specify appearance of titlebar buttons.
 20. Add option to specify appearance of inactive titlebars.
-21. Allow etching of titlebar buttons.
+21. Recolour X of close button - not button background.
 
 0.59.6
 ------

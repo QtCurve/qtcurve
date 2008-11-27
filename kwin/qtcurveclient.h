@@ -38,7 +38,7 @@ class QtCurveClient : public KCommonDecoration
 {
     public:
 
-    static QColor shadowColor(const QColor col)
+    static QColor shadowColor(const QColor &col)
     {
         return qGray(col.rgb()) < 100 ? QColor(255, 255, 255, 75) : QColor(0, 0, 0, 75);
     }
