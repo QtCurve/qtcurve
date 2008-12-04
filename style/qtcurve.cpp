@@ -5919,6 +5919,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawPrimitive(PE_FrameFocusRect, &opt, painter, widget);
                     }
 
+#if 0
 #ifndef QTC_SIMPLE_SCROLLBARS
                     if(noButtons && (!atMin || !atMax))
                     {
@@ -5963,6 +5964,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             }
                         }
                     }
+#endif
 #endif
                     if(!(option->subControls&SC_ScrollBarSlider))
                         painter->setClipping(false);
