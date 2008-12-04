@@ -22,6 +22,7 @@
 19. Add option to specify appearance of titlebar buttons.
 20. Add option to specify appearance of inactive titlebars.
 21. Recolour X of close button - not button background.
+22. Dont draw sunken button for KMenu title background - just draw Menu background.
 
 0.59.6
 ------

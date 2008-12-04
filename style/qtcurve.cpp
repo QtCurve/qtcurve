@@ -5041,10 +5041,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
         case CC_ToolButton:
             if (const QStyleOptionToolButton *toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option))
             {
-                QRect button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
-                      menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
-                State bflags(toolbutton->state);
-                bool  etched(QTC_DO_EFFECT);
+                QRect             button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
+                                  menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
+                State             bflags(toolbutton->state);
+                const QToolButton *btn = qobject_cast<const QToolButton *>(widget);
+                bool              etched(QTC_DO_EFFECT),
+                                  kMenuTitle(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
+                                             widget->parentWidget() && widget->parentWidget()->inherits("KMenu"));
 
                 if(bflags&State_MouseOver && !(bflags&State_Enabled))
                     bflags &= ~State_MouseOver;
@@ -5066,7 +5069,21 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
-                if (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised)))
+                if(kMenuTitle)
+                {
+                    if(opts.menuStripe)
+                    {
+                        int stripeWidth(qMax(20, constMenuPixmapWidth));
+
+                        drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
+                                          painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
+                                                         stripeWidth, r.height()), false,
+                                        getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
+                                        getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
+                                        false, opts.menuStripeAppearance, WIDGET_OTHER); 
+                    }
+                }
+                else if (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised)))
                 {
                     tool.rect = toolbutton->subControls & SC_ToolButtonMenu ? button.united(menuarea) : button;
                     tool.state = bflags;
