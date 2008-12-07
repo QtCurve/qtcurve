@@ -2481,10 +2481,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         {
                             QStyleOptionFrame opt(*fo);
                             opt.state&=~State_HasFocus;
-                            drawEntryField(painter, r, &opt, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
+                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
                         }
                         else
-                            drawEntryField(painter, r, option, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
+                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
                     }
                 }
                 else
@@ -2751,7 +2751,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     painter->save();
                     CEtchCheck check(widget);
-                    drawEntryField(painter, r, &opt, ROUNDED_ALL, PE_PanelLineEdit==element, QTC_DRAW_ETCH(widget, false));
+                    drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, PE_PanelLineEdit==element, QTC_DRAW_ETCH(widget, false));
                     painter->restore();
                 }
             }
@@ -2824,7 +2824,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(glow)
                     drawGlow(painter, r, WIDGET_CHECKBOX);
                 else if(QTC_DRAW_ETCH(widget, false))
-                    drawEtch(painter, r, WIDGET_CHECKBOX);
+                    drawEtch(painter, r, widget, WIDGET_CHECKBOX);
 
             if(state&State_On)
             {
@@ -2931,7 +2931,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(!glow)
                 {
                     topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                    botCol.setAlphaF(QTC_ETCH_RADIO_BOTTOM_ALPHA);
+                    if(widget && widget->parentWidget())
+                        shade(widget->parentWidget()->palette().color(QPalette::Active, widget->parentWidget()->backgroundRole()), &botCol, 1.06);
+                    else
+                        botCol.setAlphaF(0.0);
                 }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -3692,7 +3695,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                               false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
             if(doEtch && QTC_DRAW_ETCH(widget, false))
-                drawEtch(painter, r.adjusted(-1, -1, 1, 1), WIDGET_OTHER);
+                drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_OTHER);
 
             drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER,
                        IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT);
@@ -5347,7 +5350,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(doEtch)
                 {
-                    drawEtch(painter, frame.united(up).united(down), WIDGET_SPIN);
+                    drawEtch(painter, frame.united(up).united(down), widget, WIDGET_SPIN);
                     down.adjust(reverse ? 1 : 0, 0, reverse ? 0 : -1, -1);
                     up.adjust(reverse ? 1 : 0, 1, reverse ? 0 : -1, 0);
                     frame.adjust(reverse ? 0 : 1, 1, reverse ? -1 : 0, -1);
@@ -5385,7 +5388,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         frame.setX(frame.x()-1);
                     else
                         frame.setWidth(frame.width()+1);
-                    drawEntryField(painter, frame, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
+                    drawEntryField(painter, frame, widget, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                 }
             }
             break;
@@ -6006,7 +6009,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(!sunken && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && !comboBox->editable)
                         drawGlow(painter, r, WIDGET_COMBO);
                     else if(QTC_DRAW_ETCH(widget, !sunken))
-                        drawEtch(painter, r, WIDGET_COMBO,
+                        drawEtch(painter, r, widget, WIDGET_COMBO,
                                  !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
 
                     frame.adjust(1, 1, -1, -1);
@@ -6063,7 +6066,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawRect(painter, field);
                         // 2 for frame width
                         field.adjust(-2,-2, 2, 2);
-                        drawEntryField(painter, field, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
+                        drawEntryField(painter, field, widget, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
                     else if(opts.comboSplitter)
                     {
@@ -7214,7 +7217,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
             (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
         else if(QTC_DRAW_ETCH(widget, !sunken))
-            drawEtch(p, rOrig, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
+            drawEtch(p, rOrig, widget, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
     }
 
     if(!colouredMouseOver && lightBorder)
@@ -7373,23 +7376,32 @@ void QtCurveStyle::drawGlow(QPainter *p, const QRect &r, EWidget w) const
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, EWidget w, bool raised) const
+void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget,  EWidget w, bool raised) const
 {
-    QColor       topCol(Qt::black),
-                 botCol(raised ? Qt::black : Qt::white);
     QPainterPath tl,
                  br;
+    QColor       col(Qt::black);
 
     buildSplitPath(r, w, ROUNDED_ALL, getRadius(opts.round, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
 
-    topCol.setAlphaF(raised ? 0.0 : QTC_ETCH_TOP_ALPHA);
-    botCol.setAlphaF(raised ? QTC_ETCH_TOP_ALPHA : QTC_ETCH_BOTTOM_ALPHA);
-
+    col.setAlphaF(QTC_ETCH_TOP_ALPHA);
     p->setBrush(Qt::NoBrush);
     p->setRenderHint(QPainter::Antialiasing, true);
-    p->setPen(topCol);
-    p->drawPath(tl);
-    p->setPen(botCol);
+    p->setPen(col);
+
+    if(!raised)
+    {
+        p->drawPath(tl);
+        if(widget && widget->parentWidget())
+        {
+            col=widget->parentWidget()->palette().color(QPalette::Active, widget->parentWidget()->backgroundRole());
+            shade(col, &col, 1.06);
+        }
+        else
+            col.setAlphaF(0.0);
+        p->setPen(col);
+    }
+
     p->drawPath(br);
     p->setRenderHint(QPainter::Antialiasing, false);
 }
@@ -7698,7 +7710,7 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
     }
 }
 
-void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOption *option,
+void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
                                   int round, bool fill, bool doEtch) const
 {
     QRect r(rx);
@@ -7710,7 +7722,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx, const QStyleOpti
         p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.brush(QPalette::Base));
 
     if(doEtch)
-        drawEtch(p, rx, WIDGET_ENTRY, false);
+        drawEtch(p, rx, widget, WIDGET_ENTRY, false);
 
     drawBorder(p, r, option, round, NULL, WIDGET_ENTRY, BORDER_SUNKEN);
 }
