@@ -1776,7 +1776,7 @@ static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
 }
 
 static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
-                     int x, int y, int w, int h, gboolean raised)
+                     GtkWidget *widget, int x, int y, int w, int h, gboolean raised)
 {
     double xd=x+0.5,
            yd=y+0.5,
@@ -1787,9 +1787,17 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
     cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
     if(!raised)
     {
+        GdkColor *parentBg=getParentBgCol(widget);
+
         createTLPath(cr, xd, yd, w-1, h-1, radius, ROUNDED_ALL);
         cairo_stroke(cr);
-        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_ETCH_BOTTOM_ALPHA);
+        if(parentBg)
+        {
+            shade(parentBg, parentBg, 1.06);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(*parentBg));
+        }
+        else
+            cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
     }
 
     createBRPath(cr, xd, yd, w-1, h-1, radius, ROUNDED_ALL);
@@ -1800,7 +1808,7 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
 static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkStateType state,
                            GdkRectangle *area, GdkRegion *region, gint x, gint y, gint width,
                            gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
-                           EBorder borderProfile, int flags)
+                           EBorder borderProfile, int flags, GtkWidget *wid)
 {
     EAppearance app=widgetApp(widget, &opts);
     gboolean    sunken=flags&DF_SUNKEN,
@@ -2004,8 +2012,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                                        width+(WIDGET_COMBO==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), height+2,
                      WIDGET_DEF_BUTTON==widget && GTK_STATE_PRELIGHT==state ? WIDGET_STD_BUTTON : widget);
         else
-            drawEtch(cr, area, region, x-(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), y-1,
-                                       width+(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), height+2,
+            drawEtch(cr, area, region, wid, x-(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), y-1,
+                                            width+(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), height+2,
                     EFFECT_SHADOW==opts.buttonEffect && WIDGET_COMBO_BUTTON!=widget && WIDGET_BUTTON(widget) && !sunken);
 
     if(flags&DF_DO_BORDER && width>2 && height>2)
@@ -2237,7 +2245,7 @@ debugDisplayWidget(widget, 3);
         if(!(round&CORNER_TL) && !(round&CORNER_BL))
             x-=4;
 
-        drawEtch(cr, region ? NULL : area, region, x, y, width, height, FALSE);
+        drawEtch(cr, region ? NULL : area, region, widget, x, y, width, height, FALSE);
         gdk_region_destroy(region);
     }
 
@@ -2913,7 +2921,7 @@ debugDisplayWidget(widget, 3);
         {
             if(QTC_DO_EFFECT)
             {
-                drawEtch(cr, area, NULL, x-2, y, width+2, height*2, FALSE);
+                drawEtch(cr, area, NULL, widget, x-2, y, width+2, height*2, FALSE);
                 y++;
                 width--;
             }
@@ -2921,7 +2929,7 @@ debugDisplayWidget(widget, 3);
         }
         else if (QTC_DO_EFFECT)
         {
-            drawEtch(cr, area, NULL, x-2, y-height, width+2, height*2, FALSE);
+            drawEtch(cr, area, NULL, widget, x-2, y-height, width+2, height*2, FALSE);
             height--;
             width--;
         }
@@ -2930,7 +2938,7 @@ debugDisplayWidget(widget, 3);
         drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height, &btn_colors[bgnd],
                        btn_colors, round, wid, BORDER_FLAT,
                        DF_DO_CORNERS|DF_DO_BORDER|
-                       (sunken ? DF_SUNKEN : 0));
+                       (sunken ? DF_SUNKEN : 0), widget);
     }
     else if(DETAIL("spinbutton"))
         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
@@ -3131,7 +3139,7 @@ debugDisplayWidget(widget, 3);
                                    &btn_colors[bgnd], btn_colors, round, widgetType,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
                                                 (lvh ? 0 : DF_DO_BORDER)|
-                                                (horiz ? 0 : DF_VERT));
+                                                (horiz ? 0 : DF_VERT), widget);
             }
 
             if(defBtn)
@@ -3168,7 +3176,7 @@ debugDisplayWidget(widget, 3);
                                    &cols[QTC_MO_DEF_BTN], cols, round, WIDGET_DEF_BUTTON,
                                    BORDER_FLAT, /*(draw_inside ? DF_DRAW_INSIDE : 0) |*/
                                    DF_DO_CORNERS|(sunken ? DF_SUNKEN : 0)|
-                                   DF_DO_BORDER|(horiz ? 0 : DF_VERT));
+                                   DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
 
                     gdk_region_destroy(inner_region);
                     gdk_region_destroy(outer_region);
@@ -3305,7 +3313,7 @@ debugDisplayWidget(widget, 3);
                            bgndcol, qtcPalette.background,
                            ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
-                           (horiz ? 0 : DF_VERT));
+                           (horiz ? 0 : DF_VERT), widget);
 
             if(opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE && 0==strcmp(detail, "trough"))
             {
@@ -3332,7 +3340,7 @@ debugDisplayWidget(widget, 3);
                                    usedcol, qtcPalette.background,
                                    ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
                                    BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
-                                   (horiz ? 0 : DF_VERT));
+                                   (horiz ? 0 : DF_VERT), widget);
                 }
             }
         }
@@ -3371,7 +3379,7 @@ debugDisplayWidget(widget, 3);
                        WIDGET_OTHER, DF_BLEND|DF_DO_CORNERS);
 
             if(doEtch)
-                 drawEtch(cr, area, NULL, x-1, y-1, width+2, height+2, FALSE);
+                 drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE);
         }
         else /* Scrollbars... */
         {
@@ -3450,7 +3458,7 @@ debugDisplayWidget(widget, 3);
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
                            &qtcPalette.background[2], qtcPalette.background, sbarRound, WIDGET_TROUGH,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
-                           (horiz ? 0 : DF_VERT));
+                           (horiz ? 0 : DF_VERT), widget);
         }
     }
     else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") ||
@@ -3766,7 +3774,7 @@ debugDisplayWidget(widget, 3);
                                 pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
                                 DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
                                 ((!pbar || !opts.fillProgress) && border && stdColors ? DF_DO_BORDER : 0)|
-                                (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS));
+                                (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
             }
             else
             {
@@ -3786,7 +3794,7 @@ debugDisplayWidget(widget, 3);
                             qtcPalette.menuitem, opts.fillProgress ? ROUNDED_NONE : round,
                             WIDGET_PROGRESSBAR, BORDER_FLAT,
                             DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
-                            (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS));
+                            (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
 
             if(pbar && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
             {
@@ -3951,7 +3959,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     }
                     else if(opts.sunkenScrollViews)
                     {
-                        drawEtch(cr, area, NULL, x, y, width, height, FALSE);
+                        drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE);
                         x++, y++, width-=2, height-=2;
                     }
                 }
@@ -4205,7 +4213,7 @@ debugDisplayWidget(widget, 3);
             if(glow)
                 drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, WIDGET_STD_BUTTON);
             else
-                drawEtch(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, FALSE);
+                drawEtch(cr, area, NULL, widget, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, FALSE);
 //             cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
 //             cairo_move_to(cr, x-0.5, y+QTC_CHECK_SIZE);
 //             cairo_line_to(cr, x-0.5, y);

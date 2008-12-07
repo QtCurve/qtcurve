@@ -11,6 +11,7 @@
  9. Option to have flat scrollbar buttons.
 10. New slider styles - plain rotated, and round rotated.
 11. Fix crash if QTC_STYLE is set, but is empty.
+12. Alter the way the light part of etchibng is drawn - should help with darker color schemes.
 
 0.59.7
 ------
