@@ -3064,8 +3064,8 @@ debugDisplayWidget(widget, 3);
                             break;
                     }
 
-                if(GTK_APP_MOZILLA!=qtSettings.app && slider &&
-                    (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
+                if(slider && ((SCROLLBAR_NONE==opts.scrollbarType && !isMozilla()) ||
+                              (SCROLLBAR_NONE!=opts.scrollbarType && opts.flatSbarButtons)))
                 {
                     GdkRectangle troughArea;
 
