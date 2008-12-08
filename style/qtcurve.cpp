@@ -316,72 +316,70 @@ static QWidget * getActiveWindow(QWidget *widget)
     return activeWindow && activeWindow!=widget ? activeWindow : 0L;
 }
 
-static QSet<const QWidget *> theNoEtchWidgets;
 
 //
 // OK, Etching looks cr*p on plasma widgets, and khtml...
 // CPD:TODO WebKit?
-class CEtchCheck
+static QSet<const QWidget *> theNoEtchWidgets;
+
+static bool isA(const QObject *w, const char *type)
 {
-    public:
+    return w && (0==strcmp(w->metaObject()->className(), type) ||
+                (w->parent() && 0==strcmp(w->parent()->metaObject()->className(), type)));
+}
 
-    CEtchCheck(const QWidget *widget)
+static bool isInQAbstractItemView(const QObject *w)
+{
+    int level=4;
+
+    while(w && --level>0)
     {
-        itsPreviousStatus=theirStatus;
-
-        if(theirStatus)
-            theirStatus=!(theNoEtchWidgets.contains(widget));
-    }
-
-    ~CEtchCheck()
-    {
-        theirStatus=itsPreviousStatus;
-    }
-
-    static void disable() { theirStatus=false; }
-    static bool canEtch() { return theirStatus; }
-
-    static bool isA(const QObject *w, const char *type)
-    {
-        return w && (0==strcmp(w->metaObject()->className(), type) ||
-                     (w->parent() && 0==strcmp(w->parent()->metaObject()->className(), type)));
-    }
-
-    static bool isNoEtchWidget(const QWidget *widget)
-    {
-        if(widget && widget->inherits("QWebView"))
+        if(qobject_cast<const QAbstractItemView *>(w))
             return true;
-
-        // Plasma: widget -> ControlWidget -> ControlBox -> RootWidget
-        // KHTML:  widget -> QWidget       -> QWidget    -> KHTMLView
-        const QObject *w=widget && widget->parent() && widget->parent()->parent()
-                            ? widget->parent()->parent()->parent() : NULL;
-
-        return w && (isA(w, "KHTMLView") || (APP_PLASMA==theThemedApp && isA(w, "RootWidget")));
+        if(qobject_cast<const QDialog *>(w)/* || qobject_cast<const QMainWindow *>(w)*/)
+            return false;
+        w=w->parent();
     }
 
-    private:
+    return false;
+}
 
-    bool        itsPreviousStatus;
-    static bool theirStatus;
-};
+static bool isNoEtchWidget(const QWidget *widget)
+{
+    if(APP_KRUNNER==theThemedApp)
+        return true;
 
-bool CEtchCheck::theirStatus=true;
+    if(APP_PLASMA==theThemedApp)
+    {
+        const QWidget *top=widget->window();
 
-//
-// Only draw etch effect/shadow if
-//  A. This is not KRunner
-//  B. The user has selected a button effect
-//  C. i. Effect is shadow and we're raised - OR
-//     ii. We can do etching - widget is not a KHTML, Plasma, or WebKit widget. AND
-//     iii. Widget is not in a listview (these look bad when highlighted).
-#define QTC_DRAW_ETCH(widget, raised) (APP_KRUNNER!=theThemedApp && QTC_DO_EFFECT && \
-                                      ( (EFFECT_SHADOW==opts.buttonEffect && raised) || \
-                                           (widget && CEtchCheck::canEtch()    )))
-/*
-&& !(qobject_cast<const QAbstractItemView *>(widget) && option && \
-                                            option->state&State_Enabled && option->state&State_HasFocus))))
-*/
+        return !top || (!qobject_cast<const QDialog *>(top) || !qobject_cast<const QMainWindow *>(top));
+    }
+
+    if(widget && widget->inherits("QWebView"))
+        return true;
+
+    // KHTML:  widget -> QWidget       -> QWidget    -> KHTMLView
+    const QObject *w=widget && widget->parent() && widget->parent()->parent()
+                        ? widget->parent()->parent()->parent() : NULL;
+
+    return (w && isA(w, "KHTMLView")) || isInQAbstractItemView(widget);
+}
+
+static QColor getLowerEtchCol(const QWidget *widget, QPainter *painter)
+{
+    QColor col(Qt::white);
+
+    if(widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget))
+    {
+        col=widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole());
+        shade(col, &col, 1.06);
+    }
+    else
+        col.setAlphaF(0.0);
+
+    return col;
+}
 
 // from windows style
 static const int windowsItemFrame    =  2; // menu item frame width
@@ -977,9 +975,6 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=7;
 
-    if(EFFECT_NONE==opts.buttonEffect)
-        CEtchCheck::disable();
-
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMenuitemCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Background), itsBackgroundCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Button), itsButtonCols);
@@ -1235,7 +1230,7 @@ void QtCurveStyle::polish(QWidget *widget)
 {
     bool enableMouseOver(!equal(opts.highlightFactor, 1.0) || opts.coloredMouseOver);
 
-    if(EFFECT_NONE!=opts.buttonEffect && CEtchCheck::isNoEtchWidget(widget))
+    if(EFFECT_NONE!=opts.buttonEffect && isNoEtchWidget(widget))
     {
         theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
@@ -2481,10 +2476,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         {
                             QStyleOptionFrame opt(*fo);
                             opt.state&=~State_HasFocus;
-                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
+                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT);
                         }
                         else
-                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DRAW_ETCH(widget, false));
+                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DO_EFFECT);
                     }
                 }
                 else
@@ -2750,8 +2745,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         opt.state^=State_Enabled;
 
                     painter->save();
-                    CEtchCheck check(widget);
-                    drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, PE_PanelLineEdit==element, QTC_DRAW_ETCH(widget, false));
+                    drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, PE_PanelLineEdit==element, QTC_DO_EFFECT);
                     painter->restore();
                 }
             }
@@ -2778,7 +2772,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
-            CEtchCheck    check(widget);
             bool          sunken(state&State_Sunken),
                           mo(!sunken && state&State_MouseOver && state&State_Enabled),
                           doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
@@ -2823,7 +2816,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(doEtch)
                 if(glow)
                     drawGlow(painter, r, WIDGET_CHECKBOX);
-                else if(QTC_DRAW_ETCH(widget, false))
+                else
                     drawEtch(painter, r, widget, WIDGET_CHECKBOX);
 
             if(state&State_On)
@@ -2875,7 +2868,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(QTC_RADIO_SIZE);
         case PE_IndicatorRadioButton:
         {
-            CEtchCheck check(widget);
             bool       sunken(state&State_Sunken),
                        mo(!sunken && state&State_MouseOver && state&State_Enabled),
                        doEtch(!(state&QTC_STATE_MENU)
@@ -2923,7 +2915,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->setClipping(false);
 
-            if(doEtch && (glow || QTC_DRAW_ETCH(widget, false)))
+            if(doEtch && (glow || QTC_DO_EFFECT))
             {
                 QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
                        botCol(Qt::white);
@@ -2931,10 +2923,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(!glow)
                 {
                     topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                    if(widget && widget->parentWidget())
-                        shade(widget->parentWidget()->palette().color(QPalette::Active, widget->parentWidget()->backgroundRole()), &botCol, 1.06);
-                    else
-                        botCol.setAlphaF(0.0);
+                    botCol=getLowerEtchCol(widget, painter);
                 }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -3021,7 +3010,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 return;
             }
 
-            CEtchCheck   check(widget);
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
                          isFlat(false),
@@ -3694,7 +3682,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                               getWidgetShade(WIDGET_PBAR_TROUGH, false, false, opts.progressGrooveAppearance),
                               false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
-            if(doEtch && QTC_DRAW_ETCH(widget, false))
+            if(doEtch)
                 drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_OTHER);
 
             drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER,
@@ -4162,7 +4150,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                CEtchCheck check(widget);
                 drawControl(CE_PushButtonBevel, btn, painter, widget);
 
                 QStyleOptionButton subopt(*btn);
@@ -5336,7 +5323,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
         case CC_SpinBox:
             if (const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option))
             {
-                CEtchCheck check(widget);
                 QRect frame(subControlRect(CC_SpinBox, option, SC_SpinBoxFrame, widget)),
                       up(subControlRect(CC_SpinBox, option, SC_SpinBoxUp, widget)),
                       down(subControlRect(CC_SpinBox, option, SC_SpinBoxDown, widget));;
@@ -5346,7 +5332,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                       mouseOver(state&State_MouseOver),
                       upIsActive(SC_SpinBoxUp==spinBox->activeSubControls),
                       downIsActive(SC_SpinBoxDown==spinBox->activeSubControls),
-                      doEtch(QTC_DRAW_ETCH(widget, false));
+                      doEtch(QTC_DO_EFFECT);
 
                 if(doEtch)
                 {
@@ -5997,18 +5983,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             {
                 painter->save();
 
-                QRect           frame(subControlRect(CC_ComboBox, option, SC_ComboBoxFrame, widget)),
-                                arrow(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget)),
-                                field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
-                const QColor    *use(buttonColors(option));
-                bool            sunken(state&State_On); // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
-                CEtchCheck      check(widget);
+                QRect        frame(subControlRect(CC_ComboBox, option, SC_ComboBoxFrame, widget)),
+                             arrow(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget)),
+                             field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
+                const QColor *use(buttonColors(option));
+                bool         sunken(state&State_On); // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
 
                 if(QTC_DO_EFFECT)
                 {
                     if(!sunken && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && !comboBox->editable)
                         drawGlow(painter, r, WIDGET_COMBO);
-                    else if(QTC_DRAW_ETCH(widget, !sunken))
+                    else
                         drawEtch(painter, r, widget, WIDGET_COMBO,
                                  !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
 
@@ -7216,7 +7201,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
             ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
             (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
-        else if(QTC_DRAW_ETCH(widget, !sunken))
+        else
             drawEtch(p, rOrig, widget, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
     }
 
@@ -7392,14 +7377,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     if(!raised)
     {
         p->drawPath(tl);
-        if(widget && widget->parentWidget())
-        {
-            col=widget->parentWidget()->palette().color(QPalette::Active, widget->parentWidget()->backgroundRole());
-            shade(col, &col, 1.06);
-        }
-        else
-            col.setAlphaF(0.0);
-        p->setPen(col);
+        p->setPen(getLowerEtchCol(widget, p));
     }
 
     p->drawPath(br);
