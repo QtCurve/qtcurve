@@ -4941,22 +4941,22 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
                     drawBevelGradient(use[2], true, painter, QRect(r.x(), r.y()+1, r.width(), r.height()-2),
                                       true, SHADE_SBAR_DARK, SHADE_SBAR_LIGHT, false,
-                                      APPEARANCE_GRADIENT, WIDGET_OTHER);
+                                      APPEARANCE_GRADIENT, WIDGET_TROUGH);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
                 {
                     if(CE_ScrollBarAddPage==element)
-                        drawBorder(painter, r.adjusted(-5, 0, 0, 0), option, ROUNDED_RIGHT, use);
+                        drawBorder(painter, r.adjusted(-5, 0, 0, 0), option, ROUNDED_RIGHT, use, WIDGET_TROUGH);
                     else
-                        drawBorder(painter, r.adjusted(0, 0, 5, 0), option, ROUNDED_LEFT, use);
+                        drawBorder(painter, r.adjusted(0, 0, 5, 0), option, ROUNDED_LEFT, use, WIDGET_TROUGH);
                 }
                 else
 #endif
                     if(CE_ScrollBarAddPage==element)
-                        drawBorder(painter, r.adjusted(-5, 0, borderAdjust, 0), option, ROUNDED_NONE, use);
+                        drawBorder(painter, r.adjusted(-5, 0, borderAdjust, 0), option, ROUNDED_NONE, use, WIDGET_TROUGH);
                     else
-                        drawBorder(painter, r.adjusted(-borderAdjust, 0, 5, 0), option, ROUNDED_NONE, use);
+                        drawBorder(painter, r.adjusted(-borderAdjust, 0, 5, 0), option, ROUNDED_NONE, use, WIDGET_TROUGH);
             }
             else
             {
@@ -4965,22 +4965,22 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
                     drawBevelGradient(use[2], true, painter, QRect(r.x()+1, r.y(), r.width()-2, r.height()),
                                       false, SHADE_SBAR_DARK, SHADE_SBAR_LIGHT, false,
-                                      APPEARANCE_GRADIENT, WIDGET_OTHER);
+                                      APPEARANCE_GRADIENT, WIDGET_TROUGH);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
                 {
                     if(CE_ScrollBarAddPage==element)
-                        drawBorder(painter, r.adjusted(0, -5, 0, 0), option, ROUNDED_BOTTOM, use);
+                        drawBorder(painter, r.adjusted(0, -5, 0, 0), option, ROUNDED_BOTTOM, use, WIDGET_TROUGH);
                     else
-                        drawBorder(painter, r.adjusted(0, 0, 0, 5), option, ROUNDED_TOP, use);
+                        drawBorder(painter, r.adjusted(0, 0, 0, 5), option, ROUNDED_TOP, use, WIDGET_TROUGH);
                 }
                 else
 #endif
                     if(CE_ScrollBarAddPage==element)
-                        drawBorder(painter, r.adjusted(0, -5, 0, borderAdjust), option, ROUNDED_NONE, use);
+                        drawBorder(painter, r.adjusted(0, -5, 0, borderAdjust), option, ROUNDED_NONE, use, WIDGET_TROUGH);
                     else
-                        drawBorder(painter, r.adjusted(0, -borderAdjust, 0, 5), option, ROUNDED_NONE, use);
+                        drawBorder(painter, r.adjusted(0, -borderAdjust, 0, 5), option, ROUNDED_NONE, use, WIDGET_TROUGH);
             }
             painter->restore();
             break;
@@ -5783,11 +5783,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
                     painter->fillRect(r, palette.brush(QPalette::Background));
 
-                if(noButtons && slider.isValid())
+                if(noButtons)
                 {
-                    // Paint part of trough under slider, so as to paint corners.
-                    painter->setClipRegion(slider);
-
+                    // Draw complete groove here, as we want to round both ends...
                     opt.rect=subpage.united(addpage);
                     opt.state=scrollbar->state|State_On;
                     opt.state&=~State_MouseOver;
@@ -5798,25 +5796,26 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
     #endif
                                 ROUNDED_NONE,
                                 itsBackgroundCols[2], itsBackgroundCols, true, WIDGET_TROUGH);
-                    painter->setClipping(false);
                 }
-
-                if((option->subControls&SC_ScrollBarSubPage) && subpage.isValid())
+                else
                 {
-                    opt.state=scrollbar->state;
-                    opt.rect = subpage;
-                    if (!(scrollbar->activeSubControls&SC_ScrollBarSubPage))
-                        opt.state &= ~(State_Sunken | State_MouseOver);
-                    drawControl(CE_ScrollBarSubPage, &opt, painter, widget);
-                }
+                    if((option->subControls&SC_ScrollBarSubPage) && subpage.isValid())
+                    {
+                        opt.state=scrollbar->state;
+                        opt.rect = subpage;
+                        if (!(scrollbar->activeSubControls&SC_ScrollBarSubPage))
+                            opt.state &= ~(State_Sunken | State_MouseOver);
+                        drawControl(CE_ScrollBarSubPage, &opt, painter, widget);
+                    }
 
-                if((option->subControls&SC_ScrollBarAddPage) && addpage.isValid())
-                {
-                    opt.state=scrollbar->state;
-                    opt.rect = addpage;
-                    if (!(scrollbar->activeSubControls&SC_ScrollBarAddPage))
-                        opt.state &= ~(State_Sunken | State_MouseOver);
-                    drawControl(CE_ScrollBarAddPage, &opt, painter, widget);
+                    if((option->subControls&SC_ScrollBarAddPage) && addpage.isValid())
+                    {
+                        opt.state=scrollbar->state;
+                        opt.rect = addpage;
+                        if (!(scrollbar->activeSubControls&SC_ScrollBarAddPage))
+                            opt.state &= ~(State_Sunken | State_MouseOver);
+                        drawControl(CE_ScrollBarAddPage, &opt, painter, widget);
+                    }
                 }
 
                 if((option->subControls&SC_ScrollBarSubLine) && subline.isValid())
