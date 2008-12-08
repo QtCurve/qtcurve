@@ -7501,7 +7501,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                 : itsBackgroundCols);
     QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
-                          : cols[WIDGET_PROGRESS==w
+                          : cols[WIDGET_PROGRESSBAR==w
                                     ? QT_PBAR_BORDER
                                     : !enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
                                         ? QT_DISABLED_BORDER : borderVal]);
