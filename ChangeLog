@@ -25,6 +25,8 @@
 22. Dont draw sunken button for KMenu title background - just draw Menu background.
 23. Alter the way the light part of etchibng is drawn - should help with darker color schemes.
 24. Don't draw light etch part for widget in QAbstractItemView's, KRunner, or Plasma dialogs.
+25. Increase size of busy progressbar.
+26. Draw border around filled progress.
 
 0.59.6
 ------

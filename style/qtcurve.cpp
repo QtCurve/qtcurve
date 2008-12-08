@@ -3716,7 +3716,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(indeterminate) //Busy indicator
                 {
-                    int chunkSize(PROGRESS_CHUNK_WIDTH),
+                    int chunkSize(PROGRESS_CHUNK_WIDTH*3.4),
                         measure(vertical ? r.height() : r.width());
 
                     if(chunkSize>(measure/2))
@@ -7501,8 +7501,10 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                 : itsBackgroundCols);
     QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
-                          : cols[!enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
-                                    ? QT_DISABLED_BORDER : borderVal]);
+                          : cols[WIDGET_PROGRESS==w
+                                    ? QT_PBAR_BORDER
+                                    : !enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
+                                        ? QT_DISABLED_BORDER : borderVal]);
 
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, true);
@@ -7796,23 +7798,9 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor
                     ? itsMenuitemCols : itsBackgroundCols;
 
-    if(opts.fillProgress || drawFull)
-        drawLightBevel(p, r, &opt, 0L, round, use[ORIGINAL_SHADE], use, !opts.fillProgress, WIDGET_PROGRESSBAR);
-    else
-    {
-        p->setPen(use[QT_STD_BORDER]);
-        if(length>1)
-        {
-            p->setBrush(use[ORIGINAL_SHADE]);
-            drawRect(p, r);
-        }
-        else if(vertical)
-            p->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-        else
-            p->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-    }
+    drawLightBevel(p, r, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, true, WIDGET_PROGRESSBAR);
 
-    if(QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
+    if(!opts.fillProgress && QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
     {
         QRect rb(r);
 
@@ -7822,7 +7810,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
             rb.adjust(1, 1, -1, -1);
         }
         else
-            p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[QT_STD_BORDER]));
+            p->setPen(midColor(option->palette.background().color(), itsMenuitemCols[QT_PBAR_BORDER]));
         if(!(round&CORNER_TL) || !drawFull)
             p->drawPoint(rb.x(), rb.y());
         if(!(round&CORNER_BL) || !drawFull)
