@@ -1793,8 +1793,10 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
         cairo_stroke(cr);
         if(parentBg)
         {
-            shade(parentBg, parentBg, 1.06);
-            cairo_set_source_rgb(cr, QTC_CAIRO_COL(*parentBg));
+            GdkColor col;
+
+            shade(parentBg, &col, 1.06);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(col));
         }
         else
             cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
