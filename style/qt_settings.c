@@ -1868,11 +1868,11 @@ static gboolean qtInit(Options *opts)
                                                       "widget_class \"*GtkProgressBar\" style \"QtcPbar\"";
                 int pthickness=opts->fillProgress
                                 ? doEffect
-                                    ? 2
-                                    : 1
+                                    ? 1
+                                    : 0
                                 : doEffect
-                                    ? 3
-                                    : 2;
+                                    ? 2
+                                    : 1;
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat, pthickness, pthickness);

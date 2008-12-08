@@ -3708,7 +3708,7 @@ debugDisplayWidget(widget, 3);
             GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.menuitem;
             GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
                             ? &qtcPalette.menubar[ORIGINAL_SHADE] : NULL;
-            int      round=pbar ? progressbarRound(widget, rev)
+            int      round=pbar ? (opts.fillProgress ? ROUNDED_ALL : progressbarRound(widget, rev))
                                 : mb
                                     ? active_mb && opts.roundMbTopOnly
                                         ? ROUNDED_TOP
@@ -3721,7 +3721,9 @@ debugDisplayWidget(widget, 3);
             int      fillVal=grayItem && !pbar ? 4 : ORIGINAL_SHADE,
                      borderVal=pbar || opts.borderMenuitems ? 0 : fillVal;
 
-            if(!pbar && !border)
+            if(pbar)
+                x++, y++, width-=2, height-=2;
+            else if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
             if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
@@ -3775,7 +3777,7 @@ debugDisplayWidget(widget, 3);
                                 itemCols, pbar && opts.fillProgress ? ROUNDED_NONE : round,
                                 pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
                                 DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
-                                ((!pbar || !opts.fillProgress) && border && stdColors ? DF_DO_BORDER : 0)|
+                                (!pbar && border && stdColors ? DF_DO_BORDER : 0)|
                                 (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
             }
             else
@@ -3798,7 +3800,10 @@ debugDisplayWidget(widget, 3);
                             DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
                             (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
 
-            if(pbar && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
+            if(pbar)
+                realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
+                               itemCols, round, BORDER_FLAT, WIDGET_OTHER, 0, QT_PBAR_BORDER);
+            if(pbar && !opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
             {
                 /*if(!isMozilla())
                 {
