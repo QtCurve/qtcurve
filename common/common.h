@@ -1227,9 +1227,9 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #define QTC_FULL_INNER_RADIUS   2
 #define QTC_FULL_OUTER_RADIUS   3
 #define QTC_FULL_ETCH_RADIUS    4
-#define QTC_SLIGHT_INNER_RADIUS 0.5
-#define QTC_SLIGHT_OUTER_RADIUS 1.5
-#define QTC_SLIGHT_ETCH_RADIUS  2.5
+#define QTC_SLIGHT_INNER_RADIUS 1
+#define QTC_SLIGHT_OUTER_RADIUS 2
+#define QTC_SLIGHT_ETCH_RADIUS  3
 #endif
 
 typedef enum
