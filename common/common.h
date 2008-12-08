@@ -812,6 +812,9 @@ static void shade(const color &ca, color *cb, double k)
 static void shade(const color *ca, color *cb, double k)
 #endif
 {
+#ifndef __cplusplus
+    cb->pixel = ca->pixel;
+#endif
     if(equal(k, 1.0))
     {
 #ifdef __cplusplus
