@@ -5602,7 +5602,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         QTC_CAIRO_BEGIN
 
-        if(isList(widget) || width<3 || height < 3)
+        if(/*isList(widget) || */width<3 || height < 3)
             drawRounded=FALSE;
 
         cairo_new_path(cr);
