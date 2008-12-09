@@ -4178,7 +4178,7 @@ debugDisplayWidget(widget, 3);
         gboolean    drawSunken=opts.crRaised && !mnu ? GTK_STATE_ACTIVE==state : false;
         gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
-                    lb=opts.crRaised && QTC_DRAW_LIGHT_BORDER(drawSunken, widget, app);
+                    lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
         GdkColor    *colors=coloredMouseOver
                        ? qtcPalette.mouseover
                        : btn_colors;
@@ -4318,7 +4318,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         EWidget     wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
         EAppearance app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
         gboolean    drawSunken=opts.crRaised && !mnu ? GTK_STATE_ACTIVE==state : false,
-                    lb=opts.crRaised && QTC_DRAW_LIGHT_BORDER(drawSunken, widget, app);
+                    lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
 
 //         x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
 //         y+=((height-QTC_RADIO_SIZE)>>1)+1;
