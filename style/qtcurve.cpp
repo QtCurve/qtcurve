@@ -2772,9 +2772,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
-            bool          sunken(state&State_Sunken),
+            bool          menu(state&QTC_STATE_MENU),
+                          sunken(!menu && (state&State_Sunken)),
                           mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                          doEtch(PE_IndicatorMenuCheckMark!=element && !(state&QTC_STATE_MENU)
+                          doEtch(PE_IndicatorMenuCheckMark!=element && !menu
                                  && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
                                  && QTC_DO_EFFECT),
                           glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
@@ -2782,20 +2783,26 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             const QColor *bc(sunken ? NULL : borderColors(option, NULL)),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
-            const QColor &bgnd(state&State_Enabled && !sunken
-                                ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight &&
-                                  mo
-                                    ? use[QTC_CR_MO_FILL]
-                                    : palette.base().color()
-                                : palette.background().color());
+            const QColor &bgnd(opts.crRaised
+                                ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
+                                : state&State_Enabled && !sunken
+                                    ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
+                                        ? use[QTC_CR_MO_FILL]
+                                        : palette.base().color()
+                                    : palette.background().color());
+            EWidget      wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
+            EAppearance  app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
+            bool         drawSunken=opts.crRaised ? sunken : false,
+                         lb=opts.crRaised && QTC_DRAW_LIGHT_BORDER(drawSunken, widget, app);
+
             painter->save();
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
             else
-                drawBevelGradient(bgnd, false, painter, rect.adjusted(1, 1, -1, -1), true,
-                                  getWidgetShade(WIDGET_TROUGH, true, false, APPEARANCE_GRADIENT),
-                                  getWidgetShade(WIDGET_TROUGH, false, false, APPEARANCE_GRADIENT),
-                                  false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
+                drawBevelGradient(bgnd, opts.crRaised ? !sunken : false, painter, rect.adjusted(1, 1, -1, -1), true,
+                                  getWidgetShade(wid, true, drawSunken, app),
+                                  getWidgetShade(wid, false, drawSunken, app),
+                                  drawSunken, app, WIDGET_TROUGH);
 
             if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
             {
@@ -2805,9 +2812,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 //                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
-            else
+            else if(!opts.crRaised || lb)
             {
-                painter->setPen(midColor(state&State_Enabled ? palette.base().color() : palette.background().color(), use[3]));
+                painter->setPen(lb ? use[APPEARANCE_DULL_GLASS==app ? 1 : 0]
+                                   : midColor(state&State_Enabled ? palette.base().color() : palette.background().color(), use[3]));
                 painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
                 painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
             }
@@ -2817,7 +2825,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(glow)
                     drawGlow(painter, r, WIDGET_CHECKBOX);
                 else
-                    drawEtch(painter, r, widget, WIDGET_CHECKBOX);
+                    drawEtch(painter, r, widget, WIDGET_CHECKBOX, opts.crRaised ? !sunken : false);
 
             if(state&State_On)
             {
@@ -2868,29 +2876,35 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(QTC_RADIO_SIZE);
         case PE_IndicatorRadioButton:
         {
-            bool       sunken(state&State_Sunken),
-                       mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                       doEtch(!(state&QTC_STATE_MENU)
-                              && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
-                              && QTC_DO_EFFECT),
-                       glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
-                       coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
-            QRect      rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
-            int        x(rect.x()), y(rect.y());
-            QPolygon   clipRegion;
+            bool        menu(state&QTC_STATE_MENU),
+                        sunken(!menu && (state&State_Sunken)),
+                        mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                        doEtch(!menu
+                               && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
+                               && QTC_DO_EFFECT),
+                        glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
+                        coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
+            QRect       rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+            int         x(rect.x()), y(rect.y());
+            QPolygon    clipRegion;
+            EWidget     wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
+            EAppearance app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
+            bool        drawSunken=opts.crRaised ? sunken : false,
+                        lb=opts.crRaised && QTC_DRAW_LIGHT_BORDER(drawSunken, widget, app);
 
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
-                         
+
             const QColor *bc(sunken ? NULL : borderColors(option, NULL)),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
-            const QColor &bgnd(state&State_Enabled && !sunken
-                                ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight &&
-                                  mo
-                                    ? use[QTC_CR_MO_FILL]
-                                    : palette.base().color()
-                                : palette.background().color());
+            const QColor &bgnd(opts.crRaised
+                                ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
+                                : state&State_Enabled && !sunken
+                                    ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
+                                        ? use[QTC_CR_MO_FILL]
+                                        : palette.base().color()
+                                    : palette.background().color());
 
             painter->save();
 
@@ -2898,10 +2912,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect, bgnd);
             else
-                drawBevelGradient(bgnd, false, painter, rect, true,
-                                  getWidgetShade(WIDGET_TROUGH, true, false, APPEARANCE_GRADIENT),
-                                  getWidgetShade(WIDGET_TROUGH, false, false, APPEARANCE_GRADIENT),
-                                  false, APPEARANCE_GRADIENT, WIDGET_TROUGH);
+                drawBevelGradient(bgnd, opts.crRaised ? !sunken : false, painter, rect, true,
+                                  getWidgetShade(wid, true, drawSunken, app),
+                                  getWidgetShade(wid, false, drawSunken, app),
+                                  drawSunken, app, wid);
             if(coloredMo)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -2918,13 +2932,20 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(doEtch && (glow || QTC_DO_EFFECT))
             {
                 QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
-                       botCol(Qt::white);
+                       botCol(getLowerEtchCol(widget, painter));
 
                 if(!glow)
-                {
-                    topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                    botCol=getLowerEtchCol(widget, painter);
-                }
+                    if(opts.crRaised && !drawSunken)
+                    {
+                        botCol=topCol;
+                        topCol.setAlphaF(0.0);
+                        botCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+                    }
+                    else
+                    {
+                        topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+                        botCol=getLowerEtchCol(widget, painter);
+                    }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
@@ -2944,8 +2965,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                             ? palette.highlightedText().color()
                                                             :*/ itsCheckRadioCol
                                                         : palette.mid().color(), PIX_RADIO_ON, 1.0));
-            if(!coloredMo)
-                painter->drawPixmap(x, y, *getPixmap(btn[state&State_MouseOver ? 3 : 4], PIX_RADIO_LIGHT));
+            if(!coloredMo && (!opts.crRaised || lb))
+                painter->drawPixmap(x, y, *getPixmap(btn[lb ? (APPEARANCE_DULL_GLASS==app ? 1 : 0) 
+                                                            : (state&State_MouseOver ? 3 : 4)], PIX_RADIO_LIGHT));
             painter->restore();
             break;
         }
@@ -8659,17 +8681,17 @@ void QtCurveStyle::readMdiPositions() const
     }
 }
 
-const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *use) const
+const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *use, bool cr) const
 {
-    return !(option->state&State_Enabled)
+    return !option || !(option->state&State_Enabled)
                ? use[ORIGINAL_SHADE]
                : option->state&State_Sunken  // State_Down ????
                    ? use[4]
                    : option->state&State_MouseOver
-                         ? option->state&State_On
+                         ? !cr && option->state&State_On
                                ? use[SHADE_4_HIGHLIGHT]
                                : use[SHADE_ORIG_HIGHLIGHT]
-                         : option->state&State_On
+                         : !cr && option->state&State_On
                                ? use[4]
                                : use[ORIGINAL_SHADE];
 }

@@ -1093,6 +1093,7 @@ typedef struct
 #endif
                      inactiveHighlight,
                      crHighlight,
+                     crRaised,
                      fillProgress,
                      comboSplitter,
                      squareScrollViews,

@@ -13,6 +13,7 @@ colorSelTab=false
 coloredMouseOver=glow
 comboSplitter=false
 crHighlight=false
+crRaised=true
 customCheckRadioColor=#000000
 customMenuNormTextColor=#000000
 customMenuSelTextColor=#000000

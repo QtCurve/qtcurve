@@ -132,7 +132,7 @@ class QtCurveStyle : public QWindowsStyle
     void setMenuColors(const QColor &bgnd);
     const QColor * getMdiColors(const QStyleOption *option, bool active) const;
     void           readMdiPositions() const;
-    const QColor & getFill(const QStyleOption *option, const QColor *use) const;
+    const QColor & getFill(const QStyleOption *option, const QColor *use, bool cr=false) const;
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
 
