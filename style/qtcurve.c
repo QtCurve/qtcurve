@@ -1872,9 +1872,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col1));
         cairo_move_to(cr, xd + 1, yd + 1);
-        cairo_line_to(cr, xd + width - 2, yd + 1);
+        cairo_line_to(cr, xd + width - 1, yd + 1);
         cairo_move_to(cr, xd + 1, yd + 1);
-        cairo_line_to(cr, xd + 1, yd + height - 2);
+        cairo_line_to(cr, xd + 1, yd + height - 1);
         cairo_stroke(cr);
 
         if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
@@ -1884,7 +1884,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
             if(EFFECT_NONE!=opts.buttonEffect && WIDGET_SPIN_UP==widget && horiz)
             {
-                height--; bh-=4;
+                height--; bh--;
             }
 
             /* Right and bottom edge */
