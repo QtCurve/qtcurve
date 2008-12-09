@@ -2433,7 +2433,7 @@ debugDisplayWidget(widget, 3);
                 {
                     xd-=2;
                     x-=2;
-                    width+2;
+                    width+=2;
                 }
                 if(!(round&ROUNDED_RIGHT))
                     width+=2;
