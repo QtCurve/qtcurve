@@ -2793,7 +2793,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EWidget      wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
             EAppearance  app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
             bool         drawSunken=opts.crRaised ? sunken : false,
-                         lb=opts.crRaised && QTC_DRAW_LIGHT_BORDER(drawSunken, widget, app);
+                         lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
 
             painter->save();
             if(IS_FLAT(opts.appearance))
@@ -2890,7 +2890,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EWidget     wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
             EAppearance app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
             bool        drawSunken=opts.crRaised ? sunken : false,
-                        lb=opts.crRaised && QTC_DRAW_LIGHT_BORDER(drawSunken, widget, app);
+                        lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
 
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
