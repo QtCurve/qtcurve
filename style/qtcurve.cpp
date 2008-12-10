@@ -2814,7 +2814,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             else if(!opts.crButton || lb)
             {
-                painter->setPen(lb ? use[APPEARANCE_DULL_GLASS==app ? 1 : 0]
+                painter->setPen(lb ? btn[APPEARANCE_DULL_GLASS==app ? 1 : 0]
                                    : midColor(state&State_Enabled ? palette.base().color() : palette.background().color(), use[3]));
                 painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
                 painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
