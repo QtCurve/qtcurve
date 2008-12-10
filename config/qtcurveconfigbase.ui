@@ -802,9 +802,9 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="crRaised" >
+        <widget class="QCheckBox" name="crButton" >
          <property name="text" >
-          <string>Raised</string>
+          <string>Button like</string>
          </property>
         </widget>
        </item>
@@ -1686,7 +1686,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck</tabstop>
   <tabstop>crHighlight</tabstop>
-  <tabstop>crRaised</tabstop>
+  <tabstop>crButton</tabstop>
   <tabstop>titlebarAppearance</tabstop>
   <tabstop>inactiveTitlebarAppearance</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>

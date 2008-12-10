@@ -2783,23 +2783,23 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             const QColor *bc(sunken ? NULL : borderColors(option, NULL)),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
-            const QColor &bgnd(opts.crRaised
+            const QColor &bgnd(opts.crButton
                                 ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
                                 : state&State_Enabled && !sunken
                                     ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
                                         ? use[QTC_CR_MO_FILL]
                                         : palette.base().color()
                                     : palette.background().color());
-            EWidget      wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-            EAppearance  app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
-            bool         drawSunken=opts.crRaised ? sunken : false,
-                         lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
+            EWidget      wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
+            EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
+            bool         drawSunken=opts.crButton ? sunken : false,
+                         lb=opts.crButton && !drawSunken && !IS_GLASS(app);
 
             painter->save();
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
             else
-                drawBevelGradient(bgnd, opts.crRaised ? !sunken : false, painter, rect.adjusted(1, 1, -1, -1), true,
+                drawBevelGradient(bgnd, opts.crButton ? !sunken : false, painter, rect.adjusted(1, 1, -1, -1), true,
                                   getWidgetShade(wid, true, drawSunken, app),
                                   getWidgetShade(wid, false, drawSunken, app),
                                   drawSunken, app, WIDGET_TROUGH);
@@ -2812,7 +2812,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 //                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
-            else if(!opts.crRaised || lb)
+            else if(!opts.crButton || lb)
             {
                 painter->setPen(lb ? use[APPEARANCE_DULL_GLASS==app ? 1 : 0]
                                    : midColor(state&State_Enabled ? palette.base().color() : palette.background().color(), use[3]));
@@ -2825,7 +2825,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(glow)
                     drawGlow(painter, r, WIDGET_CHECKBOX);
                 else
-                    drawEtch(painter, r, widget, WIDGET_CHECKBOX, opts.crRaised ? !sunken : false);
+                    drawEtch(painter, r, widget, WIDGET_CHECKBOX,
+                             opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
 
             if(state&State_On)
             {
@@ -2887,10 +2888,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             QRect       rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
             int         x(rect.x()), y(rect.y());
             QPolygon    clipRegion;
-            EWidget     wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-            EAppearance app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
-            bool        drawSunken=opts.crRaised ? sunken : false,
-                        lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
+            EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
+            EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
+            bool        drawSunken=opts.crButton ? sunken : false,
+                        lb=opts.crButton && !drawSunken && !IS_GLASS(app);
 
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
@@ -2898,7 +2899,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             const QColor *bc(sunken ? NULL : borderColors(option, NULL)),
                          *btn(buttonColors(option)),
                          *use(bc ? bc : btn);
-            const QColor &bgnd(opts.crRaised
+            const QColor &bgnd(opts.crButton
                                 ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
                                 : state&State_Enabled && !sunken
                                     ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
@@ -2912,7 +2913,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect, bgnd);
             else
-                drawBevelGradient(bgnd, opts.crRaised ? !sunken : false, painter, rect, true,
+                drawBevelGradient(bgnd, opts.crButton ? !sunken : false, painter, rect, true,
                                   getWidgetShade(wid, true, drawSunken, app),
                                   getWidgetShade(wid, false, drawSunken, app),
                                   drawSunken, app, wid);
@@ -2935,7 +2936,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                        botCol(getLowerEtchCol(widget, painter));
 
                 if(!glow)
-                    if(opts.crRaised && !drawSunken)
+                    if(opts.crButton && !drawSunken && EFFECT_SHADOW==opts.buttonEffect)
                     {
                         botCol=topCol;
                         topCol.setAlphaF(0.0);
@@ -2965,7 +2966,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                             ? palette.highlightedText().color()
                                                             :*/ itsCheckRadioCol
                                                         : palette.mid().color(), PIX_RADIO_ON, 1.0));
-            if(!coloredMo && (!opts.crRaised || lb))
+            if(!coloredMo && (!opts.crButton || lb))
                 painter->drawPixmap(x, y, *getPixmap(btn[lb ? (APPEARANCE_DULL_GLASS==app ? 1 : 0) 
                                                             : (state&State_MouseOver ? 3 : 4)], PIX_RADIO_LIGHT));
             painter->restore();
