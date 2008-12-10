@@ -4173,16 +4173,16 @@ debugDisplayWidget(widget, 3);
 
     if(!mnu || qtSettings.qt4)
     {
-        EWidget     wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-        EAppearance app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
-        gboolean    drawSunken=opts.crRaised && !mnu ? GTK_STATE_ACTIVE==state : false;
+        EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
+        EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
+        gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : false;
         gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
-                    lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
+                    lb=opts.crButton && !drawSunken && !IS_GLASS(app);
         GdkColor    *colors=coloredMouseOver
                        ? qtcPalette.mouseover
                        : btn_colors;
-        GdkColor    *bgndCol=opts.crRaised
+        GdkColor    *bgndCol=opts.crButton
                                 ? &btn_colors[mnu ? ORIGINAL_SHADE : getFill(state, false)]
                                 :/*!isList(widget) && */GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
                                     ? &style->bg[GTK_STATE_NORMAL]
@@ -4202,7 +4202,7 @@ debugDisplayWidget(widget, 3);
                               bgndCol,
                               getWidgetShade(wid, TRUE, drawSunken, app),
                               getWidgetShade(wid, FALSE, drawSunken, app),
-                              TRUE, opts.crRaised ? GTK_STATE_ACTIVE!=state : false, drawSunken, app, wid);
+                              TRUE, opts.crButton ? GTK_STATE_ACTIVE!=state : false, drawSunken, app, wid);
 
         if(coloredMouseOver && !glow)
         {
@@ -4212,7 +4212,7 @@ debugDisplayWidget(widget, 3);
             //cairo_rectangle(cr, x+2.5, y+2.5, QTC_CHECK_SIZE-5, QTC_CHECK_SIZE-5);
             cairo_stroke(cr);
         }
-        else if(!opts.crRaised || lb)
+        else if(!opts.crButton || lb)
         {
             cairo_new_path(cr);
             if(lb)
@@ -4239,7 +4239,7 @@ debugDisplayWidget(widget, 3);
                 drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, WIDGET_STD_BUTTON);
             else
                 drawEtch(cr, area, NULL, widget, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2,
-                         opts.crRaised && !mnu ? GTK_STATE_ACTIVE!=state : false);
+                         opts.crButton && !mnu && EFFECT_SHADOW==opts.buttonEffect ? GTK_STATE_ACTIVE!=state : false);
 //             cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
 //             cairo_move_to(cr, x-0.5, y+QTC_CHECK_SIZE);
 //             cairo_line_to(cr, x-0.5, y);
@@ -4315,10 +4315,10 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                     doEtch=QTC_DO_EFFECT,
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
         int         ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL;
-        EWidget     wid=opts.crRaised ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-        EAppearance app=opts.crRaised ? opts.appearance : APPEARANCE_GRADIENT;
-        gboolean    drawSunken=opts.crRaised && !mnu ? GTK_STATE_ACTIVE==state : false,
-                    lb=opts.crRaised && !drawSunken && !IS_GLASS(app);
+        EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
+        EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
+        gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : false,
+                    lb=opts.crButton && !drawSunken && !IS_GLASS(app);
 
 //         x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
 //         y+=((height-QTC_RADIO_SIZE)>>1)+1;
@@ -4356,7 +4356,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             GdkColor *colors=coloredMouseOver
                         ? qtcPalette.mouseover
                         : btn_colors;
-            GdkColor *bgndCol=opts.crRaised
+            GdkColor *bgndCol=opts.crButton
                                 ? &btn_colors[mnu ? ORIGINAL_SHADE : getFill(state, false)]
                                 : GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
                                     ? &style->bg[GTK_STATE_NORMAL]
@@ -4373,7 +4373,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                                   bgndCol,
                                   getWidgetShade(wid, TRUE, drawSunken, app),
                                   getWidgetShade(wid, FALSE, drawSunken, app),
-                                  TRUE, opts.crRaised ? GTK_STATE_ACTIVE!=state : false, drawSunken, app, wid);
+                                  TRUE, opts.crButton ? GTK_STATE_ACTIVE!=state : false, drawSunken, app, wid);
 
             gdk_region_destroy(region);
 
@@ -4398,7 +4398,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 else
                     cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_RADIO_TOP_ALPHA);
 
-                if(!opts.crRaised || drawSunken || glow)
+                if(!opts.crButton || EFFECT_SHADOW!=opts.buttonEffect || drawSunken || glow)
                 {
                     cairo_arc (cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
                     cairo_stroke(cr);
@@ -4417,7 +4417,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 cairo_paint(cr);
 
                 /*if(!on)*/
-                if(!coloredMouseOver && (!opts.crRaised || lb))
+                if(!coloredMouseOver && (!opts.crButton || lb))
                 {
                     GdkPixbuf *light=getPixbuf(&btn_colors[lb ? (APPEARANCE_DULL_GLASS==app ? 1 : 0)
                                                               : (coloredMouseOver ? 3 : 4)], PIX_RADIO_LIGHT, 1.0);

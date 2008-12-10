@@ -14,7 +14,7 @@
 12. Alter the way the light part of etchibng is drawn - should help with darker color schemes.
 13. Draw border around filled progress.
 14. Fix light spinbuttons on dark background.
-15. Option to have raised checks/radios.
+15. Option to have button-like checks/radios.
 
 0.59.7
 ------
