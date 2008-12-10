@@ -1354,11 +1354,21 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
             res=gdk_pixbuf_new_from_inline(-1, slider_light, TRUE, NULL);
             break;
         case PIX_SLIDER_V:
-            res=gdk_pixbuf_new_from_inline(-1, slider_v, TRUE, NULL);
+        {
+            GdkPixbuf *orig=gdk_pixbuf_new_from_inline(-1, slider, TRUE, NULL);
+            res=gdk_pixbuf_rotate_simple(orig, GDK_PIXBUF_ROTATE_CLOCKWISE);
+            gdk_pixbuf_unref(orig);
             break;
+        }
         case PIX_SLIDER_LIGHT_V:
-            res=gdk_pixbuf_new_from_inline(-1, slider_light_v, TRUE, NULL);
+        {
+            GdkPixbuf *orig=gdk_pixbuf_new_from_inline(-1, slider_light, TRUE, NULL),
+                      *rotated=gdk_pixbuf_rotate_simple(orig, GDK_PIXBUF_ROTATE_CLOCKWISE);
+            res=gdk_pixbuf_flip(rotated, true);
+            gdk_pixbuf_unref(orig);
+            gdk_pixbuf_unref(rotated);
             break;
+        }
 #ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU
         case PIX_BLANK:
             return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);

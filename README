@@ -80,6 +80,4 @@ To regenerate this, run the following:
     gdk-pixbuf-csource --raw --name check_on check_on.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name slider slider.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name slider_light slider_light.png >> pixmaps.h
-    gdk-pixbuf-csource --raw --name slider_v slider_v.png >> pixmaps.h
-    gdk-pixbuf-csource --raw --name slider_light_v slider_light_v.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name check_x_on check_x_on.png >> pixmaps.h
