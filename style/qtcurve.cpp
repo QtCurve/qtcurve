@@ -2793,7 +2793,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EWidget      wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
             EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
             bool         drawSunken=opts.crButton ? sunken : false,
-                         lb=opts.crButton && !drawSunken && !IS_GLASS(app);
+                         lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
+                         drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
 
             painter->save();
             if(IS_FLAT(opts.appearance))
@@ -2812,12 +2813,18 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 //                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
-            else if(!opts.crButton || lb)
+            else if(!opts.crButton || drawLight)
             {
-                painter->setPen(lb ? btn[APPEARANCE_DULL_GLASS==app ? 1 : 0]
-                                   : midColor(state&State_Enabled ? palette.base().color() : palette.background().color(), use[3]));
-                painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
-                painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
+                painter->setPen(drawLight ? btn[QTC_LIGHT_BORDER(app)]
+                                          : midColor(state&State_Enabled ? palette.base().color()
+                                                                         : palette.background().color(), use[3]));
+                if(lightBorder)
+                    drawRect(painter, rect.adjusted(1, 1, -1, -1));
+                else
+                {
+                    painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
+                    painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
+                }
             }
 
             drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
@@ -2891,7 +2898,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
             EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
             bool        drawSunken=opts.crButton ? sunken : false,
-                        lb=opts.crButton && !drawSunken && !IS_GLASS(app);
+                        lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
+                        drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
 
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
@@ -2966,9 +2974,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                             ? palette.highlightedText().color()
                                                             :*/ itsCheckRadioCol
                                                         : palette.mid().color(), PIX_RADIO_ON, 1.0));
-            if(!coloredMo && (!opts.crButton || lb))
-                painter->drawPixmap(x, y, *getPixmap(btn[lb ? (APPEARANCE_DULL_GLASS==app ? 1 : 0) 
-                                                            : (state&State_MouseOver ? 3 : 4)], PIX_RADIO_LIGHT));
+            if(!coloredMo && (!opts.crButton || drawLight))
+                painter->drawPixmap(x, y, *getPixmap(btn[drawLight ? QTC_LIGHT_BORDER(app)
+                                                                   : (state&State_MouseOver ? 3 : 4)],
+                                                     lightBorder ? PIX_RADIO_INNER : PIX_RADIO_LIGHT));
             painter->restore();
             break;
         }
@@ -8712,6 +8721,9 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
         {
             case PIX_RADIO_BORDER:
                 img.loadFromData(radio_frame_png_data, radio_frame_png_len);
+                break;
+            case PIX_RADIO_INNER:
+                img.loadFromData(radio_inner_png_data, radio_inner_png_len);
                 break;
             case PIX_RADIO_LIGHT:
                 img.loadFromData(radio_light_png_data, radio_light_png_len);

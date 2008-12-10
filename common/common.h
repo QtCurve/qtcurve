@@ -295,6 +295,8 @@ typedef GdkColor color;
                           (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
                            APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
 
+#define QTC_LIGHT_BORDER(APP) (APPEARANCE_DULL_GLASS==APP ? 1 : 0)
+
 #define PROGRESS_ANIMATION 100
 #define MIN_SLIDER_SIZE(A) (LINE_DOTS==A ? 24 : 20)
 
@@ -364,6 +366,7 @@ typedef enum
 typedef enum
 {
     PIX_RADIO_BORDER,
+    PIX_RADIO_INNER,
     PIX_RADIO_LIGHT,
     PIX_RADIO_ON,
     PIX_CHECK,
