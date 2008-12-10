@@ -2899,7 +2899,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
             bool        drawSunken=opts.crButton ? sunken : false,
                         lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                        drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
+                        drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app)),
+                        doneShadow=false;
 
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
@@ -2916,6 +2917,19 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     : palette.background().color());
 
             painter->save();
+
+            if(doEtch && !glow && opts.crButton && !drawSunken && EFFECT_SHADOW==opts.buttonEffect)
+            {
+                QColor col(Qt::black);
+
+                col.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+                doneShadow=true;
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setBrush(Qt::NoBrush);
+                painter->setPen(col);
+                painter->drawArc(QRectF(r.x()+1.5, r.y()+1.5, QTC_RADIO_SIZE, QTC_RADIO_SIZE), 0, 360*16);
+                painter->setRenderHint(QPainter::Antialiasing, false);
+            }
 
             painter->setClipRegion(QRegion(clipRegion));
             if(IS_FLAT(opts.appearance))
@@ -2938,23 +2952,17 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->setClipping(false);
 
-            if(doEtch && (glow || QTC_DO_EFFECT))
+            if(!doneShadow && doEtch && glow)
             {
                 QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
                        botCol(getLowerEtchCol(widget, painter));
+                bool   shadow=false;
 
                 if(!glow)
-                    if(opts.crButton && !drawSunken && EFFECT_SHADOW==opts.buttonEffect)
-                    {
-                        botCol=topCol;
-                        topCol.setAlphaF(0.0);
-                        botCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                    }
-                    else
-                    {
-                        topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                        botCol=getLowerEtchCol(widget, painter);
-                    }
+                {
+                    topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+                    botCol=getLowerEtchCol(widget, painter);
+                }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
