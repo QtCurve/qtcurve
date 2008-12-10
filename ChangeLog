@@ -28,6 +28,8 @@
 25. Increase size of busy progressbar.
 26. Draw border around filled progress.
 27. Option to have button-like checks/radios.
+28. Set KDE palette for Qt applications.
+29. React to KDE font and palette changes for Qt only applications.
 
 0.59.6
 ------

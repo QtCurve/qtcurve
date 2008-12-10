@@ -19,6 +19,7 @@
 */
 
 #include <QtGui>
+#include <QtDBus/QtDBus>
 #include <QX11Info>
 #define QTC_COMMON_FUNCTIONS
 #include "qtcurve.h"
@@ -39,6 +40,20 @@
 #include <KDE/KIcon>
 #include <KDE/KComponentData>
 
+static void applyKdeSettings(bool pal)
+{
+    if(pal)
+        QApplication::setPalette(KGlobalSettings::createApplicationPalette());
+    else
+    {
+        QApplication::setFont(KGlobalSettings::generalFont());
+        QApplication::setFont(KGlobalSettings::menuFont(), "QMenuBar");
+        QApplication::setFont(KGlobalSettings::menuFont(), "QMenu");
+        QApplication::setFont(KGlobalSettings::menuFont(), "KPopupTitle");
+        QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
+    }
+}
+
 static KComponentData *theKComponentData=0;
 static int            theInstanceCount=0;
 
@@ -57,6 +72,8 @@ static void checkKComponentData()
             name="QtApp";
 
         theKComponentData=new KComponentData(name.toLatin1(), name.toLatin1());
+        applyKdeSettings(true);
+        applyKdeSettings(false);
     }
 }
 
@@ -953,6 +970,8 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     setFileDialogs();
 #endif
     QTimer::singleShot(0, this, SLOT(setupKde4()));
+    QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
+                                          "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
 #endif
 
     QString rcFile;
@@ -8800,6 +8819,23 @@ void QtCurveStyle::setupKde4()
 {
 #ifdef QTC_USE_KDE4
     checkKComponentData();
+#endif
+}
+
+void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
+{
+#ifdef QTC_USE_KDE4
+    switch(type)
+    {
+        case KGlobalSettings::PaletteChanged:
+            KGlobal::config()->reparseConfiguration();
+            applyKdeSettings(true);
+            break;
+        case KGlobalSettings::FontChanged:
+            KGlobal::config()->reparseConfiguration();
+            applyKdeSettings(false);
+            break;
+    }
 #endif
 }
 
