@@ -4386,9 +4386,20 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                                     : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                         ? &colors[QTC_CR_MO_FILL]
                                         : &style->base[GTK_STATE_NORMAL];
+            gboolean doneShadow=false;
 
             bgnd=getFill(state, set/*, TRUE*/);
 
+            if(doEtch && !mnu && !glow && opts.crButton && !drawSunken && EFFECT_SHADOW==opts.buttonEffect)
+            {
+                double radius=(QTC_RADIO_SIZE)/2.0;
+
+                cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_RADIO_TOP_ALPHA);
+                cairo_arc(cr, x+1+radius-0.5, y+1+radius-0.5, radius, 0, 2*M_PI);
+                cairo_stroke(cr);
+                doneShadow=true;
+            }
+                
             if(IS_FLAT(opts.appearance))
                 drawAreaColor(cr, NULL, region, bgndCol, x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2);
             else
@@ -4405,16 +4416,16 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 double radius=(QTC_RADIO_SIZE-2)/2.0;
 
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[QTC_CR_MO_FILL]));
-                cairo_arc (cr, x+radius + 1, y+radius + 1, radius, 0, 2*M_PI);
+                cairo_arc(cr, x+radius + 1, y+radius + 1, radius, 0, 2*M_PI);
                 cairo_stroke(cr);
                 radius--;
-                cairo_arc (cr, x+radius + 2, y+radius + 2, radius, 0, 2*M_PI);
+                cairo_arc(cr, x+radius + 2, y+radius + 2, radius, 0, 2*M_PI);
                 cairo_stroke(cr);
             }
 
-            if(doEtch && !mnu && (!list || glow))
+            if(!doneShadow && doEtch && !mnu && (!list || glow))
             {
-                double radius=(QTC_RADIO_SIZE+1)/2.0;
+                double   radius=(QTC_RADIO_SIZE+1)/2.0;
 
                 if(glow)
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QTC_GLOW_MO]));
@@ -4423,12 +4434,12 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
                 if(!opts.crButton || EFFECT_SHADOW!=opts.buttonEffect || drawSunken || glow)
                 {
-                    cairo_arc (cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
+                    cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
                     cairo_stroke(cr);
                     if(!glow)
                         setLowerEtchCol(cr, widget);
                 }
-                cairo_arc (cr, x+radius - 0.5, y+radius - 0.5, radius, 1.75*M_PI, 0.75*M_PI);
+                cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 1.75*M_PI, 0.75*M_PI);
                 cairo_stroke(cr);
             }
 
