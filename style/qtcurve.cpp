@@ -8706,6 +8706,18 @@ const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *u
                                : use[ORIGINAL_SHADE];
 }
 
+static QImage rotateImage(const QImage &img, double angle=90.0)
+{
+    QMatrix matrix;
+    matrix.translate(img.width()/2, img.height()/2);
+    matrix.rotate(angle);
+
+    QRect newRect(matrix.mapRect(QRect(0, 0, img.width(), img.height())));
+
+    return img.transformed(QMatrix(matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(),
+                                   matrix.dx() - newRect.left(), matrix.dy() - newRect.top()));
+}
+
 QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) const
 {
     QtcKey  key(createKey(col, p));
@@ -8741,10 +8753,12 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
                 img.loadFromData(slider_light_png_data, slider_light_png_len);
                 break;
             case PIX_SLIDER_V:
-                img.loadFromData(slider_v_png_data, slider_v_png_len);
+                img.loadFromData(slider_png_data, slider_png_len);
+                img=rotateImage(img);
                 break;
             case PIX_SLIDER_LIGHT_V:
-                img.loadFromData(slider_light_v_png_data, slider_light_v_png_len);
+                img.loadFromData(slider_light_png_data, slider_light_png_len);
+                img=rotateImage(img).mirrored(true, false);
                 break;
         }
 
