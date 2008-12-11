@@ -2495,10 +2495,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         {
                             QStyleOptionFrame opt(*fo);
                             opt.state&=~State_HasFocus;
-                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT);
+                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT, WIDGET_SCROLLVIEW);
                         }
                         else
-                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DO_EFFECT);
+                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DO_EFFECT, WIDGET_SCROLLVIEW);
                     }
                 }
                 else
@@ -2515,12 +2515,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             opt.state&=~State_HasFocus;
 
                         drawBorder(painter, r, &opt,
-                                ROUNDED_ALL, backgroundColors(option),
-                                WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
-                                                    ? BORDER_SUNKEN
-                                                    : state&State_Raised
-                                                        ? BORDER_RAISED
-                                                        : BORDER_FLAT);
+                                   ROUNDED_ALL, backgroundColors(option),
+                                   sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
+                                                          ? BORDER_SUNKEN
+                                                            : state&State_Raised
+                                                                ? BORDER_RAISED
+                                                                : BORDER_FLAT);
                         painter->restore();
                     }
                 }
@@ -7620,9 +7620,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                         ? itsMenuitemCols
                         : custom
                             ? custom
-                            : WIDGET_ENTRY==w
-                                ? buttonColors(option)
-                                : itsBackgroundCols);
+                            : backgroundColors(option));
     QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
                           : cols[WIDGET_PROGRESSBAR==w
@@ -7667,9 +7665,13 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                             ? tl
                             : option->palette.background().color());
             p->drawPath(topPath);
-            p->setPen(enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
-                            ? br
-                            : option->palette.background().color());
+            p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
+                        ? option->palette.background().color()
+                        : WIDGET_ENTRY==w && !hasFocus
+                            ? option->palette.base().color()
+                            : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
+                                ? br
+                                : option->palette.background().color());
             p->drawPath(botPath);
         }
     }
@@ -7814,7 +7816,7 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
-                                  int round, bool fill, bool doEtch) const
+                                  int round, bool fill, bool doEtch, EWidget w) const
 {
     QRect r(rx);
 
@@ -7827,7 +7829,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
     if(doEtch)
         drawEtch(p, rx, widget, WIDGET_ENTRY, false);
 
-    drawBorder(p, r, option, round, NULL, WIDGET_ENTRY, BORDER_SUNKEN);
+    drawBorder(p, r, option, round, NULL, w, BORDER_SUNKEN);
 }
 
 void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const

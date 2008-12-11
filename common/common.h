@@ -404,13 +404,14 @@ typedef enum
     WIDGET_UNCOLOURED_MO_BUTTON,
 #endif
     WIDGET_SPIN,
+    WIDGET_ENTRY,
+    WIDGET_SCROLLVIEW,
 #ifdef __cplusplus
     WIDGET_CHECKBUTTON,        // Qt4 only
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
     WIDGET_MENU_BUTTON,        // Qt4 only
-    WIDGET_ENTRY,
     WIDGET_FRAME,
     WIDGET_NO_ETCH_BTN,
 #endif
