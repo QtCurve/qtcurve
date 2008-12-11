@@ -1,6 +1,6 @@
 0.60
 ----
- 1. Fix "trough-lower" and "tought-upper" style slider troughs.
+ 1. Fix "trough-lower" and "tough-upper" style slider troughs.
  2. Fix reading of listview colours under KDE4.
  3. If appearance is rounded, round view selections.
  4. New focus rect options - standard, highlight, background, filled.
@@ -15,6 +15,8 @@
 13. Draw border around filled progress.
 14. Fix light spinbuttons on dark background.
 15. Option to have button-like checks/radios.
+16. Draw square border for for frames that pass no detail and no widget to
+    gtkDrawShadow.
 
 0.59.7
 ------

@@ -3956,6 +3956,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean frame=!detail || 0==strcmp(detail, "frame"),
                  scrolledWindow=DETAIL("scrolled_window"),
                  viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
+                 drawSquare=!viewport && !scrolledWindow && !detail && !widget,
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
                             ? frame : isStatusBarFrame(widget);
 
@@ -3967,12 +3968,12 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         sanitizeSize(window, &width, &height);
 
-        if(!statusBar && (frame || scrolledWindow || viewport) && QTC_ROUNDED)
+        if(!statusBar && (frame || scrolledWindow || viewport || drawSquare) && QTC_ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
             {
-                gboolean doBorder=!viewport;
+                gboolean doBorder=!viewport && !drawSquare;
 
                 if(scrolledWindow)
                 {
@@ -3988,11 +3989,14 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                         x++, y++, width-=2, height-=2;
                     }
                 }
-                if(viewport)
+                if(viewport || drawSquare)
                 {
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]));
+                    if(drawSquare)
+                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+                    else
+                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]));
                     cairo_stroke(cr);
                 }
                 if(doBorder)
