@@ -30,6 +30,7 @@
 27. Option to have button-like checks/radios.
 28. Set KDE palette for Qt applications.
 29. React to KDE font and palette changes for Qt only applications.
+30. Style QToolBox
 
 0.59.6
 ------

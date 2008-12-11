@@ -3316,9 +3316,74 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
     QRect                 r(option->rect);
     const QFlags<State> & state(option->state);
     const QPalette &      palette(option->palette);
+    bool                  reverse(Qt::RightToLeft==option->direction);
 
     switch(element)
     {
+        case CE_ToolBoxTabShape:
+        {
+            const QStyleOptionToolBox *tb = qstyleoption_cast<const QStyleOptionToolBox *>(option);
+            if(!(tb && widget))
+                break;
+
+//             const QStyleOptionToolBoxV2 *v2 = qstyleoption_cast<const QStyleOptionToolBoxV2 *>(option);
+// 
+//             if (v2 && QStyleOptionToolBoxV2::Beginning==v2->position)
+//                 break;
+
+            const QColor *use = backgroundColors(widget->palette().color(QPalette::Window));
+            QPainterPath path;
+            int          y = r.height()*15/100;
+
+            painter->save();
+            if (reverse)
+            {
+                path.moveTo(r.left()+52, r.top());
+                path.cubicTo(QPointF(r.left()+50-8, r.top()), QPointF(r.left()+50-10, r.top()+y),
+                             QPointF(r.left()+50-10, r.top()+y));
+                path.lineTo(r.left()+18+9, r.bottom()-y);
+                path.cubicTo(QPointF(r.left()+18+9, r.bottom()-y), QPointF(r.left()+19+6, r.bottom()-1-0.3),
+                             QPointF(r.left()+19, r.bottom()-1-0.3));
+            }
+            else
+            {
+                path.moveTo(r.right()-52, r.top());
+                path.cubicTo(QPointF(r.right()-50+8, r.top()), QPointF(r.right()-50+10, r.top()+y),
+                             QPointF(r.right()-50+10, r.top()+y));
+                path.lineTo(r.right()-18-9, r.bottom()-y);
+                path.cubicTo(QPointF(r.right()-18-9, r.bottom()-y), QPointF(r.right()-19-6, r.bottom()-1-0.3),
+                             QPointF(r.right()-19, r.bottom()-1-0.3));
+            }
+
+            painter->setRenderHint(QPainter::Antialiasing, true);
+            painter->translate(0, 1);
+            painter->setPen(use[0]);
+            painter->drawPath(path);
+            painter->translate(0, -1);
+            painter->setPen(use[4]);
+            painter->drawPath(path);
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            if (reverse)
+            {
+                painter->drawLine(r.left()+50-1, r.top(), r.right(), r.top());
+                painter->drawLine(r.left()+20, r.bottom()-2, r.left(), r.bottom()-2);
+                painter->setPen(use[0]);
+                painter->drawLine(r.left()+50, r.top()+1, r.right(), r.top()+1);
+                painter->drawLine(r.left()+20, r.bottom()-1, r.left(), r.bottom()-1);
+            }
+            else
+            {
+                painter->drawLine(r.left(), r.top(), r.right()-50+1, r.top());
+                painter->drawLine(r.right()-20, r.bottom()-2, r.right(), r.bottom()-2);
+                painter->setPen(use[0]);
+                painter->drawLine(r.left(), r.top()+1, r.right()-50, r.top()+1);
+                painter->drawLine(r.right()-20, r.bottom()-1, r.right(), r.bottom()-1);
+            }
+            painter->restore();
+            break;
+        }
+        //case CE_ToolBoxTabLabel:
+        //    break;
         case CE_MenuScroller:
             painter->fillRect(r, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
                                                         : itsBackgroundCols[ORIGINAL_SHADE]);
