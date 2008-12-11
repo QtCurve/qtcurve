@@ -17,6 +17,7 @@
 15. Option to have button-like checks/radios.
 16. Draw square border for for frames that pass no detail and no widget to
     gtkDrawShadow.
+17. Use base for light part of lineedit border, and background for scrollview.
 
 0.59.7
 ------

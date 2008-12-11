@@ -1729,6 +1729,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     int          useBorderVal=!enabled && WIDGET_BUTTON(widget) ? QT_DISABLED_BORDER : borderVal;
     GdkColor     *colors=c_colors ? c_colors : qtcPalette.background,
                  *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
+    gboolean     hasFocus=colors==qtcPalette.menuitem; /* CPD USED TO INDICATE FOCUS! */
 
     setCairoClipping(cr, area, region);
 
@@ -1764,7 +1765,11 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
             cairo_stroke(cr);
             if(WIDGET_CHECKBOX!=widget)
             {
-                if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app))
+                if(WIDGET_SCROLLVIEW==widget && !hasFocus)
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
+                else if(WIDGET_ENTRY==widget && !hasFocus)
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->base[state]));
+                else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app))
                 {
                     GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
                     if(flags&DF_BLEND)
@@ -2199,7 +2204,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
     gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget))),
              highlight=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app,
              doEtch=QTC_DO_EFFECT;
-    GdkColor *colors=highlight ? qtcPalette.menuitem : qtcPalette.button;
+    GdkColor *colors=highlight ? qtcPalette.menuitem : qtcPalette.background;
 
     if(ROUND_NONE!=opts.round)
     {
@@ -2246,7 +2251,7 @@ debugDisplayWidget(widget, 3);
 */
 
     drawBorder(cr, style, !widget || GTK_WIDGET_IS_SENSITIVE(widget) ? state : GTK_STATE_INSENSITIVE, area, NULL, x, y, width, height,
-               colors, round, BORDER_SUNKEN, WIDGET_OTHER, DF_DO_CORNERS|DF_BLEND);
+               colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
     if(doEtch)
     {
         GdkRectangle rect;
@@ -3980,7 +3985,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     if(opts.squareScrollViews)
                     {
                         drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                                   NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_OTHER, 0);
+                                   NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_SCROLLVIEW, 0);
                         doBorder=false;
                     }
                     else if(opts.sunkenScrollViews)
@@ -3999,10 +4004,10 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]));
                     cairo_stroke(cr);
                 }
-                if(doBorder)
+                else if(doBorder)
                     drawBorder(cr, style, state, area, NULL, x, y, width, height,
                                NULL, ROUNDED_ALL, scrolledWindow ? BORDER_SUNKEN : BORDER_FLAT,
-                               WIDGET_OTHER, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
+                               scrolledWindow ? WIDGET_SCROLLVIEW : WIDGET_OTHER, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
             }
         }
         else if(!statusBar || opts.drawStatusBarFrames)
