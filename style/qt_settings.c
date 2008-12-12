@@ -1496,11 +1496,12 @@ static gboolean qtInit(Options *opts)
                     else if(mozThunderbird)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
 #endif
-                    qtSettings.app= (firefox && opts->newFirefox) ||
-                                    ((thunderbird || mozThunderbird) && opts->newThunderbird) ||
-                                    NULL!=getenv("QTC_NEW_MOZILLA")
-                                        ? GTK_APP_NEW_MOZILLA
-                                        : GTK_APP_MOZILLA;
+                    qtSettings.app=
+#ifndef QTC_OLD_MOZILLA
+                        firefox || NULL!=getenv("QTC_NEW_MOZILLA")
+                                    ? GTK_APP_NEW_MOZILLA :
+#endif
+                                    GTK_APP_MOZILLA;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;

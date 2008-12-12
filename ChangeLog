@@ -18,6 +18,8 @@
 16. Draw square border for for frames that pass no detail and no widget to
     gtkDrawShadow.
 17. Use base for light part of lineedit border, and background for scrollview.
+18. Default to treating Firefox as firefox>.0 - cmake with -DQTC_OLD_MOZILLA=true
+    to revert.
 
 0.59.7
 ------

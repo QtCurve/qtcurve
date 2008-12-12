@@ -10,10 +10,9 @@ To build and install:
 
 The following options may be supplied to cmake:
 
-    -DQTC_NEW_MOZILLA=true
-        When Firefox, and thunderbird, are being themed - treat them as if they
-        are the newer versions. This sets 'newFirefox' and 'newThunderbird' to true
-        by default.
+    -DQTC_OLD_MOZILLA=true
+        When Firefox is being themed - treat it as if it is < 3.0
+        Thunderbird is *always* treated as being of an old Mozilla style.
 
    -DQTC_MODIFY_MOZILLA=true
         Enable mods to userChrome.css (setting KDE button order)

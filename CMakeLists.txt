@@ -106,15 +106,15 @@ if (GTK_INCLUDE_DIR)
                 "         experiment!\n"
                 "**************************************************************\n\n\n")
     endif(QTC_REORDER_GTK_DIALOG_BUTTONS)
-    if(QTC_NEW_MOZILLA)
-        message("\n\n**************************************************************\n"
-                "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
-                "**************************************************************\n\n\n")
-    else(QTC_NEW_MOZILLA)
+    if(QTC_OLD_MOZILLA)
         message("\n\n**************************************************************\n"
                 "Information: Defaulting to treating Firefox as Firefox < 3.0\n"
                 "**************************************************************\n\n\n")
-    endif(QTC_NEW_MOZILLA)
+    else(QTC_OLD_MOZILLA)
+        message("\n\n**************************************************************\n"
+                "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
+                "**************************************************************\n\n\n")
+    endif(QTC_OLD_MOZILLA)
 else (GTK_INCLUDE_DIR)
     message(FATAL_ERROR "Could not locate Gtk2 include files")
 endif (GTK_INCLUDE_DIR)
