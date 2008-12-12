@@ -2250,8 +2250,9 @@ debugDisplayWidget(widget, 3);
         drawAreaColor(cr, area, NULL, enabled ? &style->base[state] : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
 */
 
-    drawBorder(cr, style, !widget || GTK_WIDGET_IS_SENSITIVE(widget) ? state : GTK_STATE_INSENSITIVE, area, NULL, x, y, width, height,
-               colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
+    {
+    int xo=x, yo=y, widtho=width, heighto=height;
+    
     if(doEtch)
     {
         GdkRectangle rect;
@@ -2274,6 +2275,10 @@ debugDisplayWidget(widget, 3);
         gdk_region_destroy(region);
     }
 
+    drawBorder(cr, style, !widget || GTK_WIDGET_IS_SENSITIVE(widget) ? state : GTK_STATE_INSENSITIVE, area, NULL, xo, yo, widtho, heighto,
+               colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
+    }
+               
     if(GTK_IS_ENTRY(widget) && !gtk_entry_get_visibility(GTK_ENTRY(widget)))
         gtk_entry_set_invisible_char(GTK_ENTRY(widget), opts.passwordChar);
 }
@@ -3397,14 +3402,14 @@ debugDisplayWidget(widget, 3);
                               getWidgetShade(WIDGET_PBAR_TROUGH, FALSE, FALSE, opts.progressGrooveAppearance),
                               horiz, TRUE, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
+            if(doEtch)
+                 drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE);
+
             drawBorder(cr, widget && widget->parent ? widget->parent->style : style,
                        state, area, NULL, x, y, width, height,
                        NULL, ROUNDED_ALL,
                        IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT,
                        WIDGET_OTHER, DF_BLEND|DF_DO_CORNERS);
-
-            if(doEtch)
-                 drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE);
         }
         else /* Scrollbars... */
         {
