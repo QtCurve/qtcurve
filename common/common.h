@@ -1146,13 +1146,9 @@ typedef struct
                      customMenuNormTextColor,
                      customMenuSelTextColor,
                      customCheckRadioColor;
-#ifndef __cplusplus
-    bool             newFirefox,
-                     newThunderbird;
-#endif
-    #ifdef QTC_CONFIG_DIALOG
+#ifdef QTC_CONFIG_DIALOG
     EShading         shading;
-    #endif
+#endif
 #ifdef __cplusplus
     CustomGradientCont customGradient;
 #else

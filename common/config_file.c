@@ -834,10 +834,6 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
 #endif
-#ifndef __cplusplus
-            QTC_CFG_READ_BOOL(newFirefox)
-            QTC_CFG_READ_BOOL(newThunderbird)
-#endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance, false)
             QTC_CFG_READ_APPEARANCE(inactiveTitlebarAppearance, opts->titlebarAppearance, false)
@@ -1294,13 +1290,6 @@ static void defaultSettings(Options *opts)
     opts->gtkButtonOrder=false;
 #endif
 #ifndef __cplusplus
-#ifdef QTC_NEW_MOZILLA
-    opts->newFirefox=true;
-    opts->newThunderbird=true;
-#else
-    opts->newFirefox=false;
-    opts->newThunderbird=false;
-#endif
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_GRADIENT;
