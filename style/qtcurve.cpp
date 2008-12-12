@@ -2846,13 +2846,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
             }
 
-            drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
             if(doEtch)
                 if(glow)
                     drawGlow(painter, r, WIDGET_CHECKBOX);
                 else
                     drawEtch(painter, r, widget, WIDGET_CHECKBOX,
                              opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
+
+            drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
 
             if(state&State_On)
             {
