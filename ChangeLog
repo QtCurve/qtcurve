@@ -20,6 +20,7 @@
 17. Use base for light part of lineedit border, and background for scrollview.
 18. Default to treating Firefox as firefox>.0 - cmake with -DQTC_OLD_MOZILLA=true
     to revert.
+19. Draw statusbar frames, if enabled.
 
 0.59.7
 ------
