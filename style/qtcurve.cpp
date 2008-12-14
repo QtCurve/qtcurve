@@ -5241,7 +5241,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 LARGE_ARR_WIDTH, LARGE_ARR_HEIGHT);
 
                     if(bflags&State_Sunken)
-                        arrow.adjust(1, 1, 0, 0);
+                        arrow.adjust(1, 1, 1, 1);
 
                     drawArrow(painter, arrow, option, PE_IndicatorArrowDown, false, false);
                 }
