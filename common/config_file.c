@@ -627,13 +627,13 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     opts->ENTRY=toRound(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_DI(ENTRY) \
-    opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, ((int)(def->ENTRY*100))-100)+100))/100.0;
+    opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, (int)((def->ENTRY*100.0)-99.5))+100))/100.0;
 
 #define QTC_CFG_READ_DI_BOOL(ENTRY) \
     if(readBoolEntry(cfg, #ENTRY, false)) \
         opts->ENTRY=def->ENTRY; \
     else \
-        opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, ((int)(def->ENTRY*100))-100)+100))/100.0;
+        opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, (int)((def->ENTRY*100.0)-99.5))+100))/100.0;
     
 #define QTC_CFG_READ_TB_BORDER(ENTRY) \
     opts->ENTRY=toTBarBorder(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -1595,7 +1595,7 @@ static const char *toStr(EFocus f)
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
     else \
-        CFG.writeEntry(#ENTRY, ((int)(opts.ENTRY*100))-100);
+        CFG.writeEntry(#ENTRY, (int)((opts.ENTRY*100.0)-99.5));
 
 #define CFG_WRITE_ENTRY_NUM(ENTRY) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
