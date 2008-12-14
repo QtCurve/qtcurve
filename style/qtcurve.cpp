@@ -5236,14 +5236,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 }
                 else if (toolbutton->features & QStyleOptionToolButton::HasMenu)
                 {
-                    QRect arrow(r.right()-(SMALL_ARR_WIDTH+(etched ? 3 : 2)),
-                                r.bottom()-(SMALL_ARR_HEIGHT+(etched ? 4 : 3)),
-                                SMALL_ARR_WIDTH, SMALL_ARR_HEIGHT);
+                    QRect arrow(r.right()-(LARGE_ARR_WIDTH+(etched ? 3 : 2)),
+                                r.bottom()-(LARGE_ARR_HEIGHT+(etched ? 4 : 3)),
+                                LARGE_ARR_WIDTH, LARGE_ARR_HEIGHT);
 
                     if(bflags&State_Sunken)
                         arrow.adjust(1, 1, 0, 0);
 
-                    drawArrow(painter, arrow, option, PE_IndicatorArrowDown, true, false);
+                    drawArrow(painter, arrow, option, PE_IndicatorArrowDown, false, false);
                 }
 
                 if (toolbutton->state & State_HasFocus)

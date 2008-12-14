@@ -33,6 +33,7 @@
 30. Style QToolBox
 31. Use base for light part of lineedit border, and background for scrollview.
 32. Nicer 'V' arrows.
+33. Use large arrows for toolbuttons - as per KDE3.
 
 0.59.6
 ------
