@@ -256,7 +256,6 @@ typedef GdkColor color;
 #define MAX_HIGHLIGHT_FACTOR         50
 #define MIN_HIGHLIGHT_FACTOR        -50
 #define MENUBAR_DARK_FACTOR        0.97
-#define POPUPMENU_LIGHT_FACTOR     1.15
 #define INACTIVE_HIGHLIGHT_FACTOR  1.20
 #define DEF_POPUPMENU_LIGHT_FACTOR 1.15
 #define MIN_LIGHTER_POPUP_MENU        0
