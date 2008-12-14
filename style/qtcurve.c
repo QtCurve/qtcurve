@@ -2667,26 +2667,26 @@ static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrow
         {
             case GTK_ARROW_UP:
             {
-                GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x-1,y}, {x+1,y}, {x+2,y+1}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
+                GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x,y-1}, {x+2,y+1}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
-                GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x-1,y}, {x+1,y}, {x+2,y-1}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
+                GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x,y+1}, {x+2,y-1}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
-                GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x,y+1}, {x,y-1}, {x-1,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
+                GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x+1,y}, {x-1,y-2}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
-                GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x,y+1}, {x,y-1}, {x+1,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 7 : 3, fill);
+                GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x-1,y}, {x+1,y-2}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             default:
@@ -2697,26 +2697,26 @@ static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrow
         {
             case GTK_ARROW_UP:
             {
-                GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-2, y+2},  {x,y},  {x+2,y+2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-3, y+2},  {x-2, y+2}, {x,y},  {x+2, y+2}, {x+3,y+2}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
-                GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-2,y-2},  {x,y}, {x+2,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-3,y-2},  {x-2, y-2}, {x,y}, {x+2, y-2}, {x+3,y-2}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
-                GdkPoint a[]={{x-1,y-3},  {x+2,y},  {x-1,y+3},   {x-2,y+2}, {x,y}, {x-2,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                GdkPoint a[]={{x-1,y-3},  {x+2,y},  {x-1,y+3},   {x-2,y+3}, {x-2, y+2},  {x,y}, {x-2, y-2},  {x-2,y-3}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
-                GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+2}, {x,y}, {x+2,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+3}, {x+2, y+2},  {x,y}, {x+2, y-2},  {x+2,y-3}};
+                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             default:
