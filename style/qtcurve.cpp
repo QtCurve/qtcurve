@@ -3176,8 +3176,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                        (APP_KWIN==theThemedApp || state&QtC_StateKWin));
 
             opt.state=State_Horizontal|State_Enabled|State_Raised;
-            if(state&QtC_StateKWinHighlight)
-                opt.state|=QtC_StateKWinHighlight;
 
             if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
             {
@@ -3200,8 +3198,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(roundKWinFull)
             {
-                painter->setPen(state&QtC_StateKWinHighlight ? itsMenuitemCols[ORIGINAL_SHADE]
-                                                             : buttonColors(option)[QT_STD_BORDER]);
+                painter->setPen(buttonColors(option)[QT_STD_BORDER]);
                 painter->drawLine(r.x()+1, r.y()+r.height()-5, r.x()+1, r.y()+r.height()-4);
                 painter->drawPoint(r.x()+2, r.y()+r.height()-3);
                 painter->drawLine(r.x()+3, r.y()+r.height()-2, r.x()+4, r.y()+r.height()-2);
@@ -5663,8 +5660,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 QStyleOption opt(*option);
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
-                if(state&QtC_StateKWinHighlight)
-                    opt.state|=QtC_StateKWinHighlight;
 
                 if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
                 {
@@ -5694,8 +5689,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(roundKWinFull)
                 {
-                    painter->setPen(state&QtC_StateKWinHighlight ? itsMenuitemCols[ORIGINAL_SHADE]
-                                                                 : btnCols[QT_STD_BORDER]);
+                    painter->setPen(btnCols[QT_STD_BORDER]);
                     painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
                     painter->drawPoint(r.x()+2, r.y()+2);
                     painter->drawLine(r.x()+3, r.y()+1, r.x()+4, r.y()+1);
@@ -7714,7 +7708,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         }
     }
 
-    p->setPen(window && state&QtC_StateKWinHighlight ? itsMenuitemCols[ORIGINAL_SHADE] : border);
+    p->setPen(border);
     p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_EXTERNAL)));
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
