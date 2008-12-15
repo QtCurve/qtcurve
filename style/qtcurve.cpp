@@ -37,6 +37,7 @@
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KIconLoader>
+#include <KDE/KIconEffect>
 #include <KDE/KIcon>
 #include <KDE/KComponentData>
 
@@ -4381,6 +4382,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if (QIcon::Normal==mode && button->state&State_HasFocus)
                         mode = QIcon::Active;
 
+#ifdef QTC_USE_KDE4
+                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+                    if(QIcon::Disabled==mode)
+                        mode=QIcon::Normal;
+#endif
                     QIcon::State state(button->state&State_On ? QIcon::On : QIcon::Off);
                     QPixmap      pixmap(button->icon.pixmap(button->iconSize, mode, state));
                     int          labelWidth(pixmap.width()),
@@ -4388,6 +4394,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                  iconSpacing (4),//### 4 is currently hardcoded in QPushButton::sizeHint()
                                  textWidth(button->fontMetrics.boundingRect(option->rect, tf, button->text).width());
 
+#ifdef QTC_USE_KDE4
+                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+                    if(!(button->state&State_Enabled))
+                    {
+                        QImage img=pixmap.toImage();
+                        KIconEffect::toGray(img, 1.0);
+                        KIconEffect::semiTransparent(img);
+                        pixmap=QPixmap::fromImage(img);
+                    }
+#endif
                     if (!button->text.isEmpty())
                         labelWidth += (textWidth + iconSpacing);
 
