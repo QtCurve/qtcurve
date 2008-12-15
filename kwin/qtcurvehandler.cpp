@@ -103,7 +103,11 @@ bool QtCurveHandler::reset(unsigned long changed)
             break;
         case BorderNormal:
         default:
-            itsBorderSize = 4;
+            itsBorderSize =
+// #if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+//                 shadowsActive() ? 2 :
+// #endif
+                    4;
     }
 
     // read in the configuration

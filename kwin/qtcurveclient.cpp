@@ -225,6 +225,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+   if(shadowsActive())
+        opt.state|=QtC_StateKWinShadows;
+#endif
+
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
 
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
