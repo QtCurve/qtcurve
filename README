@@ -19,6 +19,9 @@ The following options may be supplied to cmake:
     -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
         Do not override Qt's file dialogs with KDE ones.
 
+    -DQTC_CUSTOM_SHADOWS=true
+        Enable custom shadows for KDE4.2. These shadows use the 'hightlight' color
+        for the active window.
 
 Themes
 ------

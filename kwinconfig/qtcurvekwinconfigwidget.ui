@@ -10,25 +10,16 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin" >
     <number>0</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="coloredBorder" >
+    <widget class="QCheckBox" name="coloredShadow" >
      <property name="whatsThis" >
       <string>Check this option if the window border should be painted in the titlebar color. Otherwise it will be painted in the background color.</string>
      </property>
      <property name="text" >
-      <string>Colored Window Border</string>
+      <string>Colored Shadow</string>
      </property>
      <property name="shortcut" >
       <string/>

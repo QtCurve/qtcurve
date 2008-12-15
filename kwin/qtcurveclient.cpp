@@ -46,7 +46,11 @@ namespace KWinQtCurve
 {
 
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory)
-             : KCommonDecoration (bridge, factory),
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+             : KCommonDecorationUnstable(bridge, factory),
+#else
+             : KCommonDecoration(bridge, factory),
+#endif
                itsTitleFont(QFont())
 {
 }
@@ -176,7 +180,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
                          titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
-                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+maximiseOffset);
+                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+maximiseOffset),
+                         borderSize(Handler()->borderSize()),
+                         round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
     int                  rectX, rectY, rectX2, rectY2;
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
@@ -189,9 +195,27 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
               windowCol(widget()->palette().color(QPalette::Window));
 
     painter.setClipRegion(e->region());
-    painter.fillRect(QRect(0, 0, r.width(), 6), windowCol); // Makes hings look nicer for kcmshell preview...
-    painter.fillRect(r.adjusted(0, 6, 0, 0), Handler()->coloredBorder() ? col : windowCol);
+    painter.fillRect(r, windowCol); // Makes hings look nicer for kcmshell preview...
+    painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
+    painter.fillRect(r.adjusted(0, 6, 0, 0), col);
 
+    if(ROUND_FULL==round)
+    {
+        QColor cornerCol(col);
+        painter.setPen(windowCol);
+        painter.drawRect(r.x()+borderSize-1, r.y()+borderSize-1,
+                         r.x()+r.width()-((borderSize*2)-1), r.y()+r.height()-((borderSize*2)-1));
+        painter.setPen(cornerCol);
+        painter.drawPoint(r.x()+borderSize-1, r.y()+r.height()-(borderSize));
+        painter.drawPoint(r.x()+r.width()-borderSize, r.y()+r.height()-borderSize);
+        cornerCol.setAlphaF(0.5);
+        painter.setPen(cornerCol);
+        painter.drawPoint(r.x()+borderSize, r.y()+r.height()-(borderSize));
+        painter.drawPoint(r.x()+borderSize-1, r.y()+r.height()-(borderSize+1));
+        painter.drawPoint(r.x()+r.width()-borderSize-1, r.y()+r.height()-borderSize);
+        painter.drawPoint(r.x()+r.width()-borderSize, r.y()+r.height()-(borderSize+1));
+    }
+    
     opt.init(widget());
 
     if(MaximizeFull==maximizeMode())
@@ -199,8 +223,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y()+6, r.width(), r.height()-6);
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
-             (active ? QStyle::State_Active : QStyle::State_None);
+             (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+    if(Handler()->coloredShadow() && shadowsActive() && active)
+        opt.state|=QtC_StateKWinHighlight;
+#endif
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
 
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
@@ -226,48 +254,44 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
 void QtCurveClient::updateWindowShape()
 {
-    int  round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
-         w(widget()->width()),
-         h(widget()->height());
-    bool maximized(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
+    setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
+                    widget()->width(), widget()->height(),
+                    maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows()));
+}
 
-    if(maximized)
-        round=ROUND_NONE;
-
-    switch(round)
+QRegion QtCurveClient::getMask(int round, int w, int h, bool maximised) const
+{  
+    switch(maximised ? ROUND_NONE : round)
     {
         case ROUND_NONE:
-        {
-            QRegion mask(0, 0, w, h);
-            setMask(mask);
-            break;
-        }
+            return  QRegion(0, 0, w, h);
         case ROUND_SLIGHT:
         {
             QRegion mask(1, 0, w-2, h);
             mask += QRegion(0, 1, 1, h-2);
             mask += QRegion(w-1, 1, 1, h-2);
 
-            setMask(mask);
-            break;
+            return mask;
         }
         default: // ROUND_FULL
         {
             QRegion mask(5, 0, w-10, h);
 
-            mask += QRegion(0, 5, 1, h-6);
-            mask += QRegion(1, 3, 1, h-3);
-            mask += QRegion(2, 2, 1, h-2);
-            mask += QRegion(3, 1, 2, h-1);
+            mask += QRegion(0, 5, 1, h-10);
+            mask += QRegion(1, 3, 1, h-6);
+            mask += QRegion(2, 2, 1, h-4);
+            mask += QRegion(3, 1, 2, h-2);
 
-            mask += QRegion(w-1, 5, 1, h-6);
-            mask += QRegion(w-2, 3, 1, h-3);
-            mask += QRegion(w-3, 2, 1, h-2);
-            mask += QRegion(w-5, 1, 2, h-1);
+            mask += QRegion(w-1, 5, 1, h-10);
+            mask += QRegion(w-2, 3, 1, h-6);
+            mask += QRegion(w-3, 2, 1, h-4);
+            mask += QRegion(w-5, 1, 2, h-2);
 
-            setMask(mask);
+            return mask;
         }
     }
+
+    return QRegion();
 }
 
 QRect QtCurveClient::captionRect() const
@@ -307,6 +331,41 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
     return KCommonDecoration::eventFilter(o, e);
 }
 
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+// Taken form Oxygen! rev873805
+QList<QRect> QtCurveClient::shadowQuads(ShadowType type) const
+{
+    Q_UNUSED(type)
+
+    QSize size = widget()->size();
+    int outside=20, underlap=5, cornersize=25;
+    // These are underlap under the decoration so the corners look nicer 10px on the outside
+    QList<QRect> quads;
+    quads.append(QRect(-outside, size.height()-underlap, cornersize, cornersize));
+    quads.append(QRect(underlap, size.height()-underlap, size.width()-2*underlap, cornersize));
+    quads.append(QRect(size.width()-underlap, size.height()-underlap, cornersize, cornersize));
+    quads.append(QRect(-outside, underlap, cornersize, size.height()-2*underlap));
+    quads.append(QRect(size.width()-underlap, underlap, cornersize, size.height()-2*underlap));
+    quads.append(QRect(-outside, -outside, cornersize, cornersize));
+    quads.append(QRect(underlap, -outside, size.width()-2*underlap, cornersize));
+    quads.append(QRect(size.width()-underlap, -outside, cornersize, cornersize));
+    return quads;
+}
+
+double QtCurveClient::shadowOpacity(ShadowType type) const
+{
+    switch( type ) {
+        case ShadowBorderedActive:
+            return isActive() ? 1.0 : 0.0;
+        case ShadowBorderedInactive:
+            return isActive() ? 0.0 : 1.0;
+        default:
+            return 0;
+    }
+    return 0;
+}
+#endif
+    
 void QtCurveClient::reset(unsigned long changed)
 {
     if (changed & SettingColors)

@@ -29,8 +29,10 @@
 
 #include <QFont>
 #include <QtGui/QApplication>
+#include <kdeversion.h>
 #include <kdecoration.h>
 #include <kdecorationfactory.h>
+#include "config.h"
 
 class QStyle;
 
@@ -55,7 +57,12 @@ enum ButtonIcon
     NumButtonIcons
 };
 
-class QtCurveHandler : public QObject, public KDecorationFactory
+class QtCurveHandler : public QObject,
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+                       public KDecorationFactoryUnstable
+#else
+                       public KDecorationFactory
+#endif
 {
     Q_OBJECT
 
@@ -75,11 +82,18 @@ class QtCurveHandler : public QObject, public KDecorationFactory
     const QFont &   titleFont()             { return itsTitleFont; }
     const QFont &   titleFontTool()         { return itsTitleFontTool; }
     int             borderSize() const      { return itsBorderSize; }
-    bool            coloredBorder() const   { return itsColoredBorder; }
+    bool            coloredShadow() const   { return itsColoredShadow; }
     bool            menuClose() const       { return itsMenuClose; }
     QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
+
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+    virtual QList< QList<QImage> > shadowTextures();
+    virtual int shadowTextureList( ShadowType type ) const;
+    virtual QList<QRect> shadowQuads( ShadowType type, QSize size ) const;
+    virtual double shadowOpacity( ShadowType type ) const;
+#endif
 
     private:
 
@@ -87,7 +101,7 @@ class QtCurveHandler : public QObject, public KDecorationFactory
 
     private:
 
-    bool    itsColoredBorder,
+    bool    itsColoredShadow,
             itsMenuClose;
     int     itsBorderSize,
             itsTitleHeight,

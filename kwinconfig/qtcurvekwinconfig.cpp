@@ -24,9 +24,11 @@
   Boston, MA 02110-1301, USA.
  */
 
+#include <kdeversion.h>
 #include <kconfig.h>
 #include <klocale.h>
 #include <kglobal.h>
+#include "config.h"
 #include "qtcurvekwinconfig.h"
 
 QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
@@ -39,10 +41,13 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     itsWidget->show();
 
+#if !KDE_IS_VERSION(4,1,80) || !defined QTC_CUSTOM_SHADOWS
+    itsWidget->coloredShadow->setVisible(false);
+#endif
     load(configGroup);
 
     connect(itsWidget->menuClose, SIGNAL(toggled(bool)),  this, SIGNAL(changed()));
-    connect(itsWidget->coloredBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->coloredShadow, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
 }
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
@@ -56,7 +61,7 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
     KConfigGroup configGroup(itsConfig, "General");
 
     itsWidget->menuClose->setChecked(configGroup.readEntry("CloseOnMenuDoubleClick", true));
-    itsWidget->coloredBorder->setChecked(configGroup.readEntry("ColoredBorder", true));
+    itsWidget->coloredShadow->setChecked(configGroup.readEntry("ColoredShadow", true));
 }
 
 void QtCurveKWinConfig::save(KConfigGroup &)
@@ -64,14 +69,14 @@ void QtCurveKWinConfig::save(KConfigGroup &)
     KConfigGroup configGroup(itsConfig, "General");
 
     configGroup.writeEntry("CloseOnMenuDoubleClick", itsWidget->menuClose->isChecked());
-    configGroup.writeEntry("ColoredBorder", itsWidget->coloredBorder->isChecked());
+    configGroup.writeEntry("ColoredShadow", itsWidget->coloredShadow->isChecked());
     itsConfig->sync();
 }
 
 void QtCurveKWinConfig::defaults()
 {
     itsWidget->menuClose->setChecked(false);
-    itsWidget->coloredBorder->setChecked(true);
+    itsWidget->coloredShadow->setChecked(true);
 }
 
 extern "C"
