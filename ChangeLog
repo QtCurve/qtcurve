@@ -38,7 +38,7 @@
 35. Remove kwin 'Colored Border' option - always true.
 36. Add 'Colored Shadow' kwin option - for KDE>=4.2 Need to specify -DQTC_CUSTOM_SHADOWS=true at cmake
     These shadows are taken from Oxygen - but the 'highlight' color is used for the active window.
-37. 'Fix' for some disabled button icons being dithered. Use KIconEfect to convert to gray and make
+37. 'Fix' for some disabled icons being dithered. Use KIconEfect to convert to gray and make
     semi-transparent.
 
 0.59.6

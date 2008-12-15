@@ -41,6 +41,15 @@
 #include <KDE/KIcon>
 #include <KDE/KComponentData>
 
+// TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+static void renderDisabled(QPixmap &pix)
+{
+    QImage img=pix.toImage();
+    KIconEffect::toGray(img, 1.0);
+    KIconEffect::semiTransparent(img);
+    pix=QPixmap::fromImage(img);
+}
+
 static void applyKdeSettings(bool pal)
 {
     if(pal)
@@ -4036,7 +4045,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (!styleHint(SH_UnderlineShortcut, mbi, widget))
                     alignment|=Qt::TextHideMnemonic;
 
+#ifdef QTC_USE_KDE4
+                // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+                QPixmap pix(mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal));
+
+                if(!(mbi->state&State_Enabled))
+                    renderDisabled(pix);
+#else
                 QPixmap pix(mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), (mbi->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled));
+#endif
 
                 painter->save();
 
@@ -4211,8 +4228,18 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if (act && !dis)
                         mode = QIcon::Active;
 
+#ifdef QTC_USE_KDE4
+                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+                    if(QIcon::Disabled==mode)
+                        mode=QIcon::Normal;
+#endif
                     QPixmap pixmap(checked ? menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode, QIcon::On)
                                            : menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode));
+#ifdef QTC_USE_KDE4
+                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+                    if(dis)
+                        renderDisabled(pixmap);
+#endif
 
                     int   pixw(pixmap.width()),
                           pixh(pixmap.height());
@@ -4397,12 +4424,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #ifdef QTC_USE_KDE4
                     // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
                     if(!(button->state&State_Enabled))
-                    {
-                        QImage img=pixmap.toImage();
-                        KIconEffect::toGray(img, 1.0);
-                        KIconEffect::semiTransparent(img);
-                        pixmap=QPixmap::fromImage(img);
-                    }
+                        renderDisabled(pixmap);
 #endif
                     if (!button->text.isEmpty())
                         labelWidth += (textWidth + iconSpacing);
