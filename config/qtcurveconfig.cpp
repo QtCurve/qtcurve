@@ -652,7 +652,7 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Scrollviews"), i++);
     new CStackItem(stackList, i18n("Tabs"), i++);
     new CStackItem(stackList, i18n("Checks and Radios"), i++);
-    new CStackItem(stackList, i18n("Titlebars"), i++);
+    new CStackItem(stackList, i18n("Windows"), i++);
     new CStackItem(stackList, i18n("Menus and Toolbars"), i++);
     new CStackItem(stackList, i18n("Advanced Settings"), i++);
     new CStackItem(stackList, i18n("Custom Gradients"), i++);
