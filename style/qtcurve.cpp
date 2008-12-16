@@ -895,10 +895,11 @@ static bool readQt3(QFile &f, QPalette &pal, QFont &font, int *contrast)
 
 static bool useQt3Settings()
 {
-    static const char *full=getenv("KDE_FULL_SESSION");
-    static const char *vers=full ? getenv("KDE_SESSION_VERSION") : 0;
+    static const char *full = getenv("KDE_FULL_SESSION");
+    static const char *vers = full ? getenv("KDE_SESSION_VERSION") : 0;
+    static bool       use   = full && (!vers || atoi(vers)<4);
 
-    return full && (!vers || atoi(vers)<4);
+    return use;
 }
 
 static bool readQt3(QPalette &pal, QFont &font, int *contrast)
