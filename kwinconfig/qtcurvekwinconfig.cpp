@@ -31,6 +31,7 @@
 #include "config.h"
 #include "qtcurvekwinconfig.h"
 
+#include <stdio.h>
 QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
                  : QObject(parent),
                    itsConfig(new KConfig("kwinqtcurverc")),
@@ -41,7 +42,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     itsWidget->show();
 
-#if !KDE_IS_VERSION(4,1,80) || !defined QTC_CUSTOM_SHADOWS
+#if !KDE_IS_VERSION(4,1,80)
     itsWidget->coloredShadow->setVisible(false);
 #endif
     load(configGroup);
@@ -75,7 +76,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 
 void QtCurveKWinConfig::defaults()
 {
-    itsWidget->menuClose->setChecked(false);
+    itsWidget->menuClose->setChecked(true);
     itsWidget->coloredShadow->setChecked(true);
 }
 

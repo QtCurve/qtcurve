@@ -58,7 +58,7 @@ enum ButtonIcon
 };
 
 class QtCurveHandler : public QObject,
-#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+#if KDE_IS_VERSION(4,1,80)
                        public KDecorationFactoryUnstable
 #else
                        public KDecorationFactory
@@ -88,7 +88,7 @@ class QtCurveHandler : public QObject,
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
 
-#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+#if KDE_IS_VERSION(4,1,80)
     virtual QList< QList<QImage> > shadowTextures();
     virtual int shadowTextureList( ShadowType type ) const;
     virtual QList<QRect> shadowQuads( ShadowType type, QSize size ) const;

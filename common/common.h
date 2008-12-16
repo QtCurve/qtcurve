@@ -347,11 +347,13 @@ typedef GdkColor color;
 typedef enum
 {
     QtC_Round = QStyle::PM_CustomBase,
-    QtC_TitleBarButtonAppearance
+    QtC_TitleBarButtonAppearance,
+    QtC_TitleBarColorTopOnly
 } QtCMetrics;
 
 #define QtC_StateKWin          QStyle::State_Top
-#define QtC_StateKWinHighlight QStyle::State_Mini
+#define QtC_StateKWinHighlight QStyle::State_Small
+#define QtC_StateKWinShadows   QStyle::State_Mini
 
 #define CLOSE_COLOR QColor(191, 82, 82)
 
@@ -1076,6 +1078,7 @@ typedef struct
 #ifdef __cplusplus
                      stdSidebarButtons,
                      gtkComboMenus,
+                     colorTitlebarOnly,
 /*
 #else
                      setDialogButtonOrder,

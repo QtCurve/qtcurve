@@ -36,7 +36,7 @@
 namespace KWinQtCurve
 {
 
-#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+#if KDE_IS_VERSION(4,1,80)
 class QtCurveClient : public KCommonDecorationUnstable
 #else
 class QtCurveClient : public KCommonDecoration
@@ -66,7 +66,7 @@ class QtCurveClient : public KCommonDecoration
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
 
-#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+#if KDE_IS_VERSION(4,1,80)
     virtual QList<QRect>      shadowQuads(ShadowType type) const;
     virtual double            shadowOpacity(ShadowType type) const;
 #endif

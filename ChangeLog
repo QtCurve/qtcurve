@@ -35,8 +35,9 @@
 32. Nicer 'V' arrows.
 33. Use large arrows for toolbuttons - as per KDE3.
 34. Make kwin bottom as rounded as top.
-35. Remove kwin 'Colored Border' option - always true.
-36. Add 'Colored Shadow' kwin option - for KDE>=4.2 Need to specify -DQTC_CUSTOM_SHADOWS=true at cmake
+35. Remove kwin 'Colored Border' option. Replaced with a style option to do
+    the same.
+36. Add 'Colored Glow' kwin option - for KDE>=4.2
     These shadows are taken from Oxygen - but the 'highlight' color is used for the active window.
 37. 'Fix' for some disabled icons being dithered. Use KIconEfect to convert to gray and make
     semi-transparent.

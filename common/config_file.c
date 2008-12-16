@@ -823,6 +823,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 #ifdef __cplusplus
             QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkComboMenus)
+            QTC_CFG_READ_BOOL(colorTitlebarOnly)
 /*
 #else
             QTC_CFG_READ_BOOL(setDialogButtonOrder)
@@ -1267,6 +1268,7 @@ static void defaultSettings(Options *opts)
     opts->stdSidebarButtons=false;
     opts->gtkScrollViews=false;
     opts->gtkComboMenus=false;
+    opts->colorTitlebarOnly=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);
     opts->customSlidersColor.setRgb(0, 0, 0);
     opts->customMenuNormTextColor.setRgb(0, 0, 0);
@@ -1704,6 +1706,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
+        CFG_WRITE_ENTRY(colorTitlebarOnly)
         CFG_WRITE_ENTRY(gtkButtonOrder)
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)

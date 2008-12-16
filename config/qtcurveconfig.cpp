@@ -434,6 +434,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(inactiveTitlebarAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(titlebarButtonAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
+    connect(colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(selectionAppearance, SIGNAL(activated(int)), SLOT(updateChanged()));
     connect(shadeCheckRadio, SIGNAL(activated(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -1099,6 +1100,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.titlebarAppearance=(EAppearance)titlebarAppearance->currentIndex();
     opts.inactiveTitlebarAppearance=(EAppearance)inactiveTitlebarAppearance->currentIndex();
     opts.titlebarButtonAppearance=(EAppearance)titlebarButtonAppearance->currentIndex();
+    opts.colorTitlebarOnly=colorTitlebarOnly->isChecked();
     opts.selectionAppearance=(EAppearance)selectionAppearance->currentIndex();
     opts.shadeCheckRadio=(EShade)shadeCheckRadio->currentIndex();
     opts.customCheckRadioColor=customCheckRadioColor->color();
@@ -1198,6 +1200,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarAppearance->setCurrentIndex(opts.titlebarAppearance);
     inactiveTitlebarAppearance->setCurrentIndex(opts.inactiveTitlebarAppearance);
     titlebarButtonAppearance->setCurrentIndex(opts.titlebarButtonAppearance);
+    colorTitlebarOnly->setChecked(opts.colorTitlebarOnly);
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
@@ -1276,6 +1279,7 @@ bool QtCurveConfig::settingsChanged()
          titlebarAppearance->currentIndex()!=currentStyle.titlebarAppearance ||
          inactiveTitlebarAppearance->currentIndex()!=currentStyle.inactiveTitlebarAppearance ||
          titlebarButtonAppearance->currentIndex()!=currentStyle.titlebarButtonAppearance ||
+         colorTitlebarOnly->isChecked()!=currentStyle.colorTitlebarOnly ||
          selectionAppearance->currentIndex()!=currentStyle.selectionAppearance ||
          toolbarSeparators->currentIndex()!=currentStyle.toolbarSeparators ||
          splitters->currentIndex()!=currentStyle.splitters ||

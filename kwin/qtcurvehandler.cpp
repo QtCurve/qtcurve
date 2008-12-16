@@ -104,7 +104,7 @@ bool QtCurveHandler::reset(unsigned long changed)
         case BorderNormal:
         default:
             itsBorderSize =
-// #if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+// #if KDE_IS_VERSION(4,1,80)
 //                 shadowsActive() ? 2 :
 // #endif
                     4;
@@ -165,7 +165,7 @@ bool QtCurveHandler::supports(Ability ability) const
         case AbilityColorTitleFore:
         case AbilityColorFrame:
             return true;
-#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+#if KDE_IS_VERSION(4,1,80)
         case AbilityCompositingShadow:
             return itsColoredShadow;
 #endif
@@ -230,7 +230,7 @@ QList<QtCurveHandler::BorderSize> QtCurveHandler::borderSizes() const
                                << BorderVeryHuge;
 }
 
-#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+#if KDE_IS_VERSION(4,1,80)
 // Shadows - Taken from Oxygen! rev873805
 QList< QList<QImage> > QtCurveHandler::shadowTextures()
 {
@@ -363,18 +363,18 @@ QList< QList<QImage> > QtCurveHandler::shadowTextures()
     p.setBrush( rg );
     p.drawRect( shadow->rect() );
 
-    rg = QRadialGradient( size, size+0.2, size );
-    c = color;
-    c = QColor( Qt::black );
-    c.setAlpha( 0.35*255 );  rg.setColorAt( 0/size, c );
-    c.setAlpha( 0.32*255 );  rg.setColorAt( 4.5/size, c );
-    c.setAlpha( 0.22*255 );  rg.setColorAt( 5.0/size, c );
-    c.setAlpha( 0.03*255 );  rg.setColorAt( 5.5/size, c );
-    c.setAlpha( 0.0*255 );  rg.setColorAt( 6.5/size, c );
-    p.setRenderHint( QPainter::Antialiasing );
-    p.setPen( Qt::NoPen );
-    p.setBrush( rg );
-    p.drawRect( shadow->rect() );
+//     rg = QRadialGradient( size, size+0.2, size );
+//     c = color;
+//     c = QColor( Qt::black );
+//     c.setAlpha( 0.35*255 );  rg.setColorAt( 0/size, c );
+//     c.setAlpha( 0.32*255 );  rg.setColorAt( 4.5/size, c );
+//     c.setAlpha( 0.22*255 );  rg.setColorAt( 5.0/size, c );
+//     c.setAlpha( 0.03*255 );  rg.setColorAt( 5.5/size, c );
+//     c.setAlpha( 0.0*255 );  rg.setColorAt( 6.5/size, c );
+//     p.setRenderHint( QPainter::Antialiasing );
+//     p.setPen( Qt::NoPen );
+//     p.setBrush( rg );
+//     p.drawRect( shadow->rect() );
 
     rg = QRadialGradient( size, size, size );
     c = color;

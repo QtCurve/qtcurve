@@ -6,23 +6,17 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>61</height>
+    <height>88</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
     <widget class="QCheckBox" name="coloredShadow" >
      <property name="whatsThis" >
-      <string>Check this option if the window border should be painted in the titlebar color. Otherwise it will be painted in the background color.</string>
+      <string>Check this option if you want the active window to have a colored glow instead of a shadow.</string>
      </property>
      <property name="text" >
       <string>Give active window a 'glow' when shadows are enabled</string>
-     </property>
-     <property name="shortcut" >
-      <string/>
      </property>
     </widget>
    </item>
