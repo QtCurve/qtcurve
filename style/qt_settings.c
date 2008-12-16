@@ -405,12 +405,10 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
         char     fname[256];
         FILE     *f;
 
-        if(absolute)
-            strcpy(fname, rc);
-        else
+        if(!absolute)
             sprintf(fname, "%s/%s", home, rc);
 
-        f=fopen(fname, "r");
+        f=fopen(absolute ? rc : fname, "r");
 
         if(f)
         {
@@ -772,14 +770,18 @@ static int qt_refs=0;
 #include <stdio.h>
 #include <dirent.h>
 
+#define KDE_CFG_DIR         "/share/config/"
+#define KDEGLOBALS_FILE     KDE_CFG_DIR"kdeglobals"
+#define KDEGLOBALS_SYS_FILE KDE_CFG_DIR"system.kdeglobals"
+
 static const char * kdeGlobals()
 {
     static char kg[QTC_MAX_FILENAME_LEN+1]={'\0'};
 
     char *kdehome=getKdeHome();
 
-    if(kdehome && strlen(kdehome)<(QTC_MAX_FILENAME_LEN-strlen("/share/config/kdeglobals")))
-        sprintf(kg, "%s/share/config/kdeglobals", kdehome);
+    if(kdehome && strlen(kdehome)<(QTC_MAX_FILENAME_LEN-strlen(KDEGLOBALS_FILE)))
+        sprintf(kg, "%s"KDEGLOBALS_FILE, kdehome);
 
     return kg;
 }
@@ -1599,9 +1601,22 @@ static gboolean qtInit(Options *opts)
             if(GTK_APP_VMPLAYER==qtSettings.app)
                 opts->shadeMenubars=SHADE_NONE;
 
-            readRc(kdeGlobals(),
-                   (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE,
-                    opts, TRUE, FALSE, qtSettings.qt4 ? KDE4 : KDE3);
+            {
+            int        f=0;
+            const char *files[]={"/etc/kderc",
+                                 qtSettings.qt4 ? "/etc/kde4/kdeglobals" : "/etc/kde3/kdeglobals",
+                                 qtSettings.qt4 ? "/etc/kde4rc" : "/etc/kde3rc",
+                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_FILE : KDE3PREFIX KDEGLOBALS_FILE,
+                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_SYS_FILE : KDE3PREFIX KDEGLOBALS_SYS_FILE,
+                                 kdeGlobals(),
+                                 0L};
+
+            for(f=0; 0!=files[f]; ++f)
+                readRc(files[f],
+                       (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|RD_TOOLBAR_ICON_SIZE|
+                        RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE,
+                        opts, TRUE, FALSE, qtSettings.qt4 ? KDE4 : KDE3);
+            }
 
             /* Tear off menu items dont seem to draw they're background, and the default background
                is drawn :-(  Fix/hack this by making that background the correct color */
