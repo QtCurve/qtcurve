@@ -5796,6 +5796,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                 }
 
+                if(opts.colorTitlebarOnly && btnCols[ORIGINAL_SHADE]!=itsBackgroundCols[ORIGINAL_SHADE])
+                {
+                    painter->setPen(btnCols[QT_STD_BORDER]);
+                    painter->drawLine(r.left()+1, r.bottom(), r.right()-1, r.bottom());
+                }
+
                 if(!titleBar->text.isEmpty())
                 {
                     QFont       font(painter->font());
