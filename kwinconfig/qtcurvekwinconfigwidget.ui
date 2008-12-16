@@ -19,7 +19,7 @@
       <string>Check this option if the window border should be painted in the titlebar color. Otherwise it will be painted in the background color.</string>
      </property>
      <property name="text" >
-      <string>Colored Shadow</string>
+      <string>Give active window a 'glow' when shadows are enabled</string>
      </property>
      <property name="shortcut" >
       <string/>

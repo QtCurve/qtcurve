@@ -194,10 +194,15 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor    col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
               windowCol(widget()->palette().color(QPalette::Window));
 
-    painter.setClipRegion(e->region());
-    painter.fillRect(r, windowCol); // Makes hings look nicer for kcmshell preview...
+#if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
+    if(!(Handler()->coloredShadow() && shadowsActive() && active))
+#endif
+    {
+        painter.setClipRegion(e->region());
+        painter.fillRect(r, windowCol); // Makes hings look nicer for kcmshell preview...
+    }
     painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
-    painter.fillRect(r.adjusted(0, 6, 0, 0), col);
+    painter.fillRect(r, col);
 
     if(ROUND_FULL==round)
     {
@@ -215,7 +220,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.drawPoint(r.x()+r.width()-borderSize-1, r.y()+r.height()-borderSize);
         painter.drawPoint(r.x()+r.width()-borderSize, r.y()+r.height()-(borderSize+1));
     }
-    
+
     opt.init(widget());
 
     if(MaximizeFull==maximizeMode())
@@ -226,10 +231,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
              (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
 #if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
-   if(shadowsActive())
-        opt.state|=QtC_StateKWinShadows;
+    if(Handler()->coloredShadow() && shadowsActive() && active)
+        opt.state|=QtC_StateKWinHighlight;
 #endif
-
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
 
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);

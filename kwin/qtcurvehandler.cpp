@@ -167,7 +167,7 @@ bool QtCurveHandler::supports(Ability ability) const
             return true;
 #if KDE_IS_VERSION(4,1,80) && defined QTC_CUSTOM_SHADOWS
         case AbilityCompositingShadow:
-            return true;
+            return itsColoredShadow;
 #endif
         default:
             return false;
@@ -254,10 +254,10 @@ QList< QList<QImage> > QtCurveHandler::shadowTextures()
     // Active shadow texture
 
     QColor color = palette.window().color();
-    QColor light = color.light(120);
-    QColor dark = color.dark(120);
-    QColor glow = palette.color(QPalette::Active, QPalette::Highlight);
-    QColor glow2 = palette.color(QPalette::Active, QPalette::Highlight);
+    QColor light = color.lighter(110);
+    QColor dark = color;
+    QColor glow = palette.color(QPalette::Active, QPalette::Highlight); // .lighter(140);
+    QColor glow2 = glow; // palette.color(QPalette::Active, QPalette::Highlight);
 
     qreal size = 25.5;
     QPixmap *shadow = new QPixmap( size*2, size*2 );
@@ -280,9 +280,9 @@ QList< QList<QImage> > QtCurveHandler::shadowTextures()
     c = color;
     c.setAlpha( 255 );  rg.setColorAt( 4.4/size, c );
     c = glow2;
-    c.setAlpha( 0.58*255 );  rg.setColorAt( 4.5/size, c );
-    c.setAlpha( 0.43*255 );  rg.setColorAt( 5.5/size, c );
-    c.setAlpha( 0.30*255 );  rg.setColorAt( 6.5/size, c );
+    c.setAlpha( 0.65*255 );  rg.setColorAt( 4.5/size, c );
+    c.setAlpha( 0.50*255 );  rg.setColorAt( 5.5/size, c );
+    c.setAlpha( 0.38*255 );  rg.setColorAt( 6.5/size, c );
     c.setAlpha( 0.22*255 );  rg.setColorAt( 7.5/size, c );
     c.setAlpha( 0.15*255 );  rg.setColorAt( 8.5/size, c );
     c.setAlpha( 0.08*255 );  rg.setColorAt( 11.5/size, c );

@@ -350,8 +350,8 @@ typedef enum
     QtC_TitleBarButtonAppearance
 } QtCMetrics;
 
-#define QtC_StateKWin        QStyle::State_Top
-#define QtC_StateKWinShadows QStyle::State_Mini
+#define QtC_StateKWin          QStyle::State_Top
+#define QtC_StateKWinHighlight QStyle::State_Mini
 
 #define CLOSE_COLOR QColor(191, 82, 82)
 
