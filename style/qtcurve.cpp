@@ -3208,7 +3208,7 @@ xxxx=false;
                                             ? buttonColors(option)
                                             : getMdiColors(option, state&State_Active));
             QStyleOption opt(*option);
-            bool         roundKWinFull(ROUND_FULL==opts.round &&
+            bool         roundKWinFull(QTC_FULLLY_ROUNDED &&
                                        (APP_KWIN==theThemedApp || state&QtC_StateKWin));
 
             opt.state=State_Horizontal|State_Enabled|State_Raised;
@@ -3376,7 +3376,7 @@ xxxx=false;
                 round=ROUNDED_NONE;
 
             painter->save();
-            if(ROUND_FULL==opts.round && r.width()>QTC_MIN_BTN_SIZE && r.height()>QTC_MIN_BTN_SIZE)
+            if(QTC_FULLLY_ROUNDED && r.width()>QTC_MIN_ROUND_FULL_SIZE && r.height()>QTC_MIN_ROUND_FULL_SIZE)
                 painter->setClipRegion(QRegion(border.adjusted(2, 1, -2, -1)).united(border.adjusted(1, 2, -1, -2)).intersect(r));
             else
                 painter->setClipRect(border.adjusted(1, 1, -1, -1).intersect(r));
@@ -5708,7 +5708,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 const int    buttonMargin(6);
                 bool         active(state & State_Active),
                              kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin),
-                             roundKWinFull(ROUND_FULL==opts.round &&
+                             roundKWinFull(QTC_FULLLY_ROUNDED &&
                                             ((APP_KWIN==theThemedApp && !(titleBar->titleBarState&State_Raised)) ||
                                               titleBar->titleBarState&QtC_StateKWin));
                 const QColor *btnCols(kwin
@@ -7816,7 +7816,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
 
-    if(ROUND_FULL==opts.round && window)
+    if(QTC_FULLLY_ROUNDED && window)
     {
         if(WIDGET_MDI_WINDOW==w)
         {
@@ -8213,7 +8213,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
     bool horiz(SLIDER_TRIANGULAR==opts.sliderStyle ? r.height()>r.width() : r.width()>r.height());
 
     if(SLIDER_TRIANGULAR==opts.sliderStyle ||
-       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && ROUND_FULL==opts.round))
+       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED))
     {
         QStyleOption opt(*option);
 

@@ -97,7 +97,6 @@ typedef GdkColor color;
 
 #define QTC_CHECK_SIZE   13
 #define QTC_RADIO_SIZE   13
-#define QTC_MIN_BTN_SIZE 8
 #define QTC_LV_SIZE      7
 
 #define LARGE_ARR_WIDTH  7
@@ -307,7 +306,7 @@ typedef GdkColor color;
 #define QTC_SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
 #define QTC_SLIDER_MO_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
 #define QTC_SLIDER_MO_LEN (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
-#define QTC_SB_SLIDER_MO_LEN(A) ((A)<22 && ROUND_FULL!=opts.round \
+#define QTC_SB_SLIDER_MO_LEN(A) ((A)<22 && !QTC_FULLLY_ROUNDED \
                                     ? 2 \
                                     : ((A)<32 || (SHADE_SELECTED!=opts.shadeSliders && SHADE_BLEND_SELECTED!=opts.shadeSliders) \
                                         ? 4 \
@@ -325,7 +324,8 @@ typedef GdkColor color;
                                     ? QTC_GLOW_MO \
                                     : QTC_MO_PLASTIK_LIGHT(W))
 
-#define QTC_DO_EFFECT          (ROUND_FULL==opts.round && EFFECT_NONE!=opts.buttonEffect)
+#define QTC_FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
+#define QTC_DO_EFFECT          (QTC_FULLLY_ROUNDED && EFFECT_NONE!=opts.buttonEffect)
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define QTC_FOCUS_ALPHA              0.08
@@ -537,7 +537,8 @@ typedef enum
 {
     ROUND_NONE,
     ROUND_SLIGHT,
-    ROUND_FULL
+    ROUND_FULL,
+    ROUND_EXTRA
 } ERound;
 
 typedef enum
@@ -1224,22 +1225,31 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
     return opts->appearance;
 };
 
+#define QTC_MIN_ROUND_FULL_SIZE  8
+#define QTC_MIN_ROUND_EXTRA_SIZE 14
+
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
 #if defined __cplusplus
-#define QTC_FULL_INNER_RADIUS   1.5
-#define QTC_FULL_OUTER_RADIUS   2.5
-#define QTC_FULL_ETCH_RADIUS    3.5
-#define QTC_SLIGHT_INNER_RADIUS 0.5
-#define QTC_SLIGHT_OUTER_RADIUS 1.5
-#define QTC_SLIGHT_ETCH_RADIUS  2.5
+#define QTC_EXTRA_INNER_RADIUS   3.5
+#define QTC_EXTRA_OUTER_RADIUS   4.5
+#define QTC_EXTRA_ETCH_RADIUS    5.5
+#define QTC_FULL_INNER_RADIUS    1.5
+#define QTC_FULL_OUTER_RADIUS    2.5
+#define QTC_FULL_ETCH_RADIUS     3.5
+#define QTC_SLIGHT_INNER_RADIUS  0.5
+#define QTC_SLIGHT_OUTER_RADIUS  1.5
+#define QTC_SLIGHT_ETCH_RADIUS   2.5
 #else
-#define QTC_FULL_INNER_RADIUS   2
-#define QTC_FULL_OUTER_RADIUS   3
-#define QTC_FULL_ETCH_RADIUS    4
-#define QTC_SLIGHT_INNER_RADIUS 1
-#define QTC_SLIGHT_OUTER_RADIUS 2
-#define QTC_SLIGHT_ETCH_RADIUS  3
+#define QTC_EXTRA_INNER_RADIUS   4
+#define QTC_EXTRA_OUTER_RADIUS   5
+#define QTC_EXTRA_ETCH_RADIUS    6
+#define QTC_FULL_INNER_RADIUS    2
+#define QTC_FULL_OUTER_RADIUS    3
+#define QTC_FULL_ETCH_RADIUS     4
+#define QTC_SLIGHT_INNER_RADIUS  1
+#define QTC_SLIGHT_OUTER_RADIUS  2
+#define QTC_SLIGHT_ETCH_RADIUS   3
 #endif
 
 typedef enum
@@ -1263,7 +1273,9 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_FULL:
                     if(w>48 && h>48)
                         return 3.0;
-                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
+                        return QTC_FULL_OUTER_RADIUS;
+                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_OUTER_RADIUS;
                 case ROUND_SLIGHT:
                     return QTC_SLIGHT_OUTER_RADIUS;
@@ -1273,8 +1285,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_INTERNAL:
             switch(r)
             {
+                case ROUND_EXTRA:
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                        return QTC_EXTRA_INNER_RADIUS;
                 case ROUND_FULL:
-                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_INNER_RADIUS;
                 case ROUND_SLIGHT:
                     return QTC_SLIGHT_INNER_RADIUS;
@@ -1284,8 +1299,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_EXTERNAL:
             switch(r)
             {
+                case ROUND_EXTRA:
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                        return QTC_EXTRA_OUTER_RADIUS;
                 case ROUND_FULL:
-                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_OUTER_RADIUS;
                 case ROUND_SLIGHT:
                     return QTC_SLIGHT_OUTER_RADIUS;
@@ -1295,8 +1313,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_ETCH:
             switch(r)
             {
+                case ROUND_EXTRA:
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                        return QTC_EXTRA_ETCH_RADIUS;
                 case ROUND_FULL:
-                    if(w>QTC_MIN_BTN_SIZE && h>QTC_MIN_BTN_SIZE)
+                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_ETCH_RADIUS;
                 case ROUND_SLIGHT:
                     return QTC_SLIGHT_ETCH_RADIUS;

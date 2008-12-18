@@ -200,6 +200,8 @@ static ERound toRound(const char *str, ERound def)
             return ROUND_SLIGHT;
         if(0==memcmp(str, "full", 4))
             return ROUND_FULL;
+        if(0==memcmp(str, "extra", 5))
+            return ROUND_EXTRA;
     }
 
     return def;
@@ -1142,10 +1144,10 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                 opts->colorMenubarMouseOver=true;
 */
 
-            if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || ROUND_FULL!=opts->round))
+            if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->coloredMouseOver=MO_COLORED;
 
-            if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || ROUND_FULL!=opts->round))
+            if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->defBtnIndicator=IND_TINT;
 
             if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
@@ -1441,6 +1443,8 @@ static const char *toStr(ERound exp)
             return "none";
         case ROUND_SLIGHT:
             return "slight";
+        case ROUND_EXTRA:
+            return "extra";
         default:
         case ROUND_FULL:
             return "full";
