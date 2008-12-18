@@ -18,6 +18,7 @@
   Boston, MA 02110-1301, USA.
 */
 
+static bool xxxx=false;
 #include <QtGui>
 #include <QtDBus/QtDBus>
 #include <QX11Info>
@@ -390,7 +391,7 @@ static bool isNoEtchWidget(const QWidget *widget)
     const QObject *w=widget && widget->parent() && widget->parent()->parent()
                         ? widget->parent()->parent()->parent() : NULL;
 
-    return (w && isA(w, "KHTMLView")) || isInQAbstractItemView(widget);
+    return (w && isA(w, "KHTMLView")) || (widget && isInQAbstractItemView(widget->parentWidget()));
 }
 
 static QColor getLowerEtchCol(const QWidget *widget, QPainter *painter)
@@ -2504,6 +2505,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
 
+xxxx=true;
                         if(!opts.highlightScrollViews && fo)
                         {
                             QStyleOptionFrame opt(*fo);
@@ -2512,6 +2514,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         }
                         else
                             drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DO_EFFECT, WIDGET_SCROLLVIEW);
+xxxx=false;
                     }
                 }
                 else
@@ -7747,7 +7750,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     bool         enabled(state&State_Enabled),
                  hasFocus(state&State_HasFocus),
                  window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
-    const QColor *cols(enabled && hasFocus && (WIDGET_FRAME==w || WIDGET_ENTRY==w)
+    const QColor *cols(enabled && hasFocus && (WIDGET_FRAME==w || WIDGET_ENTRY==w ||
+                                               (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews))
                         ? itsMenuitemCols
                         : custom
                             ? custom
