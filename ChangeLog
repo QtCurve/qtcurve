@@ -43,6 +43,7 @@
     semi-transparent.
 38. Increase width of pushbuttons with menus - fixes clipped text on kppp.
 39. Round internal corners of plain colored mouse over effect.
+40. Remove reading of Qt3 palette - this 'hack' only worked for pure Qt apps.
 
 0.59.6
 ------

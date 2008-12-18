@@ -77,7 +77,8 @@ static void checkKComponentData()
     }
 }
 
-#if defined QTC_USE_KDE4 && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
+#if defined QTC_USE_KDE4 && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
+// KDE4.1 does this functionality for us!
 #include <KDE/KFileDialog>
 #include <KDE/KDirSelectDialog>
 #include <KDE/KGlobal>
@@ -447,9 +448,7 @@ static QString kdeHome()
 {
     QString env(readEnvPath(getuid() ? "KDEHOME" : "KDEROOTHOME"));
 
-    return env.isEmpty()
-                ? QDir::homePath()+"/.kde"
-                : env;
+    return env.isEmpty() ? QDir::homePath()+"/.kde" : env;
 }
 
 static void getStyles(const QString &dir, const char *sub, QStringList &styles)
@@ -841,76 +840,6 @@ static void parseWindowLine(const QString &line, QList<int> &data)
         }
 }
 
-static bool readQt3(QFile &f, QPalette &pal, QFont &font, int *contrast)
-{
-    enum ESect
-    {
-        SECT_NONE,
-        SECT_GEN,
-        SECT_PAL,
-        SECT_KDE
-    } sect=SECT_NONE;
-
-    bool gotPal(false),
-         gotFont(false),
-         gotContrast(false);
-
-    if(f.open(QIODevice::ReadOnly))
-    {
-        QTextStream in(&f);
-
-        while (!in.atEnd())
-        {
-            QString line(in.readLine());
-
-            if(SECT_PAL==sect)
-            {
-                gotPal=true;
-                if(0==line.indexOf("active=#", Qt::CaseInsensitive))
-                    readPal(line, QPalette::Active, pal);
-                else if(0==line.indexOf("disabled=#", Qt::CaseInsensitive))
-                    readPal(line, QPalette::Disabled, pal);
-                else if(0==line.indexOf("inactive=#", Qt::CaseInsensitive))
-                    readPal(line, QPalette::Inactive, pal);
-                else if (0==line.indexOf('['))
-                    sect=SECT_NONE;
-            }
-            else if(SECT_GEN==sect)
-            {
-                if(0==line.indexOf("font=", Qt::CaseInsensitive))
-                    gotFont=font.fromString(line.mid(5));
-                else if (0==line.indexOf('['))
-                    sect=SECT_NONE;
-            }
-            else if(SECT_KDE==sect)
-            {
-                if(0==line.indexOf("contrast=", Qt::CaseInsensitive))
-                {
-                    *contrast=line.mid(9).toInt();
-                    gotContrast=true;
-                }
-                else if (0==line.indexOf('['))
-                    sect=SECT_NONE;
-            }
-
-            if(SECT_NONE==sect)
-            {
-                if(0==line.indexOf("[Palette]", Qt::CaseInsensitive))
-                    sect=SECT_PAL;
-                else if(0==line.indexOf("[General]", Qt::CaseInsensitive))
-                    sect=SECT_GEN;
-                else if(contrast && 0==line.indexOf("[KDE]", Qt::CaseInsensitive))
-                    sect=SECT_KDE;
-                if(gotPal && gotFont && (!contrast || gotContrast))
-                    break;
-            }
-        }
-        f.close();
-    }
-
-    return gotPal && gotFont && (!contrast || gotContrast);
-}
-
 static bool useQt3Settings()
 {
     static const char *full = getenv("KDE_FULL_SESSION");
@@ -918,51 +847,6 @@ static bool useQt3Settings()
     static bool       use   = full && (!vers || atoi(vers)<4);
 
     return use;
-}
-
-static bool readQt3(QPalette &pal, QFont &font, int *contrast)
-{
-    if(useQt3Settings())
-    {
-        static QPalette qt3Pal;
-        static QFont    qt3Font;
-        static bool     read(false);
-
-        if(read)
-        {
-            pal=qt3Pal;
-            font=qt3Font;
-        }
-        else
-        {
-            QFile file(QDir::homePath()+QLatin1String("/.qt/qtrc"));
-            bool  ok(true);
-
-            read=true;
-            qt3Pal=pal;
-            qt3Font=font;
-
-            if(!file.exists() || !readQt3(file, pal, font, contrast))
-            {
-                file.setFileName("/etc/qt3/qtrc");
-                if(!file.exists() || !readQt3(file, pal,font, contrast))
-                {
-                    file.setFileName("/etc/qt/qtrc");
-                    if(!file.exists() || !readQt3(file, pal, font, contrast))
-                        ok=false;
-                }
-            }
-
-            if(ok)
-            {
-                qt3Pal=pal;
-                qt3Font=font;
-            }
-
-            return ok;
-        }
-    }
-    return false;
 }
 
 static const QPushButton * getButton(const QWidget *w, const QPainter *p)
@@ -975,8 +859,6 @@ inline bool isMultiTabBarTab(const QPushButton *button)
 {
     return button && button->isFlat() && button->inherits("KMultiTabBarTab");
 }
-
-#define QTC_SKIP_TASKBAR  (APP_SKIP_TASKBAR==theThemedApp || APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp)
 
 QtCurveStyle::QtCurveStyle(const QString &name)
             : itsSliderCols(NULL),
@@ -995,7 +877,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 {
 #ifdef QTC_USE_KDE4
     theInstanceCount++;
-#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
+#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
     setFileDialogs();
 #endif
     QTimer::singleShot(0, this, SLOT(setupKde4()));
@@ -1095,7 +977,7 @@ QtCurveStyle::~QtCurveStyle()
         delete theKComponentData;
         theKComponentData=0L;
     }
-#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
+#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
     unsetFileDialogs();
 #endif
 #endif
@@ -1162,19 +1044,8 @@ void QtCurveStyle::polish(QApplication *app)
 
 void QtCurveStyle::polish(QPalette &palette)
 {
-    int      contrast(7);
+    int      contrast(QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt());
     bool     newContrast(false);
-    QPalette pal;
-    QFont    font;
-
-    // Set palette from Qt3 settings.
-    if(readQt3(pal, font, &contrast))
-    {
-        palette=pal;
-        QApplication::setFont(font);
-    }
-    else
-        contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
 
     if(contrast<0 || contrast>10)
         contrast=7;
@@ -1369,7 +1240,7 @@ void QtCurveStyle::polish(QWidget *widget)
                   (APP_KDIALOGD==theThemedApp && (-1!=(index=cap.indexOf(" - KDialog Daemon"))) &&
                     (index+17)==(int)cap.length())) )
                 widget->QWidget::setWindowTitle(cap.left(index));
-             widget->installEventFilter(this);
+             //widget->installEventFilter(this);
         }
         else if(qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
                 (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
@@ -6176,53 +6047,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawPrimitive(PE_FrameFocusRect, &opt, painter, widget);
                     }
 
-#if 0
-#ifndef QTC_SIMPLE_SCROLLBARS
-                    if(noButtons && (!atMin || !atMax))
-                    {
-                        painter->setPen(backgroundColors(option)[QT_STD_BORDER]);
-
-                        if(horiz)
-                        {
-                            if(!atMin)
-                            {
-                                painter->drawLine(slider.x(), slider.y(),
-                                                slider.x()+1, slider.y());
-                                painter->drawLine(slider.x(), slider.y()+slider.height()-1,
-                                                slider.x()+1, slider.y()+slider.height()-1);
-                            }
-                            if(!atMax)
-                            {
-                                painter->drawLine(slider.x()+slider.width()-1, slider.y(),
-                                                slider.x()+slider.width()-2, slider.y());
-                                painter->drawLine(slider.x()+slider.width()-1,
-                                                slider.y()+slider.height()-1,
-                                                slider.x()+slider.width()-2,
-                                                slider.y()+slider.height()-1);
-                            }
-                        }
-                        else
-                        {
-                            if(!atMin)
-                            {
-                                painter->drawLine(slider.x(), slider.y(),
-                                                slider.x(), slider.y()+1);
-                                painter->drawLine(slider.x()+slider.width()-1, slider.y(),
-                                                slider.x()+slider.width()-1, slider.y()+1);
-                            }
-                            if(!atMax)
-                            {
-                                painter->drawLine(slider.x(), slider.y()+slider.height()-1,
-                                                slider.x(), slider.y()+slider.height()-2);
-                                painter->drawLine(slider.x()+slider.width()-1,
-                                                slider.y()+slider.height()-1,
-                                                slider.x()+slider.width()-1,
-                                                slider.y()+slider.height()-2);
-                            }
-                        }
-                    }
-#endif
-#endif
                     if(!(option->subControls&SC_ScrollBarSlider))
                         painter->setClipping(false);
                 }
@@ -6397,26 +6221,6 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             ++newSize.rheight();
             ++newSize.rwidth();
             break;
-#if 0
-        case CT_Slider:
-            if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
-            {
-                int tickSize = pixelMetric(PM_SliderTickmarkOffset, option, widget);
-                if (slider->tickPosition & QSlider::TicksBelow) {
-                    if (slider->orientation == Qt::Horizontal)
-                        newSize.rheight() += tickSize;
-                    else
-                        newSize.rwidth() += tickSize;
-                }
-                if (slider->tickPosition & QSlider::TicksAbove) {
-                    if (slider->orientation == Qt::Horizontal)
-                        newSize.rheight() += tickSize;
-                    else
-                        newSize.rwidth() += tickSize;
-                }
-            }
-            break;
-#endif
         case CT_ScrollBar:
             if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
@@ -8702,134 +8506,78 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
         itsActiveMdiTextColor=option->palette.highlightedText().color();
         itsMdiTextColor=option->palette.text().color();
 
-        // Try to read kwin's settings...
-        if(useQt3Settings())
-        {
-            QFile f(QDir::homePath()+QLatin1String("/.qt/qtrc"));
-
-            if(f.open(QIODevice::ReadOnly))
-            {
-                QTextStream in(&f);
-                bool        inPal(false);
-
-                while (!in.atEnd())
-                {
-                    QString line(in.readLine());
-
-                    if(inPal)
-                    {
-                        if(!itsActiveMdiColors && 0==line.indexOf("activeBackground=#", Qt::CaseInsensitive))
-                        {
-                            QColor col;
-
-                            setRgb(&col, line.mid(17).toLatin1().constData());
-
-                            if(col!=itsMenuitemCols[ORIGINAL_SHADE])
-                            {
-                                itsActiveMdiColors=new QColor [TOTAL_SHADES+1]; 
-                                shadeColors(col, itsActiveMdiColors);
-                            }
-                        }
-                        else if(!itsMdiColors && 0==line.indexOf("inactiveBackground=#", Qt::CaseInsensitive))
-                        {
-                            QColor col;
-
-                            setRgb(&col, line.mid(19).toLatin1().constData());
-                            if(col!=itsButtonCols[ORIGINAL_SHADE])
-                            {
-                                itsMdiColors=new QColor [TOTAL_SHADES+1];
-                                shadeColors(col, itsMdiColors);
-                            }
-                        }
-                        else if(0==line.indexOf("activeForeground=#", Qt::CaseInsensitive))
-                            setRgb(&itsActiveMdiTextColor, line.mid(17).toLatin1().constData());
-                        else if(0==line.indexOf("inactiveForeground=#", Qt::CaseInsensitive))
-                            setRgb(&itsMdiTextColor, line.mid(19).toLatin1().constData());
-                        else if (-1!=line.indexOf('['))
-                            break;
-                    }
-                    else if(0==line.indexOf("[KWinPalette]", Qt::CaseInsensitive))
-                        inPal=true;
-                }
-                f.close();
-            }
-        }
-        else // KDE4
-        {
 #ifdef QTC_USE_KDE4
-            checkKComponentData();
+        checkKComponentData();
 
-            QColor col;
+        QColor col;
 
-            col=KGlobalSettings::activeTitleColor();
+        col=KGlobalSettings::activeTitleColor();
 
-            if(col!=itsMenuitemCols[ORIGINAL_SHADE])
-            {
-                itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
-                shadeColors(col, itsActiveMdiColors);
-            }
-
-            col=KGlobalSettings::inactiveTitleColor();
-            if(col!=itsButtonCols[ORIGINAL_SHADE])
-            {
-                itsMdiColors=new QColor [TOTAL_SHADES+1];
-                shadeColors(col, itsMdiColors);
-            }
-
-            itsActiveMdiTextColor=KGlobalSettings::activeTextColor();
-            itsMdiTextColor=KGlobalSettings::inactiveTextColor();
-#else
-            QFile f(kdeHome()+QLatin1String("/share/config/kdeglobals"));
-
-            if(f.open(QIODevice::ReadOnly))
-            {
-                QTextStream in(&f);
-                bool        inPal(false);
-
-                while (!in.atEnd())
-                {
-                    QString line(in.readLine());
-
-                    if(inPal)
-                    {
-                        if(!itsActiveMdiColors && 0==line.indexOf("activeBackground=", Qt::CaseInsensitive))
-                        {
-                            QColor col;
-
-                            setRgb(&col, line.mid(17).split(QLatin1String(",")));
-
-                            if(col!=itsMenuitemCols[ORIGINAL_SHADE])
-                            {
-                                itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
-                                shadeColors(col, itsActiveMdiColors);
-                            }
-                        }
-                        else if(!itsMdiColors && 0==line.indexOf("inactiveBackground=", Qt::CaseInsensitive))
-                        {
-                            QColor col;
-
-                            setRgb(&col, line.mid(19).split(QLatin1String(",")));
-                            if(col!=itsButtonCols[ORIGINAL_SHADE])
-                            {
-                                itsMdiColors=new QColor [TOTAL_SHADES+1];
-                                shadeColors(col, itsMdiColors);
-                            }
-                        }
-                        else if(0==line.indexOf("activeForeground=", Qt::CaseInsensitive))
-                            setRgb(&itsActiveMdiTextColor, line.mid(17).split(QLatin1String(",")));
-                        else if(0==line.indexOf("inactiveForeground=", Qt::CaseInsensitive))
-                            setRgb(&itsMdiTextColor, line.mid(19).split(QLatin1String(",")));
-                        else if (-1!=line.indexOf('['))
-                            break;
-                    }
-                    else if(0==line.indexOf("[WM]", Qt::CaseInsensitive))
-                        inPal=true;
-                }
-                f.close();
-            }
-#endif
+        if(col!=itsMenuitemCols[ORIGINAL_SHADE])
+        {
+            itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
+            shadeColors(col, itsActiveMdiColors);
         }
 
+        col=KGlobalSettings::inactiveTitleColor();
+        if(col!=itsButtonCols[ORIGINAL_SHADE])
+        {
+            itsMdiColors=new QColor [TOTAL_SHADES+1];
+            shadeColors(col, itsMdiColors);
+        }
+
+        itsActiveMdiTextColor=KGlobalSettings::activeTextColor();
+        itsMdiTextColor=KGlobalSettings::inactiveTextColor();
+#else
+        QFile f(kdeHome()+QLatin1String("/share/config/kdeglobals"));
+
+        if(f.open(QIODevice::ReadOnly))
+        {
+            QTextStream in(&f);
+            bool        inPal(false);
+
+            while (!in.atEnd())
+            {
+                QString line(in.readLine());
+
+                if(inPal)
+                {
+                    if(!itsActiveMdiColors && 0==line.indexOf("activeBackground=", Qt::CaseInsensitive))
+                    {
+                        QColor col;
+
+                        setRgb(&col, line.mid(17).split(QLatin1String(",")));
+
+                        if(col!=itsMenuitemCols[ORIGINAL_SHADE])
+                        {
+                            itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
+                            shadeColors(col, itsActiveMdiColors);
+                        }
+                    }
+                    else if(!itsMdiColors && 0==line.indexOf("inactiveBackground=", Qt::CaseInsensitive))
+                    {
+                        QColor col;
+
+                        setRgb(&col, line.mid(19).split(QLatin1String(",")));
+                        if(col!=itsButtonCols[ORIGINAL_SHADE])
+                        {
+                            itsMdiColors=new QColor [TOTAL_SHADES+1];
+                            shadeColors(col, itsMdiColors);
+                        }
+                    }
+                    else if(0==line.indexOf("activeForeground=", Qt::CaseInsensitive))
+                        setRgb(&itsActiveMdiTextColor, line.mid(17).split(QLatin1String(",")));
+                    else if(0==line.indexOf("inactiveForeground=", Qt::CaseInsensitive))
+                        setRgb(&itsMdiTextColor, line.mid(19).split(QLatin1String(",")));
+                    else if (-1!=line.indexOf('['))
+                        break;
+                }
+                else if(0==line.indexOf("[WM]", Qt::CaseInsensitive))
+                    inPal=true;
+            }
+            f.close();
+        }
+#endif
         if(!itsActiveMdiColors)
             itsActiveMdiColors=(QColor *)itsMenuitemCols;
         if(!itsMdiColors)
@@ -9055,4 +8803,3 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
 }
 
 #include "qtcurve.moc"
-
