@@ -1899,7 +1899,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         cairo_move_to(cr, xd + 1, yd + 1);
         cairo_line_to(cr, xd + 1, yd + height - 1);
         cairo_stroke(cr);
-
+       
         if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
         {
             GdkColor *col2=colouredMouseOver ? &qtcPalette.mouseover[QTC_MO_STD_DARK(widget)]
@@ -2025,6 +2025,22 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                     cairo_stroke(cr);
                 }
             }
+        }
+        else if(colouredMouseOver && 0!=round)
+        {
+            GdkColor *col=&qtcPalette.mouseover[QTC_MO_STD_LIGHT(widget, sunken)];
+
+            cairo_new_path(cr);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+            if(round&CORNER_TL)
+                cairo_rectangle(cr, xd+1.5, yd+1.5, 1, 1);
+            if(round&CORNER_BL)
+                cairo_rectangle(cr, xd+1.5, yd+height-3.5, 1, 1);
+            if(round&CORNER_BR)
+                cairo_rectangle(cr, xd+width-3.5, yd+height-3.5, 1, 1);
+            if(round&CORNER_TR)
+                cairo_rectangle(cr, xd+width-3.5, yd+1.5, 1, 1);
+            cairo_fill(cr);
         }
     }
 

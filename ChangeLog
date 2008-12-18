@@ -18,7 +18,7 @@
 16. Draw square border for for frames that pass no detail and no widget to
     gtkDrawShadow.
 17. Use base for light part of lineedit border, and background for scrollview.
-18. Default to treating Firefox as firefox>.0 - cmake with -DQTC_OLD_MOZILLA=true
+18. Default to treating Firefox as firefox>2.0 - cmake with -DQTC_OLD_MOZILLA=true
     to revert.
 19. Draw statusbar frames, if enabled.
 20. Nicer 'V' arrows.
@@ -29,6 +29,7 @@
         <KDE4 prefix>/usr/share/config/kdeglobals or <KDE3 prefix>/usr/share/config/kdeglobals
         <KDE4 prefix>/usr/share/config/system.kdeglobals or <KDE3 prefix>/usr/share/config/system.kdeglobals
         $KDEHOME/share/config/kdeglobals
+22. Round internal corners of plain colored mouse over effect.
 
 0.59.7
 ------
