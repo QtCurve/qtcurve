@@ -277,6 +277,16 @@ inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIco
     return getIconPixmap(icon, QSize(size, size), mode, state);
 }
 
+inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
+{
+    return getIconPixmap(icon, QSize(size, size), flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+}
+
+inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
+{
+    return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+}
+
 // The tabs used in multi-dock widgets, and KDE's properties dialog, look odd,
 // as the QTabBar is not a child of a QTabWidget! the QTC_STYLE_QTABBAR controls
 // whether we should style this differently.
@@ -3709,30 +3719,30 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->restore();
             }
             break;
-//         case CE_HeaderLabel:
-//             if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
-//             {
+        case CE_HeaderLabel:
+            if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
+            {
 //                 if (state & (State_On | State_Sunken))
 //                     r.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
 //                                 pixelMetric(PM_ButtonShiftVertical, option, widget));
-// 
-//                 if (!header->icon.isNull())
-//                 {
-//                     QPixmap pixmap(header->icon.pixmap(pixelMetric(PM_SmallIconSize), (header->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled));
-//                     int     pixw(pixmap.width());
-//                     QRect   aligned(alignedRect(header->direction, QFlag(header->iconAlignment), pixmap.size(), r)),
-//                             inter(aligned.intersected(r));
-// 
-//                     painter->drawPixmap(inter.x(), inter.y(), pixmap, inter.x() - aligned.x(), inter.y() - aligned.y(), inter.width(), inter.height());
-// 
-//                     if (header->direction == Qt::LeftToRight)
-//                         r.setLeft(r.left() + pixw + 2);
-//                     else
-//                         r.setRight(r.right() - pixw - 2);
-//                 }
-//                 drawItemText(painter, r, header->textAlignment, palette, state&State_Enabled, header->text, QPalette::ButtonText);
-//             }
-//             break;
+
+                if (!header->icon.isNull())
+                {
+                    QPixmap pixmap(getIconPixmap(header->icon, pixelMetric(PM_SmallIconSize), header->state));
+                    int     pixw(pixmap.width());
+                    QRect   aligned(alignedRect(header->direction, QFlag(header->iconAlignment), pixmap.size(), r)),
+                            inter(aligned.intersected(r));
+
+                    painter->drawPixmap(inter.x(), inter.y(), pixmap, inter.x() - aligned.x(), inter.y() - aligned.y(), inter.width(), inter.height());
+
+                    if (header->direction == Qt::LeftToRight)
+                        r.setLeft(r.left() + pixw + 2);
+                    else
+                        r.setRight(r.right() - pixw - 2);
+                }
+                drawItemText(painter, r, header->textAlignment, palette, state&State_Enabled, header->text, QPalette::ButtonText);
+            }
+            break;
         case CE_ProgressBarGroove:
         {
             bool   doEtch(QTC_DO_EFFECT),
@@ -3950,15 +3960,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuBarItem:
             if (const QStyleOptionMenuItem *mbi = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
-                bool down(state&(State_On|state&State_Sunken)),
-                     active(state&State_Enabled && (down || (state&State_Selected && opts.menubarMouseOver)));
-                uint alignment(Qt::AlignCenter|Qt::TextShowMnemonic|Qt::TextDontClip|Qt::TextSingleLine);
+                bool    down(state&(State_On|state&State_Sunken)),
+                        active(state&State_Enabled && (down || (state&State_Selected && opts.menubarMouseOver)));
+                uint    alignment(Qt::AlignCenter|Qt::TextShowMnemonic|Qt::TextDontClip|Qt::TextSingleLine);
+                QPixmap pix(getIconPixmap(mbi->icon, pixelMetric(PM_SmallIconSize), mbi->state));
 
                 if (!styleHint(SH_UnderlineShortcut, mbi, widget))
                     alignment|=Qt::TextHideMnemonic;
-
-                QPixmap pix(getIconPixmap(mbi->icon, pixelMetric(PM_SmallIconSize),
-                                          (mbi->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled));
 
                 painter->save();
 
@@ -4407,8 +4415,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->setClipRect(editRect);
                     if (!comboBox->currentIcon.isNull())
                     {
-                        QPixmap pixmap(getIconPixmap(comboBox->currentIcon, comboBox->iconSize,
-                                            state&State_Enabled ? QIcon::Normal : QIcon::Disabled));
+                        QPixmap pixmap(getIconPixmap(comboBox->currentIcon, comboBox->iconSize, state));
                         QRect   iconRect(editRect);
 
                         iconRect.setWidth(comboBox->iconSize.width() + 5);
@@ -4511,8 +4518,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         iconSize = QSize(iconExtent, iconExtent);
                     }
 
-                    QPixmap tabIcon(getIconPixmap(tabV2.icon, iconSize,
-                                                  (state&State_Enabled) ? QIcon::Normal : QIcon::Disabled));
+                    QPixmap tabIcon(getIconPixmap(tabV2.icon, iconSize, state&State_Enabled));
 
                     static const int constIconPad=6;
 
