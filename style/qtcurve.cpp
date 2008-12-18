@@ -29,6 +29,10 @@
 
 #if defined KDE4_FOUND && !defined QTC_NO_KDE4_LINKING
 #define QTC_USE_KDE4
+
+// TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+#define QTC_FIX_DISABLED_ICONS
+
 #endif
 
 #ifdef QTC_USE_KDE4
@@ -249,8 +253,7 @@ static void unsetFileDialogs()
 
 #endif // QTC_USE_KDE4
 
-#ifdef QTC_USE_KDE4
-// TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+#ifdef QTC_FIX_DISABLED_ICONS
 #include <KDE/KIconEffect>
 QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
 {
@@ -266,6 +269,36 @@ QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QI
 
     return pix;
 }
+
+static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
+                        const QRect &rect, QPainter *painter, const QWidget *widget = 0)
+{
+    QStyle::PrimitiveElement pe;
+    switch (toolbutton->arrowType)
+    {
+        case Qt::LeftArrow:
+            pe = QStyle::PE_IndicatorArrowLeft;
+            break;
+        case Qt::RightArrow:
+            pe = QStyle::PE_IndicatorArrowRight;
+            break;
+        case Qt::UpArrow:
+            pe = QStyle::PE_IndicatorArrowUp;
+            break;
+        case Qt::DownArrow:
+            pe = QStyle::PE_IndicatorArrowDown;
+            break;
+        default:
+            return;
+    }
+
+    QStyleOption arrowOpt;
+    arrowOpt.rect = rect;
+    arrowOpt.palette = toolbutton->palette;
+    arrowOpt.state = toolbutton->state;
+    style->drawPrimitive(pe, &arrowOpt, painter, widget);
+}
+
 #else
 inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
 {
@@ -3357,8 +3390,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             painter->restore();
             break;
         }
-        //case CE_ToolBoxTabLabel:
-        //    break;
         case CE_MenuScroller:
             painter->fillRect(r, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
                                                         : itsBackgroundCols[ORIGINAL_SHADE]);
@@ -4401,38 +4432,37 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_ComboBoxLabel:
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
-                if (!comboBox->editable)
-                {
-                    QStyleOptionComboBox opt(*comboBox);
+                QRect editRect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxEditField, widget);
+                painter->save();
+                painter->setClipRect(editRect);
 
-                    painter->save();
-                    painter->setPen(QPen(palette.buttonText(), 0));
-                    if (state & (State_On | State_Sunken))
-                        opt.rect.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
-                                           pixelMetric(PM_ButtonShiftVertical, option, widget));
-                    QTC_BASE_STYLE::drawControl(element, &opt, painter, widget);
-                    painter->restore();
-                }
-                else if(!comboBox->currentIcon.isNull())
+                if (!comboBox->currentIcon.isNull())
                 {
-                    QRect editRect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxEditField, widget);
-                    painter->save();
-                    painter->setClipRect(editRect);
-                    if (!comboBox->currentIcon.isNull())
-                    {
-                        QPixmap pixmap(getIconPixmap(comboBox->currentIcon, comboBox->iconSize, state));
-                        QRect   iconRect(editRect);
+                    QPixmap pixmap = getIconPixmap(comboBox->currentIcon, comboBox->iconSize, state);
+                    QRect   iconRect(editRect);
 
-                        iconRect.setWidth(comboBox->iconSize.width() + 5);
-                        iconRect = alignedRect(QApplication::layoutDirection(), Qt::AlignLeft | Qt::AlignVCenter,
-                                            iconRect.size(), editRect);
+                    iconRect.setWidth(comboBox->iconSize.width() + 5);
+                    if(!comboBox->editable)
+                        iconRect = alignedRect(QApplication::layoutDirection(), Qt::AlignLeft|Qt::AlignVCenter,
+                                               iconRect.size(), editRect);
+                    if (comboBox->editable)
                         painter->fillRect(iconRect, palette.brush(QPalette::Base));
-                        drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
-                    }
-                    painter->restore();
+                    drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+
+                    if (reverse)
+                        editRect.translate(-4 - comboBox->iconSize.width(), 0);
+                    else
+                        editRect.translate(comboBox->iconSize.width() + 4, 0);
                 }
-                else
-                    QTC_BASE_STYLE::drawControl(element, option, painter, widget);
+
+                if (state & (State_On|State_Sunken))
+                    editRect.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
+                                       pixelMetric(PM_ButtonShiftVertical, option, widget));
+
+                if (!comboBox->currentText.isEmpty() && !comboBox->editable)
+                    drawItemText(painter, editRect.adjusted(1, 0, -1, 0), Qt::AlignLeft|Qt::AlignVCenter, palette,
+                                 state&State_Enabled, comboBox->currentText);
+                painter->restore();
             }
             break;
         case CE_MenuBarEmptyArea:
@@ -5087,6 +5117,176 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             drawSbSliderHandle(painter, r, option);
             painter->restore();
             break;
+#ifdef QTC_FIX_DISABLED_ICONS
+        // Taken from QStyle - only required so that we can corectly set the disabled icon!!!
+        case CE_ToolButtonLabel:
+            if (const QStyleOptionToolButton *tb = qstyleoption_cast<const QStyleOptionToolButton *>(option))
+            {
+                int shiftX = 0,
+                    shiftY = 0;
+                if (state & (State_Sunken|State_On))
+                {
+                    shiftX = pixelMetric(PM_ButtonShiftHorizontal, tb, widget);
+                    shiftY = pixelMetric(PM_ButtonShiftVertical, tb, widget);
+                }
+
+                // Arrow type always overrules and is always shown
+                bool hasArrow = tb->features & QStyleOptionToolButton::Arrow;
+
+                if ((!hasArrow && tb->icon.isNull()) && !tb->text.isEmpty()
+                    || Qt::ToolButtonTextOnly==tb->toolButtonStyle)
+                {
+                    int alignment = Qt::AlignCenter|Qt::TextShowMnemonic;
+                
+                    if (!styleHint(SH_UnderlineShortcut, option, widget))
+                        alignment |= Qt::TextHideMnemonic;
+                    
+                    r.translate(shiftX, shiftY);
+                    drawItemText(painter, r, alignment, tb->palette, state&State_Enabled, tb->text, QPalette::ButtonText);
+                }
+                else
+                {
+                    QPixmap pm;
+                    QSize   pmSize = tb->iconSize;
+
+                    if (!tb->icon.isNull())
+                    {
+                        QIcon::State state = tb->state & State_On ? QIcon::On : QIcon::Off;
+                        QIcon::Mode  mode=!(tb->state & State_Enabled)
+                                            ? QIcon::Disabled
+                                            : (state&State_MouseOver) && (state&State_AutoRaise)
+                                                ? QIcon::Active
+                                                : QIcon::Normal;
+                                                
+                        pm=getIconPixmap(tb->icon, tb->rect.size().boundedTo(tb->iconSize), mode, state);
+                        pmSize = pm.size();
+                    }
+
+                    if (Qt::ToolButtonIconOnly!=tb->toolButtonStyle)
+                    {
+                        QRect pr = r;
+                        QRect tr = r;
+                        int   alignment = Qt::TextShowMnemonic;
+
+                        painter->setFont(tb->font);
+                        tr = r;
+                        if (!styleHint(SH_UnderlineShortcut, option, widget))
+                            alignment |= Qt::TextHideMnemonic;
+
+                        if (Qt::ToolButtonTextUnderIcon==tb->toolButtonStyle)
+                        {
+                            pr.setHeight(pmSize.height() + 6);
+
+                            tr.adjust(0, pr.bottom(), 0, -3);
+                            pr.translate(shiftX, shiftY);
+                            if (hasArrow)
+                                drawTbArrow(this, tb, pr, painter, widget);
+                            else
+                                drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
+                            alignment |= Qt::AlignCenter;
+                        }
+                        else
+                        {
+                            pr.setWidth(pmSize.width() + 8);
+                            tr.adjust(pr.right(), 0, 0, 0);
+                            pr.translate(shiftX, shiftY);
+                            if (hasArrow)
+                                drawTbArrow(this, tb, pr, painter, widget);
+                            else
+                                drawItemPixmap(painter, QStyle::visualRect(option->direction, r, pr), Qt::AlignCenter, pm);
+                            alignment |= Qt::AlignLeft | Qt::AlignVCenter;
+                        }
+                        tr.translate(shiftX, shiftY);
+                        drawItemText(painter, QStyle::visualRect(option->direction, r, tr), alignment, tb->palette,
+                                     tb->state & State_Enabled, tb->text, QPalette::ButtonText);
+                    }
+                    else
+                    {
+                        r.translate(shiftX, shiftY);
+                        if (hasArrow)
+                            drawTbArrow(this, tb, r, painter, widget);
+                        else
+                            drawItemPixmap(painter, r, Qt::AlignCenter, pm);
+                    }
+                }
+            }
+            break;
+        case CE_RadioButtonLabel:
+        case CE_CheckBoxLabel:
+            if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
+            {
+                uint    alignment = visualAlignment(btn->direction, Qt::AlignLeft | Qt::AlignVCenter);
+                QPixmap pix;
+                QRect   textRect = r;
+
+                if (!styleHint(SH_UnderlineShortcut, btn, widget))
+                    alignment |= Qt::TextHideMnemonic;
+
+                if (!btn->icon.isNull())
+                {
+                    pix = getIconPixmap(btn->icon, btn->iconSize, btn->state);
+                    drawItemPixmap(painter, r, alignment, pix);
+                    if (reverse)
+                        textRect.setRight(textRect.right() - btn->iconSize.width() - 4);
+                    else
+                        textRect.setLeft(textRect.left() + btn->iconSize.width() + 4);
+                }
+                if (!btn->text.isEmpty())
+                    drawItemText(painter, textRect, alignment | Qt::TextShowMnemonic,
+                                 palette, state&State_Enabled, btn->text, QPalette::WindowText);
+            }
+            break;
+        case CE_ToolBoxTabLabel:
+            if (const QStyleOptionToolBox *tb = qstyleoption_cast<const QStyleOptionToolBox *>(option))
+            {
+                bool    enabled = state & State_Enabled,
+                        selected = state & State_Selected;
+                QPixmap pm = getIconPixmap(tb->icon, pixelMetric(QStyle::PM_SmallIconSize, tb, widget) ,state);
+                QRect   cr = subElementRect(QStyle::SE_ToolBoxTabContents, tb, widget);
+                QRect   tr, ir;
+                int     ih = 0;
+
+                if (pm.isNull())
+                {
+                    tr = cr;
+                    tr.adjust(4, 0, -8, 0);
+                }
+                else
+                {
+                    int iw = pm.width() + 4;
+                    ih = pm.height();
+                    ir = QRect(cr.left() + 4, cr.top(), iw + 2, ih);
+                    tr = QRect(ir.right(), cr.top(), cr.width() - ir.right() - 4, cr.height());
+                }
+
+                if (selected && styleHint(QStyle::SH_ToolBox_SelectedPageTitleBold, tb, widget))
+                {
+                    QFont f(painter->font());
+                    f.setBold(true);
+                    painter->setFont(f);
+                }
+
+                QString txt = tb->fontMetrics.elidedText(tb->text, Qt::ElideRight, tr.width());
+
+                if (ih)
+                    painter->drawPixmap(ir.left(), (tb->rect.height() - ih) / 2, pm);
+
+                int alignment = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic;
+                if (!styleHint(QStyle::SH_UnderlineShortcut, tb, widget))
+                    alignment |= Qt::TextHideMnemonic;
+                drawItemText(painter, tr, alignment, tb->palette, enabled, txt, QPalette::ButtonText);
+
+                if (!txt.isEmpty() && state&State_HasFocus)
+                {
+                    QStyleOptionFocusRect opt;
+                    opt.rect = tr;
+                    opt.palette = palette;
+                    opt.state = QStyle::State_None;
+                    drawPrimitive(QStyle::PE_FrameFocusRect, &opt, painter, widget);
+                }
+            }
+            break;
+#endif
         case CE_RadioButton:
         case CE_CheckBox:
             if (opts.crHighlight)
