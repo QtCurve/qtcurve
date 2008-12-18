@@ -38,19 +38,9 @@ static bool xxxx=false;
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KIconLoader>
-#include <KDE/KIconEffect>
 #include <KDE/KIcon>
 #include <KDE/KComponentData>
-
-// TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-static void renderDisabled(QPixmap &pix)
-{
-    QImage img=pix.toImage();
-    KIconEffect::toGray(img, 1.0);
-    KIconEffect::semiTransparent(img);
-    pix=QPixmap::fromImage(img);
-}
-
+                           
 static void applyKdeSettings(bool pal)
 {
     if(pal)
@@ -258,6 +248,34 @@ static void unsetFileDialogs()
 #endif
 
 #endif // QTC_USE_KDE4
+
+#ifdef QTC_USE_KDE4
+// TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
+#include <KDE/KIconEffect>
+QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+{
+    QPixmap pix=icon.pixmap(size, QIcon::Normal);
+
+    if(QIcon::Disabled==mode)
+    {
+        QImage img=pix.toImage();
+        KIconEffect::toGray(img, 1.0);
+        KIconEffect::semiTransparent(img);
+        pix=QPixmap::fromImage(img);
+    }
+
+    return pix;
+}
+#else
+inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+{
+    return icon.pixmap(size, mode, state);
+}
+#endif
+inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+{
+    return getIconPixmap(icon, QSize(size, size), mode, state);
+}
 
 // The tabs used in multi-dock widgets, and KDE's properties dialog, look odd,
 // as the QTabBar is not a child of a QTabWidget! the QTC_STYLE_QTABBAR controls
@@ -4071,15 +4089,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (!styleHint(SH_UnderlineShortcut, mbi, widget))
                     alignment|=Qt::TextHideMnemonic;
 
-#ifdef QTC_USE_KDE4
-                // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-                QPixmap pix(mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), QIcon::Normal));
-
-                if(!(mbi->state&State_Enabled))
-                    renderDisabled(pix);
-#else
-                QPixmap pix(mbi->icon.pixmap(pixelMetric(PM_SmallIconSize), (mbi->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled));
-#endif
+                QPixmap pix(getIconPixmap(mbi->icon, pixelMetric(PM_SmallIconSize),
+                                          (mbi->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled));
 
                 painter->save();
 
@@ -4254,22 +4265,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if (act && !dis)
                         mode = QIcon::Active;
 
-#ifdef QTC_USE_KDE4
-                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-                    if(QIcon::Disabled==mode)
-                        mode=QIcon::Normal;
-#endif
-                    QPixmap pixmap(checked ? menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode, QIcon::On)
-                                           : menuItem->icon.pixmap(pixelMetric(PM_SmallIconSize), mode));
-#ifdef QTC_USE_KDE4
-                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-                    if(dis)
-                        renderDisabled(pixmap);
-#endif
+                    QPixmap pixmap(getIconPixmap(menuItem->icon, pixelMetric(PM_SmallIconSize), mode,
+                                   checked ? QIcon::On : QIcon::Off));
 
-                    int   pixw(pixmap.width()),
-                          pixh(pixmap.height());
-                    QRect pmr(0, 0, pixw, pixh);
+                    int     pixw(pixmap.width()),
+                            pixh(pixmap.height());
+                    QRect   pmr(0, 0, pixw, pixh);
 
                     pmr.moveCenter(vCheckRect.center());
                     painter->setPen(palette.text().color());
@@ -4435,23 +4436,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if (QIcon::Normal==mode && button->state&State_HasFocus)
                         mode = QIcon::Active;
 
-#ifdef QTC_USE_KDE4
-                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-                    if(QIcon::Disabled==mode)
-                        mode=QIcon::Normal;
-#endif
                     QIcon::State state(button->state&State_On ? QIcon::On : QIcon::Off);
-                    QPixmap      pixmap(button->icon.pixmap(button->iconSize, mode, state));
+                    QPixmap      pixmap(getIconPixmap(button->icon, button->iconSize, mode, state));
                     int          labelWidth(pixmap.width()),
                                  labelHeight(pixmap.height()),
                                  iconSpacing (4),//### 4 is currently hardcoded in QPushButton::sizeHint()
                                  textWidth(button->fontMetrics.boundingRect(option->rect, tf, button->text).width());
 
-#ifdef QTC_USE_KDE4
-                    // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-                    if(!(button->state&State_Enabled))
-                        renderDisabled(pixmap);
-#endif
                     if (!button->text.isEmpty())
                         labelWidth += (textWidth + iconSpacing);
 
@@ -4548,8 +4539,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->setClipRect(editRect);
                     if (!comboBox->currentIcon.isNull())
                     {
-                        QPixmap pixmap(comboBox->currentIcon.pixmap(comboBox->iconSize, state&State_Enabled ? QIcon::Normal : QIcon::Disabled));
+                        QPixmap pixmap(getIconPixmap(comboBox->currentIcon, comboBox->iconSize,
+                                            state&State_Enabled ? QIcon::Normal : QIcon::Disabled));
                         QRect   iconRect(editRect);
+
                         iconRect.setWidth(comboBox->iconSize.width() + 5);
                         iconRect = alignedRect(QApplication::layoutDirection(), Qt::AlignLeft | Qt::AlignVCenter,
                                             iconRect.size(), editRect);
@@ -4650,9 +4643,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         iconSize = QSize(iconExtent, iconExtent);
                     }
 
-                    QPixmap tabIcon(tabV2.icon.pixmap(iconSize,
-                                                      (state&State_Enabled) ? QIcon::Normal
-                                                                            : QIcon::Disabled));
+                    QPixmap tabIcon(getIconPixmap(tabV2.icon, iconSize,
+                                                  (state&State_Enabled) ? QIcon::Normal : QIcon::Disabled));
 
                     static const int constIconPad=6;
 
