@@ -6385,6 +6385,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
                 if (!btn->text.isEmpty() && "..."!=btn->text && size.width() < 80 && newSize.width()<size.width())
                     newSize.setWidth(80);
+                if (btn->features&QStyleOptionButton::HasMenu)
+                    newSize+=QSize(4, 0);
                 if (!btn->icon.isNull() && btn->iconSize.height() > 16)
                     newSize -= QSize(0, 2);
                 if(!btn->text.isEmpty() && size.height() < constMinH)

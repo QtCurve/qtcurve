@@ -41,6 +41,7 @@
     These shadows are taken from Oxygen - but the 'highlight' color is used for the active window.
 37. 'Fix' for some disabled icons being dithered. Use KIconEfect to convert to gray and make
     semi-transparent.
+38. Increase width of pushbuttons with menus - fixes clipped text on kppp.
 
 0.59.6
 ------
