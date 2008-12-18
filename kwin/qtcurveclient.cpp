@@ -246,6 +246,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
+    if(KDecoration::options()->color(KDecoration::ColorTitleBar, true)!=windowCol ||
+       KDecoration::options()->color(KDecoration::ColorTitleBar, false)!=windowCol)
+       opt.titleBarState|=QtCStateKWinDrawLine;
     Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
 
     itsCaptionRect = captionRect(); // also update itsCaptionRect!

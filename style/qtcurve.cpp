@@ -5707,10 +5707,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 const int    buttonMargin(6);
                 bool         active(state & State_Active),
+                             kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin),
                              roundKWinFull(ROUND_FULL==opts.round &&
                                             ((APP_KWIN==theThemedApp && !(titleBar->titleBarState&State_Raised)) ||
                                               titleBar->titleBarState&QtC_StateKWin));
-                const QColor *btnCols(theThemedApp==APP_KWIN
+                const QColor *btnCols(kwin
                                         ? buttonColors(option)
                                         : getMdiColors(titleBar, active));
                 QColor       textColor(theThemedApp==APP_KWIN
@@ -5720,6 +5721,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                             : itsMdiTextColor),
                              shadow(shadowColor(textColor));
                 QStyleOption opt(*option);
+                bool         drawLine=opts.colorTitlebarOnly &&
+                                        (kwin ? titleBar->titleBarState&QtCStateKWinDrawLine
+                                              : ((itsActiveMdiColors &&
+                                                  itsActiveMdiColors[ORIGINAL_SHADE]!=itsBackgroundCols[ORIGINAL_SHADE]) ||
+                                                (itsMdiColors &&
+                                                  itsMdiColors[ORIGINAL_SHADE]!=itsBackgroundCols[ORIGINAL_SHADE])) );
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
                 if(state&QtC_StateKWinHighlight)
@@ -5792,7 +5799,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                 }
 
-                if(opts.colorTitlebarOnly && btnCols[ORIGINAL_SHADE]!=itsBackgroundCols[ORIGINAL_SHADE])
+                if(drawLine)
                 {
                     painter->setPen(btnCols[QT_STD_BORDER]);
                     painter->drawLine(r.left()+1, r.bottom(), r.right()-1, r.bottom());

@@ -351,9 +351,10 @@ typedef enum
     QtC_TitleBarColorTopOnly
 } QtCMetrics;
 
-#define QtC_StateKWin          QStyle::State_Top
-#define QtC_StateKWinHighlight QStyle::State_Small
-#define QtC_StateKWinShadows   QStyle::State_Mini
+#define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)
+#define QtC_StateKWinHighlight ((QStyle::StateFlag)0x20000000)
+#define QtC_StateKWinShadows   ((QStyle::StateFlag)0x40000000)
+#define QtCStateKWinDrawLine   ((QStyle::StateFlag)0x80000000)
 
 #define CLOSE_COLOR QColor(191, 82, 82)
 
