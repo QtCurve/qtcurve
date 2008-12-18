@@ -5313,7 +5313,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     sanitizeSize(window, &width, &height);
 
     if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle ||
-       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && ROUND_FULL==opts.round)))
+       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED)))
     {
         gtk_paint_box(style, window, state, shadow_type, area, widget,
                       !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height);

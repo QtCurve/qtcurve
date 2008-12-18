@@ -1840,7 +1840,7 @@ static gboolean qtInit(Options *opts)
                 opts->gtkScrollViews=true;
 
             { /* C-Scope */
-            bool doEffect=ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect;
+            bool doEffect=opts->round>=ROUND_FULL && EFFECT_NONE!=opts->buttonEffect;
             int  thickness=2;
 
             if(doEffect)
@@ -1913,7 +1913,7 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
 
-            if(ROUND_FULL==opts->round && EFFECT_NONE!=opts->buttonEffect)
+            if(opts->round>=ROUND_FULL && EFFECT_NONE!=opts->buttonEffect)
                 gtk_rc_parse_string("style \"QtCSwt\" { xthickness = 3 ythickness = 2 }"
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \"QtCSwt\""
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \"QtCSwt\"");
