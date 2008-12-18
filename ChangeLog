@@ -42,6 +42,7 @@
 37. 'Fix' for some disabled icons being dithered. Use KIconEfect to convert to gray and make
     semi-transparent.
 38. Increase width of pushbuttons with menus - fixes clipped text on kppp.
+39. Round internal corners of plain colored mouse over effect.
 
 0.59.6
 ------

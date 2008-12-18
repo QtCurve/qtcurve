@@ -18,7 +18,6 @@
   Boston, MA 02110-1301, USA.
 */
 
-static bool xxxx=false;
 #include <QtGui>
 #include <QtDBus/QtDBus>
 #include <QX11Info>
@@ -2523,7 +2522,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
 
-xxxx=true;
                         if(!opts.highlightScrollViews && fo)
                         {
                             QStyleOptionFrame opt(*fo);
@@ -2532,7 +2530,6 @@ xxxx=true;
                         }
                         else
                             drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DO_EFFECT, WIDGET_SCROLLVIEW);
-xxxx=false;
                     }
                 }
                 else
@@ -7528,70 +7525,86 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                               getWidgetShade(w, true, sunken, app),
                               getWidgetShade(w, false, sunken, app), sunken, app, w);
 
-            if(plastikMouseOver && !sunken)
-            {
-                if(WIDGET_SB_SLIDER==w)
+            if(!sunken)
+                if(plastikMouseOver && !sunken)
                 {
-                    int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())),
-                        so(lightBorder ? QTC_SLIDER_MO_BORDER : 1),
-                        eo(len+so),
-                        col(QTC_SLIDER_MO_SHADE);
+                    if(WIDGET_SB_SLIDER==w)
+                    {
+                        int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())),
+                            so(lightBorder ? QTC_SLIDER_MO_BORDER : 1),
+                            eo(len+so),
+                            col(QTC_SLIDER_MO_SHADE);
 
-                    p->setClipRect(r.adjusted(1, 1, -1, -1));
-                    if(horiz)
-                    {
-                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+so, r.y(), len, r.height()-1), horiz,
-                                         getWidgetShade(w, true, sunken, app),
-                                         getWidgetShade(w, false, sunken, app), sunken, app, w);
-                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+r.width()-eo, r.y(), len, r.height()-1), horiz,
-                                         getWidgetShade(w, true, sunken, app),
-                                         getWidgetShade(w, false, sunken, app), sunken, app, w);
-                    }
-                    else
-                    {
-                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+so, r.width()-1, len), horiz,
-                                         getWidgetShade(w, true, sunken, app),
-                                         getWidgetShade(w, false, sunken, app), sunken, app, w);
-                        drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+r.height()-eo, r.width()-1, len), horiz,
-                                         getWidgetShade(w, true, sunken, app),
-                                         getWidgetShade(w, false, sunken, app), sunken, app, w);
-                    }
-                    p->setClipping(false);
-                }
-                else
-                {
-                    bool horizontal((horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w)),
-                         thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16));
-
-                    p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_DARK(w)]);
-                    p->setRenderHint(QPainter::Antialiasing, true);
-                    if(horizontal)
-                    {
-                        drawAaLine(p, r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
-                        drawAaLine(p, r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
-                    }
-                    else
-                    {
-                        drawAaLine(p, r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
-                        drawAaLine(p, r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
-                    }
-                    if(!thin)
-                    {
-                        p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_LIGHT(w)]);
-                        if(horizontal)
+                        p->setClipRect(r.adjusted(1, 1, -1, -1));
+                        if(horiz)
                         {
-                            drawAaLine(p, r.x()+1, r.y()+2, r.x()+r.width()-2, r.y()+2);
-                            drawAaLine(p, r.x()+1, r.y()+r.height()-3, r.x()+r.width()-2, r.y()+r.height()-3);
+                            drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x()+so, r.y(), len, r.height()-1),
+                                              horiz, getWidgetShade(w, true, sunken, app),
+                                              getWidgetShade(w, false, sunken, app), sunken, app, w);
+                            drawBevelGradient(itsMouseOverCols[col], !sunken, p,
+                                              QRect(r.x()+r.width()-eo, r.y(), len, r.height()-1), horiz,
+                                              getWidgetShade(w, true, sunken, app),
+                                              getWidgetShade(w, false, sunken, app), sunken, app, w);
                         }
                         else
                         {
-                            drawAaLine(p, r.x()+2, r.y()+1, r.x()+2, r.y()+r.height()-2);
-                            drawAaLine(p, r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
+                            drawBevelGradient(itsMouseOverCols[col], !sunken, p, QRect(r.x(), r.y()+so, r.width()-1, len),
+                                              horiz, getWidgetShade(w, true, sunken, app),
+                                              getWidgetShade(w, false, sunken, app), sunken, app, w);
+                            drawBevelGradient(itsMouseOverCols[col], !sunken, p,
+                                              QRect(r.x(), r.y()+r.height()-eo, r.width()-1, len), horiz,
+                                              getWidgetShade(w, true, sunken, app),
+                                              getWidgetShade(w, false, sunken, app), sunken, app, w);
                         }
+                        p->setClipping(false);
                     }
-                    p->setRenderHint(QPainter::Antialiasing, false);
+                    else
+                    {
+                        bool horizontal((horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w)),
+                             thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16));
+
+                        p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_DARK(w)]);
+                        p->setRenderHint(QPainter::Antialiasing, true);
+                        if(horizontal)
+                        {
+                            drawAaLine(p, r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
+                            drawAaLine(p, r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2, r.y()+r.height()-2);
+                        }
+                        else
+                        {
+                            drawAaLine(p, r.x()+1, r.y()+1, r.x()+1, r.y()+r.height()-2);
+                            drawAaLine(p, r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2, r.y()+r.height()-2);
+                        }
+                        if(!thin)
+                        {
+                            p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_LIGHT(w)]);
+                            if(horizontal)
+                            {
+                                drawAaLine(p, r.x()+1, r.y()+2, r.x()+r.width()-2, r.y()+2);
+                                drawAaLine(p, r.x()+1, r.y()+r.height()-3, r.x()+r.width()-2, r.y()+r.height()-3);
+                            }
+                            else
+                            {
+                                drawAaLine(p, r.x()+2, r.y()+1, r.x()+2, r.y()+r.height()-2);
+                                drawAaLine(p, r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
+                            }
+                        }
+                        p->setRenderHint(QPainter::Antialiasing, false);
+                    }
                 }
-            }
+                else if(colouredMouseOver && 0!=round)
+                {
+                    p->setPen(itsMouseOverCols[QTC_MO_STD_LIGHT(w, sunken)]);
+
+                    if(round&CORNER_TL)
+                        p->drawPoint(br.left(), br.top());
+                    if(round&CORNER_BL)
+                        p->drawPoint(br.left(), br.bottom());
+                    if(round&CORNER_BR)
+                        p->drawPoint(br.right(), br.bottom());
+                    if(round&CORNER_TR)
+                        p->drawPoint(br.right(), br.top());
+                }
         }
     }
 
