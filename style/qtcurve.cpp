@@ -3211,66 +3211,71 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if (v4Opt && (v4Opt->features & QStyleOptionViewItemV2::Alternate))
                 painter->fillRect(option->rect, option->palette.brush(cg, QPalette::AlternateBase));
 
-            if (!hover && !(state & State_Selected) && !hasCustomBackground)
+            if (!hover && !(state&State_Selected) && !hasCustomBackground)
                 break;
 
-            QColor color(hasCustomBackground && hasSolidBackground
-                            ? v4Opt->backgroundBrush.color()
-                            : palette.color(cg, QPalette::Highlight));
-
-            if (hover && !hasCustomBackground)
+            if(state&State_Selected)
             {
-                if (!(state & State_Selected))
-                    color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? 0.5 : 0.20);
+                QColor color(hasCustomBackground && hasSolidBackground
+                                ? v4Opt->backgroundBrush.color()
+                                : palette.color(cg, QPalette::Highlight));
+
+                if (hover && !hasCustomBackground)
+                {
+                    if (!(state & State_Selected))
+                        color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? 0.5 : 0.20);
+                    else
+                        color = color.lighter(110);
+                }
+
+                int round=ROUNDED_NONE;
+
+                if (v4Opt)
+                {
+                    if(QStyleOptionViewItemV4::Beginning==v4Opt->viewItemPosition)
+                        round|=ROUNDED_LEFT;
+                    if(QStyleOptionViewItemV4::End==v4Opt->viewItemPosition)
+                        round|=ROUNDED_RIGHT;
+                    if(QStyleOptionViewItemV4::OnlyOne==v4Opt->viewItemPosition ||
+                    QStyleOptionViewItemV4::Invalid==v4Opt->viewItemPosition ||
+                    (view && view->selectionBehavior() != QAbstractItemView::SelectRows))
+                        round|=ROUNDED_LEFT|ROUNDED_RIGHT;
+                }
+
+                QRect border(r);
+
+                if(ROUNDED_ALL!=round)
+                {
+                    if(!(round&ROUNDED_LEFT))
+                        border.adjust(-2, 0, 0, 0);
+                    if(!(round&ROUNDED_RIGHT))
+                        border.adjust(0, 0, 2, 0);
+                }
+
+                if(!QTC_ROUNDED)
+                    round=ROUNDED_NONE;
+                
+                painter->save();
+                if(QTC_FULLLY_ROUNDED && r.width()>QTC_MIN_ROUND_FULL_SIZE && r.height()>QTC_MIN_ROUND_FULL_SIZE)
+                    painter->setClipRegion(QRegion(border.adjusted(2, 1, -2, -1)).united(border.adjusted(1, 2, -1, -2)).intersect(r));
                 else
-                    color = color.lighter(110);
+                    painter->setClipRect(border.adjusted(1, 1, -1, -1).intersect(r));
+                drawBevelGradient(color, true, painter, border.adjusted(1, 1, -1, -1), true,
+                                getWidgetShade(WIDGET_SELECTION, true, false, opts.selectionAppearance),
+                                getWidgetShade(WIDGET_SELECTION, false, false, opts.selectionAppearance),
+                                false, opts.selectionAppearance, WIDGET_SELECTION);
+
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setBrush(Qt::NoBrush);
+                painter->setPen(color);
+                painter->setClipRect(r);
+                painter->drawPath(buildPath(border, WIDGET_SELECTION, round,
+                                            getRadius(opts.round, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION)));
+                painter->setClipping(false);
+                painter->restore();
             }
-
-            int round=ROUNDED_NONE;
-
-            if (v4Opt)
-            {
-                if(QStyleOptionViewItemV4::Beginning==v4Opt->viewItemPosition)
-                    round|=ROUNDED_LEFT;
-                if(QStyleOptionViewItemV4::End==v4Opt->viewItemPosition)
-                    round|=ROUNDED_RIGHT;
-                if(QStyleOptionViewItemV4::OnlyOne==v4Opt->viewItemPosition ||
-                   QStyleOptionViewItemV4::Invalid==v4Opt->viewItemPosition ||
-                   (view && view->selectionBehavior() != QAbstractItemView::SelectRows))
-                    round|=ROUNDED_LEFT|ROUNDED_RIGHT;
-            }
-
-            QRect border(r);
-
-            if(ROUNDED_ALL!=round)
-            {
-                if(!(round&ROUNDED_LEFT))
-                    border.adjust(-2, 0, 0, 0);
-                if(!(round&ROUNDED_RIGHT))
-                    border.adjust(0, 0, 2, 0);
-            }
-
-            if(!QTC_ROUNDED)
-                round=ROUNDED_NONE;
-
-            painter->save();
-            if(QTC_FULLLY_ROUNDED && r.width()>QTC_MIN_ROUND_FULL_SIZE && r.height()>QTC_MIN_ROUND_FULL_SIZE)
-                painter->setClipRegion(QRegion(border.adjusted(2, 1, -2, -1)).united(border.adjusted(1, 2, -1, -2)).intersect(r));
             else
-                painter->setClipRect(border.adjusted(1, 1, -1, -1).intersect(r));
-            drawBevelGradient(color, true, painter, border.adjusted(1, 1, -1, -1), true,
-                              getWidgetShade(WIDGET_SELECTION, true, false, opts.selectionAppearance),
-                              getWidgetShade(WIDGET_SELECTION, false, false, opts.selectionAppearance),
-                              false, opts.selectionAppearance, WIDGET_SELECTION);
-
-            painter->setRenderHint(QPainter::Antialiasing, true);
-            painter->setBrush(Qt::NoBrush);
-            painter->setPen(color);
-            painter->setClipRect(r);
-            painter->drawPath(buildPath(border, WIDGET_SELECTION, round,
-                                        getRadius(opts.round, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION)));
-            painter->setClipping(false);
-            painter->restore();
+                painter->fillRect(r, v4Opt->backgroundBrush);
             break;
         }
 #endif
