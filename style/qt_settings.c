@@ -1930,12 +1930,12 @@ static gboolean qtInit(Options *opts)
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].red),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].blue),
                         toQtColor(qtSettings.colors[PAL_ACTIVE][alt].red),
                         toQtColor(qtSettings.colors[PAL_ACTIVE][alt].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].blue));
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][alt].blue),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND].blue));
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
 
