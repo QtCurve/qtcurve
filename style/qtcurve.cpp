@@ -3010,7 +3010,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             // dont paint the button.
             if(0==option->palette.button().color().alpha())
             {
-                if(state&State_MouseOver && MO_GLOW==opts.coloredMouseOver && doEtch)
+                if(state&State_MouseOver && state&State_Enabled && MO_GLOW==opts.coloredMouseOver && doEtch)
                     drawGlow(painter, r, WIDGET_STD_BUTTON);
                 return;
             }
@@ -6286,7 +6286,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(QTC_DO_EFFECT)
                 {
-                    if(!sunken && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && !comboBox->editable)
+                    if(!sunken && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled &&
+                       !comboBox->editable)
                         drawGlow(painter, r, WIDGET_COMBO);
                     else
                         drawEtch(painter, r, widget, WIDGET_COMBO,
