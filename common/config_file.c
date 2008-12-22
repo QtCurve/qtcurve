@@ -32,6 +32,7 @@
 #define QTC_MAX_FILENAME_LEN   1024
 #define QTC_MAX_INPUT_LINE_LEN 256
 #define QTC_FILE               "qtcurvestylerc"
+#define QTC_VERSION_KEY        "version"
 
 #ifdef CONFIG_READ
 static int c2h(char ch)
@@ -507,6 +508,15 @@ static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
     return val.isEmpty() ? def : val.toInt();
 }
 
+/*
+static double readDoubleEntry(QtCConfig &cfg, const QString &key, double def)
+{
+    const QString &val(readStringEntry(cfg, key));
+
+    return val.isEmpty() ? def : val.toDouble();
+}
+*/
+
 static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
 {
     const QString &val(readStringEntry(cfg, key));
@@ -598,6 +608,15 @@ static int readNumEntry(GHashTable *cfg, char *key, int def)
 
     return str ? atoi(str) : def;
 }
+
+/*
+static double readDoubleEntry(GHashTable *cfg, char *key, double def)
+{
+    char *str=readStringEntry(cfg, key);
+
+    return str ? atof(str) : def;
+}
+*/
 
 static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 {
@@ -748,8 +767,11 @@ static bool readConfig(const char *file, Options *opts, Options *def)
         if(cfg)
         {
 #endif
-            int i;
-
+            int    i;
+#if 0
+            double version=readDoubleEntry(cfg, QTC_VERSION_KEY, 0.59); /* 0.59 was last version not to sore version number!*/
+TODO: New versions (>0.60) need to handle config changes...
+#endif
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
             QTC_CFG_READ_DI(highlightFactor)
@@ -1637,6 +1659,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #else
         cfg->setGroup(QTC_GROUP);
 #endif
+        CFG.writeEntry(QTC_VERSION_KEY, VERSION);
         CFG_WRITE_ENTRY_NUM(passwordChar)
         CFG_WRITE_ENTRY(round)
         CFG_WRITE_ENTRY_D(highlightFactor)
