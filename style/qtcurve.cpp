@@ -3247,7 +3247,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if (!hover && !(state&State_Selected) && !hasCustomBackground)
                 break;
 
-            if(state&State_Selected)
+            if(hasCustomBackground)
+                painter->fillRect(r, v4Opt->backgroundBrush);
+
+            if(state&State_Selected || hover)
             {
                 QColor color(hasCustomBackground && hasSolidBackground
                                 ? v4Opt->backgroundBrush.color()
@@ -3307,8 +3310,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->setClipping(false);
                 painter->restore();
             }
-            else
-                painter->fillRect(r, v4Opt->backgroundBrush);
+
             break;
         }
 #endif
