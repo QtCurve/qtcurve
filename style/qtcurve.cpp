@@ -7607,7 +7607,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                         p->setRenderHint(QPainter::Antialiasing, false);
                     }
                 }
-                else if(colouredMouseOver && 0!=round)
+                else if(colouredMouseOver && 0!=round && QTC_FULLLY_ROUNDED)
                 {
                     p->setPen(itsMouseOverCols[QTC_MO_STD_LIGHT(w, sunken)]);
 
