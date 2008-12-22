@@ -4435,6 +4435,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
                 QRect editRect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxEditField, widget);
+                bool  sunken=state & (State_On|State_Sunken);
+                int   shiftH=sunken ? pixelMetric(PM_ButtonShiftHorizontal, option, widget) : 0,
+                      shiftV=sunken ? pixelMetric(PM_ButtonShiftVertical, option, widget) : 0;
+
                 painter->save();
                 painter->setClipRect(editRect);
 
@@ -4449,6 +4453,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                                iconRect.size(), editRect);
                     if (comboBox->editable)
                         painter->fillRect(iconRect, palette.brush(QPalette::Base));
+
+                    if (sunken)
+                        iconRect.translate(shiftH, shiftV);
+
                     drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
 
                     if (reverse)
@@ -4457,9 +4465,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         editRect.translate(comboBox->iconSize.width() + 4, 0);
                 }
 
-                if (state & (State_On|State_Sunken))
-                    editRect.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
-                                       pixelMetric(PM_ButtonShiftVertical, option, widget));
+                if (sunken)
+                    editRect.translate(shiftH, shiftV);
 
                 if (!comboBox->currentText.isEmpty() && !comboBox->editable)
                     drawItemText(painter, editRect.adjusted(1, 0, -1, 0), Qt::AlignLeft|Qt::AlignVCenter, palette,
