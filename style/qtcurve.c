@@ -2026,7 +2026,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 }
             }
         }
-        else if(colouredMouseOver && 0!=round)
+        else if(colouredMouseOver && 0!=round && QTC_FULLLY_ROUNDED)
         {
             GdkColor *col=&qtcPalette.mouseover[QTC_MO_STD_LIGHT(widget, sunken)];
 
