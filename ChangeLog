@@ -22,7 +22,7 @@
     to revert.
 19. Draw statusbar frames, if enabled.
 20. Nicer 'V' arrows.
-21. When reading KDe settings, read (if they exist):
+21. When reading KDE settings, read (if they exist):
         /etc/kderc
         /etc/kde4rc or /etc/kde3rc
         /etc/kde4/kdeglobals or /etc/kde3/kdeglobals
