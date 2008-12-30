@@ -1,6 +1,7 @@
 0.60.1
 ------
 1. Only draw coloured border for moused-over items if they are enabled!
+2. Fix slight redraw errors with scrolbar slider when using flat buttons.
 
 0.60
 ----

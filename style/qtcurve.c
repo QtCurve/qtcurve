@@ -1895,9 +1895,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col1));
         cairo_move_to(cr, xd + 1, yd + 1);
-        cairo_line_to(cr, xd + width - 1, yd + 1);
+        cairo_line_to(cr, xd + width - 2, yd + 1);
         cairo_move_to(cr, xd + 1, yd + 1);
-        cairo_line_to(cr, xd + 1, yd + height - 1);
+        cairo_line_to(cr, xd + 1, yd + height - 2);
         cairo_stroke(cr);
        
         if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
@@ -5331,8 +5331,8 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle ||
        ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED)))
     {
-        gtk_paint_box(style, window, state, shadow_type, area, widget,
-                      !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height);
+        drawBox(style, window, state, shadow_type, area, widget,
+                !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height, FALSE);
 
        /* Orientation is always vertical with Mozilla, why? Anyway this hack should be OK - as we only draw
           dashes when slider is larger than 'min' pixels... */
