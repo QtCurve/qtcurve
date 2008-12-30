@@ -7634,7 +7634,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     }
 
     if(doBorder)
-        if(!sunken &&
+        if(!sunken && option->state&State_Enabled &&
             (( ( (doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) ||
                   WIDGET_MENU_BUTTON==w ) &&
                         MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||

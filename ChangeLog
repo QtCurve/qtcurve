@@ -1,3 +1,7 @@
+0.60.1
+------
+1. Only draw coloured border for moused-over items if they are enabled!
+
 0.60
 ----
  1. If appearance is rounded, also round the 'rubber band' selection.
