@@ -2,7 +2,7 @@
 #define __COMMON_H__
 
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2008 Craig.Drummond@lycos.co.uk
+  QtCurve (C) Craig Drummond, 2003 - 2009 Craig.Drummond@lycos.co.uk
 
   ----
 
