@@ -2045,7 +2045,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     }
 
     if(doEtch) //  && WIDGET_DEF_BUTTON!=widget)
-        if(!sunken &&
+        if(!sunken && GTK_STATE_INSENSITIVE!=state &&
             ((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
              MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
             (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
