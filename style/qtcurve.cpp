@@ -43,6 +43,7 @@
 #include <KDE/KIconLoader>
 #include <KDE/KIcon>
 #include <KDE/KComponentData>
+#include <KDE/KTabWidget>
                            
 static void applyKdeSettings(bool pal)
 {
@@ -3185,9 +3186,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
             {
+#ifdef QTC_USE_KDE4
+                const KTabWidget *ktw=::qobject_cast<const KTabWidget *>(widget);
+#endif
                 const QTabWidget *tw((const QTabWidget *)widget);
 
-                if(0==tw->currentIndex())
+                if(0==tw->currentIndex() && tw->count()>0
+#ifdef QTC_USE_KDE4
+                      && (!ktw || !ktw->isTabBarHidden())
+#endif
+                  )
                     if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
                     {
                         bool reverse(Qt::RightToLeft==twf->direction);
