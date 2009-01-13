@@ -1684,7 +1684,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 
             if(QTC_DO_EFFECT && (!widget || // !isFormWidget(widget) &&
                (::qobject_cast<const QLineEdit *>(widget) ||
-                (opts.sunkenScrollViews && ::qobject_cast<const QAbstractScrollArea*>(widget)))))
+                (opts.sunkenScrollViews &&
+                    (::qobject_cast<const QAbstractScrollArea*>(widget) || widget->inherits("Q3ScrollView"))))))
                 return 3;
             else
                 return 2;

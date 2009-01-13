@@ -2,6 +2,7 @@
 ------
 1. Only draw coloured border for moused-over items if they are enabled!
 2. Fix squred off corner in KTabWidgets when tabs are hidden.
+3. Fix corners of sunken Q3ScrollViews.
 
 0.60
 ----
