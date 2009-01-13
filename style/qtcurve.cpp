@@ -5387,6 +5387,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
                                         false, opts.menuStripeAppearance, WIDGET_OTHER); 
                     }
+
+                    drawBorder(painter, r.adjusted(2, 2, -2, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
                 }
                 else if (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised)))
                 {
