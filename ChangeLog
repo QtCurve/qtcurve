@@ -1,7 +1,10 @@
-0.60.1
+0.61
 ------
 1. Only draw coloured border for moused-over items if they are enabled!
 2. Fix slight redraw errors with scrolbar slider when using flat buttons.
+3. Add option to draw line after frameless groupbox title.
+4. Add option to use faded lines (toolbar separators, menutitem separators,
+   etc.)
 
 0.60
 ----

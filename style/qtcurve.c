@@ -2072,6 +2072,56 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     unsetCairoClipping(cr);
 }
 
+static void drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
+                          GdkRectangle *area, GdkRectangle *gap, gboolean fadeStart, gboolean fadeEnd, gboolean horiz)
+{
+    double          rx=x+0.5,
+                    ry=y+0.5;
+    cairo_pattern_t *pt=cairo_pattern_create_linear(rx, ry, horiz ? rx+(width-1) : rx+1, horiz ? ry+1 : ry+(height-1));
+
+    if(gap)
+    {
+        GdkRectangle r={x, y, width, height},
+                     rect=area ? *area : r;
+        GdkRegion    *region=gdk_region_rectangle(&rect),
+                     *inner=gdk_region_rectangle(gap);
+
+        gdk_region_xor(region, inner);
+        setCairoClipping(cr, NULL, region);
+        gdk_region_destroy(inner);
+        gdk_region_destroy(region);
+    }
+    else
+        setCairoClipping(cr, area, NULL);
+    cairo_pattern_add_color_stop_rgba(pt, 0, QTC_CAIRO_COL(*col), fadeStart && opts.fadeLines ? 0.0 : 1.0);
+    cairo_pattern_add_color_stop_rgba(pt, 0.4, QTC_CAIRO_COL(*col), 1.0);
+    cairo_pattern_add_color_stop_rgba(pt, 0.6, QTC_CAIRO_COL(*col), 1.0);
+    cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(*col), fadeEnd && opts.fadeLines ? 0.0 : 1.0);
+    cairo_set_source(cr, pt);
+    cairo_move_to(cr, rx, ry);
+    if(horiz)
+        cairo_line_to(cr, rx+(width-1), ry);
+    else
+        cairo_line_to(cr, rx, ry+(height-1));
+    cairo_stroke(cr);
+    cairo_pattern_destroy(pt);
+    unsetCairoClipping(cr);
+}
+
+static void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col)
+{
+    if(pt)
+    {
+        cairo_pattern_add_color_stop_rgba(pt, 0, QTC_CAIRO_COL(*col), 0.0);
+        cairo_pattern_add_color_stop_rgba(pt, 0.4, QTC_CAIRO_COL(*col), 1.0);
+        cairo_pattern_add_color_stop_rgba(pt, 0.6, QTC_CAIRO_COL(*col), 1.0);
+        cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(*col), 0.0);
+        cairo_set_source(cr, pt);
+    }
+    else
+        cairo_set_source_rgb(cr,QTC_CAIRO_COL(*col));
+}
+
 static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gboolean horiz,
                       int n_lines, int offset, GdkColor *cols, GdkRectangle *area, int dark, int etchedDisp,
                       gboolean light)
@@ -2082,18 +2132,24 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
         rx+=0.5,  rheight+=1;
 
     {
-    int      space =(n_lines*2)+(etchedDisp || !light ? (n_lines-1) : 0),
-             step = etchedDisp || !light ? 3 : 2,
-             i;
-    double   x = (horiz ? rx : rx+((rwidth-space)>>1)),
-             y = (horiz ? ry+((rheight-space)>>1) : ry),
-             x2 = rx + rwidth-1,
-             y2 = ry + rheight-1;
-    GdkColor *col1 = &cols[dark],
-             *col2 = &cols[0];
+    int             space =(n_lines*2)+(etchedDisp || !light ? (n_lines-1) : 0),
+                    step = etchedDisp || !light ? 3 : 2,
+                    i;
+    double          x = (horiz ? rx : rx+((rwidth-space)>>1)),
+                    y = (horiz ? ry+((rheight-space)>>1) : ry),
+                    x2 = rx + rwidth-1,
+                    y2 = ry + rheight-1;
+    GdkColor        *col1 = &cols[dark],
+                    *col2 = &cols[0];
+    cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>16)
+                          ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
+                          : NULL,
+                    *pt2=(pt1 && light)
+                          ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
+                          : NULL;
 
     setCairoClipping(cr, area, NULL);
-    cairo_set_source_rgb(cr,QTC_CAIRO_COL(*col1));
+    setLineCol(cr, pt1, col1);
 
     if(horiz)
     {
@@ -2106,7 +2162,7 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
 
         if(light)
         {
-            cairo_set_source_rgb(cr,QTC_CAIRO_COL(*col2));
+            setLineCol(cr, pt2, col2);
             for(i=1; i<space; i+=step)
             {
                 cairo_move_to(cr, x+offset+etchedDisp, y+i);
@@ -2125,7 +2181,7 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
         cairo_stroke(cr);
         if(light)
         {
-            cairo_set_source_rgb(cr,QTC_CAIRO_COL(*col2));
+            setLineCol(cr, pt2, col2);
             for(i=1; i<space; i+=step)
             {
                 cairo_move_to(cr, x+i, y+offset+etchedDisp);
@@ -2134,6 +2190,10 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
             cairo_stroke(cr);
         }
     }
+    if(pt1)
+        cairo_pattern_destroy(pt1);
+    if(pt2)
+        cairo_pattern_destroy(pt2);
     unsetCairoClipping(cr);
     }
 }
@@ -5536,11 +5596,22 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                              gint height, GtkPositionType gap_side, gint gap_x, gint gap_width)
 {
     if(GTK_IS_FRAME(widget) && (NULL!=gtk_frame_get_label(GTK_FRAME(widget)) || NULL!=gtk_frame_get_label_widget(GTK_FRAME(widget))))
-        if(opts.framelessGroupBoxes)
-            return;
-        else if(gap_x<5)
+    {
+        if(gap_x<5)
             gap_x+=5, gap_width+=2;
 
+        if(opts.framelessGroupBoxes)
+        {
+            if(opts.groupBoxLine)
+            {
+                QTC_CAIRO_BEGIN
+                GdkRectangle gap={x, y, gap_width, 1};
+                drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[QT_STD_BORDER], area, &gap, FALSE, TRUE, TRUE);
+                QTC_CAIRO_END
+            }
+            return;
+        }
+    }
     QTC_CAIRO_BEGIN
     drawBoxGap(cr, style, window, shadow_type, state, widget, area, x, y,
                width, height, gap_side, gap_x, gap_width, BORDER_FLAT, FALSE);
@@ -5576,22 +5647,37 @@ debugDisplayWidget(widget, 3);
             case LINE_FLAT:
             case LINE_SUNKEN:
             {
-                drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+                drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark],
+                              area, NULL, true, true, true);
+                //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
                 if(LINE_SUNKEN==opts.toolbarSeparators)
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, x1<x2 ? x1 : x2, y+1, abs(x2-x1));
+                {
+                    cairo_new_path(cr);
+                    //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, x1<x2 ? x1 : x2, y+1, abs(x2-x1));
+                    drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[light],
+                                  area, NULL, true, true, true);
+                }
             }
         }
     }
     else if(DETAIL("label"))
     {
         if(state == GTK_STATE_INSENSITIVE)
-            drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, (x1<x2 ? x1 : x2)+1, y+1, abs(x2-x1));
-        drawHLine(cr, QTC_CAIRO_COL(style->text[state]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+            //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, (x1<x2 ? x1 : x2)+1, y+1, abs(x2-x1));
+            drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[light],
+                          area, NULL, true, true, true);
+        //drawHLine(cr, QTC_CAIRO_COL(style->text[state]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+        drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark],
+                      area, NULL, true, true, true);
     }
     else if(DETAIL("menuitem"))
-        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QTC_MENU_SEP_SHADE]), 1.0, (x1<x2 ? x1 : x2)+1, y, abs(x2-x1)-1);
+        //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QTC_MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+        drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[QTC_MENU_SEP_SHADE],
+                      area, NULL, true, true, true);
     else
-        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+        //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
+        drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark],
+                      area, NULL, true, true, true);
 
     QTC_CAIRO_END
 }
@@ -5627,14 +5713,20 @@ debugDisplayWidget(widget, 3);
                 case LINE_FLAT:
                 case LINE_SUNKEN:
                 {
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x, y1<y2 ? y1 : y2, abs(y2-y1));
+//                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x, y1<y2 ? y1 : y2, abs(y2-y1));
+                    drawFadedLine(cr, x, y1<y2 ? y1 : y2, 1, abs(y2-y1), &qtcPalette.background[dark],
+                                  area, NULL, true, true, false);
                     if(LINE_SUNKEN==opts.toolbarSeparators)
-                        drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, x+1, y1<y2 ? y1 : y2, abs(y2-y1));
+//                         drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[light]), 1.0, x+1, y1<y2 ? y1 : y2, abs(y2-y1));
+                        drawFadedLine(cr, x+1, y1<y2 ? y1 : y2, 1, abs(y2-y1), &qtcPalette.background[light],
+                                      area, NULL, true, true, false);
                 }
             }
         }
         else
-            drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x, y1<y2 ? y1 : y2, abs(y2-y1));
+//             drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x, y1<y2 ? y1 : y2, abs(y2-y1));
+            drawFadedLine(cr, x, y1<y2 ? y1 : y2, 1, abs(y2-y1), &qtcPalette.background[dark],
+                          area, NULL, true, true, false);
     }
     QTC_CAIRO_END
 }
