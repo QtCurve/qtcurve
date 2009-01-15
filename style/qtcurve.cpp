@@ -632,54 +632,6 @@ static inline void drawAaRect(QPainter *p, const QRect &r)
     p->drawRect(QRectF(r.x()+0.5, r.y()+0.5, r.width()-1, r.height()-1));
 }
 
-static void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
-                      const QColor *cols, int startOffset, int dark, int etchedDisp=1,
-                      bool light=true)
-{
-    int space((nLines*2)+(etchedDisp || !light ? (nLines-1) : 0)),
-        step(etchedDisp || !light ? 3 : 2),
-        x(horiz ? r.x(): r.x()+((r.width()-space)>>1)),
-        y(horiz ? r.y()+((r.height()-space)>>1): r.y()),
-        x2(r.x()+r.width()-1),
-        y2(r.y()+r.height()-1),
-        i;
-
-    p->setRenderHint(QPainter::Antialiasing, true);
-    if(horiz)
-    {
-        if(startOffset && y+startOffset>0)
-            y+=startOffset;
-
-        p->setPen(cols[dark]);
-        for(i=0; i<space; i+=step)
-            drawAaLine(p, x+offset, y+i, x2-(offset+etchedDisp), y+i);
-
-        if(light)
-        {
-            p->setPen(cols[0]);
-            for(i=1; i<space; i+=step)
-                drawAaLine(p, x+offset+etchedDisp, y+i, x2-offset, y+i);
-        }
-    }
-    else
-    {
-        if(startOffset && x+startOffset>0)
-            x+=startOffset;
-
-        p->setPen(cols[dark]);
-        for(i=0; i<space; i+=step)
-            drawAaLine(p, x+i, y+offset, x+i, y2-(offset+etchedDisp));
-
-        if(light)
-        {
-            p->setPen(cols[0]);
-            for(i=1; i<space; i+=step)
-                drawAaLine(p, x+i, y+offset+etchedDisp, x+i, y2-offset);
-        }
-    }
-    p->setRenderHint(QPainter::Antialiasing, false);
-}
-
 static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
                      const QColor *cols, int startOffset, int dark)
 {
@@ -1305,7 +1257,7 @@ void QtCurveStyle::polish(QWidget *widget)
             // kill ugly frames...
             if (QFrame::Box==frame->frameShape() || QFrame::Panel==frame->frameShape() || QFrame::WinPanel==frame->frameShape())
                 frame->setFrameShape(QFrame::StyledPanel);
-            else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
+            //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                  widget->installEventFilter(this);
 
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
@@ -1412,7 +1364,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
         {
-            if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
+//             if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                  widget->removeEventFilter(this);
 
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
@@ -1441,32 +1393,19 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         {
             QFrame *frame = qobject_cast<QFrame*>(object);
 
-            if (frame && (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape()))
-            {
-                QPainter painter(frame);
-                QPoint   p1, p2;
-                QRect    r(frame->rect());
-
-                if (QFrame::HLine==frame->frameShape())
+            if (frame)
+                if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 {
-                    p1 = QPoint(r.x(), r.height() / 2);
-                    p2 = QPoint(r.x() + r.width(), p1.y());
+                    QPainter painter(frame);
+                    QRect    r(QFrame::HLine==frame->frameShape()
+                                ? QRect(frame->rect().x(), frame->rect().y()+ (frame->rect().height()/2), frame->rect().width(), 1)
+                                : QRect(frame->rect().x()+(frame->rect().width()/2),  frame->rect().y(), 1, frame->rect().height()));
+
+                    drawFadedLine(&painter, r, backgroundColors(frame->palette().window().color())[QT_STD_BORDER], true, true, QFrame::HLine==frame->frameShape());
+                    return true;
                 }
                 else
-                {
-                    p1 = QPoint(r.x()+r.width() / 2, 0);
-                    p2 = QPoint(p1.x(), r.height());
-                }
-
-                if (QFrame::Plain==frame->frameShadow())
-                {
-                    painter.setPen(QPen(frame->palette().dark().color(), frame->lineWidth()));
-                    painter.drawLine(p1, p2);
-                }
-                else
-                    qDrawShadeLine(&painter, p1, p2, frame->palette(), QFrame::Sunken==frame->frameShadow(), frame->lineWidth(), frame->midLineWidth());
-                return true;
-            }
+                    return false;
             break;
         }
         case QEvent::Show:
@@ -2364,26 +2303,22 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(r.width()<r.height())
                     {
                         int x(r.x()+((r.width()-2) / 2));
+                        drawFadedLine(painter, QRect(x, r.y()+6, 1, r.height()-12),
+                                      itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4], true, true, false);
 
-                        painter->setPen(itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4]);
-                        painter->drawLine(x, r.y()+6, x, r.y()+r.height()-7);
                         if(LINE_SUNKEN==opts.toolbarSeparators)
-                        {
-                            painter->setPen(itsBackgroundCols[0]);
-                            painter->drawLine(x+1, r.y()+6, x+1, r.y()+r.height()-7);
-                        }
+                            drawFadedLine(painter, QRect(x+1, r.y()+6, 1, r.height()-12),
+                                          itsBackgroundCols[0], true, true, false);
                     }
                     else
                     {
                         int y(r.y()+((r.height()-2) / 2));
 
-                        painter->setPen(itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4]);
-                        painter->drawLine(r.x()+6, y, r.x()+r.width()-7, y);
+                        drawFadedLine(painter, QRect(r.x()+6, y, r.height()-12, 1),
+                                      itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4], true, true, true);
                         if(LINE_SUNKEN==opts.toolbarSeparators)
-                        {
-                            painter->setPen(itsBackgroundCols[0]);
-                            painter->drawLine(r.x()+6, y+1, r.x()+r.width()-7, y+1);
-                        }
+                            drawFadedLine(painter, QRect(r.x()+6, y+1, r.height()-12, 1),
+                                          itsBackgroundCols[0], true, true, true);
                     }
                     break;
                 default:
@@ -2394,18 +2329,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_FrameGroupBox:
-            if(opts.framelessGroupBoxes)
+            if(opts.framelessGroupBoxes && !opts.groupBoxLine)
                 break;
             if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
                 QStyleOptionFrameV2 frameV2(*frame);
-                if (frameV2.features & QStyleOptionFrameV2::Flat)
-                {
-                    QPen oldPen = painter->pen();
-                    painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                    painter->drawLine(frameV2.rect.topLeft(), frameV2.rect.topRight());
-                    painter->setPen(oldPen);
-                }
+                if (frameV2.features & QStyleOptionFrameV2::Flat || opts.groupBoxLine)
+                    drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1),
+                                  backgroundColors(option)[QT_STD_BORDER], false, true, true);
                 else
                 {
                     frameV2.state &= ~(State_Sunken | State_HasFocus);
@@ -2415,16 +2346,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_Frame:
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
-            {
-                static const int constLineHeight=1;  // Match with SystemSettings, etc.
-
-                QLinearGradient grad(0, 0, r.width(), 1);
-                const QColor    *use(backgroundColors(option));
-
-                grad.setColorAt(0, use[QT_STD_BORDER]); // palette.text().color());
-                grad.setColorAt(1, palette.background().color());
-                painter->fillRect(QRect(r.x(), (r.y()+r.height())-(constLineHeight+1), r.width(), constLineHeight), QBrush(grad));
-            }
+                drawFadedLine(painter, QRect(r.x(), (r.y()+r.height())-2, r.width(), 1),
+                              backgroundColors(option)[QT_STD_BORDER], false, true, true);
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
             {
                 if(opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
@@ -4102,14 +4025,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         w = menuItem->fontMetrics.width(menuItem->text) + 5;
                     }
 
-                    painter->setPen(itsBackgroundCols[QTC_MENU_SEP_SHADE]);
-                    painter->drawLine(menuItem->rect.left() + 3 + (reverse ? 0 : w) +
-                                        (!reverse && doStripe ? stripeWidth : 0),
-                                      menuItem->rect.center().y(),
-                                      menuItem->rect.right() - 4 - (reverse ? w : 0) -
-                                        (reverse && doStripe ? stripeWidth : 0),
-                                      menuItem->rect.center().y());
-
+                    QRect miRect(menuItem->rect.left() + 3 + (reverse ? 0 : w) +
+                                    (!reverse && doStripe ? stripeWidth : 0),
+                                    menuItem->rect.center().y(),
+                                    menuItem->rect.width() - (7 + (doStripe ? stripeWidth : 0)),
+                                    1);
+                    drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
                     painter->restore();
                     break;
                 }
@@ -4118,7 +4039,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      checkable(QStyleOptionMenuItem::NotCheckable!=menuItem->checkType),
                      checked(menuItem->checked),
                      enabled(state&State_Enabled);
-
 
                 if(!(selected && enabled) || APPEARANCE_FADE==opts.menuitemAppearance)
                 {
@@ -7145,6 +7065,96 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
     }
 
     return QTC_BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
+}
+
+void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz) const
+{
+    QLinearGradient grad(r.topLeft(), horiz ? r.topRight() : r.bottomLeft());
+    QColor          fade(col);
+
+    fade.setAlphaF(0.0);
+    grad.setColorAt(0, fadeStart && opts.fadeLines ? fade : col);
+    grad.setColorAt(0.4, col);
+    grad.setColorAt(0.6, col);
+    grad.setColorAt(1, fadeEnd && opts.fadeLines ? fade : col);
+    p->setPen(QPen(QBrush(grad), 1)); 
+    p->drawLine(r.left(), r.top(), r.right(), r.bottom());
+}
+
+void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
+                             const QColor *cols, int startOffset, int dark, int etchedDisp,
+                             bool light) const
+{
+    int  space((nLines*2)+(etchedDisp || !light ? (nLines-1) : 0)),
+         step(etchedDisp || !light ? 3 : 2),
+         x(horiz ? r.x() : r.x()+((r.width()-space)>>1)),
+         y(horiz ? r.y()+((r.height()-space)>>1) : r.y()),
+         x2(r.x()+r.width()-1),
+         y2(r.y()+r.height()-1),
+         i;
+    QPen dp(cols[dark], 1),
+         lp(cols[light], 1);
+
+    if(opts.fadeLines && (horiz ? r.width() : r.height())>16)
+    {
+        QLinearGradient grad(r.topLeft(), horiz ? r.topRight() : r.bottomLeft());
+        QColor          fade(cols[dark]);
+
+        fade.setAlphaF(0.0);
+        grad.setColorAt(0, fade);
+        grad.setColorAt(0.4, cols[dark]);
+        grad.setColorAt(0.6, cols[dark]);
+        grad.setColorAt(1, fade);
+
+        dp=QPen(QBrush(grad), 1);
+
+        if(light)
+        {
+            fade=QColor(cols[light]);
+
+            fade.setAlphaF(0.0);
+            grad.setColorAt(0, fade);
+            grad.setColorAt(0.4, cols[light]);
+            grad.setColorAt(0.6, cols[light]);
+            grad.setColorAt(1, fade);
+            lp=QPen(QBrush(grad), 1);
+        }
+    }
+
+    p->setRenderHint(QPainter::Antialiasing, true);
+    if(horiz)
+    {
+        if(startOffset && y+startOffset>0)
+            y+=startOffset;
+
+        p->setPen(dp);
+        for(i=0; i<space; i+=step)
+            drawAaLine(p, x+offset, y+i, x2-(offset+etchedDisp), y+i);
+
+        if(light)
+        {
+            p->setPen(lp);
+            for(i=1; i<space; i+=step)
+                drawAaLine(p, x+offset+etchedDisp, y+i, x2-offset, y+i);
+        }
+    }
+    else
+    {
+        if(startOffset && x+startOffset>0)
+            x+=startOffset;
+
+        p->setPen(dp);
+        for(i=0; i<space; i+=step)
+            drawAaLine(p, x+i, y+offset, x+i, y2-(offset+etchedDisp));
+
+        if(light)
+        {
+            p->setPen(lp);
+            for(i=1; i<space; i+=step)
+                drawAaLine(p, x+i, y+offset+etchedDisp, x+i, y2-offset);
+        }
+    }
+    p->setRenderHint(QPainter::Antialiasing, false);
 }
 
 void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,

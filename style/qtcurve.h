@@ -88,6 +88,9 @@ class QtCurveStyle : public QWindowsStyle
         return qGray(col.rgb()) < 100 ? QColor(255, 255, 255, 75) : QColor(0, 0, 0, 75);
     }
 
+    void drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz) const;
+    void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset, const QColor *cols, int startOffset,
+                   int dark, int etchedDisp=1, bool light=true) const;
     void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, double shadeTop,
                                    double shadeBot, EAppearance bevApp) const;
     void drawBevelGradient(const QColor &base, bool increase, QPainter *p, QRect const &r,

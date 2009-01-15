@@ -1098,6 +1098,10 @@ typedef struct
                      vArrows,
                      xCheck,
                      framelessGroupBoxes,
+                     groupBoxLine,
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+                     fadeLines,
+#endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripe,
 #endif

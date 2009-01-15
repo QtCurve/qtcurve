@@ -1,5 +1,5 @@
-0.60.1
-------
+0.61
+----
 1. Only draw coloured border for moused-over items if they are enabled!
 2. Fix squred off corner in KTabWidgets when tabs are hidden.
 3. Fix corners of sunken Q3ScrollViews.
@@ -8,6 +8,9 @@
    the icon.
 6. Fix some weird alignment problems with KDE4 HIG.
 7. Fix default margin settings - these were too small.
+8. Add option to draw line after frameless groupbox title.
+9. Add option to use faded lines (toolbar separators, menutitem separators,
+   etc.)
 
 0.60
 ----

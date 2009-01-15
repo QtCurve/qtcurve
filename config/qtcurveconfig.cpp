@@ -469,6 +469,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(inactiveHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorMenubarMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(useHighlightForMenu, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(groupBoxLine, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(fadeLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 
     defaultSettings(&defaultStyle);
     if(!readConfig(NULL, &currentStyle, &defaultStyle))
@@ -1120,6 +1122,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.customGradient=customGradient;
     opts.colorMenubarMouseOver=colorMenubarMouseOver->isChecked();
     opts.useHighlightForMenu=useHighlightForMenu->isChecked();
+    opts.groupBoxLine=groupBoxLine->isChecked();
+    opts.fadeLines=fadeLines->isChecked();
 
     if(customShading->isChecked())
     {
@@ -1207,6 +1211,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
     colorMenubarMouseOver->setChecked(opts.colorMenubarMouseOver);
     useHighlightForMenu->setChecked(opts.useHighlightForMenu);
+    groupBoxLine->setChecked(opts.groupBoxLine);
+    fadeLines->setChecked(opts.fadeLines);
 
     shading->setCurrentIndex(opts.shading);
     gtkScrollViews->setChecked(opts.gtkScrollViews);
@@ -1286,6 +1292,8 @@ bool QtCurveConfig::settingsChanged()
          splitters->currentIndex()!=currentStyle.splitters ||
          colorMenubarMouseOver->isChecked()!=currentStyle.colorMenubarMouseOver ||
          useHighlightForMenu->isChecked()!=currentStyle.useHighlightForMenu ||
+         groupBoxLine->isChecked()!=currentStyle.groupBoxLine ||
+         fadeLines->isChecked()!=currentStyle.fadeLines ||
 
          shading->currentIndex()!=(int)currentStyle.shading ||
          gtkScrollViews->isChecked()!=currentStyle.gtkScrollViews ||

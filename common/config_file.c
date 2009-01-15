@@ -829,6 +829,10 @@ TODO: New versions (>0.60) need to handle config changes...
             QTC_CFG_READ_BOOL(vArrows)
             QTC_CFG_READ_BOOL(xCheck)
             QTC_CFG_READ_BOOL(framelessGroupBoxes)
+            QTC_CFG_READ_BOOL(groupBoxLine)
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+            QTC_CFG_READ_BOOL(fadeLines)
+#endif
             QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
             QTC_CFG_READ_BOOL(crHighlight)
@@ -1178,6 +1182,8 @@ TODO: New versions (>0.60) need to handle config changes...
             if(opts->squareScrollViews)
                 opts->highlightScrollViews=false;
 
+            if(!opts->framelessGroupBoxes)
+                opts->groupBoxLine=false;
             return true;
         }
     }
@@ -1266,6 +1272,10 @@ static void defaultSettings(Options *opts)
     opts->vArrows=false;
     opts->xCheck=false;
     opts->framelessGroupBoxes=true;
+    opts->groupBoxLine=false;
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+    opts->fadeLines=false;
+#endif
     opts->colorMenubarMouseOver=true;
     opts->inactiveHighlight=false;
     opts->crHighlight=false;
@@ -1716,6 +1726,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(vArrows)
         CFG_WRITE_ENTRY(xCheck)
         CFG_WRITE_ENTRY(framelessGroupBoxes)
+        CFG_WRITE_ENTRY(groupBoxLine)
+        CFG_WRITE_ENTRY(fadeLines)
         CFG_WRITE_ENTRY(inactiveHighlight)
         CFG_WRITE_ENTRY(crHighlight)
         CFG_WRITE_ENTRY(crButton)
