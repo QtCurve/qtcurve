@@ -4,6 +4,8 @@
 2. Fix squred off corner in KTabWidgets when tabs are hidden.
 3. Fix corners of sunken Q3ScrollViews.
 4. Draw a sunken border around KPopupMenu titles.
+5. Draw toolbar arrows after icon, so that they do not get covered by
+   the icon.
 
 0.60
 ----
