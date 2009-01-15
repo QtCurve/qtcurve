@@ -1627,12 +1627,21 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
-        case PM_DefaultTopLevelMargin:
-            return 11;
         case PM_DefaultChildMargin:
-            return 4;
+        case PM_DefaultTopLevelMargin:
+            return 9;
+        case PM_LayoutHorizontalSpacing:
+        case PM_LayoutVerticalSpacing:
+            return -1; // use layoutSpacingImplementation
         case PM_DefaultLayoutSpacing:
-            return 4;
+            return 6;
+        case PM_LayoutLeftMargin:
+        case PM_LayoutTopMargin:
+        case PM_LayoutRightMargin:
+        case PM_LayoutBottomMargin:
+            return 9; /*(pixelMetric((option && (option->state&QStyle::State_Window)) || (widget && widget->isWindow())
+                                ? PM_DefaultTopLevelMargin
+                                : PM_DefaultChildMargin, option, widget);*/
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
             return 3;
@@ -2176,6 +2185,15 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
     }
 #endif
     return QTC_BASE_STYLE::standardIconImplementation(pix, option, widget);
+}
+
+int QtCurveStyle::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
+                                              Qt::Orientation orientation, const QStyleOption *option,
+                                              const QWidget *widget) const
+{
+    Q_UNUSED(control1); Q_UNUSED(control2); Q_UNUSED(orientation);
+
+    return pixelMetric(PM_DefaultLayoutSpacing, option, widget);
 }
 
 void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,

@@ -141,6 +141,9 @@ class QtCurveStyle : public QWindowsStyle
     void           widgetDestroyed(QObject *o);
     void           setupKde4();
     QIcon          standardIconImplementation(StandardPixmap pix, const QStyleOption *option=0, const QWidget *widget=0) const;
+    int            layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
+                                               Qt::Orientation orientation, const QStyleOption *option,
+                                               const QWidget *widget) const;
     void           kdeGlobalSettingsChange(int type, int);
 
     private:
