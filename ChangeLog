@@ -6,6 +6,7 @@
 4. Draw a sunken border around KPopupMenu titles.
 5. Draw toolbar arrows after icon, so that they do not get covered by
    the icon.
+6. Fix some weird alignment problems with KDE4 HIG.
 
 0.60
 ----

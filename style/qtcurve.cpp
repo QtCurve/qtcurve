@@ -1869,6 +1869,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return Qt::AlignRight;
         case SH_FormLayoutFieldGrowthPolicy:
             return QFormLayout::ExpandingFieldsGrow;
+        case SH_FormLayoutWrapPolicy:
+            return QFormLayout::DontWrapRows;
 #endif
 #ifdef QTC_USE_KDE4
         case SH_DialogButtonBox_ButtonsHaveIcons:
