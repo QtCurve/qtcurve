@@ -49,6 +49,7 @@ typedef QString QtcKey;
 // #endif
 
 class QStyleOptionSlider;
+class QLabel;
 
 class QtCurveStyle : public QWindowsStyle
 {
@@ -171,6 +172,7 @@ class QtCurveStyle : public QWindowsStyle
     mutable QCache<QtcKey, QPixmap>    itsPixmapCache;
     mutable bool                       itsActive;
     mutable const QWidget              *itsSbWidget;
+    mutable QLabel                     *itsClickedLabel;
     QList<QProgressBar *>              itsProgressBars;
     int                                itsProgressBarAnimateTimer,
                                        itsAnimateStep;

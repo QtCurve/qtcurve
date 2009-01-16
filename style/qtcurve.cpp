@@ -1221,6 +1221,8 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->setPalette(pal);
         }
     }
+    else if(qobject_cast<QLabel*>(widget))
+        widget->installEventFilter(this);
     else if(opts.fixParentlessDialogs)
         if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
         {
@@ -1359,6 +1361,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
            (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
             widget->setPalette(QApplication::palette());
     }
+    else if(qobject_cast<QLabel*>(widget))
+        widget->removeEventFilter(this);
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
     if (!widget->isWindow())
@@ -1394,6 +1398,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             QFrame *frame = qobject_cast<QFrame*>(object);
 
             if (frame)
+            {
                 if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 {
                     QPainter painter(frame);
@@ -1406,8 +1411,51 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 }
                 else
                     return false;
+            }
+            else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
+            {
+                // paint focus rect
+                QLabel                *lbl = (QLabel *)object;
+                QPainter              painter(lbl);
+                QStyleOptionFocusRect opts;
+
+                opts.palette = lbl->palette();
+                opts.rect    = QRect(0, 0, lbl->width(), lbl->height());
+                drawPrimitive(PE_FrameFocusRect, &opts, &painter, lbl);
+            }
+
             break;
         }
+        case QEvent::MouseButtonPress:
+            if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && dynamic_cast<QMouseEvent*>(event))
+            {
+                QLabel      *lbl = (QLabel *)object;
+                QMouseEvent *mev = (QMouseEvent *)event;
+
+                if (lbl->rect().contains(mev->pos()))
+                {
+                    itsClickedLabel=lbl;
+                    lbl->repaint();
+                }
+            }
+            break;
+        case QEvent::MouseButtonRelease:
+            if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && dynamic_cast<QMouseEvent*>(event))
+            {
+                QLabel      *lbl = (QLabel *)object;
+                QMouseEvent *mev = (QMouseEvent *)event;
+
+                if(itsClickedLabel)
+                {
+                    itsClickedLabel=0;
+                    lbl->update();
+                }
+
+                // set focus to the buddy...
+                if (lbl->rect().contains(mev->pos()))
+                    ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
+            }
+            break;
         case QEvent::Show:
         {
             QProgressBar *bar = qobject_cast<QProgressBar *>(object);

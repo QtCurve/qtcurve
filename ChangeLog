@@ -1,16 +1,17 @@
 0.61
 ----
-1. Only draw coloured border for moused-over items if they are enabled!
-2. Fix squred off corner in KTabWidgets when tabs are hidden.
-3. Fix corners of sunken Q3ScrollViews.
-4. Draw a sunken border around KPopupMenu titles.
-5. Draw toolbar arrows after icon, so that they do not get covered by
-   the icon.
-6. Fix some weird alignment problems with KDE4 HIG.
-7. Fix default margin settings - these were too small.
-8. Add option to draw line after frameless groupbox title.
-9. Add option to use faded lines (toolbar separators, menutitem separators,
-   etc.)
+ 1. Only draw coloured border for moused-over items if they are enabled!
+ 2. Fix squred off corner in KTabWidgets when tabs are hidden.
+ 3. Fix corners of sunken Q3ScrollViews.
+ 4. Draw a sunken border around KPopupMenu titles.
+ 5. Draw toolbar arrows after icon, so that they do not get covered by
+    the icon.
+ 6. Fix some weird alignment problems with KDE4 HIG.
+ 7. Fix default margin settings - these were too small.
+ 8. Add option to draw line after frameless groupbox title.
+ 9. Add option to use faded lines (toolbar separators, menutitem separators,
+    etc.)
+10. Support QLabel buddy widgets, as per KStyle.
 
 0.60
 ----
