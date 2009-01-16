@@ -2098,11 +2098,16 @@ static void drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkC
     cairo_pattern_add_color_stop_rgba(pt, 0.6, QTC_CAIRO_COL(*col), 1.0);
     cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(*col), fadeEnd && opts.fadeLines ? 0.0 : 1.0);
     cairo_set_source(cr, pt);
-    cairo_move_to(cr, rx, ry);
     if(horiz)
-        cairo_line_to(cr, rx+(width-1), ry);
+    {
+        cairo_move_to(cr, x, ry);
+        cairo_line_to(cr, x+(width-1), ry);
+    }
     else
-        cairo_line_to(cr, rx, ry+(height-1));
+    {
+        cairo_move_to(cr, rx, y);
+        cairo_line_to(cr, rx, y+(height-1));
+    }
     cairo_stroke(cr);
     cairo_pattern_destroy(pt);
     unsetCairoClipping(cr);
