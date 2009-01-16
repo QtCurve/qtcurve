@@ -1567,6 +1567,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
     switch(metric)
     {
         case PM_DefaultChildMargin:
+            return 6;
         case PM_DefaultTopLevelMargin:
             return 9;
         case PM_LayoutHorizontalSpacing:
@@ -1578,9 +1579,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_LayoutTopMargin:
         case PM_LayoutRightMargin:
         case PM_LayoutBottomMargin:
-            return 9; /*(pixelMetric((option && (option->state&QStyle::State_Window)) || (widget && widget->isWindow())
+            return pixelMetric((option && (option->state&QStyle::State_Window)) || (widget && widget->isWindow())
                                 ? PM_DefaultTopLevelMargin
-                                : PM_DefaultChildMargin, option, widget);*/
+                                : PM_DefaultChildMargin, option, widget);
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
             return 3;
