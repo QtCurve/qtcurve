@@ -177,6 +177,8 @@ typedef GdkColor color;
 
 #define QTC_ROUNDED (ROUND_NONE!=opts.round)
 
+#define QTC_TOOLBAR_SEP_GAP        (opts.fadeLines ? 5 : 6)
+#define QTC_FADE_SIZE              0.4
 #define QTC_ETCHED_DARK            0.95
 #define SHADE_BEVEL_GRAD_LIGHT     (QTC_SIMPLE_SHADING ? 1.05 : 1.07)
 #define SHADE_BEVEL_GRAD_DARK      (QTC_SIMPLE_SHADING ? 0.93 : 0.91)

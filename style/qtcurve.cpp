@@ -2304,7 +2304,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(r.width()<r.height())
                     {
                         int x(r.x()+((r.width()-2) / 2));
-                        drawFadedLine(painter, QRect(x, r.y()+6, 1, r.height()-12),
+                        drawFadedLine(painter, QRect(x, r.y()+QTC_TOOLBAR_SEP_GAP, 1, r.height()-(QTC_TOOLBAR_SEP_GAP*2)),
                                       itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4], true, true, false);
 
                         if(LINE_SUNKEN==opts.toolbarSeparators)
@@ -2315,10 +2315,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         int y(r.y()+((r.height()-2) / 2));
 
-                        drawFadedLine(painter, QRect(r.x()+6, y, r.height()-12, 1),
+                        drawFadedLine(painter, QRect(r.x()+QTC_TOOLBAR_SEP_GAP, y, r.height()-(QTC_TOOLBAR_SEP_GAP*2), 1),
                                       itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4], true, true, true);
                         if(LINE_SUNKEN==opts.toolbarSeparators)
-                            drawFadedLine(painter, QRect(r.x()+6, y+1, r.height()-12, 1),
+                            drawFadedLine(painter, QRect(r.x()+QTC_TOOLBAR_SEP_GAP, y+1, r.height()-(QTC_TOOLBAR_SEP_GAP*2), 1),
                                           itsBackgroundCols[0], true, true, true);
                     }
                     break;
@@ -7075,8 +7075,8 @@ void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col,
 
     fade.setAlphaF(0.0);
     grad.setColorAt(0, fadeStart && opts.fadeLines ? fade : col);
-    grad.setColorAt(0.4, col);
-    grad.setColorAt(0.6, col);
+    grad.setColorAt(QTC_FADE_SIZE, col);
+    grad.setColorAt(1.0-QTC_FADE_SIZE, col);
     grad.setColorAt(1, fadeEnd && opts.fadeLines ? fade : col);
     p->setPen(QPen(QBrush(grad), 1)); 
     p->drawLine(r.left(), r.top(), r.right(), r.bottom());
