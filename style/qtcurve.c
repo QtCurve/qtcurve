@@ -2516,12 +2516,12 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_SELECTED==state)
         {
             double   radius=QTC_ROUNDED
-                                    ? height>48 && width>48
-                                        ? 3.0
-                                        : height>24 && width>24
-                                            ? QTC_FULL_OUTER_RADIUS
-                                            : QTC_SLIGHT_OUTER_RADIUS
-                                    : 0.0,
+                                ? height>48 && width>48
+                                    ? 3.0
+                                    : height>24 && width>24
+                                        ? QTC_FULL_OUTER_RADIUS
+                                        : QTC_SLIGHT_OUTER_RADIUS
+                                : 0.0,
                      xd=x+0.5,
                      yd=y+0.5;
             int      round=detail
@@ -5070,6 +5070,7 @@ debugDisplayWidget(widget, 3);
                     rev=(GTK_POS_TOP==gap_side || GTK_POS_BOTTOM==gap_side) &&
                         reverseLayout(widget->parent),
                     mozTab=isMozillaTab(widget);
+        int         mod=active ? 1 : 0;
         GdkColor    *col=active
                             ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
                     *selCol1=&qtcPalette.menuitem[0],
@@ -5101,7 +5102,7 @@ debugDisplayWidget(widget, 3);
             for (i = 0; i < num_children; i++ )
             {
                 GtkWidget *page=gtk_notebook_get_nth_page(notebook, i),
-                        *tab_label=gtk_notebook_get_tab_label(notebook, page);
+                          *tab_label=gtk_notebook_get_tab_label(notebook, page);
 
                 int diff=tab_label ? (vertical ? tab_label->allocation.y-y : tab_label->allocation.x-x)
                                 : -1;
@@ -5180,7 +5181,7 @@ debugDisplayWidget(widget, 3);
                 if(!active)
                     height-=2;
     #endif
-                fillTab(cr, style, window, area, state, col, x, y, width, height-1, TRUE,
+                fillTab(cr, style, window, area, state, col, x+mod, y, width-(2*mod), height-1, TRUE,
                         FALSE, WIDGET_TAB_BOT, NULL!=notebook);
 
                 drawBorder(cr, style, state, area, NULL, x, y-4, width, height+4,
@@ -5227,7 +5228,7 @@ debugDisplayWidget(widget, 3);
                     height-=2;
                 }
     #endif
-                fillTab(cr, style, window, area, state, col, x, y+1, width, height-1, TRUE,
+                fillTab(cr, style, window, area, state, col, x+mod, y+1, width-(2*mod), height-1, TRUE,
                         TRUE, WIDGET_TAB_TOP, NULL!=notebook);
 
                 drawBorder(cr, style, state, area, NULL, x, y, width, height+4,
@@ -5270,7 +5271,7 @@ debugDisplayWidget(widget, 3);
                 if(!active)
                     width-=2;
     #endif
-                fillTab(cr, style, window, area, state, col, x, y, width-1, height, FALSE,
+                fillTab(cr, style, window, area, state, col, x, y+mod, width-1, height-(2*mod), FALSE,
                         FALSE, WIDGET_TAB_BOT, NULL!=notebook);
 
                 drawBorder(cr, style, state, area, NULL, x-4, y, width+4, height,
@@ -5316,7 +5317,7 @@ debugDisplayWidget(widget, 3);
                     width-=2;
                 }
     #endif
-                fillTab(cr, style, window, area, state, col, x+1, y, width-1, height,
+                fillTab(cr, style, window, area, state, col, x+1, y+mod, width-1, height-(2*mod),
                         FALSE, TRUE, WIDGET_TAB_TOP, NULL!=notebook);
 
                 drawBorder(cr, style, state, area, NULL, x, y, width+4, height,
