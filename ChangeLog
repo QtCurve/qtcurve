@@ -12,6 +12,7 @@
  9. Add option to use faded lines (toolbar separators, menutitem separators,
     etc.)
 10. Support QLabel buddy widgets, as per KStyle.
+11. Adjust focus margins on checks/radios that don't have text.
 
 0.60
 ----

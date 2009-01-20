@@ -2959,8 +2959,24 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if (!(focusFrame->state&State_KeyboardFocusChange))
                     return;
 
+                QRect r2(r);
+
+                if(widget && (::qobject_cast<const QCheckBox *>(widget) || ::qobject_cast<const QRadioButton *>(widget)) &&
+                   ((QAbstractButton *)widget)->text().isEmpty() &&
+                   r.height()<=widget->rect().height()-2 && r.width()<=widget->rect().width()-2 &&
+                   r.x()>=1 && r.y()>=1)
+                {
+                    int adjust=qMin(qMin(abs(widget->rect().x()-r.x()), 2), abs(widget->rect().y()-r.y()));
+                    r2.adjust(-adjust, -adjust, adjust, adjust);
+                }
+                
                 if(FOCUS_STANDARD==opts.focus)
-                    QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
+                {
+                    QStyleOptionFocusRect opt(*focusFrame);
+
+                    opt.rect=r2;
+                    QTC_BASE_STYLE::drawPrimitive(element, &opt, painter, widget);
+                }
                 else
                 {
                     //Figuring out in what beast we are painting...
@@ -2968,7 +2984,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     bool         drawRounded(QTC_ROUNDED);
 
                     if(drawRounded &&
-                       (r.width()<4 || r.height()<4 ||
+                       (r2.width()<4 || r2.height()<4 ||
                         (widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) || widget->inherits("Q3ScrollView"))) ||
                         (widget && widget->parent() && ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
                                                        widget->parent()->inherits("Q3ScrollView")))))
@@ -2985,11 +3001,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(QTC_ROUNDED)
                     {
                         painter->setRenderHint(QPainter::Antialiasing, true);
-                        painter->drawPath(buildPath(r, WIDGET_SELECTION, ROUNDED_ALL,
-                                                    getRadius(opts.round, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION)));
+                        painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
+                                                    getRadius(opts.round, r2.width(), r2.height(), WIDGET_OTHER, RADIUS_SELECTION)));
                     }
                     else
-                        drawRect(painter, r);
+                        drawRect(painter, r2);
                     painter->restore();
                 }
             }
