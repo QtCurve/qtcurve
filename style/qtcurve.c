@@ -892,7 +892,7 @@ static GdkColor * getParentBgCol(GtkWidget *widget)
                : NULL;
 }
 
-static setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
+static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
     GdkColor *parentBg=getParentBgCol(widget);
 

@@ -1688,7 +1688,7 @@ static gboolean qtInit(Options *opts)
                 GtkSettingsValue svalue;
 
                 if(qtSettings.font)
-                    g_object_set(settings, "gtk-font-name", qtSettings.font, 0);
+                    g_object_set(settings, "gtk-font-name", qtSettings.font, NULL);
 
                 svalue.origin="KDE-Settings";
                 svalue.value.g_type=G_TYPE_INVALID;
