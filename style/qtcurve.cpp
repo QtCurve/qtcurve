@@ -3738,10 +3738,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x()+r.width()-2, r.y()+5, r.x()+r.width()-2, r.y()+r.height()-6);
-                            painter->setPen(itsBackgroundCols[0]);
-                            drawAaLine(painter, r.x()+r.width()-1, r.y()+5, r.x()+r.width()-1, r.y()+r.height()-6);
+                            drawFadedLine(painter, QRect(r.x()+r.width()-2, r.y()+5, 1, r.height()-10),
+                                          itsBackgroundCols[QT_STD_BORDER], true, true, false);
+                            drawFadedLine(painter, QRect(r.x()+r.width()-1, r.y()+5, 1, r.height()-10),
+                                          itsBackgroundCols[0], true, true, false);
                         }
                     }
                     else
@@ -7134,16 +7134,26 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
 
 void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz) const
 {
-    QLinearGradient grad(r.topLeft(), horiz ? r.topRight() : r.bottomLeft());
-    QColor          fade(col);
+    bool            aa(p->testRenderHint(QPainter::Antialiasing));
+    QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),
+                    end(r.x()+(horiz ? r.width()-1 : 0)+(aa ? 0.5 : 0.0),
+                        r.y()+(horiz ? 0 : r.height()-1)+(aa ? 0.5 : 0.0));
 
-    fade.setAlphaF(0.0);
-    grad.setColorAt(0, fadeStart && opts.fadeLines ? fade : col);
-    grad.setColorAt(QTC_FADE_SIZE, col);
-    grad.setColorAt(1.0-QTC_FADE_SIZE, col);
-    grad.setColorAt(1, fadeEnd && opts.fadeLines ? fade : col);
-    p->setPen(QPen(QBrush(grad), 1)); 
-    p->drawLine(r.left(), r.top(), r.right(), r.bottom());
+    if(opts.fadeLines && (fadeStart || fadeEnd))
+    {
+        QLinearGradient grad(start, end);
+        QColor          fade(col);
+
+        fade.setAlphaF(0.0);
+        grad.setColorAt(0, fadeStart && opts.fadeLines ? fade : col);
+        grad.setColorAt(QTC_FADE_SIZE, col);
+        grad.setColorAt(1.0-QTC_FADE_SIZE, col);
+        grad.setColorAt(1, fadeEnd && opts.fadeLines ? fade : col);
+        p->setPen(QPen(QBrush(grad), 1));
+    }
+    else
+        p->setPen(col);
+    p->drawLine(start, end);
 }
 
 void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
