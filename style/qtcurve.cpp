@@ -771,31 +771,6 @@ static QtcKey createKey(const QColor &color, EPixmap p)
 #endif
 }
 
-static void readPal(QString &line, QPalette::ColorGroup grp, QPalette &pal)
-{
-    QStringList cols=line.mid(line.indexOf("=#")+1).split("^e", QString::SkipEmptyParts);
-
-    if(16==cols.count())
-    {
-        QStringList::ConstIterator it(cols.begin()),
-                                   end(cols.end());
-
-        for(int i=0; it!=end; ++it, ++i)
-        {
-            QColor col;
-
-            setRgb(&col, (*it).toLatin1().constData());
-            pal.setColor(grp, (QPalette::ColorRole)i, col);
-        }
-    }
-
-#if QT_VERSION >= 0x040300
-    pal.setBrush(grp, QPalette::AlternateBase, pal.color(grp, QPalette::Base).darker(110));
-#else
-    pal.setBrush(grp, QPalette::AlternateBase, pal.color(grp, QPalette::Base).dark(110));
-#endif
-}
-
 #ifndef QTC_USE_KDE4
 static void setRgb(QColor *col, const QStringList &rgb)
 {
