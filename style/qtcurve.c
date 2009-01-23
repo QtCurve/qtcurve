@@ -3107,8 +3107,8 @@ debugDisplayWidget(widget, 3);
 
                 if(x>3 && height>10)
                 {
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x, y+4, height-8);
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+4, height-8);
+                    drawFadedLine(cr, x, y+4, 1, height-8, &qtcPalette.background[QT_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
+                    drawFadedLine(cr, x+1, y+4, 1, height-8, &qtcPalette.background[0], area, NULL, TRUE, TRUE, FALSE);
                 }
             }
             else
