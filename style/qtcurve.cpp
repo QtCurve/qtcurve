@@ -356,6 +356,7 @@ static enum
     APP_KWIN,
     APP_SYSTEMSETTINGS,
     APP_SKYPE,
+    APP_KONQUEROR,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1009,6 +1010,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_PLASMA;
         else if("krunner"==appName)
             theThemedApp=APP_KRUNNER;
+        else if("konqueror"==appName)
+            theThemedApp=APP_KONQUEROR;
         else if("skype"==appName)
             theThemedApp=APP_SKYPE;
 }
@@ -1119,6 +1122,10 @@ void QtCurveStyle::polish(QPalette &palette)
 void QtCurveStyle::polish(QWidget *widget)
 {
     bool enableMouseOver(!equal(opts.highlightFactor, 1.0) || opts.coloredMouseOver);
+
+    // 'Fix' konqueror's large menubar...
+    if(APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
+        widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
 
     if(EFFECT_NONE!=opts.buttonEffect && isNoEtchWidget(widget))
     {
@@ -6531,6 +6538,10 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             newSize.setHeight(newSize.height() - 1);
             newSize.setWidth(newSize.width() + 1);
             break;
+        case CT_MenuBar:
+            if(APP_KONQUEROR==theThemedApp && widget && qobject_cast<const QMenuBar *>(widget))
+                newSize.setHeight(konqMenuBarSize((const QMenuBar *)widget));
+            break;
         default:
             break;
     }
@@ -9089,6 +9100,20 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
     }
 
     return pix;
+}
+
+int QtCurveStyle::konqMenuBarSize(const QMenuBar *menu) const
+{
+    const QFontMetrics   fm(menu->fontMetrics());
+    QSize                sz(100, fm.height());
+
+    QStyleOptionMenuItem opt;
+    opt.fontMetrics = fm;
+    opt.state = QStyle::State_Enabled;
+    opt.menuRect = menu->rect();
+    opt.text = "File";
+    sz = sizeFromContents(QStyle::CT_MenuBarItem, &opt, sz, menu);
+    return sz.height()+6;
 }
 
 const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QColor *use) const

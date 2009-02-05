@@ -50,6 +50,7 @@ typedef QString QtcKey;
 
 class QStyleOptionSlider;
 class QLabel;
+class QMenuBar;
 
 class QtCurveStyle : public QWindowsStyle
 {
@@ -139,6 +140,7 @@ class QtCurveStyle : public QWindowsStyle
     const QColor & getFill(const QStyleOption *option, const QColor *use, bool cr=false) const;
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
+    int            konqMenuBarSize(const QMenuBar *menu) const;
 
     private Q_SLOTS:
 

@@ -14,6 +14,7 @@
 10. Support QLabel buddy widgets, as per KStyle.
 11. Adjust focus margins on checks/radios that don't have text.
 12. Fix misdrawn gradients in kwin's buttons of moveable maximised windows.
+13. 'Fix' Konqueror's menubar height.
 
 0.60
 ----
