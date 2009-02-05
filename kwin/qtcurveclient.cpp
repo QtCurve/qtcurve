@@ -175,8 +175,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QStyleOptionTitleBar opt;
     bool                 active(isActive()),
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
-                                        NULL, NULL));
-    const int            maximiseOffset(MaximizeFull==maximizeMode() ? 3 : 0),
+                                        NULL, NULL)),
+                         mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
+    const int            maximiseOffset(mximised ? 3 : 0),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
@@ -225,7 +226,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     opt.init(widget());
 
-    if(MaximizeFull==maximizeMode())
+    if(mximised)
         r.adjust(-3, -3, 3, 0);
     opt.palette.setColor(QPalette::Button, col);
     opt.palette.setColor(QPalette::Window, windowCol);
