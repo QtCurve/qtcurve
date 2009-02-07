@@ -15,6 +15,8 @@
 11. Adjust focus margins on checks/radios that don't have text.
 12. Fix misdrawn gradients in kwin's buttons of moveable maximised windows.
 13. 'Fix' Konqueror's menubar height.
+14. In config dialog, only enable 'colour seleected tab' checkbox if tab
+    appearance is gradient or inverted.
 
 0.60
 ----
