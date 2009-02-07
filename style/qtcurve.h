@@ -29,6 +29,7 @@
 #include <QPalette>
 #include <QMap>
 #include <QList>
+#include <QSet>
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
@@ -175,7 +176,7 @@ class QtCurveStyle : public QWindowsStyle
     mutable bool                       itsActive;
     mutable const QWidget              *itsSbWidget;
     mutable QLabel                     *itsClickedLabel;
-    QList<QProgressBar *>              itsProgressBars;
+    QSet<QProgressBar *>               itsProgressBars;
     int                                itsProgressBarAnimateTimer,
                                        itsAnimateStep;
     QTime                              itsTimer;

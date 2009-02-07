@@ -1324,7 +1324,10 @@ void QtCurveStyle::unpolish(QWidget *widget)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     }
     else if (qobject_cast<QProgressBar *>(widget))
+    {
         widget->removeEventFilter(this);
+        itsProgressBars.remove((QProgressBar *)widget);
+    }
     else if (widget->inherits("Q3Header"))
     {
         widget->setMouseTracking(false);
@@ -1438,13 +1441,14 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                     ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
             }
             break;
+        case QEvent::StyleChange:
         case QEvent::Show:
         {
             QProgressBar *bar = qobject_cast<QProgressBar *>(object);
 
             if(bar)
             {
-                itsProgressBars.append(bar);
+                itsProgressBars.insert(bar);
                 if (1==itsProgressBars.size())
                 {
                     itsTimer.start();
@@ -1474,7 +1478,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             // So we have to check on object.
             if(object && !itsProgressBars.isEmpty())
             {
-                itsProgressBars.removeAll(reinterpret_cast<QProgressBar*>(object));
+                itsProgressBars.remove(reinterpret_cast<QProgressBar*>(object));
                 if (itsProgressBars.isEmpty())
                 {
                     killTimer(itsProgressBarAnimateTimer);
