@@ -9138,6 +9138,11 @@ void QtCurveStyle::setupKde4()
 {
 #ifdef QTC_USE_KDE4
     checkKComponentData();
+    if(!kapp)
+    {
+        applyKdeSettings(true);
+        applyKdeSettings(false);
+    }
 #endif
 }
 
