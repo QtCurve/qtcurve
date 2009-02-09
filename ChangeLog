@@ -6,6 +6,8 @@
 4. Add option to use faded lines (toolbar separators, menutitem separators,
    etc.)
 5. Fix mis-painted pixels on selected tab.
+6. Custom gradient fix where "," is used for decimal - thanks to
+   Cedric Bellegarde
 
 0.60
 ----
