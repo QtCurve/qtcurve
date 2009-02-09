@@ -3579,7 +3579,7 @@ debugDisplayWidget(widget, 3);
                                      0==strcmp(detail,"handlebox_bin") ) )
                         || WIDGET_TYPE_NAME("PanelAppletFrame")))
     {
-        if(GTK_SHADOW_NONE!=shadow_type)
+        //if(GTK_SHADOW_NONE!=shadow_type)
         {
             GdkColor    bgnd=activeWindow && menubar && USE_SHADED_MENU_BAR_COLORS
                                     ? qtcPalette.menubar[ORIGINAL_SHADE]
