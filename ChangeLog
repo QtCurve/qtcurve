@@ -10,6 +10,7 @@
    Cedric Bellegarde
 7. Default to reading KDE4 settings if KDE_SESSION_VERSION is not set. To
    default to KDE3 instead, call cmake with -DQTC_DEFAULT_TO_KDE3=true
+8. Fix reading in of Qt4 tooltip colours.
 
 0.60
 ----

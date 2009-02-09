@@ -321,14 +321,14 @@ static char * themeFile(const char *prefix, const char *name, char **tmpStr)
     return f;
 }
 
-static void parseQtColors(char *line, int p)
+static void parseQtColors(char *line, int p, gboolean readToolTip)
 {
     int  n=-1;
     char *l=strtok(line, "#");
 
     while(l)
     {
-        if(8==strlen(l))
+        if(strlen(l)>=7)
             switch(n)
             {
                 case 0:
@@ -367,12 +367,11 @@ static void parseQtColors(char *line, int p)
                 default:
                     break;
             }
-        else
-            if(n>-1)
-                break;
+        else if(n>-1)
+            break;
 
         n++;
-        if(n>13)
+        if(n>(readToolTip ? 19 : 13))
             break;
         l=strtok(NULL, "#");
     }
@@ -557,14 +556,14 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                 else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
                           (QT4==ft ? 0==strncmp_i(line, "Palette\\active=", 15) : 0==strncmp_i(line, "active=", 7)))
                 {
-                    parseQtColors(line, PAL_ACTIVE);
+                    parseQtColors(line, PAL_ACTIVE, QT4==ft);
                     found|=RD_ACT_PALETTE;
                 }
 #ifdef QTC_READ_INACTIVE_PAL
                 else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
                           (QT4==ft ? 0==strncmp_i(line, "Palette\\inactive=", 17) : 0==strncmp_i(line, "inactive=", 9)))
                 {
-                    parseQtColors(line, PAL_INACTIVE);
+                    parseQtColors(line, PAL_INACTIVE, QT4==ft);
                     found|=RD_INACT_PALETTE;
                 }
 #endif
@@ -688,7 +687,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
     {
         strncpy(line, DEFAULT_KDE_ACT_PAL, QTC_MAX_INPUT_LINE_LEN);
         line[QTC_MAX_INPUT_LINE_LEN]='\0';
-        parseQtColors(line, PAL_ACTIVE);
+        parseQtColors(line, PAL_ACTIVE, false);
     }
 
 #ifdef QTC_READ_INACTIVE_PAL
@@ -696,7 +695,7 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
     {
         strncpy(line, DEFAULT_KDE_INACT_PAL, QTC_MAX_INPUT_LINE_LEN);
         line[QTC_MAX_INPUT_LINE_LEN]='\0';
-        parseQtColors(line, PAL_INACTIVE);
+        parseQtColors(line, PAL_INACTIVE, false);
     }
 #endif
 
@@ -1903,12 +1902,12 @@ static gboolean qtInit(Options *opts)
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue),
                         toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].red),
                         toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].green),
-                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].blue));
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP].blue),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].red),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].green),
+                        toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT].blue));
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
 
