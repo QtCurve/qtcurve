@@ -32,7 +32,6 @@
 #include <stdio.h>
 
 #define QTC_READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
-#define QTC_DEFAULT_TO_KDE3   /* Should we default to KDE3, or KDE4 settings when not running under KDE? */
 
 #define toQtColor(col) \
     col>>8
@@ -189,7 +188,7 @@ static gboolean useQt3Settings()
 #ifdef QTC_DEFAULT_TO_KDE3
     return !vers || atoi(vers)<4;
 #else
-    return vers && atoi(vers)<4);
+    return vers && atoi(vers)<4;
 #endif
 }
 

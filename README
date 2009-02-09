@@ -26,6 +26,10 @@ The following options may be supplied to cmake:
        dialogs. Note: This will cause errors to be printed to the console,
        and is only an experiment!
 
+    -DQTC_DEFAULT_TO_KDE3=true
+       If the KDE_SESSION_VERSION is not set, then assume we are running
+       under KDE3. If this cmake option is not set, then KDE4 is assumed.
+
 Themes
 ------
 As of v0.55, you can create QtCurve based themes. These will appear with KDE's style
