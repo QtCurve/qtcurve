@@ -614,7 +614,7 @@ static double readDoubleEntry(GHashTable *cfg, char *key, double def)
 {
     char *str=readStringEntry(cfg, key);
 
-    return str ? atof(str) : def;
+    return str ? g_ascii_strtod(str, NULL) : def;
 }
 */
 
@@ -981,7 +981,7 @@ TODO: New versions (>0.60) need to handle config changes...
                         {
                             if(c)
                                 *c='\0';
-                            opts->customShades[j]=atof(str);
+                            opts->customShades[j]=g_ascii_strtod(str, NULL);
                             str=c+1;
                         }
                         else
@@ -1055,7 +1055,7 @@ TODO: New versions (>0.60) need to handle config changes...
                                     if(c)
                                     {
                                         *c='\0';
-                                        opts->customGradient[i]->grad[j/2].pos=atof(str);
+                                        opts->customGradient[i]->grad[j/2].pos=g_ascii_strtod(str, NULL);
                                         str=c+1;
                                         c=str ? strchr(str, ',') : 0L;
 
@@ -1063,7 +1063,7 @@ TODO: New versions (>0.60) need to handle config changes...
                                         {
                                             if(c)
                                                 *c='\0';
-                                            opts->customGradient[i]->grad[j/2].val=atof(str);
+                                            opts->customGradient[i]->grad[j/2].val=g_ascii_strtod(str, NULL);
                                             str=c ? c+1 : c;
                                         }
                                         else
