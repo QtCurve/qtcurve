@@ -3043,6 +3043,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 isFlat = (button->features & QStyleOptionButton::Flat);
             }
 
+            isDefault=isDefault || (doEtch && FOCUS_FILLED==opts.focus && MO_GLOW==opts.coloredMouseOver &&
+                                    state&State_HasFocus && state&State_Enabled);
             if(isFlat && !isDown && !(state&State_MouseOver))
                 return;
 
@@ -5465,16 +5467,24 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QStyleOptionFocusRect fr;
 
                     fr.QStyleOption::operator=(*toolbutton);
-                    if(etched)
-                        fr.rect.adjust(4, 4, -4, -4);
+                    if(FOCUS_FILLED==opts.focus)
+                    {
+                        if(etched && MO_GLOW==opts.coloredMouseOver)
+                            fr.rect.adjust(1, 1, -1, -1);
+                    }
                     else
-                        fr.rect.adjust(3, 3, -3, -3);
+                    {
+                        if(etched)
+                            fr.rect.adjust(4, 4, -4, -4);
+                        else
+                            fr.rect.adjust(3, 3, -3, -3);
 #if QT_VERSION >= 0x040300
-                    if (toolbutton->features & QStyleOptionToolButton::MenuButtonPopup)
+                        if (toolbutton->features & QStyleOptionToolButton::MenuButtonPopup)
 #else
-                    if (toolbutton->features & QStyleOptionToolButton::Menu)
+                        if (toolbutton->features & QStyleOptionToolButton::Menu)
 #endif
-                        fr.rect.adjust(0, 0, -(pixelMetric(QStyle::PM_MenuButtonIndicator, toolbutton, widget)-1), 0);
+                            fr.rect.adjust(0, 0, -(pixelMetric(QStyle::PM_MenuButtonIndicator, toolbutton, widget)-1), 0);
+                    }
                     drawPrimitive(PE_FrameFocusRect, &fr, painter, widget);
                 }
                 QStyleOptionToolButton label = *toolbutton;
@@ -6332,12 +6342,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(QTC_DO_EFFECT)
                 {
-                    if(!sunken && MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled &&
-                       !comboBox->editable)
-                        drawGlow(painter, r, WIDGET_COMBO);
+                    if(!sunken && MO_GLOW==opts.coloredMouseOver &&
+                        ((FOCUS_FILLED==opts.focus && state&State_HasFocus) || state&State_MouseOver) &&
+                       state&State_Enabled && !comboBox->editable)
+                        drawGlow(painter, r,
+                                 FOCUS_FILLED==opts.focus && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO);
                     else
                         drawEtch(painter, r, widget, WIDGET_COMBO,
-                                 !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
+                                !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
 
                     frame.adjust(1, 1, -1, -1);
                 }
@@ -6351,7 +6363,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     QStyleOption frameOpt(*option);
 
-
                     if (comboBox->editable && !(comboBox->activeSubControls & SC_ComboBoxArrow))
                         frameOpt.state &= ~(State_Sunken | State_MouseOver);
 
@@ -6363,7 +6374,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     drawLightBevel(painter, frame, &frameOpt, widget,
                                    comboBox->editable ? (reverse ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL,
-                                   getFill(&frameOpt, use), use, true, comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
+                                   getFill(&frameOpt, use), use, true,
+                                   comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
                 }
 
                 if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
