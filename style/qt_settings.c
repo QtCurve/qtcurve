@@ -1531,7 +1531,7 @@ static gboolean qtInit(Options *opts)
             {
                 /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
                 /* ...and inactive highlight!!! */
-                static const int constFileVersion=2;
+                static const int constFileVersion=3;
                 static const int constVersionLen=1+2+(6*3)+1+1;
 
                 FILE     *f=NULL;
@@ -1563,11 +1563,11 @@ static gboolean qtInit(Options *opts)
                     fprintf(f, "%s\n"
                                 "# Fix for KDE's \"apply colors to non-KDE"
                                 " apps\" setting\n"
-                                "style \"QtCTxtFix\" "
+                                "style \""QTC_RC_SETTING"TxtFix\" "
                                 "{fg[ACTIVE]=\"#%02X%02X%02X\""
                                 " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
-                                "class \"*MenuItem\" style \"QtCTxtFix\" "
-                                "widget_class \"*.*ProgressBar\" style \"QtCTxtFix\"",
+                                "class \"*MenuItem\" style \""QTC_RC_SETTING"TxtFix\" "
+                                "widget_class \"*.*ProgressBar\" style \""QTC_RC_SETTING"TxtFix\"",
                                 version,
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
@@ -1578,10 +1578,10 @@ static gboolean qtInit(Options *opts)
                                 toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
 
                     if(opts->inactiveHighlight)
-                        fprintf(f, "style \"QtCHlFix\" "
+                        fprintf(f, "style \""QTC_RC_SETTING"HlFix\" "
                                     "{base[ACTIVE]=\"#%02X%02X%02X\""
                                     " text[ACTIVE]=\"#%02X%02X%02X\"}"
-                                    "class \"*\" style \"QtCHlFix\"",
+                                    "class \"*\" style \""QTC_RC_SETTING"HlFix\"",
 
                                     toQtColor(qtSettings.inactiveSelectCol.red),
                                     toQtColor(qtSettings.inactiveSelectCol.green),
