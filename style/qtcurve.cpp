@@ -1871,7 +1871,12 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 
 QPalette QtCurveStyle::standardPalette() const
 {
+#ifdef QTC_USE_KDE4
+    checkKComponentData();
+    return KGlobalSettings::createApplicationPalette(KSharedConfig::openConfig(KGlobal::mainComponent()));
+#else
     return QCommonStyle::standardPalette();
+#endif
 }
 
 QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
