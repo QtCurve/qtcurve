@@ -1274,7 +1274,7 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=true;
     opts->groupBoxLine=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->fadeLines=false;
+    opts->fadeLines=true;
 #endif
     opts->colorMenubarMouseOver=true;
     opts->inactiveHighlight=false;
