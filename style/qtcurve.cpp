@@ -4501,7 +4501,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 
                 if (!comboBox->currentText.isEmpty() && !comboBox->editable)
                     drawItemText(painter, editRect, Qt::AlignLeft|Qt::AlignVCenter, palette,
-                                 state&State_Enabled, comboBox->currentText);
+                                 state&State_Enabled, comboBox->currentText, QPalette::ButtonText);
                 painter->restore();
             }
             break;
