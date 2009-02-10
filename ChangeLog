@@ -13,6 +13,7 @@
  8. Fix reading in of Qt4 tooltip colours.
  9. Don't allow QtCurve's colours to be overriden.
 10. Make 'filled focus' fill the complete widget for buttons and combos.
+11. Use button text colour for combo boxes.
 
 0.60
 ----

@@ -4651,7 +4651,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-        but=isOnButton(widget, 0, &def_but);
+        but=isOnButton(widget, 0, &def_but) || isOnCombo(widget, 0);
 
         if(but && GTK_STATE_INSENSITIVE!=state)
         {
