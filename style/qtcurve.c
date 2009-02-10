@@ -5752,9 +5752,12 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 #endif
 
     {
-    gboolean doEtch=QTC_DO_EFFECT;
+    gboolean doEtch=QTC_DO_EFFECT,
+             btn=false,
+             comboButton=false,
+             rev=reverseLayout(widget->parent);
 
-    if(opts.comboSplitter && isComboBox(widget))
+    if(opts.comboSplitter && FOCUS_FILLED!=opts.focus && isComboBox(widget))
     {
 /*
         x++;
@@ -5763,19 +5766,21 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 */
         width+=2; /* Remove if re-add the above */
 
-        if(widget && reverseLayout(widget->parent))
+        if(widget && rev)
             x+=20;
         width-=22;
 
         if(isGimpCombo(widget))
             x+=2, y+=2, width-=4, height-=4;
+        btn=true;
     }
     else if(GTK_IS_OPTION_MENU(widget))
     {
-        if(!opts.comboSplitter && widget && widget->allocation.width>width)
+        if((!opts.comboSplitter || FOCUS_FILLED==opts.focus) && widget && widget->allocation.width>width)
             width=widget->allocation.width-(doEtch ? 8 : 4);
 
         x++, y++, width-=2, height-=2;
+        btn=true;
     }
 
     if(isComboBoxEntryButton(widget))
@@ -5784,12 +5789,14 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             x++, y+=2, width-=3, height-=4;
         else
             x++, y++, width-=2, height-=2;
+        btn=comboButton=true;
     }
     else if(GTK_IS_BUTTON(widget) && !GTK_IS_RADIO_BUTTON(widget) && !GTK_IS_CHECK_BUTTON(widget))
     {
         y--, height+=2;
         if(doEtch)
             x--, width+=2;
+        btn=true;
     }
 
     if(FOCUS_STANDARD==opts.focus)
@@ -5809,8 +5816,11 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         if(FOCUS_FILLED==opts.focus)
         {
+            if(btn)
+                x-=3, y-=3, width+=6, height+=6;
+
             if(drawRounded)
-                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), ROUNDED_ALL);
+                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
@@ -5818,7 +5828,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             cairo_new_path(cr);
         }
         if(drawRounded)
-            createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), ROUNDED_ALL);
+            createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), FOCUS_FILLED==opts.focus && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
         else
             cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
