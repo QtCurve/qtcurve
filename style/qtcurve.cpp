@@ -4464,7 +4464,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                       shiftV=sunken ? pixelMetric(PM_ButtonShiftVertical, option, widget) : 0;
 
                 painter->save();
-                painter->setClipRect(editRect);
 
                 if (!comboBox->currentIcon.isNull())
                 {
@@ -4492,8 +4491,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (sunken)
                     editRect.translate(shiftH, shiftV);
 
+                editRect.adjust(1, 0, -1, 0);
+                painter->setClipRect(editRect);
+                
                 if (!comboBox->currentText.isEmpty() && !comboBox->editable)
-                    drawItemText(painter, editRect.adjusted(1, 0, -1, 0), Qt::AlignLeft|Qt::AlignVCenter, palette,
+                    drawItemText(painter, editRect, Qt::AlignLeft|Qt::AlignVCenter, palette,
                                  state&State_Enabled, comboBox->currentText);
                 painter->restore();
             }
