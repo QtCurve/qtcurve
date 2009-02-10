@@ -21,6 +21,7 @@
 16. Fix animation of progressbars.
 17. Fix applying of KDE4 colors to non-KDE4 applications that have a KComponentData.
 18. Fix slight overpainting of corners of active tab.
+19. Dont darken background of dock widget titlebars, just draw a line underneath.
 
 0.60
 ----

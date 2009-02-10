@@ -3589,23 +3589,37 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_DockWidgetTitle:
             if (const QStyleOptionDockWidget *dwOpt = qstyleoption_cast<const QStyleOptionDockWidget *>(option))
             {
+#if QT_VERSION >= 0x040300
+                const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
+                bool verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
+#endif
                 // This section fixes the look of KOffice's dock widget titlebars...
                 QRect fillRect(r);
                 if(widget && widget->inherits("KoDockWidgetTitleBar"))
                     fillRect.adjust(-r.x(), -r.y(), r.x(), r.y());
 
                 painter->save();
-    #if QT_VERSION >= 0x040300
-                painter->fillRect(fillRect, palette.background().color().darker(105));
-    #else
-                painter->fillRect(fillRect, palette.background().color().dark(105));
-    #endif
+//     #if QT_VERSION >= 0x040300
+//                 painter->fillRect(fillRect, palette.background().color().darker(105));
+//     #else
+//                 painter->fillRect(fillRect, palette.background().color().dark(105));
+//     #endif
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                QPen old(painter->pen());
+#if QT_VERSION >= 0x040300
+                if(verticalTitleBar)
+                    drawFadedLine(painter, QRect(fillRect.x()+fillRect.width()/2, fillRect.y(), 1, fillRect.height()),
+                                  itsBackgroundCols[QT_STD_BORDER], true, true, false);
+                else
+#endif
+                    drawFadedLine(painter, QRect(fillRect.x(), fillRect.y()+fillRect.height()-2, fillRect.width(), 1),
+                                  itsBackgroundCols[QT_STD_BORDER], true, true, true);
+                painter->setRenderHint(QPainter::Antialiasing, false);
+                painter->setPen(old);
+
                 if (!dwOpt->title.isEmpty())
                 {
 #if QT_VERSION >= 0x040300
-                    const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
-                    bool verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
-
                     QRect titleRect(subElementRect(SE_DockWidgetTitleBarText, option, widget));
 
                     if (verticalTitleBar)
