@@ -4080,22 +4080,20 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
                                         false, opts.menuStripeAppearance, WIDGET_OTHER);
 
-                    int w(0);
-
-                    if (!menuItem->text.isEmpty())
-                    {
-                        painter->setFont(menuItem->font);
-                        drawItemText(painter, menuItem->rect.adjusted(5, 0, -5, 0), Qt::AlignLeft | Qt::AlignVCenter,
-                                     palette, state&State_Enabled, menuItem->text, QPalette::Text);
-                        w = menuItem->fontMetrics.width(menuItem->text) + 5;
-                    }
-
-                    QRect miRect(menuItem->rect.left() + 3 + (reverse ? 0 : w) +
+                    QRect miRect(menuItem->rect.left() + 3 +
                                     (!reverse && doStripe ? stripeWidth : 0),
                                     menuItem->rect.center().y(),
                                     menuItem->rect.width() - (7 + (doStripe ? stripeWidth : 0)),
                                     1);
                     drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
+
+//                     if (!menuItem->text.isEmpty())
+//                     {
+//                         painter->setFont(menuItem->font);
+//                         drawItemText(painter, menuItem->rect.adjusted(5, 0, -5, 0), Qt::AlignLeft | Qt::AlignVCenter,
+//                                      palette, state&State_Enabled, menuItem->text, QPalette::Text);
+//                     }
+
                     painter->restore();
                     break;
                 }
@@ -6537,7 +6535,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 int h(newSize.height()-8); // Fix mainly for Qt4.4
 
                 if (QStyleOptionMenuItem::Separator==mi->menuItemType)
-                    h = mi->text.isEmpty() ? (opts.thinnerMenuItems ? 6 : 8) : mi->fontMetrics.lineSpacing();
+                    h =/* mi->text.isEmpty() ? */(opts.thinnerMenuItems ? 6 : 8)/* : mi->fontMetrics.lineSpacing()*/;
                 else
                 {
                     h = qMax(h, mi->fontMetrics.height());

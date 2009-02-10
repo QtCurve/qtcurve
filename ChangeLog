@@ -22,6 +22,7 @@
 17. Fix applying of KDE4 colors to non-KDE4 applications that have a KComponentData.
 18. Fix slight overpainting of corners of active tab.
 19. Dont darken background of dock widget titlebars, just draw a line underneath.
+20. Dont draw menuitem separator titles.
 
 0.60
 ----
