@@ -26,6 +26,7 @@
 21. If print properties dialog title is empty, then use title from print dialog.
     This stops the properites window from having the executable name as its title.
 22. Fix clipping of pressed combo box text.
+23. Make 'filled focus' fill the complete widget for buttons and combos.
 
 0.60
 ----

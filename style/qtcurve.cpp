@@ -6410,7 +6410,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         QStyleOptionFocusRect focus;
 
-                        if(opts.comboSplitter)
+                        if(FOCUS_FILLED==opts.focus)
+                            focus.rect=frame;
+                        else if(opts.comboSplitter)
                             focus.rect=reverse
                                         ? field.adjusted(0, -1, 1, 1)
                                         : field.adjusted(-1, -1, 0, 1);
@@ -6608,9 +6610,20 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
             break;
 #endif
         case SE_PushButtonFocusRect:
-            rect=QTC_BASE_STYLE::subElementRect(element, option, widget);
-            if(QTC_DO_EFFECT)
-                 rect.adjust(1, 1, -1, -1);
+            if(FOCUS_FILLED==opts.focus)
+            {
+                rect=subElementRect(SE_PushButtonContents, option, widget);
+                if(QTC_DO_EFFECT)
+                    rect.adjust(-1, -1, 1, 1);
+                else
+                    rect.adjust(-2, -2, 2, 2);
+            }
+            else
+            {
+                rect=QTC_BASE_STYLE::subElementRect(element, option, widget);
+                if(QTC_DO_EFFECT)
+                    rect.adjust(1, 1, -1, -1);
+            }
             return rect;
         default:
             return QTC_BASE_STYLE::subElementRect(element, option, widget);
