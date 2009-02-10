@@ -2967,6 +2967,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     int adjust=qMin(qMin(abs(widget->rect().x()-r.x()), 2), abs(widget->rect().y()-r.y()));
                     r2.adjust(-adjust, -adjust, adjust, adjust);
                 }
+
+                if(widget && ::qobject_cast<const QGroupBox *>(widget))
+                   r2.adjust(0, 2, 0, 0);
                 
                 if(FOCUS_STANDARD==opts.focus)
                 {
