@@ -2371,7 +2371,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QStyleOptionFrameV2 frameV2(*frame);
                 if (frameV2.features & QStyleOptionFrameV2::Flat || opts.groupBoxLine)
                     drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1),
-                                  backgroundColors(option)[QT_STD_BORDER], false, true, true);
+                                  backgroundColors(option)[QT_STD_BORDER], reverse, !reverse, true);
                 else
                 {
                     frameV2.state &= ~(State_Sunken | State_HasFocus);
@@ -2382,7 +2382,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_Frame:
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
                 drawFadedLine(painter, QRect(r.x(), (r.y()+r.height())-2, r.width(), 1),
-                              backgroundColors(option)[QT_STD_BORDER], false, true, true);
+                              backgroundColors(option)[QT_STD_BORDER], reverse, !reverse, true);
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
             {
                 if(opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
