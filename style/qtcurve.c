@@ -3113,6 +3113,7 @@ debugDisplayWidget(widget, 3);
             }
             else
             {
+                gboolean glowFocus=GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && FOCUS_FILLED==opts.focus;
                 EWidget  widgetType=isComboBoxButton(widget)
                                     ? WIDGET_COMBO_BUTTON
                                     : slider
@@ -3122,7 +3123,7 @@ debugDisplayWidget(widget, 3);
                                             : lvh
                                                 ? WIDGET_LISTVIEW_HEADER
                                                 : combo || optionmenu
-                                                    ? WIDGET_STD_BUTTON
+                                                    ? (glowFocus ? WIDGET_DEF_BUTTON : WIDGET_STD_BUTTON)
                                                     : tbar_button
                                                         ?
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
@@ -3131,11 +3132,12 @@ debugDisplayWidget(widget, 3);
                                                             WIDGET_STD_BUTTON
 #endif
                                                         : togglebutton
-                                                            ? WIDGET_TOGGLE_BUTTON
+                                                            ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
                                                             : checkbox
                                                                 ? WIDGET_CHECKBOX
                                                                     : button
-                                                                        ? defBtn && IND_COLORED!=opts.defBtnIndicator
+                                                                        ? (defBtn && IND_COLORED!=opts.defBtnIndicator) ||
+                                                                          glowFocus
                                                                             ? WIDGET_DEF_BUTTON
                                                                             : WIDGET_STD_BUTTON
                                                                         : stepper || sbar
