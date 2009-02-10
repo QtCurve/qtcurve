@@ -23,6 +23,8 @@
 18. Fix slight overpainting of corners of active tab.
 19. Dont darken background of dock widget titlebars, just draw a line underneath.
 20. Dont draw menuitem separator titles.
+21. If print properties dialog title is empty, then use title from print dialog.
+    This stops the properites window from having the executable name as its title.
 
 0.60
 ----

@@ -1205,6 +1205,13 @@ void QtCurveStyle::polish(QWidget *widget)
     }
     else if(qobject_cast<QLabel*>(widget))
         widget->installEventFilter(this);
+    else if(qobject_cast<QDialog*>(widget) && widget->inherits("QPrintPropertiesDialog") &&
+            widget->parentWidget() && widget->parentWidget()->topLevelWidget() &&
+            widget->topLevelWidget() && widget->topLevelWidget()->windowTitle().isEmpty() &&
+            !widget->parentWidget()->topLevelWidget()->windowTitle().isEmpty())
+    {
+        widget->topLevelWidget()->setWindowTitle(widget->parentWidget()->topLevelWidget()->windowTitle());
+    }
     else if(opts.fixParentlessDialogs)
         if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
         {
