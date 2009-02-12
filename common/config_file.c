@@ -651,14 +651,14 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_ROUND(ENTRY) \
     opts->ENTRY=toRound(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#define QTC_CFG_READ_DI(ENTRY) \
-    opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, (int)((def->ENTRY*100.0)-99.5))+100))/100.0;
+#define QTC_CFG_READ_INT(ENTRY) \
+    opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
 
-#define QTC_CFG_READ_DI_BOOL(ENTRY) \
+#define QTC_CFG_READ_INT_BOOL(ENTRY) \
     if(readBoolEntry(cfg, #ENTRY, false)) \
         opts->ENTRY=def->ENTRY; \
     else \
-        opts->ENTRY=((double)(readNumEntry(cfg, #ENTRY, (int)((def->ENTRY*100.0)-99.5))+100))/100.0;
+        opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
     
 #define QTC_CFG_READ_TB_BORDER(ENTRY) \
     opts->ENTRY=toTBarBorder(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -787,7 +787,7 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                 def->flatSbarButtons=false;
                 def->comboSplitter=true;
                 def->handles=LINE_DOTS;
-                def->lighterPopupMenuBgnd=1.15;
+                def->lighterPopupMenuBgnd=15;
                 def->activeTabAppearance=APPEARANCE_GRADIENT;
                 def->groupBoxLine=false;
                 def->shadeSliders=SHADE_BLEND_SELECTED;
@@ -795,14 +795,14 @@ static bool readConfig(const char *file, Options *opts, Options *def)
 
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
-            QTC_CFG_READ_DI(highlightFactor)
+            QTC_CFG_READ_INT(highlightFactor)
+            QTC_CFG_READ_INT_BOOL(lighterPopupMenuBgnd)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
             QTC_CFG_READ_BOOL(fixParentlessDialogs)
             QTC_CFG_READ_STRIPE(stripedProgress)
             QTC_CFG_READ_SLIDER(sliderStyle)
             QTC_CFG_READ_BOOL(animatedProgress)
-            QTC_CFG_READ_DI_BOOL(lighterPopupMenuBgnd)
             QTC_CFG_READ_BOOL(embolden)
             QTC_CFG_READ_DEF_BTN(defBtnIndicator)
             QTC_CFG_READ_LINE(sliderThumbs)
@@ -1171,11 +1171,10 @@ static bool readConfig(const char *file, Options *opts, Options *def)
             else if(APPEARANCE_BEVELLED==opts->menuStripeAppearance)
                 opts->menuStripeAppearance=APPEARANCE_GRADIENT;
 #endif
-            if(opts->highlightFactor<((100.0+MIN_HIGHLIGHT_FACTOR)/100.0) ||
-               opts->highlightFactor>((100.0+MAX_HIGHLIGHT_FACTOR)/100.0))
+            if(opts->highlightFactor<MIN_HIGHLIGHT_FACTOR || opts->highlightFactor>MAX_HIGHLIGHT_FACTOR)
                 opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
 
-            if(opts->lighterPopupMenuBgnd>((100.0+MAX_LIGHTER_POPUP_MENU)/100.0))
+            if(opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
                 opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
 
             if(opts->animatedProgress && !opts->stripedProgress)
@@ -1652,12 +1651,6 @@ static const char *toStr(EFocus f)
     else \
         CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, DARK, CONVERT_SHADE));
 
-#define CFG_WRITE_ENTRY_D(ENTRY) \
-    if (!exportingStyle && def.ENTRY==opts.ENTRY) \
-        CFG.deleteEntry(#ENTRY); \
-    else \
-        CFG.writeEntry(#ENTRY, (int)((opts.ENTRY*100.0)-99.5));
-
 #define CFG_WRITE_ENTRY_NUM(ENTRY) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
@@ -1695,14 +1688,14 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG.writeEntry(QTC_VERSION_KEY, VERSION);
         CFG_WRITE_ENTRY_NUM(passwordChar)
         CFG_WRITE_ENTRY(round)
-        CFG_WRITE_ENTRY_D(highlightFactor)
+        CFG_WRITE_ENTRY_NUM(highlightFactor)
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_ENTRY_FORCE(appearance)
         CFG_WRITE_ENTRY(fixParentlessDialogs)
         CFG_WRITE_ENTRY(stripedProgress)
         CFG_WRITE_ENTRY(sliderStyle)
         CFG_WRITE_ENTRY(animatedProgress)
-        CFG_WRITE_ENTRY_D(lighterPopupMenuBgnd)
+        CFG_WRITE_ENTRY_NUM(lighterPopupMenuBgnd)
         CFG_WRITE_ENTRY(embolden)
         CFG_WRITE_ENTRY(defBtnIndicator)
         CFG_WRITE_ENTRY_B(sliderThumbs, false)

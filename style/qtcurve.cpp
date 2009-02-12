@@ -925,7 +925,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
     if(USE_LIGHTER_POPUP_MENU)
         itsLighterPopupMenuBgndCol=shade(itsBackgroundCols[ORIGINAL_SHADE],
-                                         opts.lighterPopupMenuBgnd);
+                                         QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
 
     switch(opts.shadeCheckRadio)
     {
@@ -1080,7 +1080,7 @@ void QtCurveStyle::polish(QPalette &palette)
 
     if(USE_LIGHTER_POPUP_MENU && newGray)
         itsLighterPopupMenuBgndCol=shade(itsBackgroundCols[ORIGINAL_SHADE],
-                                         opts.lighterPopupMenuBgnd);
+                                         QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
 
     switch(opts.shadeCheckRadio)
     {
@@ -1121,7 +1121,7 @@ void QtCurveStyle::polish(QPalette &palette)
 
 void QtCurveStyle::polish(QWidget *widget)
 {
-    bool enableMouseOver(!equal(opts.highlightFactor, 1.0) || opts.coloredMouseOver);
+    bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
     // 'Fix' konqueror's large menubar...
     if(APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
@@ -3449,7 +3449,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
             painter->save();
             painter->fillRect(r, QColor(state&State_MouseOver
-                                      ? shade(palette.background().color(), opts.highlightFactor)
+                                      ? shade(palette.background().color(), QTC_TO_FACTOR(opts.highlightFactor))
                                       : palette.background().color()));
             switch(opts.splitters)
             {
@@ -5347,7 +5347,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             highlightRect.setRight(r.right());
                         else
                             highlightRect.setX(r.x());
-                        painter->fillRect(highlightRect, shade(palette.background().color(), opts.highlightFactor));
+                        painter->fillRect(highlightRect,
+                                          shade(palette.background().color(), QTC_TO_FACTOR(opts.highlightFactor)));
                     }
                     QTC_BASE_STYLE::drawControl(element, &copy, painter, widget);
                     break;
@@ -8812,13 +8813,14 @@ void QtCurveStyle::shadeColors(const QColor &base, QColor *vals) const
 {
     QTC_SHADES
 
-    bool useCustom(NUM_STD_SHADES==opts.customShades.size());
+    bool   useCustom(NUM_STD_SHADES==opts.customShades.size());
+    double hl=QTC_TO_FACTOR(opts.highlightFactor);
 
     for(int i=0; i<NUM_STD_SHADES; ++i)
         shade(base, &vals[i], useCustom ? opts.customShades[i] : QTC_SHADE(opts.contrast, i));
-    shade(base, &vals[SHADE_ORIG_HIGHLIGHT], opts.highlightFactor);
-    shade(vals[4], &vals[SHADE_4_HIGHLIGHT], opts.highlightFactor);
-    shade(vals[2], &vals[SHADE_2_HIGHLIGHT], opts.highlightFactor);
+    shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
+    shade(vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
+    shade(vals[2], &vals[SHADE_2_HIGHLIGHT], hl);
     vals[ORIGINAL_SHADE]=base;
 }
 

@@ -253,14 +253,15 @@ typedef GdkColor color;
 #define TOO_DARK(A) ((A).red<MENUBAR_DARK_LIMIT || (A).green<MENUBAR_DARK_LIMIT || (A).blue<MENUBAR_DARK_LIMIT)
 #endif
 
-#define DEFAULT_HIGHLIGHT_FACTOR   1.05
-#define MAX_HIGHLIGHT_FACTOR         50
-#define MIN_HIGHLIGHT_FACTOR        -50
-#define MENUBAR_DARK_FACTOR        0.97
-#define INACTIVE_HIGHLIGHT_FACTOR  1.20
-#define DEF_POPUPMENU_LIGHT_FACTOR 1.02
-#define MIN_LIGHTER_POPUP_MENU        0
-#define MAX_LIGHTER_POPUP_MENU      100
+#define QTC_TO_FACTOR(A) ((100.0+((double)A))/100.0)
+#define DEFAULT_HIGHLIGHT_FACTOR                   5
+#define MAX_HIGHLIGHT_FACTOR                      50
+#define MIN_HIGHLIGHT_FACTOR                     -50
+#define MENUBAR_DARK_FACTOR        QTC_TO_FACTOR(-3)
+#define INACTIVE_HIGHLIGHT_FACTOR  QTC_TO_FACTOR(20)
+#define DEF_POPUPMENU_LIGHT_FACTOR                 2
+#define MIN_LIGHTER_POPUP_MENU                     0
+#define MAX_LIGHTER_POPUP_MENU                   100
 
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd>1)
 
@@ -1059,8 +1060,8 @@ typedef struct
 
 #endif
     int              contrast,
-                     passwordChar;
-    double           highlightFactor,
+                     passwordChar,
+                     highlightFactor,
                      lighterPopupMenuBgnd;
     ERound           round;
     bool             embolden,
