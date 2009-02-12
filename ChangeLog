@@ -1,5 +1,5 @@
 0.61
-------
+----
  1. Only draw coloured border for moused-over items if they are enabled!
  2. Fix slight redraw errors with scrolbar slider when using flat buttons.
  3. Add option to draw line after frameless groupbox title.
@@ -16,6 +16,20 @@
 11. Use button text colour for combo boxes.
 12. Add 'none' to toolbar handles and splitters style.
 13. Fix reading of KDE4 toolbar style.
+14. Change defaults:
+        Button effect: Shadow
+        Mouse over: Glow
+        Default button indicator: Glow
+        V arrows
+        Flat toolbars
+        Filled focus
+        Gradient selection
+        Flat scrollbar buttons
+        No combo line
+        Sunken toolbar handles
+        Only lighten popupmenus by 2%
+        Flat active tab
+        Don't shade sliders
 
 0.60
 ----
