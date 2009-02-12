@@ -515,7 +515,11 @@ static int readVersionEntry(QtCConfig &cfg, const QString &key)
     const QString &val(readStringEntry(cfg, key));
     int           major, minor;
 
+#if QT_VERSION >= 0x040000
     return !val.isEmpty() && 2==sscanf(val.toLatin1().constData(), "%d.%d", &major, &minor)
+#else
+    return !val.isEmpty() && 2==sscanf(val.latin1(), "%d.%d", &major, &minor)
+#endif
             ? QTC_MAKE_VERSION(major, minor)
             : 0;
 }
@@ -783,7 +787,9 @@ static bool readConfig(const char *file, Options *opts, Options *def)
                 def->vArrows=false;
                 def->toolbarAppearance=APPEARANCE_GRADIENT;
                 def->focus=FOCUS_STANDARD;
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                 def->selectionAppearance=APPEARANCE_FLAT;
+#endif
                 def->flatSbarButtons=false;
                 def->comboSplitter=true;
                 def->handles=LINE_DOTS;
