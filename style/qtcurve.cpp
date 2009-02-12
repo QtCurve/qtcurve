@@ -6422,8 +6422,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         }
                     }
 
-                    if((state&State_Enabled) && (state&State_HasFocus) &&
-                       (state&State_KeyboardFocusChange) && !comboBox->editable)
+                    if(state&State_Enabled && state&State_HasFocus &&
+                       /*state&State_KeyboardFocusChange &&*/ !comboBox->editable)
                     {
                         QStyleOptionFocusRect focus;
 
