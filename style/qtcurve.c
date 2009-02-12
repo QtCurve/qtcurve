@@ -266,12 +266,13 @@ static void shadeColors(GdkColor *base, GdkColor *vals)
 
     int      i;
     gboolean useCustom=0L!=opts.customShades;
+    double   hl=QTC_TO_FACTOR(opts.highlightFactor);
 
     for(i=0; i<NUM_STD_SHADES; ++i)
         shade(base, &vals[i], useCustom ? opts.customShades[i] : QTC_SHADE(opts.contrast, i));
-    shade(base, &vals[SHADE_ORIG_HIGHLIGHT], opts.highlightFactor);
-    shade(&vals[4], &vals[SHADE_4_HIGHLIGHT], opts.highlightFactor);
-    shade(&vals[2], &vals[SHADE_2_HIGHLIGHT], opts.highlightFactor);
+    shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
+    shade(&vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
+    shade(&vals[2], &vals[SHADE_2_HIGHLIGHT], hl);
     vals[ORIGINAL_SHADE]=*base;
 }
 
@@ -2573,7 +2574,7 @@ debugDisplayWidget(widget, 3);
     }
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
-        drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, opts.highlightFactor, x, y, width, height);
+        drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x, y,
@@ -5064,7 +5065,7 @@ debugDisplayWidget(widget, 3);
     if (DETAIL ("tab"))
     {
         GtkNotebook *notebook=GTK_IS_NOTEBOOK(widget) ? GTK_NOTEBOOK(widget) : NULL;
-        gboolean    highlightingEnabled=notebook && (opts.highlightFactor>1.0 || opts.coloredMouseOver);
+        gboolean    highlightingEnabled=notebook && (opts.highlightFactor || opts.coloredMouseOver);
         QtCTab      *highlightTab=highlightingEnabled ? lookupTabHash(widget, FALSE) : NULL;
         gboolean    highlight=FALSE;
         int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW,
@@ -6231,7 +6232,7 @@ static void generateColors()
             qtcPalette.check_radio=&opts.customCheckRadioColor;
     }
 
-    shade(&qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, opts.lighterPopupMenuBgnd);
+    shade(&qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
 }
 
 static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)

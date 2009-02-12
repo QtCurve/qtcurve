@@ -1634,7 +1634,7 @@ static gboolean qtInit(Options *opts)
                 {
                     GdkColor col;
 
-                    shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, opts->lighterPopupMenuBgnd);
+                    shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, QTC_TO_FACTOR(opts->lighterPopupMenuBgnd));
                     sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
                     gtk_rc_parse_string(tmpStr);
                 }
@@ -1646,7 +1646,7 @@ static gboolean qtInit(Options *opts)
                 char *version=(char *)malloc(versionLen);
 
                 getGtk2CfgFile(&tmpStr, xdg, "qtcurve.gtk-icons");
-                sprintf(version, "#%s %02X%02X%02X%02X%02X%02X%02X%",
+                sprintf(version, "#%s %02X%02X%02X%02X%02X%02X%02X",
                                  VERSION, 
                                  qtSettings.qt4 ? 4 : 3,
                                  qtSettings.iconSizes.smlTbSize,
