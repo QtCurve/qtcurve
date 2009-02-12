@@ -5824,7 +5824,18 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if(FOCUS_FILLED==opts.focus)
         {
             if(btn)
-                x-=3, y-=3, width+=6, height+=6;
+            {
+                gboolean d;
+
+                if(isButtonOnToolbar(widget, &d))
+                {
+                    x-=2, y-=2, width+=4, height+=4;
+                    if(!doEtch)
+                        x-=2, width+=4, y--, height+=2;
+                }
+                else
+                    x-=3, y-=3, width+=6, height+=6;
+            }
 
             if(drawRounded)
                 createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
