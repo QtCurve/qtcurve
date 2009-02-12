@@ -730,7 +730,7 @@ static void checkAppearance(EAppearance *ap, Options *opts)
 }
 
 #ifdef __cplusplus
-static bool readConfig(const QString &file, Options *opts, Options *def)
+static bool readConfig(const QString &file, Options *opts, Options *def=0L)
 #else
 static bool readConfig(const char *file, Options *opts, Options *def)
 #endif
