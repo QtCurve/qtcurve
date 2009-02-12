@@ -1408,16 +1408,14 @@ static gboolean qtInit(Options *opts)
 
             lastRead=now;
 
-            defaultSettings(opts);
-
             if(useQt3Settings())
             {
                 qtSettings.qt4=FALSE;
-                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, QT3);
-                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, QT3);
-                readRc(".qt/qtrc", RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc(".qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, FALSE, TRUE, QT3);
             }
             else
@@ -1426,10 +1424,10 @@ static gboolean qtInit(Options *opts)
 
                 char *confFile=(char *)malloc(strlen(xdg)+strlen(QT4_CFG_FILE)+2);
 
-                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, QT4);
                 sprintf(confFile, "%s/"QT4_CFG_FILE, xdg);
-                readRc(confFile, RD_ACT_PALETTE|(opts->inactiveHighlight ? 0 : RD_INACT_PALETTE)|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc(confFile, RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, TRUE, QT4);
                 free(confFile);
                 qtSettings.qt4=TRUE;
@@ -1465,7 +1463,7 @@ static gboolean qtInit(Options *opts)
                 }
             }
 
-            readConfig(rcFile, opts, opts);
+            readConfig(rcFile, opts, 0L);
 
             if(opts->inactiveHighlight)
                 generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
