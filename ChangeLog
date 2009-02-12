@@ -29,6 +29,20 @@
 23. Make 'filled focus' fill the complete widget for buttons and combos.
 24. Use button text colour for combo boxes.
 25. Add 'none' to toolbar handles and splitters style.
+26. Change defaults:
+        Button effect: Shadow
+        Mouse over: Glow
+        Default button indicator: Glow
+        V arrows
+        Flat toolbars
+        Filled focus
+        Gradient selection
+        Flat scrollbar buttons
+        No combo line
+        Sunken toolbar handles
+        Only lighten popupmenus by 2%
+        Flat active tab
+        Don't shade sliders
 
 0.60
 ----

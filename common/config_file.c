@@ -29,6 +29,8 @@
 #include <pwd.h>
 #include <sys/types.h>
 
+#define QTC_MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
+
 #define QTC_MAX_FILENAME_LEN   1024
 #define QTC_MAX_INPUT_LINE_LEN 256
 #define QTC_FILE               "qtcurvestylerc"
@@ -508,14 +510,15 @@ static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
     return val.isEmpty() ? def : val.toInt();
 }
 
-/*
-static double readDoubleEntry(QtCConfig &cfg, const QString &key, double def)
+static int readVersionEntry(QtCConfig &cfg, const QString &key)
 {
     const QString &val(readStringEntry(cfg, key));
+    int           major, minor;
 
-    return val.isEmpty() ? def : val.toDouble();
+    return !val.isEmpty() && 2==sscanf(val.toLatin1().constData(), "%d.%d", &major, &minor)
+            ? QTC_MAKE_VERSION(major, minor)
+            : 0;
 }
-*/
 
 static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
 {
@@ -609,14 +612,15 @@ static int readNumEntry(GHashTable *cfg, char *key, int def)
     return str ? atoi(str) : def;
 }
 
-/*
-static double readDoubleEntry(GHashTable *cfg, char *key, double def)
+static int readVersionEntry(GHashTable *cfg, char *key)
 {
     char *str=readStringEntry(cfg, key);
+    int  major, minor;
 
-    return str ? g_ascii_strtod(str, NULL) : def;
+    return str && 2==sscanf(str, "%d.%d", &major, &minor)
+            ? QTC_MAKE_VERSION(major, minor)
+            : 0;
 }
-*/
 
 static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 {
@@ -662,8 +666,8 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_MOUSE_OVER(ENTRY) \
     opts->ENTRY=toMouseOver(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#define QTC_CFG_READ_APPEARANCE(ENTRY, DEF, ALLOW_FADE) \
-    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF, ALLOW_FADE);
+#define QTC_CFG_READ_APPEARANCE(ENTRY, ALLOW_FADE) \
+    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW_FADE);
 
 /*
 #define QTC_CFG_READ_APPEARANCE(ENTRY) \
@@ -767,16 +771,33 @@ static bool readConfig(const char *file, Options *opts, Options *def)
         if(cfg)
         {
 #endif
-            int    i;
-#if 0
-            double version=readDoubleEntry(cfg, QTC_VERSION_KEY, 0.59); /* 0.59 was last version not to sore version number!*/
-TODO: New versions (>0.60) need to handle config changes...
-#endif
+            int i,
+                version=readVersionEntry(cfg, QTC_VERSION_KEY);
+
+            // Check if the config file expects old default values...
+            if(version<QTC_MAKE_VERSION(0, 61))
+            {
+                def->coloredMouseOver=MO_PLASTIK;
+                def->buttonEffect=EFFECT_NONE;
+                def->defBtnIndicator=IND_TINT;
+                def->vArrows=false;
+                def->toolbarAppearance=APPEARANCE_GRADIENT;
+                def->focus=FOCUS_STANDARD;
+                def->selectionAppearance=APPEARANCE_FLAT;
+                def->flatSbarButtons=false;
+                def->comboSplitter=true;
+                def->handles=LINE_DOTS;
+                def->lighterPopupMenuBgnd=1.15;
+                def->activeTabAppearance=APPEARANCE_GRADIENT;
+                def->groupBoxLine=false;
+                def->shadeSliders=SHADE_BLEND_SELECTED;
+            }
+
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
             QTC_CFG_READ_DI(highlightFactor)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
-            QTC_CFG_READ_APPEARANCE(appearance, def->appearance, false)
+            QTC_CFG_READ_APPEARANCE(appearance, false)
             QTC_CFG_READ_BOOL(fixParentlessDialogs)
             QTC_CFG_READ_STRIPE(stripedProgress)
             QTC_CFG_READ_SLIDER(sliderStyle)
@@ -791,11 +812,11 @@ TODO: New versions (>0.60) need to handle config changes...
             QTC_CFG_READ_SHADE(shadeSliders, false)
             QTC_CFG_READ_SHADE(shadeMenubars, true)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false)
-            QTC_CFG_READ_APPEARANCE(menubarAppearance, def->menubarAppearance, false)
-            QTC_CFG_READ_APPEARANCE(menuitemAppearance, opts->appearance, true)
-            QTC_CFG_READ_APPEARANCE(toolbarAppearance, def->toolbarAppearance, false)
+            QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
+            QTC_CFG_READ_APPEARANCE(menuitemAppearance, true)
+            QTC_CFG_READ_APPEARANCE(toolbarAppearance, false)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-            QTC_CFG_READ_APPEARANCE(selectionAppearance, def->selectionAppearance, false)
+            QTC_CFG_READ_APPEARANCE(selectionAppearance, false)
 #endif
             QTC_CFG_READ_LINE(toolbarSeparators)
             QTC_CFG_READ_LINE(splitters)
@@ -812,12 +833,12 @@ TODO: New versions (>0.60) need to handle config changes...
             QTC_CFG_READ_COLOR(customCheckRadioColor)
             QTC_CFG_READ_SCROLLBAR(scrollbarType)
             QTC_CFG_READ_EFFECT(buttonEffect)
-            QTC_CFG_READ_APPEARANCE(lvAppearance, opts->appearance, false)
-            QTC_CFG_READ_APPEARANCE(tabAppearance, def->tabAppearance, false)
-            QTC_CFG_READ_APPEARANCE(activeTabAppearance, opts->tabAppearance, false)
-            QTC_CFG_READ_APPEARANCE(sliderAppearance, opts->appearance, false)
-            QTC_CFG_READ_APPEARANCE(progressAppearance, opts->appearance, false)
-            QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, APPEARANCE_INVERTED, false)
+            QTC_CFG_READ_APPEARANCE(lvAppearance, false)
+            QTC_CFG_READ_APPEARANCE(tabAppearance, false)
+            QTC_CFG_READ_APPEARANCE(activeTabAppearance, false)
+            QTC_CFG_READ_APPEARANCE(sliderAppearance, false)
+            QTC_CFG_READ_APPEARANCE(progressAppearance, false)
+            QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, false)
             QTC_CFG_READ_ECOLOR(progressGrooveColor)
             QTC_CFG_READ_FOCUS(focus)
             QTC_CFG_READ_BOOL(lvLines)
@@ -845,7 +866,7 @@ TODO: New versions (>0.60) need to handle config changes...
             QTC_CFG_READ_BOOL(flatSbarButtons)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
-            QTC_CFG_READ_APPEARANCE(menuStripeAppearance, def->menuStripeAppearance, false)
+            QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
 #endif
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
@@ -864,9 +885,9 @@ TODO: New versions (>0.60) need to handle config changes...
             QTC_CFG_READ_BOOL(gtkButtonOrder)
 #endif
 #ifdef __cplusplus
-            QTC_CFG_READ_APPEARANCE(titlebarAppearance, opts->appearance, false)
-            QTC_CFG_READ_APPEARANCE(inactiveTitlebarAppearance, opts->titlebarAppearance, false)
-            QTC_CFG_READ_APPEARANCE(titlebarButtonAppearance, opts->titlebarAppearance, false)
+            QTC_CFG_READ_APPEARANCE(titlebarAppearance, false)
+            QTC_CFG_READ_APPEARANCE(inactiveTitlebarAppearance, false)
+            QTC_CFG_READ_APPEARANCE(titlebarButtonAppearance, false)
 
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
@@ -1236,18 +1257,18 @@ static void defaultSettings(Options *opts)
     opts->appearance=APPEARANCE_DULL_GLASS;
     opts->lvAppearance=APPEARANCE_BEVELLED;
     opts->tabAppearance=APPEARANCE_GRADIENT;
-    opts->activeTabAppearance=APPEARANCE_GRADIENT;
+    opts->activeTabAppearance=APPEARANCE_FLAT;
     opts->sliderAppearance=APPEARANCE_DULL_GLASS;
     opts->menubarAppearance=APPEARANCE_GRADIENT;
     opts->menuitemAppearance=APPEARANCE_DULL_GLASS;
-    opts->toolbarAppearance=APPEARANCE_GRADIENT;
+    opts->toolbarAppearance=APPEARANCE_FLAT;
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
     opts->progressGrooveAppearance=APPEARANCE_INVERTED;
     opts->progressGrooveColor=ECOLOR_BASE;
-    opts->defBtnIndicator=IND_TINT;
+    opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
-    opts->handles=LINE_DOTS;
-    opts->shadeSliders=SHADE_BLEND_SELECTED;
+    opts->handles=LINE_SUNKEN;
+    opts->shadeSliders=SHADE_NONE;
     opts->shadeMenubars=SHADE_DARKEN;
     opts->shadeCheckRadio=SHADE_NONE;
     opts->toolbarBorders=TB_NONE;
@@ -1255,24 +1276,24 @@ static void defaultSettings(Options *opts)
     opts->splitters=LINE_FLAT;
     opts->fixParentlessDialogs=false;
     opts->customMenuTextColor=false;
-    opts->coloredMouseOver=MO_PLASTIK;
+    opts->coloredMouseOver=MO_GLOW;
     opts->menubarMouseOver=true;
     opts->useHighlightForMenu=true;
     opts->shadeMenubarOnlyWhenActive=false;
     opts->thinnerMenuItems=false;
     opts->scrollbarType=SCROLLBAR_KDE;
-    opts->buttonEffect=EFFECT_NONE;
-    opts->focus=FOCUS_STANDARD;
+    opts->buttonEffect=EFFECT_SHADOW;
+    opts->focus=FOCUS_FILLED;
     opts->lvLines=false;
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;
     opts->roundMbTopOnly=true;
     opts->borderMenuitems=false;
     opts->darkerBorders=false;
-    opts->vArrows=false;
+    opts->vArrows=true;
     opts->xCheck=false;
     opts->framelessGroupBoxes=true;
-    opts->groupBoxLine=false;
+    opts->groupBoxLine=true;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->fadeLines=true;
 #endif
@@ -1281,11 +1302,11 @@ static void defaultSettings(Options *opts)
     opts->crHighlight=false;
     opts->crButton=false;
     opts->fillProgress=true;
-    opts->comboSplitter=true;
+    opts->comboSplitter=false;
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->sunkenScrollViews=false;
-    opts->flatSbarButtons=false;
+    opts->flatSbarButtons=true;
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
@@ -1295,7 +1316,7 @@ static void defaultSettings(Options *opts)
 #endif
 
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->selectionAppearance=APPEARANCE_FLAT;
+    opts->selectionAppearance=APPEARANCE_GRADIENT;
 #endif
 
 #ifdef __cplusplus
