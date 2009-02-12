@@ -28,6 +28,7 @@
 22. Fix clipping of pressed combo box text.
 23. Make 'filled focus' fill the complete widget for buttons and combos.
 24. Use button text colour for combo boxes.
+25. Add 'none' to toolbar handles and splitters style.
 
 0.60
 ----

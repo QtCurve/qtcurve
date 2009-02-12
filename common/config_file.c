@@ -1371,14 +1371,16 @@ static const char *toStr(EDefBtnIndicator ind)
     }
 }
 
-static const char *toStr(ELine ind, bool none)
+static const char *toStr(ELine ind, bool dashes)
 {
     switch(ind)
     {
         case LINE_DOTS:
             return "dots";
         case LINE_DASHES:
-            return none ? "none" : "dashes";
+            return dashes ? "dashes" : "none";
+        case LINE_NONE:
+            return "none";
         case LINE_FLAT:
             return "flat";
         default:
@@ -1682,8 +1684,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_D(lighterPopupMenuBgnd)
         CFG_WRITE_ENTRY(embolden)
         CFG_WRITE_ENTRY(defBtnIndicator)
-        CFG_WRITE_ENTRY_B(sliderThumbs, true)
-        CFG_WRITE_ENTRY_B(handles, false)
+        CFG_WRITE_ENTRY_B(sliderThumbs, false)
+        CFG_WRITE_ENTRY_B(handles, true)
         CFG_WRITE_ENTRY(highlightTab)
         CFG_WRITE_ENTRY(colorSelTab)
         CFG_WRITE_ENTRY_SHADE(shadeSliders, false, false)
@@ -1694,8 +1696,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(toolbarAppearance)
         CFG_WRITE_ENTRY_FORCE(selectionAppearance)
         CFG_WRITE_ENTRY_FORCE(menuStripeAppearance)
-        CFG_WRITE_ENTRY_B(toolbarSeparators, true)
-        CFG_WRITE_ENTRY_B(splitters, false)
+        CFG_WRITE_ENTRY_B(toolbarSeparators, false)
+        CFG_WRITE_ENTRY_B(splitters, true)
         CFG_WRITE_ENTRY(customMenuTextColor)
         CFG_WRITE_ENTRY(coloredMouseOver)
         CFG_WRITE_ENTRY(menubarMouseOver)

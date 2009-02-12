@@ -3453,6 +3453,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                       : palette.background().color()));
             switch(opts.splitters)
             {
+                case LINE_NONE:
+                    break;
                 default:
                 case LINE_DOTS:
                     drawDots(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 5);
@@ -8749,6 +8751,8 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
 
     switch(handles)
     {
+        case LINE_NONE:
+            break;
         case LINE_DOTS:
             drawDots(p, r, !(option->state&State_Horizontal), 2,
                      tb ? 5 : 3, border, tb ? -2 : 0, 5);

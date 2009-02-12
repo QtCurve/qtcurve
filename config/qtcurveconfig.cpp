@@ -249,12 +249,14 @@ static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=
     }
 }
 
-static void insertLineEntries(QComboBox *combo, bool none)
+static void insertLineEntries(QComboBox *combo, bool dashes)
 {
+    combo->insertItem(LINE_NONE, i18n("None"));
     combo->insertItem(LINE_SUNKEN, i18n("Sunken lines"));
     combo->insertItem(LINE_FLAT, i18n("Flat lines"));
     combo->insertItem(LINE_DOTS, i18n("Dots"));
-    combo->insertItem(LINE_DASHES, none ? i18n("None") : i18n("Dashes"));
+    if(dashes)
+        combo->insertItem(LINE_DASHES, i18n("Dashes"));
 }
 
 static void insertDefBtnEntries(QComboBox *combo)
@@ -370,10 +372,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(titlebarButtonAppearance);
     insertAppearanceEntries(selectionAppearance, true, false);
     insertAppearanceEntries(menuStripeAppearance, true, false);
-    insertLineEntries(handles, false);
-    insertLineEntries(sliderThumbs, true);
-    insertLineEntries(toolbarSeparators, true);
-    insertLineEntries(splitters, false);
+    insertLineEntries(handles, true);
+    insertLineEntries(sliderThumbs, false);
+    insertLineEntries(toolbarSeparators, false);
+    insertLineEntries(splitters, true);
     insertDefBtnEntries(defBtnIndicator);
     insertScrollbarEntries(scrollbarType);
     insertRoundEntries(round);
