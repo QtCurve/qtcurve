@@ -480,7 +480,9 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     }
                 }
                 else if (SECT_TOOLBAR_STYLE==section && rd&RD_TOOLBAR_STYLE &&
-                         !(found&RD_TOOLBAR_STYLE) && 0==strncmp_i(line, "IconText=", 9))
+                         !(found&RD_TOOLBAR_STYLE) &&
+                         ( (KDE3==ft && 0==strncmp_i(line, "IconText=", 9)) ||
+                           (KDE4==ft && 0==strncmp_i(line, "ToolButtonStyle=", 16))))
                 {
                     char *eq=strstr(line, "=");
 
@@ -490,9 +492,11 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                             qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
                         else if(0==strncmp_i(eq, "TextOnly", 8))
                             qtSettings.toolbarStyle=GTK_TOOLBAR_TEXT;
-                        else if(0==strncmp_i(eq, "IconTextRight", 13))
+                        else if( (KDE3==ft && 0==strncmp_i(eq, "IconTextRight", 13)) ||
+                                 (KDE4==ft && 0==strncmp_i(eq, "TextBesideIcon", 14)) )
                             qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH_HORIZ;
-                        else if(0==strncmp_i(eq, "IconTextBottom", 14))
+                        else if( (KDE3==ft && 0==strncmp_i(eq, "IconTextBottom", 14)) ||
+                                 (KDE4==ft && 0==strncmp_i(eq, "TextUnderIcon", 13)))
                             qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH;
                         found|=RD_TOOLBAR_STYLE;
                     }
