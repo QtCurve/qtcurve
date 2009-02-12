@@ -2631,6 +2631,8 @@ debugDisplayWidget(widget, 3);
 
         switch(opts.splitters)
         {
+            case LINE_NONE:
+                break;
             case LINE_DOTS:
             default:
                 drawDots(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
@@ -2690,6 +2692,8 @@ debugDisplayWidget(widget, 3);
 
         switch(opts.handles)
         {
+            case LINE_NONE:
+                break;
             case LINE_DOTS:
                 drawDots(cr, x, y, width, height, height<width, 2, 5, cols, area, 2, 5);
                 break;
