@@ -7930,7 +7930,7 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
                  yd(r.y()+0.5);
 #endif
     double       diameter(radius*2);
-    bool         rounded=diameter>0;
+    bool         rounded=diameter>0.0;
     int          width(r.width()-1),
                  height(r.height()-1);
 
