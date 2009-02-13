@@ -1648,17 +1648,19 @@ realDrawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m, n, QT_STD_BORDER)
 static void createTLPath(cairo_t *cr, double xd, double yd, double width, double height,
                          double radius, int round)
 {
-    if (round&CORNER_BL)
+    gboolean rounded=radius>0.0;
+
+    if (rounded && round&CORNER_BL)
         cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.75, M_PI);
     else
         cairo_move_to(cr, xd, yd+height);
 
-    if (round&CORNER_TL)
+    if (rounded && round&CORNER_TL)
         cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
     else
         cairo_line_to(cr, xd, yd);
 
-    if (round&CORNER_TR)
+    if (rounded && round&CORNER_TR)
         cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.5, M_PI * 1.75);
     else
         cairo_line_to(cr, xd+width, yd);
@@ -1667,17 +1669,19 @@ static void createTLPath(cairo_t *cr, double xd, double yd, double width, double
 static void createBRPath(cairo_t *cr, double xd, double yd, double width, double height,
                          double radius, int round)
 {
-    if (round&CORNER_TR)
+    gboolean rounded=radius>0.0;
+
+    if (rounded && round&CORNER_TR)
         cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.75, 0);
     else
         cairo_move_to(cr, xd+width, yd);
 
-    if (round&CORNER_BR)
+    if (rounded && round&CORNER_BR)
         cairo_arc(cr, xd+width-radius, yd+height-radius, radius, 0, M_PI * 0.5);
     else
         cairo_line_to(cr, xd+width, yd+height);
 
-    if (round&CORNER_BL)
+    if (rounded && round&CORNER_BL)
         cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.5, M_PI * 0.75);
     else
         cairo_line_to(cr, xd, yd+height);
@@ -1686,27 +1690,29 @@ static void createBRPath(cairo_t *cr, double xd, double yd, double width, double
 static void createPath(cairo_t *cr, double xd, double yd, double width, double height,
                        double radius, int round)
 {
-    if (round&CORNER_TL)
+    gboolean rounded=radius>0.0;
+
+    if (rounded && round&CORNER_TL)
         cairo_move_to(cr, xd+radius, yd);
     else
         cairo_move_to(cr, xd, yd);
 
-    if (round&CORNER_TR)
+    if (rounded && round&CORNER_TR)
         cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
     else
         cairo_line_to(cr, xd+width, yd);
 
-    if (round&CORNER_BR)
+    if (rounded && round&CORNER_BR)
         cairo_arc(cr, xd+width-radius, yd+height-radius, radius, 0, M_PI * 0.5);
     else
         cairo_line_to(cr, xd+width, yd+height);
 
-    if (round&CORNER_BL)
+    if (rounded && round&CORNER_BL)
         cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.5, M_PI);
     else
         cairo_line_to(cr, xd, yd+height);
 
-    if (round&CORNER_TL)
+    if (rounded && round&CORNER_TL)
         cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
     else
         cairo_line_to(cr, xd, yd);

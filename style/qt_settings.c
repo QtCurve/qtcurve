@@ -1841,7 +1841,7 @@ static gboolean qtInit(Options *opts)
                 opts->gtkScrollViews=true;
 
             { /* C-Scope */
-            bool doEffect=opts->round>=ROUND_FULL && EFFECT_NONE!=opts->buttonEffect;
+            bool doEffect=EFFECT_NONE!=opts->buttonEffect;
             int  thickness=2;
 
             if(doEffect)
