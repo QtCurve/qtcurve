@@ -1679,6 +1679,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>focus</tabstop>
   <tabstop>drawStatusBarFrames</tabstop>
   <tabstop>framelessGroupBoxes</tabstop>
+  <tabstop>groupBoxLine</tabstop>
   <tabstop>vArrows</tabstop>
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
