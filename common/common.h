@@ -328,7 +328,11 @@ typedef GdkColor color;
                                     : QTC_MO_PLASTIK_LIGHT(W))
 
 #define QTC_FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
+#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#define QTC_DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
+#else
 #define QTC_DO_EFFECT          (QTC_FULLLY_ROUNDED && EFFECT_NONE!=opts.buttonEffect)
+#endif
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define QTC_FOCUS_ALPHA              0.08

@@ -44,6 +44,7 @@
         Flat active tab
         Don't shade sliders
 27. Fix weird mouse-over behaviour of toolbar buttons under Qt4.5
+28. Enable shadow, etch, and 'glow' effects for squared and slight rounded appearance.
 
 0.60
 ----

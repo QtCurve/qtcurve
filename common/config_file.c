@@ -1197,11 +1197,13 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->colorMenubarMouseOver=true;
 */
 
+#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000
             if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->coloredMouseOver=MO_COLORED;
 
             if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->defBtnIndicator=IND_TINT;
+#endif
 
             if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
                 opts->sunkenScrollViews=false;
