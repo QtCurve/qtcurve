@@ -442,7 +442,7 @@ static void checkColor(EShade *s, color *c)
 #include <QMap>
 #include <QFile>
 #include <QTextStream>
-#define QTC_LATIN1(A) A.toLatin1()
+#define QTC_LATIN1(A) A.toLatin1().constData()
 #else
 #define QTC_LATIN1(A) A.latin1()
 
@@ -509,12 +509,6 @@ static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
 
     return val.isEmpty() ? def : val.toInt();
 }
-
-#if QT_VERSION >= 0x040000
-#define QTC_LATIN1(A) A.toLatin1().constData()
-#else
-#define QTC_LATIN1(A) A.latin1()
-#endif
 
 static int readVersionEntry(QtCConfig &cfg, const QString &key)
 {
