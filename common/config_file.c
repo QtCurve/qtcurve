@@ -510,12 +510,18 @@ static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
     return val.isEmpty() ? def : val.toInt();
 }
 
+#if QT_VERSION >= 0x040000
+#define QTC_LATIN1(A) A.toLatin1().constData()
+#else
+#define QTC_LATIN1(A) A.latin1()
+#endif
+
 static int readVersionEntry(QtCConfig &cfg, const QString &key)
 {
     const QString &val(readStringEntry(cfg, key));
     int           major, minor;
 
-    return !val.isEmpty() && 2==sscanf(val.toLatin1().constData(), "%d.%d", &major, &minor)
+    return !val.isEmpty() && 2==sscanf(QTC_LATIN1(val), "%d.%d", &major, &minor)
             ? QTC_MAKE_VERSION(major, minor)
             : 0;
 }
@@ -526,12 +532,6 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
 
     return val.isEmpty() ? def : (val=="true" ? true : false);
 }
-
-#if QT_VERSION >= 0x040000
-#define QTC_LATIN1(A) A.toLatin1()
-#else
-#define QTC_LATIN1(A) A.latin1()
-#endif
 
 #define QTC_CFG_READ_COLOR(ENTRY) \
     { \
