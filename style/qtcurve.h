@@ -59,6 +59,13 @@ class QtCurveStyle : public QWindowsStyle
 
     public:
 
+    enum Version
+    {
+        VER_UNKNOWN,
+        VER_4x,  // <=4.4
+        VER_45   // >=4.5
+    };
+    
     QtCurveStyle(const QString &name=QString());
     ~QtCurveStyle();
 
@@ -142,6 +149,7 @@ class QtCurveStyle : public QWindowsStyle
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     int            konqMenuBarSize(const QMenuBar *menu) const;
+    Version        qtVersion() const;
 
     private Q_SLOTS:
 
@@ -186,6 +194,7 @@ class QtCurveStyle : public QWindowsStyle
     // Required for Q3Header hover...
     QPoint                             itsPos;
     QWidget                            *itsHoverWidget;
+    mutable Version                    itsQtVersion;
 };
 
 #endif

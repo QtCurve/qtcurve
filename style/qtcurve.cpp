@@ -845,7 +845,8 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsProgressBarAnimateTimer(0),
               itsAnimateStep(0),
               itsPos(-1, -1),
-              itsHoverWidget(NULL)
+              itsHoverWidget(NULL),
+              itsQtVersion(VER_UNKNOWN)
 {
 #ifdef QTC_USE_KDE4
     theInstanceCount++;
@@ -859,6 +860,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
     QString rcFile;
 
+    defaultSettings(&opts);
     if(!name.isEmpty())
     {
         rcFile=themeFile(kdeHome(), name);
@@ -5378,14 +5380,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                   kMenuTitle(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
                                              widget->parentWidget() && widget->parentWidget()->inherits("KMenu"));
 
-                if(bflags&State_MouseOver && !(bflags&State_Enabled))
-                    bflags &= ~State_MouseOver;
+                if (!(bflags&State_Enabled))
+                    bflags &= ~(State_MouseOver | State_Raised);
 
-                if (bflags&State_AutoRaise && !(bflags & State_MouseOver))
+                if(bflags&State_MouseOver)
+                    bflags |= State_Raised;
+                else if(bflags&State_AutoRaise)
                     bflags &= ~State_Raised;
-
-                if (toolbutton->activeSubControls & SC_ToolButton)
-                    bflags |= State_Sunken;
 
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                 if(state&State_AutoRaise)
@@ -5393,9 +5394,23 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #endif
                 State mflags(bflags);
 
-                if (toolbutton->activeSubControls & SC_ToolButtonMenu)
-                    mflags |= State_Sunken;
+#if QT_VERSION >= 0x040500
+                if (state&State_Sunken && !(toolbutton->activeSubControls & SC_ToolButton))
+                    bflags&=~State_Sunken;
+#else
+                int major, minor, patch;
 
+                // Try to detect if this is Qt 4.5...
+                if(qtVersion()>=VER_45)
+                {      
+                    if (state&State_Sunken && !(toolbutton->activeSubControls & SC_ToolButton))
+                        bflags&=~State_Sunken;
+                }
+                else if (toolbutton->activeSubControls & SC_ToolButtonMenu && state&State_Enabled)
+                    mflags |= State_Sunken;
+#endif
+
+                bool drawMenu=mflags & (State_Sunken | State_On | State_Raised);
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
                 if(kMenuTitle)
@@ -5414,14 +5429,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     drawBorder(painter, r.adjusted(2, 2, -2, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
                 }
-                else if (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised)))
+                else if ( (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised))) ||
+                          (toolbutton->subControls & SC_ToolButtonMenu && drawMenu))
                 {
                     tool.rect = toolbutton->subControls & SC_ToolButtonMenu ? button.united(menuarea) : button;
                     tool.state = bflags;
 
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
                         tool.state &= ~State_MouseOver;
-
+                                 
                     drawPrimitive(PE_PanelButtonTool, &tool, painter, widget);
                 }
 
@@ -5436,7 +5452,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     tool.rect = menuarea;
                     tool.state = mflags|State_Horizontal;
 
-                    if(mflags & (State_Sunken | State_On | State_Raised))
+                    if(drawMenu)
                     {
                         const QColor *use(buttonColors(option));
 
@@ -9177,6 +9193,23 @@ int QtCurveStyle::konqMenuBarSize(const QMenuBar *menu) const
     opt.text = "File";
     sz = sizeFromContents(QStyle::CT_MenuBarItem, &opt, sz, menu);
     return sz.height()+6;
+}
+
+QtCurveStyle::Version QtCurveStyle::qtVersion() const
+{
+    if(VER_UNKNOWN==itsQtVersion)
+    {
+        int major, minor, patch;
+
+        // Try to detect if this is Qt 4.5...
+        if(3==sscanf(qVersion(), "%d.%d.%d", &major, &minor, &patch) && 4==major)
+            if(minor<5)
+                itsQtVersion=VER_4x;
+            else
+                itsQtVersion=VER_45;
+    }
+
+    return itsQtVersion;
 }
 
 const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QColor *use) const

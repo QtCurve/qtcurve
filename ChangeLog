@@ -43,6 +43,7 @@
         Only lighten popupmenus by 2%
         Flat active tab
         Don't shade sliders
+27. Fix weird mouse-over behaviour of toolbar buttons under Qt4.5
 
 0.60
 ----
