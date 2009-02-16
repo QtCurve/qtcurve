@@ -1162,6 +1162,8 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->setAttribute(Qt::WA_Hover, true);
         if(QTC_ROUNDED)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
+        if(!opts.gtkScrollViews)
+            widget->installEventFilter(this);
     }
     else if (qobject_cast<QProgressBar *>(widget))
     {
@@ -1206,6 +1208,13 @@ void QtCurveStyle::polish(QWidget *widget)
     }
     else if(qobject_cast<QLabel*>(widget))
         widget->installEventFilter(this);
+    else if(!opts.gtkScrollViews && qobject_cast<QAbstractScrollArea *>(widget))
+    {
+#ifdef QTC_HOVER_SVIEW_SBARS
+        widget->setAttribute(Qt::WA_Hover, true);
+#endif
+        widget->installEventFilter(this);
+    }
     else if(qobject_cast<QDialog*>(widget) && widget->inherits("QPrintPropertiesDialog") &&
             widget->parentWidget() && widget->parentWidget()->topLevelWidget() &&
             widget->topLevelWidget() && widget->topLevelWidget()->windowTitle().isEmpty() &&
@@ -1330,6 +1339,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover, false);
         if(QTC_ROUNDED)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+        if(!opts.gtkScrollViews)
+            widget->removeEventFilter(this);
     }
     else if (qobject_cast<QProgressBar *>(widget))
     {
@@ -1356,6 +1367,13 @@ void QtCurveStyle::unpolish(QWidget *widget)
     }
     else if(qobject_cast<QLabel*>(widget))
         widget->removeEventFilter(this);
+    else if(!opts.gtkScrollViews && qobject_cast<QAbstractScrollArea *>(widget))
+    {
+#ifdef QTC_HOVER_SVIEW_SBARS
+        widget->setAttribute(Qt::WA_Hover, false);
+#endif
+        widget->removeEventFilter(this);
+    }
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
     if (!widget->isWindow())
@@ -1384,6 +1402,112 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
 bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 {
+    if(::qobject_cast<QAbstractScrollArea *>(object))
+    {
+        QPoint pos;
+        switch(event->type())
+        {
+#ifdef QTC_HOVER_SVIEW_SBARS
+            case QEvent::HoverEnter:
+                pos=((QHoverEvent *)event)->pos();
+                printf("HE %d,%d ", pos.x(), pos.y());
+                break;
+            case QEvent::HoverMove:
+                pos=((QHoverEvent *)event)->pos();
+                printf("HM %d,%d ", pos.x(), pos.y());
+                break;
+            case QEvent::HoverLeave:
+                pos=((QHoverEvent *)event)->pos();
+                printf("HL %d,%d ", pos.x(), pos.y());
+                break;
+#endif
+            case QEvent::MouseMove:
+            case QEvent::MouseButtonPress:
+            case QEvent::MouseButtonRelease:
+                pos=((QMouseEvent *)event)->pos();
+                break;
+            case QEvent::Wheel:
+                pos=((QWheelEvent *)event)->pos();
+            default:
+                break;
+        }
+
+        if(!pos.isNull())
+        {
+            QAbstractScrollArea *area=(QAbstractScrollArea *)object;
+            QScrollBar          *sbars[2]={area->verticalScrollBar(), area->horizontalScrollBar() };
+
+            for(int i=0; i<2; ++i)
+                if(sbars[i])
+                {
+                    QRect r(i ? 0 : area->rect().right()-3, i ? area->rect().bottom()-3 : 0,
+                            sbars[i]->rect().width(), sbars[i]->rect().height());
+
+
+#ifdef QTC_HOVER_SVIEW_SBARS
+if(QEvent::HoverMove==event->type() || QEvent::HoverEnter==event->type() || QEvent::HoverLeave==event->type())
+printf("[%d]G: %d,%d  %dx%d    POS:%d,%d", i, r.x(), r.y(), r.width(), r.height(), pos.x(), pos.y());
+#endif
+                    if(r.contains(pos) ||
+                       (sbars[i]==itsSViewSBar &&
+                        (QEvent::MouseMove==event->type() ||
+                         QEvent::MouseButtonRelease==event->type())))
+                    {
+
+#ifdef QTC_HOVER_SVIEW_SBARS
+                    printf(" SEND");
+
+                        if(QEvent::HoverMove==event->type() ||
+                           QEvent::HoverEnter==event->type() ||
+                           QEvent::HoverLeave==event->type())
+                        {
+                            struct HackEvent : public QHoverEvent
+                            {
+                                void set(bool vert)
+                                {
+                                    p=QPoint(vert ? 0 : p.x(), vert ? p.y() : 0);
+                                }
+                            };
+
+                            ((HackEvent *)event)->set(0==i);
+                            printf(" %d,%d", ((HackEvent *)event)->pos().x(), ((HackEvent *)event)->pos().y());
+                        }
+#endif
+
+                        if(QEvent::MouseMove==event->type() ||
+                           QEvent::MouseButtonPress==event->type() ||
+                           QEvent::MouseButtonRelease==event->type())
+                        {
+                            struct HackEvent : public QMouseEvent
+                            {
+                                void set(bool vert)
+                                {
+                                    p=QPoint(vert ? 0 : p.x(), vert ? p.y() : 0);
+                                    g=QPoint(g.x()+(vert ? 0 : -3), g.y()+(vert ? -3 : 0));
+                                }
+                            };
+
+                            ((HackEvent *)event)->set(0==i);
+                        }
+                        sbars[i]->event(event);
+                        if(QEvent::MouseButtonPress==event->type())
+                            itsSViewSBar=sbars[i];
+                        else if(QEvent::MouseButtonRelease==event->type())
+                            itsSViewSBar=0L;
+#ifdef QTC_HOVER_SVIEW_SBARS
+if(QEvent::HoverMove==event->type() || QEvent::HoverEnter==event->type() || QEvent::HoverLeave==event->type())
+    printf("\n");
+#endif
+                        return true;
+                    }
+                }
+        }
+#ifdef QTC_HOVER_SVIEW_SBARS
+if(QEvent::HoverMove==event->type() || QEvent::HoverEnter==event->type() || QEvent::HoverLeave==event->type())
+    printf("\n");
+#endif
+    }
+
     switch(event->type())
     {
         case QEvent::Paint:

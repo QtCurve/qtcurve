@@ -47,6 +47,9 @@
         Use darkened background for progressbars
 27. Fix weird mouse-over behaviour of toolbar buttons under Qt4.5
 28. Enable shadow, etch, and 'glow' effects for squared and slight rounded appearance.
+29. When using scrollviews where the scrollbar is within the frame, track mouse
+    events so that we can simulate the scrollbar being pressed. This extends the
+    usable width of a vertial scrollbar to the right hand side of the frame.
 
 0.60
 ----

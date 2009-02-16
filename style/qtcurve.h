@@ -52,6 +52,7 @@ typedef QString QtcKey;
 class QStyleOptionSlider;
 class QLabel;
 class QMenuBar;
+class QScrollBar;
 
 class QtCurveStyle : public QWindowsStyle
 {
@@ -195,6 +196,7 @@ class QtCurveStyle : public QWindowsStyle
     QPoint                             itsPos;
     QWidget                            *itsHoverWidget;
     mutable Version                    itsQtVersion;
+    mutable QScrollBar                 *itsSViewSBar;
 };
 
 #endif
