@@ -1329,9 +1329,9 @@ static void defaultSettings(Options *opts)
     opts->selectionAppearance=APPEARANCE_GRADIENT;
 #endif
 
+    opts->gtkScrollViews=false;
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
-    opts->gtkScrollViews=false;
     opts->gtkComboMenus=false;
     opts->colorTitlebarOnly=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);
@@ -1769,7 +1769,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(titlebarAppearance)
         CFG_WRITE_ENTRY_FORCE(inactiveTitlebarAppearance)
         CFG_WRITE_ENTRY_FORCE(titlebarButtonAppearance)
-
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
         CFG_WRITE_ENTRY(colorTitlebarOnly)
