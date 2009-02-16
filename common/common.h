@@ -1280,6 +1280,7 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_SELECTION:
             switch(r)
             {
+                case ROUND_EXTRA:
                 case ROUND_FULL:
                     if(w>48 && h>48)
                         return 3.0;
@@ -1343,3 +1344,4 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 #endif
 
 #endif
+
