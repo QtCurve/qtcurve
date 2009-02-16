@@ -43,6 +43,8 @@
         Only lighten popupmenus by 2%
         Flat active tab
         Don't shade sliders
+        Don't darken menubars
+        Use darkened background for progressbars
 27. Fix weird mouse-over behaviour of toolbar buttons under Qt4.5
 28. Enable shadow, etch, and 'glow' effects for squared and slight rounded appearance.
 

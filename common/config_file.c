@@ -798,6 +798,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def.activeTabAppearance=APPEARANCE_GRADIENT;
                 def.groupBoxLine=false;
                 def.shadeSliders=SHADE_BLEND_SELECTED;
+                def.progressGrooveColor=ECOLOR_BASE;
+                def.shadeMenubars=SHADE_DARKEN;
             }
 
             QTC_CFG_READ_NUM(passwordChar)
@@ -1272,12 +1274,12 @@ static void defaultSettings(Options *opts)
     opts->toolbarAppearance=APPEARANCE_FLAT;
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
     opts->progressGrooveAppearance=APPEARANCE_INVERTED;
-    opts->progressGrooveColor=ECOLOR_BASE;
+    opts->progressGrooveColor=ECOLOR_DARK;
     opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_SUNKEN;
     opts->shadeSliders=SHADE_NONE;
-    opts->shadeMenubars=SHADE_DARKEN;
+    opts->shadeMenubars=SHADE_NONE;
     opts->shadeCheckRadio=SHADE_NONE;
     opts->toolbarBorders=TB_NONE;
     opts->toolbarSeparators=LINE_NONE;
