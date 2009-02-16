@@ -256,7 +256,7 @@ static void unsetFileDialogs()
 
 #ifdef QTC_FIX_DISABLED_ICONS
 #include <KDE/KIconEffect>
-QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State)
 {
     QPixmap pix=icon.pixmap(size, QIcon::Normal);
 
@@ -457,7 +457,7 @@ static bool isNoEtchWidget(const QWidget *widget)
     return (w && isA(w, "KHTMLView")) || (widget && isInQAbstractItemView(widget->parentWidget()));
 }
 
-static QColor getLowerEtchCol(const QWidget *widget, QPainter *painter)
+static QColor getLowerEtchCol(const QWidget *widget)
 {
     QColor col(Qt::white);
 
@@ -2465,8 +2465,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             break;
         case PE_PanelMenuBar:
-            if (widget && qobject_cast<const QMainWindow *>(widget->parentWidget())
-                || (widget->parentWidget() && widget->parentWidget()->inherits("Q3MainWindow")))
+            if (widget && widget->parentWidget() && (qobject_cast<const QMainWindow *>(widget->parentWidget()) ||
+                                                     widget->parentWidget()->inherits("Q3MainWindow")))
             {
                 painter->save();
                 drawMenuOrToolBarBackground(painter, r, option);
@@ -2913,13 +2913,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(!doneShadow && doEtch && glow)
             {
                 QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
-                       botCol(getLowerEtchCol(widget, painter));
+                       botCol(getLowerEtchCol(widget));
                 bool   shadow=false;
 
                 if(!glow)
                 {
                     topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                    botCol=getLowerEtchCol(widget, painter);
+                    botCol=getLowerEtchCol(widget);
                 }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -4035,7 +4035,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuBarItem:
             if (const QStyleOptionMenuItem *mbi = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
-                bool    down(state&(State_On|state&State_Sunken)),
+                bool    down(state&(State_On|State_Sunken)),
                         active(state&State_Enabled && (down || (state&State_Selected && opts.menubarMouseOver)));
                 uint    alignment(Qt::AlignCenter|Qt::TextShowMnemonic|Qt::TextDontClip|Qt::TextSingleLine);
                 QPixmap pix(getIconPixmap(mbi->icon, pixelMetric(PM_SmallIconSize), mbi->state));
@@ -5176,7 +5176,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 // Arrow type always overrules and is always shown
                 bool hasArrow = tb->features & QStyleOptionToolButton::Arrow;
 
-                if ((!hasArrow && tb->icon.isNull()) && !tb->text.isEmpty()
+                if (((!hasArrow && tb->icon.isNull()) && !tb->text.isEmpty())
                     || Qt::ToolButtonTextOnly==tb->toolButtonStyle)
                 {
                     int alignment = Qt::AlignCenter|Qt::TextShowMnemonic;
@@ -5398,8 +5398,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if (state&State_Sunken && !(toolbutton->activeSubControls & SC_ToolButton))
                     bflags&=~State_Sunken;
 #else
-                int major, minor, patch;
-
                 // Try to detect if this is Qt 4.5...
                 if(qtVersion()>=VER_45)
                 {      
@@ -5601,7 +5599,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                     ++lh;
                                 linebot = y + lh / 2;
                                 if (child.features & QStyleOptionQ3ListViewItem::Expandable
-                                    || child.childCount > 0 && child.height > 0)
+                                    || (child.childCount > 0 && child.height > 0))
                                 {
                                     // needs a box
 
@@ -6534,7 +6532,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_SpinBox:
             //newSize.setHeight(sizeFromContents(CT_LineEdit, option, size, widget).height());
-            newSize.rheight() -= (1 - newSize.rheight() & 1);
+            newSize.rheight() -= ((1 - newSize.rheight()) & 1);
             break;
         case CT_ToolButton:
         {
@@ -7864,7 +7862,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     if(!raised)
     {
         p->drawPath(tl);
-        p->setPen(getLowerEtchCol(widget, p));
+        p->setPen(getLowerEtchCol(widget));
     }
 
     p->drawPath(br);
@@ -8204,7 +8202,7 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
     int fill=opts.useHighlightForMenu && (!mbi || itsMenuitemCols==cols) ? ORIGINAL_SHADE : 4,
         border=opts.borderMenuitems ? 0 : fill;
 
-    if(itsMenuitemCols!=cols && mbi && !(option->state&(State_On|option->state&State_Sunken)) &&
+    if(itsMenuitemCols!=cols && mbi && !(option->state&(State_On|State_Sunken)) &&
        !opts.colorMenubarMouseOver && (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
         fill=ORIGINAL_SHADE;
     
