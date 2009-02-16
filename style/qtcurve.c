@@ -5827,6 +5827,12 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         cairo_new_path(cr);
 
+        if(isListViewHeader(widget))
+        {
+            btn=false;
+            height--;
+        }
+
         if(FOCUS_FILLED==opts.focus)
         {
             if(btn)
