@@ -479,9 +479,10 @@ static QWidget * scrollViewFrame(QWidget *widget)
 
     for(int i=0; i<10 && w; ++i, w=w->parentWidget())
     {
-    printf("Look at %s [%d / %d]\n", w->metaObject()->className(),
-            qobject_cast<QFrame *>(w) ? ((QFrame *)w)->frameWidth() : -1,
-            qobject_cast<QTabWidget *>(w) ? 1 : 0);
+//     printf("Look at %s (%s) [%d / %d]\n", w->metaObject()->className(),
+//            w->metaObject()->superClass() ? w->metaObject()->superClass()->className() : "<>",
+//            qobject_cast<QFrame *>(w) ? ((QFrame *)w)->frameWidth() : -1,
+//            qobject_cast<QTabWidget *>(w) ? 1 : 0);
         if( (qobject_cast<QFrame *>(w) && ((QFrame *)w)->frameWidth()>0) ||
             qobject_cast<QTabWidget *>(w))
             return w;
@@ -1233,7 +1234,7 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->installEventFilter(this);
         if(APP_KONTACT==theThemedApp && widget->parentWidget())
         {
-        printf("Look for scrollview frame for %s\n", widget->metaObject()->className());
+//         printf("Look for scrollview frame for %s\n", widget->metaObject()->className());
             QWidget *frame=scrollViewFrame(widget->parentWidget());
 
             if(frame)
@@ -1242,8 +1243,8 @@ void QtCurveStyle::polish(QWidget *widget)
                 itsSViewContainers[frame].insert(widget);
                 connect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
             }
-            else
-            printf("Not found :-(\n");
+//             else
+//             printf("Not found :-(\n");
         }
     }
     else if(qobject_cast<QDialog*>(widget) && widget->inherits("QPrintPropertiesDialog") &&
@@ -1470,6 +1471,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         if(!pos.isNull())
         {
             QAbstractScrollArea *area=0L;
+            QPoint              mapped(pos);
 
             if(isSViewCont)
             {
@@ -1477,8 +1479,11 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                                                end(itsSViewContainers[(QWidget *)object].end());
 
                 for(; it!=end && !area; ++it)
-                    if((*it)->rect().adjusted(0, 0, 4, 4).contains(pos))
+                {
+                    mapped=(*it)->mapFrom((QWidget *)object, pos);
+                    if((*it)->rect().adjusted(0, 0, 4, 4).contains(mapped))
                         area=(QAbstractScrollArea *)(*it);
+                }
             }
             else
                 area=(QAbstractScrollArea *)object;
@@ -1502,14 +1507,14 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                             {
                                 struct HackEvent : public QMouseEvent
                                 {
-                                    void set(bool vert)
+                                    void set(const QPoint &mapped, bool vert)
                                     {
-                                        p=QPoint(vert ? 0 : p.x(), vert ? p.y() : 0);
+                                        p=QPoint(vert ? 0 : mapped.x(), vert ? mapped.y() : 0);
                                         g=QPoint(g.x()+(vert ? 0 : -3), g.y()+(vert ? -3 : 0));
                                     }
                                 };
 
-                                ((HackEvent *)event)->set(0==i);
+                                ((HackEvent *)event)->set(mapped, 0==i);
                             }
                             sbars[i]->event(event);
                             if(QEvent::MouseButtonPress==event->type())
