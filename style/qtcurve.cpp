@@ -357,6 +357,7 @@ static enum
     APP_SYSTEMSETTINGS,
     APP_SKYPE,
     APP_KONQUEROR,
+    APP_KONTACT,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -470,6 +471,22 @@ static QColor getLowerEtchCol(const QWidget *widget)
         col.setAlphaF(0.0);
 
     return col;
+}
+
+static QWidget * scrollViewFrame(QWidget *widget)
+{
+    QWidget *w=widget;
+
+    for(int i=0; i<10 && w; ++i, w=w->parentWidget())
+    {
+    printf("Look at %s [%d / %d]\n", w->metaObject()->className(),
+            qobject_cast<QFrame *>(w) ? ((QFrame *)w)->frameWidth() : -1,
+            qobject_cast<QTabWidget *>(w) ? 1 : 0);
+        if( (qobject_cast<QFrame *>(w) && ((QFrame *)w)->frameWidth()>0) ||
+            qobject_cast<QTabWidget *>(w))
+            return w;
+    }
+    return 0L;
 }
 
 // from windows style
@@ -1013,6 +1030,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KRUNNER;
         else if("konqueror"==appName)
             theThemedApp=APP_KONQUEROR;
+        else if("kontact"==appName)
+            theThemedApp=APP_KONTACT;
         else if("skype"==appName)
             theThemedApp=APP_SKYPE;
 }
@@ -1209,7 +1228,24 @@ void QtCurveStyle::polish(QWidget *widget)
     else if(qobject_cast<QLabel*>(widget))
         widget->installEventFilter(this);
     else if(!opts.gtkScrollViews && qobject_cast<QAbstractScrollArea *>(widget))
-        widget->installEventFilter(this);
+    {
+        if((((QFrame *)widget)->frameWidth()>0))
+            widget->installEventFilter(this);
+        if(APP_KONTACT==theThemedApp && widget->parentWidget())
+        {
+        printf("Look for scrollview frame for %s\n", widget->metaObject()->className());
+            QWidget *frame=scrollViewFrame(widget->parentWidget());
+
+            if(frame)
+            {
+                frame->installEventFilter(this);
+                itsSViewContainers[frame].insert(widget);
+                connect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+            }
+            else
+            printf("Not found :-(\n");
+        }
+    }
     else if(qobject_cast<QDialog*>(widget) && widget->inherits("QPrintPropertiesDialog") &&
             widget->parentWidget() && widget->parentWidget()->topLevelWidget() &&
             widget->topLevelWidget() && widget->topLevelWidget()->windowTitle().isEmpty() &&
@@ -1363,7 +1399,28 @@ void QtCurveStyle::unpolish(QWidget *widget)
     else if(qobject_cast<QLabel*>(widget))
         widget->removeEventFilter(this);
     else if(!opts.gtkScrollViews && qobject_cast<QAbstractScrollArea *>(widget))
-        widget->removeEventFilter(this);
+    {
+        if((((QFrame *)widget)->frameWidth()>0))
+            widget->removeEventFilter(this);
+        if(APP_KONTACT==theThemedApp && widget->parentWidget())
+        {
+            QWidget *frame=scrollViewFrame(widget->parentWidget());
+
+            if(frame)
+            {
+                if(itsSViewContainers.contains(frame))
+                {
+                    itsSViewContainers[frame].remove(widget);
+                    if(0==itsSViewContainers[frame].count())
+                    {
+                        frame->removeEventFilter(this);
+                        itsSViewContainers.remove(frame);
+                        disconnect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
+                    }
+                }
+            }
+        }
+    }
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
     if (!widget->isWindow())
@@ -1392,7 +1449,9 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
 bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 {
-    if(::qobject_cast<QAbstractScrollArea *>(object))
+    bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
+
+    if(::qobject_cast<QAbstractScrollArea *>(object) || isSViewCont)
     {
         QPoint pos;
         switch(event->type())
@@ -1410,41 +1469,57 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
         if(!pos.isNull())
         {
-            QAbstractScrollArea *area=(QAbstractScrollArea *)object;
-            QScrollBar          *sbars[2]={area->verticalScrollBar(), area->horizontalScrollBar() };
+            QAbstractScrollArea *area=0L;
 
-            for(int i=0; i<2; ++i)
-                if(sbars[i])
-                {
-                    QRect r(i ? 0 : area->rect().right()-3, i ? area->rect().bottom()-3 : 0,
-                            sbars[i]->rect().width(), sbars[i]->rect().height());
+            if(isSViewCont)
+            {
+                QSet<QWidget *>::ConstIterator it(itsSViewContainers[(QWidget *)object].begin()),
+                                               end(itsSViewContainers[(QWidget *)object].end());
 
-                    if(r.contains(pos) ||
-                       (sbars[i]==itsSViewSBar &&
-                        (QEvent::MouseMove==event->type() ||
-                         QEvent::MouseButtonRelease==event->type())))
+                for(; it!=end && !area; ++it)
+                    if((*it)->rect().adjusted(0, 0, 4, 4).contains(pos))
+                        area=(QAbstractScrollArea *)(*it);
+            }
+            else
+                area=(QAbstractScrollArea *)object;
+
+            if(area)
+            {
+                QScrollBar *sbars[2]={area->verticalScrollBar(), area->horizontalScrollBar() };
+
+                for(int i=0; i<2; ++i)
+                    if(sbars[i])
                     {
-                        if(QEvent::Wheel!=event->type())
-                        {
-                            struct HackEvent : public QMouseEvent
-                            {
-                                void set(bool vert)
-                                {
-                                    p=QPoint(vert ? 0 : p.x(), vert ? p.y() : 0);
-                                    g=QPoint(g.x()+(vert ? 0 : -3), g.y()+(vert ? -3 : 0));
-                                }
-                            };
+                        QRect r(i ? 0 : area->rect().right()-3,   i ? area->rect().bottom()-3 : 0,
+                                sbars[i]->rect().width(), sbars[i]->rect().height());
 
-                            ((HackEvent *)event)->set(0==i);
+                        if(r.contains(pos) ||
+                            (sbars[i]==itsSViewSBar &&
+                             (QEvent::MouseMove==event->type() ||
+                              QEvent::MouseButtonRelease==event->type())))
+                        {
+                            if(QEvent::Wheel!=event->type())
+                            {
+                                struct HackEvent : public QMouseEvent
+                                {
+                                    void set(bool vert)
+                                    {
+                                        p=QPoint(vert ? 0 : p.x(), vert ? p.y() : 0);
+                                        g=QPoint(g.x()+(vert ? 0 : -3), g.y()+(vert ? -3 : 0));
+                                    }
+                                };
+
+                                ((HackEvent *)event)->set(0==i);
+                            }
+                            sbars[i]->event(event);
+                            if(QEvent::MouseButtonPress==event->type())
+                                itsSViewSBar=sbars[i];
+                            else if(QEvent::MouseButtonRelease==event->type())
+                                itsSViewSBar=0L;
+                            return true;
                         }
-                        sbars[i]->event(event);
-                        if(QEvent::MouseButtonPress==event->type())
-                            itsSViewSBar=sbars[i];
-                        else if(QEvent::MouseButtonRelease==event->type())
-                            itsSViewSBar=0L;
-                        return true;
                     }
-                }
+            }
         }
     }
 
@@ -9297,6 +9372,8 @@ const QColor & QtCurveStyle::menuStripeCol() const
 void QtCurveStyle::widgetDestroyed(QObject *o)
 {
     theNoEtchWidgets.remove(static_cast<const QWidget *>(o));
+    if(APP_KONTACT==theThemedApp)
+        itsSViewContainers.remove(static_cast<const QWidget *>(o));
 }
 
 void QtCurveStyle::setupKde4()

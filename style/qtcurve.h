@@ -198,6 +198,7 @@ class QtCurveStyle : public QWindowsStyle
     QWidget                            *itsHoverWidget;
     mutable Version                    itsQtVersion;
     mutable QScrollBar                 *itsSViewSBar;
+    mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
 };
 
 #endif
