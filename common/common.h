@@ -260,10 +260,10 @@ typedef GdkColor color;
 #define MENUBAR_DARK_FACTOR        QTC_TO_FACTOR(-3)
 #define INACTIVE_HIGHLIGHT_FACTOR  QTC_TO_FACTOR(20)
 #define DEF_POPUPMENU_LIGHT_FACTOR                 2
-#define MIN_LIGHTER_POPUP_MENU                     0
+#define MIN_LIGHTER_POPUP_MENU                  -100
 #define MAX_LIGHTER_POPUP_MENU                   100
 
-#define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd>1)
+#define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9

@@ -148,6 +148,7 @@ class QtCurveStyle : public QWindowsStyle
     void           readMdiPositions() const;
     const QColor & getFill(const QStyleOption *option, const QColor *use, bool cr=false) const;
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
+    const QColor & menuStripeCol() const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     int            konqMenuBarSize(const QMenuBar *menu) const;
     Version        qtVersion() const;

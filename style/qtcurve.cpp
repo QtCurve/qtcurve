@@ -4157,12 +4157,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 */
 
                     if(doStripe)
-                        drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
+                        drawBevelGradient(menuStripeCol(), true,
                                           painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
                                                          stripeWidth, r.height()), false,
-                                        getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
-                                        getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
-                                        false, opts.menuStripeAppearance, WIDGET_OTHER);
+                                          getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
+                                          getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
+                                          false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                     QRect miRect(menuItem->rect.left() + 3 +
                                     (!reverse && doStripe ? stripeWidth : 0),
@@ -4194,13 +4194,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                                                              : itsBackgroundCols[ORIGINAL_SHADE]);
 */
                     if(opts.menuStripe && !comboMenu)
-                        drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
-                                        painter,
-                                        QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth,
-                                              r.height()), false,
-                                        getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
-                                        getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
-                                        false, opts.menuStripeAppearance, WIDGET_OTHER);
+                        drawBevelGradient(menuStripeCol(), true,
+                                          painter,
+                                          QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth,
+                                                r.height()), false,
+                                          getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
+                                          getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
+                                          false, opts.menuStripeAppearance, WIDGET_OTHER);
                 }
 
                 if (selected && enabled)
@@ -5481,12 +5481,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         int stripeWidth(qMax(20, constMenuPixmapWidth));
 
-                        drawBevelGradient(itsBackgroundCols[QTC_MENU_STRIPE_SHADE], true,
+                        drawBevelGradient(menuStripeCol(), true,
                                           painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
                                                          stripeWidth, r.height()), false,
-                                        getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
-                                        getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
-                                        false, opts.menuStripeAppearance, WIDGET_OTHER); 
+                                          getWidgetShade(WIDGET_OTHER, true, false, opts.menuStripeAppearance),
+                                          getWidgetShade(WIDGET_OTHER, false, false, opts.menuStripeAppearance),
+                                          false, opts.menuStripeAppearance, WIDGET_OTHER); 
                     }
 
                     drawBorder(painter, r.adjusted(2, 2, -2, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
@@ -9282,6 +9282,13 @@ const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QCol
             : highlight
                 ? use[SHADE_2_HIGHLIGHT]
                 : use[2];
+}
+
+const QColor & QtCurveStyle::menuStripeCol() const
+{
+    return opts.lighterPopupMenuBgnd<0
+                ? itsLighterPopupMenuBgndCol
+                : itsBackgroundCols[QTC_MENU_STRIPE_SHADE];
 }
 
 void QtCurveStyle::widgetDestroyed(QObject *o)
