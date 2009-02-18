@@ -51,6 +51,7 @@
     events so that we can simulate the scrollbar being pressed. This extends the
     usable width of a vertial scrollbar to the right hand side of the frame.
 30. Allow to darken popup menu background.
+31. Fix issues with KRunner and flat scrollbar buttons.
 
 0.60
 ----

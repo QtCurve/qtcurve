@@ -1160,7 +1160,7 @@ void QtCurveStyle::polish(QWidget *widget)
     {
         if(enableMouseOver)
             widget->setAttribute(Qt::WA_Hover, true);
-        if(QTC_ROUNDED)
+        if(QTC_ROUNDED && !opts.flatSbarButtons)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, true);
         if(!opts.gtkScrollViews)
             widget->installEventFilter(this);
@@ -1332,7 +1332,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
     else if (qobject_cast<QScrollBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover, false);
-        if(QTC_ROUNDED)
+        if(QTC_ROUNDED && !opts.flatSbarButtons)
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         if(!opts.gtkScrollViews)
             widget->removeEventFilter(this);
@@ -6261,6 +6261,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
                     painter->fillRect(r, palette.brush(QPalette::Background));
+
+                if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
+                    painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
 
                 if(noButtons)
                 {
