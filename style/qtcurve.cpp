@@ -1909,6 +1909,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
+        case SH_ComboBox_PopupFrameStyle:
+            return QFrame::StyledPanel|QFrame::Plain;
         case SH_TabBar_Alignment:
             return Qt::AlignLeft;
         case SH_Header_ArrowAlignment:
@@ -2546,7 +2548,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     drawPrimitive(PE_FrameMenu, option, painter, widget);
                 else
                 {
-                    const QColor *use(backgroundColors(option));
+                    const QColor *use(APP_KRUNNER==theThemedApp ? itsBackgroundCols : backgroundColors(option));
 
                     painter->save();
                     painter->setPen(use[QT_STD_BORDER]);
@@ -6503,6 +6505,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 const QColor *use(buttonColors(option));
                 bool         sunken(state&State_On); // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
 
+                painter->fillRect(r, Qt::transparent);
                 if(QTC_DO_EFFECT)
                 {
                     if(!sunken && MO_GLOW==opts.coloredMouseOver &&
@@ -8131,7 +8134,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                         ? itsMenuitemCols
                         : custom
                             ? custom
-                            : backgroundColors(option));
+                            : APP_KRUNNER==theThemedApp ? itsBackgroundCols : backgroundColors(option));
     QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
                           : cols[WIDGET_PROGRESSBAR==w
