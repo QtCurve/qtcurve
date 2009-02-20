@@ -1241,6 +1241,7 @@ void QtCurveStyle::polish(QWidget *widget)
             {
                 frame->installEventFilter(this);
                 itsSViewContainers[frame].insert(widget);
+                connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
                 connect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
             }
 //             else
@@ -1479,11 +1480,12 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                                                end(itsSViewContainers[(QWidget *)object].end());
 
                 for(; it!=end && !area; ++it)
-                {
-                    mapped=(*it)->mapFrom((QWidget *)object, pos);
-                    if((*it)->rect().adjusted(0, 0, 4, 4).contains(mapped))
-                        area=(QAbstractScrollArea *)(*it);
-                }
+                    if((*it)->isVisible())
+                    {
+                        mapped=(*it)->mapFrom((QWidget *)object, pos);
+                        if((*it)->rect().adjusted(0, 0, 4, 4).contains(mapped))
+                            area=(QAbstractScrollArea *)(*it);
+                    }
             }
             else
                 area=(QAbstractScrollArea *)object;
@@ -9379,9 +9381,28 @@ const QColor & QtCurveStyle::menuStripeCol() const
 
 void QtCurveStyle::widgetDestroyed(QObject *o)
 {
-    theNoEtchWidgets.remove(static_cast<const QWidget *>(o));
+    QWidget *w=static_cast<const QWidget *>(o);
+    theNoEtchWidgets.remove(w);
     if(APP_KONTACT==theThemedApp)
-        itsSViewContainers.remove(static_cast<const QWidget *>(o));
+    {
+        itsSViewContainers.remove(w);
+        QMap<QWidget *, QSet<QWidget *> >::Iterator it(itsSViewContainers.begin()),
+                                                    end(itsSViewContainers.end());
+        QSet<QWidget *>                             rem;
+
+        for(; it!=end; ++it)
+        {
+            (*it).remove(w);
+            if((*it).isEmpty())
+                rem.insert(it.key());
+        }
+
+        QSet<QWidget *>::ConstIterator r(rem.begin()),
+                                       remEnd(rem.end());
+
+        for(; r!=remEnd; ++r)
+            itsSViewContainers.remove(*r);
+    }
 }
 
 void QtCurveStyle::setupKde4()
