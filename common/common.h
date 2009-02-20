@@ -1014,16 +1014,6 @@ typedef struct
 #ifdef __cplusplus
     CustomGradient() : lightBorder(false) { }
 
-    CustomGradient & operator=(const CustomGradient &o)
-    {
-        if(&o!=this)
-        {
-            grad=o.grad;
-            lightBorder=o.lightBorder;
-        }
-
-        return *this;
-    }
 #ifdef QTC_CONFIG_DIALOG
     bool operator==(const CustomGradient &o) const
     {
@@ -1053,16 +1043,6 @@ typedef double * ShadesCont;
 typedef struct
 #endif
 {
-#ifdef __cplusplus
-    Options & operator=(const Options &o)
-    {
-        if(&o!=this)
-            customGradient=o.customGradient;
-
-        return *this;
-    }
-
-#endif
     int              contrast,
                      passwordChar,
                      highlightFactor,

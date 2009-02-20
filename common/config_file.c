@@ -769,11 +769,44 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             int     i,
                     version=readVersionEntry(cfg, QTC_VERSION_KEY);
+#ifdef __cplusplus
+            Options newOpts;
+
+            if(defOpts)
+                newOpts=*defOpts;
+            else
+                defaultSettings(&newOpts);
+
+            Options *def=&newOpts;
+
+            // Copy default custom sahdes/gradients
+            opts->customShades=def->customShades;
+            opts->customGradient=def->customGradient;
+#else
             Options newOpts,
                     *def=defOpts ? defOpts : &newOpts;
+            int     i;
 
             if(!defOpts)
                 defaultSettings(def);
+
+            // Copy default custom sahdes/gradients
+            if(def->customShades)
+            {
+                opts->customShades=(double *)malloc(sizeof(double)*NUM_STD_SHADES);
+                memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
+            }
+
+            for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
+                if(def->customGradient[i] && def->customGradient[i]->numGrad>0)
+                {
+                    opts->customGradient[i]=malloc(sizeof(CustomGradient));
+                    opts->customGradient[i]->numGrad=def->customGradient[i]->numGrad;
+                    opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad);
+                    memcpy(opts->customGradient[i]->grad, def->customGradient[i]->grad, sizeof(sizeof(Gradient) * opts->customGradient[i]->numGrad));
+                    opts->customGradient[i]->lightBorder=def->customGradient[i]->lightBorder;
+                }
+#endif
 
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 61))
@@ -918,6 +951,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 QStringList::ConstIterator it(shades.begin());
                 bool                       ok(true);
 
+                 opts->customShades.clear();
                 opts->customShades.resize(NUM_STD_SHADES);
                 for(i=0; i<NUM_STD_SHADES && ok; ++i, ++it)
                     opts->customShades[i]=(*it).toDouble(&ok);
@@ -997,6 +1031,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 {
                     bool ok=true;
 
+                    if(opts->customShades)
+                    {
+                        free(opts->customShades);
+                        opts->customShades=0L;
+                    }
                     opts->customShades=malloc(sizeof(double)*NUM_STD_SHADES);
 
                     for(j=0; j<comma+1 && str && ok; ++j)
@@ -1211,6 +1250,19 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(!opts->framelessGroupBoxes)
                 opts->groupBoxLine=false;
+#ifndef __cplusplus
+            if(!defOpts)
+            {
+                int i;
+
+                if(def->customShades)
+                    free(def->customShades);
+
+                for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
+                    if(def->customGradient[i])
+                        free(def->customGradient[i]);
+            }
+#endif
             return true;
         }
     }

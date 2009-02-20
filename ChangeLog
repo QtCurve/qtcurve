@@ -5,6 +5,7 @@
 3. Fix scrollbar groove when squared and using flat scrollbar buttons.
 4. Fix kontact crash due to tracking mouse events on frames containing
    scrollviews.
+5. Read in custom gradients and shades from any system config file.
 
 0.61
 ----
