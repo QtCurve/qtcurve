@@ -801,8 +801,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 {
                     opts->customGradient[i]=malloc(sizeof(CustomGradient));
                     opts->customGradient[i]->numGrad=def->customGradient[i]->numGrad;
-                    opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad);
-                    memcpy(opts->customGradient[i]->grad, def->customGradient[i]->grad, sizeof(sizeof(Gradient) * opts->customGradient[i]->numGrad));
+                    opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad*2);
+                    memcpy(opts->customGradient[i]->grad, def->customGradient[i]->grad, sizeof(Gradient) * opts->customGradient[i]->numGrad*2);
                     opts->customGradient[i]->lightBorder=def->customGradient[i]->lightBorder;
                 }
 #endif
