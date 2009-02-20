@@ -1,3 +1,7 @@
+0.61.1
+------
+1. Fix setting of default style.
+
 0.61
 ----
  1. Only draw coloured border for moused-over items if they are enabled!
