@@ -531,7 +531,7 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
     { \
         QString sVal(cfg.readEntry(#ENTRY)); \
         if(sVal.isEmpty()) \
-            opts->ENTRY=def.ENTRY; \
+            opts->ENTRY=def->ENTRY; \
         else \
             setRgb(&(opts->ENTRY), QTC_LATIN1(sVal)); \
     }
@@ -632,76 +632,76 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
         if(str) \
             setRgb(&(opts->ENTRY), str); \
         else \
-            opts->ENTRY=def.ENTRY; \
+            opts->ENTRY=def->ENTRY; \
     }
 #endif
 
 #define QTC_CFG_READ_NUM(ENTRY) \
-    opts->ENTRY=readNumEntry(cfg, #ENTRY, def.ENTRY);
+    opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
 
 #define QTC_CFG_READ_BOOL(ENTRY) \
-    opts->ENTRY=readBoolEntry(cfg, #ENTRY, def.ENTRY);
+    opts->ENTRY=readBoolEntry(cfg, #ENTRY, def->ENTRY);
 
 #define QTC_CFG_READ_ROUND(ENTRY) \
-    opts->ENTRY=toRound(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toRound(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_INT(ENTRY) \
-    opts->ENTRY=readNumEntry(cfg, #ENTRY, def.ENTRY);
+    opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
 
 #define QTC_CFG_READ_INT_BOOL(ENTRY) \
     if(readBoolEntry(cfg, #ENTRY, false)) \
-        opts->ENTRY=def.ENTRY; \
+        opts->ENTRY=def->ENTRY; \
     else \
-        opts->ENTRY=readNumEntry(cfg, #ENTRY, def.ENTRY);
+        opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
     
 #define QTC_CFG_READ_TB_BORDER(ENTRY) \
-    opts->ENTRY=toTBarBorder(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toTBarBorder(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_MOUSE_OVER(ENTRY) \
-    opts->ENTRY=toMouseOver(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toMouseOver(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_APPEARANCE(ENTRY, ALLOW_FADE) \
-    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY, ALLOW_FADE);
+    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW_FADE);
 
 /*
 #define QTC_CFG_READ_APPEARANCE(ENTRY) \
-    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toAppearance(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 */
 
 #define QTC_CFG_READ_STRIPE(ENTRY) \
-    opts->ENTRY=toStripe(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toStripe(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_SLIDER(ENTRY) \
-    opts->ENTRY=toSlider(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toSlider(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_DEF_BTN(ENTRY) \
-    opts->ENTRY=toInd(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toInd(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_LINE(ENTRY) \
-    opts->ENTRY=toLine(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toLine(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_SHADE(ENTRY, AD) \
-    opts->ENTRY=toShade(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def.ENTRY);
+    opts->ENTRY=toShade(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def->ENTRY);
 
 #define QTC_CFG_READ_SCROLLBAR(ENTRY) \
-    opts->ENTRY=toScrollbar(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toScrollbar(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_EFFECT(ENTRY) \
-    opts->ENTRY=toEffect(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toEffect(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #ifdef QTC_CONFIG_DIALOG
 #define QTC_CFG_READ_SHADING(ENTRY, UNUSED) \
-    opts->ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 #else
 #define QTC_CFG_READ_SHADING(ENTRY, DEF) \
     ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
 #endif
 
 #define QTC_CFG_READ_ECOLOR(ENTRY) \
-    opts->ENTRY=toEColor(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toEColor(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define QTC_CFG_READ_FOCUS(ENTRY) \
-    opts->ENTRY=toFocus(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def.ENTRY);
+    opts->ENTRY=toFocus(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
@@ -769,37 +769,33 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             int     i,
                     version=readVersionEntry(cfg, QTC_VERSION_KEY);
-            Options def;
+            Options newOpts,
+                    *def=defOpts ? defOpts : &newOpts;
 
-            /* If we were supplied a default set of values (from config dialog), then
-               take a copy of these settings - as we will change things if version numbers
-               are different... */
-            if(defOpts)
-                def=*defOpts;
-            else
-                defaultSettings(&def);
+            if(!defOpts)
+                defaultSettings(def);
 
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 61))
             {
-                def.coloredMouseOver=MO_PLASTIK;
-                def.buttonEffect=EFFECT_NONE;
-                def.defBtnIndicator=IND_TINT;
-                def.vArrows=false;
-                def.toolbarAppearance=APPEARANCE_GRADIENT;
-                def.focus=FOCUS_STANDARD;
+                def->coloredMouseOver=MO_PLASTIK;
+                def->buttonEffect=EFFECT_NONE;
+                def->defBtnIndicator=IND_TINT;
+                def->vArrows=false;
+                def->toolbarAppearance=APPEARANCE_GRADIENT;
+                def->focus=FOCUS_STANDARD;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-                def.selectionAppearance=APPEARANCE_FLAT;
+                def->selectionAppearance=APPEARANCE_FLAT;
 #endif
-                def.flatSbarButtons=false;
-                def.comboSplitter=true;
-                def.handles=LINE_DOTS;
-                def.lighterPopupMenuBgnd=15;
-                def.activeTabAppearance=APPEARANCE_GRADIENT;
-                def.groupBoxLine=false;
-                def.shadeSliders=SHADE_BLEND_SELECTED;
-                def.progressGrooveColor=ECOLOR_BASE;
-                def.shadeMenubars=SHADE_DARKEN;
+                def->flatSbarButtons=false;
+                def->comboSplitter=true;
+                def->handles=LINE_DOTS;
+                def->lighterPopupMenuBgnd=15;
+                def->activeTabAppearance=APPEARANCE_GRADIENT;
+                def->groupBoxLine=false;
+                def->shadeSliders=SHADE_BLEND_SELECTED;
+                def->progressGrooveColor=ECOLOR_BASE;
+                def->shadeMenubars=SHADE_DARKEN;
             }
 
             QTC_CFG_READ_NUM(passwordChar)
