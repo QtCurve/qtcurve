@@ -785,7 +785,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #else
             Options newOpts,
                     *def=defOpts ? defOpts : &newOpts;
-            int     i;
 
             if(!defOpts)
                 defaultSettings(def);
