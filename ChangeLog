@@ -2,6 +2,7 @@
 ------
 1. Fix setting of default style. Fixes odd behaviour of config dialog!
 2. Fix position of dark part of sunken lines.
+3. Fix scrollbar groove when squared and using flat scrollbar buttons.
 
 0.61
 ----

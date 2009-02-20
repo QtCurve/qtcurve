@@ -6343,7 +6343,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
                     painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
 
-                if(noButtons)
+                if(noButtons || opts.flatSbarButtons)
                 {
                     // Draw complete groove here, as we want to round both ends...
                     opt.rect=subpage.united(addpage);
