@@ -2,6 +2,7 @@
 ------
 1. Fix setting of default style.
 2. Fix position of dark part of sunken lines.
+3. Read in custom gradients and shades from any system config file.
 
 0.61
 ----
