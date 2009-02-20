@@ -1,6 +1,7 @@
 0.61.1
 ------
 1. Fix setting of default style. Fixes odd behaviour of config dialog!
+2. Fix position of dark part of sunken lines.
 
 0.61
 ----

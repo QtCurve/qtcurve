@@ -3606,14 +3606,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 case LINE_DOTS:
                     drawDots(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 5);
                     break;
-                case LINE_SUNKEN:
-                    drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 3);
-                    break;
                 case LINE_FLAT:
-                    drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 3, border, 0, 3, 0, false);
-                    break;
+                case LINE_SUNKEN:
                 case LINE_DASHES:
-                    drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 3, 0);
+                    drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 3, border, 0, 3, opts.splitters);
             }
             painter->restore();
             break;
@@ -7367,18 +7363,18 @@ void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col,
 }
 
 void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
-                             const QColor *cols, int startOffset, int dark, int etchedDisp,
-                             bool light) const
+                             const QColor *cols, int startOffset, int dark, ELine type) const
 {
-    int  space((nLines*2)+(etchedDisp || !light ? (nLines-1) : 0)),
-         step(etchedDisp || !light ? 3 : 2),
+    int  space((nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0)),
+         step(LINE_DASHES!=type ? 3 : 2),
+         etchedDisp(LINE_SUNKEN==type ? 1 : 0),
          x(horiz ? r.x() : r.x()+((r.width()-space)>>1)),
          y(horiz ? r.y()+((r.height()-space)>>1) : r.y()),
          x2(r.x()+r.width()-1),
          y2(r.y()+r.height()-1),
          i;
     QPen dp(cols[dark], 1),
-         lp(cols[light], 1);
+         lp(cols[0], 1);
 
     if(opts.fadeLines && (horiz ? r.width() : r.height())>16)
     {
@@ -7393,14 +7389,14 @@ void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines
 
         dp=QPen(QBrush(grad), 1);
 
-        if(light)
+        if(LINE_FLAT!=type)
         {
-            fade=QColor(cols[light]);
+            fade=QColor(cols[0]);
 
             fade.setAlphaF(0.0);
             grad.setColorAt(0, fade);
-            grad.setColorAt(0.4, cols[light]);
-            grad.setColorAt(0.6, cols[light]);
+            grad.setColorAt(0.4, cols[0]);
+            grad.setColorAt(0.6, cols[0]);
             grad.setColorAt(1, fade);
             lp=QPen(QBrush(grad), 1);
         }
@@ -7414,13 +7410,15 @@ void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines
 
         p->setPen(dp);
         for(i=0; i<space; i+=step)
-            drawAaLine(p, x+offset, y+i, x2-(offset+etchedDisp), y+i);
+            drawAaLine(p, x+offset, y+i, x2-offset, y+i);
 
-        if(light)
+        if(LINE_FLAT!=type)
         {
             p->setPen(lp);
+            x+=etchedDisp;
+            x2+=etchedDisp;
             for(i=1; i<space; i+=step)
-                drawAaLine(p, x+offset+etchedDisp, y+i, x2-offset, y+i);
+                drawAaLine(p, x+offset, y+i, x2-offset, y+i);
         }
     }
     else
@@ -7430,13 +7428,15 @@ void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines
 
         p->setPen(dp);
         for(i=0; i<space; i+=step)
-            drawAaLine(p, x+i, y+offset, x+i, y2-(offset+etchedDisp));
+            drawAaLine(p, x+i, y+offset, x+i, y2-offset);
 
-        if(light)
+        if(LINE_FLAT!=type)
         {
             p->setPen(lp);
+            y+=etchedDisp;
+            y2+=etchedDisp;
             for(i=1; i<space; i+=step)
-                drawAaLine(p, x+i, y+offset+etchedDisp, x+i, y2-offset);
+                drawAaLine(p, x+i, y+offset, x+i, y2-offset);
         }
     }
     p->setRenderHint(QPainter::Antialiasing, false);
@@ -8577,10 +8577,10 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
         switch(opts.sliderThumbs)
         {
             case LINE_FLAT:
-                drawLines(p, r, !(opt.state&State_Horizontal), 3, 5, markers, 0, 5, 0, false);
+                drawLines(p, r, !(opt.state&State_Horizontal), 3, 5, markers, 0, 5, opts.sliderThumbs);
                 break;
             case LINE_SUNKEN:
-                drawLines(p, r, !(opt.state&State_Horizontal), 4, 3, markers, 0, 3);
+                drawLines(p, r, !(opt.state&State_Horizontal), 4, 3, markers, 0, 3, opts.sliderThumbs);
                 break;
             case LINE_DOTS:
             default:
@@ -8928,23 +8928,23 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
                 QRect r1(r.x()+(tb ? 2 : (r.width()-6)/2), r.y(), 3, r.height());
 
                 drawLines(p, r1, true, (r.height()-8)/2,
-                          tb ? 0 : (r.width()-5)/2, border, 0, 5, 0);
+                          tb ? 0 : (r.width()-5)/2, border, 0, 5, handles);
             }
             else
             {
                 QRect r1(r.x(), r.y()+(tb ? 2 : (r.height()-6)/2), r.width(), 3);
 
                 drawLines(p, r1, false, (r.width()-8)/2,
-                          tb ? 0 : (r.height()-5)/2, border, 0, 5, 0);
+                          tb ? 0 : (r.height()-5)/2, border, 0, 5, handles);
             }
             break;
         case LINE_FLAT:
             drawLines(p, r, !(option->state&State_Horizontal), 2,
-                      tb ? 4 : 2, border, tb ? -2 : 0, 4, 0, false);
+                      tb ? 4 : 2, border, tb ? -2 : 0, 4, handles);
             break;
         default:
             drawLines(p, r, !(option->state&State_Horizontal), 2,
-                      tb ? 4 : 2, border, tb ? -2 : 0, 3);
+                      tb ? 4 : 2, border, tb ? -2 : 0, 3, handles);
     }
 }
 
