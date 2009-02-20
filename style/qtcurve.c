@@ -2135,8 +2135,7 @@ static void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col)
 }
 
 static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight, gboolean horiz,
-                      int n_lines, int offset, GdkColor *cols, GdkRectangle *area, int dark, int etchedDisp,
-                      gboolean light)
+                      int nLines, int offset, GdkColor *cols, GdkRectangle *area, int dark, ELine type)
 {
     if(horiz)
         ry+=0.5,  rwidth+=1;
@@ -2144,9 +2143,10 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
         rx+=0.5,  rheight+=1;
 
     {
-    int             space =(n_lines*2)+(etchedDisp || !light ? (n_lines-1) : 0),
-                    step = etchedDisp || !light ? 3 : 2,
-                    i;
+    int             space = (nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0),
+                    step = LINE_DASHES!=type ? 3 : 2,
+                    i,
+                    etchedDisp = LINE_SUNKEN==type ? 1 : 0;
     double          x = (horiz ? rx : rx+((rwidth-space)>>1)),
                     y = (horiz ? ry+((rheight-space)>>1) : ry),
                     x2 = rx + rwidth-1,
@@ -2156,7 +2156,7 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
     cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>16)
                           ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
                           : NULL,
-                    *pt2=(pt1 && light)
+                    *pt2=(pt1 && LINE_FLAT!=type)
                           ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
                           : NULL;
 
@@ -2168,16 +2168,18 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
         for(i=0; i<space; i+=step)
         {
             cairo_move_to(cr, x+offset, y+i);
-            cairo_line_to(cr, x2-(offset+etchedDisp), y+i);
+            cairo_line_to(cr, x2-offset, y+i);
         }
         cairo_stroke(cr);
 
-        if(light)
+        if(LINE_FLAT!=type)
         {
             setLineCol(cr, pt2, col2);
+            x+=etchedDisp;
+            x2+=etchedDisp;
             for(i=1; i<space; i+=step)
             {
-                cairo_move_to(cr, x+offset+etchedDisp, y+i);
+                cairo_move_to(cr, x+offset, y+i);
                 cairo_line_to(cr, x2-offset, y+i);
             }
             cairo_stroke(cr);
@@ -2188,15 +2190,17 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
         for(i=0; i<space; i+=step)
         {
             cairo_move_to(cr, x+i, y+offset);
-            cairo_line_to(cr, x+i, y2-(offset+etchedDisp));
+            cairo_line_to(cr, x+i, y2-offset);
         }
         cairo_stroke(cr);
-        if(light)
+        if(LINE_FLAT!=type)
         {
             setLineCol(cr, pt2, col2);
+            y+=etchedDisp;
+            y2+=etchedDisp;
             for(i=1; i<space; i+=step)
             {
-                cairo_move_to(cr, x+i, y+offset+etchedDisp);
+                cairo_move_to(cr, x+i, y+offset);
                 cairo_line_to(cr, x+i, y2-offset);
             }
             cairo_stroke(cr);
@@ -2211,10 +2215,10 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
 }
 
 static void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean horiz,
-                     int n_lines, int offset, GdkColor *cols, GdkRectangle *area, int startOffset,
+                     int nLines, int offset, GdkColor *cols, GdkRectangle *area, int startOffset,
                      int dark)
 {
-    int      space =(n_lines*2)+(n_lines-1),
+    int      space =(nLines*2)+(nLines-1),
              x = horiz ? rx : rx+((rwidth-space)>>1),
              y = horiz ? ry+((rheight-space)>>1) : ry,
              i, j,
@@ -2645,16 +2649,11 @@ debugDisplayWidget(widget, 3);
                 drawDots(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
                          cols, area, 0, 5);
                 break;
-            case LINE_SUNKEN:
-                drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
-                          cols, area, 3, 1, TRUE);
             case LINE_FLAT:
-                drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 3,
-                          cols, area, 3, 0, FALSE);
-                break;
+            case LINE_SUNKEN:
             case LINE_DASHES:
-                drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 1,
-                          cols, area, 3, 0, TRUE);
+                drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 3,
+                          cols, area, 3, opts.splitters);
         }
     }
     /* Note: I'm not sure why the 'widget && GTK_IS_HANDLE_BOX(widget)' is in the following 'if' - its been there for a while.
@@ -2707,18 +2706,18 @@ debugDisplayWidget(widget, 3);
             case LINE_DASHES:
                 if(height>width)
                     drawLines(cr, x+3, y, 3, height, TRUE, (height-8)/2, 0,
-                              cols, area, 5, 0, TRUE);
+                              cols, area, 5, opts.handles);
                 else
                     drawLines(cr, x, y+3, width, 3, FALSE, (width-8)/2, 0,
-                              cols, area, 5, 0, TRUE);
+                              cols, area, 5, opts.handles);
                 break;
             case LINE_FLAT:
                 drawLines(cr, x, y, width, height, height<width, 2, 4, cols,
-                          area, 4, 0, FALSE);
+                          area, 4, opts.handles);
                 break;
             default:
                 drawLines(cr, x, y, width, height, height<width, 2, 4, cols,
-                          area, 3, 1, TRUE);
+                          area, 3, opts.handles);
         }
     }
     QTC_CAIRO_END
@@ -5429,11 +5428,11 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
             {
                 case LINE_FLAT:
                     drawLines(cr, x, y, width, height,
-                              GTK_ORIENTATION_HORIZONTAL!=orientation, 3, 5, btn_colors, area, 5, 0, FALSE);
+                              GTK_ORIENTATION_HORIZONTAL!=orientation, 3, 5, btn_colors, area, 5, opts.sliderThumbs);
                     break;
                 case LINE_SUNKEN:
                     drawLines(cr, x, y, width, height,
-                              GTK_ORIENTATION_HORIZONTAL!=orientation, 4, 3, btn_colors, area, 3, 1, TRUE);
+                              GTK_ORIENTATION_HORIZONTAL!=orientation, 4, 3, btn_colors, area, 3, opts.sliderThumbs);
                     break;
                 default:
                 case LINE_DOTS:
