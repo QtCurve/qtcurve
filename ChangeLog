@@ -1,6 +1,7 @@
 0.61.2
 ------
-1. Respect the "Raised" flag of toolbuttons - fixes missing border of
+1. Fix setting of options if no qtcurvestylerc is found!
+2. Respect the "Raised" flag of toolbuttons - fixes missing border of
    disabled buttons in QJackCtl.
 
 0.61.1

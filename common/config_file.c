@@ -1264,6 +1264,18 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             return true;
         }
+        else
+        {
+#ifdef __cplusplus
+            if(defOpts)
+                *opts=*defOpts;
+            else
+                defaultSettings(opts);
+#else
+            defaultSettings(opts);
+#endif
+            return true;
+        }
     }
 
     return false;
