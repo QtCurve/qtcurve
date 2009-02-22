@@ -1,6 +1,7 @@
 0.61.2
 ------
-1. Allow QtCurve's colours to be overriden - but only if stylename is
+1. Fix setting of options if no qtcurvestylerc is found!
+2. Allow QtCurve's colours to be overriden - but only if stylename is
    empty. Fixes SooperLooperGUI's background.
 
 0.61.1
