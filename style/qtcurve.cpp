@@ -5525,7 +5525,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                              widget->parentWidget() && widget->parentWidget()->inherits("KMenu"));
 
                 if (!(bflags&State_Enabled))
-                    bflags &= ~(State_MouseOver | State_Raised);
+                    bflags &= ~(State_MouseOver/* | State_Raised*/);
 
                 if(bflags&State_MouseOver)
                     bflags |= State_Raised;
