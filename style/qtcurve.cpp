@@ -4454,6 +4454,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuVMargin:
         case CE_MenuEmptyArea:
             break;
+#if 0
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
@@ -4474,6 +4475,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
             }
             break;
+#endif
         case CE_PushButtonBevel:
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
@@ -4563,8 +4565,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 //this tweak ensures the font is perfectly centered on small sizes
                 //but slightly downward to make it more gnomeish if not
-                if (button->fontMetrics.height() > 14)
-                    r.translate(0, 1);
+//                 if (button->fontMetrics.height() > 14)
+//                     r.translate(0, 1);
 
                 if (button->features&QStyleOptionButton::HasMenu)
                 {
