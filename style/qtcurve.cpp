@@ -4731,6 +4731,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (!styleHint(SH_UnderlineShortcut, option, widget))
                     alignment |= Qt::TextHideMnemonic;
 
+#if QT_VERSION >= 0x040500
+                r = subElementRect(SE_TabBarTabText, option, widget);
+#else
+                if(qtVersion()>=VER_45)
+                    r = subElementRect((QStyle::SubElement)(SE_ItemViewItemFocusRect+3), option, widget);
+#endif
+
                 if (!tabV2.icon.isNull())
                 {
                     QSize iconSize(tabV2.iconSize);
@@ -4741,7 +4748,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     }
 
                     QPixmap tabIcon(getIconPixmap(tabV2.icon, iconSize, state&State_Enabled));
-
+#if 0
                     static const int constIconPad=6;
 
                     if(reverse)
@@ -4755,13 +4762,40 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->drawPixmap(r.left() + constIconPad, r.center().y() - tabIcon.height() / 2, tabIcon);
                         r.setLeft(r.left() + iconSize.width() + constIconPad);
                     }
+#endif
+                    QSize tabIconSize = tabV2.icon.actualSize(iconSize, tabV2.state&State_Enabled
+                                                                ? QIcon::Normal
+                                                                : QIcon::Disabled);
+
+                    int offset = 4,
+                        left = option->rect.left();
+#if QT_VERSION >= 0x040500
+                    if (tabV2.leftButtonSize.isNull())
+                        offset += 2;
+                    else
+                        left += tabV2.leftButtonSize.width() + (6 + 2) + 2;
+#endif
+                    QRect iconRect = QRect(left + offset, r.center().y() - tabIcon.height() / 2,
+                                           tabIconSize.width(), tabIconSize.height());
+                    if (!verticalTabs)
+                        iconRect = visualRect(option->direction, option->rect, iconRect);
+                    painter->drawPixmap(iconRect.x(), iconRect.y(), tabIcon);
+#if QT_VERSION < 0x040500
+                    if(qtVersion()<VER_45)
+                        r.adjust(tabIconSize.width(), 0, -tabIconSize.width(), 0);
+#endif
                 }
 
                 if(!tab->text.isEmpty())
                 {
-                    static const int constBorder=6;
+#if QT_VERSION < 0x040500
+                    if(qtVersion()<VER_45)
+                    {
+                        static const int constBorder=6;
 
-                    r.adjust(constBorder, 0, -constBorder, 0);
+                        r.adjust(constBorder, 0, -constBorder, 0);
+                    }
+#endif
                     drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text, QPalette::WindowText);
                 }
 
