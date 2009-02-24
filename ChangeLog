@@ -3,6 +3,7 @@
 1. Fix setting of options if no qtcurvestylerc is found!
 2. Allow QtCurve's colours to be overriden - but only if stylename is
    empty. Fixes SooperLooperGUI's background.
+3. Fix border of tabs.
 
 0.61.1
 ------

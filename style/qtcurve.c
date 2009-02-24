@@ -1776,7 +1776,8 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
                 else if(WIDGET_ENTRY==widget && !hasFocus)
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->base[state]));
-                else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app))
+                else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app ||
+                                                         WIDGET_TAB_TOP==widget || WIDGET_TAB_BOT==widget))
                 {
                     GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
                     if(flags&DF_BLEND)
