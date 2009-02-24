@@ -4,6 +4,7 @@
 2. Respect the "Raised" flag of toolbuttons - fixes missing border of
    disabled buttons in QJackCtl.
 3. Fix text in Arora (Qt4.5) tabs.
+4. Fix border of tabs.
 
 0.61.1
 ------
