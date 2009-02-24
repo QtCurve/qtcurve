@@ -4,6 +4,8 @@
 2. Allow QtCurve's colours to be overriden - but only if stylename is
    empty. Fixes SooperLooperGUI's background.
 3. Fix border of tabs.
+4. If KDE_SESSION_VERSION is not set, but KDE_FULL_SESSION is, then
+   use KDE/Qt3 settings.
 
 0.61.1
 ------

@@ -181,16 +181,26 @@ static gboolean isMozilla()
 
 static gboolean useQt3Settings()
 {
-    static const char *vers=NULL;
+    static int ver=0;
 
-    if(!vers)
-        vers=getenv("KDE_SESSION_VERSION");
+    if(0==ver)
+    {
+        const char *sessionVersion=getenv("KDE_SESSION_VERSION");
 
+        ver=sessionVersion
+                ? atoi(sessionVersion)<4
+                    ? 3
+                    : 4
 #ifdef QTC_DEFAULT_TO_KDE3
-    return !vers || atoi(vers)<4;
+                : 3;
 #else
-    return vers && atoi(vers)<4;
+                : getenv("KDE_FULL_SESSION")
+                    ? 3
+                    : 4;
 #endif
+    }
+
+    return 3==ver;
 }
 
 static const char * defaultIcons()
