@@ -1,3 +1,8 @@
+0.61.3
+------
+1. Allow QtCurve's colours to be overriden if the style name
+   starts with the application name. Fixes Pidgin's tab labels.
+   
 0.61.2
 ------
 1. Fix setting of options if no qtcurvestylerc is found!

@@ -6336,7 +6336,8 @@ static guint qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
 static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 {
     bool       destIsQtc=QTCURVE_IS_RC_STYLE(dest),
-               srcIsQtc=!src->name || src->name==strstr(src->name, QTC_RC_SETTING);
+               srcIsQtc=!src->name || src->name==strstr(src->name, QTC_RC_SETTING) ||
+                        (getAppName() && src->name==strstr(src->name, getAppName()));
     GtkRcStyle copy;
 
     if(destIsQtc && !srcIsQtc)

@@ -1039,17 +1039,21 @@ static char * getAppNameFromPid(int pid)
 
 static char * getAppName()
 {
-    char *name=getAppNameFromPid(getpid());
+    static char *name=0L;
 
-    if(0==strcmp(name, "perl") || 0==strcmp(name, "python"))
+    if(!name)
     {
-        name=getAppNameFromPid(getppid());
-        if(!name)
-            return "scriptedapp";
-        else if(name==strstr(name, "gimp"))
-            return GIMP_PLUGIN;
-    }
+        name=getAppNameFromPid(getpid());
 
+        if(0==strcmp(name, "perl") || 0==strcmp(name, "python"))
+        {
+            name=getAppNameFromPid(getppid());
+            if(!name)
+                name="scriptedapp";
+            else if(name==strstr(name, "gimp"))
+                name=GIMP_PLUGIN;
+        }
+    }
     return name;
 }
 
