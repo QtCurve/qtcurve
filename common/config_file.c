@@ -797,12 +797,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
 
             for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
-                if(def->customGradient[i] && def->customGradient[i]->numGrad>0)
+                if(def->customGradient[i] && def->customGradient[i]->numStops>0)
                 {
-                    opts->customGradient[i]=malloc(sizeof(CustomGradient));
-                    opts->customGradient[i]->numGrad=def->customGradient[i]->numGrad;
-                    opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad*2);
-                    memcpy(opts->customGradient[i]->grad, def->customGradient[i]->grad, sizeof(Gradient) * opts->customGradient[i]->numGrad*2);
+                    opts->customGradient[i]=malloc(sizeof(Gradient));
+                    opts->customGradient[i]->numStops=def->customGradient[i]->numStops;
+                    opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
+                    memcpy(opts->customGradient[i]->stops, def->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
                     opts->customGradient[i]->lightBorder=def->customGradient[i]->lightBorder;
                 }
 #endif
@@ -982,7 +982,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     QStringList::ConstIterator it(vals.begin()),
                                                end(vals.end());
                     bool                       ok(true);
-                    CustomGradient             grad;
+                    Gradient                   grad;
 
                     if((*it)=="true")
                         grad.lightBorder=true;
@@ -1005,7 +1005,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                    (val>=0.0 && val<=2.0);
 
                             if(ok)
-                                grad.grad.insert(Gradient(pos, val));
+                                grad.stops.insert(GradientStop(pos, val));
                         }
                     }
 
@@ -1081,8 +1081,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
                     if(comma && opts->customGradient[i])
                     {
-                        if(opts->customGradient[i]->grad)
-                            free(opts->customGradient[i]->grad);
+                        if(opts->customGradient[i]->stops)
+                            free(opts->customGradient[i]->stops);
                         free(opts->customGradient[i]);
                         opts->customGradient[i]=0L;
                     }
@@ -1106,9 +1106,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
                             if(ok)
                             {
-                                opts->customGradient[i]=malloc(sizeof(CustomGradient));
-                                opts->customGradient[i]->numGrad=comma/2;
-                                opts->customGradient[i]->grad=malloc(sizeof(Gradient) * opts->customGradient[i]->numGrad);
+                                opts->customGradient[i]=malloc(sizeof(Gradient));
+                                opts->customGradient[i]->numStops=comma/2;
+                                opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops);
                                 opts->customGradient[i]->lightBorder=lb;
 
                                 str=c+1;
@@ -1119,7 +1119,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                     if(c)
                                     {
                                         *c='\0';
-                                        opts->customGradient[i]->grad[j/2].pos=g_ascii_strtod(str, NULL);
+                                        opts->customGradient[i]->stops[j/2].pos=g_ascii_strtod(str, NULL);
                                         str=c+1;
                                         c=str ? strchr(str, ',') : 0L;
 
@@ -1127,7 +1127,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                         {
                                             if(c)
                                                 *c='\0';
-                                            opts->customGradient[i]->grad[j/2].val=g_ascii_strtod(str, NULL);
+                                            opts->customGradient[i]->stops[j/2].val=g_ascii_strtod(str, NULL);
                                             str=c ? c+1 : c;
                                         }
                                         else
@@ -1139,7 +1139,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
                                 if(!ok)
                                 {
-                                    free(opts->customGradient[i]->grad);
+                                    free(opts->customGradient[i]->stops);
                                     free(opts->customGradient[i]);
                                     opts->customGradient[i]=0L;
                                 }
@@ -1837,8 +1837,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 
         for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
         {
-            CustomGradientCont::const_iterator cg(opts.customGradient.find((EAppearance)i));
-            QString                            gradKey;
+            GradientCont::const_iterator cg(opts.customGradient.find((EAppearance)i));
+            QString                      gradKey;
 
             if(i==(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
                 gradKey="sunkengradient";
@@ -1858,8 +1858,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 
                 str << (const char *)((*cg).second.lightBorder ? "true" : "false");
 
-                GradientCont::const_iterator it((*cg).second.grad.begin()),
-                                             end((*cg).second.grad.end());
+                GradientStopCont::const_iterator it((*cg).second.stops.begin()),
+                                                 end((*cg).second.stops.end());
 
                 for(; it!=end; ++it)
                     str << ',' << (*it).pos << ',' << (*it).val;
