@@ -2,6 +2,7 @@
 ------
 1. Reduce gradient code complexity - makes predefined gradients
    work in the same vein as custom gradients.
+2. Add scrollbars/slider groove and 'sunken' appearance options.
    
 0.61.3
 ------

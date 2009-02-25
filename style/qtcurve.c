@@ -1433,7 +1433,7 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         gboolean        tab=WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w,
                         selected=tab ? false : sel;
         EAppearance     app=selected
-                                ? APPEARANCE_INVERTED
+                                ? opts.sunkenAppearance
                                 : WIDGET_LISTVIEW_HEADER==w && APPEARANCE_BEVELLED==bevApp
                                     ? APPEARANCE_LV_BEVELLED
                                     : APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w
@@ -1788,7 +1788,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
     if(bw>0 && bh>0)
     {
-        drawBevelGradient(cr, style, area, region, bx, by, bw, bh, base, horiz, sunken, app, widget);
+        drawBevelGradient(cr, style, area, region, bx, by, bw, bh, base, horiz, 
+                          sunken && WIDGET_TROUGH!=widget && WIDGET_SLIDER_TROUGH!=widget, app, widget);
 
         if(plastikMouseOver)
         {
@@ -4116,8 +4117,8 @@ debugDisplayWidget(widget, 3);
     if(!mnu || qtSettings.qt4)
     {
         EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-        EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
-        gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : true;
+        EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
+        gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : false;
         gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
                     lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
@@ -4264,8 +4265,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
         int         ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL;
         EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-        EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
-        gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : true,
+        EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
+        gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : false,
                     lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
                     drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
 
