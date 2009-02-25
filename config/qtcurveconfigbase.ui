@@ -79,14 +79,14 @@
      </property>
      <widget class="QWidget" name="page" >
       <layout class="QGridLayout" name="gridLayout_2" >
-       <item row="0" column="0" >
+       <item row="0" column="1" colspan="2" >
         <widget class="QLabel" name="label_7" >
          <property name="text" >
           <string>Appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
+       <item row="0" column="3" >
         <widget class="QComboBox" name="appearance" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
@@ -99,7 +99,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2" >
+       <item row="0" column="4" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
@@ -112,75 +112,84 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" >
+       <item row="1" column="1" >
+        <widget class="QLabel" name="label_29" >
+         <property name="text" >
+          <string>Sunken appearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QComboBox" name="sunkenAppearance" />
+       </item>
+       <item row="2" column="1" colspan="2" >
         <widget class="QLabel" name="label_8" >
          <property name="text" >
           <string>Roundedness:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
+       <item row="2" column="3" >
         <widget class="QComboBox" name="round" />
        </item>
-       <item row="2" column="0" >
+       <item row="3" column="1" colspan="2" >
         <widget class="QLabel" name="label_9" >
          <property name="text" >
           <string>Button effect:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
+       <item row="3" column="3" >
         <widget class="QComboBox" name="buttonEffect" />
        </item>
-       <item row="3" column="0" >
+       <item row="4" column="1" colspan="2" >
         <widget class="QLabel" name="label_25" >
          <property name="text" >
           <string>Focus rectangle:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
+       <item row="4" column="3" >
         <widget class="QComboBox" name="focus" />
        </item>
-       <item row="4" column="0" colspan="2" >
+       <item rowspan="2" row="5" column="0" colspan="5" >
+        <layout class="QHBoxLayout" name="horizontalLayout" />
+       </item>
+       <item row="6" column="1" colspan="3" >
         <widget class="QCheckBox" name="drawStatusBarFrames" >
          <property name="text" >
           <string>Draw statusbar frames</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="3" >
-        <layout class="QHBoxLayout" name="horizontalLayout" >
-         <item>
-          <widget class="QCheckBox" name="framelessGroupBoxes" >
-           <property name="text" >
-            <string>Frameless groupboxes,</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="groupBoxLine" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>draw line after title</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="7" column="1" >
+        <widget class="QCheckBox" name="framelessGroupBoxes" >
+         <property name="text" >
+          <string>Frameless groupboxes,</string>
+         </property>
+        </widget>
        </item>
-       <item row="6" column="0" colspan="2" >
+       <item row="7" column="2" colspan="3" >
+        <widget class="QCheckBox" name="groupBoxLine" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>draw line after title</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1" colspan="3" >
         <widget class="QCheckBox" name="vArrows" >
          <property name="text" >
           <string>'V' style arrows</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="0" colspan="2" >
+       <item row="9" column="1" colspan="3" >
         <widget class="QCheckBox" name="stdSidebarButtons" >
          <property name="whatsThis" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
@@ -193,14 +202,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="8" column="0" colspan="2" >
+       <item row="10" column="1" colspan="3" >
         <widget class="QCheckBox" name="darkerBorders" >
          <property name="text" >
           <string>Darker borders</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="2" >
+       <item row="11" column="1" colspan="3" >
         <widget class="QCheckBox" name="comboSplitter" >
          <property name="whatsThis" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
@@ -213,14 +222,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="10" column="0" >
+       <item row="12" column="1" colspan="2" >
         <widget class="QCheckBox" name="fadeLines" >
          <property name="text" >
-          <string>Draw fading lines (KDE4 &amp; Gtk2)</string>
+          <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="0" >
+       <item row="13" column="1" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -356,13 +365,23 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="0" >
+        <widget class="QLabel" name="label_30" >
+         <property name="text" >
+          <string>Groove appearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QComboBox" name="grooveAppearance" />
+       </item>
+       <item row="5" column="0" >
         <widget class="QLabel" name="label_14" >
          <property name="text" >
           <string>Scrollbar buttons:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
+       <item row="5" column="1" >
         <widget class="QComboBox" name="scrollbarType" >
          <property name="whatsThis" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
@@ -379,24 +398,24 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="4" column="2" colspan="2" >
+       <item row="5" column="2" colspan="2" >
         <widget class="QCheckBox" name="flatSbarButtons" >
          <property name="text" >
           <string>Flat</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" >
+       <item row="6" column="0" >
         <widget class="QLabel" name="label_15" >
          <property name="text" >
           <string>Scrollbar thumbs:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1" >
+       <item row="6" column="1" >
         <widget class="QComboBox" name="sliderThumbs" />
        </item>
-       <item row="6" column="1" >
+       <item row="7" column="1" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1674,12 +1693,11 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <tabstops>
   <tabstop>appearance</tabstop>
+  <tabstop>sunkenAppearance</tabstop>
   <tabstop>round</tabstop>
   <tabstop>buttonEffect</tabstop>
   <tabstop>focus</tabstop>
   <tabstop>drawStatusBarFrames</tabstop>
-  <tabstop>framelessGroupBoxes</tabstop>
-  <tabstop>groupBoxLine</tabstop>
   <tabstop>vArrows</tabstop>
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
@@ -1691,6 +1709,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>customSlidersColor</tabstop>
   <tabstop>sliderStyle</tabstop>
   <tabstop>fillSlider</tabstop>
+  <tabstop>grooveAppearance</tabstop>
   <tabstop>scrollbarType</tabstop>
   <tabstop>flatSbarButtons</tabstop>
   <tabstop>sliderThumbs</tabstop>

@@ -2868,8 +2868,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         : palette.base().color()
                                     : palette.background().color());
             EWidget      wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-            EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
-            bool         drawSunken=opts.crButton ? sunken : true,
+            EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
+            bool         drawSunken=opts.crButton ? sunken : false,
                          lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
                          drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
 
@@ -2972,8 +2972,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             int         x(rect.x()), y(rect.y());
             QPolygon    clipRegion;
             EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-            EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_GRADIENT;
-            bool        drawSunken=opts.crButton ? sunken : true,
+            EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
+            bool        drawSunken=opts.crButton ? sunken : false,
                         lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
                         drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app)),
                         doneShadow=false;
@@ -5250,7 +5250,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(r.x(), r.y()+1, r.width(), r.height()-2, use[2]);
                 else
                     drawBevelGradient(use[2], painter, QRect(r.x(), r.y()+1, r.width(), r.height()-2),
-                                      true, true, APPEARANCE_GRADIENT, WIDGET_TROUGH);
+                                      true, true, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
@@ -5273,7 +5273,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(r.x()+1, r.y(), r.width()-2, r.height(), use[2]);
                 else
                     drawBevelGradient(use[2], painter, QRect(r.x()+1, r.y(), r.width()-2, r.height()),
-                                      false, true, APPEARANCE_GRADIENT, WIDGET_TROUGH);
+                                      false, true, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
@@ -6341,15 +6341,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     // Draw complete groove here, as we want to round both ends...
                     opt.rect=subpage.united(addpage);
-                    opt.state=scrollbar->state|State_On;
-                    opt.state&=~State_MouseOver;
+                    opt.state=scrollbar->state;
+                    opt.state&=~(State_MouseOver|State_Sunken|State_On);
 
                     drawLightBevel(painter, opt.rect, &opt, widget,
     #ifndef QTC_SIMPLE_SCROLLBARS
-                                SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons ? ROUNDED_ALL :
+                                   SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons ? ROUNDED_ALL :
     #endif
-                                ROUNDED_NONE,
-                                itsBackgroundCols[2], itsBackgroundCols, true, WIDGET_TROUGH);
+                                   ROUNDED_NONE,
+                                   itsBackgroundCols[2], itsBackgroundCols, true, WIDGET_TROUGH);
                 }
                 else
                 {
@@ -6357,8 +6357,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         opt.state=scrollbar->state;
                         opt.rect = subpage;
-                        if (!(scrollbar->activeSubControls&SC_ScrollBarSubPage))
-                            opt.state &= ~(State_Sunken | State_MouseOver);
+//                         if (!(scrollbar->activeSubControls&SC_ScrollBarSubPage))
+                            opt.state &= ~(State_Sunken|State_MouseOver|State_On);
                         drawControl(CE_ScrollBarSubPage, &opt, painter, widget);
                     }
 
@@ -6366,8 +6366,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         opt.state=scrollbar->state;
                         opt.rect = addpage;
-                        if (!(scrollbar->activeSubControls&SC_ScrollBarAddPage))
-                            opt.state &= ~(State_Sunken | State_MouseOver);
+//                         if (!(scrollbar->activeSubControls&SC_ScrollBarAddPage))
+                            opt.state &= ~(State_Sunken|State_MouseOver|State_On);
                         drawControl(CE_ScrollBarAddPage, &opt, painter, widget);
                     }
                 }
@@ -7551,11 +7551,11 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
         bool        tab(WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w),
                     selected(tab ? false : sel);
         EAppearance app(selected
-                            ? APPEARANCE_INVERTED
+                            ? opts.sunkenAppearance
                             : WIDGET_LISTVIEW_HEADER==w && APPEARANCE_BEVELLED==bevApp
                                 ? APPEARANCE_LV_BEVELLED
                                 : APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w ||
-                                  WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w
+                                  WIDGET_TROUGH==w || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w
                                     ? bevApp
                                     : APPEARANCE_GRADIENT);
 
@@ -8661,8 +8661,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 //     else
 //         grv.adjust(0, 0, 0, -1);
 
-    opt.state&=~(State_HasFocus|State_On);
-    opt.state|=State_Sunken;
+    opt.state&=~(State_HasFocus|State_On|State_Sunken);
 
     if(horiz)
     {

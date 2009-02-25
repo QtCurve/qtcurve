@@ -1033,7 +1033,9 @@ typedef struct
                      menuStripeAppearance,
 #endif
                      progressAppearance,
-                     progressGrooveAppearance;
+                     progressGrooveAppearance,
+                     grooveAppearance,
+                     sunkenAppearance;
     EShade           shadeSliders,
                      shadeMenubars,
                      shadeCheckRadio;
@@ -1097,9 +1099,9 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
         case WIDGET_MDI_WINDOW_BUTTON:
             return opts->titlebarButtonAppearance;
 #endif
+        case WIDGET_TROUGH:
         case WIDGET_SLIDER_TROUGH:
-            return APPEARANCE_FLAT==opts->appearance || APPEARANCE_RAISED==opts->appearance
-                    ? APPEARANCE_FLAT : APPEARANCE_GRADIENT;
+            return opts->grooveAppearance;
         default:
             break;
     }

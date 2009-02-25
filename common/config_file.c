@@ -876,6 +876,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_APPEARANCE(sliderAppearance, false)
             QTC_CFG_READ_APPEARANCE(progressAppearance, false)
             QTC_CFG_READ_APPEARANCE(progressGrooveAppearance, false)
+            QTC_CFG_READ_APPEARANCE(grooveAppearance, false)
+            QTC_CFG_READ_APPEARANCE(sunkenAppearance, false)
             QTC_CFG_READ_ECOLOR(progressGrooveColor)
             QTC_CFG_READ_FOCUS(focus)
             QTC_CFG_READ_BOOL(lvLines)
@@ -1172,7 +1174,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             checkAppearance(&opts->progressAppearance, opts);
             checkAppearance(&opts->progressGrooveAppearance, opts);
-
+            checkAppearance(&opts->grooveAppearance, opts);
+            checkAppearance(&opts->sunkenAppearance, opts);
 #ifndef __cplusplus
             releaseConfig(cfg);
 #endif
@@ -1334,6 +1337,8 @@ static void defaultSettings(Options *opts)
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
     opts->progressGrooveAppearance=APPEARANCE_INVERTED;
     opts->progressGrooveColor=ECOLOR_DARK;
+    opts->grooveAppearance=APPEARANCE_INVERTED;
+    opts->sunkenAppearance=APPEARANCE_INVERTED;
     opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_SUNKEN;
@@ -1801,6 +1806,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_FORCE(sliderAppearance)
         CFG_WRITE_ENTRY_FORCE(progressAppearance)
         CFG_WRITE_ENTRY_FORCE(progressGrooveAppearance)
+        CFG_WRITE_ENTRY_FORCE(grooveAppearance)
+        CFG_WRITE_ENTRY_FORCE(sunkenAppearance)
         CFG_WRITE_ENTRY(progressGrooveColor)
         CFG_WRITE_ENTRY(focus)
         CFG_WRITE_ENTRY(lvLines)
