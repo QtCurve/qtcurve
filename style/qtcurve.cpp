@@ -1785,11 +1785,13 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
                 return option && option->state & State_Selected ? 0 : -2;
 #endif
+#if QT_VERSION < 0x040500
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             {
-                 if(QTabBar::RoundedSouth==tab->shape || QTabBar::TriangularSouth==tab->shape)
+                 if(qtVersion()<VER_45 && (QTabBar::RoundedSouth==tab->shape || QTabBar::TriangularSouth==tab->shape))
                     return -2;
             }
+#endif
             return 2;
         case PM_TabBarTabShiftHorizontal:
 #ifdef QTC_STYLE_QTABBAR
@@ -4689,7 +4691,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_TabBarTabLabel:
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             {
+#if QT_VERSION >= 0x040500
+                QStyleOptionTabV3 tabV2(*tab);
+#else
                 QStyleOptionTabV2 tabV2(*tab);
+#endif
                 bool              verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
                                                QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape),
                                   selected(state&State_Selected),
@@ -4719,15 +4725,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->setTransform(m, true);
                 }
 
-                r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
-                               pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
-
-                if (selected)
-                {
-                    r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
-                    r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
-                }
-
                 int alignment(Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic);
 
                 if (!styleHint(SH_UnderlineShortcut, option, widget))
@@ -4738,6 +4735,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #else
                 if(qtVersion()>=VER_45)
                     r = subElementRect((QStyle::SubElement)(SE_ItemViewItemFocusRect+3), option, widget);
+                else
+                {
+                    r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
+                                   pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+
+                    if (selected)
+                    {
+                        r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+                        r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
+                    }
+                }
 #endif
 
                 if (!tabV2.icon.isNull())
