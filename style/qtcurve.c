@@ -1430,8 +1430,9 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
     else
     {
         cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
-        gboolean        tab=WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w,
-                        selected=tab ? false : sel;
+        gboolean        topTab=WIDGET_TAB_TOP==w,
+                        botTab=WIDGET_TAB_BOT==w,
+                        selected=(topTab || botTab) ? false : sel;
         EAppearance     app=selected
                                 ? opts.sunkenAppearance
                                 : WIDGET_LISTVIEW_HEADER==w && APPEARANCE_BEVELLED==bevApp
@@ -1441,28 +1442,28 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                                         : APPEARANCE_GRADIENT;
         const Gradient  *grad=getGradient(app, &opts);
         int             i=0;
-        bool            colorTab=sel && tab && opts.colorSelTab && 2==grad->numStops;
+        bool            colorTab=sel && (topTab || botTab) && opts.colorSelTab;
 
         setCairoClipping(cr, area, region);
 
         for(i=0; i<grad->numStops; ++i)
         {
             GdkColor col;
-
-            if(sel && tab && i==grad->numStops-1)
+            
+            if(sel && (topTab || botTab) && i==grad->numStops-1)
                 col=*base;
             else
             {
-                GdkColor mid;
-                double   val=WIDGET_TAB_BOT==w ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
-                if(colorTab && tab && 0==i)
-                    generateMidColor(base, &qtcPalette.menuitem[0], &mid, QTC_COLOR_SEL_TAB_FACTOR);
-                shade(colorTab && tab && 0==i
-                        ? &mid
-                        : base,
-                      &col, WIDGET_TAB_BOT==w ? QTC_MAX(val, 0.9) : grad->stops[i].val);
+                double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
+                shade(base, &col, botTab ? QTC_MAX(val, 0.9) : val);
             }
-            cairo_pattern_add_color_stop_rgb(pt, WIDGET_TAB_BOT==w ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
+            if(sel && opts.colorSelTab && (topTab || botTab) && 0==i)
+            {
+                GdkColor t;
+                tintColor(&col, &qtcPalette.menuitem[0], &t, QTC_COLOR_SEL_TAB_FACTOR);
+                col=t;
+            }
+            cairo_pattern_add_color_stop_rgb(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
                                              QTC_CAIRO_COL(col));
         }
 
@@ -4840,7 +4841,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
 {
     if(GTK_STATE_NORMAL==state && APPEARANCE_INVERTED==opts.appearance)
         drawAreaColor(cr, area, NULL, &style->bg[GTK_STATE_NORMAL], x, y, width, height);
-    else
+    else if(grad)
     {
         gboolean    selected=GTK_STATE_NORMAL==state;
         EAppearance app=selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP;
@@ -4848,6 +4849,8 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
         drawBevelGradient(cr, style, area, NULL, x, y, width, height,
                           col, horiz, GTK_STATE_NORMAL==state, app, tab);
     }
+    else
+        drawAreaColor(cr, area, NULL, col, x, y, width, height);
 }
 
 static gboolean isMozillaTab(GtkWidget *widget)
@@ -5129,7 +5132,7 @@ debugDisplayWidget(widget, 3);
                 }
     #endif
                 fillTab(cr, style, window, area, state, col, x+1, y+mod, width-1, height-(2*mod),
-                        TRUE, WIDGET_TAB_TOP, NULL!=notebook);
+                        FALSE, WIDGET_TAB_TOP, NULL!=notebook);
 
                 drawBorder(cr, style, state, area, NULL, x, y, width+4, height,
                            qtcPalette.background,
