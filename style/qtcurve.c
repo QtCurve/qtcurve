@@ -1738,16 +1738,17 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     }
     else if(colouredMouseOver || (!IS_GLASS(app) && (!sunken || flags&DF_DRAW_INSIDE)))
     {
-        int      dark=bevelledButton ? 2 : 4;
+        int      dark=bevelledButton ? 2 : 4,
+                 end=round && QTC_ROUNDED ? 2 : 1;
         GdkColor *col1=colouredMouseOver ? &qtcPalette.mouseover[QTC_MO_STD_LIGHT(widget, sunken)]
                                          : &colors[sunken ? dark : 0];
         /* Top and left */
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col1));
         cairo_move_to(cr, xd + 1, yd + 1);
-        cairo_line_to(cr, xd + width - 2, yd + 1);
+        cairo_line_to(cr, xd + width - end, yd + 1);
         cairo_move_to(cr, xd + 1, yd + 1);
-        cairo_line_to(cr, xd + 1, yd + height - 2);
+        cairo_line_to(cr, xd + 1, yd + height - end);
         cairo_stroke(cr);
        
         if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)

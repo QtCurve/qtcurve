@@ -7,6 +7,7 @@
 0.61.4
 ------
 1. Make squared scrollview appearance consistent when round is set to none.
+2. Fix missing pixels in squred progressbars with inverted gradient.
 
 0.61.3
 ------
