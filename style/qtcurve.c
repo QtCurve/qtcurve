@@ -3887,7 +3887,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         sanitizeSize(window, &width, &height);
 
-        if(!statusBar && (frame || scrolledWindow || viewport || drawSquare) && QTC_ROUNDED)
+        if(!statusBar && (frame || scrolledWindow || viewport || drawSquare)) // && QTC_ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
