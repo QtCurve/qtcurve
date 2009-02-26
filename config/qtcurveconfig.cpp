@@ -235,7 +235,9 @@ static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=
     combo->insertItem(APPEARANCE_RAISED, i18n("Raised"));
     combo->insertItem(APPEARANCE_DULL_GLASS, i18n("Dull glass"));
     combo->insertItem(APPEARANCE_SHINY_GLASS, i18n("Shiny glass"));
-    combo->insertItem(APPEARANCE_GRADIENT, i18n("Gradient"));
+    combo->insertItem(APPEARANCE_SOFT_GRADIENT, i18n("Soft gradient"));
+    combo->insertItem(APPEARANCE_GRADIENT, i18n("Standard gradient"));
+    combo->insertItem(APPEARANCE_HARSH_GRADIENT, i18n("Harsh gradient"));
     combo->insertItem(APPEARANCE_INVERTED, i18n("Inverted gradient"));
     if(split)
     {
@@ -715,7 +717,7 @@ void QtCurveConfig::gradChanged(int i)
         gradLightBorder->setChecked(false);
     }
 
-    gradLightBorder->setEnabled(APPEARANCE_SUNKEN!=i);
+    gradLightBorder->setEnabled(QTC_NUM_CUSTOM_GRAD!=i);
 }
 
 static double prev=0.0;
@@ -950,10 +952,10 @@ void QtCurveConfig::populateShades(const Options &opts)
     if(contrast<0 || contrast>10)
         contrast=7;
 
-    customShading->setChecked(opts.customShades.size());
+    customShading->setChecked(QTC_USE_CUSTOM_SHADES(opts));
 
     for(int i=0; i<NUM_STD_SHADES; ++i)
-        shadeVals[i]->setValue(opts.customShades.size()
+        shadeVals[i]->setValue(QTC_USE_CUSTOM_SHADES(opts)
                                   ? opts.customShades[i]
                                   : shades[SHADING_SIMPLE==shading->currentIndex()
                                             ? 1 : 0]
@@ -963,8 +965,8 @@ void QtCurveConfig::populateShades(const Options &opts)
 
 bool QtCurveConfig::diffShades(const Options &opts)
 {
-    if( (0==opts.customShades.size() && customShading->isChecked()) ||
-        (opts.customShades.size() && !customShading->isChecked()) )
+    if( (!QTC_USE_CUSTOM_SHADES(opts) && customShading->isChecked()) ||
+        (QTC_USE_CUSTOM_SHADES(opts) && !customShading->isChecked()) )
         return true;
 
     if(customShading->isChecked())
@@ -1135,12 +1137,11 @@ void QtCurveConfig::setOptions(Options &opts)
 
     if(customShading->isChecked())
     {
-        opts.customShades.resize(NUM_STD_SHADES);
         for(int i=0; i<NUM_STD_SHADES; ++i)
             opts.customShades[i]=shadeVals[i]->value();
     }
     else
-        opts.customShades.clear();
+        opts.customShades[0]=0;
 }
 
 void QtCurveConfig::setWidgetOptions(const Options &opts)

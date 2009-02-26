@@ -148,6 +148,10 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
             return APPEARANCE_RAISED;
         if(0==memcmp(str, "gradient", 8) || 0==memcmp(str, "lightgradient", 13))
             return APPEARANCE_GRADIENT;
+        if(0==memcmp(str, "soft", 4))
+            return APPEARANCE_SOFT_GRADIENT;
+        if(0==memcmp(str, "harsh", 5))
+            return APPEARANCE_HARSH_GRADIENT;
         if(0==memcmp(str, "splitgradient", 13))
             return APPEARANCE_SPLIT_GRADIENT;
         if(0==memcmp(str, "glass", 5) || 0==memcmp(str, "shinyglass", 10))
@@ -779,8 +783,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             Options *def=&newOpts;
 
-            // Copy default custom sahdes/gradients
-            opts->customShades=def->customShades;
             opts->customGradient=def->customGradient;
 #else
             Options newOpts,
@@ -788,14 +790,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(!defOpts)
                 defaultSettings(def);
-
-            // Copy default custom sahdes/gradients
-            if(def->customShades)
-            {
-                opts->customShades=(double *)malloc(sizeof(double)*NUM_STD_SHADES);
-                memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
-            }
-
             for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
                 if(def->customGradient[i] && def->customGradient[i]->numStops>0)
                 {
@@ -806,7 +800,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     opts->customGradient[i]->lightBorder=def->customGradient[i]->lightBorder;
                 }
 #endif
-
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 61))
             {
@@ -829,6 +822,24 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->progressGrooveColor=ECOLOR_BASE;
                 def->shadeMenubars=SHADE_DARKEN;
             }
+
+            if(version<QTC_MAKE_VERSION(0, 62))
+            {
+                def->appearance=APPEARANCE_DULL_GLASS;
+                def->sliderAppearance=APPEARANCE_DULL_GLASS;
+                def->menuitemAppearance=APPEARANCE_DULL_GLASS;
+                def->useHighlightForMenu=true;
+                def->tabAppearance=APPEARANCE_GRADIENT;
+                def->highlightFactor=3;
+                def->toolbarSeparators=LINE_NONE;
+                def->menubarAppearance=APPEARANCE_SOFT_GRADIENT;
+                def->crButton=false;
+                def->customShades[0]=0;
+            }
+
+            opts->customShades[0]=0;
+            if(QTC_USE_CUSTOM_SHADES(*def))
+                memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
 
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
@@ -952,13 +963,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 QStringList::ConstIterator it(shades.begin());
                 bool                       ok(true);
 
-                 opts->customShades.clear();
-                opts->customShades.resize(NUM_STD_SHADES);
                 for(i=0; i<NUM_STD_SHADES && ok; ++i, ++it)
                     opts->customShades[i]=(*it).toDouble(&ok);
 
                 if(!ok)
-                    opts->customShades.clear();
+                    opts->customShades[0]=0;
             }
 
             for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
@@ -1032,13 +1041,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 {
                     bool ok=true;
 
-                    if(opts->customShades)
-                    {
-                        free(opts->customShades);
-                        opts->customShades=0L;
-                    }
-                    opts->customShades=malloc(sizeof(double)*NUM_STD_SHADES);
-
                     for(j=0; j<comma+1 && str && ok; ++j)
                     {
                         char *c=strchr(str, ',');
@@ -1055,10 +1057,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     }
 
                     if(!ok)
-                    {
-                        free(opts->customShades);
-                        opts->customShades=0L;
-                    }
+                        opts->customShades[0]=0;
                 }
             }
             }
@@ -1257,9 +1256,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 int i;
 
-                if(def->customShades)
-                    free(def->customShades);
-
                 for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
                     if(def->customGradient[i])
                         free(def->customGradient[i]);
@@ -1311,10 +1307,13 @@ static void defaultSettings(Options *opts)
 
     for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
         opts->customGradient[i]=0L;
-
-    opts->customShades=0L;
 #endif
-
+    opts->customShades[0]=1.16;
+    opts->customShades[1]=1.07;
+    opts->customShades[2]=0.9;
+    opts->customShades[3]=0.78;
+    opts->customShades[4]=0.84;
+    opts->customShades[5]=0.75;
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
@@ -1326,13 +1325,13 @@ static void defaultSettings(Options *opts)
     opts->highlightTab=true;
     opts->colorSelTab=false;
     opts->embolden=false;
-    opts->appearance=APPEARANCE_DULL_GLASS;
+    opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->lvAppearance=APPEARANCE_BEVELLED;
-    opts->tabAppearance=APPEARANCE_GRADIENT;
+    opts->tabAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->activeTabAppearance=APPEARANCE_FLAT;
-    opts->sliderAppearance=APPEARANCE_DULL_GLASS;
-    opts->menubarAppearance=APPEARANCE_GRADIENT;
-    opts->menuitemAppearance=APPEARANCE_DULL_GLASS;
+    opts->sliderAppearance=APPEARANCE_SOFT_GRADIENT;
+    opts->menubarAppearance=APPEARANCE_FLAT;
+    opts->menuitemAppearance=APPEARANCE_FADE;
     opts->toolbarAppearance=APPEARANCE_FLAT;
     opts->progressAppearance=APPEARANCE_DULL_GLASS;
     opts->progressGrooveAppearance=APPEARANCE_INVERTED;
@@ -1346,13 +1345,13 @@ static void defaultSettings(Options *opts)
     opts->shadeMenubars=SHADE_NONE;
     opts->shadeCheckRadio=SHADE_NONE;
     opts->toolbarBorders=TB_NONE;
-    opts->toolbarSeparators=LINE_NONE;
+    opts->toolbarSeparators=LINE_SUNKEN;
     opts->splitters=LINE_FLAT;
     opts->fixParentlessDialogs=false;
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_GLOW;
     opts->menubarMouseOver=true;
-    opts->useHighlightForMenu=true;
+    opts->useHighlightForMenu=false;
     opts->shadeMenubarOnlyWhenActive=false;
     opts->thinnerMenuItems=false;
     opts->scrollbarType=SCROLLBAR_KDE;
@@ -1374,7 +1373,7 @@ static void defaultSettings(Options *opts)
     opts->colorMenubarMouseOver=true;
     opts->inactiveHighlight=false;
     opts->crHighlight=false;
-    opts->crButton=false;
+    opts->crButton=true;
     opts->fillProgress=true;
     opts->comboSplitter=false;
     opts->squareScrollViews=false;
@@ -1390,7 +1389,7 @@ static void defaultSettings(Options *opts)
 #endif
 
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->selectionAppearance=APPEARANCE_GRADIENT;
+    opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
 #endif
 
     opts->gtkScrollViews=false;
@@ -1523,8 +1522,12 @@ static QString toStr(EAppearance exp)
             return "flat";
         case APPEARANCE_RAISED:
             return "raised";
+        case APPEARANCE_SOFT_GRADIENT:
+            return "soft";
         case APPEARANCE_GRADIENT:
             return "gradient";
+        case APPEARANCE_HARSH_GRADIENT:
+            return "harsh";
         case APPEARANCE_SPLIT_GRADIENT:
             return "splitgradient";
         case APPEARANCE_DULL_GLASS:
@@ -1874,7 +1877,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             }
         }
 
-        if(NUM_STD_SHADES==opts.customShades.size())
+        if(opts.customShades[0]>0)
         {
             QString     shadeVal;
 #if QT_VERSION >= 0x040000
@@ -1882,15 +1885,11 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #else
             QTextStream str(&shadeVal, IO_WriteOnly);
 #endif
-
-            ShadesCont::const_iterator it(opts.customShades.begin()),
-                                       end(opts.customShades.end());
-
-            for(int i=0; it!=end; ++it, ++i)
+            for(int i=0; i<NUM_STD_SHADES; ++i)
                 if(0==i)
-                    str << *it;
+                    str << opts.customShades[i];
                 else
-                    str << ',' << *it;
+                    str << ',' << opts.customShades[i];
             CFG.writeEntry("customShades", shadeVal);
         }
         else

@@ -848,7 +848,6 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
     QString rcFile;
 
-    defaultSettings(&opts);
     if(!name.isEmpty())
     {
         rcFile=themeFile(kdeHome(), name);
@@ -8784,7 +8783,7 @@ void QtCurveStyle::shadeColors(const QColor &base, QColor *vals) const
 {
     QTC_SHADES
 
-    bool   useCustom(NUM_STD_SHADES==opts.customShades.size());
+    bool   useCustom(QTC_USE_CUSTOM_SHADES(opts));
     double hl=QTC_TO_FACTOR(opts.highlightFactor);
 
     for(int i=0; i<NUM_STD_SHADES; ++i)

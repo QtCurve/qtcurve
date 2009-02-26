@@ -193,7 +193,7 @@ typedef GdkColor color;
 #endif
 
 #define QTC_TO_FACTOR(A) ((100.0+((double)A))/100.0)
-#define DEFAULT_HIGHLIGHT_FACTOR                   5
+#define DEFAULT_HIGHLIGHT_FACTOR                   3
 #define MAX_HIGHLIGHT_FACTOR                      50
 #define MIN_HIGHLIGHT_FACTOR                     -50
 #define MENUBAR_DARK_FACTOR        QTC_TO_FACTOR(-3)
@@ -381,18 +381,19 @@ typedef enum
 
         QTC_NUM_CUSTOM_GRAD,
 
-    APPEARANCE_SUNKEN = QTC_NUM_CUSTOM_GRAD,
-
     APPEARANCE_FLAT = QTC_NUM_CUSTOM_GRAD,
     APPEARANCE_RAISED,
     APPEARANCE_DULL_GLASS,
     APPEARANCE_SHINY_GLASS,
+    APPEARANCE_SOFT_GRADIENT,
     APPEARANCE_GRADIENT,
+    APPEARANCE_HARSH_GRADIENT,
     APPEARANCE_INVERTED,
     APPEARANCE_SPLIT_GRADIENT,
     APPEARANCE_BEVELLED,
+        APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
         APPEARANCE_FADE, /* Only for poupmenu items! */
-        APPEARANCE_LV_BEVELLED /* To be used only with getGradient */
+    QTC_NUM_STD_APP = APPEARANCE_LV_BEVELLED-QTC_NUM_CUSTOM_GRAD
 } EAppearance;
 
 #define IS_SLIDER(W)        (WIDGET_SLIDER==W || WIDGET_SB_SLIDER==W)
@@ -938,12 +939,12 @@ Gradient
 #endif
 ;
 
+#define QTC_USE_CUSTOM_SHADES(A) ((A).customShades[0]>0.00001)
+
 #ifdef __cplusplus
 typedef std::map<EAppearance, Gradient> GradientCont;
-typedef std::vector<double> ShadesCont;
 struct Options
 #else
-typedef double * ShadesCont;
 typedef struct
 #endif
 {
@@ -1056,7 +1057,7 @@ typedef struct
 #else
     Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD+1];
 #endif
-    ShadesCont       customShades;
+    double           customShades[NUM_STD_SHADES];
 #ifndef __cplusplus
 } Options;
 #else
@@ -1153,7 +1154,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
     }
 
     {
-    static Gradient stdGradients[9];
+    static Gradient stdGradients[QTC_NUM_STD_APP];
     static bool     init=false;
 
     if(!init)
@@ -1161,9 +1162,11 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
         setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], false,2,0.0,1.0,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_RAISED], true,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_RAISED], true,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
-        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.3,1.0,0.925);
+        setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.04,1.0,0.98);
+        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.1,1.0,0.94);
+        setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.3,1.0,0.925);
         setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_RAISED], false,2,0.0,0.93,1.0,1.04);
-        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], false,4,0.0,1.07,0.499,1.004,0.5,0.976,1.0,0.91);
+        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], false,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
         setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], false,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], false,3,0.0,1.00,0.85,1.0,1.0,0.90);
         init=true;
