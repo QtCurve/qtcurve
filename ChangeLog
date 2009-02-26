@@ -13,6 +13,8 @@
         Flat menubar appearance
         Button like check/radios
         Supply, and use, predefined custom shades
+5. Allow all bar flat and raised tabs to bol coloured.
+6. Only save appearance settings if different from default.
 
 0.61.4
 ------
