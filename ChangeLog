@@ -4,6 +4,10 @@
    work in the same vein as custom gradients.
 2. Add scrollbar groove/slider and 'sunken' appearance options.
 
+0.61.4
+------
+1. Fix settings for sliderThumbs, handles, toolbarSeparators, and splitters.
+
 0.61.3
 ------
 1. Fix compilation with Qt4.5
