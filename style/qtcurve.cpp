@@ -5255,7 +5255,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(r.x(), r.y()+1, r.width(), r.height()-2, use[2]);
                 else
                     drawBevelGradient(use[2], painter, QRect(r.x(), r.y()+1, r.width(), r.height()-2),
-                                      true, true, opts.grooveAppearance, WIDGET_TROUGH);
+                                      true, false, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))
@@ -5278,7 +5278,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->fillRect(r.x()+1, r.y(), r.width()-2, r.height(), use[2]);
                 else
                     drawBevelGradient(use[2], painter, QRect(r.x()+1, r.y(), r.width()-2, r.height()),
-                                      false, true, opts.grooveAppearance, WIDGET_TROUGH);
+                                      false, false, opts.grooveAppearance, WIDGET_TROUGH);
 
 #ifndef QTC_SIMPLE_SCROLLBARS
                 if(QTC_ROUNDED && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons))

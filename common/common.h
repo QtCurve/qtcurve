@@ -224,7 +224,7 @@ typedef GdkColor color;
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define QTC_DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    ((!SUKEN && (getGradient(APP, &opts)->lightBorder) && WIDGET_MENU_ITEM!=WIDGET && \
+    ((!SUKEN && (getGradient(APP, &opts)->lightBorder) && WIDGET_MENU_ITEM!=WIDGET && !IS_TROUGH(WIDGET) && \
                           (WIDGET_DEF_BUTTON!=WIDGET || IND_COLORED!=opts.defBtnIndicator)) || \
                           (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
                            APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
@@ -397,6 +397,7 @@ typedef enum
 } EAppearance;
 
 #define IS_SLIDER(W)        (WIDGET_SLIDER==W || WIDGET_SB_SLIDER==W)
+#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==W || WIDGET_PBAR_TROUGH==W || WIDGET_TROUGH==W)
 #define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==W || WIDGET_CHECKBOX==W)
 
 typedef enum
