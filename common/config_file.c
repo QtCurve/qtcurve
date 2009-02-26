@@ -821,6 +821,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->shadeSliders=SHADE_BLEND_SELECTED;
                 def->progressGrooveColor=ECOLOR_BASE;
                 def->shadeMenubars=SHADE_DARKEN;
+                opts->highlightTab=true;
             }
 
             if(version<QTC_MAKE_VERSION(0, 62))
@@ -830,11 +831,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->menuitemAppearance=APPEARANCE_DULL_GLASS;
                 def->useHighlightForMenu=true;
                 def->tabAppearance=APPEARANCE_GRADIENT;
-                def->highlightFactor=3;
+                def->highlightFactor=5;
                 def->toolbarSeparators=LINE_NONE;
                 def->menubarAppearance=APPEARANCE_SOFT_GRADIENT;
                 def->crButton=false;
                 def->customShades[0]=0;
+                def->stripedProgress=STRIPE_DIAGONAL;
             }
 
             opts->customShades[0]=0;
@@ -1322,9 +1324,9 @@ static void defaultSettings(Options *opts)
     opts->round=ROUND_FULL;
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
-    opts->stripedProgress=STRIPE_DIAGONAL;
+    opts->stripedProgress=STRIPE_NONE;
     opts->sliderStyle=SLIDER_TRIANGULAR;
-    opts->highlightTab=true;
+    opts->highlightTab=false;
     opts->colorSelTab=false;
     opts->embolden=false;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
