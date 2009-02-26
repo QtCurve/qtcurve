@@ -3,6 +3,16 @@
 1. Reduce gradient code complexity - makes predefined gradients
    work in the same vein as custom gradients.
 2. Add scrollbars/slider groove and 'sunken' appearance options.
+3. Added new soft and harsh gradients.
+4. Change defaults:
+        Soft gradient
+        Fade menuitems
+        Don't use highlight for menu.
+        Default highlight set to 3%
+        Toolbar separators set to sunken
+        Flat menubar appearance
+        Button like check/radios
+        Supply, and use, predefined custom shades
 
 0.61.4
 ------

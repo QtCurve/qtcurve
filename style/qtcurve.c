@@ -265,7 +265,7 @@ static void shadeColors(GdkColor *base, GdkColor *vals)
     QTC_SHADES
 
     int      i;
-    gboolean useCustom=0L!=opts.customShades;
+    gboolean useCustom=QTC_USE_CUSTOM_SHADES(opts);
     double   hl=QTC_TO_FACTOR(opts.highlightFactor);
 
     for(i=0; i<NUM_STD_SHADES; ++i)
