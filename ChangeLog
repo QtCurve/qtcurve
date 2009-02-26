@@ -25,6 +25,7 @@
 0.61.4
 ------
 1. Fix settings for sliderThumbs, handles, toolbarSeparators, and splitters.
+2. Fix separators on vertical toolbars.
 
 0.61.3
 ------

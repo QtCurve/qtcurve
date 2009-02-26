@@ -2487,10 +2487,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         int y(r.y()+((r.height()-2) / 2));
 
-                        drawFadedLine(painter, QRect(r.x()+QTC_TOOLBAR_SEP_GAP, y, r.height()-(QTC_TOOLBAR_SEP_GAP*2), 1),
+                        drawFadedLine(painter, QRect(r.x()+QTC_TOOLBAR_SEP_GAP, y, r.width()-(QTC_TOOLBAR_SEP_GAP*2), 1),
                                       itsBackgroundCols[LINE_SUNKEN==opts.toolbarSeparators ? 3 : 4], true, true, true);
                         if(LINE_SUNKEN==opts.toolbarSeparators)
-                            drawFadedLine(painter, QRect(r.x()+QTC_TOOLBAR_SEP_GAP, y+1, r.height()-(QTC_TOOLBAR_SEP_GAP*2), 1),
+                            drawFadedLine(painter, QRect(r.x()+QTC_TOOLBAR_SEP_GAP, y+1, r.width()-(QTC_TOOLBAR_SEP_GAP*2), 1),
                                           itsBackgroundCols[0], true, true, true);
                     }
                     break;
