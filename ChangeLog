@@ -15,6 +15,9 @@
         Supply, and use, predefined custom shades
         Plain progress
         Don't highlight active tab
+        Round slider
+        Sunken scrollviews
+        Sunken appearance set to soft
 5. Allow all bar flat and raised tabs to bol coloured.
 6. Only save appearance settings if different from default.
 
