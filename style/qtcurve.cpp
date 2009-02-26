@@ -1723,6 +1723,12 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
+#if QT_VERSION >= 0x040500
+        case PM_ScrollView_ScrollBarSpacing:
+#else
+        case PM_TextCursorWidth+3:
+#endif
+            return 3;
         case PM_DefaultChildMargin:
             return 6;
         case PM_DefaultTopLevelMargin:

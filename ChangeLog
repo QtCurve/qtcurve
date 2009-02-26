@@ -17,6 +17,7 @@
         Don't highlight active tab
 5. Allow all bar flat and raised tabs to bol coloured.
 6. Only save appearance settings if different from default.
+7. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
 
 0.61.4
 ------
