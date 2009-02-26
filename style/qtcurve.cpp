@@ -7596,26 +7596,25 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
 void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
                                          bool horiz, bool sel, EAppearance app, EWidget w) const
 {
-    bool                             tab(WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w);
+    bool                             topTab(WIDGET_TAB_TOP==w),
+                                     botTab(WIDGET_TAB_BOT==w);
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
                                      end(grad->stops.end());
     int                              numStops(grad->stops.size());
-    bool                             colorTab(sel && tab && opts.colorSelTab && 2==numStops);
 
     for(int i=0; it!=end; ++it, ++i)
     {
         QColor col;
 
-        if(sel && tab && i==numStops-1)
+        if(sel && (topTab || botTab) && i==numStops-1)
             col=base;
         else
-            shade(colorTab && tab && 0==i
-                    ? midColor(base, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR)
-                    : base,
-                &col, WIDGET_TAB_BOT==w ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
-        g.setColorAt(WIDGET_TAB_BOT==w ? 1.0-(*it).pos : (*it).pos, col);
+            shade(base, &col, botTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
+        if(sel && opts.colorSelTab && (topTab || botTab) && 0==i)
+            col=tint(col, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR);
+        g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     //p->fillRect(r, base);
     p->fillRect(r, QBrush(g));

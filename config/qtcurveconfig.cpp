@@ -627,11 +627,12 @@ void QtCurveConfig::stripedProgressChanged()
 
 void QtCurveConfig::activeTabAppearanceChanged()
 {
-    int current(activeTabAppearance->currentIndex());
+    int  current(activeTabAppearance->currentIndex());
+    bool disableCol(APPEARANCE_FLAT==current && APPEARANCE_RAISED==current);
 
-    if(colorSelTab->isChecked() && APPEARANCE_GRADIENT!=current && APPEARANCE_INVERTED!=current)
+    if(colorSelTab->isChecked() && disableCol)
         colorSelTab->setChecked(false);
-    colorSelTab->setEnabled(APPEARANCE_GRADIENT==current || APPEARANCE_INVERTED==current);
+    colorSelTab->setEnabled(!disableCol);
     updateChanged();
 }
 
