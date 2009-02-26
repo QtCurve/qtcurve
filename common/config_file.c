@@ -837,6 +837,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->crButton=false;
                 def->customShades[0]=0;
                 def->stripedProgress=STRIPE_DIAGONAL;
+                def->sliderStyle=SLIDER_TRIANGULAR;
+                def->sunkenScrollViews=false;
+                def->sunkenAppearance=APPEARANCE_INVERTED;
             }
 
             opts->customShades[0]=0;
@@ -1325,7 +1328,7 @@ static void defaultSettings(Options *opts)
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
     opts->stripedProgress=STRIPE_NONE;
-    opts->sliderStyle=SLIDER_TRIANGULAR;
+    opts->sliderStyle=SLIDER_ROUND;
     opts->highlightTab=false;
     opts->colorSelTab=false;
     opts->embolden=false;
@@ -1341,7 +1344,7 @@ static void defaultSettings(Options *opts)
     opts->progressGrooveAppearance=APPEARANCE_INVERTED;
     opts->progressGrooveColor=ECOLOR_DARK;
     opts->grooveAppearance=APPEARANCE_INVERTED;
-    opts->sunkenAppearance=APPEARANCE_INVERTED;
+    opts->sunkenAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_SUNKEN;
@@ -1382,7 +1385,7 @@ static void defaultSettings(Options *opts)
     opts->comboSplitter=false;
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
-    opts->sunkenScrollViews=false;
+    opts->sunkenScrollViews=true;
     opts->flatSbarButtons=true;
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
