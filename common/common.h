@@ -495,11 +495,11 @@ typedef enum
 
 typedef enum
 {
+    LINE_NONE,
     LINE_SUNKEN,
     LINE_FLAT,
     LINE_DOTS,
-    LINE_DASHES,
-    LINE_NONE
+    LINE_DASHES
 } ELine;
 
 typedef enum
@@ -508,7 +508,7 @@ typedef enum
     TB_LIGHT,
     TB_DARK,
     TB_LIGHT_ALL,
-    TB_DARK_ALL,
+    TB_DARK_ALL
 } ETBarBorder;
 
 typedef enum
