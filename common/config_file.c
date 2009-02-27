@@ -1026,7 +1026,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     }
 
                     if(ok)
+                    {
                         opts->customGradient[(EAppearance)i]=grad;
+                        opts->customGradient[(EAppearance)i].stops.fix();
+                    }
                 }
             }
 #else
@@ -1143,7 +1146,36 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                         ok=false;
                                 }
 
-                                if(!ok)
+                                if(ok)
+                                {
+                                    int addStart=0,
+                                        addEnd=0;
+                                    if(opts->customGradient[i]->stops[0].pos>0.001)
+                                        addStart=1;
+                                    if(opts->customGradient[i]->stops[opts->customGradient[i]->numStops-1].pos<99.999)
+                                        addEnd=1;
+                                    if(addStart || addEnd)
+                                    {
+                                        int          newSize=opts->customGradient[i]->numStops+addStart+addEnd;
+                                        GradientStop *stops=malloc(sizeof(GradientStop) * newSize*2);
+
+                                        if(addStart)
+                                        {
+                                            stops[0].pos=0.0;
+                                            stops[0].val=1.0;
+                                        }
+                                        memcpy(&stops[1], opts->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
+                                        if(addEnd)
+                                        {
+                                            stops[opts->customGradient[i]->numStops+1].pos=1.0;
+                                            stops[opts->customGradient[i]->numStops+1].val=1.0;
+                                        }
+                                        opts->customGradient[i]->numStops=newSize;
+                                        free(opts->customGradient[i]->stops);
+                                        opts->customGradient[i]->stops=stops;
+                                    }
+                                }
+                                else
                                 {
                                     free(opts->customGradient[i]->stops);
                                     free(opts->customGradient[i]);
@@ -1872,8 +1904,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 
                 str << (const char *)((*cg).second.lightBorder ? "true" : "false");
 
-                GradientStopCont::const_iterator it((*cg).second.stops.begin()),
-                                                 end((*cg).second.stops.end());
+                GradientStopCont                 stops((*cg).second.stops.fix());
+                GradientStopCont::const_iterator it(stops.begin()),
+                                                 end(stops.end());
 
                 for(; it!=end; ++it)
                     str << ',' << (*it).pos << ',' << (*it).val;

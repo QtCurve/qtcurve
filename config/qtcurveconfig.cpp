@@ -168,8 +168,9 @@ void CGradientPreview::paintEvent(QPaintEvent *)
     if(stops.size())
     {
         QLinearGradient                  grad(r.topLeft(), r.bottomLeft());
-        GradientStopCont::const_iterator it(stops.begin()),
-                                         end(stops.end());
+        GradientStopCont                 st(stops.fix());
+        GradientStopCont::const_iterator it(st.begin()),
+                                         end(st.end());
 
         for(; it!=end; ++it)
         {

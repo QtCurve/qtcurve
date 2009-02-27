@@ -911,7 +911,24 @@ GradientStop
 ;
 
 #ifdef __cplusplus
-typedef std::set<GradientStop> GradientStopCont;
+struct GradientStopCont : public std::set<GradientStop>
+{
+    GradientStopCont fix() const
+    {
+        GradientStopCont c(*this);
+        if(size())
+        {
+            GradientStopCont::const_iterator   first(c.begin());
+            GradientStopCont::reverse_iterator last(c.rbegin());
+
+            if((*first).pos>0.001)
+                c.insert(GradientStop(0.0, 1.0));
+            if((*last).pos<99.999)
+                c.insert(GradientStop(1.0, 1.0));
+        }
+        return c;                                  
+    }
+};
 struct Gradient
 #else
 typedef struct
