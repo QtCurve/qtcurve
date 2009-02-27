@@ -37,6 +37,7 @@
 
 #ifdef QTC_USE_KDE4
 #include <KDE/KApplication>
+#include <KDE/KAboutData>
 #include <KDE/KGlobalSettings>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
@@ -76,7 +77,8 @@ static void checkKComponentData()
         if(name.isEmpty())
             name="QtApp";
 
-        theKComponentData=new KComponentData(name.toLatin1(), name.toLatin1());
+        QByteArray utf8=name.toUtf8();
+        theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n("Qt"), "0.1"));
         applyKdeSettings(true);
         applyKdeSettings(false);
     }
@@ -1990,7 +1992,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 #endif
 #ifdef QTC_USE_KDE4
         case SH_DialogButtonBox_ButtonsHaveIcons:
-            return kapp && KGlobalSettings::showIconsOnPushButtons();
+            checkKComponentData();
+            return KGlobalSettings::showIconsOnPushButtons();
         case SH_ItemView_ActivateItemOnSingleClick:
             checkKComponentData();
             return KGlobalSettings::singleClick();
@@ -2015,143 +2018,141 @@ QPalette QtCurveStyle::standardPalette() const
 QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
 #ifdef QTC_USE_KDE4
-    if(kapp)
-    {
-        bool fd(widget && qobject_cast<const QFileDialog *>(widget));
+    checkKComponentData();
+    bool fd(widget && qobject_cast<const QFileDialog *>(widget));
 
-        switch(pix)
-        {
-    //         case SP_TitleBarMenuButton:
-    //         case SP_TitleBarMinButton:
-    //         case SP_TitleBarMaxButton:
-    //         case SP_TitleBarCloseButton:
-    //         case SP_TitleBarNormalButton:
-    //         case SP_TitleBarShadeButton:
-    //         case SP_TitleBarUnshadeButton:
-    //         case SP_TitleBarContextHelpButton:
-    //         case SP_DockWidgetCloseButton:
-            case SP_MessageBoxInformation:
-                return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
-            case SP_MessageBoxWarning:
-                return KIconLoader::global()->loadIcon("dialog-warning", KIconLoader::Dialog, 32);
-            case SP_MessageBoxCritical:
-                return KIconLoader::global()->loadIcon("dialog-error", KIconLoader::Dialog, 32);
-            case SP_MessageBoxQuestion:
-                return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
-    //         case SP_DesktopIcon:
-    //             return KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 16);
-    //         case SP_TrashIcon:
-    //             return KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 16);
-    //         case SP_ComputerIcon:
-    //             return KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 16);
-    //         case SP_DriveFDIcon:
-    //             return KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 16);
-    //         case SP_DriveHDIcon:
-    //             return KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 16);
-    //         case SP_DriveCDIcon:
-    //         case SP_DriveDVDIcon:
-    //             return KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 16);
-    //         case SP_DriveNetIcon:
-    //             return KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 16);
-    //         case SP_DirOpenIcon:
-    //             return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
-    //         case SP_DirIcon:
-    //         case SP_DirClosedIcon:
-    //             return KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16);
-    //         case SP_DirLinkIcon:
-    //         case SP_FileIcon:
-    //             return KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16);
-    //         case SP_FileLinkIcon:
-    //         case SP_ToolBarHorizontalExtensionButton:
-    //         case SP_ToolBarVerticalExtensionButton:
-            case SP_FileDialogStart:
-                return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-edn" : "go-first", KIconLoader::Small, 16);
-            case SP_FileDialogEnd:
-                return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-first" : "go-end", KIconLoader::Small, 16);
-            case SP_FileDialogToParent:
-                return KIconLoader::global()->loadIcon("go-up", KIconLoader::Small, 16);
-            case SP_FileDialogNewFolder:
-                return KIconLoader::global()->loadIcon("folder-new", KIconLoader::Small, 16);
-            case SP_FileDialogDetailedView:
-                return KIconLoader::global()->loadIcon("view-list-details", KIconLoader::Small, 16);
-    //         case SP_FileDialogInfoView:
-    //             return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
-    //         case SP_FileDialogContentsView:
-    //             return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
-            case SP_FileDialogListView:
-                return KIconLoader::global()->loadIcon("view-list-icons", KIconLoader::Small, 16);
-            case SP_FileDialogBack:
-                return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-next" : "go-previous", KIconLoader::Small, 16);
-            case SP_DialogOkButton:
-                return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
-            case SP_DialogCancelButton:
-                return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
-            case SP_DialogHelpButton:
-                return KIconLoader::global()->loadIcon("help-contents", KIconLoader::Small, 16);
-            case SP_DialogOpenButton:
-                return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
-            case SP_DialogSaveButton:
-                return KIconLoader::global()->loadIcon("document-save", KIconLoader::Small, 16);
-            case SP_DialogCloseButton:
-                return KIconLoader::global()->loadIcon("dialog-close", KIconLoader::Small, 16);
-            case SP_DialogApplyButton:
-                return KIconLoader::global()->loadIcon("dialog-ok-apply", KIconLoader::Small, 16);
-            case SP_DialogResetButton:
-                return KIconLoader::global()->loadIcon("document-revert", KIconLoader::Small, 16);
-    //         case SP_DialogDiscardButton:
-    //              return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
-            case SP_DialogYesButton:
-                return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
-            case SP_DialogNoButton:
-                return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
-            case SP_ArrowUp:
-                return KIconLoader::global()->loadIcon("arrow-up", KIconLoader::Dialog, 32);
-            case SP_ArrowDown:
-                return KIconLoader::global()->loadIcon("arrow-down", KIconLoader::Dialog, 32);
-            case SP_ArrowLeft:
-                return KIconLoader::global()->loadIcon("arrow-left", KIconLoader::Dialog, 32);
-            case SP_ArrowRight:
-                return KIconLoader::global()->loadIcon("arrow-right", KIconLoader::Dialog, 32);
-            case SP_ArrowBack:
-                return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? (fd ? "go-next" : "arrow-right")
-                                                        : (fd ? "go-previous" : "arrow-left"), KIconLoader::Dialog, 32);
-            case SP_ArrowForward:
-                return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? (fd ? "go-previous" : "arrow-left")
-                                                        : (fd ? "go-next" : "arrow-right"), KIconLoader::Dialog, 32);
-    //         case SP_DirHomeIcon:
-    //             return KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 16);
-    //         case SP_CommandLink:
-    //         case SP_VistaShield:
-            case SP_BrowserReload:
-                return KIconLoader::global()->loadIcon("view-refresh", KIconLoader::Small, 16);
-            case SP_BrowserStop:
-                return KIconLoader::global()->loadIcon("process-stop", KIconLoader::Small, 16);
-            case SP_MediaPlay:
-                return KIconLoader::global()->loadIcon("media-playback-start", KIconLoader::Small, 16);
-            case SP_MediaStop:
-                return KIconLoader::global()->loadIcon("media-playback-stop", KIconLoader::Small, 16);
-            case SP_MediaPause:
-                return KIconLoader::global()->loadIcon("media-playback-pause", KIconLoader::Small, 16);
-            case SP_MediaSkipForward:
-                return KIconLoader::global()->loadIcon("media-skip-forward", KIconLoader::Small, 16);
-            case SP_MediaSkipBackward:
-                return KIconLoader::global()->loadIcon("media-skip-backward", KIconLoader::Small, 16);
-            case SP_MediaSeekForward:
-                return KIconLoader::global()->loadIcon("media-seek-forward", KIconLoader::Small, 16);
-            case SP_MediaSeekBackward:
-                return KIconLoader::global()->loadIcon("media-seek-backward", KIconLoader::Small, 16);
-            case SP_MediaVolume:
-                return KIconLoader::global()->loadIcon("player-volume", KIconLoader::Small, 16);
-            case SP_MediaVolumeMuted:
-                return KIconLoader::global()->loadIcon("player-volume-muted", KIconLoader::Small, 16);
-            default:
-                break;
-        }
+    switch(pix)
+    {
+//         case SP_TitleBarMenuButton:
+//         case SP_TitleBarMinButton:
+//         case SP_TitleBarMaxButton:
+//         case SP_TitleBarCloseButton:
+//         case SP_TitleBarNormalButton:
+//         case SP_TitleBarShadeButton:
+//         case SP_TitleBarUnshadeButton:
+//         case SP_TitleBarContextHelpButton:
+//         case SP_DockWidgetCloseButton:
+        case SP_MessageBoxInformation:
+            return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
+        case SP_MessageBoxWarning:
+            return KIconLoader::global()->loadIcon("dialog-warning", KIconLoader::Dialog, 32);
+        case SP_MessageBoxCritical:
+            return KIconLoader::global()->loadIcon("dialog-error", KIconLoader::Dialog, 32);
+        case SP_MessageBoxQuestion:
+            return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
+//         case SP_DesktopIcon:
+//             return KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 16);
+//         case SP_TrashIcon:
+//             return KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 16);
+//         case SP_ComputerIcon:
+//             return KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 16);
+//         case SP_DriveFDIcon:
+//             return KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 16);
+//         case SP_DriveHDIcon:
+//             return KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 16);
+//         case SP_DriveCDIcon:
+//         case SP_DriveDVDIcon:
+//             return KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 16);
+//         case SP_DriveNetIcon:
+//             return KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 16);
+//         case SP_DirOpenIcon:
+//             return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
+//         case SP_DirIcon:
+//         case SP_DirClosedIcon:
+//             return KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16);
+//         case SP_DirLinkIcon:
+//         case SP_FileIcon:
+//             return KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16);
+//         case SP_FileLinkIcon:
+//         case SP_ToolBarHorizontalExtensionButton:
+//         case SP_ToolBarVerticalExtensionButton:
+        case SP_FileDialogStart:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-edn" : "go-first", KIconLoader::Small, 16);
+        case SP_FileDialogEnd:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-first" : "go-end", KIconLoader::Small, 16);
+        case SP_FileDialogToParent:
+            return KIconLoader::global()->loadIcon("go-up", KIconLoader::Small, 16);
+        case SP_FileDialogNewFolder:
+            return KIconLoader::global()->loadIcon("folder-new", KIconLoader::Small, 16);
+        case SP_FileDialogDetailedView:
+            return KIconLoader::global()->loadIcon("view-list-details", KIconLoader::Small, 16);
+//         case SP_FileDialogInfoView:
+//             return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+//         case SP_FileDialogContentsView:
+//             return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+        case SP_FileDialogListView:
+            return KIconLoader::global()->loadIcon("view-list-icons", KIconLoader::Small, 16);
+        case SP_FileDialogBack:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-next" : "go-previous", KIconLoader::Small, 16);
+        case SP_DialogOkButton:
+            return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+        case SP_DialogCancelButton:
+            return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
+        case SP_DialogHelpButton:
+            return KIconLoader::global()->loadIcon("help-contents", KIconLoader::Small, 16);
+        case SP_DialogOpenButton:
+            return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
+        case SP_DialogSaveButton:
+            return KIconLoader::global()->loadIcon("document-save", KIconLoader::Small, 16);
+        case SP_DialogCloseButton:
+            return KIconLoader::global()->loadIcon("dialog-close", KIconLoader::Small, 16);
+        case SP_DialogApplyButton:
+            return KIconLoader::global()->loadIcon("dialog-ok-apply", KIconLoader::Small, 16);
+        case SP_DialogResetButton:
+            return KIconLoader::global()->loadIcon("document-revert", KIconLoader::Small, 16);
+//         case SP_DialogDiscardButton:
+//              return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
+        case SP_DialogYesButton:
+            return KIconLoader::global()->loadIcon("dialog-ok", KIconLoader::Small, 16);
+        case SP_DialogNoButton:
+            return KIconLoader::global()->loadIcon("dialog-cancel", KIconLoader::Small, 16);
+        case SP_ArrowUp:
+            return KIconLoader::global()->loadIcon("arrow-up", KIconLoader::Dialog, 32);
+        case SP_ArrowDown:
+            return KIconLoader::global()->loadIcon("arrow-down", KIconLoader::Dialog, 32);
+        case SP_ArrowLeft:
+            return KIconLoader::global()->loadIcon("arrow-left", KIconLoader::Dialog, 32);
+        case SP_ArrowRight:
+            return KIconLoader::global()->loadIcon("arrow-right", KIconLoader::Dialog, 32);
+        case SP_ArrowBack:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? (fd ? "go-next" : "arrow-right")
+                                                    : (fd ? "go-previous" : "arrow-left"), KIconLoader::Dialog, 32);
+        case SP_ArrowForward:
+            return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? (fd ? "go-previous" : "arrow-left")
+                                                    : (fd ? "go-next" : "arrow-right"), KIconLoader::Dialog, 32);
+//         case SP_DirHomeIcon:
+//             return KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 16);
+//         case SP_CommandLink:
+//         case SP_VistaShield:
+        case SP_BrowserReload:
+            return KIconLoader::global()->loadIcon("view-refresh", KIconLoader::Small, 16);
+        case SP_BrowserStop:
+            return KIconLoader::global()->loadIcon("process-stop", KIconLoader::Small, 16);
+        case SP_MediaPlay:
+            return KIconLoader::global()->loadIcon("media-playback-start", KIconLoader::Small, 16);
+        case SP_MediaStop:
+            return KIconLoader::global()->loadIcon("media-playback-stop", KIconLoader::Small, 16);
+        case SP_MediaPause:
+            return KIconLoader::global()->loadIcon("media-playback-pause", KIconLoader::Small, 16);
+        case SP_MediaSkipForward:
+            return KIconLoader::global()->loadIcon("media-skip-forward", KIconLoader::Small, 16);
+        case SP_MediaSkipBackward:
+            return KIconLoader::global()->loadIcon("media-skip-backward", KIconLoader::Small, 16);
+        case SP_MediaSeekForward:
+            return KIconLoader::global()->loadIcon("media-seek-forward", KIconLoader::Small, 16);
+        case SP_MediaSeekBackward:
+            return KIconLoader::global()->loadIcon("media-seek-backward", KIconLoader::Small, 16);
+        case SP_MediaVolume:
+            return KIconLoader::global()->loadIcon("player-volume", KIconLoader::Small, 16);
+        case SP_MediaVolumeMuted:
+            return KIconLoader::global()->loadIcon("player-volume-muted", KIconLoader::Small, 16);
+        default:
+            break;
     }
 #endif
     return QTC_BASE_STYLE::standardPixmap(pix, option, widget);
@@ -2160,140 +2161,138 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
 #ifdef QTC_USE_KDE4
-    if(kapp)
+    checkKComponentData();
+    switch(pix)
     {
-        switch(pix)
-        {
-    //         case SP_TitleBarMenuButton:
-    //         case SP_TitleBarMinButton:
-    //         case SP_TitleBarMaxButton:
-    //         case SP_TitleBarCloseButton:
-    //         case SP_TitleBarNormalButton:
-    //         case SP_TitleBarShadeButton:
-    //         case SP_TitleBarUnshadeButton:
-    //         case SP_TitleBarContextHelpButton:
-    //         case SP_DockWidgetCloseButton:
-            case SP_MessageBoxInformation:
-                return KIcon("dialog-information");
-            case SP_MessageBoxWarning:
-                return KIcon("dialog-warning");
-            case SP_MessageBoxCritical:
-                return KIcon("dialog-error");
-            case SP_MessageBoxQuestion:
-                return KIcon("dialog-information");
-    //         case SP_DesktopIcon:
-    //             return KIcon("user-desktop");
-    //         case SP_TrashIcon:
-    //             return KIcon("user-trash");
-    //         case SP_ComputerIcon:
-    //             return KIcon("computer");
-    //         case SP_DriveFDIcon:
-    //             return KIcon("media-floppy");
-    //         case SP_DriveHDIcon:
-    //             return KIcon("drive-harddisk");
-    //         case SP_DriveCDIcon:
-    //         case SP_DriveDVDIcon:
-    //             return KIcon("media-optical");
-    //         case SP_DriveNetIcon:
-    //             return KIcon("network-server");
-    //         case SP_DirOpenIcon:
-    //             return KIcon("document-open");
-    //         case SP_DirIcon:
-    //         case SP_DirClosedIcon:
-    //             return KIcon("folder");
-    //         case SP_DirLinkIcon:
-    //         case SP_FileIcon:
-    //             return KIcon("application-x-zerosize");
-    //         case SP_FileLinkIcon:
-    //         case SP_ToolBarHorizontalExtensionButton:
-    //         case SP_ToolBarVerticalExtensionButton:
-            case SP_FileDialogStart:
-                return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-edn" : "go-first");
-            case SP_FileDialogEnd:
-                return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-first" : "go-end");
-            case SP_FileDialogToParent:
-                return KIcon("go-up");
-            case SP_FileDialogNewFolder:
-                return KIcon("folder-new");
-            case SP_FileDialogDetailedView:
-                return KIcon("view-list-details");
-    //         case SP_FileDialogInfoView:
-    //             return KIcon("dialog-ok");
-    //         case SP_FileDialogContentsView:
-    //             return KIcon("dialog-ok");
-            case SP_FileDialogListView:
-                return KIcon("view-list-icons");
-            case SP_FileDialogBack:
-                return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-next" : "go-previous");
-            case SP_DialogOkButton:
-                return KIcon("dialog-ok");
-            case SP_DialogCancelButton:
-                return KIcon("dialog-cancel");
-            case SP_DialogHelpButton:
-                return KIcon("help-contents");
-            case SP_DialogOpenButton:
-                return KIcon("document-open");
-            case SP_DialogSaveButton:
-                return KIcon("document-save");
-            case SP_DialogCloseButton:
-                return KIcon("dialog-close");
-            case SP_DialogApplyButton:
-                return KIcon("dialog-ok-apply");
-            case SP_DialogResetButton:
-                return KIcon("document-revert");
-    //         case SP_DialogDiscardButton:
-    //              return KIcon("dialog-cancel");
-            case SP_DialogYesButton:
-                return KIcon("dialog-ok");
-            case SP_DialogNoButton:
-                return KIcon("dialog-cancel");
-            case SP_ArrowUp:
-                return KIcon("arrow-up");
-            case SP_ArrowDown:
-                return KIcon("arrow-down");
-            case SP_ArrowLeft:
-                return KIcon("arrow-left");
-            case SP_ArrowRight:
-                return KIcon("arrow-right");
-            case SP_ArrowBack:
-                return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-next" : "go-previous");
-            case SP_ArrowForward:
-                return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                        ? "go-previous"
-                                                        : "go-next");
-    //         case SP_DirHomeIcon:
-    //             return KIcon("user-home");
-    //         case SP_CommandLink:
-    //         case SP_VistaShield:
-            case SP_BrowserReload:
-                return KIcon("view-refresh");
-            case SP_BrowserStop:
-                return KIcon("process-stop");
-            case SP_MediaPlay:
-                return KIcon("media-playback-start");
-            case SP_MediaStop:
-                return KIcon("media-playback-stop");
-            case SP_MediaPause:
-                return KIcon("media-playback-pause");
-            case SP_MediaSkipForward:
-                return KIcon("media-skip-forward");
-            case SP_MediaSkipBackward:
-                return KIcon("media-skip-backward");
-            case SP_MediaSeekForward:
-                return KIcon("media-seek-forward");
-            case SP_MediaSeekBackward:
-                return KIcon("media-seek-backward");
-            case SP_MediaVolume:
-                return KIcon("player-volume");
-            case SP_MediaVolumeMuted:
-                return KIcon("player-volume-muted");
-            default:
-                break;
-        }
+//         case SP_TitleBarMenuButton:
+//         case SP_TitleBarMinButton:
+//         case SP_TitleBarMaxButton:
+//         case SP_TitleBarCloseButton:
+//         case SP_TitleBarNormalButton:
+//         case SP_TitleBarShadeButton:
+//         case SP_TitleBarUnshadeButton:
+//         case SP_TitleBarContextHelpButton:
+//         case SP_DockWidgetCloseButton:
+        case SP_MessageBoxInformation:
+            return KIcon("dialog-information");
+        case SP_MessageBoxWarning:
+            return KIcon("dialog-warning");
+        case SP_MessageBoxCritical:
+            return KIcon("dialog-error");
+        case SP_MessageBoxQuestion:
+            return KIcon("dialog-information");
+//         case SP_DesktopIcon:
+//             return KIcon("user-desktop");
+//         case SP_TrashIcon:
+//             return KIcon("user-trash");
+//         case SP_ComputerIcon:
+//             return KIcon("computer");
+//         case SP_DriveFDIcon:
+//             return KIcon("media-floppy");
+//         case SP_DriveHDIcon:
+//             return KIcon("drive-harddisk");
+//         case SP_DriveCDIcon:
+//         case SP_DriveDVDIcon:
+//             return KIcon("media-optical");
+//         case SP_DriveNetIcon:
+//             return KIcon("network-server");
+//         case SP_DirOpenIcon:
+//             return KIcon("document-open");
+//         case SP_DirIcon:
+//         case SP_DirClosedIcon:
+//             return KIcon("folder");
+//         case SP_DirLinkIcon:
+//         case SP_FileIcon:
+//             return KIcon("application-x-zerosize");
+//         case SP_FileLinkIcon:
+//         case SP_ToolBarHorizontalExtensionButton:
+//         case SP_ToolBarVerticalExtensionButton:
+        case SP_FileDialogStart:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-edn" : "go-first");
+        case SP_FileDialogEnd:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-first" : "go-end");
+        case SP_FileDialogToParent:
+            return KIcon("go-up");
+        case SP_FileDialogNewFolder:
+            return KIcon("folder-new");
+        case SP_FileDialogDetailedView:
+            return KIcon("view-list-details");
+//         case SP_FileDialogInfoView:
+//             return KIcon("dialog-ok");
+//         case SP_FileDialogContentsView:
+//             return KIcon("dialog-ok");
+        case SP_FileDialogListView:
+            return KIcon("view-list-icons");
+        case SP_FileDialogBack:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-next" : "go-previous");
+        case SP_DialogOkButton:
+            return KIcon("dialog-ok");
+        case SP_DialogCancelButton:
+            return KIcon("dialog-cancel");
+        case SP_DialogHelpButton:
+            return KIcon("help-contents");
+        case SP_DialogOpenButton:
+            return KIcon("document-open");
+        case SP_DialogSaveButton:
+            return KIcon("document-save");
+        case SP_DialogCloseButton:
+            return KIcon("dialog-close");
+        case SP_DialogApplyButton:
+            return KIcon("dialog-ok-apply");
+        case SP_DialogResetButton:
+            return KIcon("document-revert");
+//         case SP_DialogDiscardButton:
+//              return KIcon("dialog-cancel");
+        case SP_DialogYesButton:
+            return KIcon("dialog-ok");
+        case SP_DialogNoButton:
+            return KIcon("dialog-cancel");
+        case SP_ArrowUp:
+            return KIcon("arrow-up");
+        case SP_ArrowDown:
+            return KIcon("arrow-down");
+        case SP_ArrowLeft:
+            return KIcon("arrow-left");
+        case SP_ArrowRight:
+            return KIcon("arrow-right");
+        case SP_ArrowBack:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-next" : "go-previous");
+        case SP_ArrowForward:
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
+                                                    ? "go-previous"
+                                                    : "go-next");
+//         case SP_DirHomeIcon:
+//             return KIcon("user-home");
+//         case SP_CommandLink:
+//         case SP_VistaShield:
+        case SP_BrowserReload:
+            return KIcon("view-refresh");
+        case SP_BrowserStop:
+            return KIcon("process-stop");
+        case SP_MediaPlay:
+            return KIcon("media-playback-start");
+        case SP_MediaStop:
+            return KIcon("media-playback-stop");
+        case SP_MediaPause:
+            return KIcon("media-playback-pause");
+        case SP_MediaSkipForward:
+            return KIcon("media-skip-forward");
+        case SP_MediaSkipBackward:
+            return KIcon("media-skip-backward");
+        case SP_MediaSeekForward:
+            return KIcon("media-seek-forward");
+        case SP_MediaSeekBackward:
+            return KIcon("media-seek-backward");
+        case SP_MediaVolume:
+            return KIcon("player-volume");
+        case SP_MediaVolumeMuted:
+            return KIcon("player-volume-muted");
+        default:
+            break;
     }
 #endif
     return QTC_BASE_STYLE::standardIconImplementation(pix, option, widget);
@@ -9227,6 +9226,7 @@ void QtCurveStyle::setupKde4()
 void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
 {
 #ifdef QTC_USE_KDE4
+    checkKComponentData();
     switch(type)
     {
         case KGlobalSettings::PaletteChanged:
