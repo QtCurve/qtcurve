@@ -1547,72 +1547,65 @@ static gboolean qtInit(Options *opts)
             {
                 /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
                 /* ...and inactive highlight!!! */
-                static const int constFileVersion=3;
-                static const int constVersionLen=1+2+(6*3)+1+1;
+                static const char *format="style \""QTC_RC_SETTING"MTxt\""
+                                          " {fg[ACTIVE]=\"#%02X%02X%02X\""
+                                          " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
+                                          " style \""QTC_RC_SETTING"PTxt\""
+                                          " {fg[ACTIVE]=\"#%02X%02X%02X\""
+                                          " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
+                                          " class \"*MenuItem\" style \""QTC_RC_SETTING"MTxt\" "
+                                          " widget_class \"*.*MenuItem*\" style \""QTC_RC_SETTING"MTxt\" "
+                                          " widget_class \"*.*ProgressBar\" style \""QTC_RC_SETTING"PTxt\"";
+                tmpStr=(char *)realloc(tmpStr, strlen(format));
 
-                FILE     *f=NULL;
-                char     version[constVersionLen];
-                GdkColor inactiveHighlightTextCol=opts->inactiveHighlight
-                                            ? qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]
-                                            : qtSettings.colors[PAL_INACTIVE][COLOR_TEXT_SELECTED];
-
-                sprintf(version, "#%02d%02X%02X%02X%02X%02X%02X%02X%02X%02X%01X",
-                                    constFileVersion,
-                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
-                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
-                                    toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
-
-                                    toQtColor(qtSettings.inactiveSelectCol.red),
-                                    toQtColor(qtSettings.inactiveSelectCol.green),
-                                    toQtColor(qtSettings.inactiveSelectCol.blue),
-
-                                    toQtColor(inactiveHighlightTextCol.red),
-                                    toQtColor(inactiveHighlightTextCol.green),
-                                    toQtColor(inactiveHighlightTextCol.blue),
-
-                                    opts->inactiveHighlight);
-
-                getGtk2CfgFile(&tmpStr, xdg, "qtcurve.gtk-colors");
-
-                if(!checkFileVersion(tmpStr, version, constVersionLen) && (f=fopen(tmpStr, "w")))
+                if(tmpStr)
                 {
-                    fprintf(f, "%s\n"
-                                "# Fix for KDE's \"apply colors to non-KDE"
-                                " apps\" setting\n"
-                                "style \""QTC_RC_SETTING"TxtFix\" "
-                                "{fg[ACTIVE]=\"#%02X%02X%02X\""
-                                " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
-                                "class \"*MenuItem\" style \""QTC_RC_SETTING"TxtFix\" "
-                                "widget_class \"*.*ProgressBar\" style \""QTC_RC_SETTING"TxtFix\"",
-                                version,
-                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
-                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
-                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
+                    GdkColor *highlightedMenuCol=opts->useHighlightForMenu
+                                            ? &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]
+                                            : &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT];
 
-                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
-                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
-                                toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
-
-                    if(opts->inactiveHighlight)
-                        fprintf(f, "style \""QTC_RC_SETTING"HlFix\" "
-                                    "{base[ACTIVE]=\"#%02X%02X%02X\""
-                                    " text[ACTIVE]=\"#%02X%02X%02X\"}"
-                                    "class \"*\" style \""QTC_RC_SETTING"HlFix\"",
-
-                                    toQtColor(qtSettings.inactiveSelectCol.red),
-                                    toQtColor(qtSettings.inactiveSelectCol.green),
-                                    toQtColor(qtSettings.inactiveSelectCol.blue),
-
-                                    toQtColor(inactiveHighlightTextCol.red),
-                                    toQtColor(inactiveHighlightTextCol.green),
-                                    toQtColor(inactiveHighlightTextCol.blue));
-                    fclose(f);
+                    sprintf(tmpStr, format, toQtColor(highlightedMenuCol->red),
+                                            toQtColor(highlightedMenuCol->green),
+                                            toQtColor(highlightedMenuCol->blue),
+                                            toQtColor(highlightedMenuCol->red),
+                                            toQtColor(highlightedMenuCol->green),
+                                            toQtColor(highlightedMenuCol->blue),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].red),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].green),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
+                    gtk_rc_parse_string(tmpStr);
                 }
-
-                /* Now get gtk to read this file *after* its other gtkrc files - this
-                    allows us to undo the KDE settings! */
-                gtk_rc_add_default_file(tmpStr);
             }
+
+            if(opts->inactiveHighlight)
+            {
+                static const char *format="style \""QTC_RC_SETTING"HlFix\" "
+                                          "{base[ACTIVE]=\"#%02X%02X%02X\""
+                                          " text[ACTIVE]=\"#%02X%02X%02X\"}"
+                                          "class \"*\" style \""QTC_RC_SETTING"HlFix\"";
+
+                tmpStr=(char *)realloc(tmpStr, strlen(format));
+
+                if(tmpStr)
+                {
+                    GdkColor *inactiveHighlightTextCol=opts->inactiveHighlight
+                                            ? &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]
+                                            : &qtSettings.colors[PAL_INACTIVE][COLOR_TEXT_SELECTED];
+
+                    sprintf(tmpStr, format, toQtColor(qtSettings.inactiveSelectCol.red),
+                                            toQtColor(qtSettings.inactiveSelectCol.green),
+                                            toQtColor(qtSettings.inactiveSelectCol.blue),
+
+                                            toQtColor(inactiveHighlightTextCol->red),
+                                            toQtColor(inactiveHighlightTextCol->green),
+                                            toQtColor(inactiveHighlightTextCol->blue));
+                    gtk_rc_parse_string(tmpStr);
+                }
+            }
+
             if(GTK_APP_VMPLAYER==qtSettings.app)
                 opts->shadeMenubars=SHADE_NONE;
 

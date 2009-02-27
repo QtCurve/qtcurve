@@ -25,6 +25,7 @@
 ------
 1. Make squared scrollview appearance consistent when round is set to none.
 2. Fix missing pixels in squred progressbars with inverted gradient.
+3. Fix Firefox/OO.o menu text when useHighlightForMenu is set to false.
 
 0.61.3
 ------
