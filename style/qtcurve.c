@@ -3167,16 +3167,16 @@ debugDisplayWidget(widget, 3);
                 if(sunken)
                     cx++, cy++, cheight--;
 
-                drawVLine(cr, QTC_CAIRO_COL(btn_colors[darkLine]), 1.0,
-                        cx + (rev ? ind_width+QT_STYLE->xthickness
-                                    : (cwidth - ind_width - QT_STYLE->xthickness)),
-                        cy + QT_STYLE->ythickness-1, cheight-3);
+                drawFadedLine(cr, cx + (rev ? ind_width+QT_STYLE->xthickness
+                                            : (cwidth - ind_width - QT_STYLE->xthickness)),
+                                  cy + QT_STYLE->ythickness-1, 1, cheight-3,
+                             &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
 
                 if(!sunken)
-                    drawVLine(cr, QTC_CAIRO_COL(btn_colors[0]), 1.0,
-                            cx + (rev ? ind_width+QT_STYLE->xthickness
-                                        : (cwidth - ind_width - QT_STYLE->xthickness))+1,
-                            cy + QT_STYLE->ythickness-1, cheight-3);
+                    drawFadedLine(cr, cx + 1 + (rev ? ind_width+QT_STYLE->xthickness
+                                                    : (cwidth - ind_width - QT_STYLE->xthickness)),
+                                      cy + QT_STYLE->ythickness-1, 1, cheight-3,
+                                 &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
             }
             else if((button || togglebutton) && (combo || combo_entry))
             {
@@ -3196,12 +3196,12 @@ debugDisplayWidget(widget, 3);
 
                 if(!combo_entry)
                 {
-                    drawVLine(cr, QTC_CAIRO_COL(btn_colors[darkLine]), 1.0,
-                            vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, height-8);
+                    drawFadedLine(cr, vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
+                                  &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
 
                     if(!sunken)
-                        drawVLine(cr, QTC_CAIRO_COL(btn_colors[0]), 1.0,
-                                vx+(rev ? LARGE_ARR_WIDTH+4 : 0)+1, y+4, height-8);
+                        drawFadedLine(cr, vx+1+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
+                                      &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
                 }
             }
         }
