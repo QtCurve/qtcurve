@@ -2,7 +2,7 @@
 ------
 1. Reduce gradient code complexity - makes predefined gradients
    work in the same vein as custom gradients.
-2. Add scrollbars/slider groove and 'sunken' appearance options.
+2. Add scrollbar/slider groove and 'sunken' appearance options.
 3. Added new soft and harsh gradients.
 4. Change defaults:
         Soft gradient
@@ -20,6 +20,7 @@
         Sunken appearance set to soft
 5. Allow all bar flat and raised tabs to bol coloured.
 6. Only save appearance settings if different from default.
+7. If a gradient does not define the values for positions 0 and 100, then add these.
 
 0.61.4
 ------
