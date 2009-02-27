@@ -6570,15 +6570,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                     else if(opts.comboSplitter)
                     {
-                        painter->setPen(use[QT_BORDER(state&State_Enabled)]);
-                        painter->drawLine(reverse ? arrow.right()+1 : arrow.x()-1, arrow.top()+2,
-                                          reverse ? arrow.right()+1 : arrow.x()-1, arrow.bottom()-2);
+                        drawFadedLine(painter, QRect(reverse ? arrow.right()+1 : arrow.x()-1, arrow.top()+2,
+                                                     1, arrow.height()-4),
+                                      use[QT_BORDER(state&State_Enabled)], true, true, false);
                         if(!sunken)
-                        {
-                            painter->setPen(use[0]);
-                            painter->drawLine(reverse ? arrow.right()+2 : arrow.x(), arrow.top()+2,
-                                              reverse ? arrow.right()+2 : arrow.x(), arrow.bottom()-2);
-                        }
+                            drawFadedLine(painter, QRect(reverse ? arrow.right()+2 : arrow.x(), arrow.top()+2,
+                                                         1, arrow.height()-4),
+                                          use[0], true, true, false);
                     }
 
                     if(state&State_Enabled && state&State_HasFocus &&
