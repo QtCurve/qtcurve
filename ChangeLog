@@ -26,6 +26,7 @@
 ------
 1. Fix settings for sliderThumbs, handles, toolbarSeparators, and splitters.
 2. Fix separators on vertical toolbars.
+3. Fix chopped off text on tabs with icons, but no close button (Qt<4.5)
 
 0.61.3
 ------

@@ -4749,7 +4749,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->drawPixmap(iconRect.x(), iconRect.y(), tabIcon);
 #if QT_VERSION < 0x040500
                     if(qtVersion()<VER_45)
-                        r.adjust(tabIconSize.width(), 0, -tabIconSize.width(), 0);
+                        r.adjust(reverse ? 0 : tabIconSize.width(), 0, reverse ? -tabIconSize.width() : 0, 0);
 #endif
                 }
 
