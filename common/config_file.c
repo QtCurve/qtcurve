@@ -1028,7 +1028,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     if(ok)
                     {
                         opts->customGradient[(EAppearance)i]=grad;
-                        opts->customGradient[(EAppearance)i].stops.fix();
+                        opts->customGradient[(EAppearance)i].stops=grad.stops.fix();
                     }
                 }
             }
