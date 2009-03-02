@@ -1199,7 +1199,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 }
 
 #define QTC_MIN_ROUND_FULL_SIZE  8
-#define QTC_MIN_ROUND_EXTRA_SIZE 20
+#define QTC_MIN_ROUND_EXTRA_SIZE 12
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
