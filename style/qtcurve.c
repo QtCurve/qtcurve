@@ -1660,23 +1660,24 @@ static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
 }
 
 static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
-                     GtkWidget *widget, int x, int y, int w, int h, gboolean raised)
+                     GtkWidget *widget, int x, int y, int w, int h, gboolean raised,
+                     int round, EWidget wid)
 {
     double xd=x+0.5,
            yd=y+0.5,
-           radius=getRadius(opts.round, w, h, WIDGET_STD_BUTTON, RADIUS_ETCH);
+           radius=getRadius(opts.round, w, h, wid, RADIUS_ETCH);
 
     setCairoClipping(cr, area, region);
 
     cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
     if(!raised)
     {
-        createTLPath(cr, xd, yd, w-1, h-1, radius, ROUNDED_ALL);
+        createTLPath(cr, xd, yd, w-1, h-1, radius, round);
         cairo_stroke(cr);
         setLowerEtchCol(cr, widget);
     }
 
-    createBRPath(cr, xd, yd, w-1, h-1, radius, ROUNDED_ALL);
+    createBRPath(cr, xd, yd, w-1, h-1, radius, round);
     cairo_stroke(cr);
     unsetCairoClipping(cr);
 }
@@ -1868,7 +1869,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         else
             drawEtch(cr, area, region, wid, xe-(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), ye-1,
                                             we+(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), he+2,
-                    EFFECT_SHADOW==opts.buttonEffect && WIDGET_COMBO_BUTTON!=widget && WIDGET_BUTTON(widget) && !sunken);
+                    EFFECT_SHADOW==opts.buttonEffect && WIDGET_COMBO_BUTTON!=widget && WIDGET_BUTTON(widget) && !sunken,
+                    round, widget);
 
     xd-=1, x--, yd-=1, y--, width+=2, height+=2;
     if(flags&DF_DO_BORDER && width>2 && height>2)
@@ -2172,7 +2174,7 @@ debugDisplayWidget(widget, 3);
         if(!(round&CORNER_TL) && !(round&CORNER_BL))
             x-=4;
 
-        drawEtch(cr, region ? NULL : area, region, widget, x, y, width, height, FALSE);
+        drawEtch(cr, region ? NULL : area, region, widget, x, y, width, height, FALSE, round, WIDGET_ENTRY);
         gdk_region_destroy(region);
     }
 
@@ -2849,7 +2851,7 @@ debugDisplayWidget(widget, 3);
         {
             if(QTC_DO_EFFECT)
             {
-                drawEtch(cr, area, NULL, widget, x-2, y, width+2, height*2, FALSE);
+                drawEtch(cr, area, NULL, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
                 y++;
                 width--;
             }
@@ -2857,7 +2859,7 @@ debugDisplayWidget(widget, 3);
         }
         else if (QTC_DO_EFFECT)
         {
-            drawEtch(cr, area, NULL, widget, x-2, y-height, width+2, height*2, FALSE);
+            drawEtch(cr, area, NULL, widget, x-2, y-height, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
             height--;
             width--;
         }
@@ -3297,7 +3299,7 @@ debugDisplayWidget(widget, 3);
                               horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
             if(doEtch)
-                 drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE);
+                 drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
 
             drawBorder(cr, widget && widget->parent ? widget->parent->style : style,
                        state, area, NULL, x, y, width, height,
@@ -3875,7 +3877,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     }
                     else if(opts.sunkenScrollViews)
                     {
-                        drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE);
+                        drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE, ROUNDED_ALL, WIDGET_SCROLLVIEW);
                         x++, y++, width-=2, height-=2;
                     }
                 }
@@ -4159,19 +4161,8 @@ debugDisplayWidget(widget, 3);
                 drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, WIDGET_STD_BUTTON);
             else
                 drawEtch(cr, area, NULL, widget, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2,
-                         opts.crButton && !mnu && EFFECT_SHADOW==opts.buttonEffect ? GTK_STATE_ACTIVE!=state : false);
-//             cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
-//             cairo_move_to(cr, x-0.5, y+QTC_CHECK_SIZE);
-//             cairo_line_to(cr, x-0.5, y);
-//             cairo_move_to(cr, x, y-0.5);
-//             cairo_line_to(cr, x+QTC_CHECK_SIZE, y-0.5);
-//             cairo_stroke(cr);
-//             cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_ETCH_BOTTOM_ALPHA);
-//             cairo_move_to(cr, x, y+QTC_CHECK_SIZE+0.5);
-//             cairo_line_to(cr, x+QTC_CHECK_SIZE, y+QTC_CHECK_SIZE+0.5);
-//             cairo_move_to(cr, x+QTC_CHECK_SIZE+0.5, y+QTC_CHECK_SIZE);
-//             cairo_line_to(cr, x+QTC_CHECK_SIZE+0.5, y);
-//             cairo_stroke(cr);
+                         opts.crButton && !mnu && EFFECT_SHADOW==opts.buttonEffect ? GTK_STATE_ACTIVE!=state : false,
+                         ROUNDED_ALL, WIDGET_STD_BUTTON);
         }
 
         drawBorder(cr, style, state, area, NULL, x, y, QTC_CHECK_SIZE, QTC_CHECK_SIZE,
