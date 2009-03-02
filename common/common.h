@@ -1264,7 +1264,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                         return ((w>h ? h : w)-2)/2;
                     if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE-2))
                     {
-                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget || WIDGET_MENU_BUTTON==widget)
+                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
+#ifdef __cplusplus
+                           || WIDGET_MENU_BUTTON==widget
+#endif
+                           )
                             return 8.5;
                         if(widget!=WIDGET_MENU_ITEM)
                             return QTC_EXTRA_INNER_RADIUS;
@@ -1285,7 +1289,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                         return (w>h ? h : w)/2;
                     if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                     {
-                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget || WIDGET_MENU_BUTTON==widget)
+                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
+#ifdef __cplusplus
+                           || WIDGET_MENU_BUTTON==widget
+#endif
+                           )
                             return 9.5;
                         if(widget!=WIDGET_MENU_ITEM)
                             return QTC_EXTRA_OUTER_RADIUS;
@@ -1306,7 +1314,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                         return (w>h ? h : w)/2;
                     if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                     {
-                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget || WIDGET_MENU_BUTTON==widget)
+                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
+#ifdef __cplusplus
+                           || WIDGET_MENU_BUTTON==widget
+#endif
+                           )
                             return 10.5;
                         if(widget!=WIDGET_MENU_ITEM)
                             return QTC_EXTRA_ETCH_RADIUS;
