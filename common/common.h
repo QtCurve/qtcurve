@@ -1237,7 +1237,7 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 {
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
-
+        
     switch(rad)
     {
         case RADIUS_SELECTION:
@@ -1296,6 +1296,8 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
             switch(r)
             {
                 case ROUND_EXTRA:
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                        return (w>h ? h : w)/2;
                     if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget)
                         return 10.5;
                     if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
