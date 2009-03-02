@@ -617,27 +617,6 @@ static inline void drawRect(QPainter *p, const QRect &r)
     p->drawRect(r.x(), r.y(), r.width()-1, r.height()-1);
 }
 
-static void drawPathRect(QPainter *p, const QRect &r, const QColor &col)
-{
-    double       xd(r.x()+0.5),
-                 yd(r.y()+0.5);
-    int          width(r.width()-1),
-                 height(r.height()-1);
-    QPainterPath path;
-
-    path.moveTo(xd+width, yd+height);
-    path.lineTo(xd+width, yd);
-    path.lineTo(xd, yd);
-    path.lineTo(xd, yd+height);
-    path.lineTo(xd+width, yd+height);
-
-    p->setRenderHint(QPainter::Antialiasing, true);
-    p->setBrush(Qt::NoBrush);
-    p->setPen(col);
-    p->drawPath(path);
-    p->setRenderHint(QPainter::Antialiasing, false);
-}
-
 static inline void drawAaLine(QPainter *p, int x1, int y1, int x2, int y2)
 {
     p->drawLine(QLineF(x1+0.5, y1+0.5, x2+0.5, y2+0.5));
@@ -3180,9 +3159,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 opt.state|=QTC_STATE_KWIN_BUTTON;
 
             // This section fixes some drawng issues with krunner's buttons on nvidia
-            painter->setRenderHint(QPainter::Antialiasing, true);
-            painter->fillRect(doEtch ? r.adjusted(2, 2, -2, -2) : r.adjusted(1, 1, -1, -1), palette.background().color());
-            painter->setRenderHint(QPainter::Antialiasing, false);
+//             painter->setRenderHint(QPainter::Antialiasing, true);
+//             painter->fillRect(doEtch ? r.adjusted(2, 2, -2, -2) : r.adjusted(1, 1, -1, -1), palette.background().color());
+//             painter->setRenderHint(QPainter::Antialiasing, false);
 
             drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL, getFill(&opt, use), use,
                            true, isKWin
@@ -7517,7 +7496,6 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
         else
             inCache=false;
     }
-    p->setClipRect(origRect);
     QRect fillRect(origRect);
 
     if(opts.animatedProgress)
@@ -7539,8 +7517,6 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
 
     if(!inCache)
         delete pix;
-
-    p->setClipping(false);
 }
 
 void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect,
@@ -7632,8 +7608,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     if(APPEARANCE_RAISED==app && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w))
         app=APPEARANCE_FLAT;
 
-    QRect        r(rOrig),
-                 br(r);
+    QRect        r(rOrig);
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  lightBorder(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
@@ -7662,81 +7637,18 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     p->save();
 
     if(doEtch)
-    {
         r.adjust(1, 1, -1, -1);
-        br=r;
 
-        if( !sunken &&
-            ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
-            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
-            drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
-        else
-            drawEtch(p, rOrig, widget, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
-    }
-
-    if(!colouredMouseOver && lightBorder)
-        br.adjust(1, 1,-1,-1);
-    else if(colouredMouseOver || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
-            (!IS_GLASS(app) && !sunken && option->state&State_Raised))
+    if(r.width()>0 && r.height()>0)
     {
-        p->setRenderHint(QPainter::Antialiasing, true);
-        if(colouredMouseOver)
-            p->setPen(border[QTC_MO_STD_LIGHT(w, sunken)]);
-        else
-            p->setPen(border[c1]);
-        if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
-        {
-            //Left & top
-            drawAaLine(p, br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-3);
-            drawAaLine(p, br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
+        p->setClipPath(buildPath(r.adjusted(0, 0, -1, -1), w, round,
+                       getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL)));
 
-            if(colouredMouseOver)
-                p->setPen(border[QTC_MO_STD_DARK(w)]);
-            else
-                p->setPen(border[sunken ? 0 : dark]);
-            //Right & bottom
-            drawAaLine(p, br.x()+br.width()-2, br.y()+1, br.x()+br.width()-2, br.y()+br.height()-3);
-            drawAaLine(p, br.x()+1, br.y()+br.height()-2, br.x()+br.width()-2, br.y()+br.height()-2);
-            br.adjust(2, 2,-2,-2);
-        }
-        else
-        {
-            //Left & top
-            drawAaLine(p, br.x()+1, br.y()+2, br.x()+1, br.y()+br.height()-(WIDGET_MDI_WINDOW_TITLE==w ? 1 : 2));
-            if((WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w) && APPEARANCE_SHINY_GLASS==app)
-                br.adjust(2, 1, -1, -1);
-            else
-            {
-                drawAaLine(p, br.x()+1, br.y()+1, br.x()+br.width()-2, br.y()+1);
-                br.adjust(2, 2,-1,-1);
-            }
-        }
-        p->setRenderHint(QPainter::Antialiasing, false);
-    }
-    else
-        br.adjust(1, 1,-1,-1);
-
-    if(!colouredMouseOver && lightBorder && br.width()>0 && br.height()>0)
-    {
-        br=r.adjusted(1,1,-1,-1);
-        drawPathRect(p, br, cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
-
-        if(IS_CUSTOM(app) || (WIDGET_PROGRESSBAR==w && (!IS_GLASS(app) || opts.fillProgress)))
-            br.adjust(1,1,-1,-1);
-        else if(horiz)
-            br.adjust(1,0,-1,-1);
-        else
-            br.adjust(0,1,-1,-1);
-    }
-
-    // fill
-    if(br.width()>0 && br.height()>0)
-    {
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
-            drawProgressBevelGradient(p, br, option, horiz, app);
+            drawProgressBevelGradient(p, r, option, horiz, app);
         else
         {
-            drawBevelGradient(fill, p, WIDGET_MDI_WINDOW_TITLE==w ? br.adjusted(0, 0, 0, 1) : br, horiz,
+            drawBevelGradient(fill, p, r.adjusted(1, 1, -1, WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1), horiz,
                               sunken, app, w);
 
             if(!sunken)
@@ -7749,7 +7661,6 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                             eo(len+so),
                             col(QTC_SLIDER_MO_SHADE);
 
-                        p->setClipRect(r.adjusted(1, 1, -1, -1));
                         if(horiz)
                         {
                             drawBevelGradient(itsMouseOverCols[col], p, QRect(r.x()+so, r.y(), len, r.height()-1),
@@ -7764,7 +7675,6 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                             drawBevelGradient(itsMouseOverCols[col], p,
                                               QRect(r.x(), r.y()+r.height()-eo, r.width()-1, len), horiz, sunken, app, w);
                         }
-                        p->setClipping(false);
                     }
                     else
                     {
@@ -7800,23 +7710,70 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                         p->setRenderHint(QPainter::Antialiasing, false);
                     }
                 }
-                else if(colouredMouseOver && 0!=round && QTC_FULLLY_ROUNDED)
-                {
-                    p->setPen(itsMouseOverCols[QTC_MO_STD_LIGHT(w, sunken)]);
-
-                    if(round&CORNER_TL)
-                        p->drawPoint(br.left(), br.top());
-                    if(round&CORNER_BL)
-                        p->drawPoint(br.left(), br.bottom());
-                    if(round&CORNER_BR)
-                        p->drawPoint(br.right(), br.bottom());
-                    if(round&CORNER_TR)
-                        p->drawPoint(br.right(), br.top());
-                }
         }
+        p->setClipping(false);
     }
 
+    p->setRenderHint(QPainter::Antialiasing, true);
+    r.adjust(1, 1, -1, -1);
+    if(!colouredMouseOver && lightBorder)
+    {
+        if(plastikMouseOver && !sunken)
+        {
+            bool thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16)),
+                 horizontal(WIDGET_SB_SLIDER==w ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
+            int  len(WIDGET_SB_SLIDER==w ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height()) : (thin ? 1 : 2));
+
+            if(horizontal)
+                p->setClipRect(r.x(), r.y()+len, r.width(), r.height()-(len*2));
+            else
+                p->setClipRect(r.x()+len, r.y(), r.width()-(len*2), r.height());
+        }
+        p->setPen(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
+        p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL)));
+        if(plastikMouseOver && !sunken)
+            p->setClipping(false);
+    }
+    else if(colouredMouseOver || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
+            (!IS_GLASS(app) && !sunken && option->state&State_Raised))
+    {
+        QPainterPath innerTlPath,
+                     innerBrPath;
+
+        buildSplitPath(r, w, round,
+                       getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL),
+                       innerTlPath, innerBrPath);
+
+        p->setPen(border[colouredMouseOver ? QTC_MO_STD_LIGHT(w, sunken) : c1]);
+        if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
+        {
+            p->drawPath(innerTlPath);
+            p->setPen(border[colouredMouseOver ? QTC_MO_STD_DARK(w) : (sunken ? 0 : dark)]);
+            p->drawPath(innerBrPath);
+        }
+        else
+        {
+            if((WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w) && APPEARANCE_SHINY_GLASS==app)
+                drawAaLine(p, r.x(), r.y()+1, r.x(), r.y()+r.height()-(WIDGET_MDI_WINDOW_TITLE==w ? 0 : 1));
+            else
+                p->drawPath(innerTlPath);
+        }
+    }
+    p->setRenderHint(QPainter::Antialiasing, false);
+
+    if(doEtch)
+    {
+        if( !sunken &&
+            ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
+            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
+            drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
+        else
+            drawEtch(p, rOrig, widget, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
+    }
+    
     if(doBorder)
+    {
+        r.adjust(-1, -1, 1, 1);
         if(!sunken && option->state&State_Enabled &&
             (( ( (doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) ||
                   WIDGET_MENU_BUTTON==w ) &&
@@ -7825,7 +7782,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
             drawBorder(p, r, option, round, itsMouseOverCols, w);
         else
             drawBorder(p, r, option, round, cols, w);
-
+    }
+        
     p->restore();
 }
 
