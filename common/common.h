@@ -1199,7 +1199,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 }
 
 #define QTC_MIN_ROUND_FULL_SIZE  8
-#define QTC_MIN_ROUND_EXTRA_SIZE 12
+#define QTC_MIN_ROUND_EXTRA_SIZE 14
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
@@ -1237,18 +1237,18 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 {
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
-        
+
     switch(rad)
     {
         case RADIUS_SELECTION:
             switch(r)
             {
                 case ROUND_EXTRA:
+                    if(w>48 && h>48)
+                        return 6.0;
                 case ROUND_FULL:
                     if(w>48 && h>48)
                         return 3.0;
-                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
-                        return QTC_FULL_OUTER_RADIUS;
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_OUTER_RADIUS;
                 case ROUND_SLIGHT:
@@ -1262,10 +1262,13 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_EXTRA:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return ((w>h ? h : w)-2)/2;
-                    if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget)
-                        return 8.5;
-                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
-                        return QTC_EXTRA_INNER_RADIUS;
+                    if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE-2))
+                    {
+                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget || WIDGET_MENU_BUTTON==widget)
+                            return 8.5;
+                        if(widget!=WIDGET_MENU_ITEM)
+                            return QTC_EXTRA_INNER_RADIUS;
+                    }
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_INNER_RADIUS;
@@ -1280,10 +1283,13 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_EXTRA:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
-                    if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget)
-                        return 9.5;
-                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
-                        return QTC_EXTRA_OUTER_RADIUS;
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                    {
+                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget || WIDGET_MENU_BUTTON==widget)
+                            return 9.5;
+                        if(widget!=WIDGET_MENU_ITEM)
+                            return QTC_EXTRA_OUTER_RADIUS;
+                    }
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_OUTER_RADIUS;
@@ -1298,10 +1304,13 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_EXTRA:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
-                    if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget)
-                        return 10.5;
-                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
-                        return QTC_EXTRA_ETCH_RADIUS;
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                    {
+                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget || WIDGET_MENU_BUTTON==widget)
+                            return 10.5;
+                        if(widget!=WIDGET_MENU_ITEM)
+                            return QTC_EXTRA_ETCH_RADIUS;
+                    }
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_ETCH_RADIUS;
