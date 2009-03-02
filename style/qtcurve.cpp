@@ -7716,23 +7716,23 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     p->setRenderHint(QPainter::Antialiasing, true);
     r.adjust(1, 1, -1, -1);
+
+    if(plastikMouseOver && !sunken)
+    {
+        bool thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16)),
+                horizontal(WIDGET_SB_SLIDER==w ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
+        int  len(WIDGET_SB_SLIDER==w ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height()) : (thin ? 1 : 2));
+
+        if(horizontal)
+            p->setClipRect(r.x(), r.y()+len, r.width(), r.height()-(len*2));
+        else
+            p->setClipRect(r.x()+len, r.y(), r.width()-(len*2), r.height());
+    }
+        
     if(!colouredMouseOver && lightBorder)
     {
-        if(plastikMouseOver && !sunken)
-        {
-            bool thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16)),
-                 horizontal(WIDGET_SB_SLIDER==w ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
-            int  len(WIDGET_SB_SLIDER==w ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height()) : (thin ? 1 : 2));
-
-            if(horizontal)
-                p->setClipRect(r.x(), r.y()+len, r.width(), r.height()-(len*2));
-            else
-                p->setClipRect(r.x()+len, r.y(), r.width()-(len*2), r.height());
-        }
         p->setPen(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
         p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL)));
-        if(plastikMouseOver && !sunken)
-            p->setClipping(false);
     }
     else if(colouredMouseOver || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
             (!IS_GLASS(app) && !sunken && option->state&State_Raised))
@@ -7759,6 +7759,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                 p->drawPath(innerTlPath);
         }
     }
+    if(plastikMouseOver && !sunken)
+        p->setClipping(false);
     p->setRenderHint(QPainter::Antialiasing, false);
 
     if(doEtch)
