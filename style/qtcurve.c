@@ -1645,16 +1645,16 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
 }
 
 static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
-                     int x, int y, int w, int h, EWidget widget)
+                     int x, int y, int w, int h, int round, EWidget widget)
 {
     double   xd=x+0.5,
              yd=y+0.5,
-             radius=getRadius(opts.round, w, h, WIDGET_STD_BUTTON, RADIUS_ETCH);
+             radius=getRadius(opts.round, w, h, widget, RADIUS_ETCH);
     GdkColor *col=&qtcPalette.mouseover[WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator ? QTC_GLOW_DEFBTN : QTC_GLOW_MO];
 
     setCairoClipping(cr, area, region);
     cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
-    createPath(cr, xd, yd, w-1, h-1, radius, ROUNDED_ALL);
+    createPath(cr, xd, yd, w-1, h-1, radius, round);
     cairo_stroke(cr);
     unsetCairoClipping(cr);
 }
@@ -1697,8 +1697,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 plastikMouseOver=doColouredMouseOver && (MO_PLASTIK==opts.coloredMouseOver || WIDGET_SB_SLIDER==widget),
                 colouredMouseOver=doColouredMouseOver && WIDGET_SB_SLIDER!=widget &&
                                        (MO_COLORED==opts.coloredMouseOver ||
-                                              (MO_GLOW==opts.coloredMouseOver &&
-                                              ((WIDGET_COMBO!=widget && !ETCH_WIDGET(widget))))),
+                                              (MO_GLOW==opts.coloredMouseOver && WIDGET_COMBO!=widget && !ETCH_WIDGET(widget))),
                 lightBorder=QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || WIDGET_COMBO_BUTTON==widget) && QTC_DO_EFFECT,
@@ -1706,13 +1705,13 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     int         xe=x, ye=y, we=width, he=height;
     double      xd=x+0.5, yd=y+0.5;
 
-    if((WIDGET_COMBO || WIDGET_COMBO_BUTTON) && doEtch)
+    if(WIDGET_COMBO_BUTTON==widget && doEtch)
         if(ROUNDED_RIGHT==round)
             x--, xd-=1, width++;
         else if(ROUNDED_LEFT==round)
             width++;
 
-    if(doEtch) /*  && WIDGET_DEF_BUTTON!=widget) */
+    if(doEtch)
         xd+=1, x++, yd+=1, y++, width-=2, height-=2, xe=x, ye=y, we=width, he=height;
 
     if(width>0 && height>0)
@@ -1858,13 +1857,12 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         setCairoClipping(cr, area, region);
     }
 
-    if(doEtch) /*  && WIDGET_DEF_BUTTON!=widget) */
+    if(doEtch)
         if(!sunken && GTK_STATE_INSENSITIVE!=state &&
             ((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
              MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
             (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
-            drawGlow(cr, area, region, xe-(WIDGET_COMBO==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), ye-1,
-                                       we+(WIDGET_COMBO==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), he+2,
+            drawGlow(cr, area, region, xe-1, ye-1, we+2, he+2, round,
                      WIDGET_DEF_BUTTON==widget && GTK_STATE_PRELIGHT==state ? WIDGET_STD_BUTTON : widget);
         else
             drawEtch(cr, area, region, wid, xe-(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), ye-1,
@@ -2859,7 +2857,7 @@ debugDisplayWidget(widget, 3);
         }
         else if (QTC_DO_EFFECT)
         {
-            drawEtch(cr, area, NULL, widget, x-2, y-height, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
+            drawEtch(cr, area, NULL, widget, x-2, y-2, width+2, height+2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
             height--;
             width--;
         }
@@ -2938,7 +2936,7 @@ debugDisplayWidget(widget, 3);
                                             : lvh
                                                 ? WIDGET_LISTVIEW_HEADER
                                                 : combo || optionmenu
-                                                    ? (glowFocus ? WIDGET_DEF_BUTTON : WIDGET_STD_BUTTON)
+                                                    ? WIDGET_COMBO
                                                     : tbar_button
                                                         ?
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
@@ -4158,7 +4156,7 @@ debugDisplayWidget(widget, 3);
         if(doEtch && (!list || glow) && !mnu)
         {
             if(glow)
-                drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, WIDGET_STD_BUTTON);
+                drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, ROUNDED_ALL, WIDGET_STD_BUTTON);
             else
                 drawEtch(cr, area, NULL, widget, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2,
                          opts.crButton && !mnu && EFFECT_SHADOW==opts.buttonEffect ? GTK_STATE_ACTIVE!=state : false,
