@@ -209,6 +209,8 @@ static ERound toRound(const char *str, ERound def)
             return ROUND_FULL;
         if(0==memcmp(str, "extra", 5))
             return ROUND_EXTRA;
+        if(0==memcmp(str, "max", 3))
+            return ROUND_MAX;
     }
 
     return def;
@@ -1277,6 +1279,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 */
 
 #if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000
+            if(opts->round>ROUND_FULL)
+                opts->round=ROUND_FULL;
+
             if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->coloredMouseOver=MO_COLORED;
 
@@ -1618,6 +1623,8 @@ static const char *toStr(ERound exp)
             return "slight";
         case ROUND_EXTRA:
             return "extra";
+        case ROUND_MAX:
+            return "max";
         default:
         case ROUND_FULL:
             return "full";

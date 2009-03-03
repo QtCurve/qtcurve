@@ -480,7 +480,8 @@ typedef enum
     ROUND_NONE,
     ROUND_SLIGHT,
     ROUND_FULL,
-    ROUND_EXTRA
+    ROUND_EXTRA,
+    ROUND_MAX
 } ERound;
 
 typedef enum
@@ -1244,6 +1245,7 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_SELECTION:
             switch(r)
             {
+                case ROUND_MAX:
                 case ROUND_EXTRA:
                     if(w>48 && h>48)
                         return 6.0;
@@ -1260,20 +1262,19 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_INTERNAL:
             switch(r)
             {
-                case ROUND_EXTRA:
+                case ROUND_MAX:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return ((w>h ? h : w)-2)/2;
-                    if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE-2))
-                    {
-                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
+                    if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE-2) &&
+                       (WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
 #ifdef __cplusplus
                            || WIDGET_MENU_BUTTON==widget
 #endif
-                           )
-                            return 8.5;
-                        if(widget!=WIDGET_MENU_ITEM)
-                            return QTC_EXTRA_INNER_RADIUS;
-                    }
+                           ))
+                        return 8.5;
+                case ROUND_EXTRA:
+                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                        return QTC_EXTRA_INNER_RADIUS;
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_INNER_RADIUS;
@@ -1285,20 +1286,19 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_EXTERNAL:
             switch(r)
             {
-                case ROUND_EXTRA:
+                case ROUND_MAX:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
-                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
-                    {
-                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE &&
+                       (WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
 #ifdef __cplusplus
                            || WIDGET_MENU_BUTTON==widget
 #endif
-                           )
-                            return 9.5;
-                        if(widget!=WIDGET_MENU_ITEM)
-                            return QTC_EXTRA_OUTER_RADIUS;
-                    }
+                           ))
+                        return 9.5;
+                case ROUND_EXTRA:
+                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                        return QTC_EXTRA_OUTER_RADIUS;
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_OUTER_RADIUS;
@@ -1310,20 +1310,19 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
         case RADIUS_ETCH:
             switch(r)
             {
-                case ROUND_EXTRA:
+                case ROUND_MAX:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
-                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
-                    {
-                        if(WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE &&
+                       (WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
 #ifdef __cplusplus
                            || WIDGET_MENU_BUTTON==widget
 #endif
-                           )
-                            return 10.5;
-                        if(widget!=WIDGET_MENU_ITEM)
-                            return QTC_EXTRA_ETCH_RADIUS;
-                    }
+                           ))
+                        return 10.5;
+                case ROUND_EXTRA:
+                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                        return QTC_EXTRA_ETCH_RADIUS;
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_ETCH_RADIUS;
