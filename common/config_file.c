@@ -1288,6 +1288,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->defBtnIndicator=IND_TINT;
 #endif
+            if(opts->round>ROUND_EXTRA)
+                opts->focus=FOCUS_LINE;
 
             if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
                 opts->sunkenScrollViews=false;

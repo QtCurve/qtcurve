@@ -404,7 +404,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuStripe, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menuStripeAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(round, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(round, SIGNAL(currentIndexChanged(int)), SLOT(roundChanged()));
     connect(toolbarBorders, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderThumbs, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(handles, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -450,7 +450,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(selectionAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(shadeCheckRadio, SIGNAL(currentIndexChanged(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
-    connect(focus, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(focus, SIGNAL(currentIndexChanged(int)), SLOT(focusChanged()));
     connect(lvLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(drawStatusBarFrames, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(buttonEffect, SIGNAL(currentIndexChanged(int)), SLOT(buttonEffectChanged()));
@@ -997,6 +997,18 @@ void QtCurveConfig::updateChanged()
 {
     if (settingsChanged())
         emit changed(true);
+}
+
+void QtCurveConfig::focusChanged()
+{
+    if(ROUND_MAX==round->currentIndex() && FOCUS_LINE!=focus->currentIndex())
+        round->setCurrentIndex(ROUND_EXTRA);
+}
+
+void QtCurveConfig::roundChanged()
+{
+    if(ROUND_MAX==round->currentIndex() && FOCUS_LINE!=focus->currentIndex())
+        focus->setCurrentIndex(FOCUS_LINE);
 }
 
 void QtCurveConfig::importStyle()

@@ -83,6 +83,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     void setStyle(QAction *s);
     void updateChanged();
+    void focusChanged();
+    void roundChanged();
     void importStyle();
     void exportStyle();
     void exportTheme();
