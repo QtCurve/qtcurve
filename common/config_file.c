@@ -324,6 +324,8 @@ static EFocus toFocus(const char *str, EFocus def)
             return FOCUS_BACKGROUND;
         if(0==memcmp(str, "filled", 6))
             return FOCUS_FILLED;
+        if(0==memcmp(str, "line", 4))
+            return FOCUS_LINE;
     }
 
     return def;
@@ -1737,6 +1739,8 @@ static const char *toStr(EFocus f)
             return "background";
         case FOCUS_FILLED:
             return "filled";
+        case FOCUS_LINE:
+            return "line";
     }
 }
 

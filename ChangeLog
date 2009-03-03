@@ -21,10 +21,12 @@
  5. Allow all bar flat and raised tabs to be coloured.
  6. Only save appearance settings if different from default.
  7. If a gradient does not define the values for positions 0 and 100, then add these.
- 8. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
- 9. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
+ 8. Better colouring of selected tab.
+ 9. Added new focus option - line.
+10. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
+11. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
     compiled against KDE.
-10. Fix shading of menuitems when slider is set to 'orig selected'
+12. Fix shading of menuitems when slider is set to 'orig selected'
 
 0.61.4
 ------

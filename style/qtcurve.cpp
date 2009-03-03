@@ -3081,31 +3081,42 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 {
                     //Figuring out in what beast we are painting...
                     const QColor *use(FOCUS_BACKGROUND==opts.focus ?  backgroundColors(option) : itsMenuitemCols);
-                    bool         drawRounded(QTC_ROUNDED);
-
-                    if(drawRounded &&
-                       (r2.width()<4 || r2.height()<4 ||
-                        (widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) || widget->inherits("Q3ScrollView"))) ||
-                        (widget && widget->parent() && ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
-                                                       widget->parent()->inherits("Q3ScrollView")))))
-                        drawRounded=false;
 
                     painter->save();
                     QColor c(use[FOCUS_BACKGROUND!=opts.focus && state&State_Selected ? 3 : QT_FOCUS]);
-                    painter->setPen(c);
-                    if(FOCUS_FILLED==opts.focus)
-                    {
-                        c.setAlphaF(QTC_FOCUS_ALPHA);
-                        painter->setBrush(c);
-                    }
-                    if(QTC_ROUNDED)
-                    {
-                        painter->setRenderHint(QPainter::Antialiasing, true);
-                        painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
-                                                    getRadius(opts.round, r2.width(), r2.height(), WIDGET_OTHER, RADIUS_SELECTION)));
-                    }
+
+                    if(FOCUS_LINE==opts.focus)
+                        drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-1, r2.width(), 1),
+                                      c, true, true, true);
                     else
-                        drawRect(painter, r2);
+                    {
+                        bool drawRounded(QTC_ROUNDED);
+
+                        if(drawRounded &&
+                           (r2.width()<4 || r2.height()<4 ||
+                           (widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) ||
+                                        widget->inherits("Q3ScrollView"))) ||
+                                         (widget && widget->parent() &&
+                                            ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
+                                                       widget->parent()->inherits("Q3ScrollView")))))
+                            drawRounded=false;
+
+                        painter->setPen(c);
+                        if(FOCUS_FILLED==opts.focus)
+                        {
+                            c.setAlphaF(QTC_FOCUS_ALPHA);
+                            painter->setBrush(c);
+                        }
+                        if(QTC_ROUNDED)
+                        {
+                            painter->setRenderHint(QPainter::Antialiasing, true);
+                            painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
+                                                        getRadius(opts.round, r2.width(), r2.height(), WIDGET_OTHER,
+                                                                  RADIUS_SELECTION)));
+                        }
+                        else
+                            drawRect(painter, r2);
+                    }
                     painter->restore();
                 }
             }
@@ -7591,8 +7602,8 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
             col=base;
         else
             shade(base, &col, botTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
-        if(sel && opts.colorSelTab && (topTab || botTab) && 0==i)
-            col=tint(col, itsMenuitemCols[0], QTC_COLOR_SEL_TAB_FACTOR);
+        if(sel && opts.colorSelTab && (topTab || botTab) && i<numStops-1)
+            col=tint(col, itsMenuitemCols[0], (1.0-(*it).pos)*QTC_COLOR_SEL_TAB_FACTOR);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     //p->fillRect(r, base);

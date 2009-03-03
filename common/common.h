@@ -523,7 +523,8 @@ typedef enum
     FOCUS_STANDARD,
     FOCUS_HIGHLIGHT,
     FOCUS_FILLED,
-    FOCUS_BACKGROUND
+    FOCUS_BACKGROUND,
+    FOCUS_LINE
 } EFocus;
 
 #define DEF_IND_STR                "fontcolor"
