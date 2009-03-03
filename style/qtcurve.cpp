@@ -7641,8 +7641,9 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     if(r.width()>0 && r.height()>0)
     {
-        p->setClipPath(buildPath(r.adjusted(0, 0, -1, -1), w, round,
-                       getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL)));
+        double radius=getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL);
+        p->setClipPath(buildPath(r.adjusted(0, 0, radius>QTC_EXTRA_ETCH_RADIUS ? -1 : 0,
+                                            radius>QTC_EXTRA_ETCH_RADIUS ? -1 : 0), w, round, radius));
 
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
             drawProgressBevelGradient(p, r, option, horiz, app);
