@@ -1,10 +1,10 @@
 0.62.0
 ------
-1. Reduce gradient code complexity - makes predefined gradients
-   work in the same vein as custom gradients.
-2. Add scrollbar/slider groove and 'sunken' appearance options.
-3. Added new soft and harsh gradients.
-4. Change defaults:
+ 1. Reduce gradient code complexity - makes predefined gradients
+    work in the same vein as custom gradients.
+ 2. Add scrollbar/slider groove and 'sunken' appearance options.
+ 3. Added new soft and harsh gradients.
+ 4. Change defaults:
         Soft gradient
         Fade menuitems
         Don't use highlight for menu.
@@ -18,11 +18,12 @@
         Round slider
         Sunken scrollviews
         Sunken appearance set to soft
-5. Allow all bar flat and raised tabs to bol coloured.
-6. Only save appearance settings if different from default.
-7. If a gradient does not define the values for positions 0 and 100, then add these.
-8. Better colouring of selected tab.
-9. Added new focus option - line.
+ 5. Allow all bar flat and raised tabs to bol coloured.
+ 6. Only save appearance settings if different from default. 
+ 7. If a gradient does not define the values for positions 0 and 100, then add these.
+ 8. Better colouring of selected tab.
+ 9. Added new focus option - line.
+10. Add new round options - extra and max.
 
 0.61.4
 ------
