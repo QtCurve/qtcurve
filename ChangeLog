@@ -23,10 +23,11 @@
  7. If a gradient does not define the values for positions 0 and 100, then add these.
  8. Better colouring of selected tab.
  9. Added new focus option - line.
-10. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
-11. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
+10. Add new round options - extra and max.
+11. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
+12. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
     compiled against KDE.
-12. Fix shading of menuitems when slider is set to 'orig selected'
+13. Fix shading of menuitems when slider is set to 'orig selected'
 
 0.61.4
 ------

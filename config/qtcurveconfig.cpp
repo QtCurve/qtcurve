@@ -286,7 +286,8 @@ static void insertRoundEntries(QComboBox *combo)
     combo->insertItem(ROUND_NONE, i18n("Square"));
     combo->insertItem(ROUND_SLIGHT, i18n("Slightly rounded"));
     combo->insertItem(ROUND_FULL, i18n("Fully rounded"));
-//    combo->insertItem(ROUND_EXTRA, i18n("Extra rounded (KDE4 & Gtk2)"));
+    combo->insertItem(ROUND_EXTRA, i18n("Extra rounded (KDE4 & Gtk2)"));
+    combo->insertItem(ROUND_MAX, i18n("Max rounded (KDE4 & Gtk2)"));
 }
 
 static void insertMouseOverEntries(QComboBox *combo)
