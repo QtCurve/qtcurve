@@ -3646,7 +3646,7 @@ debugDisplayWidget(widget, 3);
                (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
                 fillVal=ORIGINAL_SHADE;
 
-            if(!mb && menuitem &&  APPEARANCE_FADE==opts.menuitemAppearance)
+            if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
             {
                 gboolean reverse=FALSE; /* TODO !!! */
                 int      roundOffet=QTC_ROUNDED ? 1 : 0,
@@ -3700,7 +3700,7 @@ debugDisplayWidget(widget, 3);
                                       TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
 
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, WIDGET_OTHER, 0, borderVal);
+                               itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
             }
             if(pbar && opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
