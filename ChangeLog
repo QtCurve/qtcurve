@@ -21,6 +21,8 @@
 5. Allow all bar flat and raised tabs to bol coloured.
 6. Only save appearance settings if different from default.
 7. If a gradient does not define the values for positions 0 and 100, then add these.
+8. Better colouring of selected tab.
+9. Added new focus option - line.
 
 0.61.4
 ------

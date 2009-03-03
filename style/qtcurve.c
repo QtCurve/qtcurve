@@ -1457,10 +1457,10 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
                 shade(base, &col, botTab ? QTC_MAX(val, 0.9) : val);
             }
-            if(sel && opts.colorSelTab && (topTab || botTab) && 0==i)
+            if(sel && opts.colorSelTab && (topTab || botTab) && i<grad->numStops-1)
             {
                 GdkColor t;
-                tintColor(&col, &qtcPalette.menuitem[0], &t, QTC_COLOR_SEL_TAB_FACTOR);
+                tintColor(&col, &qtcPalette.menuitem[0], &t, (1.0-grad->stops[i].pos)*QTC_COLOR_SEL_TAB_FACTOR);
                 col=t;
             }
             cairo_pattern_add_color_stop_rgb(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
@@ -5576,47 +5576,54 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         QTC_CAIRO_BEGIN
 
-        if(/*isList(widget) || */width<3 || height < 3)
-            drawRounded=FALSE;
-
-        cairo_new_path(cr);
-
-        if(isListViewHeader(widget))
+        if(FOCUS_LINE==opts.focus)
+            drawFadedLine(cr, x, y+height-1, width, 1, col, area, NULL, TRUE, TRUE, TRUE);
+        else
         {
-            btn=false;
-            height--;
-        }
+            if(/*isList(widget) || */width<3 || height < 3)
+                drawRounded=FALSE;
 
-        if(FOCUS_FILLED==opts.focus)
-        {
-            if(btn)
+            cairo_new_path(cr);
+
+            if(isListViewHeader(widget))
             {
-                gboolean d;
-
-                if(isButtonOnToolbar(widget, &d))
-                {
-                    x-=2, y-=2, width+=4, height+=4;
-                    if(!doEtch)
-                        x-=2, width+=4, y--, height+=2;
-                }
-                else
-                    x-=3, y-=3, width+=6, height+=6;
+                btn=false;
+                height--;
             }
+            if(FOCUS_FILLED==opts.focus)
+            {
+                if(btn)
+                {
+                    gboolean d;
 
+                    if(isButtonOnToolbar(widget, &d))
+                    {
+                        x-=2, y-=2, width+=4, height+=4;
+                        if(!doEtch)
+                            x-=2, width+=4, y--, height+=2;
+                    }
+                    else
+                        x-=3, y-=3, width+=6, height+=6;
+                }
+
+                if(drawRounded)
+                    createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
+                               RADIUS_SELECTION), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
+                else
+                    cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+                cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
+                cairo_fill(cr);
+                cairo_new_path(cr);
+            }
             if(drawRounded)
-                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
+                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
+                           RADIUS_SELECTION), FOCUS_FILLED==opts.focus && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
+                           ROUNDED_ALL);
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
-            cairo_fill(cr);
-            cairo_new_path(cr);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+            cairo_stroke(cr);
         }
-        if(drawRounded)
-            createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER, RADIUS_SELECTION), FOCUS_FILLED==opts.focus && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
-        else
-            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
-        cairo_stroke(cr);
         QTC_CAIRO_END
     }
     }
