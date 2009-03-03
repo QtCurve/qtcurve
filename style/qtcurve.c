@@ -3362,6 +3362,7 @@ debugDisplayWidget(widget, 3);
 
                 setCairoClipping(cr, area, NULL);
 
+                drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
                 if(horiz)
                 {
                     if(ROUNDED_LEFT==sbarRound || ROUNDED_ALL==sbarRound)
