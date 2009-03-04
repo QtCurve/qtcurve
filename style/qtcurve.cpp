@@ -3112,7 +3112,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
                                                         getRadius(opts.round, r2.width(), r2.height(), WIDGET_OTHER,
-                                                                  RADIUS_SELECTION)));
+                                                                  FOCUS_FILLED==opts.focus
+                                                                    ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
                         }
                         else
                             drawRect(painter, r2);
