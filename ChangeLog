@@ -33,6 +33,8 @@
     compiled against KDE.
 16. Fix shading of menuitems when slider is set to 'orig selected'
 17. Map more KDE4 icons.
+18. When drawing arrows (such as in KDE4 colour selector), assume the arrow is
+    enabled.
 
 0.61.5
 ------

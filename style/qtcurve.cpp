@@ -2392,10 +2392,15 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowLeft:
         case PE_IndicatorArrowRight:
+        {
+            QStyleOption opt(*option);
+
+            opt.state|=State_Enabled;
             if(state&(State_Sunken|State_On))
                 r.adjust(1, 1, 1, 1);
-            drawArrow(painter, r, option, element);
+            drawArrow(painter, r, &opt, element);
             break;
+        }
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
         case PE_IndicatorSpinUp:
