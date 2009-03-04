@@ -33,6 +33,10 @@
     compiled against KDE.
 16. Fix shading of menuitems when slider is set to 'orig selected'
 
+0.61.5
+------
+1. Try to prevent toolbar button text being clipped.
+
 0.61.4
 ------
 1. Fix settings for sliderThumbs, handles, toolbarSeparators, and splitters.

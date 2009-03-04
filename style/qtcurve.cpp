@@ -5332,7 +5332,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             pr.setHeight(pmSize.height() + 6);
 
-                            tr.adjust(0, pr.bottom(), 0, -3);
+                            tr.adjust(0, pr.bottom(), 0, 0); // -3);
                             pr.translate(shiftX, shiftY);
                             if (hasArrow)
                                 drawTbArrow(this, tb, pr, painter, widget);
