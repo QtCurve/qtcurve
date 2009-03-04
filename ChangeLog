@@ -27,7 +27,7 @@
 11. Don't etch disabled items.
 12. Use text colour for focus indicator in tree/list/etc views.
 13. When specifying custom gradients, add the pssibility to have no
-    internal border - optins are now none, light, 3d
+    internal border - options are now none, light, 3d
 
 0.61.5
 ------
