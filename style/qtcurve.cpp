@@ -3349,7 +3349,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
             }
             painter->save();
-            drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED, false);
+            drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_TAB_FRAME, BORDER_RAISED, false);
             painter->restore();
             break;
         }
@@ -4816,31 +4816,34 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      mouseOver(state&State_Enabled && state&State_MouseOver);
                 const QColor *use(backgroundColors(option));
                 const QColor &fill(getTabFill(selected, mouseOver, use));
+                double radius=getRadius(opts.round, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
 
                 painter->save();
                 switch(tab->shape)
                 {
                     case QTabBar::RoundedNorth:
                     case QTabBar::TriangularNorth:
-                        if(!selected)
-                            r.adjust(0, 2, 0, -2);
-
-                        if(!firstTab)
-                            r.adjust(-tabOverlap, 0, 0, 0);
-                        fillTab(painter, r.adjusted(1, 1, -1, 0), option, fill, true, WIDGET_TAB_TOP);
-
-                        // This clipping helps with plasma's tabs and nvidia
-                        if(selected)
-                            painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
-                        drawBorder(painter, r.adjusted(0, 0, 0, 4), option,
-                                    selected || onlyTab
+                    {
+                        int round=selected || onlyTab
                                         ? ROUNDED_TOP
                                         : firstTab
                                             ? ROUNDED_TOPLEFT
                                             : lastTab
                                                 ? ROUNDED_TOPRIGHT
-                                                : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                                : ROUNDED_NONE;
+                        if(!selected)
+                            r.adjust(0, 2, 0, -2);
+
+                        if(!firstTab)
+                            r.adjust(-tabOverlap, 0, 0, 0);
+                        painter->setClipPath(buildPath(r.adjusted(0, 0, 0, 4), WIDGET_TAB_TOP, round, radius));
+                        fillTab(painter, r.adjusted(1, 1, -1, 0), option, fill, true, WIDGET_TAB_TOP);
+                        painter->setClipping(false);
+                        // This clipping helps with plasma's tabs and nvidia
+                        if(selected)
+                            painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
+                        drawBorder(painter, r.adjusted(0, 0, 0, 4), option, round, NULL, WIDGET_TAB_TOP,
+                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -4892,24 +4895,27 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
+                    }
                     case QTabBar::RoundedSouth:
                     case QTabBar::TriangularSouth:
-                        if(!selected)
-                            r.adjust(0, 2, 0, -2);
-                        if(!firstTab)
-                            r.adjust(-tabOverlap, 0, 0, 0);
-
-                        fillTab(painter, r.adjusted(1, 0, -1, -1), option, fill, true, WIDGET_TAB_BOT);
-
-                        drawBorder(painter, r.adjusted(0, -4, 0, 0), option,
-                                    selected || onlyTab
+                    {
+                        int round=selected || onlyTab
                                         ? ROUNDED_BOTTOM
                                         : firstTab
                                             ? ROUNDED_BOTTOMLEFT
                                             : lastTab
                                                 ? ROUNDED_BOTTOMRIGHT
-                                                : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                                : ROUNDED_NONE;
+                        if(!selected)
+                            r.adjust(0, 2, 0, -2);
+                        if(!firstTab)
+                            r.adjust(-tabOverlap, 0, 0, 0);
+
+                        painter->setClipPath(buildPath(r.adjusted(0, -4, 0, 0), WIDGET_TAB_BOT, round, radius));
+                        fillTab(painter, r.adjusted(1, 0, -1, -1), option, fill, true, WIDGET_TAB_BOT);
+                        painter->setClipping(false);
+                        drawBorder(painter, r.adjusted(0, -4, 0, 0), option, round, NULL, WIDGET_TAB_BOT,
+                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -4956,24 +4962,27 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
+                    }
                     case QTabBar::RoundedWest:
                     case QTabBar::TriangularWest:
-                        if(!selected)
-                            r.adjust(2, 0, -2, 0);
-
-                        if(!firstTab)
-                            r.adjust(0, -tabOverlap, 0, 0);
-                        fillTab(painter, r.adjusted(1, 1, 0, -1), option, fill, false, WIDGET_TAB_TOP);
-
-                        drawBorder(painter, r.adjusted(0, 0, 4, 0), option,
-                                    selected || onlyTab
+                    {
+                        int round=selected || onlyTab
                                         ? ROUNDED_LEFT
                                         : firstTab
                                             ? ROUNDED_TOPLEFT
                                             : lastTab
                                                 ? ROUNDED_BOTTOMLEFT
-                                                : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_TOP, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                                : ROUNDED_NONE;
+                        if(!selected)
+                            r.adjust(2, 0, -2, 0);
+
+                        if(!firstTab)
+                            r.adjust(0, -tabOverlap, 0, 0);
+                        painter->setClipPath(buildPath(r.adjusted(0, 0, 4, 0), WIDGET_TAB_TOP, round, radius));
+                        fillTab(painter, r.adjusted(1, 1, 0, -1), option, fill, false, WIDGET_TAB_TOP);
+                        painter->setClipping(false);
+                        drawBorder(painter, r.adjusted(0, 0, 4, 0), option, round, NULL, WIDGET_TAB_TOP,
+                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -5020,24 +5029,27 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
+                    }
                     case QTabBar::RoundedEast:
                     case QTabBar::TriangularEast:
-                        if(!selected)
-                            r.adjust(2, 0, -2, 0);
-
-                        if(!firstTab)
-                            r.adjust(0, -tabOverlap, 0, 0);
-                        fillTab(painter, r.adjusted(0, 1, -1, -1), option, fill, false, WIDGET_TAB_BOT);
-
-                        drawBorder(painter, r.adjusted(-4, 0, 0, 0), option,
-                                    selected || onlyTab
+                    {
+                        int round=selected || onlyTab
                                         ? ROUNDED_RIGHT
                                         : firstTab
                                             ? ROUNDED_TOPRIGHT
                                             : lastTab
                                                 ? ROUNDED_BOTTOMRIGHT
-                                                : ROUNDED_NONE,
-                                    NULL, WIDGET_TAB_BOT, selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                                : ROUNDED_NONE;
+                        if(!selected)
+                            r.adjust(2, 0, -2, 0);
+
+                        if(!firstTab)
+                            r.adjust(0, -tabOverlap, 0, 0);
+                        painter->setClipPath(buildPath(r.adjusted(-4, 0, 0, 0), WIDGET_TAB_BOT, round, radius));
+                        fillTab(painter, r.adjusted(0, 1, -1, -1), option, fill, false, WIDGET_TAB_BOT);
+                        painter->setClipping(false);
+                        drawBorder(painter, r.adjusted(-4, 0, 0, 0), option, round, NULL, WIDGET_TAB_BOT,
+                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -5084,6 +5096,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
                         break;
+                    }
                 }
                 painter->restore();
             }

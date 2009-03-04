@@ -366,6 +366,7 @@ typedef enum
     WIDGET_SELECTION,
 #endif
     WIDGET_FOCUS,
+    WIDGET_TAB_FRAME,
     WIDGET_OTHER
 } EWidget;
 
@@ -1283,7 +1284,8 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                            ))
                         return 8.5;
                 case ROUND_EXTRA:
-                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                    if(widget!=WIDGET_MENU_ITEM && widget!=WIDGET_TAB_FRAME &&
+                       w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                         return QTC_EXTRA_INNER_RADIUS;
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
@@ -1307,7 +1309,8 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                            ))
                         return 9.5;
                 case ROUND_EXTRA:
-                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                    if(widget!=WIDGET_MENU_ITEM && widget!=WIDGET_TAB_FRAME &&
+                       w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                         return QTC_EXTRA_OUTER_RADIUS;
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
@@ -1331,7 +1334,8 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                            ))
                         return 10.5;
                 case ROUND_EXTRA:
-                    if(widget!=WIDGET_MENU_ITEM && w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
+                    if(widget!=WIDGET_MENU_ITEM && widget!=WIDGET_TAB_FRAME &&
+                       w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                         return QTC_EXTRA_ETCH_RADIUS;
                 case ROUND_FULL:
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
