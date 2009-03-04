@@ -1872,7 +1872,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_ComboBox_PopupFrameStyle:
             return QFrame::StyledPanel|QFrame::Plain;
         case SH_TabBar_Alignment:
-            return Qt::AlignLeft;
+            return opts.centerTabs ? Qt::AlignHCenter : Qt::AlignLeft;
         case SH_Header_ArrowAlignment:
             return Qt::AlignLeft;
         case SH_MessageBox_CenterButtons:
@@ -3312,7 +3312,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         {
             int round(ROUNDED_ALL);
 
-            if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
+            if(!opts.centerTabs && opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
             {
 #ifdef QTC_USE_KDE4
                 const KTabWidget *ktw=::qobject_cast<const KTabWidget *>(widget);
@@ -3352,7 +3352,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
             }
             painter->save();
-            drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_TAB_FRAME, BORDER_RAISED, false);
+            drawBorder(painter, r, option, round, backgroundColors(option),
+                       opts.centerTabs ? WIDGET_OTHER : WIDGET_TAB_FRAME, BORDER_RAISED, false);
             painter->restore();
             break;
         }
