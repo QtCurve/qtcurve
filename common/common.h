@@ -224,10 +224,13 @@ typedef GdkColor color;
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define QTC_DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    ((!SUKEN && (getGradient(APP, &opts)->lightBorder) && WIDGET_MENU_ITEM!=WIDGET && !IS_TROUGH(WIDGET) && \
+    ((!SUKEN && (GB_LIGHT==getGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=WIDGET && !IS_TROUGH(WIDGET) && \
                           (WIDGET_DEF_BUTTON!=WIDGET || IND_COLORED!=opts.defBtnIndicator)) || \
                           (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
                            APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
+
+#define QTC_DRAW_3D_BORDER(SUNKEN, APP) \
+    (!SUNKEN && GB_3D==getGradient(APP, &opts)->border)
 
 #define QTC_LIGHT_BORDER(APP) (APPEARANCE_DULL_GLASS==APP ? 1 : 0)
 
@@ -912,6 +915,13 @@ GradientStop
 #endif
 ;
 
+typedef enum
+{
+    GB_NONE,
+    GB_LIGHT,
+    GB_3D
+} EGradientBorder;
+
 #ifdef __cplusplus
 struct GradientStopCont : public std::set<GradientStop>
 {
@@ -925,7 +935,7 @@ struct GradientStopCont : public std::set<GradientStop>
 
             if((*first).pos>0.001)
                 c.insert(GradientStop(0.0, 1.0));
-            if((*last).pos<99.999)
+            if((*last).pos<0.999)
                 c.insert(GradientStop(1.0, 1.0));
         }
         return c;                                  
@@ -937,16 +947,16 @@ typedef struct
 #endif
 {
 #ifdef __cplusplus
-    Gradient() : lightBorder(false) { }
+    Gradient() : border(GB_3D) { }
 
 #ifdef QTC_CONFIG_DIALOG
     bool operator==(const Gradient &o) const
     {
-        return lightBorder==o.lightBorder && stops==o.stops;
+        return border==o.border && stops==o.stops;
     }
 #endif
 #endif
-    bool             lightBorder;
+    EGradientBorder  border;
 #ifdef __cplusplus
     GradientStopCont stops;
 #else
@@ -1130,12 +1140,12 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
     return opts->appearance;
 };
 
-static void setupGradient(Gradient *grad, bool lightBorder, int numStops, ...)
+static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
 {
     va_list  ap;
     int      i;
 
-    grad->lightBorder=lightBorder;
+    grad->border=border;
 #ifndef __cplusplus
     grad->numStops=numStops;
     grad->stops=malloc(sizeof(GradientStop) * numStops*2);
@@ -1179,16 +1189,16 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 
     if(!init)
     {
-        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], false,2,0.0,1.0,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_RAISED], true,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_RAISED], true,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
-        setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.04,1.0,0.98);
-        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.1,1.0,0.94);
-        setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_RAISED], false,2,0.0,1.3,1.0,0.925);
-        setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_RAISED], false,2,0.0,0.93,1.0,1.04);
-        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], false,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
-        setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], false,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
-        setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], false,3,0.0,1.00,0.85,1.0,1.0,0.90);
+        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], GB_3D,2,0.0,1.0,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
+        setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.04,1.0,0.98);
+        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.1,1.0,0.94);
+        setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.3,1.0,0.925);
+        setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_RAISED], GB_3D,2,0.0,0.93,1.0,1.04);
+        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], GB_3D,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
+        setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
+        setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
         init=true;
     }
 

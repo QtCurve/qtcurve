@@ -353,6 +353,13 @@ static void insertFocusEntries(QComboBox *combo)
     combo->insertItem(FOCUS_LINE, i18n("Line drawn with highlight color"));
 }
 
+static void insertGradBorderEntries(QComboBox *combo)
+{
+    combo->insertItem(GB_NONE, i18n("No border"));
+    combo->insertItem(GB_LIGHT, i18n("Light border"));
+    combo->insertItem(GB_3D, i18n("3D border"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                exportDialog(NULL)
@@ -394,6 +401,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertSliderStyleEntries(sliderStyle);
     insertEColorEntries(progressGrooveColor);
     insertFocusEntries(focus);
+    insertGradBorderEntries(gradBorder);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -701,7 +709,7 @@ void QtCurveConfig::gradChanged(int i)
     if(it!=customGradient.end())
     {
         gradPreview->setGrad((*it).second.stops);
-        gradLightBorder->setChecked((*it).second.lightBorder);
+        gradBorder->setCurrentIndex((*it).second.border);
 
         GradientStopCont::const_iterator git((*it).second.stops.begin()),
                                          gend((*it).second.stops.end());
@@ -721,10 +729,10 @@ void QtCurveConfig::gradChanged(int i)
     else
     {
         gradPreview->setGrad(GradientStopCont());
-        gradLightBorder->setChecked(false);
+        gradBorder->setCurrentIndex(GB_3D);
     }
 
-    gradLightBorder->setEnabled(QTC_NUM_CUSTOM_GRAD!=i);
+    gradBorder->setEnabled(QTC_NUM_CUSTOM_GRAD!=i);
 }
 
 static double prev=0.0;
@@ -776,7 +784,7 @@ void QtCurveConfig::addGradStop()
     {
         Gradient cust;
 
-        cust.lightBorder=gradLightBorder->isChecked();
+        cust.border=(EGradientBorder)gradBorder->currentIndex();
         cust.stops.insert(GradientStop(stopPosition->value()/100.0, stopValue->value()/100.0));
         customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
         added=true;

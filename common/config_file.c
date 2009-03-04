@@ -333,6 +333,20 @@ static EFocus toFocus(const char *str, EFocus def)
     return def;
 }
 
+static EGradientBorder toGradientBorder(const char *str)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "light", 5) || 0==memcmp(str, "true", 4))
+            return GB_LIGHT;
+        if(0==memcmp(str, "none", 4))
+            return GB_NONE;
+        if(0==memcmp(str, "3d", 2) || 0==memcmp(str, "false", 5))
+            return GB_3D;
+    }
+    return GB_3D;
+}
+
 #endif
 
 #ifdef CONFIG_WRITE
@@ -801,7 +815,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     opts->customGradient[i]->numStops=def->customGradient[i]->numStops;
                     opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
                     memcpy(opts->customGradient[i]->stops, def->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
-                    opts->customGradient[i]->lightBorder=def->customGradient[i]->lightBorder;
+                    opts->customGradient[i]->border=def->customGradient[i]->border;
                 }
 #endif
             /* Check if the config file expects old default values... */
@@ -1003,30 +1017,21 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                                end(vals.end());
                     bool                       ok(true);
                     Gradient                   grad;
+                    int                        j;
 
-                    if((*it)=="true")
-                        grad.lightBorder=true;
-                    else if((*it)=="false")
-                        grad.lightBorder=false;
-                    else
-                        ok=false;
+                    grad.border=toGradientBorder(QTC_LATIN1((*it)));
 
-                    if(ok)
+                    for(++it, j=0; it!=end && ok; ++it, ++j)
                     {
-                        int j;
+                        double pos=(*it).toDouble(&ok),
+                               val=ok ? (*(++it)).toDouble(&ok) : 0.0;
 
-                        for(++it, j=0; it!=end && ok; ++it, ++j)
-                        {
-                            double pos=(*it).toDouble(&ok),
-                                   val=ok ? (*(++it)).toDouble(&ok) : 0.0;
+                        if(ok)
+                            ok=(pos>=0 && pos<=1.0) &&
+                                (val>=0.0 && val<=2.0);
 
-                            if(ok)
-                                ok=(pos>=0 && pos<=1.0) &&
-                                   (val>=0.0 && val<=2.0);
-
-                            if(ok)
-                                grad.stops.insert(GradientStop(pos, val));
-                        }
+                        if(ok)
+                            grad.stops.insert(GradientStop(pos, val));
                     }
 
                     if(ok)
@@ -1106,85 +1111,75 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
                         if(c)
                         {
-                            bool lb=false,
-                                 ok=true;
+                            EGradientBorder border=toGradientBorder(str);
+                            bool            ok=true;
 
                             *c='\0';
-                            if(0==memcmp(str, "true", 4))
-                                lb=true;
-                            else if(0==memcmp(str, "false", 4))
-                                lb=false;
-                            else
-                                ok=false;
 
-                            if(ok)
+                            opts->customGradient[i]=malloc(sizeof(Gradient));
+                            opts->customGradient[i]->numStops=comma/2;
+                            opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops);
+                            opts->customGradient[i]->border=border;
+                            str=c+1;
+                            for(j=0; j<comma && str && ok; j+=2)
                             {
-                                opts->customGradient[i]=malloc(sizeof(Gradient));
-                                opts->customGradient[i]->numStops=comma/2;
-                                opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops);
-                                opts->customGradient[i]->lightBorder=lb;
+                                c=strchr(str, ',');
 
-                                str=c+1;
-                                for(j=0; j<comma && str && ok; j+=2)
+                                if(c)
                                 {
-                                    c=strchr(str, ',');
+                                    *c='\0';
+                                    opts->customGradient[i]->stops[j/2].pos=g_ascii_strtod(str, NULL);
+                                    str=c+1;
+                                    c=str ? strchr(str, ',') : 0L;
 
-                                    if(c)
+                                    if(c || str)
                                     {
-                                        *c='\0';
-                                        opts->customGradient[i]->stops[j/2].pos=g_ascii_strtod(str, NULL);
-                                        str=c+1;
-                                        c=str ? strchr(str, ',') : 0L;
-
-                                        if(c || str)
-                                        {
-                                            if(c)
-                                                *c='\0';
-                                            opts->customGradient[i]->stops[j/2].val=g_ascii_strtod(str, NULL);
-                                            str=c ? c+1 : c;
-                                        }
-                                        else
-                                            ok=false;
+                                        if(c)
+                                            *c='\0';
+                                        opts->customGradient[i]->stops[j/2].val=g_ascii_strtod(str, NULL);
+                                        str=c ? c+1 : c;
                                     }
                                     else
                                         ok=false;
                                 }
-
-                                if(ok)
-                                {
-                                    int addStart=0,
-                                        addEnd=0;
-                                    if(opts->customGradient[i]->stops[0].pos>0.001)
-                                        addStart=1;
-                                    if(opts->customGradient[i]->stops[opts->customGradient[i]->numStops-1].pos<99.999)
-                                        addEnd=1;
-                                    if(addStart || addEnd)
-                                    {
-                                        int          newSize=opts->customGradient[i]->numStops+addStart+addEnd;
-                                        GradientStop *stops=malloc(sizeof(GradientStop) * newSize*2);
-
-                                        if(addStart)
-                                        {
-                                            stops[0].pos=0.0;
-                                            stops[0].val=1.0;
-                                        }
-                                        memcpy(&stops[1], opts->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
-                                        if(addEnd)
-                                        {
-                                            stops[opts->customGradient[i]->numStops+1].pos=1.0;
-                                            stops[opts->customGradient[i]->numStops+1].val=1.0;
-                                        }
-                                        opts->customGradient[i]->numStops=newSize;
-                                        free(opts->customGradient[i]->stops);
-                                        opts->customGradient[i]->stops=stops;
-                                    }
-                                }
                                 else
+                                    ok=false;
+                            }
+
+                            if(ok)
+                            {
+                                int addStart=0,
+                                    addEnd=0;
+                                if(opts->customGradient[i]->stops[0].pos>0.001)
+                                    addStart=1;
+                                if(opts->customGradient[i]->stops[opts->customGradient[i]->numStops-1].pos<0.999)
+                                    addEnd=1;
+                                if(addStart || addEnd)
                                 {
+                                    int          newSize=opts->customGradient[i]->numStops+addStart+addEnd;
+                                    GradientStop *stops=malloc(sizeof(GradientStop) * newSize*2);
+
+                                    if(addStart)
+                                    {
+                                        stops[0].pos=0.0;
+                                        stops[0].val=1.0;
+                                    }
+                                    memcpy(&stops[1], opts->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
+                                    if(addEnd)
+                                    {
+                                        stops[opts->customGradient[i]->numStops+1].pos=1.0;
+                                        stops[opts->customGradient[i]->numStops+1].val=1.0;
+                                    }
+                                    opts->customGradient[i]->numStops=newSize;
                                     free(opts->customGradient[i]->stops);
-                                    free(opts->customGradient[i]);
-                                    opts->customGradient[i]=0L;
+                                    opts->customGradient[i]->stops=stops;
                                 }
+                            }
+                            else
+                            {
+                                free(opts->customGradient[i]->stops);
+                                free(opts->customGradient[i]);
+                                opts->customGradient[i]=0L;
                             }
                         }
                     }
@@ -1756,6 +1751,20 @@ static const char *toStr(EFocus f)
     }
 }
 
+static const char *toStr(EGradientBorder g)
+{
+    switch(g)
+    {
+        case GB_NONE:
+            return "none";
+        case GB_LIGHT:
+            return "light";
+        default:
+        case GB_3D:
+            return "3d";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -1918,7 +1927,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
                 QTextStream str(&gradVal, IO_WriteOnly);
 #endif
 
-                str << (const char *)((*cg).second.lightBorder ? "true" : "false");
+                str << toStr((*cg).second.border);
 
                 GradientStopCont                 stops((*cg).second.stops.fix());
                 GradientStopCont::const_iterator it(stops.begin()),

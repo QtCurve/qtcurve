@@ -2854,7 +2854,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
             bool         drawSunken=opts.crButton ? sunken : false,
                          lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                         drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
+                         draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
+                         drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d);
 
             painter->save();
             if(IS_FLAT(opts.appearance))
@@ -2958,7 +2959,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
             bool        drawSunken=opts.crButton ? sunken : false,
                         lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                        drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app)),
+                        draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
+                        drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d),
                         doneShadow=false;
 
             clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
@@ -7601,6 +7603,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  lightBorder(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
+                 draw3d(!lightBorder && WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w &&
+                        QTC_DRAW_3D_BORDER(sunken, app)),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
                                      !(option->state&QTC_STATE_KWIN_BUTTON) &&
@@ -7725,7 +7729,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
-            (!IS_GLASS(app) && !sunken && option->state&State_Raised))
+            (draw3d && option->state&State_Raised))
     {
         QPainterPath innerTlPath,
                      innerBrPath;
