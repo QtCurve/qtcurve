@@ -1699,6 +1699,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                                        (MO_COLORED==opts.coloredMouseOver ||
                                               (MO_GLOW==opts.coloredMouseOver && WIDGET_COMBO!=widget && !ETCH_WIDGET(widget))),
                 lightBorder=QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
+                draw3d=!lightBorder && QTC_DRAW_3D_BORDER(sunken, app),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || WIDGET_COMBO_BUTTON==widget) && QTC_DO_EFFECT,
                 horiz=!(flags&DF_VERT);
@@ -1829,7 +1830,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         createPath(cr, xd, yd, width-1, height-1, getRadius(opts.round, width, height, widget, RADIUS_INTERNAL), round);
         cairo_stroke(cr);
     }
-    else if(colouredMouseOver || (!IS_GLASS(app) && (!sunken || flags&DF_DRAW_INSIDE)))
+    else if(colouredMouseOver || (!sunken && (draw3d || flags&DF_DRAW_INSIDE)))
     {
         int      dark=bevelledButton ? 2 : 4;
         GdkColor *col1=colouredMouseOver ? &qtcPalette.mouseover[QTC_MO_STD_LIGHT(widget, sunken)]
@@ -4094,7 +4095,8 @@ debugDisplayWidget(widget, 3);
         gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
                     lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                    drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
+                    draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
+                    drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d);
         GdkColor    *colors=coloredMouseOver
                        ? qtcPalette.mouseover
                        : btn_colors;
@@ -4229,7 +4231,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
         gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : false,
                     lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                    drawLight=opts.crButton && !drawSunken && (lightBorder || !IS_GLASS(app));
+                    draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
+                    drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d);
 
 //         x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
 //         y+=((height-QTC_RADIO_SIZE)>>1)+1;
