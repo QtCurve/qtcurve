@@ -3080,27 +3080,22 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 else
                 {
                     //Figuring out in what beast we are painting...
-                    const QColor *use(FOCUS_BACKGROUND==opts.focus ?  backgroundColors(option) : itsMenuitemCols);
-
-                    painter->save();
-                    QColor c(use[FOCUS_BACKGROUND!=opts.focus && state&State_Selected ? 3 : QT_FOCUS]);
-
-                    if(FOCUS_LINE==opts.focus)
-                        drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-1, r2.width(), 1),
-                                      c, true, true, true);
-                    else
-                    {
-                        bool drawRounded(QTC_ROUNDED);
-
-                        if(drawRounded &&
-                           (r2.width()<4 || r2.height()<4 ||
-                           (widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) ||
+                    bool view((widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) ||
                                         widget->inherits("Q3ScrollView"))) ||
                                          (widget && widget->parent() &&
                                             ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
-                                                       widget->parent()->inherits("Q3ScrollView")))))
-                            drawRounded=false;
+                                              widget->parent()->inherits("Q3ScrollView"))));
+                    const QColor *use(view ? 0L : (FOCUS_BACKGROUND==opts.focus ?  backgroundColors(option) : itsMenuitemCols));
 
+                    painter->save();
+                    QColor c(view ? state&State_Selected ? palette.highlightedText().color() : palette.text().color()
+                                  : use[FOCUS_BACKGROUND!=opts.focus && state&State_Selected ? 3 : QT_FOCUS]);
+
+                    if(FOCUS_LINE==opts.focus)
+                        drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-(view ? 3 : 1), r2.width(), 1),
+                                      c, true, true, true);
+                    else
+                    {
                         painter->setPen(c);
                         if(FOCUS_FILLED==opts.focus)
                         {
