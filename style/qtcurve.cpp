@@ -1884,7 +1884,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_DitherDisabledText:
             return false;
         case SH_EtchDisabledText:
-            return true;
+            return false;
         case SH_WindowFrame_Mask:
             if (QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
             {
@@ -4318,19 +4318,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->drawPixmap(pmr.topLeft(), pixmap);
                 }
 
-                painter->setPen(selected && opts.useHighlightForMenu ? palette.highlightedText().color() : palette.foreground().color());
+                painter->setPen(dis
+                                    ? palette.text().color()
+                                    : selected && opts.useHighlightForMenu
+                                        ? palette.highlightedText().color()
+                                        : palette.foreground().color());
 
                 int    x, y, w, h,
                        tab(menuItem->tabWidth);
-                QColor discol;
 
                 menuItem->rect.getRect(&x, &y, &w, &h);
-
-                if (dis)
-                {
-                    discol = palette.text().color();
-                    painter->setPen(discol);
-                }
 
                 int     xm(windowsItemFrame + checkcol + windowsItemHMargin),
                         xpos(menuItem->rect.x() + xm);
@@ -4343,8 +4340,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     int t(s.indexOf(QLatin1Char('\t'))),
                         textFlags(Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine);
 
-                    painter->save();
-
                     if (!styleHint(SH_UnderlineShortcut, menuItem, widget))
                         textFlags |= Qt::TextHideMnemonic;
                     textFlags |= Qt::AlignLeft;
@@ -4354,12 +4349,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         QRect vShortcutRect(visualRect(option->direction, menuItem->rect,
                                                     QRect(textRect.topRight(), QPoint(menuItem->rect.right(), textRect.bottom()))));
 
-                        if (dis) //  && !act)
-                        {
-                            painter->setPen(palette.light().color());
-                            painter->drawText(vShortcutRect.adjusted(1, 1, 1, 1), textFlags, s.mid(t + 1));
-                            painter->setPen(discol);
-                        }
                         painter->drawText(vShortcutRect, textFlags, s.mid(t + 1));
                         s = s.left(t);
                     }
@@ -4370,14 +4359,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         font.setBold(true);
 
                     painter->setFont(font);
-                    if (dis) //  && !act)
-                    {
-                        painter->setPen(palette.light().color());
-                        painter->drawText(vTextRect.adjusted(1, 1, 1, 1), textFlags, s.left(t));
-                        painter->setPen(discol);
-                    }
                     painter->drawText(vTextRect, textFlags, s.left(t));
-                    painter->restore();
                 }
 
                 // Arrow
