@@ -32,6 +32,7 @@
 15. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
     compiled against KDE.
 16. Fix shading of menuitems when slider is set to 'orig selected'
+17. Map more KDE4 icons.
 
 0.61.5
 ------

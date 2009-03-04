@@ -2019,29 +2019,29 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
             return KIconLoader::global()->loadIcon("dialog-error", KIconLoader::Dialog, 32);
         case SP_MessageBoxQuestion:
             return KIconLoader::global()->loadIcon("dialog-information", KIconLoader::Dialog, 32);
-//         case SP_DesktopIcon:
-//             return KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 16);
-//         case SP_TrashIcon:
-//             return KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 16);
-//         case SP_ComputerIcon:
-//             return KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 16);
-//         case SP_DriveFDIcon:
-//             return KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 16);
-//         case SP_DriveHDIcon:
-//             return KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 16);
-//         case SP_DriveCDIcon:
-//         case SP_DriveDVDIcon:
-//             return KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 16);
-//         case SP_DriveNetIcon:
-//             return KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 16);
-//         case SP_DirOpenIcon:
-//             return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
-//         case SP_DirIcon:
-//         case SP_DirClosedIcon:
-//             return KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16);
+        case SP_DesktopIcon:
+            return KIconLoader::global()->loadIcon("user-desktop", KIconLoader::Small, 16);
+        case SP_TrashIcon:
+            return KIconLoader::global()->loadIcon("user-trash", KIconLoader::Small, 16);
+        case SP_ComputerIcon:
+            return KIconLoader::global()->loadIcon("computer", KIconLoader::Small, 16);
+        case SP_DriveFDIcon:
+            return KIconLoader::global()->loadIcon("media-floppy", KIconLoader::Small, 16);
+        case SP_DriveHDIcon:
+            return KIconLoader::global()->loadIcon("drive-harddisk", KIconLoader::Small, 16);
+        case SP_DriveCDIcon:
+        case SP_DriveDVDIcon:
+            return KIconLoader::global()->loadIcon("media-optical", KIconLoader::Small, 16);
+        case SP_DriveNetIcon:
+            return KIconLoader::global()->loadIcon("network-server", KIconLoader::Small, 16);
+        case SP_DirOpenIcon:
+            return KIconLoader::global()->loadIcon("document-open", KIconLoader::Small, 16);
+        case SP_DirIcon:
+        case SP_DirClosedIcon:
+            return KIconLoader::global()->loadIcon("folder", KIconLoader::Small, 16);
 //         case SP_DirLinkIcon:
-//         case SP_FileIcon:
-//             return KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16);
+        case SP_FileIcon:
+            return KIconLoader::global()->loadIcon("application-x-zerosize", KIconLoader::Small, 16);
 //         case SP_FileLinkIcon:
 //         case SP_ToolBarHorizontalExtensionButton:
 //         case SP_ToolBarVerticalExtensionButton:
@@ -2104,8 +2104,8 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
             return KIconLoader::global()->loadIcon(Qt::RightToLeft==QApplication::layoutDirection()
                                                     ? (fd ? "go-previous" : "arrow-left")
                                                     : (fd ? "go-next" : "arrow-right"), KIconLoader::Dialog, 32);
-//         case SP_DirHomeIcon:
-//             return KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 16);
+        case SP_DirHomeIcon:
+            return KIconLoader::global()->loadIcon("user-home", KIconLoader::Small, 16);
 //         case SP_CommandLink:
 //         case SP_VistaShield:
         case SP_BrowserReload:
@@ -2160,29 +2160,29 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
             return KIcon("dialog-error");
         case SP_MessageBoxQuestion:
             return KIcon("dialog-information");
-//         case SP_DesktopIcon:
-//             return KIcon("user-desktop");
-//         case SP_TrashIcon:
-//             return KIcon("user-trash");
-//         case SP_ComputerIcon:
-//             return KIcon("computer");
-//         case SP_DriveFDIcon:
-//             return KIcon("media-floppy");
-//         case SP_DriveHDIcon:
-//             return KIcon("drive-harddisk");
-//         case SP_DriveCDIcon:
-//         case SP_DriveDVDIcon:
-//             return KIcon("media-optical");
-//         case SP_DriveNetIcon:
-//             return KIcon("network-server");
-//         case SP_DirOpenIcon:
-//             return KIcon("document-open");
-//         case SP_DirIcon:
-//         case SP_DirClosedIcon:
-//             return KIcon("folder");
+        case SP_DesktopIcon:
+            return KIcon("user-desktop");
+        case SP_TrashIcon:
+            return KIcon("user-trash");
+        case SP_ComputerIcon:
+            return KIcon("computer");
+        case SP_DriveFDIcon:
+            return KIcon("media-floppy");
+        case SP_DriveHDIcon:
+            return KIcon("drive-harddisk");
+        case SP_DriveCDIcon:
+        case SP_DriveDVDIcon:
+            return KIcon("media-optical");
+        case SP_DriveNetIcon:
+            return KIcon("network-server");
+        case SP_DirOpenIcon:
+            return KIcon("document-open");
+        case SP_DirIcon:
+        case SP_DirClosedIcon:
+            return KIcon("folder");
 //         case SP_DirLinkIcon:
-//         case SP_FileIcon:
-//             return KIcon("application-x-zerosize");
+        case SP_FileIcon:
+            return KIcon("application-x-zerosize");
 //         case SP_FileLinkIcon:
 //         case SP_ToolBarHorizontalExtensionButton:
 //         case SP_ToolBarVerticalExtensionButton:
@@ -2244,8 +2244,8 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
             return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
                                                     ? "go-previous"
                                                     : "go-next");
-//         case SP_DirHomeIcon:
-//             return KIcon("user-home");
+        case SP_DirHomeIcon:
+            return KIcon("user-home");
 //         case SP_CommandLink:
 //         case SP_VistaShield:
         case SP_BrowserReload:
