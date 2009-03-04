@@ -2793,9 +2793,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_PanelLineEdit:
+            painter->setClipPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, ROUNDED_ALL,
+                                           getRadius(opts.round, r.width(), r.height(), WIDGET_ENTRY, RADIUS_EXTERNAL)));
             painter->fillRect(QTC_DO_EFFECT
                                 ? r.adjusted(2, 2, -2, -2)
                                 : r.adjusted(1, 1, -1, -1), palette.brush(QPalette::Base));
+            painter->setClipping(false);
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
@@ -8154,7 +8157,12 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
         r.adjust(1, 1, -1, -1);
 
     if(fill)
+    {
+        p->setClipPath(buildPath(r, WIDGET_ENTRY, round,
+                                 getRadius(opts.round, r.width(), r.height(), WIDGET_ENTRY, RADIUS_EXTERNAL)));
         p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.brush(QPalette::Base));
+        p->setClipping(false);
+    }
 
     if(doEtch)
         drawEtch(p, rx, widget, WIDGET_ENTRY, false);
