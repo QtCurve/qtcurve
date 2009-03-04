@@ -2931,7 +2931,7 @@ debugDisplayWidget(widget, 3);
             }
             else
             {
-                gboolean glowFocus=GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && FOCUS_FILLED==opts.focus;
+                gboolean glowFocus=GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && QTC_FULL_FOCUS;
                 EWidget  widgetType=isComboBoxButton(widget)
                                     ? WIDGET_COMBO_BUTTON
                                     : slider
@@ -5558,7 +5558,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
              rev=widget && reverseLayout(widget->parent),
              view=isList(widget);
 
-    if(opts.comboSplitter && FOCUS_FILLED!=opts.focus && isComboBox(widget))
+    if(opts.comboSplitter && !QTC_FULL_FOCUS && isComboBox(widget))
     {
 /*
         x++;
@@ -5577,7 +5577,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else if(GTK_IS_OPTION_MENU(widget))
     {
-        if((!opts.comboSplitter || FOCUS_FILLED==opts.focus) && widget && widget->allocation.width>width)
+        if((!opts.comboSplitter || QTC_FULL_FOCUS) && widget && widget->allocation.width>width)
             width=widget->allocation.width-(doEtch ? 8 : 4);
 
         x++, y++, width-=2, height-=2;
@@ -5625,7 +5625,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 btn=false;
                 height--;
             }
-            if(FOCUS_FILLED==opts.focus)
+            if(QTC_FULL_FOCUS)
             {
                 if(btn)
                 {
@@ -5641,19 +5641,22 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         x-=3, y-=3, width+=6, height+=6;
                 }
 
-                if(drawRounded)
-                    createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
-                               RADIUS_EXTERNAL), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
-                else
-                    cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-                cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
-                cairo_fill(cr);
-                cairo_new_path(cr);
+                if(FOCUS_FILLED==opts.focus)
+                {
+                    if(drawRounded)
+                        createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
+                                   RADIUS_EXTERNAL), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
+                    else
+                        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+                    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
+                    cairo_fill(cr);
+                    cairo_new_path(cr);
+                }
             }
             if(drawRounded)
                 createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
-                           FOCUS_FILLED==opts.focus ? RADIUS_EXTERNAL : RADIUS_SELECTION),
-                           FOCUS_FILLED==opts.focus && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
+                           QTC_FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION),
+                           QTC_FULL_FOCUS && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
                            ROUNDED_ALL);
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
