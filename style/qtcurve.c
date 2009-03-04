@@ -5523,7 +5523,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     gboolean doEtch=QTC_DO_EFFECT,
              btn=false,
              comboButton=false,
-             rev=reverseLayout(widget->parent);
+             rev=widget && reverseLayout(widget->parent);
 
     if(opts.comboSplitter && FOCUS_FILLED!=opts.focus && isComboBox(widget))
     {

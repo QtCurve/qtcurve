@@ -25,6 +25,10 @@
  9. Added new focus option - line.
 10. Add new round options - extra and max.
 
+0.61.5
+------
+1. Fix crash when drawing focus - occurs when using alt-tab in xfwm4
+
 0.61.4
 ------
 1. Make squared scrollview appearance consistent when round is set to none.
