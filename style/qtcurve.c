@@ -1682,6 +1682,14 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
     unsetCairoClipping(cr);
 }
 
+static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, int rad, int round)
+{
+    cairo_new_path(cr);
+    cairo_save(cr);
+    createPath(cr, x+0.5, y+0.5, w-1, h-1, getRadius(opts.round, w, h, widget, rad), round);
+    cairo_clip(cr);
+}
+
 static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkStateType state,
                            GdkRectangle *area, GdkRegion *region, gint x, gint y, gint width,
                            gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
@@ -1717,11 +1725,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
     if(width>0 && height>0)
     {
-        cairo_new_path(cr);
-        cairo_save(cr);
-        createPath(cr, xd, yd, width-1, height-1, getRadius(opts.round, width, height, widget, RADIUS_INTERNAL), round);
-        cairo_clip(cr);
-
+        clipPath(cr, x, y, width, height, widget, RADIUS_INTERNAL, round);
         drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, base, horiz,
                           sunken && !IS_TROUGH(widget), app, widget);
 
@@ -4004,7 +4008,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
 
         drawBorder(cr, widget && widget->parent ? widget->parent->style : style, state,
                    area, NULL, x, y, width, height, NULL, round,
-                   borderProfile, WIDGET_OTHER, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
+                   borderProfile, WIDGET_TAB_FRAME, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
     }
 
     if(gap_width>0)
@@ -4966,22 +4970,24 @@ debugDisplayWidget(widget, 3);
         switch(gap_side)
         {
             case GTK_POS_TOP:  /* => tabs are on bottom !!! */
-    #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-                if(!active)
-                    height-=2;
-    #endif
-                fillTab(cr, style, window, area, state, col, x+mod, y, width-(2*mod), height-1, TRUE,
-                        WIDGET_TAB_BOT, NULL!=notebook);
-
-                drawBorder(cr, style, state, area, NULL, x, y-4, width, height+4,
-                           qtcPalette.background,
-                           active || (firstTab && lastTab)
+            {
+                int round=active || (firstTab && lastTab)
                                     ? ROUNDED_BOTTOM
                                     : firstTab
                                         ? ROUNDED_BOTTOMLEFT
                                         : lastTab
                                             ? ROUNDED_BOTTOMRIGHT
-                                            : ROUNDED_NONE,
+                                            : ROUNDED_NONE;
+    #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
+                if(!active)
+                    height-=2;
+    #endif
+                clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
+                fillTab(cr, style, window, area, state, col, x+mod, y, width-(2*mod), height-1, TRUE,
+                        WIDGET_TAB_BOT, NULL!=notebook);
+                cairo_restore(cr);
+                drawBorder(cr, style, state, area, NULL, x, y-4, width, height+4,
+                           qtcPalette.background, round,
                            active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
@@ -5009,7 +5015,16 @@ debugDisplayWidget(widget, 3);
                 }
 
                 break;
+            }
             case GTK_POS_BOTTOM: /* => tabs are on top !!! */
+            {
+                int round=active || (firstTab && lastTab)
+                                    ? ROUNDED_TOP
+                                    : firstTab
+                                        ? ROUNDED_TOPLEFT
+                                        : lastTab
+                                            ? ROUNDED_TOPRIGHT
+                                            : ROUNDED_NONE;
     #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
                 if(!active)
                 {
@@ -5017,18 +5032,12 @@ debugDisplayWidget(widget, 3);
                     height-=2;
                 }
     #endif
+                clipPath(cr, x, y, width, height+4, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
                 fillTab(cr, style, window, area, state, col, x+mod, y+1, width-(2*mod), height-1, TRUE,
                         WIDGET_TAB_TOP, NULL!=notebook);
-
+                cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y, width, height+4,
-                           qtcPalette.background,
-                           active || (firstTab && lastTab)
-                                    ? ROUNDED_TOP
-                                    : firstTab
-                                        ? ROUNDED_TOPLEFT
-                                        : lastTab
-                                            ? ROUNDED_TOPRIGHT
-                                            : ROUNDED_NONE,
+                           qtcPalette.background, round,
                            active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
@@ -5055,23 +5064,26 @@ debugDisplayWidget(widget, 3);
                     drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, sx, y, sw);
                 }
                 break;
+            }
             case GTK_POS_LEFT: /* => tabs are on right !!! */
-    #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
-                if(!active)
-                    width-=2;
-    #endif
-                fillTab(cr, style, window, area, state, col, x, y+mod, width-1, height-(2*mod), FALSE,
-                        WIDGET_TAB_BOT, NULL!=notebook);
-
-                drawBorder(cr, style, state, area, NULL, x-4, y, width+4, height,
-                           qtcPalette.background,
-                           active || (firstTab && lastTab)
+            {
+                int round=active || (firstTab && lastTab)
                                     ? ROUNDED_RIGHT
                                     : firstTab
                                         ? ROUNDED_TOPRIGHT
                                         : lastTab
                                             ? ROUNDED_BOTTOMRIGHT
-                                            : ROUNDED_NONE,
+                                            : ROUNDED_NONE;
+    #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
+                if(!active)
+                    width-=2;
+    #endif
+                clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
+                fillTab(cr, style, window, area, state, col, x, y+mod, width-1, height-(2*mod), FALSE,
+                        WIDGET_TAB_BOT, NULL!=notebook);
+                cairo_restore(cr);
+                drawBorder(cr, style, state, area, NULL, x-4, y, width+4, height,
+                           qtcPalette.background, round,
                            active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
@@ -5098,7 +5110,16 @@ debugDisplayWidget(widget, 3);
                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x+width-1, sy, sh);
                 }
                 break;
+            }
             case GTK_POS_RIGHT: /* => tabs are on left !!! */
+            {
+                int round=active || (firstTab && lastTab)
+                                    ? ROUNDED_LEFT
+                                    : firstTab
+                                        ? ROUNDED_TOPLEFT
+                                        : lastTab
+                                            ? ROUNDED_BOTTOMLEFT
+                                            : ROUNDED_NONE;
     #if GTK_CHECK_VERSION(2, 10, 0) && !GTK_CHECK_VERSION(2, 10, 11)
                 if(!active)
                 {
@@ -5106,18 +5127,12 @@ debugDisplayWidget(widget, 3);
                     width-=2;
                 }
     #endif
+                clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
                 fillTab(cr, style, window, area, state, col, x+1, y+mod, width-1, height-(2*mod),
                         FALSE, WIDGET_TAB_TOP, NULL!=notebook);
-
+                cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y, width+4, height,
-                           qtcPalette.background,
-                           active || (firstTab && lastTab)
-                                    ? ROUNDED_LEFT
-                                    : firstTab
-                                        ? ROUNDED_TOPLEFT
-                                        : lastTab
-                                            ? ROUNDED_BOTTOMLEFT
-                                            : ROUNDED_NONE,
+                           qtcPalette.background, round,
                            active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
@@ -5144,6 +5159,7 @@ debugDisplayWidget(widget, 3);
                     drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x, sy, sh);
                 }
                 break;
+            }
         }
         QTC_CAIRO_END
     }
