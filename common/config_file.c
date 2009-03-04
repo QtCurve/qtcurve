@@ -326,6 +326,8 @@ static EFocus toFocus(const char *str, EFocus def)
             return FOCUS_BACKGROUND;
         if(0==memcmp(str, "filled", 6))
             return FOCUS_FILLED;
+        if(0==memcmp(str, "full", 4))
+            return FOCUS_FULL;
         if(0==memcmp(str, "line", 4))
             return FOCUS_LINE;
     }
@@ -1487,7 +1489,7 @@ static void defaultSettings(Options *opts)
 
 #if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION < 0x040000)
     if(FOCUS_FILLED==opts->focus)
-        opts->focus=FOCUS_HIGHLIGHT;
+        opts->focus=FOCUS_FULL;
 #endif
 }
 
@@ -1748,6 +1750,8 @@ static const char *toStr(EFocus f)
             return "background";
         case FOCUS_FILLED:
             return "filled";
+        case FOCUS_FULL:
+            return "full";
         case FOCUS_LINE:
             return "line";
     }

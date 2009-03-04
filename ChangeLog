@@ -22,7 +22,7 @@
  6. Only save appearance settings if different from default.
  7. If a gradient does not define the values for positions 0 and 100, then add these.
  8. Better colouring of selected tab.
- 9. Added new focus option - line.
+ 9. Added new focus options - full and line.
 10. Add new round options - extra and max.
 11. Don't etch disabled items.
 12. Use text colour for focus indicator in tree/list/etc views.

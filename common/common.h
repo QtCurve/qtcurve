@@ -527,10 +527,13 @@ typedef enum
 {
     FOCUS_STANDARD,
     FOCUS_HIGHLIGHT,
+    FOCUS_FULL,
     FOCUS_FILLED,
     FOCUS_BACKGROUND,
     FOCUS_LINE
 } EFocus;
+
+#define QTC_FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
 
 #define DEF_IND_STR                "fontcolor"
 #define DEF_LINE_STR               "dots"

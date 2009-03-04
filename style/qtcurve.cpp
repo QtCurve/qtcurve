@@ -3117,8 +3117,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
                                                         getRadius(opts.round, r2.width(), r2.height(), WIDGET_OTHER,
-                                                                  FOCUS_FILLED==opts.focus
-                                                                    ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
+                                                                  QTC_FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
                         }
                         else
                             drawRect(painter, r2);
@@ -3159,7 +3158,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 isFlat = (button->features & QStyleOptionButton::Flat);
             }
 
-            isDefault=isDefault || (doEtch && FOCUS_FILLED==opts.focus && MO_GLOW==opts.coloredMouseOver &&
+            isDefault=isDefault || (doEtch && QTC_FULL_FOCUS && MO_GLOW==opts.coloredMouseOver &&
                                     state&State_HasFocus && state&State_Enabled);
             if(isFlat && !isDown && !(state&State_MouseOver))
                 return;
@@ -5615,7 +5614,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QStyleOptionFocusRect fr;
 
                     fr.QStyleOption::operator=(*toolbutton);
-                    if(FOCUS_FILLED==opts.focus)
+                    if(QTC_FULL_FOCUS)
                     {
                         if(etched && MO_GLOW==opts.coloredMouseOver)
                             fr.rect.adjust(1, 1, -1, -1);
@@ -6495,10 +6494,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(QTC_DO_EFFECT)
                 {
                     if(!sunken && MO_GLOW==opts.coloredMouseOver &&
-                        ((FOCUS_FILLED==opts.focus && state&State_HasFocus) || state&State_MouseOver) &&
+                        ((QTC_FULL_FOCUS && state&State_HasFocus) || state&State_MouseOver) &&
                        state&State_Enabled && !comboBox->editable)
-                        drawGlow(painter, r,
-                                 FOCUS_FILLED==opts.focus && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO);
+                        drawGlow(painter, r, QTC_FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO);
                     else
                         drawEtch(painter, r, widget, WIDGET_COMBO,
                                 !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
@@ -6575,7 +6573,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         QStyleOptionFocusRect focus;
 
-                        if(FOCUS_FILLED==opts.focus)
+                        if(QTC_FULL_FOCUS)
                             focus.rect=frame;
                         else if(opts.comboSplitter)
                             focus.rect=reverse
@@ -6775,7 +6773,7 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
             break;
 #endif
         case SE_PushButtonFocusRect:
-            if(FOCUS_FILLED==opts.focus)
+            if(QTC_FULL_FOCUS)
             {
                 rect=subElementRect(SE_PushButtonContents, option, widget);
                 if(QTC_DO_EFFECT)
