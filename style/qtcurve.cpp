@@ -4963,7 +4963,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(!firstTab)
                             r.adjust(0, -tabOverlap, 0, 0);
-                        fillTab(painter, r.adjusted(2, 1, 0, -1), option, fill, false, WIDGET_TAB_TOP);
+                        fillTab(painter, r.adjusted(1, 1, 0, -1), option, fill, false, WIDGET_TAB_TOP);
 
                         drawBorder(painter, r.adjusted(0, 0, 4, 0), option,
                                     selected || onlyTab
