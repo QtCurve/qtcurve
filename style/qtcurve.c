@@ -4375,12 +4375,26 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
 }
 
+static void qtcDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text,
+                          GdkRectangle *area, gint x, gint y, PangoLayout *layout)
+{
+    GdkGC *gc=use_text || GTK_STATE_INSENSITIVE==state ? style->text_gc[state] : style->fg_gc[state];
+
+    if(area)
+        gdk_gc_set_clip_rectangle(gc, area);
+
+    gdk_draw_layout(window, gc, x, y, layout);
+
+    if(area)
+        gdk_gc_set_clip_rectangle(gc, NULL);
+}
+
 static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text,
                           GdkRectangle *area, GtkWidget *widget, const gchar *detail, gint x, gint y,
                           PangoLayout *layout)
 {
     if(GTK_IS_PROGRESS(widget) || GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar"))
-        parent_class->draw_layout(style, window, state, use_text, area, widget, detail, x, y, layout);
+        qtcDrawLayout(style, window, state, use_text, area, x, y, layout);
     else
     {
         QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
@@ -4542,12 +4556,11 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!opts.useHighlightForMenu && (isMenuItem || mb) && GTK_STATE_INSENSITIVE!=state)
             state=GTK_STATE_NORMAL;
 
-        parent_class->draw_layout(style, window, selectedText ? GTK_STATE_SELECTED : state,
-                                  use_text || selectedText, area, widget, detail, x, y, layout);
+        qtcDrawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area, x, y, layout);
+
         if(opts.embolden && def_but)
-            parent_class->draw_layout(style, window, selectedText ? GTK_STATE_SELECTED : state,
-                                      use_text || selectedText,
-                                      area, widget, detail, x+1, y, layout);
+            qtcDrawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area,
+                          x+1, y, layout);
 
         if(swap_gc)
             for(i=0; i<4; ++i)

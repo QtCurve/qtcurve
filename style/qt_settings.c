@@ -120,6 +120,7 @@ typedef enum
 enum QtPallete
 {
     PAL_ACTIVE,
+    PAL_DISABLED,
     PAL_INACTIVE
 #ifndef QTC_READ_INACTIVE_PAL
         = PAL_ACTIVE
@@ -156,6 +157,9 @@ struct QtData
 
 #define DEFAULT_KDE_ACT_PAL \
 "active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
+
+#define DEFAULT_KDE_DIS_PAL \
+"disabled=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#c7c7c7^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
 
 #ifdef QTC_READ_INACTIVE_PAL
 #define DEFAULT_KDE_INACT_PAL \
@@ -264,17 +268,18 @@ static const char * italicStr(int i)
 enum
 {
     RD_ACT_PALETTE       = 0x0001,
-    RD_INACT_PALETTE     = 0x0002,
-    RD_FONT              = 0x0004,
-    RD_CONTRAST          = 0x0008,
-    RD_ICONS             = 0x0010,
-    RD_TOOLBAR_STYLE     = 0x0020,
-    RD_TOOLBAR_ICON_SIZE = 0x0040,
-    RD_BUTTON_ICONS      = 0x0080,
-    RD_SMALL_ICON_SIZE   = 0x0100,
-    RD_LIST_COLOR        = 0x0200,
-    RD_STYLE             = 0x0400,
-    RD_LIST_SHADE        = 0x0800
+    RD_DIS_PALETTE       = 0x0002,
+    RD_INACT_PALETTE     = 0x0004,
+    RD_FONT              = 0x0008,
+    RD_CONTRAST          = 0x0010,
+    RD_ICONS             = 0x0020,
+    RD_TOOLBAR_STYLE     = 0x0040,
+    RD_TOOLBAR_ICON_SIZE = 0x0080,
+    RD_BUTTON_ICONS      = 0x0100,
+    RD_SMALL_ICON_SIZE   = 0x0200,
+    RD_LIST_COLOR        = 0x0400,
+    RD_STYLE             = 0x0800,
+    RD_LIST_SHADE        = 0x1000
 };
 
 static char * getKdeHome()
@@ -574,6 +579,12 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                     parseQtColors(line, PAL_ACTIVE, QT4==ft);
                     found|=RD_ACT_PALETTE;
                 }
+                else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE) &&
+                          (QT4==ft ? 0==strncmp_i(line, "Palette\\disabled=", 15) : 0==strncmp_i(line, "disabled=", 7)))
+                {
+                    parseQtColors(line, PAL_DISABLED, QT4==ft);
+                    found|=RD_DIS_PALETTE;
+                }
 #ifdef QTC_READ_INACTIVE_PAL
                 else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
                           (QT4==ft ? 0==strncmp_i(line, "Palette\\inactive=", 17) : 0==strncmp_i(line, "inactive=", 9)))
@@ -703,6 +714,13 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
         strncpy(line, DEFAULT_KDE_ACT_PAL, QTC_MAX_INPUT_LINE_LEN);
         line[QTC_MAX_INPUT_LINE_LEN]='\0';
         parseQtColors(line, PAL_ACTIVE, false);
+    }
+
+    if(rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE))
+    {
+        strncpy(line, DEFAULT_KDE_DIS_PAL, QTC_MAX_INPUT_LINE_LEN);
+        line[QTC_MAX_INPUT_LINE_LEN]='\0';
+        parseQtColors(line, PAL_DISABLED, false);
     }
 
 #ifdef QTC_READ_INACTIVE_PAL
@@ -1425,11 +1443,11 @@ static gboolean qtInit(Options *opts)
             if(useQt3Settings())
             {
                 qtSettings.qt4=FALSE;
-                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc("/etc/qt/qtrc", RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, QT3);
-                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc("/etc/qt3/qtrc", RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, QT3);
-                readRc(".qt/qtrc", RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc(".qt/qtrc", RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, FALSE, TRUE, QT3);
             }
             else
@@ -1438,10 +1456,10 @@ static gboolean qtInit(Options *opts)
 
                 char *confFile=(char *)malloc(strlen(xdg)+strlen(QT4_CFG_FILE)+2);
 
-                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc("/etc/xdg/"QT4_CFG_FILE, RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, FALSE, QT4);
                 sprintf(confFile, "%s/"QT4_CFG_FILE, xdg);
-                readRc(confFile, RD_ACT_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
+                readRc(confFile, RD_ACT_PALETTE|RD_DIS_PALETTE|RD_INACT_PALETTE|RD_FONT|RD_CONTRAST|RD_STYLE,
                        opts, TRUE, TRUE, QT4);
                 free(confFile);
                 qtSettings.qt4=TRUE;
@@ -1997,7 +2015,11 @@ static void qtExit()
 }
 
 #define SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL) \
-    st->itm[state]=rc->color_flags[state]&ITEM ? rc->itm[state] : qtSettings.colors[PAL][QTP_COL];
+    st->itm[state]=rc->color_flags[state]&ITEM \
+        ? rc->itm[state] \
+        : qtSettings.colors[state==GTK_STATE_INSENSITIVE \
+                                ? PAL_DISABLED \
+                                : PAL ][QTP_COL];
 
 #define SET_COLOR(st, rc, itm, ITEM, state, QTP_COL) \
     SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE)
@@ -2019,7 +2041,7 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
 
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_NORMAL, COLOR_TEXT)
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_SELECTED, COLOR_TEXT_SELECTED)
-    SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_INSENSITIVE, COLOR_MID)
+    SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_INSENSITIVE, COLOR_TEXT)
     /*SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED)*/
 
     if(opts->inactiveHighlight)

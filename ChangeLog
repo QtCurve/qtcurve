@@ -24,6 +24,7 @@
  8. Better colouring of selected tab.
  9. Added new focus option - line.
 10. Add new round options - extra and max.
+11. Don't etch disabled items.
 
 0.61.5
 ------
