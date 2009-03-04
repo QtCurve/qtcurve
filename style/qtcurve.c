@@ -5536,7 +5536,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     gboolean doEtch=QTC_DO_EFFECT,
              btn=false,
              comboButton=false,
-             rev=widget && reverseLayout(widget->parent);
+             rev=widget && reverseLayout(widget->parent),
+             view=isList(widget);
 
     if(opts.comboSplitter && FOCUS_FILLED!=opts.focus && isComboBox(widget))
     {
@@ -5586,7 +5587,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         gboolean drawRounded=QTC_ROUNDED;
         GdkColor *cols=FOCUS_BACKGROUND==opts.focus ? qtcPalette.background : qtcPalette.menuitem;
-        GdkColor *col=&cols[FOCUS_BACKGROUND!=opts.focus && GTK_STATE_SELECTED==state ? 3 : QT_FOCUS];
+        GdkColor *col=view ? &style->text[state]
+                           : &cols[FOCUS_BACKGROUND!=opts.focus && GTK_STATE_SELECTED==state ? 3 : QT_FOCUS];
 
         QTC_CAIRO_BEGIN
 
