@@ -5622,7 +5622,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
                 if(drawRounded)
                     createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
-                               RADIUS_SELECTION), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
+                               RADIUS_EXTERNAL), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
                 else
                     cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
                 cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_FOCUS_ALPHA);
@@ -5631,7 +5631,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
             if(drawRounded)
                 createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
-                           RADIUS_SELECTION), FOCUS_FILLED==opts.focus && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
+                           FOCUS_FILLED==opts.focus ? RADIUS_EXTERNAL : RADIUS_SELECTION),
+                           FOCUS_FILLED==opts.focus && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
                            ROUNDED_ALL);
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
