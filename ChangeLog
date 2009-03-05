@@ -28,6 +28,8 @@
 12. Use text colour for focus indicator in tree/list/etc views.
 13. When specifying custom gradients, add the pssibility to have no
     internal border - options are now none, light, 3d
+14. Only apply plastik style mouse-over scrollbars and sliders when
+    plastik is set as the mouse-over style.
 
 0.61.5
 ------
