@@ -50,6 +50,7 @@ class QScrollBar;
 class QtCurveStyle : public QWindowsStyle
 {
     Q_OBJECT
+    Q_CLASSINFO("X-KDE-CustomElements", "true")
 
     public:
 
@@ -58,6 +59,11 @@ class QtCurveStyle : public QWindowsStyle
         VER_UNKNOWN,
         VER_4x,  // <=4.4
         VER_45   // >=4.5
+    };
+
+    enum CustomElements
+    {
+        CE_QtC_KCapacityBar = CE_CustomBase+0xFFFF00
     };
     
     QtCurveStyle(const QString &name=QString());

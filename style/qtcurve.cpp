@@ -1980,6 +1980,10 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_MenuBar_AltKeyNavigation:
             return false;
         default:
+            // Tell the calling app that we can handle certain custom widgets...
+            if(hint>=SH_CustomBase && widget)
+                if("CE_CapacityBar"==widget->objectName())
+                    return CE_QtC_KCapacityBar;
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);
    }
 }
@@ -3464,6 +3468,18 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
     switch(element)
     {
+        case CE_QtC_KCapacityBar:
+            if (const QStyleOptionProgressBar *bar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+            {
+                QStyleOptionProgressBar mod(*bar);
+
+                if(QTC_DO_EFFECT)
+                    mod.rect.adjust(1, 1, -1, -1);
+                drawControl(CE_ProgressBarGroove, option, painter, widget);
+                drawControl(CE_ProgressBarContents, &mod, painter, widget);
+                drawControl(CE_ProgressBarLabel, &mod, painter, widget);
+            }
+            break;
         case CE_ToolBoxTabShape:
         {
             const QStyleOptionToolBox *tb = qstyleoption_cast<const QStyleOptionToolBox *>(option);
