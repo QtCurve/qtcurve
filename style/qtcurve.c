@@ -1576,9 +1576,13 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     EAppearance  app=widgetApp(widget, &opts);
     gboolean     enabled=GTK_STATE_INSENSITIVE!=state,
                  useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled;
-    int          useBorderVal=!enabled && WIDGET_BUTTON(widget) ? QT_DISABLED_BORDER : borderVal;
-    GdkColor     *colors=c_colors ? c_colors : qtcPalette.background,
-                 *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
+    GdkColor     *colors=c_colors ? c_colors : qtcPalette.background;
+    int          useBorderVal=!enabled && WIDGET_BUTTON(widget)
+                                ? QT_DISABLED_BORDER
+                                : qtcPalette.mouseover==colors && IS_SLIDER(widget)
+                                    ? QT_SLIDER_MO_BORDER
+                                    : borderVal;
+    GdkColor     *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
     gboolean     hasFocus=colors==qtcPalette.menuitem; /* CPD USED TO INDICATE FOCUS! */
 
     setCairoClipping(cr, area, region);
@@ -5209,9 +5213,9 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(LINE_NONE!=opts.sliderThumbs &&
            (scale || ((GTK_ORIENTATION_HORIZONTAL==orientation && width>=min) || height>=min)))
         {
-            GdkColor *markers=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
-                                ? /*SHADE_NONE==opts.shadeSliders ? */qtcPalette.mouseover/* : itsBackgroundCols*/
-                                : btn_colors;
+            GdkColor *markers=/*opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
+                                ? qtcPalette.mouseover
+                                : */btn_colors;
                               
             if(LINE_SUNKEN!=opts.sliderThumbs)
                 if(GTK_ORIENTATION_HORIZONTAL==orientation)
@@ -5255,6 +5259,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver ||
                                        ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) &&
                                        (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders));
+        int          borderVal=qtcPalette.mouseover==borderCols ? QT_SLIDER_MO_BORDER : QT_BORDER(GTK_STATE_INSENSITIVE==state);
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)
         {
@@ -5343,7 +5348,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                    radius=2.5;
 
             cairo_new_path(cr);
-            cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[QT_STD_BORDER]));
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
             switch(direction)
             {
                 case GTK_ARROW_UP:
@@ -5380,8 +5385,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else
         {
-            GdkPixbuf *border=getPixbuf(&borderCols[coloredMouseOver ? 4 : QT_BORDER(GTK_STATE_INSENSITIVE!=state)],
-                                        horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8);
+            GdkPixbuf *border=getPixbuf(&borderCols[borderVal], horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8);
 
             gdk_cairo_set_source_pixbuf(cr, border, x, y);
             cairo_paint(cr);
