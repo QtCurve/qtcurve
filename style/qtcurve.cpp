@@ -8670,7 +8670,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 //     else
 //         grv.adjust(0, 0, 0, -1);
 
-    opt.state&=~(State_HasFocus|State_On|State_Sunken);
+    opt.state&=~(State_HasFocus|State_On|State_Sunken|State_MouseOver);
 
     if(horiz)
     {
