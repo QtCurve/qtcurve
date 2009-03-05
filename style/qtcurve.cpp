@@ -7984,7 +7984,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                     ? QT_PBAR_BORDER
                                     : !enabled && (WIDGET_BUTTON(w) || WIDGET_SLIDER_TROUGH==w)
                                         ? QT_DISABLED_BORDER
-                                        : borderVal]);
+                                            : itsMouseOverCols==cols && IS_SLIDER(w)
+                                                ? QT_SLIDER_MO_BORDER
+                                                : borderVal]);
 
     if(!window)
         p->setRenderHint(QPainter::Antialiasing, true);
@@ -8409,9 +8411,9 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
                     ? ROUNDED_ALL : ROUNDED_NONE,
                    getFill(&opt, use), use, true, WIDGET_SB_SLIDER);
 
-    const QColor *markers(opts.coloredMouseOver && opt.state&State_MouseOver
-                              ? /*SHADE_NONE==opts.shadeSliders ? */itsMouseOverCols/* : itsBackgroundCols*/
-                              : use);
+    const QColor *markers(/*opts.coloredMouseOver && opt.state&State_MouseOver
+                              ? itsMouseOverCols
+                              : */use);
 
     if(opt.state&State_Horizontal)
         r.setX(r.x()+1);
@@ -8464,7 +8466,8 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver) ||
                                    (SLIDER_ROUND==opts.sliderStyle &&
                                    (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders)));
-        int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13);
+        int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13),
+                         borderVal(itsMouseOverCols==border ? QT_SLIDER_MO_BORDER : QT_BORDER(opt.state&State_Enabled));
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)
         {
@@ -8553,6 +8556,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                          radius(2.5),
                          diameter(radius*2);
 
+            p->setPen(border[borderVal]);
             switch(direction)
             {
                 default:
@@ -8563,7 +8567,6 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                     path.lineTo(xd+5, yd+14);
                     path.lineTo(xd+10, yd+9);
                     path.arcTo(xd+10-diameter, yd, diameter, diameter, 0, 90);
-                    p->setPen(border[QT_STD_BORDER]);
                     p->setRenderHint(QPainter::Antialiasing, true);
                     p->drawPath(path);
                     p->setRenderHint(QPainter::Antialiasing, false);
@@ -8581,7 +8584,6 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                     path.lineTo(xd+10, yd+5);
                     path.lineTo(xd+5, yd);
                     path.lineTo(xd, yd+5);
-                    p->setPen(border[QT_STD_BORDER]);
                     p->setRenderHint(QPainter::Antialiasing, true);
                     p->drawPath(path);
                     p->setRenderHint(QPainter::Antialiasing, false);
@@ -8599,7 +8601,6 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                     path.lineTo(xd+5, yd);
                     path.lineTo(xd, yd+5);
                     path.lineTo(xd+5, yd+10);
-                    p->setPen(border[QT_STD_BORDER]);
                     p->setRenderHint(QPainter::Antialiasing, true);
                     p->drawPath(path);
                     p->setRenderHint(QPainter::Antialiasing, false);
@@ -8617,7 +8618,6 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                     path.lineTo(xd+9, yd+10);
                     path.lineTo(xd+14, yd+5);
                     path.lineTo(xd+9, yd);
-                    p->setPen(border[QT_STD_BORDER]);
                     p->setRenderHint(QPainter::Antialiasing, true);
                     p->drawPath(path);
                     p->setRenderHint(QPainter::Antialiasing, false);
@@ -8633,8 +8633,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         else
         {
             p->drawPixmap(x, y,
-                          *getPixmap(border[opts.coloredMouseOver && opt.state&State_MouseOver ? 4 : QT_BORDER(opt.state&State_Enabled)],
-                                     horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8));
+                          *getPixmap(border[borderVal], horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8));
 
             if(drawLight)
                 p->drawPixmap(x, y, *getPixmap(use[0], horiz ? PIX_SLIDER_LIGHT : PIX_SLIDER_LIGHT_V));
