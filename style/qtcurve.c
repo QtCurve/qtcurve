@@ -1457,7 +1457,7 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
                 shade(base, &col, botTab ? QTC_MAX(val, 0.9) : val);
             }
-            if(sel && opts.colorSelTab && (topTab || botTab) && i<grad->numStops-1)
+            if(colorTab && i<grad->numStops-1)
             {
                 GdkColor t;
                 tintColor(&col, &qtcPalette.menuitem[0], &t, (1.0-grad->stops[i].pos)*QTC_COLOR_SEL_TAB_FACTOR);
