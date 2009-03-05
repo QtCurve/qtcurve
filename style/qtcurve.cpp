@@ -3977,13 +3977,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     col=itsBackgroundCols[2];
             }
 
+            painter->setClipPath(buildPath(r, WIDGET_PBAR_TROUGH, ROUNDED_ALL,
+                                 getRadius(opts.round, r.width(), r.height(), WIDGET_PBAR_TROUGH, RADIUS_EXTERNAL)));
             drawBevelGradient(col, painter, r.adjusted(1, 1, -1, -1), horiz,
                               false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
+            painter->setClipping(false);
 
             if(doEtch)
-                drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_OTHER);
+                drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_PBAR_TROUGH);
 
-            drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER,
+            drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_PBAR_TROUGH,
                        IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT);
             painter->restore();
             break;

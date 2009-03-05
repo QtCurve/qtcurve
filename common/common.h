@@ -358,13 +358,13 @@ typedef enum
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
-    WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FRAME,
     WIDGET_NO_ETCH_BTN,
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     WIDGET_SELECTION,
 #endif
+    WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FOCUS,
     WIDGET_TAB_FRAME,
     WIDGET_OTHER
@@ -1250,6 +1250,12 @@ typedef enum
     RADIUS_ETCH
 } ERadius;
 
+#define QTC_MAX_ROUND_WIDGET(A) \
+            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_MENU_BUTTON==A)
+
+#define QTC_EXTRA_ROUND_WIDGET(A) \
+            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME)
+
 static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 {
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
@@ -1281,14 +1287,10 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return ((w>h ? h : w)-2)/2;
                     if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE-2) &&
-                       (WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
-#ifdef __cplusplus
-                           || WIDGET_MENU_BUTTON==widget
-#endif
-                           ))
+                       QTC_MAX_ROUND_WIDGET(widget))
                         return 8.5;
                 case ROUND_EXTRA:
-                    if(widget!=WIDGET_MENU_ITEM && widget!=WIDGET_TAB_FRAME &&
+                    if(QTC_EXTRA_ROUND_WIDGET(widget) &&
                        w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                         return QTC_EXTRA_INNER_RADIUS;
                 case ROUND_FULL:
@@ -1306,14 +1308,10 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
                     if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE &&
-                       (WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
-#ifdef __cplusplus
-                           || WIDGET_MENU_BUTTON==widget
-#endif
-                           ))
+                       QTC_MAX_ROUND_WIDGET(widget))
                         return 9.5;
                 case ROUND_EXTRA:
-                    if(widget!=WIDGET_MENU_ITEM && widget!=WIDGET_TAB_FRAME &&
+                    if(QTC_EXTRA_ROUND_WIDGET(widget) &&
                        w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                         return QTC_EXTRA_OUTER_RADIUS;
                 case ROUND_FULL:
@@ -1331,14 +1329,10 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
                     if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE &&
-                       (WIDGET_STD_BUTTON==widget || WIDGET_DEF_BUTTON==widget
-#ifdef __cplusplus
-                           || WIDGET_MENU_BUTTON==widget
-#endif
-                           ))
+                       QTC_MAX_ROUND_WIDGET(widget))
                         return 10.5;
                 case ROUND_EXTRA:
-                    if(widget!=WIDGET_MENU_ITEM && widget!=WIDGET_TAB_FRAME &&
+                    if(QTC_EXTRA_ROUND_WIDGET(widget) &&
                        w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE)
                         return QTC_EXTRA_ETCH_RADIUS;
                 case ROUND_FULL:
