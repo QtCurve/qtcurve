@@ -8157,7 +8157,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
     if(fill)
     {
         p->setClipPath(buildPath(r, WIDGET_ENTRY, round,
-                                 getRadius(opts.round, r.width(), r.height(), WIDGET_ENTRY, RADIUS_EXTERNAL)));
+                                 getRadius(opts.round, r.width(), r.height(), WIDGET_ENTRY, RADIUS_INTERNAL)));
         p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.brush(QPalette::Base));
         p->setClipping(false);
     }
