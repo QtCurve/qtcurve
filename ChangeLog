@@ -30,6 +30,7 @@
     internal border - options are now none, light, 3d
 14. Only apply plastik style mouse-over scrollbars and sliders when
     plastik is set as the mouse-over style.
+15. Only draw 1 arrow on Gtk combos.
 
 0.61.5
 ------

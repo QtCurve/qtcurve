@@ -2647,11 +2647,17 @@ debugDisplayWidget(widget, 3);
         if(isOnCombo(widget, 0) && !isOnComboEntry(widget, 0))
         {
             x++;
-                
-            drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_UP,
-                      x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-(opts.vArrows ? 0 : 1)), FALSE, TRUE);
-            drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
-                      x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
+
+//             if(opts.singleComboArrow)
+                drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
+                          x+(width>>1), y+(height>>1), FALSE, TRUE);
+//             else
+//             {
+//                 drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_UP,
+//                           x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-(opts.vArrows ? 0 : 1)), FALSE, TRUE);
+//                 drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
+//                           x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
+//             }
         }
         else
             drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
@@ -4711,10 +4717,17 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 : x+(width>>1);
 
     //QTC_CAIRO_BEGIN
-    drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_UP, x,
-              y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
-    drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_DOWN, x,
-              y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
+//     if(opts.singleComboArrow)
+        drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_DOWN, x,
+                  y+(height>>1), FALSE, TRUE);
+//     else
+//     {
+//         drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_UP, x,
+//                   y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
+//         drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_DOWN, x,
+//                   y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
+//     }
+
     //QTC_CAIRO_END
 }
 
