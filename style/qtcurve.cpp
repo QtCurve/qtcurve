@@ -6562,17 +6562,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(sunken)
                         arrow.adjust(1, 1, 1, 1);
 
-                    if(comboBox->editable || !opts.gtkComboMenus)
+                    //if(comboBox->editable || !opts.gtkComboMenus)
                         drawArrow(painter, arrow, option, PE_IndicatorArrowDown);
-                    else
-                    {
-                        int middle=arrow.y()+(arrow.height()>>1);
-                        
-                        QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+(opts.vArrows ? 2 : 1)), arrow.width(), LARGE_ARR_HEIGHT);
-                        drawArrow(painter, ar, option, PE_IndicatorArrowUp);
-                        ar=QRect(arrow.x(), middle+1, arrow.width(), LARGE_ARR_HEIGHT);
-                        drawArrow(painter, ar, option, PE_IndicatorArrowDown);
-                    }
+//                     else
+//                     {
+//                         int middle=arrow.y()+(arrow.height()>>1);
+//                         
+//                         QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+(opts.vArrows ? 2 : 1)), arrow.width(), LARGE_ARR_HEIGHT);
+//                         drawArrow(painter, ar, option, PE_IndicatorArrowUp);
+//                         ar=QRect(arrow.x(), middle+1, arrow.width(), LARGE_ARR_HEIGHT);
+//                         drawArrow(painter, ar, option, PE_IndicatorArrowDown);
+//                     }
                 }
 
                 if(/*controls&SC_ComboBoxEditField &&*/ field.isValid())

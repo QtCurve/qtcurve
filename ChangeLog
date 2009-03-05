@@ -30,15 +30,16 @@
     internal border - options are now none, light, 3d
 14. Only apply plastik style mouse-over scrollbars and sliders when
     plastik is set as the mouse-over style.
-15. Add option to have central tabs.
-16. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
-17. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
+15. Only draw 1 arrow on combos - event when in Gtk style.
+16. Add option to have central tabs.
+17. Move Qt4.5 scrollbars closer to scrollview when they are lpaced on the outside.
+18. Provide icon mapping for pure-Qt apps, as well as KDE ones, if QtCurve is
     compiled against KDE.
-18. Fix shading of menuitems when slider is set to 'orig selected'
-19. Map more KDE4 icons.
-20. When drawing arrows (such as in KDE4 colour selector), assume the arrow is
+19. Fix shading of menuitems when slider is set to 'orig selected'
+20. Map more KDE4 icons.
+21. When drawing arrows (such as in KDE4 colour selector), assume the arrow is
     enabled.
-21. Style KCapacityBar - draw this as if it is a progressbar.
+22. Style KCapacityBar - draw this as if it is a progressbar.
 
 0.61.5
 ------
