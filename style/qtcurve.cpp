@@ -7791,10 +7791,9 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     {
         r.adjust(-1, -1, 1, 1);
         if(!sunken && option->state&State_Enabled &&
-            (( ( (doEtch && (WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || (WIDGET_COMBO==w)) ||
-                  WIDGET_MENU_BUTTON==w ) &&
-                        MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
-            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
+            ( ( ( (doEtch && WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || WIDGET_COMBO==w || WIDGET_MENU_BUTTON==w ) &&
+                 MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
+               (doEtch && WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(p, r, option, round, itsMouseOverCols, w);
         else
             drawBorder(p, r, option, round, cols, w);
