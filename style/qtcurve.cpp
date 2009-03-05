@@ -706,6 +706,7 @@ static bool isHoriz(const QStyleOption *option, EWidget w)
 
 /*
 Cache key:
+    widgettype 2
     app        5
     size      15
     horiz      1
@@ -715,22 +716,31 @@ Cache key:
     red        8
     type       1  (0 for widget, 1 for pixmap)
     ------------
-              54
+              56
 */
-enum ECacheFlags
+enum ECacheType
 {
     CACHE_STD,
     CACHE_PBAR,
-    CACHE_COL_SEL_TAB
+    CACHE_TAB_TOP,
+    CACHE_TAB_BOT
 };
 
-static QtcKey createKey(qulonglong size, const QColor &color, bool horiz, int app, ECacheFlags flags)
+static QtcKey createKey(qulonglong size, const QColor &color, bool horiz, int app, EWidget w)
 {
+    ECacheType type=WIDGET_TAB_TOP==w
+                        ? CACHE_TAB_TOP
+                        : WIDGET_TAB_BOT==w
+                            ? CACHE_TAB_BOT
+                            : WIDGET_PROGRESSBAR==w
+                                ? CACHE_PBAR
+                                : CACHE_STD;
+
     return (color.rgba()<<1)+
            (((qulonglong)(horiz ? 1 : 0))<<32)  +
            (((qulonglong)(size&0x7FFF))<<33)+
            (((qulonglong)(app&0x1F))<<48)+
-           (((qulonglong)(flags&0x03))<<53);
+           (((qulonglong)(type&0x03))<<53);
 }
 
 static QtcKey createKey(const QColor &color, EPixmap p)
@@ -7451,7 +7461,7 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
             inCache(true);
     QRect   r(0, 0, horiz ? PROGRESS_CHUNK_WIDTH*2 : origRect.width(),
                     horiz ? origRect.height() : PROGRESS_CHUNK_WIDTH*2);
-    QtcKey  key(createKey(horiz ? r.height() : r.width(), use[ORIGINAL_SHADE], horiz, bevApp, CACHE_PBAR));
+    QtcKey  key(createKey(horiz ? r.height() : r.width(), use[ORIGINAL_SHADE], horiz, bevApp, WIDGET_PROGRESSBAR));
     QPixmap *pix(itsPixmapCache.object(key));
 
     if(!pix)
@@ -7570,8 +7580,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
         {
             QRect   r(0, 0, horiz ? QTC_PIXMAP_DIMENSION : origRect.width(),
                             horiz ? origRect.height() : QTC_PIXMAP_DIMENSION);
-            QtcKey  key(createKey(horiz ? r.height() : r.width(), base, horiz, app,
-                                  tab && sel && opts.colorSelTab ? CACHE_COL_SEL_TAB : CACHE_STD));
+            QtcKey  key(createKey(horiz ? r.height() : r.width(), base, horiz, app, w));
             QPixmap *pix(itsPixmapCache.object(key));
             bool    inCache(true);
 
