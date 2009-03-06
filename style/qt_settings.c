@@ -541,9 +541,6 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
     char        line[QTC_MAX_INPUT_LINE_LEN+1];
     FILE        *f=fopen(rc, "r");
 
-if(NULL==getenv("QTC_KDE4") && rd&RD_KDE4_PAL)
-rd-=RD_KDE4_PAL;
-
     if(KDE4==ft)
     {
         // Set defaults!
