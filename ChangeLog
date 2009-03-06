@@ -31,6 +31,9 @@
 14. Only apply plastik style mouse-over scrollbars and sliders when
     plastik is set as the mouse-over style.
 15. Only draw 1 arrow on Gtk combos.
+16. Under KDE4, attempt to read KDE4 palette from kdeglobals - needed because
+    if Qt4.5 is set to 'Desktop settings aware', it will not store its palette
+    in ~/.config/TrollTech.conf
 
 0.61.5
 ------

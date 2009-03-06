@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "colorutils.c"
 #define CONFIG_READ
 #include "config_file.c"
 #include <gtk/gtk.h>
@@ -88,14 +89,15 @@ enum QtColorRoles
     COLOR_SELECTED,
     COLOR_WINDOW,
 
-    COLOR_FOREGROUND,
     COLOR_MID,
     COLOR_TEXT,
     COLOR_TEXT_SELECTED,
-    COLOR_BUTTON_TEXT,
     COLOR_LV,
 
     COLOR_TOOLTIP,
+
+    COLOR_BUTTON_TEXT,
+    COLOR_WINDOW_TEXT,
     COLOR_TOOLTIP_TEXT,
 
     COLOR_NONE,
@@ -214,19 +216,29 @@ static const char * defaultIcons()
 
 enum
 {
-    SECT_NONE,
-    SECT_PALETTE,
-    SECT_GENERAL,
-    SECT_KDE,
-    SECT_ICONS,
-    SECT_TOOLBAR_STYLE,
-    SECT_MAIN_TOOLBAR_ICONS,
-    SECT_SMALL_ICONS,
+    SECT_NONE                 =0x000001,
+    SECT_PALETTE              =0x000002,
+    SECT_GENERAL              =0x000004,
+    SECT_KDE                  =0x000008,
+    SECT_ICONS                =0x000010,
+    SECT_TOOLBAR_STYLE        =0x000020,
+    SECT_MAIN_TOOLBAR_ICONS   =0x000040,
+    SECT_SMALL_ICONS          =0x000080,
 
-    SECT_COLORS_VIEW, // KDE4!
+    SECT_KDE4_COL_BUTTON      =0x000100,
+    SECT_KDE4_COL_SEL         =0x000200,
+    SECT_KDE4_COL_TOOLTIP     =0x000400,
+    SECT_KDE4_COL_VIEW        =0x000800,
+    SECT_KDE4_COL_WINDOW      =0x001000,
+
+    SECT_KDE4_EFFECT_DISABLED =0x002000,
+    SECT_KDE4_EFFECT_INACTIVE =0x004000,
+
     SECT_QT
 };
 
+#define ALL_KDE4_PAL_SETTINGS (SECT_KDE4_COL_BUTTON|SECT_KDE4_COL_SEL|SECT_KDE4_COL_TOOLTIP|SECT_KDE4_COL_VIEW| \
+                               SECT_KDE4_COL_WINDOW|SECT_KDE4_EFFECT_DISABLED|SECT_KDE4_EFFECT_INACTIVE)
 /*
   Qt uses the following predefined weights: 
     Light    = 25,
@@ -279,7 +291,8 @@ enum
     RD_SMALL_ICON_SIZE   = 0x0200,
     RD_LIST_COLOR        = 0x0400,
     RD_STYLE             = 0x0800,
-    RD_LIST_SHADE        = 0x1000
+    RD_LIST_SHADE        = 0x1000,
+    RD_KDE4_PAL          = 0x2000,
 };
 
 static char * getKdeHome()
@@ -348,7 +361,7 @@ static void parseQtColors(char *line, int p, gboolean readToolTip)
             switch(n)
             {
                 case 0:
-                    setRgb(&qtSettings.colors[p][COLOR_FOREGROUND], l);
+                    setRgb(&qtSettings.colors[p][COLOR_WINDOW_TEXT], l);
                     break;
                 case 1:
                     setRgb(&qtSettings.colors[p][COLOR_BUTTON], l);
@@ -401,23 +414,438 @@ typedef enum
     KDE4
 } FileType;
 
-static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboolean setDefaultFont, FileType ft)
+typedef enum
 {
-    const char *home=absolute ? NULL : getHome();
-    int        found=0,
-               weight=WEIGHT_NORMAL,
-               italic=0,
-               fixedW=0;
-    float      size=DEFAULT_KDE_FONT_SIZE;
-    const char *family=DEFAULT_KDE_FONT,
-               *foundry="*";
-    char       line[QTC_MAX_INPUT_LINE_LEN+1],
-               fontLine[QTC_MAX_INPUT_LINE_LEN+1];
+    BackgroundAlternate,
+    BackgroundNormal,
+    //DecorationFocus,
+    //DecorationHover,
+    ForegroundNormal,
+
+    UnknownColor
+} ColorType;
+
+typedef enum  // Taken from "kcolorscheme.cpp"
+{
+    // Effects
+    Intensity = 0,
+    Color = 1,
+    Contrast = 2,
+    // Intensity
+    IntensityNoEffect = 0,
+    IntensityShade = 1,
+    IntensityDarken = 2,
+    IntensityLighten = 3,
+    // Color
+    ColorNoEffect = 0,
+    ColorDesaturate = 1,
+    ColorFade = 2,
+    ColorTint = 3,
+    // Contrast
+    ContrastNoEffect = 0,
+    ContrastFade = 1,
+    ContrastTint = 2
+} ColAdjustEffects;
+    
+typedef struct
+{
+    double           amount;
+    ColAdjustEffects effect;
+} ColAdjust;
+
+typedef struct
+{
+    GdkColor  col;
+    ColAdjust intensity,
+              color,
+              contrast;
+    gboolean  enabled;
+} ColorEffect;
+
+typedef enum
+{
+    EFF_DISABLED,
+    EFF_INACTIVE
+} Effect;
+
+static ColorType getColorType(const char *line)
+{
+    if(0==strncmp_i(line, "BackgroundAlternate=", 20))
+        return BackgroundAlternate;
+    if(0==strncmp_i(line, "BackgroundNormal=", 17))
+        return BackgroundNormal;
+    if(0==strncmp_i(line, "ForegroundNormal=", 17))
+        return ForegroundNormal;
+    return UnknownColor;
+}
+
+static GdkColor readColor(const char *line)
+{
+    char     *eq=strchr(line, '=');
+    GdkColor col;
+
+    if(eq && ++eq && *eq!='\0' && 3==sscanf(eq, "%d,%d,%d\n", (int *)&col.red, (int *)&col.green, (int *)&col.blue))
+    {
+        col.red=toGtkColor(col.red);
+        col.green=toGtkColor(col.green);
+        col.blue=toGtkColor(col.blue);
+    }
+    else
+        col.red=col.blue=col.green=0;
+    return col;
+}
+
+static int readInt(const char *line, int offset)
+{
+    return line[offset]!='\0' ? atoi(&line[offset]) : 0;
+}
+
+static double readDouble(const char *line, int offset)
+{
+    return line[offset]!='\0' ? g_ascii_strtod(&line[offset], NULL) : 0;
+}
+
+static gboolean readBool(const char *line, int offset)
+{
+    return line[offset]!='\0' ? 0==strcmp(&line[offset], "true") : false;
+}
+
+#define QTC_MIX(a, b, bias) (a + ((b - a) * bias))
+GdkColor mixColors(const GdkColor *c1, const GdkColor *c2, double bias)
+{
+    if (bias <= 0.0 || isnan(bias)) return *c1;
+    if (bias >= 1.0) return *c2;
+
+    {
+    double   r1=c1->red/65535.0,
+             g1=c1->green/65535.0,
+             b1=c1->blue/65535.0,
+             r2=c2->red/65535.0,
+             g2=c2->green/65535.0,
+             b2=c2->blue/65535.0;
+    GdkColor col;
+
+    col.red=(int)(65535.0*QTC_MIX(r1, r2, bias));
+    col.green=(int)(65535.0*QTC_MIX(g1, g2, bias));
+    col.blue=(int)(65535.0*QTC_MIX(b1, b2, bias));
+
+    return col;
+    }
+}
+
+static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
+{
+    ColorEffect effects[2];
+    int         found=0,
+                colorsFound=0;
+    char        line[QTC_MAX_INPUT_LINE_LEN+1];
+    FILE        *f=fopen(rc, "r");
+
+if(NULL==getenv("QTC_KDE4") && rd&RD_KDE4_PAL)
+rd-=RD_KDE4_PAL;
+
+    if(KDE4==ft)
+    {
+        // Set defaults!
+        effects[EFF_DISABLED].col.red=112;
+        effects[EFF_DISABLED].col.green=111;
+        effects[EFF_DISABLED].col.blue=110;
+        effects[EFF_DISABLED].color.amount=0.0;
+        effects[EFF_DISABLED].color.effect=ColorNoEffect;
+        effects[EFF_DISABLED].contrast.amount=0.65;
+        effects[EFF_DISABLED].contrast.effect=ContrastFade;
+        effects[EFF_DISABLED].intensity.amount=0.1;
+        effects[EFF_DISABLED].intensity.effect=IntensityDarken;
+        effects[EFF_DISABLED].enabled=true;
+        effects[EFF_INACTIVE].col.red=112;
+        effects[EFF_INACTIVE].col.green=111;
+        effects[EFF_INACTIVE].col.blue=110;
+        effects[EFF_INACTIVE].color.amount=0.0;
+        effects[EFF_INACTIVE].color.effect=ColorNoEffect;
+        effects[EFF_INACTIVE].contrast.amount=0.0;
+        effects[EFF_INACTIVE].contrast.effect=ContrastNoEffect;
+        effects[EFF_INACTIVE].intensity.amount=0.0;
+        effects[EFF_INACTIVE].intensity.effect=IntensityNoEffect;
+        effects[EFF_INACTIVE].enabled=false;
+    }
+
+    if(f)
+    {
+        int section=SECT_NONE;
+
+        while(found!=rd && NULL!=fgets(line, QTC_MAX_INPUT_LINE_LEN, f))
+            if(line[0]=='[')
+            {
+                if(opts->mapKdeIcons && 0==strncmp_i(line, "[Icons]", 7))
+                    section=SECT_ICONS;
+                else if(0==strncmp_i(line, "[Toolbar style]", 15))
+                    section=SECT_TOOLBAR_STYLE;
+                else if(opts->mapKdeIcons && 0==strncmp_i(line, "[MainToolbarIcons]", 18))
+                    section=SECT_MAIN_TOOLBAR_ICONS;
+                else if(opts->mapKdeIcons && 0==strncmp_i(line, "[SmallIcons]", 12))
+                    section=SECT_SMALL_ICONS;
+                else if(KDE4==ft && 0==strncmp_i(line, "[Colors:View]", 13))
+                    section=SECT_KDE4_COL_VIEW;
+                else if(KDE4==ft && 0==strncmp_i(line, "[Colors:Button]", 15))
+                    section=SECT_KDE4_COL_BUTTON;
+                else if(KDE4==ft && 0==strncmp_i(line, "[Colors:Selection]", 18))
+                    section=SECT_KDE4_COL_SEL;
+                else if(KDE4==ft && 0==strncmp_i(line, "[Colors:Tooltip]", 16))
+                    section=SECT_KDE4_COL_TOOLTIP;
+                else if(KDE4==ft && 0==strncmp_i(line, "[Colors:Window]", 15))
+                    section=SECT_KDE4_COL_WINDOW;
+                else if(KDE4==ft && 0==strncmp_i(line, "[ColorEffects:Disabled]", 23))
+                    section=SECT_KDE4_EFFECT_DISABLED;
+                else if(KDE4==ft && 0==strncmp_i(line, "[ColorEffects:Inactive]", 23))
+                    section=SECT_KDE4_EFFECT_INACTIVE;
+                else
+                {
+                    section=SECT_NONE;
+                    if(colorsFound==ALL_KDE4_PAL_SETTINGS)
+                        found|=RD_KDE4_PAL;
+                    if(found==rd)
+                        break;
+                }
+            }
+            else if (SECT_SMALL_ICONS==section && rd&RD_SMALL_ICON_SIZE && !(found&RD_SMALL_ICON_SIZE) &&
+                        0==strncmp_i(line, "Size=", 5))
+            {
+                int size=readInt(line, 5);
+
+                if(0!=size)
+                {
+                    qtSettings.iconSizes.smlTbSize=size;
+                    qtSettings.iconSizes.btnSize=size;
+                    qtSettings.iconSizes.mnuSize=size;
+                    found|=RD_SMALL_ICON_SIZE;
+                }
+            }
+            else if (SECT_TOOLBAR_STYLE==section && rd&RD_TOOLBAR_STYLE &&
+                        !(found&RD_TOOLBAR_STYLE) &&
+                        ( (KDE3==ft && 0==strncmp_i(line, "IconText=", 9)) ||
+                        (KDE4==ft && 0==strncmp_i(line, "ToolButtonStyle=", 16))))
+            {
+                char *eq=strstr(line, "=");
+
+                if(eq && ++eq)
+                {
+                    if(0==strncmp_i(eq, "IconOnly", 8))
+                        qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
+                    else if(0==strncmp_i(eq, "TextOnly", 8))
+                        qtSettings.toolbarStyle=GTK_TOOLBAR_TEXT;
+                    else if( (KDE3==ft && 0==strncmp_i(eq, "IconTextRight", 13)) ||
+                                (KDE4==ft && 0==strncmp_i(eq, "TextBesideIcon", 14)) )
+                        qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH_HORIZ;
+                    else if( (KDE3==ft && 0==strncmp_i(eq, "IconTextBottom", 14)) ||
+                                (KDE4==ft && 0==strncmp_i(eq, "TextUnderIcon", 13)))
+                        qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH;
+                    found|=RD_TOOLBAR_STYLE;
+                }
+            }
+            else if (SECT_MAIN_TOOLBAR_ICONS==section && rd&RD_TOOLBAR_ICON_SIZE &&
+                        !(found&RD_TOOLBAR_ICON_SIZE) && 0==strncmp_i(line, "Size=", 5))
+            {
+                qtSettings.iconSizes.tbSize=readInt(line, 5);
+                found|=RD_TOOLBAR_ICON_SIZE;
+            }
+            else if (SECT_KDE==section && rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS) &&
+                        0==strncmp_i(line, "ShowIconsOnPushButtons=", 23))
+            {
+                qtSettings.buttonIcons=readBool(line, 23);
+                found|=RD_BUTTON_ICONS;
+            }
+            else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
+                    ( (KDE3==ft && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20)) ||
+                        (KDE4==ft && SECT_KDE4_COL_VIEW==section && 0==strncmp_i(line, "BackgroundAlternate=", 20)) ) )
+            {
+                qtSettings.colors[PAL_ACTIVE][COLOR_LV]=readColor(line);
+                found|=RD_LIST_COLOR;
+            }
+            else if(KDE4==ft && section>=SECT_KDE4_COL_BUTTON && section<=SECT_KDE4_COL_WINDOW &&
+                    rd&RD_KDE4_PAL && !(found&RD_KDE4_PAL))
+            {
+                ColorType colorType=getColorType(line);
+
+                colorsFound|=section;
+                if(UnknownColor!=colorType)
+                {
+                    GdkColor color=readColor(line);
+
+                    switch(section)
+                    {
+                        case SECT_KDE4_COL_BUTTON:
+                            if(BackgroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=color;
+                            else if(ForegroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=color;
+                            break;
+                        case SECT_KDE4_COL_SEL:
+                            if(BackgroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]=color;
+                            else if(ForegroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]=color;
+                            break;
+                        case SECT_KDE4_COL_TOOLTIP:
+                            if(BackgroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=color;
+                            else if(ForegroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]=color;
+                            break;
+                        case SECT_KDE4_COL_VIEW:
+                            if(BackgroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND]=color;
+                            else if(ForegroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]=color;
+                            else if(BackgroundAlternate==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_LV]=color;
+                            break;
+                        case SECT_KDE4_COL_WINDOW:
+                            if(BackgroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]=color;
+                            else if(ForegroundNormal==colorType)
+                                qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT]=color;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            else if(KDE4==ft && (SECT_KDE4_EFFECT_DISABLED==section || SECT_KDE4_EFFECT_INACTIVE==section) &&
+                    rd&RD_KDE4_PAL && !(found&RD_KDE4_PAL))
+            {
+                colorsFound|=section;
+                Effect eff=SECT_KDE4_EFFECT_DISABLED==section ? EFF_DISABLED : EFF_INACTIVE;
+                if(0==strncmp_i(line, "Color=", 6))
+                    effects[eff].col=readColor(line);
+                else if(0==strncmp_i(line, "ColorAmount=", 12))
+                    effects[eff].color.amount=readDouble(line, 12);
+                else if(0==strncmp_i(line, "ColorEffect=", 12))
+                    effects[eff].color.effect=readInt(line, 12);
+                else if(0==strncmp_i(line, "ContrastAmount=", 15))
+                    effects[eff].contrast.amount=readDouble(line, 15);
+                else if(0==strncmp_i(line, "ContrastEffect=", 15))
+                    effects[eff].contrast.effect=readInt(line, 15);
+                else if(0==strncmp_i(line, "IntensityAmount=", 16))
+                    effects[eff].intensity.amount=readDouble(line, 16);
+                else if(0==strncmp_i(line, "IntensityEffect=", 16))
+                    effects[eff].intensity.effect=readInt(line, 16);
+                else if(0==strncmp_i(line, "Enable=", 7))
+                    effects[eff].enabled=readBool(line, 7);
+            }
+            else if(SECT_GENERAL==section && rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE) &&
+                    0==strncmp_i(line, "shadeSortColumn=", 16))
+            {
+                qtSettings.shadeSortedList=readBool(line, 16);
+                found|=RD_LIST_SHADE;
+            }
+            else if(found==rd)
+                break;
+
+        fclose(f);
+    }
+
+    if(found&RD_KDE4_PAL)
+    {
+        int eff=0;
+        // TODO: Mid color???
+        qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW];
+        
+        for(eff=0; eff<2; ++eff)
+        {
+            int p=0==eff ? PAL_DISABLED : PAL_INACTIVE;
+            memcpy(qtSettings.colors[p], qtSettings.colors[PAL_ACTIVE], sizeof(GdkColor) * COLOR_NUMCOLORS);
+            if(effects[eff].enabled)
+            {
+                int col;
+                for(col=0; col<COLOR_NUMCOLORS; ++col)
+                {
+                    switch(effects[eff].intensity.effect)
+                    {
+                        case IntensityShade:
+                            qtSettings.colors[p][col] = ColorUtils_shade(&qtSettings.colors[PAL_ACTIVE][col], effects[eff].intensity.amount, 0.0);
+                            break;
+                        case IntensityDarken:
+                            qtSettings.colors[p][col] = ColorUtils_darken(&qtSettings.colors[PAL_ACTIVE][col], effects[eff].intensity.amount, 1.0);
+                            break;
+                        case IntensityLighten:
+                            qtSettings.colors[p][col] = ColorUtils_lighten(&qtSettings.colors[PAL_ACTIVE][col], effects[eff].intensity.amount, 1.0);
+                        default:
+                            break;
+                    }
+                    switch (effects[eff].color.effect)
+                    {
+                        case ColorDesaturate:
+                            qtSettings.colors[p][col] = ColorUtils_darken(&qtSettings.colors[PAL_ACTIVE][col], 0.0, 1.0 - effects[eff].color.amount);
+                            break;
+                        case ColorFade:
+                            qtSettings.colors[p][col] = ColorUtils_mix(&qtSettings.colors[PAL_ACTIVE][col], &effects[eff].col, effects[eff].color.amount);
+                            break;
+                        case ColorTint:
+                            qtSettings.colors[p][col] = ColorUtils_tint(&qtSettings.colors[PAL_ACTIVE][col], &effects[eff].col, effects[eff].color.amount);
+                        default:
+                            break;
+                    }
+
+                    if(COLOR_BUTTON_TEXT==col || COLOR_TEXT==col || COLOR_WINDOW_TEXT==col || COLOR_TOOLTIP_TEXT==col)
+                    {
+                        int other=COLOR_BUTTON_TEXT==col
+                                    ? COLOR_BUTTON
+                                    : COLOR_WINDOW_TEXT==col
+                                        ? COLOR_WINDOW
+                                        : COLOR_TEXT==col
+                                            ? COLOR_BACKGROUND
+                                            : COLOR_TOOLTIP;
+
+                        switch(effects[eff].contrast.effect)
+                        {
+                            case ContrastFade:
+                                qtSettings.colors[p][col]=ColorUtils_mix(&qtSettings.colors[PAL_ACTIVE][col],
+                                                                         &qtSettings.colors[PAL_ACTIVE][other],
+                                                                         effects[eff].contrast.amount);
+                                break;
+                            case ContrastTint:
+                                qtSettings.colors[p][col]=ColorUtils_tint(&qtSettings.colors[PAL_ACTIVE][col],
+                                                                          &qtSettings.colors[PAL_ACTIVE][other],
+                                                                          effects[eff].contrast.amount);
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(rd&RD_ICONS && !qtSettings.icons)
+    {
+        qtSettings.icons=(char *)malloc(strlen(defaultIcons())+1);
+        strcpy(qtSettings.icons, defaultIcons());
+    }
+    if(rd&RD_TOOLBAR_STYLE && !(found&RD_TOOLBAR_STYLE))
+        qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
+    if(rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS))
+        qtSettings.buttonIcons=TRUE;
+    if(rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE))
+        qtSettings.shadeSortedList=TRUE;
+}
+
+static void readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboolean setDefaultFont, FileType ft)
+{
+    const char  *home=absolute ? NULL : getHome();
+    int         found=0,
+                weight=WEIGHT_NORMAL,
+                italic=0,
+                fixedW=0;
+    float       size=DEFAULT_KDE_FONT_SIZE;
+    const char  *family=DEFAULT_KDE_FONT,
+                *foundry="*";
+    char        line[QTC_MAX_INPUT_LINE_LEN+1],
+                fontLine[QTC_MAX_INPUT_LINE_LEN+1];
 
     if(absolute || NULL!=home)
     {
-        char     fname[256];
-        FILE     *f;
+        char fname[256];
+        FILE *f;
 
         if(!absolute)
             sprintf(fname, "%s/%s", home, rc);
@@ -443,135 +871,17 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
                             section=SECT_GENERAL;
                         else if(0==strncmp_i(line, "[KDE]", 5))
                             section=SECT_KDE;
-                        else if(opts->mapKdeIcons && 0==strncmp_i(line, "[Icons]", 7))
-                            section=SECT_ICONS;
-                        else if(0==strncmp_i(line, "[Toolbar style]", 15))
-                            section=SECT_TOOLBAR_STYLE;
-                        else if(opts->mapKdeIcons && 0==strncmp_i(line, "[MainToolbarIcons]", 18))
-                            section=SECT_MAIN_TOOLBAR_ICONS;
-                        else if(opts->mapKdeIcons && 0==strncmp_i(line, "[SmallIcons]", 12))
-                            section=SECT_SMALL_ICONS;
-                        else if(KDE4==ft && 0==strncmp_i(line, "[Colors:View]", 13))
-                            section=SECT_COLORS_VIEW;
                         else
                             section=SECT_NONE;
-                }
-                else if (SECT_ICONS==section && rd&RD_ICONS && !(found&RD_ICONS) &&
-                         0==strncmp_i(line, "Theme=", 6))
-                {
-                    char *eq=strstr(line, "=");
-
-                    if(eq && ++eq)
-                    {
-                        unsigned int len=strlen(eq);
-
-                        if(qtSettings.icons)
-                        {
-                            free(qtSettings.icons);
-                            qtSettings.icons=NULL;
-                        }
-
-                        qtSettings.icons=(char *)malloc(len+1);
-                        strcpy(qtSettings.icons, eq);
-                        if('\n'==qtSettings.icons[len-1])
-                            qtSettings.icons[len-1]='\0';
-                    }
-
-                    found|=RD_ICONS;
-                }
-                else if (SECT_SMALL_ICONS==section && rd&RD_SMALL_ICON_SIZE && !(found&RD_SMALL_ICON_SIZE) &&
-                         0==strncmp_i(line, "Size=", 5))
-                {
-                    char *eq=strstr(line, "=");
-
-                    if(eq && ++eq)
-                    {
-                        int size=atoi(eq);
-
-                        qtSettings.iconSizes.smlTbSize=size;
-                        qtSettings.iconSizes.btnSize=size;
-                        qtSettings.iconSizes.mnuSize=size;
-                        found|=RD_SMALL_ICON_SIZE;
-                    }
-                }
-                else if (SECT_TOOLBAR_STYLE==section && rd&RD_TOOLBAR_STYLE &&
-                         !(found&RD_TOOLBAR_STYLE) &&
-                         ( (KDE3==ft && 0==strncmp_i(line, "IconText=", 9)) ||
-                           (KDE4==ft && 0==strncmp_i(line, "ToolButtonStyle=", 16))))
-                {
-                    char *eq=strstr(line, "=");
-
-                    if(eq && ++eq)
-                    {
-                        if(0==strncmp_i(eq, "IconOnly", 8))
-                            qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
-                        else if(0==strncmp_i(eq, "TextOnly", 8))
-                            qtSettings.toolbarStyle=GTK_TOOLBAR_TEXT;
-                        else if( (KDE3==ft && 0==strncmp_i(eq, "IconTextRight", 13)) ||
-                                 (KDE4==ft && 0==strncmp_i(eq, "TextBesideIcon", 14)) )
-                            qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH_HORIZ;
-                        else if( (KDE3==ft && 0==strncmp_i(eq, "IconTextBottom", 14)) ||
-                                 (KDE4==ft && 0==strncmp_i(eq, "TextUnderIcon", 13)))
-                            qtSettings.toolbarStyle=GTK_TOOLBAR_BOTH;
-                        found|=RD_TOOLBAR_STYLE;
-                    }
-                }
-                else if (SECT_MAIN_TOOLBAR_ICONS==section && rd&RD_TOOLBAR_ICON_SIZE &&
-                         !(found&RD_TOOLBAR_ICON_SIZE) && 0==strncmp_i(line, "Size=", 5))
-                {
-                    char *eq=strstr(line, "=");
-
-                    if(eq && ++eq)
-                    {
-                        qtSettings.iconSizes.tbSize=atoi(eq);
-                        found|=RD_TOOLBAR_ICON_SIZE;
-                    }
-                }
-                else if (SECT_KDE==section && rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS) &&
-                         0==strncmp_i(line, "ShowIconsOnPushButtons=", 23))
-                {
-                    char *eq=strstr(line, "=");
-
-                    if(eq && ++eq)
-                    {
-                        qtSettings.buttonIcons=0==strncmp_i(eq, "true", 4);
-                        found|=RD_BUTTON_ICONS;
-                    }
                 }
                 else if(rd&RD_CONTRAST && !(found&RD_CONTRAST) &&
                          ( (QT3==ft && SECT_KDE==section && 0==strncmp_i(line, "contrast=", 9)) ||
                            (QT4==ft && SECT_QT==section  && 0==strncmp_i(line, "KDE\\contrast=", 13))))
                 {
-                    char *l=strchr(line, '=');
-                    l++;
-                    sscanf(l, "%i", &(opts->contrast));
+                    opts->contrast=readInt(line, QT3==ft ? 9 : 13);
                     if(opts->contrast>10 || opts->contrast<0)
                         opts->contrast=7;
                     found|=RD_CONTRAST;
-                }
-                else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
-                        ( (KDE3==ft && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20)) ||
-                          (KDE4==ft && SECT_COLORS_VIEW==section && 0==strncmp_i(line, "BackgroundAlternate=", 20)) ) )
-                {
-                    sscanf(&line[20], "%d,%d,%d\n", &qtSettings.colors[PAL_ACTIVE][COLOR_LV].red,
-                                                    &qtSettings.colors[PAL_ACTIVE][COLOR_LV].green,
-                                                    &qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue);
-                    qtSettings.colors[PAL_ACTIVE][COLOR_LV].red=toGtkColor(qtSettings.colors[PAL_ACTIVE][COLOR_LV].red);
-                    qtSettings.colors[PAL_ACTIVE][COLOR_LV].green=toGtkColor(qtSettings.colors[PAL_ACTIVE][COLOR_LV].green);
-                    qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue=toGtkColor(qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue);
-
-                    found|=RD_LIST_COLOR;
-                }
-                else if(SECT_GENERAL==section && rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE) &&
-                        0==strncmp_i(line, "shadeSortColumn=", 16))
-                {
-                    char *eq=strstr(line, "=");
-
-                    if(eq && ++eq)
-                    {
-                        qtSettings.shadeSortedList=0==strncmp_i(eq, "true", 4);
-                        found|=RD_LIST_SHADE;
-                    }
                 }
                 else if(( (QT3==ft && SECT_PALETTE==section) || (QT4==ft && SECT_QT==section)) && rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE) &&
                           (QT4==ft ? 0==strncmp_i(line, "Palette\\active=", 15) : 0==strncmp_i(line, "active=", 7)))
@@ -776,19 +1086,6 @@ static int readRc(const char *rc, int rd, Options *opts, gboolean absolute, gboo
         printf("REQUEST FONT: %s\n", qtSettings.font);
 #endif
     }
-
-    if(rd&RD_ICONS && !qtSettings.icons)
-    {
-        qtSettings.icons=(char *)malloc(strlen(defaultIcons())+1);
-        strcpy(qtSettings.icons, defaultIcons());
-    }
-    if(rd&RD_TOOLBAR_STYLE && !(found&RD_TOOLBAR_STYLE))
-        qtSettings.toolbarStyle=GTK_TOOLBAR_ICONS;
-    if(rd&RD_BUTTON_ICONS && !(found&RD_BUTTON_ICONS))
-        qtSettings.buttonIcons=TRUE;
-    if(rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE))
-        qtSettings.shadeSortedList=TRUE;
-    return found;
 }
 
 static int qt_refs=0;
@@ -1638,10 +1935,10 @@ static gboolean qtInit(Options *opts)
                                  0L};
 
             for(f=0; 0!=files[f]; ++f)
-                readRc(files[f],
-                       (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|RD_TOOLBAR_ICON_SIZE|
-                        RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE,
-                        opts, TRUE, FALSE, qtSettings.qt4 ? KDE4 : KDE3);
+                readKdeGlobals(files[f], (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|
+                                         RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE|
+                                         (qtSettings.qt4 ? RD_KDE4_PAL : 0),
+                               opts, qtSettings.qt4 ? KDE4 : KDE3);
             }
 
             /* Tear off menu items dont seem to draw they're background, and the default background
@@ -2051,11 +2348,11 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
 
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_PRELIGHT, COLOR_TEXT)
 
-    SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_NORMAL, COLOR_FOREGROUND)
+    SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_NORMAL, COLOR_WINDOW_TEXT)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_SELECTED, COLOR_TEXT_SELECTED)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_INSENSITIVE, COLOR_MID)
-    SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_ACTIVE, COLOR_FOREGROUND)
-    SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_PRELIGHT, COLOR_FOREGROUND)
+    SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_ACTIVE, COLOR_WINDOW_TEXT)
+    SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_PRELIGHT, COLOR_WINDOW_TEXT)
 }
 
 static void qtSetFont(GtkRcStyle *rc_style)
