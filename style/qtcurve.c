@@ -4171,11 +4171,11 @@ debugDisplayWidget(widget, 3);
         if(doEtch && (!list || glow) && !mnu)
         {
             if(glow)
-                drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, ROUNDED_ALL, WIDGET_STD_BUTTON);
+                drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, ROUNDED_ALL, WIDGET_CHECKBOX);
             else
                 drawEtch(cr, area, NULL, widget, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2,
                          opts.crButton && !mnu && EFFECT_SHADOW==opts.buttonEffect ? GTK_STATE_ACTIVE!=state : false,
-                         ROUNDED_ALL, WIDGET_STD_BUTTON);
+                         ROUNDED_ALL, WIDGET_CHECKBOX);
         }
 
         drawBorder(cr, style, state, area, NULL, x, y, QTC_CHECK_SIZE, QTC_CHECK_SIZE,
