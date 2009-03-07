@@ -2872,7 +2872,10 @@ debugDisplayWidget(widget, 3);
         }
         else if (QTC_DO_EFFECT)
         {
-            drawEtch(cr, area, NULL, widget, x-2, y-2, width+2, height+2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
+            GdkRectangle clip;
+
+            clip.x=x-2, clip.y=y, clip.width=width+2, clip.height=height;
+            drawEtch(cr, &clip, NULL, widget, x-2, y-2, width+2, height+2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
             height--;
             width--;
         }
