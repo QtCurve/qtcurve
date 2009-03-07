@@ -4710,7 +4710,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     }
                 }
 #endif
-
                 if (!tabV2.icon.isNull())
                 {
                     QSize iconSize(tabV2.iconSize);
@@ -4721,24 +4720,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     }
 
                     QPixmap tabIcon(getIconPixmap(tabV2.icon, iconSize, state&State_Enabled));
-#if 0
-                    static const int constIconPad=6;
-
-                    if(reverse)
-                    {
-                        painter->drawPixmap(r.right() - (iconSize.width() + constIconPad),
-                                            r.center().y() - tabIcon.height() / 2, tabIcon);
-                        r.setRight(r.right() - (iconSize.width() + constIconPad));
-                    }
-                    else
-                    {
-                        painter->drawPixmap(r.left() + constIconPad, r.center().y() - tabIcon.height() / 2, tabIcon);
-                        r.setLeft(r.left() + iconSize.width() + constIconPad);
-                    }
-#endif
-                    QSize tabIconSize = tabV2.icon.actualSize(iconSize, tabV2.state&State_Enabled
-                                                                ? QIcon::Normal
-                                                                : QIcon::Disabled);
+                    QSize   tabIconSize = tabV2.icon.actualSize(iconSize, tabV2.state&State_Enabled
+                                                                  ? QIcon::Normal
+                                                                  : QIcon::Disabled);
 
                     int offset = 4,
                         left = option->rect.left();
@@ -4746,7 +4730,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if (tabV2.leftButtonSize.isNull())
                         offset += 2;
                     else
-                        left += tabV2.leftButtonSize.width() + (6 + 2) + 2;
+                        left += tabV2.leftButtonSize.width() + 2;
 #endif
                     QRect iconRect = QRect(left + offset, r.center().y() - tabIcon.height() / 2,
                                            tabIconSize.width(), tabIconSize.height());
@@ -4761,14 +4745,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(!tab->text.isEmpty())
                 {
-#if QT_VERSION < 0x040500
-                    if(qtVersion()<VER_45)
-                    {
-                        static const int constBorder=6;
+                    static const int constBorder=6;
 
-                        r.adjust(constBorder, 0, -constBorder, 0);
-                    }
-#endif
+                    r.adjust(constBorder, 0, -constBorder, 0);
                     drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text, QPalette::WindowText);
                 }
 
