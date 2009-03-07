@@ -3483,9 +3483,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 QStyleOptionProgressBar mod(*bar);
 
+                if(mod.rect.height()>16 && widget->parentWidget() &&
+                   (qobject_cast<const QStatusBar *>(widget->parentWidget()) ||
+                    widget->parentWidget()->inherits("DolphinStatusBar")))
+                {
+                    int m=(mod.rect.height()-16)/2;
+                    mod.rect.adjust(0, m, 0, -m);
+                }
+                drawControl(CE_ProgressBarGroove, &mod, painter, widget);
                 if(QTC_DO_EFFECT)
                     mod.rect.adjust(1, 1, -1, -1);
-                drawControl(CE_ProgressBarGroove, option, painter, widget);
                 drawControl(CE_ProgressBarContents, &mod, painter, widget);
                 drawControl(CE_ProgressBarLabel, &mod, painter, widget);
             }
