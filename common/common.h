@@ -1254,8 +1254,13 @@ typedef enum
 #define QTC_MAX_ROUND_WIDGET(A) \
             (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_MENU_BUTTON==A)
 
+#ifdef __cplusplus
+#define QTC_EXTRA_ROUND_WIDGET(A) \
+            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_MDI_WINDOW && A!=WIDGET_MDI_WINDOW_TITLE)
+#else
 #define QTC_EXTRA_ROUND_WIDGET(A) \
             (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME)
+#endif
 
 static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
 {
