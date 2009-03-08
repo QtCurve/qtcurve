@@ -45,7 +45,7 @@
 static struct
 {
     GdkColor background[TOTAL_SHADES+1],
-             button[TOTAL_SHADES+1],
+             button[2][TOTAL_SHADES+1],
              *slider,
              *defbtn,
              *mouseover,
@@ -286,16 +286,16 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
     return gtk_gc_get(style->depth, style->colormap, &gc_values, GDK_GC_FOREGROUND);
 }
 
-#define QTC_SET_BTN_COLS(SCROLLBAR, SCALE, LISTVIEW) \
+#define QTC_SET_BTN_COLS(SCROLLBAR, SCALE, LISTVIEW, STATE) \
 { \
     if(SCROLLBAR || SCALE) \
         btn_colors=SHADE_NONE!=opts.shadeSliders \
                     ? qtcPalette.slider \
-                    : qtcPalette.button; \
+                    : qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? 1 : 0]; \
     else if(LISTVIEW) \
         btn_colors=qtcPalette.background; \
     else \
-        btn_colors=qtcPalette.button; \
+        btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? 1 : 0]; \
 }
 
 static void generateMidColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor)
@@ -2783,6 +2783,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
              checkbox=!stepper && DETAIL(QTC_CHECKBOX),
              vscrollbar=!checkbox && DETAIL("vscrollbar"),
              hscrollbar=!vscrollbar && DETAIL("hscrollbar"),
+             spinUp=!hscrollbar && DETAIL("spinbutton_up"),
+             spinDown=!spinUp && DETAIL("spinbutton_down"),
              rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent)),
              activeWindow=TRUE;
     GdkColor new_cols[TOTAL_SHADES+1],
@@ -2818,7 +2820,8 @@ debugDisplayWidget(widget, 3);
             btn_colors=new_cols;
         }
         else
-            QTC_SET_BTN_COLS(slider, hscale|vscale, lvh)
+            QTC_SET_BTN_COLS(slider, hscale|vscale, lvh, 
+                             (GTK_STATE_INSENSITIVE==state && (spinUp||spinDown) ? GTK_STATE_ACTIVE : state))
     }
 
     g_return_if_fail(style != NULL);
@@ -2855,10 +2858,9 @@ debugDisplayWidget(widget, 3);
             activeWindow=gtk_window_has_toplevel_focus(GTK_WINDOW(topLevel));
     }
 
-    if(detail && (0==strcmp(detail, "spinbutton_up") || 0==strcmp(detail, "spinbutton_down")))
+    if(spinUp || spinDown)
     {
-        EWidget wid=0==strcmp(detail, "spinbutton_up")
-                        ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
+        EWidget wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
 
         if(WIDGET_SPIN_UP==wid)
         {
@@ -4072,7 +4074,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
         btn_colors=new_colors;
     }
     else
-        btn_colors=qtcPalette.button;
+        btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? 1 : 0];
 
 //     x+=(width-checkSpace)>>1;
 //     y+=(height-checkSpace)>>1;
@@ -4279,7 +4281,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 btn_colors=new_colors;
             }
             else
-                btn_colors=qtcPalette.button;
+                btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? 1 : 0];
 
             { /* C-scoping */
             GdkColor *colors=coloredMouseOver
@@ -5211,7 +5213,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
             btn_colors=new_colors;
         }
         else
-            QTC_SET_BTN_COLS(scrollbar, scale, FALSE)
+            QTC_SET_BTN_COLS(scrollbar, scale, FALSE, state)
     }
 
     FN_CHECK
@@ -5985,7 +5987,8 @@ static void styleUnrealize(GtkStyle *style)
 static void generateColors()
 {
     shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], qtcPalette.background);
-    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON], qtcPalette.button);
+    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON], qtcPalette.button[0]);
+    shadeColors(&qtSettings.colors[PAL_DISABLED][COLOR_BUTTON], qtcPalette.button[1]);
     shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED], qtcPalette.menuitem);
 
     if(SHADE_CUSTOM==opts.shadeMenubars)
@@ -6016,7 +6019,7 @@ static void generateColors()
             GdkColor mid;
 
             generateMidColor(&qtcPalette.menuitem[ORIGINAL_SHADE],
-                            &qtcPalette.button[ORIGINAL_SHADE], &mid, 1.0);
+                            &qtcPalette.button[0][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.slider=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.slider);
         }
@@ -6028,7 +6031,7 @@ static void generateColors()
     {
         GdkColor col;
 
-        tintColor(&qtcPalette.button[ORIGINAL_SHADE],
+        tintColor(&qtcPalette.button[0][ORIGINAL_SHADE],
                   &qtcPalette.menuitem[ORIGINAL_SHADE], &col, 0.2);
         qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
         shadeColors(&col, qtcPalette.defbtn);
@@ -6042,7 +6045,7 @@ static void generateColors()
             GdkColor mid;
 
             generateMidColor(&qtcPalette.menuitem[ORIGINAL_SHADE],
-                             &qtcPalette.button[ORIGINAL_SHADE], &mid, 1.0);
+                             &qtcPalette.button[0][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.defbtn);
         }
@@ -6059,7 +6062,7 @@ static void generateColors()
             GdkColor mid;
 
             generateMidColor(&qtcPalette.menuitem[ORIGINAL_SHADE],
-                             &qtcPalette.button[ORIGINAL_SHADE], &mid, 1.0);
+                             &qtcPalette.button[0][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.mouseover=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.mouseover);
         }

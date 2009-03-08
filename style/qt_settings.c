@@ -741,7 +741,7 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
         fclose(f);
     }
 
-    if(found&RD_KDE4_PAL)
+    if(found&RD_KDE4_PAL && KDE4==ft)
     {
         int    eff=0;
         double contrast=0.1*opts->contrast,
