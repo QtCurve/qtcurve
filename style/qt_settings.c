@@ -36,11 +36,11 @@
 #define QTC_RC_SETTING "QtC__"
 
 #define toQtColor(col) \
-    col>>8
+    ((col&0xFF00)>>8)
 /*    ((int)((((double)col)/256.0)+0.5))*/
 
 #define toGtkColor(col) \
-    col<<8
+    ((col<<8)+col)
 
 /*
 #define QTC_DEBUG
@@ -743,10 +743,24 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
 
     if(found&RD_KDE4_PAL)
     {
-        int eff=0;
-        // TODO: Mid color???
-        qtSettings.colors[PAL_ACTIVE][COLOR_MID]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW];
-        
+        int    eff=0;
+        double contrast=0.1*opts->contrast,
+               y;
+
+        contrast = (1.0 > contrast ? (-1.0 < contrast ? contrast : -1.0) : 1.0);
+        y = ColorUtils_luma(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
+
+        if(y<0.006)
+            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=ColorUtils_shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], 0.01 + 0.20 * contrast, 0.0);
+        else if(y>0.93)
+            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=ColorUtils_shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], -0.02 - 0.20 * contrast, 0.0);
+        else
+        {
+            double darkAmount =  (     - y       ) * (0.55 + contrast * 0.35);
+
+            qtSettings.colors[PAL_ACTIVE][COLOR_MID]=ColorUtils_shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], (0.35 + 0.15 * y) * darkAmount, 0.0);
+        }
+
         for(eff=0; eff<2; ++eff)
         {
             int p=0==eff ? PAL_DISABLED : PAL_INACTIVE;
@@ -759,26 +773,26 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
                     switch(effects[eff].intensity.effect)
                     {
                         case IntensityShade:
-                            qtSettings.colors[p][col] = ColorUtils_shade(&qtSettings.colors[PAL_ACTIVE][col], effects[eff].intensity.amount, 0.0);
+                            qtSettings.colors[p][col] = ColorUtils_shade(&qtSettings.colors[p][col], effects[eff].intensity.amount, 0.0);
                             break;
                         case IntensityDarken:
-                            qtSettings.colors[p][col] = ColorUtils_darken(&qtSettings.colors[PAL_ACTIVE][col], effects[eff].intensity.amount, 1.0);
+                            qtSettings.colors[p][col] = ColorUtils_darken(&qtSettings.colors[p][col], effects[eff].intensity.amount, 1.0);
                             break;
                         case IntensityLighten:
-                            qtSettings.colors[p][col] = ColorUtils_lighten(&qtSettings.colors[PAL_ACTIVE][col], effects[eff].intensity.amount, 1.0);
+                            qtSettings.colors[p][col] = ColorUtils_lighten(&qtSettings.colors[p][col], effects[eff].intensity.amount, 1.0);
                         default:
                             break;
                     }
                     switch (effects[eff].color.effect)
                     {
                         case ColorDesaturate:
-                            qtSettings.colors[p][col] = ColorUtils_darken(&qtSettings.colors[PAL_ACTIVE][col], 0.0, 1.0 - effects[eff].color.amount);
+                            qtSettings.colors[p][col] = ColorUtils_darken(&qtSettings.colors[p][col], 0.0, 1.0 - effects[eff].color.amount);
                             break;
                         case ColorFade:
-                            qtSettings.colors[p][col] = ColorUtils_mix(&qtSettings.colors[PAL_ACTIVE][col], &effects[eff].col, effects[eff].color.amount);
+                            qtSettings.colors[p][col] = ColorUtils_mix(&qtSettings.colors[p][col], &effects[eff].col, effects[eff].color.amount);
                             break;
                         case ColorTint:
-                            qtSettings.colors[p][col] = ColorUtils_tint(&qtSettings.colors[PAL_ACTIVE][col], &effects[eff].col, effects[eff].color.amount);
+                            qtSettings.colors[p][col] = ColorUtils_tint(&qtSettings.colors[p][col], &effects[eff].col, effects[eff].color.amount);
                         default:
                             break;
                     }
@@ -796,17 +810,18 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
                         switch(effects[eff].contrast.effect)
                         {
                             case ContrastFade:
-                                qtSettings.colors[p][col]=ColorUtils_mix(&qtSettings.colors[PAL_ACTIVE][col],
-                                                                         &qtSettings.colors[PAL_ACTIVE][other],
+                                qtSettings.colors[p][col]=ColorUtils_mix(&qtSettings.colors[p][col],
+                                                                         &qtSettings.colors[PAL_DISABLED][other],
                                                                          effects[eff].contrast.amount);
                                 break;
                             case ContrastTint:
-                                qtSettings.colors[p][col]=ColorUtils_tint(&qtSettings.colors[PAL_ACTIVE][col],
-                                                                          &qtSettings.colors[PAL_ACTIVE][other],
+                                qtSettings.colors[p][col]=ColorUtils_tint(&qtSettings.colors[p][col],
+                                                                          &qtSettings.colors[PAL_DISABLED][other],
                                                                           effects[eff].contrast.amount);
                             default:
                                 break;
                         }
+printf("%d -> %d %d %d\n", col, qtSettings.colors[p][col].red>>8, qtSettings.colors[p][col].green>>8, qtSettings.colors[p][col].blue>>8);
                     }
                 }
             }
@@ -1759,6 +1774,23 @@ static gboolean qtInit(Options *opts)
                 qtSettings.qt4=TRUE;
             }
 
+            {
+            int        f=0;
+            const char *files[]={"/etc/kderc",
+                                 qtSettings.qt4 ? "/etc/kde4/kdeglobals" : "/etc/kde3/kdeglobals",
+                                 qtSettings.qt4 ? "/etc/kde4rc" : "/etc/kde3rc",
+                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_FILE : KDE3PREFIX KDEGLOBALS_FILE,
+                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_SYS_FILE : KDE3PREFIX KDEGLOBALS_SYS_FILE,
+                                 kdeGlobals(),
+                                 0L};
+
+            for(f=0; 0!=files[f]; ++f)
+                readKdeGlobals(files[f], (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|
+                                         RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE|
+                                         (qtSettings.qt4 ? RD_KDE4_PAL : 0),
+                               opts, qtSettings.qt4 ? KDE4 : KDE3);
+            }
+
             /* Only for testing - allows me to simulate Qt's -style parameter. e.g start Gtk2 app as follows:
 
                 QTC_STYLE=qtc_klearlooks gtk-demo
@@ -1920,23 +1952,6 @@ static gboolean qtInit(Options *opts)
 
             if(GTK_APP_VMPLAYER==qtSettings.app)
                 opts->shadeMenubars=SHADE_NONE;
-
-            {
-            int        f=0;
-            const char *files[]={"/etc/kderc",
-                                 qtSettings.qt4 ? "/etc/kde4/kdeglobals" : "/etc/kde3/kdeglobals",
-                                 qtSettings.qt4 ? "/etc/kde4rc" : "/etc/kde3rc",
-                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_FILE : KDE3PREFIX KDEGLOBALS_FILE,
-                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_SYS_FILE : KDE3PREFIX KDEGLOBALS_SYS_FILE,
-                                 kdeGlobals(),
-                                 0L};
-
-            for(f=0; 0!=files[f]; ++f)
-                readKdeGlobals(files[f], (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|
-                                         RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_COLOR|RD_LIST_SHADE|
-                                         (qtSettings.qt4 ? RD_KDE4_PAL : 0),
-                               opts, qtSettings.qt4 ? KDE4 : KDE3);
-            }
 
             /* Tear off menu items dont seem to draw they're background, and the default background
                is drawn :-(  Fix/hack this by making that background the correct color */
