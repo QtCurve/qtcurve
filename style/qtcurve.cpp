@@ -3592,11 +3592,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         {
             const QColor *use(buttonColors(option));
             const QColor *border(borderColors(option, use));
+            const QColor &color(palette.color(QPalette::Active, QPalette::Window));
 
             painter->save();
-            painter->fillRect(r, QColor(state&State_MouseOver
-                                      ? shade(palette.background().color(), QTC_TO_FACTOR(opts.highlightFactor))
-                                      : palette.background().color()));
+            painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled
+                                      ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
+                                      : color));
             switch(opts.splitters)
             {
                 case LINE_NONE:
