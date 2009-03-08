@@ -821,7 +821,6 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts, FileType ft)
                             default:
                                 break;
                         }
-printf("%d -> %d %d %d\n", col, qtSettings.colors[p][col].red>>8, qtSettings.colors[p][col].green>>8, qtSettings.colors[p][col].blue>>8);
                     }
                 }
             }
@@ -2330,6 +2329,11 @@ static void qtExit()
                                 ? PAL_DISABLED \
                                 : PAL ][QTP_COL];
 
+#define SET_COLOR_PAL_ACT(st, rc, itm, ITEM, state, QTP_COL) \
+    st->itm[state]=rc->color_flags[state]&ITEM \
+        ? rc->itm[state] \
+        : qtSettings.colors[PAL_ACTIVE][QTP_COL];
+
 #define SET_COLOR(st, rc, itm, ITEM, state, QTP_COL) \
     SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE)
 
@@ -2343,7 +2347,7 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
 
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_NORMAL, COLOR_BACKGROUND)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_SELECTED, COLOR_SELECTED)
-    SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_INSENSITIVE, COLOR_WINDOW)
+    SET_COLOR_PAL_ACT(style, rc_style, base, GTK_RC_BASE, GTK_STATE_INSENSITIVE, COLOR_WINDOW)
     /*SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED)*/
     style->base[GTK_STATE_ACTIVE]=qtSettings.inactiveSelectCol;
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_PRELIGHT, COLOR_SELECTED)
