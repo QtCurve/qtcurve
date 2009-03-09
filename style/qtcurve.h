@@ -62,7 +62,7 @@ void qtcurve_rc_style_register_type (GTypeModule *module);
 typedef struct 
 {
     GtkStyle parent_instance;
-    GdkGC   *button_text_gc,
+    GdkGC   *button_text_gc[2],
             *menutext_gc[2];
 } QtCurveStyle;
 

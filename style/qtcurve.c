@@ -291,11 +291,11 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
     if(SCROLLBAR || SCALE) \
         btn_colors=SHADE_NONE!=opts.shadeSliders \
                     ? qtcPalette.slider \
-                    : qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? 1 : 0]; \
+                    : qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
     else if(LISTVIEW) \
         btn_colors=qtcPalette.background; \
     else \
-        btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? 1 : 0]; \
+        btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
 }
 
 static void generateMidColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor)
@@ -456,6 +456,18 @@ static gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail
 
 }
 
+static gboolean isOnListViewHeader(GtkWidget *w, int level)
+{
+    if(w)
+    {
+        if(isListViewHeader(w))
+            return TRUE;
+        else if(level<4)
+            return isOnListViewHeader(w->parent, ++level);
+    }
+    return FALSE;
+}
+
 static gboolean isComboBoxButton(GtkWidget *widget)
 {
     return widget && GTK_IS_BUTTON(widget) && widget->parent &&
@@ -509,11 +521,23 @@ static gboolean isOnComboEntry(GtkWidget *w, int level)
     return FALSE;
 }
 
-static gboolean isOnCombo(GtkWidget *w, int level)
+static gboolean isOnComboBox(GtkWidget *w, int level)
 {
     if(w)
     {
         if(GTK_IS_COMBO_BOX(w))
+            return TRUE;
+        else if(level<4)
+            return isOnComboBox(w->parent, ++level);
+    }
+    return FALSE;
+}
+
+static gboolean isOnCombo(GtkWidget *w, int level)
+{
+    if(w)
+    {
+        if(GTK_IS_COMBO(w))
             return TRUE;
         else if(level<4)
             return isOnCombo(w->parent, ++level);
@@ -574,8 +598,7 @@ static gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
 {
     if(w)
     {
-        if(GTK_IS_BUTTON(w) &&(!(GTK_IS_RADIO_BUTTON(w) || GTK_IS_CHECK_BUTTON(w) ||
-                               GTK_IS_OPTION_MENU(w))))
+        if((GTK_IS_BUTTON(w) || GTK_IS_OPTION_MENU(w)) && (!(GTK_IS_RADIO_BUTTON(w) || GTK_IS_CHECK_BUTTON(w))))
         {
             if(def)
                 *def=GTK_WIDGET_HAS_DEFAULT(w);
@@ -2636,6 +2659,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          const gchar *detail, GtkArrowType arrow_type,
                          gboolean fill, gint x, gint y, gint width, gint height)
 {
+    QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 //    QTC_CAIRO_BEGIN
 
 #ifdef QTC_DEBUG
@@ -2644,23 +2668,27 @@ debugDisplayWidget(widget, 3);
 #endif
     if(DETAIL("arrow"))
     {
-        if(isOnCombo(widget, 0) && !isOnComboEntry(widget, 0))
+        gboolean onComboEntry=isOnComboEntry(widget, 0);
+
+        if(isOnComboBox(widget, 0) && !onComboEntry)
         {
             x++;
 
 //             if(opts.singleComboArrow)
-                drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
-                          x+(width>>1), y+(height>>1), FALSE, TRUE);
+                drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE],
+                          area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
 //             else
 //             {
-//                 drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_UP,
+//                 drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], area,  GTK_ARROW_UP,
 //                           x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-(opts.vArrows ? 0 : 1)), FALSE, TRUE);
-//                 drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  GTK_ARROW_DOWN,
+//                 drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], area,  GTK_ARROW_DOWN,
 //                           x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
 //             }
         }
         else
-            drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
+            drawArrow(window, onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0)
+                                ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                                : style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
                       x+(width>>1), y+(height>>1), FALSE, TRUE);
     }
     else
@@ -2750,8 +2778,10 @@ debugDisplayWidget(widget, 3);
             else
                 y++;
 
-        drawArrow(window, style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
-                           ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)],
+        drawArrow(window, isSpinButton || sbar
+                            ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                            : style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
+                                ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)],
                   area, arrow_type, x, y, isSpinButton, TRUE);
     }
     //QTC_CAIRO_END
@@ -2896,7 +2926,7 @@ debugDisplayWidget(widget, 3);
     else if(detail &&( button || togglebutton || optionmenu || checkbox || sbar || hscale || vscale ||
                        stepper || slider || qtc_paned))
     {
-        gboolean combo=0==strcmp(detail, "optionmenu") || isOnCombo(widget, 0),
+        gboolean combo=0==strcmp(detail, "optionmenu") || isOnComboBox(widget, 0),
                  combo_entry=combo && isOnComboEntry(widget, 0),
                  horiz_tbar,
                  tbar_button=isButtonOnToolbar(widget, &horiz_tbar),
@@ -4047,6 +4077,15 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
     }
 }
 
+static GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean mnu)
+{
+    return !qtSettings.qt4 && mnu
+                ? &style->text[state]
+                : GTK_STATE_INSENSITIVE==state
+                    ? &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT]
+                    : qtcPalette.check_radio;
+}
+
 static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                          const gchar *detail, gint x, gint y, gint width, gint height)
@@ -4073,7 +4112,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
         btn_colors=new_colors;
     }
     else
-        btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? 1 : 0];
+        btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
 
 //     x+=(width-checkSpace)>>1;
 //     y+=(height-checkSpace)>>1;
@@ -4189,11 +4228,7 @@ debugDisplayWidget(widget, 3);
 
     if(on)
     {
-        GdkPixbuf *pix=getPixbuf(GTK_STATE_INSENSITIVE==state /* || (list && (GTK_STATE_SELECTED==state || GTK_STATE_ACTIVE==state)) */
-                                    ? &style->text[ind_state]
-                                    : GTK_STATE_PRELIGHT==state && !qtSettings.qt4 && mnu
-                                        ? &style->text[GTK_STATE_PRELIGHT]
-                                        : qtcPalette.check_radio, PIX_CHECK, 1.0);
+        GdkPixbuf *pix=getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_CHECK, 1.0);
         int       pw=gdk_pixbuf_get_width(pix),
                   ph=gdk_pixbuf_get_height(pix),
                   dx=(x+(QTC_CHECK_SIZE/2))-(pw/2),
@@ -4205,9 +4240,7 @@ debugDisplayWidget(widget, 3);
     else if (tri)
     {
         int      ty=y+(QTC_CHECK_SIZE/2);
-        GdkColor *col=GTK_STATE_INSENSITIVE==state
-                        ? &style->text[ind_state]
-                        : qtcPalette.check_radio;
+        GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
 
         drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty, QTC_CHECK_SIZE-6);
         drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty+1, QTC_CHECK_SIZE-6);
@@ -4280,7 +4313,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 btn_colors=new_colors;
             }
             else
-                btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? 1 : 0];
+                btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
 
             { /* C-scoping */
             GdkColor *colors=coloredMouseOver
@@ -4371,9 +4404,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         if(on)
         {
-            GdkPixbuf *pix=getPixbuf(GTK_STATE_INSENSITIVE==state /* || (list && (GTK_STATE_SELECTED==state || GTK_STATE_ACTIVE==state))*/
-                                        ? &style->text[ind_state]
-                                        : qtcPalette.check_radio, PIX_RADIO_ON, 1.0);
+            GdkPixbuf *pix=getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_RADIO_ON, 1.0);
 
             gdk_cairo_set_source_pixbuf(cr, pix, x, y);
             cairo_paint(cr);
@@ -4382,9 +4413,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
             int ty=y+(QTC_RADIO_SIZE/2);
 
-            GdkColor *col=GTK_STATE_INSENSITIVE==state
-                            ? &style->text[ind_state]
-                            : qtcPalette.check_radio;
+            GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
 
             drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty, QTC_RADIO_SIZE-6);
             drawHLine(cr, QTC_CAIRO_COL(*col), 1.0, x+3, ty+1, QTC_RADIO_SIZE-6);
@@ -4465,17 +4494,19 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-        but=isOnButton(widget, 0, &def_but) || isOnCombo(widget, 0);
+        but=isOnButton(widget, 0, &def_but) || isOnComboBox(widget, 0);
 
-        if(but && GTK_STATE_INSENSITIVE!=state)
+        if(but && (qtSettings.qt4 || GTK_STATE_INSENSITIVE!=state))
         {
             use_text=TRUE;
             swap_gc=TRUE;
             for(i=0; i<4; ++i)
             {
                 prevGcs[i]=style->text_gc[i];
-                style->text_gc[i]=qtcurveStyle->button_text_gc;
+                style->text_gc[i]=qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
             }
+            if(state==GTK_STATE_INSENSITIVE)
+                state=GTK_STATE_NORMAL;
         }
         else if(isMenuItem)
         {
@@ -4710,6 +4741,7 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height)
 {
+    QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
     //if(QTC_DO_EFFECT)
     //    x--;
 
@@ -4722,13 +4754,13 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     //QTC_CAIRO_BEGIN
 //     if(opts.singleComboArrow)
-        drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_DOWN, x,
+        drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_DOWN, x,
                   y+(height>>1), FALSE, TRUE);
 //     else
 //     {
-//         drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_UP, x,
+//         drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_UP, x,
 //                   y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
-//         drawArrow(window, style->text_gc[QTC_ARROW_STATE(state)], NULL, GTK_ARROW_DOWN, x,
+//         drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_DOWN, x,
 //                   y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
 //     }
 
@@ -5523,7 +5555,7 @@ printf("Draw vline %d %d %d %d %s  ", state, x, y1, y2, detail ? detail : "NULL"
 debugDisplayWidget(widget, 3);
 #endif
 
-    if(!(DETAIL("vseparator") && isOnCombo(widget, 0))) /* CPD: Combo handled in drawBox */
+    if(!(DETAIL("vseparator") && isOnComboBox(widget, 0))) /* CPD: Combo handled in drawBox */
     {
         gboolean tbar=DETAIL("toolbar");
         int      dark=tbar ? 3 : 5,
@@ -5959,7 +5991,10 @@ static void styleRealize(GtkStyle *style)
 
     parent_class->realize(style);
 
-    qtcurveStyle->button_text_gc=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]);
+    qtcurveStyle->button_text_gc[PAL_ACTIVE]=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]);
+    qtcurveStyle->button_text_gc[PAL_DISABLED]=qtSettings.qt4
+                            ? realizeColors(style, &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT])
+                            : style->text_gc[GTK_STATE_INSENSITIVE];
     if(opts.customMenuTextColor)
     {
         qtcurveStyle->menutext_gc[0]=realizeColors(style, &opts.customMenuNormTextColor);
@@ -5974,7 +6009,9 @@ static void styleUnrealize(GtkStyle *style)
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 
     parent_class->unrealize(style);
-    gtk_gc_release(qtcurveStyle->button_text_gc);
+    gtk_gc_release(qtcurveStyle->button_text_gc[PAL_ACTIVE]);
+    if(qtSettings.qt4)
+        gtk_gc_release(qtcurveStyle->button_text_gc[PAL_DISABLED]);
     if(opts.customMenuTextColor)
     {
         gtk_gc_release(qtcurveStyle->menutext_gc[0]);
@@ -5986,8 +6023,8 @@ static void styleUnrealize(GtkStyle *style)
 static void generateColors()
 {
     shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], qtcPalette.background);
-    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON], qtcPalette.button[0]);
-    shadeColors(&qtSettings.colors[PAL_DISABLED][COLOR_BUTTON], qtcPalette.button[1]);
+    shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON], qtcPalette.button[PAL_ACTIVE]);
+    shadeColors(&qtSettings.colors[PAL_DISABLED][COLOR_BUTTON], qtcPalette.button[PAL_DISABLED]);
     shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED], qtcPalette.menuitem);
 
     if(SHADE_CUSTOM==opts.shadeMenubars)
@@ -6018,7 +6055,7 @@ static void generateColors()
             GdkColor mid;
 
             generateMidColor(&qtcPalette.menuitem[ORIGINAL_SHADE],
-                            &qtcPalette.button[0][ORIGINAL_SHADE], &mid, 1.0);
+                            &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.slider=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.slider);
         }
@@ -6030,7 +6067,7 @@ static void generateColors()
     {
         GdkColor col;
 
-        tintColor(&qtcPalette.button[0][ORIGINAL_SHADE],
+        tintColor(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
                   &qtcPalette.menuitem[ORIGINAL_SHADE], &col, 0.2);
         qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
         shadeColors(&col, qtcPalette.defbtn);
@@ -6044,7 +6081,7 @@ static void generateColors()
             GdkColor mid;
 
             generateMidColor(&qtcPalette.menuitem[ORIGINAL_SHADE],
-                             &qtcPalette.button[0][ORIGINAL_SHADE], &mid, 1.0);
+                             &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.defbtn);
         }
@@ -6061,7 +6098,7 @@ static void generateColors()
             GdkColor mid;
 
             generateMidColor(&qtcPalette.menuitem[ORIGINAL_SHADE],
-                             &qtcPalette.button[0][ORIGINAL_SHADE], &mid, 1.0);
+                             &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.mouseover=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.mouseover);
         }
