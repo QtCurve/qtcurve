@@ -5868,7 +5868,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(up.isValid())
                 {
-                    QStyleOption opt;
+                    QStyleOption opt(*option);
 
                     up.setHeight(up.height()+1);
                     opt.rect=up;
@@ -5882,7 +5882,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(down.isValid())
                 {
-                    QStyleOption opt;
+                    QStyleOption opt(*option);
 
                     opt.rect=down;
                     opt.state|=(enabled ? State_Enabled : State_None)|(downIsActive && sunken ? State_Sunken : State_Raised)|
