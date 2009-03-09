@@ -2820,8 +2820,7 @@ debugDisplayWidget(widget, 3);
             btn_colors=new_cols;
         }
         else
-            QTC_SET_BTN_COLS(slider, hscale|vscale, lvh, 
-                             (GTK_STATE_INSENSITIVE==state && (spinUp||spinDown) ? GTK_STATE_ACTIVE : state))
+            QTC_SET_BTN_COLS(slider, hscale|vscale, lvh, state)
     }
 
     g_return_if_fail(style != NULL);
