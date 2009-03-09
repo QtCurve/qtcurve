@@ -909,7 +909,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     switch(opts.shadeCheckRadio)
     {
         default:
-            itsCheckRadioCol=QApplication::palette().color(QPalette::Active, QPalette::Text);
+            itsCheckRadioCol=QApplication::palette().color(QPalette::Active, QPalette::ButtonText);
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
@@ -1066,7 +1066,7 @@ void QtCurveStyle::polish(QPalette &palette)
     switch(opts.shadeCheckRadio)
     {
         default:
-            itsCheckRadioCol=palette.color(QPalette::Active, QPalette::Text);
+            itsCheckRadioCol=palette.color(QPalette::Active, QPalette::ButtonText);
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
@@ -2399,7 +2399,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         }
         case PE_IndicatorHeaderArrow:
             if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
-                drawArrow(painter, r, option, header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown);
+                drawArrow(painter, r,
+                          header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown, 
+                          option->palette.buttonText().color());
             break;
         case PE_IndicatorArrowUp:
         case PE_IndicatorArrowDown:
@@ -2439,7 +2441,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(state&State_Sunken)
                     sr.adjust(1, 1, 1, 1);
 
-                drawArrow(painter, sr, option, PE_IndicatorSpinUp==element ? PE_IndicatorArrowUp : PE_IndicatorArrowDown, true);
+                drawArrow(painter, sr, PE_IndicatorSpinUp==element ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
+                          option->palette.buttonText().color(), true);
             }
             else
             {
@@ -2918,12 +2921,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(state&State_On)
             {
-                QPixmap *pix(getPixmap(state&State_Enabled
-                                        ? /*state&State_Selected
-                                            ? palette.highlightedText().color()
-                                            : */ itsCheckRadioCol
-                                        : palette.mid().color(),
-                                    PIX_CHECK, 1.0));
+                QPixmap *pix(getPixmap(checkRadioCol(option), PIX_CHECK, 1.0));
 
                 painter->drawPixmap(r.center().x()-(pix->width()/2), r.center().y()-(pix->height()/2),
                                     *pix);
@@ -2932,11 +2930,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 int x(r.center().x()), y(r.center().y());
 
-                painter->setPen(state&State_Enabled
-                                ? /*state&State_Selected
-                                    ? palette.highlightedText().color()
-                                    : */ itsCheckRadioCol
-                                : palette.mid().color());
+                painter->setPen(checkRadioCol(option));
                 painter->drawLine(x-3, y, x+3, y);
                 painter->drawLine(x-3, y+1, x+3, y+1);
             }
@@ -3056,11 +3050,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->drawPixmap(x, y, *getPixmap(use[QT_BORDER(state&State_Enabled)], PIX_RADIO_BORDER, 0.8));
 
             if(state&State_On)
-                painter->drawPixmap(x, y, *getPixmap(state&State_Enabled
-                                                        ? /*state&State_Selected
-                                                            ? palette.highlightedText().color()
-                                                            :*/ itsCheckRadioCol
-                                                        : palette.mid().color(), PIX_RADIO_ON, 1.0));
+                painter->drawPixmap(x, y, *getPixmap(checkRadioCol(option), PIX_RADIO_ON, 1.0));
             if(!coloredMo && (!opts.crButton || drawLight))
                 painter->drawPixmap(x, y, *getPixmap(btn[drawLight ? QTC_LIGHT_BORDER(app)
                                                                    : (state&State_MouseOver ? 3 : 4)],
@@ -4471,16 +4461,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
                 if (btn->features & QStyleOptionButton::HasMenu)
                 {
-                    int                mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
-                    QRect              ir(btn->rect);
-                    QStyleOptionButton newBtn(*btn);
+                    int   mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
+                    QRect ar(Qt::LeftToRight==btn->direction
+                                ? btn->rect.right() - mbi
+                                : btn->rect.x() + 6,
+                             ((btn->rect.height() - mbi)/2),
+                             mbi - 6, mbi);
 
-                    newBtn.rect = QRect(Qt::LeftToRight==btn->direction
-                                            ? ir.right() - mbi
-                                            : ir.x() + 6,
-                                        ((ir.height() - mbi)/2),
-                                        mbi - 6, mbi);
-                    drawPrimitive(PE_IndicatorArrowDown, &newBtn, painter, widget);
+                    drawArrow(painter, ar, PE_IndicatorArrowDown, option->palette.buttonText().color());
                 }
             }
             break;
@@ -4560,7 +4548,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(option->state &(State_On | State_Sunken))
                             ar.adjust(1, 1, 1, 1);
-                        drawArrow(painter, ar, option, PE_IndicatorArrowDown);
+                        drawArrow(painter, ar, PE_IndicatorArrowDown, option->palette.buttonText().color());
                     }
 
 //                     QRect              ir(button->rect);
@@ -5665,7 +5653,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(bflags&State_Sunken)
                         arrow.adjust(1, 1, 1, 1);
 
-                    drawArrow(painter, arrow, option, PE_IndicatorArrowDown, false, false);
+                    drawArrow(painter, arrow, PE_IndicatorArrowDown, option->palette.buttonText().color());
                 }
             }
             break;
@@ -6549,7 +6537,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         arrow.adjust(1, 1, 1, 1);
 
                     //if(comboBox->editable || !opts.gtkComboMenus)
-                        drawArrow(painter, arrow, option, PE_IndicatorArrowDown);
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, option->palette.buttonText().color());
 //                     else
 //                     {
 //                         int middle=arrow.y()+(arrow.height()>>1);
@@ -8362,11 +8350,11 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
 void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, const QStyleOption *option,
                              PrimitiveElement pe, bool small, bool checkActive) const
 {
-    drawArrow(p, r, pe, option->state&State_Enabled
-                            ? checkActive && option->state&State_Selected
+    drawArrow(p, r, pe, /*option->state&State_Enabled
+                            ? */checkActive && option->state&State_Selected
                                 ? option->palette.highlightedText().color()
-                                : option->palette.text().color()
-                            : option->palette.mid().color(), small);
+                                : option->palette.text().color()/*
+                            : option->palette.mid().color()*/, small);
 }
 
 void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const
@@ -9177,6 +9165,13 @@ const QColor & QtCurveStyle::menuStripeCol() const
     return opts.lighterPopupMenuBgnd<0
                 ? itsLighterPopupMenuBgndCol
                 : itsBackgroundCols[QTC_MENU_STRIPE_SHADE];
+}
+
+const QColor & QtCurveStyle::checkRadioCol(const QStyleOption *opt) const
+{
+    return opt->state&State_Enabled
+            ? itsCheckRadioCol
+            : opt->palette.buttonText().color();
 }
 
 void QtCurveStyle::widgetDestroyed(QObject *o)

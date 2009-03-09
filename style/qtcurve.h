@@ -147,6 +147,7 @@ class QtCurveStyle : public QWindowsStyle
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     int            konqMenuBarSize(const QMenuBar *menu) const;
     Version        qtVersion() const;
+    const QColor & checkRadioCol(const QStyleOption *opt) const;
 
     private Q_SLOTS:
 
