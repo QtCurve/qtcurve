@@ -396,8 +396,8 @@ typedef enum
     APPEARANCE_INVERTED,
     APPEARANCE_SPLIT_GRADIENT,
     APPEARANCE_BEVELLED,
-        APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
         APPEARANCE_FADE, /* Only for poupmenu items! */
+        APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
     QTC_NUM_STD_APP = APPEARANCE_LV_BEVELLED-QTC_NUM_CUSTOM_GRAD
 } EAppearance;
 
