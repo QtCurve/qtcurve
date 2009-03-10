@@ -307,8 +307,18 @@ enum
 
 static char * getKdeHome()
 {
-/* TODO: Call kde-config ! */
     static char *kdeHome=NULL;
+
+    if(!kdeHome)
+        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --localprefix" : "kde-config --localprefix", &kdeHome, NULL, NULL, NULL))
+        {
+            int len=strlen(kdeHome);
+
+            if(len>1 && kdeHome[len-1]=='\n')
+                kdeHome[len-1]='\0';
+        }
+        else
+            kdeHome=0L;
 
     if(!kdeHome)
     {

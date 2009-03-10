@@ -36,6 +36,8 @@
     if Qt4.5 is set to 'Desktop settings aware', it will not store its palette
     in ~/.config/TrollTech.conf
 17. Fix Firefox issues with scrollbar slider when using flat scrolbar buttons.
+18. Call kde-config (KDE3) / kde4-config (KDE4) to determine location of
+    user's kde folder.
 
 0.61.5
 ------
