@@ -918,14 +918,24 @@ p, li { white-space: pre-wrap; }
        <item row="2" column="1" >
         <widget class="QComboBox" name="titlebarButtonAppearance" />
        </item>
-       <item row="3" column="0" colspan="2" >
+       <item row="3" column="0" >
+        <widget class="QLabel" name="label_31" >
+         <property name="text" >
+          <string>Text alignment:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QComboBox" name="titlebarAlignment" />
+       </item>
+       <item row="4" column="0" colspan="2" >
         <widget class="QCheckBox" name="colorTitlebarOnly" >
          <property name="text" >
           <string>Color titlebar only (KDE4)</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" >
+       <item row="5" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -1737,6 +1747,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>highlightTab</tabstop>
   <tabstop>colorSelTab</tabstop>
   <tabstop>tabAppearance</tabstop>
+  <tabstop>centerTabs</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck</tabstop>
@@ -1744,8 +1755,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>crButton</tabstop>
   <tabstop>titlebarAppearance</tabstop>
   <tabstop>inactiveTitlebarAppearance</tabstop>
-  <tabstop>centerTabs</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>
+  <tabstop>titlebarAlignment</tabstop>
   <tabstop>colorTitlebarOnly</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>handles</tabstop>

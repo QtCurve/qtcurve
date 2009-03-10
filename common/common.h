@@ -292,7 +292,8 @@ typedef enum
 {
     QtC_Round = QStyle::PM_CustomBase,
     QtC_TitleBarButtonAppearance,
-    QtC_TitleBarColorTopOnly
+    QtC_TitleBarColorTopOnly,
+    QtC_TitleAlignment
 } QtCMetrics;
 
 #define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)
@@ -535,6 +536,15 @@ typedef enum
 } EFocus;
 
 #define QTC_FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
+
+#if defined __cplusplus
+typedef enum
+{
+    ALIGN_LEFT,
+    ALIGN_CENTER,
+    ALIGN_RIGHT
+} EAlign;
+#endif
 
 #define DEF_IND_STR                "fontcolor"
 #define DEF_LINE_STR               "dots"
@@ -1085,6 +1095,9 @@ typedef struct
                      customMenuNormTextColor,
                      customMenuSelTextColor,
                      customCheckRadioColor;
+#if defined __cplusplus
+    EAlign           titlebarAlignment;
+#endif
 #ifdef QTC_CONFIG_DIALOG
     EShading         shading;
 #endif

@@ -349,6 +349,22 @@ static EGradientBorder toGradientBorder(const char *str)
     return GB_3D;
 }
 
+#ifdef __cplusplus
+static EAlign toAlign(const char *str, EAlign def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "left", 4))
+            return ALIGN_LEFT;
+        if(0==memcmp(str, "center", 6))
+            return ALIGN_CENTER;
+        if(0==memcmp(str, "right", 5))
+            return ALIGN_RIGHT;
+    }
+    return def;
+}
+#endif
+
 #endif
 
 #ifdef CONFIG_WRITE
@@ -727,6 +743,11 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_FOCUS(ENTRY) \
     opts->ENTRY=toFocus(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#ifdef __cplusplus
+#define QTC_CFG_READ_ALIGN(ENTRY) \
+    opts->ENTRY=toAlign(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+#endif
+
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
     if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
@@ -944,6 +965,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
+            QTC_CFG_READ_ALIGN(titlebarAlignment)
             QTC_CFG_READ_BOOL(centerTabs)
             QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkComboMenus)
@@ -1451,6 +1473,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuNormTextColor.setRgb(0, 0, 0);
     opts->customMenuSelTextColor.setRgb(0, 0, 0);
     opts->customCheckRadioColor.setRgb(0, 0, 0);
+    opts->titlebarAlignment=ALIGN_LEFT;
 #else
 /*
     opts->setDialogButtonOrder=false;
@@ -1770,6 +1793,20 @@ static const char *toStr(EGradientBorder g)
     }
 }
 
+static const char *toStr(EAlign ind)
+{
+    switch(ind)
+    {
+        default:
+        case ALIGN_LEFT:
+            return "left";
+        case ALIGN_CENTER:
+            return "center";
+        case ALIGN_RIGHT:
+            return "right";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -1911,6 +1948,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(gtkButtonOrder)
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)
+        CFG_WRITE_ENTRY(titlebarAlignment)
 
         for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
         {

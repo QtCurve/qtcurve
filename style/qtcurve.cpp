@@ -1856,6 +1856,17 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return opts.colorTitlebarOnly;
         case QtC_TitleBarButtonAppearance:
             return (int)opts.titlebarButtonAppearance;
+        case QtC_TitleAlignment:
+            switch(opts.titlebarAlignment)
+            {
+                default:
+                case ALIGN_LEFT:
+                    return Qt::AlignLeft;
+                case ALIGN_CENTER:
+                    return Qt::AlignHCenter;
+                case ALIGN_RIGHT:
+                    return Qt::AlignRight;
+            }
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
@@ -6103,7 +6114,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     QFont       font(painter->font());
                     QRect       textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
-                    QTextOption textOpt(Qt::AlignLeft | Qt::AlignVCenter);
+                    QTextOption textOpt(((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, NULL, NULL))
+                                        |Qt::AlignVCenter);
 
                     font.setBold(true);
                     painter->setFont(font);

@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>88</height>
+    <height>245</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
@@ -27,6 +27,35 @@
      </property>
      <property name="text" >
       <string>Close windows by double clicking the menu button</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>&lt;p>&lt;b>NOTE:&lt;/b>&lt;i>This window decoration uses the QtCurve widget style, and shares its configuration. To alter settings such as the titlebar gradient, or text alignment, please set the appropriate options in the widget style.&lt;/i>&lt;/p></string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
      </property>
     </widget>
    </item>

@@ -361,6 +361,13 @@ static void insertGradBorderEntries(QComboBox *combo)
     combo->insertItem(GB_3D, i18n("3D border"));
 }
 
+static void insertAlignEntries(QComboBox *combo)
+{
+    combo->insertItem(ALIGN_LEFT, i18n("Left"));
+    combo->insertItem(ALIGN_CENTER, i18n("Center"));
+    combo->insertItem(ALIGN_RIGHT, i18n("Right"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                exportDialog(NULL)
@@ -403,6 +410,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertEColorEntries(progressGrooveColor);
     insertFocusEntries(focus);
     insertGradBorderEntries(gradBorder);
+    insertAlignEntries(titlebarAlignment);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -492,6 +500,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(useHighlightForMenu, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(groupBoxLine, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(fadeLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(titlebarAlignment, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
 
     defaultSettings(&defaultStyle);
     if(!readConfig(NULL, &currentStyle, &defaultStyle))
@@ -1167,6 +1176,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.useHighlightForMenu=useHighlightForMenu->isChecked();
     opts.groupBoxLine=groupBoxLine->isChecked();
     opts.fadeLines=fadeLines->isChecked();
+    opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
 
     if(customShading->isChecked())
     {
@@ -1257,6 +1267,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     useHighlightForMenu->setChecked(opts.useHighlightForMenu);
     groupBoxLine->setChecked(opts.groupBoxLine);
     fadeLines->setChecked(opts.fadeLines);
+    titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
 
     shading->setCurrentIndex(opts.shading);
     gtkScrollViews->setChecked(opts.gtkScrollViews);
@@ -1341,6 +1352,7 @@ bool QtCurveConfig::settingsChanged()
          useHighlightForMenu->isChecked()!=currentStyle.useHighlightForMenu ||
          groupBoxLine->isChecked()!=currentStyle.groupBoxLine ||
          fadeLines->isChecked()!=currentStyle.fadeLines ||
+         titlebarAlignment->currentIndex()!=currentStyle.titlebarAlignment ||
 
          shading->currentIndex()!=(int)currentStyle.shading ||
          gtkScrollViews->isChecked()!=currentStyle.gtkScrollViews ||
