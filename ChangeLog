@@ -18,6 +18,7 @@
         Sunken scrollviews
         Sunken appearance set to soft
         Line focus
+        Extra rounded (only applies to Gtk2 and KDE4 variants)
  5. Allow all bar flat and raised tabs to bol coloured.
  6. Only save appearance settings if different from default. 
  7. If a gradient does not define the values for positions 0 and 100, then add these.
