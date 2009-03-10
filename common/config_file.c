@@ -1974,26 +1974,40 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
                 CFG.deleteEntry(gradKey);
             else
             {
-                QString     gradVal;
+                GradientCont::const_iterator d;
+
+                if(exportingStyle || (d=def.customGradient.find((EAppearance)i))==def.customGradient.end() || !((*d)==(*cg)))
+                {
+                    QString     gradVal;
 #if QT_VERSION >= 0x040000
-                QTextStream str(&gradVal);
+                    QTextStream str(&gradVal);
 #else
-                QTextStream str(&gradVal, IO_WriteOnly);
+                    QTextStream str(&gradVal, IO_WriteOnly);
 #endif
 
-                str << toStr((*cg).second.border);
+                    str << toStr((*cg).second.border);
 
-                GradientStopCont                 stops((*cg).second.stops.fix());
-                GradientStopCont::const_iterator it(stops.begin()),
-                                                 end(stops.end());
+                    GradientStopCont                 stops((*cg).second.stops.fix());
+                    GradientStopCont::const_iterator it(stops.begin()),
+                                                    end(stops.end());
 
-                for(; it!=end; ++it)
-                    str << ',' << (*it).pos << ',' << (*it).val;
-                CFG.writeEntry(gradKey, gradVal);
+                    for(; it!=end; ++it)
+                        str << ',' << (*it).pos << ',' << (*it).val;
+                    CFG.writeEntry(gradKey, gradVal);
+                }
+                else
+                    CFG.deleteEntry(gradKey);
             }
         }
 
-        if(opts.customShades[0]>0)
+        if(opts.customShades[0]>0 &&
+           (exportingStyle ||
+            opts.customShades[0]!=def.customShades[0] ||
+            opts.customShades[1]!=def.customShades[1] ||
+            opts.customShades[2]!=def.customShades[2] ||
+            opts.customShades[3]!=def.customShades[3] ||
+            opts.customShades[4]!=def.customShades[4] ||
+            opts.customShades[5]!=def.customShades[5]))
         {
             QString     shadeVal;
 #if QT_VERSION >= 0x040000
