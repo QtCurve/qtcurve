@@ -6690,6 +6690,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
                 if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
                     menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
+                else if (tbOpt->features & QStyleOptionToolButton::HasMenu)
+                    newSize.setWidth(newSize.width()+6);
             }
 
             newSize.setWidth(newSize.width() - menuAreaWidth);

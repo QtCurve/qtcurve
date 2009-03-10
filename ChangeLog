@@ -41,6 +41,7 @@
     enabled.
 22. Style KCapacityBar - draw this as if it is a progressbar.
 23. Fixed Qt4.5 tabs?
+24. Add extra space for arrow on toolbuttons with menus.
 
 0.61.5
 ------
