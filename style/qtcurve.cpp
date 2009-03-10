@@ -7675,7 +7675,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                                             radius>QTC_EXTRA_ETCH_RADIUS ? -1 : 0), w, round, radius), Qt::IntersectClip);
 
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
-            drawProgressBevelGradient(p, r, option, horiz, app);
+            drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
         else
         {
             drawBevelGradient(fill, p, r.adjusted(1, 1, -1, WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1), horiz,
