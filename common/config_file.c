@@ -844,6 +844,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 62))
             {
+#ifdef __cplusplus
+                def->titlebarAppearance=APPEARANCE_GRADIENT;
+                def->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
+#endif
+                def->round=ROUND_FULL;
                 def->appearance=APPEARANCE_DULL_GLASS;
                 def->sliderAppearance=APPEARANCE_DULL_GLASS;
                 def->menuitemAppearance=APPEARANCE_DULL_GLASS;
@@ -1377,6 +1382,10 @@ static void defaultSettings(Options *opts)
 
     for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
         opts->customGradient[i]=0L;
+#else
+    // Setup titlebar gradients...
+    setupGradient(&(opts->customGradient[APPEARANCE_CUSTOM1]), GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
+    setupGradient(&(opts->customGradient[APPEARANCE_CUSTOM2]), GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
 #endif
     opts->customShades[0]=1.16;
     opts->customShades[1]=1.07;
@@ -1387,7 +1396,11 @@ static void defaultSettings(Options *opts)
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
+#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000
     opts->round=ROUND_FULL;
+#else
+    opts->round=ROUND_EXTRA;
+#endif
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
     opts->stripedProgress=STRIPE_NONE;
@@ -1494,8 +1507,8 @@ static void defaultSettings(Options *opts)
 #ifndef __cplusplus
 #endif
 #ifdef __cplusplus
-    opts->titlebarAppearance=APPEARANCE_GRADIENT;
-    opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
+    opts->titlebarAppearance=APPEARANCE_CUSTOM1;
+    opts->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
     opts->titlebarButtonAppearance=APPEARANCE_GRADIENT;
 #endif
     /* Read system config file... */

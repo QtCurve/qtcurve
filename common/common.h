@@ -1113,6 +1113,33 @@ typedef struct
 };
 #endif
 
+#if defined QTC_COMMON_FUNCTIONS
+static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
+{
+    va_list  ap;
+    int      i;
+
+    grad->border=border;
+#ifndef __cplusplus
+    grad->numStops=numStops;
+    grad->stops=malloc(sizeof(GradientStop) * numStops*2);
+#endif
+    va_start(ap, numStops);
+    for(i=0; i<numStops; ++i)
+    {
+        double pos=va_arg(ap, double),
+               val=va_arg(ap, double);
+#ifdef __cplusplus
+        grad->stops.insert(GradientStop(pos, val));
+#else
+        grad->stops[i].pos=pos;
+        grad->stops[i].val=val;
+#endif
+    }
+    va_end(ap);
+}
+#endif
+
 #if defined QTC_COMMON_FUNCTIONS && !defined QTC_CONFIG_DIALOG
 
 #ifdef __cplusplus
@@ -1158,31 +1185,6 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 
     return opts->appearance;
 };
-
-static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
-{
-    va_list  ap;
-    int      i;
-
-    grad->border=border;
-#ifndef __cplusplus
-    grad->numStops=numStops;
-    grad->stops=malloc(sizeof(GradientStop) * numStops*2);
-#endif
-    va_start(ap, numStops);
-    for(i=0; i<numStops; ++i)
-    {
-        double pos=va_arg(ap, double),
-               val=va_arg(ap, double);
-#ifdef __cplusplus
-        grad->stops.insert(GradientStop(pos, val));
-#else
-        grad->stops[i].pos=pos;
-        grad->stops[i].val=val;
-#endif
-    }
-    va_end(ap);
-}
 
 static const Gradient * getGradient(EAppearance app, const Options *opts)
 {
