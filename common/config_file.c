@@ -821,6 +821,23 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 }
 #endif
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(0, 62))
+            {
+                def->appearance=APPEARANCE_DULL_GLASS;
+                def->sliderAppearance=APPEARANCE_DULL_GLASS;
+                def->menuitemAppearance=APPEARANCE_DULL_GLASS;
+                def->useHighlightForMenu=true;
+                def->tabAppearance=APPEARANCE_GRADIENT;
+                def->highlightFactor=5;
+                def->toolbarSeparators=LINE_NONE;
+                def->menubarAppearance=APPEARANCE_SOFT_GRADIENT;
+                def->crButton=false;
+                def->customShades[0]=0;
+                def->stripedProgress=STRIPE_DIAGONAL;
+                def->sunkenScrollViews=false;
+                def->sunkenAppearance=APPEARANCE_INVERTED;
+                def->focus=FOCUS_FILLED;
+            }
             if(version<QTC_MAKE_VERSION(0, 61))
             {
                 def->coloredMouseOver=MO_PLASTIK;
@@ -842,24 +859,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->progressGrooveColor=ECOLOR_BASE;
                 def->shadeMenubars=SHADE_DARKEN;
                 opts->highlightTab=true;
-            }
-
-            if(version<QTC_MAKE_VERSION(0, 62))
-            {
-                def->appearance=APPEARANCE_DULL_GLASS;
-                def->sliderAppearance=APPEARANCE_DULL_GLASS;
-                def->menuitemAppearance=APPEARANCE_DULL_GLASS;
-                def->useHighlightForMenu=true;
-                def->tabAppearance=APPEARANCE_GRADIENT;
-                def->highlightFactor=5;
-                def->toolbarSeparators=LINE_NONE;
-                def->menubarAppearance=APPEARANCE_SOFT_GRADIENT;
-                def->crButton=false;
-                def->customShades[0]=0;
-                def->stripedProgress=STRIPE_DIAGONAL;
-                def->sliderStyle=SLIDER_TRIANGULAR;
-                def->sunkenScrollViews=false;
-                def->sunkenAppearance=APPEARANCE_INVERTED;
             }
 
             opts->customShades[0]=0;
@@ -1370,7 +1369,7 @@ static void defaultSettings(Options *opts)
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
     opts->stripedProgress=STRIPE_NONE;
-    opts->sliderStyle=SLIDER_ROUND;
+    opts->sliderStyle=SLIDER_TRIANGULAR;
     opts->highlightTab=false;
     opts->colorSelTab=false;
     opts->embolden=false;
@@ -1405,7 +1404,7 @@ static void defaultSettings(Options *opts)
     opts->thinnerMenuItems=false;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_SHADOW;
-    opts->focus=FOCUS_FILLED;
+    opts->focus=FOCUS_LINE;
     opts->lvLines=false;
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;

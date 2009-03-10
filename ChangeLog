@@ -15,9 +15,9 @@
         Supply, and use, predefined custom shades
         Plain progress
         Don't highlight active tab
-        Round slider
         Sunken scrollviews
         Sunken appearance set to soft
+        Line focus
  5. Allow all bar flat and raised tabs to be coloured.
  6. Only save appearance settings if different from default.
  7. If a gradient does not define the values for positions 0 and 100, then add these.
