@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>QtCurveConfigBase</class>
- <widget class="QWidget" name="QtCurveConfigBase" >
-  <property name="geometry" >
+ <widget class="QWidget" name="QtCurveConfigBase">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,102 +10,102 @@
     <height>611</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form1</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_5" >
-   <item row="0" column="0" colspan="2" >
-    <widget class="QLabel" name="titleLabel" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+  <layout class="QGridLayout" name="gridLayout_5">
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="titleLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>title</string>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QTreeWidget" name="stackList" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+   <item row="1" column="0">
+    <widget class="QTreeWidget" name="stackList">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize" >
+     <property name="minimumSize">
       <size>
        <width>150</width>
        <height>0</height>
       </size>
      </property>
-     <property name="indentation" >
+     <property name="indentation">
       <number>0</number>
      </property>
-     <property name="rootIsDecorated" >
+     <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
      <column>
-      <property name="text" >
+      <property name="text">
        <string>Category</string>
       </property>
      </column>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QPushButton" name="optionBtn" >
-     <property name="text" >
+   <item row="2" column="0">
+    <widget class="QPushButton" name="optionBtn">
+     <property name="text">
       <string>Options</string>
      </property>
     </widget>
    </item>
-   <item rowspan="2" row="1" column="1" >
-    <widget class="QStackedWidget" name="stack" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+   <item row="1" column="1" rowspan="2">
+    <widget class="QStackedWidget" name="stack">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="currentIndex" >
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="page" >
-      <layout class="QGridLayout" name="gridLayout_2" >
-       <item row="0" column="1" colspan="2" >
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
+     <widget class="QWidget" name="page">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="1" colspan="2">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
           <string>Appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="3" >
-        <widget class="QComboBox" name="appearance" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+       <item row="0" column="3">
+        <widget class="QComboBox" name="appearance">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="whatsThis" >
+         <property name="whatsThis">
           <string>The setting here affects the general appearance - and will be applied to buttons, scrollbars, sliders, combo boxes, and spin buttons.</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="4" >
+       <item row="0" column="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -112,129 +113,129 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="1" >
-        <widget class="QLabel" name="label_29" >
-         <property name="text" >
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_29">
+         <property name="text">
           <string>Sunken appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="3" >
-        <widget class="QComboBox" name="sunkenAppearance" />
+       <item row="1" column="3">
+        <widget class="QComboBox" name="sunkenAppearance"/>
        </item>
-       <item row="2" column="1" colspan="2" >
-        <widget class="QLabel" name="label_8" >
-         <property name="text" >
+       <item row="2" column="1" colspan="2">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
           <string>Roundedness:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="3" >
-        <widget class="QComboBox" name="round" />
+       <item row="2" column="3">
+        <widget class="QComboBox" name="round"/>
        </item>
-       <item row="3" column="1" colspan="2" >
-        <widget class="QLabel" name="label_9" >
-         <property name="text" >
+       <item row="3" column="1" colspan="2">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
           <string>Button effect:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="3" >
-        <widget class="QComboBox" name="buttonEffect" />
+       <item row="3" column="3">
+        <widget class="QComboBox" name="buttonEffect"/>
        </item>
-       <item row="4" column="1" colspan="2" >
-        <widget class="QLabel" name="label_25" >
-         <property name="text" >
+       <item row="4" column="1" colspan="2">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
           <string>Focus rectangle:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="3" >
-        <widget class="QComboBox" name="focus" />
+       <item row="4" column="3">
+        <widget class="QComboBox" name="focus"/>
        </item>
-       <item rowspan="2" row="5" column="0" colspan="5" >
-        <layout class="QHBoxLayout" name="horizontalLayout" />
+       <item row="5" column="0" rowspan="2" colspan="5">
+        <layout class="QHBoxLayout" name="horizontalLayout"/>
        </item>
-       <item row="6" column="1" colspan="3" >
-        <widget class="QCheckBox" name="drawStatusBarFrames" >
-         <property name="text" >
+       <item row="6" column="1" colspan="3">
+        <widget class="QCheckBox" name="drawStatusBarFrames">
+         <property name="text">
           <string>Draw statusbar frames</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1" >
-        <widget class="QCheckBox" name="framelessGroupBoxes" >
-         <property name="text" >
+       <item row="7" column="1">
+        <widget class="QCheckBox" name="framelessGroupBoxes">
+         <property name="text">
           <string>Frameless groupboxes,</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2" colspan="3" >
-        <widget class="QCheckBox" name="groupBoxLine" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+       <item row="7" column="2" colspan="3">
+        <widget class="QCheckBox" name="groupBoxLine">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>draw line after title</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1" colspan="3" >
-        <widget class="QCheckBox" name="vArrows" >
-         <property name="text" >
+       <item row="8" column="1" colspan="3">
+        <widget class="QCheckBox" name="vArrows">
+         <property name="text">
           <string>'V' style arrows</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1" colspan="3" >
-        <widget class="QCheckBox" name="stdSidebarButtons" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="9" column="1" colspan="3">
+        <widget class="QCheckBox" name="stdSidebarButtons">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, drawn as per normal buttons - otherwise they will be drawn in a more flat style.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, drawn as per normal buttons - otherwise they will be drawn in a more flat style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Standard buttons for sidebars</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1" colspan="3" >
-        <widget class="QCheckBox" name="darkerBorders" >
-         <property name="text" >
+       <item row="10" column="1" colspan="3">
+        <widget class="QCheckBox" name="darkerBorders">
+         <property name="text">
           <string>Darker borders</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1" colspan="3" >
-        <widget class="QCheckBox" name="comboSplitter" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="11" column="1" colspan="3">
+        <widget class="QCheckBox" name="comboSplitter">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This option controls whether a line is drawn near non-editable combo box arrows.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This option controls whether a line is drawn near non-editable combo box arrows.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Combo splitter</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1" colspan="2" >
-        <widget class="QCheckBox" name="fadeLines" >
-         <property name="text" >
+       <item row="12" column="1" colspan="2">
+        <widget class="QCheckBox" name="fadeLines">
+         <property name="text">
           <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1" >
+       <item row="13" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -244,24 +245,24 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2" >
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_10" >
-         <property name="text" >
+     <widget class="QWidget" name="page_2">
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
           <string>Markings:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2" >
-        <widget class="QComboBox" name="splitters" />
+       <item row="0" column="2">
+        <widget class="QComboBox" name="splitters"/>
        </item>
-       <item row="0" column="3" >
+       <item row="0" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -269,12 +270,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="1" >
+       <item row="1" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -284,55 +285,55 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_3" >
-      <layout class="QGridLayout" name="gridLayout_6" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_11" >
-         <property name="text" >
+     <widget class="QWidget" name="page_3">
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
           <string>Appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="sliderAppearance" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="0" column="1">
+        <widget class="QComboBox" name="sliderAppearance">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This appearance setting affects both scrollbar sliders, and other sliders.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This appearance setting affects both scrollbar sliders, and other sliders.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_12" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
           <string>Coloration:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="shadeSliders" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="1" column="1">
+        <widget class="QComboBox" name="shadeSliders">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This color setting affects both scrollbar sliders, and other sliders.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This color setting affects both scrollbar sliders, and other sliders.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="2" >
-        <widget class="KColorButton" name="customSlidersColor" >
-         <property name="text" >
+       <item row="1" column="2">
+        <widget class="KColorButton" name="customSlidersColor">
+         <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="1" column="3" >
+       <item row="1" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -340,87 +341,87 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_13" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
           <string>Style:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
-        <widget class="QComboBox" name="sliderStyle" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="2" column="1">
+        <widget class="QComboBox" name="sliderStyle">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This setting only affects standard sliders - i.e. not scrollbar sliders. 'Triangular' is a very similar style to plastik's sliders. &lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This setting only affects standard sliders - i.e. not scrollbar sliders. 'Triangular' is a very similar style to plastik's sliders. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="fillSlider" >
-         <property name="text" >
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="fillSlider">
+         <property name="text">
           <string>Fill used part of slider groove</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" >
-        <widget class="QLabel" name="label_30" >
-         <property name="text" >
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
           <string>Groove appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QComboBox" name="grooveAppearance" />
+       <item row="4" column="1">
+        <widget class="QComboBox" name="grooveAppearance"/>
        </item>
-       <item row="5" column="0" >
-        <widget class="QLabel" name="label_14" >
-         <property name="text" >
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
           <string>Scrollbar buttons:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1" >
-        <widget class="QComboBox" name="scrollbarType" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="5" column="1">
+        <widget class="QComboBox" name="scrollbarType">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This controls the position, and number, of buttons on a scrollbar.&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">KDE - 1 button at the top/left, and two at the bottom/right&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Windows - 1 botton at each end&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Platinum -  no buttons at the top/left, two at bottom/right&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Next - two buttons at the top/left, none at bottom/right&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">None - no buttons, only the slider&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This controls the position, and number, of buttons on a scrollbar.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;KDE - 1 button at the top/left, and two at the bottom/right&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Windows - 1 botton at each end&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Platinum -  no buttons at the top/left, two at bottom/right&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Next - two buttons at the top/left, none at bottom/right&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;None - no buttons, only the slider&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="2" colspan="2" >
-        <widget class="QCheckBox" name="flatSbarButtons" >
-         <property name="text" >
+       <item row="5" column="2" colspan="2">
+        <widget class="QCheckBox" name="flatSbarButtons">
+         <property name="text">
           <string>Flat</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" >
-        <widget class="QLabel" name="label_15" >
-         <property name="text" >
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
           <string>Scrollbar thumbs:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1" >
-        <widget class="QComboBox" name="sliderThumbs" />
+       <item row="6" column="1">
+        <widget class="QComboBox" name="sliderThumbs"/>
        </item>
-       <item row="7" column="1" >
+       <item row="7" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -430,44 +431,44 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_4" >
-      <layout class="QGridLayout" name="gridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_16" >
-         <property name="text" >
+     <widget class="QWidget" name="page_4">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_16">
+         <property name="text">
           <string>Bar:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="progressAppearance" />
+       <item row="0" column="1">
+        <widget class="QComboBox" name="progressAppearance"/>
        </item>
-       <item row="0" column="2" >
-        <widget class="QComboBox" name="stripedProgress" />
+       <item row="0" column="2">
+        <widget class="QComboBox" name="stripedProgress"/>
        </item>
-       <item row="0" column="3" >
-        <widget class="QCheckBox" name="animatedProgress" >
-         <property name="text" >
+       <item row="0" column="3">
+        <widget class="QCheckBox" name="animatedProgress">
+         <property name="text">
           <string>Animated</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="4" >
-        <widget class="QCheckBox" name="fillProgress" >
-         <property name="whatsThis" >
+       <item row="0" column="4">
+        <widget class="QCheckBox" name="fillProgress">
+         <property name="whatsThis">
           <string>Enable this option to remove the 1 pixel border around the filled element.</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>No border</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="5" >
-        <spacer name="horizontalSpacer" >
-         <property name="orientation" >
+       <item row="0" column="5">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>118</width>
            <height>20</height>
@@ -475,25 +476,25 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_24" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_24">
+         <property name="text">
           <string>Groove:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="progressGrooveAppearance" />
+       <item row="1" column="1">
+        <widget class="QComboBox" name="progressGrooveAppearance"/>
        </item>
-       <item row="1" column="2" >
-        <widget class="QComboBox" name="progressGrooveColor" />
+       <item row="1" column="2">
+        <widget class="QComboBox" name="progressGrooveColor"/>
        </item>
-       <item row="1" column="3" colspan="3" >
+       <item row="1" column="3" colspan="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -501,12 +502,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="2" column="1" >
+       <item row="2" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -516,21 +517,21 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_5" >
-      <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="2" >
-        <widget class="QCheckBox" name="embolden" >
-         <property name="text" >
+     <widget class="QWidget" name="page_5">
+      <layout class="QGridLayout">
+       <item row="0" column="0" colspan="2">
+        <widget class="QCheckBox" name="embolden">
+         <property name="text">
           <string>Embolden text</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2" >
+       <item row="0" column="2">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -538,22 +539,22 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_17" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
           <string>Indicate with:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="defBtnIndicator" />
+       <item row="1" column="1">
+        <widget class="QComboBox" name="defBtnIndicator"/>
        </item>
-       <item row="2" column="0" >
+       <item row="2" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -563,24 +564,24 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_6" >
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_18" >
-         <property name="text" >
+     <widget class="QWidget" name="page_6">
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_18">
+         <property name="text">
           <string>Coloration:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2" >
-        <widget class="QComboBox" name="coloredMouseOver" />
+       <item row="0" column="2">
+        <widget class="QComboBox" name="coloredMouseOver"/>
        </item>
-       <item row="0" column="3" >
+       <item row="0" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -588,32 +589,32 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" colspan="2" >
-        <widget class="QLabel" name="textLabel1_8" >
-         <property name="whatsThis" >
+       <item row="1" column="0" colspan="2">
+        <widget class="QLabel" name="textLabel1_8">
+         <property name="whatsThis">
           <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Highlight by:</string>
          </property>
-         <property name="wordWrap" >
+         <property name="wordWrap">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="1" column="2" >
-        <widget class="QSpinBox" name="highlightFactor" >
-         <property name="suffix" >
+       <item row="1" column="2">
+        <widget class="QSpinBox" name="highlightFactor">
+         <property name="suffix">
           <string>%</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" colspan="2" >
+       <item row="2" column="1" colspan="2">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -623,24 +624,24 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_7" >
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_19" >
-         <property name="text" >
+     <widget class="QWidget" name="page_7">
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_19">
+         <property name="text">
           <string>Header appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="lvAppearance" />
+       <item row="0" column="1">
+        <widget class="QComboBox" name="lvAppearance"/>
        </item>
-       <item row="0" column="2" >
+       <item row="0" column="2">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -648,35 +649,35 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="textLabel1_8_2_4" >
-         <property name="whatsThis" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="textLabel1_8_2_4">
+         <property name="whatsThis">
           <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Selection appearance (KDE4 &amp; Gtk2):</string>
          </property>
-         <property name="wordWrap" >
+         <property name="wordWrap">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="selectionAppearance" />
+       <item row="1" column="1">
+        <widget class="QComboBox" name="selectionAppearance"/>
        </item>
-       <item row="2" column="0" >
-        <widget class="QCheckBox" name="lvLines" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="lvLines">
+         <property name="text">
           <string>Join items with lines (KDE)</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" >
+       <item row="3" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -686,42 +687,42 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_15" >
-      <layout class="QVBoxLayout" >
+     <widget class="QWidget" name="page_15">
+      <layout class="QVBoxLayout">
        <item>
-        <widget class="QCheckBox" name="gtkScrollViews" >
-         <property name="text" >
+        <widget class="QCheckBox" name="gtkScrollViews">
+         <property name="text">
           <string>Scrollbars on the outside</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="highlightScrollViews" >
-         <property name="text" >
+        <widget class="QCheckBox" name="highlightScrollViews">
+         <property name="text">
           <string>Highlight on focus (KDE)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="squareScrollViews" >
-         <property name="text" >
+        <widget class="QCheckBox" name="squareScrollViews">
+         <property name="text">
           <string>Always draw with a square frame - regardless of the general round setting.</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="sunkenScrollViews" >
-         <property name="text" >
+        <widget class="QCheckBox" name="sunkenScrollViews">
+         <property name="text">
           <string>Draw etched when button effect set to etched/shadow.</string>
          </property>
         </widget>
        </item>
        <item>
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -731,41 +732,41 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_8" >
-      <layout class="QGridLayout" name="gridLayout_9" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_20" >
-         <property name="text" >
+     <widget class="QWidget" name="page_8">
+      <layout class="QGridLayout" name="gridLayout_9">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_20">
+         <property name="text">
           <string>Active tab appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="activeTabAppearance" />
+       <item row="0" column="1">
+        <widget class="QComboBox" name="activeTabAppearance"/>
        </item>
-       <item row="0" column="2" >
-        <widget class="QCheckBox" name="highlightTab" >
-         <property name="whatsThis" >
+       <item row="0" column="2">
+        <widget class="QCheckBox" name="highlightTab">
+         <property name="whatsThis">
           <string>This will cause a coloured stripe to be drawn over the current tab.</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Highlight</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="3" >
-        <widget class="QCheckBox" name="colorSelTab" >
-         <property name="text" >
+       <item row="0" column="3">
+        <widget class="QCheckBox" name="colorSelTab">
+         <property name="text">
           <string>Color</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="4" >
+       <item row="0" column="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -773,29 +774,22 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_21" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
           <string>Inactive tab appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="tabAppearance" />
+       <item row="1" column="1">
+        <widget class="QComboBox" name="tabAppearance"/>
        </item>
-       <item row="2" column="0" >
-        <widget class="QCheckBox" name="centerTabs" >
-         <property name="text" >
-          <string>Place in center (KDE)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" >
+       <item row="2" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -805,31 +799,31 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_9" >
-      <layout class="QGridLayout" name="gridLayout_8" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_22" >
-         <property name="text" >
+     <widget class="QWidget" name="page_9">
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_22">
+         <property name="text">
           <string>Coloration:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="shadeCheckRadio" />
+       <item row="0" column="1">
+        <widget class="QComboBox" name="shadeCheckRadio"/>
        </item>
-       <item row="0" column="2" >
-        <widget class="KColorButton" name="customCheckRadioColor" >
-         <property name="text" >
+       <item row="0" column="2">
+        <widget class="KColorButton" name="customCheckRadioColor">
+         <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="0" column="3" >
+       <item row="0" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -837,33 +831,33 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" colspan="4" >
-        <widget class="QCheckBox" name="xCheck" >
-         <property name="text" >
+       <item row="1" column="0" colspan="4">
+        <widget class="QCheckBox" name="xCheck">
+         <property name="text">
           <string>'X' style checkmarks</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="4" >
-        <widget class="QCheckBox" name="crHighlight" >
-         <property name="text" >
+       <item row="2" column="0" colspan="4">
+        <widget class="QCheckBox" name="crHighlight">
+         <property name="text">
           <string>Highlight text background</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="crButton" >
-         <property name="text" >
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="crButton">
+         <property name="text">
           <string>Button like</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
+       <item row="4" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -873,24 +867,24 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_10" >
-      <layout class="QGridLayout" name="gridLayout_7" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_23" >
-         <property name="text" >
+     <widget class="QWidget" name="page_10">
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
           <string>Active appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="titlebarAppearance" />
+       <item row="0" column="1">
+        <widget class="QComboBox" name="titlebarAppearance"/>
        </item>
-       <item row="0" column="2" >
+       <item row="0" column="2">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -898,49 +892,49 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_28" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_28">
+         <property name="text">
           <string>Inactive appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="inactiveTitlebarAppearance" />
+       <item row="1" column="1">
+        <widget class="QComboBox" name="inactiveTitlebarAppearance"/>
        </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_27" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_27">
+         <property name="text">
           <string>Button appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
-        <widget class="QComboBox" name="titlebarButtonAppearance" />
+       <item row="2" column="1">
+        <widget class="QComboBox" name="titlebarButtonAppearance"/>
        </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="label_31" >
-         <property name="text" >
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_31">
+         <property name="text">
           <string>Text alignment:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
-        <widget class="QComboBox" name="titlebarAlignment" />
+       <item row="3" column="1">
+        <widget class="QComboBox" name="titlebarAlignment"/>
        </item>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QCheckBox" name="colorTitlebarOnly" >
-         <property name="text" >
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="colorTitlebarOnly">
+         <property name="text">
           <string>Color titlebar only (KDE4)</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" >
+       <item row="5" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -950,40 +944,40 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_11" >
-      <layout class="QGridLayout" name="gridLayout_4" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="textLabel1_4" >
-         <property name="text" >
+     <widget class="QWidget" name="page_11">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QLabel" name="textLabel1_4">
+         <property name="text">
           <string>Border:</string>
          </property>
-         <property name="wordWrap" >
+         <property name="wordWrap">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="toolbarBorders" />
+       <item row="0" column="1">
+        <widget class="QComboBox" name="toolbarBorders"/>
        </item>
-       <item row="0" column="2" >
-        <widget class="QLabel" name="textLabel2" >
-         <property name="text" >
+       <item row="0" column="2">
+        <widget class="QLabel" name="textLabel2">
+         <property name="text">
           <string>Handles:</string>
          </property>
-         <property name="wordWrap" >
+         <property name="wordWrap">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="3" >
-        <widget class="QComboBox" name="handles" />
+       <item row="0" column="3">
+        <widget class="QComboBox" name="handles"/>
        </item>
-       <item row="0" column="4" >
+       <item row="0" column="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>342</width>
            <height>24</height>
@@ -991,153 +985,153 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" colspan="5" >
-        <widget class="QGroupBox" name="groupBox2_2" >
-         <property name="title" >
+       <item row="1" column="0" colspan="5">
+        <widget class="QGroupBox" name="groupBox2_2">
+         <property name="title">
           <string>Menus</string>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="textLabel1_4_3" >
-            <property name="text" >
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="textLabel1_4_3">
+            <property name="text">
              <string>Menubar appearance:</string>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="5" >
-           <widget class="QComboBox" name="menubarAppearance" />
+          <item row="0" column="1" colspan="5">
+           <widget class="QComboBox" name="menubarAppearance"/>
           </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="textLabel1_4_2_5" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="textLabel1_4_2_5">
+            <property name="text">
              <string>Coloration:</string>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" colspan="4" >
-           <widget class="QComboBox" name="shadeMenubars" />
+          <item row="1" column="1" colspan="4">
+           <widget class="QComboBox" name="shadeMenubars"/>
           </item>
-          <item row="1" column="5" >
-           <widget class="KColorButton" name="customMenubarsColor" >
-            <property name="text" >
+          <item row="1" column="5">
+           <widget class="KColorButton" name="customMenubarsColor">
+            <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="5" >
-           <widget class="QCheckBox" name="shadeMenubarOnlyWhenActive" >
-            <property name="text" >
+          <item row="2" column="0" colspan="5">
+           <widget class="QCheckBox" name="shadeMenubarOnlyWhenActive">
+            <property name="text">
              <string>Apply coloration to active window only</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="3" >
-           <widget class="QCheckBox" name="customMenuTextColor" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <item row="3" column="0" colspan="3">
+           <widget class="QCheckBox" name="customMenuTextColor">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Custom text colors (normal/selected):</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="4" >
-           <widget class="KColorButton" name="customMenuNormTextColor" >
-            <property name="text" >
+          <item row="3" column="4">
+           <widget class="KColorButton" name="customMenuNormTextColor">
+            <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="3" column="5" >
-           <widget class="KColorButton" name="customMenuSelTextColor" >
-            <property name="text" >
+          <item row="3" column="5">
+           <widget class="KColorButton" name="customMenuSelTextColor">
+            <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="6" >
-           <widget class="QCheckBox" name="menubarMouseOver" >
-            <property name="text" >
+          <item row="4" column="0" colspan="6">
+           <widget class="QCheckBox" name="menubarMouseOver">
+            <property name="text">
              <string>Enable mouse-over for menubar items</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0" colspan="3" >
-           <widget class="QCheckBox" name="colorMenubarMouseOver" >
-            <property name="text" >
+          <item row="5" column="0" colspan="3">
+           <widget class="QCheckBox" name="colorMenubarMouseOver">
+            <property name="text">
              <string>Color menubar items on mouse-over</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="6" >
-           <widget class="QCheckBox" name="roundMbTopOnly" >
-            <property name="text" >
+          <item row="6" column="0" colspan="6">
+           <widget class="QCheckBox" name="roundMbTopOnly">
+            <property name="text">
              <string>Round selected menubar items on top only</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0" >
-           <widget class="QLabel" name="textLabel1_4_2_6" >
-            <property name="text" >
+          <item row="7" column="0">
+           <widget class="QLabel" name="textLabel1_4_2_6">
+            <property name="text">
              <string>Menuitem appearance:</string>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="7" column="1" colspan="5" >
-           <widget class="QComboBox" name="menuitemAppearance" />
+          <item row="7" column="1" colspan="5">
+           <widget class="QComboBox" name="menuitemAppearance"/>
           </item>
-          <item row="8" column="0" colspan="4" >
-           <widget class="QCheckBox" name="borderMenuitems" >
-            <property name="text" >
+          <item row="8" column="0" colspan="4">
+           <widget class="QCheckBox" name="borderMenuitems">
+            <property name="text">
              <string>Border menuitems</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="0" colspan="5" >
-           <widget class="QCheckBox" name="useHighlightForMenu" >
-            <property name="text" >
+          <item row="9" column="0" colspan="5">
+           <widget class="QCheckBox" name="useHighlightForMenu">
+            <property name="text">
              <string>Use 'highlight' color for active menuitems</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="0" colspan="2" >
-           <widget class="QLabel" name="label_26" >
-            <property name="text" >
+          <item row="10" column="0" colspan="2">
+           <widget class="QLabel" name="label_26">
+            <property name="text">
              <string>Popup-menu background:</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="2" >
-           <widget class="KIntNumInput" name="lighterPopupMenuBgnd" >
-            <property name="suffix" >
+          <item row="10" column="2">
+           <widget class="KIntNumInput" name="lighterPopupMenuBgnd">
+            <property name="suffix">
              <string>%</string>
             </property>
-            <property name="prefix" >
+            <property name="prefix">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="10" column="3" colspan="3" >
-           <spacer name="spacer" >
-            <property name="orientation" >
+          <item row="10" column="3" colspan="3">
+           <spacer name="spacer">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>208</width>
               <height>20</height>
@@ -1145,47 +1139,47 @@ p, li { white-space: pre-wrap; }
             </property>
            </spacer>
           </item>
-          <item row="11" column="0" colspan="6" >
-           <widget class="QCheckBox" name="thinnerMenuItems" >
-            <property name="text" >
+          <item row="11" column="0" colspan="6">
+           <widget class="QCheckBox" name="thinnerMenuItems">
+            <property name="text">
              <string>Thinner menu items</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="0" >
-           <widget class="QCheckBox" name="menuStripe" >
-            <property name="text" >
+          <item row="12" column="0">
+           <widget class="QCheckBox" name="menuStripe">
+            <property name="text">
              <string>Menu stripe (KDE)</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="1" colspan="5" >
-           <widget class="QComboBox" name="menuStripeAppearance" />
+          <item row="12" column="1" colspan="5">
+           <widget class="QComboBox" name="menuStripeAppearance"/>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="2" column="0" colspan="5" >
-        <widget class="QGroupBox" name="groupBox2" >
-         <property name="title" >
+       <item row="2" column="0" colspan="5">
+        <widget class="QGroupBox" name="groupBox2">
+         <property name="title">
           <string>Toolbars</string>
          </property>
-         <property name="flat" >
+         <property name="flat">
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" >
-          <property name="margin" >
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>11</number>
           </property>
-          <property name="spacing" >
+          <property name="spacing">
            <number>6</number>
           </property>
-          <item row="0" column="4" >
+          <item row="0" column="4">
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
               <height>20</height>
@@ -1193,28 +1187,28 @@ p, li { white-space: pre-wrap; }
             </property>
            </spacer>
           </item>
-          <item row="0" column="3" >
-           <widget class="QComboBox" name="toolbarSeparators" />
+          <item row="0" column="3">
+           <widget class="QComboBox" name="toolbarSeparators"/>
           </item>
-          <item row="0" column="2" >
-           <widget class="QLabel" name="textLabel2_3" >
-            <property name="text" >
+          <item row="0" column="2">
+           <widget class="QLabel" name="textLabel2_3">
+            <property name="text">
              <string>Separators:</string>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QComboBox" name="toolbarAppearance" />
+          <item row="0" column="1">
+           <widget class="QComboBox" name="toolbarAppearance"/>
           </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="textLabel1_4_2_7" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QLabel" name="textLabel1_4_2_7">
+            <property name="text">
              <string>Appearance:</string>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>false</bool>
             </property>
            </widget>
@@ -1222,15 +1216,15 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="3" column="1" >
+       <item row="3" column="1">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::MinimumExpanding</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>83</width>
            <height>21</height>
@@ -1240,89 +1234,89 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_12" >
-      <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="4" >
-        <widget class="QCheckBox" name="gtkComboMenus" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+     <widget class="QWidget" name="page_12">
+      <layout class="QGridLayout">
+       <item row="0" column="0" colspan="4">
+        <widget class="QCheckBox" name="gtkComboMenus">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Gtk style comboboxes (KDE4)</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="4" >
-        <widget class="QCheckBox" name="gtkButtonOrder" >
-         <property name="text" >
+       <item row="1" column="0" colspan="4">
+        <widget class="QCheckBox" name="gtkButtonOrder">
+         <property name="text">
           <string>Gtk button order</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="4" >
-        <widget class="QCheckBox" name="mapKdeIcons" >
-         <property name="text" >
+       <item row="2" column="0" colspan="4">
+        <widget class="QCheckBox" name="mapKdeIcons">
+         <property name="text">
           <string>Map KDE icons (Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="4" >
-        <widget class="QCheckBox" name="fixParentlessDialogs" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="3" column="0" colspan="4">
+        <widget class="QCheckBox" name="fixParentlessDialogs">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#ff0000;">Warning: Experimental!&lt;/span>&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window. &lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Note:&lt;/span> This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;Warning: Experimental!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window. &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>'Fix' parentless dialogs</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="4" >
-        <widget class="QCheckBox" name="inactiveHighlight" >
-         <property name="whatsThis" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="4" column="0" colspan="4">
+        <widget class="QCheckBox" name="inactiveHighlight">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Selecting this option will cause the highlight colour of inactive items (e.g. those in inactive windows) to be drawn using a blen of the background and highlight colors.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Selecting this option will cause the highlight colour of inactive items (e.g. those in inactive windows) to be drawn using a blen of the background and highlight colors.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Use blended background/highlight color for highlight of inactive elements</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" >
-        <widget class="QLabel" name="label" >
-         <property name="text" >
+       <item row="5" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
           <string>Character to use for password entries:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1" >
-        <widget class="QPushButton" name="passwordChar" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+       <item row="5" column="1">
+        <widget class="QPushButton" name="passwordChar">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
         </widget>
        </item>
-       <item row="5" column="2" >
+       <item row="5" column="2">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -1330,12 +1324,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="6" column="3" >
+       <item row="6" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>261</height>
@@ -1345,113 +1339,113 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_13" >
-      <layout class="QVBoxLayout" >
+     <widget class="QWidget" name="page_13">
+      <layout class="QVBoxLayout">
        <item>
-        <widget class="QComboBox" name="gradCombo" />
+        <widget class="QComboBox" name="gradCombo"/>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox" >
-         <property name="title" >
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
           <string>Settings</string>
          </property>
-         <layout class="QGridLayout" >
-          <item rowspan="2" row="0" column="0" >
-           <widget class="QTreeWidget" name="gradStops" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Expanding" hsizetype="Minimum" >
+         <layout class="QGridLayout">
+          <item row="0" column="0" rowspan="2">
+           <widget class="QTreeWidget" name="gradStops">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="indentation" >
+            <property name="indentation">
              <number>0</number>
             </property>
-            <property name="rootIsDecorated" >
+            <property name="rootIsDecorated">
              <bool>false</bool>
             </property>
             <column>
-             <property name="text" >
+             <property name="text">
               <string>Position (%)</string>
              </property>
             </column>
             <column>
-             <property name="text" >
+             <property name="text">
               <string>Value (%)</string>
              </property>
             </column>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QLabel" name="label_3" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="text" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;">&lt;span style=" font-weight:600; font-style:italic;">NOTE:&lt;/span>&lt;span style=" font-style:italic;"> &lt;/span>&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt; font-style:italic;">&lt;span style=" text-decoration: underline;">Position&lt;/span> has a range of 0% to 100% - 0% being top/left, and 100% being bottom/right.&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt; font-style:italic;">&lt;span style=" text-decoration: underline;">Value&lt;/span> has a range of 0% to 200%. A value of 120% implies lightening by 20%, and a value of 80% implies darkening by 20%&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;NOTE:&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt; font-style:italic;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Position&lt;/span&gt; has a range of 0% to 100% - 0% being top/left, and 100% being bottom/right.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt; font-style:italic;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Value&lt;/span&gt; has a range of 0% to 200%. A value of 120% implies lightening by 20%, and a value of 80% implies darkening by 20%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QGroupBox" name="groupBox_2" >
-            <property name="title" >
+          <item row="1" column="1">
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="title">
              <string>Gradient Stop</string>
             </property>
-            <layout class="QGridLayout" >
-             <item row="0" column="0" >
-              <widget class="QLabel" name="label_5" >
-               <property name="text" >
+            <layout class="QGridLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
                 <string>Position:</string>
                </property>
               </widget>
              </item>
-             <item rowspan="2" row="0" column="1" colspan="4" >
-              <widget class="KIntNumInput" name="stopPosition" >
-               <property name="maximum" >
+             <item row="0" column="1" rowspan="2" colspan="4">
+              <widget class="KIntNumInput" name="stopPosition">
+               <property name="maximum">
                 <number>100</number>
                </property>
-               <property name="suffix" >
+               <property name="suffix">
                 <string>%</string>
                </property>
               </widget>
              </item>
-             <item rowspan="2" row="1" column="0" >
-              <widget class="QLabel" name="label_6" >
-               <property name="text" >
+             <item row="1" column="0" rowspan="2">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
                 <string>Value:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1" colspan="4" >
-              <widget class="KIntNumInput" name="stopValue" >
-               <property name="maximum" >
+             <item row="2" column="1" colspan="4">
+              <widget class="KIntNumInput" name="stopValue">
+               <property name="maximum">
                 <number>200</number>
                </property>
-               <property name="suffix" >
+               <property name="suffix">
                 <string>%</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2" >
+             <item row="3" column="0" colspan="2">
               <spacer>
-               <property name="orientation" >
+               <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
-               <property name="sizeHint" stdset="0" >
+               <property name="sizeHint" stdset="0">
                 <size>
                  <width>143</width>
                  <height>20</height>
@@ -1459,30 +1453,30 @@ p, li { white-space: pre-wrap; }
                </property>
               </spacer>
              </item>
-             <item row="3" column="2" >
-              <widget class="KPushButton" name="addButton" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+             <item row="3" column="2">
+              <widget class="KPushButton" name="addButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
               </widget>
              </item>
-             <item row="3" column="3" >
-              <widget class="KPushButton" name="updateButton" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+             <item row="3" column="3">
+              <widget class="KPushButton" name="updateButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
               </widget>
              </item>
-             <item row="3" column="4" >
-              <widget class="KPushButton" name="removeButton" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+             <item row="3" column="4">
+              <widget class="KPushButton" name="removeButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1492,31 +1486,31 @@ p, li { white-space: pre-wrap; }
             </layout>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QComboBox" name="gradBorder" />
+          <item row="2" column="0">
+           <widget class="QComboBox" name="gradBorder"/>
           </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="gradPreviewBox" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+        <widget class="QGroupBox" name="gradPreviewBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="title" >
+         <property name="title">
           <string>Preview</string>
          </property>
-         <layout class="QHBoxLayout" >
+         <layout class="QHBoxLayout">
           <item>
-           <widget class="QWidget" native="1" name="previewWidgetContainer" />
+           <widget class="QWidget" name="previewWidgetContainer" native="true"/>
           </item>
           <item>
-           <widget class="KColorButton" name="previewColor" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+           <widget class="KColorButton" name="previewColor">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -1528,129 +1522,129 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_14" >
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
+     <widget class="QWidget" name="page_14">
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
           <string>Shading routine:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="shading" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+       <item row="0" column="1">
+        <widget class="QComboBox" name="shading">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2" >
-        <widget class="QGroupBox" name="customShading" >
-         <property name="title" >
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="customShading">
+         <property name="title">
           <string>Use Custom Values</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="KDoubleNumInput" name="shade0" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+         <layout class="QGridLayout">
+          <item row="0" column="0">
+           <widget class="KDoubleNumInput" name="shade0">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
            </widget>
           </item>
-          <item rowspan="7" row="0" column="1" >
-           <widget class="QLabel" name="label_4" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
+          <item row="0" column="1" rowspan="7">
+           <widget class="QLabel" name="label_4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="text" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-style:italic;">QtCurve uses various hard-coded shading values to draw elements such as button frames, the background for pressed buttons, etc. The following is a brief overview of how each shade is used - use this as a guide only, as shades are used for various things.&lt;/span>&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">1 Is used for the light part of 3d elements - such as the border of tab widgets.&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">2 Is used for the lighter shade of striped progressbars.&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">3 Is used for the dark part of 3d elements - such as the border of tab widgets.&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">4 Is used for the shaded border of checks and radios, toolbar borders (when set to dark), the dark part of sunken/raised slider handles, etc.&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">5 Is used for the background of pressed widgets, and the border of toolbars (when not dark).&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">6 Is used as the border of most widgets.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;QtCurve uses various hard-coded shading values to draw elements such as button frames, the background for pressed buttons, etc. The following is a brief overview of how each shade is used - use this as a guide only, as shades are used for various things.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;1 Is used for the light part of 3d elements - such as the border of tab widgets.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;2 Is used for the lighter shade of striped progressbars.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;3 Is used for the dark part of 3d elements - such as the border of tab widgets.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;4 Is used for the shaded border of checks and radios, toolbar borders (when set to dark), the dark part of sunken/raised slider handles, etc.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;5 Is used for the background of pressed widgets, and the border of toolbars (when not dark).&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;6 Is used as the border of most widgets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
-            <property name="wordWrap" >
+            <property name="wordWrap">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="KDoubleNumInput" name="shade1" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <item row="1" column="0">
+           <widget class="KDoubleNumInput" name="shade1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="KDoubleNumInput" name="shade2" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <item row="2" column="0">
+           <widget class="KDoubleNumInput" name="shade2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" >
-           <widget class="KDoubleNumInput" name="shade3" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <item row="3" column="0">
+           <widget class="KDoubleNumInput" name="shade3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" >
-           <widget class="KDoubleNumInput" name="shade4" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <item row="4" column="0">
+           <widget class="KDoubleNumInput" name="shade4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
            </widget>
           </item>
-          <item row="5" column="0" >
-           <widget class="KDoubleNumInput" name="shade5" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <item row="5" column="0">
+           <widget class="KDoubleNumInput" name="shade5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" >
+          <item row="6" column="0">
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
               <height>16</height>
@@ -1661,12 +1655,12 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="2" column="0" >
+       <item row="2" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>104</height>
@@ -1680,7 +1674,7 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
@@ -1747,7 +1741,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>highlightTab</tabstop>
   <tabstop>colorSelTab</tabstop>
   <tabstop>tabAppearance</tabstop>
-  <tabstop>centerTabs</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck</tabstop>
@@ -1797,11 +1790,11 @@ p, li { white-space: pre-wrap; }
   <tabstop>previewColor</tabstop>
  </tabstops>
  <includes>
-  <include location="local" >kcolorbutton.h</include>
-  <include location="local" >kcolorbutton.h</include>
-  <include location="local" >kcolorbutton.h</include>
-  <include location="local" >kcolorbutton.h</include>
-  <include location="local" >kcolorbutton.h</include>
+  <include location="local">kcolorbutton.h</include>
+  <include location="local">kcolorbutton.h</include>
+  <include location="local">kcolorbutton.h</include>
+  <include location="local">kcolorbutton.h</include>
+  <include location="local">kcolorbutton.h</include>
  </includes>
  <resources/>
  <connections>
@@ -1811,11 +1804,11 @@ p, li { white-space: pre-wrap; }
    <receiver>groupBoxLine</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>251</x>
      <y>206</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>422</x>
      <y>212</y>
     </hint>

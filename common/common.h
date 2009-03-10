@@ -1014,7 +1014,6 @@ typedef struct
                      roundMbTopOnly,
                      gtkScrollViews,
 #ifdef __cplusplus
-                     centerTabs,
                      stdSidebarButtons,
                      gtkComboMenus,
                      colorTitlebarOnly,

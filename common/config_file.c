@@ -971,7 +971,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)
-            QTC_CFG_READ_BOOL(centerTabs)
             QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkComboMenus)
             QTC_CFG_READ_BOOL(colorTitlebarOnly)
@@ -1477,7 +1476,6 @@ static void defaultSettings(Options *opts)
 
     opts->gtkScrollViews=false;
 #ifdef __cplusplus
-    opts->centerTabs=false;
     opts->stdSidebarButtons=false;
     opts->gtkComboMenus=false;
     opts->colorTitlebarOnly=false;
@@ -1949,7 +1947,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(sunkenScrollViews)
         CFG_WRITE_ENTRY(flatSbarButtons)
-        CFG_WRITE_ENTRY(centerTabs)
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY(titlebarAppearance)
