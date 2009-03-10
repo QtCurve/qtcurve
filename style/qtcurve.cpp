@@ -5596,7 +5596,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                        MO_GLOW==opts.coloredMouseOver ? WIDGET_MENU_BUTTON : WIDGET_NO_ETCH_BTN);
                     }
 
-                    drawPrimitive(PE_IndicatorArrowDown, &tool, painter, widget);
+                    drawArrow(painter, tool.rect, PE_IndicatorArrowDown, option->palette.buttonText().color());
                 }
 /*
                 else if (toolbutton->features & QStyleOptionToolButton::HasMenu)
