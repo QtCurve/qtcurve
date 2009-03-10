@@ -672,7 +672,10 @@ void QtCurveConfig::passwordCharClicked()
     CharSelectDialog dlg(this, cur);
 
     if(QDialog::Accepted==dlg.exec() && dlg.currentChar()!=cur)
+    {
         setPasswordChar(dlg.currentChar());
+        updateChanged();
+    }
 }
 
 void QtCurveConfig::setupStack()
@@ -1024,6 +1027,7 @@ void QtCurveConfig::focusChanged()
 {
     if(ROUND_MAX==round->currentIndex() && FOCUS_LINE!=focus->currentIndex())
         round->setCurrentIndex(ROUND_EXTRA);
+    updateChanged();
 }
 
 void QtCurveConfig::roundChanged()
@@ -1033,6 +1037,7 @@ void QtCurveConfig::roundChanged()
 
     if(round->currentIndex()>ROUND_FULL && IND_COLORED==defBtnIndicator->currentIndex())
         defBtnIndicator->setCurrentIndex(IND_TINT);
+    updateChanged();
 }
 
 void QtCurveConfig::importStyle()
