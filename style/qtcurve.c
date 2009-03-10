@@ -3040,6 +3040,8 @@ debugDisplayWidget(widget, 3);
                             break;
                     }
 
+#if 0
+// Not required? Seems to mess up firefox for flatSbarButtons anyway...
                 if(slider && ((SCROLLBAR_NONE==opts.scrollbarType && !isMozilla()) ||
                               (SCROLLBAR_NONE!=opts.scrollbarType && opts.flatSbarButtons)))
                 {
@@ -3079,6 +3081,7 @@ debugDisplayWidget(widget, 3);
                             horiz ? x-2 : x, horiz ? y : y-2, horiz ? width+4 : width,
                             horiz ? height : height+4, FALSE);
                 }
+#endif
 
 #ifdef QTC_INCREASE_SB_SLIDER
                 if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons)
@@ -3262,8 +3265,8 @@ debugDisplayWidget(widget, 3);
 
             gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
                                                GTK_STATE_INSENSITIVE==state
-                                                   ? GTK_STATE_INSENSITIVE 
-                                                   : GTK_STATE_NORMAL, 
+                                                   ? GTK_STATE_INSENSITIVE
+                                                   : GTK_STATE_NORMAL,
                                                area, x, y, width, height);
 
             if(horiz)

@@ -34,6 +34,7 @@
 16. Under KDE4, read palette, and font, from kdeglobals - needed because
     if Qt4.5 is set to 'Desktop settings aware', it will not store its palette
     in ~/.config/TrollTech.conf
+17. Fix Firefox issues with scrollbar slider when using flat scrolbar buttons.
 
 0.61.5
 ------
