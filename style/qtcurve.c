@@ -2686,7 +2686,8 @@ debugDisplayWidget(widget, 3);
 //             }
         }
         else
-            drawArrow(window, onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0)
+            drawArrow(window, onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) ||
+                              isOnButton(widget, 0, 0L)
                                 ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
                                 : style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
                       x+(width>>1), y+(height>>1), FALSE, TRUE);
