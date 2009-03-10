@@ -5861,7 +5861,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     up.setHeight(up.height()+1);
                     opt.rect=up;
                     opt.direction=option->direction;
-                    opt.state|=(enabled ? State_Enabled : State_None)|(upIsActive && sunken ? State_Sunken : State_Raised)|
+                    opt.state=(enabled ? State_Enabled : State_None)|(upIsActive && sunken ? State_Sunken : State_Raised)|
                               (upIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;;
 
                     drawPrimitive(QAbstractSpinBox::PlusMinus==spinBox->buttonSymbols ? PE_IndicatorSpinPlus : PE_IndicatorSpinUp,
@@ -5873,8 +5873,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QStyleOption opt(*option);
 
                     opt.rect=down;
-                    opt.state|=(enabled ? State_Enabled : State_None)|(downIsActive && sunken ? State_Sunken : State_Raised)|
-                               (downIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;
+                    opt.state=(enabled ? State_Enabled : State_None)|(downIsActive && sunken ? State_Sunken : State_Raised)|
+                              (downIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;
                     opt.direction=option->direction;
 
                     drawPrimitive(QAbstractSpinBox::PlusMinus==spinBox->buttonSymbols ? PE_IndicatorSpinMinus : PE_IndicatorSpinDown,
