@@ -1008,18 +1008,18 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #else
             QStringList shades(QStringList::split(',', readStringEntry(cfg, "customShades")));
 #endif
+            bool ok(NUM_STD_SHADES==shades.size());
 
-            if(NUM_STD_SHADES==shades.size())
+            if(ok)
             {
                 QStringList::ConstIterator it(shades.begin());
-                bool                       ok(true);
 
                 for(i=0; i<NUM_STD_SHADES && ok; ++i, ++it)
                     opts->customShades[i]=(*it).toDouble(&ok);
-
-                if(!ok)
-                    opts->customShades[0]=0;
             }
+
+            if(!ok && shades.size())
+                opts->customShades[0]=0;
 
             for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
             {
@@ -1075,16 +1075,17 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(str)
             {
-                int j,
-                    comma=0;
+                int  j,
+                     comma=0;
+                bool ok=true;
 
                 for(j=0; str[j]; ++j)
                     if(','==str[j])
                         comma++;
 
-                if((NUM_STD_SHADES-1)==comma)
+                ok=(NUM_STD_SHADES-1)==comma;
+                if(ok)
                 {
-                    bool ok=true;
 
                     for(j=0; j<comma+1 && str && ok; ++j)
                     {
@@ -1100,10 +1101,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                         else
                             ok=false;
                     }
-
-                    if(!ok)
-                        opts->customShades[0]=0;
                 }
+
+                if(!ok)
+                    opts->customShades[0]=0;
             }
             }
 
@@ -2000,14 +2001,14 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             }
         }
 
-        if(opts.customShades[0]>0 &&
-           (exportingStyle ||
-            opts.customShades[0]!=def.customShades[0] ||
-            opts.customShades[1]!=def.customShades[1] ||
-            opts.customShades[2]!=def.customShades[2] ||
-            opts.customShades[3]!=def.customShades[3] ||
-            opts.customShades[4]!=def.customShades[4] ||
-            opts.customShades[5]!=def.customShades[5]))
+        if(opts.customShades[0]==0 ||
+           exportingStyle ||
+           opts.customShades[0]!=def.customShades[0] ||
+           opts.customShades[1]!=def.customShades[1] ||
+           opts.customShades[2]!=def.customShades[2] ||
+           opts.customShades[3]!=def.customShades[3] ||
+           opts.customShades[4]!=def.customShades[4] ||
+           opts.customShades[5]!=def.customShades[5])
         {
             QString     shadeVal;
 #if QT_VERSION >= 0x040000
@@ -2015,11 +2016,14 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #else
             QTextStream str(&shadeVal, IO_WriteOnly);
 #endif
-            for(int i=0; i<NUM_STD_SHADES; ++i)
-                if(0==i)
-                    str << opts.customShades[i];
-                else
-                    str << ',' << opts.customShades[i];
+            if(0==opts.customShades[0])
+                 str << 0;
+            else
+                for(int i=0; i<NUM_STD_SHADES; ++i)
+                    if(0==i)
+                        str << opts.customShades[i];
+                    else
+                        str << ',' << opts.customShades[i];
             CFG.writeEntry("customShades", shadeVal);
         }
         else

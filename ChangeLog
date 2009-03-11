@@ -1,9 +1,10 @@
 0.62.1
 ------
 1. Use highlight colour for unselected focused view items.
-2. Reduce tab width by 4 pixels.
-3. Fix clipping of toolbar text.
-4. Fix group box check box clipping.
+2. Fix saving/reading of custom shades.
+3. Reduce tab width by 4 pixels.
+4. Fix clipping of toolbar text.
+5. Fix group box check box clipping.
 
 0.62.0
 ------
