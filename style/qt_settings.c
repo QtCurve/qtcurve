@@ -490,7 +490,7 @@ static GdkColor readColor(const char *line)
     char     *eq=strchr(line, '=');
     GdkColor col;
 
-    if(eq && ++eq && *eq!='\0' && 3==sscanf(eq, "%d,%d,%d\n", (int *)&col.red, (int *)&col.green, (int *)&col.blue))
+    if(eq && ++eq && *eq!='\0' && 3==sscanf(eq, "%d,%d,%d", (int *)&col.red, (int *)&col.green, (int *)&col.blue))
     {
         col.red=toGtkColor(col.red);
         col.green=toGtkColor(col.green);
@@ -513,7 +513,7 @@ static double readDouble(const char *line, int offset)
 
 static gboolean readBool(const char *line, int offset)
 {
-    return line[offset]!='\0' ? 0==strcmp(&line[offset], "true") : false;
+    return line[offset]!='\0' ? 0==strncmp_i(&line[offset], "true", 4) : false;
 }
 
 static void parseFontLine(const char *line, int *weight, int *italic, int *fixedW, float *size,
