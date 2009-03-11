@@ -4504,7 +4504,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
             use_text=TRUE;
             swap_gc=TRUE;
-            for(i=0; i<4; ++i)
+            for(i=0; i<5; ++i)
             {
                 prevGcs[i]=style->text_gc[i];
                 style->text_gc[i]=qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
@@ -4518,7 +4518,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             {
                 if(opts.customMenuTextColor && qtcurveStyle->menutext_gc[0])
                 {
-                    for(i=0; i<4; ++i)
+                    for(i=0; i<5; ++i)
                         prevGcs[i]=style->text_gc[i];
                     swap_gc=TRUE;
                     style->text_gc[GTK_STATE_NORMAL]=qtcurveStyle->menutext_gc[0];
@@ -4617,7 +4617,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                           x+1, y, layout);
 
         if(swap_gc)
-            for(i=0; i<4; ++i)
+            for(i=0; i<5; ++i)
                 style->text_gc[i]=prevGcs[i];
     }
 }
