@@ -5666,7 +5666,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         gboolean drawRounded=QTC_ROUNDED;
         GdkColor *cols=FOCUS_BACKGROUND==opts.focus ? qtcPalette.background : qtcPalette.menuitem;
-        GdkColor *col=view ? &style->text[state]
+        GdkColor *col=view && GTK_STATE_SELECTED==state
+                           ? &style->text[state]
                            : &cols[FOCUS_BACKGROUND!=opts.focus && GTK_STATE_SELECTED==state ? 3 : QT_FOCUS];
 
         QTC_CAIRO_BEGIN

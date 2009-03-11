@@ -1,6 +1,7 @@
 0.62.1
 ------
-1. Fix reading of boolean values from kdeglobals.
+1. Use highlight colour for unselected focused view items.
+2. Fix reading of boolean values from kdeglobals.
 
 0.62.0
 ------
