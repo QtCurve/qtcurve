@@ -1843,7 +1843,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MaximumDragDistance:
             return -1;
         case PM_TabBarTabHSpace:
-            return 18;
+            return 14;
         case PM_TabBarTabVSpace:
             return opts.highlightTab ? 10 : 8;
         case PM_TitleBarHeight:
