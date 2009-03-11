@@ -1,9 +1,10 @@
 0.62.1
 ------
 1. Use highlight colour for unselected focused view items.
-2. Fix reading of boolean values from kdeglobals.
-3. Fix some slight tab drawing glitches.
-4. Stop disabled menuitems from using custom menu text colour
+2. Fix saving/reading of custom shades.
+3. Fix reading of boolean values from kdeglobals.
+4. Fix some slight tab drawing glitches.
+5. Stop disabled menuitems from using custom menu text colour
    if custom colours have been set.
 
 0.62.0
