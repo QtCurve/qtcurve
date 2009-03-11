@@ -6784,9 +6784,9 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
 #if QT_VERSION >= 0x040300
         case SE_GroupBoxLayoutItem:
             rect = option->rect;
-            if (const QStyleOptionGroupBox *groupBoxOpt = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
-                if (groupBoxOpt->subControls & (SC_GroupBoxCheckBox | SC_GroupBoxLabel))
-                    rect.setTop(rect.top() + 2);    // eat the top margin a little bit
+//             if (const QStyleOptionGroupBox *groupBoxOpt = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
+//                 if (groupBoxOpt->subControls & (SC_GroupBoxCheckBox | SC_GroupBoxLabel))
+//                     rect.setTop(rect.top() + 2);    // eat the top margin a little bit
             break;
 #endif
         case SE_PushButtonFocusRect:
