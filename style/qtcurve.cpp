@@ -3109,10 +3109,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                          (widget && widget->parent() &&
                                             ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
                                               widget->parent()->inherits("Q3ScrollView"))));
-                    const QColor *use(view ? 0L : (FOCUS_BACKGROUND==opts.focus ?  backgroundColors(option) : itsMenuitemCols));
+                    const QColor *use(view && state&State_Selected
+                                        ? 0L : (FOCUS_BACKGROUND==opts.focus ?  backgroundColors(option) : itsMenuitemCols));
 
                     painter->save();
-                    QColor c(view ? state&State_Selected ? palette.highlightedText().color() : palette.text().color()
+                    QColor c(view && state&State_Selected
+                                  ? palette.highlightedText().color()
                                   : use[FOCUS_BACKGROUND!=opts.focus && state&State_Selected ? 3 : QT_FOCUS]);
 
                     if(FOCUS_LINE==opts.focus)

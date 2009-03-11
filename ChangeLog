@@ -1,3 +1,7 @@
+0.62.1
+------
+1. Use highlight colour for unselected focused view items.
+
 0.62.0
 ------
  1. Reduce gradient code complexity - makes predefined gradients
