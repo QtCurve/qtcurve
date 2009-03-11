@@ -6685,9 +6685,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_ToolButton:
         {
-            newSize.rheight() += 3;
-            newSize.rwidth() += 3;
-
+            newSize = QSize(size.width()+9, size.height()+9);
             // -- from kstyle & oxygen --
             // We want to avoid super-skiny buttons, for things like "up" when icons + text
             // For this, we would like to make width >= height.
