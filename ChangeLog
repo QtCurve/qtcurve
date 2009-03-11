@@ -2,6 +2,7 @@
 ------
 1. Use highlight colour for unselected focused view items.
 2. Fix reading of boolean values from kdeglobals.
+3. Fix some slight tab drawing glitches.
 
 0.62.0
 ------
