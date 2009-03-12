@@ -2,6 +2,7 @@
 ------
 1. Adjust KMenu titles.
 2. Fixed (hopefully!) clipping of toolbutton text.
+3. Fixed some more tab clipping (Qt4.5)
 
 0.62.1
 ------

@@ -4753,9 +4753,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if(!tab->text.isEmpty())
                 {
+#if QT_VERSION < 0x040500
                     static const int constBorder=6;
 
-                    r.adjust(constBorder, 0, -constBorder, 0);
+                    if(qtVersion()<VER_45)
+                        r.adjust(constBorder, 0, -constBorder, 0);
+#endif
                     drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text, QPalette::WindowText);
                 }
 
