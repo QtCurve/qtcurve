@@ -4758,6 +4758,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     if(qtVersion()<VER_45)
                         r.adjust(constBorder, 0, -constBorder, 0);
+#else
+                    if(tabV2.leftButtonSize.isNull())
+                        r.adjust(constBorder, 0, -constBorder, 0);
 #endif
                     drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text, QPalette::WindowText);
                 }
