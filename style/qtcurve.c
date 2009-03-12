@@ -2800,7 +2800,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         setState(widget, &state, &btn_down, -1, -1);
     {
 
-    gboolean pbar=DETAIL("bar") && GTK_IS_PROGRESS_BAR(widget),
+    gboolean pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
              qtc_paned=!pbar && IS_QTC_PANED,
              slider=!qtc_paned && (DETAIL("slider") || DETAIL("qtc-slider")),
              hscale=!slider && DETAIL("hscale"),
@@ -3234,7 +3234,8 @@ debugDisplayWidget(widget, 3);
     }
     else if(widget && detail && (0==strcmp(detail, "trough") || detail==strstr(detail, "trough-")))
     {
-        gboolean pbar=GTK_IS_PROGRESS_BAR(widget),
+        gboolean list=isList(widget),
+                 pbar=list || GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
         int      border=QT_BORDER(GTK_STATE_INSENSITIVE!=state || !scale);
         GdkColor *bgndcol=&qtcPalette.background[2];
@@ -3325,7 +3326,7 @@ debugDisplayWidget(widget, 3);
         }
         else if(pbar)
         {
-            gboolean doEtch=QTC_DO_EFFECT;
+            gboolean doEtch=!list && QTC_DO_EFFECT;
             GdkColor *col=&style->base[state];
 
             switch(opts.progressGrooveColor)
@@ -3341,7 +3342,7 @@ debugDisplayWidget(widget, 3);
                     col=&qtcPalette.background[2];
             }
 
-            drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+//             drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
             if(doEtch)
                 x++, y++, width-=2, height-=2;
@@ -3829,18 +3830,15 @@ debugDisplayWidget(widget, 3);
     }
     else
     {
-        int dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : 4;
-
-/* CPD: TODO When is this used??? */
-        drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width-1, height-1);
-        cairo_new_path(cr);
-        cairo_rectangle(cr, x, y, width-1, height-1);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
-        cairo_stroke(cr);
-        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+1, width-3);
-        drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+1, height-3);
-        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x+1, y+height-2, width-3);
-        drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x+1, y+height-2, height-3);
+        clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
+        drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
+        unsetCairoClipping(cr);
+        drawBorder(cr, style, state, area, NULL, x, y, width, height,
+                   NULL, ROUNDED_ALL, GTK_SHADOW_NONE==shadow_type
+                                        ? BORDER_FLAT
+                                        : GTK_SHADOW_IN==shadow_type || GTK_SHADOW_ETCHED_IN==shadow_type
+                                            ? BORDER_SUNKEN
+                                            : BORDER_RAISED, WIDGET_OTHER, QT_STD_BORDER);
     }
 
     QTC_CAIRO_END
