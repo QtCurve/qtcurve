@@ -3342,13 +3342,16 @@ debugDisplayWidget(widget, 3);
                     col=&qtcPalette.background[2];
             }
 
-//             drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+            if(!list)
+                drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
             if(doEtch)
                 x++, y++, width-=2, height-=2;
 
+            clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);
             drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
                               horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
+            unsetCairoClipping(cr);
 
             if(doEtch)
                  drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
