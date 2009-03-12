@@ -5572,7 +5572,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                           false, opts.menuStripeAppearance, WIDGET_OTHER); 
                     }
 
-                    drawBorder(painter, r.adjusted(2, 2, -2, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
+                    // For some reason the MenuTitle has a larger border on the left, so adjust the width by 1 pixel to make
+                    // this look nicer.
+                    drawBorder(painter, r.adjusted(2, 2, -3, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
                 }
                 else if ( (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised))) ||
                           (toolbutton->subControls & SC_ToolButtonMenu && drawMenu))
