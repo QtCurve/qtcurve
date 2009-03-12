@@ -499,6 +499,7 @@ static const int windowsItemVMargin  =  2; // menu item ver text margin
 static const int windowsRightBorder  = 15; // right border on windows
 static const int windowsArrowHMargin =  6; // arrow horizontal margin
 static const int constProgressBarFps = 20;
+static const int constTabPad         = 6;
 
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
@@ -4704,18 +4705,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #if QT_VERSION >= 0x040500
                 r = subElementRect(SE_TabBarTabText, option, widget);
 #else
-                if(qtVersion()>=VER_45)
-                    r = subElementRect((QStyle::SubElement)(SE_ItemViewItemFocusRect+3), option, widget);
-                else
-                {
-                    r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
-                                   pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+                r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
+                                pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
 
-                    if (selected)
-                    {
-                        r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
-                        r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
-                    }
+                if (selected)
+                {
+                    r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+                    r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
                 }
 #endif
                 if (!tabV2.icon.isNull())
@@ -4735,7 +4731,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     int offset = 4,
                         left = option->rect.left();
 #if QT_VERSION >= 0x040500
-                    if (tabV2.leftButtonSize.isNull())
+                    if (tabV2.leftButtonSize.isNull() || tabV2.leftButtonSize.width()<=0)
                         offset += 2;
                     else
                         left += tabV2.leftButtonSize.width() + 2;
@@ -4746,23 +4742,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         iconRect = visualRect(option->direction, option->rect, iconRect);
                     painter->drawPixmap(iconRect.x(), iconRect.y(), tabIcon);
 #if QT_VERSION < 0x040500
-                    if(qtVersion()<VER_45)
-                        r.adjust(reverse ? 0 : tabIconSize.width(), 0, reverse ? -tabIconSize.width() : 0, 0);
+                    r.adjust(reverse ? 0 : tabIconSize.width(), 0, reverse ? -tabIconSize.width() : 0, 0);
 #endif
                 }
 
                 if(!tab->text.isEmpty())
                 {
 #if QT_VERSION < 0x040500
-                    static const int constBorder=6;
-
-                    if(qtVersion()<VER_45)
-                        r.adjust(constBorder, 0, -constBorder, 0);
-#else
-                    if(tabV2.leftButtonSize.isNull())
-                        r.adjust(constBorder, 0, -constBorder, 0);
+                    r.adjust(constTabPad, 0, -constTabPad, 0);
 #endif
-                    drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text, QPalette::WindowText);
+                    drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text,
+                                 QPalette::WindowText);
                 }
 
                 if (verticalTabs)
@@ -4772,10 +4762,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 {
                     const int constOffset = 1 + pixelMetric(PM_DefaultFrameWidth);
 
-                    int x1, x2;
-                    x1 = tabV2.rect.left();
-                    x2 = tabV2.rect.right() - 1;
-
+                    int                   x1=tabV2.rect.left(),
+                                          x2=tabV2.rect.right() - 1;
                     QStyleOptionFocusRect fropt;
                     fropt.QStyleOption::operator=(*tab);
                     fropt.rect.setRect(x1 + 1 + constOffset, tabV2.rect.y() + constOffset,
@@ -6778,6 +6766,74 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
     QRect rect;
     switch (element)
     {
+#if QT_VERSION >= 0x040500
+        case SE_TabBarTabText:
+            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
+            {
+                QStyleOptionTabV3 tabV2(*tab);
+                bool              verticalTabs=QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
+                                               QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape;
+
+                rect=tabV2.rect;
+                if (verticalTabs)
+                    rect.setRect(0, 0, rect.height(), rect.width());
+                int verticalShift = pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget);
+                int horizontalShift = pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget);
+                if (tabV2.shape == QTabBar::RoundedSouth || tabV2.shape == QTabBar::TriangularSouth)
+                    verticalShift = -verticalShift;
+                rect.adjust(0, 0, horizontalShift, verticalShift);
+                bool selected = tabV2.state & State_Selected;
+                if (selected)
+                {
+                    rect.setBottom(rect.bottom() - verticalShift);
+                    rect.setRight(rect.right() - horizontalShift);
+                }
+
+                // left widget
+                if (tabV2.leftButtonSize.isNull())
+                    rect.setLeft(rect.left()+constTabPad);
+                else if(tabV2.leftButtonSize.width()>0)
+                    rect.setLeft(rect.left() + constTabPad + 2 +
+                                (verticalTabs ? tabV2.leftButtonSize.height() : tabV2.leftButtonSize.width()));
+                else if(tabV2.icon.isNull())
+                    rect.setLeft(rect.left()+constTabPad);
+                else
+                    rect.setLeft(rect.left() + 2);
+
+                // icon
+                if (!tabV2.icon.isNull())
+                {
+                    QSize iconSize = tabV2.iconSize;
+                    if (!iconSize.isValid())
+                    {
+                        int iconExtent = pixelMetric(PM_SmallIconSize);
+                        iconSize = QSize(iconExtent, iconExtent);
+                    }
+                    QSize tabIconSize = tabV2.icon.actualSize(iconSize,
+                                                            (tabV2.state & State_Enabled) ? QIcon::Normal
+                                                            : QIcon::Disabled);
+                    int offset = 4;
+                    if (tabV2.leftButtonSize.isNull())
+                        offset += 2;
+
+                    QRect iconRect = QRect(rect.left() + offset, rect.center().y() - tabIconSize.height() / 2,
+                                           tabIconSize.width(), tabIconSize .height());
+                    if (!verticalTabs)
+                        iconRect = visualRect(option->direction, option->rect, iconRect);
+                    rect.setLeft(rect.left() + tabIconSize.width() + offset + 2);
+                }
+
+                // right widget
+                if (!tabV2.rightButtonSize.isNull() && tabV2.rightButtonSize.width()>0)
+                    rect.setRight(rect.right() - constTabPad - 2 -
+                                  (verticalTabs ? tabV2.rightButtonSize.height() : tabV2.rightButtonSize.width()));
+
+                if (!verticalTabs)
+                    rect = visualRect(option->direction, option->rect, rect);
+                return rect;
+            }
+            break;
+#endif
         case SE_RadioButtonIndicator:
             rect = visualRect(option->direction, option->rect,
                               QTC_BASE_STYLE::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
