@@ -3,6 +3,7 @@
 1. Adjust KMenu titles.
 2. Fixed (hopefully!) clipping of toolbutton text.
 3. Fixed some more tab clipping (Qt4.5)
+4. Draw KMenuTitle more button like - is more consistent with KDE3.
 
 0.62.1
 ------
