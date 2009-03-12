@@ -5359,12 +5359,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     if (Qt::ToolButtonIconOnly!=tb->toolButtonStyle)
                     {
-                        QRect pr = r;
-                        QRect tr = r;
+                        QRect pr = r,
+                              tr = r;
                         int   alignment = Qt::TextShowMnemonic;
 
                         painter->setFont(tb->font);
-                        tr = r;
                         if (!styleHint(SH_UnderlineShortcut, option, widget))
                             alignment |= Qt::TextHideMnemonic;
 
@@ -5372,7 +5371,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             pr.setHeight(pmSize.height() + 6);
 
-                            tr.adjust(0, pr.bottom(), 0, 0); // -3);
+                            tr.adjust(0, pr.bottom()-2, 0, 0); // -3);
                             pr.translate(shiftX, shiftY);
                             if (hasArrow)
                                 drawTbArrow(this, tb, pr, painter, widget);
