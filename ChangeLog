@@ -1,6 +1,7 @@
 0.62.2
 ------
 1. Adjust KMenu titles.
+2. Fixed (hopefully!) clipping of toolbutton text.
 
 0.62.1
 ------
