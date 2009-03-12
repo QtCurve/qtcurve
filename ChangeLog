@@ -1,7 +1,9 @@
 0.62.2
 ------
 1. Improve appearance of progressbars in listviews (such as in d4x)
-
+2. Call kde-config (KDE3) / kde4-config (KDE4) to determine location
+   of system icons for creating icon map.
+ 
 0.62.1
 ------
 1. Use highlight colour for unselected focused view items.

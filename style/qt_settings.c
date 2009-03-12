@@ -310,7 +310,8 @@ static char * getKdeHome()
     static char *kdeHome=NULL;
 
     if(!kdeHome)
-        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --localprefix" : "kde-config --localprefix", &kdeHome, NULL, NULL, NULL))
+        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --expandvars --localprefix"
+                                                    : "kde-config --expandvars --localprefix", &kdeHome, NULL, NULL, NULL))
         {
             int len=strlen(kdeHome);
 
@@ -1197,16 +1198,32 @@ static const char * kdeGlobals()
 
 static const char * kdeIconsPrefix()
 {
-    return !qtSettings.qt4 && KDE3_ICONS_PREFIX && strlen(KDE3_ICONS_PREFIX)>2
-            ? KDE3_ICONS_PREFIX
-            : qtSettings.qt4 && KDE4_ICONS_PREFIX && strlen(KDE4_ICONS_PREFIX)>2
-                ? KDE4_ICONS_PREFIX
-                : DEFAULT_ICON_PREFIX;
+    static char *kdeIcons=NULL;
+
+    if(!kdeIcons)
+        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --expandvars --install icon"
+                                                    : "kde-config --expandvars --install icon", &kdeIcons, NULL, NULL, NULL))
+        {
+            int len=strlen(kdeIcons);
+
+            if(len>1 && kdeIcons[len-1]=='\n')
+                kdeIcons[len-1]='\0';
+        }
+        else
+            kdeIcons=0L;
+
+    if(!kdeIcons)
+        kdeIcons=!qtSettings.qt4 && KDE3_ICONS_PREFIX && strlen(KDE3_ICONS_PREFIX)>2
+                    ? KDE3_ICONS_PREFIX
+                    : qtSettings.qt4 && KDE4_ICONS_PREFIX && strlen(KDE4_ICONS_PREFIX)>2
+                        ? KDE4_ICONS_PREFIX
+                        : DEFAULT_ICON_PREFIX;
+
+    return kdeIcons;
 }
 
 static char * getIconPath()
 {
-
     static char *path=NULL;
     char        *kdeHome=getKdeHome();
     const char  *kdePrefix=kdeIconsPrefix(),
