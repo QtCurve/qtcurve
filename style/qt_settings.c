@@ -720,13 +720,13 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
         while(found!=rd && NULL!=fgets(line, QTC_MAX_INPUT_LINE_LEN, f))
             if(line[0]=='[')
             {
-                if(opts->mapKdeIcons && 0==strncmp_i(line, "[Icons]", 7))
+                if(0==strncmp_i(line, "[Icons]", 7))
                     section=SECT_ICONS;
                 else if(0==strncmp_i(line, "[Toolbar style]", 15))
                     section=SECT_TOOLBAR_STYLE;
-                else if(opts->mapKdeIcons && 0==strncmp_i(line, "[MainToolbarIcons]", 18))
+                else if(0==strncmp_i(line, "[MainToolbarIcons]", 18))
                     section=SECT_MAIN_TOOLBAR_ICONS;
-                else if(opts->mapKdeIcons && 0==strncmp_i(line, "[SmallIcons]", 12))
+                else if(0==strncmp_i(line, "[SmallIcons]", 12))
                     section=SECT_SMALL_ICONS;
                 else if(qtSettings.qt4 && 0==strncmp_i(line, "[Colors:View]", 13))
                     section=SECT_KDE4_COL_VIEW;
@@ -755,8 +755,24 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
                         break;
                 }
             }
+            else if (SECT_ICONS==section && rd&RD_ICONS && !(found&RD_ICONS) &&
+                     0==strncmp_i(line, "Theme=", 6))
+            {
+                char *eq=strstr(line, "=");
+
+                if(eq && ++eq)
+                {
+                    unsigned int len=strlen(eq);
+
+                    qtSettings.icons=(char *)realloc(qtSettings.icons, len+1);
+                    strcpy(qtSettings.icons, eq);
+                    if('\n'==qtSettings.icons[len-1])
+                        qtSettings.icons[len-1]='\0';
+                }
+                found|=RD_ICONS;
+            }
             else if (SECT_SMALL_ICONS==section && rd&RD_SMALL_ICON_SIZE && !(found&RD_SMALL_ICON_SIZE) &&
-                        0==strncmp_i(line, "Size=", 5))
+                     0==strncmp_i(line, "Size=", 5))
             {
                 int size=readInt(line, 5);
 
@@ -1845,7 +1861,7 @@ static gboolean qtInit(Options *opts)
                                  0L};
 
             for(f=0; 0!=files[f]; ++f)
-                readKdeGlobals(files[f], (opts->mapKdeIcons ? RD_ICONS|RD_SMALL_ICON_SIZE : 0)|RD_TOOLBAR_STYLE|
+                readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|
                                          RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
                                          (qtSettings.qt4 ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE : RD_LIST_COLOR),
                                opts);

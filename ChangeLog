@@ -1,3 +1,7 @@
+0.62.3
+------
+1. Fix setting of custom non-default icon themes.
+
 0.62.2
 ------
 1. Improve appearance of progressbars in listviews (such as in d4x)
