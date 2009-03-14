@@ -3,6 +3,8 @@
 1. Fix setting of custom non-default icon themes.
 2. When creating icon map, check for icons in non-default style first,
    and then check default.
+3. Improve appearance GtkCombo poup menu (even though this is actually
+   a deprecated widget!)
 
 0.62.2
 ------
