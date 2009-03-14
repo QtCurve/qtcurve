@@ -3078,7 +3078,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_FrameFocusRect:
             if (const QStyleOptionFocusRect *focusFrame = qstyleoption_cast<const QStyleOptionFocusRect *>(option))
             {
-                if (!(focusFrame->state&State_KeyboardFocusChange))
+                if (!(focusFrame->state&State_KeyboardFocusChange) ||
+                    (widget && widget->inherits("QComboBoxListView")))
                     return;
 
                 QRect r2(r);
