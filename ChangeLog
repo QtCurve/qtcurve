@@ -1,6 +1,8 @@
 0.62.3
 ------
 1. Fix setting of custom non-default icon themes.
+2. When creating icon map, check for icons in non-default style first,
+   and then check default.
 
 0.62.2
 ------

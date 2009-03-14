@@ -1,8 +1,8 @@
 gtk-about actions/help-about.png places/start-here-kde.png
 gtk-add actions/list-add.png
-gtk-apply actions/dialog-ok-apply.png
+gtk-apply actions/dialog-ok-apply.png actions/ok-apply.png actions/apply.png
 gtk-bold actions/format-text-bold.png
-gtk-cancel actions/dialog-cancel.png
+gtk-cancel actions/dialog-cancel.png actions/cancel.png
 gtk-cdrom devices/media-optical.png
 gtk-clear actions/edit-clear.png
 gtk-close actions/window-close.png
@@ -65,7 +65,7 @@ gtk-missing-image mimetypes/unknown.png
 gtk-network places/network-server.png
 gtk-new actions/document-new.png
 gtk-no actions/edit-delete.png
-gtk-ok actions/dialog-ok.png
+gtk-ok actions/dialog-ok.png actions/ok.png
 gtk-open actions/document-open.png
 gtk-paste actions/edit-paste.png
 gtk-preferences actions/configure.png
@@ -90,7 +90,7 @@ gtk-undelete actions/edit-undo.png
 gtk-underline actions/format-text-underline.png
 gtk-undo actions/edit-undo.png
 gtk-unindent actions/format-indent-less.png
-gtk-yes actions/dialog-ok.png
+gtk-yes actions/dialog-ok.png actions/ok.png
 gtk-zoom-100 actions/zoom-original.png
 gtk-zoom-fit actions/zoom-fit-best.png
 gtk-zoom-in actions/zoom-in.png

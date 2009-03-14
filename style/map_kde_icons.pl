@@ -2,14 +2,15 @@
 # (C) Craig Drummond, 2007 - 2009
 # Release uneder the GPL, v2 or later.
 #
-# Usage perl map_kde_icons.pl <icon map file> <kde prefix> <kde version> <small toolbar size> <toolbar size> <dnd size> <btn size> <menu size> <dialog size> <icons map file version>
+# Usage perl map_kde_icons.pl <icon map file> <kde prefix> <kde version> <small toolbar size> <toolbar size> <dnd size> <btn size> <menu size> <dialog size> <icon theme name> <icons map file version>
 #@iconSizes = ( 22,                  32,           22,        16,         16,                  48           );
 # KDE Uses 32x32 for dialogs, and 16x16 for buttons
 @iconSizes = ( $ARGV[3],            $ARGV[4],             $ARGV[5], $ARGV[6],     $ARGV[7],   $ARGV[8]     );
 @gtk       = ( "gtk-small-toolbar", "gtk-large-toolbar", "gtk-dnd", "gtk-button", "gtk-menu", "gtk-dialog" );
 $numSizes=$#iconSizes+1;
+$useCustom=0;
 
-printf "#%s %02X%02X%02X%02X%02X%02X%02X\n", $ARGV[9], $ARGV[2], $ARGV[3], $ARGV[4], $ARGV[5], $ARGV[6], $ARGV[7], $ARGV[8];
+printf "#%s %s %02X%02X%02X%02X%02X%02X%02X\n", $ARGV[10], $ARGV[9], $ARGV[2], $ARGV[3], $ARGV[4], $ARGV[5], $ARGV[6], $ARGV[7], $ARGV[8];
 printf "#This file is created, and used by, QtCurve. Alterations may be overwritten.\n";
 print "gtk-icon-sizes=\"gtk-small-toolbar=$ARGV[3],$ARGV[3]:gtk-large-toolbar=$ARGV[4],$ARGV[4]:";
 print "gtk-dnd=$ARGV[5],$ARGV[5]:gtk-button=$ARGV[6],$ARGV[6]:gtk-menu=$ARGV[7],$ARGV[7]:gtk-dialog=$ARGV[8],$ARGV[8]\"\n";
@@ -17,16 +18,23 @@ print "gtk-dnd=$ARGV[5],$ARGV[5]:gtk-button=$ARGV[6],$ARGV[6]:gtk-menu=$ARGV[7],
 
 if ($ARGV[1])
 {
-    $base=$ARGV[1];
+    $baseDefault=$ARGV[1];
+    if($ARGV[9] ne "XX")
+    {
+        $useCustom=1;
+        $baseCustom=join("", $baseDefault, "/");
+        $baseCustom=join("", $baseCustom, "$ARGV[9]");
+        $baseCustom=join("", $baseCustom, "/");
+    }
 }
 
 if($ARGV[2] == "3")
 {
-    $base=join("", $base, "/crystalsvg/");
+    $baseDefault=join("", $baseDefault, "/crystalsvg/");
 }
 else
 {
-    $base=join("", $base, "/oxygen/");
+    $baseDefault=join("", $baseDefault, "/oxygen/");
 }
 
 open(icons, "$ARGV[0]") || die "Could not open \"$ARGV[0]\"\n";
@@ -69,20 +77,43 @@ while($entry=<icons>)
     {
         $got=0;
         $use=0;
-        for($i=0; $i<$#iconMap && $use == 0; $i++)
+        if($useCustom)
         {
-            for($index=0; $index<$numSizes; $index++)
+            for($i=0; $i<$#iconMap && $use == 0; $i++)
             {
-                $files[$index]=checkSize($base, $iconSizes[$index], $iconMap[$i+1]);
-                if($files[$index])
+                for($index=0; $index<$numSizes; $index++)
                 {
-                    $got++;
+                    $files[$index]=checkSize($baseCustom, $iconSizes[$index], $iconMap[$i+1]);
+                    if($files[$index])
+                    {
+                        $got++;
+                    }
+                }
+
+                if($got)
+                {
+                    $use=$i+1;
                 }
             }
+        }
 
-            if($got)
+        if($got == 0)
+        {
+            for($i=0; $i<$#iconMap && $use == 0; $i++)
             {
-                $use=$i+1;
+                for($index=0; $index<$numSizes; $index++)
+                {
+                    $files[$index]=checkSize($baseDefault, $iconSizes[$index], $iconMap[$i+1]);
+                    if($files[$index])
+                    {
+                        $got++;
+                    }
+                }
+
+                if($got)
+                {
+                    $use=$i+1;
+                }
             }
         }
 

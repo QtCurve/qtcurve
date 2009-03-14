@@ -2050,12 +2050,14 @@ static gboolean qtInit(Options *opts)
 
             if(opts->mapKdeIcons && (path=getIconPath()))
             {
-                int  versionLen=1+strlen(VERSION)+1+2+(6*2)+1;  /* '#' VERSION ' '<kde version> <..nums above..>\0 */
+                const char *iconTheme=qtSettings.icons ? qtSettings.icons : "XX";
+                int  versionLen=1+strlen(VERSION)+1+strlen(iconTheme)+1+2+(6*2)+1;  /* '#' VERSION ' '<kde version> <..nums above..>\0 */
                 char *version=(char *)malloc(versionLen);
 
                 getGtk2CfgFile(&tmpStr, xdg, "qtcurve.gtk-icons");
-                sprintf(version, "#%s %02X%02X%02X%02X%02X%02X%02X",
-                                 VERSION, 
+                sprintf(version, "#%s %s %02X%02X%02X%02X%02X%02X%02X",
+                                 VERSION,
+                                 iconTheme,
                                  qtSettings.qt4 ? 4 : 3,
                                  qtSettings.iconSizes.smlTbSize,
                                  qtSettings.iconSizes.tbSize,
@@ -2066,11 +2068,12 @@ static gboolean qtInit(Options *opts)
 
                 if(!checkFileVersion(tmpStr, version, versionLen))
                 {
-                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s > %s";
+                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "VERSION" > %s";
 
                     const char *kdeprefix=kdeIconsPrefix();
-                    char       *cmdStr=(char *)malloc(strlen(constCmdStrFmt)+strlen(VERSION)
+                    char       *cmdStr=(char *)malloc(strlen(constCmdStrFmt)
                                                       +2+(4*6)+2+
+                                                      strlen(iconTheme)+
                                                       (kdeprefix ? strlen(kdeprefix) : DEFAULT_ICON_PREFIX_LEN)+strlen(tmpStr)+1);
 
                     sprintf(cmdStr, constCmdStrFmt,
@@ -2083,9 +2086,8 @@ static gboolean qtInit(Options *opts)
                                     qtSettings.iconSizes.btnSize,
                                     qtSettings.iconSizes.mnuSize,
                                     qtSettings.iconSizes.dlgSize,
-                                    VERSION,
+                                    iconTheme,
                                     tmpStr);
-
                     system(cmdStr);
                     free(cmdStr);
                 }
