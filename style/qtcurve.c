@@ -2784,16 +2784,18 @@ debugDisplayWidget(widget, 3);
             switch(stepper)
             {
                 case QTC_STEPPER_B:
-                    if(GTK_ARROW_RIGHT==arrow_type)
-                        x--;
-                    else
-                        y--;
+                    if(opts.flatSbarButtons || !opts.vArrows)
+                        if(GTK_ARROW_RIGHT==arrow_type)
+                            x--;
+                        else
+                            y--;
                     break;
                 case QTC_STEPPER_C:
-                    if(GTK_ARROW_LEFT==arrow_type)
-                        x++;
-                    else
-                        y++;
+                    if(opts.flatSbarButtons || !opts.vArrows)
+                        if(GTK_ARROW_LEFT==arrow_type)
+                            x++;
+                        else
+                            y++;
                 default:
                     break;
             }

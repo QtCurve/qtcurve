@@ -1,7 +1,8 @@
 0.62.4
 ------
 1. When drawing filled slider groove, use fill colour for border as well.
-2. Improve appearance of GtkCombo edit field.
+2. Better positioning of V arrows on secondary scrollbar buttons.
+3. Improve appearance of GtkCombo edit field.
 
 0.62.3
 ------
