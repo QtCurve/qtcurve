@@ -8773,9 +8773,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
         if(opts.fillSlider && slider->maximum!=slider->minimum && slider->state&State_Enabled)
         {
-            const QColor &usedCol=itsSliderCols
-                                   ? itsSliderCols[ORIGINAL_SHADE]
-                                   : itsMenuitemCols[ORIGINAL_SHADE];
+            const QColor *usedCols=itsSliderCols ? itsSliderCols : itsMenuitemCols;
 
             if (horiz)
                 if (slider->upsideDown)
@@ -8789,7 +8787,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
                     grv=QRect(grv.left(), grv.top(), grv.width(), (handle.top() - grv.top())+2);
 
             if(grv.height()>0 && grv.width()>0)
-                drawLightBevel(p, grv, &opt, widget, ROUNDED_ALL, usedCol, NULL, true, WIDGET_SLIDER_TROUGH);
+                drawLightBevel(p, grv, &opt, widget, ROUNDED_ALL, usedCols[ORIGINAL_SHADE], usedCols, true, WIDGET_SLIDER_TROUGH);
         }
     }
 }
