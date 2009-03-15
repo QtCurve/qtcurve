@@ -121,6 +121,18 @@ style "qtcurve-swt-combo" = "qtcurve-default"
   ythickness = 2
 }
 
+style "qtcurve-combo" = "qtcurve-default"
+{
+  xthickness = 4
+  ythickness = 3
+}
+
+style "qtcurve-combo-button" = "qtcurve-default"
+{
+  xthickness = 1
+  ythickness = 1
+}
+
 style "qtcurve-separator" = "qtcurve-default"
 {
   GtkMenuItem::horizontal-padding = 1
@@ -166,6 +178,8 @@ widget_class "*Toolbar*" style "qtcurve-toolbar"
 widget_class "*Toolbar*Button" style "qtcurve-toolbarbutton"
 widget_class "*HandleBox*HBox*SPDesktopWidget" style "qtcurve-sptoolbar"
 widget_class "*HandleBox*SPButton" style "qtcurve-sptoolbarbutton"
+widget_class "*.GtkCombo.GtkEntry" style "qtcurve-combo"
+widget_class "*.GtkCombo.GtkButton" style "qtcurve-combo-button"
 widget_class "*.SwtFixed.GtkCombo.GtkButton" style "qtcurve-swt-combo"
 widget_class "*.SwtFixed.GtkCombo.GtkEntry" style "qtcurve-swt-combo"
 widget_class "*Toolbar*Entry" style "qtcurve-w2"

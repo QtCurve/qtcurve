@@ -2326,6 +2326,10 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string(tmpStr);
             } /* C-Scope */
 
+            if( EFFECT_NONE==opts->buttonEffect)
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"Cmb\" { xthickness = 4 ythickness = 2 }"
+                                    "widget_class \"*.GtkCombo.GtkEntry\" style \""QTC_RC_SETTING"Cmb\"");
+
             if(opts->round>=ROUND_FULL && EFFECT_NONE!=opts->buttonEffect)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"Swt\" { xthickness = 3 ythickness = 2 }"
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \""QTC_RC_SETTING"Swt\""
