@@ -1949,7 +1949,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_ScrollBar_MiddleClickAbsolutePosition:
             return true;
         case SH_MainWindow_SpaceBelowMenuBar:
-            return 0;
+            return 2;
         case SH_DialogButtonLayout:
             return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
         case SH_MessageBox_TextInteractionFlags:
