@@ -5,6 +5,7 @@
    and then check default.
 3. Improve appearance GtkCombo poup menu (even though this is actually
    a deprecated widget!)
+4. When menubars have a border, adjust the menubar items accordingly.
 
 0.62.2
 ------
