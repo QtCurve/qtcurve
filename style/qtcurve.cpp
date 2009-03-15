@@ -5161,7 +5161,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     {
                         round=ROUNDED_NONE;
                         br.adjust(0, 0, 1, 0);
-                        ar.adjust(1, 0, 1, 0);
+                        if(opts.flatSbarButtons || !opts.vArrows)
+                            ar.adjust(1, 0, 1, 0);
                     }
                     else if(reverse && PE_IndicatorArrowRight==pe && r.x()>3)
                     {
@@ -5169,21 +5170,24 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             round=ROUNDED_NONE;
                             br.adjust(-1, 0, 0, 0);
-                            ar.adjust(-1, 0, -1, 0);
+                            if(opts.flatSbarButtons || !opts.vArrows)
+                                ar.adjust(-1, 0, -1, 0);
                         }
                         else
                         {
                             if(r.x()<pixelMetric(PM_ScrollBarExtent, option, widget)+2)
                                 round=ROUNDED_NONE;
                             br.adjust(0, 0, 1, 0);
-                            ar.adjust(1, 0, 1, 0);
+                            if(opts.flatSbarButtons || !opts.vArrows)
+                                ar.adjust(1, 0, 1, 0);
                         }
                     }
                     else if(PE_IndicatorArrowUp==pe && r.y()>3)
                     {
                         round=ROUNDED_NONE;
                         br.adjust(0, 0, 0, 1);
-                        ar.adjust(0, 1, 0, 1);
+                        if(opts.flatSbarButtons || !opts.vArrows)
+                            ar.adjust(0, 1, 0, 1);
                     }
                     break;
                 case SCROLLBAR_NEXT:
@@ -5191,19 +5195,22 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     {
                         round=ROUNDED_NONE;
                         br.adjust(-1, 0, 0, 0);
-                        ar.adjust(-1, 0, 0, -1);
+                        if(opts.flatSbarButtons || !opts.vArrows)
+                            ar.adjust(-1, 0, 0, -1);
                     }
                     else if(reverse && PE_IndicatorArrowLeft==pe)
                     {
                         round=ROUNDED_NONE;
                         br.adjust(0, 0, 1, 0);
-                        ar.adjust(-1, 0, 0, 1);
+                        if(opts.flatSbarButtons || !opts.vArrows)
+                            ar.adjust(-1, 0, 0, 1);
                     }
                     else if(PE_IndicatorArrowDown==pe)
                     {
                         round=ROUNDED_NONE;
                         br.adjust(0, -1, 0, 0);
-                        ar.adjust(0, -1, 0, -1);
+                        if(opts.flatSbarButtons || !opts.vArrows)
+                            ar.adjust(0, -1, 0, -1);
                     }
                     break;
             }
@@ -5235,6 +5242,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             // The following fixes gwenviews scrollbars...
             if(opt.palette.text().color()!=opt.palette.buttonText().color())
                 opt.palette.setColor(QPalette::Text, opt.palette.buttonText().color());
+
             drawPrimitive(pe, &opt, painter, widget);
             painter->restore();
             break;
