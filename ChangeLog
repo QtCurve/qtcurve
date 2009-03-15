@@ -1,6 +1,8 @@
 0.62.3
 ------
 1. Dont draw focus for combobox listviews.
+2. When menubars have a border, adjust the menubar items accordingly.
+3. Reduce menubar margins.
 
 0.62.2
 ------
