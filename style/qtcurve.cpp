@@ -1741,7 +1741,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 0;
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
-            return TB_LIGHT_ALL!=opts.toolbarBorders && TB_LIGHT_ALL!=opts.toolbarBorders ? 0 : 1;
+            return TB_LIGHT_ALL!=opts.toolbarBorders && TB_DARK_ALL!=opts.toolbarBorders ? 0 : 1;
         case PM_MenuHMargin:
         case PM_MenuVMargin:
             return 0;
