@@ -6,6 +6,8 @@
 3. Improve appearance GtkCombo poup menu (even though this is actually
    a deprecated widget!)
 4. When menubars have a border, adjust the menubar items accordingly.
+5. When filling the used part of a slider groove, use the slider colour 
+   if set, otherwise use the highlight colour.
 
 0.62.2
 ------

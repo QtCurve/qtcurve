@@ -3282,9 +3282,7 @@ debugDisplayWidget(widget, 3);
             GdkColor      *usedcol=opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE
                                     ? qtcPalette.slider
                                         ? &qtcPalette.slider[ORIGINAL_SHADE]
-                                        : qtcPalette.mouseover
-                                            ? &qtcPalette.mouseover[ORIGINAL_SHADE]
-                                            : &qtcPalette.menuitem[1]
+                                        : &qtcPalette.menuitem[ORIGINAL_SHADE]
                                     : bgndcol;
 
             if(horiz && rev)
