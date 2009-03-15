@@ -3264,7 +3264,8 @@ debugDisplayWidget(widget, 3);
                  pbar=list || GTK_IS_PROGRESS_BAR(widget),
                  scale=!pbar && GTK_IS_SCALE(widget);
         int      border=QT_BORDER(GTK_STATE_INSENSITIVE!=state || !scale);
-        GdkColor *bgndcol=&qtcPalette.background[2];
+        GdkColor *bgndcols=qtcPalette.background,
+                 *bgndcol=&bgndcols[2];
         gboolean horiz=GTK_IS_RANGE(widget)
                         ? GTK_ORIENTATION_HORIZONTAL==GTK_RANGE(widget)->orientation
                         : width>height;
@@ -3279,11 +3280,11 @@ debugDisplayWidget(widget, 3);
             gboolean      inverted=gtk_range_get_inverted(GTK_RANGE(widget)),
                           doEtch=QTC_DO_EFFECT;
             int           troughSize=SLIDER_TROUGH_SIZE+(doEtch ? 2 : 0);
-            GdkColor      *usedcol=opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE
+            GdkColor      *usedcols=opts.fillSlider && adjustment->upper!=adjustment->lower && state!=GTK_STATE_INSENSITIVE
                                     ? qtcPalette.slider
-                                        ? &qtcPalette.slider[ORIGINAL_SHADE]
-                                        : &qtcPalette.menuitem[ORIGINAL_SHADE]
-                                    : bgndcol;
+                                        ? qtcPalette.slider
+                                        : qtcPalette.menuitem
+                                    : qtcPalette.background;
 
             if(horiz && rev)
                 inverted=!inverted;
@@ -3310,11 +3311,14 @@ debugDisplayWidget(widget, 3);
             }
 
             if(GTK_STATE_INSENSITIVE==state)
-                bgndcol=&qtcPalette.background[ORIGINAL_SHADE];
+                bgndcol=&bgndcols[ORIGINAL_SHADE];
             else if (0==strcmp(detail, "trough-lower"))
-                bgndcol=usedcol;
+            {
+                bgndcols=usedcols;
+                bgndcol=&usedcols[ORIGINAL_SHADE];
+            }
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                           bgndcol, qtcPalette.background,
+                           bgndcol, bgndcols,
                            ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT), widget);
@@ -3341,7 +3345,7 @@ debugDisplayWidget(widget, 3);
                 if(used_w>0 && used_h>0)
                 {
                     drawLightBevel(cr, style, window, state, area, NULL, used_x, used_y, used_w, used_h,
-                                   usedcol, qtcPalette.background,
+                                   &usedcols[ORIGINAL_SHADE], usedcols,
                                    ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
                                    BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                                    (horiz ? 0 : DF_VERT), widget);
