@@ -2383,7 +2383,7 @@ static gboolean qtInit(Options *opts)
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
-                        TB_LIGHT_ALL==opts->toolbarBorders || TB_DARK_ALL==opts->toolbarBorders ? 3 : 2);
+                        TB_LIGHT_ALL==opts->toolbarBorders || TB_DARK_ALL==opts->toolbarBorders ? 4 : 3);
                 gtk_rc_parse_string(tmpStr);
             }
 
