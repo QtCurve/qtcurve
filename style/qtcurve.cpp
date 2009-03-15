@@ -8775,9 +8775,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
         {
             const QColor &usedCol=itsSliderCols
                                    ? itsSliderCols[ORIGINAL_SHADE]
-                                   : itsMouseOverCols
-                                       ? itsMouseOverCols[ORIGINAL_SHADE]
-                                       : itsMenuitemCols[1];
+                                   : itsMenuitemCols[ORIGINAL_SHADE];
 
             if (horiz)
                 if (slider->upsideDown)
