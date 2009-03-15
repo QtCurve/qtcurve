@@ -3725,12 +3725,17 @@ debugDisplayWidget(widget, 3);
             else if(!pbar && !border)
                 x--, y--, width+=2, height+=2;
 
-            if(mb && TB_NONE!=opts.toolbarBorders)
+            if(mb)
             {
                 y++;
                 height-=active_mb && opts.roundMbTopOnly ? 1 : 2;
-                if(TB_LIGHT_ALL==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders)
-                    x++, width-=2;
+                if(TB_NONE!=opts.toolbarBorders)
+                {
+                    y++;
+                    height-=active_mb && opts.roundMbTopOnly ? 1 : 2;
+                    if(TB_LIGHT_ALL==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders)
+                        x++, width-=2;
+                }
             }
             if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
                (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
