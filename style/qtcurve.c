@@ -3109,7 +3109,8 @@ debugDisplayWidget(widget, 3);
 #endif
 
 #ifdef QTC_INCREASE_SB_SLIDER
-                if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons)
+                if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons &&
+                   !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver))
                 {
                     GtkAdjustment *adj = GTK_RANGE(widget)->adjustment;
                     gboolean      horizontal = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
