@@ -2938,7 +2938,8 @@ debugDisplayWidget(widget, 3);
         }
 
         drawBgnd(cr, &btn_colors[bgnd], widget, area, x+1, y+1, width-2, height-2);
-        drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height, &btn_colors[bgnd],
+        drawLightBevel(cr, style, window, state, area, NULL, x, y, width, 
+                       height-(WIDGET_SPIN_UP==wid && QTC_DO_EFFECT ? 1 : 0), &btn_colors[bgnd],
                        btn_colors, round, wid, BORDER_FLAT,
                        DF_DO_CORNERS|DF_DO_BORDER|
                        (sunken ? DF_SUNKEN : 0), widget);
