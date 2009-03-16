@@ -1,3 +1,7 @@
+0.62.5
+------
+1. Use gradient for filled slider.
+
 0.62.4
 ------
 1. When drawing filled slider groove, use fill colour for border as well.

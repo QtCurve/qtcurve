@@ -3288,6 +3288,7 @@ debugDisplayWidget(widget, 3);
                                         ? qtcPalette.slider
                                         : qtcPalette.menuitem
                                     : qtcPalette.background;
+            EWidget       wid=WIDGET_SLIDER_TROUGH;
 
             if(horiz && rev)
                 inverted=!inverted;
@@ -3315,14 +3316,14 @@ debugDisplayWidget(widget, 3);
 
             if(GTK_STATE_INSENSITIVE==state)
                 bgndcol=&bgndcols[ORIGINAL_SHADE];
-            else if (0==strcmp(detail, "trough-lower"))
+            else if (0==strcmp(detail, "trough-lower") && opts.fillSlider)
             {
                 bgndcols=usedcols;
                 bgndcol=&usedcols[ORIGINAL_SHADE];
+                wid=WIDGET_FILLED_SLIDER_TROUGH;
             }
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                           bgndcol, bgndcols,
-                           ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
+                           bgndcol, bgndcols, ROUNDED_ALL, wid,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT), widget);
 
@@ -3349,7 +3350,7 @@ debugDisplayWidget(widget, 3);
                 {
                     drawLightBevel(cr, style, window, state, area, NULL, used_x, used_y, used_w, used_h,
                                    &usedcols[ORIGINAL_SHADE], usedcols,
-                                   ROUNDED_ALL, WIDGET_SLIDER_TROUGH,
+                                   ROUNDED_ALL, WIDGET_FILLED_SLIDER_TROUGH,
                                    BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                                    (horiz ? 0 : DF_VERT), widget);
                 }
