@@ -2619,7 +2619,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         painter->setPen(use[0]);
                         painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.width()-1);
+                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
                         painter->setPen(use[dark ? 3 : 4]);
                         painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
                         painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
@@ -3717,7 +3717,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     {
                         painter->setPen(use[0]);
                         painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.width()-1);
+                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
                         painter->setPen(use[dark ? 3 : 4]);
                         painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
                         painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
