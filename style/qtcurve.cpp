@@ -1949,7 +1949,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_ScrollBar_MiddleClickAbsolutePosition:
             return true;
         case SH_MainWindow_SpaceBelowMenuBar:
-            return 2;
+            return 1;
         case SH_DialogButtonLayout:
             return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
         case SH_MessageBox_TextInteractionFlags:
@@ -4194,25 +4194,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
-                {
-                    QRect r2(r);
-
-                    switch(opts.toolbarBorders)
-                    {
-                        case TB_NONE:
-                            break;
-                        case TB_LIGHT:
-                        case TB_DARK:
-                            r2.adjust(0, 1, 0, 0);
-                            break;
-                        case TB_LIGHT_ALL:
-                        case TB_DARK_ALL:
-                            r2.adjust(1, 1, -1, 0);
-                    }
-                    drawMenuItem(painter, r2, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
+                    drawMenuItem(painter, r.adjusted(0, 1, 0, 0), option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
                                  opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down)
                                     ? itsMenuitemCols : itsBackgroundCols);
-                }
 
                 if (!pix.isNull())
                     drawItemPixmap(painter, mbi->rect, alignment, pix);
@@ -6774,7 +6758,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             }
             break;
         case CT_MenuBarItem:
-            newSize.setHeight(newSize.height() - 1);
+            newSize.setHeight(newSize.height() +1);
             newSize.setWidth(newSize.width() + 1);
             break;
         case CT_MenuBar:
