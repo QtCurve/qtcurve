@@ -1,6 +1,6 @@
 0.62.5
 ------
-1. Use gradient for filled slider.
+1. Use gradient for filled slider - unless appearance is flat/raised.
 2. Reduce the amount of size adjustment to menubar items when toolbar
    borders are set.
 

@@ -1158,7 +1158,7 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
         case WIDGET_SB_SLIDER:
             return opts->sliderAppearance;
         case WIDGET_FILLED_SLIDER_TROUGH:
-            return APPEARANCE_GRADIENT;
+            return IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_HARSH_GRADIENT;
         case WIDGET_TAB_TOP:
         case WIDGET_TAB_BOT:
             return opts->tabAppearance;
