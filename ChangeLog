@@ -1,6 +1,6 @@
 0.62.5
 ------
-1. Use gradient for filled slider.
+1. Use gradient for filled slider - unless appearance is flat/raised.
 
 0.62.4
 ------
