@@ -1,6 +1,7 @@
 0.62.5
 ------
-1. Reduce the amount of size adjustment to menubar items when toolbar
+1. Use gradient for filled slider.
+2. Reduce the amount of size adjustment to menubar items when toolbar
    borders are set.
 
 0.62.4

@@ -8785,17 +8785,17 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
             if (horiz)
                 if (slider->upsideDown)
-                    grv=QRect(handle.right()-2, grv.top(), (grv.right()-handle.right())+2, grv.height());
+                    grv=QRect(handle.right()-4, grv.top(), (grv.right()-handle.right())+4, grv.height());
                 else
-                    grv=QRect(grv.left(), grv.top(), handle.left()+2, grv.height());
+                    grv=QRect(grv.left(), grv.top(), handle.left()+4, grv.height());
             else
                 if (slider->upsideDown)
-                    grv=QRect(grv.left(), handle.bottom()-2, grv.width(), (grv.height() - handle.bottom())+2);
+                    grv=QRect(grv.left(), handle.bottom()-4, grv.width(), (grv.height() - handle.bottom())+4);
                 else
-                    grv=QRect(grv.left(), grv.top(), grv.width(), (handle.top() - grv.top())+2);
+                    grv=QRect(grv.left(), grv.top(), grv.width(), (handle.top() - grv.top())+4);
 
             if(grv.height()>0 && grv.width()>0)
-                drawLightBevel(p, grv, &opt, widget, ROUNDED_ALL, usedCols[ORIGINAL_SHADE], usedCols, true, WIDGET_SLIDER_TROUGH);
+                drawLightBevel(p, grv, &opt, widget, ROUNDED_ALL, usedCols[ORIGINAL_SHADE], usedCols, true, WIDGET_FILLED_SLIDER_TROUGH);
         }
     }
 }

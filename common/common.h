@@ -215,12 +215,13 @@ typedef GdkColor color;
 #ifdef __cplusplus
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
                           WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w)
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w)
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
+                        WIDGET_FILLED_SLIDER_TROUGH==w)
 #else
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
                           WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
-                        WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
+                        WIDGET_FILLED_SLIDER_TROUGH==w || WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
 #endif
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
@@ -337,6 +338,7 @@ typedef enum
     WIDGET_LISTVIEW_HEADER,
     WIDGET_SLIDER,
     WIDGET_SLIDER_TROUGH,
+    WIDGET_FILLED_SLIDER_TROUGH,
     WIDGET_SB_SLIDER,
     WIDGET_SB_BUTTON,
     WIDGET_TROUGH,
@@ -403,7 +405,7 @@ typedef enum
 } EAppearance;
 
 #define IS_SLIDER(W)        (WIDGET_SLIDER==W || WIDGET_SB_SLIDER==W)
-#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==W || WIDGET_PBAR_TROUGH==W || WIDGET_TROUGH==W)
+#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==W || WIDGET_PBAR_TROUGH==W || WIDGET_TROUGH==W || WIDGET_FILLED_SLIDER_TROUGH==W)
 #define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==W || WIDGET_CHECKBOX==W)
 
 typedef enum
@@ -1155,6 +1157,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
         case WIDGET_SLIDER:
         case WIDGET_SB_SLIDER:
             return opts->sliderAppearance;
+        case WIDGET_FILLED_SLIDER_TROUGH:
+            return APPEARANCE_GRADIENT;
         case WIDGET_TAB_TOP:
         case WIDGET_TAB_BOT:
             return opts->tabAppearance;
