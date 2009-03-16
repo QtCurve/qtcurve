@@ -4203,11 +4203,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             break;
                         case TB_LIGHT:
                         case TB_DARK:
-                            r2.adjust(0, 1, 0, down && opts.roundMbTopOnly ? 0 : -1);
+                            r2.adjust(0, 1, 0, 0);
                             break;
                         case TB_LIGHT_ALL:
                         case TB_DARK_ALL:
-                            r2.adjust(1, 1, -1, down && opts.roundMbTopOnly ? 0 : -1);
+                            r2.adjust(1, 1, -1, 0);
                     }
                     drawMenuItem(painter, r2, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
                                  opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down)
