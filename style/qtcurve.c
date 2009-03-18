@@ -2305,10 +2305,10 @@ printf("Draw flat box %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, 
 debugDisplayWidget(widget, 3);
 #endif
 
-#define QTC_MODAL_HACK_NAME  "--kgtk-modal-dialog-hack--"
-#define QTC_MENU_HACK_NAME   "--kgtk-menu-hack--"
+#define QTC_MODAL_HACK_NAME  "--qtcurve-modal-dialog-hack--"
+#define QTC_MENU_HACK_NAME   "--qtcurve-menu-hack--"
 #ifdef QTC_REORDER_GTK_DIALOG_BUTTONS
-#define QTC_BUTTON_HACK_NAME "--kgtk-button-hack--"
+#define QTC_BUTTON_HACK_NAME "--qtcurve-button-hack--"
 
 #if GTK_CHECK_VERSION(2, 6, 0)
     if(!opts.gtkButtonOrder && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
