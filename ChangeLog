@@ -3,6 +3,7 @@
 1. Use gradient for filled slider - unless appearance is flat/raised.
 2. Slightly alter listview header size.
 3. Fix white-on-white text of disabled lsitviews - noticable in synaptic.
+4. If a toolbar is disabled, so should the handle.
 
 0.62.4
 ------

@@ -2543,6 +2543,9 @@ debugDisplayWidget(widget, 3);
             }
         }
 #endif
+        if(widget && GTK_STATE_INSENSITIVE!=state)
+            state=GTK_WIDGET_STATE(widget);
+
         if(paf)  /* The paf here is expected to be on the gnome panel */
             if(height<width)
                 y++;
