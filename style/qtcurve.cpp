@@ -1721,6 +1721,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_TextCursorWidth+3:
 #endif
             return 3;
+        case PM_HeaderMargin:
+            return 3;
         case PM_DefaultChildMargin:
             return 6;
         case PM_DefaultTopLevelMargin:
