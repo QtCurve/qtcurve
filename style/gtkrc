@@ -146,6 +146,12 @@ style "qtcurve-w0" = "qtcurve-default"
   ythickness = 0
 }
 
+style "qtcurve-header" = "qtcurve-default"
+{
+  xthickness = 2
+  ythickness = 0
+}
+
 class "*GtkWidget" style "qtcurve-default"
 class "*GtkNotebook" style "qtcurve-w2"
 class "*Button" style "qtcurve-h2"
@@ -171,8 +177,8 @@ widget_class "*.GtkImageMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-separator"
 class "*GtkEntry" style "qtcurve-w2"
 widget_class "*.tooltips.*.GtkToggleButton" style "qtcurve-tasklist"
-widget_class "*Tree*GtkButton" style "qtcurve-default"
-widget_class "*List*GtkButton" style "qtcurve-default"
+widget_class "*Tree*GtkButton" style "qtcurve-header"
+widget_class "*List*GtkButton" style "qtcurve-header"
 widget_class "BasePWidget.GtkEventBox.GtkTable.GtkFrame" style "qtcurve-w2"
 widget_class "*Toolbar*" style "qtcurve-toolbar"
 widget_class "*Toolbar*Button" style "qtcurve-toolbarbutton"

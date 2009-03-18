@@ -1,6 +1,7 @@
 0.62.5
 ------
 1. Use gradient for filled slider - unless appearance is flat/raised.
+2. Slightly alter listview header size.
 
 0.62.4
 ------
