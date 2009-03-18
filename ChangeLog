@@ -6,6 +6,7 @@
 3. Fix vertical toolbar borders.
 4. Slightly alter listview header size.
 5. Actually include the KWin titlebar alignment code!!!
+6. Adjust tab widget scroll buttons slightly.
 
 0.62.4
 ------

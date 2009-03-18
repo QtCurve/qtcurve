@@ -1721,6 +1721,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_TextCursorWidth+3:
 #endif
             return 3;
+        case PM_TabBarScrollButtonWidth:
+            return 18;
         case PM_HeaderMargin:
             return 3;
         case PM_DefaultChildMargin:
@@ -5531,13 +5533,69 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
         case CC_ToolButton:
             if (const QStyleOptionToolButton *toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option))
             {
-                QRect             button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
-                                  menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
-                State             bflags(toolbutton->state);
-                const QToolButton *btn = qobject_cast<const QToolButton *>(widget);
-                bool              etched(QTC_DO_EFFECT),
-                                  kMenuTitle(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
-                                             widget->parentWidget() && widget->parentWidget()->inherits("KMenu"));
+                if (widget)
+                {
+                    if(QTabBar *bar = qobject_cast<QTabBar *>(widget->parentWidget()))
+                    {
+                        QStyleOptionToolButton btn(*toolbutton);
+
+                        if(Qt::LeftArrow==toolbutton->arrowType || Qt::RightArrow==toolbutton->arrowType)
+                            btn.rect.adjust(0, 4, 0, -4);
+                        else
+                            btn.rect.adjust(4, 0, -4, 0);
+                        if(!(btn.state&State_Enabled))
+                            btn.state&=~State_MouseOver;
+                        drawPrimitive(PE_PanelButtonTool, &btn, painter, widget);
+                        if(opts.vArrows)
+                            switch(toolbutton->arrowType)
+                            {
+                                case Qt::LeftArrow:
+                                    btn.rect.adjust(-1, 0, -1, 0);
+                                    break;
+                                case Qt::RightArrow:
+                                    btn.rect.adjust(1, 0, 1, 0);
+                                    break;
+                                case Qt::UpArrow:
+                                    btn.rect.adjust(0, -1, 0, -1);
+                                    break;
+                                case Qt::DownArrow:
+                                    btn.rect.adjust(0, 1, 0, 1);
+                                    break;
+                            }
+                        drawTbArrow(this, &btn, btn.rect, painter, widget);
+                        break;
+                    }
+
+                    const QToolButton *btn = qobject_cast<const QToolButton *>(widget);
+
+                    if(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
+                       widget->parentWidget() && widget->parentWidget()->inherits("KMenu"))
+                    {
+                        if(opts.menuStripe)
+                        {
+                            int stripeWidth(qMax(20, constMenuPixmapWidth));
+
+                            drawBevelGradient(menuStripeCol(),
+                                              painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
+                                                             stripeWidth, r.height()), false,
+                                              false, opts.menuStripeAppearance, WIDGET_OTHER);
+                        }
+
+                        // For some reason the MenuTitle has a larger border on the left, so adjust the width by 1 pixel
+                        // to make this look nicer.
+                        //drawBorder(painter, r.adjusted(2, 2, -3, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
+                        QStyleOption opt;
+                        opt.state=State_Raised|State_Enabled|State_Horizontal;
+                        drawLightBevel(painter, r.adjusted(2, 2, -3, -2), &opt, widget, ROUNDED_ALL,
+                                    getFill(&opt, itsBackgroundCols), itsBackgroundCols,
+                                    true, WIDGET_NO_ETCH_BTN);
+                        break;
+                    }
+                }
+                QRect button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
+                      menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
+                State bflags(toolbutton->state);
+                bool  etched(QTC_DO_EFFECT);
 
                 if (!(bflags&State_Enabled))
                     bflags &= ~(State_MouseOver/* | State_Raised*/);
@@ -5570,29 +5628,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 bool drawMenu=mflags & (State_Sunken | State_On | State_Raised);
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
-                if(kMenuTitle)
-                {
-                    if(opts.menuStripe)
-                    {
-                        int stripeWidth(qMax(20, constMenuPixmapWidth));
 
-                        drawBevelGradient(menuStripeCol(),
-                                          painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
-                                                         stripeWidth, r.height()), false,
-                                          false, opts.menuStripeAppearance, WIDGET_OTHER); 
-                    }
-
-                    // For some reason the MenuTitle has a larger border on the left, so adjust the width by 1 pixel to make
-                    // this look nicer.
-                    //drawBorder(painter, r.adjusted(2, 2, -3, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
-                    QStyleOption opt;
-                    opt.state=State_Raised|State_Enabled|State_Horizontal;
-                    drawLightBevel(painter, r.adjusted(2, 2, -3, -2), &opt, widget, ROUNDED_ALL,
-                                   getFill(&opt, itsBackgroundCols), itsBackgroundCols,
-                                   true, WIDGET_NO_ETCH_BTN);
-                }
-                else if ( (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised))) ||
-                          (toolbutton->subControls & SC_ToolButtonMenu && drawMenu))
+                if ( (toolbutton->subControls & SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised))) ||
+                     (toolbutton->subControls & SC_ToolButtonMenu && drawMenu))
                 {
                     tool.rect = toolbutton->subControls & SC_ToolButtonMenu ? button.united(menuarea) : button;
                     tool.state = bflags;
