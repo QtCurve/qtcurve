@@ -2382,12 +2382,15 @@ static gboolean qtInit(Options *opts)
             if(TB_NONE!=opts->toolbarBorders)
             {
                 static const char *constStrFormat="style \""QTC_RC_SETTING"Mnu\" "
-                                                  "{ xthickness=1 ythickness=%d } "
-                                                  " widget_class \"*MenuBar*MenuItem\" style \""QTC_RC_SETTING"Mnu\"";
+                                                  "{ xthickness=%d ythickness=2 } "
+                                                  "style \""QTC_RC_SETTING"MnuItm\" "
+                                                  "{ xthickness=1 ythickness=3 } "
+                                                  " widget_class \"*MenuBar*MenuItem\" style \""QTC_RC_SETTING"MnuItm\""
+                                                  " class \"*MenuBar\" style \""QTC_RC_SETTING"Mnu\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
-                        TB_LIGHT_ALL==opts->toolbarBorders || TB_DARK_ALL==opts->toolbarBorders ? 4 : 3);
+                        TB_LIGHT_ALL==opts->toolbarBorders || TB_DARK_ALL==opts->toolbarBorders ? 1 : 0);
                 gtk_rc_parse_string(tmpStr);
             }
 
