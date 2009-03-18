@@ -4,6 +4,7 @@
 2. Reduce the amount of size adjustment to menubar items when toolbar
    borders are set.
 3. Fix vertical toolbar borders.
+4. Slightly alter listview header size.
 
 0.62.4
 ------
