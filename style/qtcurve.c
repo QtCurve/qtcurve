@@ -4529,6 +4529,9 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         debugDisplayWidget(widget, 3);
 #endif
 
+        if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==GTK_WIDGET_STATE(widget))
+             state=GTK_STATE_INSENSITIVE;
+             
 #ifndef QTC_READ_INACTIVE_PAL /* If we reead the inactive palette, then there is no need for the following... */
         /* The following fixes the text in list views... if not used, when an item is selected it
            gets the selected text color - but when the window changes focus it gets the normal
@@ -4536,7 +4539,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
          if(DETAIL("cellrenderertext") && GTK_STATE_ACTIVE==state)
              state=GTK_STATE_SELECTED;
 #endif
-
+            
         if(opts.shadeMenubarOnlyWhenActive)
         {
             GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
