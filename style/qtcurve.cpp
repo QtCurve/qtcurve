@@ -1740,6 +1740,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuBarItemSpacing:
             return 0;
         case PM_MenuBarVMargin:
+            return TB_NONE==opts.toolbarBorders ? 0 : 1;
         case PM_MenuBarHMargin:
             return TB_LIGHT_ALL!=opts.toolbarBorders && TB_DARK_ALL!=opts.toolbarBorders ? 0 : 1;
         case PM_MenuHMargin:
@@ -4194,9 +4195,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
-                    drawMenuItem(painter, r.adjusted(0, 1, 0, 0), option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
+                {
+                    bool topOnly=down && opts.roundMbTopOnly;
+                    drawMenuItem(painter, r.adjusted(0, 2, 0, topOnly ? 0 : -1), option, true, topOnly ? ROUNDED_TOP : ROUNDED_ALL,
                                  opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down)
                                     ? itsMenuitemCols : itsBackgroundCols);
+                }
 
                 if (!pix.isNull())
                     drawItemPixmap(painter, mbi->rect, alignment, pix);
