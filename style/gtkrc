@@ -150,6 +150,7 @@ style "qtcurve-header" = "qtcurve-default"
 {
   xthickness = 2
   ythickness = 0
+  GtkButton::focus-padding = 1
 }
 
 class "*GtkWidget" style "qtcurve-default"

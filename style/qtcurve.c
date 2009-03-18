@@ -4556,6 +4556,9 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         but=isOnButton(widget, 0, &def_but) || isOnComboBox(widget, 0);
 
+        if(isOnListViewHeader(widget, 0))
+            y--;
+
         if(but && (qtSettings.qt4 || GTK_STATE_INSENSITIVE!=state))
         {
             use_text=TRUE;
@@ -5740,7 +5743,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             if(isListViewHeader(widget))
             {
                 btn=false;
-                height--;
+                y++, x++, width-=2, height-=3;
             }
             if(QTC_FULL_FOCUS)
             {
