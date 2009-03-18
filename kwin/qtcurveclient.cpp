@@ -258,13 +258,17 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     {
         painter.setFont(itsTitleFont);
 
-        QString str(painter.fontMetrics().elidedText(caption(), Qt::ElideRight, itsCaptionRect.width(), QPalette::WindowText));
+        QString       str(painter.fontMetrics().elidedText(caption(), Qt::ElideRight,
+                                                           itsCaptionRect.width(), QPalette::WindowText));
+        Qt::Alignment alignment(Qt::AlignVCenter|
+                                ((Qt::Alignment)Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment,
+                                                                                 0L, 0L)));
 
         painter.setClipRect(titleRect);
         painter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
-        painter.drawText(itsCaptionRect.adjusted(1, 1, 1, 1), Qt::AlignLeft | Qt::AlignVCenter, str);
+        painter.drawText(itsCaptionRect.adjusted(1, 1, 1, 1), alignment, str);
         painter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
-        painter.drawText(itsCaptionRect, Qt::AlignLeft | Qt::AlignVCenter, str);
+        painter.drawText(itsCaptionRect, alignment, str);
     }
     painter.end();
 }
