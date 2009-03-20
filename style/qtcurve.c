@@ -1235,19 +1235,32 @@ static GtkWidget **lookupMenubarHash(void *hash, gboolean create)
     return rv;
 }
 
+static gboolean menuIsSelectable(GtkWidget *menu)
+{
+    return !((!GTK_BIN(menu)->child &&
+             G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
+             GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
+             !GTK_WIDGET_IS_SENSITIVE(menu) ||
+             !GTK_WIDGET_VISIBLE(menu));
+}
+
 static gboolean menubarEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     if(GDK_MOTION_NOTIFY==event->type)
     {
         static int last_x=-100, last_y=-100;
 
+        if(event->motion.x<2.0)
+            event->motion.x+=2.0, event->motion.x_root+=2.0;
+        if(event->motion.y<2.0)
+            event->motion.y+=2.0, event->motion.y_root+=2.0;
         if(abs(last_x-event->motion.x_root)>4 || abs(last_y-event->motion.y_root)>4)
         {
             GtkWidget **item=lookupMenubarHash(widget, FALSE);
 
             if(item)
             {
-                GtkMenuShell *menuShell = GTK_MENU_SHELL (widget);
+                GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
                 GList        *children=menuShell->children;
                 GtkWidget    *current=NULL;
                 int          nx, ny;
@@ -1294,6 +1307,55 @@ static gboolean menubarEvent(GtkWidget *widget, GdkEvent *event, gpointer user_d
                     gtk_widget_set_state(*item, GTK_STATE_NORMAL);
             }
             *item=0;
+        }
+    }
+    else if(GDK_BUTTON_PRESS==event->type/* || GDK_BUTTON_RELEASE==event->type*/)
+    {
+        // QtCurve's menubars have a 2 pixel border -> but want the left/top to be 'active'...
+        int nx, ny;
+        gdk_window_get_origin(widget->window, &nx, &ny);
+        if((event->button.x_root-nx)<=2.0 || (event->button.y_root-ny)<=2.0)
+        {
+            GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
+            GList        *children=menuShell->children;
+
+            if((event->button.x_root-nx)<=2.0)
+                event->button.x_root+=2.0;
+            if((event->button.y_root-ny)<=2.0)
+                event->button.y_root+=2.0;
+
+            while (children)
+            {
+                GtkWidget *item = children->data;
+                int cx=(item->allocation.x+nx),
+                    cy=(item->allocation.y+ny),
+                    cw=(item->allocation.width),
+                    ch=(item->allocation.height);
+
+                if(cx<=event->button.x_root && cy<=event->button.y_root &&
+                   (cx+cw)>event->button.x_root && (cy+ch)>event->button.y_root)
+                {
+                    if(menuIsSelectable(item))
+                    {
+                        if(GDK_BUTTON_PRESS==event->type)
+                        {
+                            if(item!=menuShell->active_menu_item)
+                                gtk_menu_shell_select_item(menuShell, item);
+                            else
+                                gtk_menu_shell_deselect(menuShell);
+                        }
+//                         else if(GDK_BUTTON_RELEASE==event->type)
+//                         {
+//                             if(item==menuShell->active_menu_item)
+//                                 gtk_menu_shell_deselect(menuShell);
+//                         }
+                        return TRUE;
+                    }
+
+                    break;
+                }
+                children = children->next;
+            }
         }
     }
 
@@ -2905,7 +2967,8 @@ debugDisplayWidget(widget, 3);
             lookupMenubarHash(widget, TRUE); /* Create hash entry... */
             if(opts.menubarMouseOver)
             {
-                gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK);
+                gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK|
+                                              GDK_BUTTON_PRESS_MASK/*|GDK_BUTTON_RELEASE_MASK*/);
                 g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(menubarDeleteEvent), widget);
                 g_signal_connect(G_OBJECT(widget), "event", G_CALLBACK(menubarEvent), widget);
             }
@@ -3706,6 +3769,11 @@ debugDisplayWidget(widget, 3);
                     }
             }
         }
+
+        // The handling of 'mouse pressed' in the menubar event handler doesn't seem to set the
+        // menu as active, therefore the active_mb fails. However the check below works...
+        if(mb && !active_mb && widget)
+            active_mb=widget==GTK_MENU_SHELL(mb)->active_menu_item;
 
         /* The following 'if' is just a hack for a menubar item problem with pidgin. Sometime, a 12pix width
            empty menubar item is drawn on the right - and doesnt disappear! */
