@@ -78,7 +78,7 @@ static void checkKComponentData()
             name="QtApp";
 
         QByteArray utf8=name.toUtf8();
-        theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n("Qt"), "0.1"));
+        theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n(utf8), "0.1"));
         applyKdeSettings(true);
         applyKdeSettings(false);
     }
