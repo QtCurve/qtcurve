@@ -1167,7 +1167,7 @@ void QtCurveStyle::polish(QWidget *widget)
     {
         widget->setAttribute(Qt::WA_Hover, true);
 
-        if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
+//         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->installEventFilter(this);
 
         if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
@@ -1352,7 +1352,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
     {
         widget->setAttribute(Qt::WA_Hover, false);
 
-        if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
+//         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->removeEventFilter(this);
 
         if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
@@ -1410,10 +1410,52 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->setBackgroundRole(QPalette::Button);
 }
 
+//
+// QtCurve's menu's have a 2 pixel border all around - but want the top, and left edges to
+// active the nearest menu item. Therefore, when we get a mouse event in that region then
+// adjsut its position...
+static bool updateMenuBarEvent(QMouseEvent *event, QMenuBar *menu)
+{
+    struct HackEvent : public QMouseEvent
+    {
+        bool adjust()
+        {
+            if(p.x()<2 || p.y()<2)
+            {
+                p=QPoint(p.x()<2 ? p.x()+2 : p.x(), p.y()<2 ? p.y()+2 : p.y());
+                g=QPoint(p.x()<2 ? g.x()+2 : g.x(), p.y()<2 ? g.y()+2 : g.y());
+                return true;
+            }
+            return false;
+        }
+    };
+
+    struct HackedMenu : public QMenuBar
+    {
+        void send(QMouseEvent *ev)
+        {
+            event(ev);
+        }
+    };
+
+    if(((HackEvent *)event)->adjust())
+    {
+        ((HackedMenu *)menu)->send(event);
+        return true;
+    }
+    return false;
+}
+
 bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 {
     bool isSViewCont=APP_KONTACT==theThemedApp && itsSViewContainers.contains((QWidget*)object);
 
+    if(::qobject_cast<QMenuBar *>(object) && dynamic_cast<QMouseEvent *>(event))
+    {
+        if(updateMenuBarEvent((QMouseEvent *)event, (QMenuBar*)object))
+            return true;
+    }
+    
     if(::qobject_cast<QAbstractScrollArea *>(object) || isSViewCont)
     {
         QPoint pos;
