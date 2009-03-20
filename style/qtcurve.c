@@ -3748,11 +3748,14 @@ debugDisplayWidget(widget, 3);
                          mainWidth=width-(reverse ? roundOffet+1 : 1+MENUITEM_FADE_SIZE),
                          fadeX=reverse ? x+1 : width-MENUITEM_FADE_SIZE;
 
+                clipPath(cr, mainX-1, mainY-1, mainWidth+1, height-2, WIDGET_MENU_ITEM, RADIUS_INTERNAL,
+                         reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
                 drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(roundOffet+3));
+                unsetCairoClipping(cr);
 
                 if(QTC_ROUNDED)
                     realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
-                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_OTHER, 0, fillVal);
+                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_MENU_ITEM, 0, fillVal);
 
                 {
                     GdkColor        *left=reverse ? &qtcPalette.menu : &itemCols[fillVal],
