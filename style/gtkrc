@@ -96,7 +96,6 @@ style "qtcurve-tasklist" = "qtcurve-default"
   ythickness = 3
 }
 
-
 style "qtcurve-menuitem" = "qtcurve-default"
 {
   xthickness = 1
@@ -105,14 +104,17 @@ style "qtcurve-menuitem" = "qtcurve-default"
 
 style "qtcurve-menubar" = "qtcurve-default"
 {
+    GtkMenuBar::shadow_type = GTK_SHADOW_ETCHED_IN
+    GtkToolbar::shadow_type = GTK_SHADOW_ETCHED_IN
+
   xthickness = 2
   ythickness = 2
 }
 
 style "qtcurve-menubaritem" = "qtcurve-default"
 {
-  xthickness = 1
-  ythickness = 3
+  xthickness = 0
+  ythickness = 2
 }
 
 style "qtcurve-swt-combo" = "qtcurve-default"
