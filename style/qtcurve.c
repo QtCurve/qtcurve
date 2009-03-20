@@ -3550,10 +3550,7 @@ debugDisplayWidget(widget, 3);
     {
         //if(GTK_SHADOW_NONE!=shadow_type)
         {
-            GdkColor    bgnd=activeWindow && menubar && USE_SHADED_MENU_BAR_COLORS
-                                    ? qtcPalette.menubar[ORIGINAL_SHADE]
-                                    : style->bg[state];
-            GdkColor    *col=activeWindow && menubar && USE_SHADED_MENU_BAR_COLORS
+            GdkColor    *col=activeWindow && menubar && (GTK_STATE_INSENSITIVE!=state || USE_SHADED_MENU_BAR_COLORS)
                                 ? &qtcPalette.menubar[ORIGINAL_SHADE]
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
@@ -3565,7 +3562,7 @@ debugDisplayWidget(widget, 3);
                     shade(&bgnd, &bgnd, MENUBAR_DARK_FACTOR);
 
                 drawBevelGradient(cr, style, area, NULL, x, y, width,
-                                height, &bgnd,
+                                height, col,
                                 menubar
                                     ? TRUE
                                     : DETAIL("handlebox")
@@ -3587,7 +3584,7 @@ debugDisplayWidget(widget, 3);
                          right=FALSE,
                          all=TB_LIGHT_ALL==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders;
                 int      border=TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders ? 3 : 4;
-                GdkColor *cols=activeWindow && menubar && USE_SHADED_MENU_BAR_COLORS
+                GdkColor *cols=activeWindow && menubar && GTK_STATE_INSENSITIVE!=state
                                 ? qtcPalette.menubar : qtcPalette.background;
 
                 if(menubar)
@@ -6157,18 +6154,34 @@ static void generateColors()
     shadeColors(&qtSettings.colors[PAL_DISABLED][COLOR_BUTTON], qtcPalette.button[PAL_DISABLED]);
     shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED], qtcPalette.menuitem);
 
-    if(SHADE_CUSTOM==opts.shadeMenubars)
-        shadeColors(&opts.customMenubarsColor, qtcPalette.menubar);
-    else if(SHADE_BLEND_SELECTED==opts.shadeMenubars)
+    switch(opts.shadeMenubars)
     {
-        GdkColor color;
+        case SHADE_NONE:
+            memcpy(qtcPalette.menubar, qtcPalette.background, sizeof(GdkColor)*(TOTAL_SHADES+1));
+            break;
+        case SHADE_BLEND_SELECTED:
+        {
+            GdkColor color;
 
-        if(IS_GLASS(opts.appearance))
-            shade(&qtcPalette.menuitem[ORIGINAL_SHADE], &color, MENUBAR_GLASS_SELECTED_DARK_FACTOR);
-        else
-            color=qtcPalette.menuitem[ORIGINAL_SHADE];
+            if(IS_GLASS(opts.appearance))
+                shade(&qtcPalette.menuitem[ORIGINAL_SHADE], &color, MENUBAR_GLASS_SELECTED_DARK_FACTOR);
+            else
+                color=qtcPalette.menuitem[ORIGINAL_SHADE];
 
-        shadeColors(&color, qtcPalette.menubar);
+            shadeColors(&color, qtcPalette.menubar);
+            break;
+        }
+        case SHADE_CUSTOM:
+            shadeColors(&opts.customMenubarsColor, qtcPalette.menubar);
+            break;
+        case SHADE_DARKEN:
+        {
+            GdkColor color;
+
+            shade(&qtcPalette.background[ORIGINAL_SHADE], &color, MENUBAR_DARK_FACTOR);
+            shadeColors(&color, qtcPalette.menubar);
+            break;
+        }
     }
 
     switch(opts.shadeSliders)
