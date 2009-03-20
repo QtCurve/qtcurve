@@ -79,8 +79,9 @@ static void checkKComponentData()
 
         QByteArray utf8=name.toUtf8();
         theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n(utf8), "0.1"));
-        applyKdeSettings(true);
-        applyKdeSettings(false);
+// Dont call these here, as if we get called at app start, things seem to go wrong...
+//         applyKdeSettings(true);
+//         applyKdeSettings(false);
     }
 }
 

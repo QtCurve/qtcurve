@@ -7,6 +7,7 @@
 4. Slightly alter listview header size.
 5. Actually include the KWin titlebar alignment code!!!
 6. Adjust tab widget scroll buttons slightly.
+7. Fix crash with some pure Qt4 apps.
 
 0.62.4
 ------
