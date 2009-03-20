@@ -3550,17 +3550,13 @@ debugDisplayWidget(widget, 3);
     {
         //if(GTK_SHADOW_NONE!=shadow_type)
         {
-            GdkColor    *col=activeWindow && menubar && (GTK_STATE_INSENSITIVE!=state || USE_SHADED_MENU_BAR_COLORS)
+            GdkColor    *col=activeWindow && menubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
                                 ? &qtcPalette.menubar[ORIGINAL_SHADE]
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
 
             /* Toolbars and menus */
             if(!IS_FLAT(app))
-            {
-                if(activeWindow && menubar && SHADE_DARKEN==opts.shadeMenubars)
-                    shade(&bgnd, &bgnd, MENUBAR_DARK_FACTOR);
-
                 drawBevelGradient(cr, style, area, NULL, x, y, width,
                                 height, col,
                                 menubar
@@ -3569,10 +3565,6 @@ debugDisplayWidget(widget, 3);
                                             ? width<height
                                             : width>height,
                                 FALSE, app, WIDGET_OTHER);
-            }
-            else if(activeWindow && menubar && SHADE_DARKEN==opts.shadeMenubars)
-                drawAreaMod(cr, style, GTK_STATE_NORMAL, area, NULL, MENUBAR_DARK_FACTOR, x, y,
-                            width, height);
             else
                 drawAreaColor(cr, area, NULL, col, x, y, width, height);
 
