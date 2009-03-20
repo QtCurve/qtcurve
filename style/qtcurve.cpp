@@ -8869,7 +8869,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
 void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
 {
-    drawBevelGradient(menu && itsActive && (option->state&State_Enabled || USE_SHADED_MENU_BAR_COLORS)
+    drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                         ? itsMenubarCols[ORIGINAL_SHADE]
                         : option->palette.background().color(),
                       p, r, horiz, false, menu ? opts.menubarAppearance : opts.toolbarAppearance);
