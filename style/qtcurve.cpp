@@ -273,6 +273,27 @@ QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QI
     return pix;
 }
 
+#else
+inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+{
+    return icon.pixmap(size, mode, state);
+}
+#endif
+inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
+{
+    return getIconPixmap(icon, QSize(size, size), mode, state);
+}
+
+inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
+{
+    return getIconPixmap(icon, QSize(size, size), flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+}
+
+inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
+{
+    return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
+}
+
 static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
                         const QRect &rect, QPainter *painter, const QWidget *widget = 0)
 {
@@ -300,27 +321,6 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
     arrowOpt.palette = toolbutton->palette;
     arrowOpt.state = toolbutton->state;
     style->drawPrimitive(pe, &arrowOpt, painter, widget);
-}
-
-#else
-inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
-{
-    return icon.pixmap(size, mode, state);
-}
-#endif
-inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIcon::State state=QIcon::Off)
-{
-    return getIconPixmap(icon, QSize(size, size), mode, state);
-}
-
-inline QPixmap getIconPixmap(const QIcon &icon, int size, int flags, QIcon::State state=QIcon::Off)
-{
-    return getIconPixmap(icon, QSize(size, size), flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
-}
-
-inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QIcon::State state=QIcon::Off)
-{
-    return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
 }
 
 // The tabs used in multi-dock widgets, and KDE's properties dialog, look odd,
