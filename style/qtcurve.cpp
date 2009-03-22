@@ -4669,7 +4669,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (sunken)
                     editRect.translate(shiftH, shiftV);
 
-                editRect.adjust(1, 0, -1, 0);
+                int margin=comboBox->frame && widget && widget->rect().height()<(QTC_DO_EFFECT ? 26 : 24)  ? 4 : 0;
+                editRect.adjust(1, -margin, -1, margin);
                 painter->setClipRect(editRect);
                 
                 if (!comboBox->currentText.isEmpty() && !comboBox->editable)
@@ -6683,13 +6684,21 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                        /*state&State_KeyboardFocusChange &&*/ !comboBox->editable)
                     {
                         QStyleOptionFocusRect focus;
+                        bool                  listViewCombo=comboBox->frame && widget && widget->rect().height()<(QTC_DO_EFFECT ? 26 : 24);
 
                         if(QTC_FULL_FOCUS)
                             focus.rect=frame;
                         else if(opts.comboSplitter)
+                        {
                             focus.rect=reverse
                                         ? field.adjusted(0, -1, 1, 1)
                                         : field.adjusted(-1, -1, 0, 1);
+
+                            if(listViewCombo)
+                                focus.rect.adjust(0, -2, 0, 2);
+                        }
+                        else if(listViewCombo)
+                            focus.rect=frame.adjusted(1, 1, -1, -1);
                         else
                             focus.rect=frame.adjusted(3, 3, -3, -3);
 
