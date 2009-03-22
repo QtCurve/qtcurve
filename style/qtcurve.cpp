@@ -6842,7 +6842,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_MenuBarItem:
             if (!size.isEmpty())
-                newSize=size+QSize((windowsItemHMargin * 4)-2, windowsItemVMargin);
+                newSize=size+QSize((windowsItemHMargin * 4)-1, windowsItemVMargin);
             break;
         case CT_MenuBar:
             if(APP_KONQUEROR==theThemedApp && widget && qobject_cast<const QMenuBar *>(widget))

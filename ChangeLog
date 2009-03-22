@@ -1,3 +1,8 @@
+0.62.6
+------
+1. Increase menubar item height by 1 pixel - seems to align better
+   with Gtk2.
+
 0.62.5
 ------
 1. Use gradient for filled slider - unless appearance is flat/raised.
