@@ -3090,7 +3090,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
                        botCol(getLowerEtchCol(widget));
-                bool   shadow=false;
 
                 if(!glow)
                 {
@@ -4720,9 +4719,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 QStyleOptionTabV2 tabV2(*tab);
 #endif
                 bool              verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
-                                               QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape),
-                                  selected(state&State_Selected),
-                                  reverse(Qt::RightToLeft==option->direction);
+                                               QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape);
 
                 if (verticalTabs)
                 {
@@ -5575,7 +5572,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             {
                 if (widget)
                 {
-                    if(QTabBar *bar = qobject_cast<QTabBar *>(widget->parentWidget()))
+                    if(qobject_cast<QTabBar *>(widget->parentWidget()))
                     {
                         QStyleOptionToolButton btn(*toolbutton);
 
@@ -5600,6 +5597,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                     break;
                                 case Qt::DownArrow:
                                     btn.rect.adjust(0, 1, 0, 1);
+                                default:
                                     break;
                             }
                         drawTbArrow(this, &btn, btn.rect, painter, widget);
