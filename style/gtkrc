@@ -113,7 +113,7 @@ style "qtcurve-menubar" = "qtcurve-default"
 
 style "qtcurve-menubaritem" = "qtcurve-default"
 {
-  xthickness = 0
+  xthickness = 1
   ythickness = 2
 }
 

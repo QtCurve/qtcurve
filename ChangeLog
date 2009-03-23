@@ -1,3 +1,7 @@
+0.62.6
+------
+1. Alter meunbar item widths slightly to make more consistent with KDE4.
+
 0.62.5
 ------
 1. Use gradient for filled slider - unless appearance is flat/raised.
