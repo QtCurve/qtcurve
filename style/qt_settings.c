@@ -1939,6 +1939,9 @@ static gboolean qtInit(Options *opts)
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
+                    if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts->menuitemAppearance &&
+                       (thunderbird || mozThunderbird))
+                        opts->menuitemAppearance=APPEARANCE_GRADIENT;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
