@@ -4754,9 +4754,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 r = subElementRect(SE_TabBarTabText, option, widget);
 #else
                 r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
-                                pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
+                               pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
 
-                if (selected)
+                if (state&State_Selected)
                 {
                     r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
                     r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
