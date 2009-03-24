@@ -2422,15 +2422,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
                 }
 
-                QStyleOption opt(*option);
-
-                opt.state|=State_Enabled;
-
-                drawArrow(painter, ar, &opt, state&State_Open
+                drawArrow(painter, ar, state&State_Open
                                                 ? PE_IndicatorArrowDown
                                                 : reverse
                                                     ? PE_IndicatorArrowLeft
-                                                    : PE_IndicatorArrowRight);
+                                                    : PE_IndicatorArrowRight, palette.text().color());
             }
 
             if(opts.lvLines)
@@ -2468,15 +2464,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowLeft:
         case PE_IndicatorArrowRight:
-        {
-            QStyleOption opt(*option);
-
-            opt.state|=State_Enabled;
             if(state&(State_Sunken|State_On))
                 r.adjust(1, 1, 1, 1);
-            drawArrow(painter, r, &opt, element);
+            drawArrow(painter, r, element, palette.text().color());
             break;
-        }
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
         case PE_IndicatorSpinUp:
@@ -4460,16 +4451,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 // Arrow
                 if (QStyleOptionMenuItem::SubMenu==menuItem->menuItemType) // draw sub menu arrow
                 {
-                    QStyleOption     arropt(*option);
                     int              dim((menuItem->rect.height() - 4) / 2),
                                      xpos(menuItem->rect.left() + menuItem->rect.width() - 6 - 2 - dim);
                     PrimitiveElement arrow(Qt::RightToLeft==option->direction ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight);
                     QRect            vSubMenuRect(visualRect(option->direction, menuItem->rect,
                                                              QRect(xpos, menuItem->rect.top() + menuItem->rect.height() / 2 - dim / 2, dim, dim)));
 
-                    if(!opts.useHighlightForMenu)
-                        arropt.state&=~State_Selected;
-                    drawArrow(painter, vSubMenuRect, &arropt, arrow, false, true);
+                    drawArrow(painter, vSubMenuRect, arrow,
+                              opts.useHighlightForMenu && state&State_Selected
+                                ? palette.highlightedText().color()
+                                : palette.text().color());
                 }
 
                 painter->restore();
@@ -5876,15 +5867,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         }
                                     }
 
-                                    QStyleOption opt(*option);
-
-                                    opt.state|=State_Enabled;
-
-                                    drawArrow(painter, ar, &opt, child.state&State_Open
-                                                                    ? PE_IndicatorArrowDown
-                                                                    : reverse
-                                                                        ? PE_IndicatorArrowLeft
-                                                                        : PE_IndicatorArrowRight);
+                                    drawArrow(painter, ar, child.state&State_Open
+                                                                ? PE_IndicatorArrowDown
+                                                                : reverse
+                                                                    ? PE_IndicatorArrowLeft
+                                                                    : PE_IndicatorArrowRight,
+                                              palette.text().color());
 
                                     if(opts.lvLines)
                                     {
@@ -8533,16 +8521,6 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
     p->setRenderHint(QPainter::Antialiasing, false);
     p->drawPolygon(a);
     p->restore();
-}
-
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, const QStyleOption *option,
-                             PrimitiveElement pe, bool small, bool checkActive) const
-{
-    drawArrow(p, r, pe, /*option->state&State_Enabled
-                            ? */checkActive && option->state&State_Selected
-                                ? option->palette.highlightedText().color()
-                                : option->palette.text().color()/*
-                            : option->palette.mid().color()*/, small);
 }
 
 void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const
