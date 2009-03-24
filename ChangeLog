@@ -4,6 +4,8 @@
 2. If QTC_NEW_MOZILLA is not set, don't allow faded menuitems for thunderbird -
    these just don't work here. In thunderbird it is not possible to detect if a
    menuitem is on a menubar, or in a popup menu :-(
+3. Make file chooser's pathbar buttons more KDE4 like. This is not 100%, as there
+   are no ">" arrows. To seperate items a light gray "/" is drawn.
 
 0.62.5
 ------

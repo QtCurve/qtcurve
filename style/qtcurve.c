@@ -468,6 +468,12 @@ static gboolean isOnListViewHeader(GtkWidget *w, int level)
     return FALSE;
 }
 
+static gboolean isPathButton(GtkWidget *widget)
+{
+    return widget && widget->parent && GTK_IS_BUTTON(widget) &&
+           0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GtkPathBar");
+}
+
 static gboolean isComboBoxButton(GtkWidget *widget)
 {
     return widget && GTK_IS_BUTTON(widget) && widget->parent &&
@@ -922,11 +928,15 @@ static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down,
     }
 }
 
-static void drawAreaColor(cairo_t *cr, GdkRectangle *area, GdkRegion *region, GdkColor *col, gint x, gint y, gint width, gint height)
+#define drawAreaColor(cr, area, region, col, x, y, width, height) \
+        drawAreaColorAlpha(cr, area, region, col, x, y, width, height, 1.0)
+
+static void drawAreaColorAlpha(cairo_t *cr, GdkRectangle *area, GdkRegion *region, GdkColor *col, gint x, gint y,
+                               gint width, gint height, double alpha)
 {
     setCairoClipping(cr, area, region);
     cairo_rectangle(cr, x, y, width, height);
-    cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
     cairo_fill(cr);
     unsetCairoClipping(cr);
 }
@@ -1527,16 +1537,18 @@ static gboolean sanitizeSize(GdkWindow *window, gint *width, gint *height)
   return set_bg;
 }
 
-static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
-                              GdkRegion *region, int x, int y, int width, int height, GdkColor *base,
-                              gboolean horiz, gboolean sel, EAppearance bevApp, EWidget w)
+#define drawBevelGradient(cr, style, area, reagion, x, y, width, height, base, horiz, sel, bevApp, w) \
+        drawBevelGradientAlpha(cr, style, area, reagion, x, y, width, height, base, horiz, sel, bevApp, w, 1.0)
+static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
+                                   GdkRegion *region, int x, int y, int width, int height, GdkColor *base,
+                                   gboolean horiz, gboolean sel, EAppearance bevApp, EWidget w, double alpha)
 {
     EAppearance app=APPEARANCE_BEVELLED!=bevApp || WIDGET_BUTTON(w) || WIDGET_LISTVIEW_HEADER==w
                         ? bevApp
                         : APPEARANCE_GRADIENT;
 
     if(IS_FLAT(bevApp))
-        drawAreaColor(cr, area, region, base, x, y, width, height);
+        drawAreaColorAlpha(cr, area, region, base, x, y, width, height, alpha);
     else
     {
         cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
@@ -1573,8 +1585,8 @@ static void drawBevelGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 tintColor(&col, &qtcPalette.menuitem[0], &t, (1.0-grad->stops[i].pos)*QTC_COLOR_SEL_TAB_FACTOR);
                 col=t;
             }
-            cairo_pattern_add_color_stop_rgb(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
-                                             QTC_CAIRO_COL(col));
+            cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
+                                              QTC_CAIRO_COL(col), alpha);
         }
 
         cairo_set_source(cr, pt);
@@ -2356,6 +2368,46 @@ static void dialogMapEvent(GtkWidget *widget, gpointer user_data)
     }
 }
 
+static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
+                          const gchar *detail, int x, int y, int width, int height, int round)
+{
+    double   radius=QTC_ROUNDED
+                        ? height>48 && width>48
+                            ? 3.0
+                            : height>24 && width>24
+                                ? QTC_FULL_OUTER_RADIUS
+                                : QTC_SLIGHT_OUTER_RADIUS
+                        : 0.0,
+                xd=x+0.5,
+                yd=y+0.5,
+                alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
+    int      xo=x, yo=y, widtho=width;
+    GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
+
+    if(detail && ROUNDED_ALL!=round)
+    {
+        if(!(round&ROUNDED_LEFT))
+        {
+            x-=2;
+            xd-=2;
+            width+=2;
+        }
+        if(!(round&ROUNDED_RIGHT))
+            width+=2;
+    }
+            
+    drawBevelGradientAlpha(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
+                           TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
+
+    cairo_save(cr);
+    cairo_rectangle(cr, xo, yo, widtho, height);
+    cairo_clip(cr);
+    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
+    createPath(cr, xd, yd, width-1, height-1,  getRadius(opts.round, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
+    cairo_stroke(cr);
+    cairo_restore(cr);
+}
+
 static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                            GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                            const gchar *detail, gint x, gint y, gint width, gint height)
@@ -2454,52 +2506,19 @@ debugDisplayWidget(widget, 3);
 
         if(GTK_STATE_SELECTED==state)
         {
-            double   radius=QTC_ROUNDED
-                                ? height>48 && width>48
-                                    ? 3.0
-                                    : height>24 && width>24
-                                        ? QTC_FULL_OUTER_RADIUS
-                                        : QTC_SLIGHT_OUTER_RADIUS
-                                : 0.0,
-                     xd=x+0.5,
-                     yd=y+0.5;
-            int      round=detail
-                                ? 0!=strstr(detail, "_start")
-                                    ? ROUNDED_LEFT
-                                    : 0!=strstr(detail, "_end")
-                                        ? ROUNDED_RIGHT
-                                        : 0!=strstr(detail, "_middle")
-                                            ? ROUNDED_NONE
-                                            : ROUNDED_ALL
-                                : ROUNDED_NONE,
-                     xo=x, yo=y, widtho=width;
-            GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
-
-            if(detail && ROUNDED_ALL!=round)
-            {
-                if(!(round&ROUNDED_LEFT))
-                {
-                    xd-=2;
-                    x-=2;
-                    width+=2;
-                }
-                if(!(round&ROUNDED_RIGHT))
-                    width+=2;
-            }
+            int round=detail
+                    ? 0!=strstr(detail, "_start")
+                        ? ROUNDED_LEFT
+                        : 0!=strstr(detail, "_end")
+                            ? ROUNDED_RIGHT
+                            : 0!=strstr(detail, "_middle")
+                                ? ROUNDED_NONE
+                                : ROUNDED_ALL
+                    : ROUNDED_NONE;
 
             if(!QTC_ROUNDED)
                 round=ROUNDED_NONE;
-
-            drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
-                              TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION);
-
-            cairo_save(cr);
-            cairo_rectangle(cr, xo, yo, widtho, height);
-            cairo_clip(cr);
-            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), GTK_STATE_PRELIGHT==state ? 0.20 : 1.0);
-            createPath(cr, xd, yd, width-1, height-1,  getRadius(opts.round, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
-            cairo_stroke(cr);
-            cairo_restore(cr);
+            drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round);
         }
         else
             drawAreaColor(cr, area, NULL,
@@ -3066,6 +3085,20 @@ debugDisplayWidget(widget, 3);
                 {
                     drawFadedLine(cr, x, y+4, 1, height-8, &qtcPalette.background[QT_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
                     drawFadedLine(cr, x+1, y+4, 1, height-8, &qtcPalette.background[0], area, NULL, TRUE, TRUE, FALSE);
+                }
+            }
+            else if(isPathButton(widget))
+            {
+                if(GTK_STATE_PRELIGHT==state)
+                    drawSelection(cr, style, state, area, widget, NULL, x, y, width, height, ROUNDED_ALL);
+
+                if(GTK_IS_TOGGLE_BUTTON(widget))
+                {
+                    cairo_new_path(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[5]));
+                    cairo_move_to(cr, x+width-0.5, y+9.5);
+                    cairo_line_to(cr, x+width-3.5, y+height-9.5);
+                    cairo_stroke(cr);
                 }
             }
             else

@@ -42,6 +42,12 @@ style "qtcurve-default"
   }
 }
 
+style "qtcurve-pathbutton" = "qtcurve-default"
+{
+  GtkButton::child_displacement_x = 0
+  GtkButton::child_displacement_y = 0
+}
+
 style "qtcurve-toolbar" = "qtcurve-default"
 {
   GtkButton::default_border = { 0, 0, 0, 0 }
@@ -194,3 +200,4 @@ widget_class "*.SwtFixed.GtkCombo.GtkEntry" style "qtcurve-swt-combo"
 widget_class "*Toolbar*Entry" style "qtcurve-w2"
 class "GtkComboBoxEntry" style "qtcurve-w0"
 widget_class "*.GtkComboBoxEntry.*Button" style "qtcurve-w0"
+widget_class "*PathBar.*Button" style "qtcurve-pathbutton"
