@@ -27,6 +27,10 @@
 #define CONFIG_READ
 #include "config_file.c"
 
+#ifdef QTC_XBAR_SUPPORT
+#include "macmenu.h"
+#endif
+
 #if defined KDE4_FOUND && !defined QTC_NO_KDE4_LINKING
 #define QTC_USE_KDE4
 
@@ -361,6 +365,9 @@ static enum
     APP_SKYPE,
     APP_KONQUEROR,
     APP_KONTACT,
+#ifdef QTC_XBAR_SUPPORT
+    APP_QTDESIGNER,
+#endif
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -997,6 +1004,10 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KONTACT;
         else if("skype"==appName)
             theThemedApp=APP_SKYPE;
+#ifdef QTC_XBAR_SUPPORT
+        else if("Designer"==QCoreApplication::applicationName())
+            theThemedApp=APP_QTDESIGNER;
+#endif
 }
 
 void QtCurveStyle::polish(QPalette &palette)
@@ -1166,6 +1177,11 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->installEventFilter(this);
     else if(qobject_cast<QMenuBar *>(widget))
     {
+#ifdef QTC_XBAR_SUPPORT
+        if (!((APP_QTDESIGNER==theThemedApp) && widget->inherits("QDesignerMenuBar")))
+            Bespin::MacMenu::manage((QMenuBar *)widget);
+#endif
+
         widget->setAttribute(Qt::WA_Hover, true);
 
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
@@ -1351,6 +1367,10 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->removeEventFilter(this);
     else if(qobject_cast<QMenuBar *>(widget))
     {
+#ifdef QTC_XBAR_SUPPORT
+        Bespin::MacMenu::release((QMenuBar *)widget);
+#endif
+
         widget->setAttribute(Qt::WA_Hover, false);
 
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
@@ -1996,6 +2016,15 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_ScrollBar_MiddleClickAbsolutePosition:
             return true;
         case SH_MainWindow_SpaceBelowMenuBar:
+#ifdef QTC_XBAR_SUPPORT
+            if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
+                if (0==menubar->height() && !menubar->actions().isEmpty())
+                {   // we trick menubars if we use macmenus - hehehe...
+                    // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
+                    return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
+                }
+#endif
+
             return 0;
         case SH_DialogButtonLayout:
             return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
@@ -4234,6 +4263,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 painter->save();
 
+#ifdef QTC_XBAR_SUPPORT
+                if(!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))
+#endif
                 drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
@@ -4254,6 +4286,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : palette.foreground().color()
                                         : palette.foreground().color();
 
+// #ifdef QTC_XBAR_SUPPORT
+//                     if(palette.foreground().color()==col && palette.foreground().color()!=QApplication::palette().foreground().color() &&
+//                        palette.background().color()==QApplication::palette().background().color())
+//                         col=QApplication::palette().foreground().color();
+// #endif
                     painter->setPen(col);
                     painter->drawText(r, alignment, mbi->text);
                 }
@@ -9397,5 +9434,3 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
     }
 #endif
 }
-
-#include "qtcurve.moc"

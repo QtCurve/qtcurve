@@ -3,6 +3,8 @@
 1. Increase menubar item height by 1 pixel - seems to align better
    with Gtk2.
 2. Improve look of comboboxes in Qt4 printer properties dialog listview.
+3. Provide initial support for Bespin's XBar - disabled by default. To enable,
+   call cmake with -DQTC_XBAR_SUPPORT=true
 
 0.62.5
 ------
