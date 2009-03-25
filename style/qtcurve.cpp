@@ -3483,14 +3483,20 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 if(!QTC_ROUNDED)
                     round=ROUNDED_NONE;
-                
+
+                QRect inner(border.adjusted(1, 1, -1, -1));
                 painter->save();
                 if(QTC_FULLLY_ROUNDED && r.width()>QTC_MIN_ROUND_FULL_SIZE && r.height()>QTC_MIN_ROUND_FULL_SIZE)
-                    painter->setClipRegion(QRegion(border.adjusted(2, 1, -2, -1)).united(border.adjusted(1, 2, -1, -2)).intersect(r));
+                {
+                    double radius=getRadius(opts.round, border.width(), border.height(), WIDGET_OTHER, RADIUS_SELECTION);
+                    painter->setClipRect(r);
+                    painter->setClipPath(buildPath(border.adjusted(0, 0, 0,
+                                                                   radius>QTC_EXTRA_ETCH_RADIUS ? -1 : 0),
+                                                   WIDGET_OTHER, round, radius), Qt::IntersectClip);
+                }
                 else
-                    painter->setClipRect(border.adjusted(1, 1, -1, -1).intersect(r));
-                drawBevelGradient(color, painter, border.adjusted(1, 1, -1, -1), true,
-                                false, opts.selectionAppearance, WIDGET_SELECTION);
+                    painter->setClipRect(inner.intersect(r));
+                drawBevelGradient(color, painter, inner, true, false, opts.selectionAppearance, WIDGET_SELECTION);
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
