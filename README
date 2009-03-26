@@ -22,6 +22,11 @@ The following options may be supplied to cmake:
     -DQTC_XBAR_SUPPORT=true
         Include support for Bespin's XBar
 
+XBar/MacMenu
+------------
+The XBar support was copied directly from Bespin. The relevant files are named macmenu*
+These were taken from revision 435
+
 Themes
 ------
 As of v0.55, you can create QtCurve based themes. These will appear with KDE's style
@@ -52,7 +57,6 @@ When KDE's style panel is restarted, your new theme should appear in the list.
 
 Creating Distribution Packages
 ------------------------------
-
 CMake (as of v2.4.x) does not support building rpm or deb packages, and a simple
 checkinstall will not work. CMake 2.6 should support rpm and deb packages, but until
 then I have supplied a simple shell script to build a package with checkinstall.

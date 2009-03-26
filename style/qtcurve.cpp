@@ -1117,9 +1117,11 @@ void QtCurveStyle::polish(QWidget *widget)
 {
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
+#ifndef QTC_XBAR_SUPPORT
     // 'Fix' konqueror's large menubar...
     if(APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
         widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
+#endif
 
     if(EFFECT_NONE!=opts.buttonEffect && isNoEtchWidget(widget))
     {
@@ -1808,6 +1810,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 0;
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
+#ifdef QTC_XBAR_SUPPORT
+            if(widget && 0==widget->size().height())
+                return 0;
+#endif
             return 2;
         case PM_MenuHMargin:
         case PM_MenuVMargin:
@@ -2674,6 +2680,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                      widget->parentWidget()->inherits("Q3MainWindow")))
             {
                 painter->save();
+#ifdef QTC_XBAR_SUPPORT
+                if(!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))
+#endif
                 drawMenuOrToolBarBackground(painter, r, option);
                 if(TB_NONE!=opts.toolbarBorders)
                 {
@@ -4716,6 +4725,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 painter->save();
 
+#ifdef QTC_XBAR_SUPPORT
+                if(!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))
+#endif
                 drawMenuOrToolBarBackground(painter, r, option);
                 if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
                     (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
@@ -6893,7 +6905,13 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_MenuBar:
             if(APP_KONQUEROR==theThemedApp && widget && qobject_cast<const QMenuBar *>(widget))
-                newSize.setHeight(konqMenuBarSize((const QMenuBar *)widget));
+            {
+                int height=konqMenuBarSize((const QMenuBar *)widget);
+#ifdef QTC_XBAR_SUPPORT
+                if(size.height()>height)
+#endif
+                newSize.setHeight(height);
+            }
             break;
         default:
             break;
