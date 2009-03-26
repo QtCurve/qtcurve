@@ -356,6 +356,8 @@ static EAlign toAlign(const char *str, EAlign def)
     {
         if(0==memcmp(str, "left", 4))
             return ALIGN_LEFT;
+        if(0==memcmp(str, "center-full", 11))
+            return ALIGN_FULL_CENTER;
         if(0==memcmp(str, "center", 6))
             return ALIGN_CENTER;
         if(0==memcmp(str, "right", 5))
@@ -1814,6 +1816,8 @@ static const char *toStr(EAlign ind)
             return "left";
         case ALIGN_CENTER:
             return "center";
+        case ALIGN_FULL_CENTER:
+            return "center-full";
         case ALIGN_RIGHT:
             return "right";
     }

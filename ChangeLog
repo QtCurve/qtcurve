@@ -6,6 +6,8 @@
 3. Provide initial support for Bespin's XBar - disabled by default. To enable,
    call cmake with -DQTC_XBAR_SUPPORT=true
 4. Draw popup menu title text!
+5. Allow ability to specify if titlebar center alignment is for the full window
+   width, or just the text area.
 
 0.62.5
 ------

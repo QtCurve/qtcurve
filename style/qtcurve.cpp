@@ -1939,6 +1939,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 case ALIGN_LEFT:
                     return Qt::AlignLeft;
                 case ALIGN_CENTER:
+                    return Qt::AlignHCenter|Qt::AlignVCenter;
+                case ALIGN_FULL_CENTER:
                     return Qt::AlignHCenter;
                 case ALIGN_RIGHT:
                     return Qt::AlignRight;
@@ -6254,10 +6256,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(!titleBar->text.isEmpty())
                 {
-                    QFont       font(painter->font());
-                    QRect       textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
-                    QTextOption textOpt(((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, NULL, NULL))
-                                        |Qt::AlignVCenter);
+                    QFont         font(painter->font());
+                    Qt::Alignment align((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, NULL, NULL));
+                    QRect         textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
+                    QTextOption   textOpt(align|Qt::AlignVCenter);
+                    bool          alignRealCenter(Qt::AlignHCenter==align);
 
                     font.setBold(true);
                     painter->setFont(font);
@@ -6265,10 +6268,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     QString str(painter->fontMetrics().elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
 
+                    if(alignRealCenter)
+                    {
+                        painter->setClipRect(textRect);
+                        textRect=r;
+                    }
                     painter->setPen(shadow);
                     painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
+                    if(alignRealCenter)
+                        painter->setClipping(false);
                 }
 
                 // min button

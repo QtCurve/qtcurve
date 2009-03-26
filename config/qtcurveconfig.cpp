@@ -364,7 +364,8 @@ static void insertGradBorderEntries(QComboBox *combo)
 static void insertAlignEntries(QComboBox *combo)
 {
     combo->insertItem(ALIGN_LEFT, i18n("Left"));
-    combo->insertItem(ALIGN_CENTER, i18n("Center"));
+    combo->insertItem(ALIGN_CENTER, i18n("Center (between controls)"));
+    combo->insertItem(ALIGN_FULL_CENTER, i18n("Center (full width)"));
     combo->insertItem(ALIGN_RIGHT, i18n("Right"));
 }
 

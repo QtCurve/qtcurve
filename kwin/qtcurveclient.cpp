@@ -190,10 +190,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
-    const int titleEdgeBottomBottom(rectY+titleEdgeTop+titleHeight+titleEdgeBottom);
-    QRect     titleRect(rectX+titleEdgeLeft+buttonsLeftWidth(), rectY+titleEdgeTop,
-                        rectX2-titleEdgeRight-buttonsRightWidth()-(rectX+titleEdgeLeft+buttonsLeftWidth()),
-                        titleEdgeBottomBottom-(rectY+titleEdgeTop));
     QColor    col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
               windowCol(widget()->palette().color(QPalette::Window));
 
@@ -260,15 +256,21 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
         QString       str(painter.fontMetrics().elidedText(caption(), Qt::ElideRight,
                                                            itsCaptionRect.width(), QPalette::WindowText));
-        Qt::Alignment alignment(Qt::AlignVCenter|
-                                ((Qt::Alignment)Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment,
-                                                                                 0L, 0L)));
+        Qt::Alignment hAlign((Qt::Alignment)Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment,
+                                                                                 0L, 0L)),
+                      alignment(Qt::AlignVCenter|hAlign);
+        const int     titleEdgeBottomBottom(rectY+titleEdgeTop+titleHeight+titleEdgeBottom);
+        QRect         textRect(Qt::AlignHCenter==hAlign
+                                    ? QRect(rectX+titleEdgeLeft, rectY+titleEdgeTop,
+                                            rectX2-titleEdgeRight-(rectX+titleEdgeLeft),
+                                            titleEdgeBottomBottom-(rectY+titleEdgeTop))
+                                    : itsCaptionRect);
 
-        painter.setClipRect(titleRect);
+        painter.setClipRect(itsCaptionRect);
         painter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
-        painter.drawText(itsCaptionRect.adjusted(1, 1, 1, 1), alignment, str);
+        painter.drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
         painter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
-        painter.drawText(itsCaptionRect, alignment, str);
+        painter.drawText(textRect, alignment, str);
     }
     painter.end();
 }

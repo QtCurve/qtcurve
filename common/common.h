@@ -544,6 +544,7 @@ typedef enum
 {
     ALIGN_LEFT,
     ALIGN_CENTER,
+    ALIGN_FULL_CENTER,
     ALIGN_RIGHT
 } EAlign;
 #endif
