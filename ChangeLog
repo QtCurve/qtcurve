@@ -6,6 +6,7 @@
    menuitem is on a menubar, or in a popup menu :-(
 3. Make file chooser's pathbar buttons more KDE4 like. This is not 100%, as there
    are no ">" arrows. To seperate items a light gray "/" is drawn.
+4. Improve entry focus highlight when round>full.
 
 0.62.5
 ------

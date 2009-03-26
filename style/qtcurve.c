@@ -2530,6 +2530,24 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
+    else if( GTK_APP_JAVA!=qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") &&
+             GTK_WIDGET_HAS_FOCUS(widget) )
+    {
+        /* Frames have a 2 pixel frame width, but with round>ROUND_FULL the background cuts into the
+           focus highlight. So, rectify this here by redrawing this highlight. */
+        gboolean rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent));
+        int      round=GTK_IS_SPIN_BUTTON(widget) || isComboBoxEntry(widget)
+                        ? (rev ? ROUNDED_RIGHT : ROUNDED_LEFT)
+                        : ROUNDED_ALL;
+
+        if(widget->parent && GTK_IS_ENTRY(widget) && GTK_IS_COMBO(widget->parent))
+            x-=3, width+=6;
+        else
+            x-=2, width+=4;
+        y-=2, height+=4;
+        drawBorder(cr, style, state, area, NULL, x, y, width, height, qtcPalette.menuitem,
+                   round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
+    }
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x, y,
