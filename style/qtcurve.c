@@ -1256,7 +1256,7 @@ static gboolean menuIsSelectable(GtkWidget *menu)
 
 static gboolean menubarEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-    if(GDK_MOTION_NOTIFY==event->type)
+    if(opts.menubarMouseOver && GDK_MOTION_NOTIFY==event->type)
     {
         static int last_x=-100, last_y=-100;
 
@@ -1303,7 +1303,7 @@ static gboolean menubarEvent(GtkWidget *widget, GdkEvent *event, gpointer user_d
             }
         }
     }
-    else if(GDK_LEAVE_NOTIFY==event->type)
+    else if(opts.menubarMouseOver && GDK_LEAVE_NOTIFY==event->type)
     {
         GtkWidget **item=lookupMenubarHash(widget, FALSE);
         if(item)
@@ -2984,13 +2984,10 @@ debugDisplayWidget(widget, 3);
         if(!mbHash)
         {
             lookupMenubarHash(widget, TRUE); /* Create hash entry... */
-            if(opts.menubarMouseOver)
-            {
-                gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK|
-                                              GDK_BUTTON_PRESS_MASK/*|GDK_BUTTON_RELEASE_MASK*/);
-                g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(menubarDeleteEvent), widget);
-                g_signal_connect(G_OBJECT(widget), "event", G_CALLBACK(menubarEvent), widget);
-            }
+            gtk_widget_add_events(widget, (opts.menubarMouseOver ? (GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK) : 0)|
+                                          GDK_BUTTON_PRESS_MASK/*|GDK_BUTTON_RELEASE_MASK*/);
+            g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(menubarDeleteEvent), widget);
+            g_signal_connect(G_OBJECT(widget), "event", G_CALLBACK(menubarEvent), widget);
 
             if(opts.shadeMenubarOnlyWhenActive && topLevel && GTK_IS_WINDOW(topLevel))
                 g_signal_connect(G_OBJECT(topLevel), "event", G_CALLBACK(windowEvent), widget);
