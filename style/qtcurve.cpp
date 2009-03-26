@@ -60,7 +60,8 @@ static void applyKdeSettings(bool pal)
         QApplication::setFont(KGlobalSettings::menuFont(), "QMenuBar");
         QApplication::setFont(KGlobalSettings::menuFont(), "QMenu");
         QApplication::setFont(KGlobalSettings::menuFont(), "KPopupTitle");
-        QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
+// Don't set toolbar font - messes things up with Arora...
+//         QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
     }
 }
 
