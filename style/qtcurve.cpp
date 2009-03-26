@@ -5656,11 +5656,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         // For some reason the MenuTitle has a larger border on the left, so adjust the width by 1 pixel
                         // to make this look nicer.
                         //drawBorder(painter, r.adjusted(2, 2, -3, -2), option, ROUNDED_ALL, NULL, WIDGET_OTHER, BORDER_SUNKEN);
-                        QStyleOption opt;
+                        QStyleOptionToolButton opt(*toolbutton);
+                        opt.rect = r.adjusted(2, 2, -3, -2);
                         opt.state=State_Raised|State_Enabled|State_Horizontal;
-                        drawLightBevel(painter, r.adjusted(2, 2, -3, -2), &opt, widget, ROUNDED_ALL,
-                                    getFill(&opt, itsBackgroundCols), itsBackgroundCols,
-                                    true, WIDGET_NO_ETCH_BTN);
+                        drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
+                                       getFill(&opt, itsBackgroundCols), itsBackgroundCols,
+                                       true, WIDGET_NO_ETCH_BTN);
+                        int fw = pixelMetric(PM_DefaultFrameWidth, option, widget);
+                        opt.rect.adjust(fw, fw, -fw, -fw);
+                        drawControl(CE_ToolButtonLabel, &opt, painter, widget);
                         break;
                     }
                 }
