@@ -2900,13 +2900,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             drawControl(CE_Splitter, &dockWidgetHandle, painter, widget);
             break;
         }
-        case PE_PanelLineEdit:
-            painter->setClipPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, ROUNDED_ALL,
-                                           getRadius(opts.round, r.width(), r.height(), WIDGET_ENTRY, RADIUS_EXTERNAL)));
-            painter->fillRect(QTC_DO_EFFECT
-                                ? r.adjusted(2, 2, -2, -2)
-                                : r.adjusted(1, 1, -1, -1), palette.brush(QPalette::Base));
-            painter->setClipping(false);
+        // case PE_PanelLineEdit: // NOT USED Teh default QCommonStyle one works ok. Teh previous overriden one caused problems in arora.
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
@@ -2921,7 +2915,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         opt.state^=State_Enabled;
 
                     painter->save();
-                    drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, PE_PanelLineEdit==element, QTC_DO_EFFECT);
+                    drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT);
                     painter->restore();
                 }
             }
