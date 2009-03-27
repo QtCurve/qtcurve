@@ -103,3 +103,9 @@ endif (KDE4_FOUND)
 
 add_subdirectory(style)
 
+if (QTC_XBAR_SUPPORT)
+    message("\n**************************************************************\n"
+            "Information: XBar support enabled.\n"
+            "**************************************************************\n")
+endif (QTC_XBAR_SUPPORT)
+
