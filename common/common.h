@@ -1235,8 +1235,9 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
     return 0L; /* Will never happen! */
 }
 
-#define QTC_MIN_ROUND_FULL_SIZE  8
-#define QTC_MIN_ROUND_EXTRA_SIZE 14
+#define QTC_MIN_ROUND_FULL_SIZE       8
+#define QTC_MIN_ROUND_EXTRA_SIZE      14
+#define QTC_MIN_ROUND_MAX_HEIGHT_SIZE 20
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
@@ -1311,7 +1312,7 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_MAX:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return ((w>h ? h : w)-2)/2;
-                    if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE-2) &&
+                    if(w>(QTC_MIN_ROUND_EXTRA_SIZE-2) && h>(QTC_MIN_ROUND_MAX_HEIGHT_SIZE-2) &&
                        QTC_MAX_ROUND_WIDGET(widget))
                         return 8.5;
                 case ROUND_EXTRA:
@@ -1332,7 +1333,7 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_MAX:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
-                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE &&
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_MAX_HEIGHT_SIZE &&
                        QTC_MAX_ROUND_WIDGET(widget))
                         return 9.5;
                 case ROUND_EXTRA:
@@ -1353,7 +1354,7 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
                 case ROUND_MAX:
                     if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                         return (w>h ? h : w)/2;
-                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_EXTRA_SIZE &&
+                    if(w>QTC_MIN_ROUND_EXTRA_SIZE && h>QTC_MIN_ROUND_MAX_HEIGHT_SIZE &&
                        QTC_MAX_ROUND_WIDGET(widget))
                         return 10.5;
                 case ROUND_EXTRA:
