@@ -6729,7 +6729,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
                         drawRect(painter, field);
                         // 2 for frame width
-                        field.adjust(-2,-2, 2, 2);
+                        int pad=opts.round>ROUND_FULL ? 2 : 0;
+
+                        field.adjust(-(2+pad),-2, (2+pad), 2);
                         drawEntryField(painter, field, widget, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
                     else if(opts.comboSplitter)
@@ -7097,7 +7099,10 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                         if(doEtch)
                             r.adjust(1, 1, -1, -1);
                         if(ed)
-                            r.adjust(-2, -2, 2, 2);
+                        {
+                            int pad=opts.round>ROUND_FULL ? 2 : 0;
+                            r.adjust(-2+pad, -2, 2-pad, 2);
+                        }
                         break;
                     case SC_ComboBoxListBoxPopup:
                     default:
@@ -7119,8 +7124,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                 bs=bs.expandedTo(QApplication::globalStrut());
 
                 int extra(bs.height()*2==r.height() ? 0 : 1),
-                    y(0), x(reverse ? 0 : r.width()-bs.width()),
-                    rx(x-fw*2);
+                    y(0), x(reverse ? 0 : r.width()-bs.width());
 
                 switch(subControl)
                 {
@@ -7129,7 +7133,10 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     case SC_SpinBoxDown:
                         return QRect(x, y+bs.height(), bs.width(), bs.height()+extra);
                     case SC_SpinBoxEditField:
-                        return QRect(fw+(reverse ? bs.width() : 0), fw, rx, r.height()-2*fw);
+                    {
+                        int pad=/*opts.round>ROUND_FULL ? */ 2 /*: 0*/;
+                        return QRect(fw+(reverse ? bs.width() : 0)+pad, fw, (x-fw*2)-pad, r.height()-2*fw);
+                    }
                     case SC_SpinBoxFrame:
                         return reverse
                                 ? QRect(r.x()+bs.width(), r.y(),
