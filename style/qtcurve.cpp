@@ -3443,8 +3443,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
             }
             painter->save();
-            drawBorder(painter, r, option, round, backgroundColors(option),
-                       WIDGET_TAB_FRAME, BORDER_RAISED, false);
+            QStyleOption opt(*option);
+
+            opt.state|=State_Enabled;
+            drawBorder(painter, r, &opt, round, backgroundColors(option), WIDGET_TAB_FRAME, BORDER_RAISED, false);
             painter->restore();
             break;
         }
