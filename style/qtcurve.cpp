@@ -5433,6 +5433,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 {
                     QPixmap pm;
                     QSize   pmSize = tb->iconSize;
+                    QRect   pr = r;
 
                     if (!tb->icon.isNull())
                     {
@@ -5442,15 +5443,25 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             : (state&State_MouseOver) && (state&State_AutoRaise)
                                                 ? QIcon::Active
                                                 : QIcon::Normal;
-                                                
-                        pm=getIconPixmap(tb->icon, tb->rect.size().boundedTo(tb->iconSize), mode, state);
-                        pmSize = pm.size();
+                        QSize        iconSize = tb->iconSize;
+
+                        if (!iconSize.isValid())
+                        {
+                            int iconExtent = pixelMetric(PM_ToolBarIconSize);
+                            iconSize = QSize(iconExtent, iconExtent);
+                        }
+
+                        pm=getIconPixmap(tb->icon, tb->rect.size().boundedTo(iconSize), mode, state);
+                        pmSize = tb->icon.actualSize(iconSize, mode);
+                        if(pmSize.width()<pm.width())
+                            pr.setX(pr.x()+((pm.width()-pmSize.width())/2));
+                        if(pmSize.height()<pm.height())
+                            pr.setY(pr.y()+((pm.height()-pmSize.height())/2));
                     }
 
                     if (Qt::ToolButtonIconOnly!=tb->toolButtonStyle)
                     {
-                        QRect pr = r,
-                              tr = r;
+                        QRect tr = r;
                         int   alignment = Qt::TextShowMnemonic;
 
                         painter->setFont(tb->font);
@@ -5486,11 +5497,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     }
                     else
                     {
-                        r.translate(shiftX, shiftY);
+                        pr.translate(shiftX, shiftY);
                         if (hasArrow)
-                            drawTbArrow(this, tb, r, painter, widget);
+                            drawTbArrow(this, tb, pr, painter, widget);
                         else
-                            drawItemPixmap(painter, r, Qt::AlignCenter, pm);
+                            drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
                     }
                 }
             }

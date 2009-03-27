@@ -9,6 +9,7 @@
 5. Allow ability to specify if titlebar center alignment is for the full window
    width, or just the text area.
 6. Fix weird highlighting behaviour in QtWebKit text edit fields.
+7. Fix position of toolbar icons in Arora.
 
 0.62.5
 ------
