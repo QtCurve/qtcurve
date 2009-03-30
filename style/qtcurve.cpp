@@ -2901,7 +2901,25 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             drawControl(CE_Splitter, &dockWidgetHandle, painter, widget);
             break;
         }
-        // case PE_PanelLineEdit: // NOT USED Teh default QCommonStyle one works ok. Teh previous overriden one caused problems in arora.
+        case PE_PanelLineEdit:
+            if (const QStyleOptionFrame *panel = qstyleoption_cast<const QStyleOptionFrame *>(option))
+            {
+                if(panel->lineWidth > 0)
+                {
+                    QRect r2(r.adjusted(1, 1, -1, (QTC_DO_EFFECT ? -2 : -1)));
+                    painter->save();
+                    painter->setClipPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL,
+                                                   getRadius(opts.round, r2.width(), r2.height(), WIDGET_ENTRY,
+                                                   RADIUS_INTERNAL)),
+                                         Qt::IntersectClip);
+                    painter->fillRect(r2, palette.brush(QPalette::Base));
+                    painter->restore();
+                    drawPrimitive(PE_FrameLineEdit, option, painter, widget);
+                }
+                else
+                    painter->fillRect(r.adjusted(2, 2, -2, -2), palette.brush(QPalette::Base));
+            }
+            break;
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
@@ -7134,7 +7152,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                         return QRect(x, y+bs.height(), bs.width(), bs.height()+extra);
                     case SC_SpinBoxEditField:
                     {
-                        int pad=/*opts.round>ROUND_FULL ? */ 2 /*: 0*/;
+                        int pad=opts.round>ROUND_FULL ? 2 : 0;
                         return QRect(fw+(reverse ? bs.width() : 0)+pad, fw, (x-fw*2)-pad, r.height()-2*fw);
                     }
                     case SC_SpinBoxFrame:
