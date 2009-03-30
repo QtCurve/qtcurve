@@ -9070,7 +9070,7 @@ const QColor * QtCurveStyle::sliderColors(const QStyleOption *option) const
 
 const QColor * QtCurveStyle::backgroundColors(const QColor &col) const
 {
-    if(col!=itsBackgroundCols[ORIGINAL_SHADE])
+    if(col.alpha()!=0 && col!=itsBackgroundCols[ORIGINAL_SHADE])
     {
         shadeColors(col, itsColoredBackgroundCols);
         return itsColoredBackgroundCols;
