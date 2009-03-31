@@ -1770,7 +1770,8 @@ void QtCurveStyle::timerEvent(QTimerEvent *event)
     {
         itsAnimateStep = itsTimer.elapsed() / (1000 / constProgressBarFps);
         foreach (QProgressBar *bar, itsProgressBars)
-            if ((opts.animatedProgress && 0==itsAnimateStep%2) || (0==bar->minimum() && 0==bar->maximum()))
+            if ((opts.animatedProgress && 0==itsAnimateStep%2 && bar->value()!=bar->minimum() && bar->value()!=bar->maximum()) ||
+                (0==bar->minimum() && 0==bar->maximum()))
                 bar->update();
     }
 
