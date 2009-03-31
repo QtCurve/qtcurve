@@ -366,6 +366,7 @@ static enum
     APP_SKYPE,
     APP_KONQUEROR,
     APP_KONTACT,
+    APP_ARORA,
 #ifdef QTC_XBAR_SUPPORT
     APP_QTDESIGNER,
 #endif
@@ -419,6 +420,14 @@ static QWidget * getActiveWindow(QWidget *widget)
     return activeWindow && activeWindow!=widget ? activeWindow : 0L;
 }
 
+static const QWidget * getToolBar(const QWidget *w, bool checkQ3)
+{
+    return w
+            ? qobject_cast<const QToolBar *>(w) || (checkQ3 && w->inherits("Q3ToolBar"))
+                ? w
+                : getToolBar(w->parentWidget(), checkQ3)
+            : 0L;
+}
 
 //
 // OK, Etching looks cr*p on plasma widgets, and khtml...
@@ -1005,6 +1014,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KONTACT;
         else if("skype"==appName)
             theThemedApp=APP_SKYPE;
+        else if("arora"==appName)
+            theThemedApp=APP_ARORA;
 #ifdef QTC_XBAR_SUPPORT
         else if("Designer"==QCoreApplication::applicationName())
             theThemedApp=APP_QTDESIGNER;
@@ -1305,7 +1316,7 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->setPalette(pal);
     }
                 
-    bool onToolBar(widget && widget->parent() && (qobject_cast<QToolBar *>(widget->parent()) || widget->parent()->inherits("Q3ToolBar")));
+    bool onToolBar(widget && widget->parent() && 0L!=getToolBar(widget->parentWidget(), true));
 
     if (qobject_cast<QMenuBar *>(widget) ||
         widget->inherits("Q3ToolBar") ||
@@ -2934,6 +2945,40 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(opt.state&State_Enabled && state&State_ReadOnly)
                         opt.state^=State_Enabled;
 
+                    if(QTC_DO_EFFECT && APP_ARORA==theThemedApp && widget && widget->parentWidget() && 0==strcmp(widget->metaObject()->className(), "LocationBar"))
+                    {
+                        const QToolBar *tb=(const QToolBar *)getToolBar(widget->parentWidget(), false);
+
+                        if(tb)
+                        {
+                            QRect r2(r);
+
+                            struct TB : public QToolBar
+                            {
+                                void initOpt(QStyleOptionToolBar *opt) { initStyleOption(opt); }
+                            };
+
+                            QStyleOptionToolBar opt;
+
+                            ((TB *)tb)->initOpt(&opt);
+                            bool horiz=Qt::NoToolBarArea==opt.toolBarArea || Qt::BottomToolBarArea==opt.toolBarArea || Qt::TopToolBarArea==opt.toolBarArea;
+
+                            if(horiz) // Should be!!!
+                            {
+                                painter->save();
+
+                                // Only need to adjust coords if toolbar has a gradient...
+                                if(APPEARANCE_FLAT!=opts.toolbarAppearance && APPEARANCE_RAISED!=opts.toolbarAppearance)
+                                {
+                                    r2.setY(-widget->mapTo((QWidget *)tb, QPoint(r.x(), r.y())).y());
+                                    r2.setHeight(tb->rect().height());
+                                }
+                                painter->setClipRegion(QRegion(r2).subtract(QRegion(r2.adjusted(2, 2, -2, -2))));
+                                drawMenuOrToolBarBackground(painter, r2, &opt, false, horiz);
+                                painter->restore();
+                            }
+                        }
+                    }
                     painter->save();
                     drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT);
                     painter->restore();
