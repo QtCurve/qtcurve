@@ -3701,7 +3701,6 @@ debugDisplayWidget(widget, 3);
         GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
         gboolean   active_mb=isMozilla() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE),
                    horizPbar=isHorizontalProgressbar(widget);
-        int        animShift=-PROGRESS_CHUNK_WIDTH;
 
 #ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
          -> and if tey are they're drawn first incorrectly :-( */
@@ -3725,15 +3724,21 @@ debugDisplayWidget(widget, 3);
 
         if(pbar && STRIPE_NONE!=opts.stripedProgress)
         {
-            GdkRectangle rect={x, y, width-2, height-2};
-            int          stripeOffset;
+            GdkRectangle              rect={x, y, width-2, height-2};
+            GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
+                                        ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
+                                        : GTK_PROGRESS_LEFT_TO_RIGHT;
+            gboolean                  revProg=GTK_PROGRESS_LEFT_TO_RIGHT!=orientation;
+            int                       animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH,
+                                      stripeOffset;
 
             if(opts.animatedProgress && QTC_IS_PROGRESS_BAR(widget))
             {
                 if(!GTK_PROGRESS(widget)->activity_mode)
                     qtc_animation_progressbar_add((gpointer)widget);
 
-                animShift+=((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2);
+                animShift+=(revProg ? -1 : 1)*
+                           (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
             }
 
             constrainRect(&rect, area);

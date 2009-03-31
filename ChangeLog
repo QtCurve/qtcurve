@@ -1,3 +1,7 @@
+0.62.7
+------
+1. For right-to-left progressbars, make animation go right-to-left - matches KDE.
+
 0.62.6
 ------
 1. Alter meunbar item widths slightly to make more consistent with KDE4.
