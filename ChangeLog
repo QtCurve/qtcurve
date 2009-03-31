@@ -3,6 +3,7 @@
 1. Dont draw hover for disabled listviews.
 2. Stop animating progressbars when they reach max value.
 3. Fix 'bleeding' of Arora's progressbar.
+4. Don't round Arora's location bar popup.
 
 0.62.6
 ------

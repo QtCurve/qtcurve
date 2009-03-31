@@ -2645,9 +2645,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 if(sv && (opts.sunkenScrollViews || opts.squareScrollViews))
                 {
-                    if(opts.squareScrollViews)
+                    bool arora(APP_ARORA==theThemedApp && widget && !widget->parentWidget());
+
+                    if(opts.squareScrollViews || arora)
                     {
                         const QColor *use(backgroundColors(option));
+
+                        if(arora)
+                            painter->fillRect(r, palette.brush(QPalette::Base));
                         painter->setPen(use[QT_STD_BORDER]);
                         drawRect(painter, r);
                     }
