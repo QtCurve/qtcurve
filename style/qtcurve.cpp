@@ -3473,7 +3473,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         {
             const QStyleOptionViewItemV4 *v4Opt = qstyleoption_cast<const QStyleOptionViewItemV4*>(option);
             const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
-            bool hover = (option->state & State_MouseOver) && (!view ||
+            bool hover = state&State_MouseOver && state&State_Enabled && (!view ||
                          QAbstractItemView::NoSelection!=view->selectionMode()),
                  hasCustomBackground = v4Opt->backgroundBrush.style() != Qt::NoBrush &&
                                         !(option->state & State_Selected),

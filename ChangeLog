@@ -1,3 +1,7 @@
+0.62.7
+------
+1. Dont draw hover for disabled listviews.
+
 0.62.6
 ------
 1. Increase menubar item height by 1 pixel - seems to align better
