@@ -2968,7 +2968,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             ((TB *)tb)->initOpt(&opt);
                             bool horiz=Qt::NoToolBarArea==opt.toolBarArea || Qt::BottomToolBarArea==opt.toolBarArea || Qt::TopToolBarArea==opt.toolBarArea;
 
-                            if(horiz) // Should be!!!
+//                             if(horiz) // Should be!!!
                             {
                                 painter->save();
 
