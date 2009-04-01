@@ -1912,9 +1912,10 @@ static gboolean qtInit(Options *opts)
                 gboolean firefox=isMozApp(app, "firefox") || isMozApp(app, "iceweasel") ||
                                  isMozApp(app, "swiftfox") || isMozApp(app, "xulrunner"),
                          thunderbird=!firefox && isMozApp(app, "thunderbird"),
-                         mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird");
+                         mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird"),
+                         seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(app, "seamonkey");
 
-                if(firefox || thunderbird || mozThunderbird)
+                if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
 #ifdef QTC_MODIFY_MOZILLA
                     GdkColor *menu_col=SHADE_CUSTOM==opts->shadeMenubars
@@ -1940,7 +1941,7 @@ static gboolean qtInit(Options *opts)
 #endif
                                     GTK_APP_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts->menuitemAppearance &&
-                       (thunderbird || mozThunderbird))
+                       (thunderbird || mozThunderbird || seamonkey))
                         opts->menuitemAppearance=APPEARANCE_GRADIENT;
                 }
                 else if(0==strcmp(app, "soffice.bin"))

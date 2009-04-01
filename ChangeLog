@@ -1,6 +1,7 @@
 0.62.7
 ------
 1. For right-to-left progressbars, make animation go right-to-left - matches KDE.
+2. Detect seamonkey as a Mozilla app.
 
 0.62.6
 ------
