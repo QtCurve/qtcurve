@@ -30,7 +30,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <dirent.h>
 
 #define QTC_READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
 #define QTC_RC_SETTING "QtC__"
@@ -304,6 +307,51 @@ enum
     RD_LIST_SHADE        = 0x1000,
     RD_KDE4_PAL          = 0x2000,
 };
+
+/*
+ Try to determine if a mozilla app is >= v3.  Tested with:
+
+Mozilla Firefox 3.0.8, Copyright (c) 1998 - 2009 mozilla.org
+ Thunderbird 2.0.0.21, Copyright (c) 1998-2009 mozilla.org
+ Thunderbird 3.0b2, Copyright (c) 1998-2009 mozilla.org
+Mozilla XULRunner 1.9.0.8 - 2009032711
+
+To get the verison number:
+1. Get the command-line from /proc/<pid>/cmdline - so Linux specific
+2. Append --version to this, and call the application
+3. Look for the fist '.' in the returned string
+4. Look at the character to the left of that, if it is a digit and >2  then
+   we assume this is a new mozilla app...
+
+...what a pain...
+*/
+
+static gboolean isNewMozilla(int pid)
+{
+    char     cmdline[MAX_LINE_LEN+11];
+    gboolean newMoz=FALSE;
+    int      procFile=-1;
+
+    sprintf(cmdline, "/proc/%d/cmdline", pid);
+
+    if(-1!=(procFile=open(cmdline, O_RDONLY)))
+    {
+        if(read(procFile, cmdline, MAX_LINE_LEN)>2)
+        {
+            char *version=0L;
+            strcat(cmdline, " --version");
+            if(g_spawn_command_line_sync(cmdline, &version, NULL, NULL, NULL))
+            {
+                char *dot=strchr(version, '.');
+
+                newMoz=dot && dot!=version && isdigit(dot[-1]) && dot[-1]>'2';
+            }
+        }
+        close(procFile);
+    }
+
+    return newMoz;
+}
 
 static char * getKdeHome()
 {
@@ -1182,12 +1230,6 @@ static void readQtRc(const char *rc, int rd, Options *opts, gboolean absolute, g
 static int qt_refs=0;
 
 #define MAX_APP_NAME_LEN 32
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <dirent.h>
 
 #define KDE_CFG_DIR         "/share/config/"
 #define KDEGLOBALS_FILE     KDE_CFG_DIR"kdeglobals"
@@ -1940,6 +1982,8 @@ static gboolean qtInit(Options *opts)
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
+                    if(GTK_APP_MOZILLA==qtSettings.app && isNewMozilla(getpid()))
+                        qtSettings.app=GTK_APP_NEW_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts->menuitemAppearance &&
                        (thunderbird || mozThunderbird || seamonkey))
                         opts->menuitemAppearance=APPEARANCE_GRADIENT;
