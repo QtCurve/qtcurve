@@ -3319,9 +3319,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 isFlat = (button->features & QStyleOptionButton::Flat);
             }
 
+            if(!(opt.state&State_Enabled))
+                opt.state&=~State_MouseOver;
+
             isDefault=isDefault || (doEtch && QTC_FULL_FOCUS && MO_GLOW==opts.coloredMouseOver &&
-                                    state&State_HasFocus && state&State_Enabled);
-            if(isFlat && !isDown && !(state&State_MouseOver))
+                                    opt.state&State_HasFocus && opt.state&State_Enabled);
+            if(isFlat && !isDown && !(opt.state&State_MouseOver))
                 return;
 
             painter->save();
