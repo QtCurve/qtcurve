@@ -1537,14 +1537,16 @@ static char * getAppName()
                       "{ background-color : HighlightText !important; color: HighlightText !important; } "\
                       "/* "QTC_GUARD_STR" */\n"
 
-#define CSS_FILE_STR  "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve.css\"); /* "QTC_GUARD_STR" */\n"
+#define CSS_FILE_STR     "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve.css\"); /* "QTC_GUARD_STR" */\n"
+#define BTN_CSS_FILE_STR "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve-KDEButtonOrder.css\"); /* "QTC_GUARD_STR" */\n"
 
-static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu_colors)
+static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_menu_colors)
 {
     FILE        *f=fopen(file, "r");
     char        *contents=NULL;
-    gboolean    remove_css=FALSE,
-                remove_menu_colors=FALSE;
+    gboolean    remove_btn_css=FALSE,
+                remove_menu_colors=FALSE,
+                add_css=TRUE;
     struct stat st;
     size_t      file_size=0,
                 new_size=0;
@@ -1567,27 +1569,26 @@ static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu
                 {
                     gboolean write_line=TRUE;
 
-                    if(0==strcmp(line, CSS_FILE_STR))
+                    if(0==strcmp(line, BTN_CSS_FILE_STR))
                     {
-                        if (add_css)
-                            add_css=FALSE;
+                        if (add_btn_css)
+                            add_btn_css=FALSE;
                         else
                         {
-                            remove_css=TRUE;
+                            remove_btn_css=TRUE;
                             write_line=FALSE;
                         }
                     }
-                    else
+                    else if(0==strcmp(line, CSS_FILE_STR))
+                        add_css=FALSE;
+                    else if(0==strcmp(line, MENU_TEXT_STR))
                     {
-                        if(0==strcmp(line, MENU_TEXT_STR))
+                        if (add_menu_colors)
+                            add_menu_colors=FALSE;
+                        else
                         {
-                            if (add_menu_colors)
-                                add_menu_colors=FALSE;
-                            else
-                            {
-                                remove_menu_colors=TRUE;
-                                write_line=FALSE;
-                            }
+                            remove_menu_colors=TRUE;
+                            write_line=FALSE;
                         }
                     }
                     if(write_line)
@@ -1601,11 +1602,11 @@ static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu
         fclose(f);
     }
 
-    if(!contents || add_css || add_menu_colors)
+    if(!contents || add_btn_css || add_menu_colors || add_css)
     {
         if(!contents)
         {
-            new_size=strlen(MENU_TEXT_STR)+strlen(CSS_FILE_STR)+3;
+            new_size=strlen(MENU_TEXT_STR)+strlen(BTN_CSS_FILE_STR)+strlen(CSS_FILE_STR)+4;
 
             contents=(char *)malloc(new_size);
             if(contents)
@@ -1614,7 +1615,7 @@ static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu
 
         if(contents)
         {
-            if(add_css)  /* CSS needs to be on 1st line */
+            if(add_css)
             {
                 char *css_contents=(char *)malloc(new_size);
 
@@ -1622,6 +1623,19 @@ static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu
                 {
                     css_contents[0]='\0';
                     strcat(css_contents, CSS_FILE_STR);
+                    strcat(css_contents, contents);
+                    free(contents);
+                    contents=css_contents;
+                }
+            }
+            if(add_btn_css)
+            {
+                char *css_contents=(char *)malloc(new_size);
+
+                if(css_contents)
+                {
+                    css_contents[0]='\0';
+                    strcat(css_contents, BTN_CSS_FILE_STR);
                     strcat(css_contents, contents);
                     free(contents);
                     contents=css_contents;
@@ -1638,7 +1652,7 @@ static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu
         }
     }
 
-    if(contents && (add_css || remove_css || add_menu_colors || remove_menu_colors))
+    if(contents && (add_btn_css || remove_btn_css || add_menu_colors || remove_menu_colors))
     {
         f=fopen(file, "w");
 
@@ -1651,7 +1665,7 @@ static void processUserChromeCss(char *file, gboolean add_css, gboolean add_menu
     }
 }
 
-static void processMozillaApp(gboolean add_css, gboolean add_menu_colors, char *app, gboolean under_moz)
+static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, char *app, gboolean under_moz)
 {
     const char *home=getHome();
 
@@ -1675,33 +1689,36 @@ static void processMozillaApp(gboolean add_css, gboolean add_menu_colors, char *
                     ((str=strstr(dir_ent->d_name, CSS_DEFAULT_ALT)) && str==dir_ent->d_name &&
                     '\0'!=str[strlen(CSS_DEFAULT_ALT)]))
                  {
-                     char        sub[MAX_CSS_HOME];
-                     struct stat statbuf;
+                    char        sub[MAX_CSS_HOME];
+                    struct stat statbuf;
 
 #ifdef QTC_MODIFY_MOZILLA_USER_JS
-                     /* Add custom user.js file */
-                     sprintf(sub, "%s%s/user.js", cssHome, dir_ent->d_name);
-                     if(-1==lstat(sub, &statbuf))
-                     {
-                         FILE *in=NULL;
+                    /* Add custom user.js file */
 
-                         sprintf(sub, QTC_MOZILLA_DIR"/%s-user.js", app);
+                    sprintf(sub, "%s%s/user.js", cssHome, dir_ent->d_name);
+                    if(-1==lstat(sub, &statbuf))
+                    {
+                        FILE *in=NULL;
 
-                         if((in=fopen(sub, "r")))
-                         {
-                             FILE *out=fopen(sub, "w");
+                        sprintf(sub, QTC_MOZILLA_DIR"/%s-user.js", app);
 
-                             if(out)
-                             {
-                                 char ch;
+                        if((in=fopen(sub, "r")))
+                        {
+                            FILE *out=NULL;
 
-                                 while((ch=fgetc(in))!=EOF)
-                                     fputc(ch, out);
-                                 fclose(out);
-                             }
-                             fclose(in);
-                         }
-                     }
+                            sprintf(sub, "%s%s/user.js", cssHome, dir_ent->d_name);
+
+                            if((out=fopen(sub, "w")))
+                            {
+                                char ch;
+
+                                while((ch=fgetc(in))!=EOF)
+                                    fputc(ch, out);
+                                fclose(out);
+                            }
+                            fclose(in);
+                        }
+                    }
 #endif
 
                      /* Now do userChrome.css */
@@ -1710,7 +1727,7 @@ static void processMozillaApp(gboolean add_css, gboolean add_menu_colors, char *
                      if(-1!=lstat(sub, &statbuf) && S_ISDIR(statbuf.st_mode))
                      {
                          strcat(sub, USER_CHROME_FILE);
-                         processUserChromeCss(sub, add_css, add_menu_colors);
+                         processUserChromeCss(sub, add_btn_css, add_menu_colors);
                      }
                  }
              }
@@ -1965,11 +1982,8 @@ static gboolean qtInit(Options *opts)
                     GdkColor *menu_col=SHADE_CUSTOM==opts->shadeMenubars
                                         ? &opts->customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
-                    gboolean add_menu_colors=FALSE;
-
-                    if(SHADE_BLEND_SELECTED==opts->shadeMenubars || (SHADE_CUSTOM==opts->shadeMenubars &&
-                                                               TOO_DARK(*menu_col) ))
-                        add_menu_colors=TRUE;
+                    gboolean add_menu_colors=SHADE_BLEND_SELECTED==opts->shadeMenubars ||
+                                             (SHADE_CUSTOM==opts->shadeMenubars && TOO_DARK(*menu_col) );
 
                     if(firefox)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "firefox", TRUE);
