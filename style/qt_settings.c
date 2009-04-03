@@ -326,11 +326,11 @@ To get the verison number:
 ...what a pain...
 */
 
-static gboolean isNewMozilla(int pid)
+static int getMozillaVersion(int pid)
 {
-    char     cmdline[MAX_LINE_LEN+11];
-    gboolean newMoz=FALSE;
-    int      procFile=-1;
+    char cmdline[MAX_LINE_LEN+11];
+    int  ver=0,
+         procFile=-1;
 
     sprintf(cmdline, "/proc/%d/cmdline", pid);
 
@@ -344,13 +344,14 @@ static gboolean isNewMozilla(int pid)
             {
                 char *dot=strchr(version, '.');
 
-                newMoz=dot && dot!=version && isdigit(dot[-1]) && dot[-1]>'2';
+                if(dot && dot!=version && isdigit(dot[-1]))
+                    ver=dot[-1]-'0';
             }
         }
         close(procFile);
     }
 
-    return newMoz;
+    return ver;
 }
 
 static char * getKdeHome()
@@ -1956,6 +1957,7 @@ static gboolean qtInit(Options *opts)
                          thunderbird=!firefox && isMozApp(app, "thunderbird"),
                          mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(app, "seamonkey");
+                int      mozVersion=0;
 
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
@@ -1982,10 +1984,13 @@ static gboolean qtInit(Options *opts)
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
-                    if(GTK_APP_MOZILLA==qtSettings.app && isNewMozilla(getpid()))
+
+                    if(GTK_APP_MOZILLA==qtSettings.app)
+                        mozVersion=getMozillaVersion(getpid());
+                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>2)
                         qtSettings.app=GTK_APP_NEW_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts->menuitemAppearance &&
-                       (thunderbird || mozThunderbird || seamonkey))
+                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<2)))
                         opts->menuitemAppearance=APPEARANCE_GRADIENT;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
