@@ -2912,6 +2912,9 @@ debugDisplayWidget(widget, 3);
                     break;
             }
 
+        if(isSpinButton && isFixedWidget(widget) && (isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app))
+            x--;
+
         if(isSpinButton && !QTC_DO_EFFECT)
             if(GTK_ARROW_UP==arrow_type)
                 y--;

@@ -4,7 +4,7 @@
 2. Detect seamonkey as a Mozilla app.
 3. Try to determine if a Mozilla app is new, or not, by calling <app> --version
 4. Fix OO.o scrollbars when using flat scrollbar buttons.
-5. Improve Mozilla and OO.o spin widgets - not perfect, but better.
+5. Improve Mozilla and OO.o spin widgets.
 6. Fix OO.o comboboxes.
 7. Shrink size of Firefox toolbars - but only if '-DQTC_MODIFY_MOZILLA=true' is
    passed to cmake. This modifies your ~/.mozilla/firefox/???.default/chrome/userChrome.css
