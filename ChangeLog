@@ -3,6 +3,7 @@
 1. For right-to-left progressbars, make animation go right-to-left - matches KDE.
 2. Detect seamonkey as a Mozilla app.
 3. Try to determine if a Mozilla app is new, or not, by calling <app> --version
+4. Fix OO.o scrollbars when using flat scrollbar buttons.
 
 0.62.6
 ------

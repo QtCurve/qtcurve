@@ -854,11 +854,13 @@ static int progressbarRound(GtkWidget *widget, gboolean rev)
     }
 }
 
-static gboolean isMozillaWidget(GtkWidget *widget)
+static gboolean isFixedWidget(GtkWidget *widget)
 {
-    return isMozilla() && widget && widget->parent && widget->parent->parent &&
+    return widget && widget->parent && widget->parent->parent &&
            GTK_IS_FIXED(widget->parent) && GTK_IS_WINDOW(widget->parent->parent);
 }
+
+#define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
 
 static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down, int sliderWidth, int sliderHeight)
 {
@@ -3251,6 +3253,16 @@ debugDisplayWidget(widget, 3);
                 }
 #endif
 
+                if(GTK_APP_OPEN_OFFICE==qtSettings.app && opts.flatSbarButtons && slider &&
+                   (SCROLLBAR_KDE==opts.scrollbarType || SCROLLBAR_WINDOWS==opts.scrollbarType) &&
+                   widget && GTK_IS_RANGE(widget) && isFixedWidget(widget))
+                {
+                    if (GTK_RANGE(widget)->orientation!=GTK_ORIENTATION_HORIZONTAL)
+                        y++, height--;
+                    else
+                        x+=2, width-=2;
+                }
+
                 if(defBtn && IND_TINT==opts.defBtnIndicator)
                     btn_colors=qtcPalette.defbtn;
 
@@ -3581,6 +3593,13 @@ debugDisplayWidget(widget, 3);
                         drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y+height-1, width);
                 }
                 unsetCairoClipping(cr);
+            }
+            else if(GTK_APP_OPEN_OFFICE==qtSettings.app && opts.flatSbarButtons && isFixedWidget(widget))
+            {
+                if (horiz)
+                    width--;
+                else
+                    height--;
             }
 
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
