@@ -1791,11 +1791,19 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
                      GtkWidget *widget, int x, int y, int w, int h, gboolean raised,
                      int round, EWidget wid)
 {
-    double xd=x+0.5,
-           yd=y+0.5,
-           radius=getRadius(opts.round, w, h, wid, RADIUS_ETCH);
+    double       xd=x+0.5,
+                 yd=y+0.5,
+                 radius=getRadius(opts.round, w, h, wid, RADIUS_ETCH);
+    GdkRectangle *a=area,
+                 b;
 
-    setCairoClipping(cr, area, region);
+    if(WIDGET_COMBO_BUTTON==wid && GTK_APP_OPEN_OFFICE==qtSettings.app && widget && isFixedWidget(widget->parent))
+    {
+        b.x=x+2; b.y=y; b.width=w-4; b.height=h;
+        a=&b;
+    }
+        
+    setCairoClipping(cr, a, region);
 
     cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
     if(!raised)
@@ -1952,7 +1960,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     }
     else
         setCairoClipping(cr, area, region);
-        
+
     if(!colouredMouseOver && lightBorder)
     {
         GdkColor *col=&colors[QTC_LIGHT_BORDER(app)];
@@ -3019,13 +3027,22 @@ debugDisplayWidget(widget, 3);
 
     if(spinUp || spinDown)
     {
-        EWidget wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
+        EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
+        GdkRectangle *a=area,
+                     b;
+        gboolean     ooOrMoz=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
 
+        if(!a && isFixedWidget(widget) && ooOrMoz)
+        {
+            b.x=x; b.y=y; b.width=width; b.height=height;
+            a=&b;
+        }
+        
         if(WIDGET_SPIN_UP==wid)
         {
             if(QTC_DO_EFFECT)
             {
-                drawEtch(cr, area, NULL, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
+                drawEtch(cr, a, NULL, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
                 y++;
                 width--;
             }
@@ -3036,13 +3053,14 @@ debugDisplayWidget(widget, 3);
             GdkRectangle clip;
 
             clip.x=x-2, clip.y=y, clip.width=width+2, clip.height=height;
-            drawEtch(cr, &clip, NULL, widget, x-2, y-2, width+2, height+2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
+            drawEtch(cr, ooOrMoz ? a : &clip, NULL, widget, x-2, y-2, width+2, height+2, FALSE,
+                     ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
             height--;
             width--;
         }
 
         drawBgnd(cr, &btn_colors[bgnd], widget, area, x+1, y+1, width-2, height-2);
-        drawLightBevel(cr, style, window, state, area, NULL, x, y, width, 
+        drawLightBevel(cr, style, window, state, area, NULL, x, y, width,
                        height-(WIDGET_SPIN_UP==wid && QTC_DO_EFFECT ? 1 : 0), &btn_colors[bgnd],
                        btn_colors, round, wid, BORDER_FLAT,
                        DF_DO_CORNERS|DF_DO_BORDER|

@@ -4,6 +4,8 @@
 2. Detect seamonkey as a Mozilla app.
 3. Try to determine if a Mozilla app is new, or not, by calling <app> --version
 4. Fix OO.o scrollbars when using flat scrollbar buttons.
+5. Improve Mozilla and OO.o spin widgets - not perfect, but better.
+6. Fix OO.o comboboxes.
 
 0.62.6
 ------
