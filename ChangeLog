@@ -6,8 +6,8 @@
 4. Fix OO.o scrollbars when using flat scrollbar buttons.
 5. Improve Mozilla and OO.o spin widgets.
 6. Fix OO.o comboboxes.
-7. Shrink size of Firefox toolbars - but only if '-DQTC_MODIFY_MOZILLA=true' is
-   passed to cmake. This modifies your ~/.mozilla/firefox/???.default/chrome/userChrome.css
+7. Shrink (by 2 pixels) size of Firefox toolbars - but only if '-DQTC_MODIFY_MOZILLA=true'
+   is passed to cmake. This modifies your ~/.mozilla/firefox/???.default/chrome/userChrome.css
    file to include /usr/share/themes/QtCurve/mozilla/QtCurve.css file.
 8. Fix KDE button order in FireFox 3 dialogs - but only if '-DQTC_MODIFY_MOZILLA=true'
    is passed to cmake.
