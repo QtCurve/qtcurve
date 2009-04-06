@@ -1,3 +1,7 @@
+0.62.8
+------
+1. Don't round KMix's popup.
+
 0.62.7
 ------
 1. Dont draw hover for disabled listviews.

@@ -367,6 +367,7 @@ static enum
     APP_KONQUEROR,
     APP_KONTACT,
     APP_ARORA,
+    APP_KMIX,
 #ifdef QTC_XBAR_SUPPORT
     APP_QTDESIGNER,
 #endif
@@ -1016,6 +1017,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_SKYPE;
         else if("arora"==appName)
             theThemedApp=APP_ARORA;
+        else if("kmix"==appName)
+            theThemedApp=APP_KMIX;
 #ifdef QTC_XBAR_SUPPORT
         else if("Designer"==QCoreApplication::applicationName())
             theThemedApp=APP_QTDESIGNER;
@@ -2684,7 +2687,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             opt.state&=~State_HasFocus;
 
                         drawBorder(painter, r, &opt,
-                                   ROUNDED_ALL, backgroundColors(option),
+                                   opts.round && APP_KMIX==theThemedApp && widget && widget->parentWidget() &&
+                                   qobject_cast<const QFrame *>(widget) && 0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")
+                                   ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
                                    sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
                                                           ? BORDER_SUNKEN
                                                             : state&State_Raised
