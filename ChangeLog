@@ -8,6 +8,7 @@
    QTC_MODIFY_MOZILLA option - as the KDE button order is affeced by the
    instantApply setting. (If the KDE button order is set, and instantApply is
    set to true, then the Firefox prefences dialog's 'Cancel' button has no text!)
+5. Draw Mozilla's scrolled windows square - as it seems to assume they all are.
 
 0.62.7
 ------

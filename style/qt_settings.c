@@ -2444,6 +2444,14 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string(tmpStr);
             }
 
+            /* Mozilla seems to assume that all scrolledviews are square :-(
+               So, set the xthickness and ythickness to 1, and in qtcurve.c draw these as sqare */
+            if(isMozilla())
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"SVm\""
+                                    " { xthickness=1 ythickness=1 } "
+                                    "widget_class \"GtkWindow.GtkFixed.GtkScrolledWindow\" style \""QTC_RC_SETTING"SVm\"");
+            
+
             if(tmpStr)
                 free(tmpStr);
         }

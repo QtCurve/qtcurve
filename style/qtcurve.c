@@ -4120,7 +4120,8 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
                 if(scrolledWindow)
                 {
-                    if(opts.squareScrollViews)
+                    /* See code in qt_settings.c as to isMozill part */
+                    if(opts.squareScrollViews || isMozillaWidget(widget))
                     {
                         drawBorder(cr, style, state, area, NULL, x, y, width, height,
                                    NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_SCROLLVIEW, 0);
