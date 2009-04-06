@@ -3,6 +3,11 @@
 1. Treat 'abrowser' as Firefox.
 2. Disable tab-mouse over for all tabs that are of the type
    GtkNoteBook.GtkFixed.GtkWindow (this is for mainly Mozilla and OO.o widgets)
+3. Fix OK/Cancel buttons for all Firefox3 dialogs.
+4. Removed QTC_MODIFY_MOZILLA_USER_JS cmake option, thsi is now set via the
+   QTC_MODIFY_MOZILLA option - as the KDE button order is affeced by the
+   instantApply setting. (If the KDE button order is set, and instantApply is
+   set to true, then the Firefox prefences dialog's 'Cancel' button has no text!)
 
 0.62.7
 ------

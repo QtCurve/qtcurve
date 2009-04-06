@@ -1692,9 +1692,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                     char        sub[MAX_CSS_HOME];
                     struct stat statbuf;
 
-#ifdef QTC_MODIFY_MOZILLA_USER_JS
                     /* Add custom user.js file */
-
                     sprintf(sub, "%s%s/user.js", cssHome, dir_ent->d_name);
                     if(-1==lstat(sub, &statbuf))
                     {
@@ -1719,7 +1717,6 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                             fclose(in);
                         }
                     }
-#endif
 
                      /* Now do userChrome.css */
                      sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name, USER_CHROME_DIR);

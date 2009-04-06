@@ -15,13 +15,13 @@ The following options may be supplied to cmake:
         Thunderbird is *always* treated as being of an old Mozilla style.
 
     -DQTC_MODIFY_MOZILLA=true
-        Enable mods to userChrome.css
+        Modify userChrome.css
             - setting KDE button order
             - shrink size of toolbars
-
-    -DQTC_MODIFY_MOZILLA_USER_JS=true
-        Enable mods to user.js (setting of instant apply, and
-        move ~/.mime.types and ~/.mailcap into ~/.mozilla)
+        Edit user.js
+            - disable instant apply
+            - move ~/.mime.types and ~/.mailcap into ~/.mozilla
+            - setup mailto protocol handler
 
     -DQTC_REORDER_GTK_DIALOG_BUTTONS=true
        When set QtCurve will try to manually re-order the buttons of Gtk
