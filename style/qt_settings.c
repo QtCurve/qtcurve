@@ -1691,45 +1691,51 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                  {
                     char        sub[MAX_CSS_HOME];
                     struct stat statbuf;
+                    FILE        *userJs=NULL;
+                    gboolean    alterUserJs=TRUE;
 
                     /* Add custom user.js file */
                     sprintf(sub, "%s%s/user.js", cssHome, dir_ent->d_name);
-                    if(-1==lstat(sub, &statbuf))
+
+                    if((userJs=fopen(sub, "r")))
                     {
-                        FILE *in=NULL;
-
-                        sprintf(sub, QTC_MOZILLA_DIR"/%s-user.js", app);
-
-                        if((in=fopen(sub, "r")))
-                        {
-                            FILE *out=NULL;
-
-                            sprintf(sub, "%s%s/user.js", cssHome, dir_ent->d_name);
-
-                            if((out=fopen(sub, "w")))
+                        char  *line=NULL;
+                        size_t len=0;
+                        
+                        while(-1!=getline(&line, &len, userJs))
+                            if(NULL!=strstr(line, "browser.preferences.instantApply"))
                             {
-                                char ch;
-
-                                while((ch=fgetc(in))!=EOF)
-                                    fputc(ch, out);
-                                fclose(out);
+                                /* If instant-apply is set to true, then we cannot alter button order,
+                                   as this produces sde effects (such as the preferences dialog's close
+                                   button having no text! */
+                                if(NULL!=strstr(line, "true"))
+                                    add_btn_css=FALSE;
+                                alterUserJs=FALSE;
+                                break;
                             }
-                            fclose(in);
-                        }
+                        fclose(userJs);
+                        if (line)
+                            free(line);
                     }
 
-                     /* Now do userChrome.css */
-                     sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name, USER_CHROME_DIR);
+                    if(alterUserJs && ((userJs=fopen(sub, "a"))))
+                    {
+                        fputs("\nuser_pref(\"browser.preferences.instantApply\", false);\n", userJs);
+                        fclose(userJs);
+                    }
 
-                     if(-1!=lstat(sub, &statbuf) && S_ISDIR(statbuf.st_mode))
-                     {
-                         strcat(sub, USER_CHROME_FILE);
-                         processUserChromeCss(sub, add_btn_css, add_menu_colors);
-                     }
-                 }
-             }
+                    /* Now do userChrome.css */
+                    sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name, USER_CHROME_DIR);
 
-             closedir(dir);
+                    if(-1!=lstat(sub, &statbuf) && S_ISDIR(statbuf.st_mode))
+                    {
+                        strcat(sub, USER_CHROME_FILE);
+                        processUserChromeCss(sub, add_btn_css, add_menu_colors);
+                    }
+                }
+            }
+
+            closedir(dir);
         }
     }
 }
