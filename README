@@ -20,8 +20,6 @@ The following options may be supplied to cmake:
             - shrink size of toolbars
         Edit user.js
             - disable instant apply
-            - move ~/.mime.types and ~/.mailcap into ~/.mozilla
-            - setup mailto protocol handler
 
     -DQTC_REORDER_GTK_DIALOG_BUTTONS=true
        When set QtCurve will try to manually re-order the buttons of Gtk
