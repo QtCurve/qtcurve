@@ -5096,7 +5096,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
 
 static gboolean isMozillaTab(GtkWidget *widget)
 {
-    return isMozillaWidget(widget) && GTK_IS_NOTEBOOK(widget);
+    return /*isMozillaWidget(widget) */ isFixedWidget(widget) && GTK_IS_NOTEBOOK(widget);
 }
 
 static void gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType state,

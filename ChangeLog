@@ -1,3 +1,9 @@
+0.62.8
+------
+1. Treat 'abrowser' as Firefox.
+2. Disable tab-mouse over for all tabs that are of the type
+   GtkNoteBook.GtkFixed.GtkWindow (this is for mainly Mozilla and OO.o widgets)
+
 0.62.7
 ------
 1. For right-to-left progressbars, make animation go right-to-left - matches KDE.

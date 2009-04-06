@@ -1970,7 +1970,8 @@ static gboolean qtInit(Options *opts)
             if((app=getAppName()))
             {
                 gboolean firefox=isMozApp(app, "firefox") || isMozApp(app, "iceweasel") ||
-                                 isMozApp(app, "swiftfox") || isMozApp(app, "xulrunner"),
+                                 isMozApp(app, "swiftfox") || isMozApp(app, "xulrunner") ||
+                                 isMozApp(app, "abrowser"),
                          thunderbird=!firefox && isMozApp(app, "thunderbird"),
                          mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(app, "seamonkey");
