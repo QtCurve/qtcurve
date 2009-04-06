@@ -2,12 +2,12 @@
 ------
 1. Treat 'abrowser' as Firefox.
 2. Disable tab-mouse over for all tabs that are of the type
-   GtkNoteBook.GtkFixed.GtkWindow (this is for mainly Mozilla and OO.o widgets)
+   GtkNoteBook.GtkFixed.GtkWindow (this is mainly for Mozilla and OO.o widgets)
 3. Fix OK/Cancel buttons for all Firefox3 dialogs.
 4. Removed QTC_MODIFY_MOZILLA_USER_JS cmake option, this is now set via the
    QTC_MODIFY_MOZILLA option - as the KDE button order is affected by the
    instantApply setting.
-5. Draw Mozilla's scrolled windows square - as it seems to assume they all are.
+5. Draw Mozilla's scrolled windows square - as it seems to assume they are.
 
 0.62.7
 ------
