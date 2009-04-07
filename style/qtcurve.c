@@ -948,8 +948,15 @@ static GdkColor * getParentBgCol(GtkWidget *widget)
     if(GTK_IS_SCROLLBAR(widget))
         widget=widget->parent;
 
-    return widget && widget->parent && widget->parent->style
-               ? &(widget->parent->style->bg[widget->parent->state])
+    if(widget)
+    {
+        widget=widget->parent;
+        while(widget && GTK_IS_BOX(widget))
+            widget=widget->parent;
+    }
+
+    return widget && widget->style
+               ? &(widget->style->bg[widget->state])
                : NULL;
 }
 

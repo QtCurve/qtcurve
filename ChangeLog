@@ -8,6 +8,8 @@
    QTC_MODIFY_MOZILLA option - as the KDE button order is affected by the
    instantApply setting.
 5. Draw Mozilla's scrolled windows square - as it seems to assume they are.
+6. When determinging lower etch colour, ignore GtkBox widgets when looking up
+   parent tree.
 
 0.62.7
 ------
