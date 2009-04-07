@@ -2265,6 +2265,17 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
         if(doEtch)
             cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-3);
+        if(opts.round>ROUND_FULL)
+        {
+            if(round&CORNER_TL)
+                cairo_rectangle(cr, x+2.5, y+2.5, 1, 1);
+            if(round&CORNER_BL)
+                cairo_rectangle(cr, x+2.5, y+height-3.5, 1, 1);
+            if(round&CORNER_TR)
+                cairo_rectangle(cr, x+width-2.5, y+2.5, 1, 1);
+            if(round&CORNER_BR)
+                cairo_rectangle(cr, x+width-2.5, y+height-3.5, 1, 1);
+        }
         cairo_set_line_width(cr, 1);
         cairo_stroke(cr);
         unsetCairoClipping(cr);
