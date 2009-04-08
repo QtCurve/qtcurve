@@ -145,13 +145,25 @@ enum QtPallete
     PAL_NUMPALS
 };
 
+enum QtFont
+{
+    FONT_GENERAL,
+    FONT_MENU,
+    FONT_TOOLBAR,
+
+    FONT_NUM_STD,
+
+    FONT_BOLD = FONT_NUM_STD,
+
+    FONT_NUM_TOTAL
+};
+
 struct QtData
 {
     GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS],
                     inactiveSelectCol;
-    char            *font,
+    char            *fonts[FONT_NUM_TOTAL],
                     *icons,
-                    *boldfont,
                     *styleName;
     GtkToolbarStyle toolbarStyle;
     struct QtIcons  iconSizes;
@@ -306,6 +318,9 @@ enum
     RD_STYLE             = 0x0800,
     RD_LIST_SHADE        = 0x1000,
     RD_KDE4_PAL          = 0x2000,
+
+    RD_MENU_FONT         = 0x4000,
+    RD_TB_FONT           = 0x8000
 };
 
 /*
@@ -566,19 +581,35 @@ static gboolean readBool(const char *line, int offset)
     return line[offset]!='\0' ? 0==strncmp_i(&line[offset], "true", 4) : false;
 }
 
-static void parseFontLine(const char *line, int *weight, int *italic, int *fixedW, float *size,
-                          char *family, char *foundry)
+typedef struct
 {
-    int   n=-1,
-          rc_weight=WEIGHT_NORMAL,
-          rc_italic=0,
-          rc_fixedW=0;
-    float rc_size=12.0;
-    char  *l,
-          *rc_family=NULL,
-          *rc_foundry=NULL,
-          fontLine[QTC_MAX_INPUT_LINE_LEN+1];
+    int   weight,
+          italic,
+          fixedW;
+    float size;
+    char  family[QTC_MAX_INPUT_LINE_LEN+1];
+} QtFontDetails;
 
+static void initFont(QtFontDetails *f, gboolean setFamily)
+{
+    f->weight=WEIGHT_NORMAL,
+    f->italic=0;
+    f->fixedW=0;
+    f->size=DEFAULT_KDE_FONT_SIZE;
+    if(setFamily)
+        strcpy(f->family, DEFAULT_KDE_FONT);
+    else
+        f->family[0]='\0';
+}
+
+static void parseFontLine(const char *line, QtFontDetails *font)
+{
+    int           n=-1;
+    char          *l,
+                  fontLine[QTC_MAX_INPUT_LINE_LEN+1];
+    QtFontDetails rc;
+
+    initFont(&rc, FALSE);
     memcpy(fontLine, line, QTC_MAX_INPUT_LINE_LEN+1);
     l=strtok(fontLine, "=");
 
@@ -588,110 +619,89 @@ static void parseFontLine(const char *line, int *weight, int *italic, int *fixed
         {
             case 0:  /* Family - and foundry(maybe!) (ignore X11 and XFT) */
             {
-                char *ob=NULL,
-                        *cb=NULL;
+                char *dash=NULL;
 
-                if(NULL!=(ob=strchr(l, '[')) && ob!=l && NULL!=(cb=strchr(l, ']')))
+                if(NULL!=(dash=strchr(l, '-')))
                 {
-                    ob[-1]='\0';
-                    *cb='\0';
-                    rc_foundry=&(ob[1]);
-
-                    if(0==strcmp_i(rc_foundry, "xft") ||
-                        0==strcmp_i(rc_foundry, "x11"))
-                        rc_foundry=NULL;
-                }
-                else  /* Sometimes .kderc has "adobe-helvetica" */
-                {
-                    char *dash=NULL;
-
-                    if(NULL!=(dash=strchr(l, '-')))
-                    {
-                        rc_foundry=l;
-                        *dash='\0';
-                        l=++dash;
-                    }
+                    *dash='\0';
+                    l=++dash;
                 }
 
-                rc_family=l;
+                strcpy(rc.family, l);
                 break;
             }
             case 1:  /* Point size */
-                sscanf(l, "%f", &rc_size);
+                sscanf(l, "%f", &rc.size);
                 break;
             case 4:  /* Weight */
-                sscanf(l, "%d", &rc_weight);
+                sscanf(l, "%d", &rc.weight);
                 break;
             case 5:  /* Slant */
-                sscanf(l, "%d", &rc_italic);
+                sscanf(l, "%d", &rc.italic);
                 break;
             case 8:  /* Spacing */
-                sscanf(l, "%d", &rc_fixedW);
+                sscanf(l, "%d", &rc.fixedW);
                 break;
             default:
                 break;
         }
 
         n++;
-        if(n>8 && NULL!=family)
+        if(n>8 && '\0'!=font->family[0])
         {
-            *weight=rc_weight;
-            *italic=rc_italic;
-            *fixedW=rc_fixedW;
-            *size=rc_size;
-            strcpy(family, rc_family);
-            if(NULL==rc_foundry)
-                foundry[0]='\0';
-            else
-                strcpy(foundry, rc_foundry);
+            font->weight=rc.weight;
+            font->italic=rc.italic;
+            font->fixedW=rc.fixedW;
+            font->size=rc.size;
+            strcpy(font->family, rc.family);
             break;
         }
         l=strtok(NULL, ",");
     }
 }
 
-static void setFont(int weight, int italic, int fixedW, float size, const char *family, const char *foundry)
+static void setFont(QtFontDetails *font, int f)
 {
-    if(qtSettings.font)
+    if(qtSettings.fonts[f])
     {
-        free(qtSettings.font);
-        qtSettings.font=NULL;
+        free(qtSettings.fonts[f]);
+        qtSettings.fonts[f]=NULL;
     }
-    if(qtSettings.boldfont)
+    if(FONT_GENERAL==f && qtSettings.fonts[FONT_BOLD])
     {
-        free(qtSettings.boldfont);
-        qtSettings.boldfont=NULL;
+        free(qtSettings.fonts[FONT_BOLD]);
+        qtSettings.fonts[FONT_BOLD]=NULL;
     }
 
-    qtSettings.font=(char *)malloc(
-        strlen(family) + 1 +
-        strlen(weightStr(weight)) + 1 +
-        strlen(italicStr(italic)) + 1 +
+    qtSettings.fonts[f]=(char *)malloc(
+        strlen(font->family) + 1 +
+        strlen(weightStr(font->weight)) + 1 +
+        strlen(italicStr(font->italic)) + 1 +
         20+  /* point size */ +1);
 
-    sprintf(qtSettings.font, "%s %s %s %d",
-            family,
-            weightStr(weight),
-            italicStr(italic),
-            (int)size);
+    sprintf(qtSettings.fonts[f], "%s %s %s %d",
+            font->family,
+            weightStr(font->weight),
+            italicStr(font->italic),
+            (int)font->size);
 
     /* Qt uses a bold font for progressbars, try to mimic this... */
-    if(weight>=WEIGHT_NORMAL && weight<WEIGHT_DEMIBOLD)
+    if(FONT_GENERAL==f && font->weight>=WEIGHT_NORMAL && font->weight<WEIGHT_DEMIBOLD)
     {
-        qtSettings.boldfont=(char *)malloc(
-            strlen(family) + 1 +
+        qtSettings.fonts[FONT_BOLD]=(char *)malloc(
+            strlen(font->family) + 1 +
             strlen(weightStr(WEIGHT_BOLD)) + 1 +
-            strlen(italicStr(italic)) + 1 +
+            strlen(italicStr(font->italic)) + 1 +
             20+  /* point size */ +1);
 
-        sprintf(qtSettings.boldfont, "%s %s %s %d",
-                family,
+        sprintf(qtSettings.fonts[FONT_BOLD], "%s %s %s %d",
+                font->family,
                 weightStr(WEIGHT_BOLD),
-                italicStr(italic),
-                (int)size);
+                italicStr(font->italic),
+                (int)font->size);
     }
 #ifdef QTC_DEBUG
-    printf("REQUEST FONT: %s\n", qtSettings.font);
+    printf("REQUEST FONT: %s\n", qtSettings.fonts[f]);
 #endif
 }
 
@@ -720,17 +730,16 @@ GdkColor mixColors(const GdkColor *c1, const GdkColor *c2, double bias)
 
 static void readKdeGlobals(const char *rc, int rd, Options *opts)
 {
-    ColorEffect effects[2];
-    int         found=0,
-                colorsFound=0,
-                weight=WEIGHT_NORMAL,
-                italic=0,
-                fixedW=0;
-    float       size=DEFAULT_KDE_FONT_SIZE;
-    char        family[QTC_MAX_INPUT_LINE_LEN+1],
-                foundry[QTC_MAX_INPUT_LINE_LEN+1],
-                line[QTC_MAX_INPUT_LINE_LEN+1];
-    FILE        *f=fopen(rc, "r");
+    ColorEffect   effects[2];
+    int           found=0,
+                  colorsFound=0,
+                  i;
+    char          line[QTC_MAX_INPUT_LINE_LEN+1];
+    FILE          *f=fopen(rc, "r");
+    QtFontDetails fonts[FONT_NUM_STD];
+
+    for(i=0; i<FONT_NUM_STD; ++i)
+        initFont(&fonts[i], TRUE);
 
     if(qtSettings.qt4)
     {
@@ -755,11 +764,6 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
         effects[EFF_INACTIVE].intensity.amount=0.0;
         effects[EFF_INACTIVE].intensity.effect=IntensityNoEffect;
         effects[EFF_INACTIVE].enabled=false;
-        if(rd&RD_FONT)
-        {
-            strcpy(family, DEFAULT_KDE_FONT);
-            strcpy(foundry, "*");
-        }
     }
 
     if(f)
@@ -925,8 +929,20 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
             else if (qtSettings.qt4 && SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) &&
                      0==strncmp_i(line, "font=", 5))
             {
-                parseFontLine(line, &weight, &italic, &fixedW, &size, family, foundry);
+                parseFontLine(line, &fonts[FONT_GENERAL]);
                 found|=RD_FONT;
+            }
+            else if (SECT_GENERAL==section && rd&RD_MENU_FONT && !(found&RD_MENU_FONT) &&
+                     0==strncmp_i(line, "menuFont=", 9))
+            {
+                parseFontLine(line, &fonts[FONT_MENU]);
+                found|=RD_MENU_FONT;
+            }
+            else if (SECT_GENERAL==section && rd&RD_TB_FONT && !(found&RD_TB_FONT) &&
+                     0==strncmp_i(line, "toolBarFont=", 12))
+            {
+                parseFontLine(line, &fonts[FONT_TOOLBAR]);
+                found|=RD_TB_FONT;
             }
             else if(qtSettings.qt4 && rd&RD_CONTRAST && !(found&RD_CONTRAST) && SECT_KDE==section &&
                     0==strncmp_i(line, "contrast=", 9))
@@ -1105,27 +1121,22 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
         qtSettings.buttonIcons=TRUE;
     if(rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE))
         qtSettings.shadeSortedList=TRUE;
-    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.font && qtSettings.qt4)))  /* No need to check if read in */
-        setFont(weight, italic, fixedW, size, family, foundry);
+    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && qtSettings.qt4)))  /* No need to check if read in */
+        setFont(&fonts[FONT_GENERAL], FONT_GENERAL);
+    if(rd&RD_MENU_FONT && found&RD_MENU_FONT)
+        setFont(&fonts[FONT_MENU], FONT_MENU);
+    if(rd&RD_TB_FONT && found&RD_TB_FONT)
+        setFont(&fonts[FONT_TOOLBAR], FONT_TOOLBAR);
 }
 
 static void readQtRc(const char *rc, int rd, Options *opts, gboolean absolute, gboolean setDefaultFont)
 {
-    const char  *home=absolute ? NULL : getHome();
-    int         found=0,
-                weight=WEIGHT_NORMAL,
-                italic=0,
-                fixedW=0;
-    float       size=DEFAULT_KDE_FONT_SIZE;
-    char        family[QTC_MAX_INPUT_LINE_LEN+1],
-                foundry[QTC_MAX_INPUT_LINE_LEN+1],
-                line[QTC_MAX_INPUT_LINE_LEN+1];
+    const char    *home=absolute ? NULL : getHome();
+    int           found=0;
+    char          line[QTC_MAX_INPUT_LINE_LEN+1];
+    QtFontDetails font;
 
-    if(rd&RD_FONT)
-    {
-        strcpy(family, DEFAULT_KDE_FONT);
-        strcpy(foundry, "*");
-    }
+    initFont(&font, TRUE);
 
     if(absolute || NULL!=home)
     {
@@ -1191,7 +1202,7 @@ static void readQtRc(const char *rc, int rd, Options *opts, gboolean absolute, g
                 }
                 else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncmp_i(line, "font=", 5))
                 {
-                    parseFontLine(line, &weight, &italic, &fixedW, &size, family, foundry);
+                    parseFontLine(line, &font);
                     found|=RD_FONT;
                 }
                 else if(found==rd)
@@ -1224,8 +1235,8 @@ static void readQtRc(const char *rc, int rd, Options *opts, gboolean absolute, g
     }
 #endif
 
-    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.font && setDefaultFont)))  /* No need to check if read in */
-        setFont(weight, italic, fixedW, size, family, foundry);
+    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /* No need to check if read in */
+        setFont(&font, FONT_GENERAL);
 }
 
 static int qt_refs=0;
@@ -1886,8 +1897,7 @@ static gboolean qtInit(Options *opts)
             const char  *xdg=xdgConfigFolder();
 
             qtSettings.icons=NULL;
-            qtSettings.boldfont=NULL;
-            qtSettings.font=NULL;
+            memset(qtSettings.fonts, 0, sizeof(char *)*FONT_NUM_TOTAL);
             qtSettings.iconSizes.smlTbSize=16;
             qtSettings.iconSizes.tbSize=22;
             qtSettings.iconSizes.dndSize=32;
@@ -1924,7 +1934,7 @@ static gboolean qtInit(Options *opts)
                                  0L};
 
             for(f=0; 0!=files[f]; ++f)
-                readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|
+                readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|RD_MENU_FONT|RD_TB_FONT|
                                          RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
                                          (qtSettings.qt4 ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE : RD_LIST_COLOR),
                                opts);
@@ -2171,8 +2181,8 @@ static gboolean qtInit(Options *opts)
             {
                 GtkSettingsValue svalue;
 
-                if(qtSettings.font)
-                    g_object_set(settings, "gtk-font-name", qtSettings.font, NULL);
+                if(qtSettings.fonts[FONT_GENERAL])
+                    g_object_set(settings, "gtk-font-name", qtSettings.fonts[FONT_GENERAL], NULL);
 
                 svalue.origin="KDE-Settings";
                 svalue.value.g_type=G_TYPE_INVALID;
@@ -2213,7 +2223,18 @@ static gboolean qtInit(Options *opts)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"Sldr\" {GtkScale::slider_length = 11 GtkScale::slider_width = 18} class \"*\" style \""QTC_RC_SETTING"Sldr\"");
             else if(SLIDER_PLAIN_ROTATED==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"Sldr\" {GtkScale::slider_length = 13 GtkScale::slider_width = 21} class \"*\" style \""QTC_RC_SETTING"Sldr\"");
-            if(qtSettings.boldfont)
+
+            if(qtSettings.fonts[FONT_GENERAL])
+            {
+                static const char *constFormat="style \""QTC_RC_SETTING"Fnt\" {font_name=\"%s\"} "
+                                               "widget_class \"*\" style \""QTC_RC_SETTING"Fnt\" ";
+                tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.fonts[FONT_GENERAL])+1);
+
+                sprintf(tmpStr, constFormat, qtSettings.fonts[FONT_GENERAL]);
+                gtk_rc_parse_string(tmpStr);
+            }
+
+            if(qtSettings.fonts[FONT_BOLD])
             {
                 static const char *constBoldPrefix="style \""QTC_RC_SETTING"BFnt\"{font_name=\"";
                 static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""QTC_RC_SETTING"BFnt\" ";
@@ -2224,21 +2245,41 @@ static gboolean qtInit(Options *opts)
                     static const char *constStdSuffix="\"} ";
                     static const char *constGrpBoxBoldSuffix="widget_class \"*Frame.GtkLabel\" style \""QTC_RC_SETTING"BFnt\" "
                                                              "widget_class \"*Statusbar.*Frame.GtkLabel\" style \""QTC_RC_SETTING"Fnt\"";
-                    tmpStr=(char *)realloc(tmpStr, strlen(constStdPrefix)+strlen(qtSettings.font)+strlen(constStdSuffix)+
-                                                   strlen(constBoldPrefix)+strlen(qtSettings.boldfont)+strlen(constBoldSuffix)+
+                    tmpStr=(char *)realloc(tmpStr, strlen(constStdPrefix)+strlen(qtSettings.fonts[FONT_GENERAL])+strlen(constStdSuffix)+
+                                                   strlen(constBoldPrefix)+strlen(qtSettings.fonts[FONT_BOLD])+strlen(constBoldSuffix)+
                                                    strlen(constGrpBoxBoldSuffix)+1);
 
                     sprintf(tmpStr, "%s%s%s%s%s%s%s",
-                                    constStdPrefix, qtSettings.font, constStdSuffix,
-                                    constBoldPrefix, qtSettings.boldfont, constBoldSuffix,
+                                    constStdPrefix, qtSettings.fonts[FONT_GENERAL], constStdSuffix,
+                                    constBoldPrefix, qtSettings.fonts[FONT_BOLD], constBoldSuffix,
                                     constGrpBoxBoldSuffix);
                 }
                 else
                 {
-                    tmpStr=(char *)realloc(tmpStr, strlen(constBoldPrefix)+strlen(qtSettings.boldfont)+strlen(constBoldSuffix)+1);
-                    sprintf(tmpStr, "%s%s%s", constBoldPrefix, qtSettings.boldfont, constBoldSuffix);
+                    tmpStr=(char *)realloc(tmpStr, strlen(constBoldPrefix)+strlen(qtSettings.fonts[FONT_BOLD])+strlen(constBoldSuffix)+1);
+                    sprintf(tmpStr, "%s%s%s", constBoldPrefix, qtSettings.fonts[FONT_BOLD], constBoldSuffix);
                 }
 
+                gtk_rc_parse_string(tmpStr);
+            }
+
+            if(qtSettings.fonts[FONT_MENU] && qtSettings.fonts[FONT_GENERAL] && strcmp(qtSettings.fonts[FONT_MENU], qtSettings.fonts[FONT_GENERAL]))
+            {
+                static const char *constFormat="style \""QTC_RC_SETTING"MFnt\" {font_name=\"%s\"} "
+                                               "widget_class \"*.*MenuItem.*\" style \""QTC_RC_SETTING"MFnt\" ";
+                tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.fonts[FONT_MENU])+1);
+
+                sprintf(tmpStr, constFormat, qtSettings.fonts[FONT_MENU]);
+                gtk_rc_parse_string(tmpStr);
+            }
+
+            if(qtSettings.fonts[FONT_TOOLBAR] && qtSettings.fonts[FONT_GENERAL] && strcmp(qtSettings.fonts[FONT_TOOLBAR], qtSettings.fonts[FONT_GENERAL]))
+            {
+                static const char *constFormat="style \""QTC_RC_SETTING"TbFnt\" {font_name=\"%s\"} "
+                                               "widget_class \"*.*Toolbar.*\" style \""QTC_RC_SETTING"TbFnt\" ";
+                tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.fonts[FONT_TOOLBAR])+1);
+
+                sprintf(tmpStr, constFormat, qtSettings.fonts[FONT_TOOLBAR]);
                 gtk_rc_parse_string(tmpStr);
             }
 
@@ -2472,15 +2513,18 @@ static void qtExit()
 
     if(0==qt_refs)
     {
-        if(qtSettings.font)
-            free(qtSettings.font);
-        qtSettings.font=NULL;
+        int i;
+
+        for(i=0; i<FONT_NUM_TOTAL; ++i)
+        {
+            if(qtSettings.fonts[i])
+                free(qtSettings.fonts[i]);
+            qtSettings.fonts[i]=NULL;
+        }
+
         if(qtSettings.icons)
             free(qtSettings.icons);
         qtSettings.icons=NULL;
-        if(qtSettings.boldfont)
-            free(qtSettings.boldfont);
-        qtSettings.boldfont=NULL;
     }
 }
 
@@ -2531,15 +2575,4 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_INSENSITIVE, COLOR_MID)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_ACTIVE, COLOR_WINDOW_TEXT)
     SET_COLOR(style, rc_style, fg, GTK_RC_FG, GTK_STATE_PRELIGHT, COLOR_WINDOW_TEXT)
-}
-
-static void qtSetFont(GtkRcStyle *rc_style)
-{
-    if(qtSettings.font)
-    {
-        if (rc_style->font_desc)
-            pango_font_description_free (rc_style->font_desc);
-
-        rc_style->font_desc = pango_font_description_from_string (qtSettings.font);
-    }
 }

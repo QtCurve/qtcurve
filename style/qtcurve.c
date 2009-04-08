@@ -6418,7 +6418,6 @@ static guint qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
     /* If we bail out due to errors, we *don't* reset the scope, so the error messaging code can make
        sense of our tokens. */
     old_scope = g_scanner_set_scope(scanner, scope_id);
-    qtSetFont(rc_style);
 
     token = g_scanner_peek_next_token(scanner);
     while(token != G_TOKEN_RIGHT_CURLY)
