@@ -2578,8 +2578,8 @@ debugDisplayWidget(widget, 3);
     }
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
-        parent_class->draw_flat_box(style, window, state, shadow_type, area, widget, detail, x, y,
-                                    width, height);
+        parent_class->draw_flat_box(style, window, GTK_STATE_INSENSITIVE==state && DETAIL(QTC_PANED) ? GTK_STATE_NORMAL : state,
+                                    shadow_type, area, widget, detail, x, y, width, height);
 
         /* For SWT (e.g. eclipse) apps. For some reason these only seem to allow a ythickness of at max 2 - but
            for etching we need 3. So we fake this by drawing the 3rd lines here...*/

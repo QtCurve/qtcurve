@@ -11,6 +11,7 @@
 6. When determinging lower etch colour, ignore GtkBox widgets when looking up
    parent tree.
 7. Set menu and toolbar fonts.
+8. Dont darken disabled splitter.
 
 0.62.7
 ------
