@@ -2237,7 +2237,8 @@ static gboolean qtInit(Options *opts)
             if(qtSettings.fonts[FONT_BOLD])
             {
                 static const char *constBoldPrefix="style \""QTC_RC_SETTING"BFnt\"{font_name=\"";
-                static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""QTC_RC_SETTING"BFnt\" ";
+                static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""QTC_RC_SETTING"BFnt\" "
+                                                   "widget_class \"*GtkProgress*\" style \""QTC_RC_SETTING"BFnt\" ";
 
                 if(opts->framelessGroupBoxes)
                 {
