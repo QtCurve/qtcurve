@@ -1398,10 +1398,13 @@ static void defaultSettings(Options *opts)
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000
-    opts->round=ROUND_FULL;
-#else
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
+    opts->fadeLines=true;
+    opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
+    opts->gtkButtonOrder=false;
+#else
+    opts->round=ROUND_FULL;
 #endif
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
@@ -1452,9 +1455,6 @@ static void defaultSettings(Options *opts)
     opts->xCheck=false;
     opts->framelessGroupBoxes=true;
     opts->groupBoxLine=true;
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->fadeLines=true;
-#endif
     opts->colorMenubarMouseOver=true;
     opts->inactiveHighlight=false;
     opts->crHighlight=false;
@@ -1471,10 +1471,6 @@ static void defaultSettings(Options *opts)
 #endif
 #ifdef QTC_CONFIG_DIALOG
     opts->shading=SHADING_HSL;
-#endif
-
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
 #endif
 
     opts->gtkScrollViews=false;
@@ -1501,11 +1497,6 @@ static void defaultSettings(Options *opts)
 
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
     opts->mapKdeIcons=true;
-#endif
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->gtkButtonOrder=false;
-#endif
-#ifndef __cplusplus
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
