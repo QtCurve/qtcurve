@@ -1304,7 +1304,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->colorMenubarMouseOver=true;
 */
 
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000
+#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined QTC_CONFIG_DIALOG
             if(opts->round>ROUND_FULL)
                 opts->round=ROUND_FULL;
 
