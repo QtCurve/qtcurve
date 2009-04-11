@@ -1007,7 +1007,7 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_SYSTEMSETTINGS;
         else if("plasma"==appName)
             theThemedApp=APP_PLASMA;
-        else if("krunner"==appName)
+        else if("krunner"==appName || "krunner_lock"==appName)
             theThemedApp=APP_KRUNNER;
         else if("konqueror"==appName)
             theThemedApp=APP_KONQUEROR;
@@ -2687,8 +2687,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             opt.state&=~State_HasFocus;
 
                         drawBorder(painter, r, &opt,
-                                   opts.round && APP_KMIX==theThemedApp && widget && widget->parentWidget() &&
-                                   qobject_cast<const QFrame *>(widget) && 0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")
+                                   opts.round && (APP_KMIX==theThemedApp || APP_KRUNNER==theThemedApp) && widget && widget->parentWidget() &&
+                                   qobject_cast<const QFrame *>(widget) && 
+                                        ( (APP_KMIX==theThemedApp && 0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
+                                          (APP_KRUNNER==theThemedApp && 0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")))
                                    ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
                                    sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
                                                           ? BORDER_SUNKEN
