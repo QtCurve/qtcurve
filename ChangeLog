@@ -1,3 +1,7 @@
+0.62.9
+------
+1. Draw correct colour for popup of non-editable combo's in toolbars.
+
 0.62.8
 ------
 1. Don't round KMix's popup, or the 'unlock screen' dialog.
