@@ -1320,15 +1320,15 @@ void QtCurveStyle::polish(QWidget *widget)
     }
                 
     //bool onToolBar(widget && widget->parent() && 0L!=getToolBar(widget->parentWidget(), true));
-    bool onToolBar(widget && widget->parent() && (qobject_cast<QToolBar *>(widget->parent()) || widget->parent()->inherits("Q3ToolBar")));
+    bool parentIsToolbar(widget && widget->parent() && (qobject_cast<QToolBar *>(widget->parent()) || widget->parent()->inherits("Q3ToolBar")));
 
     if (qobject_cast<QMenuBar *>(widget) ||
         widget->inherits("Q3ToolBar") ||
         qobject_cast<QToolBar *>(widget) ||
-        onToolBar)
+        parentIsToolbar)
         widget->setBackgroundRole(QPalette::Window);
 
-    if(!IS_FLAT(opts.toolbarAppearance) && onToolBar)
+    if(!IS_FLAT(opts.toolbarAppearance) && parentIsToolbar)
         widget->setAutoFillBackground(false);
 
     if(APP_SYSTEMSETTINGS==theThemedApp &&
