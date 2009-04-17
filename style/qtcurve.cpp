@@ -2624,8 +2624,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_Frame:
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
-                drawFadedLine(painter, QRect(r.x(), (r.y()+r.height())-2, r.width(), 1),
-                              backgroundColors(option)[QT_STD_BORDER], reverse, !reverse, true);
+                break;
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
             {
                 if(opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())

@@ -5,6 +5,7 @@
 2. Use a lighter shade for the dark portion of gradient border.
 3. Flat dot for radio buttons.
 4. Use button colour for listview headers.
+5. Remove line from KTitleWidget
 
 0.62.9
 ------
