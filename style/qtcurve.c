@@ -292,8 +292,8 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
         btn_colors=SHADE_NONE!=opts.shadeSliders \
                     ? qtcPalette.slider \
                     : qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
-    else if(LISTVIEW) \
-        btn_colors=qtcPalette.background; \
+    /*else if(LISTVIEW && !opts.lvButton) \
+        btn_colors=qtcPalette.background;*/ \
     else \
         btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
 }
@@ -3140,8 +3140,8 @@ debugDisplayWidget(widget, 3);
 
                 if(x>3 && height>10)
                 {
-                    drawFadedLine(cr, x, y+4, 1, height-8, &qtcPalette.background[QT_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
-                    drawFadedLine(cr, x+1, y+4, 1, height-8, &qtcPalette.background[0], area, NULL, TRUE, TRUE, FALSE);
+                    drawFadedLine(cr, x, y+4, 1, height-8, &btn_colors[QT_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
+                    drawFadedLine(cr, x+1, y+4, 1, height-8, &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
                 }
             }
             else if(isPathButton(widget))
