@@ -946,6 +946,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_APPEARANCE(sunkenAppearance, false)
             QTC_CFG_READ_ECOLOR(progressGrooveColor)
             QTC_CFG_READ_FOCUS(focus)
+            QTC_CFG_READ_BOOL(lvButton)
             QTC_CFG_READ_BOOL(lvLines)
             QTC_CFG_READ_BOOL(drawStatusBarFrames)
             QTC_CFG_READ_BOOL(fillSlider)
@@ -1448,6 +1449,7 @@ static void defaultSettings(Options *opts)
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_SHADOW;
     opts->focus=FOCUS_LINE;
+    opts->lvButton=false;
     opts->lvLines=false;
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;
@@ -1928,6 +1930,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(sunkenAppearance)
         CFG_WRITE_ENTRY(progressGrooveColor)
         CFG_WRITE_ENTRY(focus)
+        CFG_WRITE_ENTRY(lvButton)
         CFG_WRITE_ENTRY(lvLines)
         CFG_WRITE_ENTRY(drawStatusBarFrames)
         CFG_WRITE_ENTRY(fillSlider)

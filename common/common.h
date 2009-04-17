@@ -1015,6 +1015,7 @@ typedef struct
                      useHighlightForMenu,
                      shadeMenubarOnlyWhenActive,
                      thinnerMenuItems,
+                     lvButton,
                      lvLines,
                      drawStatusBarFrames,
                      fillSlider,

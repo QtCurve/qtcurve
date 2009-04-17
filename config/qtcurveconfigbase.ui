@@ -625,7 +625,7 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="page_7">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="gridLayout_10">
        <item row="0" column="0">
         <widget class="QLabel" name="label_19">
          <property name="text">
@@ -637,6 +637,13 @@ p, li { white-space: pre-wrap; }
         <widget class="QComboBox" name="lvAppearance"/>
        </item>
        <item row="0" column="2">
+        <widget class="QCheckBox" name="lvButton">
+         <property name="text">
+          <string>Button color</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1731,6 +1738,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>coloredMouseOver</tabstop>
   <tabstop>highlightFactor</tabstop>
   <tabstop>lvAppearance</tabstop>
+  <tabstop>lvButton</tabstop>
   <tabstop>selectionAppearance</tabstop>
   <tabstop>lvLines</tabstop>
   <tabstop>gtkScrollViews</tabstop>

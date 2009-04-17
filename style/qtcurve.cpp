@@ -3998,7 +3998,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader *>(option);
             bool                     horiz(ho ? Qt::Horizontal==ho->orientation : state&State_Horizontal);
             QStyleOption             opt(*option);
-            const QColor             *use(/*opts.lvButton ? */buttonColors(option)/* : backgroundColors(option)*/);
+            const QColor             *use(opts.lvButton ? buttonColors(option) : backgroundColors(option));
 
             opt.state&=~State_MouseOver;
             painter->save();
@@ -4029,7 +4029,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_HeaderSection:
             if (const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
-                const QColor *use(/*opts.lvButton ? */buttonColors(option)/* : backgroundColors(option)*/);
+                const QColor *use(opts.lvButton ? buttonColors(option) : backgroundColors(option));
 
                 painter->save();
 

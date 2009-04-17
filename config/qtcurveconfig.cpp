@@ -471,6 +471,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(focus, SIGNAL(currentIndexChanged(int)), SLOT(focusChanged()));
     connect(lvLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(lvButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(drawStatusBarFrames, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(buttonEffect, SIGNAL(currentIndexChanged(int)), SLOT(buttonEffectChanged()));
     connect(coloredMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(coloredMouseOverChanged()));
@@ -1104,6 +1105,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.appearance=(EAppearance)appearance->currentIndex();
     opts.focus=(EFocus)focus->currentIndex();
     opts.lvLines=lvLines->isChecked();
+    opts.lvButton=lvButton->isChecked();
     opts.drawStatusBarFrames=drawStatusBarFrames->isChecked();
     opts.buttonEffect=(EEffect)buttonEffect->currentIndex();
     opts.coloredMouseOver=(EMouseOver)coloredMouseOver->currentIndex();
@@ -1205,6 +1207,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     appearance->setCurrentIndex(opts.appearance);
     focus->setCurrentIndex(opts.focus);
     lvLines->setChecked(opts.lvLines);
+    lvButton->setChecked(opts.lvButton);
     drawStatusBarFrames->setChecked(opts.drawStatusBarFrames);
     buttonEffect->setCurrentIndex(opts.buttonEffect);
     coloredMouseOver->setCurrentIndex(opts.coloredMouseOver);
@@ -1299,6 +1302,7 @@ bool QtCurveConfig::settingsChanged()
          appearance->currentIndex()!=(int)currentStyle.appearance ||
          focus->currentIndex()!=(int)currentStyle.focus ||
          lvLines->isChecked()!=currentStyle.lvLines ||
+         lvButton->isChecked()!=currentStyle.lvButton ||
          drawStatusBarFrames->isChecked()!=currentStyle.drawStatusBarFrames ||
          buttonEffect->currentIndex()!=(EEffect)currentStyle.buttonEffect ||
          coloredMouseOver->currentIndex()!=(int)currentStyle.coloredMouseOver ||
