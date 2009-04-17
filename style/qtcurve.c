@@ -1850,7 +1850,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                                               (MO_GLOW==opts.coloredMouseOver && WIDGET_COMBO!=widget &&
                                                !ETCH_WIDGET(widget) && WIDGET_SB_SLIDER!=widget)),
                 lightBorder=QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
-                draw3d=!lightBorder && QTC_DRAW_3D_BORDER(sunken, app),
+                draw3dfull=!lightBorder && QTC_DRAW_3D_BORDER(sunken, app),
+                draw3d=draw3dfull || (!lightBorder && QTC_DRAW_3D_BORDER(sunken, app)),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || WIDGET_COMBO_BUTTON==widget) && QTC_DO_EFFECT,
                 horiz=!(flags&DF_VERT);
@@ -1979,7 +1980,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     }
     else if(colouredMouseOver || (!sunken && (draw3d || flags&DF_DRAW_INSIDE)))
     {
-        int      dark=bevelledButton ? 2 : 4;
+        int      dark=/*bevelledButton ? */2/* : 4*/;
         GdkColor *col1=colouredMouseOver ? &qtcPalette.mouseover[QTC_MO_STD_LIGHT(widget, sunken)]
                                          : &colors[sunken ? dark : 0];
 
@@ -1987,7 +1988,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col1));
         createTLPath(cr, xd, yd, width-1, height-1, getRadius(opts.round, width, height, widget, RADIUS_INTERNAL), round);
         cairo_stroke(cr);
-        if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
+        if(colouredMouseOver || bevelledButton || draw3dfull)
         {
             GdkColor *col2=colouredMouseOver ? &qtcPalette.mouseover[QTC_MO_STD_DARK(widget)]
                                              : &colors[sunken ? 0 : dark];
@@ -4374,8 +4375,10 @@ debugDisplayWidget(widget, 3);
         gboolean    coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver,
                     lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                    draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
-                    drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d);
+                    draw3dFull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(drawSunken, app),
+                    draw3d=draw3dFull || (!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app)),
+                    drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d),
+                    drawDark=drawLight && draw3dFull && !lightBorder;
         GdkColor    *colors=coloredMouseOver
                        ? qtcPalette.mouseover
                        : btn_colors;
@@ -4433,6 +4436,16 @@ debugDisplayWidget(widget, 3);
                 cairo_line_to(cr, x+QTC_CHECK_SIZE-1.5, y+1.5);
             }
             cairo_stroke(cr);
+
+            if(drawDark)
+            {
+                cairo_new_path(cr);
+                cairo_set_source_rgb(cr, QTC_CAIRO_COL(btn_colors[2]));
+                cairo_move_to(cr, x+1.5, y+QTC_CHECK_SIZE-1.5);
+                cairo_line_to(cr, x+QTC_CHECK_SIZE-1.5, y+QTC_CHECK_SIZE-1.5);
+                cairo_line_to(cr, x+QTC_CHECK_SIZE-1.5, y+1.5);
+                cairo_stroke(cr);
+            }
         }
 
         if(doEtch && (!list || glow) && !mnu)
@@ -4504,7 +4517,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
         gboolean    drawSunken=opts.crButton && !mnu ? GTK_STATE_ACTIVE==state : false,
                     lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                    draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
+                    draw3d=!lightBorder &&
+                           (QTC_DRAW_3D_BORDER(drawSunken, app) || QTC_DRAW_3D_FULL_BORDER(drawSunken, app)),
                     drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d);
 
 //         x+=((width-QTC_RADIO_SIZE)>>1)+1;  /* +1 solves clipping on prnting dialog */
