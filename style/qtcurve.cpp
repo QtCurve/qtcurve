@@ -3997,26 +3997,27 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_HeaderEmptyArea:
         {
             const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader *>(option);
-            bool horiz(ho ? Qt::Horizontal==ho->orientation : state&State_Horizontal);
-            QStyleOption opt(*option);
+            bool                     horiz(ho ? Qt::Horizontal==ho->orientation : state&State_Horizontal);
+            QStyleOption             opt(*option);
+            const QColor             *use(/*opts.lvButton ? */buttonColors(option)/* : backgroundColors(option)*/);
 
             opt.state&=~State_MouseOver;
             painter->save();
 
-            drawBevelGradient(getFill(&opt, itsBackgroundCols), painter, r, horiz,
+            drawBevelGradient(getFill(&opt, use), painter, r, horiz,
                               false, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
             painter->setRenderHint(QPainter::Antialiasing, true);
             if(APPEARANCE_RAISED==opts.lvAppearance)
             {
-                painter->setPen(itsBackgroundCols[4]);
+                painter->setPen(use[4]);
                 if(horiz)
                     drawAaLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1, r.y()+r.height()-2);
                 else
                     drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
             }
 
-            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+            painter->setPen(use[QT_STD_BORDER]);
             if(horiz)
                 drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
             else
@@ -4029,6 +4030,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_HeaderSection:
             if (const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
+                const QColor *use(/*opts.lvButton ? */buttonColors(option)/* : backgroundColors(option)*/);
+
                 painter->save();
 
                 if(state & (State_Raised | State_Sunken))
@@ -4044,14 +4047,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(-1==ho->section && !(state&State_Enabled) && widget && widget->isEnabled())
                         opt.state|=State_Enabled;
 
-                    drawBevelGradient(getFill(&opt, itsBackgroundCols), painter, r,
+                    drawBevelGradient(getFill(&opt, use), painter, r,
                                         Qt::Horizontal==ho->orientation,
                                         sunken, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
                     painter->setRenderHint(QPainter::Antialiasing, true);
                     if(APPEARANCE_RAISED==opts.lvAppearance)
                     {
-                        painter->setPen(itsBackgroundCols[4]);
+                        painter->setPen(use[4]);
                         if(Qt::Horizontal==ho->orientation)
                             drawAaLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1, r.y()+r.height()-2);
                         else
@@ -4070,16 +4073,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             painter->setPen(border[QT_STD_BORDER]);
                         }
                         else
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                         drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
 
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
                             drawFadedLine(painter, QRect(r.x()+r.width()-2, r.y()+5, 1, r.height()-10),
-                                          itsBackgroundCols[QT_STD_BORDER], true, true, false);
+                                          use[QT_STD_BORDER], true, true, false);
                             drawFadedLine(painter, QRect(r.x()+r.width()-1, r.y()+5, 1, r.height()-10),
-                                          itsBackgroundCols[0], true, true, false);
+                                          use[0], true, true, false);
                         }
                     }
                     else
@@ -4091,16 +4094,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             painter->setPen(border[QT_STD_BORDER]);
                         }
                         else
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                         drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
 
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                            painter->setPen(use[QT_STD_BORDER]);
                             drawAaLine(painter, r.x()+5, r.y()+r.height()-2, r.x()+r.width()-6,
                                       r.y()+r.height()-2);
-                            painter->setPen(itsBackgroundCols[0]);
+                            painter->setPen(use[0]);
                             drawAaLine(painter, r.x()+5, r.y()+r.height()-1, r.x()+r.width()-6,
                                       r.y()+r.height()-1);
                         }
@@ -4108,7 +4111,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->setRenderHint(QPainter::Antialiasing, false);
                 }
                 else
-                    painter->fillRect(r, getFill(option, itsBackgroundCols));
+                    painter->fillRect(r, getFill(option, use));
                 painter->restore();
             }
             break;
