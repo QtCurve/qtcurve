@@ -3042,8 +3042,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
             bool         drawSunken=opts.crButton ? sunken : false,
                          lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                         draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
-                         drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d);
+                         draw3dFull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(drawSunken, app),
+                         draw3d=draw3dFull || (!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app)),
+                         drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d),
+                         drawDark=drawLight && draw3dFull && !lightBorder;
 
             painter->save();
             if(IS_FLAT(opts.appearance))
@@ -3071,6 +3073,15 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 {
                     painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
                     painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
+
+                    if(drawDark)
+                    {
+                        painter->setPen(btn[2]);
+                        painter->drawLine(rect.x()+rect.width()-2, rect.y()+1,
+                                          rect.x()+rect.width()-2, rect.y()+rect.height()-2);
+                        painter->drawLine(rect.x()+1, rect.y()+rect.height()-2,
+                                          rect.x()+rect.width()-2, rect.y()+rect.height()-2);
+                    }
                 }
             }
 
@@ -3138,7 +3149,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
             bool        drawSunken=opts.crButton ? sunken : false,
                         lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                        draw3d=!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app),
+                        draw3d=!lightBorder &&
+                               (QTC_DRAW_3D_BORDER(drawSunken, app) || QTC_DRAW_3D_FULL_BORDER(drawSunken, app)),
                         drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d),
                         doneShadow=false;
 
@@ -7972,8 +7984,11 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
                  lightBorder(WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
-                 draw3d(!lightBorder && WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w &&
-                        QTC_DRAW_3D_BORDER(sunken, app)),
+                 draw3dfull(!lightBorder && WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w &&
+                        QTC_DRAW_3D_FULL_BORDER(sunken, app)),
+                 draw3d(draw3dfull || (
+                            !lightBorder && WIDGET_MDI_WINDOW!=w && WIDGET_MDI_WINDOW_TITLE!=w &&
+                            QTC_DRAW_3D_BORDER(sunken, app))),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
                                      !(option->state&QTC_STATE_KWIN_BUTTON) &&
@@ -7990,8 +8005,6 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                                               ((WIDGET_COMBO!=w && !ETCH_WIDGET(w) && WIDGET_SB_SLIDER!=w) || !QTC_DO_EFFECT)))),
                  doEtch(doBorder && ETCH_WIDGET(w) && QTC_DO_EFFECT),
                  horiz(isHoriz(option, w));
-    int          dark(bevelledButton ? 2 : 4),
-                 c1(sunken ? dark : 0);
     const QColor *cols(custom ? custom : itsBackgroundCols),
                  *border(colouredMouseOver ? borderColors(option, cols) : cols);
 
@@ -8101,13 +8114,14 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     {
         QPainterPath innerTlPath,
                      innerBrPath;
+        int          dark(/*bevelledButton ? */2/* : 4*/);
 
         buildSplitPath(r, w, round,
                        getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL),
                        innerTlPath, innerBrPath);
 
-        p->setPen(border[colouredMouseOver ? QTC_MO_STD_LIGHT(w, sunken) : c1]);
-        if(colouredMouseOver || bevelledButton || APPEARANCE_RAISED==app)
+        p->setPen(border[colouredMouseOver ? QTC_MO_STD_LIGHT(w, sunken) : (sunken ? dark : 0)]);
+        if(colouredMouseOver || bevelledButton || draw3dfull)
         {
             p->drawPath(innerTlPath);
             p->setPen(border[colouredMouseOver ? QTC_MO_STD_DARK(w) : (sunken ? 0 : dark)]);

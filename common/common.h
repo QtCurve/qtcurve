@@ -231,6 +231,9 @@ typedef GdkColor color;
                           (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
                            APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
 
+#define QTC_DRAW_3D_FULL_BORDER(SUNKEN, APP) \
+    (!SUNKEN && GB_3D_FULL==getGradient(APP, &opts)->border)
+    
 #define QTC_DRAW_3D_BORDER(SUNKEN, APP) \
     (!SUNKEN && GB_3D==getGradient(APP, &opts)->border)
 
@@ -937,7 +940,8 @@ typedef enum
 {
     GB_NONE,
     GB_LIGHT,
-    GB_3D
+    GB_3D,
+    GB_3D_FULL
 } EGradientBorder;
 
 #ifdef __cplusplus
@@ -1214,7 +1218,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 
     if(!init)
     {
-        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], GB_3D,2,0.0,1.0,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], GB_3D_FULL,2,0.0,1.0,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
         setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.04,1.0,0.98);

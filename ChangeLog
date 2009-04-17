@@ -1,3 +1,9 @@
+0.63.0
+------
+1. Add '3dfull' to gradient border options. This forces the
+   dark, as well as the light, portion to be drawn.
+2. Use a lighter shade for the dark portion of gradient border.
+
 0.62.9
 ------
 1. Draw correct colour for popup of combo's in toolbars.
