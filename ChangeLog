@@ -3,6 +3,7 @@
 1. Add '3dfull' to gradient border options. This forces the
    dark, as well as the light, portion to be drawn.
 2. Use a lighter shade for the dark portion of gradient border.
+3. Flat dot for radio buttons.
 
 0.62.8
 ------
