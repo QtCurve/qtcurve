@@ -44,6 +44,7 @@
 #include <KDE/KComponentData>
 #include <KDE/KTabWidget>
 #include <KDE/KColorScheme>
+#include <KDE/KStandardDirs>
 
 static KComponentData *theKComponentData=0;
 static int            theInstanceCount=0;
@@ -500,18 +501,9 @@ static const int constTabPad         = 6;
 
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
-static QString readEnvPath(const char *env)
-{
-   QByteArray path=getenv(env);
-
-   return path.isEmpty() ? QString::null : QFile::decodeName(path);
-}
-
 static QString kdeHome()
 {
-    QString env(readEnvPath(getuid() ? "KDEHOME" : "KDEROOTHOME"));
-
-    return env.isEmpty() ? QDir::homePath()+"/.kde" : env;
+    return KGlobal::dirs()->localkdedir();
 }
 
 static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
