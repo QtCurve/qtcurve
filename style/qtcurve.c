@@ -2042,8 +2042,12 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     unsetCairoClipping(cr);
 }
 
-static void drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
-                          GdkRectangle *area, GdkRectangle *gap, gboolean fadeStart, gboolean fadeEnd, gboolean horiz)
+#define drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart, fadeEnd, horiz) \
+        drawFadedLineReal(cr, x, y, width, height, col, area, gap, fadeStart, fadeEnd, horiz, 1.0)
+                          
+static void drawFadedLineReal(cairo_t *cr, int x, int y, int width, int height, GdkColor *col,
+                              GdkRectangle *area, GdkRectangle *gap, gboolean fadeStart, gboolean fadeEnd, gboolean horiz,
+                              double alpha)
 {
     double          rx=x+0.5,
                     ry=y+0.5;
@@ -2063,10 +2067,10 @@ static void drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkC
     }
     else
         setCairoClipping(cr, area, NULL);
-    cairo_pattern_add_color_stop_rgba(pt, 0, QTC_CAIRO_COL(*col), fadeStart && opts.fadeLines ? 0.0 : 1.0);
-    cairo_pattern_add_color_stop_rgba(pt, QTC_FADE_SIZE, QTC_CAIRO_COL(*col), 1.0);
-    cairo_pattern_add_color_stop_rgba(pt, 1.0-QTC_FADE_SIZE, QTC_CAIRO_COL(*col), 1.0);
-    cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(*col), fadeEnd && opts.fadeLines ? 0.0 : 1.0);
+    cairo_pattern_add_color_stop_rgba(pt, 0, QTC_CAIRO_COL(*col), fadeStart && opts.fadeLines ? 0.0 : alpha);
+    cairo_pattern_add_color_stop_rgba(pt, QTC_FADE_SIZE, QTC_CAIRO_COL(*col), alpha);
+    cairo_pattern_add_color_stop_rgba(pt, 1.0-QTC_FADE_SIZE, QTC_CAIRO_COL(*col), alpha);
+    cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(*col), fadeEnd && opts.fadeLines ? 0.0 : alpha);
     cairo_set_source(cr, pt);
     if(horiz)
     {
@@ -2081,6 +2085,14 @@ static void drawFadedLine(cairo_t *cr, int x, int y, int width, int height, GdkC
     cairo_stroke(cr);
     cairo_pattern_destroy(pt);
     unsetCairoClipping(cr);
+}
+
+static void drawHighlight(cairo_t *cr, int x, int y, int width, int height, GdkRectangle *area, gboolean horiz, gboolean inc)
+{
+    drawFadedLineReal(cr, x, y, width, height, &qtcPalette.mouseover[ORIGINAL_SHADE],
+                      area, NULL, true, true, horiz, inc ? 0.5 : 1.0);
+    drawFadedLineReal(cr, x+(horiz ? 0 : 1), y+(horiz ? 1 : 0), width, height, &qtcPalette.mouseover[ORIGINAL_SHADE],
+                      area, NULL, true, true, horiz, inc ? 1.0 : 0.5);
 }
 
 static void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col)
@@ -3131,17 +3143,12 @@ debugDisplayWidget(widget, 3);
                 drawBevelGradient(cr, style, area, NULL, x, y, width, height, &btn_colors[bgnd],
                                   horiz, sunken, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
+                if(APPEARANCE_RAISED==opts.lvAppearance)
+                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[4]), 1.0, x, y+height-2, width);
+                drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x, y+height-1, width);
+                    
                 if(GTK_STATE_PRELIGHT==state && opts.coloredMouseOver)
-                {
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, x, y+height-2, width);
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x, y+height-1, width);
-                }
-                else
-                {
-                    if(APPEARANCE_RAISED==opts.lvAppearance)
-                        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[4]), 1.0, x, y+height-2, width);
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x, y+height-1, width);
-                }
+                    drawHighlight(cr, x, y+height-2, width, 2, area, true, true);
 
                 if(x>3 && height>10)
                 {
@@ -5304,13 +5311,8 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                {
-                    int sx=x+(firstTab ? moOffset : 1),
-                        sw=width-((lastTab ? moOffset : 1)+1);
-
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, sx, y+height-2, sw);
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, sx, y+height-1, sw);
-                }
+                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y+height-2, width-(firstTab || lastTab ? moOffset : 1), 2,
+                                  area, true, true);
 
                 break;
             }
@@ -5354,13 +5356,8 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                {
-                    int sx=x+(firstTab ? moOffset : 1),
-                        sw=width-((lastTab ? moOffset : 1)+1);
-
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, sx, y+1, sw);
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, sx, y, sw);
-                }
+                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y, width-(firstTab || lastTab ? moOffset : 1), 2,
+                                  area, true, false);
                 break;
             }
             case GTK_POS_LEFT: /* => tabs are on right !!! */
@@ -5400,13 +5397,8 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                {
-                    int sy=y+(firstTab ? moOffset : 1),
-                        sh=height-((lastTab ? moOffset : 1)+1);
-
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, x+width-2, sy, sh);
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x+width-1, sy, sh);
-                }
+                    drawHighlight(cr, x+width-2, y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
+                                  area, false, true);
                 break;
             }
             case GTK_POS_RIGHT: /* => tabs are on left !!! */
@@ -5449,13 +5441,8 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                {
-                    int sy=y+(firstTab ? moOffset : 1),
-                        sh=height-((lastTab ? moOffset : 1)+1);
-
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[ORIGINAL_SHADE]), 1.0, x+1, sy, sh);
-                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QT_STD_BORDER]), 1.0, x, sy, sh);
-                }
+                    drawHighlight(cr, x, y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
+                                  area, false, false);
                 break;
             }
         }

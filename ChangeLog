@@ -7,7 +7,8 @@
 4. Option to use button colour for listview headers.
 5. Use KDE4 colors for focus and mouse-over.
 6. Removal of background focus option.
-7. Create icon-mapping file in a more robust manner.
+7. Use faded lines for tab and listview header mouse-over.
+8. Create icon-mapping file in a more robust manner.
 
 0.62.8
 ------
