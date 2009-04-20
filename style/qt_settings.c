@@ -2149,13 +2149,14 @@ static gboolean qtInit(Options *opts)
 
                 if(!checkFileVersion(tmpStr, version, versionLen))
                 {
-                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "VERSION" > %s";
+                    static const char *constCmdStrFmt="perl "GTK_THEME_DIR"/map_kde_icons.pl "GTK_THEME_DIR"/icons%d %s %d %d %d %d %d %d %d %s "VERSION" > %s.%d && mv %s.%d %s";
 
                     const char *kdeprefix=kdeIconsPrefix();
+                    int        fileNameLen=strlen(tmpStr);
                     char       *cmdStr=(char *)malloc(strlen(constCmdStrFmt)
                                                       +2+(4*6)+2+
                                                       strlen(iconTheme)+
-                                                      (kdeprefix ? strlen(kdeprefix) : DEFAULT_ICON_PREFIX_LEN)+strlen(tmpStr)+1);
+                                                      (kdeprefix ? strlen(kdeprefix) : DEFAULT_ICON_PREFIX_LEN)+(fileNameLen*3)+64+1);
 
                     sprintf(cmdStr, constCmdStrFmt,
                                     qtSettings.qt4 ? 4 : 3,
@@ -2168,6 +2169,10 @@ static gboolean qtInit(Options *opts)
                                     qtSettings.iconSizes.mnuSize,
                                     qtSettings.iconSizes.dlgSize,
                                     iconTheme,
+                                    tmpStr,
+                                    getpid(),
+                                    tmpStr,
+                                    getpid(),
                                     tmpStr);
                     system(cmdStr);
                     free(cmdStr);
