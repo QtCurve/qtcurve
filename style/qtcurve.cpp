@@ -514,7 +514,7 @@ static QString kdeHome()
     return env.isEmpty() ? QDir::homePath()+"/.kde" : env;
 }
 
-static void getStyles(const QString &dir, const char *sub, QStringList &styles)
+static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
 {
     QDir d(dir+sub);
 
@@ -534,12 +534,12 @@ static void getStyles(const QString &dir, const char *sub, QStringList &styles)
             QString style((*it).left((*it).lastIndexOf(QTC_THEME_SUFFIX)));
 
             if(!styles.contains(style))
-                styles.append(style);
+                styles.insert(style);
         }
     }
 }
 
-static void getStyles(const QString &dir, QStringList &styles)
+static void getStyles(const QString &dir, QSet<QString> &styles)
 {
     getStyles(dir, QTC_THEME_DIR, styles);
     getStyles(dir, QTC_THEME_DIR4, styles);
@@ -570,14 +570,14 @@ class QtCurveStylePlugin : public QStylePlugin
 
     QStringList keys() const
     {
-        QStringList list;
-        list << "QtCurve";
+        QSet<QString> styles;
+        styles.insert("QtCurve");
 
-        getStyles(kdeHome(), list);
-        getStyles(KDE_PREFIX(3), list);
-        getStyles(KDE_PREFIX(4), list);
+        getStyles(kdeHome(), styles);
+        getStyles(KDE_PREFIX(3), styles);
+        getStyles(KDE_PREFIX(4), styles);
 
-        return list;
+        return styles.toList();
     }
 
     QStyle * create(const QString &key)
