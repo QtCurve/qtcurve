@@ -3998,20 +3998,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
                     }
 
-                    const QColor *border(borderColors(&opt, NULL));
-
                     if(Qt::Horizontal==ho->orientation)
                     {
-                        if(border)
-                        {
-                            painter->setPen(border[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x(), r.y()+r.height()-2, r.x()+r.width()-1,
-                                      r.y()+r.height()-2);
-                            painter->setPen(border[QT_STD_BORDER]);
-                        }
-                        else
-                            painter->setPen(use[QT_STD_BORDER]);
+                        painter->setPen(use[QT_STD_BORDER]);
                         drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                        if(itsMouseOverCols && opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
+                            drawHighlight(painter, QRect(r.x(), r.y()+r.height()-2, r.width(), 2), true, true);
 
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
@@ -4024,14 +4016,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     }
                     else
                     {
-                        if(border)
-                        {
-                            painter->setPen(border[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+r.width()-2, r.y(), r.x()+r.width()-2, r.y()+r.height()-1);
-                            painter->setPen(border[QT_STD_BORDER]);
-                        }
-                        else
-                            painter->setPen(use[QT_STD_BORDER]);
+                        painter->setPen(use[QT_STD_BORDER]);
                         drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
 
                         if(q3Header ||
@@ -4044,6 +4029,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             drawAaLine(painter, r.x()+5, r.y()+r.height()-1, r.x()+r.width()-6,
                                       r.y()+r.height()-1);
                         }
+                        if(itsMouseOverCols && opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
+                            drawHighlight(painter, QRect(r.x(), r.y()+r.height()-3, r.width(), 2), true, true);
                     }
                     painter->setRenderHint(QPainter::Antialiasing, false);
                 }
@@ -5022,16 +5009,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                        {
-                            painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.y()+1,
-                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.y()+1);
-                            painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.y(),
-                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.y());
-                            painter->setRenderHint(QPainter::Antialiasing, false);
-                        }
+                            drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1), r.y(),
+                                                         r.width()-(firstTab || lastTab ? moOffset : 1), 2),
+                                          true, false);
                         break;
                     }
                     case QTabBar::RoundedSouth:
@@ -5089,16 +5069,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                        {
-                            painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.bottom()-1,
-                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.bottom()-1);
-                            painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x()+(firstTab ? moOffset : 1), r.bottom(),
-                                              r.x()+r.width()-((lastTab ? moOffset : 0)+1), r.bottom());
-                            painter->setRenderHint(QPainter::Antialiasing, false);
-                        }
+                            drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1), r.y()+r.height()-2,
+                                                         r.width()-(firstTab || lastTab ? moOffset : 1), 2),
+                                          true, true);
                         break;
                     }
                     case QTabBar::RoundedWest:
@@ -5156,16 +5129,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                        {
-                            painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.x()+1, r.y()+(firstTab ? moOffset : 1),
-                                              r.x()+1, r.y()+r.height()-((lastTab ? moOffset : 0)+1));
-                            painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.x(), r.y()+(firstTab ? moOffset : 1),
-                                              r.x(), r.y()+r.height()-((lastTab ? moOffset : 0)+1));
-                            painter->setRenderHint(QPainter::Antialiasing, false);
-                        }
+                            drawHighlight(painter, QRect(r.x(), r.y()+(firstTab ? moOffset : 1),
+                                                         2, r.height()-(firstTab || lastTab ? moOffset : 1)),
+                                          false, false);
                         break;
                     }
                     case QTabBar::RoundedEast:
@@ -5223,16 +5189,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                        {
-                            painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->setPen(itsMouseOverCols[ORIGINAL_SHADE]);
-                            drawAaLine(painter, r.right()-1, r.y()+(firstTab ? moOffset : 1),
-                                              r.right()-1, r.y()+r.height()-((lastTab ? moOffset : 0)+1));
-                            painter->setPen(itsMouseOverCols[QT_STD_BORDER]);
-                            drawAaLine(painter, r.right(), r.y()+(firstTab ? moOffset : 1),
-                                              r.right(), r.y()+r.height()-((lastTab ? moOffset : 0)+1));
-                            painter->setRenderHint(QPainter::Antialiasing, false);
-                        }
+                            drawHighlight(painter, QRect(r.x()+r.width()-2, r.y()+(firstTab ? moOffset : 1),
+                                                         2, r.height()-(firstTab || lastTab ? moOffset : 1)),
+                                          false, true);
                         break;
                     }
                 }
@@ -7623,6 +7582,15 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
     }
 
     return QTC_BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
+}
+
+void QtCurveStyle::drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) const
+{
+    QColor col1(itsMouseOverCols[ORIGINAL_SHADE]);
+
+    col1.setAlphaF(0.5);
+    drawFadedLine(p, r, inc ? col1 : itsMouseOverCols[ORIGINAL_SHADE], true, true, horiz);
+    drawFadedLine(p, r.adjusted(horiz ? 0 : 1, horiz ? 1 : 0, 0, 0), inc ? itsMouseOverCols[ORIGINAL_SHADE] : col1, true, true, horiz);
 }
 
 void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz) const
