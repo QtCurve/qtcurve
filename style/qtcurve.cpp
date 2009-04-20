@@ -5753,6 +5753,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                        MO_GLOW==opts.coloredMouseOver ? WIDGET_MENU_BUTTON : WIDGET_NO_ETCH_BTN);
                     }
 
+                    if(mflags&State_Sunken)
+                        tool.rect.adjust(1, 1, 1, 1);
                     drawArrow(painter, tool.rect, PE_IndicatorArrowDown, option->palette.buttonText().color());
                 }
 /*
