@@ -149,8 +149,9 @@ typedef GdkColor color;
 
 #define QTC_SIMPLE_SHADING (!shading)
 
-#define QTC_GLOW_MO        ORIGINAL_SHADE
+#define QTC_GLOW_MO        0 /*ORIGINAL_SHADE*/
 #define QTC_GLOW_DEFBTN    0
+#define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
 
 #define QT_STD_BORDER      5
 #define QT_PBAR_BORDER     4
@@ -159,7 +160,7 @@ typedef GdkColor color;
 #define QT_SLIDER_MO_BORDER 3
 
 #define QT_FRAME_DARK_SHADOW 2
-#define QT_FOCUS              (FOCUS_BACKGROUND==opts.focus ? 3 : ORIGINAL_SHADE)
+#define QT_FOCUS(SEL)         ((SEL) ? 3 : ORIGINAL_SHADE)
 #define QTC_MENU_STRIPE_SHADE (USE_LIGHTER_POPUP_MENU ? ORIGINAL_SHADE : 2)
 #define QTC_MENU_SEP_SHADE    (USE_LIGHTER_POPUP_MENU ? 4 : 3)
 
@@ -533,10 +534,9 @@ typedef enum
 typedef enum
 {
     FOCUS_STANDARD,
-    FOCUS_HIGHLIGHT,
+    FOCUS_RECTANGLE,
     FOCUS_FULL,
     FOCUS_FILLED,
-    FOCUS_BACKGROUND,
     FOCUS_LINE
 } EFocus;
 

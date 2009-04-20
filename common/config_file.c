@@ -320,10 +320,8 @@ static EFocus toFocus(const char *str, EFocus def)
     {
         if(0==memcmp(str, "standard", 8))
             return FOCUS_STANDARD;
-        if(0==memcmp(str, "highlight", 9))
-            return FOCUS_HIGHLIGHT;
-        if(0==memcmp(str, "background", 10))
-            return FOCUS_BACKGROUND;
+        if(0==memcmp(str, "rect", 4) || 0==memcmp(str, "highlight", 9))
+            return FOCUS_RECTANGLE;
         if(0==memcmp(str, "filled", 6))
             return FOCUS_FILLED;
         if(0==memcmp(str, "full", 4))
@@ -1776,10 +1774,8 @@ static const char *toStr(EFocus f)
         default:
         case FOCUS_STANDARD:
             return "standard";
-        case FOCUS_HIGHLIGHT:
-            return "highlight";
-        case FOCUS_BACKGROUND:
-            return "background";
+        case FOCUS_RECTANGLE:
+            return "rect";
         case FOCUS_FILLED:
             return "filled";
         case FOCUS_FULL:

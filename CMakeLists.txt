@@ -68,38 +68,29 @@ endif(NOT KDE4PREFIX)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules )
 
 # search packages used by KDE
-find_package(KDE4)
+find_package(KDE4 REQUIRED)
 find_package(Qt4 REQUIRED)
 
 configure_file(config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
-if (KDE4_FOUND)
-    include(KDE4Defaults)
+include(KDE4Defaults)
+message("** PREFIX=${CMAKE_INSTALL_PREFIX}")
 
-    message("** PREFIX=${CMAKE_INSTALL_PREFIX}")
+add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
+include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
+set(QTCURVE_STYLE_DIR ${PLUGIN_INSTALL_DIR}/plugins/styles/)
+add_subdirectory(config)
+add_subdirectory(themes)
+add_subdirectory(colors)
 
-    add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
-    include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
-    set(QTCURVE_STYLE_DIR ${PLUGIN_INSTALL_DIR}/plugins/styles/)
-    add_subdirectory(config)
-    add_subdirectory(themes)
-    add_subdirectory(colors)
+find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES}) # kwinglobals.h is new for KDE4
 
-    find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES}) # kwinglobals.h is new for KDE4
-
-    if (KWINGLOBALS_H)
-        add_subdirectory(kwin)
-        add_subdirectory(kwinconfig)
-    else (KWINGLOBALS_H)
-        message("** KWin headers not found - KWin decoration will not be built")
-    endif (KWINGLOBALS_H)
-else (KDE4_FOUND)
-    set(CMAKE_INSTALL_PREFIX ${OLD_CMAKE_INSTALL_PREFIX})
-    add_definitions(${QT_DEFINITIONS})
-    include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
-    set(QTCURVE_STYLE_DIR ${QT_PLUGINS_DIR}/styles/)
-    message("** WARNING: KDE4 headers not found, QtCurve's config dialog will not be built")
-endif (KDE4_FOUND)
+if (KWINGLOBALS_H)
+    add_subdirectory(kwin)
+    add_subdirectory(kwinconfig)
+else (KWINGLOBALS_H)
+    message("** KWin headers not found - KWin decoration will not be built")
+endif (KWINGLOBALS_H)
 
 add_subdirectory(style)
 

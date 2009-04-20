@@ -152,6 +152,8 @@ class QtCurveStyle : public QWindowsStyle
 
     void           widgetDestroyed(QObject *o);
     void           setupKde4();
+    void           setDecorationColors();
+    void           applyKdeSettings(bool pal);
     QIcon          standardIconImplementation(StandardPixmap pix, const QStyleOption *option=0, const QWidget *widget=0) const;
     int            layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
                                                Qt::Orientation orientation, const QStyleOption *option,
@@ -161,9 +163,10 @@ class QtCurveStyle : public QWindowsStyle
     private:
 
     Options                            opts;
-    QColor                             itsMenuitemCols[TOTAL_SHADES+1],
+    QColor                             itsHighlightCols[TOTAL_SHADES+1],
                                        itsBackgroundCols[TOTAL_SHADES+1],
                                        itsMenubarCols[TOTAL_SHADES+1],
+                                       itsFocusCols[TOTAL_SHADES+1],
                                        *itsSliderCols,
                                        *itsDefBtnCols,
                                        *itsMouseOverCols,
