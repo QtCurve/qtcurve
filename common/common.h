@@ -263,10 +263,10 @@ typedef GdkColor color;
 #define QTC_MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
 
 #define QTC_MO_STD_DARK(W)     (MO_GLOW==opts.coloredMouseOver \
-                                    ? QTC_GLOW_MO \
+                                    ? 1 \
                                     : QTC_MO_PLASTIK_DARK(W))
 #define QTC_MO_STD_LIGHT(W, S) (MO_GLOW==opts.coloredMouseOver \
-                                    ? QTC_GLOW_MO \
+                                    ? 1 \
                                     : QTC_MO_PLASTIK_LIGHT(W))
 
 #define QTC_FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
