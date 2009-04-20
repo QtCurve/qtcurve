@@ -113,6 +113,9 @@ enum QtColorRoles
     COLOR_WINDOW_TEXT,
     COLOR_TOOLTIP_TEXT,
 
+    COLOR_FOCUS,    /* KDE4 */
+    COLOR_HOVER,    /* KDE4 */
+    
     COLOR_NONE,
     COLOR_NUMCOLORS=COLOR_NONE  /* NONE does not count! */
 };
@@ -489,8 +492,8 @@ typedef enum
 {
     BackgroundAlternate,
     BackgroundNormal,
-    //DecorationFocus,
-    //DecorationHover,
+    DecorationFocus,
+    DecorationHover,
     ForegroundNormal,
 
     UnknownColor
@@ -547,6 +550,10 @@ static ColorType getColorType(const char *line)
         return BackgroundNormal;
     if(0==strncmp_i(line, "ForegroundNormal=", 17))
         return ForegroundNormal;
+    if(0==strncmp_i(line, "DecorationFocus=", 16))
+        return DecorationFocus;
+    if(0==strncmp_i(line, "DecorationHover=", 16))
+        return DecorationHover;
     return UnknownColor;
 }
 
@@ -764,6 +771,22 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
         effects[EFF_INACTIVE].intensity.amount=0.0;
         effects[EFF_INACTIVE].intensity.effect=IntensityNoEffect;
         effects[EFF_INACTIVE].enabled=false;
+
+        qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=setGdkColor(232, 231, 230);
+        qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=setGdkColor(20, 19, 18);
+        qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]=setGdkColor(65, 139, 212);
+        qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]=setGdkColor(255, 255, 255);
+        qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=setGdkColor(192, 218, 255);
+        qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]=setGdkColor(20, 19, 18);
+        qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND]=setGdkColor(255, 255, 255);
+        qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]=setGdkColor(20, 19, 18);
+        qtSettings.colors[PAL_ACTIVE][COLOR_LV]=setGdkColor(248, 247, 246);
+        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]=setGdkColor(233, 232, 232);
+        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT]=setGdkColor(20, 19, 18);
+
+        qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=
+        qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=
+            qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
     }
 
     if(f)
@@ -890,10 +913,21 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
                     switch(section)
                     {
                         case SECT_KDE4_COL_BUTTON:
-                            if(BackgroundNormal==colorType)
-                                qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=color;
-                            else if(ForegroundNormal==colorType)
-                                qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=color;
+                            switch(colorType)
+                            {
+                                case BackgroundNormal:
+                                    qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=color;
+                                    break;
+                                case ForegroundNormal:
+                                    qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=color;
+                                    break;
+                                case DecorationFocus:
+                                    qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=color;
+                                    break;
+                                case DecorationHover:
+                                    qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=color;
+                                    break;
+                            }
                             break;
                         case SECT_KDE4_COL_SEL:
                             if(BackgroundNormal==colorType)
@@ -1001,34 +1035,6 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
         int    eff=0;
         double contrast=0.1*opts->contrast,
                y;
-
-        // Set defaults, if not read in...
-        if(!(colorsFound&SECT_KDE4_COL_BUTTON))
-        {
-            qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON]=setGdkColor(232, 231, 230);
-            qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]=setGdkColor(20, 19, 18);
-        }
-        if(!(colorsFound&SECT_KDE4_COL_SEL))
-        {
-            qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]=setGdkColor(65, 139, 212);
-            qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]=setGdkColor(255, 255, 255);
-        }
-        if(!(colorsFound&SECT_KDE4_COL_TOOLTIP))
-        {
-            qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=setGdkColor(192, 218, 255);
-            qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]=setGdkColor(20, 19, 18);
-        }
-        if(!(colorsFound&SECT_KDE4_COL_VIEW))
-        {
-            qtSettings.colors[PAL_ACTIVE][COLOR_BACKGROUND]=setGdkColor(255, 255, 255);
-            qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]=setGdkColor(20, 19, 18);
-            qtSettings.colors[PAL_ACTIVE][COLOR_LV]=setGdkColor(248, 247, 246);
-        }
-        if(!(colorsFound&SECT_KDE4_COL_WINDOW))
-        {
-            qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]=setGdkColor(233, 232, 232);
-            qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT]=setGdkColor(20, 19, 18);
-        }        
 
         contrast = (1.0 > contrast ? (-1.0 < contrast ? contrast : -1.0) : 1.0);
         y = ColorUtils_luma(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
@@ -1226,6 +1232,20 @@ static void readQtRc(const char *rc, int rd, Options *opts, gboolean absolute, g
         parseQtColors(line, PAL_DISABLED);
     }
 
+    if(rd&RD_ACT_PALETTE)
+    {
+        qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=
+        qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=
+            qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
+    }
+/*
+    if(rd&RD_DIS_PALETTE)
+    {
+        qtSettings.colors[PAL_DISABLED][COLOR_FOCUS]=
+        qtSettings.colors[PAL_DISABLED][COLOR_HOVER]=
+            qtSettings.colors[PAL_DISABLED][COLOR_SELECTED];
+    }
+*/
 #ifdef QTC_READ_INACTIVE_PAL
     if(rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE))
     {
@@ -1233,6 +1253,15 @@ static void readQtRc(const char *rc, int rd, Options *opts, gboolean absolute, g
         line[QTC_MAX_INPUT_LINE_LEN]='\0';
         parseQtColors(line, PAL_INACTIVE);
     }
+
+/*
+    if(rd&RD_INACT_PALETTE)
+    {
+        qtSettings.colors[PAL_INACTIVE][COLOR_FOCUS]=
+        qtSettings.colors[PAL_INACTIVE][COLOR_HOVER]=
+            qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
+    }
+*/
 #endif
 
     if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /* No need to check if read in */
