@@ -3898,6 +3898,11 @@ debugDisplayWidget(widget, 3);
                (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
                 fillVal=ORIGINAL_SHADE;
 
+            if(pbar)
+            {
+                clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
+            }
+
             if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
             {
                 gboolean reverse=FALSE; /* TODO !!! */
@@ -3934,7 +3939,7 @@ debugDisplayWidget(widget, 3);
                                   TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
             else if(stdColors && (pbar || opts.borderMenuitems))
             {
-                if(pbar && (horizPbar ? width : height)<3)
+                if(pbar && (horizPbar ? width : height)<2)
                 {
                     if((!pbar || !opts.fillProgress) && border && stdColors)
                         drawAreaColor(cr, area, NULL, &itemCols[fillVal], x, y, width, height);
@@ -3963,7 +3968,7 @@ debugDisplayWidget(widget, 3);
                             DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
                             (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
 
-            if(pbar)
+            if(pbar&& width>2 && height>2)
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                                itemCols, round, BORDER_FLAT, WIDGET_OTHER, 0, QT_PBAR_BORDER);
             if(pbar && !opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
