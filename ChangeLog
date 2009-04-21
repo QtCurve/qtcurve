@@ -1,15 +1,16 @@
 0.63.0
 ------
-1. Add '3dfull' to gradient border options. This forces the
-   dark, as well as the light, portion to be drawn.
-2. Use a lighter shade for the dark portion of gradient border.
-3. Flat dot for radio buttons.
-4. Option to use button colour for listview headers.
-5. Use KDE4 colors for focus and mouse-over.
-6. Removal of background focus option.
-7. Use faded lines for tab and listview header mouse-over.
-8. Remove line from KTitleWidget
-9. KDE4 is now required for building.
+ 1. Add '3dfull' to gradient border options. This forces the
+    dark, as well as the light, portion to be drawn.
+ 2. Use a lighter shade for the dark portion of gradient border.
+ 3. Flat dot for radio buttons.
+ 4. Option to use button colour for listview headers.
+ 5. Use KDE4 colors for focus and mouse-over.
+ 6. Removal of background focus option.
+ 7. Softer, and much nicer, colouration of selected tab.
+ 8. Use faded lines for tab and listview header mouse-over.
+ 9. Remove line from KTitleWidget
+10. KDE4 is now required for building.
 
 0.62.9
 ------

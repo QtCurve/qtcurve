@@ -4960,7 +4960,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(selected)
                             painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
                         drawBorder(painter, r.adjusted(0, 0, 0, 4), option, round, NULL, WIDGET_TAB_TOP,
-                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -4999,6 +4999,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setClipRect(QRect(r.x(), r.y(), r.width(), 3));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
+
+                            if(opts.colorSelTab)
+                                colorTab(painter, r, true, WIDGET_TAB_TOP, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
                             drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1), r.y(),
@@ -5025,7 +5028,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillTab(painter, r.adjusted(1, 0, -1, -1), option, fill, true, WIDGET_TAB_BOT);
                         painter->setClipping(false);
                         drawBorder(painter, r.adjusted(0, -4, 0, 0), option, round, NULL, WIDGET_TAB_BOT,
-                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -5059,6 +5062,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setClipRect(QRect(r.x(), r.y()+r.height()-3, r.width(), r.y()+r.height()-1));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_BOT, BORDER_FLAT, false, 3);
                             }
+
+                            if(opts.colorSelTab)
+                                colorTab(painter, r, true, WIDGET_TAB_BOT, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
                             drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1), r.y()+r.height()-2,
@@ -5085,7 +5091,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillTab(painter, r.adjusted(1, 1, 0, -1), option, fill, false, WIDGET_TAB_TOP);
                         painter->setClipping(false);
                         drawBorder(painter, r.adjusted(0, 0, 4, 0), option, round, NULL, WIDGET_TAB_TOP,
-                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -5119,6 +5125,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setClipRect(QRect(r.x(), r.y(), 3, r.height()));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
+
+                            if(opts.colorSelTab)
+                                colorTab(painter, r, false, WIDGET_TAB_TOP, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
                             drawHighlight(painter, QRect(r.x(), r.y()+(firstTab ? moOffset : 1),
@@ -5145,7 +5154,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillTab(painter, r.adjusted(0, 1, -1, -1), option, fill, false, WIDGET_TAB_BOT);
                         painter->setClipping(false);
                         drawBorder(painter, r.adjusted(-4, 0, 0, 0), option, round, NULL, WIDGET_TAB_BOT,
-                                   selected && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, false);
+                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
 
                         if(selected)
                         {
@@ -5179,6 +5188,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setClipRect(QRect(r.x()+r.width()-3, r.y(), r.x()+r.width()-1, r.height()));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
+
+                            if(opts.colorSelTab)
+                                colorTab(painter, r, false, WIDGET_TAB_BOT, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
                             drawHighlight(painter, QRect(r.x()+r.width()-2, r.y()+(firstTab ? moOffset : 1),
@@ -7850,8 +7862,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
                                          bool horiz, bool sel, EAppearance app, EWidget w) const
 {
     bool                             topTab(WIDGET_TAB_TOP==w),
-                                     botTab(WIDGET_TAB_BOT==w),
-                                     colorTab(sel && opts.colorSelTab && (topTab || botTab));
+                                     botTab(WIDGET_TAB_BOT==w);
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
@@ -7866,8 +7877,6 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
             col=base;
         else
             shade(base, &col, botTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
-        if(colorTab && i<numStops-1)
-            col=tint(col, itsHighlightCols[0], (1.0-(*it).pos)*QTC_COLOR_SEL_TAB_FACTOR);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     //p->fillRect(r, base);
@@ -9016,6 +9025,22 @@ void QtCurveStyle::fillTab(QPainter *p, const QRect &r, const QStyleOption *opti
 
         drawBevelGradient(fill, p, r, horiz, option->state&State_Selected, app, tab);
     }
+}
+
+void QtCurveStyle::colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int round) const
+{
+    p->save();
+    p->setRenderHint(QPainter::Antialiasing, true);
+    QLinearGradient grad(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
+    QColor          start(itsHighlightCols[ORIGINAL_SHADE]),
+                    end(itsHighlightCols[ORIGINAL_SHADE]);
+
+    start.setAlphaF(QTC_COLOR_SEL_TAB_FACTOR);
+    end.setAlphaF(0.0);
+    grad.setColorAt(0, WIDGET_TAB_TOP==tab ? start : end);
+    grad.setColorAt(1, WIDGET_TAB_TOP==tab ? end : start);
+    p->fillPath(buildPath(r, tab, round, getRadius(opts.round, r.width(), r.height(), tab, RADIUS_EXTERNAL)), grad);
+    p->restore();
 }
 
 void QtCurveStyle::shadeColors(const QColor &base, QColor *vals) const
