@@ -5888,7 +5888,11 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         QTC_CAIRO_BEGIN
 
         if(FOCUS_LINE==opts.focus)
+        {
+            if(view || isListViewHeader(widget))
+                height-=2;
             drawFadedLine(cr, x, y+height-1, width, 1, col, area, NULL, TRUE, TRUE, TRUE);
+        }
         else
         {
             if(/*isList(widget) || */width<3 || height < 3)
