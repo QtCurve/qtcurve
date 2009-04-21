@@ -130,6 +130,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu=true, bool horiz=true) const;
     void drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOption *option, bool tb, ELine handles) const;
     void fillTab(QPainter *p, const QRect &r, const QStyleOption *option, const QColor &fill, bool horiz, EWidget tab) const;
+    void colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int round) const;
     void shadeColors(const QColor &base, QColor *vals) const;
     const QColor * buttonColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
