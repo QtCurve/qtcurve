@@ -3195,8 +3195,7 @@ debugDisplayWidget(widget, 3);
                                                             : checkbox
                                                                 ? WIDGET_CHECKBOX
                                                                     : button
-                                                                        ? (defBtn && IND_COLORED!=opts.defBtnIndicator) ||
-                                                                          glowFocus
+                                                                        ? defBtn || glowFocus
                                                                             ? WIDGET_DEF_BUTTON
                                                                             : WIDGET_STD_BUTTON
                                                                         : stepper || sbar
@@ -3315,17 +3314,19 @@ debugDisplayWidget(widget, 3);
                         x+=2, width-=2;
                 }
 
-                if(defBtn && IND_TINT==opts.defBtnIndicator)
-                    btn_colors=qtcPalette.defbtn;
-
                 if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                     drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
                 else
+                {
+                    GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator)
+                                    ? qtcPalette.defbtn : btn_colors;
+
                     drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                                   &btn_colors[bgnd], btn_colors, round, widgetType,
+                                   &cols[bgnd], cols, round, widgetType,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
                                                 (lvh ? 0 : DF_DO_BORDER)|
                                                 (horiz ? 0 : DF_VERT), widget);
+                }
             }
 
             if(defBtn)
@@ -3344,26 +3345,11 @@ debugDisplayWidget(widget, 3);
                 }
                 else if(IND_COLORED==opts.defBtnIndicator && (COLORED_BORDER_SIZE>2))
                 {
-                    int       o=COLORED_BORDER_SIZE+(QTC_DO_EFFECT ? 1 : 0); // offset needed because of etch
-                    GdkPoint  outer[4]={ {x, y}, {x+width, y}, {x+width, y+height},
-                                         {x, y+height} },
-                              inner[4]={ {x+o,       y+o       },
-                                         {x+width-o, y+o       },
-                                         {x+width-o, y+height-o},
-                                         {x+o,       y+height-o} };
-                    GdkRegion *outer_region=gdk_region_polygon(outer, 4, GDK_EVEN_ODD_RULE),
-                              *inner_region=gdk_region_polygon(inner, 4, GDK_EVEN_ODD_RULE);
+                    int o=COLORED_BORDER_SIZE+(QTC_DO_EFFECT ? 1 : 0); // offset needed because of etch
 
-                    gdk_region_xor(inner_region, outer_region);
-
-                    drawLightBevel(cr, style, window, state, NULL, inner_region, x, y, width, height,
-                                   &qtcPalette.defbtn[QTC_MO_DEF_BTN], qtcPalette.defbtn, round, WIDGET_DEF_BUTTON,
-                                   BORDER_FLAT, /*(draw_inside ? DF_DRAW_INSIDE : 0) |*/
-                                   DF_DO_CORNERS|(sunken ? DF_SUNKEN : 0)|
-                                   DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
-
-                    gdk_region_destroy(inner_region);
-                    gdk_region_destroy(outer_region);
+                    drawBevelGradient(cr, style, area, NULL, x+o, y+o, width-(2*o), height-(2*o),
+                                      &btn_colors[bgnd],
+                                      TRUE, GTK_STATE_ACTIVE==state, opts.appearance, WIDGET_STD_BUTTON);
                 }
         }
 
