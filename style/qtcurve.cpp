@@ -3307,12 +3307,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 //             painter->fillRect(doEtch ? r.adjusted(2, 2, -2, -2) : r.adjusted(1, 1, -1, -1), palette.background().color());
 //             painter->setRenderHint(QPainter::Antialiasing, false);
 
-            drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL, getFill(&opt, use), use,
+            bool coloredDef=isDefault && state&State_Enabled && IND_COLORED==opts.defBtnIndicator;
+            
+            drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL,
+                           coloredDef ? itsDefBtnCols[QTC_MO_DEF_BTN] : getFill(&opt, use),
+                           coloredDef ? itsDefBtnCols : use,
                            true, isKWin
                                     ? WIDGET_MDI_WINDOW_BUTTON
                                     : isOnListView
                                         ? WIDGET_NO_ETCH_BTN
-                                        : isDefault && state&State_Enabled  && IND_COLORED!=opts.defBtnIndicator
+                                        : isDefault && state&State_Enabled
                                             ? WIDGET_DEF_BUTTON
                                             : WIDGET_STD_BUTTON);
 
@@ -3340,23 +3344,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
                     case IND_COLORED:
                     {
-                        QRegion outer(r);
-                        QRect   r2(r);
+                        int   offset=COLORED_BORDER_SIZE+(doEtch ? 1 : 0);
+                        QRect r2(r.adjusted(offset, offset, -offset, -offset));
 
-                        if(doEtch)
-                            r2.adjust(1, 1, -1, -1);
-
-                        r2.adjust(COLORED_BORDER_SIZE, COLORED_BORDER_SIZE, -COLORED_BORDER_SIZE,
-                                    -COLORED_BORDER_SIZE);
-
-                        QRegion inner(r2);
-
-                        painter->setClipRegion(outer.subtract(inner));
-
-                        drawLightBevel(painter, r, option, widget, ROUNDED_ALL, itsDefBtnCols[QTC_MO_DEF_BTN],
-                                       itsDefBtnCols, true, WIDGET_DEF_BUTTON);
-
-                        painter->setClipping(false);
+                        drawBevelGradient(getFill(&opt, use), painter, r2, true,
+                                          state &(State_On | State_Sunken),
+                                          opts.appearance, WIDGET_STD_BUTTON);
                     }
                     default:
                         break;
