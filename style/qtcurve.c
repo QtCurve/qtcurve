@@ -1574,7 +1574,6 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
                                         : APPEARANCE_GRADIENT;
         const Gradient  *grad=getGradient(app, &opts);
         int             i=0;
-        bool            colorTab=sel && (topTab || botTab) && opts.colorSelTab;
 
         setCairoClipping(cr, area, region);
 
@@ -1589,12 +1588,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
                 double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
                 shade(base, &col, botTab ? QTC_MAX(val, 0.9) : val);
             }
-            if(colorTab && i<grad->numStops-1)
-            {
-                GdkColor t;
-                tintColor(&col, &qtcPalette.highlight[0], &t, (1.0-grad->stops[i].pos)*QTC_COLOR_SEL_TAB_FACTOR);
-                col=t;
-            }
+
             cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
                                               QTC_CAIRO_COL(col), alpha);
         }
@@ -5123,6 +5117,22 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
         drawAreaColor(cr, area, NULL, col, x, y, width, height);
 }
 
+static void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidget tab, gboolean horiz)
+{
+    cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
+
+    clipPath(cr, x, y, width, height, tab, RADIUS_EXTERNAL, round);
+    cairo_pattern_add_color_stop_rgba(pt, 0, QTC_CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
+                                      WIDGET_TAB_TOP==tab ? QTC_COLOR_SEL_TAB_FACTOR : 0.0);
+    cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
+                                      WIDGET_TAB_TOP==tab ? 0.0 : QTC_COLOR_SEL_TAB_FACTOR);
+    cairo_set_source(cr, pt);
+    cairo_rectangle(cr, x, y, width, height);
+    cairo_fill(cr);
+    cairo_pattern_destroy (pt);
+    unsetCairoClipping(cr);
+}
+                    
 static gboolean isMozillaTab(GtkWidget *widget)
 {
     return /*isMozillaWidget(widget) */ isFixedWidget(widget) && GTK_IS_NOTEBOOK(widget);
@@ -5279,7 +5289,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y-4, width, height+4,
                            qtcPalette.background, round,
-                           active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                           active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5295,6 +5305,9 @@ debugDisplayWidget(widget, 3);
                                    qtcPalette.highlight, ROUNDED_BOTTOM,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
                 }
+
+                if(opts.colorSelTab && notebook && active)
+                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, true);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1), y+height-2, width-(firstTab || lastTab ? moOffset : 1), 2,
@@ -5324,7 +5337,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y, width, height+4,
                            qtcPalette.background, round,
-                           active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                           active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5340,6 +5353,9 @@ debugDisplayWidget(widget, 3);
                                    qtcPalette.highlight, ROUNDED_TOP,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
                 }
+
+                if(opts.colorSelTab && notebook && active)
+                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, true);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1), y, width-(firstTab || lastTab ? moOffset : 1), 2,
@@ -5365,7 +5381,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x-4, y, width+4, height,
                            qtcPalette.background, round,
-                           active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                           active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5382,6 +5398,9 @@ debugDisplayWidget(widget, 3);
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
                 }
 
+                if(opts.colorSelTab && notebook && active)
+                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, false);
+                    
                 if(notebook && opts.coloredMouseOver && highlight)
                     drawHighlight(cr, x+width-2, y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
                                   area, false, true);
@@ -5409,7 +5428,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y, width+4, height,
                            qtcPalette.background, round,
-                           active && !opts.colorSelTab ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                           active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5425,6 +5444,9 @@ debugDisplayWidget(widget, 3);
                                    qtcPalette.highlight, ROUNDED_LEFT,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
                 }
+
+                if(opts.colorSelTab && notebook && active)
+                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, false);
 
                 if(notebook && opts.coloredMouseOver && highlight)
                     drawHighlight(cr, x, y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
