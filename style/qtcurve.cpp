@@ -4609,15 +4609,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     QPixmap      pixmap(getIconPixmap(button->icon, button->iconSize, mode, state));
                     int          labelWidth(pixmap.width()),
                                  labelHeight(pixmap.height()),
-                                 iconSpacing (4),//### 4 is currently hardcoded in QPushButton::sizeHint()
-                                 textWidth(button->fontMetrics.boundingRect(option->rect, tf, button->text).width());
+                                 iconSpacing (4);//### 4 is currently hardcoded in QPushButton::sizeHint()
 
                     if (!button->text.isEmpty())
-                        labelWidth += (textWidth + iconSpacing);
+                        labelWidth += (button->fontMetrics.boundingRect(option->rect, tf, button->text).width() + iconSpacing);
 
                     QRect iconRect(r.x() + (r.width() - labelWidth) / 2,
-                                r.y() + (r.height() - labelHeight) / 2,
-                                pixmap.width(), pixmap.height());
+                                   r.y() + (r.height() - labelHeight) / 2,
+                                   pixmap.width(), pixmap.height());
 
                     iconRect = visualRect(button->direction, r, iconRect);
 
@@ -5458,7 +5457,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             pr.setHeight(pmSize.height() + 6);
 
-                            tr.adjust(0, pr.bottom()-2, 0, 0); // -3);
+                            tr.adjust(0, pr.bottom()-3, 0, 0); // -3);
                             pr.translate(shiftX, shiftY);
                             if (hasArrow)
                                 drawTbArrow(this, tb, pr, painter, widget);
@@ -5484,6 +5483,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     else
                     {
                         pr.translate(shiftX, shiftY);
+
                         if (hasArrow)
                             drawTbArrow(this, tb, pr, painter, widget);
                         else
@@ -5699,7 +5699,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #else
                 // Try to detect if this is Qt 4.5...
                 if(qtVersion()>=VER_45)
-                {      
+                {
                     if (state&State_Sunken && !(toolbutton->activeSubControls & SC_ToolButton))
                         bflags&=~State_Sunken;
                 }
@@ -5719,7 +5719,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
                         tool.state &= ~State_MouseOver;
-                                 
+
                     drawPrimitive(PE_PanelButtonTool, &tool, painter, widget);
                 }
 
@@ -6839,7 +6839,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_ToolButton:
         {
-            newSize = QSize(size.width()+9, size.height()+9);
+            newSize = QSize(size.width()+8, size.height()+8);
             // -- from kstyle & oxygen --
             // We want to avoid super-skiny buttons, for things like "up" when icons + text
             // For this, we would like to make width >= height.
@@ -6851,7 +6851,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
             {
-                if ((!tbOpt->icon.isNull()) && (!tbOpt->text.isEmpty()) && Qt::ToolButtonTextUnderIcon==tbOpt->toolButtonStyle)
+                if (!tbOpt->icon.isNull() && !tbOpt->text.isEmpty() && Qt::ToolButtonTextUnderIcon==tbOpt->toolButtonStyle)
                     newSize.setHeight(newSize.height()-4);
 
                 if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
