@@ -1780,11 +1780,13 @@ static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
     double   xd=x+0.5,
              yd=y+0.5,
              radius=getRadius(opts.round, w, h, widget, RADIUS_ETCH);
-    gboolean def=WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator;
+    gboolean def=WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator,
+             defShade=def && (!qtcPalette.defbtn ||
+                              QTC_EQUAL_COLOR(qtcPalette.defbtn[ORIGINAL_SHADE], qtcPalette.mouseover[ORIGINAL_SHADE]));
     GdkColor *col=def && qtcPalette.defbtn ? &qtcPalette.defbtn[QTC_GLOW_DEFBTN] : &qtcPalette.mouseover[QTC_GLOW_MO];
 
     setCairoClipping(cr, area, region);
-    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_GLOW_ALPHA(def));
+    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_GLOW_ALPHA(defShade));
     createPath(cr, xd, yd, w-1, h-1, radius, round);
     cairo_stroke(cr);
     unsetCairoClipping(cr);
