@@ -3908,7 +3908,7 @@ debugDisplayWidget(widget, 3);
                              widget->allocation.height-(2*offset), WIDGET_PROGRESSBAR,
                              RADIUS_EXTERNAL, ROUNDED_ALL);
                 }
-                else
+                else if ((horizPbar ? width : height)<4)
                     clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
 
             if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
