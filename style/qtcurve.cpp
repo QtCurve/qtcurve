@@ -8080,10 +8080,11 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
 void QtCurveStyle::drawGlow(QPainter *p, const QRect &r, EWidget w) const
 {
-    bool   def(WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator);
+    bool   def(WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator),
+           defShade=def && (!itsDefBtnCols || itsDefBtnCols[ORIGINAL_SHADE]==itsMouseOverCols[ORIGINAL_SHADE]);
     QColor col(def && itsDefBtnCols ? itsDefBtnCols[QTC_GLOW_DEFBTN] : itsMouseOverCols[QTC_GLOW_MO]);
 
-    col.setAlphaF(QTC_GLOW_ALPHA(def));
+    col.setAlphaF(QTC_GLOW_ALPHA(defShade));
     p->setBrush(Qt::NoBrush);
     p->setRenderHint(QPainter::Antialiasing, true);
     p->setPen(col);
