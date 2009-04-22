@@ -8,9 +8,9 @@
  5. Use KDE4 colors for focus and mouse-over.
  6. Removal of background focus option.
  7. Softer, and much nicer, colouration of selected tab.
- 8. Use faded lines for tab and listview header mouse-over.
- 9. Remove line from KTitleWidget
-10. KDE4 is now required for building.
+ 8. Improve appearance of progress when at very small steps.
+ 9. Use faded lines for tab and listview header mouse-over.
+10. Remove line from KTitleWidget
 
 0.62.9
 ------

@@ -8517,6 +8517,7 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
 void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical, bool reverse) const
 {
     QStyleOption opt(*option);
+    QRect        rx(r);
 
     opt.state|=State_Raised;
 
@@ -8530,35 +8531,35 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     else
         opt.state&=~QTC_STATE_REVERSE;
 
-    if(r.width()<1)
+    if((vertical ? r.height() : r.width())<1)
         return;
 
-    int  length(vertical ? r.height() : r.width());
-    bool drawFull(length > 3);
+    if(vertical && r.height()<4)
+        rx.setHeight(4);
+
+    if(!vertical && rx.width()<4)
+        rx.setWidth(4);
+
+    int          length(vertical ? rx.height() : rx.width());
     const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor
                     ? itsHighlightCols : itsBackgroundCols;
-
-    drawLightBevel(p, r, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, true, WIDGET_PROGRESSBAR);
+                                         
+    drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, true,
+                   WIDGET_PROGRESSBAR);
 
     if(!opts.fillProgress && QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
     {
-        QRect rb(r);
+        bool drawFull(length > 3);
 
-        if(opts.fillProgress)
-        {
-            p->setPen(backgroundColors(option)[QT_STD_BORDER]);
-            rb.adjust(1, 1, -1, -1);
-        }
-        else
-            p->setPen(midColor(option->palette.background().color(), itsHighlightCols[QT_PBAR_BORDER]));
+        p->setPen(midColor(option->palette.background().color(), itsHighlightCols[QT_PBAR_BORDER]));
         if(!(round&CORNER_TL) || !drawFull)
-            p->drawPoint(rb.x(), rb.y());
+            p->drawPoint(rx.x(), rx.y());
         if(!(round&CORNER_BL) || !drawFull)
-            p->drawPoint(rb.x(), rb.y()+rb.height()-1);
+            p->drawPoint(rx.x(), rx.y()+rx.height()-1);
         if(!(round&CORNER_TR) || !drawFull)
-            p->drawPoint(rb.x()+rb.width()-1, rb.y());
+            p->drawPoint(rx.x()+rx.width()-1, rx.y());
         if(!(round&CORNER_BR) || !drawFull)
-            p->drawPoint(rb.x()+rb.width()-1, rb.y()+rb.height()-1);
+            p->drawPoint(rx.x()+rx.width()-1, rx.y()+rx.height()-1);
     }
 }
 
