@@ -4585,6 +4585,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                              ((btn->rect.height() - mbi)/2),
                              mbi - 6, mbi);
 
+                    if(option->state &(State_On | State_Sunken))
+                        ar.adjust(1, 1, 1, 1);
+                            
                     drawArrow(painter, ar, PE_IndicatorArrowDown, option->palette.buttonText().color());
                 }
             }
