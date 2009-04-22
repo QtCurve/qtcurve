@@ -172,7 +172,7 @@ typedef GdkColor color;
             : shades[SHADING_SIMPLE==shading ? 1 : 0][c][s] )
 
 #define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
-#define QTC_COLOR_SEL_TAB_FACTOR 1.2
+#define QTC_COLOR_SEL_TAB_FACTOR 0.25
 
 #define INVERT_SHADE(A) (1.0+(1.0-A))
 
