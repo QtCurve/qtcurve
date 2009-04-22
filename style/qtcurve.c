@@ -3899,9 +3899,15 @@ debugDisplayWidget(widget, 3);
                 fillVal=ORIGINAL_SHADE;
 
             if(pbar)
-            {
-                clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
-            }
+                if(widget && opts.fillProgress && (horizPbar ? width : height)<16)
+                {
+                    int offset=QTC_DO_EFFECT ? 1 : 0;
+                    clipPath(cr, offset, offset, widget->allocation.width-(2*offset),
+                             widget->allocation.height-(2*offset), WIDGET_PROGRESSBAR,
+                             RADIUS_EXTERNAL, ROUNDED_ALL);
+                }
+                else
+                    clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
 
             if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
             {
@@ -3939,12 +3945,7 @@ debugDisplayWidget(widget, 3);
                                   TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
             else if(stdColors && (pbar || opts.borderMenuitems))
             {
-                if(pbar && (horizPbar ? width : height)<2)
-                {
-                    if((!pbar || !opts.fillProgress) && border && stdColors)
-                        drawAreaColor(cr, area, NULL, &itemCols[fillVal], x, y, width, height);
-                }
-                else
+                if(!pbar || (horizPbar ? width : height)>1)
                     drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
                                 width, height, &itemCols[fillVal],
                                 itemCols, round, pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
