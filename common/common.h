@@ -149,8 +149,8 @@ typedef GdkColor color;
 
 #define QTC_SIMPLE_SHADING (!shading)
 
-#define QTC_GLOW_MO        0 /*ORIGINAL_SHADE*/
-#define QTC_GLOW_DEFBTN    0
+#define QTC_GLOW_MO        1 /*ORIGINAL_SHADE*/
+#define QTC_GLOW_DEFBTN    1
 #define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
 
 #define QT_STD_BORDER      5
