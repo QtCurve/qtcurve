@@ -3751,34 +3751,15 @@ debugDisplayWidget(widget, 3);
             }
         }
     }
-    else if(widget && (menuitem || pbar))
-    {
-        GdkRegion  *region=NULL;
-        GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
-        gboolean   active_mb=isMozilla() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE),
-                   horizPbar=isHorizontalProgressbar(widget);
+    else if(widget && pbar)
+   {
+        GdkRegion *region=NULL;
+        gboolean  horiz=isHorizontalProgressbar(widget);
 
-#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
-         -> and if tey are they're drawn first incorrectly :-( */
-        if(!mb && menuitem && GTK_IS_IMAGE_MENU_ITEM(widget) &&
-           (0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)) ||
-            (GTK_IS_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))) &&
-             GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))))))
-        {
-            // Give it a blank icon - so that menuStripe looks ok, plus this matched KDE style!
-            if(0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))
-                gtk_image_menu_item_set_image(GTK_IS_IMAGE_MENU_ITEM(widget),
-                                              gtk_image_new_from_pixbuf(getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0)));
-            else
-                gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))),
-                                          getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
-        }
-#endif
-
-        if(pbar && opts.fillProgress)
+        if(opts.fillProgress)
             x--, y--, width+=2, height+=2;
 
-        if(pbar && STRIPE_NONE!=opts.stripedProgress)
+        if(STRIPE_NONE!=opts.stripedProgress)
         {
             GdkRectangle              rect={x, y, width-2, height-2};
             GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
@@ -3804,7 +3785,7 @@ debugDisplayWidget(widget, 3);
             {
                 default:
                 case STRIPE_PLAIN:
-                    if(horizPbar)
+                    if(horiz)
                         for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
                         {
                             GdkRectangle inner_rect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
@@ -3834,7 +3815,7 @@ debugDisplayWidget(widget, 3);
                         }
                     break;
                 case STRIPE_DIAGONAL:
-                    if(horizPbar)
+                    if(horiz)
                         for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
                         {
                             GdkPoint  a[4]={ {x+stripeOffset+animShift,                               y},
@@ -3868,110 +3849,35 @@ debugDisplayWidget(widget, 3);
             }
         }
 
-        // The handling of 'mouse pressed' in the menubar event handler doesn't seem to set the
-        // menu as active, therefore the active_mb fails. However the check below works...
-        if(mb && !active_mb && widget)
-            active_mb=widget==GTK_MENU_SHELL(mb)->active_menu_item;
-
-        /* The following 'if' is just a hack for a menubar item problem with pidgin. Sometime, a 12pix width
-           empty menubar item is drawn on the right - and doesnt disappear! */
-        if(!mb || width>12)
         {
-            gboolean grayItem=(!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app) ||
-                              (!opts.useHighlightForMenu && (mb || menuitem)) ||
-                              (pbar && GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor);
+            gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
             GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
-            GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
-                            ? &qtcPalette.menubar[ORIGINAL_SHADE] : NULL;
-            int      round=pbar ? (opts.fillProgress ? ROUNDED_ALL : progressbarRound(widget, rev))
-                                : mb
-                                    ? active_mb && opts.roundMbTopOnly
-                                        ? ROUNDED_TOP
-                                        : ROUNDED_ALL
-                                    : ROUNDED_ALL,
+            int      round=opts.fillProgress ? ROUNDED_ALL : progressbarRound(widget, rev),
                      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
-            gboolean border=pbar || menuitem || mb,
-                     stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars,
-                     horiz=horizPbar || menuitem;
-            int      fillVal=grayItem && !pbar ? 4 : ORIGINAL_SHADE,
-                     borderVal=pbar || opts.borderMenuitems ? 0 : fillVal;
-            EWidget  wid=pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM;
+            int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
+                     borderVal=0;
 
-            if(pbar)
-                x++, y++, width-=2, height-=2;
-            else if(!pbar && !border)
-                x--, y--, width+=2, height+=2;
+            x++, y++, width-=2, height-=2;
 
-            if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
-               (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
-                fillVal=ORIGINAL_SHADE;
+            if(opts.round>ROUND_SLIGHT && (horiz ? width : height)<4)
+                clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
 
-            if(pbar && opts.round>ROUND_SLIGHT && (horizPbar ? width : height)<4)
-                clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
+            if((horiz ? width : height)>1)
+                drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
+                            width, height, &itemCols[fillVal],
+                            itemCols, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
+                            DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
-            if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
-            {
-                gboolean reverse=FALSE; /* TODO !!! */
-                int      roundOffet=QTC_ROUNDED ? 1 : 0,
-                         mainX=x+(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1),
-                         mainY=y+roundOffet+1,
-                         mainWidth=width-(reverse ? roundOffet+1 : 1+MENUITEM_FADE_SIZE),
-                         fadeX=reverse ? x+1 : width-MENUITEM_FADE_SIZE;
-
-                clipPath(cr, mainX-1, mainY-1, mainWidth+1, height-2, WIDGET_MENU_ITEM, RADIUS_INTERNAL,
-                         reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
-                drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(roundOffet+3));
-                unsetCairoClipping(cr);
-
-                if(QTC_ROUNDED)
-                    realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
-                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, wid, 0, fillVal);
-
-                {
-                    GdkColor        *left=reverse ? &qtcPalette.menu : &itemCols[fillVal],
-                                    *right=reverse ? &itemCols[fillVal] : &qtcPalette.menu;
-                    cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
-
-                    cairo_pattern_add_color_stop_rgb(pt, 0, QTC_CAIRO_COL(*left));
-                    cairo_pattern_add_color_stop_rgb(pt, 1.00, QTC_CAIRO_COL(*right));
-                    cairo_set_source(cr, pt);
-                    cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
-                    cairo_fill(cr);
-                    cairo_pattern_destroy (pt);
-                }
-            }
-            else if(!opts.borderMenuitems && !mb && menuitem)
-                drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
-                                  TRUE, FALSE, opts.menuitemAppearance, wid);
-            else if(stdColors && (pbar || opts.borderMenuitems))
-            {
-                if(!pbar || (horizPbar ? width : height)>1)
-                    drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
-                                width, height, &itemCols[fillVal],
-                                itemCols, round, wid, BORDER_FLAT, DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
-                                (!pbar && border && stdColors ? DF_DO_BORDER : 0)|
-                                (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
-            }
-            else
-            {
-                if(width>2 && height>2)
-                    drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, &itemCols[fillVal],
-                                      TRUE, FALSE, opts.menuitemAppearance, wid);
-
-                realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, wid, 0, borderVal);
-            }
-            if(pbar && opts.stripedProgress && width>4 && height>4)
+            if(opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
                             width, height, &itemCols[1],
-                            qtcPalette.highlight, round, wid, BORDER_FLAT,
-                            DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
-                            (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
+                            qtcPalette.highlight, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
+                            DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
-            if(pbar&& width>2 && height>2)
+            if(width>2 && height>2)
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, wid, 0, QT_PBAR_BORDER);
-            if(pbar && !opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
+                               itemCols, round, BORDER_FLAT, WIDGET_PROGRESSBAR, 0, QT_PBAR_BORDER);
+            if(!opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
             {
                 /*if(!isMozilla())
                 {
@@ -3994,6 +3900,112 @@ debugDisplayWidget(widget, 3);
                 if(!(round&CORNER_BL))
                     cairo_rectangle(cr, x, y+height-1, 1, 1);
                 cairo_fill(cr);
+            }
+        }
+
+        if(region)
+            gdk_region_destroy(region);
+    }
+    else if(widget && menuitem)
+    {
+        GdkRegion  *region=NULL;
+        GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
+        gboolean   active_mb=isMozilla() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE);
+
+#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
+         -> and if tey are they're drawn first incorrectly :-( */
+        if(!mb && menuitem && GTK_IS_IMAGE_MENU_ITEM(widget) &&
+           (0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)) ||
+            (GTK_IS_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))) &&
+             GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))))))
+        {
+            // Give it a blank icon - so that menuStripe looks ok, plus this matched KDE style!
+            if(0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))
+                gtk_image_menu_item_set_image(GTK_IS_IMAGE_MENU_ITEM(widget),
+                                              gtk_image_new_from_pixbuf(getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0)));
+            else
+                gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))),
+                                          getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
+        }
+#endif
+        // The handling of 'mouse pressed' in the menubar event handler doesn't seem to set the
+        // menu as active, therefore the active_mb fails. However the check below works...
+        if(mb && !active_mb && widget)
+            active_mb=widget==GTK_MENU_SHELL(mb)->active_menu_item;
+
+        /* The following 'if' is just a hack for a menubar item problem with pidgin. Sometime, a 12pix width
+           empty menubar item is drawn on the right - and doesnt disappear! */
+        if(!mb || width>12)
+        {
+            gboolean grayItem=(!opts.colorMenubarMouseOver && mb && !active_mb && GTK_APP_OPEN_OFFICE!=qtSettings.app) ||
+                              (!opts.useHighlightForMenu && (mb || menuitem));
+            GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
+            GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
+                            ? &qtcPalette.menubar[ORIGINAL_SHADE] : NULL;
+            int      round=mb
+                                ? active_mb && opts.roundMbTopOnly
+                                    ? ROUNDED_TOP
+                                    : ROUNDED_ALL
+                                : ROUNDED_ALL,
+                     new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
+            gboolean stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars;
+            int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
+                     borderVal=opts.borderMenuitems ? 0 : fillVal;
+
+            if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
+               (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
+                fillVal=ORIGINAL_SHADE;
+
+            if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
+            {
+                gboolean reverse=FALSE; /* TODO !!! */
+                int      roundOffet=QTC_ROUNDED ? 1 : 0,
+                         mainX=x+(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1),
+                         mainY=y+roundOffet+1,
+                         mainWidth=width-(reverse ? roundOffet+1 : 1+MENUITEM_FADE_SIZE),
+                         fadeX=reverse ? x+1 : width-MENUITEM_FADE_SIZE;
+
+                clipPath(cr, mainX-1, mainY-1, mainWidth+1, height-2, WIDGET_MENU_ITEM, RADIUS_INTERNAL,
+                         reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
+                drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(roundOffet+3));
+                unsetCairoClipping(cr);
+
+                if(QTC_ROUNDED)
+                    realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
+                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_MENU_ITEM, 0, fillVal);
+
+                {
+                    GdkColor        *left=reverse ? &qtcPalette.menu : &itemCols[fillVal],
+                                    *right=reverse ? &itemCols[fillVal] : &qtcPalette.menu;
+                    cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
+
+                    cairo_pattern_add_color_stop_rgb(pt, 0, QTC_CAIRO_COL(*left));
+                    cairo_pattern_add_color_stop_rgb(pt, 1.00, QTC_CAIRO_COL(*right));
+                    cairo_set_source(cr, pt);
+                    cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
+                    cairo_fill(cr);
+                    cairo_pattern_destroy (pt);
+                }
+            }
+            else if(!opts.borderMenuitems && !mb && menuitem)
+                drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
+                                  TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+            else if(stdColors && opts.borderMenuitems)
+            {
+                drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
+                                width, height, &itemCols[fillVal],
+                                itemCols, round, WIDGET_MENU_ITEM, BORDER_FLAT, DF_DRAW_INSIDE|
+                                (stdColors ? DF_DO_BORDER : 0)|
+                                (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
+            }
+            else
+            {
+                if(width>2 && height>2)
+                    drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, &itemCols[fillVal],
+                                      TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+
+                realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
+                               itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
             }
         }
 
