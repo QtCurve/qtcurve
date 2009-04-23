@@ -3538,10 +3538,10 @@ debugDisplayWidget(widget, 3);
             if(doEtch)
                 x++, y++, width-=2, height-=2;
 
-            clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);
+            /*clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);*/
             drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
                               horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
-            unsetCairoClipping(cr);
+            /*unsetCairoClipping(cr);*/
 
             if(doEtch)
                  drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
@@ -3549,8 +3549,9 @@ debugDisplayWidget(widget, 3);
             drawBorder(cr, widget && widget->parent ? widget->parent->style : style,
                        state, area, NULL, x, y, width, height,
                        NULL, ROUNDED_ALL,
-                       IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT,
-                       WIDGET_OTHER, DF_BLEND|DF_DO_CORNERS);
+                       IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
+                            ? BORDER_SUNKEN : BORDER_FLAT,
+                       WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
         }
         else /* Scrollbars... */
         {
@@ -3890,6 +3891,7 @@ debugDisplayWidget(widget, 3);
                      horiz=horizPbar || menuitem;
             int      fillVal=grayItem && !pbar ? 4 : ORIGINAL_SHADE,
                      borderVal=pbar || opts.borderMenuitems ? 0 : fillVal;
+            EWidget  wid=pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM;
 
             if(pbar)
                 x++, y++, width-=2, height-=2;
@@ -3900,16 +3902,8 @@ debugDisplayWidget(widget, 3);
                (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
                 fillVal=ORIGINAL_SHADE;
 
-            if(pbar)
-                if(widget && opts.fillProgress && (horizPbar ? width : height)<16)
-                {
-                    int offset=QTC_DO_EFFECT ? 1 : 0;
-                    clipPath(cr, offset, offset, widget->allocation.width-(2*offset),
-                             widget->allocation.height-(2*offset), WIDGET_PROGRESSBAR,
-                             RADIUS_EXTERNAL, ROUNDED_ALL);
-                }
-                else if ((horizPbar ? width : height)<4)
-                    clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
+            if(pbar && opts.round>ROUND_SLIGHT && (horizPbar ? width : height)<4)
+                clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
 
             if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
             {
@@ -3927,7 +3921,7 @@ debugDisplayWidget(widget, 3);
 
                 if(QTC_ROUNDED)
                     realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
-                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_MENU_ITEM, 0, fillVal);
+                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, wid, 0, fillVal);
 
                 {
                     GdkColor        *left=reverse ? &qtcPalette.menu : &itemCols[fillVal],
@@ -3944,14 +3938,13 @@ debugDisplayWidget(widget, 3);
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
                 drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
-                                  TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+                                  TRUE, FALSE, opts.menuitemAppearance, wid);
             else if(stdColors && (pbar || opts.borderMenuitems))
             {
                 if(!pbar || (horizPbar ? width : height)>1)
                     drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
                                 width, height, &itemCols[fillVal],
-                                itemCols, round, pbar ? WIDGET_PROGRESSBAR : WIDGET_MENU_ITEM, BORDER_FLAT,
-                                DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
+                                itemCols, round, wid, BORDER_FLAT, DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|
                                 (!pbar && border && stdColors ? DF_DO_BORDER : 0)|
                                 (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
             }
@@ -3959,21 +3952,21 @@ debugDisplayWidget(widget, 3);
             {
                 if(width>2 && height>2)
                     drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, &itemCols[fillVal],
-                                      TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+                                      TRUE, FALSE, opts.menuitemAppearance, wid);
 
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
+                               itemCols, round, BORDER_FLAT, wid, 0, borderVal);
             }
             if(pbar && opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
                             width, height, &itemCols[1],
-                            qtcPalette.highlight, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
+                            qtcPalette.highlight, round, wid, BORDER_FLAT,
                             DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|
                             (activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
 
             if(pbar&& width>2 && height>2)
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, WIDGET_OTHER, 0, QT_PBAR_BORDER);
+                               itemCols, round, BORDER_FLAT, wid, 0, QT_PBAR_BORDER);
             if(pbar && !opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
             {
                 /*if(!isMozilla())
