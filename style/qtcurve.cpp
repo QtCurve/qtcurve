@@ -8538,11 +8538,11 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     if((vertical ? r.height() : r.width())<1)
         return;
 
-    if(vertical && r.height()<4)
-        rx.setHeight(4);
+    if(vertical && r.height()<3)
+        rx.setHeight(3);
 
-    if(!vertical && rx.width()<4)
-        rx.setWidth(4);
+    if(!vertical && rx.width()<3)
+        rx.setWidth(3);
 
     int          length(vertical ? rx.height() : rx.width());
     const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor
