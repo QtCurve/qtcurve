@@ -2158,6 +2158,15 @@ static gboolean qtInit(Options *opts)
                 }
             }
 
+            if(opts->mapKdeIcons && qtSettings.icons)
+            {
+                static const char *constFormat="gtk-icon-theme-name=\"%s\" gtk-fallback-icon-theme=\"hicolor\"";
+                tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.icons)+1);
+
+                sprintf(tmpStr, constFormat, qtSettings.icons);
+                gtk_rc_parse_string(tmpStr);
+            }
+            
             if(opts->mapKdeIcons && (path=getIconPath()))
             {
                 const char *iconTheme=qtSettings.icons ? qtSettings.icons : "XX";
