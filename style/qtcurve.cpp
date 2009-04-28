@@ -8087,16 +8087,21 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
 void QtCurveStyle::drawGlow(QPainter *p, const QRect &r, EWidget w) const
 {
-    bool   def(WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator),
-           defShade=def && (!itsDefBtnCols || itsDefBtnCols[ORIGINAL_SHADE]==itsMouseOverCols[ORIGINAL_SHADE]);
-    QColor col(def && itsDefBtnCols ? itsDefBtnCols[QTC_GLOW_DEFBTN] : itsMouseOverCols[QTC_GLOW_MO]);
+    if(itsMouseOverCols || itsDefBtnCols)
+    {
+        bool   def(WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator),
+               defShade=def && (!itsDefBtnCols ||
+                                (itsMouseOverCols && itsDefBtnCols[ORIGINAL_SHADE]==itsMouseOverCols[ORIGINAL_SHADE]));
+        QColor col((def && itsDefBtnCols) || !itsMouseOverCols
+                        ? itsDefBtnCols[QTC_GLOW_DEFBTN] : itsMouseOverCols[QTC_GLOW_MO]);
 
-    col.setAlphaF(QTC_GLOW_ALPHA(defShade));
-    p->setBrush(Qt::NoBrush);
-    p->setRenderHint(QPainter::Antialiasing, true);
-    p->setPen(col);
-    p->drawPath(buildPath(r, w, ROUNDED_ALL, getRadius(opts.round, r.width(), r.height(), w, RADIUS_ETCH)));
-    p->setRenderHint(QPainter::Antialiasing, false);
+        col.setAlphaF(QTC_GLOW_ALPHA(defShade));
+        p->setBrush(Qt::NoBrush);
+        p->setRenderHint(QPainter::Antialiasing, true);
+        p->setPen(col);
+        p->drawPath(buildPath(r, w, ROUNDED_ALL, getRadius(opts.round, r.width(), r.height(), w, RADIUS_ETCH)));
+        p->setRenderHint(QPainter::Antialiasing, false);
+    }
 }
 
 void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget,  EWidget w, bool raised) const
