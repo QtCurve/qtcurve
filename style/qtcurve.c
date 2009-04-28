@@ -1777,19 +1777,24 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
 static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
                      int x, int y, int w, int h, int round, EWidget widget)
 {
-    double   xd=x+0.5,
-             yd=y+0.5,
-             radius=getRadius(opts.round, w, h, widget, RADIUS_ETCH);
-    gboolean def=WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator,
-             defShade=def && (!qtcPalette.defbtn ||
-                              QTC_EQUAL_COLOR(qtcPalette.defbtn[ORIGINAL_SHADE], qtcPalette.mouseover[ORIGINAL_SHADE]));
-    GdkColor *col=def && qtcPalette.defbtn ? &qtcPalette.defbtn[QTC_GLOW_DEFBTN] : &qtcPalette.mouseover[QTC_GLOW_MO];
+    if(qtcPalette.mouseover || qtcPalette.defbtn)
+    {
+        double   xd=x+0.5,
+                 yd=y+0.5,
+                 radius=getRadius(opts.round, w, h, widget, RADIUS_ETCH);
+        gboolean def=WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator,
+                 defShade=def && (!qtcPalette.defbtn ||
+                                  (qtcPalette.mouseover &&
+                                   QTC_EQUAL_COLOR(qtcPalette.defbtn[ORIGINAL_SHADE], qtcPalette.mouseover[ORIGINAL_SHADE])));
+        GdkColor *col=(def && qtcPalette.defbtn) || !qtcPalette.mouseover
+                            ? &qtcPalette.defbtn[QTC_GLOW_DEFBTN] : &qtcPalette.mouseover[QTC_GLOW_MO];
 
-    setCairoClipping(cr, area, region);
-    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_GLOW_ALPHA(defShade));
-    createPath(cr, xd, yd, w-1, h-1, radius, round);
-    cairo_stroke(cr);
-    unsetCairoClipping(cr);
+        setCairoClipping(cr, area, region);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_GLOW_ALPHA(defShade));
+        createPath(cr, xd, yd, w-1, h-1, radius, round);
+        cairo_stroke(cr);
+        unsetCairoClipping(cr);
+    }
 }
 
 static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
