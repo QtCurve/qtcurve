@@ -8076,7 +8076,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                  (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && option->state&State_MouseOver) ||
                (doEtch && WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(p, r, option, round,
-                        WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator && !(option->state&State_MouseOver)
+                       WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator &&
+                       (!(option->state&State_MouseOver) || !itsMouseOverCols)
                             ? itsDefBtnCols : itsMouseOverCols, w);
         else
             drawBorder(p, r, option, round, cols, w);
