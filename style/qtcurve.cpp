@@ -4926,7 +4926,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                   QStyleOptionTab::End : QStyleOptionTab::Beginning)) || onlyTab);
                 int  tabBarAlignment(styleHint(SH_TabBar_Alignment, tab, widget)),
                      tabOverlap(onlyTab ? 0 : pixelMetric(PM_TabBarTabOverlap, option, widget)),
-                     moOffset(ROUNDED_NONE==opts.round ? 1 : opts.round);
+                     moOffset(ROUNDED_NONE==opts.round || !opts.tabMouseOverTop ? 1 : opts.round);
                 bool leftAligned((!rtlHorTabs && Qt::AlignLeft==tabBarAlignment) ||
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
                      rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
@@ -5007,9 +5007,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 colorTab(painter, r, true, WIDGET_TAB_TOP, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                            drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1), r.y(),
+                            drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1),
+                                                         r.y()+(opts.tabMouseOverTop ? 0 : r.height()-1),
                                                          r.width()-(firstTab || lastTab ? moOffset : 1), 2),
-                                          true, false);
+                                          true, !opts.tabMouseOverTop);
                         break;
                     }
                     case QTabBar::RoundedSouth:
@@ -5070,9 +5071,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 colorTab(painter, r, true, WIDGET_TAB_BOT, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                            drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1), r.y()+r.height()-2,
+                            drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1),
+                                                         r.y()+(opts.tabMouseOverTop ? r.height()-2 : -1),
                                                          r.width()-(firstTab || lastTab ? moOffset : 1), 2),
-                                          true, true);
+                                          true, opts.tabMouseOverTop);
                         break;
                     }
                     case QTabBar::RoundedWest:
@@ -5133,9 +5135,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 colorTab(painter, r, false, WIDGET_TAB_TOP, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                            drawHighlight(painter, QRect(r.x(), r.y()+(firstTab ? moOffset : 1),
+                            drawHighlight(painter, QRect(r.x()+(opts.tabMouseOverTop ? 0 : r.width()-1),
+                                                         r.y()+(firstTab ? moOffset : 1),
                                                          2, r.height()-(firstTab || lastTab ? moOffset : 1)),
-                                          false, false);
+                                          false, !opts.tabMouseOverTop);
                         break;
                     }
                     case QTabBar::RoundedEast:
@@ -5196,9 +5199,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 colorTab(painter, r, false, WIDGET_TAB_BOT, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver)
-                            drawHighlight(painter, QRect(r.x()+r.width()-2, r.y()+(firstTab ? moOffset : 1),
+                            drawHighlight(painter, QRect(r.x()+(opts.tabMouseOverTop ? r.width()-2 : -1),
+                                                         r.y()+(firstTab ? moOffset : 1),
                                                          2, r.height()-(firstTab || lastTab ? moOffset : 1)),
-                                          false, true);
+                                          false, opts.tabMouseOverTop);
                         break;
                     }
                 }

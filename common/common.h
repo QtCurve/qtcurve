@@ -1008,6 +1008,7 @@ typedef struct
     bool             embolden,
                      highlightTab,
                      colorSelTab,
+                     tabMouseOverTop,
                      animatedProgress,
                      fixParentlessDialogs,
                      customMenuTextColor,

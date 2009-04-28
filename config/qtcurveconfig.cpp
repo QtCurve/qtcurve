@@ -453,6 +453,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(crHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(crButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorSelTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(tabMouseOverTop, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(stdSidebarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1150,6 +1151,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.crHighlight=crHighlight->isChecked();
     opts.crButton=crButton->isChecked();
     opts.colorSelTab=colorSelTab->isChecked();
+    opts.tabMouseOverTop=tabMouseOverTop->isChecked();
     opts.stdSidebarButtons=stdSidebarButtons->isChecked();
     opts.borderMenuitems=borderMenuitems->isChecked();
     opts.progressAppearance=(EAppearance)progressAppearance->currentIndex();
@@ -1255,6 +1257,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     crHighlight->setChecked(opts.crHighlight);
     crButton->setChecked(opts.crButton);
     colorSelTab->setChecked(opts.colorSelTab);
+    tabMouseOverTop->setChecked(opts.tabMouseOverTop);
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     borderMenuitems->setChecked(opts.borderMenuitems);
     progressAppearance->setCurrentIndex(opts.progressAppearance);
@@ -1326,6 +1329,7 @@ bool QtCurveConfig::settingsChanged()
          crHighlight->isChecked()!=currentStyle.crHighlight ||
          crButton->isChecked()!=currentStyle.crButton ||
          colorSelTab->isChecked()!=currentStyle.colorSelTab ||
+         tabMouseOverTop->isChecked()!=currentStyle.tabMouseOverTop ||
          stdSidebarButtons->isChecked()!=currentStyle.stdSidebarButtons ||
          borderMenuitems->isChecked()!=currentStyle.borderMenuitems ||
          defBtnIndicator->currentIndex()!=(int)currentStyle.defBtnIndicator ||

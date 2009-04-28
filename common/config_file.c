@@ -845,6 +845,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 }
 #endif
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(0, 63))
+            {
+                def->tabMouseOverTop=true;
+            }
             if(version<QTC_MAKE_VERSION(0, 62))
             {
 #ifdef __cplusplus
@@ -910,6 +914,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_LINE(handles)
             QTC_CFG_READ_BOOL(highlightTab)
             QTC_CFG_READ_BOOL(colorSelTab)
+            QTC_CFG_READ_BOOL(tabMouseOverTop)
             QTC_CFG_READ_SHADE(shadeSliders, false)
             QTC_CFG_READ_SHADE(shadeMenubars, true)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false)
@@ -1411,6 +1416,7 @@ static void defaultSettings(Options *opts)
     opts->sliderStyle=SLIDER_TRIANGULAR;
     opts->highlightTab=false;
     opts->colorSelTab=false;
+    opts->tabMouseOverTop=false;
     opts->embolden=false;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->lvAppearance=APPEARANCE_BEVELLED;
@@ -1890,6 +1896,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_B(handles, true)
         CFG_WRITE_ENTRY(highlightTab)
         CFG_WRITE_ENTRY(colorSelTab)
+        CFG_WRITE_ENTRY(tabMouseOverTop)
         CFG_WRITE_ENTRY_SHADE(shadeSliders, false, false)
         CFG_WRITE_ENTRY_SHADE(shadeMenubars, true, false)
         CFG_WRITE_ENTRY_SHADE(shadeCheckRadio, false, true)
