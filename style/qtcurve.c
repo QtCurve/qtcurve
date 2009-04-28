@@ -5177,7 +5177,7 @@ debugDisplayWidget(widget, 3);
         QtCTab      *highlightTab=highlightingEnabled ? lookupTabHash(widget, FALSE) : NULL;
         gboolean    highlight=FALSE;
         int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW,
-                    moOffset=ROUNDED_NONE==opts.round ? 1 : opts.round;
+                    moOffset=ROUNDED_NONE==opts.round || !opts.tabMouseOverTop ? 1 : opts.round;
         gboolean    firstTab=notebook ? FALSE : TRUE,
                     lastTab=notebook ? FALSE : TRUE,
                     vertical=GTK_POS_LEFT==gap_side || GTK_POS_RIGHT==gap_side,
@@ -5331,8 +5331,9 @@ debugDisplayWidget(widget, 3);
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, true);
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y+height-2, width-(firstTab || lastTab ? moOffset : 1), 2,
-                                  area, true, true);
+                    drawHighlight(cr, x+(firstTab ? moOffset : 1),
+                                  y+(opts.tabMouseOverTop ? height-2 : -1), width-(firstTab || lastTab ? moOffset : 1), 2,
+                                  NULL, true, opts.tabMouseOverTop);
 
                 break;
             }
@@ -5379,8 +5380,9 @@ debugDisplayWidget(widget, 3);
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, true);
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y, width-(firstTab || lastTab ? moOffset : 1), 2,
-                                  area, true, false);
+                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(opts.tabMouseOverTop ? 0 : height-1),
+                                  width-(firstTab || lastTab ? moOffset : 1), 2,
+                                  NULL, true, !opts.tabMouseOverTop);
                 break;
             }
             case GTK_POS_LEFT: /* => tabs are on right !!! */
@@ -5423,8 +5425,9 @@ debugDisplayWidget(widget, 3);
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, false);
                     
                 if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x+width-2, y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                  area, false, true);
+                    drawHighlight(cr, x+(opts.tabMouseOverTop ? width-2 : -1),
+                                  y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
+                                  NULL, false, opts.tabMouseOverTop);
                 break;
             }
             case GTK_POS_RIGHT: /* => tabs are on left !!! */
@@ -5470,8 +5473,9 @@ debugDisplayWidget(widget, 3);
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, false);
 
                 if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x, y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                  area, false, false);
+                    drawHighlight(cr, x+(opts.tabMouseOverTop ? 0 : width-1),
+                                  y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
+                                  NULL, false, !opts.tabMouseOverTop);
                 break;
             }
         }
