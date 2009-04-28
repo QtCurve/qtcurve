@@ -2032,7 +2032,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
               (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(cr, style, state, area, region, x, y, width, height,
-                       WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator && GTK_STATE_PRELIGHT!=state
+                       WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator &&
+                       (GTK_STATE_PRELIGHT!=state || !qtcPalette.mouseover)
                             ? qtcPalette.defbtn : qtcPalette.mouseover,
                        round, borderProfile, widget, flags);
         else
