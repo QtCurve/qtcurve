@@ -4116,11 +4116,24 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 #endif
     else if(DETAIL("entry") || DETAIL("text"))
     {
-        gboolean combo=isComboBoxEntry(widget);
+        gboolean combo=isComboBoxEntry(widget),
+                 isSpin=!combo && isSpinButton(widget),
+                 rev=reverseLayout(widget) || (combo && widget && reverseLayout(widget->parent));
 
+#if GTK_CHECK_VERSION(2, 16, 0)
+        if(isSpin && widget && width==widget->allocation.width)
+        {
+            int btnWidth, dummy;
+            gdk_drawable_get_size(GTK_SPIN_BUTTON(widget)->panel, &btnWidth, &dummy);
+            width-=btnWidth;
+            if(rev)
+                x+=btnWidth;
+        }
+#endif
+                
         drawEntryField(cr, style, state, widget, area, x, y, width, height,
-                       combo || isSpinButton(widget)
-                           ? reverseLayout(widget) || (combo && widget && reverseLayout(widget->parent))
+                       combo || isSpin
+                           ? rev
                                 ? ROUNDED_RIGHT
                                 : ROUNDED_LEFT
                            : ROUNDED_ALL,

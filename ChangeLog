@@ -18,6 +18,7 @@
 12. Create icon-mapping file in a more robust manner.
 13. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
     and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
+14. Fix spin widget entry highlighting under Gtk 2.16
 
 0.62.8
 ------
