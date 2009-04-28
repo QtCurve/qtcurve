@@ -9,10 +9,14 @@
  6. Removal of background focus option.
  7. Softer, and much nicer, colouration of selected tab.
  8. Add option to draw tab's mouse over lines at the bottom.
- 9. Don't max/extra round progressbars.
-10. Use faded lines for tab and listview header mouse-over.
-11. Create icon-mapping file in a more robust manner.
-12. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
+ 9. Modified defaults:
+     Tab mouse-over highlight drawn at the bottom
+     Plain slider style
+     Align titlebars text in center
+10. Don't max/extra round progressbars.
+11. Use faded lines for tab and listview header mouse-over.
+12. Create icon-mapping file in a more robust manner.
+13. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
     and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
 
 0.62.8
