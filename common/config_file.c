@@ -848,6 +848,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(version<QTC_MAKE_VERSION(0, 63))
             {
                 def->tabMouseOverTop=true;
+                def->sliderStyle=SLIDER_TRIANGULAR;
+#ifdef __cplusplus
+                def->titlebarAlignment=ALIGN_LEFT;
+#endif
             }
             if(version<QTC_MAKE_VERSION(0, 62))
             {
@@ -1413,7 +1417,7 @@ static void defaultSettings(Options *opts)
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->animatedProgress=false;
     opts->stripedProgress=STRIPE_NONE;
-    opts->sliderStyle=SLIDER_TRIANGULAR;
+    opts->sliderStyle=SLIDER_PLAIN;
     opts->highlightTab=false;
     opts->colorSelTab=false;
     opts->tabMouseOverTop=false;
@@ -1489,7 +1493,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuNormTextColor.setRgb(0, 0, 0);
     opts->customMenuSelTextColor.setRgb(0, 0, 0);
     opts->customCheckRadioColor.setRgb(0, 0, 0);
-    opts->titlebarAlignment=ALIGN_LEFT;
+    opts->titlebarAlignment=ALIGN_CENTER;
 #else
 /*
     opts->setDialogButtonOrder=false;
