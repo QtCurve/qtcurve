@@ -1487,7 +1487,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuNormTextColor.setRgb(0, 0, 0);
     opts->customMenuSelTextColor.setRgb(0, 0, 0);
     opts->customCheckRadioColor.setRgb(0, 0, 0);
-    opts->titlebarAlignment=ALIGN_CENTER;
+    opts->titlebarAlignment=ALIGN_FULL_CENTER;
 #else
 /*
     opts->setDialogButtonOrder=false;
