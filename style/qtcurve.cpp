@@ -6253,7 +6253,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                     if(APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance))
                     {
-                        painter->setPen(btnCols[0]);
+                        col=(btnCols[0]);
+                        col.setAlphaF(0.5);
+                        painter->setPen(col);
                         painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
                         painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
                         //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);

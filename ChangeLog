@@ -16,6 +16,7 @@
 10. Don't max/extra round progressbars.
 11. Use faded lines for tab and listview header mouse-over.
 12. Remove line from KTitleWidget
+13. Slightly improve highlight in corner of kwin windows.
 
 0.62.9
 ------
