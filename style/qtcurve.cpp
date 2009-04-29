@@ -6281,12 +6281,27 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->setFont(font);
                     textOpt.setWrapMode(QTextOption::NoWrap);
 
-                    QString str(painter->fontMetrics().elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
+                    QFontMetrics fm(painter->fontMetrics());
+                    QString str(fm.elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
 
                     if(alignRealCenter)
                     {
-                        painter->setClipRect(textRect);
-                        textRect=r;
+                        int textWidth=fm.boundingRect(str).width();
+                        if(textRect.left()>((r.width()-textWidth)>>1))
+                        {
+                            textOpt.setAlignment(Qt::AlignVCenter|Qt::AlignLeft);
+                            alignRealCenter=false;
+                        }
+                        else if(textRect.right()<((r.width()+textWidth)>>1))
+                        {
+                            textOpt.setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+                            alignRealCenter=false;
+                        }
+                        else
+                        {
+                            painter->setClipRect(textRect);
+                            textRect=r;
+                        }
                     }
                     painter->setPen(shadow);
                     painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);

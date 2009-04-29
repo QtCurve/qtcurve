@@ -21,6 +21,8 @@
     with menuitem highlight.
 15. Remove 'Custom sunken gradient' setting, as this was not
     actually used.
+16. Better handling of 'full centered' titlebar texts when
+    window size is small.
     
 0.62.9
 ------

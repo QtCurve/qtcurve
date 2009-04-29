@@ -254,17 +254,33 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     {
         painter.setFont(itsTitleFont);
 
-        QString       str(painter.fontMetrics().elidedText(caption(), Qt::ElideRight,
-                                                           itsCaptionRect.width(), QPalette::WindowText));
+        QFontMetrics  fm(painter.fontMetrics());
+        QString       str(fm.elidedText(caption(), Qt::ElideRight, itsCaptionRect.width(), QPalette::WindowText));
         Qt::Alignment hAlign((Qt::Alignment)Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment,
                                                                                  0L, 0L)),
                       alignment(Qt::AlignVCenter|hAlign);
         const int     titleEdgeBottomBottom(rectY+titleEdgeTop+titleHeight+titleEdgeBottom);
-        QRect         textRect(Qt::AlignHCenter==hAlign
-                                    ? QRect(rectX+titleEdgeLeft, rectY+titleEdgeTop,
+        bool          alignFull(Qt::AlignHCenter==hAlign);
+        QRect         textRect(alignFull
+                                    ? QRect(rectX+titleEdgeLeft, itsCaptionRect.y(),
                                             rectX2-titleEdgeRight-(rectX+titleEdgeLeft),
-                                            titleEdgeBottomBottom-(rectY+titleEdgeTop))
+                                            itsCaptionRect.height())
                                     : itsCaptionRect);
+
+        if(alignFull)
+        {
+            int textWidth=fm.boundingRect(str).width()+8;
+            if(itsCaptionRect.left()>((textRect.width()-textWidth)>>1))
+            {
+                alignment=Qt::AlignVCenter|Qt::AlignLeft;
+                textRect=itsCaptionRect;
+            }
+            else if(itsCaptionRect.right()<((textRect.width()+textWidth)>>1))
+            {
+                alignment=Qt::AlignVCenter|Qt::AlignRight;
+                textRect=itsCaptionRect;
+            }
+        }
 
         painter.setClipRect(itsCaptionRect);
         painter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
