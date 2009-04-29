@@ -4423,7 +4423,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             else if (checked)
                             {
                                 int          iconSize(qMax(menuItem->maxIconWidth, 20));
-                                QRect        sunkenRect(r.left() + 1, r.top() + (r.height() - iconSize) / 2 + 1,
+                                QRect        sunkenRect(r.left() + 1, r.top() + (r.height() - iconSize) / 2,
                                                         iconSize, iconSize);
                                 QStyleOption opt(*option);
 

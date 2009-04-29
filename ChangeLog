@@ -17,6 +17,8 @@
 11. Use faded lines for tab and listview header mouse-over.
 12. Remove line from KTitleWidget
 13. Slightly improve highlight in corner of kwin windows.
+14. Align pressed box drwn for checkable icon menuitems better
+    with menuitem highlight.
 
 0.62.9
 ------
