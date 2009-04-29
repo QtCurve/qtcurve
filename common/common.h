@@ -1112,7 +1112,7 @@ typedef struct
 #ifdef __cplusplus
     GradientCont     customGradient;
 #else
-    Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD+1];
+    Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD];
 #endif
     double           customShades[NUM_STD_SHADES];
 #ifndef __cplusplus

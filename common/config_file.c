@@ -1034,14 +1034,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(!ok && shades.size())
                 opts->customShades[0]=0;
 
-            for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
+            for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
             {
                 QString gradKey;
 
-                if(i==QTC_NUM_CUSTOM_GRAD)
-                    gradKey="sunkengradient";
-                else
-                    gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
+                gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
 
 #if (defined QT_VERSION && (QT_VERSION >= 0x040000))
                 QStringList vals(readStringEntry(cfg, gradKey).split(',', QString::SkipEmptyParts));
@@ -1121,15 +1118,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
             }
 
-            for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
+            for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
             {
                 char gradKey[18];
                 char *str;
 
-                if(i==QTC_NUM_CUSTOM_GRAD)
-                    sprintf(gradKey, "sunkengradient");
-                else
-                    sprintf(gradKey, "customgradient%d", i+1);
+                sprintf(gradKey, "customgradient%d", i+1);
                 if((str=readStringEntry(cfg, gradKey)))
                 {
                     int j,
@@ -1968,15 +1962,12 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
 
-        for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD+1); ++i)
+        for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
         {
             GradientCont::const_iterator cg(opts.customGradient.find((EAppearance)i));
             QString                      gradKey;
 
-            if(i==(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
-                gradKey="sunkengradient";
-            else
-                gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
+            gradKey.sprintf("customgradient%d", (i-APPEARANCE_CUSTOM1)+1);
 
             if(cg==opts.customGradient.end())
                 CFG.deleteEntry(gradKey);
