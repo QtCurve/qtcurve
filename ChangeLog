@@ -23,7 +23,8 @@
     actually used.
 16. Better handling of 'full centered' titlebar texts when
     window size is small.
-    
+17. Don't round KWin's tab box.
+
 0.62.9
 ------
 1. Draw correct colour for popup of combo's in toolbars.

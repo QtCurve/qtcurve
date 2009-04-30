@@ -2627,18 +2627,25 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     if (fo && fo->lineWidth>0)
                     {
+                        bool         kwinTab(APP_KWIN==theThemedApp &&  widget && !widget->parentWidget() &&
+                                             0==strcmp(widget->metaObject()->className(), "KWin::TabBox"));
                         QStyleOption opt(*option);
 
                         painter->save();
+
+                        if(kwinTab)
+                            r.adjust(-1, -1, 1, 1);
 
                         if(!opts.highlightScrollViews)
                             opt.state&=~State_HasFocus;
 
                         drawBorder(painter, r, &opt,
-                                   opts.round && (APP_KMIX==theThemedApp || APP_KRUNNER==theThemedApp) && widget && widget->parentWidget() &&
-                                   qobject_cast<const QFrame *>(widget) && 
-                                        ( (APP_KMIX==theThemedApp && 0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
-                                          (APP_KRUNNER==theThemedApp && 0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")))
+                                   opts.round &&
+                                    ( (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
+                                       0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
+                                      (APP_KRUNNER==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
+                                       0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")) ||
+                                      kwinTab)
                                    ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
                                    sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
                                                           ? BORDER_SUNKEN
