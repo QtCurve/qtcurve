@@ -422,7 +422,7 @@ static bool isA(const QObject *w, const char *type)
 
 static bool isInQAbstractItemView(const QObject *w)
 {
-    int level=4;
+    int level=8;
 
     while(w && --level>0)
     {
@@ -461,8 +461,17 @@ static bool isNoEtchWidget(const QWidget *widget)
 static QColor getLowerEtchCol(const QWidget *widget)
 {
     QColor col(Qt::white);
-
-    if(widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget))
+    
+    bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
+// CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
+// KPackageKit, and that swith its KTextBrowser - so jsut check when we draw scrollviews...
+//     if(doEtch && isInQAbstractItemView(widget->parentWidget()))
+//     {
+//         doEtch=false;
+//         theNoEtchWidgets.insert(widget);
+//     }
+            
+    if(doEtch)
     {
         col=widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole());
         shade(col, &col, 1.06);
@@ -2611,14 +2620,34 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
 
+                        // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
+                        // but is when painted. So check here if it should not be etched.
+                        // Also, see not in getLowerEtchCol()
+                        if(QTC_DO_EFFECT && widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget) &&
+                           isInQAbstractItemView(widget->parentWidget()))
+                            theNoEtchWidgets.insert(widget);
+
+                        // If we are set to have sunken scrollviews, then the frame width is set to 3.
+                        // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
+                        // need to draw inner border...
+                        bool doEtch=QTC_DO_EFFECT,
+                             noEtchW=doEtch && theNoEtchWidgets.contains(widget);
+                        if(doEtch && noEtchW)
+                        {
+                            painter->setPen(palette.brush(QPalette::Base).color());
+                            drawRect(painter, r.adjusted(2, 2, -2, -2));
+                        }
+        
                         if(!opts.highlightScrollViews && fo)
                         {
                             QStyleOptionFrame opt(*fo);
                             opt.state&=~State_HasFocus;
-                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT, WIDGET_SCROLLVIEW);
+                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false,
+                                           doEtch && !noEtchW, WIDGET_SCROLLVIEW);
                         }
                         else
-                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false, QTC_DO_EFFECT, WIDGET_SCROLLVIEW);
+                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false,
+                                           doEtch && !noEtchW, WIDGET_SCROLLVIEW);
                     }
                 }
                 else

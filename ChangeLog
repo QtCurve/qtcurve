@@ -24,6 +24,7 @@
 16. Better handling of 'full centered' titlebar texts when
     window size is small.
 17. Don't round KWin's tab box.
+18. Improve look of widgets in KPackageKit.
 
 0.62.9
 ------
