@@ -169,8 +169,9 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
         {
             int i=atoi(&str[14]);
 
-            if(i>=1 && i<(QTC_NUM_CUSTOM_GRAD+1))
-                return (EAppearance)(APPEARANCE_CUSTOM1+(i-1));
+            i--;
+            if(i>=0 && i<QTC_NUM_CUSTOM_GRAD)
+                return (EAppearance)(APPEARANCE_CUSTOM1+i);
         }
     }
     return def;
@@ -834,7 +835,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(!defOpts)
                 defaultSettings(def);
-            for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
+            for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
                 if(def->customGradient[i] && def->customGradient[i]->numStops>0)
                 {
                     opts->customGradient[i]=malloc(sizeof(Gradient));
@@ -1335,7 +1336,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 int i;
 
-                for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
+                for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
                     if(def->customGradient[i])
                         free(def->customGradient[i]);
             }
@@ -1384,7 +1385,7 @@ static void defaultSettings(Options *opts)
 #ifndef __cplusplus
     int i;
 
-    for(i=0; i<QTC_NUM_CUSTOM_GRAD+1; ++i)
+    for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
         opts->customGradient[i]=0L;
 #else
     // Setup titlebar gradients...
