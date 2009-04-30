@@ -4057,7 +4057,8 @@ debugDisplayWidget(widget, 3);
         drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                   NULL, ROUNDED_ALL, GTK_SHADOW_NONE==shadow_type
+                   NULL, !detail || strcmp(detail+1, "ruler") ? ROUNDED_ALL : ROUNDED_NONE,
+                   GTK_SHADOW_NONE==shadow_type
                                         ? BORDER_FLAT
                                         : GTK_SHADOW_IN==shadow_type || GTK_SHADOW_ETCHED_IN==shadow_type
                                             ? BORDER_SUNKEN
