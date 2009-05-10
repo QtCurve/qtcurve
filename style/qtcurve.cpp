@@ -3417,7 +3417,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(roundKWinFull)
             {
                 bool   kwinHighlight(state&QtC_StateKWinHighlight);
-                QColor col(kwinHighlight ? itsHighlightCols[0] : buttonColors(option)[QT_STD_BORDER]);
+                QColor col(opts.colorTitlebarOnly
+                            ? backgroundColors(option)[QT_STD_BORDER]
+                            : kwinHighlight ? itsHighlightCols[0] : buttonColors(option)[QT_STD_BORDER]);
 
                 painter->setPen(col);
 

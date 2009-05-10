@@ -203,9 +203,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
     painter.fillRect(r, colorTitleOnly ? windowCol : col);
 
-    if(ROUND_FULL==round)
+    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol)
     {
-        QColor cornerCol(colorTitleOnly ? windowCol : col);
+        QColor cornerCol(col);
         painter.setPen(windowCol);
         painter.drawRect(r.x()+borderSize-1, r.y()+borderSize-1,
                          r.x()+r.width()-((borderSize*2)-1), r.y()+r.height()-((borderSize*2)-1));

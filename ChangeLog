@@ -27,6 +27,8 @@
 18. Improve look of widgets in KPackageKit.
 19. Dont use QTimer to setup KDE settings.
 20. Fix line under coloured MDI window titlebars.
+21. Fix some KWin issues; rounding of coloured window bar borders,
+    incorrect colouring of buttom of windows when only colouring titlebar.
 
 0.62.9
 ------
