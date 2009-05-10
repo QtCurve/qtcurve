@@ -26,6 +26,7 @@
 17. Don't round KWin's tab box.
 18. Improve look of widgets in KPackageKit.
 19. Dont use QTimer to setup KDE settings.
+20. Fix line under coloured MDI window titlebars.
 
 0.62.9
 ------

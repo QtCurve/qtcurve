@@ -6232,7 +6232,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->setClipRegion(mask);
                 }
 
-                drawLightBevel(painter, r, &opt, widget,
+                drawLightBevel(painter, r.adjusted(0, 0, 0, 1), &opt, widget,
                                titleBar->titleBarState&State_Raised
                                 ? ROUNDED_NONE
                                 : titleBar->titleBarState&State_Enabled
