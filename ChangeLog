@@ -13,15 +13,16 @@
      Tab mouse-over highlight drawn at the bottom
      Plain slider style
      Align titlebars text in center
-10. Don't max/extra round progressbars.
-11. Use faded lines for tab and listview header mouse-over.
-12. Create icon-mapping file in a more robust manner.
-13. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
+10. Add appearance setting for background of flat scrollbar buttons.
+11. Don't max/extra round progressbars.
+12. Use faded lines for tab and listview header mouse-over.
+13. Create icon-mapping file in a more robust manner.
+14. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
     and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
-14. Fix spin widget entry highlighting under Gtk 2.16
-15. Don't round rulers.
-16. Fix faded menuitems when not rounding.
-17. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
+15. Fix spin widget entry highlighting under Gtk 2.16
+16. Don't round rulers.
+17. Fix faded menuitems when not rounding.
+18. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
 
 0.62.8
 ------

@@ -3321,7 +3321,14 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
-                    drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
+                {
+                    if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                        drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
+                                          &qtcPalette.background[ORIGINAL_SHADE],
+                                          horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+                    else
+                        drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
+                }
                 else
                 {
                     GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator)
@@ -3565,7 +3572,9 @@ debugDisplayWidget(widget, 3);
         }
         else /* Scrollbars... */
         {
-            int sbarRound=ROUNDED_ALL;
+            int      sbarRound=ROUNDED_ALL,
+                     xo=x, yo=y, wo=width, ho=height;
+            gboolean drawBgnd=opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType;
 
             if(opts.flatSbarButtons)
                 switch(opts.scrollbarType)
@@ -3613,29 +3622,37 @@ debugDisplayWidget(widget, 3);
     #endif
                 }
 
+            if(drawBgnd)
+                drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
+                                  &qtcPalette.background[ORIGINAL_SHADE],
+                                  horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+
             if(isMozilla())
             {
-                GdkColor *parent_col=getParentBgCol(widget),
-                         *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
-
-                setCairoClipping(cr, area, NULL);
-
-                drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
-                if(horiz)
+                if(!drawBgnd)
                 {
-                    if(ROUNDED_LEFT==sbarRound || ROUNDED_ALL==sbarRound)
-                        drawVLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y, height);
-                    if(ROUNDED_RIGHT==sbarRound || ROUNDED_ALL==sbarRound)
-                        drawVLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x+width-1, y, height);
+                    GdkColor *parent_col=getParentBgCol(widget),
+                            *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
+
+                    setCairoClipping(cr, area, NULL);
+
+                    drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+                    if(horiz)
+                    {
+                        if(ROUNDED_LEFT==sbarRound || ROUNDED_ALL==sbarRound)
+                            drawVLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y, height);
+                        if(ROUNDED_RIGHT==sbarRound || ROUNDED_ALL==sbarRound)
+                            drawVLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x+width-1, y, height);
+                    }
+                    else
+                    {
+                        if(ROUNDED_TOP==sbarRound || ROUNDED_ALL==sbarRound)
+                            drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y, width);
+                        if(ROUNDED_BOTTOM==sbarRound || ROUNDED_ALL==sbarRound)
+                            drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y+height-1, width);
+                    }
+                    unsetCairoClipping(cr);
                 }
-                else
-                {
-                    if(ROUNDED_TOP==sbarRound || ROUNDED_ALL==sbarRound)
-                        drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y, width);
-                    if(ROUNDED_BOTTOM==sbarRound || ROUNDED_ALL==sbarRound)
-                        drawHLine(cr, QTC_CAIRO_COL(*bgnd_col), 1.0, x, y+height-1, width);
-                }
-                unsetCairoClipping(cr);
             }
             else if(GTK_APP_OPEN_OFFICE==qtSettings.app && opts.flatSbarButtons && isFixedWidget(widget))
             {
