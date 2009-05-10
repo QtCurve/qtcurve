@@ -25,6 +25,7 @@
     window size is small.
 17. Don't round KWin's tab box.
 18. Improve look of widgets in KPackageKit.
+19. Dont use QTimer to setup KDE settings.
 
 0.62.9
 ------

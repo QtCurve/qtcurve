@@ -49,28 +49,6 @@
 static KComponentData *theKComponentData=0;
 static int            theInstanceCount=0;
 
-static void checkKComponentData()
-{
-    if(!theKComponentData && !KGlobal::hasMainComponent())
-    {
-        //printf("Creating KComponentData\n");
-
-        QString name(QApplication::applicationName());
-
-        if(name.isEmpty())
-            name=qAppName();
-
-        if(name.isEmpty())
-            name="QtApp";
-
-        QByteArray utf8=name.toUtf8();
-        theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n(utf8), "0.1"));
-// Dont call these here, as if we get called at app start, things seem to go wrong...
-//         applyKdeSettings(true);
-//         applyKdeSettings(false);
-    }
-}
-
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 // KDE4.1 does this functionality for us!
 #include <KDE/KFileDialog>
@@ -139,8 +117,6 @@ static void kde2QtFilter(const QString &orig, const QString &kde, QString *sel)
 
 static QString getExistingDirectory(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options)
 {
-    checkKComponentData();
-
     KUrl url(KDirSelectDialog::selectDirectory(KUrl(dir), true, parent, caption));
 
     if(url.isLocalFile())
@@ -152,8 +128,6 @@ static QString getExistingDirectory(QWidget *parent, const QString &caption, con
 static QString getOpenFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter,
                                QFileDialog::Options)
 {
-    checkKComponentData();
-
     KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
 
     dlg.setOperationMode(KFileDialog::Opening);
@@ -172,8 +146,6 @@ static QString getOpenFileName(QWidget *parent, const QString &caption, const QS
 static QStringList getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QString &filter,
                                     QString *selectedFilter, QFileDialog::Options)
 {
-    checkKComponentData();
-
     KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
 
     dlg.setOperationMode(KFileDialog::Opening);
@@ -192,8 +164,6 @@ static QStringList getOpenFileNames(QWidget *parent, const QString &caption, con
 static QString getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter,
                                QFileDialog::Options)
 {
-    checkKComponentData();
-
     KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
 
     dlg.setOperationMode(KFileDialog::Saving);
@@ -819,10 +789,27 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsQtVersion(VER_UNKNOWN)
 {
     theInstanceCount++;
+
+    if(!theKComponentData && !KGlobal::hasMainComponent())
+    {
+        //printf("Creating KComponentData\n");
+
+        QString name(QApplication::applicationName());
+
+        if(name.isEmpty())
+            name=qAppName();
+
+        if(name.isEmpty())
+            name="QtApp";
+
+        //QByteArray utf8=name.toUtf8();
+        //theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n(utf8), "0.1"));
+        theKComponentData=new KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
+    }
+
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
     setFileDialogs();
 #endif
-    QTimer::singleShot(0, this, SLOT(setupKde4()));
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
 
@@ -907,6 +894,8 @@ QtCurveStyle::QtCurveStyle(const QString &name)
         case SHADE_CUSTOM:
             itsCheckRadioCol=opts.customCheckRadioColor;
     }
+
+    setupKde4();
 }
 
 QtCurveStyle::~QtCurveStyle()
@@ -2062,10 +2051,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return QFormLayout::DontWrapRows;
 #endif
         case SH_DialogButtonBox_ButtonsHaveIcons:
-            checkKComponentData();
             return KGlobalSettings::showIconsOnPushButtons();
         case SH_ItemView_ActivateItemOnSingleClick:
-            checkKComponentData();
             return KGlobalSettings::singleClick();
         case SH_MenuBar_AltKeyNavigation:
             return false;
@@ -2085,7 +2072,6 @@ QPalette QtCurveStyle::standardPalette() const
 
 QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
-    checkKComponentData();
     bool fd(widget && qobject_cast<const QFileDialog *>(widget));
 
     switch(pix)
@@ -2226,7 +2212,6 @@ QPixmap QtCurveStyle::standardPixmap(StandardPixmap pix, const QStyleOption *opt
 
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
-    checkKComponentData();
     switch(pix)
     {
 //         case SP_TitleBarMenuButton:
@@ -9210,11 +9195,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
         itsActiveMdiTextColor=option->palette.highlightedText().color();
         itsMdiTextColor=option->palette.text().color();
 
-        checkKComponentData();
-
-        QColor col;
-
-        col=KGlobalSettings::activeTitleColor();
+        QColor col=KGlobalSettings::activeTitleColor();
 
         if(col!=itsHighlightCols[ORIGINAL_SHADE])
         {
@@ -9254,8 +9235,6 @@ void QtCurveStyle::readMdiPositions() const
         itsMdiButtons[1].append(SC_TitleBarMaxButton);
         itsMdiButtons[1].append(WINDOWTITLE_SPACER);
         itsMdiButtons[1].append(SC_TitleBarCloseButton);
-
-        checkKComponentData();
 
         KConfig      cfg("kwinrc");
         KConfigGroup grp(&cfg, "Style");
@@ -9465,7 +9444,6 @@ void QtCurveStyle::widgetDestroyed(QObject *o)
 
 void QtCurveStyle::setupKde4()
 {
-    checkKComponentData();
     if(kapp)
         setDecorationColors();
     else
@@ -9502,7 +9480,6 @@ void QtCurveStyle::applyKdeSettings(bool pal)
 }
 void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
 {
-    checkKComponentData();
     switch(type)
     {
         case KGlobalSettings::PaletteChanged:
