@@ -8321,6 +8321,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
             }
 
+            if(window)
+                tl.setAlphaF(0.5);
+
             buildSplitPath(r.adjusted(1, 1, -1, -1), w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL),
                            topPath, botPath);
 
