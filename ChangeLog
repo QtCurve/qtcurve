@@ -20,6 +20,7 @@
     and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
 14. Fix spin widget entry highlighting under Gtk 2.16
 15. Don't round rulers.
+16. Fix faded menuitems when not rounding.
 
 0.62.8
 ------
