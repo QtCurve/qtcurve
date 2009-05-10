@@ -5494,9 +5494,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         pm=getIconPixmap(tb->icon, tb->rect.size().boundedTo(iconSize), mode, state);
                         pmSize = tb->icon.actualSize(iconSize, mode);
                         if(pmSize.width()<pm.width())
-                            pr.setX(pr.x()+((pm.width()-pmSize.width())/2));
+                            pr.setX(pr.x()+((pm.width()-pmSize.width())));
                         if(pmSize.height()<pm.height())
-                            pr.setY(pr.y()+((pm.height()-pmSize.height())/2));
+                            pr.setY(pr.y()+((pm.height()-pmSize.height())));
                     }
 
                     if (Qt::ToolButtonIconOnly!=tb->toolButtonStyle)
