@@ -1941,6 +1941,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
+        case SH_Menu_AllowActiveAndDisabled:
+            return false;
         case SH_ComboBox_PopupFrameStyle:
             return QFrame::StyledPanel|QFrame::Plain;
         case SH_TabBar_Alignment:
