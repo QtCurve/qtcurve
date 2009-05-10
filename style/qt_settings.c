@@ -818,7 +818,7 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
                     section=SECT_KDE4_EFFECT_DISABLED;
                 else if(qtSettings.qt4 && 0==strncmp_i(line, "[ColorEffects:Inactive]", 23))
                     section=SECT_KDE4_EFFECT_INACTIVE;
-                else if(qtSettings.qt4 && 0==strncmp_i(line, "[General]", 9))
+                else if(/*qtSettings.qt4 && */0==strncmp_i(line, "[General]", 9))
                     section=SECT_GENERAL;
                 else if(qtSettings.qt4 && 0==strncmp_i(line, "[KDE]", 5))
                     section=SECT_KDE;
