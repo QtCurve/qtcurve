@@ -13,21 +13,22 @@
      Tab mouse-over highlight drawn at the bottom
      Plain slider style
      Align titlebars text in center
-10. Don't max/extra round progressbars.
-11. Use faded lines for tab and listview header mouse-over.
-12. Remove line from KTitleWidget
-13. Slightly improve highlight in corner of kwin windows.
-14. Align pressed box drwn for checkable icon menuitems better
+10. Add appearance setting for background of flat scrollbar buttons.
+11. Don't max/extra round progressbars.
+12. Use faded lines for tab and listview header mouse-over.
+13. Remove line from KTitleWidget
+14. Slightly improve highlight in corner of kwin windows.
+15. Align pressed box drwn for checkable icon menuitems better
     with menuitem highlight.
-15. Remove 'Custom sunken gradient' setting, as this was not
+16. Remove 'Custom sunken gradient' setting, as this was not
     actually used.
-16. Better handling of 'full centered' titlebar texts when
+17. Better handling of 'full centered' titlebar texts when
     window size is small.
-17. Don't round KWin's tab box.
-18. Improve look of widgets in KPackageKit.
-19. Dont use QTimer to setup KDE settings.
-20. Fix line under coloured MDI window titlebars.
-21. Fix some KWin issues; rounding of coloured window bar borders,
+18. Don't round KWin's tab box.
+19. Improve look of widgets in KPackageKit.
+20. Dont use QTimer to setup KDE settings.
+21. Fix line under coloured MDI window titlebars.
+22. Fix some KWin issues; rounding of coloured window bar borders,
     incorrect colouring of buttom of windows when only colouring titlebar.
 
 0.62.9

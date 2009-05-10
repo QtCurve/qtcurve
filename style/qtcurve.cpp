@@ -5315,7 +5315,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             }
 
             painter->save();
-            if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
+            if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, state&State_Horizontal, false,
+                                      opts.sbarBgndAppearance, WIDGET_SB_BGND);
+            else if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
                 painter->fillRect(r, palette.brush(QPalette::Background));
 
             QStyleOption opt(*option);
@@ -6546,11 +6549,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 painter->save();
 
-                if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
-                    painter->fillRect(r, palette.brush(QPalette::Background));
+                if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                    drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,
+                                          opts.sbarBgndAppearance, WIDGET_SB_BGND);
+                else
+                {
+                    if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
+                        painter->fillRect(r, palette.brush(QPalette::Background));
 
-                if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
-                    painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
+                    if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
+                        painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
+                }
 
                 if(noButtons || opts.flatSbarButtons)
                 {

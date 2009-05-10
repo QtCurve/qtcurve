@@ -345,6 +345,7 @@ typedef enum
     WIDGET_FILLED_SLIDER_TROUGH,
     WIDGET_SB_SLIDER,
     WIDGET_SB_BUTTON,
+    WIDGET_SB_BGND,
     WIDGET_TROUGH,
     WIDGET_CHECKBOX,
     WIDGET_TOGGLE_BUTTON,
@@ -1090,7 +1091,8 @@ typedef struct
                      progressAppearance,
                      progressGrooveAppearance,
                      grooveAppearance,
-                     sunkenAppearance;
+                     sunkenAppearance,
+                     sbarBgndAppearance;
     EShade           shadeSliders,
                      shadeMenubars,
                      shadeCheckRadio;
@@ -1158,6 +1160,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 {
     switch(w)
     {
+        case WIDGET_SB_BGND:
+            return opts->sbarBgndAppearance;
         case WIDGET_LISTVIEW_HEADER:
             return opts->lvAppearance;
         case WIDGET_SB_BUTTON:
