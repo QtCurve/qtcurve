@@ -3353,13 +3353,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                      etchOffset(doEtch ? 1 : 0);
                         double       xd(r.x()+0.5),
                                      yd(r.y()+0.5);
+                        const QColor *cols(itsMouseOverCols ? itsMouseOverCols : itsHighlightCols);
 
                         path.moveTo(xd+offset+etchOffset, yd+offset+etchOffset);
                         path.lineTo(xd+offset+6+etchOffset, yd+offset+etchOffset);
                         path.lineTo(xd+offset+etchOffset, yd+offset+6+etchOffset);
                         path.lineTo(xd+offset+etchOffset, yd+offset+etchOffset);
-                        painter->setBrush(itsMouseOverCols[isDown ? 0 : 4]);
-                        painter->setPen(itsMouseOverCols[isDown ? 0 : 4]);
+                        painter->setBrush(cols[isDown ? 0 : 4]);
+                        painter->setPen(cols[isDown ? 0 : 4]);
                         painter->setRenderHint(QPainter::Antialiasing, true);
                         painter->drawPath(path);
                         painter->setRenderHint(QPainter::Antialiasing, false);
