@@ -3347,7 +3347,8 @@ debugDisplayWidget(widget, 3);
                 {
                     int      offset=sunken ? 5 : 4,
                              etchOffset=QTC_DO_EFFECT ? 1 : 0;
-                    GdkColor *col=&qtcPalette.mouseover[GTK_STATE_ACTIVE==state ? 0 : 4];
+                    GdkColor *cols=qtcPalette.mouseover ? qtcPalette.mouseover : qtcPalette.highlight,
+                             *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
 
                     cairo_new_path(cr);
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
