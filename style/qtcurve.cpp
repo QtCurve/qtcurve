@@ -4392,18 +4392,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      checked(menuItem->checked),
                      enabled(state&State_Enabled);
 
-                if(!(selected && enabled) || APPEARANCE_FADE==opts.menuitemAppearance)
-                {
-/*
-                    painter->fillRect(menuItem->rect, USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol
-                                                                             : itsBackgroundCols[ORIGINAL_SHADE]);
-*/
-                    if(opts.menuStripe && !comboMenu)
-                        drawBevelGradient(menuStripeCol(), painter,
-                                          QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth,
-                                                r.height()), false,
-                                          false, opts.menuStripeAppearance, WIDGET_OTHER);
-                }
+                if(opts.menuStripe && !comboMenu)
+                    drawBevelGradient(menuStripeCol(), painter,
+                                        QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth,
+                                            r.height()), false,
+                                        false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                 if (selected && enabled)
                     drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL,
