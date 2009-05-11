@@ -5956,9 +5956,10 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else if(GTK_IS_BUTTON(widget) && !GTK_IS_RADIO_BUTTON(widget) && !GTK_IS_CHECK_BUTTON(widget))
     {
-        y--, height+=2;
         if(doEtch)
             x--, width+=2;
+        else
+            y--, height+=2;
         btn=true;
     }
 

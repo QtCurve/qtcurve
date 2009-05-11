@@ -2412,6 +2412,11 @@ static gboolean qtInit(Options *opts)
             int  thickness=2;
 
             if(doEffect)
+            {
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"Etch2\" "
+                                    "{ xthickness = 3 ythickness = 2 } "
+                                    "class \"*Button\" style \""QTC_RC_SETTING"Etch2\""
+                                    "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\"");
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"Etch\" "
                                     "{ xthickness = 3 ythickness = 3 } "
 //                                     "style \""QTC_RC_SETTING"EtchI\" "
@@ -2420,9 +2425,9 @@ static gboolean qtInit(Options *opts)
                                     "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" "
                                     "class \"*GtkEntry\" style  \""QTC_RC_SETTING"Etch\" "
                                     "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" "
-                                    "class \"*Button\" style \""QTC_RC_SETTING"Etch\""
-                                    "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch\""
+                                    //"class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch\""
                                     /*"class \"*GtkWidget\" style \"QtcEtchI\""*/);
+            }
 
             if(!opts->gtkScrollViews)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"SV\""

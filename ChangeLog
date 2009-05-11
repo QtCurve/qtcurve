@@ -24,6 +24,7 @@
 17. Don't round rulers.
 18. Fix faded menuitems when not rounding.
 19. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
+20. Make buttons slightly thinner, matches KDE4 better.
 
 0.62.8
 ------
