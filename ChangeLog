@@ -14,24 +14,25 @@
      Plain slider style
      Align titlebars text in center
 10. Add appearance setting for background of flat scrollbar buttons.
-11. Don't max/extra round progressbars.
-12. Use faded lines for tab and listview header mouse-over.
-13. Remove line from KTitleWidget
-14. Slightly improve highlight in corner of kwin windows.
-15. Align pressed box drwn for checkable icon menuitems better
+11. Add HCY colour space.
+12. Update gradient preview when change colour space.
+13. Don't max/extra round progressbars.
+14. Use faded lines for tab and listview header mouse-over.
+15. Remove line from KTitleWidget
+16. Slightly improve highlight in corner of kwin windows.
+17. Align pressed box drwn for checkable icon menuitems better
     with menuitem highlight.
-16. Remove 'Custom sunken gradient' setting, as this was not
+18. Remove 'Custom sunken gradient' setting, as this was not
     actually used.
-17. Better handling of 'full centered' titlebar texts when
+19. Better handling of 'full centered' titlebar texts when
     window size is small.
-18. Don't round KWin's tab box.
-19. Improve look of widgets in KPackageKit.
-20. Dont use QTimer to setup KDE settings.
-21. Fix line under coloured MDI window titlebars.
-22. Fix some KWin issues; rounding of coloured window bar borders,
+20. Don't round KWin's tab box.
+21. Improve look of widgets in KPackageKit.
+22. Dont use QTimer to setup KDE settings.
+23. Fix line under coloured MDI window titlebars.
+24. Fix some KWin issues; rounding of coloured window bar borders,
     incorrect colouring of buttom of windows when only colouring titlebar.
-23. When navigating popupmenus with the keyboard, skip over disabled items.
-
+25. When navigating popupmenus with the keyboard, skip over disabled items.
 
 0.62.9
 ------

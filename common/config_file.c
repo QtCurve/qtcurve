@@ -261,6 +261,8 @@ static EShading toShading(const char *str, EShading def)
             return SHADING_HSL;
         if(0==memcmp(str, "hsv", 3))
             return SHADING_HSV;
+        if(0==memcmp(str, "hcy", 3))
+            return SHADING_HCY;
     }
 
     return def;
@@ -1723,6 +1725,8 @@ static const char *toStr(EShading s)
             return "hsl";
         case SHADING_HSV:
             return "hsv";
+        case SHADING_HCY:
+            return "hcy";
     }
 }
 

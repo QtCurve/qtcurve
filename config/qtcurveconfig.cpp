@@ -319,6 +319,7 @@ static void insertShadingEntries(QComboBox *combo)
     combo->insertItem(SHADING_SIMPLE, i18n("Simple"));
     combo->insertItem(SHADING_HSL, i18n("Use HSL color space"));
     combo->insertItem(SHADING_HSV, i18n("Use HSV color space"));
+    combo->insertItem(SHADING_HCY, i18n("Use HCY color space"));
 }
 
 static void insertStripeEntries(QComboBox *combo)
@@ -371,7 +372,8 @@ static void insertAlignEntries(QComboBox *combo)
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
-               exportDialog(NULL)
+               exportDialog(NULL),
+               gradPreview(NULL)
 {
     setupUi(this);
     titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2009");
@@ -625,6 +627,8 @@ void QtCurveConfig::shadeSlidersChanged()
 {
     customSlidersColor->setEnabled(SHADE_CUSTOM==shadeSliders->currentIndex());
     updateChanged();
+    if(gradPreview)
+        gradPreview->repaint();
 }
 
 void QtCurveConfig::shadeMenubarsChanged()

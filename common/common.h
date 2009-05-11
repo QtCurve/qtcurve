@@ -57,7 +57,8 @@ typedef enum
 {
     SHADING_SIMPLE=0,
     SHADING_HSL=1,
-    SHADING_HSV=2
+    SHADING_HSV=2,
+    SHADING_HCY=3
 } EShading;
 
 #if (!defined QTC_KWIN)
@@ -755,15 +756,18 @@ inline int limit(double c)
 }
 #endif
 
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <KDE/KColorUtils>
+#else
+#include "colorutils.c"
+#endif
+
 #ifdef __cplusplus
 static void shade(const color &ca, color *cb, double k)
 #else
 static void shade(const color *ca, color *cb, double k)
 #endif
 {
-#ifndef __cplusplus
-    cb->pixel = ca->pixel;
-#endif
     if(equal(k, 1.0))
     {
 #ifdef __cplusplus
@@ -849,10 +853,24 @@ static void shade(const color *ca, color *cb, double k)
                 cb->green=limit(g*65535.0);
                 cb->blue=limit(b*65535.0);
     #endif
+                break;
+            }
+            case SHADING_HCY:
+            {
+    #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+                *cb=KColorUtils::shade(ca, k-1.0, 0.0);
+    #elif defined __cplusplus
+                *cb=ColorUtils_shade(&ca, k-1.0, 0.0);                
+    #else
+                *cb=ColorUtils_shade(ca, k-1.0, 0.0);
+    #endif
             }
         }
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
     cb->setAlpha(ca.alpha());
+#endif
+#ifndef __cplusplus
+    cb->pixel = ca->pixel;
 #endif
 }
 
