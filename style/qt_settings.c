@@ -20,7 +20,6 @@
 
 #include "config.h"
 #include "common.h"
-#include "colorutils.c"
 #define CONFIG_READ
 #include "config_file.c"
 #include <gtk/gtk.h>
