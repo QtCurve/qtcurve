@@ -28,10 +28,10 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
 #ifdef __cplusplus
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define QTC_FLOAT_COLOR(VAL, COL) (VAL).COL##F()
-#define QTC_TO_COLOR(R, G, B) QColor::fromRgbF(r, g, b)
+#define QTC_TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
 #else
 #define QTC_FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
-#define QTC_TO_COLOR(R, G, B) QColor(limit(R*255), limit(G*255), limit(B*255))
+#define QTC_TO_COLOR(R, G, B) QColor(limit(R*255.0), limit(G*255.0), limit(B*255.0))
 #endif
 #else
 #define inline
@@ -73,12 +73,12 @@ static const double yc[3] = { 0.34375, 0.5, 0.15625 };
 
 static inline double ColorUtils_HCY_gamma(double n)
 {
-    return pow(normalize(n), 2.2);
+    return pow(ColorUtils_normalize(n), 2.2);
 }
 
 static inline double ColorUtils_HCY_igamma(double n)
 {
-    return pow(normalize(n), 1.0/2.2);
+    return pow(ColorUtils_normalize(n), 1.0/2.2);
 }
 
 static inline double ColorUtils_HCY_lumag(double r, double g, double b)
@@ -193,6 +193,7 @@ static color ColorUtils_HCY_toColor(ColorUtils_HCY *hcy)
         return QTC_TO_COLOR(ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(to));
 }
 
+// #ifndef __cplusplus
 static inline double ColorUtils_HCY_luma(const color *color)
 {
     return ColorUtils_HCY_lumag(ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, red)),
@@ -293,3 +294,12 @@ static color ColorUtils_mix(const color *c1, const color *c2, double bias)
     return QTC_TO_COLOR(r, g, b);
     }
 }
+
+// #endif
+/* Added!!! */
+// static color ColorUtils_shade_qtc(const color *color, double k)
+// {
+//     ColorUtils_HCY c=ColorUtils_HCY_fromColor(color);
+//     c.y = ColorUtils_normalize(c.y * (k>1.0 ? (k*1.1) : (k<1.0 ? (k*0.9) : k)));
+//     return ColorUtils_HCY_toColor(&c);
+// }
