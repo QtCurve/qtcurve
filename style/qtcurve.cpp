@@ -3353,7 +3353,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                      etchOffset(doEtch ? 1 : 0);
                         double       xd(r.x()+0.5),
                                      yd(r.y()+0.5);
-                        const QColor *cols(itsMouseOverCols ? itsMouseOverCols : itsHighlightCols);
+                        const QColor *cols(itsFocusCols ? itsFocusCols : itsHighlightCols);
 
                         path.moveTo(xd+offset+etchOffset, yd+offset+etchOffset);
                         path.lineTo(xd+offset+6+etchOffset, yd+offset+etchOffset);
