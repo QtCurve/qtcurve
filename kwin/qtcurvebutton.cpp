@@ -45,7 +45,12 @@ QtCurveButton::QtCurveButton(ButtonType type, QtCurveClient *parent)
                itsIconType(NumButtonIcons),
                itsHover(false)
 {
-    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_PaintOnScreen, false);
+    setAttribute(Qt::WA_NoSystemBackground, true);
+    setAutoFillBackground(false);
+    setFocusPolicy(Qt::NoFocus);
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
+    setAttribute(Qt::WA_Hover, true);
 }
 
 void QtCurveButton::reset(unsigned long changed)

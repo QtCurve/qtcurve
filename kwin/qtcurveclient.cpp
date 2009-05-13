@@ -42,6 +42,8 @@
 #define QTC_KWIN
 #include "common.h"
 
+#define QTC_DRAW_INTO_PIXMAPS
+
 namespace KWinQtCurve
 {
 
@@ -132,6 +134,7 @@ void QtCurveClient::init()
 
     KCommonDecoration::init();
     widget()->setAutoFillBackground(false);
+    widget()->setAttribute(Qt::WA_NoSystemBackground, true);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent);
     widget()->setAttribute(Qt::WA_PaintOnScreen, false);
 }
@@ -171,7 +174,8 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
     QPainter             painter(widget());
-    QRect                r(widget()->rect());
+    QRect                r(widget()->rect()),
+                         rx(r);
     QStyleOptionTitleBar opt;
     bool                 active(isActive()),
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
@@ -203,23 +207,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
     painter.fillRect(r, colorTitleOnly ? windowCol : col);
 
-    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol)
-    {
-        QColor cornerCol(col);
-        painter.setPen(windowCol);
-        painter.drawRect(r.x()+borderSize-1, r.y()+borderSize-1,
-                         r.x()+r.width()-((borderSize*2)-1), r.y()+r.height()-((borderSize*2)-1));
-        painter.setPen(cornerCol);
-        painter.drawPoint(r.x()+borderSize-1, r.y()+r.height()-(borderSize));
-        painter.drawPoint(r.x()+r.width()-borderSize, r.y()+r.height()-borderSize);
-        cornerCol.setAlphaF(0.5);
-        painter.setPen(cornerCol);
-        painter.drawPoint(r.x()+borderSize, r.y()+r.height()-(borderSize));
-        painter.drawPoint(r.x()+borderSize-1, r.y()+r.height()-(borderSize+1));
-        painter.drawPoint(r.x()+r.width()-borderSize-1, r.y()+r.height()-borderSize);
-        painter.drawPoint(r.x()+r.width()-borderSize, r.y()+r.height()-(borderSize+1));
-    }
-
     opt.init(widget());
 
     if(mximised)
@@ -238,7 +225,40 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             opt.state|=QtC_StateKWinHighlight;
     }
 #endif
+
+#ifdef QTC_DRAW_INTO_PIXMAPS
+    // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
+    QPixmap pix(32, 32);
+    QPainter p2(&pix);
+    opt.rect=QRect(0, 0, pix.width(), pix.height());
+    p2.fillRect(opt.rect, colorTitleOnly ? windowCol : col);
+    Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &p2, widget());
+    p2.end();
+    painter.drawTiledPixmap(r.x(), r.y()+10, 2, r.height()-18, pix.copy(0, 8, 2, 16));
+    painter.drawTiledPixmap(r.x()+r.width()-2, r.y()+8, 2, r.height()-16, pix.copy(pix.width()-2, 8, 2, 16));
+    painter.drawTiledPixmap(r.x()+8, r.y()+r.height()-2, r.width()-16, 2, pix.copy(8, pix.height()-2, 16, 2));
+    painter.drawPixmap(r.x(), r.y()+r.height()-8, pix.copy(0, 24, 8, 8));
+    painter.drawPixmap(r.x()+r.width()-8, r.y()+r.height()-8, pix.copy(24, 24, 8, 8));
+#else
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
+#endif
+
+    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol)
+    {
+        QColor cornerCol(col);
+        painter.setPen(windowCol);
+        painter.drawRect(rx.x()+borderSize-1, rx.y()+borderSize-1,
+                         rx.x()+rx.width()-((borderSize*2)-1), rx.y()+rx.height()-((borderSize*2)-1));
+        painter.setPen(cornerCol);
+        painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize));
+        painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-borderSize);
+        cornerCol.setAlphaF(0.5);
+        painter.setPen(cornerCol);
+        painter.drawPoint(rx.x()+borderSize, rx.y()+rx.height()-(borderSize));
+        painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize+1));
+        painter.drawPoint(rx.x()+rx.width()-borderSize-1, rx.y()+rx.height()-borderSize);
+        painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-(borderSize+1));
+    }
 
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
@@ -246,7 +266,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(KDecoration::options()->color(KDecoration::ColorTitleBar, true)!=windowCol ||
        KDecoration::options()->color(KDecoration::ColorTitleBar, false)!=windowCol)
        opt.titleBarState|=QtCStateKWinDrawLine;
+#ifdef QTC_DRAW_INTO_PIXMAPS
+    QPixmap  tPix(32, titleBarHeight);
+    QPainter tPainter(&tPix);
+    opt.rect=QRect(0, 0, tPix.width(), tPix.height());
+    Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &tPainter, widget());
+    tPainter.end();
+    painter.drawTiledPixmap(r.x()+12, r.y(), r.width()-24, tPix.height(), tPix.copy(8, 0, 16, tPix.height()));
+    painter.drawPixmap(r.x(), r.y(), tPix.copy(0, 0, 16, tPix.height()));
+    painter.drawPixmap(r.x()+r.width()-16, r.y(), tPix.copy(tPix.width()-16, 0, 16, tPix.height()));
+#else
     Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
+#endif
 
     itsCaptionRect = captionRect(); // also update itsCaptionRect!
 

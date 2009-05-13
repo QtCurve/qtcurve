@@ -6220,7 +6220,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->setClipRegion(mask);
                 }
 
-                drawLightBevel(painter, r.adjusted(0, 0, 0, 1), &opt, widget,
+                drawLightBevel(painter, r, &opt, widget,
                                titleBar->titleBarState&State_Raised
                                 ? ROUNDED_NONE
                                 : titleBar->titleBarState&State_Enabled
@@ -6229,6 +6229,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                btnCols[ORIGINAL_SHADE], btnCols, true,
                                titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
 
+                painter->setPen(btnCols[0]);
+                painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                 if(roundKWinFull)
                 {
                     bool   kwinHighlight(state&QtC_StateKWinHighlight);
@@ -8164,14 +8166,14 @@ QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, doubl
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
-#if QT_VERSION >= 0x040400
-    bool         window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
-    double       xd(window ? r.x() : (r.x()+0.5)),
-                 yd(window ? r.y() : (r.y()+0.5));
-#else
+// #if QT_VERSION >= 0x040400
+//     bool         window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
+//     double       xd(window ? r.x() : (r.x()+0.5)),
+//                  yd(window ? r.y() : (r.y()+0.5));
+// #else
     double       xd(r.x()+0.5),
                  yd(r.y()+0.5);
-#endif
+// #endif
     double       diameter(radius*2);
     int          width(r.width()-1),
                  height(r.height()-1);
@@ -8210,13 +8212,13 @@ QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, doubl
 void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double radius, QPainterPath &tl, QPainterPath &br) const
 {
     bool         window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
-#if QT_VERSION >= 0x040400
-    double       xd(window ? r.x() : (r.x()+0.5)),
-                 yd(window ? r.y() : (r.y()+0.5));
-#else
+// #if QT_VERSION >= 0x040400
+//     double       xd(window ? r.x() : (r.x()+0.5)),
+//                  yd(window ? r.y() : (r.y()+0.5));
+// #else
     double       xd(r.x()+0.5),
                  yd(r.y()+0.5);
-#endif
+// #endif
     double       diameter(radius*2);
     bool         rounded=diameter>0.0;
     int          width(r.width()-1),
@@ -8285,7 +8287,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                                 ? QT_SLIDER_MO_BORDER
                                                 : borderVal]);
 
-    if(!window)
+//     if(!window)
         p->setRenderHint(QPainter::Antialiasing, true);
 
     p->setBrush(Qt::NoBrush);
@@ -8314,8 +8316,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
             }
 
-            if(window)
-                tl.setAlphaF(0.5);
+//             if(window)
+//                 tl.setAlphaF(0.5);
 
             buildSplitPath(r.adjusted(1, 1, -1, -1), w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL),
                            topPath, botPath);
@@ -8339,7 +8341,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 
     p->setPen(window && state&QtC_StateKWinHighlight ? itsHighlightCols[0] : border);
     p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_EXTERNAL)));
-    if(!window)
+//     if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
 
     if(QTC_FULLLY_ROUNDED && window)
