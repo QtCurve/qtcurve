@@ -857,12 +857,22 @@ static void shade(const color *ca, color *cb, double k)
             }
             case SHADING_HCY:
             {
+    #define QTC_HCY_FACTOR 0.15
     #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-                *cb=KColorUtils::shade(ca, k-1.0, 0.0);
+                if(k>1.0)
+                    *cb=KColorUtils::lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
+                else
+                    *cb=KColorUtils::darken(ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
     #elif defined __cplusplus
-                *cb=ColorUtils_shade(&ca, k-1.0, 0.0);                
+                if(k>1.0)
+                    *cb=ColorUtils_lighten(&ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
+                else
+                    *cb=ColorUtils_darken(&ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
     #else
-                *cb=ColorUtils_shade(ca, k-1.0, 0.0);
+                if(k>1.0)
+                    *cb=ColorUtils_lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
+                else
+                    *cb=ColorUtils_darken(ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
     #endif
             }
         }
