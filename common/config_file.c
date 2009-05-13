@@ -980,6 +980,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(sunkenScrollViews)
             QTC_CFG_READ_BOOL(flatSbarButtons)
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+            QTC_CFG_READ_BOOL(titlebarBorder)
+#endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
@@ -1473,6 +1476,9 @@ static void defaultSettings(Options *opts)
     opts->highlightScrollViews=false;
     opts->sunkenScrollViews=true;
     opts->flatSbarButtons=true;
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    opts->titlebarBorder=true;
+#endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
@@ -1955,6 +1961,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(sunkenScrollViews)
         CFG_WRITE_ENTRY(flatSbarButtons)
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+        CFG_WRITE_ENTRY(titlebarBorder)
+#endif
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY(titlebarAppearance)

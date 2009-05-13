@@ -3402,7 +3402,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->setClipRegion(mask);
             }
                 
-            drawBorder(painter, r, &opt, ROUNDED_BOTTOM, borderCols, WIDGET_MDI_WINDOW, BORDER_RAISED);
+            drawBorder(painter, r, &opt, ROUNDED_BOTTOM, borderCols, WIDGET_MDI_WINDOW, opts.titlebarBorder ? BORDER_RAISED : BORDER_FLAT);
 
             if(roundKWinFull)
             {
@@ -6229,8 +6229,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                btnCols[ORIGINAL_SHADE], btnCols, true,
                                titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
 
-                painter->setPen(btnCols[0]);
-                painter->drawPoint(r.x()+1, r.y()+r.height()-1);
+                if(opts.titlebarBorder)
+                {
+                    painter->setPen(btnCols[0]);
+                    painter->drawPoint(r.x()+1, r.y()+r.height()-1);
+                }
+
                 if(roundKWinFull)
                 {
                     bool   kwinHighlight(state&QtC_StateKWinHighlight);
@@ -6262,7 +6266,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->drawPoint(r.x()+r.width()-3, r.y()+2);
                         painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
                     }
-                    if(APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance))
+                    if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
                     {
                         col=(btnCols[0]);
                         col.setAlphaF(0.5);
@@ -8061,7 +8065,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         p->setPen(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
         p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
-    else if(colouredMouseOver || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
+    else if(colouredMouseOver || (opts.titlebarBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w)) ||
             (draw3d && option->state&State_Raised))
     {
         QPainterPath innerTlPath,
@@ -8292,52 +8296,53 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 
     p->setBrush(Qt::NoBrush);
 
-    switch(borderProfile)
-    {
-        case BORDER_FLAT:
-            break;
-        case BORDER_RAISED:
-        case BORDER_SUNKEN:
+    if(!window || opts.titlebarBorder)
+        switch(borderProfile)
         {
-            EAppearance  app(widgetApp(w, &opts));
-            int          dark=window ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
-
-            if(APPEARANCE_FLAT==app && window)
-                app=APPEARANCE_RAISED;
-
-            QColor       tl(cols[BORDER_RAISED==borderProfile ? 0 : dark]),
-                         br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
-            QPainterPath topPath,
-                         botPath;
-
-            if(doBlend && !window)
+            case BORDER_FLAT:
+                break;
+            case BORDER_RAISED:
+            case BORDER_SUNKEN:
             {
-                tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
-                br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
-            }
+                EAppearance  app(widgetApp(w, &opts));
+                int          dark=window ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
 
-//             if(window)
-//                 tl.setAlphaF(0.5);
+                if(APPEARANCE_FLAT==app && window)
+                    app=APPEARANCE_RAISED;
 
-            buildSplitPath(r.adjusted(1, 1, -1, -1), w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL),
-                           topPath, botPath);
+                QColor       tl(cols[BORDER_RAISED==borderProfile ? 0 : dark]),
+                             br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
+                QPainterPath topPath,
+                             botPath;
 
-            p->setPen((enabled || BORDER_SUNKEN==borderProfile) &&
-                      (BORDER_RAISED==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
-                            ? tl
-                            : option->palette.background().color());
-            p->drawPath(topPath);
-            p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
-                        ? option->palette.background().color()
-                        : WIDGET_ENTRY==w && !hasFocus
-                            ? option->palette.base().color()
-                            : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app ||
-                                          WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
-                                ? br
+                if(doBlend && !window)
+                {
+                    tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
+                    br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
+                }
+
+    //             if(window)
+    //                 tl.setAlphaF(0.5);
+
+                buildSplitPath(r.adjusted(1, 1, -1, -1), w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_INTERNAL),
+                               topPath, botPath);
+
+                p->setPen((enabled || BORDER_SUNKEN==borderProfile) &&
+                          (BORDER_RAISED==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
+                                ? tl
                                 : option->palette.background().color());
-            p->drawPath(botPath);
+                p->drawPath(topPath);
+                p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
+                            ? option->palette.background().color()
+                            : WIDGET_ENTRY==w && !hasFocus
+                                ? option->palette.base().color()
+                                : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app ||
+                                            WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                    ? br
+                                    : option->palette.background().color());
+                p->drawPath(botPath);
+            }
         }
-    }
 
     p->setPen(window && state&QtC_StateKWinHighlight ? itsHighlightCols[0] : border);
     p->drawPath(buildPath(r, w, round, getRadius(opts.round, r.width(), r.height(), w, RADIUS_EXTERNAL)));

@@ -907,17 +907,17 @@ p, li { white-space: pre-wrap; }
      </widget>
      <widget class="QWidget" name="page_10">
       <layout class="QGridLayout" name="gridLayout_7">
-       <item row="0" column="0">
+       <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_23">
          <property name="text">
           <string>Active appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="0" column="2">
         <widget class="QComboBox" name="titlebarAppearance"/>
        </item>
-       <item row="0" column="2">
+       <item row="0" column="3">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -930,24 +930,24 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" colspan="2">
         <widget class="QLabel" name="label_28">
          <property name="text">
           <string>Inactive appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="2">
         <widget class="QComboBox" name="inactiveTitlebarAppearance"/>
        </item>
-       <item row="2" column="0">
+       <item row="2" column="0" colspan="2">
         <widget class="QLabel" name="label_27">
          <property name="text">
           <string>Button appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="2" column="2">
         <widget class="QComboBox" name="titlebarButtonAppearance"/>
        </item>
        <item row="3" column="0">
@@ -957,10 +957,10 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="3" column="2">
         <widget class="QComboBox" name="titlebarAlignment"/>
        </item>
-       <item row="4" column="0" colspan="2">
+       <item row="4" column="0" colspan="3">
         <widget class="QCheckBox" name="colorTitlebarOnly">
          <property name="text">
           <string>Color titlebar only (KDE4)</string>
@@ -968,6 +968,13 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="5" column="0">
+        <widget class="QCheckBox" name="titlebarBorder">
+         <property name="text">
+          <string>Light border (KDE4)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1779,6 +1786,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>titlebarAlignment</tabstop>
   <tabstop>colorTitlebarOnly</tabstop>
+  <tabstop>titlebarBorder</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>handles</tabstop>
   <tabstop>menubarAppearance</tabstop>

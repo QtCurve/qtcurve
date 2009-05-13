@@ -495,6 +495,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(highlightScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sunkenScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(flatSbarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(gtkComboMenus, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(gtkButtonOrder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1177,6 +1178,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.squareScrollViews=squareScrollViews->isChecked();
     opts.sunkenScrollViews=sunkenScrollViews->isChecked();
     opts.flatSbarButtons=flatSbarButtons->isChecked();
+    opts.titlebarBorder=titlebarBorder->isChecked();
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.gtkComboMenus=gtkComboMenus->isChecked();
     opts.gtkButtonOrder=gtkButtonOrder->isChecked();
@@ -1289,6 +1291,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     squareScrollViews->setChecked(opts.squareScrollViews);
     sunkenScrollViews->setChecked(opts.sunkenScrollViews);
     flatSbarButtons->setChecked(opts.flatSbarButtons);
+    titlebarBorder->setChecked(opts.titlebarBorder);
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     gtkComboMenus->setChecked(opts.gtkComboMenus);
     gtkButtonOrder->setChecked(opts.gtkButtonOrder);
@@ -1375,6 +1378,7 @@ bool QtCurveConfig::settingsChanged()
          squareScrollViews->isChecked()!=currentStyle.squareScrollViews ||
          sunkenScrollViews->isChecked()!=currentStyle.sunkenScrollViews ||
          flatSbarButtons->isChecked()!=currentStyle.flatSbarButtons ||
+         titlebarBorder->isChecked()!=currentStyle.titlebarBorder ||
          sbarBgndAppearance->currentIndex()!=currentStyle.sbarBgndAppearance ||
          gtkComboMenus->isChecked()!=currentStyle.gtkComboMenus ||
          gtkButtonOrder->isChecked()!=currentStyle.gtkButtonOrder ||
