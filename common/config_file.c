@@ -971,7 +971,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(fadeLines)
 #endif
-            QTC_CFG_READ_BOOL(inactiveHighlight)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
             QTC_CFG_READ_BOOL(crHighlight)
             QTC_CFG_READ_BOOL(crButton)
@@ -1466,7 +1465,6 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=true;
     opts->groupBoxLine=true;
     opts->colorMenubarMouseOver=true;
-    opts->inactiveHighlight=false;
     opts->crHighlight=false;
     opts->crButton=true;
     opts->fillProgress=true;
@@ -1949,7 +1947,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(groupBoxLine)
         CFG_WRITE_ENTRY(fadeLines)
-        CFG_WRITE_ENTRY(inactiveHighlight)
         CFG_WRITE_ENTRY(crHighlight)
         CFG_WRITE_ENTRY(crButton)
         CFG_WRITE_ENTRY(fillProgress)

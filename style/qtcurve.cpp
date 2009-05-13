@@ -644,20 +644,6 @@ static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int of
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
-{
-    return QColor((a.red()+limit(b.red()*factor))>>1, 
-                  (a.green()+limit(b.green()*factor))>>1, 
-                  (a.blue()+limit(b.blue()*factor))>>1);
-}
-
-inline QColor tint(const QColor &a, const QColor &b, double factor=0.2)
-{
-    return QColor((int)((a.red()+(factor*b.red()))/(1+factor)),
-                  (int)((a.green()+(factor*b.green()))/(1+factor)),
-                  (int)((a.blue()+(factor*b.blue()))/(1+factor)));
-}
-
 static QColor shade(const QColor &a, float k)
 {
     QColor mod;
@@ -862,7 +848,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     {
         itsDefBtnCols=new QColor [TOTAL_SHADES+1];
         shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
-                         itsHighlightCols[ORIGINAL_SHADE]), itsDefBtnCols);
+                         itsHighlightCols[ORIGINAL_SHADE], QTC_DEF_BNT_TINT), itsDefBtnCols);
     }
     else
     {
@@ -1033,7 +1019,7 @@ void QtCurveStyle::polish(QPalette &palette)
     if(newDefBtn)
         if(IND_TINT==opts.defBtnIndicator)
             shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
-                        itsHighlightCols[ORIGINAL_SHADE]), itsDefBtnCols);
+                        itsHighlightCols[ORIGINAL_SHADE], QTC_DEF_BNT_TINT), itsDefBtnCols);
         else if(IND_GLOW!=opts.defBtnIndicator)
             shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                         itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
@@ -1075,13 +1061,14 @@ void QtCurveStyle::polish(QPalette &palette)
         if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
             palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i, palette.color(QPalette::Active, (QPalette::ColorRole)i));
 
-    if(opts.inactiveHighlight)
-    {
-        palette.setColor(QPalette::Inactive, QPalette::Highlight,
-                          midColor(palette.color(QPalette::Active, QPalette::Window),
-                                   palette.color(QPalette::Active, QPalette::Highlight), INACTIVE_HIGHLIGHT_FACTOR));
-        palette.setColor(QPalette::Inactive, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::WindowText));
-    }
+//     KConfigGroup group(KGlobal::config(), "ColorEffects:Inactive");
+//     if(group.readEntry("ChangeSelectionColor", group.readEntry("Enable", false)))
+//     {
+//         palette.setColor(QPalette::Inactive, QPalette::Highlight,
+//                           midColor(palette.color(QPalette::Active, QPalette::Window),
+//                                    palette.color(QPalette::Active, QPalette::Highlight), INACTIVE_HIGHLIGHT_FACTOR));
+//         palette.setColor(QPalette::Inactive, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::WindowText));
+//     }
 }
 
 void QtCurveStyle::polish(QWidget *widget)
@@ -5014,7 +5001,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsHighlightCols[0]);
                                 drawAaLine(painter, r.left()+1, r.top()+1, r.right()-1, r.top()+1);
-                                painter->setPen(midColor(fill, itsHighlightCols[0], IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
+                                painter->setPen(midColor(fill, itsHighlightCols[0])); // , IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
                                 drawAaLine(painter, r.left()+1, r.top()+2, r.right()-1, r.top()+2);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
@@ -5142,7 +5129,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 painter->setPen(itsHighlightCols[0]);
                                 drawAaLine(painter, r.left()+1, r.top()+1, r.left()+1, r.bottom()-1);
-                                painter->setPen(midColor(fill, itsHighlightCols[0], IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
+                                painter->setPen(midColor(fill, itsHighlightCols[0])); //, IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
                                 drawAaLine(painter, r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
 
@@ -6840,7 +6827,6 @@ void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags,
         if(button && isMultiTabBarTab(button) && button->isChecked())
             textRole=QPalette::HighlightedText;
     }
-
     QTC_BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 

@@ -153,6 +153,7 @@ typedef GdkColor color;
 #define QTC_GLOW_MO        1 /*ORIGINAL_SHADE*/
 #define QTC_GLOW_DEFBTN    1
 #define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
+#define QTC_DEF_BNT_TINT   0.4
 
 #define QT_STD_BORDER      5
 #define QT_PBAR_BORDER     4
@@ -758,8 +759,18 @@ inline int limit(double c)
 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #include <KDE/KColorUtils>
+#define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
 #else
 #include "colorutils.c"
+#ifdef __cplusplus
+#define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
+#define midColor(COLA, COLB) ColorUtils_mix(&(COLA), &(COLB), 0.5)
+#define midColorF(COLA, COLB, FACTOR) ColorUtils_mix(&(COLA), &(COLB), FACTOR-0.5)
+#else
+#define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -1079,7 +1090,6 @@ typedef struct
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripe,
 #endif
-                     inactiveHighlight,
                      crHighlight,
                      crButton,
                      fillProgress,

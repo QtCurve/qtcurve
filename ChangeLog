@@ -15,24 +15,27 @@
      Align titlebars text in center
 10. Add appearance setting for background of flat scrollbar buttons.
 11. Add HCY colour space.
-12. Update gradient preview when change colour space.
-13. Don't max/extra round progressbars.
-14. Use faded lines for tab and listview header mouse-over.
-15. Remove line from KTitleWidget
-16. Slightly improve highlight in corner of kwin windows.
-17. Align pressed box drwn for checkable icon menuitems better
+12. Use tint and mix color routines from KDE4's KColorUtils.
+13. Remove QtCurve's 'inactiveHighlight' option, and use KDE4s setting
+    instead.
+14. Update gradient preview when change colour space.
+15. Don't max/extra round progressbars.
+16. Use faded lines for tab and listview header mouse-over.
+17. Remove line from KTitleWidget
+18. Slightly improve highlight in corner of kwin windows.
+19. Align pressed box drwn for checkable icon menuitems better
     with menuitem highlight.
-18. Remove 'Custom sunken gradient' setting, as this was not
+20. Remove 'Custom sunken gradient' setting, as this was not
     actually used.
-19. Better handling of 'full centered' titlebar texts when
+21. Better handling of 'full centered' titlebar texts when
     window size is small.
-20. Don't round KWin's tab box.
-21. Improve look of widgets in KPackageKit.
-22. Dont use QTimer to setup KDE settings.
-23. Fix line under coloured MDI window titlebars.
-24. Fix some KWin issues; rounding of coloured window bar borders,
+22. Don't round KWin's tab box.
+23. Improve look of widgets in KPackageKit.
+24. Dont use QTimer to setup KDE settings.
+25. Fix line under coloured MDI window titlebars.
+26. Fix some KWin issues; rounding of coloured window bar borders,
     incorrect colouring of buttom of windows when only colouring titlebar.
-25. When navigating popupmenus with the keyboard, skip over disabled items.
+27. When navigating popupmenus with the keyboard, skip over disabled items.
 
 0.62.9
 ------
