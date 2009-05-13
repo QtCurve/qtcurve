@@ -15,16 +15,19 @@
      Align titlebars text in center
 10. Add appearance setting for background of flat scrollbar buttons.
 11. Add HCY colour space.
-12. Don't max/extra round progressbars.
-13. Use faded lines for tab and listview header mouse-over.
-14. Create icon-mapping file in a more robust manner.
-15. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
+12. Use tint and mix color routines from KDE4's KColorUtils.
+13. Remove QtCurve's 'inactiveHighlight' option, and use KDE4s setting
+    instead.
+14. Don't max/extra round progressbars.
+15. Use faded lines for tab and listview header mouse-over.
+16. Create icon-mapping file in a more robust manner.
+17. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
     and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
-16. Fix spin widget entry highlighting under Gtk 2.16
-17. Don't round rulers.
-18. Fix faded menuitems when not rounding.
-19. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
-20. Make buttons slightly thinner, matches KDE4 better.
+18. Fix spin widget entry highlighting under Gtk 2.16
+19. Don't round rulers.
+20. Fix faded menuitems when not rounding.
+21. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
+22. Make buttons slightly thinner, matches KDE4 better.
 
 0.62.8
 ------

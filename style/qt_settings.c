@@ -58,8 +58,6 @@ static GdkColor setGdkColor(int r, int g, int b)
 #define QTC_DEBUG
 */
 
-static void generateMidColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor);
-
 static int strncmp_i(const char *s1, const char *s2, int num)
 {
     char c1,
@@ -162,8 +160,8 @@ enum QtFont
 
 struct QtData
 {
-    GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS],
-                    inactiveSelectCol;
+    GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS]; /*,
+                    inactiveSelectCol;*/
     char            *fonts[FONT_NUM_TOTAL],
                     *icons,
                     *styleName;
@@ -172,7 +170,8 @@ struct QtData
     gboolean        buttonIcons,
                     shadeSortedList;
     EGtkApp         app;
-    gboolean        qt4;
+    gboolean        qt4,
+                    inactiveChangeSelectionColor;
 };
 
 #include <gmodule.h>
@@ -1016,6 +1015,8 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
                     effects[eff].intensity.effect=readInt(line, 16);
                 else if(0==strncmp_i(line, "Enable=", 7))
                     effects[eff].enabled=readBool(line, 7);
+                else if(0==strncmp_i(line, "ChangeSelectionColor=", 21))
+                    qtSettings.inactiveChangeSelectionColor=true;
             }
             else if(SECT_GENERAL==section && rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE) &&
                     0==strncmp_i(line, "shadeSortColumn=", 16))
@@ -1113,6 +1114,14 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
                 }
             }
         }
+
+        if(qtSettings.inactiveChangeSelectionColor)
+            if(effects[PAL_INACTIVE].enabled)
+                qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=ColorUtils_tint(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW],
+                                                                                &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED],
+                                                                                0.4);
+            else
+                qtSettings.inactiveChangeSelectionColor=FALSE;
     }
 
     if(rd&RD_ICONS && !qtSettings.icons)
@@ -1936,6 +1945,7 @@ static gboolean qtInit(Options *opts)
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]=setGdkColor(0, 0, 0);
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=setGdkColor(0xFF, 0xFF, 192);
             qtSettings.styleName=NULL;
+            qtSettings.inactiveChangeSelectionColor=FALSE;
 
             lastRead=now;
 
@@ -2000,12 +2010,14 @@ static gboolean qtInit(Options *opts)
 
             readConfig(rcFile, opts, 0L);
 
+/*
             if(opts->inactiveHighlight)
                 generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
                                 &(qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED]),
                                 &qtSettings.inactiveSelectCol, INACTIVE_HIGHLIGHT_FACTOR);
             else
                 qtSettings.inactiveSelectCol=qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
+*/
 
             /* Check if we're firefox... */
             if((app=getAppName()))
@@ -2109,28 +2121,27 @@ static gboolean qtInit(Options *opts)
                 }
             }
 
-            if(opts->inactiveHighlight)
+            if(qtSettings.inactiveChangeSelectionColor)
             {
                 static const char *format="style \""QTC_RC_SETTING"HlFix\" "
-                                          "{base[ACTIVE]=\"#%02X%02X%02X\""
-                                          " text[ACTIVE]=\"#%02X%02X%02X\"}"
+                                          "{base[ACTIVE]=\"#%02X%02X%02X\"}"
+                                          //" text[ACTIVE]=\"#%02X%02X%02X\"}"
                                           "class \"*\" style \""QTC_RC_SETTING"HlFix\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(format));
 
                 if(tmpStr)
                 {
-                    GdkColor *inactiveHighlightTextCol=opts->inactiveHighlight
-                                            ? &qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]
-                                            : &qtSettings.colors[PAL_INACTIVE][COLOR_TEXT_SELECTED];
+                    sprintf(tmpStr, format, toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].red),
+                                            toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].green),
+                                            toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].blue));
 
-                    sprintf(tmpStr, format, toQtColor(qtSettings.inactiveSelectCol.red),
-                                            toQtColor(qtSettings.inactiveSelectCol.green),
-                                            toQtColor(qtSettings.inactiveSelectCol.blue),
-
-                                            toQtColor(inactiveHighlightTextCol->red),
-                                            toQtColor(inactiveHighlightTextCol->green),
-                                            toQtColor(inactiveHighlightTextCol->blue));
+                    // KDE4 does not set the text colour...
+                    /*
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
+                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue));
+                    */
                     gtk_rc_parse_string(tmpStr);
                 }
             }
@@ -2602,19 +2613,20 @@ static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_NORMAL, COLOR_BACKGROUND)
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_SELECTED, COLOR_SELECTED)
     SET_COLOR_PAL_ACT(style, rc_style, base, GTK_RC_BASE, GTK_STATE_INSENSITIVE, COLOR_WINDOW)
-    /*SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED)*/
-    style->base[GTK_STATE_ACTIVE]=qtSettings.inactiveSelectCol;
+    SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_ACTIVE, COLOR_SELECTED)
+    if(qtSettings.inactiveChangeSelectionColor)
+        style->base[GTK_STATE_ACTIVE]=qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED];
     SET_COLOR(style, rc_style, base, GTK_RC_BASE, GTK_STATE_PRELIGHT, COLOR_SELECTED)
 
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_NORMAL, COLOR_TEXT)
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_SELECTED, COLOR_TEXT_SELECTED)
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_INSENSITIVE, COLOR_TEXT)
-    /*SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED)*/
+    SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED)
 
-    if(opts->inactiveHighlight)
-        SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT)
-    else
-        SET_COLOR_PAL(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED, PAL_INACTIVE)
+//     if(opts->inactiveHighlight)
+//         SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT)
+//     else
+//         SET_COLOR_PAL(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_ACTIVE, COLOR_TEXT_SELECTED, PAL_INACTIVE)
 
     SET_COLOR(style, rc_style, text, GTK_RC_TEXT, GTK_STATE_PRELIGHT, COLOR_TEXT)
 

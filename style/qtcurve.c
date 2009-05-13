@@ -299,24 +299,6 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
         btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
 }
 
-static void generateMidColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor)
-{
-    *mid=*b;
-
-    mid->red=(a->red+limit(b->red*factor))>>1;
-    mid->green=(a->green+limit(b->green*factor))>>1;
-    mid->blue=(a->blue+limit(b->blue*factor))>>1;
-}
-
-static void tintColor(GdkColor *a, GdkColor *b, GdkColor *mid, double factor)
-{
-    *mid=*b;
-
-    mid->red=limit((a->red+(factor*b->red))/(1+factor));
-    mid->green=limit((a->green+(factor*b->green))/(1+factor));
-    mid->blue=limit((a->blue+(factor*b->blue))/(1+factor));
-}
-
 static GdkColor * getCellCol(GdkColor *std, const gchar *detail)
 {
     static GdkColor shaded;
@@ -4477,9 +4459,9 @@ debugDisplayWidget(widget, 3);
                 }
                 else
                 {
-                    GdkColor mid;
+                    GdkColor mid=midColor(GTK_STATE_INSENSITIVE==state
+                                            ? &style->bg[GTK_STATE_NORMAL] : &style->base[GTK_STATE_NORMAL], &(colors[3]));
 
-                    generateMidColor(GTK_STATE_INSENSITIVE==state ? &style->bg[GTK_STATE_NORMAL] : &style->base[GTK_STATE_NORMAL], &(colors[3]), &mid, 1.0);
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(mid));
                 }
                 cairo_move_to(cr, x+1.5, y+QTC_CHECK_SIZE-1.5);
@@ -5354,9 +5336,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid;
+                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
 
-                    generateMidColor(col, &(qtcPalette.highlight[0]), &mid, 1.0);
                     drawHLine(cr, QTC_CAIRO_COL(mid), 1.0, x+1, y+height-3, width-2);
                     drawHLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+height-2, width-2);
 
@@ -5403,9 +5384,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid;
+                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
 
-                    generateMidColor(col, &(qtcPalette.highlight[0]), &mid, 1.0);
                     drawHLine(cr, QTC_CAIRO_COL(mid), 1.0, x+1, y+2, width-2);
                     drawHLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+1, width-2);
 
@@ -5448,9 +5428,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid;
+                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
 
-                    generateMidColor(col, &(qtcPalette.highlight[0]), &mid, 1.0);
                     drawVLine(cr, QTC_CAIRO_COL(mid), 1.0, x+width-3, y+1, height-2);
                     drawVLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+width-2, y+1, height-2);
 
@@ -5496,9 +5475,8 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid;
+                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
 
-                    generateMidColor(col, &(qtcPalette.highlight[0]), &mid, 1.0);
                     drawVLine(cr, QTC_CAIRO_COL(mid), 1.0, x+2, y+1, height-2);
                     drawVLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+1, height-2);
 
@@ -6382,10 +6360,9 @@ static void generateColors()
             break;
         case SHADE_BLEND_SELECTED:
         {
-            GdkColor mid;
+            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                  &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-            generateMidColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                            &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.slider=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.slider);
         }
@@ -6397,10 +6374,8 @@ static void generateColors()
         qtcPalette.defbtn=qtcPalette.focus;
     else if(IND_TINT==opts.defBtnIndicator)
     {
-        GdkColor col;
-
-        tintColor(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
-                  &qtcPalette.highlight[ORIGINAL_SHADE], &col, 0.2);
+        GdkColor col=tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
+                          &qtcPalette.highlight[ORIGINAL_SHADE], QTC_DEF_BNT_TINT);
         qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
         shadeColors(&col, qtcPalette.defbtn);
     }
@@ -6410,10 +6385,9 @@ static void generateColors()
             qtcPalette.defbtn=qtcPalette.slider;
         else
         {
-            GdkColor mid;
+            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                  &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-            generateMidColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                             &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &mid, 1.0);
             qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.defbtn);
         }
