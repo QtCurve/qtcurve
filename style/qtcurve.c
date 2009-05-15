@@ -5207,7 +5207,9 @@ debugDisplayWidget(widget, 3);
                     rev=(GTK_POS_TOP==gap_side || GTK_POS_BOTTOM==gap_side) &&
                         reverseLayout(widget->parent),
                     mozTab=isMozillaTab(widget);
-        int         mod=active ? 1 : 0;
+        int         mod=active ? 1 : 0,
+                    highlightOffset=opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1,
+                    highlightBorder=(opts.round>ROUND_FULL ? 4 : 3);
         GdkColor    *col=active
                             ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
                     *selCol1=&qtcPalette.highlight[0],
@@ -5336,13 +5338,11 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
+                    drawHLine(cr, QTC_CAIRO_COL(*selCol1), 0.5, x+1, y+height-3, width-2);
+                    drawHLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+highlightOffset, y+height-2, width-(2*highlightOffset));
 
-                    drawHLine(cr, QTC_CAIRO_COL(mid), 1.0, x+1, y+height-3, width-2);
-                    drawHLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+height-2, width-2);
-
-                    clipArea.y=y+height-3;
-                    clipArea.height=3;
+                    clipArea.y=y+height-highlightBorder;
+                    clipArea.height=highlightBorder;
                     realDrawBorder(cr, style, state, &clipArea, NULL, x, y, width, height,
                                    qtcPalette.highlight, ROUNDED_BOTTOM,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
@@ -5384,13 +5384,11 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
-
-                    drawHLine(cr, QTC_CAIRO_COL(mid), 1.0, x+1, y+2, width-2);
-                    drawHLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+1, width-2);
+                    drawHLine(cr, QTC_CAIRO_COL(*selCol1), 0.5, x+1, y+2, width-2);
+                    drawHLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+highlightOffset, y+1, width-(2*highlightOffset));
 
                     clipArea.y=y;
-                    clipArea.height=3;
+                    clipArea.height=highlightBorder;
                     realDrawBorder(cr, style, state, &clipArea, NULL, x, y, width, height,
                                    qtcPalette.highlight, ROUNDED_TOP,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
@@ -5428,13 +5426,11 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
+                    drawVLine(cr, QTC_CAIRO_COL(*selCol1), 0.5, x+width-3, y+1, height-2);
+                    drawVLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+width-2, y+highlightOffset, height-(2*highlightOffset));
 
-                    drawVLine(cr, QTC_CAIRO_COL(mid), 1.0, x+width-3, y+1, height-2);
-                    drawVLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+width-2, y+1, height-2);
-
-                    clipArea.x=x+width-3;
-                    clipArea.width=3;
+                    clipArea.x=x+width-highlightBorder;
+                    clipArea.width=highlightBorder;
                     realDrawBorder(cr, style, state, &clipArea, NULL, x, y, width, height,
                                    qtcPalette.highlight, ROUNDED_RIGHT,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
@@ -5475,13 +5471,11 @@ debugDisplayWidget(widget, 3);
 
                 if(notebook && opts.highlightTab && active)
                 {
-                    GdkColor mid=midColor(col, &(qtcPalette.highlight[0]));
-
-                    drawVLine(cr, QTC_CAIRO_COL(mid), 1.0, x+2, y+1, height-2);
-                    drawVLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+1, height-2);
+                    drawVLine(cr, QTC_CAIRO_COL(*selCol1), 0.5, x+2, y+1, height-2);
+                    drawVLine(cr, QTC_CAIRO_COL(*selCol1), 1.0, x+1, y+highlightOffset, height-(2*highlightOffset));
 
                     clipArea.x=x;
-                    clipArea.width=3;
+                    clipArea.width=highlightBorder;
                     realDrawBorder(cr, style, state, &clipArea, NULL, x, y, width, height,
                                    qtcPalette.highlight, ROUNDED_LEFT,
                                    BORDER_FLAT, WIDGET_OTHER, 0, 3);
