@@ -1016,7 +1016,7 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
                 else if(0==strncmp_i(line, "Enable=", 7))
                     effects[eff].enabled=readBool(line, 7);
                 else if(0==strncmp_i(line, "ChangeSelectionColor=", 21))
-                    qtSettings.inactiveChangeSelectionColor=true;
+                    qtSettings.inactiveChangeSelectionColor=readBool(line, 21);
             }
             else if(SECT_GENERAL==section && rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE) &&
                     0==strncmp_i(line, "shadeSortColumn=", 16))
@@ -1115,6 +1115,7 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
             }
         }
 
+        qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
         if(qtSettings.inactiveChangeSelectionColor)
             if(effects[PAL_INACTIVE].enabled)
                 qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=ColorUtils_tint(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW],
