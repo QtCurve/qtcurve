@@ -6092,7 +6092,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if ((option->subControls & SC_SliderHandle) && handle.isValid())
                 {
-                    drawSliderHandle(painter, handle, slider);
+                    QStyleOptionSlider s(*slider);
+                    if(!(s.activeSubControls & QStyle::SC_SliderHandle))
+                    {
+                        s.state &= ~QStyle::State_MouseOver;
+                        s.state &= ~QStyle::State_Sunken;
+                    }
+
+                    drawSliderHandle(painter, handle, &s);
 
                     if (state&State_HasFocus)
                     {
