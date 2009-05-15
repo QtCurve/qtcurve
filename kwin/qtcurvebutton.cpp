@@ -156,7 +156,16 @@ void QtCurveButton::drawButton(QPainter *painter)
         QPixmap menuIcon(itsClient->icon().pixmap(style()->pixelMetric(QStyle::PM_SmallIconSize)));
         if (width() < menuIcon.width() || height() < menuIcon.height())
             menuIcon = menuIcon.scaled(width(), height());
-        bP.drawPixmap((int)(((width()-menuIcon.width())/2.0)+0.5), (int)(((height()-menuIcon.height())/2.0)+0.5), menuIcon);
+
+        int dX(((width()-menuIcon.width())/2.0)+0.5),
+            dY(((height()-menuIcon.height())/2.0)+0.5);
+
+        if(isDown())
+        {
+            dY++;
+            dX++;
+        }
+        bP.drawPixmap(dX, dY, menuIcon);
     }
     else
     {

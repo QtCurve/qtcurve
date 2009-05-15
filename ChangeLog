@@ -38,6 +38,7 @@
     incorrect colouring of buttom of windows when only colouring titlebar.
 28. When navigating popupmenus with the keyboard, skip over disabled items.
 29. Add option to control light border on windows.
+30. Move kwin menu icon when pressed.
 
 0.62.9
 ------
