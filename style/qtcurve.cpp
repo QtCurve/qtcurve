@@ -4932,7 +4932,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                   QStyleOptionTab::End : QStyleOptionTab::Beginning)) || onlyTab);
                 int  tabBarAlignment(styleHint(SH_TabBar_Alignment, tab, widget)),
                      tabOverlap(onlyTab ? 0 : pixelMetric(PM_TabBarTabOverlap, option, widget)),
-                     moOffset(ROUNDED_NONE==opts.round || !opts.tabMouseOverTop ? 1 : opts.round);
+                     moOffset(ROUNDED_NONE==opts.round || !opts.tabMouseOverTop ? 1 : opts.round),
+                     highlightOffset(opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1),
+                     highlightBorder(opts.round>ROUND_FULL ? 4 : 3);
                 bool leftAligned((!rtlHorTabs && Qt::AlignLeft==tabBarAlignment) ||
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
                      rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
@@ -4998,14 +5000,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             if(opts.highlightTab)
                             {
+                                QColor col(itsHighlightCols[0]);
                                 painter->setRenderHint(QPainter::Antialiasing, true);
-                                painter->setPen(itsHighlightCols[0]);
-                                drawAaLine(painter, r.left()+1, r.top()+1, r.right()-1, r.top()+1);
-                                painter->setPen(midColor(fill, itsHighlightCols[0])); // , IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
+                                painter->setPen(col);
+                                drawAaLine(painter, r.left()+highlightOffset, r.top()+1, r.right()-highlightOffset, r.top()+1);
+                                col.setAlphaF(0.5);
+                                painter->setPen(col);
                                 drawAaLine(painter, r.left()+1, r.top()+2, r.right()-1, r.top()+2);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
-
-                                painter->setClipRect(QRect(r.x(), r.y(), r.width(), 3));
+                                painter->setClipRect(QRect(r.x(), r.y(), r.width(), highlightBorder));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
 
@@ -5062,14 +5065,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             if(opts.highlightTab)
                             {
+                                QColor col(itsHighlightCols[0]);
                                 painter->setRenderHint(QPainter::Antialiasing, true);
-                                painter->setPen(itsHighlightCols[0]);
-                                drawAaLine(painter, r.left()+1, r.bottom()-1, r.right()-1, r.bottom()-1);
-                                painter->setPen(midColor(fill, itsHighlightCols[0]));
+                                painter->setPen(col);
+                                drawAaLine(painter, r.left()+highlightOffset, r.bottom()-1, r.right()-highlightOffset, r.bottom()-1);
+                                col.setAlphaF(0.5);
+                                painter->setPen(col);
                                 drawAaLine(painter, r.left()+1, r.bottom()-2, r.right()-1, r.bottom()-2);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
-
-                                painter->setClipRect(QRect(r.x(), r.y()+r.height()-3, r.width(), r.y()+r.height()-1));
+                                painter->setClipRect(QRect(r.x(), r.y()+r.height()-highlightBorder, r.width(), r.y()+r.height()-1));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_BOT, BORDER_FLAT, false, 3);
                             }
 
@@ -5126,14 +5130,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             if(opts.highlightTab)
                             {
+                                QColor col(itsHighlightCols[0]);
                                 painter->setRenderHint(QPainter::Antialiasing, true);
-                                painter->setPen(itsHighlightCols[0]);
-                                drawAaLine(painter, r.left()+1, r.top()+1, r.left()+1, r.bottom()-1);
-                                painter->setPen(midColor(fill, itsHighlightCols[0])); //, IS_FLAT(opts.activeTabAppearance) ? 1.0 : 1.2));
+                                painter->setPen(col);
+                                drawAaLine(painter, r.left()+1, r.top()+highlightOffset, r.left()+1, r.bottom()-highlightOffset);
+                                col.setAlphaF(0.5);
+                                painter->setPen(col);
                                 drawAaLine(painter, r.left()+2, r.top()+1, r.left()+2, r.bottom()-1);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
-
-                                painter->setClipRect(QRect(r.x(), r.y(), 3, r.height()));
+                                painter->setClipRect(QRect(r.x(), r.y(), highlightBorder, r.height()));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
 
@@ -5190,14 +5195,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             if(opts.highlightTab)
                             {
+                                QColor col(itsHighlightCols[0]);
                                 painter->setRenderHint(QPainter::Antialiasing, true);
-                                painter->setPen(itsHighlightCols[0]);
-                                drawAaLine(painter, r.right()-1, r.top()+1, r.right()-1, r.bottom()-1);
-                                painter->setPen(midColor(fill, itsHighlightCols[0]));
+                                painter->setPen(col);
+                                drawAaLine(painter, r.right()-1, r.top()+highlightOffset, r.right()-1, r.bottom()-highlightOffset);
+                                col.setAlphaF(0.5);
+                                painter->setPen(col);
                                 drawAaLine(painter, r.right()-2, r.top()+1, r.right()-2, r.bottom()-1);
                                 painter->setRenderHint(QPainter::Antialiasing, false);
-
-                                painter->setClipRect(QRect(r.x()+r.width()-3, r.y(), r.x()+r.width()-1, r.height()));
+                                painter->setClipRect(QRect(r.x()+r.width()-highlightBorder, r.y(), r.x()+r.width()-1, r.height()));
                                 drawBorder(painter, r, option, ROUNDED_ALL, itsHighlightCols, WIDGET_TAB_TOP, BORDER_FLAT, false, 3);
                             }
 
