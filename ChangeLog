@@ -29,6 +29,8 @@
 21. Fix faded menuitems when not rounding.
 22. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
 23. Make buttons slightly thinner, matches KDE4 better.
+24. Fix settnig of KDE icons when QtCurve is configured by just having
+    gtk-theme-name="QtCurve" in the gtkrc file.
 
 0.62.8
 ------

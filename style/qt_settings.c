@@ -2227,8 +2227,8 @@ static gboolean qtInit(Options *opts)
                     free(cmdStr);
                 }
                 free(version);
-                gtk_rc_add_default_file(tmpStr);
                 gtk_rc_parse_string(path);
+                gtk_rc_parse(tmpStr);
             }
 
             if((settings=gtk_settings_get_default()))
