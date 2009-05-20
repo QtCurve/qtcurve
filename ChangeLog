@@ -41,6 +41,12 @@
 30. Add option to control light border on windows.
 31. Move kwin menu icon when pressed.
 32. Only draw mouse-over effect on sliders when mouse is over slider handle.
+33. Titlebar button options:
+        Show border on hover only
+        Show icon on hover only
+        Round buttons
+        No border
+        Coloration
 
 0.62.9
 ------

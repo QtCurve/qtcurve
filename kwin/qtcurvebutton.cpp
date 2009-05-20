@@ -129,7 +129,11 @@ inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
 void QtCurveButton::drawButton(QPainter *painter)
 {
     QRect    r(0, 0, width(), height());
-    bool     active(itsClient->isActive());
+    int      flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QTC_TitleBarButtons, 0L, 0L);
+    bool     active(itsClient->isActive()),
+             sunken(isDown()),
+             drawFrame(!(flags&QTC_TITLEBAR_BUTTON_NO_FRAME) &&
+                       (itsHover || sunken || !(flags&QTC_TITLEBAR_BUTTON_HOVER_FRAME)));
     QPixmap  tempPixmap;
     QColor   buttonColor(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     QPixmap  buffer(width(), height());
@@ -140,14 +144,49 @@ void QtCurveButton::drawButton(QPainter *painter)
 
     itsClient->drawBtnBgnd(&bP, r, active);
 
-    if (itsHover)
+    if (drawFrame && (!(flags&QTC_TITLEBAR_BUTTON_ROUND) || MenuButton!=type()))
     {
         QStyleOption opt;
+        int          offset=flags&QTC_TITLEBAR_BUTTON_ROUND ? 1 : 0;
 
         opt.init(this);
-        opt.rect=QRect(0, 0, width(), height());
-        opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised)|QStyle::State_MouseOver|QStyle::State_Horizontal|QtC_StateKWin;
-        opt.palette.setColor(QPalette::Button, buttonColor);
+        opt.rect=QRect(offset, offset, width()-(2*offset), height()-(2*offset));
+        opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised) |
+                   (active ? QStyle::State_Active : QStyle::State_None) |
+                   (itsHover ? QStyle::State_MouseOver : QStyle::State_None)|QStyle::State_Horizontal|QtC_StateKWin;
+        if(!(flags&QTC_TITLEBAR_BUTTON_STD_COLOR))
+            opt.palette.setColor(QPalette::Button, buttonColor);
+        if(flags&QTC_TITLEBAR_BUTTON_COLOR)
+            switch(type())
+            {
+                case HelpButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_HELP;
+                    break;
+                case MaxButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_MAX;
+                    break;
+                case MinButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_MIN;
+                    break;
+                case CloseButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_CLOSE;
+                    break;
+                case MenuButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_MENU;
+                    break;
+                case OnAllDesktopsButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_ALL_DESKTOPS;
+                    break;
+                case AboveButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_KEEP_ABOVE;
+                    break;
+                case BelowButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_KEEP_BELOW;
+                    break;
+                case ShadeButton:
+                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_SHADE;
+                    break;
+            }
         Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
     }
 
@@ -160,7 +199,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         int dX(((width()-menuIcon.width())/2.0)+0.5),
             dY(((height()-menuIcon.height())/2.0)+0.5);
 
-        if(isDown())
+        if(sunken)
         {
             dY++;
             dX++;
@@ -170,24 +209,30 @@ void QtCurveButton::drawButton(QPainter *painter)
     else
     {
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
-        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active));
+        QColor        col(KDecoration::options()->color(KDecoration::ColorFont,
+                            active || flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
 
-        if(isDown())
+        if(sunken)
         {
             dY++;
             dX++;
         }
-        else
+        else if(itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL))
         {
+            QColor shadow();
+
             bP.setPen(QtCurveClient::shadowColor(col));
             bP.drawPixmap(dX+1, dY+1, icon);
         }
 
-        if(CloseButton==type() && itsHover)
+        if(CloseButton==type() && itsHover && !(flags&QTC_TITLEBAR_BUTTON_COLOR))
             col=CLOSE_COLOR;
-            
+
+        if(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
+            col.setAlphaF(HOVER_BUTTON_ALPHA);
+
         bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);
     }
@@ -259,21 +304,22 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
                 lineWidth2 = 1;
 
             int margin1, margin2;
-            margin1 = margin2 = lineWidth2*2;
+            margin1 = margin2 = (lineWidth2*2)+1;
             if (r.width() < 8)
                 margin1 = 1;
+            int margin1h=margin1-1, margin2h=margin2-1;
 
             // background window
-            drawObject(p, HorizontalLine, r.x()+margin1, r.top(), r.width()-margin1, lineWidth2);
-            drawObject(p, HorizontalLine, r.right()-margin2, r.bottom()-(lineWidth2-1)-margin1, margin2, lineWidth2);
-            drawObject(p, VerticalLine, r.x()+margin1, r.top(), margin2, lineWidth2);
+            drawObject(p, HorizontalLine, r.x()+margin1h, r.top(), r.width()-margin1, lwTitleBar);
+            drawObject(p, HorizontalLine, r.right()-margin2h, r.bottom()-(lineWidth2-1)-margin1, margin2h, lineWidth2);
+            drawObject(p, VerticalLine, r.x()+margin1h, r.top(), margin2, lineWidth2);
             drawObject(p, VerticalLine, r.right()-(lineWidth2-1), r.top(), r.height()-margin1, lineWidth2);
 
             // foreground window
-            drawObject(p, HorizontalLine, r.x(), r.top()+margin2, r.width()-margin2, lwTitleBar);
-            drawObject(p, HorizontalLine, r.x(), r.bottom()-(lineWidth2-1), r.width()-margin2, lineWidth2);
+            drawObject(p, HorizontalLine, r.x(), r.top()+margin2, r.width()-margin2h, lwTitleBar);
+            drawObject(p, HorizontalLine, r.x(), r.bottom()-(lineWidth2-1), r.width()-margin2h, lineWidth2);
             drawObject(p, VerticalLine, r.x(), r.top()+margin2, r.height(), lineWidth2);
-            drawObject(p, VerticalLine, r.right()-(lineWidth2-1)-margin2, r.top()+margin2, r.height(), lineWidth2);
+            drawObject(p, VerticalLine, r.right()-(lineWidth2-1)-margin2h, r.top()+margin2, r.height(), lineWidth2);
 
             break;
         }

@@ -72,7 +72,6 @@ static EShading shading=SHADING_HSL;
 #endif
 #include <map>
 #include <set>
-#include <vector>
 #else
 #include <glib.h>
 #endif
@@ -217,9 +216,9 @@ typedef GdkColor color;
 
 #ifdef __cplusplus
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
-                          WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w)
+                          WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_MDI_WINDOW_BUTTON==w)
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
-                        WIDGET_FILLED_SLIDER_TROUGH==w)
+                        WIDGET_FILLED_SLIDER_TROUGH==w || WIDGET_MDI_WINDOW_BUTTON==w)
 #else
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
                           WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_UNCOLOURED_MO_BUTTON==w)
@@ -300,7 +299,8 @@ typedef enum
     QtC_Round = QStyle::PM_CustomBase,
     QtC_TitleBarButtonAppearance,
     QtC_TitleBarColorTopOnly,
-    QtC_TitleAlignment
+    QtC_TitleAlignment,
+    QTC_TitleBarButtons
 } QtCMetrics;
 
 #define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)
@@ -309,7 +309,39 @@ typedef enum
 #define QtCStateKWinDrawLine   ((QStyle::StateFlag)0x80000000)
 
 #define CLOSE_COLOR QColor(191, 82, 82)
+#define HOVER_BUTTON_ALPHA 0.2
+#endif
 
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+typedef enum
+{
+    QTC_TITLEBAR_BUTTON_ROUND            = 0x01,
+    QTC_TITLEBAR_BUTTON_HOVER_FRAME      = 0x02,
+    QTC_TITLEBAR_BUTTON_HOVER_SYMBOL     = 0x04,
+    QTC_TITLEBAR_BUTTON_NO_FRAME         = 0x08,
+    QTC_TITLEBAR_BUTTON_COLOR            = 0x10,
+    QTC_TITLEBAR_BUTTON_COLOR_INACTIVE   = 0x20,
+    QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER = 0x40,
+    QTC_TITLEBAR_BUTTON_STD_COLOR        = 0x80
+} ETitleBarButtonFlags;
+
+typedef enum
+{
+    TITLEBAR_CLOSE,
+    TITLEBAR_MIN,
+    TITLEBAR_MAX,
+    TITLEBAR_HELP,
+    TITLEBAR_MENU,
+    TITLEBAR_SHADE,
+    TITLEBAR_ALL_DESKTOPS,
+    TITLEBAR_KEEP_ABOVE,
+    TITLEBAR_KEEP_BELOW,
+    NUM_TITLEBAR_BUTTONS
+} ETitleBarButtons;
+
+#define QTC_TBAR_VERSION_HACK 65535
+
+typedef std::map<ETitleBarButtons, QColor> TBCols;
 #endif
 
 typedef enum
@@ -1101,6 +1133,10 @@ typedef struct
                      titlebarBorder,
 #endif
                      flatSbarButtons;
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    int              titlebarButtons;
+    TBCols           titlebarButtonColors;
+#endif
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
@@ -1339,10 +1375,17 @@ typedef enum
             (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
 #endif
 
-static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
+static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad)
 {
+    ERound r=opts->round;
+
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
+
+#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    if(WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+       r=ROUND_MAX;
+#endif
 
     switch(rad)
     {
@@ -1367,7 +1410,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
+#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                       || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+#endif
+                       )
                         return ((w>h ? h : w)-2)/2;
                     if(w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)-2) &&
                        QTC_MAX_ROUND_WIDGET(widget))
@@ -1388,7 +1435,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
+#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                       || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+#endif
+                      )
                         return (w>h ? h : w)/2;
                     if(w>QTC_MIN_ROUND_EXTRA_SIZE(widget) && h>QTC_MIN_ROUND_MAX_HEIGHT_SIZE &&
                        QTC_MAX_ROUND_WIDGET(widget))
@@ -1409,7 +1460,11 @@ static double getRadius(ERound r, int w, int h, EWidget widget, ERadius rad)
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
+#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                       || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+#endif
+                      )
                         return (w>h ? h : w)/2;
                     if(w>QTC_MIN_ROUND_EXTRA_SIZE(widget) && h>QTC_MIN_ROUND_MAX_HEIGHT_SIZE &&
                        QTC_MAX_ROUND_WIDGET(widget))

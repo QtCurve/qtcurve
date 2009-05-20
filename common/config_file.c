@@ -989,6 +989,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(flatSbarButtons)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(titlebarBorder)
+            QTC_CFG_READ_INT(titlebarButtons)
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
@@ -1029,6 +1030,41 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_SHADING(shading, shading);
 
 #ifdef __cplusplus
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+            if(opts->titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
+            {
+#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                QStringList cols(readStringEntry(cfg, "titlebarButtonColors").split(',', QString::SkipEmptyParts));
+#else
+                QStringList cols(QStringList::split(',', readStringEntry(cfg, "titlebarButtonColors")));
+#endif
+                bool        ok=NUM_TITLEBAR_BUTTONS==cols.count();
+
+                if(ok)
+                {
+                    QStringList::ConstIterator it(cols.begin()),
+                                               end(cols.end());
+                    TBCols                     cols;
+
+                    for(int i=0; it!=end && ok; ++it, ++i)
+                    {
+                        QColor col;
+                        setRgb(&col, QTC_LATIN1((*it)));
+                        if(QTC_IS_BLACK(col))
+                            ok=false;
+                        else
+                            cols[(ETitleBarButtons)i]=col;
+                    }
+
+                    if(ok)
+                        opts->titlebarButtonColors=cols;
+                }
+
+                if(!ok)
+                    opts->titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
+            }
+#endif
+
 #if (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QStringList shades(readStringEntry(cfg, "customShades").split(',', QString::SkipEmptyParts));
 #else
@@ -1487,6 +1523,7 @@ static void defaultSettings(Options *opts)
     opts->flatSbarButtons=true;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->titlebarBorder=true;
+    opts->titlebarButtons=QTC_TITLEBAR_BUTTON_HOVER_FRAME;
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
@@ -1973,6 +2010,31 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(flatSbarButtons)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(titlebarBorder)
+        CFG_WRITE_ENTRY_NUM(titlebarButtons)
+
+        if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR && NUM_TITLEBAR_BUTTONS==opts.titlebarButtonColors.size())
+        {
+            QString     val;
+#if QT_VERSION >= 0x040000
+            QTextStream str(&val);
+#else
+            QTextStream str(&val, IO_WriteOnly);
+#endif
+            for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
+            {
+                TBCols::const_iterator c(opts.titlebarButtonColors.find((ETitleBarButtons)i));
+
+                if(c!=opts.titlebarButtonColors.end())
+                {
+                    if(i)
+                        str << ',';
+                    str << toStr((*c).second);
+                }
+            }
+            CFG.writeEntry("titlebarButtonColors", val);
+        }
+        else
+            CFG.deleteEntry("titlebarButtonColors");
 #endif
         CFG_WRITE_ENTRY(menuStripe)
         CFG_WRITE_ENTRY(stdSidebarButtons)
@@ -2013,7 +2075,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 
                     GradientStopCont                 stops((*cg).second.stops.fix());
                     GradientStopCont::const_iterator it(stops.begin()),
-                                                    end(stops.end());
+                                                     end(stops.end());
 
                     for(; it!=end; ++it)
                         str << ',' << (*it).pos << ',' << (*it).val;

@@ -117,13 +117,13 @@ class QtCurveStyle : public QWindowsStyle
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
-    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r, bool sunken, int margin, SubControl button) const;
+    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r, bool hover, bool sunken, int margin, SubControl button) const;
     void drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const;
     void drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option, int round,
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;
     void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const;
     void drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical=false, bool reverse=false) const;
-    void drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small=false) const;
+    void drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small=false, bool mdi=false) const;
     void drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleOption *option, bool slider=false) const;
     void drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const;
     void drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle, const QStyleOptionSlider *slider, const QWidget *widget) const;
@@ -140,6 +140,7 @@ class QtCurveStyle : public QWindowsStyle
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
     void setMenuColors(const QColor &bgnd);
+    bool           coloredMdiButtons(bool active, bool mouseOver) const;
     const QColor * getMdiColors(const QStyleOption *option, bool active) const;
     void           readMdiPositions() const;
     const QColor & getFill(const QStyleOption *option, const QColor *use, bool cr=false) const;
@@ -190,6 +191,7 @@ class QtCurveStyle : public QWindowsStyle
     int                                itsProgressBarAnimateTimer,
                                        itsAnimateStep;
     QTime                              itsTimer;
+    QMap<int, QColor *>                itsTitleBarButtonsCols;
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
     mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
 
