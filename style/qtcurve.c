@@ -1696,7 +1696,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
         round=ROUNDED_NONE;
 
     {
-    double       radius=getRadius(opts.round, width, height, widget, RADIUS_EXTERNAL),
+    double       radius=getRadius(&opts, width, height, widget, RADIUS_EXTERNAL),
                  xd=x+0.5,
                  yd=y+0.5;
     EAppearance  app=widgetApp(widget, &opts);
@@ -1723,7 +1723,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
         case BORDER_RAISED:
         case BORDER_SUNKEN:
         {
-            double radiusi=getRadius(opts.round, width, height, widget, RADIUS_INTERNAL),
+            double radiusi=getRadius(&opts, width, height, widget, RADIUS_INTERNAL),
                    xdi=xd+1,
                    ydi=yd+1;
             int    widthi=width-2,
@@ -1781,7 +1781,7 @@ static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
     {
         double   xd=x+0.5,
                  yd=y+0.5,
-                 radius=getRadius(opts.round, w, h, widget, RADIUS_ETCH);
+                 radius=getRadius(&opts, w, h, widget, RADIUS_ETCH);
         gboolean def=WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator,
                  defShade=def && (!qtcPalette.defbtn ||
                                   (qtcPalette.mouseover &&
@@ -1803,7 +1803,7 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
 {
     double       xd=x+0.5,
                  yd=y+0.5,
-                 radius=getRadius(opts.round, w, h, wid, RADIUS_ETCH);
+                 radius=getRadius(&opts, w, h, wid, RADIUS_ETCH);
     GdkRectangle *a=area,
                  b;
 
@@ -1832,7 +1832,7 @@ static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, in
 {
     cairo_new_path(cr);
     cairo_save(cr);
-    createPath(cr, x+0.5, y+0.5, w-1, h-1, getRadius(opts.round, w, h, widget, rad), round);
+    createPath(cr, x+0.5, y+0.5, w-1, h-1, getRadius(&opts, w, h, widget, rad), round);
     cairo_clip(cr);
 }
 
@@ -1978,7 +1978,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
-        createPath(cr, xd, yd, width-1, height-1, getRadius(opts.round, width, height, widget, RADIUS_INTERNAL), round);
+        createPath(cr, xd, yd, width-1, height-1, getRadius(&opts, width, height, widget, RADIUS_INTERNAL), round);
         cairo_stroke(cr);
     }
     else if(colouredMouseOver || (!sunken && (draw3d || flags&DF_DRAW_INSIDE)))
@@ -1989,7 +1989,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col1));
-        createTLPath(cr, xd, yd, width-1, height-1, getRadius(opts.round, width, height, widget, RADIUS_INTERNAL), round);
+        createTLPath(cr, xd, yd, width-1, height-1, getRadius(&opts, width, height, widget, RADIUS_INTERNAL), round);
         cairo_stroke(cr);
         if(colouredMouseOver || bevelledButton || draw3dfull)
         {
@@ -1998,7 +1998,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col2));
-            createBRPath(cr, xd, yd, width-1, height-1, getRadius(opts.round, width, height, widget, RADIUS_INTERNAL), round);
+            createBRPath(cr, xd, yd, width-1, height-1, getRadius(&opts, width, height, widget, RADIUS_INTERNAL), round);
             cairo_stroke(cr);
         }
     }
@@ -2451,7 +2451,7 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
     cairo_rectangle(cr, xo, yo, widtho, height);
     cairo_clip(cr);
     cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
-    createPath(cr, xd, yd, width-1, height-1,  getRadius(opts.round, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
+    createPath(cr, xd, yd, width-1, height-1,  getRadius(&opts, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
     cairo_stroke(cr);
     cairo_restore(cr);
 }
@@ -6047,7 +6047,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 if(FOCUS_FILLED==opts.focus)
                 {
                     if(drawRounded)
-                        createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
+                        createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(&opts, width, height, WIDGET_OTHER,
                                    RADIUS_EXTERNAL), comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL);
                     else
                         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
@@ -6057,7 +6057,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             }
             if(drawRounded)
-                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(opts.round, width, height, WIDGET_OTHER,
+                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(&opts, width, height, WIDGET_OTHER,
                            QTC_FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION),
                            QTC_FULL_FOCUS && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
                            ROUNDED_ALL);
