@@ -56,6 +56,24 @@ static struct
              *check_radio;
 } qtcPalette;
 
+typedef struct
+{
+    GtkStyle *style;
+    GdkWindow *window;
+    GtkStateType state;
+    GtkShadowType shadow_type;
+    GdkRectangle *area;
+    GtkWidget *widget;
+    const gchar *detail;
+    gint x;
+    gint y;
+    gint width;
+    gint height;
+    GtkOrientation orientation;
+} QtCSlider;
+
+static QtCSlider lastSlider;
+
 #define M_PI 3.14159265358979323846
 #define QTC_CAIRO_COL(A) (A).red/65535.0, (A).green/65535.0, (A).blue/65535.0
 
@@ -2438,6 +2456,11 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
     cairo_restore(cr);
 }
 
+static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
+                          GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
+                          const gchar *detail, gint x, gint y, gint width, gint height,
+                          GtkOrientation orientation);
+                          
 static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                            GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                            const gchar *detail, gint x, gint y, gint width, gint height)
@@ -3189,7 +3212,7 @@ debugDisplayWidget(widget, 3);
                                                                         : stepper || sbar
                                                                             ? WIDGET_SB_BUTTON
                                                                             : WIDGET_OTHER;
-                int xo=x, yo=y, wo=width, ho=height;
+                int xo=x, yo=y, wo=width, ho=height, stepper=QTC_STEPPER_NONE;
 
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                 /* Try and guess if this button is a toolbar button... */
@@ -3206,7 +3229,9 @@ debugDisplayWidget(widget, 3);
                     bgnd=getFill(state, btn_down);
                 }
                 else */ if(WIDGET_SB_BUTTON==widgetType && GTK_APP_MOZILLA!=qtSettings.app)
-                    switch(getStepper(widget, x, y, width, height))
+                {
+                    stepper=getStepper(widget, x, y, width, height);
+                    switch(stepper)
                     {
                         case QTC_STEPPER_B:
                             if(horiz)
@@ -3222,6 +3247,7 @@ debugDisplayWidget(widget, 3);
                         default:
                             break;
                     }
+                }
 
 #if 0
 // Not required? Seems to mess up firefox for flatSbarButtons anyway...
@@ -3267,11 +3293,12 @@ debugDisplayWidget(widget, 3);
 #endif
 
 #ifdef QTC_INCREASE_SB_SLIDER
-                if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons &&
-                   !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver))
+                if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons && SCROLLBAR_NONE!=opts.scrollbarType
+                   /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
                 {
                     GtkAdjustment *adj = GTK_RANGE(widget)->adjustment;
-                    gboolean      horizontal = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
+                    gboolean      horizontal = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL,
+                                  atEnd = FALSE;
 
                     if(adj->value <= adj->lower &&
                         (GTK_RANGE(widget)->has_stepper_a || GTK_RANGE(widget)->has_stepper_b))
@@ -3280,6 +3307,7 @@ debugDisplayWidget(widget, 3);
                             y--, height++;
                         else
                             x--, width++;
+                        atEnd=TRUE;
                     }
                     if(adj->value >= adj->upper - adj->page_size &&
                         (GTK_RANGE(widget)->has_stepper_c || GTK_RANGE(widget)->has_stepper_d))
@@ -3288,7 +3316,11 @@ debugDisplayWidget(widget, 3);
                             height++;
                         else
                             width++;
+                        atEnd=TRUE;
                     }
+
+                    if(widget && lastSlider.widget==widget && !atEnd)
+                        lastSlider.widget=NULL;
                 }
 #endif
 
@@ -3321,6 +3353,20 @@ debugDisplayWidget(widget, 3);
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
                                                 (lvh ? 0 : DF_DO_BORDER)|
                                                 (horiz ? 0 : DF_VERT), widget);
+                }
+
+                /* Gtk draws slider first, and then the buttons. But if we have a shaded slider, and extend this so that it
+                   overlaps (by 1 pixel) the buttons, then the top/bottom is vut off if this is shaded...
+                   So, work-around this by re-drawing the slider here! */
+                if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType &&
+                   WIDGET_SB_BUTTON==widgetType && widget && widget==lastSlider.widget &&
+                   ( (SCROLLBAR_NEXT==opts.scrollbarType && QTC_STEPPER_B==stepper) || QTC_STEPPER_D==stepper))
+                {
+                    gtkDrawSlider(lastSlider.style, lastSlider.window, lastSlider.state,
+                                 lastSlider.shadow_type, NULL, lastSlider.widget,
+                                 lastSlider.detail, lastSlider.x, lastSlider.y, lastSlider.width, lastSlider.height,
+                                 lastSlider.orientation);
+                    lastSlider.widget=NULL;
                 }
             }
 
@@ -5510,6 +5556,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     QTC_CAIRO_BEGIN
 
+    lastSlider.widget=NULL;
     if(GTK_IS_RANGE(widget) && scrollbar)
         setState(widget, &state, NULL, width, height);
 
@@ -5532,6 +5579,22 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle ||
        ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED)))
     {
+        if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType)
+        {
+            lastSlider.style=style;
+            lastSlider.window=window;
+            lastSlider.state=state;
+            lastSlider.shadow_type=shadow_type;
+            lastSlider.area=area;
+            lastSlider.widget=widget;
+            lastSlider.detail=detail;
+            lastSlider.x=x;
+            lastSlider.y=y;
+            lastSlider.width=width;
+            lastSlider.height=height;
+            lastSlider.orientation=orientation;
+        }
+    
         drawBox(style, window, state, shadow_type, area, widget,
                 !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height, FALSE);
 
@@ -6549,6 +6612,7 @@ void qtcurve_style_register_type(GTypeModule *module)
 
 static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
+    lastSlider.widget=NULL;
     if(qtInit(&opts))
         generateColors();
 #ifdef QTC_ADD_EVENT_FILTER____DISABLED

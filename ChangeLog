@@ -31,6 +31,8 @@
 23. Make buttons slightly thinner, matches KDE4 better.
 24. Fix settnig of KDE icons when QtCurve is configured by just having
     gtk-theme-name="QtCurve" in the gtkrc file.
+25. Fix painting of scrollbar slider ends when sliders are shaded, and scrollbar
+    buttons are not flat.
 
 0.62.8
 ------
