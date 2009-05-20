@@ -1133,7 +1133,8 @@ typedef struct
                      progressGrooveAppearance,
                      grooveAppearance,
                      sunkenAppearance,
-                     sbarBgndAppearance;
+                     sbarBgndAppearance,
+                     sliderFill;
     EShade           shadeSliders,
                      shadeMenubars,
                      shadeCheckRadio;
@@ -1210,7 +1211,7 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
         case WIDGET_SB_SLIDER:
             return opts->sliderAppearance;
         case WIDGET_FILLED_SLIDER_TROUGH:
-            return IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
+            return opts->sliderFill;
         case WIDGET_TAB_TOP:
         case WIDGET_TAB_BOT:
             return opts->tabAppearance;

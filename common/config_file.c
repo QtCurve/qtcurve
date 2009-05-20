@@ -955,6 +955,13 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_APPEARANCE(grooveAppearance, false)
             QTC_CFG_READ_APPEARANCE(sunkenAppearance, false)
             QTC_CFG_READ_APPEARANCE(sbarBgndAppearance, false)
+
+            if(version<QTC_MAKE_VERSION(0, 63))
+                opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
+            else
+            {
+                QTC_CFG_READ_APPEARANCE(sliderFill, false)
+            }
             QTC_CFG_READ_ECOLOR(progressGrooveColor)
             QTC_CFG_READ_FOCUS(focus)
             QTC_CFG_READ_BOOL(lvButton)
@@ -1254,6 +1261,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkAppearance(&opts->grooveAppearance, opts);
             checkAppearance(&opts->sunkenAppearance, opts);
             checkAppearance(&opts->sbarBgndAppearance, opts);
+            checkAppearance(&opts->sliderFill, opts);
 #ifndef __cplusplus
             releaseConfig(cfg);
 #endif
@@ -1437,6 +1445,7 @@ static void defaultSettings(Options *opts)
     opts->grooveAppearance=APPEARANCE_INVERTED;
     opts->sunkenAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->sbarBgndAppearance=APPEARANCE_FLAT;
+    opts->sliderFill=APPEARANCE_GRADIENT;
     opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
     opts->handles=LINE_SUNKEN;
@@ -1939,6 +1948,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(grooveAppearance)
         CFG_WRITE_ENTRY(sunkenAppearance)
         CFG_WRITE_ENTRY(sbarBgndAppearance)
+        CFG_WRITE_ENTRY(sliderFill)
         CFG_WRITE_ENTRY(progressGrooveColor)
         CFG_WRITE_ENTRY(focus)
         CFG_WRITE_ENTRY(lvButton)
