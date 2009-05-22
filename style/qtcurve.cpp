@@ -3576,25 +3576,17 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 QRect inner(border.adjusted(1, 1, -1, -1));
                 painter->save();
-                if(QTC_FULLLY_ROUNDED && r.width()>QTC_MIN_ROUND_FULL_SIZE && r.height()>QTC_MIN_ROUND_FULL_SIZE)
-                {
-                    double radius=getRadius(&opts, border.width(), border.height(), WIDGET_OTHER, RADIUS_SELECTION);
-                    painter->setClipRect(r);
-                    painter->setClipPath(buildPath(border.adjusted(0, 0, 0,
-                                                                   radius>QTC_EXTRA_ETCH_RADIUS ? -1 : 0),
-                                                   WIDGET_OTHER, round, radius), Qt::IntersectClip);
-                }
-                else
-                    painter->setClipRect(inner.intersect(r));
-                drawBevelGradient(color, painter, inner, true, false, opts.selectionAppearance, WIDGET_SELECTION);
-
                 painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setClipPath(buildPath(border, WIDGET_OTHER, round,
+                                               getRadius(&opts, border.width(), border.height(), WIDGET_OTHER, RADIUS_SELECTION),
+                                               0, -0.5));
+
+                drawBevelGradient(color, painter, inner, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                 painter->setBrush(Qt::NoBrush);
                 painter->setPen(color);
                 painter->setClipRect(r);
                 painter->drawPath(buildPath(border, WIDGET_SELECTION, round,
                                             getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION)));
-                painter->setClipping(false);
                 painter->restore();
             }
 
@@ -6403,7 +6395,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 }
 
                 if(showIcon && iconX>=0)
-                    painter->drawPixmap(iconX, r.y()+((r.height()-iconSize)/2), pixmap);
+                    painter->drawPixmap(iconX, r.y()+((r.height()-iconSize)/2)+1, pixmap);
         
                 // min button
                 if ((titleBar->subControls&SC_TitleBarMinButton) && (titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
@@ -8070,20 +8062,21 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     if(doEtch)
         r.adjust(1, 1, -1, -1);
 
+    p->setRenderHint(QPainter::Antialiasing, true);
+
     if(r.width()>0 && r.height()>0)
     {
-        double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL);
-        int    modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -1 : 0,
-               modH=radius>QTC_EXTRA_ETCH_RADIUS ? -1 : 0;
-        
-        p->setClipPath(buildPath(r.adjusted(0, 0, modW, modH), w, round, radius), Qt::IntersectClip);
+        double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+               modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
+               modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
+
+        p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
 
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
             drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
         else
         {
-            drawBevelGradient(fill, p, r.adjusted(1, 1, -1, WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1), horiz,
-                              sunken, app, w);
+            drawBevelGradient(fill, p, r.adjusted(1, 1, -1,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1), horiz, sunken, app, w);
 
             if(!sunken)
                 if(plastikMouseOver && !sunken)
@@ -8116,7 +8109,6 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                              thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16));
 
                         p->setPen(itsMouseOverCols[QTC_MO_PLASTIK_DARK(w)]);
-                        p->setRenderHint(QPainter::Antialiasing, true);
                         if(horizontal)
                         {
                             drawAaLine(p, r.x()+1, r.y()+1, r.x()+r.width()-2, r.y()+1);
@@ -8141,14 +8133,12 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                                 drawAaLine(p, r.x()+r.width()-3, r.y()+1, r.x()+r.width()-3, r.y()+r.height()-2);
                             }
                         }
-                        p->setRenderHint(QPainter::Antialiasing, false);
                     }
                 }
         }
         p->setClipping(false);
     }
 
-    p->setRenderHint(QPainter::Antialiasing, true);
     r.adjust(1, 1, -1, -1);
 
     if(plastikMouseOver && !sunken)
@@ -8268,22 +8258,16 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius) const
+QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius, double wmod, double hmod) const
 {
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
-// #if QT_VERSION >= 0x040400
-//     bool         window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
-//     double       xd(window ? r.x() : (r.x()+0.5)),
-//                  yd(window ? r.y() : (r.y()+0.5));
-// #else
     double       xd(r.x()+0.5),
-                 yd(r.y()+0.5);
-// #endif
-    double       diameter(radius*2);
-    int          width(r.width()-1),
-                 height(r.height()-1);
+                 yd(r.y()+0.5),
+                 diameter(radius*2),
+                 width((r.width()-1)+wmod),
+                 height((r.height()-1)+hmod);
 
     QPainterPath path;
 
