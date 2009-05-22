@@ -44,6 +44,8 @@
 #define toGtkColor(col) \
     ((col<<8)+col)
 
+static void shadeColors(GdkColor *base, GdkColor *vals);
+
 static GdkColor setGdkColor(int r, int g, int b)
 {
     GdkColor col;
@@ -2558,7 +2560,23 @@ static gboolean qtInit(Options *opts)
                                     " { xthickness=1 ythickness=1 } "
                                     "widget_class \"GtkWindow.GtkFixed.GtkScrolledWindow\" style \""QTC_RC_SETTING"SVm\"");
             
+            if(!opts->useHighlightForMenu && GTK_APP_OPEN_OFFICE==qtSettings.app)
+            {
+                static const char *constStrFormat="style \""QTC_RC_SETTING"OOMnu\" "
+                                                  "{ bg[SELECTED] = \"#%02X%02X%02X\" } "
+                                                  " class \"*Menu*\" style \""QTC_RC_SETTING"OOMnu\" "
+                                                  " widget_class \"*Menu*\" style \""QTC_RC_SETTING"OOMnu\" ";
 
+
+                shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], qtcPalette.background);
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
+                sprintf(tmpStr, constStrFormat,
+                        toQtColor(qtcPalette.background[4].red),
+                        toQtColor(qtcPalette.background[4].green),
+                        toQtColor(qtcPalette.background[4].blue));
+                gtk_rc_parse_string(tmpStr);
+            }
+            
             if(tmpStr)
                 free(tmpStr);
         }

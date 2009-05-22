@@ -34,11 +34,6 @@
 #include <math.h>
 #define QTC_COMMON_FUNCTIONS
 #include "qtcurve.h"
-#include "qt_settings.c"
-#include "animation.c"
-#include "pixmaps.h"
-#include "config.h"
-#include <cairo.h>
 
 #define SBAR_BTN_SIZE 15
 
@@ -55,6 +50,12 @@ static struct
              menu,
              *check_radio;
 } qtcPalette;
+
+#include "qt_settings.c"
+#include "animation.c"
+#include "pixmaps.h"
+#include "config.h"
+#include <cairo.h>
 
 typedef struct
 {

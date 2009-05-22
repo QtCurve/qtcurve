@@ -34,6 +34,8 @@
     gtk-theme-name="QtCurve" in the gtkrc file.
 26. Fix painting of scrollbar slider ends when sliders are shaded, and scrollbar
     buttons are not flat.
+27. When not using highlight colour for menus, get OpenOffice to use the correct
+    colour for selected menubar items.
 
 0.62.8
 ------
