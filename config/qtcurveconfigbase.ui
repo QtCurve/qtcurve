@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>705</width>
-    <height>645</height>
+    <height>673</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1055,16 +1055,16 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="7" column="0" colspan="3">
+          <item row="8" column="0" colspan="3">
            <widget class="QGroupBox" name="titlebarButtons_colors">
             <property name="title">
              <string>Custom Colors</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QCheckBox" name="titlebarButtons_colorOnMouseOver">
+              <widget class="QCheckBox" name="titlebarButtons_colorSymbolsOnly">
                <property name="text">
-                <string>Use only for mouse-over</string>
+                <string>Use only for symbols</string>
                </property>
               </widget>
              </item>
@@ -1170,6 +1170,13 @@ p, li { white-space: pre-wrap; }
               </layout>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="titlebarButtons_colorOnMouseOver">
+            <property name="text">
+             <string>Use color only for mouse-over</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -1997,6 +2004,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>titlebarButtons_button</tabstop>
   <tabstop>titlebarButtons_custom</tabstop>
   <tabstop>titlebarButtons_colorOnMouseOver</tabstop>
+  <tabstop>titlebarButtons_colorSymbolsOnly</tabstop>
   <tabstop>titlebarButtons_colorInactive</tabstop>
   <tabstop>titlebarButtons_colorClose</tabstop>
   <tabstop>titlebarButtons_colorMin</tabstop>

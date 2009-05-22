@@ -369,7 +369,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     }
 
     if(showIcon && iconX>=0)
-        painter.drawPixmap(iconX, itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2), menuIcon);
+        painter.drawPixmap(iconX, itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2)+1, menuIcon);
 
     painter.end();
 }

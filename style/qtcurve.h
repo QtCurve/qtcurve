@@ -116,8 +116,10 @@ class QtCurveStyle : public QWindowsStyle
     void buildSplitPath(const QRect &r, EWidget w, int round, double radius, QPainterPath &tl, QPainterPath &br) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
+    void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
+                        ETitleBarButtons btn, const QColor &textColor, const QColor &shadow, const QColor *btnCols) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
-    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r, bool hover, bool sunken, int margin, SubControl button) const;
+    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r, bool hover, bool sunken, SubControl button, bool customCol) const;
     void drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const;
     void drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option, int round,
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;
@@ -191,7 +193,7 @@ class QtCurveStyle : public QWindowsStyle
     int                                itsProgressBarAnimateTimer,
                                        itsAnimateStep;
     QTime                              itsTimer;
-    QMap<int, QColor *>                itsTitleBarButtonsCols;
+    mutable QMap<int, QColor *>        itsTitleBarButtonsCols;
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
     mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
 

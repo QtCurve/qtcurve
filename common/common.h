@@ -301,7 +301,8 @@ typedef enum
     QtC_TitleBarColorTopOnly,
     QtC_TitleAlignment,
     QtC_TitleBarButtons,
-    QtC_TitleBarIcon
+    QtC_TitleBarIcon,
+    QtC_TitleBarIconColor
 } QtCMetrics;
 
 #define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)
@@ -316,14 +317,15 @@ typedef enum
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 typedef enum
 {
-    QTC_TITLEBAR_BUTTON_ROUND            = 0x01,
-    QTC_TITLEBAR_BUTTON_HOVER_FRAME      = 0x02,
-    QTC_TITLEBAR_BUTTON_HOVER_SYMBOL     = 0x04,
-    QTC_TITLEBAR_BUTTON_NO_FRAME         = 0x08,
-    QTC_TITLEBAR_BUTTON_COLOR            = 0x10,
-    QTC_TITLEBAR_BUTTON_COLOR_INACTIVE   = 0x20,
-    QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER = 0x40,
-    QTC_TITLEBAR_BUTTON_STD_COLOR        = 0x80
+    QTC_TITLEBAR_BUTTON_ROUND            = 0x0001,
+    QTC_TITLEBAR_BUTTON_HOVER_FRAME      = 0x0002,
+    QTC_TITLEBAR_BUTTON_HOVER_SYMBOL     = 0x0004,
+    QTC_TITLEBAR_BUTTON_NO_FRAME         = 0x0008,
+    QTC_TITLEBAR_BUTTON_COLOR            = 0x0010,
+    QTC_TITLEBAR_BUTTON_COLOR_INACTIVE   = 0x0020,
+    QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER = 0x0040,
+    QTC_TITLEBAR_BUTTON_STD_COLOR        = 0x0080,
+    QTC_TITLEBAR_BUTTON_COLOR_SYMBOL     = 0x0100
 } ETitleBarButtonFlags;
 
 typedef enum

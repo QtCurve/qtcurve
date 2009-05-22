@@ -132,7 +132,8 @@ inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
 void QtCurveButton::drawButton(QPainter *painter)
 {
     QRect    r(0, 0, width(), height());
-    int      flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L);
+    int      flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L),
+             versionHack=0;
     bool     active(itsClient->isActive()),
              sunken(isDown()),
              drawFrame(!(flags&QTC_TITLEBAR_BUTTON_NO_FRAME) &&
@@ -149,6 +150,38 @@ void QtCurveButton::drawButton(QPainter *painter)
 
     itsClient->drawBtnBgnd(&bP, r, active);
 
+    if(flags&QTC_TITLEBAR_BUTTON_COLOR)
+        switch(type())
+        {
+            case HelpButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_HELP;
+                break;
+            case MaxButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_MAX;
+                break;
+            case MinButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_MIN;
+                break;
+            case CloseButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_CLOSE;
+                break;
+            case MenuButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_MENU;
+                break;
+            case OnAllDesktopsButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_ALL_DESKTOPS;
+                break;
+            case AboveButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_KEEP_ABOVE;
+                break;
+            case BelowButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_KEEP_BELOW;
+                break;
+            case ShadeButton:
+                versionHack=QTC_TBAR_VERSION_HACK+TITLEBAR_SHADE;
+                break;
+        }
+            
     if (drawFrame && (!(flags&QTC_TITLEBAR_BUTTON_ROUND) || MenuButton!=type() || !iconForMenu))
     {
         QStyleOption opt;
@@ -161,37 +194,8 @@ void QtCurveButton::drawButton(QPainter *painter)
                    (itsHover ? QStyle::State_MouseOver : QStyle::State_None)|QStyle::State_Horizontal|QtC_StateKWin;
         if(!(flags&QTC_TITLEBAR_BUTTON_STD_COLOR))
             opt.palette.setColor(QPalette::Button, buttonColor);
-        if(flags&QTC_TITLEBAR_BUTTON_COLOR)
-            switch(type())
-            {
-                case HelpButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_HELP;
-                    break;
-                case MaxButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_MAX;
-                    break;
-                case MinButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_MIN;
-                    break;
-                case CloseButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_CLOSE;
-                    break;
-                case MenuButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_MENU;
-                    break;
-                case OnAllDesktopsButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_ALL_DESKTOPS;
-                    break;
-                case AboveButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_KEEP_ABOVE;
-                    break;
-                case BelowButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_KEEP_BELOW;
-                    break;
-                case ShadeButton:
-                    opt.version=QTC_TBAR_VERSION_HACK+TITLEBAR_SHADE;
-                    break;
-            }
+        if(flags&QTC_TITLEBAR_BUTTON_COLOR && !(flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL))
+            opt.version=versionHack;
         Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
     }
 
@@ -218,13 +222,25 @@ void QtCurveButton::drawButton(QPainter *painter)
                             active || flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
+        bool          customCol(false);
+
+        if(flags&QTC_TITLEBAR_BUTTON_COLOR && flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL &&
+           itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL))
+        {
+            QStyleOption opt;
+
+            opt.init(this);
+            opt.version=versionHack;
+            col=QColor(QRgb(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIconColor, &opt, 0L)));
+            customCol=true;
+        }
 
         if(sunken)
         {
             dY++;
             dX++;
         }
-        else if(itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL))
+        else if(itsHover && !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         {
             QColor shadow();
 
@@ -232,7 +248,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             bP.drawPixmap(dX+1, dY+1, icon);
         }
 
-        if(CloseButton==type() && itsHover && !(flags&QTC_TITLEBAR_BUTTON_COLOR))
+        if(CloseButton==type() && itsHover && !(flags&QTC_TITLEBAR_BUTTON_COLOR) && !customCol)
             col=CLOSE_COLOR;
 
         if(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
