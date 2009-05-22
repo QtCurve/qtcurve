@@ -34,6 +34,7 @@
 #include <QTreeWidget>
 #include <QPainter>
 #include <QSettings>
+#include <QtDBus>
 #include <KGuiItem>
 #include <KInputDialog>
 #include <klocale.h>
@@ -601,12 +602,19 @@ void QtCurveConfig::save()
 
     // This is only read by KDE3...
     KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
-    KConfigGroup grp(&kglobals, "KDE");
+    KConfigGroup kde(&kglobals, "KDE");
 
     if(opts.gtkButtonOrder)
-        grp.writeEntry("ButtonLayout", 2);
+        kde.writeEntry("ButtonLayout", 2);
     else
-        grp.deleteEntry("ButtonLayout");
+        kde.deleteEntry("ButtonLayout");
+
+    // If using QtCurve window decoration, get this to update...
+    KConfig      kwin("kwinrc", KConfig::CascadeConfig);
+    KConfigGroup style(&kwin, "Style");
+
+    if(style.readEntry("PluginLib", QString())=="kwin3_qtcurve")
+        QDBusConnection::sessionBus().send(QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig"));
 }
 
 void QtCurveConfig::defaults()

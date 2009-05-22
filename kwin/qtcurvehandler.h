@@ -106,7 +106,8 @@ class QtCurveHandler : public QObject,
             itsMenuClose;
     int     itsBorderSize,
             itsTitleHeight,
-            itsTitleHeightTool;
+            itsTitleHeightTool,
+            itsTimeStamp;
     QFont   itsTitleFont,
             itsTitleFontTool;
     QStyle  *itsStyle;
