@@ -3579,9 +3579,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QRect inner(border.adjusted(1, 1, -1, -1));
                 painter->save();
                 painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setClipRect(r);
                 painter->setClipPath(buildPath(border, WIDGET_OTHER, round,
                                                getRadius(&opts, border.width(), border.height(), WIDGET_OTHER, RADIUS_SELECTION),
-                                               0, -0.5));
+                                               0, -0.5), Qt::IntersectClip);
 
                 drawBevelGradient(color, painter, inner, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                 painter->setBrush(Qt::NoBrush);
@@ -3707,7 +3708,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         {
             painter->save();
             QColor c(itsHighlightCols[ORIGINAL_SHADE]);
-            double radius=QTC_ROUNDED ? getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION) : 0.0;
+            double radius=QTC_ROUNDED ? getRadius(&opts, r.width(), r.height(), WIDGET_RUBBER_BAND, RADIUS_SELECTION) : 0.0;
 
             painter->setPen(c);
             c.setAlpha(50);
@@ -3715,7 +3716,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             if(radius>0.0 && r.width()>(2*radius) && r.height()>(2*radius))
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->drawPath(buildPath(r, WIDGET_SELECTION, ROUNDED_ALL, radius));
+                painter->drawPath(buildPath(r, WIDGET_RUBBER_BAND, ROUNDED_ALL, radius));
             }
             else
                 drawRect(painter, r);
