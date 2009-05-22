@@ -3707,15 +3707,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         {
             painter->save();
             QColor c(itsHighlightCols[ORIGINAL_SHADE]);
+            double radius=QTC_ROUNDED ? getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION) : 0.0;
 
             painter->setPen(c);
             c.setAlpha(50);
             painter->setBrush(c);
-            if(QTC_ROUNDED)
+            if(radius>0.0 && r.width()>(2*radius) && r.height()>(2*radius))
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->drawPath(buildPath(r, WIDGET_SELECTION, ROUNDED_ALL,
-                                            getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION)));
+                painter->drawPath(buildPath(r, WIDGET_SELECTION, ROUNDED_ALL, radius));
             }
             else
                 drawRect(painter, r);
