@@ -240,7 +240,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             dY++;
             dX++;
         }
-        else if(itsHover && !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+        else // if(!(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         {
             QColor shadow();
 
@@ -254,7 +254,6 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
             col.setAlphaF(HOVER_BUTTON_ALPHA);
 
-printf("col %d %d %d %d\n", col.red(), col.green(), col.blue(), col.alpha());
         bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);
     }

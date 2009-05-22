@@ -8399,7 +8399,7 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
 {
     static const int margin(6);
 
-    if(!sunken && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+    if(!sunken) // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, margin, button);
 
     QColor col(color);
