@@ -117,17 +117,17 @@ void QtCurveButton::paintEvent(QPaintEvent *)
     drawButton(&p);
 }
 
-inline int limit(double c)
-{
-    return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
-}
-
-inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
-{
-    return QColor((a.red()+limit(b.red()*factor))>>1, 
-                  (a.green()+limit(b.green()*factor))>>1, 
-                  (a.blue()+limit(b.blue()*factor))>>1);
-}
+// inline int limit(double c)
+// {
+//     return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
+// }
+// 
+// inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
+// {
+//     return QColor((a.red()+limit(b.red()*factor))>>1, 
+//                   (a.green()+limit(b.green()*factor))>>1, 
+//                   (a.blue()+limit(b.blue()*factor))>>1);
+// }
 
 void QtCurveButton::drawButton(QPainter *painter)
 {
@@ -225,7 +225,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         bool          customCol(false);
 
         if(flags&QTC_TITLEBAR_BUTTON_COLOR && flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL &&
-           itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL))
+           (itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)))
         {
             QStyleOption opt;
 
@@ -254,6 +254,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
             col.setAlphaF(HOVER_BUTTON_ALPHA);
 
+printf("col %d %d %d %d\n", col.red(), col.green(), col.blue(), col.alpha());
         bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);
     }
