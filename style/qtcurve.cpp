@@ -1919,8 +1919,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 case ALIGN_RIGHT:
                     return Qt::AlignRight;
             }
-        case QTC_TitleBarButtons:
+        case QtC_TitleBarButtons:
             return opts.titlebarButtons;
+        case QtC_TitleBarIcon:
+            return opts.titlebarIcon;
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
@@ -6315,8 +6317,20 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->drawLine(r.left()+1, r.bottom(), r.right()-1, r.bottom());
                 }
 
+                bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && r.width()>64 &&
+                                 !titleBar->icon.isNull();
+                int     iconSize=showIcon ? pixelMetric(QStyle::PM_SmallIconSize) : 0,
+                        iconX=r.x();
+
+                QPixmap pixmap;
+
+                if(showIcon)
+                    pixmap=getIconPixmap(titleBar->icon, iconSize, titleBar->state);
+
                 if(!titleBar->text.isEmpty())
                 {
+                    static const int constPad=4;
+
                     QFont         font(painter->font());
                     Qt::Alignment align((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, NULL, NULL));
                     QRect         textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
@@ -6330,18 +6344,43 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QFontMetrics fm(painter->fontMetrics());
                     QString str(fm.elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
 
+                    if(showIcon)
+                        if(align&Qt::AlignHCenter)
+                        {
+                            //if(add icon to alignment)
+                                if(reverse)
+                                    textRect.setWidth(textRect.width()-(iconSize+constPad));
+                                else
+                                    textRect.setX(textRect.x()+iconSize+constPad);
+                        }
+                        else
+                        {
+                            textRect.setWidth(textRect.width()-(iconSize+constPad));
+                            if( (!reverse && align&Qt::AlignLeft) || (reverse && align&Qt::AlignRight) )
+                                textRect.setX(textRect.x()+(iconSize+constPad));
+                            else
+                                iconX=textRect.right()+constPad;
+                        }
+
+                    int textWidth=alignRealCenter || (showIcon && align&Qt::AlignHCenter)
+                                    ? fm.boundingRect(str).width() : 0;
+
+                    //if((NOT add icon to alignment) align&Qt::AlignHCenter && (textWidth+iconSize+constPad)>textRect.width())
+                    //    showIcon=false;
+            
                     if(alignRealCenter)
                     {
-                        int textWidth=fm.boundingRect(str).width();
                         if(textRect.left()>((r.width()-textWidth)>>1))
                         {
                             textOpt.setAlignment(Qt::AlignVCenter|Qt::AlignLeft);
                             alignRealCenter=false;
+                            //if(NOT add icon to alignment) showIcon=false;
                         }
                         else if(textRect.right()<((r.width()+textWidth)>>1))
                         {
                             textOpt.setAlignment(Qt::AlignVCenter|Qt::AlignRight);
                             alignRealCenter=false;
+                            //if(NOT add icon to alignment) showIcon=false;
                         }
                         else
                         {
@@ -6355,8 +6394,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->drawText(textRect, str, textOpt);
                     if(alignRealCenter)
                         painter->setClipping(false);
+
+                    if(align&Qt::AlignHCenter)
+                        if(reverse)
+                            iconX=textRect.right()-(((textRect.width()-textWidth)/2)-(iconSize+constPad));
+                        else
+                            iconX=textRect.x()+(((textRect.width()-textWidth)/2)-(iconSize+constPad));
                 }
 
+                if(showIcon && iconX>=0)
+                    painter->drawPixmap(iconX, r.y()+((r.height()-iconSize)/2), pixmap);
+        
                 // min button
                 if ((titleBar->subControls&SC_TitleBarMinButton) && (titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMinimized))
@@ -6398,11 +6446,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if (rect.isValid())
                     {
                         bool sunken((titleBar->activeSubControls&SC_TitleBarCloseButton) && (titleBar->state&State_Sunken)),
-                             hover((titleBar->activeSubControls&SC_TitleBarCloseButton) && (titleBar->state&State_MouseOver));
+                             hover((titleBar->activeSubControls&SC_TitleBarCloseButton) && (titleBar->state&State_MouseOver)),
+                             colored=coloredMdiButtons(state&State_Active, hover);
 
                         drawMdiButton(painter, rect, hover, sunken,
-                                      coloredMdiButtons(state&State_Active, hover) ? itsTitleBarButtonsCols[TITLEBAR_CLOSE] : btnCols);
-                        drawMdiIcon(painter, hover || sunken ? CLOSE_COLOR : textColor, shadow, rect, hover, sunken, buttonMargin, SC_TitleBarCloseButton);
+                                      colored ? itsTitleBarButtonsCols[TITLEBAR_CLOSE] : btnCols);
+                        drawMdiIcon(painter, !colored && (hover || sunken) ? CLOSE_COLOR : textColor, shadow, rect, hover, sunken, buttonMargin, SC_TitleBarCloseButton);
                     }
                 }
 
@@ -6497,21 +6546,30 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                              hover((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_MouseOver));
                         int  offset(sunken ? 1 : 0);
 
-                        if(!(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-                            drawMdiButton(painter, rect, hover, sunken,
-                                          coloredMdiButtons(state&State_Active, hover) ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
+                        if(TITLEBAR_ICON_MENU_BUTTON==opts.titlebarIcon)
+                        {
+                            if(!(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+                                drawMdiButton(painter, rect, hover, sunken,
+                                            coloredMdiButtons(state&State_Active, hover) ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
 
-                        if (!titleBar->icon.isNull())
-                            titleBar->icon.paint(painter, rect.adjusted(offset, offset, offset, offset));
+                            if (!titleBar->icon.isNull())
+                                titleBar->icon.paint(painter, rect.adjusted(offset, offset, offset, offset));
+                            else
+                            {
+                                QStyleOption tool(0);
+
+                                tool.palette = palette;
+                                tool.rect = rect;
+                                painter->save();
+                                drawItemPixmap(painter, rect.adjusted(offset, offset, offset, offset), Qt::AlignCenter, standardIcon(SP_TitleBarMenuButton, &tool, widget).pixmap(16, 16));
+                                painter->restore();
+                            }
+                        }
                         else
                         {
-                            QStyleOption tool(0);
-
-                            tool.palette = palette;
-                            tool.rect = rect;
-                            painter->save();
-                            drawItemPixmap(painter, rect.adjusted(offset, offset, offset, offset), Qt::AlignCenter, standardIcon(SP_TitleBarMenuButton, &tool, widget).pixmap(16, 16));
-                            painter->restore();
+                            drawMdiButton(painter, rect, hover, sunken,
+                                          coloredMdiButtons(state&State_Active, hover) ? itsTitleBarButtonsCols[TITLEBAR_SHADE] : btnCols);
+                            drawMdiIcon(painter, textColor, shadow, rect, hover, sunken, buttonMargin, SC_TitleBarSysMenu);
                         }
                     }
                 }
@@ -8500,6 +8558,10 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
             break;
         case SC_TitleBarUnshadeButton:
             drawArrow(painter, rect, PE_IndicatorArrowDown, color, false, true);
+            break;
+        case SC_TitleBarSysMenu:
+            for(int i=1; i<=constIconSize; i+=3)
+                painter->drawLine(rect.left() + 1, rect.top() + i,  rect.right() - 1, rect.top() + i);
         default:
             break;
     }
@@ -9225,7 +9287,8 @@ bool QtCurveStyle::coloredMdiButtons(bool active, bool mouseOver) const
             (active
                 ? (mouseOver || !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER))
                 : ( (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER && mouseOver) ||
-                    opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_INACTIVE));
+                    (!(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER) &&
+                       opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_INACTIVE)) );
 }
 
 const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool active) const

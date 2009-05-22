@@ -300,7 +300,8 @@ typedef enum
     QtC_TitleBarButtonAppearance,
     QtC_TitleBarColorTopOnly,
     QtC_TitleAlignment,
-    QTC_TitleBarButtons
+    QtC_TitleBarButtons,
+    QtC_TitleBarIcon
 } QtCMetrics;
 
 #define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)
@@ -324,6 +325,13 @@ typedef enum
     QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER = 0x40,
     QTC_TITLEBAR_BUTTON_STD_COLOR        = 0x80
 } ETitleBarButtonFlags;
+
+typedef enum
+{
+    TITLEBAR_ICON_NONE,
+    TITLEBAR_ICON_MENU_BUTTON,
+    TITLEBAR_ICON_NEXT_TO_TITLE
+} ETitleBarIcon;
 
 typedef enum
 {
@@ -1136,6 +1144,7 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;
+    ETitleBarIcon    titlebarIcon;
 #endif
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;

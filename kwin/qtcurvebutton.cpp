@@ -83,6 +83,9 @@ void QtCurveButton::reset(unsigned long changed)
             case BelowButton:
                 itsIconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
                 break;
+            case MenuButton:
+                itsIconType=MenuIcon;
+                break;
             default:
                 itsIconType = NumButtonIcons; // empty...
                 break;
@@ -129,11 +132,13 @@ inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
 void QtCurveButton::drawButton(QPainter *painter)
 {
     QRect    r(0, 0, width(), height());
-    int      flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QTC_TitleBarButtons, 0L, 0L);
+    int      flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L);
     bool     active(itsClient->isActive()),
              sunken(isDown()),
              drawFrame(!(flags&QTC_TITLEBAR_BUTTON_NO_FRAME) &&
-                       (itsHover || sunken || !(flags&QTC_TITLEBAR_BUTTON_HOVER_FRAME)));
+                       (itsHover || sunken || !(flags&QTC_TITLEBAR_BUTTON_HOVER_FRAME))),
+             iconForMenu(TITLEBAR_ICON_MENU_BUTTON==
+                            Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon, 0L, 0L));
     QPixmap  tempPixmap;
     QColor   buttonColor(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     QPixmap  buffer(width(), height());
@@ -144,10 +149,10 @@ void QtCurveButton::drawButton(QPainter *painter)
 
     itsClient->drawBtnBgnd(&bP, r, active);
 
-    if (drawFrame && (!(flags&QTC_TITLEBAR_BUTTON_ROUND) || MenuButton!=type()))
+    if (drawFrame && (!(flags&QTC_TITLEBAR_BUTTON_ROUND) || MenuButton!=type() || !iconForMenu))
     {
         QStyleOption opt;
-        int          offset=flags&QTC_TITLEBAR_BUTTON_ROUND ? 1 : 0;
+        int          offset=flags&QTC_TITLEBAR_BUTTON_ROUND && !itsClient->isToolWindow() ? 1 : 0;
 
         opt.init(this);
         opt.rect=QRect(offset, offset, width()-(2*offset), height()-(2*offset));
@@ -190,7 +195,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
     }
 
-    if (MenuButton==type())
+    if (MenuButton==type() && iconForMenu)
     {
         QPixmap menuIcon(itsClient->icon().pixmap(style()->pixelMetric(QStyle::PM_SmallIconSize)));
         if (width() < menuIcon.width() || height() < menuIcon.height())
@@ -329,7 +334,7 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             break;
         case HelpIcon:
         {
-            int center = r.x()+r.width()/2 -1;
+            int center = r.x()+r.width()/2; // -1;
             int side = r.width()/4;
 
             // paint a question mark... code is quite messy, to be cleaned up later...! :o
@@ -492,6 +497,13 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             style->drawPrimitive(ShadeIcon==icon ? QStyle::PE_IndicatorArrowUp
                                                  : QStyle::PE_IndicatorArrowDown,
                                  &opt, &p, 0L);
+            break;
+        }
+        case MenuIcon:
+        {
+            int offset=(r.height()-7)/2;
+            for(int i=0; i<3; i++)
+                drawObject(p, HorizontalLine, r.x()+1, r.y()+offset+(i*3), r.width()-2, 1);
             break;
         }
         default:

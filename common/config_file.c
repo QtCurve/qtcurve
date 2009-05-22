@@ -371,6 +371,22 @@ static EAlign toAlign(const char *str, EAlign def)
 }
 #endif
 
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "none", 4))
+            return TITLEBAR_ICON_NONE;
+        if(0==memcmp(str, "menu", 4))
+            return TITLEBAR_ICON_MENU_BUTTON;
+        if(0==memcmp(str, "title", 5))
+            return TITLEBAR_ICON_NEXT_TO_TITLE;
+    }
+    return def;
+}
+#endif
+
 #endif
 
 #ifdef CONFIG_WRITE
@@ -754,6 +770,11 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     opts->ENTRY=toAlign(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 #endif
 
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#define QTC_CFG_READ_TB_ICON(ENTRY) \
+    opts->ENTRY=toTitlebarIcon(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+#endif
+    
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
     if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
@@ -990,6 +1011,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(titlebarBorder)
             QTC_CFG_READ_INT(titlebarButtons)
+            QTC_CFG_READ_TB_ICON(titlebarIcon)
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_BOOL(menuStripe)
@@ -1038,29 +1060,21 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #else
                 QStringList cols(QStringList::split(',', readStringEntry(cfg, "titlebarButtonColors")));
 #endif
-                bool        ok=NUM_TITLEBAR_BUTTONS==cols.count();
-
-                if(ok)
+                if(NUM_TITLEBAR_BUTTONS==cols.count())
                 {
                     QStringList::ConstIterator it(cols.begin()),
                                                end(cols.end());
                     TBCols                     cols;
 
-                    for(int i=0; it!=end && ok; ++it, ++i)
+                    for(int i=0; it!=end; ++it, ++i)
                     {
                         QColor col;
                         setRgb(&col, QTC_LATIN1((*it)));
-                        if(QTC_IS_BLACK(col))
-                            ok=false;
-                        else
-                            cols[(ETitleBarButtons)i]=col;
+                        cols[(ETitleBarButtons)i]=col;
                     }
-
-                    if(ok)
-                        opts->titlebarButtonColors=cols;
+                    opts->titlebarButtonColors=cols;
                 }
-
-                if(!ok)
+                else
                     opts->titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
             }
 #endif
@@ -1524,6 +1538,7 @@ static void defaultSettings(Options *opts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->titlebarBorder=true;
     opts->titlebarButtons=QTC_TITLEBAR_BUTTON_HOVER_FRAME;
+    opts->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=false;
@@ -1876,6 +1891,20 @@ static const char *toStr(EAlign ind)
     }
 }
 
+static const char * toStr(ETitleBarIcon icn)
+{
+    switch(icn)
+    {
+        case TITLEBAR_ICON_NONE:
+            return "none";
+        default:
+        case TITLEBAR_ICON_MENU_BUTTON:
+            return "menu";
+        case TITLEBAR_ICON_NEXT_TO_TITLE:
+            return "title";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -2011,6 +2040,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(titlebarBorder)
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
+        CFG_WRITE_ENTRY(titlebarIcon)
 
         if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR && NUM_TITLEBAR_BUTTONS==opts.titlebarButtonColors.size())
         {

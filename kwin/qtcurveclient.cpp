@@ -280,9 +280,25 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
 
     itsCaptionRect = captionRect(); // also update itsCaptionRect!
+    bool     showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,
+                                                                                    0L, 0L)
+                      && itsCaptionRect.width()>64;
+    int     iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0,
+            iconX=itsCaptionRect.x();
+    QPixmap menuIcon;
 
+    if(showIcon)
+    {
+        menuIcon=icon().pixmap(iconSize);
+
+        if(menuIcon.isNull())
+            showIcon=false;
+    }
+        
     if(!caption().isEmpty())
     {
+        static const int constPad=6;
+
         painter.setFont(itsTitleFont);
 
         QFontMetrics  fm(painter.fontMetrics());
@@ -297,19 +313,45 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                             rectX2-titleEdgeRight-(rectX+titleEdgeLeft),
                                             itsCaptionRect.height())
                                     : itsCaptionRect);
+        bool          rtl=Qt::RightToLeft==QApplication::layoutDirection();
+
+        if(showIcon)
+            if(alignment&Qt::AlignHCenter)
+            {
+                //if(add icon to alignment)
+                    if(rtl)
+                        textRect.setWidth(textRect.width()-(iconSize+constPad));
+                    else
+                        textRect.setX(textRect.x()+iconSize+constPad);
+            }
+            else
+            {
+                textRect.setWidth(textRect.width()-(iconSize+constPad));
+                if( (!rtl && alignment&Qt::AlignLeft) || (rtl && alignment&Qt::AlignRight) )
+                    textRect.setX(textRect.x()+(iconSize+constPad));
+                else
+                    iconX=textRect.right()+constPad;
+            }
+
+        int textWidth=alignFull || (showIcon && alignment&Qt::AlignHCenter)
+                        ? fm.boundingRect(str).width()+constPad : 0;
+
+//         if( (NOT add icon to alignment) && alignment&Qt::AlignHCenter && (textWidth+iconSize+constPad)>textRect.width())
+//             showIcon=false;
 
         if(alignFull)
         {
-            int textWidth=fm.boundingRect(str).width()+8;
             if(itsCaptionRect.left()>((textRect.width()-textWidth)>>1))
             {
                 alignment=Qt::AlignVCenter|Qt::AlignLeft;
                 textRect=itsCaptionRect;
+                //if(NOT add icon to alignment) showIcon=false;
             }
             else if(itsCaptionRect.right()<((textRect.width()+textWidth)>>1))
             {
                 alignment=Qt::AlignVCenter|Qt::AlignRight;
                 textRect=itsCaptionRect;
+                //if(NOT add icon to alignment) showIcon=false;
             }
         }
 
@@ -318,7 +360,17 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
         painter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
         painter.drawText(textRect, alignment, str);
+
+        if(alignment&Qt::AlignHCenter)
+            if(rtl)
+                iconX=textRect.right()-(((textRect.width()-textWidth)/2)-iconSize);
+            else
+                iconX=textRect.x()+(((textRect.width()-textWidth)/2)-iconSize);
     }
+
+    if(showIcon && iconX>=0)
+        painter.drawPixmap(iconX, itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2), menuIcon);
+
     painter.end();
 }
 

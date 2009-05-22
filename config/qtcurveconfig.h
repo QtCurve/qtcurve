@@ -100,7 +100,6 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void shadingChanged();
     void activeTabAppearanceChanged();
     void passwordCharClicked();
-
     void changeStack();
     void gradChanged(int i);
     void editItem(QTreeWidgetItem *i, int col);
@@ -120,8 +119,10 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     bool diffShades(const Options &opts);
     void setPasswordChar(int ch);
     void loadStyle(const QString &file);
+    int getTitleBarButtonFlags();
     void setOptions(Options &opts);
     void setWidgetOptions(const Options &opts);
+    bool diffTitleBarButtonColors(const Options &opts);
     bool settingsChanged();
 
     private:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>715</width>
-    <height>611</height>
+    <width>705</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -916,15 +916,15 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="page_10">
-      <layout class="QGridLayout" name="gridLayout_7">
-       <item row="0" column="0" colspan="2">
+      <layout class="QGridLayout" name="gridLayout_12">
+       <item row="0" column="0">
         <widget class="QLabel" name="label_23">
          <property name="text">
           <string>Active appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
+       <item row="0" column="1" colspan="2">
         <widget class="QComboBox" name="titlebarAppearance"/>
        </item>
        <item row="0" column="3">
@@ -940,37 +940,37 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="1" column="0" colspan="2">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_28">
          <property name="text">
           <string>Inactive appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
+       <item row="1" column="1" colspan="2">
         <widget class="QComboBox" name="inactiveTitlebarAppearance"/>
        </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="label_27">
-         <property name="text">
-          <string>Button appearance:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QComboBox" name="titlebarButtonAppearance"/>
-       </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_31">
          <property name="text">
           <string>Text alignment:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
+       <item row="2" column="1" colspan="2">
         <widget class="QComboBox" name="titlebarAlignment"/>
        </item>
-       <item row="4" column="0" colspan="3">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_43">
+         <property name="text">
+          <string>Application icon (KDE4):</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" colspan="2">
+        <widget class="QComboBox" name="titlebarIcon"/>
+       </item>
+       <item row="4" column="0" colspan="2">
         <widget class="QCheckBox" name="colorTitlebarOnly">
          <property name="text">
           <string>Color titlebar only (KDE4)</string>
@@ -984,7 +984,198 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="6" column="0" colspan="4">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Buttons</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="titlebarButtons_noFrame">
+            <property name="text">
+             <string>Only show symbols</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>Appearance:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="titlebarButtonAppearance"/>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>327</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="titlebarButtons_round">
+            <property name="text">
+             <string>Circular (KDE4)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QCheckBox" name="titlebarButtons_hoverFrame">
+            <property name="text">
+             <string>Show frame on mouse-over (KDE4)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QCheckBox" name="titlebarButtons_hoverSymbol">
+            <property name="text">
+             <string>Highlight symbol on mouse-over (KDE4)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="titlebarButtons_button">
+            <property name="text">
+             <string>Use button color</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="titlebarButtons_custom">
+            <property name="text">
+             <string>Use custom colors</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0" colspan="3">
+           <widget class="QGroupBox" name="titlebarButtons_colors">
+            <property name="title">
+             <string>Custom Colors</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QCheckBox" name="titlebarButtons_colorOnMouseOver">
+               <property name="text">
+                <string>Use only for mouse-over</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="titlebarButtons_colorInactive">
+               <property name="text">
+                <string>Also apply to inactive windows</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_7">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_34">
+                 <property name="text">
+                  <string>Close:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="label_35">
+                 <property name="text">
+                  <string>Minimise:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="4">
+                <widget class="QLabel" name="label_36">
+                 <property name="text">
+                  <string>Maximise:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_37">
+                 <property name="text">
+                  <string>Help:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLabel" name="label_38">
+                 <property name="text">
+                  <string>Menu:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QLabel" name="label_39">
+                 <property name="text">
+                  <string>Shade:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_40">
+                 <property name="text">
+                  <string>All Desktops:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="2">
+                <widget class="QLabel" name="label_41">
+                 <property name="text">
+                  <string>Keep Above:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="4">
+                <widget class="QLabel" name="label_42">
+                 <property name="text">
+                  <string>Keep Below:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="KColorButton" name="titlebarButtons_colorClose"/>
+               </item>
+               <item row="0" column="3">
+                <widget class="KColorButton" name="titlebarButtons_colorMin"/>
+               </item>
+               <item row="0" column="5">
+                <widget class="KColorButton" name="titlebarButtons_colorMax"/>
+               </item>
+               <item row="2" column="1">
+                <widget class="KColorButton" name="titlebarButtons_colorHelp"/>
+               </item>
+               <item row="2" column="3">
+                <widget class="KColorButton" name="titlebarButtons_colorMenu"/>
+               </item>
+               <item row="2" column="5">
+                <widget class="KColorButton" name="titlebarButtons_colorShade"/>
+               </item>
+               <item row="4" column="1">
+                <widget class="KColorButton" name="titlebarButtons_colorAllDesktops"/>
+               </item>
+               <item row="4" column="3">
+                <widget class="KColorButton" name="titlebarButtons_colorKeepAbove"/>
+               </item>
+               <item row="4" column="5">
+                <widget class="KColorButton" name="titlebarButtons_colorKeepBelow"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="7" column="2">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1794,10 +1985,28 @@ p, li { white-space: pre-wrap; }
   <tabstop>crButton</tabstop>
   <tabstop>titlebarAppearance</tabstop>
   <tabstop>inactiveTitlebarAppearance</tabstop>
-  <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>titlebarAlignment</tabstop>
+  <tabstop>titlebarIcon</tabstop>
   <tabstop>colorTitlebarOnly</tabstop>
   <tabstop>titlebarBorder</tabstop>
+  <tabstop>titlebarButtons_noFrame</tabstop>
+  <tabstop>titlebarButtonAppearance</tabstop>
+  <tabstop>titlebarButtons_round</tabstop>
+  <tabstop>titlebarButtons_hoverFrame</tabstop>
+  <tabstop>titlebarButtons_hoverSymbol</tabstop>
+  <tabstop>titlebarButtons_button</tabstop>
+  <tabstop>titlebarButtons_custom</tabstop>
+  <tabstop>titlebarButtons_colorOnMouseOver</tabstop>
+  <tabstop>titlebarButtons_colorInactive</tabstop>
+  <tabstop>titlebarButtons_colorClose</tabstop>
+  <tabstop>titlebarButtons_colorMin</tabstop>
+  <tabstop>titlebarButtons_colorMax</tabstop>
+  <tabstop>titlebarButtons_colorHelp</tabstop>
+  <tabstop>titlebarButtons_colorMenu</tabstop>
+  <tabstop>titlebarButtons_colorShade</tabstop>
+  <tabstop>titlebarButtons_colorAllDesktops</tabstop>
+  <tabstop>titlebarButtons_colorKeepAbove</tabstop>
+  <tabstop>titlebarButtons_colorKeepBelow</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>handles</tabstop>
   <tabstop>menubarAppearance</tabstop>
@@ -1845,50 +2054,98 @@ p, li { white-space: pre-wrap; }
  <resources/>
  <connections>
   <connection>
-   <sender>framelessGroupBoxes</sender>
+   <sender>titlebarButtons_noFrame</sender>
    <signal>toggled(bool)</signal>
-   <receiver>groupBoxLine</receiver>
-   <slot>setEnabled(bool)</slot>
+   <receiver>label_27</receiver>
+   <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>350</x>
-     <y>251</y>
+     <x>325</x>
+     <y>267</y>
     </hint>
     <hint type="destinationlabel">
-     <x>702</x>
-     <y>251</y>
+     <x>325</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>flatSbarButtons</sender>
+   <sender>titlebarButtons_noFrame</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sbarBgndAppearance</receiver>
-   <slot>setEnabled(bool)</slot>
+   <receiver>titlebarButtonAppearance</receiver>
+   <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>538</x>
-     <y>219</y>
+     <x>325</x>
+     <y>267</y>
     </hint>
     <hint type="destinationlabel">
-     <x>481</x>
-     <y>253</y>
+     <x>460</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>fillSlider</sender>
+   <sender>titlebarButtons_noFrame</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sliderFill</receiver>
+   <receiver>titlebarButtons_round</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>325</x>
+     <y>327</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>titlebarButtons_noFrame</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>titlebarButtons_hoverFrame</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>355</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>titlebarButtons_colorOnMouseOver</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>titlebarButtons_colorInactive</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>478</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>393</x>
+     <y>510</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>titlebarButtons_custom</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>titlebarButtons_colors</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>145</y>
+     <x>305</x>
+     <y>432</y>
     </hint>
     <hint type="destinationlabel">
-     <x>430</x>
-     <y>145</y>
+     <x>341</x>
+     <y>461</y>
     </hint>
    </hints>
   </connection>

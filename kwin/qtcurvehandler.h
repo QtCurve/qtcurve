@@ -54,6 +54,7 @@ enum ButtonIcon
     NoKeepBelowIcon,
     ShadeIcon,
     UnShadeIcon,
+    MenuIcon,
     NumButtonIcons
 };
 
