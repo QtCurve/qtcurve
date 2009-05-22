@@ -52,6 +52,7 @@
         On menu button
         NExt to title
 35. Fix selection appearance when using raster graphicssystem.
+36. Add an option to export the KDE4 palette for KDE3 applications.
 
 0.62.9
 ------

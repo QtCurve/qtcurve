@@ -108,6 +108,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void removeGradStop();
     void updateGradStop();
     void stopSelected();
+    void exportColors();
 
     private:
 

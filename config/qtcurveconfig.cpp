@@ -563,6 +563,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addAction(i18n("Export..."), this, SLOT(exportStyle()));
     menu->addSeparator();
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
+    menu->addSeparator();
+    menu->addAction(i18n("Export KDE4 colors to KDE3..."), this, SLOT(exportColors()));
     loadStyles(subMenu);
     setupGradientsTab();
     setupStack();
@@ -960,6 +962,28 @@ void QtCurveConfig::stopSelected()
     {
         stopPosition->setValue(0);
         stopValue->setValue(0);
+    }
+}
+
+void QtCurveConfig::exportColors()
+{
+    if(KMessageBox::Yes==KMessageBox::questionYesNo(this, i18n("Export your current KDE4 color palette so that it "
+                                                               "can be used by KDE3 applications?")))
+    {
+        KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
+        KConfigGroup group(&kglobals, "General");
+
+        group.writeEntry("alternateBackground", palette().color(QPalette::Active, QPalette::AlternateBase));
+        group.writeEntry("background", palette().color(QPalette::Active, QPalette::Window));
+        group.writeEntry("buttonBackground", palette().color(QPalette::Active, QPalette::Button));
+        group.writeEntry("buttonForeground", palette().color(QPalette::Active, QPalette::ButtonText));
+        group.writeEntry("foreground", palette().color(QPalette::Active, QPalette::WindowText));
+        group.writeEntry("selectBackground", palette().color(QPalette::Active, QPalette::Highlight));
+        group.writeEntry("selectForeground", palette().color(QPalette::Active, QPalette::HighlightedText));
+        group.writeEntry("windowBackground", palette().color(QPalette::Active, QPalette::Base));
+        group.writeEntry("windowForeground", palette().color(QPalette::Active, QPalette::Text));
+        group.writeEntry("linkColor", palette().color(QPalette::Active, QPalette::Link));
+        group.writeEntry("visitedLinkColor", palette().color(QPalette::Active, QPalette::LinkVisited));
     }
 }
 
