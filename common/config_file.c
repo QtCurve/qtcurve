@@ -857,16 +857,19 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     *def=defOpts ? defOpts : &newOpts;
 
             if(!defOpts)
-                defaultSettings(def);
-            for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
-                if(def->customGradient[i] && def->customGradient[i]->numStops>0)
-                {
-                    opts->customGradient[i]=malloc(sizeof(Gradient));
-                    opts->customGradient[i]->numStops=def->customGradient[i]->numStops;
-                    opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
-                    memcpy(opts->customGradient[i]->stops, def->customGradient[i]->stops, sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
-                    opts->customGradient[i]->border=def->customGradient[i]->border;
-                }
+                defaultSettings(&newOpts);
+
+            if(opts!=def)
+                for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+                    if(def->customGradient[i] && def->customGradient[i]->numStops>0)
+                    {
+                        opts->customGradient[i]=malloc(sizeof(Gradient));
+                        opts->customGradient[i]->numStops=def->customGradient[i]->numStops;
+                        opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
+                        memcpy(opts->customGradient[i]->stops, def->customGradient[i]->stops,
+                               sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
+                        opts->customGradient[i]->border=def->customGradient[i]->border;
+                    }
 #endif
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 63))
@@ -922,9 +925,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->highlightTab=true;
             }
 
-            opts->customShades[0]=0;
-            if(QTC_USE_CUSTOM_SHADES(*def))
-                memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
+            if(opts!=def)
+            {
+                opts->customShades[0]=0;
+                if(QTC_USE_CUSTOM_SHADES(*def))
+                    memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
+            }
 
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
