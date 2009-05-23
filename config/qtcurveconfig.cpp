@@ -385,6 +385,13 @@ static void insertTitlebarIconEntriess(QComboBox *combo)
     combo->insertItem(TITLEBAR_ICON_NEXT_TO_TITLE, i18n("Place next to title"));
 }
 
+static void insertTabMoEntriess(QComboBox *combo)
+{
+    combo->insertItem(TAB_MO_TOP, i18n("Highlight on top"));
+    combo->insertItem(TAB_MO_BOTTOM, i18n("Highlight on bottom"));
+    combo->insertItem(TAB_MO_GLOW, i18n("Add a slight glow"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                exportDialog(NULL),
@@ -431,8 +438,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertFocusEntries(focus);
     insertGradBorderEntries(gradBorder);
     insertAlignEntries(titlebarAlignment);
-
     insertTitlebarIconEntriess(titlebarIcon);
+    insertTabMoEntriess(tabMouseOver);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -474,7 +481,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(crHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(crButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorSelTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(tabMouseOverTop, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(tabMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(stdSidebarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1251,7 +1258,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.crHighlight=crHighlight->isChecked();
     opts.crButton=crButton->isChecked();
     opts.colorSelTab=colorSelTab->isChecked();
-    opts.tabMouseOverTop=tabMouseOverTop->isChecked();
+    opts.tabMouseOver=(ETabMo)tabMouseOver->currentIndex();
     opts.stdSidebarButtons=stdSidebarButtons->isChecked();
     opts.borderMenuitems=borderMenuitems->isChecked();
     opts.progressAppearance=(EAppearance)progressAppearance->currentIndex();
@@ -1383,7 +1390,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     crHighlight->setChecked(opts.crHighlight);
     crButton->setChecked(opts.crButton);
     colorSelTab->setChecked(opts.colorSelTab);
-    tabMouseOverTop->setChecked(opts.tabMouseOverTop);
+    tabMouseOver->setCurrentIndex(opts.tabMouseOver);
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     borderMenuitems->setChecked(opts.borderMenuitems);
     progressAppearance->setCurrentIndex(opts.progressAppearance);
@@ -1509,7 +1516,7 @@ bool QtCurveConfig::settingsChanged()
          crHighlight->isChecked()!=currentStyle.crHighlight ||
          crButton->isChecked()!=currentStyle.crButton ||
          colorSelTab->isChecked()!=currentStyle.colorSelTab ||
-         tabMouseOverTop->isChecked()!=currentStyle.tabMouseOverTop ||
+         tabMouseOver->currentIndex()!=currentStyle.tabMouseOver ||
          stdSidebarButtons->isChecked()!=currentStyle.stdSidebarButtons ||
          borderMenuitems->isChecked()!=currentStyle.borderMenuitems ||
          defBtnIndicator->currentIndex()!=(int)currentStyle.defBtnIndicator ||

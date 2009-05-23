@@ -8,7 +8,7 @@
  5. Use KDE4 colors for focus and mouse-over.
  6. Removal of background focus option.
  7. Softer, and much nicer, colouration of selected tab.
- 8. Add option to draw tab's mouse over lines at the bottom.
+ 8. Tab mouse over options; top (as before), below, or glow.
  9. Modified defaults:
      Tab mouse-over highlight drawn at the bottom
      Plain slider style

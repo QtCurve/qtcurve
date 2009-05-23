@@ -586,6 +586,13 @@ typedef enum
     FOCUS_LINE
 } EFocus;
 
+typedef enum
+{
+    TAB_MO_TOP,
+    TAB_MO_BOTTOM,
+    TAB_MO_GLOW
+} ETabMo;
+
 #define QTC_FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
 
 #if defined __cplusplus
@@ -1091,7 +1098,6 @@ typedef struct
     bool             embolden,
                      highlightTab,
                      colorSelTab,
-                     tabMouseOverTop,
                      animatedProgress,
                      fixParentlessDialogs,
                      customMenuTextColor,
@@ -1158,6 +1164,7 @@ typedef struct
                      handles,
                      toolbarSeparators,
                      splitters;
+    ETabMo           tabMouseOver;
     EAppearance      appearance,
                      menubarAppearance,
                      menuitemAppearance,

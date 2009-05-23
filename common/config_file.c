@@ -336,6 +336,21 @@ static EFocus toFocus(const char *str, EFocus def)
     return def;
 }
 
+static ETabMo toTabMo(const char *str, ETabMo def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "top", 3))
+            return TAB_MO_TOP;
+        if(0==memcmp(str, "bot", 3))
+            return TAB_MO_BOTTOM;
+        if(0==memcmp(str, "glow", 4))
+            return TAB_MO_GLOW;
+    }
+
+    return def;
+}
+
 static EGradientBorder toGradientBorder(const char *str)
 {
     if(str)
@@ -765,6 +780,9 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_FOCUS(ENTRY) \
     opts->ENTRY=toFocus(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#define QTC_CFG_READ_TAB_MO(ENTRY) \
+    opts->ENTRY=toTabMo(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 #ifdef __cplusplus
 #define QTC_CFG_READ_ALIGN(ENTRY) \
     opts->ENTRY=toAlign(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -900,7 +918,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 63))
             {
-                def->tabMouseOverTop=true;
+                def->tabMouseOver=TAB_MO_TOP;
                 def->sliderStyle=SLIDER_TRIANGULAR;
 #ifdef __cplusplus
                 def->titlebarAlignment=ALIGN_LEFT;
@@ -974,7 +992,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_LINE(handles)
             QTC_CFG_READ_BOOL(highlightTab)
             QTC_CFG_READ_BOOL(colorSelTab)
-            QTC_CFG_READ_BOOL(tabMouseOverTop)
+            QTC_CFG_READ_TAB_MO(tabMouseOver)
             QTC_CFG_READ_SHADE(shadeSliders, false)
             QTC_CFG_READ_SHADE(shadeMenubars, true)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false)
@@ -1514,7 +1532,7 @@ static void defaultSettings(Options *opts)
     opts->sliderStyle=SLIDER_PLAIN;
     opts->highlightTab=false;
     opts->colorSelTab=false;
-    opts->tabMouseOverTop=false;
+    opts->tabMouseOver=TAB_MO_BOTTOM;
     opts->embolden=false;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->lvAppearance=APPEARANCE_BEVELLED;
@@ -1894,6 +1912,20 @@ static const char *toStr(EFocus f)
     }
 }
 
+static const char *toStr(ETabMo f)
+{
+    switch(f)
+    {
+        default:
+        case TAB_MO_BOTTOM:
+            return "bot";
+        case TAB_MO_TOP:
+            return "top";
+        case TAB_MO_GLOW:
+            return "glow";
+    }
+}
+
 static const char *toStr(EGradientBorder g)
 {
     switch(g)
@@ -2016,7 +2048,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_B(handles, true)
         CFG_WRITE_ENTRY(highlightTab)
         CFG_WRITE_ENTRY(colorSelTab)
-        CFG_WRITE_ENTRY(tabMouseOverTop)
+        CFG_WRITE_ENTRY(tabMouseOver)
         CFG_WRITE_ENTRY_SHADE(shadeSliders, false, false)
         CFG_WRITE_ENTRY_SHADE(shadeMenubars, true, false)
         CFG_WRITE_ENTRY_SHADE(shadeCheckRadio, false, true)
