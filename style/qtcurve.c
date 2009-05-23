@@ -5128,7 +5128,10 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y, rightPos ? 1 : 0);
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y, 2);
             }
-            drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
+            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
+            else
+                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
             break;
         case GTK_POS_BOTTOM:
             if(gap_x > 0)
@@ -5146,7 +5149,10 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-1, rightPos ? 1 : 0);
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y+height-1, 2);
             }
-            drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
+            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
+            else
+                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
             break;
         case GTK_POS_LEFT:
             if(gap_x>0)
@@ -5164,7 +5170,10 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x, y+gap_x+gap_width-2, 1);
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+gap_x+gap_width-1, 2);
             }
-            drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y, 3);
+            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+1, 2);
+            else
+                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y, 3);
             break;
         case GTK_POS_RIGHT:
             if(gap_x>0)
@@ -5181,7 +5190,10 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-1, 2);
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x+gap_width-1, 2);
             }
-            drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
+            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
+            else
+                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
 
             break;
     }
@@ -5246,17 +5258,19 @@ debugDisplayWidget(widget, 3);
         QtCTab      *highlightTab=highlightingEnabled ? lookupTabHash(widget, FALSE) : NULL;
         gboolean    highlight=FALSE;
         int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW,
-                    moOffset=ROUNDED_NONE==opts.round || !opts.tabMouseOverTop ? 1 : opts.round;
+                    moOffset=ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round;
         gboolean    firstTab=notebook ? FALSE : TRUE,
                     lastTab=notebook ? FALSE : TRUE,
                     vertical=GTK_POS_LEFT==gap_side || GTK_POS_RIGHT==gap_side,
                     active=GTK_STATE_NORMAL==state, /* Normal -> active tab? */
                     rev=(GTK_POS_TOP==gap_side || GTK_POS_BOTTOM==gap_side) &&
                         reverseLayout(widget->parent),
-                    mozTab=isMozillaTab(widget);
+                    mozTab=isMozillaTab(widget),
+                    glowMo=!active && notebook && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver;
         int         mod=active ? 1 : 0,
                     highlightOffset=opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1,
-                    highlightBorder=(opts.round>ROUND_FULL ? 4 : 3);
+                    highlightBorder=(opts.round>ROUND_FULL ? 4 : 3),
+                    sizeAdjust=!active && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0;
         GdkColor    *col=active
                             ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
                     *selCol1=&qtcPalette.highlight[0],
@@ -5360,11 +5374,13 @@ debugDisplayWidget(widget, 3);
             area=&clipArea;
         }
 
+        glowMo=glowMo && highlight;
+
         switch(gap_side)
         {
             case GTK_POS_TOP:  /* => tabs are on bottom !!! */
             {
-                int round=active || (firstTab && lastTab)
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
                                     ? ROUNDED_BOTTOM
                                     : firstTab
                                         ? ROUNDED_BOTTOMLEFT
@@ -5376,12 +5392,18 @@ debugDisplayWidget(widget, 3);
                     height-=2;
     #endif
                 clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+mod, y, width-(2*mod), height-1, TRUE,
+                fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
                         WIDGET_TAB_BOT, NULL!=notebook);
                 cairo_restore(cr);
-                drawBorder(cr, style, state, area, NULL, x, y-4, width, height+4,
-                           qtcPalette.background, round,
+                drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y-4, width-(2*sizeAdjust), height+4,
+                           glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
                            active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                if(glowMo)
+                {
+                    if(area)
+                        area->height++;
+                    drawGlow(cr, area, NULL, x, y-4, width, height+5, round, WIDGET_OTHER);
+                }
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5398,16 +5420,16 @@ debugDisplayWidget(widget, 3);
                 if(opts.colorSelTab && notebook && active)
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, true);
 
-                if(notebook && opts.coloredMouseOver && highlight)
+                if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1),
-                                  y+(opts.tabMouseOverTop ? height-2 : -1), width-(firstTab || lastTab ? moOffset : 1), 2,
-                                  NULL, true, opts.tabMouseOverTop);
+                                  y+(TAB_MO_TOP==opts.tabMouseOver ? height-2 : -1), width-(firstTab || lastTab ? moOffset : 1), 2,
+                                  NULL, true, TAB_MO_TOP==opts.tabMouseOver);
 
                 break;
             }
             case GTK_POS_BOTTOM: /* => tabs are on top !!! */
             {
-                int round=active || (firstTab && lastTab)
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
                                     ? ROUNDED_TOP
                                     : firstTab
                                         ? ROUNDED_TOPLEFT
@@ -5422,12 +5444,18 @@ debugDisplayWidget(widget, 3);
                 }
     #endif
                 clipPath(cr, x, y, width, height+4, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+mod, y+1, width-(2*mod), height-1, TRUE,
+                fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y+1, width-(2*(mod+sizeAdjust)), height-1, TRUE,
                         WIDGET_TAB_TOP, NULL!=notebook);
                 cairo_restore(cr);
-                drawBorder(cr, style, state, area, NULL, x, y, width, height+4,
-                           qtcPalette.background, round,
+                drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y, width-(2*sizeAdjust), height+4,
+                           glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
                            active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                if(glowMo)
+                {
+                    if(area)
+                        area->y--, area->height+=2;
+                    drawGlow(cr, area, NULL, x, y-1, width, height+5, round, WIDGET_OTHER);
+                }
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5444,15 +5472,15 @@ debugDisplayWidget(widget, 3);
                 if(opts.colorSelTab && notebook && active)
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, true);
 
-                if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(opts.tabMouseOverTop ? 0 : height-1),
+                if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+                    drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(TAB_MO_TOP==opts.tabMouseOver ? 0 : height-1),
                                   width-(firstTab || lastTab ? moOffset : 1), 2,
-                                  NULL, true, !opts.tabMouseOverTop);
+                                  NULL, true, !TAB_MO_TOP==opts.tabMouseOver);
                 break;
             }
             case GTK_POS_LEFT: /* => tabs are on right !!! */
             {
-                int round=active || (firstTab && lastTab)
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
                                     ? ROUNDED_RIGHT
                                     : firstTab
                                         ? ROUNDED_TOPRIGHT
@@ -5464,12 +5492,18 @@ debugDisplayWidget(widget, 3);
                     width-=2;
     #endif
                 clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x, y+mod, width-1, height-(2*mod), FALSE,
+                fillTab(cr, style, window, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
                         WIDGET_TAB_BOT, NULL!=notebook);
                 cairo_restore(cr);
-                drawBorder(cr, style, state, area, NULL, x-4, y, width+4, height,
-                           qtcPalette.background, round,
+                drawBorder(cr, style, state, area, NULL, x-4, y+sizeAdjust, width+4, height-(2*sizeAdjust),
+                           glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
                            active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
+                if(glowMo)
+                {
+                    if(area)
+                        area->width++;
+                    drawGlow(cr, area, NULL, x-4, y, width+5, height, round, WIDGET_OTHER);
+                }
 
                 if(notebook && opts.highlightTab && active)
                 {
@@ -5486,15 +5520,15 @@ debugDisplayWidget(widget, 3);
                 if(opts.colorSelTab && notebook && active)
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, false);
                     
-                if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x+(opts.tabMouseOverTop ? width-2 : -1),
+                if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+                    drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? width-2 : -1),
                                   y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                  NULL, false, opts.tabMouseOverTop);
+                                  NULL, false, TAB_MO_TOP==opts.tabMouseOver);
                 break;
             }
             case GTK_POS_RIGHT: /* => tabs are on left !!! */
             {
-                int round=active || (firstTab && lastTab)
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
                                     ? ROUNDED_LEFT
                                     : firstTab
                                         ? ROUNDED_TOPLEFT
@@ -5509,13 +5543,18 @@ debugDisplayWidget(widget, 3);
                 }
     #endif
                 clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+1, y+mod, width-1, height-(2*mod),
+                fillTab(cr, style, window, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
                         FALSE, WIDGET_TAB_TOP, NULL!=notebook);
                 cairo_restore(cr);
-                drawBorder(cr, style, state, area, NULL, x, y, width+4, height,
-                           qtcPalette.background, round,
+                drawBorder(cr, style, state, area, NULL, x, y+sizeAdjust, width+4, height-(2*sizeAdjust),
+                           glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
                            active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
-
+                if(glowMo)
+                {
+                    if(area)
+                        area->x--, area->width+=2;
+                    drawGlow(cr, area, NULL, x-1, y, width+5, height, round, WIDGET_OTHER);
+                }
                 if(notebook && opts.highlightTab && active)
                 {
                     drawVLine(cr, QTC_CAIRO_COL(*selCol1), 0.5, x+2, y+1, height-2);
@@ -5531,10 +5570,10 @@ debugDisplayWidget(widget, 3);
                 if(opts.colorSelTab && notebook && active)
                     colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, false);
 
-                if(notebook && opts.coloredMouseOver && highlight)
-                    drawHighlight(cr, x+(opts.tabMouseOverTop ? 0 : width-1),
+                if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
+                    drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? 0 : width-1),
                                   y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                  NULL, false, !opts.tabMouseOverTop);
+                                  NULL, false, !TAB_MO_TOP==opts.tabMouseOver);
                 break;
             }
         }

@@ -2560,6 +2560,9 @@ static gboolean qtInit(Options *opts)
                                     " { xthickness=1 ythickness=1 } "
                                     "widget_class \"GtkWindow.GtkFixed.GtkScrolledWindow\" style \""QTC_RC_SETTING"SVm\"");
             
+            if(TAB_MO_GLOW==opts->tabMouseOver)
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"Tab\" { GtkNotebook::tab-overlap = 0 } class \"*GtkNotebook\" style \""QTC_RC_SETTING"Tab\"");
+
             if(!opts->useHighlightForMenu && GTK_APP_OPEN_OFFICE==qtSettings.app)
             {
                 static const char *constStrFormat="style \""QTC_RC_SETTING"OOMnu\" "
