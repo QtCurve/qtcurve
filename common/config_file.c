@@ -793,6 +793,39 @@ static void checkAppearance(EAppearance *ap, Options *opts)
 
 static void defaultSettings(Options *opts);
 
+#ifndef __cplusplus
+static void copyGradients(Options *src, Options *dest)
+{
+    if(src && dest && src!=dest)
+    {
+        int i;
+
+        for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+            if(src->customGradient[i] && src->customGradient[i]->numStops>0)
+            {
+                dest->customGradient[i]=malloc(sizeof(Gradient));
+                dest->customGradient[i]->numStops=src->customGradient[i]->numStops;
+                dest->customGradient[i]->stops=malloc(sizeof(GradientStop) * dest->customGradient[i]->numStops*2);
+                memcpy(dest->customGradient[i]->stops, src->customGradient[i]->stops,
+                        sizeof(GradientStop) * dest->customGradient[i]->numStops*2);
+                dest->customGradient[i]->border=src->customGradient[i]->border;
+            }
+            else
+                dest->customGradient[i]=NULL;
+    }
+}
+
+static void copyOpts(Options *src, Options *dest)
+{
+    if(src && dest && src!=dest)
+    {
+        memcpy(dest, src, sizeof(Options));
+        memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
+        copyGradients(src, dest);
+    }
+}
+#endif
+
 #ifdef __cplusplus
 static bool readConfig(const QString &file, Options *opts, Options *defOpts=0L)
 #else
@@ -851,25 +884,18 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             Options *def=&newOpts;
 
-            opts->customGradient=def->customGradient;
-#else
-            Options newOpts,
-                    *def=defOpts ? defOpts : &newOpts;
-
-            if(!defOpts)
-                defaultSettings(&newOpts);
-
             if(opts!=def)
-                for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
-                    if(def->customGradient[i] && def->customGradient[i]->numStops>0)
-                    {
-                        opts->customGradient[i]=malloc(sizeof(Gradient));
-                        opts->customGradient[i]->numStops=def->customGradient[i]->numStops;
-                        opts->customGradient[i]->stops=malloc(sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
-                        memcpy(opts->customGradient[i]->stops, def->customGradient[i]->stops,
-                               sizeof(GradientStop) * opts->customGradient[i]->numStops*2);
-                        opts->customGradient[i]->border=def->customGradient[i]->border;
-                    }
+                opts->customGradient=def->customGradient;
+#else
+            Options newOpts;
+            Options *def=&newOpts;
+
+            if(defOpts)
+                copyOpts(defOpts, &newOpts);
+            else
+                defaultSettings(&newOpts);
+            if(opts!=def)
+                copyGradients(def, opts);
 #endif
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 63))
@@ -1421,7 +1447,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else
                 defaultSettings(opts);
 #else
-            defaultSettings(opts);
+            if(defOpts)
+                copyOpts(defOpts, opts);
+            else
+                defaultSettings(opts);
 #endif
             return true;
         }
