@@ -37,6 +37,7 @@
 27. When not using highlight colour for menus, get OpenOffice to use the correct
     colour for selected menubar items.
 28. Fix setting of custom shades, and gradients, when reading system config file.
+29. Dont crash when /etc/qtcurvestylerc is only readable by root!
 
 0.62.8
 ------
