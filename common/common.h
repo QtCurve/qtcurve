@@ -436,6 +436,15 @@ typedef enum
     APPEARANCE_CUSTOM8,
     APPEARANCE_CUSTOM9,
     APPEARANCE_CUSTOM10,
+    APPEARANCE_CUSTOM11,
+    APPEARANCE_CUSTOM12,
+    APPEARANCE_CUSTOM13,
+    APPEARANCE_CUSTOM14,
+    APPEARANCE_CUSTOM15,
+    APPEARANCE_CUSTOM16,
+    APPEARANCE_CUSTOM17,
+    APPEARANCE_CUSTOM18,
+    APPEARANCE_CUSTOM19,
 
         QTC_NUM_CUSTOM_GRAD,
 
@@ -1165,6 +1174,7 @@ typedef struct
                      toolbarSeparators,
                      splitters;
     ETabMo           tabMouseOver;
+/* NOTE: If add an appearance setting, increase the number of custmo gradients to match! */
     EAppearance      appearance,
                      menubarAppearance,
                      menuitemAppearance,
