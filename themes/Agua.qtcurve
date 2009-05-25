@@ -31,3 +31,7 @@ progressGrooveAppearance=inverted
 sbarBgndAppearance=customgradient1
 selectionAppearance=softgradient
 shading=hcy
+titlebarButtonAppearance=customgradient1
+titlebarButtonColors=#FB483F,#FCCD74,#90CE55,#5BA4E4,#A58DEF,#EFEDE8,#EFEDE8,#EFEDE8,#EFEDE8
+titlebarButtons=149
+titlebarIcon=title
