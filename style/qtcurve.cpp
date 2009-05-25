@@ -6404,7 +6404,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->setClipping(false);
 
                     if(align&Qt::AlignHCenter)
-                        if(reverse)
+                        if(textRect.x()>0)
+                            showIcon=false;
+                        else if(reverse)
                             iconX=textRect.right()-(((textRect.width()-textWidth)/2)-(iconSize+constPad));
                         else
                             iconX=textRect.x()+(((textRect.width()-textWidth)/2)-(iconSize+constPad));
