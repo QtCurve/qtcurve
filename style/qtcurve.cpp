@@ -46,6 +46,8 @@
 #include <KDE/KColorScheme>
 #include <KDE/KStandardDirs>
 
+#define QTC_MO_ARROW(COL) (MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled ? itsMouseOverCols[QT_STD_BORDER] : COL)
+
 static KComponentData *theKComponentData=0;
 static int            theInstanceCount=0;
 
@@ -2463,7 +2465,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
                 drawArrow(painter, r,
                           header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown, 
-                          option->palette.buttonText().color());
+                          QTC_MO_ARROW(option->palette.buttonText().color()));
             break;
         case PE_IndicatorArrowUp:
         case PE_IndicatorArrowDown:
@@ -2471,7 +2473,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorArrowRight:
             if(state&(State_Sunken|State_On))
                 r.adjust(1, 1, 1, 1);
-            drawArrow(painter, r, element, palette.text().color());
+            drawArrow(painter, r, element, QTC_MO_ARROW(palette.text().color()));
             break;
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
@@ -2499,7 +2501,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     sr.adjust(1, 1, 1, 1);
 
                 drawArrow(painter, sr, PE_IndicatorSpinUp==element ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
-                          option->palette.buttonText().color(), true);
+                          QTC_MO_ARROW(option->palette.buttonText().color()), true);
             }
             else
             {
@@ -2513,7 +2515,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(state&State_Sunken)
                     c+=QPoint(1, 1);
 
-                painter->setPen(palette.buttonText().color());
+                painter->setPen(MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled
+                                 ? itsMouseOverCols[QT_STD_BORDER] : palette.buttonText().color());
                 painter->drawLine(c.x()-l, c.y(), c.x()+l, c.y());
                 if(!down)
                     painter->drawLine(c.x(), c.y()-l, c.x(), c.y()+l);
@@ -4607,7 +4610,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(option->state &(State_On | State_Sunken))
                         ar.adjust(1, 1, 1, 1);
                             
-                    drawArrow(painter, ar, PE_IndicatorArrowDown, option->palette.buttonText().color());
+                    drawArrow(painter, ar, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
                 }
             }
             break;
@@ -4686,7 +4689,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(option->state &(State_On | State_Sunken))
                             ar.adjust(1, 1, 1, 1);
-                        drawArrow(painter, ar, PE_IndicatorArrowDown, option->palette.buttonText().color());
+                        drawArrow(painter, ar, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
                     }
 
 //                     QRect              ir(button->rect);
@@ -5353,8 +5356,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 drawLightBevel(painter, br, &opt, widget, round, getFill(&opt, use), use, true, WIDGET_SB_BUTTON);
 
             opt.rect = ar;
-            // The following fixes gwenviews scrollbars...
-            if(opt.palette.text().color()!=opt.palette.buttonText().color())
+            
+            if(opt.palette.text().color()!=opt.palette.buttonText().color()) // The following fixes gwenviews scrollbars...
                 opt.palette.setColor(QPalette::Text, opt.palette.buttonText().color());
 
             drawPrimitive(pe, &opt, painter, widget);
@@ -5805,7 +5808,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(mflags&State_Sunken)
                         tool.rect.adjust(1, 1, 1, 1);
-                    drawArrow(painter, tool.rect, PE_IndicatorArrowDown, option->palette.buttonText().color());
+                    drawArrow(painter, tool.rect, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
                 }
 /*
                 else if (toolbutton->features & QStyleOptionToolButton::HasMenu)
@@ -5862,7 +5865,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(bflags&State_Sunken)
                         arrow.adjust(1, 1, 1, 1);
 
-                    drawArrow(painter, arrow, PE_IndicatorArrowDown, option->palette.buttonText().color());
+                    drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
                 }
             }
             break;
@@ -6742,7 +6745,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         arrow.adjust(1, 1, 1, 1);
 
                     //if(comboBox->editable || !opts.gtkComboMenus)
-                        drawArrow(painter, arrow, PE_IndicatorArrowDown, option->palette.buttonText().color());
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()),
+                                  false, false);
 //                     else
 //                     {
 //                         int middle=arrow.y()+(arrow.height()>>1);
@@ -7951,8 +7955,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                  plastikMouseOver(doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver),
                  colouredMouseOver(doColouredMouseOver && WIDGET_MENU_BUTTON!=w &&
                                        (MO_COLORED==opts.coloredMouseOver ||
-                                              (MO_GLOW==opts.coloredMouseOver &&
-                                              ((WIDGET_COMBO!=w && !ETCH_WIDGET(w) && WIDGET_SB_SLIDER!=w) || !QTC_DO_EFFECT)))),
+                                              (MO_GLOW==opts.coloredMouseOver && !QTC_DO_EFFECT))),
                  doEtch(doBorder && ETCH_WIDGET(w) && QTC_DO_EFFECT),
                  horiz(isHoriz(option, w));
     const QColor *cols(custom ? custom : itsBackgroundCols),
@@ -8666,9 +8669,9 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
     p->save();
     if(!mdi)
         col.setAlpha(255);
+    p->setRenderHint(QPainter::Antialiasing, true);
     p->setPen(col);
     p->setBrush(col);
-    p->setRenderHint(QPainter::Antialiasing, true);
     p->fillPath(path, col);
     p->setRenderHint(QPainter::Antialiasing, false);
     p->drawPolygon(a);
