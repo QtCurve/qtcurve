@@ -46,7 +46,8 @@
 #include <KDE/KColorScheme>
 #include <KDE/KStandardDirs>
 
-#define QTC_MO_ARROW(COL) (MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled ? itsMouseOverCols[QT_STD_BORDER] : COL)
+#define QTC_MO_ARROW_X(MO, COL) (MO_GLOW==opts.coloredMouseOver && state&State_Enabled && MO ? itsMouseOverCols[QT_STD_BORDER] : COL)
+#define QTC_MO_ARROW(COL)       QTC_MO_ARROW_X(state&State_MouseOver, COL)
 
 static KComponentData *theKComponentData=0;
 static int            theInstanceCount=0;
@@ -6744,11 +6745,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
                 {
+                    bool mouseOver=comboBox->editable && !(comboBox->activeSubControls&SC_ComboBoxArrow)
+                                    ? false : (state&State_MouseOver ? true : false);
+
                     if(sunken)
                         arrow.adjust(1, 1, 1, 1);
 
                     //if(comboBox->editable || !opts.gtkComboMenus)
-                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()),
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW_X(mouseOver, option->palette.buttonText().color()),
                                   false, false);
 //                     else
 //                     {
