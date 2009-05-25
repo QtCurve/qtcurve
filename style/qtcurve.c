@@ -5270,7 +5270,7 @@ debugDisplayWidget(widget, 3);
         int         mod=active ? 1 : 0,
                     highlightOffset=opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1,
                     highlightBorder=(opts.round>ROUND_FULL ? 4 : 3),
-                    sizeAdjust=!active && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0;
+                    sizeAdjust=(!active || mozTab) && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0;
         GdkColor    *col=active
                             ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
                     *selCol1=&qtcPalette.highlight[0],
@@ -5444,10 +5444,10 @@ debugDisplayWidget(widget, 3);
                 }
     #endif
                 clipPath(cr, x, y, width, height+4, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y+1, width-(2*(mod+sizeAdjust)), height-1, TRUE,
+                fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y+1, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE,
                         WIDGET_TAB_TOP, NULL!=notebook);
                 cairo_restore(cr);
-                drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y, width-(2*sizeAdjust), height+4,
+                drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y, width-(2*(mozTab ? 2 : 1)*sizeAdjust), height+4,
                            glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
                            active ? BORDER_RAISED : BORDER_FLAT, WIDGET_OTHER, 0);
                 if(glowMo)
