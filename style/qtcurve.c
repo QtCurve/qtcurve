@@ -35,6 +35,8 @@
 #define QTC_COMMON_FUNCTIONS
 #include "qtcurve.h"
 
+#define QTC_MO_ARROW(COL) (MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state ? qtcurveStyle->arrow_mouseover_gc : (COL))
+
 #define SBAR_BTN_SIZE 15
 
 static struct
@@ -1849,10 +1851,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                                   GTK_STATE_PRELIGHT==state &&
                                   (IS_TOGGLE_BUTTON(widget) || !sunken),
                 plastikMouseOver=doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver,
-                colouredMouseOver=doColouredMouseOver &&
-                                       (MO_COLORED==opts.coloredMouseOver ||
-                                              (MO_GLOW==opts.coloredMouseOver && WIDGET_COMBO!=widget &&
-                                               !ETCH_WIDGET(widget) && WIDGET_SB_SLIDER!=widget)),
+                colouredMouseOver=doColouredMouseOver && MO_COLORED==opts.coloredMouseOver,
                 lightBorder=QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
                 draw3dfull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app),
                 draw3d=draw3dfull || (!lightBorder && QTC_DRAW_3D_BORDER(sunken, app)),
@@ -2860,7 +2859,7 @@ debugDisplayWidget(widget, 3);
             x++;
 
 //             if(opts.singleComboArrow)
-                drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE],
+                drawArrow(window, QTC_MO_ARROW(qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]),
                           area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
 //             else
 //             {
@@ -2871,10 +2870,9 @@ debugDisplayWidget(widget, 3);
 //             }
         }
         else
-            drawArrow(window, onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) ||
-                              isOnButton(widget, 0, 0L)
-                                ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                                : style->text_gc[QTC_ARROW_STATE(state)], area,  arrow_type,
+            drawArrow(window, QTC_MO_ARROW(onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, 0L)
+                                            ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                                            : style->text_gc[QTC_ARROW_STATE(state)]), area,  arrow_type,
                       x+(width>>1), y+(height>>1), FALSE, TRUE);
     }
     else
@@ -2969,10 +2967,13 @@ debugDisplayWidget(widget, 3);
             else
                 y++;
 
-        drawArrow(window, isSpinButton || sbar
-                            ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                            : style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
-                                ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)],
+        if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
+            state=GTK_STATE_PRELIGHT;
+
+        drawArrow(window, QTC_MO_ARROW(isSpinButton || sbar
+                                        ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                                        : style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
+                                            ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)]),
                   area, arrow_type, x, y, isSpinButton, TRUE);
     }
     //QTC_CAIRO_END
@@ -6389,6 +6390,10 @@ static void styleRealize(GtkStyle *style)
     }
     else
         qtcurveStyle->menutext_gc[0]=NULL;
+
+    qtcurveStyle->arrow_mouseover_gc=MO_GLOW==opts.coloredMouseOver
+                                        ? realizeColors(style, &qtcPalette.mouseover[QT_STD_BORDER])
+                                        : NULL;
 }
 
 static void styleUnrealize(GtkStyle *style)
@@ -6405,6 +6410,10 @@ static void styleUnrealize(GtkStyle *style)
         gtk_gc_release(qtcurveStyle->menutext_gc[1]);
         qtcurveStyle->menutext_gc[0]=qtcurveStyle->menutext_gc[1]=NULL;
     }
+
+    if(qtcurveStyle->arrow_mouseover_gc)
+        gtk_gc_release(qtcurveStyle->arrow_mouseover_gc);
+    qtcurveStyle->arrow_mouseover_gc=NULL;
 }
 
 static void generateColors()
