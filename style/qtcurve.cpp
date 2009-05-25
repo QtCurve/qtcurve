@@ -8391,7 +8391,7 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                         ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols));
         drawMdiIcon(p, colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
                         ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
-                        : (SC_TitleBarCloseButton==sc && !colored && (hover || sunken) ? CLOSE_COLOR : textColor),
+                        : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : textColor),
                     shadow, rect, hover, sunken, sc,  colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL);
     }
 }
