@@ -38,7 +38,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
                    itsWidget(new QtCurveKWinConfigWidget(parent))
 {
     KConfigGroup configGroup(itsConfig, "General");
-    KGlobal::locale()->insertCatalog("kwin_clients");
+    KGlobal::locale()->insertCatalog("qtcurve");
 
     itsWidget->show();
 

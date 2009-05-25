@@ -58,7 +58,7 @@ extern "C"
 {
     KDE_EXPORT QObject * allocate_kstyle_config(QWidget* parent)
     {
-        KGlobal::locale()->insertCatalog("kstyle_qtcurve_config");
+        KGlobal::locale()->insertCatalog("qtcurve");
 
         return new QtCurveConfig(parent);
     }
