@@ -1060,6 +1060,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="8" column="0" colspan="3">
            <widget class="QGroupBox" name="titlebarButtons_colors">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="title">
              <string>Custom Colors</string>
             </property>
