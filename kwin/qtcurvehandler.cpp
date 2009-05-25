@@ -311,7 +311,7 @@ QList< QList<QImage> > QtCurveHandler::shadowTextures()
     QColor color = palette.window().color();
     QColor light = color.lighter(110);
     QColor dark = color;
-    QColor glow = palette.color(QPalette::Active, QPalette::Highlight); // .lighter(140);
+    QColor glow = KColorScheme(QPalette::Active).decoration(KColorScheme::FocusColor).color();
     QColor glow2 = glow; // palette.color(QPalette::Active, QPalette::Highlight);
 
     qreal size = 25.5;
