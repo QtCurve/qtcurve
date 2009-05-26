@@ -432,9 +432,7 @@ static bool isNoEtchWidget(const QWidget *widget)
 }
 
 static QColor getLowerEtchCol(const QWidget *widget)
-{
-    QColor col(Qt::white);
-    
+{ 
     bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
 // CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
 // KPackageKit, and thats with its KTextBrowser - so just check when we draw scrollviews...
@@ -446,12 +444,17 @@ static QColor getLowerEtchCol(const QWidget *widget)
             
     if(doEtch)
     {
-        col=widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole());
-        shade(col, &col, 1.06);
+        QColor bgnd(widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole()));
+        
+        if(bgnd.alpha()>0)
+        {
+            shade(bgnd, &bgnd, 1.06);
+            return bgnd;
+        }
     }
-    else
-        col.setAlphaF(0.25);
-
+        
+    QColor col(Qt::white);
+    col.setAlphaF(0.25);
     return col;
 }
 

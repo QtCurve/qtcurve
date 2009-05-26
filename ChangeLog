@@ -62,6 +62,7 @@
 41. Translation support - thanks to Jonathan Riddell
 42. Use focus colour for coloured window shadows.
 43. Reduce toolbutton pop-up menu delay from 600ms to 250ms
+44. Fix edit field in KDE4.3's kickoff menu.
 
 0.62.9
 ------
