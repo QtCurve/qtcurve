@@ -3438,7 +3438,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool   kwinHighlight(state&QtC_StateKWinHighlight);
                 QColor col(opts.colorTitlebarOnly
                             ? backgroundColors(option)[QT_STD_BORDER]
-                            : kwinHighlight ? itsHighlightCols[0] : buttonColors(option)[QT_STD_BORDER]);
+                            : kwinHighlight ? itsFocusCols[0] : buttonColors(option)[QT_STD_BORDER]);
 
                 painter->setPen(col);
 
@@ -6285,7 +6285,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(roundKWinFull)
                 {
                     bool   kwinHighlight(state&QtC_StateKWinHighlight);
-                    QColor col(kwinHighlight ? itsHighlightCols[0] : btnCols[QT_STD_BORDER]);
+                    QColor col(kwinHighlight ? itsFocusCols[0] : btnCols[QT_STD_BORDER]);
 
                     painter->setPen(col);
 
@@ -6295,6 +6295,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->drawPoint(r.x()+1, r.y()+3);
                         painter->drawPoint(r.x()+r.width()-4, r.y()+1);
                         painter->drawPoint(r.x()+r.width()-2, r.y()+3);
+//                         painter->drawPoint(r.x()+r.width()-1, r.y()+6);
                         col.setAlphaF(0.5);
                         painter->setPen(col);
                         painter->drawPoint(r.x()+2, r.y()+2);
@@ -6315,8 +6316,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                     if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
                     {
-                        col=(btnCols[0]);
-                        col.setAlphaF(0.5);
+                        col=btnCols[0];
+                        //col.setAlphaF(0.5);
                         painter->setPen(col);
                         painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
                         painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
@@ -8347,7 +8348,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             }
         }
 
-    p->setPen(window && state&QtC_StateKWinHighlight ? itsHighlightCols[0] : border);
+    p->setPen(window && state&QtC_StateKWinHighlight ? itsFocusCols[0] : border);
     p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
 //     if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
