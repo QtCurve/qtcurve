@@ -6343,76 +6343,76 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     static const int constPad=4;
 
                     QFont         font(painter->font());
-                    Qt::Alignment align((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, NULL, NULL));
-                    QRect         textRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
-                    QTextOption   textOpt(align|Qt::AlignVCenter);
-                    bool          alignRealCenter(Qt::AlignHCenter==align);
+                    Qt::Alignment alignment((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, NULL, NULL));
+                    bool          alignFull(Qt::AlignHCenter==alignment),
+                                  iconRight((!reverse && alignment&Qt::AlignRight) || (reverse && alignment&Qt::AlignLeft));
+                    QRect         captionRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget)),
+                                  textRect(alignFull
+                                            ? QRect(r.x(), captionRect.y(), r.width(), captionRect.height())
+                                            : captionRect);
 
                     font.setBold(true);
                     painter->setFont(font);
-                    textOpt.setWrapMode(QTextOption::NoWrap);
 
                     QFontMetrics fm(painter->fontMetrics());
                     QString str(fm.elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
 
+                    int           textWidth=alignFull || (showIcon && alignment&Qt::AlignHCenter)
+                                                ? fm.boundingRect(str).width()+(showIcon ? iconSize+constPad : 0) : 0;
+
+                    if(alignFull)
+                        if(captionRect.left()>((textRect.width()-textWidth)>>1))
+                        {
+                            alignment=Qt::AlignVCenter|Qt::AlignLeft;
+                            textRect=captionRect;
+                        }
+                        else if(captionRect.right()<((textRect.width()+textWidth)>>1))
+                        {
+                            alignment=Qt::AlignVCenter|Qt::AlignRight;
+                            textRect=captionRect;
+                        }
+
                     if(showIcon)
-                        if(align&Qt::AlignHCenter)
+                        if(alignment&Qt::AlignHCenter)
                         {
-                            //if(add icon to alignment)
-                                if(reverse)
-                                    textRect.setWidth(textRect.width()-(iconSize+constPad));
-                                else
-                                    textRect.setX(textRect.x()+iconSize+constPad);
-                        }
-                        else
-                        {
-                            textRect.setWidth(textRect.width()-(iconSize+constPad));
-                            if( (!reverse && align&Qt::AlignLeft) || (reverse && align&Qt::AlignRight) )
-                                textRect.setX(textRect.x()+(iconSize+constPad));
+                            if(reverse)
+                            {
+                                iconX=((textRect.width()-textWidth)/2.0)+0.5+textWidth+iconSize;
+                                textRect.setX(textRect.x()-(iconSize+constPad));
+                            }
                             else
-                                iconX=textRect.right()+constPad;
+                            {
+                                iconX=((textRect.width()-textWidth)/2.0)+0.5;
+                                textRect.setX(textRect.x()+iconSize+constPad);
+                            }
+                        }
+                        else if((!reverse && alignment&Qt::AlignLeft) || (reverse && alignment&Qt::AlignRight))
+                        {
+                            iconX=textRect.x();
+                            textRect.setX(textRect.x()+(iconSize+constPad));
+                        }
+                        else if((!reverse && alignment&Qt::AlignRight) || (reverse && alignment&Qt::AlignLeft))
+                        {
+                            if(iconRight)
+                            {
+                                iconX=textRect.x()+textRect.width()-iconSize;
+                                textRect.setWidth(textRect.width()-(iconSize+constPad));
+                            }
+                            else
+                            {
+                                iconX=textRect.x()+textRect.width()-textWidth;
+                                if(iconX<textRect.x())
+                                    iconX=textRect.x();
+                            }
                         }
 
-                    int textWidth=alignRealCenter || (showIcon && align&Qt::AlignHCenter)
-                                    ? fm.boundingRect(str).width() : 0;
+                    QTextOption textOpt(alignment|Qt::AlignVCenter);
+                    textOpt.setWrapMode(QTextOption::NoWrap);
 
-                    //if((NOT add icon to alignment) align&Qt::AlignHCenter && (textWidth+iconSize+constPad)>textRect.width())
-                    //    showIcon=false;
-            
-                    if(alignRealCenter)
-                    {
-                        if(textRect.left()>((r.width()-textWidth)>>1))
-                        {
-                            textOpt.setAlignment(Qt::AlignVCenter|Qt::AlignLeft);
-                            alignRealCenter=false;
-                            //if(NOT add icon to alignment) showIcon=false;
-                        }
-                        else if(textRect.right()<((r.width()+textWidth)>>1))
-                        {
-                            textOpt.setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-                            alignRealCenter=false;
-                            //if(NOT add icon to alignment) showIcon=false;
-                        }
-                        else
-                        {
-                            painter->setClipRect(textRect);
-                            textRect=r;
-                        }
-                    }
                     painter->setPen(shadow);
                     painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
-                    if(alignRealCenter)
-                        painter->setClipping(false);
-
-                    if(align&Qt::AlignHCenter)
-                        if(textRect.x()>0)
-                            showIcon=false;
-                        else if(reverse)
-                            iconX=textRect.right()-(((textRect.width()-textWidth)/2)-(iconSize+constPad));
-                        else
-                            iconX=textRect.x()+(((textRect.width()-textWidth)/2)-(iconSize+constPad));
                 }
 
                 if(showIcon && iconX>=0)
