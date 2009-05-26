@@ -450,7 +450,7 @@ static QColor getLowerEtchCol(const QWidget *widget)
         shade(col, &col, 1.06);
     }
     else
-        col.setAlphaF(0.0);
+        col.setAlphaF(0.25);
 
     return col;
 }
