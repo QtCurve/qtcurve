@@ -437,7 +437,7 @@ static QColor getLowerEtchCol(const QWidget *widget)
     
     bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
 // CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
-// KPackageKit, and that swith its KTextBrowser - so jsut check when we draw scrollviews...
+// KPackageKit, and thats with its KTextBrowser - so just check when we draw scrollviews...
 //     if(doEtch && isInQAbstractItemView(widget->parentWidget()))
 //     {
 //         doEtch=false;
