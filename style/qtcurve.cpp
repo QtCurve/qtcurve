@@ -8357,8 +8357,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             p->drawPoint(r.x()+1, r.y()+r.height()-1);
             p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
             p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
-            p->setPen(cols[ORIGINAL_SHADE]);
-            p->drawPoint(r.x()+1, r.y()+r.height()-2);
+//             p->setPen(cols[ORIGINAL_SHADE]);
+//             p->drawPoint(r.x()+1, r.y()+r.height()-2);
         }
 
         if(WIDGET_MDI_WINDOW_TITLE==w)
@@ -9128,7 +9128,7 @@ const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
 {
     if(option && option->version>=QTC_TBAR_VERSION_HACK &&
        option->version<QTC_TBAR_VERSION_HACK+NUM_TITLEBAR_BUTTONS &&
-       coloredMdiButtons(option->state&State_Active, option->state&State_MouseOver))
+       coloredMdiButtons(option->state&State_Active, option->state&(State_MouseOver|State_Sunken)))
         return itsTitleBarButtonsCols[option->version-QTC_TBAR_VERSION_HACK];
 
     if(option && option->palette.button()!=itsButtonCols[ORIGINAL_SHADE])
