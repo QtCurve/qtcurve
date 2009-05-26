@@ -8386,7 +8386,9 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
              hover((titleBar->activeSubControls&sc) && (titleBar->state&State_MouseOver)),
              colored=coloredMdiButtons(titleBar->state&State_Active, hover),
              useBtnCols(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_STD_COLOR &&
-                         (hover || !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER)));
+                         (hover ||
+                          !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER) ||
+                          opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR));
 
         drawMdiButton(p, rect, hover, sunken,
                       colored && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL)

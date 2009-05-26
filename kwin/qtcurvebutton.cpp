@@ -192,7 +192,8 @@ void QtCurveButton::drawButton(QPainter *painter)
         opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised) |
                    (active ? QStyle::State_Active : QStyle::State_None) |
                    (itsHover ? QStyle::State_MouseOver : QStyle::State_None)|QStyle::State_Horizontal|QtC_StateKWin;
-        if(!(flags&QTC_TITLEBAR_BUTTON_STD_COLOR) || (flags&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER && !itsHover))
+        if(!(flags&QTC_TITLEBAR_BUTTON_STD_COLOR) ||
+           (flags&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER && !itsHover && !(flags&QTC_TITLEBAR_BUTTON_COLOR)))
             opt.palette.setColor(QPalette::Button, buttonColor);
         if(flags&QTC_TITLEBAR_BUTTON_COLOR && !(flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL))
             opt.version=versionHack;
