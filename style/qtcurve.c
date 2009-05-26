@@ -976,7 +976,7 @@ static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(col));
     }
     else
-        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.0);
+        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.25);
 }
 
 static void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
