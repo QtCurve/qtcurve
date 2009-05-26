@@ -297,7 +297,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         
     if(!caption().isEmpty())
     {
-        static const int constPad=6;
+        static const int constPad=4;
 
         painter.setFont(itsTitleFont);
 
@@ -363,9 +363,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
         if(alignment&Qt::AlignHCenter)
             if(rtl)
-                iconX=textRect.right()-(((textRect.width()-textWidth)/2)-iconSize);
+                iconX=textRect.right()-((((textRect.width()-textWidth)/2.0)+0.5)-(iconSize+constPad));
             else
-                iconX=textRect.x()+(((textRect.width()-textWidth)/2)-iconSize);
+                iconX=textRect.x()+((((textRect.width()-textWidth)/2.0)+0.5)-(iconSize+constPad));
     }
 
     if(showIcon && iconX>=0)
