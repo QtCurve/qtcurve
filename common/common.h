@@ -149,6 +149,7 @@ typedef GdkColor color;
 
 #define QTC_SIMPLE_SHADING (!shading)
 
+#define QTC_THIN_SBAR_MOD  4
 #define QTC_GLOW_MO        1 /*ORIGINAL_SHADE*/
 #define QTC_GLOW_DEFBTN    1
 #define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
@@ -1158,6 +1159,7 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                      titlebarBorder,
 #endif
+                     thinSbarGroove,
                      flatSbarButtons;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;

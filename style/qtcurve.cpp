@@ -6560,12 +6560,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     opt.state=scrollbar->state;
                     opt.state&=~(State_MouseOver|State_Sunken|State_On);
 
-                    drawLightBevel(painter, opt.rect, &opt, widget,
+                    drawLightBevel(painter, opts.thinSbarGroove
+                                                ? horiz
+                                                    ? opt.rect.adjusted(0, QTC_THIN_SBAR_MOD, 0, -QTC_THIN_SBAR_MOD)
+                                                    : opt.rect.adjusted(QTC_THIN_SBAR_MOD, 0, -QTC_THIN_SBAR_MOD, 0)
+                                                : opt.rect, &opt, widget,
     #ifndef QTC_SIMPLE_SCROLLBARS
                                    SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons ? ROUNDED_ALL :
     #endif
                                    ROUNDED_NONE,
-                                   itsBackgroundCols[2], itsBackgroundCols, true, WIDGET_TROUGH);
+                                   itsBackgroundCols[2], itsBackgroundCols, true,
+                                   opts.thinSbarGroove ? WIDGET_SLIDER_TROUGH : WIDGET_TROUGH);
                 }
                 else
                 {

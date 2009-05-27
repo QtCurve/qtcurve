@@ -463,6 +463,13 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
+       <item row="4" column="2">
+        <widget class="QCheckBox" name="thinSbarGroove">
+         <property name="text">
+          <string>Thin scrollbar groove</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_4">
@@ -1964,6 +1971,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>fillSlider</tabstop>
   <tabstop>sliderFill</tabstop>
   <tabstop>grooveAppearance</tabstop>
+  <tabstop>thinSbarGroove</tabstop>
   <tabstop>scrollbarType</tabstop>
   <tabstop>flatSbarButtons</tabstop>
   <tabstop>sbarBgndAppearance</tabstop>
@@ -2074,12 +2082,12 @@ p, li { white-space: pre-wrap; }
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>267</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>325</x>
-     <y>299</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
    </hints>
   </connection>
@@ -2090,12 +2098,12 @@ p, li { white-space: pre-wrap; }
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>267</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>460</x>
-     <y>299</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
    </hints>
   </connection>
@@ -2106,12 +2114,12 @@ p, li { white-space: pre-wrap; }
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>267</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>325</x>
-     <y>327</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
    </hints>
   </connection>
@@ -2122,12 +2130,12 @@ p, li { white-space: pre-wrap; }
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>267</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>433</x>
-     <y>355</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
    </hints>
   </connection>
@@ -2138,12 +2146,12 @@ p, li { white-space: pre-wrap; }
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>391</x>
-     <y>478</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>393</x>
-     <y>510</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
    </hints>
   </connection>
@@ -2154,12 +2162,28 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>305</x>
-     <y>432</y>
+     <x>261</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>341</x>
-     <y>461</y>
+     <x>261</x>
+     <y>59</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flatSbarButtons</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>thinSbarGroove</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>505</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>181</y>
     </hint>
    </hints>
   </connection>
