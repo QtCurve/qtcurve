@@ -35,7 +35,7 @@
 #define QTC_COMMON_FUNCTIONS
 #include "qtcurve.h"
 
-#define QTC_MO_ARROW(COL) (MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state ? qtcurveStyle->arrow_mouseover_gc : (COL))
+#define QTC_MO_ARROW(MENU, COL) (!MENU && MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state ? qtcurveStyle->arrow_mouseover_gc : (COL))
 
 #define SBAR_BTN_SIZE 15
 
@@ -2859,7 +2859,7 @@ debugDisplayWidget(widget, 3);
             x++;
 
 //             if(opts.singleComboArrow)
-                drawArrow(window, QTC_MO_ARROW(qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]),
+                drawArrow(window, QTC_MO_ARROW(false, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]),
                           area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
 //             else
 //             {
@@ -2870,7 +2870,8 @@ debugDisplayWidget(widget, 3);
 //             }
         }
         else
-            drawArrow(window, QTC_MO_ARROW(onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, 0L)
+            drawArrow(window, QTC_MO_ARROW(false, onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) ||
+                                                  isOnButton(widget, 0, 0L)
                                             ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
                                             : style->text_gc[QTC_ARROW_STATE(state)]), area,  arrow_type,
                       x+(width>>1), y+(height>>1), FALSE, TRUE);
@@ -2878,6 +2879,7 @@ debugDisplayWidget(widget, 3);
     else
     {
         int      isSpinButton = DETAIL("spinbutton"),
+                 isMenuItem = DETAIL("menuitem"),
                  a_width=LARGE_ARR_WIDTH,
                  a_height=LARGE_ARR_HEIGHT;
         gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
@@ -2970,7 +2972,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
             state=GTK_STATE_PRELIGHT;
 
-        drawArrow(window, QTC_MO_ARROW(isSpinButton || sbar
+        drawArrow(window, QTC_MO_ARROW(isMenuItem, isSpinButton || sbar
                                         ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
                                         : style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
                                             ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)]),
