@@ -77,7 +77,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 void QtCurveKWinConfig::defaults()
 {
     itsWidget->menuClose->setChecked(true);
-    itsWidget->coloredShadow->setChecked(true);
+    itsWidget->coloredShadow->setChecked(false);
 }
 
 extern "C"

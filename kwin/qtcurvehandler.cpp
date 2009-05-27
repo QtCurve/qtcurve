@@ -250,7 +250,7 @@ void QtCurveHandler::readConfig()
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;
 
-    itsColoredShadow = config.readEntry("ColoredShadow", true);
+    itsColoredShadow = config.readEntry("ColoredShadow", false);
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
 }
 
