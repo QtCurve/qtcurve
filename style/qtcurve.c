@@ -976,7 +976,7 @@ static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(col));
     }
     else
-        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.25);
+        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.0);
 }
 
 static void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
@@ -3605,7 +3605,8 @@ debugDisplayWidget(widget, 3);
         {
             int      sbarRound=ROUNDED_ALL,
                      xo=x, yo=y, wo=width, ho=height;
-            gboolean drawBgnd=opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType;
+            gboolean drawBgnd=opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType,
+                     thinner=opts.thinSbarGroove && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons);
 
             if(opts.flatSbarButtons)
                 switch(opts.scrollbarType)
@@ -3693,8 +3694,13 @@ debugDisplayWidget(widget, 3);
                     height--;
             }
 
-            drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                           &qtcPalette.background[2], qtcPalette.background, sbarRound, WIDGET_TROUGH,
+            drawLightBevel(cr, style, window, state, area, NULL,
+                           thinner && !horiz ? x+QTC_THIN_SBAR_MOD : x,
+                           thinner && horiz  ? y+QTC_THIN_SBAR_MOD : y,
+                           thinner && !horiz ? width-(QTC_THIN_SBAR_MOD*2) : width,
+                           thinner && horiz  ? height-(QTC_THIN_SBAR_MOD*2) : height,
+                           &qtcPalette.background[2], qtcPalette.background, sbarRound,
+                           thinner ? WIDGET_SLIDER_TROUGH : WIDGET_TROUGH,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT), widget);
         }
