@@ -124,11 +124,13 @@ void QtCurveHandler::setStyle()
 
 bool QtCurveHandler::reset(unsigned long changed)
 {
+    bool styleChanged=false;
     if(abs(itsTimeStamp-getTimeStamp(xdgConfigFolder()+"/qtcurvestylerc"))>2)
     {
         delete itsStyle;
         itsStyle=0L;
         setStyle();
+        styleChanged=true;
     }
     
     // we assume the active font to be the same as the inactive font since the control
@@ -180,7 +182,7 @@ bool QtCurveHandler::reset(unsigned long changed)
     bool needHardReset = true;
     // TODO: besides the Color and Font settings I can maybe handle more changes
     //       without a hard reset. I will do this later...
-    if ((changed & ~(SettingColors | SettingFont | SettingButtons)) == 0)
+    if (!styleChanged && (changed & ~(SettingColors | SettingFont | SettingButtons)) == 0)
        needHardReset = false;
 
     if (needHardReset)
