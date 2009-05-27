@@ -6175,11 +6175,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     int v(slider->minimum),
                         len(pixelMetric(PM_SliderLength, slider, widget));
 
-                    QVarLengthArray<QLine, 32> lines;
-                    while (v <= slider->maximum)
+                    while (v <= slider->maximum + 1)
                     {
+                        if (v == slider->maximum + 1 && interval == 1)
+                            break;
+
                         int pos(sliderPositionFromValue(slider->minimum, slider->maximum,
-                                                        v, (horizontal
+                                                        qMin(v, slider->maximum), (horizontal
                                                             ? slider->rect.width()
                                                             : slider->rect.height()) - len,
                                                         slider->upsideDown) + len / 2);
@@ -6189,19 +6191,19 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         if (horizontal)
                         {
                             if (ticksAbove)
-                                lines.append(QLine(pos, slider->rect.top() + extra,
+                                painter->drawLine(QLine(pos, slider->rect.top() + extra,
                                                 pos, slider->rect.top() + tickSize));
                             if (ticksBelow)
-                                lines.append(QLine(pos, slider->rect.bottom() - extra,
+                                painter->drawLine(QLine(pos, slider->rect.bottom() - extra,
                                                 pos, slider->rect.bottom() - tickSize));
                         }
                         else
                         {
                             if (ticksAbove)
-                                lines.append(QLine(slider->rect.left() + extra, pos,
+                                painter->drawLine(QLine(slider->rect.left() + extra, pos,
                                                 slider->rect.left() + tickSize, pos));
                             if (ticksBelow)
-                                lines.append(QLine(slider->rect.right() - extra, pos,
+                                painter->drawLine(QLine(slider->rect.right() - extra, pos,
                                                 slider->rect.right() - tickSize, pos));
                         }
 
@@ -6211,7 +6213,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             break;
                         v = nextInterval;
                     }
-                    painter->drawLines(lines.constData(), lines.size());
                     painter->setPen(oldPen);
                 }
             }
