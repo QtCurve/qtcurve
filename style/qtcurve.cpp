@@ -5112,7 +5112,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1),
                                                          r.y()+(TAB_MO_TOP==opts.tabMouseOver ? r.height()-2 : -1),
                                                          r.width()-(firstTab || lastTab ? moOffset : 1), 2),
-                                          true, TAB_MO_TOP==opts.tabMouseOver);
+                                          true, TAB_MO_TOP!=opts.tabMouseOver);
                         break;
                     }
                     case QTabBar::RoundedWest:
@@ -5179,7 +5179,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             drawHighlight(painter, QRect(r.x()+(TAB_MO_TOP==opts.tabMouseOver ? 0 : r.width()-1),
                                                          r.y()+(firstTab ? moOffset : 1),
                                                          2, r.height()-(firstTab || lastTab ? moOffset : 1)),
-                                          false, TAB_MO_TOP!=opts.tabMouseOver);
+                                          false, TAB_MO_TOP==opts.tabMouseOver);
                         break;
                     }
                     case QTabBar::RoundedEast:
@@ -5246,7 +5246,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             drawHighlight(painter, QRect(r.x()+(TAB_MO_TOP==opts.tabMouseOver ? r.width()-2 : -1),
                                                          r.y()+(firstTab ? moOffset : 1),
                                                          2, r.height()-(firstTab || lastTab ? moOffset : 1)),
-                                          false, TAB_MO_TOP==opts.tabMouseOver);
+                                          false, TAB_MO_TOP!=opts.tabMouseOver);
                         break;
                     }
                 }
