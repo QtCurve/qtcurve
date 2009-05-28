@@ -5075,9 +5075,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setPen(use[QT_FRAME_DARK_SHADOW]);
                             if(!fixLeft)
-                                painter->drawPoint(r2.left()-1, r2.top());
+                                painter->drawPoint(r2.left()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top());
                             if(!fixRight)
-                                painter->drawLine(r2.right()-1, r2.top(), r2.right(), r2.top());
+                                painter->drawLine(r2.right()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top(), r2.right(), r2.top());
                         }
                         else
                         {
@@ -5142,7 +5142,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setPen(use[0]);
                             if(!firstTab)
-                                painter->drawPoint(r2.right(), r2.top()-1);
+                                painter->drawPoint(r2.right(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
                             painter->drawLine(r2.right(), r2.bottom()-1, r2.right(), r2.bottom());
                         }
                         else
@@ -5209,8 +5209,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         {
                             painter->setPen(use[QT_FRAME_DARK_SHADOW]);
                             if(!firstTab)
-                                painter->drawPoint(r2.left(), r2.top()-1);
-                            painter->drawLine(r2.left(), r2.bottom()-1, r2.left(), r2.bottom());
+                                painter->drawPoint(r2.left(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
+                            painter->drawLine(r2.left(), r2.bottom()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.left(), r2.bottom());
                         }
                         else
                         {
