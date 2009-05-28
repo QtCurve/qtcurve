@@ -5432,7 +5432,7 @@ debugDisplayWidget(widget, 3);
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1),
                                   y+(TAB_MO_TOP==opts.tabMouseOver ? height-2 : -1), width-(firstTab || lastTab ? moOffset : 1), 2,
-                                  NULL, true, TAB_MO_TOP==opts.tabMouseOver);
+                                  NULL, true, TAB_MO_TOP!=opts.tabMouseOver);
 
                 break;
             }
@@ -5484,7 +5484,7 @@ debugDisplayWidget(widget, 3);
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(TAB_MO_TOP==opts.tabMouseOver ? 0 : height-1),
                                   width-(firstTab || lastTab ? moOffset : 1), 2,
-                                  NULL, true, !TAB_MO_TOP==opts.tabMouseOver);
+                                  NULL, true, TAB_MO_TOP==opts.tabMouseOver);
                 break;
             }
             case GTK_POS_LEFT: /* => tabs are on right !!! */
@@ -5532,7 +5532,7 @@ debugDisplayWidget(widget, 3);
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? width-2 : -1),
                                   y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                  NULL, false, TAB_MO_TOP==opts.tabMouseOver);
+                                  NULL, false, TAB_MO_TOP!=opts.tabMouseOver);
                 break;
             }
             case GTK_POS_RIGHT: /* => tabs are on left !!! */
@@ -5582,7 +5582,7 @@ debugDisplayWidget(widget, 3);
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? 0 : width-1),
                                   y+(firstTab ? moOffset : 1), 2, height-(firstTab || lastTab ? moOffset : 1),
-                                  NULL, false, !TAB_MO_TOP==opts.tabMouseOver);
+                                  NULL, false, TAB_MO_TOP==opts.tabMouseOver);
                 break;
             }
         }
