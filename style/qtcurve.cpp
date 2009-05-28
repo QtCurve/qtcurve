@@ -6333,11 +6333,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->drawLine(r.left()+1, r.bottom(), r.right()-1, r.bottom());
                 }
 
-                bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && r.width()>64 &&
-                                 !titleBar->icon.isNull();
+                bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && !titleBar->icon.isNull();
                 int     iconSize=showIcon ? pixelMetric(QStyle::PM_SmallIconSize) : 0,
                         iconX=r.x();
-
                 QPixmap pixmap;
 
                 if(showIcon)
@@ -6388,7 +6386,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             else
                             {
                                 iconX=((textRect.width()-textWidth)/2.0)+0.5;
-                                textRect.setX(textRect.x()+iconSize+constPad);
+                                textRect.setX(iconX+iconSize+constPad);
+                                alignment=Qt::AlignVCenter|Qt::AlignLeft;
                             }
                         }
                         else if((!reverse && alignment&Qt::AlignLeft) || (reverse && alignment&Qt::AlignRight))

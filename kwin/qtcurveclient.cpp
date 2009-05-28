@@ -281,8 +281,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     itsCaptionRect = captionRect(); // also update itsCaptionRect!
     bool     showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,
-                                                                                    0L, 0L)
-                      && itsCaptionRect.width()>64;
+                                                                                    0L, 0L);
     int     iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0,
             iconX=itsCaptionRect.x();
     QPixmap menuIcon;
@@ -337,11 +336,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 {
                     iconX=((textRect.width()-textWidth)/2.0)+0.5+textWidth+iconSize;
                     textRect.setX(textRect.x()-(iconSize+constPad));
+//                     iconX=((textRect.width()-textWidth)/2.0)+0.5+(textWidth-constPad);
+//                     textRect.setX(iconX-(textWidth-iconSize));
+//                     textRect.setWidth(textWidth-iconSize);
+//                     alignment=Qt::AlignVCenter|Qt::AlignRight;
                 }
                 else
                 {
                     iconX=((textRect.width()-textWidth)/2.0)+0.5;
-                    textRect.setX(textRect.x()+iconSize+constPad);
+                    textRect.setX(iconX+iconSize+constPad);
+                    alignment=Qt::AlignVCenter|Qt::AlignLeft;
                 }
             }
             else if((!reverse && alignment&Qt::AlignLeft) || (reverse && alignment&Qt::AlignRight))
@@ -364,11 +368,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 }
             }
 
-        painter.setClipRect(itsCaptionRect);
+        painter.setClipRect(itsCaptionRect.adjusted(-2, 0, 2, 0));
         painter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
         painter.drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
         painter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
         painter.drawText(textRect, alignment, str);
+        painter.setClipping(false);
     }
 
     if(showIcon && iconX>=0)
