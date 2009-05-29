@@ -23,25 +23,26 @@
     config items.
 16. When using glow style mouse over, use mouse over colour for arrows.
 17. Option to use a thinner groove for scrollbars (only when using flat, or no, buttons).
-18. Better tab highlighting.
-19. Don't max/extra round progressbars.
-20. Use faded lines for tab and listview header mouse-over.
-21. Create icon-mapping file in a more robust manner.
-22. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
+18. Option to only color sliders on mouse over.
+19. Better tab highlighting.
+20. Don't max/extra round progressbars.
+21. Use faded lines for tab and listview header mouse-over.
+22. Create icon-mapping file in a more robust manner.
+23. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
     and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
-23. Fix spin widget entry highlighting under Gtk 2.16
-24. Don't round rulers.
-25. Fix faded menuitems when not rounding.
-26. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
-27. Make buttons slightly thinner, matches KDE4 better.
-28. Fix settnig of KDE icons when QtCurve is configured by just having
+24. Fix spin widget entry highlighting under Gtk 2.16
+25. Don't round rulers.
+26. Fix faded menuitems when not rounding.
+27. Fix alternate listview colours when running under KDE3 (KDE_SESSION_VERSION=3)
+28. Make buttons slightly thinner, matches KDE4 better.
+29. Fix settnig of KDE icons when QtCurve is configured by just having
     gtk-theme-name="QtCurve" in the gtkrc file.
-29. Fix painting of scrollbar slider ends when sliders are shaded, and scrollbar
+30. Fix painting of scrollbar slider ends when sliders are shaded, and scrollbar
     buttons are not flat.
-30. When not using highlight colour for menus, get OpenOffice to use the correct
+31. When not using highlight colour for menus, get OpenOffice to use the correct
     colour for selected menubar items.
-31. Fix setting of custom shades, and gradients, when reading system config file.
-32. Dont crash when /etc/qtcurvestylerc is only readable by root!
+32. Fix setting of custom shades, and gradients, when reading system config file.
+33. Dont crash when /etc/qtcurvestylerc is only readable by root!
 
 0.62.8
 ------

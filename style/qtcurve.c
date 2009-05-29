@@ -311,9 +311,11 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
 #define QTC_SET_BTN_COLS(SCROLLBAR, SCALE, LISTVIEW, STATE) \
 { \
     if(SCROLLBAR || SCALE) \
-        btn_colors=SHADE_NONE!=opts.shadeSliders \
-                    ? qtcPalette.slider \
-                    : qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
+        btn_colors=GTK_STATE_INSENSITIVE==STATE \
+                    ? qtcPalette.background \
+                    : SHADE_NONE!=opts.shadeSliders && (!opts.colorSliderMouseOver || GTK_STATE_PRELIGHT==STATE) \
+                        ? qtcPalette.slider \
+                        : qtcPalette.button[PAL_ACTIVE]; \
     else if(LISTVIEW && !opts.lvButton) \
         btn_colors=qtcPalette.background; \
     else \
