@@ -6590,6 +6590,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     opt.state=scrollbar->state;
                     opt.state&=~(State_MouseOver|State_Sunken|State_On);
 
+                    if(opts.thinSbarGroove && slider.isValid())
+                        painter->setClipRegion(QRegion(opt.rect).subtract(slider));
                     drawLightBevel(painter, opts.thinSbarGroove
                                                 ? horiz
                                                     ? opt.rect.adjusted(0, QTC_THIN_SBAR_MOD, 0, -QTC_THIN_SBAR_MOD)
@@ -6601,6 +6603,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                    ROUNDED_NONE,
                                    itsBackgroundCols[2], itsBackgroundCols, true,
                                    opts.thinSbarGroove ? WIDGET_SLIDER_TROUGH : WIDGET_TROUGH);
+                    if(opts.thinSbarGroove && slider.isValid())
+                        painter->setClipping(false);
                 }
                 else
                 {
