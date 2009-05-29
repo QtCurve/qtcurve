@@ -3202,7 +3202,7 @@ debugDisplayWidget(widget, 3);
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                                                             WIDGET_UNCOLOURED_MO_BUTTON
 #else
-                                                            WIDGET_STD_BUTTON
+                                                            WIDGET_TOOLBAR_BUTTON
 #endif
                                                         : togglebutton
                                                             ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
