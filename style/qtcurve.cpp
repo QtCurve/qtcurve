@@ -967,7 +967,7 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_SYSTEMSETTINGS;
         else if("plasma"==appName)
             theThemedApp=APP_PLASMA;
-        else if("krunner"==appName || "krunner_lock"==appName)
+        else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
             theThemedApp=APP_KRUNNER;
         else if("konqueror"==appName)
             theThemedApp=APP_KONQUEROR;
