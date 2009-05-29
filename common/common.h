@@ -1359,13 +1359,14 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
     return 0L; /* Will never happen! */
 }
 
-#define QTC_MIN_ROUND_FULL_SIZE       8
+#define QTC_MIN_ROUND_FULL_SIZE     8
 #ifdef __cplusplus
-#define QTC_MIN_ROUND_EXTRA_SIZE(W)   (WIDGET_SPIN==W ? 7 : 14)
+#define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==W ? 7 : 14)
 #else
-#define QTC_MIN_ROUND_EXTRA_SIZE(W)   (WIDGET_SPIN_UP==W || WIDGET_SPIN_DOWN==W || WIDGET_SPIN==W ? 7 : 14)
+#define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==W || WIDGET_SPIN_DOWN==W || WIDGET_SPIN==W ? 7 : 14)
 #endif
-#define QTC_MIN_ROUND_MAX_HEIGHT_SIZE 20
+#define QTC_MIN_ROUND_MAX_HEIGHT    21
+#define QTC_MIN_ROUND_MAX_WIDTH     32
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
@@ -1452,8 +1453,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 #endif
                        )
                         return ((w>h ? h : w)-2)/2;
-                    if(w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)-2) &&
-                       QTC_MAX_ROUND_WIDGET(widget))
+                    if(w>(QTC_MIN_ROUND_MAX_WIDTH-2) && h>(QTC_MIN_ROUND_MAX_HEIGHT-2) && QTC_MAX_ROUND_WIDGET(widget))
                         return 8.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
@@ -1477,8 +1477,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 #endif
                       )
                         return (w>h ? h : w)/2;
-                    if(w>QTC_MIN_ROUND_EXTRA_SIZE(widget) && h>QTC_MIN_ROUND_MAX_HEIGHT_SIZE &&
-                       QTC_MAX_ROUND_WIDGET(widget))
+                    if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_MAX_ROUND_WIDGET(widget))
                         return 9.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
@@ -1502,8 +1501,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 #endif
                       )
                         return (w>h ? h : w)/2;
-                    if(w>QTC_MIN_ROUND_EXTRA_SIZE(widget) && h>QTC_MIN_ROUND_MAX_HEIGHT_SIZE &&
-                       QTC_MAX_ROUND_WIDGET(widget))
+                    if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_MAX_ROUND_WIDGET(widget))
                         return 10.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
