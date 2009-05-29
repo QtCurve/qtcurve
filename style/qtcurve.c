@@ -35,7 +35,8 @@
 #define QTC_COMMON_FUNCTIONS
 #include "qtcurve.h"
 
-#define QTC_MO_ARROW(MENU, COL) (!MENU && MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state ? qtcurveStyle->arrow_mouseover_gc : (COL))
+#define QTC_MO_ARROW(MENU, COL) (!MENU && MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
+                                    ? &qtcPalette.mouseover[QT_STD_BORDER] : (COL))
 
 #define SBAR_BTN_SIZE 15
 
@@ -2748,34 +2749,25 @@ debugDisplayWidget(widget, 3);
     QTC_CAIRO_END
 }
 
-static void drawArrowPolygon(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
+static void drawArrowPolygon(cairo_t *cr, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
-    if(area)
-        gdk_gc_set_clip_rectangle(gc, area);
-
-    gdk_draw_polygon(window, gc, FALSE, points, npoints);
-    if(fill)
-        gdk_draw_polygon(window, gc, TRUE, points, npoints);
-
-    if(area)
-        gdk_gc_set_clip_rectangle(gc, NULL);
-
-/*
-    The following produces slightly blurred looking arrows - hence I just use Gdk direct.
-    int i;
+    int               i;
+    cairo_antialias_t aa=cairo_get_antialias(cr);
     setCairoClipping(cr, area, NULL);
     cairo_new_path(cr);
     cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+    cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
     for(i=0; i<npoints; ++i)
         cairo_line_to(cr, points[i].x+0.5, points[i].y+0.5);
     cairo_line_to(cr, points[0].x+0.5, points[0].y+0.5);
     cairo_stroke_preserve(cr);
-    cairo_fill(cr);
+    if(fill)
+        cairo_fill(cr);
+    cairo_set_antialias(cr, aa);
     unsetCairoClipping(cr);
-*/
 }
 
-static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrowType arrow_type,
+static void drawArrow(cairo_t *cr, GdkColor *col, GdkRectangle *area, GtkArrowType arrow_type,
                       gint x, gint y, gboolean small, gboolean fill)
 {
     if(small)
@@ -2784,25 +2776,25 @@ static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrow
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x,y-1}, {x+2,y+1}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x,y+1}, {x+2,y-1}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x+1,y}, {x-1,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x-1,y}, {x+1,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 6 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             default:
@@ -2814,25 +2806,25 @@ static void drawArrow(GdkWindow *window, GdkGC *gc, GdkRectangle *area, GtkArrow
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-3, y+2},  {x-2, y+2}, {x,y},  {x+2, y+2}, {x+3,y+2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-3,y-2},  {x-2, y-2}, {x,y}, {x+2, y-2}, {x+3,y-2}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x-1,y-3},  {x+2,y},  {x-1,y+3},   {x-2,y+3}, {x-2, y+2},  {x,y}, {x-2, y-2},  {x-2,y-3}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+3}, {x+2, y+2},  {x,y}, {x+2, y-2},  {x+2,y-3}};
-                drawArrowPolygon(window, gc, area, a, opts.vArrows ? 8 : 3, fill);
+                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             default:
@@ -2845,8 +2837,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          const gchar *detail, GtkArrowType arrow_type,
                          gboolean fill, gint x, gint y, gint width, gint height)
 {
-    QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
-//    QTC_CAIRO_BEGIN
+    QTC_CAIRO_BEGIN
 
 #ifdef QTC_DEBUG
 printf("Draw arrow %d %d %d %d %d %d %d %s  ", state, shadow, arrow_type, x, y, width, height, detail ? detail : "NULL");
@@ -2861,7 +2852,8 @@ debugDisplayWidget(widget, 3);
             x++;
 
 //             if(opts.singleComboArrow)
-                drawArrow(window, QTC_MO_ARROW(false, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]),
+                drawArrow(cr, QTC_MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                                                                    [COLOR_BUTTON_TEXT]),
                           area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
 //             else
 //             {
@@ -2872,11 +2864,14 @@ debugDisplayWidget(widget, 3);
 //             }
         }
         else
-            drawArrow(window, QTC_MO_ARROW(false, onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) ||
+        {
+            GdkColor *col=onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) ||
                                                   isOnButton(widget, 0, 0L)
-                                            ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                                            : style->text_gc[QTC_ARROW_STATE(state)]), area,  arrow_type,
-                      x+(width>>1), y+(height>>1), FALSE, TRUE);
+                                            ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                                                                [COLOR_BUTTON_TEXT]
+                                            : &style->text[QTC_ARROW_STATE(state)];
+            drawArrow(cr, QTC_MO_ARROW(false, col), area,  arrow_type, x+(width>>1), y+(height>>1), FALSE, TRUE);
+        }
     }
     else
     {
@@ -2974,13 +2969,15 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
             state=GTK_STATE_PRELIGHT;
 
-        drawArrow(window, QTC_MO_ARROW(isMenuItem, isSpinButton || sbar
-                                        ? qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                                        : style->text_gc[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
-                                            ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)]),
-                  area, arrow_type, x, y, isSpinButton, TRUE);
+        {
+        GdkColor *col=isSpinButton || sbar
+                        ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT]
+                        : &style->text[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
+                                        ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)];
+        drawArrow(cr, QTC_MO_ARROW(isMenuItem, col), area, arrow_type, x, y, isSpinButton, TRUE);
+        }
     }
-    //QTC_CAIRO_END
+    QTC_CAIRO_END
 }
 
 static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -5087,10 +5084,10 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 ? x+1
                 : x+(width>>1);
 
-    //QTC_CAIRO_BEGIN
+    QTC_CAIRO_BEGIN
 //     if(opts.singleComboArrow)
-        drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_DOWN, x,
-                  y+(height>>1), FALSE, TRUE);
+        drawArrow(cr, &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT], NULL,
+                  GTK_ARROW_DOWN, x, y+(height>>1), FALSE, TRUE);
 //     else
 //     {
 //         drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_UP, x,
@@ -5099,7 +5096,7 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
 //                   y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
 //     }
 
-    //QTC_CAIRO_END
+    QTC_CAIRO_END
 }
 
 static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -6367,20 +6364,20 @@ debugDisplayWidget(widget, 5);
 #endif
     gboolean isExpander=widget && GTK_IS_EXPANDER(widget),
              fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;
-    GdkGC    *gc=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
-                    ? style->base_gc[GTK_STATE_PRELIGHT]
-                    : style->text_gc[QTC_ARROW_STATE(state)];
+    GdkColor *col=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
+                    ? &qtcPalette.mouseover[QT_STD_BORDER]
+                    : &style->text[QTC_ARROW_STATE(state)];
 
     x-=QTC_LV_SIZE>>1;
     y-=QTC_LV_SIZE>>1;
 
-    //QTC_CAIRO_BEGIN
+    QTC_CAIRO_BEGIN
     if(GTK_EXPANDER_COLLAPSED==expander_style)
-        drawArrow(window, gc, area, reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
+        drawArrow(cr, col, area, reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
                   x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
     else
-        drawArrow(window, gc, area, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
-    //QTC_CAIRO_END
+        drawArrow(cr, col, area, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
+    QTC_CAIRO_END
 }
 
 static void styleRealize(GtkStyle *style)
@@ -6400,10 +6397,6 @@ static void styleRealize(GtkStyle *style)
     }
     else
         qtcurveStyle->menutext_gc[0]=NULL;
-
-    qtcurveStyle->arrow_mouseover_gc=MO_GLOW==opts.coloredMouseOver
-                                        ? realizeColors(style, &qtcPalette.mouseover[QT_STD_BORDER])
-                                        : NULL;
 }
 
 static void styleUnrealize(GtkStyle *style)
@@ -6420,10 +6413,6 @@ static void styleUnrealize(GtkStyle *style)
         gtk_gc_release(qtcurveStyle->menutext_gc[1]);
         qtcurveStyle->menutext_gc[0]=qtcurveStyle->menutext_gc[1]=NULL;
     }
-
-    if(qtcurveStyle->arrow_mouseover_gc)
-        gtk_gc_release(qtcurveStyle->arrow_mouseover_gc);
-    qtcurveStyle->arrow_mouseover_gc=NULL;
 }
 
 static void generateColors()

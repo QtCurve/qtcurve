@@ -63,8 +63,7 @@ typedef struct
 {
     GtkStyle parent_instance;
     GdkGC   *button_text_gc[2],
-            *menutext_gc[2],
-            *arrow_mouseover_gc;
+            *menutext_gc[2];
 } QtCurveStyle;
 
 struct _QtCurveStyleClass
