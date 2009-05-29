@@ -297,9 +297,7 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 #define QTC_STATE_REVERSE     (QStyle::StateFlag)0x10000000
 #define QTC_STATE_MENU        (QStyle::StateFlag)0x20000000
 #define QTC_STATE_KWIN_BUTTON (QStyle::StateFlag)0x40000000
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
 #define QTC_STATE_TBAR_BUTTON (QStyle::StateFlag)0x80000000
-#endif
 
 #define M_PI 3.14159265358979323846
 
@@ -2889,15 +2887,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if( ((state&State_Enabled) || !(state&State_AutoRaise)) &&
                (!widget || !dwt || (state&State_MouseOver)) )
             {
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                 QStyleOption opt(*option);
 
                 if(dwt)
                     opt.state|=QTC_STATE_TBAR_BUTTON;
                 drawPrimitive(PE_PanelButtonCommand, &opt, painter, widget);
-#else
-                drawPrimitive(PE_PanelButtonCommand, option, painter, widget);
-#endif
             }
             break;
         }
@@ -3361,7 +3355,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         ? WIDGET_NO_ETCH_BTN
                                         : isDefault && state&State_Enabled
                                             ? WIDGET_DEF_BUTTON
-                                            : WIDGET_STD_BUTTON);
+                                            : state&QTC_STATE_TBAR_BUTTON
+                                                ? WIDGET_TOOLBAR_BUTTON
+                                                : WIDGET_STD_BUTTON);
 
             if (isDefault && state&State_Enabled)
                 switch(opts.defBtnIndicator)
@@ -5783,10 +5779,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 else if(bflags&State_AutoRaise)
                     bflags &= ~State_Raised;
 
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                 if(state&State_AutoRaise)
                     bflags|=QTC_STATE_TBAR_BUTTON;
-#endif
+
                 State mflags(bflags);
 
 #if QT_VERSION >= 0x040500

@@ -67,6 +67,7 @@
 46. Fix edit field in KDE4.3's kickoff menu.
 47. Turn kwin colored shadow off by default - seems to have issues with
     KDE4.3Beta and/or Qt 4.5.1
+48. Dont max round toolbar buttons.
 
 0.62.9
 ------
