@@ -3266,8 +3266,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                   : itsFocusCols[QT_FOCUS(state&State_Selected)]);
 
                     if(FOCUS_LINE==opts.focus)
-                        drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-(view ? 3 : 1), r2.width(), 1),
-                                      c, true, true, true);
+                        if(!(state&State_Horizontal) && widget && qobject_cast<const QTabBar *>(widget))
+                            drawFadedLine(painter, QRect(r2.x()+r2.width()-1, r2.y(), 1, r2.height()),
+                                          c, true, true, false);
+                        else
+                            drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-(view ? 3 : 1), r2.width(), 1),
+                                          c, true, true, true);
                     else
                     {
                         painter->setPen(c);
@@ -4902,7 +4906,33 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     QStyleOptionFocusRect fropt;
                     fropt.QStyleOption::operator=(*tab);
                     fropt.rect.setRect(x1 + 1 + constOffset, tabV2.rect.y() + constOffset,
-                                    x2 - x1 - 2*constOffset, tabV2.rect.height() - 2*constOffset);
+                                       x2 - x1 - 2*constOffset, tabV2.rect.height() - 2*constOffset);
+
+                    fropt.state|=State_Horizontal;
+                    if(TAB_MO_BOTTOM==opts.tabMouseOver && FOCUS_LINE==opts.focus)
+                        switch(tabV2.shape)
+                        {
+                            case QTabBar::RoundedNorth:
+                            case QTabBar::TriangularNorth:
+                                fropt.rect.adjust(0, 0, 0, 1);
+                                break;
+                            case QTabBar::RoundedEast:
+                            case QTabBar::TriangularEast:
+                                fropt.rect.adjust(-2, 0, -(fropt.rect.width()+1), 0);
+                                fropt.state&=~State_Horizontal;
+                                break;
+                            case QTabBar::RoundedSouth:
+                            case QTabBar::TriangularSouth:
+                                fropt.rect.adjust(0, 0, 0, 1);
+                                break;
+                            case QTabBar::RoundedWest:
+                            case QTabBar::TriangularWest:
+                                fropt.rect.adjust(0, 0, 2, 0);
+                                fropt.state&=~State_Horizontal;
+                            default:
+                                break;
+                        }
+
                     drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
                 }
             }
