@@ -341,14 +341,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_13">
          <property name="text">
           <string>Style:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QComboBox" name="sliderStyle">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -358,14 +358,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QCheckBox" name="fillSlider">
          <property name="text">
           <string>Fill used part of slider groove:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QComboBox" name="sliderFill">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -375,24 +375,24 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_30">
          <property name="text">
           <string>Groove appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="grooveAppearance"/>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_14">
          <property name="text">
           <string>Scrollbar buttons:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QComboBox" name="scrollbarType">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -409,21 +409,21 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
+       <item row="6" column="2">
         <widget class="QCheckBox" name="flatSbarButtons">
          <property name="text">
           <string>Flat</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_32">
          <property name="text">
           <string>Background:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QComboBox" name="sbarBgndAppearance">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -440,17 +440,17 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_15">
          <property name="text">
           <string>Scrollbar thumbs:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QComboBox" name="sliderThumbs"/>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -463,10 +463,17 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="4" column="2">
+       <item row="5" column="2">
         <widget class="QCheckBox" name="thinSbarGroove">
          <property name="text">
           <string>Thin scrollbar groove</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="colorSliderMouseOver">
+         <property name="text">
+          <string>Color only on mouse-over</string>
          </property>
         </widget>
        </item>
@@ -1967,6 +1974,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>sliderAppearance</tabstop>
   <tabstop>shadeSliders</tabstop>
   <tabstop>customSlidersColor</tabstop>
+  <tabstop>colorSliderMouseOver</tabstop>
   <tabstop>sliderStyle</tabstop>
   <tabstop>fillSlider</tabstop>
   <tabstop>sliderFill</tabstop>

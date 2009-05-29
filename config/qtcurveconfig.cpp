@@ -521,6 +521,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sunkenScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(flatSbarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1282,6 +1283,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sunkenScrollViews=sunkenScrollViews->isChecked();
     opts.flatSbarButtons=flatSbarButtons->isChecked();
     opts.thinSbarGroove=thinSbarGroove->isChecked();
+    opts.colorSliderMouseOver=colorSliderMouseOver->isChecked();
     opts.titlebarBorder=titlebarBorder->isChecked();
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
@@ -1422,6 +1424,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sunkenScrollViews->setChecked(opts.sunkenScrollViews);
     flatSbarButtons->setChecked(opts.flatSbarButtons);
     thinSbarGroove->setChecked(opts.thinSbarGroove);
+    colorSliderMouseOver->setChecked(opts.colorSliderMouseOver);
     titlebarBorder->setChecked(opts.titlebarBorder);
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
@@ -1563,6 +1566,7 @@ bool QtCurveConfig::settingsChanged()
          sunkenScrollViews->isChecked()!=currentStyle.sunkenScrollViews ||
          flatSbarButtons->isChecked()!=currentStyle.flatSbarButtons ||
          thinSbarGroove->isChecked()!=currentStyle.thinSbarGroove ||
+         colorSliderMouseOver->isChecked()!=currentStyle.colorSliderMouseOver ||
          titlebarBorder->isChecked()!=currentStyle.titlebarBorder ||
          sbarBgndAppearance->currentIndex()!=currentStyle.sbarBgndAppearance ||
          sliderFill->currentIndex()!=currentStyle.sliderFill ||

@@ -9159,7 +9159,7 @@ const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
 const QColor * QtCurveStyle::sliderColors(const QStyleOption *option) const
 {
     return (option && option->state&State_Enabled)
-                ? SHADE_NONE!=opts.shadeSliders// && option->palette.button()==itsButtonCols[ORIGINAL_SHADE]
+                ? SHADE_NONE!=opts.shadeSliders && (!opts.colorSliderMouseOver || option->state&State_MouseOver)
                         ? itsSliderCols
                         : itsButtonCols //buttonColors(option)
                 : itsBackgroundCols;
