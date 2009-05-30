@@ -2586,7 +2586,8 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
-    else if( GTK_APP_JAVA!=qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") &&
+    else if( GTK_APP_JAVA!=qtSettings.app && GTK_APP_INKSCAPE!=qtSettings.app &&
+             widget && opts.round>ROUND_FULL && DETAIL("entry_bg") &&
              GTK_WIDGET_HAS_FOCUS(widget) && strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget)), "SexyIconEntry") )
     {
         /* Check that widget doesnt already have extra padding... (AS GEdit's seach entry does!)*/
@@ -2594,7 +2595,7 @@ debugDisplayWidget(widget, 3);
         {
             /* Frames have a 2 pixel frame width, but with round>ROUND_FULL the background cuts into the
                focus highlight. So, rectify this here by redrawing this highlight. */
-            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent));
+            gboolean rev=reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent));
             int      round=GTK_IS_SPIN_BUTTON(widget) || isComboBoxEntry(widget)
                             ? (rev ? ROUNDED_RIGHT : ROUNDED_LEFT)
                             : ROUNDED_ALL;
@@ -2607,6 +2608,13 @@ debugDisplayWidget(widget, 3);
             drawBorder(cr, style, state, area, NULL, x, y, width, height, qtcPalette.highlight,
                     round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
         }
+    }
+    else if(GTK_APP_INKSCAPE==qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") && GTK_IS_SPIN_BUTTON(widget) &&
+            (height+6)<widget->allocation.height)
+    {
+        printf("%d %d\n", height, widget->allocation.height);
+        drawEntryField(cr, style, state, widget, area, x-2, y-2, width+4, height+4,
+                       reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, FALSE);
     }
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {

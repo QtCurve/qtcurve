@@ -129,6 +129,7 @@ typedef enum
     GTK_APP_GIMP,
     GTK_APP_GIMP_PLUGIN,
     GTK_APP_JAVA,
+    GTK_APP_INKSCAPE,
     /*GTK_APP_JAVA_SWT,*/
     GTK_APP_EVOLUTION
     /*GTK_APP_GAIM*/
@@ -2076,6 +2077,8 @@ static gboolean qtInit(Options *opts)
                     qtSettings.app=GTK_APP_JAVA;
                 else if(0==strcmp(app, "evolution"))
                     qtSettings.app=GTK_APP_EVOLUTION;
+                else if(0==strcmp(app, "inkscape"))
+                    qtSettings.app=GTK_APP_INKSCAPE;
                 /*else if(0==strcmp(app, "eclipse"))
                     qtSettings.app=GTK_APP_JAVA_SWT;*/
                 /*else if(app==strstr(app, "gaim"))
