@@ -26,6 +26,7 @@
 
 #include <ui_qtcurveconfigbase.h>
 #include <QMap>
+#include <QComboBox>
 #include "common.h"
 
 class QMenu;
@@ -68,7 +69,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     QtCurveConfig(QWidget *parent);
     virtual ~QtCurveConfig();
 
-    const Options & current() const { return currentStyle; }
+    EShading currentShading() const { return (EShading)shading->currentIndex(); }
 
     Q_SIGNALS:
 

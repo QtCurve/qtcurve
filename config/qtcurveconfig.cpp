@@ -177,7 +177,9 @@ void CGradientPreview::paintEvent(QPaintEvent *)
         for(; it!=end; ++it)
         {
             QColor col;
-            shade(&(cfg->current()), color, &col, (*it).val);
+            Options opts;
+            opts.shading=cfg->currentShading();
+            shade(&opts, color, &col, (*it).val);
             grad.setColorAt((*it).pos, col);
         }
         p.fillRect(r, QBrush(grad));
