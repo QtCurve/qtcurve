@@ -3695,6 +3695,9 @@ debugDisplayWidget(widget, 3);
                     height--;
             }
 
+            if(thinner)
+                drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+
             drawLightBevel(cr, style, window, state, area, NULL,
                            thinner && !horiz ? x+QTC_THIN_SBAR_MOD : x,
                            thinner && horiz  ? y+QTC_THIN_SBAR_MOD : y,
