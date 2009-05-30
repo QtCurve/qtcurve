@@ -292,10 +292,10 @@ static void shadeColors(GdkColor *base, GdkColor *vals)
     double   hl=QTC_TO_FACTOR(opts.highlightFactor);
 
     for(i=0; i<NUM_STD_SHADES; ++i)
-        shade(base, &vals[i], useCustom ? opts.customShades[i] : QTC_SHADE(opts.contrast, i));
-    shade(base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
-    shade(&vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
-    shade(&vals[2], &vals[SHADE_2_HIGHLIGHT], hl);
+        shade(&opts, base, &vals[i], useCustom ? opts.customShades[i] : QTC_SHADE(opts.contrast, i));
+    shade(&opts, base, &vals[SHADE_ORIG_HIGHLIGHT], hl);
+    shade(&opts, &vals[4], &vals[SHADE_4_HIGHLIGHT], hl);
+    shade(&opts, &vals[2], &vals[SHADE_2_HIGHLIGHT], hl);
     vals[ORIGINAL_SHADE]=*base;
 }
 
@@ -975,7 +975,7 @@ static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
     {
         GdkColor col;
 
-        shade(parentBg, &col, 1.06);
+        shade(&opts, parentBg, &col, 1.06);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(col));
     }
     else
@@ -998,7 +998,7 @@ static void drawAreaModColor(cairo_t *cr, GdkRectangle *area,
     GdkColor modified;
 
     if(!equal(mod, 0.0))
-        shade(orig, &modified, mod);
+        shade(&opts, orig, &modified, mod);
     else
         modified=*orig;
 
@@ -1592,7 +1592,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             else
             {
                 double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
-                shade(base, &col, botTab ? QTC_MAX(val, 0.9) : val);
+                shade(&opts, base, &col, botTab ? QTC_MAX(val, 0.9) : val);
             }
 
             cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
@@ -6442,7 +6442,7 @@ static void generateColors()
             GdkColor color;
 
             if(IS_GLASS(opts.appearance))
-                shade(&qtcPalette.highlight[ORIGINAL_SHADE], &color, MENUBAR_GLASS_SELECTED_DARK_FACTOR);
+                shade(&opts, &qtcPalette.highlight[ORIGINAL_SHADE], &color, MENUBAR_GLASS_SELECTED_DARK_FACTOR);
             else
                 color=qtcPalette.highlight[ORIGINAL_SHADE];
 
@@ -6456,7 +6456,7 @@ static void generateColors()
         {
             GdkColor color;
 
-            shade(&qtcPalette.background[ORIGINAL_SHADE], &color, MENUBAR_DARK_FACTOR);
+            shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &color, MENUBAR_DARK_FACTOR);
             shadeColors(&color, qtcPalette.menubar);
             break;
         }
@@ -6525,7 +6525,7 @@ static void generateColors()
             qtcPalette.check_radio=&opts.customCheckRadioColor;
     }
 
-    shade(&qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
+    shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
 }
 
 static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)

@@ -2168,7 +2168,7 @@ static gboolean qtInit(Options *opts)
                 {
                     GdkColor col;
 
-                    shade(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, QTC_TO_FACTOR(opts->lighterPopupMenuBgnd));
+                    shade(opts, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, QTC_TO_FACTOR(opts->lighterPopupMenuBgnd));
                     sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
                     gtk_rc_parse_string(tmpStr);
                 }
