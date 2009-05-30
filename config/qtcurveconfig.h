@@ -33,6 +33,7 @@ class QAction;
 class QComboBox;
 class KDoubleNumInput;
 class CExportThemeDialog;
+class QtCurveConfig;
 
 class CGradientPreview : public QWidget
 {
@@ -40,7 +41,7 @@ class CGradientPreview : public QWidget
 
     public:
 
-    CGradientPreview(QWidget *p);
+    CGradientPreview(QtCurveConfig *c, QWidget *p);
 
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
@@ -53,6 +54,7 @@ class CGradientPreview : public QWidget
 
     private:
 
+    QtCurveConfig    *cfg;
     QColor           color;
     GradientStopCont stops;
 };
@@ -65,6 +67,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     QtCurveConfig(QWidget *parent);
     virtual ~QtCurveConfig();
+
+    const Options & current() const { return currentStyle; }
 
     Q_SIGNALS:
 

@@ -145,8 +145,9 @@ class CStackItem : public QTreeWidgetItem
     int stackId;
 };
 
-CGradientPreview::CGradientPreview(QWidget *p)
-                : QWidget(p)
+CGradientPreview::CGradientPreview(QtCurveConfig *c, QWidget *p)
+                : QWidget(p),
+                  cfg(c)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 }
@@ -176,7 +177,7 @@ void CGradientPreview::paintEvent(QPaintEvent *)
         for(; it!=end; ++it)
         {
             QColor col;
-            shade(color, &col, (*it).val);
+            shade(&(cfg->current()), color, &col, (*it).val);
             grad.setColorAt((*it).pos, col);
         }
         p.fillRect(r, QBrush(grad));
@@ -728,8 +729,9 @@ void QtCurveConfig::activeTabAppearanceChanged()
 
 void QtCurveConfig::shadingChanged()
 {
-    ::shading=(EShading)shading->currentIndex();
     updateChanged();
+    if(gradPreview)
+        gradPreview->repaint();
 }
 
 void QtCurveConfig::passwordCharClicked()
@@ -1012,7 +1014,7 @@ void QtCurveConfig::setupGradientsTab()
 
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
 
-    gradPreview=new CGradientPreview(previewWidgetContainer);
+    gradPreview=new CGradientPreview(this, previewWidgetContainer);
     QBoxLayout *layout=new QBoxLayout(QBoxLayout::TopToBottom, previewWidgetContainer);
     layout->addWidget(gradPreview);
     layout->setMargin(0);

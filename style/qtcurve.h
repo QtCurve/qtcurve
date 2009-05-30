@@ -152,6 +152,9 @@ class QtCurveStyle : public QWindowsStyle
     int            konqMenuBarSize(const QMenuBar *menu) const;
     Version        qtVersion() const;
     const QColor & checkRadioCol(const QStyleOption *opt) const;
+    QColor         shade(const QColor &a, float k) const;
+    void           shade(const color &ca, color *cb, double k) const;
+    QColor         getLowerEtchCol(const QWidget *widget) const;
 
     private Q_SLOTS:
 

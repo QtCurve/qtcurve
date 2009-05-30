@@ -429,33 +429,6 @@ static bool isNoEtchWidget(const QWidget *widget)
     return (w && isA(w, "KHTMLView")) || (widget && isInQAbstractItemView(widget->parentWidget()));
 }
 
-static QColor getLowerEtchCol(const QWidget *widget)
-{ 
-    bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
-// CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
-// KPackageKit, and thats with its KTextBrowser - so just check when we draw scrollviews...
-//     if(doEtch && isInQAbstractItemView(widget->parentWidget()))
-//     {
-//         doEtch=false;
-//         theNoEtchWidgets.insert(widget);
-//     }
-            
-    if(doEtch)
-    {
-        QColor bgnd(widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole()));
-        
-        if(bgnd.alpha()>0)
-        {
-            shade(bgnd, &bgnd, 1.06);
-            return bgnd;
-        }
-    }
-        
-    QColor col(Qt::white);
-    col.setAlphaF(0.25);
-    return col;
-}
-
 static QWidget * scrollViewFrame(QWidget *widget)
 {
     QWidget *w=widget;
@@ -646,14 +619,6 @@ static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int of
                 drawAaPoint(p, x+i, y+offset+1+(3*j));
     }
     p->setRenderHint(QPainter::Antialiasing, false);
-}
-
-static QColor shade(const QColor &a, float k)
-{
-    QColor mod;
-
-    shade(a, &mod, k);
-    return mod;
 }
 
 static bool isHoriz(const QStyleOption *option, EWidget w)
@@ -9487,6 +9452,43 @@ const QColor & QtCurveStyle::checkRadioCol(const QStyleOption *opt) const
     return opt->state&State_Enabled
             ? itsCheckRadioCol
             : opt->palette.buttonText().color();
+}
+
+QColor QtCurveStyle::shade(const QColor &a, float k) const
+{
+    QColor mod;
+
+    ::shade(&opts, a, &mod, k);
+    return mod;
+}
+
+void QtCurveStyle::shade(const color &ca, color *cb, double k) const
+{
+    ::shade(&opts, ca, cb, k);
+}
+
+QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
+{ 
+    bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
+// CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
+// KPackageKit, and thats with its KTextBrowser - so just check when we draw scrollviews...
+//     if(doEtch && isInQAbstractItemView(widget->parentWidget()))
+//     {
+//         doEtch=false;
+//         theNoEtchWidgets.insert(widget);
+//     }
+            
+    if(doEtch)
+    {
+        QColor bgnd(widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole()));
+        
+        if(bgnd.alpha()>0)
+            return shade(bgnd, 1.06);
+    }
+        
+    QColor col(Qt::white);
+    col.setAlphaF(0.25);
+    return col;
 }
 
 void QtCurveStyle::widgetDestroyed(QObject *o)

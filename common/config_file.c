@@ -766,13 +766,8 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_EFFECT(ENTRY) \
     opts->ENTRY=toEffect(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#ifdef QTC_CONFIG_DIALOG
-#define QTC_CFG_READ_SHADING(ENTRY, UNUSED) \
+#define QTC_CFG_READ_SHADING(ENTRY) \
     opts->ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
-#else
-#define QTC_CFG_READ_SHADING(ENTRY, DEF) \
-    ENTRY=toShading(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), DEF);
-#endif
 
 #define QTC_CFG_READ_ECOLOR(ENTRY) \
     opts->ENTRY=toEColor(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -1101,7 +1096,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
 #endif
-            QTC_CFG_READ_SHADING(shading, shading);
+            QTC_CFG_READ_SHADING(shading);
 
 #ifdef __cplusplus
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -1601,10 +1596,7 @@ static void defaultSettings(Options *opts)
     opts->menuStripe=false;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
 #endif
-#ifdef QTC_CONFIG_DIALOG
     opts->shading=SHADING_HSL;
-#endif
-
     opts->gtkScrollViews=false;
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;

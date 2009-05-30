@@ -61,10 +61,6 @@ typedef enum
     SHADING_HCY=3
 } EShading;
 
-#if (!defined QTC_KWIN)
-static EShading shading=SHADING_HSL;
-#endif
-
 #ifdef __cplusplus
 #include <qconfig.h>
 #ifdef QTC_CONFIG_DIALOG
@@ -170,8 +166,8 @@ typedef GdkColor color;
     (c>10 || c<0 || s>=NUM_STD_SHADES || s<0 \
         ? 1.0 \
         : opts.darkerBorders && (QT_STD_BORDER==i || QT_DISABLED_BORDER==i) \
-            ? shades[SHADING_SIMPLE==shading ? 1 : 0][c][s] - 0.1 \
-            : shades[SHADING_SIMPLE==shading ? 1 : 0][c][s] )
+            ? shades[SHADING_SIMPLE==opts.shading ? 1 : 0][c][s] - 0.1 \
+            : shades[SHADING_SIMPLE==opts.shading ? 1 : 0][c][s] )
 
 #define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
 #define QTC_COLOR_SEL_TAB_FACTOR 0.25
@@ -640,377 +636,6 @@ bool equal(double d1, double d2)
     return (fabs(d1 - d2) < 0.0001);
 }
 
-#ifdef QTC_COMMON_FUNCTIONS
-
-#define QTC_MIN(a, b) ((a) < (b) ? (a) : (b))
-#define QTC_MAX(a, b) ((b) < (a) ? (a) : (b))
-
-
-/* Taken from rgb->hsl routines taken from KColor
-    Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
-*/
-static inline double normalize(double a)
-{
-    return (a < 0.0 ? 0.0 : a > 1.0 ? 1.0 : a);
-}
-
-static inline double mix(double a, double b, double k)
-{
-    return a + ( ( b - a ) * k );
-}
-
-static inline double wrap(double a, double d)
-{
-    register double r = fmod( a, d );
-    return ( r < 0.0 ? d + r : ( r > 0.0 ? r : 0.0 ) );
-}
-
-static inline double h2c(double h, double m1, double m2)
-{
-    h = wrap( h, 6.0 );
-
-    if ( h < 1.0 )
-        return mix( m1, m2, h );
-    if ( h < 3.0 )
-        return m2;
-    if ( h < 4.0 )
-        return mix( m1, m2, 4.0 - h );
-    return m1;
-}
-
-static inline void rgbToHsl(double r, double g, double b, double *h, double *s, double *l)
-{
-    double min=QTC_MIN(QTC_MIN(r, g), b),
-           max=QTC_MAX(QTC_MAX(r, g), b);
-
-    *l = 0.5 * (max + min);
-    *s = 0.0;
-    *h = 0.0;
-
-    if (max != min)
-    {
-        double delta = max - min;
-
-        if ( *l <= 0.5 )
-            *s = delta / ( max + min );
-        else
-            *s = delta / ( 2.0 - max - min );
-
-        if ( r == max )
-            *h = ( g - b ) / delta;
-        else if ( g == max )
-            *h = 2.0 + ( b - r ) / delta;
-        else if ( b == max )
-            *h = 4.0 + ( r - g ) / delta;
-
-        *h /= 6.0;
-        if ( *h < 0.0 )
-            (*h) += 1.0;
-    }
-}
-
-static inline void hslToRgb(double h, double s, double l, double *r, double *g, double *b)
-{
-    double m1, m2;
-
-    // TODO h2rgb( h, r, g, b );
-    h *= 6.0;
-
-    if ( l <= 0.5 )
-        m2 = l * ( 1.0 + s );
-    else
-        m2 = l + s * ( 1.0 - l );
-    m1 = 2.0 * l - m2;
-
-    *r = h2c( h + 2.0, m1, m2 );
-    *g = h2c( h,       m1, m2 );
-    *b = h2c( h - 2.0, m1, m2 );
-}
-
-static void rgbToHsv(double r, double g, double b, double *h, double *s, double *v)
-{
-    double min=QTC_MIN(QTC_MIN(r, g), b),
-           max=QTC_MAX(QTC_MAX(r, g), b),
-           delta=max - min;
-
-    *v=max;
-    if(max != 0)
-        *s=delta / max;
-    else
-    {
-        /* r=g=b=0                  s=0, v is undefined */
-        *s=0;
-        *h=-1;
-        return;
-    }
-    if(r == max)
-        *h=(g - b) / delta;         /* between yellow & magenta */
-    else if(g == max)
-        *h=2 + (b - r) / delta;     /* between cyan & yellow */
-    else
-        *h=4 + (r - g) / delta;     /* between magenta & cyan */
-    *h *= 60;                       /* degrees */
-    if(*h < 0)
-        *h += 360;
-}
-
-static void hsvToRgb(double *r, double *g, double *b, double h, double s, double v)
-{
-    if(0==s)
-        *r=*g=*b=v;
-    else
-    {
-        int    i;
-        double f,
-               p;
-
-        h /= 60;                      /* sector 0 to 5 */
-        i=(int)floor(h);
-        f=h - i;                      /* factorial part of h */
-        p=v * (1 - s);
-        switch(i)
-        {
-            case 0:
-                *r=v;
-                *g=v * (1 - s * (1 - f));
-                *b=p;
-                break;
-            case 1:
-                *r=v * (1 - s * f);
-                *g=v;
-                *b=p;
-                break;
-            case 2:
-                *r=p;
-                *g=v;
-                *b=v * (1 - s * (1 - f));
-                break;
-            case 3:
-                *r=p;
-                *g=v * (1 - s * f);
-                *b=v;
-                break;
-            case 4:
-                *r=v * (1 - s * (1 - f));
-                *g=p;
-                *b=v;
-                break;
-            /* case 5: */
-            default:
-                *r=v;
-                *g=p;
-                *b=v * (1 - s * f);
-                break;
-        }
-    }
-}
-
-#ifdef __cplusplus
-inline int limit(double c)
-{
-    return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
-}
-#else
-inline int limit(double c)
-{
-    return c < 0.0
-               ? 0
-               : c > 65535.0
-                     ? 65535
-                     : (int)c;
-}
-#endif
-
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <KDE/KColorUtils>
-#define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
-#define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
-#else
-#include "colorutils.c"
-#ifdef __cplusplus
-#define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
-#define midColor(COLA, COLB) ColorUtils_mix(&(COLA), &(COLB), 0.5)
-#define midColorF(COLA, COLB, FACTOR) ColorUtils_mix(&(COLA), &(COLB), FACTOR-0.5)
-#else
-#define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
-#define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
-#endif
-#endif
-
-#ifdef __cplusplus
-static void shade(const color &ca, color *cb, double k)
-#else
-static void shade(const color *ca, color *cb, double k)
-#endif
-{
-    if(equal(k, 1.0))
-    {
-#ifdef __cplusplus
-        *cb=ca;
-#else
-        cb->red = ca->red;
-        cb->green = ca->green;
-        cb->blue = ca->blue;
-#endif
-    }
-    else
-        switch(shading)
-        {
-            case SHADING_SIMPLE:
-            {
-    #ifdef __cplusplus
-                int v=(int)(255.0*(k-1.0));
-
-                cb->setRgb(limit(ca.red()+v), limit(ca.green()+v), limit(ca.blue()+v));
-    #else
-                double v=65535.0*(k-1.0);
-
-                cb->red = limit(ca->red+v);
-                cb->green = limit(ca->green+v);
-                cb->blue = limit(ca->blue+v);
-    #endif
-                break;
-            }
-            case SHADING_HSL:
-            {
-    #ifdef __cplusplus
-                double r(ca.red()/255.0),
-                       g(ca.green()/255.0),
-                       b(ca.blue()/255.0);
-    #else
-                double r=ca->red/65535.0,
-                       g=ca->green/65535.0,
-                       b=ca->blue/65535.0;
-    #endif
-                double h, s, l;
-
-                rgbToHsl(r, g, b, &h, &s, &l);
-                l=normalize(l*k);
-                s=normalize(s*k);
-                hslToRgb(h, s, l, &r, &g, &b);
-    #ifdef __cplusplus
-                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
-    #else
-                cb->red=limit(r*65535.0);
-                cb->green=limit(g*65535.0);
-                cb->blue=limit(b*65535.0);
-    #endif
-                break;
-            }
-            case SHADING_HSV:
-            {
-    #ifdef __cplusplus
-                double r(ca.red()/255.0),
-                       g(ca.green()/255.0),
-                       b(ca.blue()/255.0);
-    #else
-                double r=ca->red/65535.0,
-                       g=ca->green/65535.0,
-                       b=ca->blue/65535.0;
-    #endif
-                double h, s, v;
-
-                rgbToHsv(r, g, b, &h, &s, &v);
-
-                v*=k;
-                if (v > 1.0)
-                {
-                    s -= v - 1.0;
-                    if (s < 0)
-                        s = 0;
-                    v = 1.0;
-                }
-                hsvToRgb(&r, &g, &b, h, s, v);
-    #ifdef __cplusplus
-                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
-    #else
-                cb->red=limit(r*65535.0);
-                cb->green=limit(g*65535.0);
-                cb->blue=limit(b*65535.0);
-    #endif
-                break;
-            }
-            case SHADING_HCY:
-            {
-    #define QTC_HCY_FACTOR 0.15
-    #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-                if(k>1.0)
-                    *cb=KColorUtils::lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
-                else
-                    *cb=KColorUtils::darken(ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
-    #elif defined __cplusplus
-                if(k>1.0)
-                    *cb=ColorUtils_lighten(&ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
-                else
-                    *cb=ColorUtils_darken(&ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
-    #else
-                if(k>1.0)
-                    *cb=ColorUtils_lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
-                else
-                    *cb=ColorUtils_darken(ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
-    #endif
-            }
-        }
-#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
-    cb->setAlpha(ca.alpha());
-#endif
-#ifndef __cplusplus
-    cb->pixel = ca->pixel;
-#endif
-}
-
-#if (!defined QTC_CONFIG_DIALOG)
-static unsigned char checkBounds(int num)
-{
-    return num < 0   ? 0   :
-           num > 255 ? 255 :
-                       num;
-}
-
-static void adjustPix(unsigned char *data, int numChannels, int w, int h, int stride,
-                      int ro, int go, int bo, double shade)
-{
-    int width=w*numChannels,
-        offset=0,
-        row,
-        r=(int)((ro*shade)+0.5),
-        g=(int)((go*shade)+0.5),
-        b=(int)((bo*shade)+0.5);
-
-    for(row=0; row<h; ++row)
-    {
-        int column;
-
-        for(column=0; column<width; column+=numChannels)
-        {
-            unsigned char source=data[offset+column+1];
-
-#if defined  __cplusplus
-#if Q_BYTE_ORDER == Q_BIG_ENDIAN
-            /* ARGB */
-            data[offset+column+1] = checkBounds(r-source);
-            data[offset+column+2] = checkBounds(g-source);
-            data[offset+column+3] = checkBounds(b-source);
-#else
-            /* BGRA */
-            data[offset+column] = checkBounds(b-source);
-            data[offset+column+1] = checkBounds(g-source);
-            data[offset+column+2] = checkBounds(r-source);
-#endif
-#else
-            /* GdkPixbuf is RGBA */
-            data[offset+column] = checkBounds(r-source);
-            data[offset+column+1] = checkBounds(g-source);
-            data[offset+column+2] = checkBounds(b-source);
-#endif
-
-        }
-        offset+=stride;
-    }
-}
-#endif
-#endif /* QTC_COMMON_NO_FUNCTIONS */
-
 #ifdef __cplusplus
 struct GradientStop
 #else
@@ -1222,9 +847,7 @@ typedef struct
 #if defined __cplusplus
     EAlign           titlebarAlignment;
 #endif
-#ifdef QTC_CONFIG_DIALOG
     EShading         shading;
-#endif
 #ifdef __cplusplus
     GradientCont     customGradient;
 #else
@@ -1237,7 +860,376 @@ typedef struct
 };
 #endif
 
-#if defined QTC_COMMON_FUNCTIONS
+#ifdef QTC_COMMON_FUNCTIONS
+
+#define QTC_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define QTC_MAX(a, b) ((b) < (a) ? (a) : (b))
+
+
+/* Taken from rgb->hsl routines taken from KColor
+    Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
+*/
+static inline double normalize(double a)
+{
+    return (a < 0.0 ? 0.0 : a > 1.0 ? 1.0 : a);
+}
+
+static inline double mix(double a, double b, double k)
+{
+    return a + ( ( b - a ) * k );
+}
+
+static inline double wrap(double a, double d)
+{
+    register double r = fmod( a, d );
+    return ( r < 0.0 ? d + r : ( r > 0.0 ? r : 0.0 ) );
+}
+
+static inline double h2c(double h, double m1, double m2)
+{
+    h = wrap( h, 6.0 );
+
+    if ( h < 1.0 )
+        return mix( m1, m2, h );
+    if ( h < 3.0 )
+        return m2;
+    if ( h < 4.0 )
+        return mix( m1, m2, 4.0 - h );
+    return m1;
+}
+
+static inline void rgbToHsl(double r, double g, double b, double *h, double *s, double *l)
+{
+    double min=QTC_MIN(QTC_MIN(r, g), b),
+           max=QTC_MAX(QTC_MAX(r, g), b);
+
+    *l = 0.5 * (max + min);
+    *s = 0.0;
+    *h = 0.0;
+
+    if (max != min)
+    {
+        double delta = max - min;
+
+        if ( *l <= 0.5 )
+            *s = delta / ( max + min );
+        else
+            *s = delta / ( 2.0 - max - min );
+
+        if ( r == max )
+            *h = ( g - b ) / delta;
+        else if ( g == max )
+            *h = 2.0 + ( b - r ) / delta;
+        else if ( b == max )
+            *h = 4.0 + ( r - g ) / delta;
+
+        *h /= 6.0;
+        if ( *h < 0.0 )
+            (*h) += 1.0;
+    }
+}
+
+static inline void hslToRgb(double h, double s, double l, double *r, double *g, double *b)
+{
+    double m1, m2;
+
+    // TODO h2rgb( h, r, g, b );
+    h *= 6.0;
+
+    if ( l <= 0.5 )
+        m2 = l * ( 1.0 + s );
+    else
+        m2 = l + s * ( 1.0 - l );
+    m1 = 2.0 * l - m2;
+
+    *r = h2c( h + 2.0, m1, m2 );
+    *g = h2c( h,       m1, m2 );
+    *b = h2c( h - 2.0, m1, m2 );
+}
+
+static void rgbToHsv(double r, double g, double b, double *h, double *s, double *v)
+{
+    double min=QTC_MIN(QTC_MIN(r, g), b),
+           max=QTC_MAX(QTC_MAX(r, g), b),
+           delta=max - min;
+
+    *v=max;
+    if(max != 0)
+        *s=delta / max;
+    else
+    {
+        /* r=g=b=0                  s=0, v is undefined */
+        *s=0;
+        *h=-1;
+        return;
+    }
+    if(r == max)
+        *h=(g - b) / delta;         /* between yellow & magenta */
+    else if(g == max)
+        *h=2 + (b - r) / delta;     /* between cyan & yellow */
+    else
+        *h=4 + (r - g) / delta;     /* between magenta & cyan */
+    *h *= 60;                       /* degrees */
+    if(*h < 0)
+        *h += 360;
+}
+
+static void hsvToRgb(double *r, double *g, double *b, double h, double s, double v)
+{
+    if(0==s)
+        *r=*g=*b=v;
+    else
+    {
+        int    i;
+        double f,
+               p;
+
+        h /= 60;                      /* sector 0 to 5 */
+        i=(int)floor(h);
+        f=h - i;                      /* factorial part of h */
+        p=v * (1 - s);
+        switch(i)
+        {
+            case 0:
+                *r=v;
+                *g=v * (1 - s * (1 - f));
+                *b=p;
+                break;
+            case 1:
+                *r=v * (1 - s * f);
+                *g=v;
+                *b=p;
+                break;
+            case 2:
+                *r=p;
+                *g=v;
+                *b=v * (1 - s * (1 - f));
+                break;
+            case 3:
+                *r=p;
+                *g=v * (1 - s * f);
+                *b=v;
+                break;
+            case 4:
+                *r=v * (1 - s * (1 - f));
+                *g=p;
+                *b=v;
+                break;
+            /* case 5: */
+            default:
+                *r=v;
+                *g=p;
+                *b=v * (1 - s * f);
+                break;
+        }
+    }
+}
+
+#ifdef __cplusplus
+inline int limit(double c)
+{
+    return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
+}
+#else
+inline int limit(double c)
+{
+    return c < 0.0
+               ? 0
+               : c > 65535.0
+                     ? 65535
+                     : (int)c;
+}
+#endif
+
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <KDE/KColorUtils>
+#define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
+#else
+#include "colorutils.c"
+#ifdef __cplusplus
+#define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
+#define midColor(COLA, COLB) ColorUtils_mix(&(COLA), &(COLB), 0.5)
+#define midColorF(COLA, COLB, FACTOR) ColorUtils_mix(&(COLA), &(COLB), FACTOR-0.5)
+#else
+#define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
+#define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
+#endif
+#endif
+
+#ifdef __cplusplus
+static void shade(const Options *opts, const color &ca, color *cb, double k)
+#else
+static void shade(const Options *opts, const color *ca, color *cb, double k)
+#endif
+{
+    if(equal(k, 1.0))
+    {
+#ifdef __cplusplus
+        *cb=ca;
+#else
+        cb->red = ca->red;
+        cb->green = ca->green;
+        cb->blue = ca->blue;
+#endif
+    }
+    else
+        switch(opts->shading)
+        {
+            case SHADING_SIMPLE:
+            {
+    #ifdef __cplusplus
+                int v=(int)(255.0*(k-1.0));
+
+                cb->setRgb(limit(ca.red()+v), limit(ca.green()+v), limit(ca.blue()+v));
+    #else
+                double v=65535.0*(k-1.0);
+
+                cb->red = limit(ca->red+v);
+                cb->green = limit(ca->green+v);
+                cb->blue = limit(ca->blue+v);
+    #endif
+                break;
+            }
+            case SHADING_HSL:
+            {
+    #ifdef __cplusplus
+                double r(ca.red()/255.0),
+                       g(ca.green()/255.0),
+                       b(ca.blue()/255.0);
+    #else
+                double r=ca->red/65535.0,
+                       g=ca->green/65535.0,
+                       b=ca->blue/65535.0;
+    #endif
+                double h, s, l;
+
+                rgbToHsl(r, g, b, &h, &s, &l);
+                l=normalize(l*k);
+                s=normalize(s*k);
+                hslToRgb(h, s, l, &r, &g, &b);
+    #ifdef __cplusplus
+                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
+    #else
+                cb->red=limit(r*65535.0);
+                cb->green=limit(g*65535.0);
+                cb->blue=limit(b*65535.0);
+    #endif
+                break;
+            }
+            case SHADING_HSV:
+            {
+    #ifdef __cplusplus
+                double r(ca.red()/255.0),
+                       g(ca.green()/255.0),
+                       b(ca.blue()/255.0);
+    #else
+                double r=ca->red/65535.0,
+                       g=ca->green/65535.0,
+                       b=ca->blue/65535.0;
+    #endif
+                double h, s, v;
+
+                rgbToHsv(r, g, b, &h, &s, &v);
+
+                v*=k;
+                if (v > 1.0)
+                {
+                    s -= v - 1.0;
+                    if (s < 0)
+                        s = 0;
+                    v = 1.0;
+                }
+                hsvToRgb(&r, &g, &b, h, s, v);
+    #ifdef __cplusplus
+                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
+    #else
+                cb->red=limit(r*65535.0);
+                cb->green=limit(g*65535.0);
+                cb->blue=limit(b*65535.0);
+    #endif
+                break;
+            }
+            case SHADING_HCY:
+            {
+    #define QTC_HCY_FACTOR 0.15
+    #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+                if(k>1.0)
+                    *cb=KColorUtils::lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
+                else
+                    *cb=KColorUtils::darken(ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
+    #elif defined __cplusplus
+                if(k>1.0)
+                    *cb=ColorUtils_lighten(&ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
+                else
+                    *cb=ColorUtils_darken(&ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
+    #else
+                if(k>1.0)
+                    *cb=ColorUtils_lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
+                else
+                    *cb=ColorUtils_darken(ca, 1.0-(k*(1-QTC_HCY_FACTOR)), 1.0);
+    #endif
+            }
+        }
+#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+    cb->setAlpha(ca.alpha());
+#endif
+#ifndef __cplusplus
+    cb->pixel = ca->pixel;
+#endif
+}
+
+#if (!defined QTC_CONFIG_DIALOG)
+static unsigned char checkBounds(int num)
+{
+    return num < 0   ? 0   :
+           num > 255 ? 255 :
+                       num;
+}
+
+static void adjustPix(unsigned char *data, int numChannels, int w, int h, int stride,
+                      int ro, int go, int bo, double shade)
+{
+    int width=w*numChannels,
+        offset=0,
+        row,
+        r=(int)((ro*shade)+0.5),
+        g=(int)((go*shade)+0.5),
+        b=(int)((bo*shade)+0.5);
+
+    for(row=0; row<h; ++row)
+    {
+        int column;
+
+        for(column=0; column<width; column+=numChannels)
+        {
+            unsigned char source=data[offset+column+1];
+
+#if defined  __cplusplus
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN
+            /* ARGB */
+            data[offset+column+1] = checkBounds(r-source);
+            data[offset+column+2] = checkBounds(g-source);
+            data[offset+column+3] = checkBounds(b-source);
+#else
+            /* BGRA */
+            data[offset+column] = checkBounds(b-source);
+            data[offset+column+1] = checkBounds(g-source);
+            data[offset+column+2] = checkBounds(r-source);
+#endif
+#else
+            /* GdkPixbuf is RGBA */
+            data[offset+column] = checkBounds(r-source);
+            data[offset+column+1] = checkBounds(g-source);
+            data[offset+column+2] = checkBounds(b-source);
+#endif
+
+        }
+        offset+=stride;
+    }
+}
+#endif
+
 static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
 {
     va_list  ap;
