@@ -2611,11 +2611,8 @@ debugDisplayWidget(widget, 3);
     }
     else if(GTK_APP_INKSCAPE==qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") && GTK_IS_SPIN_BUTTON(widget) &&
             (height+6)<widget->allocation.height)
-    {
-        printf("%d %d\n", height, widget->allocation.height);
         drawEntryField(cr, style, state, widget, area, x-2, y-2, width+4, height+4,
                        reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, FALSE);
-    }
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         parent_class->draw_flat_box(style, window, GTK_STATE_INSENSITIVE==state && DETAIL(QTC_PANED) ? GTK_STATE_NORMAL : state,
