@@ -4933,7 +4933,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     break;
                 }
 #endif
-
+#if QT_VERSION >= 0x040500
+                QStyleOptionTabV3 tabV3(*tab);
+#endif
                 QRect r2(r);
                 bool rtlHorTabs(Qt::RightToLeft==tab->direction && horiz),
                      onlyTab(QStyleOptionTab::OnlyOneTab==tab->position),
@@ -4953,8 +4955,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
                      rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
                                    (rtlHorTabs && Qt::AlignLeft==tabBarAlignment)),
-                     fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab),
-                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab),
+                     fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab
+#if QT_VERSION >= 0x040500
+                             && !tabV3.documentMode
+#endif
+                            ),
+                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab
+#if QT_VERSION >= 0x040500
+                             && !tabV3.documentMode
+#endif
+                             ),
                      mouseOver(state&State_Enabled && state&State_MouseOver),
                      glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver);
                 const QColor *use(backgroundColors(option));

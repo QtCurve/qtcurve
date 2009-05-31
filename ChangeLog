@@ -68,6 +68,7 @@
 47. Turn kwin colored shadow off by default - seems to have issues with
     KDE4.3Beta and/or Qt 4.5.1
 48. Dont max round toolbar buttons.
+49. Fix slight drawing glitch with Qt4.5 document mode tabs.
 
 0.62.9
 ------
