@@ -987,6 +987,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_LINE(handles)
             QTC_CFG_READ_BOOL(highlightTab)
             QTC_CFG_READ_BOOL(colorSelTab)
+            QTC_CFG_READ_BOOL(roundAllTabs)
             QTC_CFG_READ_TAB_MO(tabMouseOver)
             QTC_CFG_READ_SHADE(shadeSliders, false)
             QTC_CFG_READ_SHADE(shadeMenubars, true)
@@ -1529,6 +1530,7 @@ static void defaultSettings(Options *opts)
     opts->sliderStyle=SLIDER_PLAIN;
     opts->highlightTab=false;
     opts->colorSelTab=false;
+    opts->roundAllTabs=false;
     opts->tabMouseOver=TAB_MO_BOTTOM;
     opts->embolden=false;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
@@ -2044,6 +2046,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_B(handles, true)
         CFG_WRITE_ENTRY(highlightTab)
         CFG_WRITE_ENTRY(colorSelTab)
+        CFG_WRITE_ENTRY(roundAllTabs)
         CFG_WRITE_ENTRY(tabMouseOver)
         CFG_WRITE_ENTRY_SHADE(shadeSliders, false, false)
         CFG_WRITE_ENTRY_SHADE(shadeMenubars, true, false)

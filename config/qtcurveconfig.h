@@ -104,6 +104,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void stripedProgressChanged();
     void shadingChanged();
     void activeTabAppearanceChanged();
+    void tabMoChanged();
     void passwordCharClicked();
     void changeStack();
     void gradChanged(int i);

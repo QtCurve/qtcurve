@@ -4977,7 +4977,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     case QTabBar::RoundedNorth:
                     case QTabBar::TriangularNorth:
                     {
-                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver
+                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                         ? ROUNDED_TOP
                                         : firstTab
                                             ? ROUNDED_TOPLEFT
@@ -5052,7 +5052,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     case QTabBar::RoundedSouth:
                     case QTabBar::TriangularSouth:
                     {
-                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver
+                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                         ? ROUNDED_BOTTOM
                                         : firstTab
                                             ? ROUNDED_BOTTOMLEFT
@@ -5119,7 +5119,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     case QTabBar::RoundedWest:
                     case QTabBar::TriangularWest:
                     {
-                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver
+                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                         ? ROUNDED_LEFT
                                         : firstTab
                                             ? ROUNDED_TOPLEFT
@@ -5186,7 +5186,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     case QTabBar::RoundedEast:
                     case QTabBar::TriangularEast:
                     {
-                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver
+                        int round=selected || onlyTab || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                         ? ROUNDED_RIGHT
                                         : firstTab
                                             ? ROUNDED_TOPRIGHT

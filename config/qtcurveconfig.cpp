@@ -484,7 +484,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(crHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(crButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorSelTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(tabMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(roundAllTabs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(tabMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(tabMoChanged()));
     connect(stdSidebarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -726,6 +727,14 @@ void QtCurveConfig::activeTabAppearanceChanged()
     if(colorSelTab->isChecked() && disableCol)
         colorSelTab->setChecked(false);
     colorSelTab->setEnabled(!disableCol);
+    updateChanged();
+}
+
+void QtCurveConfig::tabMoChanged()
+{
+    if(TAB_MO_GLOW==tabMouseOver->currentIndex())
+        roundAllTabs->setChecked(true);
+    roundAllTabs->setEnabled(TAB_MO_GLOW!=tabMouseOver->currentIndex());
     updateChanged();
 }
 
@@ -1264,6 +1273,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.crHighlight=crHighlight->isChecked();
     opts.crButton=crButton->isChecked();
     opts.colorSelTab=colorSelTab->isChecked();
+    opts.roundAllTabs=roundAllTabs->isChecked();
     opts.tabMouseOver=(ETabMo)tabMouseOver->currentIndex();
     opts.stdSidebarButtons=stdSidebarButtons->isChecked();
     opts.borderMenuitems=borderMenuitems->isChecked();
@@ -1398,6 +1408,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     crHighlight->setChecked(opts.crHighlight);
     crButton->setChecked(opts.crButton);
     colorSelTab->setChecked(opts.colorSelTab);
+    roundAllTabs->setChecked(opts.roundAllTabs);
     tabMouseOver->setCurrentIndex(opts.tabMouseOver);
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     borderMenuitems->setChecked(opts.borderMenuitems);
@@ -1526,6 +1537,7 @@ bool QtCurveConfig::settingsChanged()
          crHighlight->isChecked()!=currentStyle.crHighlight ||
          crButton->isChecked()!=currentStyle.crButton ||
          colorSelTab->isChecked()!=currentStyle.colorSelTab ||
+         roundAllTabs->isChecked()!=currentStyle.roundAllTabs ||
          tabMouseOver->currentIndex()!=currentStyle.tabMouseOver ||
          stdSidebarButtons->isChecked()!=currentStyle.stdSidebarButtons ||
          borderMenuitems->isChecked()!=currentStyle.borderMenuitems ||
