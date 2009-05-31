@@ -5396,7 +5396,7 @@ debugDisplayWidget(widget, 3);
         {
             case GTK_POS_TOP:  /* => tabs are on bottom !!! */
             {
-                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                     ? ROUNDED_BOTTOM
                                     : firstTab
                                         ? ROUNDED_BOTTOMLEFT
@@ -5445,7 +5445,7 @@ debugDisplayWidget(widget, 3);
             }
             case GTK_POS_BOTTOM: /* => tabs are on top !!! */
             {
-                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                     ? ROUNDED_TOP
                                     : firstTab
                                         ? ROUNDED_TOPLEFT
@@ -5496,7 +5496,7 @@ debugDisplayWidget(widget, 3);
             }
             case GTK_POS_LEFT: /* => tabs are on right !!! */
             {
-                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                     ? ROUNDED_RIGHT
                                     : firstTab
                                         ? ROUNDED_TOPRIGHT
@@ -5544,7 +5544,7 @@ debugDisplayWidget(widget, 3);
             }
             case GTK_POS_RIGHT: /* => tabs are on left !!! */
             {
-                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver
+                int round=active || (firstTab && lastTab) || TAB_MO_GLOW==opts.tabMouseOver || opts.roundAllTabs
                                     ? ROUNDED_LEFT
                                     : firstTab
                                         ? ROUNDED_TOPLEFT
