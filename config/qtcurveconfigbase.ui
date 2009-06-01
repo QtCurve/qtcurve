@@ -80,14 +80,14 @@
      </property>
      <widget class="QWidget" name="page">
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="1" colspan="2">
+       <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
           <string>Appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
+       <item row="0" column="2">
         <widget class="QComboBox" name="appearance">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -100,7 +100,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="4">
+       <item row="0" column="3">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -113,64 +113,61 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_29">
          <property name="text">
           <string>Sunken appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="3">
+       <item row="1" column="2">
         <widget class="QComboBox" name="sunkenAppearance"/>
        </item>
-       <item row="2" column="1" colspan="2">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Roundedness:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="3">
+       <item row="2" column="2">
         <widget class="QComboBox" name="round"/>
        </item>
-       <item row="3" column="1" colspan="2">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
           <string>Button effect:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="3">
+       <item row="3" column="2">
         <widget class="QComboBox" name="buttonEffect"/>
        </item>
-       <item row="4" column="1" colspan="2">
+       <item row="4" column="0">
         <widget class="QLabel" name="label_25">
          <property name="text">
           <string>Focus rectangle:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
+       <item row="4" column="2">
         <widget class="QComboBox" name="focus"/>
        </item>
-       <item row="5" column="0" rowspan="2" colspan="5">
-        <layout class="QHBoxLayout" name="horizontalLayout"/>
-       </item>
-       <item row="6" column="1" colspan="3">
+       <item row="5" column="0">
         <widget class="QCheckBox" name="drawStatusBarFrames">
          <property name="text">
           <string>Draw statusbar frames</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="6" column="0">
         <widget class="QCheckBox" name="framelessGroupBoxes">
          <property name="text">
           <string>Frameless groupboxes,</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2" colspan="3">
+       <item row="6" column="1" colspan="3">
         <widget class="QCheckBox" name="groupBoxLine">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -183,14 +180,14 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1" colspan="3">
+       <item row="7" column="0">
         <widget class="QCheckBox" name="vArrows">
          <property name="text">
           <string>'V' style arrows</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1" colspan="3">
+       <item row="8" column="0" colspan="2">
         <widget class="QCheckBox" name="stdSidebarButtons">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -203,14 +200,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="10" column="1" colspan="3">
+       <item row="9" column="0">
         <widget class="QCheckBox" name="darkerBorders">
          <property name="text">
           <string>Darker borders</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1" colspan="3">
+       <item row="10" column="0">
         <widget class="QCheckBox" name="comboSplitter">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -223,14 +220,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="12" column="1" colspan="2">
+       <item row="11" column="0" colspan="2">
         <widget class="QCheckBox" name="fadeLines">
          <property name="text">
           <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="12" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -503,6 +500,12 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="0" column="4">
         <widget class="QCheckBox" name="fillProgress">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="whatsThis">
           <string>Enable this option to remove the 1 pixel border around the filled element.</string>
          </property>
@@ -510,19 +513,6 @@ p, li { white-space: pre-wrap; }
           <string>No border</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="5">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>118</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_24">
@@ -686,23 +676,16 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="0" column="2">
         <widget class="QCheckBox" name="lvButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Button color</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="3">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="textLabel1_8_2_4">
@@ -811,23 +794,16 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="0" column="3">
         <widget class="QCheckBox" name="colorSelTab">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Color</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="4">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_21">
@@ -1618,7 +1594,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="5" column="3">
+       <item row="5" column="1">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1949,19 +1925,6 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item row="2" column="0">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>104</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
     </widget>
@@ -1972,17 +1935,7 @@ p, li { white-space: pre-wrap; }
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
    <class>KDoubleNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
   </customwidget>
@@ -1990,6 +1943,16 @@ p, li { white-space: pre-wrap; }
    <class>KPushButton</class>
    <extends>QPushButton</extends>
    <header>kpushbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
