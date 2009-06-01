@@ -2613,6 +2613,12 @@ debugDisplayWidget(widget, 3);
             (height+6)<widget->allocation.height)
         drawEntryField(cr, style, state, widget, area, x-2, y-2, width+4, height+4,
                        reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, FALSE);
+    else if(DETAIL("tooltip"))
+    {
+        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
+        cairo_stroke(cr);
+    }
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         parent_class->draw_flat_box(style, window, GTK_STATE_INSENSITIVE==state && DETAIL(QTC_PANED) ? GTK_STATE_NORMAL : state,

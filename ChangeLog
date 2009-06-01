@@ -44,6 +44,7 @@
     colour for selected menubar items.
 33. Fix setting of custom shades, and gradients, when reading system config file.
 34. Dont crash when /etc/qtcurvestylerc is only readable by root!
+35. Use tooltip text color to draw its border, as per KDE4.
 
 0.62.8
 ------
