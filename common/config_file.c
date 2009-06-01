@@ -177,16 +177,16 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
     return def;
 }
 
-static EShade toShade(const char *str, bool allowDarken, EShade def)
+static EShade toShade(const char *str, bool allowDarken, EShade def, bool menuShade)
 {
     if(str)
     {
         /* true/false is from 0.25... */
-        if(0==memcmp(str, "true", 4) || 0==memcmp(str, "selected", 8))
+        if((!menuShade && 0==memcmp(str, "true", 4)) || 0==memcmp(str, "selected", 8))
             return SHADE_BLEND_SELECTED;
         if(0==memcmp(str, "origselected", 12))
             return SHADE_SELECTED;
-        if(allowDarken && 0==memcmp(str, "darken", 6))
+        if(allowDarken && (0==memcmp(str, "darken", 6) || (menuShade && 0==memcmp(str, "true", 4))))
             return SHADE_DARKEN;
         if(0==memcmp(str, "custom", 6))
             return SHADE_CUSTOM;
@@ -757,8 +757,8 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_LINE(ENTRY) \
     opts->ENTRY=toLine(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#define QTC_CFG_READ_SHADE(ENTRY, AD) \
-    opts->ENTRY=toShade(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def->ENTRY);
+#define QTC_CFG_READ_SHADE(ENTRY, AD, MENU_STRIPE) \
+    opts->ENTRY=toShade(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def->ENTRY, MENU_STRIPE);
 
 #define QTC_CFG_READ_SCROLLBAR(ENTRY) \
     opts->ENTRY=toScrollbar(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -989,9 +989,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(colorSelTab)
             QTC_CFG_READ_BOOL(roundAllTabs)
             QTC_CFG_READ_TAB_MO(tabMouseOver)
-            QTC_CFG_READ_SHADE(shadeSliders, false)
-            QTC_CFG_READ_SHADE(shadeMenubars, true)
-            QTC_CFG_READ_SHADE(shadeCheckRadio, false)
+            QTC_CFG_READ_SHADE(shadeSliders, false, false)
+            QTC_CFG_READ_SHADE(shadeMenubars, true, false)
+            QTC_CFG_READ_SHADE(shadeCheckRadio, false, false)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
             QTC_CFG_READ_APPEARANCE(menuitemAppearance, true)
             QTC_CFG_READ_APPEARANCE(toolbarAppearance, false)
@@ -1062,8 +1062,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_TB_ICON(titlebarIcon)
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
-            QTC_CFG_READ_BOOL(menuStripe)
+            QTC_CFG_READ_SHADE(menuStripe, true, true)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
+            QTC_CFG_READ_COLOR(customMenuStripeColor)
 #endif
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
@@ -1369,7 +1370,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkColor(&opts->shadeMenubars, &opts->customMenubarsColor);
             checkColor(&opts->shadeSliders, &opts->customSlidersColor);
             checkColor(&opts->shadeCheckRadio, &opts->customCheckRadioColor);
-
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
+            checkColor(&opts->menuStripe, &opts->customMenuStripeColor);
+#endif
             if(APPEARANCE_BEVELLED==opts->toolbarAppearance)
                 opts->toolbarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->toolbarAppearance)
@@ -1595,8 +1598,9 @@ static void defaultSettings(Options *opts)
     opts->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
-    opts->menuStripe=false;
+    opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
+    opts->customMenuStripeColor.setRgb(0, 0, 0);
 #endif
     opts->shading=SHADING_HSL;
     opts->gtkScrollViews=false;
@@ -1753,7 +1757,7 @@ static QString toStr(EAppearance exp)
     }
 }
 
-static const char *toStr(EShade exp, bool dark, bool convertBlendSelToSel)
+static const char *toStr(EShade exp)
 {
     switch(exp)
     {
@@ -1761,12 +1765,13 @@ static const char *toStr(EShade exp, bool dark, bool convertBlendSelToSel)
         case SHADE_NONE:
             return "none";
         case SHADE_BLEND_SELECTED:
-            return dark || !convertBlendSelToSel ? "selected" : "origselected";
+            return "selected";
         case SHADE_CUSTOM:
             return "custom";
-        /* case SHADE_SELECTED */
+        case SHADE_SELECTED:
+            return "origselected";
         case SHADE_DARKEN:
-            return dark ? "darken" : "origselected";
+            return "darken";
     }
 }
 
@@ -1989,12 +1994,6 @@ static const char * toStr(ETitleBarIcon icn)
     else \
         CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, B));
 
-#define CFG_WRITE_ENTRY_SHADE(ENTRY, DARK, CONVERT_SHADE) \
-    if (!exportingStyle && def.ENTRY==opts.ENTRY) \
-        CFG.deleteEntry(#ENTRY); \
-    else \
-        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, DARK, CONVERT_SHADE));
-
 #define CFG_WRITE_ENTRY_NUM(ENTRY) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
@@ -2048,9 +2047,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(colorSelTab)
         CFG_WRITE_ENTRY(roundAllTabs)
         CFG_WRITE_ENTRY(tabMouseOver)
-        CFG_WRITE_ENTRY_SHADE(shadeSliders, false, false)
-        CFG_WRITE_ENTRY_SHADE(shadeMenubars, true, false)
-        CFG_WRITE_ENTRY_SHADE(shadeCheckRadio, false, true)
+        CFG_WRITE_ENTRY(shadeSliders)
+        CFG_WRITE_ENTRY(shadeMenubars)
+        CFG_WRITE_ENTRY(shadeCheckRadio)
         CFG_WRITE_ENTRY(menubarAppearance)
         CFG_WRITE_ENTRY(menuitemAppearance)
         CFG_WRITE_ENTRY(toolbarAppearance)
@@ -2135,6 +2134,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             CFG.deleteEntry("titlebarButtonColors");
 #endif
         CFG_WRITE_ENTRY(menuStripe)
+        CFG_WRITE_ENTRY(customMenuStripeColor)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY(titlebarAppearance)
         CFG_WRITE_ENTRY(inactiveTitlebarAppearance)

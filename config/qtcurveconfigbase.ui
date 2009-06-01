@@ -1284,7 +1284,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="5">
+          <item row="0" column="1">
            <widget class="QComboBox" name="menubarAppearance"/>
           </item>
           <item row="1" column="0">
@@ -1297,24 +1297,24 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="1" column="1" colspan="4">
+          <item row="1" column="1">
            <widget class="QComboBox" name="shadeMenubars"/>
           </item>
-          <item row="1" column="5">
+          <item row="1" column="4">
            <widget class="KColorButton" name="customMenubarsColor">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="5">
+          <item row="2" column="0" colspan="2">
            <widget class="QCheckBox" name="shadeMenubarOnlyWhenActive">
             <property name="text">
              <string>Apply coloration to active window only</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="3">
+          <item row="3" column="0" colspan="2">
            <widget class="QCheckBox" name="customMenuTextColor">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1327,35 +1327,35 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="3" column="4">
+          <item row="3" column="2" colspan="2">
            <widget class="KColorButton" name="customMenuNormTextColor">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="3" column="5">
+          <item row="3" column="4">
            <widget class="KColorButton" name="customMenuSelTextColor">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="6">
+          <item row="4" column="0" colspan="2">
            <widget class="QCheckBox" name="menubarMouseOver">
             <property name="text">
              <string>Enable mouse-over for menubar items</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0" colspan="3">
+          <item row="5" column="0" colspan="2">
            <widget class="QCheckBox" name="colorMenubarMouseOver">
             <property name="text">
              <string>Color menubar items on mouse-over</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="6">
+          <item row="6" column="0" colspan="2">
            <widget class="QCheckBox" name="roundMbTopOnly">
             <property name="text">
              <string>Round selected menubar items on top only</string>
@@ -1372,31 +1372,31 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="7" column="1" colspan="5">
+          <item row="7" column="1">
            <widget class="QComboBox" name="menuitemAppearance"/>
           </item>
-          <item row="8" column="0" colspan="4">
+          <item row="8" column="0">
            <widget class="QCheckBox" name="borderMenuitems">
             <property name="text">
              <string>Border menuitems</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="0" colspan="5">
+          <item row="9" column="0" colspan="2">
            <widget class="QCheckBox" name="useHighlightForMenu">
             <property name="text">
              <string>Use 'highlight' color for active menuitems</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="0" colspan="2">
+          <item row="10" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
              <string>Popup-menu background:</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="2">
+          <item row="10" column="1">
            <widget class="KIntNumInput" name="lighterPopupMenuBgnd">
             <property name="suffix">
              <string>%</string>
@@ -1406,7 +1406,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="10" column="3" colspan="3">
+          <item row="10" column="2" colspan="3">
            <spacer name="spacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -1419,7 +1419,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </spacer>
           </item>
-          <item row="11" column="0" colspan="6">
+          <item row="11" column="0">
            <widget class="QCheckBox" name="thinnerMenuItems">
             <property name="text">
              <string>Thinner menu items</string>
@@ -1427,14 +1427,28 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="12" column="0">
-           <widget class="QCheckBox" name="menuStripe">
+           <widget class="QLabel" name="label_44">
             <property name="text">
-             <string>Menu stripe (KDE)</string>
+             <string>Stripe (KDE):</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="1" colspan="5">
-           <widget class="QComboBox" name="menuStripeAppearance"/>
+          <item row="12" column="1">
+           <widget class="QComboBox" name="menuStripe"/>
+          </item>
+          <item row="12" column="2">
+           <widget class="KColorButton" name="customMenuStripeColor">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="3" colspan="2">
+           <widget class="QComboBox" name="menuStripeAppearance">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1945,7 +1959,17 @@ p, li { white-space: pre-wrap; }
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
    <class>KDoubleNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
   </customwidget>
@@ -1953,16 +1977,6 @@ p, li { white-space: pre-wrap; }
    <class>KPushButton</class>
    <extends>QPushButton</extends>
    <header>kpushbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2063,6 +2077,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>lighterPopupMenuBgnd</tabstop>
   <tabstop>thinnerMenuItems</tabstop>
   <tabstop>menuStripe</tabstop>
+  <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>
   <tabstop>toolbarAppearance</tabstop>
   <tabstop>toolbarSeparators</tabstop>

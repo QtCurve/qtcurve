@@ -1131,6 +1131,7 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->installEventFilter(this);
 
         if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
+           SHADE_SELECTED==opts.shadeMenubars ||
            (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
         {
             QPalette pal(widget->palette());
@@ -1321,6 +1322,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
             widget->removeEventFilter(this);
 
         if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
+           SHADE_SELECTED==opts.shadeMenubars ||
            (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
             widget->setPalette(QApplication::palette());
     }
@@ -8574,7 +8576,7 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
     }
     else if(mbi || opts.borderMenuitems)
     {
-        bool stdColor(!mbi || SHADE_BLEND_SELECTED!=opts.shadeMenubars);
+        bool stdColor(!mbi || (SHADE_BLEND_SELECTED!=opts.shadeMenubars && SHADE_SELECTED!=opts.shadeMenubars));
 
         QStyleOption opt(*option);
 
@@ -9215,7 +9217,10 @@ void QtCurveStyle::setMenuColors(const QColor &bgnd)
         case SHADE_NONE:
             memcpy(itsMenubarCols, itsBackgroundCols, sizeof(QColor)*(TOTAL_SHADES+1));
             break;
-        case SHADE_BLEND_SELECTED:  // For menubars we dont actually blend...
+        case SHADE_BLEND_SELECTED:
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsBackgroundCols[ORIGINAL_SHADE]), itsMenubarCols);
+            break;
+        case SHADE_SELECTED:
             shadeColors(IS_GLASS(opts.appearance)
                             ? shade(itsHighlightCols[ORIGINAL_SHADE], MENUBAR_GLASS_SELECTED_DARK_FACTOR)
                             : itsHighlightCols[ORIGINAL_SHADE],
@@ -9455,9 +9460,25 @@ const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QCol
 
 const QColor & QtCurveStyle::menuStripeCol() const
 {
-    return opts.lighterPopupMenuBgnd<0
+    switch(opts.menuStripe)
+    {
+        default:
+        case SHADE_NONE:
+            return itsBackgroundCols[ORIGINAL_SHADE];
+        case SHADE_CUSTOM:
+            return opts.customMenuStripeColor;
+        case SHADE_BLEND_SELECTED:
+            return midColor(itsHighlightCols[ORIGINAL_SHADE],
+                            opts.lighterPopupMenuBgnd<0
+                                ? itsLighterPopupMenuBgndCol
+                                : itsBackgroundCols[ORIGINAL_SHADE]);
+        case SHADE_SELECTED:
+            return itsHighlightCols[QTC_MENU_STRIPE_SHADE];
+        case SHADE_DARKEN:
+            return opts.lighterPopupMenuBgnd<0
                 ? itsLighterPopupMenuBgndCol
                 : itsBackgroundCols[QTC_MENU_STRIPE_SHADE];
+    }
 }
 
 const QColor & QtCurveStyle::checkRadioCol(const QStyleOption *opt) const

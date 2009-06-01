@@ -531,9 +531,9 @@ typedef enum
 {
     SHADE_NONE,
     SHADE_CUSTOM,
-    SHADE_BLEND_SELECTED,  /* In the case of check/radios this is SHADE_SELECTED */
-      SHADE_SELECTED,
-      SHADE_DARKEN = SHADE_SELECTED ,  /* For menubar only! */
+    SHADE_SELECTED,
+    SHADE_BLEND_SELECTED,
+    SHADE_DARKEN
 } EShade;
 
 typedef enum
@@ -776,9 +776,6 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      fadeLines,
 #endif
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
-                     menuStripe,
-#endif
                      crHighlight,
                      crButton,
                      fillProgress,
@@ -835,6 +832,9 @@ typedef struct
                      sliderFill;
     EShade           shadeSliders,
                      shadeMenubars,
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
+                     menuStripe,
+#endif
                      shadeCheckRadio;
     EColor           progressGrooveColor;
     EEffect          buttonEffect;
@@ -844,6 +844,9 @@ typedef struct
                      customSlidersColor,
                      customMenuNormTextColor,
                      customMenuSelTextColor,
+#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
+                     customMenuStripeColor,
+#endif
                      customCheckRadioColor;
 #if defined __cplusplus
     EAlign           titlebarAlignment;

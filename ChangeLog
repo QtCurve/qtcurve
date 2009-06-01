@@ -25,51 +25,52 @@
 17. Option to use a thinner groove for scrollbars (only when using flat, or no, buttons).
 18. Option to only color sliders on mouse over.
 19. Option to round all tabs.
-20. Better tab highlighting.
-21. Update gradient preview when change colour space.
-22. Don't max/extra round progressbars.
-23. Use faded lines for tab and listview header mouse-over.
-24. Remove line from KTitleWidget
-25. Slightly improve highlight in corner of kwin windows.
-26. Align pressed box drwn for checkable icon menuitems better
+20. Add option to specify menu stripe color.
+21. Better tab highlighting.
+22. Update gradient preview when change colour space.
+23. Don't max/extra round progressbars.
+24. Use faded lines for tab and listview header mouse-over.
+25. Remove line from KTitleWidget
+26. Slightly improve highlight in corner of kwin windows.
+27. Align pressed box drwn for checkable icon menuitems better
     with menuitem highlight.
-27. Remove 'Custom sunken gradient' setting, as this was not
+28. Remove 'Custom sunken gradient' setting, as this was not
     actually used.
-28. Better handling of 'full centered' titlebar texts when
+29. Better handling of 'full centered' titlebar texts when
     window size is small.
-29. Don't round KWin's tab box.
-30. Improve look of widgets in KPackageKit.
-31. Dont use QTimer to setup KDE settings.
-32. Fix line under coloured MDI window titlebars.
-33. Fix some KWin issues; rounding of coloured window bar borders,
+30. Don't round KWin's tab box.
+31. Improve look of widgets in KPackageKit.
+32. Dont use QTimer to setup KDE settings.
+33. Fix line under coloured MDI window titlebars.
+34. Fix some KWin issues; rounding of coloured window bar borders,
     incorrect colouring of buttom of windows when only colouring titlebar.
-34. When navigating popupmenus with the keyboard, skip over disabled items.
-35. Add option to control light border on windows.
-36. Move kwin menu icon when pressed.
-37. Only draw mouse-over effect on sliders when mouse is over slider handle.
-38. Titlebar button options:
+35. When navigating popupmenus with the keyboard, skip over disabled items.
+36. Add option to control light border on windows.
+37. Move kwin menu icon when pressed.
+38. Only draw mouse-over effect on sliders when mouse is over slider handle.
+39. Titlebar button options:
         Show border on hover only
         Show icon on hover only
         Round buttons
         No border
         Coloration
-39. Titlebar app icon options:
+40. Titlebar app icon options:
         None
         On menu button
         NExt to title
-40. Fix selection appearance when using raster graphicssystem.
-41. Add an option to export the KDE4 palette for KDE3 applications.
-42. Tell KWin to re-load its config if the kwin style is set to QtCurve, and
+41. Fix selection appearance when using raster graphicssystem.
+42. Add an option to export the KDE4 palette for KDE3 applications.
+43. Tell KWin to re-load its config if the kwin style is set to QtCurve, and
     QtCurve's settings are changed.
-43. Fix artifacts with very thin selections.
-44. Translation support - thanks to Jonathan Riddell
-45. Use focus colour for coloured window shadows.
-46. Reduce toolbutton pop-up menu delay from 600ms to 250ms
-47. Fix edit field in KDE4.3's kickoff menu.
-48. Turn kwin colored shadow off by default - seems to have issues with
+44. Fix artifacts with very thin selections.
+45. Translation support - thanks to Jonathan Riddell
+46. Use focus colour for coloured window shadows.
+47. Reduce toolbutton pop-up menu delay from 600ms to 250ms
+48. Fix edit field in KDE4.3's kickoff menu.
+49. Turn kwin colored shadow off by default - seems to have issues with
     KDE4.3Beta and/or Qt 4.5.1
-49. Dont max round toolbar buttons.
-50. Fix slight drawing glitch with Qt4.5 document mode tabs.
+50. Dont max round toolbar buttons.
+51. Fix slight drawing glitch with Qt4.5 document mode tabs.
 
 0.62.9
 ------
