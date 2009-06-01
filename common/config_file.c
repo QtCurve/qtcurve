@@ -177,7 +177,7 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
     return def;
 }
 
-static EShade toShade(const char *str, bool allowDarken, EShade def, bool menuShade)
+static EShade toShade(const char *str, bool allowDarken, EShade def, bool menuShade, color *col)
 {
     if(str)
     {
@@ -190,6 +190,11 @@ static EShade toShade(const char *str, bool allowDarken, EShade def, bool menuSh
             return SHADE_DARKEN;
         if(0==memcmp(str, "custom", 6))
             return SHADE_CUSTOM;
+        if('#'==str[0] && col)
+        {
+            setRgb(col, str);
+            return SHADE_CUSTOM;
+        }
         if(0==memcmp(str, "none", 4))
             return SHADE_NONE;
     }
@@ -757,8 +762,8 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_LINE(ENTRY) \
     opts->ENTRY=toLine(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#define QTC_CFG_READ_SHADE(ENTRY, AD, MENU_STRIPE) \
-    opts->ENTRY=toShade(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def->ENTRY, MENU_STRIPE);
+#define QTC_CFG_READ_SHADE(ENTRY, AD, MENU_STRIPE, COL) \
+    opts->ENTRY=toShade(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), AD, def->ENTRY, MENU_STRIPE, COL);
 
 #define QTC_CFG_READ_SCROLLBAR(ENTRY) \
     opts->ENTRY=toScrollbar(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -989,9 +994,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(colorSelTab)
             QTC_CFG_READ_BOOL(roundAllTabs)
             QTC_CFG_READ_TAB_MO(tabMouseOver)
-            QTC_CFG_READ_SHADE(shadeSliders, false, false)
-            QTC_CFG_READ_SHADE(shadeMenubars, true, false)
-            QTC_CFG_READ_SHADE(shadeCheckRadio, false, false)
+            QTC_CFG_READ_SHADE(shadeSliders, false, false, &opts->customSlidersColor)
+            QTC_CFG_READ_SHADE(shadeMenubars, true, false, &opts->customMenubarsColor)
+            QTC_CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
             QTC_CFG_READ_APPEARANCE(menuitemAppearance, true)
             QTC_CFG_READ_APPEARANCE(toolbarAppearance, false)
@@ -1006,11 +1011,17 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(useHighlightForMenu)
             QTC_CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
             QTC_CFG_READ_BOOL(thinnerMenuItems)
-            QTC_CFG_READ_COLOR(customSlidersColor)
-            QTC_CFG_READ_COLOR(customMenubarsColor)
+            if(version<QTC_MAKE_VERSION(0, 63))
+            {
+                if(QTC_IS_BLACK(opts->customSlidersColor))
+                    QTC_CFG_READ_COLOR(customSlidersColor)
+                if(QTC_IS_BLACK(opts->customMenubarsColor))
+                    QTC_CFG_READ_COLOR(customMenubarsColor)
+                if(QTC_IS_BLACK(opts->customCheckRadioColor))
+                    QTC_CFG_READ_COLOR(customCheckRadioColor)
+            }
             QTC_CFG_READ_COLOR(customMenuSelTextColor)
             QTC_CFG_READ_COLOR(customMenuNormTextColor)
-            QTC_CFG_READ_COLOR(customCheckRadioColor)
             QTC_CFG_READ_SCROLLBAR(scrollbarType)
             QTC_CFG_READ_EFFECT(buttonEffect)
             QTC_CFG_READ_APPEARANCE(lvAppearance, false)
@@ -1062,9 +1073,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_TB_ICON(titlebarIcon)
 #endif
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
-            QTC_CFG_READ_SHADE(menuStripe, true, true)
+            QTC_CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
-            QTC_CFG_READ_COLOR(customMenuStripeColor)
+            if(version<QTC_MAKE_VERSION(0, 63) && QTC_IS_BLACK(opts->customMenuStripeColor))
+                QTC_CFG_READ_COLOR(customMenuStripeColor)
 #endif
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
@@ -1757,7 +1769,15 @@ static QString toStr(EAppearance exp)
     }
 }
 
-static const char *toStr(EShade exp)
+static QString toStr(const QColor &col)
+{
+    QString colorStr;
+
+    colorStr.sprintf("#%02X%02X%02X", col.red(), col.green(), col.blue());
+    return colorStr;
+}
+
+static QString toStr(EShade exp, const QColor &col)
 {
     switch(exp)
     {
@@ -1767,7 +1787,7 @@ static const char *toStr(EShade exp)
         case SHADE_BLEND_SELECTED:
             return "selected";
         case SHADE_CUSTOM:
-            return "custom";
+            return toStr(col);
         case SHADE_SELECTED:
             return "origselected";
         case SHADE_DARKEN:
@@ -1826,14 +1846,6 @@ static const char *toStr(EEffect e)
 }
 
 inline const char * toStr(bool b) { return b ? "true" : "false"; }
-
-static QString toStr(const QColor &col)
-{
-    QString colorStr;
-
-    colorStr.sprintf("#%02X%02X%02X", col.red(), col.green(), col.blue());
-    return colorStr;
-}
 
 static const char *toStr(EShading s)
 {
@@ -2000,6 +2012,12 @@ static const char * toStr(ETitleBarIcon icn)
     else \
         CFG.writeEntry(#ENTRY, opts.ENTRY);
 
+#define CFG_WRITE_SHADE_ENTRY(ENTRY, COL) \
+    if (!exportingStyle && def.ENTRY==opts.ENTRY) \
+        CFG.deleteEntry(#ENTRY); \
+    else \
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, opts.COL));
+
 bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false)
 {
     if(!cfg)
@@ -2047,9 +2065,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(colorSelTab)
         CFG_WRITE_ENTRY(roundAllTabs)
         CFG_WRITE_ENTRY(tabMouseOver)
-        CFG_WRITE_ENTRY(shadeSliders)
-        CFG_WRITE_ENTRY(shadeMenubars)
-        CFG_WRITE_ENTRY(shadeCheckRadio)
         CFG_WRITE_ENTRY(menubarAppearance)
         CFG_WRITE_ENTRY(menuitemAppearance)
         CFG_WRITE_ENTRY(toolbarAppearance)
@@ -2063,11 +2078,11 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(useHighlightForMenu)
         CFG_WRITE_ENTRY(shadeMenubarOnlyWhenActive)
         CFG_WRITE_ENTRY(thinnerMenuItems)
-        CFG_WRITE_ENTRY(customSlidersColor)
-        CFG_WRITE_ENTRY(customMenubarsColor)
+        CFG_WRITE_SHADE_ENTRY(shadeSliders, customSlidersColor)
+        CFG_WRITE_SHADE_ENTRY(shadeMenubars, customMenubarsColor)
         CFG_WRITE_ENTRY(customMenuSelTextColor)
         CFG_WRITE_ENTRY(customMenuNormTextColor)
-        CFG_WRITE_ENTRY(customCheckRadioColor)
+        CFG_WRITE_SHADE_ENTRY(shadeCheckRadio, customCheckRadioColor)
         CFG_WRITE_ENTRY(scrollbarType)
         CFG_WRITE_ENTRY(buttonEffect)
         CFG_WRITE_ENTRY(lvAppearance)
@@ -2133,8 +2148,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         else
             CFG.deleteEntry("titlebarButtonColors");
 #endif
-        CFG_WRITE_ENTRY(menuStripe)
-        CFG_WRITE_ENTRY(customMenuStripeColor)
+        CFG_WRITE_SHADE_ENTRY(menuStripe, customMenuStripeColor)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY(titlebarAppearance)
         CFG_WRITE_ENTRY(inactiveTitlebarAppearance)
