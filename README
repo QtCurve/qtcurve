@@ -8,13 +8,7 @@ To build and install:
 4. make
 5. make install
 
-
-If you have KDE4 installed, then cmake will detect this, and compile QtCurve's config dialog.
-
 The following options may be supplied to cmake:
-
-    -DQTC_NO_KDE4_LINKING=true
-        Do not use KDE4 libraries for icon mapping, reading kwin settings, etc.
 
     -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
         Do not override Qt's file dialogs with KDE ones.
