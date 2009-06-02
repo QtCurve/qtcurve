@@ -37,3 +37,4 @@ titlebarButtonAppearance=customgradient4
 titlebarButtonColors=#CC4358,#DCC864,#5ACC80,#4190C5,#8888CC,#D6D5D1,#D6D5D1,#D6D5D1,#D6D5D1
 titlebarButtons=85
 titlebarIcon=title
+inactiveTitlebarAppearance=customgradient1
