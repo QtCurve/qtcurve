@@ -73,7 +73,7 @@ void ResizeCorner::raise()
     XQueryTree(QX11Info::display(), client->windowId(), &root, &daddy, &kids, &numKids);
     if (daddy)
         XReparentWindow(QX11Info::display(), winId(), daddy, 0, 0);
-    move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
+    move(client->width() - CORNER_SIZE, client->height() - CORNER_SIZE);
     client->widget()->removeEventFilter(this);
     client->widget()->installEventFilter(this);
 }
@@ -104,7 +104,7 @@ bool ResizeCorner::eventFilter(QObject *obj, QEvent *ev)
     }
     
     if (obj == parent() && QEvent::Resize==ev->type())
-        move(client->width() - (CORNER_SIZE+2), client->height() - (CORNER_SIZE+2));
+        move(client->width() - CORNER_SIZE, client->height() - CORNER_SIZE);
 
     return false;
 }
