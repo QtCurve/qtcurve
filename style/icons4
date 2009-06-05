@@ -25,7 +25,7 @@ gtk-edit actions/document-properties.png
 gtk-execute actions/fork.png
 gtk-file mimetypes/application-x-zerosize.png
 gtk-find actions/edit-find.png
-gtk-find-and-replace NONE
+gtk-find-and-replace actions/edit-find-replace.png
 gtk-floppy devices/media-floppy.png
 gtk-fullscreen actions/view-fullscreen.png
 gtk-goto-bottom actions/go-bottom.png
