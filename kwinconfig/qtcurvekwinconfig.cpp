@@ -49,6 +49,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     connect(itsWidget->menuClose, SIGNAL(toggled(bool)),  this, SIGNAL(changed()));
     connect(itsWidget->coloredShadow, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->resizeGrip, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
 }
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
@@ -62,7 +63,8 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
     KConfigGroup configGroup(itsConfig, "General");
 
     itsWidget->menuClose->setChecked(configGroup.readEntry("CloseOnMenuDoubleClick", true));
-    itsWidget->coloredShadow->setChecked(configGroup.readEntry("ColoredShadow", true));
+    itsWidget->coloredShadow->setChecked(configGroup.readEntry("ColoredShadow", false));
+    itsWidget->resizeGrip->setChecked(configGroup.readEntry("ShowResizeGrip", false));
 }
 
 void QtCurveKWinConfig::save(KConfigGroup &)
@@ -71,6 +73,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 
     configGroup.writeEntry("CloseOnMenuDoubleClick", itsWidget->menuClose->isChecked());
     configGroup.writeEntry("ColoredShadow", itsWidget->coloredShadow->isChecked());
+    configGroup.writeEntry("ShowResizeGrip", itsWidget->resizeGrip->isChecked());
     itsConfig->sync();
 }
 
@@ -78,6 +81,7 @@ void QtCurveKWinConfig::defaults()
 {
     itsWidget->menuClose->setChecked(true);
     itsWidget->coloredShadow->setChecked(false);
+    itsWidget->resizeGrip->setChecked(false);
 }
 
 extern "C"

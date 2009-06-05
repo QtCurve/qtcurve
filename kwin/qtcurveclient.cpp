@@ -39,6 +39,7 @@
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
+#include "resizecorner.h"
 #define QTC_KWIN
 #include "common.h"
 
@@ -53,7 +54,8 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *fact
 #else
              : KCommonDecoration(bridge, factory),
 #endif
-               itsTitleFont(QFont())
+               itsTitleFont(QFont()),
+               itsResizeGrip(0L)
 {
 }
 
@@ -137,6 +139,23 @@ void QtCurveClient::init()
     widget()->setAttribute(Qt::WA_NoSystemBackground, true);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent);
     widget()->setAttribute(Qt::WA_PaintOnScreen, false);
+    if(Handler()->showResizeGrip() && isResizable())
+        itsResizeGrip=new ResizeCorner(this);
+}
+
+void QtCurveClient::maximizeChange()
+{
+    reset(SettingBorder);
+}
+
+void QtCurveClient::activeChange()
+{
+    if (itsResizeGrip)
+    {
+        itsResizeGrip->setColor(KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
+        itsResizeGrip->update();
+    }
+    KCommonDecoration::activeChange();
 }
 
 void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
@@ -226,6 +245,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     }
 #endif
 
+    if(borderSize<=1)
+        opt.state|=QtCStateKWinNotFull;
 #ifdef QTC_DRAW_INTO_PIXMAPS
     // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
     QPixmap pix(32, 32);
@@ -243,7 +264,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
 #endif
 
-    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol)
+    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && borderSize>1)
     {
         QColor cornerCol(col);
         painter.setPen(windowCol);
@@ -406,16 +427,23 @@ QRegion QtCurveClient::getMask(int round, int w, int h, bool maximised) const
         default: // ROUND_FULL
         {
             QRegion mask(5, 0, w-10, h);
+            bool    fullRound=Handler()->borderSize()>1;
 
-            mask += QRegion(0, 5, 1, h-10);
-            mask += QRegion(1, 3, 1, h-6);
-            mask += QRegion(2, 2, 1, h-4);
-            mask += QRegion(3, 1, 2, h-2);
+            if(fullRound)
+                mask += QRegion(0, 5, 1, h-10);
+            else
+                mask += QRegion(0, 5, 1, h-6);
+            mask += QRegion(1, 3, 1, h-((fullRound ? 2 : 1)*3));
+            mask += QRegion(2, 2, 1, h-((fullRound ? 2 : 1)*2));
+            mask += QRegion(3, 1, 2, h-((fullRound ? 2 : 1)*1));
 
-            mask += QRegion(w-1, 5, 1, h-10);
-            mask += QRegion(w-2, 3, 1, h-6);
-            mask += QRegion(w-3, 2, 1, h-4);
-            mask += QRegion(w-5, 1, 2, h-2);
+            if(fullRound)
+                mask += QRegion(w-1, 5, 1, h-10);
+            else
+                mask += QRegion(w-1, 5, 1, h-6);
+            mask += QRegion(w-2, 3, 1, h-((fullRound ? 2 : 1)*3));
+            mask += QRegion(w-3, 2, 1, h-((fullRound ? 2 : 1)*2));
+            mask += QRegion(w-5, 1, 2, h-((fullRound ? 2 : 1)*1));
 
             return mask;
         }
@@ -498,13 +526,22 @@ double QtCurveClient::shadowOpacity(ShadowType type) const
     
 void QtCurveClient::reset(unsigned long changed)
 {
-    if (changed & SettingColors)
+    if (changed&SettingBorder)
+        if (maximizeMode() == MaximizeFull)
+        {
+            if (!options()->moveResizeMaximizedWindows() && itsResizeGrip)
+                itsResizeGrip->hide();
+        }
+        else if (itsResizeGrip)
+                itsResizeGrip->show();
+
+    if (changed&SettingColors)
     {
         // repaint the whole thing
         widget()->update();
         updateButtons();
     }
-    else if (changed & SettingFont)
+    else if (changed&SettingFont)
     {
         // font has changed -- update title height and font
         itsTitleFont = isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
@@ -512,7 +549,7 @@ void QtCurveClient::reset(unsigned long changed)
         updateLayout();
         widget()->update();
     }
-
+    
     KCommonDecoration::reset(changed);
 }
 

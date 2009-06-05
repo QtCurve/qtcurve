@@ -71,6 +71,9 @@
     KDE4.3Beta and/or Qt 4.5.1
 50. Dont max round toolbar buttons.
 51. Fix slight drawing glitch with Qt4.5 document mode tabs.
+52. Added 'Tiny' to kwin style border options.
+53. Added option to show a resize grip on kwin windows - taken from
+    Bespin KWin decoration.
 
 0.62.9
 ------

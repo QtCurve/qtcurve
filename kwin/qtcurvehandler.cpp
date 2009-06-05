@@ -141,7 +141,7 @@ bool QtCurveHandler::reset(unsigned long changed)
     switch(KDecoration::options()->preferredBorderSize(this))
     {
         case BorderTiny:
-            itsBorderSize = 2;
+            itsBorderSize = 1;
             break;
         case BorderLarge:
             itsBorderSize = 8;
@@ -168,7 +168,7 @@ bool QtCurveHandler::reset(unsigned long changed)
     }
 
     // read in the configuration
-    readConfig();
+    bool configChanged=readConfig();
 
     for (int t=0; t < 2; ++t)
         for (int i=0; i < NumButtonIcons; i++)
@@ -185,7 +185,7 @@ bool QtCurveHandler::reset(unsigned long changed)
     if (!styleChanged && (changed & ~(SettingColors | SettingFont | SettingButtons)) == 0)
        needHardReset = false;
 
-    if (needHardReset)
+    if (needHardReset || configChanged)
         return true;
     else
     {
@@ -231,7 +231,7 @@ bool QtCurveHandler::supports(Ability ability) const
     };
 }
 
-void QtCurveHandler::readConfig()
+bool QtCurveHandler::readConfig()
 {
     KConfig configFile("kwinqtcurverc");
     const KConfigGroup config(&configFile, "General");
@@ -252,8 +252,14 @@ void QtCurveHandler::readConfig()
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;
 
+    bool oldColoredShadow=itsColoredShadow,
+         oldMenuClose=itsMenuClose,
+         oldShowResizeGrip=itsShowResizeGrip;
     itsColoredShadow = config.readEntry("ColoredShadow", false);
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
+    itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
+
+    return oldColoredShadow!=itsColoredShadow || oldMenuClose!=itsMenuClose || oldShowResizeGrip!=itsShowResizeGrip;
 }
 
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)
@@ -280,7 +286,8 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
 QList<QtCurveHandler::BorderSize> QtCurveHandler::borderSizes() const
 {
     // the list must be sorted
-    return QList<BorderSize>() << BorderNormal
+    return QList<BorderSize>() << BorderTiny
+                               << BorderNormal
                                << BorderLarge
                                << BorderVeryLarge
                                << BorderHuge

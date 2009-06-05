@@ -3368,6 +3368,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_FrameWindow:
         {
+            ERound oldRound=opts.round;
+            if(opts.round>ROUND_SLIGHT && state&QtCStateKWinNotFull && state&QtC_StateKWin)
+                opts.round=ROUND_SLIGHT;
+
             const QColor *borderCols(opts.colorTitlebarOnly
                                         ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
                                         : theThemedApp==APP_KWIN
@@ -3397,8 +3401,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 mask += QRegion(x+w-5, y+1, 2, h-2);
                 painter->setClipRegion(mask);
             }
-                
+
             drawBorder(painter, r, &opt, ROUNDED_BOTTOM, borderCols, WIDGET_MDI_WINDOW, opts.titlebarBorder ? BORDER_RAISED : BORDER_FLAT);
+            opts.round=oldRound;
 
             if(roundKWinFull)
             {

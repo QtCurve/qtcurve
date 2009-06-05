@@ -85,6 +85,7 @@ class QtCurveHandler : public QObject,
     int             borderSize() const      { return itsBorderSize; }
     bool            coloredShadow() const   { return itsColoredShadow; }
     bool            menuClose() const       { return itsMenuClose; }
+    bool            showResizeGrip() const  { return itsShowResizeGrip; }
     QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
@@ -98,12 +99,13 @@ class QtCurveHandler : public QObject,
 
     private:
 
-    void readConfig();
+    bool readConfig();
 
     private:
 
     bool    itsColoredShadow,
-            itsMenuClose;
+            itsMenuClose,
+            itsShowResizeGrip;
     int     itsBorderSize,
             itsTitleHeight,
             itsTitleHeightTool,

@@ -36,6 +36,8 @@
 namespace KWinQtCurve
 {
 
+class ResizeCorner;
+
 #if KDE_IS_VERSION(4,1,80)
 class QtCurveClient : public KCommonDecorationUnstable
 #else
@@ -58,6 +60,8 @@ class QtCurveClient : public KCommonDecoration
                                            const KCommonDecorationButton *btn= 0) const;
     KCommonDecorationButton * createButton(ButtonType type);
     void                      init();
+    void                      maximizeChange();
+    void                      activeChange();
     void                      reset(unsigned long changed);
     void                      drawBtnBgnd(QPainter *p, const QRect &r, bool active);
     void                      paintEvent(QPaintEvent *e);
@@ -84,10 +88,11 @@ class QtCurveClient : public KCommonDecoration
         QColor  col;
     };
 
-    ButtonBgnd itsButtonBackground[2];
-    QRect      itsCaptionRect;
-    QString    itsOldCaption;
-    QFont      itsTitleFont;
+    ResizeCorner *itsResizeGrip;
+    ButtonBgnd   itsButtonBackground[2];
+    QRect        itsCaptionRect;
+    QString      itsOldCaption;
+    QFont        itsTitleFont;
 };
 
 }

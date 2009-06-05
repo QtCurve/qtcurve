@@ -309,6 +309,7 @@ typedef enum
 #define QtC_StateKWinHighlight ((QStyle::StateFlag)0x20000000)
 #define QtC_StateKWinShadows   ((QStyle::StateFlag)0x40000000)
 #define QtCStateKWinDrawLine   ((QStyle::StateFlag)0x80000000)
+#define QtCStateKWinNotFull    ((QStyle::StateFlag)0x80000000)
 
 #define CLOSE_COLOR QColor(191, 82, 82)
 #define HOVER_BUTTON_ALPHA 0.2

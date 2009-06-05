@@ -170,7 +170,7 @@ class QtCurveStyle : public QWindowsStyle
 
     private:
 
-    Options                            opts;
+    mutable Options                    opts;
     QColor                             itsHighlightCols[TOTAL_SHADES+1],
                                        itsBackgroundCols[TOTAL_SHADES+1],
                                        itsMenubarCols[TOTAL_SHADES+1],
