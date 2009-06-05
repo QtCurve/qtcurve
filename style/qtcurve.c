@@ -2611,8 +2611,9 @@ debugDisplayWidget(widget, 3);
                     round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
         }
     }
+    // TODO: This is not good, there must be a better and more consisten way!
     else if(GTK_APP_INKSCAPE==qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") && GTK_IS_SPIN_BUTTON(widget) &&
-            (height+6)<widget->allocation.height)
+            (height+(QTC_DO_EFFECT ? 2 : 0)+12)==widget->allocation.height)
         drawEntryField(cr, style, state, widget, area, x-2, y-2, width+4, height+4,
                        reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, FALSE);
     else if(DETAIL("tooltip"))
