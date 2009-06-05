@@ -6275,62 +6275,68 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 //                     painter->setClipRegion(mask);
 //                 }
 
-                drawLightBevel(painter, r, &opt, widget,
-                               titleBar->titleBarState&State_Raised
-                                ? ROUNDED_NONE
-                                : titleBar->titleBarState&State_Enabled
-                                    ? ROUNDED_ALL
-                                    : ROUNDED_TOP,
-                               titleCols[ORIGINAL_SHADE], titleCols, state&QtCStateKWinNoBorder ? false : true,
-                               titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
-
-                if(opts.titlebarBorder)
+                if(state&QtCStateKWinNoBorder)
+                    drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, true, false,
+                                      widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active), WIDGET_MDI_WINDOW);
+                else
                 {
-                    painter->setPen(btnCols[0]);
-                    painter->drawPoint(r.x()+1, r.y()+r.height()-1);
-                }
+                    drawLightBevel(painter, r, &opt, widget,
+                                   titleBar->titleBarState&State_Raised
+                                        ? ROUNDED_NONE
+                                        : titleBar->titleBarState&State_Enabled
+                                            ? ROUNDED_ALL
+                                            : ROUNDED_TOP,
+                                    titleCols[ORIGINAL_SHADE], titleCols, true,
+                                    titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
 
-                if(roundKWinFull && !(state&QtCStateKWinNoBorder))
-                {
-                    bool   kwinHighlight(state&QtC_StateKWinHighlight);
-                    QColor col(kwinHighlight ? itsFocusCols[0] : btnCols[QT_STD_BORDER]);
-
-                    painter->setPen(col);
-
-                    if(kwinHighlight || (state&QtC_StateKWinShadows))
+                    if(opts.titlebarBorder)
                     {
-                        painter->drawPoint(r.x()+3, r.y()+1);
-                        painter->drawPoint(r.x()+1, r.y()+3);
-                        painter->drawPoint(r.x()+r.width()-4, r.y()+1);
-                        painter->drawPoint(r.x()+r.width()-2, r.y()+3);
-//                         painter->drawPoint(r.x()+r.width()-1, r.y()+6);
-                        col.setAlphaF(0.5);
-                        painter->setPen(col);
-                        painter->drawPoint(r.x()+2, r.y()+2);
-                        painter->drawPoint(r.x()+4, r.y()+1);
-                        painter->drawPoint(r.x()+1, r.y()+4);
-                        painter->drawPoint(r.x()+r.width()-3, r.y()+2);
-                        painter->drawPoint(r.x()+r.width()-5, r.y()+1);
-                        painter->drawPoint(r.x()+r.width()-2, r.y()+4);
+                        painter->setPen(btnCols[0]);
+                        painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
-                    else
+
+                    if(roundKWinFull)
                     {
-                        painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
-                        painter->drawPoint(r.x()+2, r.y()+2);
-                        painter->drawLine(r.x()+3, r.y()+1, r.x()+4, r.y()+1);
-                        painter->drawLine(r.x()+r.width()-2, r.y()+4, r.x()+r.width()-2, r.y()+3);
-                        painter->drawPoint(r.x()+r.width()-3, r.y()+2);
-                        painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
-                    }
-                    if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
-                    {
-                        col=btnCols[0];
-                        //col.setAlphaF(0.5);
+                        bool   kwinHighlight(state&QtC_StateKWinHighlight);
+                        QColor col(kwinHighlight ? itsFocusCols[0] : btnCols[QT_STD_BORDER]);
+
                         painter->setPen(col);
-                        painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
-                        painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
-                        //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
-                        painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
+
+                        if(kwinHighlight || (state&QtC_StateKWinShadows))
+                        {
+                            painter->drawPoint(r.x()+3, r.y()+1);
+                            painter->drawPoint(r.x()+1, r.y()+3);
+                            painter->drawPoint(r.x()+r.width()-4, r.y()+1);
+                            painter->drawPoint(r.x()+r.width()-2, r.y()+3);
+    //                         painter->drawPoint(r.x()+r.width()-1, r.y()+6);
+                            col.setAlphaF(0.5);
+                            painter->setPen(col);
+                            painter->drawPoint(r.x()+2, r.y()+2);
+                            painter->drawPoint(r.x()+4, r.y()+1);
+                            painter->drawPoint(r.x()+1, r.y()+4);
+                            painter->drawPoint(r.x()+r.width()-3, r.y()+2);
+                            painter->drawPoint(r.x()+r.width()-5, r.y()+1);
+                            painter->drawPoint(r.x()+r.width()-2, r.y()+4);
+                        }
+                        else
+                        {
+                            painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
+                            painter->drawPoint(r.x()+2, r.y()+2);
+                            painter->drawLine(r.x()+3, r.y()+1, r.x()+4, r.y()+1);
+                            painter->drawLine(r.x()+r.width()-2, r.y()+4, r.x()+r.width()-2, r.y()+3);
+                            painter->drawPoint(r.x()+r.width()-3, r.y()+2);
+                            painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
+                        }
+                        if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
+                        {
+                            col=btnCols[0];
+                            //col.setAlphaF(0.5);
+                            painter->setPen(col);
+                            painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
+                            painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
+                            //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
+                            painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
+                        }
                     }
                 }
 
@@ -8006,23 +8012,17 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     if(r.width()>0 && r.height()>0)
     {
-        bool nonBorderedWindow(!doBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w));
+        double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+               modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
+               modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
 
-        if(!nonBorderedWindow)
-        {
-            double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
-                   modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
-                   modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
-
-            p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
-        }
+        p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
 
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
             drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
         else
         {
-            int adjust=nonBorderedWindow ? 0 : 1;
-            drawBevelGradient(fill, p, r.adjusted(adjust, adjust, -adjust,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -adjust),
+            drawBevelGradient(fill, p, r.adjusted(1, 1, -1,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1),
                               horiz, sunken, app, w);
 
             if(!sunken)
