@@ -4129,13 +4129,15 @@ debugDisplayWidget(widget, 3);
         gtkDrawHandle(style, window, state, shadow_type, area, widget, detail, x, y, width, height,
                       orientation);
     }
+    else if(detail && 0==strcmp(detail+1, "ruler"))
+        drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
     else
     {
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
         drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                   NULL, !detail || strcmp(detail+1, "ruler") ? ROUNDED_ALL : ROUNDED_NONE,
+                   NULL, ROUNDED_ALL,
                    GTK_SHADOW_NONE==shadow_type
                                         ? BORDER_FLAT
                                         : GTK_SHADOW_IN==shadow_type || GTK_SHADOW_ETCHED_IN==shadow_type
