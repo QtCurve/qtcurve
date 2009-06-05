@@ -199,7 +199,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     bool                 active(isActive()),
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
                                         NULL, NULL)),
-                         mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
+                         mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows()),
+                         roundBottom(Handler()->roundBottom());
     const int            maximiseOffset(mximised ? 3 : 0),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -245,7 +246,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     }
 #endif
 
-    if(borderSize<=1)
+    if(!roundBottom)
         opt.state|=QtCStateKWinNotFull;
 #ifdef QTC_DRAW_INTO_PIXMAPS
     // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
@@ -264,7 +265,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
 #endif
 
-    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && borderSize>1)
+    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
     {
         QColor cornerCol(col);
         painter.setPen(windowCol);
@@ -427,23 +428,23 @@ QRegion QtCurveClient::getMask(int round, int w, int h, bool maximised) const
         default: // ROUND_FULL
         {
             QRegion mask(5, 0, w-10, h);
-            bool    fullRound=Handler()->borderSize()>1;
+            bool    roundBottom=Handler()->roundBottom();
 
-            if(fullRound)
+            if(roundBottom)
                 mask += QRegion(0, 5, 1, h-10);
             else
                 mask += QRegion(0, 5, 1, h-6);
-            mask += QRegion(1, 3, 1, h-((fullRound ? 2 : 1)*3));
-            mask += QRegion(2, 2, 1, h-((fullRound ? 2 : 1)*2));
-            mask += QRegion(3, 1, 2, h-((fullRound ? 2 : 1)*1));
+            mask += QRegion(1, 3, 1, h-((roundBottom ? 2 : 1)*3));
+            mask += QRegion(2, 2, 1, h-((roundBottom ? 2 : 1)*2));
+            mask += QRegion(3, 1, 2, h-((roundBottom ? 2 : 1)*1));
 
-            if(fullRound)
+            if(roundBottom)
                 mask += QRegion(w-1, 5, 1, h-10);
             else
                 mask += QRegion(w-1, 5, 1, h-6);
-            mask += QRegion(w-2, 3, 1, h-((fullRound ? 2 : 1)*3));
-            mask += QRegion(w-3, 2, 1, h-((fullRound ? 2 : 1)*2));
-            mask += QRegion(w-5, 1, 2, h-((fullRound ? 2 : 1)*1));
+            mask += QRegion(w-2, 3, 1, h-((roundBottom ? 2 : 1)*3));
+            mask += QRegion(w-3, 2, 1, h-((roundBottom ? 2 : 1)*2));
+            mask += QRegion(w-5, 1, 2, h-((roundBottom ? 2 : 1)*1));
 
             return mask;
         }

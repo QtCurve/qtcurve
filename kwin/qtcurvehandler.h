@@ -86,6 +86,7 @@ class QtCurveHandler : public QObject,
     bool            coloredShadow() const   { return itsColoredShadow; }
     bool            menuClose() const       { return itsMenuClose; }
     bool            showResizeGrip() const  { return itsShowResizeGrip; }
+    bool            roundBottom() const     { return itsRoundBottom && itsBorderSize>1; }
     QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
@@ -105,7 +106,8 @@ class QtCurveHandler : public QObject,
 
     bool    itsColoredShadow,
             itsMenuClose,
-            itsShowResizeGrip;
+            itsShowResizeGrip,
+            itsRoundBottom;
     int     itsBorderSize,
             itsTitleHeight,
             itsTitleHeightTool,

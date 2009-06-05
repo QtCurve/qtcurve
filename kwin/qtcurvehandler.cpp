@@ -254,12 +254,15 @@ bool QtCurveHandler::readConfig()
 
     bool oldColoredShadow=itsColoredShadow,
          oldMenuClose=itsMenuClose,
-         oldShowResizeGrip=itsShowResizeGrip;
+         oldShowResizeGrip=itsShowResizeGrip,
+         oldRoundBottom=itsRoundBottom;
     itsColoredShadow = config.readEntry("ColoredShadow", false);
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
+    itsRoundBottom = config.readEntry("RoundBottom", true);
 
-    return oldColoredShadow!=itsColoredShadow || oldMenuClose!=itsMenuClose || oldShowResizeGrip!=itsShowResizeGrip;
+    return oldColoredShadow!=itsColoredShadow || oldMenuClose!=itsMenuClose || oldShowResizeGrip!=itsShowResizeGrip ||
+           oldRoundBottom!=itsRoundBottom;
 }
 
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)
