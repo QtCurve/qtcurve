@@ -43,16 +43,18 @@
 namespace KWinQtCurve
 {
 
-ResizeCorner::ResizeCorner(QtCurveClient * parent)
+ResizeCorner::ResizeCorner(QtCurveClient *parent)
             : QWidget(parent->widget()),
-              col(KDecoration::options()->color(KDecoration::ColorTitleBar, true))
+              client(parent)
 {
     hide();
-    if (!(parent->widget() && parent->windowId())) {
+    if (!(parent->widget() && parent->windowId()))
+    {
         deleteLater();
         return;
     }
-    client = parent;
+    setColor(KDecoration::options()->color(KDecoration::ColorTitleBar, true));
+    setAutoFillBackground(true);
     setCursor(QCursor(Qt::SizeFDiagCursor));
     setFixedSize(CORNER_SIZE, CORNER_SIZE);
     QPolygon triangle(3);
@@ -87,10 +89,13 @@ void ResizeCorner::move(int x, int y)
 
 void ResizeCorner::setColor(const QColor &c)
 {
-    col=c;
-    if(col==palette().color(QPalette::Window))
+    QColor   col=c;
+    QPalette pal(palette());
+
+    if(col==client->widget()->palette().color(backgroundRole()))
         col = col.value() > 100 ? col.dark(130) : col.light(120);
-    col.setAlphaF(0.5);
+    pal.setColor(backgroundRole(), col);
+    setPalette(pal);
 }
  
 bool ResizeCorner::eventFilter(QObject *obj, QEvent *ev)
@@ -141,19 +146,25 @@ void ResizeCorner::mouseReleaseEvent(QMouseEvent *)
    client->performWindowOperation(KDecoration::NoOp);
 }
 
-void ResizeCorner::paintEvent(QPaintEvent *)
-{
-//     QRect           r(rect());
-//     QLinearGradient grad(QPoint(r.x(), r.y()), QPoint(r.x()+r.width()-1, r.y()+r.height()-1));
-//     QColor          s(col);
+// void ResizeCorner::paintEvent(QPaintEvent *)
+// {
+// //     QRect           r(rect());
+// //     QLinearGradient grad(QPoint(r.x(), r.y()), QPoint(r.x()+r.width()-1, r.y()+r.height()-1));
+// //     QColor          s(col);
+// // 
+// //     s.setAlphaF(0);
+// //     grad.setColorAt(0, s);
+// //     grad.setColorAt(0.5, s);
+// //     grad.setColorAt(1, col);
+// //     QPainter(this).fillRect(r, QBrush(grad));
+//     QPainter p(this);
+//         p.setPen(Qt::red);
 // 
-//     s.setAlphaF(0);
-//     grad.setColorAt(0, s);
-//     grad.setColorAt(0.5, s);
-//     grad.setColorAt(1, col);
-//     QPainter(this).fillRect(r, QBrush(grad));
-    QPainter(this).fillRect(rect(), col);
-}
+//     QPolygon triangle(3);
+//     triangle.putPoints(0, 3, CORNER_SIZE,0, CORNER_SIZE,CORNER_SIZE, 0,CORNER_SIZE);
+//     p.drawPolygon(triangle);
+// //     p.fillRect(rect(), col);
+// }
 
 }
 

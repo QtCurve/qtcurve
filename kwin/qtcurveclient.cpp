@@ -437,20 +437,27 @@ QRegion QtCurveClient::getMask(int round, int w, int h, bool maximised) const
             bool    roundBottom=Handler()->roundBottom();
 
             if(roundBottom)
+            {
                 mask += QRegion(0, 5, 1, h-10);
-            else
-                mask += QRegion(0, 5, 1, h-6);
-            mask += QRegion(1, 3, 1, h-((roundBottom ? 2 : 1)*3));
-            mask += QRegion(2, 2, 1, h-((roundBottom ? 2 : 1)*2));
-            mask += QRegion(3, 1, 2, h-((roundBottom ? 2 : 1)*1));
-
-            if(roundBottom)
+                mask += QRegion(1, 3, 1, h-6);
+                mask += QRegion(2, 2, 1, h-4);
+                mask += QRegion(3, 1, 2, h-2);
                 mask += QRegion(w-1, 5, 1, h-10);
+                mask += QRegion(w-2, 3, 1, h-6);
+                mask += QRegion(w-3, 2, 1, h-4);
+                mask += QRegion(w-5, 1, 2, h-2);
+            }
             else
-                mask += QRegion(w-1, 5, 1, h-6);
-            mask += QRegion(w-2, 3, 1, h-((roundBottom ? 2 : 1)*3));
-            mask += QRegion(w-3, 2, 1, h-((roundBottom ? 2 : 1)*2));
-            mask += QRegion(w-5, 1, 2, h-((roundBottom ? 2 : 1)*1));
+            {
+                mask += QRegion(0, 5, 1, h-5);
+                mask += QRegion(1, 3, 1, h-2);
+                mask += QRegion(2, 2, 1, h-1);
+                mask += QRegion(3, 1, 2, h);
+                mask += QRegion(w-1, 5, 1, h-5);
+                mask += QRegion(w-2, 3, 1, h-2);
+                mask += QRegion(w-3, 2, 1, h-1);
+                mask += QRegion(w-5, 1, 2, h);
+            }
 
             return mask;
         }

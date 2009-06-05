@@ -3369,8 +3369,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_FrameWindow:
         {
             ERound oldRound=opts.round;
-            if(opts.round>ROUND_SLIGHT && state&QtCStateKWinNotFull && state&QtC_StateKWin)
-                opts.round=ROUND_SLIGHT;
+            if(state&QtCStateKWinNotFull && state&QtC_StateKWin)
+                opts.round=ROUND_NONE;
 
             const QColor *borderCols(opts.colorTitlebarOnly
                                         ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))

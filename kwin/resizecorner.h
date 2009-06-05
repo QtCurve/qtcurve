@@ -49,13 +49,16 @@ class ResizeCorner : public QWidget
     
     void mousePressEvent(QMouseEvent *ev);
     void mouseReleaseEvent(QMouseEvent *ev);
-    void paintEvent(QPaintEvent *ev);
+//     void paintEvent(QPaintEvent *ev);
 
     private:
 
     bool eventFilter(QObject *obj, QEvent *e);
+    
+    private:
+
     QtCurveClient *client;
-    QColor        col;
+//     QColor        col;
 };
 
 } 
