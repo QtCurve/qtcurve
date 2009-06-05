@@ -2475,6 +2475,8 @@ printf("Draw flat box %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, 
 debugDisplayWidget(widget, 3);
 #endif
 
+    sanitizeSize(window, &width, &height);
+
 #define QTC_MODAL_HACK_NAME  "--qtcurve-modal-dialog-hack--"
 #define QTC_MENU_HACK_NAME   "--qtcurve-menu-hack--"
 #ifdef QTC_REORDER_GTK_DIALOG_BUTTONS
@@ -2615,6 +2617,10 @@ debugDisplayWidget(widget, 3);
                        reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, FALSE);
     else if(DETAIL("tooltip"))
     {
+        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]));
+        cairo_fill(cr);
+        cairo_new_path(cr);
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
         cairo_stroke(cr);
@@ -4154,11 +4160,12 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                           GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                           const gchar *detail, gint x, gint y, gint width, gint height)
 {
+    sanitizeSize(window, &width, &height);
+
     QTC_CAIRO_BEGIN
 
     if(isComboBoxList(widget))
     {
-        sanitizeSize(window, &width, &height);
         cairo_new_path(cr);
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
@@ -4170,7 +4177,6 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
     else if(isComboList(widget))
     {
-        sanitizeSize(window, &width, &height);
         drawAreaColor(cr, area, NULL, &style->base[state], x, y, width, height);
         if(!DETAIL("viewport"))
         {
@@ -4225,8 +4231,6 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                detail ? detail : "NULL");
        debugDisplayWidget(widget, 3);
     #endif
-
-        sanitizeSize(window, &width, &height);
 
         if(!statusBar && (frame || scrolledWindow || viewport || drawSquare)) // && QTC_ROUNDED)
         {
@@ -5272,6 +5276,7 @@ printf("Draw extension %d %d %d %d %d %d %d %s  ", state, shadow_type, gap_side,
 "NULL");
 debugDisplayWidget(widget, 3);
 #endif
+    sanitizeSize(window, &width, &height);
 
     if (DETAIL ("tab"))
     {
@@ -5377,8 +5382,6 @@ debugDisplayWidget(widget, 3);
         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
                                            GTK_STATE_NORMAL, area, x, y, width, height);
 */
-        sanitizeSize(window, &width, &height);
-
         /*
         TODO: This is not good, should respect 'area' as passed in. However, it works for the moment - if the thunderbird hack
               above is used. Needs to be fixed tho.
