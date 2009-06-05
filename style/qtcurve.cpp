@@ -6666,10 +6666,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     // If "SC_ScrollBarSlider" wasn't specified, then we only want to draw the portion
                     // of the slider that overlaps with the trough. So, once again set the clipping
                     // region...
-                    if(!(option->subControls&SC_ScrollBarSlider))
-                        painter->setClipRegion(QRegion(s2)+QRegion(a2));
+
+                    // NO! Seeems to mess things up with Arora, su just dsiable all clipping when drawing
+                    // the slider...
+                    painter->setClipping(false);
+//                     if(!(option->subControls&SC_ScrollBarSlider))
+//                         painter->setClipRegion(QRegion(s2)+QRegion(a2));
 #ifdef QTC_INCREASE_SB_SLIDER
-                    else if(!opts.flatSbarButtons)
+                    /*else*/ if(!opts.flatSbarButtons)
                     {
                         if(atMax)
                             switch(opts.scrollbarType)
@@ -6713,8 +6717,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawPrimitive(PE_FrameFocusRect, &opt, painter, widget);
                     }
 
-                    if(!(option->subControls&SC_ScrollBarSlider))
-                        painter->setClipping(false);
+//                     if(!(option->subControls&SC_ScrollBarSlider))
+//                         painter->setClipping(false);
                 }
                 painter->restore();
             }
