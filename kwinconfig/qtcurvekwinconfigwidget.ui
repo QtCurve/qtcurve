@@ -46,6 +46,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="noBorder">
+     <property name="text">
+      <string>Dont draw outer dark border.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

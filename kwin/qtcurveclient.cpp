@@ -200,7 +200,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
                                         NULL, NULL)),
                          mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows()),
-                         roundBottom(Handler()->roundBottom());
+                         roundBottom(Handler()->roundBottom()),
+                         noBorder(Handler()->noBorder());
     const int            maximiseOffset(mximised ? 3 : 0),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -248,22 +249,27 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(!roundBottom)
         opt.state|=QtCStateKWinNotFull;
+    if(noBorder)
+        opt.state|=QtCStateKWinNoBorder;
+    else
+    {
 #ifdef QTC_DRAW_INTO_PIXMAPS
-    // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
-    QPixmap pix(32, 32);
-    QPainter p2(&pix);
-    opt.rect=QRect(0, 0, pix.width(), pix.height());
-    p2.fillRect(opt.rect, colorTitleOnly ? windowCol : col);
-    Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &p2, widget());
-    p2.end();
-    painter.drawTiledPixmap(r.x(), r.y()+10, 2, r.height()-18, pix.copy(0, 8, 2, 16));
-    painter.drawTiledPixmap(r.x()+r.width()-2, r.y()+8, 2, r.height()-16, pix.copy(pix.width()-2, 8, 2, 16));
-    painter.drawTiledPixmap(r.x()+8, r.y()+r.height()-2, r.width()-16, 2, pix.copy(8, pix.height()-2, 16, 2));
-    painter.drawPixmap(r.x(), r.y()+r.height()-8, pix.copy(0, 24, 8, 8));
-    painter.drawPixmap(r.x()+r.width()-8, r.y()+r.height()-8, pix.copy(24, 24, 8, 8));
+        // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
+        QPixmap pix(32, 32);
+        QPainter p2(&pix);
+        opt.rect=QRect(0, 0, pix.width(), pix.height());
+        p2.fillRect(opt.rect, colorTitleOnly ? windowCol : col);
+        Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &p2, widget());
+        p2.end();
+        painter.drawTiledPixmap(r.x(), r.y()+10, 2, r.height()-18, pix.copy(0, 8, 2, 16));
+        painter.drawTiledPixmap(r.x()+r.width()-2, r.y()+8, 2, r.height()-16, pix.copy(pix.width()-2, 8, 2, 16));
+        painter.drawTiledPixmap(r.x()+8, r.y()+r.height()-2, r.width()-16, 2, pix.copy(8, pix.height()-2, 16, 2));
+        painter.drawPixmap(r.x(), r.y()+r.height()-8, pix.copy(0, 24, 8, 8));
+        painter.drawPixmap(r.x()+r.width()-8, r.y()+r.height()-8, pix.copy(24, 24, 8, 8));
 #else
-    Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
+        Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
 #endif
+    }
 
     if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
     {

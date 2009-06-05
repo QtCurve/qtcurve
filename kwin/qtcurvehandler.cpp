@@ -138,6 +138,9 @@ bool QtCurveHandler::reset(unsigned long changed)
     itsTitleFont = KDecoration::options()->font(true, false); // not small
     itsTitleFontTool = KDecoration::options()->font(true, true); // small
 
+    // read in the configuration
+    bool configChanged=readConfig();
+
     switch(KDecoration::options()->preferredBorderSize(this))
     {
         case BorderTiny:
@@ -167,8 +170,8 @@ bool QtCurveHandler::reset(unsigned long changed)
                     4;
     }
 
-    // read in the configuration
-    bool configChanged=readConfig();
+    if(itsNoBorder && (itsBorderSize==1 || itsBorderSize>4))
+        itsBorderSize--;
 
     for (int t=0; t < 2; ++t)
         for (int i=0; i < NumButtonIcons; i++)
@@ -260,6 +263,7 @@ bool QtCurveHandler::readConfig()
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
     itsRoundBottom = config.readEntry("RoundBottom", true);
+    itsNoBorder = config.readEntry("NoBorder", false);
 
     return oldColoredShadow!=itsColoredShadow || oldMenuClose!=itsMenuClose || oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom;

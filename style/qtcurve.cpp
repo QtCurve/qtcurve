@@ -6258,22 +6258,22 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(state&QtC_StateKWinHighlight)
                     opt.state|=QtC_StateKWinHighlight;
 
-                if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
-                {
-                    int     x(r.x()), y(r.y()), w(r.width()), h(r.height());
-                    QRegion mask(x+5, y+0, w-10, h);
-
-                    mask += QRegion(x+0, y+5, 1, h-6);
-                    mask += QRegion(x+1, y+3, 1, h-3);
-                    mask += QRegion(x+2, y+2, 1, h-2);
-                    mask += QRegion(x+3, y+1, 2, h-1);
-
-                    mask += QRegion(x+w-1, y+5, 1, h-6);
-                    mask += QRegion(x+w-2, y+3, 1, h-3);
-                    mask += QRegion(x+w-3, y+2, 1, h-2);
-                    mask += QRegion(x+w-5, y+1, 2, h-1);
-                    painter->setClipRegion(mask);
-                }
+//                 if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
+//                 {
+//                     int     x(r.x()), y(r.y()), w(r.width()), h(r.height());
+//                     QRegion mask(x+5, y+0, w-10, h);
+// 
+//                     mask += QRegion(x+0, y+5, 1, h-6);
+//                     mask += QRegion(x+1, y+3, 1, h-3);
+//                     mask += QRegion(x+2, y+2, 1, h-2);
+//                     mask += QRegion(x+3, y+1, 2, h-1);
+// 
+//                     mask += QRegion(x+w-1, y+5, 1, h-6);
+//                     mask += QRegion(x+w-2, y+3, 1, h-3);
+//                     mask += QRegion(x+w-3, y+2, 1, h-2);
+//                     mask += QRegion(x+w-5, y+1, 2, h-1);
+//                     painter->setClipRegion(mask);
+//                 }
 
                 drawLightBevel(painter, r, &opt, widget,
                                titleBar->titleBarState&State_Raised
@@ -6281,7 +6281,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 : titleBar->titleBarState&State_Enabled
                                     ? ROUNDED_ALL
                                     : ROUNDED_TOP,
-                               titleCols[ORIGINAL_SHADE], titleCols, true,
+                               titleCols[ORIGINAL_SHADE], titleCols, state&QtCStateKWinNoBorder ? false : true,
                                titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
 
                 if(opts.titlebarBorder)
@@ -6290,7 +6290,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                 }
 
-                if(roundKWinFull)
+                if(roundKWinFull && !(state&QtCStateKWinNoBorder))
                 {
                     bool   kwinHighlight(state&QtC_StateKWinHighlight);
                     QColor col(kwinHighlight ? itsFocusCols[0] : btnCols[QT_STD_BORDER]);
@@ -8006,17 +8006,24 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
 
     if(r.width()>0 && r.height()>0)
     {
-        double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
-               modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
-               modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
+        bool nonBorderedWindow(!doBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w));
 
-        p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
+        if(!nonBorderedWindow)
+        {
+            double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+                   modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
+                   modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
+
+            p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
+        }
 
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
             drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
         else
         {
-            drawBevelGradient(fill, p, r.adjusted(1, 1, -1,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1), horiz, sunken, app, w);
+            int adjust=nonBorderedWindow ? 0 : 1;
+            drawBevelGradient(fill, p, r.adjusted(adjust, adjust, -adjust,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -adjust),
+                              horiz, sunken, app, w);
 
             if(!sunken)
                 if(plastikMouseOver && !sunken)

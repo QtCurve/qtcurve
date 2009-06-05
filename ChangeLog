@@ -75,6 +75,7 @@
 53. Added option to control whether bottom of KWin windows are rounded.
 54. Added option to show a resize grip on kwin windows - taken from
     Bespin KWin decoration.
+55. Added option to not draw outer dark border on KWin windows.
 
 0.62.9
 ------
