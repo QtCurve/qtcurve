@@ -2585,6 +2585,14 @@ static gboolean qtInit(Options *opts)
                         toQtColor(qtcPalette.background[4].blue));
                 gtk_rc_parse_string(tmpStr);
             }
+
+            {
+                static const char *constStrFormat="gtk-menu-popup-delay=%d";
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
+                sprintf(tmpStr, constStrFormat, opts->menuDelay);
+                gtk_rc_parse_string(tmpStr);
+            }
             
             if(tmpStr)
                 free(tmpStr);
