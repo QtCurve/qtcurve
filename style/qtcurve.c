@@ -3357,12 +3357,12 @@ debugDisplayWidget(widget, 3);
 
                 if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
-                    if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                    //if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                         drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
                                           &qtcPalette.background[ORIGINAL_SHADE],
                                           horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
-                    else
-                        drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
+//                     else
+//                         drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
                 }
                 else
                 {
@@ -3624,7 +3624,7 @@ debugDisplayWidget(widget, 3);
         {
             int      sbarRound=ROUNDED_ALL,
                      xo=x, yo=y, wo=width, ho=height;
-            gboolean drawBgnd=opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType,
+            gboolean drawBg=opts.flatSbarButtons/* && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType*/,
                      thinner=opts.thinSbarGroove && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons);
 
             if(opts.flatSbarButtons)
@@ -3673,14 +3673,14 @@ debugDisplayWidget(widget, 3);
     #endif
                 }
 
-            if(drawBgnd)
+            if(drawBg)
                 drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
                                   &qtcPalette.background[ORIGINAL_SHADE],
                                   horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
             if(isMozilla())
             {
-                if(!drawBgnd)
+                if(!drawBg)
                 {
                     GdkColor *parent_col=getParentBgCol(widget),
                             *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
@@ -3713,8 +3713,9 @@ debugDisplayWidget(widget, 3);
                     height--;
             }
 
-            if(thinner && !drawBgnd)
-                drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+            if(thinner && !drawBg)
+                //drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+                drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, x, y, width, height);
 
             drawLightBevel(cr, style, window, state, area, NULL,
                            thinner && !horiz ? x+QTC_THIN_SBAR_MOD : x,
