@@ -3713,7 +3713,7 @@ debugDisplayWidget(widget, 3);
                     height--;
             }
 
-            if(thinner)
+            if(thinner && !drawBgnd)
                 drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
             drawLightBevel(cr, style, window, state, area, NULL,
