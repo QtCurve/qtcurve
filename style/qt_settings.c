@@ -2512,7 +2512,10 @@ static gboolean qtInit(Options *opts)
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \""QTC_RC_SETTING"Swt\""
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \""QTC_RC_SETTING"Swt\"");
 
-            if(opts->lighterPopupMenuBgnd && !opts->borderMenuitems)
+            if(!opts->popupBorder)
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
+                                    "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
+            else if(opts->lighterPopupMenuBgnd && !opts->borderMenuitems)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
 

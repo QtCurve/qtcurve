@@ -4115,10 +4115,13 @@ debugDisplayWidget(widget, 3);
                               &qtcPalette.background[QTC_MENU_STRIPE_SHADE],
                               FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
 #endif
-        cairo_new_path(cr);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
-        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        cairo_stroke(cr);
+        if(opts.popupBorder)
+        {
+            cairo_new_path(cr);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            cairo_stroke(cr);
+        }
     }
     else if(detail &&(!strcmp(detail, "paned") || !strcmp(detail+1, "paned")))
     {
@@ -4170,19 +4173,19 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     if(isComboBoxList(widget))
     {
-        cairo_new_path(cr);
-        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
-        cairo_stroke(cr);
-        cairo_new_path(cr);
-        cairo_rectangle(cr, x+1.5, y+1.5, width-3, height-3);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->base[state]));
-        cairo_stroke(cr);
+        drawAreaColor(cr, area, NULL, &style->base[state], x, y, width, height);
+        if(opts.popupBorder)
+        {
+            cairo_new_path(cr);
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+            cairo_stroke(cr);
+        }
     }
     else if(isComboList(widget))
     {
         drawAreaColor(cr, area, NULL, &style->base[state], x, y, width, height);
-        if(!DETAIL("viewport"))
+        if(opts.popupBorder && !DETAIL("viewport"))
         {
             cairo_new_path(cr);
             cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
@@ -4246,7 +4249,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                 if(!drawSquare && widget && widget->parent && !isFixedWidget(widget) &&
                    GTK_IS_FRAME(widget) && GTK_IS_WINDOW(widget->parent))
                     drawSquare=true;
-                    
+
                 if(scrolledWindow)
                 {
                     /* See code in qt_settings.c as to isMozill part */
