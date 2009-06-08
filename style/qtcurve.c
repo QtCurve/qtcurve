@@ -1850,6 +1850,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     EAppearance app=widgetApp(widget, &opts);
     gboolean    sunken=flags&DF_SUNKEN,
                 doColouredMouseOver=opts.coloredMouseOver && qtcPalette.mouseover &&
+                                  (!opts.unifySpinBtns || (WIDGET_SPIN!=widget && WIDGET_SPIN_DOWN!=widget &&
+                                                           WIDGET_SPIN_UP!=widget)) &&
                                   WIDGET_UNCOLOURED_MO_BUTTON!=widget &&
                                   GTK_STATE_PRELIGHT==state &&
                                   (IS_TOGGLE_BUTTON(widget) || !sunken),
@@ -3098,51 +3100,86 @@ debugDisplayWidget(widget, 3);
 
     if(spinUp || spinDown)
     {
-        EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
-        GdkRectangle *a=area,
-                     b;
-        gboolean     ooOrMoz=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
+        if(!opts.unifySpinBtns || sunken || GTK_STATE_PRELIGHT==state)
+        {
+            EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
+            GdkRectangle *a=area,
+                         b,
+                         unified;
+            gboolean     ooOrMoz=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
 
-        if(!a && isFixedWidget(widget) && ooOrMoz)
-        {
-            b.x=x; b.y=y; b.width=width; b.height=height;
-            a=&b;
-        }
-        
-        if(WIDGET_SPIN_UP==wid)
-        {
-            if(QTC_DO_EFFECT)
+            if(!a && isFixedWidget(widget) && ooOrMoz)
             {
-                drawEtch(cr, a, NULL, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
-                y++;
-                width--;
+                b.x=x; b.y=y; b.width=width; b.height=height;
+                a=&b;
             }
-            height++;
-        }
-        else if (QTC_DO_EFFECT)
-        {
-            GdkRectangle clip;
 
-            clip.x=x-2, clip.y=y, clip.width=width+2, clip.height=height;
-            drawEtch(cr, ooOrMoz ? a : &clip, NULL, widget, x-2, y-2, width+2, height+2, FALSE,
-                     ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
-            height--;
-            width--;
-        }
+            if(WIDGET_SPIN_UP==wid)
+            {
+                if(QTC_DO_EFFECT)
+                {
+                    if(!opts.unifySpinBtns)
+                        drawEtch(cr, a, NULL, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
+                    y++;
+                    width--;
+                }
+                height++;
+                if(opts.unifySpinBtns)
+                {
+                    unified.x=x, unified.y=y, unified.width=width, unified.height=height-(GTK_STATE_PRELIGHT==state ? 2 : 1);
+                    height*=2;
+                    area=&unified;
+                }
+            }
+            else if (QTC_DO_EFFECT)
+            {
+                GdkRectangle clip;
 
-        drawBgnd(cr, &btn_colors[bgnd], widget, area, x+1, y+1, width-2, height-2);
-        drawLightBevel(cr, style, window, state, area, NULL, x, y, width,
-                       height-(WIDGET_SPIN_UP==wid && QTC_DO_EFFECT ? 1 : 0), &btn_colors[bgnd],
-                       btn_colors, round, wid, BORDER_FLAT,
-                       DF_DO_CORNERS|DF_DO_BORDER|
-                       (sunken ? DF_SUNKEN : 0), widget);
+                clip.x=x-2, clip.y=y, clip.width=width+2, clip.height=height;
+                if(!opts.unifySpinBtns)
+                    drawEtch(cr, ooOrMoz ? a : &clip, NULL, widget, x-2, y-2, width+2, height+2, FALSE,
+                             ROUNDED_RIGHT, WIDGET_SPIN_DOWN);
+                height--;
+                width--;
+                if(opts.unifySpinBtns)
+                {
+                    unified.x=x, unified.y=y+((GTK_STATE_PRELIGHT==state ? 1 : 0)),
+                        unified.width=width, unified.height=height-(GTK_STATE_PRELIGHT==state ? 1 : 0);
+                    y-=height, height*=2;
+                    area=&unified;
+                }
+            }
+
+            drawBgnd(cr, &btn_colors[bgnd], widget, area, x+1, y+1, width-2, height-2);
+            drawLightBevel(cr, style, window, state, area, NULL, x, y, width,
+                           height-(WIDGET_SPIN_UP==wid && QTC_DO_EFFECT ? 1 : 0), &btn_colors[bgnd],
+                           btn_colors, round, wid, BORDER_FLAT,
+                           DF_DO_CORNERS|DF_DO_BORDER|
+                           (sunken ? DF_SUNKEN : 0), widget);
+        }
     }
     else if(DETAIL("spinbutton"))
+    {
         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
-                                           GTK_STATE_INSENSITIVE==state 
-                                               ? GTK_STATE_INSENSITIVE 
-                                               : GTK_STATE_NORMAL, 
+                                           GTK_STATE_INSENSITIVE==state
+                                                ? GTK_STATE_INSENSITIVE
+                                                : GTK_STATE_NORMAL,
                                            area, x, y, width, height);
+        if(opts.unifySpinBtns)
+        {
+            int offset=(QTC_DO_EFFECT ? 1 : 0);
+            drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE,
+                     ROUNDED_RIGHT, WIDGET_SPIN);
+            drawLightBevel(cr, style, window, state, area, NULL, x, y+offset,
+                           width-offset, height-(2*offset), &btn_colors[bgnd],
+                           btn_colors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
+                           DF_DO_CORNERS|DF_DO_BORDER|
+                           (sunken ? DF_SUNKEN : 0), widget);
+            drawFadedLine(cr, x+2, y+(height>>1), width-(offset+3), 1, &btn_colors[QT_STD_BORDER], area,
+                          NULL, TRUE, TRUE, TRUE);
+        }
+
+    }
     else if(detail &&( button || togglebutton || optionmenu || checkbox || sbar || hscale || vscale ||
                        stepper || slider || qtc_paned))
     {
