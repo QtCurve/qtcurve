@@ -1,6 +1,8 @@
 0.63.1
 ------
-1. Fix scrollbar background when using thinner grooves.
+1. Slightly changed min width/height of when buttons can be max
+   rounded - fixes some issues with firefox.
+2. Fix scrollbar background when using thinner grooves.
 
 0.63.0
 ------
