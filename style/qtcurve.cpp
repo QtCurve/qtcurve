@@ -9514,10 +9514,13 @@ const QColor & QtCurveStyle::menuStripeCol() const
         case SHADE_CUSTOM:
             return opts.customMenuStripeColor;
         case SHADE_BLEND_SELECTED:
-            return midColor(itsHighlightCols[ORIGINAL_SHADE],
-                            opts.lighterPopupMenuBgnd<0
-                                ? itsLighterPopupMenuBgndCol
-                                : itsBackgroundCols[ORIGINAL_SHADE]);
+            // Hack! Use opts.customMenuStripeColor to store this setting!
+            if(QTC_IS_BLACK(opts.customMenuStripeColor))
+                opts.customMenuStripeColor=midColor(itsHighlightCols[ORIGINAL_SHADE],
+                                opts.lighterPopupMenuBgnd<0
+                                    ? itsLighterPopupMenuBgndCol
+                                    : itsBackgroundCols[ORIGINAL_SHADE]);
+            return opts.customMenuStripeColor;
         case SHADE_SELECTED:
             return itsHighlightCols[QTC_MENU_STRIPE_SHADE];
         case SHADE_DARKEN:
