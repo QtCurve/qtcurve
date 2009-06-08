@@ -6978,7 +6978,21 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
                     menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
                 else if (tbOpt->features & QStyleOptionToolButton::HasMenu)
-                    newSize.setWidth(newSize.width()+6);
+                    switch(tbOpt->toolButtonStyle)
+                    {
+                        case Qt::ToolButtonIconOnly:
+                            newSize.setWidth(newSize.width()+16);
+                            break;
+                        case Qt::ToolButtonTextBesideIcon:
+                            newSize.setWidth(newSize.width()+3);
+                            break;
+                        case Qt::ToolButtonTextOnly:
+                            newSize.setWidth(newSize.width()+8);
+                            break;
+                        case Qt::ToolButtonTextUnderIcon:
+                            newSize.setWidth(newSize.width()+8);
+                            break;
+                    }
             }
 
             newSize.setWidth(newSize.width() - menuAreaWidth);

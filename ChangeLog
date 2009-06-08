@@ -5,7 +5,8 @@
 3. Harmonize KDE4 & Gtk2 popupmenu overlaps.
 4. Slightly changed min width/height of when buttons can be max
    rounded.
-   
+5. Alter position of arrow in toolbar buttons with menus.
+
 0.63.0
 ------
  1. Add '3dfull' to gradient border options. This forces the
