@@ -790,7 +790,8 @@ typedef struct
 #endif
                      colorSliderMouseOver,
                      thinSbarGroove,
-                     flatSbarButtons;
+                     flatSbarButtons,
+                     popupBorder;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;

@@ -1731,6 +1731,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_TextCursorWidth+3:
 #endif
             return 3;
+        case PM_MenuPanelWidth:
+            return opts.popupBorder ? pixelMetric(PM_DefaultFrameWidth, option, widget) : 0;
         case PM_TabBarScrollButtonWidth:
             return 18;
         case PM_HeaderMargin:
@@ -1793,8 +1795,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ButtonDefaultIndicator:
             return 0;
         case PM_DefaultFrameWidth:
-//             if (widget && widget->inherits("QComboBoxPrivateContainer"))
-//                 return 1;
+            if (!opts.popupBorder && widget && widget->inherits("QComboBoxPrivateContainer"))
+                return 0;
 
             if (widget && widget->parentWidget() &&
                 ::qobject_cast<const QFrame *>(widget) &&

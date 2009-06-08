@@ -1439,6 +1439,13 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+          <item row="13" column="0">
+           <widget class="QCheckBox" name="popupBorder">
+            <property name="text">
+             <string>Border popupmenus</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1935,7 +1942,17 @@ p, li { white-space: pre-wrap; }
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
    <class>KDoubleNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
   </customwidget>
@@ -1943,16 +1960,6 @@ p, li { white-space: pre-wrap; }
    <class>KPushButton</class>
    <extends>QPushButton</extends>
    <header>kpushbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2055,6 +2062,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>menuStripe</tabstop>
   <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>
+  <tabstop>popupBorder</tabstop>
   <tabstop>toolbarAppearance</tabstop>
   <tabstop>toolbarSeparators</tabstop>
   <tabstop>gtkComboMenus</tabstop>

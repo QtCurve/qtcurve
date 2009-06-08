@@ -1,6 +1,7 @@
-0.63.1
+0.64.0
 ------
-1. Slightly changed min width/height of when buttons can be max
+1. Add option to not draw border around popupmenus.
+2. Slightly changed min width/height of when buttons can be max
    rounded.
    
 0.63.0

@@ -503,6 +503,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(tabMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(tabMoChanged()));
     connect(stdSidebarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(popupBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(progressGrooveAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(grooveAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1299,6 +1300,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.tabMouseOver=(ETabMo)tabMouseOver->currentIndex();
     opts.stdSidebarButtons=stdSidebarButtons->isChecked();
     opts.borderMenuitems=borderMenuitems->isChecked();
+    opts.popupBorder=popupBorder->isChecked();
     opts.progressAppearance=(EAppearance)progressAppearance->currentIndex();
     opts.progressGrooveAppearance=(EAppearance)progressGrooveAppearance->currentIndex();
     opts.grooveAppearance=(EAppearance)grooveAppearance->currentIndex();
@@ -1434,6 +1436,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     tabMouseOver->setCurrentIndex(opts.tabMouseOver);
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     borderMenuitems->setChecked(opts.borderMenuitems);
+    popupBorder->setChecked(opts.popupBorder);
     progressAppearance->setCurrentIndex(opts.progressAppearance);
     progressGrooveAppearance->setCurrentIndex(opts.progressGrooveAppearance);
     grooveAppearance->setCurrentIndex(opts.grooveAppearance);
@@ -1563,6 +1566,7 @@ bool QtCurveConfig::settingsChanged()
          tabMouseOver->currentIndex()!=currentStyle.tabMouseOver ||
          stdSidebarButtons->isChecked()!=currentStyle.stdSidebarButtons ||
          borderMenuitems->isChecked()!=currentStyle.borderMenuitems ||
+         popupBorder->isChecked()!=currentStyle.popupBorder ||
          defBtnIndicator->currentIndex()!=(int)currentStyle.defBtnIndicator ||
          sliderThumbs->currentIndex()!=(int)currentStyle.sliderThumbs ||
          handles->currentIndex()!=(int)currentStyle.handles ||
