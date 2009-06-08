@@ -220,14 +220,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="2">
+       <item row="12" column="0" colspan="2">
         <widget class="QCheckBox" name="fadeLines">
          <property name="text">
           <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -239,6 +239,13 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="11" column="0">
+        <widget class="QCheckBox" name="unifySpinBtns">
+         <property name="text">
+          <string>Unify spin widget buttons</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -1972,8 +1979,9 @@ p, li { white-space: pre-wrap; }
   <tabstop>vArrows</tabstop>
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
-  <tabstop>fadeLines</tabstop>
   <tabstop>comboSplitter</tabstop>
+  <tabstop>unifySpinBtns</tabstop>
+  <tabstop>fadeLines</tabstop>
   <tabstop>splitters</tabstop>
   <tabstop>sliderAppearance</tabstop>
   <tabstop>shadeSliders</tabstop>

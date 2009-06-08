@@ -1066,6 +1066,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(sunkenScrollViews)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(popupBorder)
+            QTC_CFG_READ_BOOL(unifySpinBtns)
             QTC_CFG_READ_BOOL(thinSbarGroove)
             QTC_CFG_READ_BOOL(colorSliderMouseOver)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -1604,6 +1605,7 @@ static void defaultSettings(Options *opts)
     opts->sunkenScrollViews=true;
     opts->flatSbarButtons=true;
     opts->popupBorder=true;
+    opts->unifySpinBtns=false;
     opts->thinSbarGroove=false;
     opts->colorSliderMouseOver=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -2120,6 +2122,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(sunkenScrollViews)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(popupBorder)
+        CFG_WRITE_ENTRY(unifySpinBtns)
         CFG_WRITE_ENTRY(thinSbarGroove)
         CFG_WRITE_ENTRY(colorSliderMouseOver)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
