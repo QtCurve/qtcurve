@@ -1923,6 +1923,19 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
+        case SH_RubberBand_Mask:
+        {
+            const QStyleOptionRubberBand *opt = qstyleoption_cast<const QStyleOptionRubberBand *>(option);
+            if (!opt)
+                return true;
+            if (QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask*>(returnData)) 
+            {
+                printf("Wibble\n");
+                mask->region = option->rect;
+                mask->region -= option->rect.adjusted(1,1,-1,-1);
+            }
+            return true;
+        }
         case SH_Menu_SubMenuPopupDelay:
             return opts.menuDelay;
         case SH_ToolButton_PopupDelay:
@@ -3698,16 +3711,21 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             QColor c(itsHighlightCols[ORIGINAL_SHADE]);
             double radius=QTC_ROUNDED ? getRadius(&opts, r.width(), r.height(), WIDGET_RUBBER_BAND, RADIUS_SELECTION) : 0.0;
 
+            painter->setClipRegion(r);
+            r.adjust(0, 0, -1, -1);
             painter->setPen(c);
-            c.setAlpha(50);
-            painter->setBrush(c);
-            if(radius>0.0 && r.width()>(2*radius) && r.height()>(2*radius))
+            if(r.width()>0 && r.height()>0)
             {
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->drawPath(buildPath(r, WIDGET_RUBBER_BAND, ROUNDED_ALL, radius));
+                c.setAlpha(50);
+                painter->setBrush(c);
+                if(radius>0.0 && r.width()>(2*radius) && r.height()>(2*radius))
+                {
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->drawPath(buildPath(r, WIDGET_RUBBER_BAND, ROUNDED_ALL, radius));
+                }
+                else
+                    drawRect(painter, r);
             }
-            else
-                drawRect(painter, r);
             painter->restore();
             break;
         }
