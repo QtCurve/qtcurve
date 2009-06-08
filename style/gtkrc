@@ -144,8 +144,13 @@ style "qtcurve-combo-button" = "qtcurve-default"
 style "qtcurve-separator" = "qtcurve-default"
 {
   GtkMenuItem::horizontal-padding = 1
-  xthickness = 0
-  ythickness = 3
+  # We are setting the desired height by using wide-separators
+  # There is no other way to get the odd height ...
+  GtkWidget::wide-separators = 1
+  GtkWidget::separator-width = 1
+  GtkWidget::separator-height = 4
+  xthickness = 1
+  ythickness = 1
 }
 
 style "qtcurve-w0" = "qtcurve-default"
@@ -170,7 +175,6 @@ class "*GtkMenu" style "qtcurve-w2"
 class "*GtkScrolledWindow" style "qtcurve-w2"
 class "*GtkViewport" style "qtcurve-w2"
 class "*MenuBar" style "qtcurve-menubar"
-class "*SeparatorMenuItem" style "qtcurve-separator"
 class "*MenuItem" style "qtcurve-menuitem"
 widget_class "*MenuBar*MenuItem" style "qtcurve-menubaritem"
 class "*GtkFrame" style "qtcurve-w2"
@@ -183,7 +187,6 @@ widget_class "*.GtkAccelMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkRadioMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkCheckMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkImageMenuItem.*" style "qtcurve-default"
-widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-separator"
 class "*GtkEntry" style "qtcurve-w2"
 widget_class "*.tooltips.*.GtkToggleButton" style "qtcurve-tasklist"
 widget_class "*Tree*GtkButton" style "qtcurve-header"
@@ -201,3 +204,5 @@ widget_class "*Toolbar*Entry" style "qtcurve-w2"
 class "GtkComboBoxEntry" style "qtcurve-w0"
 widget_class "*.GtkComboBoxEntry.*Button" style "qtcurve-w0"
 widget_class "*PathBar.*Button" style "qtcurve-pathbutton"
+class "*SeparatorMenuItem" style "qtcurve-separator"
+widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-separator"

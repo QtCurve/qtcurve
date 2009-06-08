@@ -3872,7 +3872,7 @@ debugDisplayWidget(widget, 3);
         }
     }
     else if(widget && pbar)
-   {
+    {
         GdkRegion *region=NULL;
         gboolean  horiz=isHorizontalProgressbar(widget);
 
@@ -4172,6 +4172,10 @@ debugDisplayWidget(widget, 3);
     }
     else if(detail && 0==strcmp(detail+1, "ruler"))
         drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
+    else if(DETAIL("hseparator"))
+        drawFadedLine(cr, x+1, y+(height>>1), width-1, 1, &qtcPalette.background[QT_STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
+    else if(DETAIL("vseparator"))
+        drawFadedLine(cr, x+(width>>1), y, 1, height, &qtcPalette.background[QT_STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
     else
     {
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
