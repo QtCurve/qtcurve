@@ -7022,7 +7022,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 int h(newSize.height()-8); // Fix mainly for Qt4.4
 
                 if (QStyleOptionMenuItem::Separator==mi->menuItemType)
-                    h =/* mi->text.isEmpty() ? */(opts.thinnerMenuItems ? 6 : 8)/* : mi->fontMetrics.lineSpacing()*/;
+                    h = 7;
                 else
                 {
                     h = qMax(h, mi->fontMetrics.height());
