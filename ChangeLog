@@ -3,7 +3,7 @@
 1. Add option to not draw border around popupmenus.
 2. Add option to unify spinbuttons.
 3. Add option to set sub-menu delay (default 100ms)
-4. Use equal top/bottom pdding on popupmenu separators.
+4. Use equal top/bottom padding on popupmenu separators.
 5. Harmonize KDE4 & Gtk2 popupmenu overlaps.
 6. Slightly changed min width/height of when buttons can be max
    rounded - fixes some issues with firefox.
