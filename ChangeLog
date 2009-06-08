@@ -2,10 +2,11 @@
 ------
 1. Add option to not draw border around popupmenus.
 2. Add option to unify spinbuttons.
-3. Harmonize KDE4 & Gtk2 popupmenu overlaps.
-4. Slightly changed min width/height of when buttons can be max
+3. Add option to set sub-menu delay (default 100ms)
+4. Harmonize KDE4 & Gtk2 popupmenu overlaps.
+5. Slightly changed min width/height of when buttons can be max
    rounded.
-5. Alter position of arrow in toolbar buttons with menus.
+6. Alter position of arrow in toolbar buttons with menus.
 
 0.63.0
 ------

@@ -979,6 +979,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_NUM(passwordChar)
             QTC_CFG_READ_ROUND(round)
             QTC_CFG_READ_INT(highlightFactor)
+            QTC_CFG_READ_INT(menuDelay)
             QTC_CFG_READ_INT_BOOL(lighterPopupMenuBgnd)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
@@ -1421,6 +1422,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->highlightFactor<MIN_HIGHLIGHT_FACTOR || opts->highlightFactor>MAX_HIGHLIGHT_FACTOR)
                 opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
 
+            if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
+                opts->menuDelay=DEFAULT_MENU_DELAY;
+
             if(opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
                 opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
 
@@ -1533,6 +1537,7 @@ static void defaultSettings(Options *opts)
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
+    opts->menuDelay=DEFAULT_MENU_DELAY;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
@@ -2054,6 +2059,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(passwordChar)
         CFG_WRITE_ENTRY(round)
         CFG_WRITE_ENTRY_NUM(highlightFactor)
+        CFG_WRITE_ENTRY_NUM(menuDelay)
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_ENTRY(appearance)
         CFG_WRITE_ENTRY(fixParentlessDialogs)

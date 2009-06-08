@@ -1923,6 +1923,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
+        case SH_Menu_SubMenuPopupDelay:
+            return opts.menuDelay;
         case SH_ToolButton_PopupDelay:
             return 250;
         case SH_Menu_AllowActiveAndDisabled:

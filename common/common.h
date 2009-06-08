@@ -202,6 +202,10 @@ typedef GdkColor color;
 #define MIN_LIGHTER_POPUP_MENU                  -100
 #define MAX_LIGHTER_POPUP_MENU                   100
 
+#define DEFAULT_MENU_DELAY 100
+#define MIN_MENU_DELAY       0
+#define MAX_MENU_DELAY     500
+
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
@@ -734,7 +738,8 @@ typedef struct
     int              contrast,
                      passwordChar,
                      highlightFactor,
-                     lighterPopupMenuBgnd;
+                     lighterPopupMenuBgnd,
+                     menuDelay;
     ERound           round;
     bool             embolden,
                      highlightTab,
