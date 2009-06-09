@@ -146,6 +146,7 @@ void QtCurveClient::init()
 void QtCurveClient::maximizeChange()
 {
     reset(SettingBorder);
+    KCommonDecoration::maximizeChange();
 }
 
 void QtCurveClient::activeChange()

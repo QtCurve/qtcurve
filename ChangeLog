@@ -11,6 +11,7 @@
  8. Fix selection artifact issues with details view in dolphin.
  9. Fix setting of check/radio shade.
 10. Fix storing of custom menu stripe colour.
+11. Fix max/restore button being 'stuck'
 
 0.63.0
 ------
