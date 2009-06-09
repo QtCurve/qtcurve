@@ -1379,9 +1379,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #ifndef __cplusplus
             releaseConfig(cfg);
 #endif
-            if(SHADE_SELECTED==opts->shadeCheckRadio)
-                opts->shadeCheckRadio=SHADE_BLEND_SELECTED;
-
             checkColor(&opts->shadeMenubars, &opts->customMenubarsColor);
             checkColor(&opts->shadeSliders, &opts->customSlidersColor);
             checkColor(&opts->shadeCheckRadio, &opts->customCheckRadioColor);

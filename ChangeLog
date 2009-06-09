@@ -9,6 +9,7 @@
    rounded.
 7. Alter position of arrow in toolbar buttons with menus.
 8. Fix selection artifact issues with details view in dolphin.
+9. Fix setting of check/radio shade.
 
 0.63.0
 ------
