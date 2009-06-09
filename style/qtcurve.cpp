@@ -1074,6 +1074,9 @@ void QtCurveStyle::polish(QWidget *widget)
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
         itemView->viewport()->setAttribute(Qt::WA_Hover);
 
+    if(APP_KONTACT==theThemedApp && qobject_cast<QToolButton *>(widget))
+        ((QToolButton *)widget)->setAutoRaise(true);
+
     if(enableMouseOver &&
        (qobject_cast<QPushButton *>(widget) ||
         qobject_cast<QAbstractButton*>(widget) ||
