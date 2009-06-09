@@ -7954,6 +7954,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
 void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect,
                                      bool horiz, bool sel, EAppearance bevApp, EWidget w) const
 {
+    if(origRect.width()<1 || origRect.height()<1)
+        return;
+
     if(IS_FLAT(bevApp))
         p->fillRect(origRect, base);
     else
