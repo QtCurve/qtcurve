@@ -15,6 +15,7 @@
 12. Fix QPainter errors displayed when running qtconfig.
 13. Fix reading of kwin button positions for MDI windows when
     custom postitions are set, but the flag to use these is not.
+14. Add an option to export the KDE4 palette, and font, for pure-Qt3 applications.
 
 0.63.0
 ------

@@ -602,6 +602,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
     menu->addSeparator();
     menu->addAction(i18n("Export KDE4 colors to KDE3..."), this, SLOT(exportColors()));
+    menu->addAction(i18n("Export KDE4 font && colors to Qt3..."), this, SLOT(exportQt()));
     loadStyles(subMenu);
     setupGradientsTab();
     setupStack();
@@ -1044,6 +1045,56 @@ void QtCurveConfig::exportColors()
         group.writeEntry("windowForeground", palette().color(QPalette::Active, QPalette::Text));
         group.writeEntry("linkColor", palette().color(QPalette::Active, QPalette::Link));
         group.writeEntry("visitedLinkColor", palette().color(QPalette::Active, QPalette::LinkVisited));
+    }
+}
+
+void QtCurveConfig::exportQt()
+{
+    if(KMessageBox::Yes==KMessageBox::questionYesNo(this, i18n("Export your current KDE4 color palette, and font, so "
+                                                               "that they can be used by pure-Qt3 applications?")))
+    {
+        KConfig        cfg(QDir::homePath()+"/.qt/qtrc", KConfig::NoGlobals);
+        KConfigGroup   gen(&cfg, "General");
+        KConfigGroup   pal(&cfg, "Palette");
+        KConfigGroup   kde(&cfg, "KDE");
+        const QPalette &p=palette();
+        int            i;
+        QStringList    act,
+                       inact,
+                       dis;
+        QString        sep("^e");
+
+        QPalette::ColorRole roles[]={QPalette::Foreground,
+                                     QPalette::Button,
+                                     QPalette::Light,
+                                     QPalette::Midlight,
+                                     QPalette::Dark,
+                                     QPalette::Mid,
+                                     QPalette::Text,
+                                     QPalette::BrightText,
+                                     QPalette::ButtonText,
+                                     QPalette::Base,
+                                     QPalette::Background,
+                                     QPalette::Shadow,
+                                     QPalette::Highlight,
+                                     QPalette::HighlightedText,
+                                     QPalette::Link,
+                                     QPalette::LinkVisited,
+                                     QPalette::NColorRoles
+                                    };
+        
+        for (i = 0; roles[i] != QPalette::NColorRoles; i++)
+        {
+            act << p.color(QPalette::Active, roles[i]).name();
+            inact << p.color(QPalette::Inactive, roles[i]).name();
+            dis << p.color(QPalette::Disabled, roles[i]).name();
+        }
+
+        gen.writeEntry("font", font());
+        pal.writeEntry("active", act.join(sep));
+        pal.writeEntry("disabled", dis.join(sep));
+        pal.writeEntry("inactive", inact.join(sep));
+        kde.writeEntry("contrast", QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt());
     }
 }
 
