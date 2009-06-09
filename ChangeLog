@@ -1,15 +1,16 @@
 0.64.0
 ------
-1. Add option to not draw border around popupmenus.
-2. Add option to unify spinbuttons.
-3. Add option to set sub-menu delay (default 100ms)
-4. Use equal top/bottom padding on popupmenu separators.
-5. Harmonize KDE4 & Gtk2 popupmenu overlaps.
-6. Slightly changed min width/height of when buttons can be max
-   rounded.
-7. Alter position of arrow in toolbar buttons with menus.
-8. Fix selection artifact issues with details view in dolphin.
-9. Fix setting of check/radio shade.
+ 1. Add option to not draw border around popupmenus.
+ 2. Add option to unify spinbuttons.
+ 3. Add option to set sub-menu delay (default 100ms)
+ 4. Use equal top/bottom padding on popupmenu separators.
+ 5. Harmonize KDE4 & Gtk2 popupmenu overlaps.
+ 6. Slightly changed min width/height of when buttons can be max
+    rounded.
+ 7. Alter position of arrow in toolbar buttons with menus.
+ 8. Fix selection artifact issues with details view in dolphin.
+ 9. Fix setting of check/radio shade.
+10. Fix storing of custom menu stripe colour.
 
 0.63.0
 ------

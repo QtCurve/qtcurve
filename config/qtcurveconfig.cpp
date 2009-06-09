@@ -471,6 +471,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuDelay, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuStripe, SIGNAL(currentIndexChanged(int)), SLOT(menuStripeChanged()));
+    connect(customMenuStripeColor, SIGNAL(changed(const QColor &)), SLOT(menuStripeChanged()));
     connect(menuStripeAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(round, SIGNAL(currentIndexChanged(int)), SLOT(roundChanged()));
     connect(toolbarBorders, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1268,6 +1269,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.lighterPopupMenuBgnd=lighterPopupMenuBgnd->value();
     opts.menuDelay=menuDelay->value();
     opts.menuStripe=(EShade)menuStripe->currentIndex();
+    opts.customMenuStripeColor=customMenuStripeColor->color();
     opts.menuStripeAppearance=(EAppearance)menuStripeAppearance->currentIndex();
     opts.embolden=embolden->isChecked();
     opts.scrollbarType=(EScrollbar)scrollbarType->currentIndex();
@@ -1384,6 +1386,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     lighterPopupMenuBgnd->setValue(opts.lighterPopupMenuBgnd);
     menuDelay->setValue(opts.menuDelay);
     menuStripe->setCurrentIndex(opts.menuStripe);
+    customMenuStripeColor->setColor(opts.customMenuStripeColor);
     menuStripeAppearance->setCurrentIndex(opts.menuStripeAppearance);
     toolbarBorders->setCurrentIndex(opts.toolbarBorders);
     sliderThumbs->setCurrentIndex(opts.sliderThumbs);
@@ -1426,6 +1429,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customMenuNormTextColor->setEnabled(customMenuTextColor->isChecked());
     customMenuSelTextColor->setEnabled(customMenuTextColor->isChecked());
     customCheckRadioColor->setEnabled(SHADE_CUSTOM==opts.shadeCheckRadio);
+    customMenuStripeColor->setEnabled(SHADE_CUSTOM==opts.menuStripe);
 
     animatedProgress->setEnabled(STRIPE_NONE!=stripedProgress->currentIndex());
 
