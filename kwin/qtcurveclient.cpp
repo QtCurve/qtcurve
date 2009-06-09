@@ -140,7 +140,7 @@ void QtCurveClient::init()
     widget()->setAttribute(Qt::WA_OpaquePaintEvent);
     widget()->setAttribute(Qt::WA_PaintOnScreen, false);
     if(Handler()->showResizeGrip() && isResizable())
-        itsResizeGrip=new ResizeCorner(this);
+        itsResizeGrip=new ResizeCorner(this, KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
 }
 
 void QtCurveClient::maximizeChange()

@@ -43,7 +43,7 @@
 namespace KWinQtCurve
 {
 
-ResizeCorner::ResizeCorner(QtCurveClient *parent)
+ResizeCorner::ResizeCorner(QtCurveClient *parent, const QColor &c)
             : QWidget(parent->widget()),
               client(parent)
 {
@@ -53,7 +53,7 @@ ResizeCorner::ResizeCorner(QtCurveClient *parent)
         deleteLater();
         return;
     }
-    setColor(KDecoration::options()->color(KDecoration::ColorTitleBar, true));
+    setColor(c);
     setAutoFillBackground(true);
     setCursor(QCursor(Qt::SizeFDiagCursor));
     setFixedSize(CORNER_SIZE, CORNER_SIZE);

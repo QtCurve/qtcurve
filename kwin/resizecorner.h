@@ -37,7 +37,7 @@ class ResizeCorner : public QWidget
     
     public:
     
-    ResizeCorner(QtCurveClient *parent);
+    ResizeCorner(QtCurveClient *parent, const QColor &c);
     void move(int x, int y);
     void setColor(const QColor &c);
     
