@@ -102,6 +102,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void shadeCheckRadioChanged();
     void customMenuTextColorChanged();
     void menuStripeChanged();
+    void comboBtnChanged();
     void stripedProgressChanged();
     void shadingChanged();
     void activeTabAppearanceChanged();
