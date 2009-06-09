@@ -47,6 +47,7 @@ static struct
              *slider,
              *defbtn,
              *mouseover,
+             *combobtn,
              menubar[TOTAL_SHADES+1],
              highlight[TOTAL_SHADES+1],
              focus[TOTAL_SHADES+1],
@@ -2008,11 +2009,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
         }
     }
 
-    if(plastikMouseOver && !sunken)
-    {
-        unsetCairoClipping(cr);
-        setCairoClipping(cr, area, region);
-    }
+    unsetCairoClipping(cr);
 
     if(doEtch)
         if(!sunken && GTK_STATE_INSENSITIVE!=state &&
@@ -2030,6 +2027,12 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     xd-=1, x--, yd-=1, y--, width+=2, height+=2;
     if(flags&DF_DO_BORDER && width>2 && height>2)
     {
+        GdkColor *borderCols=WIDGET_COMBO==widget && colors==qtcPalette.combobtn
+                            ? GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver && !sunken
+                                ? &qtcPalette.mouseover
+                                : &qtcPalette.button[PAL_ACTIVE]
+                            : colors;
+                            
         cairo_new_path(cr);
         /* Yuck! this is a mess!!!! */
         if(!sunken && (doEtch || WIDGET_SB_SLIDER==widget) &&
@@ -2042,11 +2045,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                             ? qtcPalette.defbtn : qtcPalette.mouseover,
                        round, borderProfile, widget, flags);
         else
-            drawBorder(cr, style, state, area, region, x, y, width, height, colors,
+            drawBorder(cr, style, state, area, region, x, y, width, height, borderCols,
                        round, borderProfile, widget, flags);
     }
-
-    unsetCairoClipping(cr);
 }
 
 #define drawFadedLine(cr, x, y, width, height, col, area, gap, fadeStart, fadeEnd, horiz) \
@@ -3404,7 +3405,10 @@ debugDisplayWidget(widget, 3);
                 else
                 {
                     GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator)
-                                    ? qtcPalette.defbtn : btn_colors;
+                                    ? qtcPalette.defbtn
+                                    : WIDGET_COMBO_BUTTON==widgetType && qtcPalette.combobtn
+                                        ? qtcPalette.combobtn
+                                        : btn_colors;
 
                     drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
                                    &cols[bgnd], cols, round, widgetType,
@@ -3453,7 +3457,7 @@ debugDisplayWidget(widget, 3);
                 }
         }
 
-        if(opts.comboSplitter)
+        if(opts.comboSplitter || SHADE_NONE!=opts.comboBtn)
         {
             if(optionmenu)
             {
@@ -3477,19 +3481,42 @@ debugDisplayWidget(widget, 3);
                 cy+=3;
                 cheight-=6;
 
-                if(sunken)
-                    cx++, cy++, cheight--;
+                if(SHADE_NONE!=opts.comboBtn)
+                {
+                    GdkRectangle btn;
 
-                drawFadedLine(cr, cx + (rev ? ind_width+QT_STYLE->xthickness
-                                            : (cwidth - ind_width - QT_STYLE->xthickness)),
-                                  cy + QT_STYLE->ythickness-1, 1, cheight-3,
-                             &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
+                    btn.x=cx + (rev ? ind_width+QT_STYLE->xthickness
+                                    : (cwidth - ind_width - QT_STYLE->xthickness)+1),
+                    btn.y=y, btn.width=ind_width+4, btn.height=height;
 
-                if(!sunken)
-                    drawFadedLine(cr, cx + 1 + (rev ? ind_width+QT_STYLE->xthickness
-                                                    : (cwidth - ind_width - QT_STYLE->xthickness)),
-                                      cy + QT_STYLE->ythickness-1, 1, cheight-3,
-                                 &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
+                    setCairoClipping(cr, &btn, NULL);
+                    if(rev)
+                        btn.width+=3;
+                    else
+                        btn.x-=3, btn.width+=3;
+                    drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
+                                   &qtcPalette.combobtn[bgnd], qtcPalette.combobtn,
+                                   rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
+                                   BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+                    unsetCairoClipping(cr);
+                }
+                
+                if(opts.comboSplitter)
+                {
+                    if(sunken)
+                        cx++, cy++, cheight--;
+
+                    drawFadedLine(cr, cx + (rev ? ind_width+QT_STYLE->xthickness
+                                                : (cwidth - ind_width - QT_STYLE->xthickness)),
+                                    cy + QT_STYLE->ythickness-1, 1, cheight-3,
+                                &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
+
+                    if(!sunken)
+                        drawFadedLine(cr, cx + 1 + (rev ? ind_width+QT_STYLE->xthickness
+                                                        : (cwidth - ind_width - QT_STYLE->xthickness)),
+                                        cy + QT_STYLE->ythickness-1, 1, cheight-3,
+                                    &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
+                }
             }
             else if((button || togglebutton) && (combo || combo_entry))
             {
@@ -3509,12 +3536,34 @@ debugDisplayWidget(widget, 3);
 
                 if(!combo_entry)
                 {
-                    drawFadedLine(cr, vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
-                                  &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
+                    if(SHADE_NONE!=opts.comboBtn)
+                    {
+                        GdkRectangle btn;
 
-                    if(!sunken)
-                        drawFadedLine(cr, vx+1+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
-                                      &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
+                        btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
+                        btn.y=y, btn.width=20+4, btn.height=height;
+
+                        setCairoClipping(cr, &btn, NULL);
+                        if(rev)
+                            btn.width+=3;
+                        else
+                            btn.x-=3, btn.width+=3;
+                        drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
+                                    &qtcPalette.combobtn[bgnd], qtcPalette.combobtn,
+                                    rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
+                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+                        unsetCairoClipping(cr);
+                    }
+
+                    if(opts.comboSplitter)
+                    {
+                        drawFadedLine(cr, vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
+                                      &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
+
+                        if(!sunken)
+                            drawFadedLine(cr, vx+1+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
+                                          &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
+                    }
                 }
             }
         }
@@ -6342,6 +6391,36 @@ static void generateColors()
             qtcPalette.slider=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.slider);
         }
+        default:
+            break;
+    }
+
+    qtcPalette.combobtn=NULL;
+    switch(opts.comboBtn)
+    {
+        case SHADE_SELECTED:
+            qtcPalette.combobtn=qtcPalette.highlight;
+            break;
+        case SHADE_CUSTOM:
+            if(SHADE_CUSTOM==opts.shadeSliders && QTC_EQUAL_COLOR(opts.customSlidersColor, opts.customComboBtnColor))
+                qtcPalette.combobtn=qtcPalette.slider;
+            else
+            {
+                qtcPalette.combobtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&opts.customComboBtnColor, qtcPalette.combobtn);
+            }
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                qtcPalette.combobtn=qtcPalette.slider;
+            else
+            {
+                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                      &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+
+                qtcPalette.combobtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&mid, qtcPalette.combobtn);
+            }
         default:
             break;
     }
