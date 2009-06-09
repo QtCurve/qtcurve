@@ -1081,6 +1081,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(version<QTC_MAKE_VERSION(0, 63) && QTC_IS_BLACK(opts->customMenuStripeColor))
                 QTC_CFG_READ_COLOR(customMenuStripeColor)
 #endif
+            QTC_CFG_READ_SHADE(comboBtn, false, false, &opts->customComboBtnColor);
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)
@@ -1388,6 +1389,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             checkColor(&opts->menuStripe, &opts->customMenuStripeColor);
 #endif
+            checkColor(&opts->comboBtn, &opts->customComboBtnColor);
             if(APPEARANCE_BEVELLED==opts->toolbarAppearance)
                 opts->toolbarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->toolbarAppearance)
@@ -1625,6 +1627,7 @@ static void defaultSettings(Options *opts)
 #endif
     opts->shading=SHADING_HSL;
     opts->gtkScrollViews=false;
+    opts->comboBtn=SHADE_NONE;
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
     opts->gtkComboMenus=false;
@@ -1634,6 +1637,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuNormTextColor.setRgb(0, 0, 0);
     opts->customMenuSelTextColor.setRgb(0, 0, 0);
     opts->customCheckRadioColor.setRgb(0, 0, 0);
+    opts->customComboBtnColor.setRgb(0, 0, 0);
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
 #else
 /*
@@ -1644,6 +1648,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuNormTextColor.red=opts->customMenuNormTextColor.green=opts->customMenuNormTextColor.blue=0;
     opts->customMenuSelTextColor.red=opts->customMenuSelTextColor.green=opts->customMenuSelTextColor.blue=0;
     opts->customCheckRadioColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
+    opts->customComboBtnColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
 #endif
 
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
@@ -2161,6 +2166,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             CFG.deleteEntry("titlebarButtonColors");
 #endif
         CFG_WRITE_SHADE_ENTRY(menuStripe, customMenuStripeColor)
+        CFG_WRITE_SHADE_ENTRY(comboBtn, customComboBtnColor)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY(titlebarAppearance)
         CFG_WRITE_ENTRY(inactiveTitlebarAppearance)

@@ -846,7 +846,8 @@ typedef struct
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripe,
 #endif
-                     shadeCheckRadio;
+                     shadeCheckRadio,
+                     comboBtn;
     EColor           progressGrooveColor;
     EEffect          buttonEffect;
     EScrollbar       scrollbarType;
@@ -858,7 +859,8 @@ typedef struct
 #if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      customMenuStripeColor,
 #endif
-                     customCheckRadioColor;
+                     customCheckRadioColor,
+                     customComboBtnColor;
 #if defined __cplusplus
     EAlign           titlebarAlignment;
 #endif
