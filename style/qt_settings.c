@@ -785,9 +785,15 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
         qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]=setGdkColor(233, 232, 232);
         qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT]=setGdkColor(20, 19, 18);
 
-        qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=
-        qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=
-            qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
+        if(qtSettings.qt4)
+        {
+            qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=setGdkColor( 43, 116, 199);
+            qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=setGdkColor(119, 183, 255);
+        }
+        else
+            qtSettings.colors[PAL_ACTIVE][COLOR_FOCUS]=
+            qtSettings.colors[PAL_ACTIVE][COLOR_HOVER]=
+                qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
     }
 
     if(f)

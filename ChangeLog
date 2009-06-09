@@ -8,6 +8,8 @@
 6. Slightly changed min width/height of when buttons can be max
    rounded - fixes some issues with firefox.
 7. Fix scrollbar background when using thinner grooves.
+8. Under KDE4 (KDE_SESSION_VERSION>=4), default hover/focus colours to the
+   KDE4 defaults.
 
 0.63.0
 ------
