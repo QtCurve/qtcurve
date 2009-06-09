@@ -1738,6 +1738,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return opts.popupBorder ? pixelMetric(PM_DefaultFrameWidth, option, widget) : 0;
         case PM_SubMenuOverlap:
             return -2;
+        case PM_SizeGripSize:
+            return SIZE_GRIP_SIZE;
         case PM_TabBarScrollButtonWidth:
             return 18;
         case PM_HeaderMargin:
@@ -3760,23 +3762,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         }
         case CE_SizeGrip:
         {
-            painter->save();
-            painter->setRenderHint(QPainter::Antialiasing, true);
-            int x, y, w, h;
-            r.getRect(&x, &y, &w, &h);
-
-            if (h > w)
-                painter->translate(0, h - w);
-            else
-                painter->translate(w - h, 0);
-
-            int sw(qMin(h, w)),
-                sx(x),
-                sy(y),
-                s(sw / 4),
-                dark(4); // QT_BORDER(state&State_Enabled));
-
+            QPolygon   triangle(3);
             Qt::Corner corner;
+            int        size=SIZE_GRIP_SIZE-2;
+
             if (const QStyleOptionSizeGrip *sgrp = qstyleoption_cast<const QStyleOptionSizeGrip *>(option))
                 corner = sgrp->corner;
             else if (Qt::RightToLeft==option->direction)
@@ -3787,52 +3776,25 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             switch(corner)
             {
                 case Qt::BottomLeftCorner:
-                    sx = x + sw;
-                    for (int i = 0; i < 4; ++i)
-                    {
-//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
-//                         painter->drawLine(x, sy - 1 , sx + 1, sw);
-                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
-                        painter->drawLine(x, sy, sx, sw);
-                        sx -= s;
-                        sy += s;
-                    }
+                    triangle.putPoints(0, 3, 0,0, size,size, 0,size);
+                    triangle.translate(r.x(), r.y()+(r.height()-(SIZE_GRIP_SIZE-1)));
                     break;
                 case Qt::BottomRightCorner:
-                    for (int i = 0; i < 4; ++i)
-                    {
-//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
-//                         painter->drawLine(sx - 1, sw, sw, sy - 1);
-                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
-                        painter->drawLine(sx, sw, sw, sy);
-                        sx += s;
-                        sy += s;
-                    }
+                    triangle.putPoints(0, 3, size,0, size,size, 0,size);
+                    triangle.translate(r.x()+(r.width()-(SIZE_GRIP_SIZE-1)), r.y()+(r.height()-(SIZE_GRIP_SIZE-1)));
                     break;
                 case Qt::TopRightCorner:
-                    sy = y + sw;
-                    for (int i = 0; i < 4; ++i)
-                    {
-//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
-//                         painter->drawLine(sx - 1, y, sw, sy + 1);
-                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
-                        painter->drawLine(sx, y, sw, sy);
-                        sx += s;
-                        sy -= s;
-                    }
+                    triangle.putPoints(0, 3, 0,0, size,0, size,size);
+                    triangle.translate(r.x()+(r.width()-(SIZE_GRIP_SIZE-1)), r.y());
                     break;
                 case Qt::TopLeftCorner:
-                    for (int i = 0; i < 4; ++i)
-                    {
-//                         painter->setPen(QPen(itsBackgroundCols[0], 1));
-//                         painter->drawLine(x, sy - 1, sx - 1, y);
-                        painter->setPen(QPen(itsBackgroundCols[dark], 1));
-                        painter->drawLine(x, sy, sx, y);
-                        sx += s;
-                        sy += s;
-                    }
+                    triangle.putPoints(0, 3, 0,0, size,0, 0,size);
+                    triangle.translate(r.x(), r.y());
             }
-            painter->setRenderHint(QPainter::Antialiasing, false);
+            painter->save();
+            painter->setPen(itsBackgroundCols[2]);
+            painter->setBrush(itsBackgroundCols[2]);
+            painter->drawPolygon(triangle);
             painter->restore();
             break;
         }

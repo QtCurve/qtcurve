@@ -206,6 +206,8 @@ typedef GdkColor color;
 #define MIN_MENU_DELAY       0
 #define MAX_MENU_DELAY     500
 
+#define SIZE_GRIP_SIZE 12
+
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
