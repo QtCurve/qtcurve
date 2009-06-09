@@ -4,11 +4,12 @@
 2. Add option to unify spinbuttons.
 3. Add option to set sub-menu delay (default 100ms)
 4. Use equal top/bottom padding on popupmenu separators.
-5. Harmonize KDE4 & Gtk2 popupmenu overlaps.
-6. Slightly changed min width/height of when buttons can be max
+5. Draw resize grip as a darkend triangle.
+6. Harmonize KDE4 & Gtk2 popupmenu overlaps.
+7. Slightly changed min width/height of when buttons can be max
    rounded - fixes some issues with firefox.
-7. Fix scrollbar background when using thinner grooves.
-8. Under KDE4 (KDE_SESSION_VERSION>=4), default hover/focus colours to the
+8. Fix scrollbar background when using thinner grooves.
+9. Under KDE4 (KDE_SESSION_VERSION>=4), default hover/focus colours to the
    KDE4 defaults.
 
 0.63.0

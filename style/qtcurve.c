@@ -2769,7 +2769,7 @@ debugDisplayWidget(widget, 3);
     QTC_CAIRO_END
 }
 
-static void drawArrowPolygon(cairo_t *cr, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
+static void drawPolygon(cairo_t *cr, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
     int               i;
     cairo_antialias_t aa=cairo_get_antialias(cr);
@@ -2796,25 +2796,25 @@ static void drawArrow(cairo_t *cr, GdkColor *col, GdkRectangle *area, GtkArrowTy
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x,y-1}, {x+2,y+1}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x,y+1}, {x+2,y-1}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x+1,y}, {x-1,y-2}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x-1,y}, {x+1,y-2}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             default:
@@ -2826,25 +2826,25 @@ static void drawArrow(cairo_t *cr, GdkColor *col, GdkRectangle *area, GtkArrowTy
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-3, y+2},  {x-2, y+2}, {x,y},  {x+2, y+2}, {x+3,y+2}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-3,y-2},  {x-2, y-2}, {x,y}, {x+2, y-2}, {x+3,y-2}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x-1,y-3},  {x+2,y},  {x-1,y+3},   {x-2,y+3}, {x-2, y+2},  {x,y}, {x-2, y-2},  {x-2,y-3}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+3}, {x+2, y+2},  {x,y}, {x+2, y-2},  {x+2,y-3}};
-                drawArrowPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             default:
@@ -6188,232 +6188,38 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
                               GdkRectangle *area, GtkWidget *widget, const gchar *detail,
                               GdkWindowEdge edge, gint x, gint y, gint width, gint height)
 {
-    int dark=4; /* QT_BORDER(GTK_STATE_INSENSITIVE!=state); */
-
     FN_CHECK
     QTC_CAIRO_BEGIN
 
-    switch(edge)
-    {
-        case GDK_WINDOW_EDGE_NORTH_WEST:
-            /* make it square */
-            if(width < height)
-                height = width;
-            else if(height < width)
-                width = height;
-            break;
-        case GDK_WINDOW_EDGE_NORTH:
-            if(width < height)
-                height = width;
-            break;
-        case GDK_WINDOW_EDGE_NORTH_EAST:
-            /* make it square, aligning to top right */
-            if(width < height)
-                height = width;
-            else if(height < width)
-            {
-                x +=(width - height);
-                width = height;
-            }
-            break;
-        case GDK_WINDOW_EDGE_WEST:
-            if(height < width)
-                width = height;
-            break;
-        case GDK_WINDOW_EDGE_EAST:
-            /* aligning to right */
-            if(height < width)
-            {
-                x +=(width - height);
-                width = height;
-            }
-            break;
-        case GDK_WINDOW_EDGE_SOUTH_WEST:
-            /* make it square, aligning to bottom left */
-            if(width < height)
-            {
-                y +=(height - width);
-                height = width;
-            }
-            else if(height < width)
-                width = height;
-            break;
-        case GDK_WINDOW_EDGE_SOUTH:
-            /* align to bottom */
-            if(width < height)
-            {
-                y +=(height - width);
-                height = width;
-            }
-            break;
-        case GDK_WINDOW_EDGE_SOUTH_EAST:
-            /* make it square, aligning to bottom right */
-            if(width < height)
-            {
-                y +=(height - width);
-                height = width;
-            }
-            else if(height < width)
-            {
-                x +=(width - height);
-                width = height;
-            }
-            break;
-        default:
-            g_assert_not_reached();
-    }
+    int size=SIZE_GRIP_SIZE-2;
 
     /* Clear background */
     gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
 
     switch(edge)
     {
-        case GDK_WINDOW_EDGE_WEST:
-        case GDK_WINDOW_EDGE_EAST:
+        case GDK_WINDOW_EDGE_SOUTH_EAST:
         {
-            gint xi = x;
-
-            while(xi < x + width)
-            {
-/*
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
-                cairo_move_to(cr, xi, y);
-                cairo_line_to(cr, xi, y + height);
-                cairo_stroke(cr);
-*/
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
-                xi++;
-                cairo_move_to(cr, xi, y);
-                cairo_line_to(cr, xi, y + height);
-                cairo_stroke(cr);
-                xi += 2;
-            }
-            break;
-        }
-        case GDK_WINDOW_EDGE_NORTH:
-        case GDK_WINDOW_EDGE_SOUTH:
-        {
-            gint yi = y;
-
-            while(yi < y + height)
-            {
-/*
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
-                cairo_move_to(cr, x, yi);
-                cairo_line_to(cr, x + width, yi);
-                cairo_stroke(cr);
-*/
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
-                yi++;
-                cairo_move_to(cr, x, yi);
-                cairo_line_to(cr, x + width, yi);
-                cairo_stroke(cr);
-                yi+= 2;
-            }
-            break;
-        }
-        case GDK_WINDOW_EDGE_NORTH_WEST:
-        {
-            gint xi = x + width,
-                 yi = y + height;
-
-            while(xi > x + 3)
-            {
-/*
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
-                cairo_move_to(cr, xi, y);
-                cairo_line_to(cr, x, yi);
-                cairo_stroke(cr);
-*/
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
-                --xi; --yi;
-                cairo_move_to(cr, xi, y);
-                cairo_line_to(cr, x, yi);
-                cairo_stroke(cr);
-                xi -= 3; yi -= 3;
-            }
-            break;
-        }
-        case GDK_WINDOW_EDGE_NORTH_EAST:
-        {
-            gint xi = x,
-                 yi = y + height;
-
-            while(xi <(x + width - 3))
-            {
-/*
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
-                cairo_move_to(cr, xi, y);
-                cairo_line_to(cr, x + width, yi);
-                cairo_stroke(cr);
-*/
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
-                ++xi; --yi;
-                cairo_move_to(cr, xi, y);
-                cairo_line_to(cr, x + width, yi);
-                cairo_stroke(cr);
-                xi += 3; yi -= 3;
-            }
+            GdkPoint a[]={{ x+width,       (y+height)-size},
+                          { x+width,        y+height},
+                          {(x+width)-size,  y+height}};
+            drawPolygon(cr, &qtcPalette.background[2], area, a, 3, TRUE);
             break;
         }
         case GDK_WINDOW_EDGE_SOUTH_WEST:
         {
-            gint xi = x + width,
-            yi = y;
-
-            while(xi > x + 3)
-            {
-/*
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
-                cairo_move_to(cr, x, yi);
-                cairo_line_to(cr, xi, y + height);
-                cairo_stroke(cr);
-*/
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
-                --xi; ++yi;
-                cairo_move_to(cr, x, yi);
-                cairo_line_to(cr, xi, y + height);
-                cairo_stroke(cr);
-                xi -= 3; yi += 3;
-            }
+            GdkPoint a[]={{(x+width)-size, (y+height)-size},
+                          { x+width,        y+height},
+                          {(x+width)-size,  y+height}};
+            drawPolygon(cr, &qtcPalette.background[2], area, a, 3, TRUE);
             break;
         }
-        case GDK_WINDOW_EDGE_SOUTH_EAST:
-        {
-            gint xi = x,
-                 yi = y;
-
-            while(xi <(x + width - 3))
-            {
-/*
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[0]));
-                cairo_move_to(cr, xi, y + height);
-                cairo_line_to(cr, x + width, yi);
-                cairo_stroke(cr);
-*/
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[dark]));
-                xi++; yi++;
-                cairo_move_to(cr, xi, y + height);
-                cairo_line_to(cr, x + width, yi);
-                cairo_stroke(cr);
-                xi += 3; yi+=3;
-            }
-            break;
-        }
+        case GDK_WINDOW_EDGE_NORTH_EAST:
+            // TODO!!
+        case GDK_WINDOW_EDGE_NORTH_WEST:
+            // TODO!!
         default:
-            g_assert_not_reached();
+            parent_class->draw_resize_grip(style, window, state, area, widget, detail, edge, x, y, width, height);
     }
 
     QTC_CAIRO_END
