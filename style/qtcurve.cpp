@@ -6483,7 +6483,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(showIcon && iconX>=0)
                     painter->drawPixmap(iconX, r.y()+((r.height()-iconSize)/2)+1, pixmap);
-        
+
                 if ((titleBar->subControls&SC_TitleBarMinButton) && (titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMinimized))
                     drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, textColor, shadow, btnCols, bgndCols);
@@ -9377,42 +9377,44 @@ void QtCurveStyle::readMdiPositions() const
 
         KConfig      cfg("kwinrc");
         KConfigGroup grp(&cfg, "Style");
-        QString      val;
 
-        val=grp.readEntry("ButtonsOnLeft");
-        if(!val.isEmpty())
+        if(grp.readEntry("CustomButtonPositions", false))
         {
-            itsMdiButtons[0].clear();
-            parseWindowLine(val, itsMdiButtons[0]);
-        }
-
-        val=grp.readEntry("ButtonsOnRight");
-        if(!val.isEmpty())
-        {
-            itsMdiButtons[1].clear();
-            parseWindowLine(val, itsMdiButtons[1]);
-        }
-
-        // Designer uses shade buttons, not min/max - so if we dont have shade in our kwin config. then add this
-        // button near the max button...
-        if(-1==itsMdiButtons[0].indexOf(SC_TitleBarShadeButton) && -1==itsMdiButtons[1].indexOf(SC_TitleBarShadeButton))
-        {
-            int maxPos=itsMdiButtons[0].indexOf(SC_TitleBarMaxButton);
-
-            if(-1==maxPos) // Left doesnt have max button, assume right does and add shade there
+            QString val=grp.readEntry("ButtonsOnLeft");
+            if(!val.isEmpty())
             {
-                int minPos=itsMdiButtons[1].indexOf(SC_TitleBarMinButton);
-                maxPos=itsMdiButtons[1].indexOf(SC_TitleBarMaxButton);
-
-                itsMdiButtons[1].insert(minPos<maxPos ? (minPos==-1 ? 0 : minPos)
-                                                        : (maxPos==-1 ? 0 : maxPos), SC_TitleBarShadeButton);
+                itsMdiButtons[0].clear();
+                parseWindowLine(val, itsMdiButtons[0]);
             }
-            else // Add to left button
-            {
-                int minPos=itsMdiButtons[0].indexOf(SC_TitleBarMinButton);
 
-                itsMdiButtons[1].insert(minPos>maxPos ? (minPos==-1 ? 0 : minPos)
-                                                      : (maxPos==-1 ? 0 : maxPos), SC_TitleBarShadeButton);
+            val=grp.readEntry("ButtonsOnRight");
+            if(!val.isEmpty())
+            {
+                itsMdiButtons[1].clear();
+                parseWindowLine(val, itsMdiButtons[1]);
+            }
+
+            // Designer uses shade buttons, not min/max - so if we dont have shade in our kwin config. then add this
+            // button near the max button...
+            if(-1==itsMdiButtons[0].indexOf(SC_TitleBarShadeButton) && -1==itsMdiButtons[1].indexOf(SC_TitleBarShadeButton))
+            {
+                int maxPos=itsMdiButtons[0].indexOf(SC_TitleBarMaxButton);
+
+                if(-1==maxPos) // Left doesnt have max button, assume right does and add shade there
+                {
+                    int minPos=itsMdiButtons[1].indexOf(SC_TitleBarMinButton);
+                    maxPos=itsMdiButtons[1].indexOf(SC_TitleBarMaxButton);
+
+                    itsMdiButtons[1].insert(minPos<maxPos ? (minPos==-1 ? 0 : minPos)
+                                                            : (maxPos==-1 ? 0 : maxPos), SC_TitleBarShadeButton);
+                }
+                else // Add to left button
+                {
+                    int minPos=itsMdiButtons[0].indexOf(SC_TitleBarMinButton);
+
+                    itsMdiButtons[1].insert(minPos>maxPos ? (minPos==-1 ? 0 : minPos)
+                                                        : (maxPos==-1 ? 0 : maxPos), SC_TitleBarShadeButton);
+                }
             }
         }
     }

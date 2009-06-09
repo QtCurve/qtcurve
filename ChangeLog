@@ -13,6 +13,8 @@
 10. Fix storing of custom menu stripe colour.
 11. Fix max/restore button being 'stuck'
 12. Fix QPainter errors displayed when running qtconfig.
+13. Fix reading of kwin button positions for MDI windows when
+    custom postitions are set, but the flag to use these is not.
 
 0.63.0
 ------
