@@ -1052,6 +1052,9 @@ void QtCurveStyle::polish(QPalette &palette)
 //                                    palette.color(QPalette::Active, QPalette::Highlight), INACTIVE_HIGHLIGHT_FACTOR));
 //         palette.setColor(QPalette::Inactive, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::WindowText));
 //     }
+
+    // Force this to be re-generated!
+    opts.customMenuStripeColor=Qt::black;
 }
 
 void QtCurveStyle::polish(QWidget *widget)
