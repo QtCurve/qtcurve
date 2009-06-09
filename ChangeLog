@@ -12,6 +12,8 @@
  9. Fix scrollbar background when using thinner grooves.
 10. Under KDE4 (KDE_SESSION_VERSION>=4), default hover/focus colours to the
     KDE4 defaults.
+11. Fix firefox crashing when scrollbar slider move to top. This only occurs
+    when not using flat scrollbar buttons, and a coloured scrollbar slider.
 
 0.63.0
 ------

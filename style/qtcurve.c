@@ -83,6 +83,7 @@ static QtCSlider lastSlider;
 #define QTC_CAIRO_COL(A) (A).red/65535.0, (A).green/65535.0, (A).blue/65535.0
 
 #define QTC_CAIRO_BEGIN \
+    if(GDK_IS_DRAWABLE(window)) \
     { \
     cairo_t *cr=(cairo_t*)gdk_cairo_create(window); \
     setCairoClipping(cr, area, NULL); \
