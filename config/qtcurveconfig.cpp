@@ -1496,6 +1496,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customMenuSelTextColor->setEnabled(customMenuTextColor->isChecked());
     customCheckRadioColor->setEnabled(SHADE_CUSTOM==opts.shadeCheckRadio);
     customMenuStripeColor->setEnabled(SHADE_CUSTOM==opts.menuStripe);
+    menuStripeAppearance->setEnabled(SHADE_NONE!=opts.menuStripe);
 
     animatedProgress->setEnabled(STRIPE_NONE!=stripedProgress->currentIndex());
 
