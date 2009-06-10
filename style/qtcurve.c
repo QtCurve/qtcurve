@@ -3416,7 +3416,8 @@ debugDisplayWidget(widget, 3);
                                         ? qtcPalette.combobtn
                                         : btn_colors;
                     int      bg=(WIDGET_COMBO_BUTTON==widgetType && SHADE_DARKEN==opts.comboBtn) ||
-                                (WIDGET_SB_SLIDER==widgetType && SHADE_DARKEN==opts.shadeSliders)
+                                (WIDGET_SB_SLIDER==widgetType && SHADE_DARKEN==opts.shadeSliders) ||
+                                (defBtn && IND_DARKEN==opts.defBtnIndicator)
                                     ? getFillReal(state, btn_down, true) : bgnd;
 
                     drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
@@ -6436,27 +6437,32 @@ static void generateColors()
             break;
     }
 
-    if(IND_GLOW==opts.defBtnIndicator)
-        qtcPalette.defbtn=qtcPalette.focus;
-    else if(IND_TINT==opts.defBtnIndicator)
+    switch(opts.defBtnIndicator)
     {
-        GdkColor col=tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
-                          &qtcPalette.highlight[ORIGINAL_SHADE], QTC_DEF_BNT_TINT);
-        qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-        shadeColors(&col, qtcPalette.defbtn);
-    }
-    else if(IND_COLORED==opts.defBtnIndicator)
-    {
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
-            qtcPalette.defbtn=qtcPalette.slider;
-        else
+        case IND_GLOW:
+            qtcPalette.defbtn=qtcPalette.focus;
+            break;
+        case IND_TINT:
         {
-            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                                  &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
-
+            GdkColor col=tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
+                            &qtcPalette.highlight[ORIGINAL_SHADE], QTC_DEF_BNT_TINT);
             qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-            shadeColors(&mid, qtcPalette.defbtn);
+            shadeColors(&col, qtcPalette.defbtn);
+            break;
         }
+        default:
+            break;
+        case IND_COLORED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                qtcPalette.defbtn=qtcPalette.slider;
+            else
+            {
+                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                    &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+
+                qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&mid, qtcPalette.defbtn);
+            }
     }
 
     if(opts.coloredMouseOver)
