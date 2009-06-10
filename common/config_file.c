@@ -85,6 +85,8 @@ static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
             return IND_TINT;
         if(0==memcmp(str, "glow", 4))
             return IND_GLOW;
+        if(0==memcmp(str, "darken", 6))
+            return IND_DARKEN;
     }
 
     return def;
@@ -1695,6 +1697,8 @@ static const char *toStr(EDefBtnIndicator ind)
             return "tint";
         case IND_GLOW:
             return "glow";
+        case IND_DARKEN:
+            return "darken";
         default:
             return "colored";
     }

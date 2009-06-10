@@ -502,6 +502,7 @@ typedef enum
     IND_COLORED,
     IND_TINT,
     IND_GLOW,
+    IND_DARKEN,
     IND_NONE
 } EDefBtnIndicator;
 

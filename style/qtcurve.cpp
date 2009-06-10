@@ -820,24 +820,27 @@ QtCurveStyle::QtCurveStyle(const QString &name)
                         itsSliderCols);
     }
 
-    if(IND_GLOW==opts.defBtnIndicator)
-        itsDefBtnCols=itsFocusCols;
-    else if(IND_TINT==opts.defBtnIndicator)
+    switch(opts.defBtnIndicator)
     {
-        itsDefBtnCols=new QColor [TOTAL_SHADES+1];
-        shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
-                         itsHighlightCols[ORIGINAL_SHADE], QTC_DEF_BNT_TINT), itsDefBtnCols);
-    }
-    else
-    {
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
-            itsDefBtnCols=itsSliderCols;
-        else
-        {
+        case IND_GLOW:
+            itsDefBtnCols=itsFocusCols;
+            break;
+        case IND_TINT:
             itsDefBtnCols=new QColor [TOTAL_SHADES+1];
-            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                                 itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
-        }
+            shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
+                            itsHighlightCols[ORIGINAL_SHADE], QTC_DEF_BNT_TINT), itsDefBtnCols);
+            break;
+        default:
+            break;
+        case IND_COLORED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                itsDefBtnCols=itsSliderCols;
+            else
+            {
+                itsDefBtnCols=new QColor [TOTAL_SHADES+1];
+                shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                                    itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
+            }
     }
 
     switch(opts.comboBtn)
@@ -3389,7 +3392,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             bool coloredDef=isDefault && state&State_Enabled && IND_COLORED==opts.defBtnIndicator;
             
             drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL,
-                           coloredDef ? itsDefBtnCols[QTC_MO_DEF_BTN] : getFill(&opt, use),
+                           coloredDef ? itsDefBtnCols[QTC_MO_DEF_BTN]
+                                      : getFill(&opt, use, false,
+                                                isDefault && state&State_Enabled && IND_DARKEN==opts.defBtnIndicator),
                            coloredDef ? itsDefBtnCols : use,
                            true, isKWin
                                     ? WIDGET_MDI_WINDOW_BUTTON
