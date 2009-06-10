@@ -8099,6 +8099,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                  plastikMouseOver(doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver),
                  colouredMouseOver(doColouredMouseOver && WIDGET_MENU_BUTTON!=w &&
                                        (MO_COLORED==opts.coloredMouseOver ||
+                                        MO_COLORED_THICK==opts.coloredMouseOver ||
                                               (MO_GLOW==opts.coloredMouseOver && !QTC_DO_EFFECT))),
                  doEtch(doBorder && ETCH_WIDGET(w) && QTC_DO_EFFECT),
                  horiz(isHoriz(option, w));
@@ -8255,7 +8256,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                             ? option->state&State_MouseOver && MO_GLOW==opts.coloredMouseOver && !sunken
                                 ? itsMouseOverCols
                                 : itsButtonCols
-                            : border;
+                            : cols;
 
         r.adjust(-1, -1, 1, 1);
         if(!sunken && option->state&State_Enabled &&
@@ -8267,7 +8268,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                        (!(option->state&State_MouseOver) || !itsMouseOverCols)
                             ? itsDefBtnCols : itsMouseOverCols, w);
         else
-            drawBorder(p, r, option, round, borderCols, w);
+            drawBorder(p, r, option, round,
+                       colouredMouseOver && MO_COLORED_THICK==opts.coloredMouseOver ? itsMouseOverCols : borderCols, w);
     }
         
     p->restore();

@@ -128,6 +128,8 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
     {
         if(0==memcmp(str, "true", 4) || 0==memcmp(str, "colored", 7))
             return MO_COLORED;
+        if(0==memcmp(str, "thickcolored", 12))
+            return MO_COLORED_THICK;
         if(0==memcmp(str, "plastik", 7))
             return MO_PLASTIK;
         if(0==memcmp(str, "glow", 4))
@@ -1738,6 +1740,8 @@ static const char *toStr(EMouseOver mo)
     {
         case MO_COLORED:
             return "colored";
+        case MO_COLORED_THICK:
+            return "thickcolored";
         case MO_NONE:
             return "none";
         case MO_GLOW:

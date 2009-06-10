@@ -6,19 +6,20 @@
  4. Use equal top/bottom padding on popupmenu separators.
  5. Add option to colour arrow part of combobox.
  6. Draw resize grip as a darkend triangle.
- 7. Harmonize KDE4 & Gtk2 popupmenu overlaps.
- 8. Slightly changed min width/height of when buttons can be max
+ 7. Add a 'thick colored border' mouse over type.
+ 8. Harmonize KDE4 & Gtk2 popupmenu overlaps.
+ 9. Slightly changed min width/height of when buttons can be max
     rounded.
- 9. Alter position of arrow in toolbar buttons with menus.
-10. Fix selection artifact issues with details view in dolphin.
-11. Fix setting of check/radio shade.
-12. Fix storing of custom menu stripe colour.
-13. Fix max/restore button being 'stuck'
-14. Fix QPainter errors displayed when running qtconfig.
-15. Fix reading of kwin button positions for MDI windows when
+10. Alter position of arrow in toolbar buttons with menus.
+11. Fix selection artifact issues with details view in dolphin.
+12. Fix setting of check/radio shade.
+13. Fix storing of custom menu stripe colour.
+14. Fix max/restore button being 'stuck'
+15. Fix QPainter errors displayed when running qtconfig.
+16. Fix reading of kwin button positions for MDI windows when
     custom postitions are set, but the flag to use these is not.
-16. Add an option to export the KDE4 palette, and font, for pure-Qt3 applications.
-17. Set Kontact's toolbuttons to be auto-raise.
+17. Add an option to export the KDE4 palette, and font, for pure-Qt3 applications.
+18. Set Kontact's toolbuttons to be auto-raise.
 
 0.63.0
 ------

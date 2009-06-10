@@ -573,6 +573,7 @@ typedef enum
 {
     MO_NONE,
     MO_COLORED,
+    MO_COLORED_THICK,
     MO_PLASTIK,
     MO_GLOW
 } EMouseOver;
