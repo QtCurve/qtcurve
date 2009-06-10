@@ -19,6 +19,8 @@
     when not using flat scrollbar buttons, and a coloured scrollbar slider.
 15. Dont draw frame around GEdits combos in its status bar - unless
     drawStatusBarFrames is set to true.
+16. Dont attempt alter OK/Cancel button for Firefox 3.5 - seems to mess up
+    preferences dialog.
 
 0.63.0
 ------

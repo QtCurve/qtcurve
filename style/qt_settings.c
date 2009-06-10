@@ -364,7 +364,21 @@ static int getMozillaVersion(int pid)
                 char *dot=strchr(version, '.');
 
                 if(dot && dot!=version && isdigit(dot[-1]))
-                    ver=dot[-1]-'0';
+                {
+                    char *minor=&dot[1];
+                    char *major=0L;
+                    int i=0;
+                    
+                    for(i=-1; dot[i]!=version; i--)
+                        if(!isdigit(dot[i]))
+                        {
+                            major=&dot[i+1];
+                            break;
+                        }
+                    ver=major && minor
+                        ? QTC_MAKE_VERSION(strtol(major, NULL, 10), strtol(minor, NULL, 10))
+                        : QTC_MAKE_VERSION(dot[-1]-'0', 0);
+                }
             }
         }
         close(procFile);
@@ -2042,6 +2056,16 @@ static gboolean qtInit(Options *opts)
 
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
+// If QTC_MODIFY_MOZILLA is set, then we always need to get version!
+#ifndef QTC_MODIFY_MOZILLA
+                    if(GTK_APP_MOZILLA==qtSettings.app)
+#endif
+                        mozVersion=getMozillaVersion(getpid());
+                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>QTC_MAKE_VERSION(2, 0))
+                        qtSettings.app=GTK_APP_NEW_MOZILLA;
+                    if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts->menuitemAppearance &&
+                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<QTC_MAKE_VERSION(2, 0))))
+                        opts->menuitemAppearance=APPEARANCE_GRADIENT;
 #ifdef QTC_MODIFY_MOZILLA
                     GdkColor *menu_col=SHADE_CUSTOM==opts->shadeMenubars
                                         ? &opts->customMenubarsColor
@@ -2050,7 +2074,7 @@ static gboolean qtInit(Options *opts)
                                              (SHADE_CUSTOM==opts->shadeMenubars && TOO_DARK(*menu_col) );
 
                     if(firefox)
-                        processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "firefox", TRUE);
+                        processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts->gtkButtonOrder, add_menu_colors, "firefox", TRUE);
                     else if(thunderbird)
                         processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
                     else if(mozThunderbird)
@@ -2062,14 +2086,6 @@ static gboolean qtInit(Options *opts)
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
-
-                    if(GTK_APP_MOZILLA==qtSettings.app)
-                        mozVersion=getMozillaVersion(getpid());
-                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>2)
-                        qtSettings.app=GTK_APP_NEW_MOZILLA;
-                    if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts->menuitemAppearance &&
-                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<2)))
-                        opts->menuitemAppearance=APPEARANCE_GRADIENT;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
