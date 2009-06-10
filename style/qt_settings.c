@@ -2070,7 +2070,7 @@ static gboolean qtInit(Options *opts)
                     GdkColor *menu_col=SHADE_CUSTOM==opts->shadeMenubars
                                         ? &opts->customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
-                    gboolean add_menu_colors=SHADE_BLEND_SELECTED==opts->shadeMenubars ||
+                    gboolean add_menu_colors=SHADE_BLEND_SELECTED==opts->shadeMenubars || SHADE_SELECTED==opts->shadeMenubars ||
                                              (SHADE_CUSTOM==opts->shadeMenubars && TOO_DARK(*menu_col) );
 
                     if(firefox)

@@ -3721,7 +3721,7 @@ debugDisplayWidget(widget, 3);
                                     : ROUNDED_ALL
                                 : ROUNDED_ALL,
                      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
-            gboolean stdColors=!mb || SHADE_BLEND_SELECTED!=opts.shadeMenubars;
+            gboolean stdColors=!mb || (SHADE_BLEND_SELECTED!=opts.shadeMenubars && SHADE_SELECTED!=opts.shadeMenubars);
             int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
                      borderVal=opts.borderMenuitems ? 0 : fillVal;
 
@@ -4575,9 +4575,8 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                     style->text_gc[GTK_STATE_INSENSITIVE]=qtcurveStyle->menutext_gc[0];
                     use_text=TRUE;
                 }
-                else if (SHADE_BLEND_SELECTED==opts.shadeMenubars ||
-                         (SHADE_CUSTOM==opts.shadeMenubars &&
-                          TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
+                else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars || 
+                         (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
                     selectedText=TRUE;
             }
         }
@@ -5952,6 +5951,13 @@ static void generateColors()
             memcpy(qtcPalette.menubar, qtcPalette.background, sizeof(GdkColor)*(TOTAL_SHADES+1));
             break;
         case SHADE_BLEND_SELECTED:
+        {
+            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                  &qtcPalette.background[ORIGINAL_SHADE]);
+            shadeColors(&mid, qtcPalette.menubar);
+            break;
+        }    
+        case SHADE_SELECTED:
         {
             GdkColor color;
 
