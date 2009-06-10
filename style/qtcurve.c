@@ -316,7 +316,8 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
     if(SCROLLBAR || SCALE) \
         btn_colors=GTK_STATE_INSENSITIVE==STATE \
                     ? qtcPalette.background \
-                    : SHADE_NONE!=opts.shadeSliders && (!opts.colorSliderMouseOver || GTK_STATE_PRELIGHT==STATE) \
+                    : SHADE_NONE!=opts.shadeSliders && qtcPalette.slider && \
+                      (!opts.colorSliderMouseOver || GTK_STATE_PRELIGHT==STATE) \
                         ? qtcPalette.slider \
                         : qtcPalette.button[PAL_ACTIVE]; \
     else if(LISTVIEW && !opts.lvButton) \
@@ -705,18 +706,20 @@ static EStepper getStepper(GtkWidget *widget, int x, int y, int width, int heigh
     return QTC_STEPPER_NONE;
 }
 
-static int getFill(GtkStateType state, gboolean set/*, gboolean allow_mouse_over_set*/)
+static int getFillReal(GtkStateType state, gboolean set, gboolean darker)
 {
     return GTK_STATE_INSENSITIVE==state
-               ? ORIGINAL_SHADE
+               ? (darker ? 2 : ORIGINAL_SHADE)
                : GTK_STATE_PRELIGHT==state
                    ? set /*&& allow_mouse_over_set*/
-                       ? SHADE_4_HIGHLIGHT
-                       : SHADE_ORIG_HIGHLIGHT
+                       ? (darker ? 3 : SHADE_4_HIGHLIGHT)
+                       : (darker ? SHADE_2_HIGHLIGHT : SHADE_ORIG_HIGHLIGHT)
                    : set || GTK_STATE_ACTIVE==state
-                       ? 4
-                       : ORIGINAL_SHADE;
+                       ? (darker ? 5 : 4)
+                       : (darker ? 2 : ORIGINAL_SHADE);
 }
+
+#define getFill(state, set) getFillReal(state, set, FALSE)
 
 static int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int height, gboolean rev)
 {
@@ -3412,9 +3415,12 @@ debugDisplayWidget(widget, 3);
                                     : WIDGET_COMBO_BUTTON==widgetType && qtcPalette.combobtn
                                         ? qtcPalette.combobtn
                                         : btn_colors;
+                    int      bg=(WIDGET_COMBO_BUTTON==widgetType && SHADE_DARKEN==opts.comboBtn) ||
+                                (WIDGET_SB_SLIDER==widgetType && SHADE_DARKEN==opts.shadeSliders)
+                                    ? getFillReal(state, btn_down, true) : bgnd;
 
                     drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                                   &cols[bgnd], cols, round, widgetType,
+                                   &cols[bg], cols, round, widgetType,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
                                                 (lvh ? 0 : DF_DO_BORDER)|
                                                 (horiz ? 0 : DF_VERT), widget);
@@ -3487,6 +3493,8 @@ debugDisplayWidget(widget, 3);
                 if(SHADE_NONE!=opts.comboBtn)
                 {
                     GdkRectangle btn;
+                    GdkColor     *cols=qtcPalette.combobtn ? qtcPalette.combobtn : btn_colors;
+                    int          bg=SHADE_DARKEN==opts.comboBtn ? getFillReal(state, btn_down, true) : bgnd;
 
                     btn.x=cx + (rev ? ind_width+QT_STYLE->xthickness
                                     : (cwidth - ind_width - QT_STYLE->xthickness)+1),
@@ -3498,8 +3506,7 @@ debugDisplayWidget(widget, 3);
                     else
                         btn.x-=3, btn.width+=3;
                     drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
-                                   &qtcPalette.combobtn[bgnd], qtcPalette.combobtn,
-                                   rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
+                                   &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
                     unsetCairoClipping(cr);
                 }
@@ -3542,6 +3549,8 @@ debugDisplayWidget(widget, 3);
                     if(SHADE_NONE!=opts.comboBtn)
                     {
                         GdkRectangle btn;
+                        GdkColor     *cols=qtcPalette.combobtn ? qtcPalette.combobtn : btn_colors;
+                        int          bg=SHADE_DARKEN==opts.comboBtn ? getFillReal(state, btn_down, true) : bgnd;
 
                         btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
                         btn.y=y, btn.width=20+4, btn.height=height;
@@ -3552,8 +3561,7 @@ debugDisplayWidget(widget, 3);
                         else
                             btn.x-=3, btn.width+=3;
                         drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
-                                    &qtcPalette.combobtn[bgnd], qtcPalette.combobtn,
-                                    rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
+                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                     BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
                         unsetCairoClipping(cr);
                     }
@@ -5800,7 +5808,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     {
         gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                      horiz=SLIDER_TRIANGULAR==opts.sliderStyle ? height>width : width>height;
-        int          bgnd=getFill(state, FALSE),
+        int          bgnd=getFillReal(state, FALSE, SHADE_DARKEN==opts.shadeSliders),
                      xo=horiz ? 8 : 0,
                      yo=horiz ? 0 : 8,
                      size=SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13,
