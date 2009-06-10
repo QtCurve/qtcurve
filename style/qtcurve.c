@@ -1858,7 +1858,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                                   GTK_STATE_PRELIGHT==state &&
                                   (IS_TOGGLE_BUTTON(widget) || !sunken),
                 plastikMouseOver=doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver,
-                colouredMouseOver=doColouredMouseOver && MO_COLORED==opts.coloredMouseOver,
+                colouredMouseOver=doColouredMouseOver &&
+                                  (MO_COLORED==opts.coloredMouseOver || MO_COLORED_THICK==opts.coloredMouseOver),
                 lightBorder=QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
                 draw3dfull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app),
                 draw3d=draw3dfull || (!lightBorder && QTC_DRAW_3D_BORDER(sunken, app)),
@@ -2046,7 +2047,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                             ? qtcPalette.defbtn : qtcPalette.mouseover,
                        round, borderProfile, widget, flags);
         else
-            drawBorder(cr, style, state, area, region, x, y, width, height, borderCols,
+            drawBorder(cr, style, state, area, region, x, y, width, height,
+                       colouredMouseOver && MO_COLORED_THICK==opts.coloredMouseOver ? qtcPalette.mouseover : borderCols,
                        round, borderProfile, widget, flags);
     }
 }

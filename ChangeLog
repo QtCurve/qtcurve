@@ -6,13 +6,14 @@
  4. Use equal top/bottom padding on popupmenu separators.
  5. Add option to colour arrow part of combobox.
  6. Draw resize grip as a darkend triangle.
- 7. Harmonize KDE4 & Gtk2 popupmenu overlaps.
- 8. Slightly changed min width/height of when buttons can be max
+ 7. Add a 'thick colored border' mouse over type.
+ 8. Harmonize KDE4 & Gtk2 popupmenu overlaps.
+ 9. Slightly changed min width/height of when buttons can be max
     rounded - fixes some issues with firefox.
- 9. Fix scrollbar background when using thinner grooves.
-10. Under KDE4 (KDE_SESSION_VERSION>=4), default hover/focus colours to the
+10. Fix scrollbar background when using thinner grooves.
+11. Under KDE4 (KDE_SESSION_VERSION>=4), default hover/focus colours to the
     KDE4 defaults.
-11. Fix firefox crashing when scrollbar slider move to top. This only occurs
+12. Fix firefox crashing when scrollbar slider move to top. This only occurs
     when not using flat scrollbar buttons, and a coloured scrollbar slider.
 
 0.63.0
