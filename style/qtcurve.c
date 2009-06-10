@@ -95,13 +95,6 @@ static QtCSlider lastSlider;
     cairo_destroy(cr); \
     }
 
-/*
- * Disabled, for the moment, due to not working very well...
- *    1. Seems to mouse over for the whole toolbar
- *    2. When a toolbar is made floating, the mouse over effect does not turn "off" :-(
-#define QTC_MOUSEOVER_HANDLES
-*/
-
 #define QT_STYLE style
 #define WIDGET_TYPE_NAME(xx) (widget && !strcmp(g_type_name (G_TYPE_FROM_INSTANCE(widget)), (xx)))
 #define FN_CHECK g_return_if_fail(GTK_IS_STYLE(style)); g_return_if_fail(window != NULL);
@@ -184,9 +177,6 @@ static GtkStyleClass  *parent_class=NULL;
 static Options        opts;
 static GtkRequisition defaultOptionIndicatorSize    = { 6, 13 };
 static GtkBorder      defaultOptionIndicatorSpacing = { 7, 5, 1, 1 };
-#ifdef QTC_MOUSEOVER_HANDLES
-static GHashTable     *toolbarHandleHashTable       = NULL;
-#endif
 static GCache         *pixbufCache                  = NULL;
 
 #define DETAIL(xx) ((detail) &&(!strcmp(xx, detail)))
@@ -1038,91 +1028,6 @@ static void constrainRect(GdkRectangle *rect, GdkRectangle *con)
             rect->height-=(rect->y+rect->height)-(con->y+con->height);
     }
 }
-
-#ifdef QTC_MOUSEOVER_HANDLES
-static int * lookupToolbarHandleHash(void *hash, gboolean create)
-{
-    int *rv=NULL;
-
-    if(!toolbarHandleHashTable)
-        toolbarHandleHashTable=g_hash_table_new(g_direct_hash, g_direct_equal);
-
-    rv=(int *)g_hash_table_lookup(toolbarHandleHashTable, hash);
-
-    if(!rv && create)
-    {
-        rv=(int *)malloc(sizeof(int));
-        *rv=0;
-        g_hash_table_insert(toolbarHandleHashTable, hash, rv);
-        rv=g_hash_table_lookup(toolbarHandleHashTable, hash);
-    }
-
-    return rv;
-}
-
-static gboolean toolbarHandleEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-    if(GDK_MOTION_NOTIFY==event->type)
-    {
-        int *handle=lookupToolbarHandleHash(widget, FALSE);
-
-#if 0
-        if(handle)
-        {
-            static int last_x=-100, last_y=-100;
-
-            if(abs(last_x-event->motion.x_root)>4 || abs(last_y-event->motion.y_root)>4)
-            {
-                int nx, ny;
-
-                gdk_window_get_origin(widget->window, &nx, &ny);
-                {
-                int      tx=(widget->allocation.x+nx),
-                         ty=(widget->allocation.y+ny),
-                         tw=(widget->allocation.width),
-                         th=(widget->allocation.height);
-                gboolean inHandle=(tx<=event->motion.x_root && ty<=event->motion.y_root &&
-                                    (tx+tw)>event->motion.x_root && (ty+th)>event->motion.y_root);
-
-                last_x=event->motion.x_root;
-                last_y=event->motion.y_root;
-
-                if( (inHandle && !(*handle)) || (!inHandle && *handle))
-                {
-                    *handle=!(*handle);
-                    gtk_widget_queue_draw(widget);
-                }
-                }
-            }
-        }
-#else
-        if(handle && 0==*handle)
-        {
-            *handle=1;
-            gtk_widget_queue_draw(widget);
-        }
-#endif
-    }
-    else if(GDK_LEAVE_NOTIFY==event->type)
-    {
-        int *handle=lookupToolbarHandleHash(widget, FALSE);
-        if(handle && 1==*handle)
-        {
-            *handle=0;
-            gtk_widget_queue_draw(widget);
-        }
-    }
-
-    return FALSE;
-}
-
-static gboolean toolbarHandleDeleteEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-    if(lookupToolbarHandleHash(widget, FALSE))
-        g_hash_table_remove(toolbarHandleHashTable, widget);
-    return FALSE;
-}
-#endif
 
 static gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
@@ -2421,23 +2326,6 @@ debugDisplayWidget(widget, 3);
     else if((DETAIL("handlebox") && (GTK_APP_JAVA==qtSettings.app || (widget && GTK_IS_HANDLE_BOX(widget)))) ||
             DETAIL("dockitem") || paf)
     {
-#ifdef QTC_MOUSEOVER_HANDLES
-        int *handleHash=NULL;
-
-        if(opts.coloredMouseOver && !isMozilla())
-        {
-            handleHash=lookupToolbarHandleHash(widget, FALSE);
-
-            if(!handleHash)
-            {
-                lookupToolbarHandleHash(widget, TRUE); /* Create hash entry... */
-                gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK);
-                g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(toolbarHandleDeleteEvent),
-                                 widget);
-                g_signal_connect(G_OBJECT(widget), "event", G_CALLBACK(toolbarHandleEvent), widget);
-            }
-        }
-#endif
         if(widget && GTK_STATE_INSENSITIVE!=state)
             state=GTK_WIDGET_STATE(widget);
 
@@ -2450,35 +2338,27 @@ debugDisplayWidget(widget, 3);
             gtkDrawBox(style, window, state, shadow_type, area, widget, "handlebox", x, y, width,
                        height);
 
-        GdkColor *cols=
-#ifdef QTC_MOUSEOVER_HANDLES
-                    opts.coloredMouseOver && handleHash && *handleHash
-                        ? qtcPalette.mouseover :
-#endif
-
-                        qtcPalette.background;
-
         switch(opts.handles)
         {
             case LINE_NONE:
                 break;
             case LINE_DOTS:
-                drawDots(cr, x, y, width, height, height<width, 2, 5, cols, area, 2, 5);
+                drawDots(cr, x, y, width, height, height<width, 2, 5, qtcPalette.background, area, 2, 5);
                 break;
             case LINE_DASHES:
                 if(height>width)
                     drawLines(cr, x+3, y, 3, height, TRUE, (height-8)/2, 0,
-                              cols, area, 5, opts.handles);
+                              qtcPalette.background, area, 5, opts.handles);
                 else
                     drawLines(cr, x, y+3, width, 3, FALSE, (width-8)/2, 0,
-                              cols, area, 5, opts.handles);
+                              qtcPalette.background, area, 5, opts.handles);
                 break;
             case LINE_FLAT:
-                drawLines(cr, x, y, width, height, height<width, 2, 4, cols,
+                drawLines(cr, x, y, width, height, height<width, 2, 4, qtcPalette.background,
                           area, 4, opts.handles);
                 break;
             default:
-                drawLines(cr, x, y, width, height, height<width, 2, 4, cols,
+                drawLines(cr, x, y, width, height, height<width, 2, 4, qtcPalette.background,
                           area, 3, opts.handles);
         }
     }
