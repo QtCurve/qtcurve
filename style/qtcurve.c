@@ -3412,10 +3412,12 @@ debugDisplayWidget(widget, 3);
                 {
                     GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator)
                                     ? qtcPalette.defbtn
-                                    : WIDGET_COMBO_BUTTON==widgetType && qtcPalette.combobtn
+                                    : WIDGET_COMBO_BUTTON==widgetType && qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state
                                         ? qtcPalette.combobtn
                                         : btn_colors;
-                    int      bg=(WIDGET_COMBO_BUTTON==widgetType && SHADE_DARKEN==opts.comboBtn) ||
+                    int      bg=(WIDGET_COMBO_BUTTON==widgetType &&
+                                  (SHADE_DARKEN==opts.comboBtn ||
+                                      (SHADE_NONE!=opts.comboBtn && GTK_STATE_INSENSITIVE==state))) ||
                                 (WIDGET_SB_SLIDER==widgetType && SHADE_DARKEN==opts.shadeSliders) ||
                                 (defBtn && IND_DARKEN==opts.defBtnIndicator)
                                     ? getFillReal(state, btn_down, true) : bgnd;
@@ -3494,8 +3496,9 @@ debugDisplayWidget(widget, 3);
                 if(SHADE_NONE!=opts.comboBtn)
                 {
                     GdkRectangle btn;
-                    GdkColor     *cols=qtcPalette.combobtn ? qtcPalette.combobtn : btn_colors;
-                    int          bg=SHADE_DARKEN==opts.comboBtn ? getFillReal(state, btn_down, true) : bgnd;
+                    GdkColor     *cols=qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state ? qtcPalette.combobtn : btn_colors;
+                    int          bg=SHADE_DARKEN==opts.comboBtn || (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
+                                        ? getFillReal(state, btn_down, true) : bgnd;
 
                     btn.x=cx + (rev ? ind_width+QT_STYLE->xthickness
                                     : (cwidth - ind_width - QT_STYLE->xthickness)+1),
@@ -3550,9 +3553,12 @@ debugDisplayWidget(widget, 3);
                     if(SHADE_NONE!=opts.comboBtn)
                     {
                         GdkRectangle btn;
-                        GdkColor     *cols=qtcPalette.combobtn ? qtcPalette.combobtn : btn_colors;
-                        int          bg=SHADE_DARKEN==opts.comboBtn ? getFillReal(state, btn_down, true) : bgnd;
-
+                        GdkColor     *cols=qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state
+                                        ? qtcPalette.combobtn : btn_colors;
+                        int          bg=SHADE_DARKEN==opts.comboBtn ||
+                                            (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
+                                        ? getFillReal(state, btn_down, true) : bgnd;
+                                        
                         btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
                         btn.y=y, btn.width=20+4, btn.height=height;
 
