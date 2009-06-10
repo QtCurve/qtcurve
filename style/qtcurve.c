@@ -5636,7 +5636,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("menuitem"))
         //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QTC_MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
-        drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[QTC_MENU_SEP_SHADE],
+        drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[QTC_MENU_SEP_SHADE],
                       area, NULL, true, true, true);
     else
         //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[dark]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
