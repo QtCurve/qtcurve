@@ -997,7 +997,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(colorSelTab)
             QTC_CFG_READ_BOOL(roundAllTabs)
             QTC_CFG_READ_TAB_MO(tabMouseOver)
-            QTC_CFG_READ_SHADE(shadeSliders, false, false, &opts->customSlidersColor)
+            QTC_CFG_READ_SHADE(shadeSliders, true, false, &opts->customSlidersColor)
             QTC_CFG_READ_SHADE(shadeMenubars, true, false, &opts->customMenubarsColor)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
@@ -1083,7 +1083,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(version<QTC_MAKE_VERSION(0, 63) && QTC_IS_BLACK(opts->customMenuStripeColor))
                 QTC_CFG_READ_COLOR(customMenuStripeColor)
 #endif
-            QTC_CFG_READ_SHADE(comboBtn, false, false, &opts->customComboBtnColor);
+            QTC_CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)

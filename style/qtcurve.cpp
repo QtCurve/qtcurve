@@ -6844,8 +6844,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     drawLightBevel(painter, frame, &frameOpt, widget,
                                    comboBox->editable ? (reverse ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL,
-                                   getFill(&frameOpt, cols), cols, true,
-                                   comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
+                                   getFill(&frameOpt, cols, false, SHADE_DARKEN==opts.comboBtn && comboBox->editable),
+                                   cols, true, comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
                 }
 
                 if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
@@ -6853,17 +6853,18 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     bool mouseOver=comboBox->editable && !(comboBox->activeSubControls&SC_ComboBoxArrow)
                                     ? false : (state&State_MouseOver ? true : false);
 
-                    if(!comboBox->editable && itsComboBtnCols)
+                    if(!comboBox->editable && (SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
                     {
                         QStyleOption frameOpt(*option);
                         QRect        btn(arrow.x(), frame.y(), arrow.width()+2, frame.height());
+                        const QColor *cols=SHADE_DARKEN==opts.comboBtn ? use : itsComboBtnCols;
                         if(!sunken)
                             frameOpt.state|=State_Raised;
                         painter->save();
                         painter->setClipRect(btn);
                         drawLightBevel(painter, btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
                                        &frameOpt, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT,
-                                       getFill(&frameOpt, itsComboBtnCols), itsComboBtnCols, true, WIDGET_COMBO);
+                                       getFill(&frameOpt, cols, false, SHADE_DARKEN==opts.comboBtn), cols, true, WIDGET_COMBO);
                         painter->restore();
                     }
                     
@@ -8870,7 +8871,7 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
                    || SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons
 #endif
                     ? ROUNDED_ALL : ROUNDED_NONE,
-                   getFill(&opt, use), use, true, WIDGET_SB_SLIDER);
+                   getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders), use, true, WIDGET_SB_SLIDER);
 
     const QColor *markers(/*opts.coloredMouseOver && opt.state&State_MouseOver
                               ? itsMouseOverCols
@@ -8917,7 +8918,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                          *border(opt.state&State_MouseOver && (MO_GLOW==opts.coloredMouseOver ||
                                                                MO_COLORED==opts.coloredMouseOver)
                                     ? itsMouseOverCols : use);
-        const QColor     &fill(getFill(&opt, use));
+        const QColor     &fill(getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders));
         int              x(r.x()),
                          y(r.y()),
                          xo(horiz ? 8 : 0),
@@ -9296,7 +9297,8 @@ const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
 const QColor * QtCurveStyle::sliderColors(const QStyleOption *option) const
 {
     return (option && option->state&State_Enabled)
-                ? SHADE_NONE!=opts.shadeSliders && (!opts.colorSliderMouseOver || option->state&State_MouseOver)
+                ? SHADE_NONE!=opts.shadeSliders && itsSliderCols &&
+                  (!opts.colorSliderMouseOver || option->state&State_MouseOver)
                         ? itsSliderCols
                         : itsButtonCols //buttonColors(option)
                 : itsBackgroundCols;
@@ -9465,19 +9467,19 @@ void QtCurveStyle::readMdiPositions() const
     }
 }
 
-const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *use, bool cr) const
+const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *use, bool cr, bool darker) const
 {
     return !option || !(option->state&State_Enabled)
-               ? use[ORIGINAL_SHADE]
+               ? use[darker ? 2 : ORIGINAL_SHADE]
                : option->state&State_Sunken  // State_Down ????
-                   ? use[4]
+                   ? use[darker ? 5 : 4]
                    : option->state&State_MouseOver
                          ? !cr && option->state&State_On
-                               ? use[SHADE_4_HIGHLIGHT]
-                               : use[SHADE_ORIG_HIGHLIGHT]
+                               ? use[darker ? 3 : SHADE_4_HIGHLIGHT]
+                               : use[darker ? SHADE_2_HIGHLIGHT : SHADE_ORIG_HIGHLIGHT]
                          : !cr && option->state&State_On
-                               ? use[4]
-                               : use[ORIGINAL_SHADE];
+                               ? use[darker ? 5 : 4]
+                               : use[darker ? 2 : ORIGINAL_SHADE];
 }
 
 static QImage rotateImage(const QImage &img, double angle=90.0)
