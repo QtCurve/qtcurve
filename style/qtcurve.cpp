@@ -6834,7 +6834,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(/*comboBox->frame &&*/ frame.isValid())
                 {
-                    const QColor *cols=itsComboBtnCols && comboBox->editable ? itsComboBtnCols : use;
+                    const QColor *cols=itsComboBtnCols && comboBox->editable && state&State_Enabled ? itsComboBtnCols : use;
 
                     QStyleOption frameOpt(*option);
 
@@ -6849,7 +6849,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     drawLightBevel(painter, frame, &frameOpt, widget,
                                    comboBox->editable ? (reverse ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL,
-                                   getFill(&frameOpt, cols, false, SHADE_DARKEN==opts.comboBtn && comboBox->editable),
+                                   getFill(&frameOpt, cols, false,
+                                           (SHADE_DARKEN==opts.comboBtn || (SHADE_NONE!=opts.comboBtn &&
+                                                                            !(state&State_Enabled))) &&
+                                           comboBox->editable),
                                    cols, true, comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
                 }
 
@@ -6862,14 +6865,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         QStyleOption frameOpt(*option);
                         QRect        btn(arrow.x(), frame.y(), arrow.width()+2, frame.height());
-                        const QColor *cols=SHADE_DARKEN==opts.comboBtn ? use : itsComboBtnCols;
+                        const QColor *cols=SHADE_DARKEN==opts.comboBtn || !(state&State_Enabled) ? use : itsComboBtnCols;
                         if(!sunken)
                             frameOpt.state|=State_Raised;
                         painter->save();
                         painter->setClipRect(btn);
                         drawLightBevel(painter, btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
                                        &frameOpt, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT,
-                                       getFill(&frameOpt, cols, false, SHADE_DARKEN==opts.comboBtn), cols, true, WIDGET_COMBO);
+                                       getFill(&frameOpt, cols, false,
+                                               SHADE_DARKEN==opts.comboBtn || (SHADE_NONE!=opts.comboBtn &&
+                                                                               !(state&State_Enabled))),
+                                       cols, true, WIDGET_COMBO);
                         painter->restore();
                     }
                     
