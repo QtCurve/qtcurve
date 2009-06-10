@@ -6260,6 +6260,9 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
     switch(edge)
     {
         case GDK_WINDOW_EDGE_SOUTH_EAST:
+        // Adjust Firefox's resize grip so that it can be completely covered by QtCurve's KWin resize grip.
+        if(isMozilla())
+            x++, y++;
         {
             GdkPoint a[]={{ x+width,       (y+height)-size},
                           { x+width,        y+height},
