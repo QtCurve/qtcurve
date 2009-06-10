@@ -5608,7 +5608,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         else
                         {
                             if (tb->features&QStyleOptionToolButton::HasMenu)
-                                pr.adjust(-4, 0, 0, 0);
+                                pr.adjust(-LARGE_ARR_WIDTH, 0, 0, 0);
                             drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
                         }
                     }
@@ -7048,7 +7048,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                     switch(tbOpt->toolButtonStyle)
                     {
                         case Qt::ToolButtonIconOnly:
-                            newSize.setWidth(newSize.width()+12);
+                            newSize.setWidth(newSize.width()+LARGE_ARR_WIDTH+2);
                             break;
                         case Qt::ToolButtonTextBesideIcon:
                             newSize.setWidth(newSize.width()+3);
