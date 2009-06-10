@@ -21,6 +21,7 @@
     drawStatusBarFrames is set to true.
 16. Dont attempt alter OK/Cancel button for Firefox 3.5 - seems to mess up
     preferences dialog.
+17. Replace QtCurve's menubar mouse-over code with that from the glide engine.
 
 0.63.0
 ------

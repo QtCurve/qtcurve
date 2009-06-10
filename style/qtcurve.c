@@ -57,6 +57,7 @@ static struct
 
 #include "qt_settings.c"
 #include "animation.c"
+#include "menu.c"
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -192,7 +193,6 @@ static GHashTable     *tabHashTable                 = NULL;
 #ifdef QTC_MOUSEOVER_HANDLES
 static GHashTable     *toolbarHandleHashTable       = NULL;
 #endif
-static GHashTable     *menubarHashTable             = NULL;
 static GCache         *pixbufCache                  = NULL;
 
 #define DETAIL(xx) ((detail) &&(!strcmp(xx, detail)))
@@ -1248,165 +1248,10 @@ static gboolean toolbarHandleDeleteEvent(GtkWidget *widget, GdkEvent *event, gpo
 }
 #endif
 
-static GtkWidget **lookupMenubarHash(void *hash, gboolean create)
-{
-    GtkWidget **rv=NULL;
-
-    if(!menubarHashTable)
-        menubarHashTable=g_hash_table_new(g_direct_hash, g_direct_equal);
-
-    rv=(GtkWidget **)g_hash_table_lookup(menubarHashTable, hash);
-
-    if(!rv && create)
-    {
-        rv=malloc(sizeof(GtkWidget *));
-        *rv=0;
-        g_hash_table_insert(menubarHashTable, hash, rv);
-        rv=g_hash_table_lookup(menubarHashTable, hash);
-    }
-
-    return rv;
-}
-
-static gboolean menuIsSelectable(GtkWidget *menu)
-{
-    return !((!GTK_BIN(menu)->child &&
-             G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
-             GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
-             !GTK_WIDGET_IS_SENSITIVE(menu) ||
-             !GTK_WIDGET_VISIBLE(menu));
-}
-
-static gboolean menubarEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-    if(opts.menubarMouseOver && GDK_MOTION_NOTIFY==event->type)
-    {
-        static int last_x=-100, last_y=-100;
-
-        if(event->motion.x<2.0)
-            event->motion.x+=2.0, event->motion.x_root+=2.0;
-        if(event->motion.y<2.0)
-            event->motion.y+=2.0, event->motion.y_root+=2.0;
-        if(abs(last_x-event->motion.x_root)>4 || abs(last_y-event->motion.y_root)>4)
-        {
-            GtkWidget **item=lookupMenubarHash(widget, FALSE);
-
-            if(item)
-            {
-                GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
-                GList        *children=menuShell->children;
-                GtkWidget    *current=NULL;
-                int          nx, ny;
-
-                gdk_window_get_origin(widget->window, &nx, &ny);
-
-                while (children)
-                {
-                    current = children->data;
-                    {
-                    int cx=(current->allocation.x+nx),
-                        cy=(current->allocation.y+ny),
-                        cw=(current->allocation.width),
-                        ch=(current->allocation.height);
-
-                    if(cx<=event->motion.x_root && cy<=event->motion.y_root &&
-                       (cx+cw)>event->motion.x_root && (cy+ch)>event->motion.y_root)
-                        break;
-                    }
-                    children = children->next;
-                }
-
-                if(children && (*item)!=current)
-                {
-                    if(*item)
-                        gtk_widget_set_state(*item, GTK_STATE_NORMAL);
-                    *item=current;
-                    gtk_widget_set_state(current, GTK_STATE_PRELIGHT);
-                }
-            }
-        }
-    }
-    else if(opts.menubarMouseOver && GDK_LEAVE_NOTIFY==event->type)
-    {
-        GtkWidget **item=lookupMenubarHash(widget, FALSE);
-        if(item)
-        {
-            if(*item && GTK_IS_MENU_ITEM(*item))
-            {
-                GtkMenuItem *mi=GTK_MENU_ITEM((*item));
-                if(GTK_STATE_PRELIGHT==(*item)->state &&
-                    mi->submenu && (!GTK_WIDGET_MAPPED (mi->submenu) ||
-                                    GTK_MENU (mi->submenu)->tearoff_active))
-                    gtk_widget_set_state(*item, GTK_STATE_NORMAL);
-            }
-            *item=0;
-        }
-    }
-    else if(GDK_BUTTON_PRESS==event->type/* || GDK_BUTTON_RELEASE==event->type*/)
-    {
-        // QtCurve's menubars have a 2 pixel border -> but want the left/top to be 'active'...
-        int nx, ny;
-        gdk_window_get_origin(widget->window, &nx, &ny);
-        if((event->button.x_root-nx)<=2.0 || (event->button.y_root-ny)<=2.0)
-        {
-            GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
-            GList        *children=menuShell->children;
-
-            if((event->button.x_root-nx)<=2.0)
-                event->button.x_root+=2.0;
-            if((event->button.y_root-ny)<=2.0)
-                event->button.y_root+=2.0;
-
-            while (children)
-            {
-                GtkWidget *item = children->data;
-                int cx=(item->allocation.x+nx),
-                    cy=(item->allocation.y+ny),
-                    cw=(item->allocation.width),
-                    ch=(item->allocation.height);
-
-                if(cx<=event->button.x_root && cy<=event->button.y_root &&
-                   (cx+cw)>event->button.x_root && (cy+ch)>event->button.y_root)
-                {
-                    if(menuIsSelectable(item))
-                    {
-                        if(GDK_BUTTON_PRESS==event->type)
-                        {
-                            if(item!=menuShell->active_menu_item)
-                                gtk_menu_shell_select_item(menuShell, item);
-                            else
-                                gtk_menu_shell_deselect(menuShell);
-                        }
-//                         else if(GDK_BUTTON_RELEASE==event->type)
-//                         {
-//                             if(item==menuShell->active_menu_item)
-//                                 gtk_menu_shell_deselect(menuShell);
-//                         }
-                        return TRUE;
-                    }
-
-                    break;
-                }
-                children = children->next;
-            }
-        }
-    }
-
-    return FALSE;
-}
-
-static gboolean menubarDeleteEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-    if(lookupMenubarHash(widget, FALSE))
-        g_hash_table_remove(menubarHashTable, widget);
-    return FALSE;
-}
-
 static gboolean windowEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     if(GDK_FOCUS_CHANGE==event->type)
-        if(lookupMenubarHash((GtkWidget *)user_data, FALSE)) /* Ensure widget is still valid! */
-            gtk_widget_queue_draw((GtkWidget *)user_data);
+        gtk_widget_queue_draw((GtkWidget *)user_data);
 
     return FALSE;
 }
@@ -2488,32 +2333,27 @@ debugDisplayWidget(widget, 3);
 
     sanitizeSize(window, &width, &height);
 
-#define QTC_MODAL_HACK_NAME  "--qtcurve-modal-dialog-hack--"
-#define QTC_MENU_HACK_NAME   "--qtcurve-menu-hack--"
+#define QTC_MODAL_HACK  "QTC_MODAL_HACK_SET"
 #ifdef QTC_REORDER_GTK_DIALOG_BUTTONS
-#define QTC_BUTTON_HACK_NAME "--qtcurve-button-hack--"
+#define QTC_BUTTON_HACK "QTC_BUTTON_ORDER_HACK_SET"
 
 #if GTK_CHECK_VERSION(2, 6, 0)
     if(!opts.gtkButtonOrder && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 
-        if(topLevel && GTK_IS_DIALOG(topLevel) && (!topLevel->name || 0==strcmp(topLevel->name, QTC_MODAL_HACK_NAME)))
+        if(topLevel && GTK_IS_DIALOG(topLevel) && !g_object_get_data(G_OBJECT(topLevel), QTC_BUTTON_HACK))
         {
+            g_object_set_data(G_OBJECT(topLevel), QTC_BUTTON_HACK, (gpointer)1);
             gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
                                                     GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
                                                     GTK_RESPONSE_REJECT, GTK_RESPONSE_CLOSE, GTK_RESPONSE_NO, GTK_RESPONSE_CANCEL, -1);
 
-            if(!topLevel->name)
-                gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME);
-            else
-                gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME QTC_MODAL_HACK_NAME);
         }
     }
 #endif
 #endif
-    if(widget && opts.fixParentlessDialogs &&
-        GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
+    if(widget && opts.fixParentlessDialogs && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 
@@ -2532,20 +2372,11 @@ debugDisplayWidget(widget, 3);
                     (GTK_APP_GIMP==qtSettings.app &&
                      strcmp(typename, QTC_GIMP_WINDOW) &&
                      strcmp(typename, QTC_GIMP_MAIN) ) ) &&
-#if 0
-                   (!topLevel->name || !strstr(topLevel->name, QTC_MODAL_HACK_NAME)) &&
-#else
-                   (!topLevel->name || strcmp(topLevel->name, QTC_MODAL_HACK_NAME)) &&
-#endif
+                   !g_object_get_data(G_OBJECT(topLevel), QTC_MODAL_HACK) &&
                    NULL==gtk_window_get_transient_for(GTK_WINDOW(topLevel)))
             {
-                /* Give the widget a name so that we dont keep on performing this function... */
-                if(!topLevel->name)
-                    gtk_widget_set_name(topLevel, QTC_MODAL_HACK_NAME);
-#if 0
-                else if(0==strcmp(topLevel->name, QTC_BUTTON_HACK_NAME))
-                    gtk_widget_set_name(topLevel, QTC_BUTTON_HACK_NAME QTC_MODAL_HACK_NAME);
-#endif
+                g_object_set_data(G_OBJECT(topLevel), QTC_MODAL_HACK, (gpointer)1);
+
                 /*
                   For non-modal dialogs we set the transient hint when the "map" event is received, this has the
                   effect that the dialog is placed where it would've been without this hack, but it does not get
@@ -3085,27 +2916,24 @@ debugDisplayWidget(widget, 3);
     else if(-1==height)
         gdk_window_get_size(window, NULL, &height);
 
-    if(menubar && !isMozilla() && GTK_APP_JAVA!=qtSettings.app &&
-       (opts.menubarMouseOver || opts.shadeMenubarOnlyWhenActive))
+    if(menubar && !isMozilla() && GTK_APP_JAVA!=qtSettings.app && opts.shadeMenubarOnlyWhenActive)
     {
-        GtkWidget **mbHash=lookupMenubarHash(widget, FALSE);
         GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
-
-        if(!mbHash)
+                
+        if(topLevel && GTK_IS_WINDOW(topLevel))
         {
-            lookupMenubarHash(widget, TRUE); /* Create hash entry... */
-            gtk_widget_add_events(widget, (opts.menubarMouseOver ? (GDK_LEAVE_NOTIFY_MASK|GDK_POINTER_MOTION_MASK) : 0)|
-                                          GDK_BUTTON_PRESS_MASK/*|GDK_BUTTON_RELEASE_MASK*/);
-            g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(menubarDeleteEvent), widget);
-            g_signal_connect(G_OBJECT(widget), "event", G_CALLBACK(menubarEvent), widget);
-
-            if(opts.shadeMenubarOnlyWhenActive && topLevel && GTK_IS_WINDOW(topLevel))
+            #define QTC_SHADE_ACTIVE_MB_HACK_SET "QTC_SHADE_ACTIVE_MB_HACK_SET"
+            if (!g_object_get_data(G_OBJECT(topLevel), QTC_SHADE_ACTIVE_MB_HACK_SET))
+            {
+                g_object_set_data(G_OBJECT(topLevel), QTC_SHADE_ACTIVE_MB_HACK_SET, (gpointer)1);
                 g_signal_connect(G_OBJECT(topLevel), "event", G_CALLBACK(windowEvent), widget);
-        }
-
-        if(topLevel && GTK_IS_WINDOW(topLevel) && opts.shadeMenubarOnlyWhenActive)
+            }
             activeWindow=gtk_window_has_toplevel_focus(GTK_WINDOW(topLevel));
+        }
     }
+
+    if (opts.menubarMouseOver && QTC_GE_IS_MENU_SHELL(widget) && !isMozilla())
+        qtcMenuShellSetup(widget);
 
     if(spinUp || spinDown)
     {
