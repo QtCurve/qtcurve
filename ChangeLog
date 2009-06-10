@@ -17,6 +17,8 @@
     KDE4 defaults.
 14. Fix firefox crashing when scrollbar slider move to top. This only occurs
     when not using flat scrollbar buttons, and a coloured scrollbar slider.
+15. Dont draw frame around GEdits combos in its status bar - unless
+    drawStatusBarFrames is set to true.
 
 0.63.0
 ------

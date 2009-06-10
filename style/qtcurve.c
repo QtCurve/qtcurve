@@ -579,7 +579,9 @@ static gboolean isSpinButton(GtkWidget *widget)
 
 static gboolean isStatusBarFrame(GtkWidget *widget)
 {
-    return widget && widget->parent && GTK_IS_FRAME(widget) && GTK_IS_STATUSBAR(widget->parent);
+    return widget && widget->parent && GTK_IS_FRAME(widget) &&
+           (GTK_IS_STATUSBAR(widget->parent) ||
+            (widget->parent->parent && GTK_IS_STATUSBAR(widget->parent->parent)));
 }
 
 static GtkMenuBar * isMenubar(GtkWidget *w, int level)
