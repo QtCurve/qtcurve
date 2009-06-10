@@ -1,66 +1,3 @@
-#define QTC_EXTEND_MENUBAR_ITEM_HACK
-
-#ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
-static gboolean menuIsSelectable(GtkWidget *menu)
-{
-    return !((!GTK_BIN(menu)->child &&
-             G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
-             GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
-             !GTK_WIDGET_IS_SENSITIVE(menu) ||
-             !GTK_WIDGET_VISIBLE(menu));
-}
-
-static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-    if(GDK_BUTTON_PRESS==event->type)
-    {
-        // QtCurve's menubars have a 2 pixel border -> but want the left/top to be 'active'...
-        int nx, ny;
-        gdk_window_get_origin(widget->window, &nx, &ny);
-        if((event->button.x_root-nx)<=2.0 || (event->button.y_root-ny)<=2.0)
-        {
-            GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
-            GList        *children=menuShell->children;
-
-            if((event->button.x_root-nx)<=2.0)
-                event->button.x_root+=2.0;
-            if((event->button.y_root-ny)<=2.0)
-                event->button.y_root+=2.0;
-
-            while (children)
-            {
-                GtkWidget *item = children->data;
-                int cx=(item->allocation.x+nx),
-                    cy=(item->allocation.y+ny),
-                    cw=(item->allocation.width),
-                    ch=(item->allocation.height);
-
-                if(cx<=event->button.x_root && cy<=event->button.y_root &&
-                   (cx+cw)>event->button.x_root && (cy+ch)>event->button.y_root)
-                {
-                    if(menuIsSelectable(item))
-                    {
-                        if(GDK_BUTTON_PRESS==event->type)
-                        {
-                            if(item!=menuShell->active_menu_item)
-                                gtk_menu_shell_select_item(menuShell, item);
-                            else
-                                gtk_menu_shell_deselect(menuShell);
-                        }
-                        return TRUE;
-                    }
-
-                    break;
-                }
-                children = children->next;
-            }
-        }
-    }
-
-    return FALSE;
-}
-#endif
-
 #define QTC_GE_IS_MENU(object) ((object) && objectIsA ((GObject*)(object), "GtkMenu"))
 #define QTC_GE_IS_MENU_SHELL(object) ((object) && objectIsA((GObject*)(object), "GtkMenuShell"))
 #define QTC_GE_IS_MENU_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkMenuBar"))
@@ -82,6 +19,77 @@ static gboolean objectIsA(const GObject * object, const gchar * type_name)
 
   return result;
 }
+
+// Does nto actually work :-(
+// #define QTC_EXTEND_MENUBAR_ITEM_HACK
+
+#ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
+static gboolean menuIsSelectable(GtkWidget *menu)
+{
+    return !((!GTK_BIN(menu)->child &&
+             G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
+             GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
+             !GTK_WIDGET_IS_SENSITIVE(menu) ||
+             !GTK_WIDGET_VISIBLE(menu));
+}
+
+static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+    if (QTC_GE_IS_MENU_BAR(widget))
+    {
+        // QtCurve's menubars have a 2 pixel border -> but want the left/top to be 'active'...
+        int nx, ny;
+        gdk_window_get_origin(widget->window, &nx, &ny);
+        if((event->x_root-nx)<=2.0 || (event->y_root-ny)<=2.0)
+        {
+            GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
+            GList        *children=menuShell->children;
+
+            if((event->x_root-nx)<=2.0)
+                event->x_root+=2.0;
+            if((event->y_root-ny)<=2.0)
+                event->y_root+=2.0;
+
+            while (children)
+            {
+                GtkWidget *item = children->data;
+                int cx=(item->allocation.x+nx),
+                    cy=(item->allocation.y+ny),
+                    cw=(item->allocation.width),
+                    ch=(item->allocation.height);
+
+                if(cx<=event->x_root && cy<=event->y_root &&
+                   (cx+cw)>event->x_root && (cy+ch)>event->y_root)
+                {
+                    if(menuIsSelectable(item))
+                    {
+                        GtkMenuShellClass *klass=GTK_MENU_SHELL_GET_CLASS(widget);
+                        GtkWidgetClass    *widget_class=(GtkWidgetClass*) klass;
+//                         printf("Send press\n");
+                        menuShell->active=FALSE;
+                        widget_class->button_press_event(widget, event);
+                        widget_class->button_release_event(widget, event);
+
+//                         if(GDK_BUTTON_PRESS==event->type)
+//                         {
+//                             if(item!=menuShell->active_menu_item)
+//                                 gtk_menu_shell_select_item(menuShell, item);
+//                             else
+//                                 gtk_menu_shell_deselect(menuShell);
+//                         }
+                        return TRUE;
+                    }
+
+                    break;
+                }
+                children = children->next;
+            }
+        }
+    }
+
+    return FALSE;
+}
+#endif
 
 /* Taken from glide Gtk2 engine */
 
