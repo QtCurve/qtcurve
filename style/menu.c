@@ -10,7 +10,7 @@ static gboolean menuIsSelectable(GtkWidget *menu)
              !GTK_WIDGET_VISIBLE(menu));
 }
 
-static gboolean qtcMenubarEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     if(GDK_BUTTON_PRESS==event->type)
     {
@@ -107,7 +107,7 @@ static void qtcMenuShellCleanup(GtkWidget *widget)
       g_signal_handler_disconnect(G_OBJECT(widget), id);
 
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_EVENT_ID");
+      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID");
       g_signal_handler_disconnect(G_OBJECT(widget), id);
 #endif
 
@@ -259,8 +259,8 @@ static void qtcMenuShellSetup(GtkWidget *widget)
         
         
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
-        id=g_signal_connect(G_OBJECT(widget), "event", G_CALLBACK(qtcMenubarEvent), widget);
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_EVENT_ID", (gpointer)id);
+        id=g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(qtcMenuShellButtonPress), widget);
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID", (gpointer)id);
 #endif
       }
     }  
