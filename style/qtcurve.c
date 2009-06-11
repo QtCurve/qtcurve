@@ -468,6 +468,13 @@ static gboolean isPathButton(GtkWidget *widget)
            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GtkPathBar");
 }
 
+// static gboolean isTabButton(GtkWidget *widget)
+// {
+//     return widget && GTK_IS_BUTTON(widget) && widget->parent &&
+//            (GTK_IS_NOTEBOOK(widget->parent) ||
+//             (widget->parent->parent && GTK_IS_BOX(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent)));
+// }
+
 static gboolean isComboBoxButton(GtkWidget *widget)
 {
     return widget && GTK_IS_BUTTON(widget) && widget->parent &&
@@ -2832,6 +2839,11 @@ debugDisplayWidget(widget, 3);
                     cairo_stroke(cr);
                 }
             }
+// Re-enable this to stop the button background being drawn for tab widget icons.
+//             else if (isTabButton(widget))
+//             {
+//                 ;
+//             }
             else
             {
                 gboolean glowFocus=GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && QTC_FULL_FOCUS;
