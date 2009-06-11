@@ -7,17 +7,15 @@
 
 static gboolean objectIsA(const GObject * object, const gchar * type_name)
 {
-  gboolean result = FALSE;
-
-  if ((object))
+    if ((object))
     {
-      GType tmp = g_type_from_name (type_name);
+        GType tmp = g_type_from_name(type_name);
 
-      if (tmp)
-        result = g_type_check_instance_is_a ((GTypeInstance *) object, tmp);
+        if (tmp)
+            return g_type_check_instance_is_a((GTypeInstance *) object, tmp);
     }
 
-  return result;
+    return FALSE;
 }
 
 #define QTC_EXTEND_MENUBAR_ITEM_HACK
@@ -25,8 +23,7 @@ static gboolean objectIsA(const GObject * object, const gchar * type_name)
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
 static gboolean menuIsSelectable(GtkWidget *menu)
 {
-    return !((!GTK_BIN(menu)->child &&
-             G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
+    return !((!GTK_BIN(menu)->child && G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
              GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
              !GTK_WIDGET_IS_SENSITIVE(menu) ||
              !GTK_WIDGET_VISIBLE(menu));
@@ -96,135 +93,117 @@ static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event
  ***********************************************/
 static void qtcMenuShellCleanup(GtkWidget *widget)
 {
-  if (QTC_GE_IS_MENU_BAR(widget))
+    if (QTC_GE_IS_MENU_BAR(widget))
     {
-      gint id = 0;
- 
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_MOTION_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-                                             
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_LEAVE_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-     
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_DESTROY_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-       
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_STYLE_SET_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_MOTION_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_LEAVE_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_DESTROY_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_STYLE_SET_ID"));
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_RELEASE_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_RELEASE_ID"));
 #endif
-
-      g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET");      
+      g_object_steal_data(G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET");
     }
 }
 
 /***********************************************
- *   Style set signal to ensure menushell signals
- *   get cleaned up if the theme changes
+ *   Style set signal to ensure menushell signals get cleaned up if the theme changes
  ***********************************************/
 static gboolean qtcMenuShellStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
 {
-  qtcMenuShellCleanup(widget);
-  
-  return FALSE;
+    qtcMenuShellCleanup(widget);
+    return FALSE;
 }
  
 /***********************************************
- *   Destroy signal to ensure menushell signals
- *   get cleaned if it is destroyed
+ *   Destroy signal to ensure menushell signals get cleaned if it is destroyed
  ***********************************************/
 static gboolean qtcMenuShellDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
- qtcMenuShellCleanup (widget);
-  
-  return FALSE;
+    qtcMenuShellCleanup(widget);
+    return FALSE;
 }
- 
+
 /***********************************************
- *   Motion signal to ensure menushell items
- *   prelight state changes on mouse move.
+ *   Motion signal to ensure menushell items prelight state changes on mouse move.
  ***********************************************/
 static gboolean qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-  if (QTC_GE_IS_MENU_SHELL(widget))
+    if (QTC_GE_IS_MENU_SHELL(widget))
     {
-      gint pointer_x, pointer_y;
-      GdkModifierType pointer_mask;
-      GList *children = NULL, *child = NULL;
+        gint            pointer_x,
+                        pointer_y;
+        GdkModifierType pointer_mask;
      
-      gdk_window_get_pointer(widget->window, &pointer_x, &pointer_y, &pointer_mask);
-        
-      if (QTC_GE_IS_CONTAINER(widget))
+        gdk_window_get_pointer(widget->window, &pointer_x, &pointer_y, &pointer_mask);
+
+        if (QTC_GE_IS_CONTAINER(widget))
         {
-          children = gtk_container_get_children(GTK_CONTAINER(widget));
+            GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
+                  *child;
               
-          for (child = g_list_first(children); child; child = g_list_next(child))
+            for (child = g_list_first(children); child; child = g_list_next(child))
             {
-          if ((child->data) && QTC_GE_IS_WIDGET(child->data) && 
-                  (GTK_WIDGET_STATE(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
-            {
-              if ((pointer_x >= GTK_WIDGET(child->data)->allocation.x) && 
-                  (pointer_y >= GTK_WIDGET(child->data)->allocation.y) &&
-                  (pointer_x < (GTK_WIDGET(child->data)->allocation.x + 
-                                  GTK_WIDGET(child->data)->allocation.width)) && 
-                  (pointer_y < (GTK_WIDGET(child->data)->allocation.y +
-                                  GTK_WIDGET(child->data)->allocation.height)))
+                if ((child->data) && QTC_GE_IS_WIDGET(child->data) && 
+                    (GTK_WIDGET_STATE(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
                 {
-                      gtk_widget_set_state (GTK_WIDGET(child->data), GTK_STATE_PRELIGHT);
-                }
-              else
+                    if ((pointer_x >= GTK_WIDGET(child->data)->allocation.x) && 
+                        (pointer_y >= GTK_WIDGET(child->data)->allocation.y) &&
+                        (pointer_x < (GTK_WIDGET(child->data)->allocation.x +
+                                  GTK_WIDGET(child->data)->allocation.width)) &&
+                        (pointer_y < (GTK_WIDGET(child->data)->allocation.y +
+                                  GTK_WIDGET(child->data)->allocation.height)))
                     {
-                      gtk_widget_set_state (GTK_WIDGET(child->data), GTK_STATE_NORMAL);
+                        gtk_widget_set_state (GTK_WIDGET(child->data), GTK_STATE_PRELIGHT);
+                    }
+                    else
+                    {
+                        gtk_widget_set_state (GTK_WIDGET(child->data), GTK_STATE_NORMAL);
                     }
                  }
-             }              
+             }    
          
-           if (children)   
-             g_list_free(children);
+            if (children)   
+                g_list_free(children);
         }
     }
  
-  return FALSE;
+    return FALSE;
 }
  
 /***********************************************
- *   Leave signal to ensure menushell items
- *   normal state on mouse leave.
+ *   Leave signal to ensure menushell items normal state on mouse leave.
  ***********************************************/
 static gboolean qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-  if (QTC_GE_IS_MENU_SHELL(widget))
-    {
-      GList *children = NULL, *child = NULL;
- 
-      if (QTC_GE_IS_CONTAINER(widget))
-        {
-          children = gtk_container_get_children(GTK_CONTAINER(widget));
+    if (QTC_GE_IS_MENU_SHELL(widget) && QTC_GE_IS_CONTAINER(widget))
+    { 
+        GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
+              *child    = NULL;
               
-          for (child = g_list_first(children); child; child = g_list_next(child))
-            {
-          if ((child->data) && QTC_GE_IS_MENU_ITEM(child->data) && 
-                  (GTK_WIDGET_STATE(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
-            {
-                  if ((!QTC_GE_IS_MENU(GTK_MENU_ITEM(child->data)->submenu)) || 
-                      (!(GTK_WIDGET_REALIZED(GTK_MENU_ITEM(child->data)->submenu) && 
-                         GTK_WIDGET_VISIBLE(GTK_MENU_ITEM(child->data)->submenu) &&
-                         GTK_WIDGET_REALIZED(GTK_MENU(GTK_MENU_ITEM(child->data)->submenu)->toplevel) &&
-                         GTK_WIDGET_VISIBLE(GTK_MENU(GTK_MENU_ITEM(child->data)->submenu)->toplevel))))
-              {
+        for (child = g_list_first(children); child; child = g_list_next(child))
+        {
+            if ((child->data) && QTC_GE_IS_MENU_ITEM(child->data) && 
+                (GTK_WIDGET_STATE(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE) &&
+                ((!QTC_GE_IS_MENU(GTK_MENU_ITEM(child->data)->submenu)) ||
+                 (!(GTK_WIDGET_REALIZED(GTK_MENU_ITEM(child->data)->submenu) &&
+                    GTK_WIDGET_VISIBLE(GTK_MENU_ITEM(child->data)->submenu) &&
+                    GTK_WIDGET_REALIZED(GTK_MENU(GTK_MENU_ITEM(child->data)->submenu)->toplevel) &&
+                    GTK_WIDGET_VISIBLE(GTK_MENU(GTK_MENU_ITEM(child->data)->submenu)->toplevel)))))
+                {
                     gtk_widget_set_state (GTK_WIDGET(child->data), GTK_STATE_NORMAL);
-                  }
-                }               
-            }         
-            
-          if (children)   
-        g_list_free(children);
+                }
         }
+            
+        if (children)   
+            g_list_free(children);
     }
  
   return FALSE;
@@ -236,42 +215,28 @@ static gboolean qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gp
  ***********************************************/
 static void qtcMenuShellSetup(GtkWidget *widget)
 {
-  if (QTC_GE_IS_MENU_BAR(widget))
+    if (QTC_GE_IS_MENU_BAR(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET"))
     {
-      gint id = 0;
- 
-      if (!g_object_get_data(G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET"))
-      {
-        id = g_signal_connect(G_OBJECT(widget), "motion-notify-event",
-                                             (GtkSignalFunc)qtcMenuShellMotion,
-                                             NULL);
-                                  
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_MOTION_ID", (gpointer)id);
-        
-        id = g_signal_connect(G_OBJECT(widget), "leave-notify-event",
-                                             (GtkSignalFunc)qtcMenuShellLeave,
-                                             NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_LEAVE_ID", (gpointer)id);
-                                             
-        id = g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                             (GtkSignalFunc)qtcMenuShellDestroy,
-                                             NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_DESTROY_ID", (gpointer)id);
- 
         g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET", (gpointer)1);
-        
-        id = g_signal_connect(G_OBJECT(widget), "style-set",
-                                             (GtkSignalFunc)qtcMenuShellStyleSet,
-                                             NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_STYLE_SET_ID", (gpointer)id);
-        
-        
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_MOTION_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event",
+                                                     (GtkSignalFunc)qtcMenuShellMotion, NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_LEAVE_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event",
+                                                     (GtkSignalFunc)qtcMenuShellLeave, NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_DESTROY_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
+                                                     (GtkSignalFunc)qtcMenuShellDestroy, NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_STYLE_SET_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
+                                                     (GtkSignalFunc)qtcMenuShellStyleSet, NULL));
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
-        id=g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(qtcMenuShellButtonPress), widget);
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID", (gpointer)id);
-        id=g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(qtcMenuShellButtonPress), widget);
-        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_RELEASE_ID", (gpointer)id);
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-press-event",
+                                                     G_CALLBACK(qtcMenuShellButtonPress), widget));
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_RELEASE_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-release-event",
+                                                     G_CALLBACK(qtcMenuShellButtonPress), widget));
 #endif
-      }
     }  
 }
