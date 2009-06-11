@@ -367,9 +367,9 @@ static int getMozillaVersion(int pid)
                 {
                     char *minor=&dot[1];
                     char *major=0L;
-                    int i=0;
+                    int  i=0;
                     
-                    for(i=-1; dot[i]!=version; i--)
+                    for(i=-1; (&dot[i])!=version; i--)
                         if(!isdigit(dot[i]))
                         {
                             major=&dot[i+1];
