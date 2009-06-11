@@ -1,3 +1,8 @@
+0.64.1
+------
+1. When using shaded combo buttons, use the combo splitter setting to
+   determine if there should be a border between the shaded and unshaded parts.
+
 0.64.0
 ------
  1. Add option to not draw border around popupmenus.

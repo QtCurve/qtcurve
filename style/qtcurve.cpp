@@ -6870,7 +6870,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             frameOpt.state|=State_Raised;
                         painter->save();
                         painter->setClipRect(btn);
-                        drawLightBevel(painter, btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
+                        drawLightBevel(painter, opts.comboSplitter
+                                                    ? btn
+                                                    : btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
                                        &frameOpt, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                        getFill(&frameOpt, cols, false,
                                                SHADE_DARKEN==opts.comboBtn || (SHADE_NONE!=opts.comboBtn &&
@@ -6909,7 +6911,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         field.adjust(-(2+pad),-2, (2+pad), 2);
                         drawEntryField(painter, field, widget, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
-                    else if(opts.comboSplitter)
+                    else if(opts.comboSplitter && !(SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
                     {
                         drawFadedLine(painter, QRect(reverse ? arrow.right()+1 : arrow.x()-1, arrow.top()+2,
                                                      1, arrow.height()-4),
