@@ -1,7 +1,9 @@
 0.64.1
 ------
-1. Make menubar items selectable right up to the top edge of the menubar.
-2. Fix clipping of close icon on GEdit tabs.
+1. When using shaded combo buttons, use the combo splitter setting to
+   determine if there should be a border between the shaded and unshaded parts.
+2. Make menubar items selectable right up to the top edge of the menubar.
+3. Fix clipping of close icon on GEdit tabs.
 
 0.64.0
 ------

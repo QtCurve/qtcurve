@@ -3102,7 +3102,8 @@ debugDisplayWidget(widget, 3);
                                     : (cwidth - ind_width - QT_STYLE->xthickness)+1),
                     btn.y=y, btn.width=ind_width+4, btn.height=height;
 
-                    setCairoClipping(cr, &btn, NULL);
+                    if(!opts.comboSplitter)
+                        setCairoClipping(cr, &btn, NULL);
                     if(rev)
                         btn.width+=3;
                     else
@@ -3110,10 +3111,10 @@ debugDisplayWidget(widget, 3);
                     drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
-                    unsetCairoClipping(cr);
+                    if(!opts.comboSplitter)
+                        unsetCairoClipping(cr);
                 }
-                
-                if(opts.comboSplitter)
+                else if(opts.comboSplitter)
                 {
                     if(sunken)
                         cx++, cy++, cheight--;
@@ -3160,7 +3161,8 @@ debugDisplayWidget(widget, 3);
                         btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
                         btn.y=y, btn.width=20+4, btn.height=height;
 
-                        setCairoClipping(cr, &btn, NULL);
+                        if(!opts.comboSplitter)
+                            setCairoClipping(cr, &btn, NULL);
                         if(rev)
                             btn.width+=3;
                         else
@@ -3168,10 +3170,10 @@ debugDisplayWidget(widget, 3);
                         drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                     &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                     BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
-                        unsetCairoClipping(cr);
+                        if(!opts.comboSplitter)
+                            unsetCairoClipping(cr);
                     }
-
-                    if(opts.comboSplitter)
+                    else if(opts.comboSplitter)
                     {
                         drawFadedLine(cr, vx+(rev ? LARGE_ARR_WIDTH+4 : 0), y+4, 1, height-8,
                                       &btn_colors[darkLine], area, NULL, TRUE, TRUE, FALSE);
