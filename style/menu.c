@@ -20,8 +20,7 @@ static gboolean objectIsA(const GObject * object, const gchar * type_name)
   return result;
 }
 
-// Does nto actually work :-(
-// #define QTC_EXTEND_MENUBAR_ITEM_HACK
+#define QTC_EXTEND_MENUBAR_ITEM_HACK
 
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
 static gboolean menuIsSelectable(GtkWidget *menu)
@@ -63,20 +62,19 @@ static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event
                 {
                     if(menuIsSelectable(item))
                     {
-                        GtkMenuShellClass *klass=GTK_MENU_SHELL_GET_CLASS(widget);
-                        GtkWidgetClass    *widget_class=(GtkWidgetClass*) klass;
-//                         printf("Send press\n");
-                        menuShell->active=FALSE;
-                        widget_class->button_press_event(widget, event);
-                        widget_class->button_release_event(widget, event);
-
-//                         if(GDK_BUTTON_PRESS==event->type)
-//                         {
-//                             if(item!=menuShell->active_menu_item)
-//                                 gtk_menu_shell_select_item(menuShell, item);
-//                             else
-//                                 gtk_menu_shell_deselect(menuShell);
-//                         }
+                        if(GDK_BUTTON_PRESS==event->type)
+                            if(item!=menuShell->active_menu_item)
+                            {
+                                menuShell->active=FALSE;
+                                gtk_menu_shell_select_item(menuShell, item);
+                                menuShell->active=TRUE;
+                            }
+                            else
+                            {
+                                menuShell->active=TRUE;
+                                gtk_menu_shell_deselect(menuShell);
+                                menuShell->active=FALSE;
+                            }
                         return TRUE;
                     }
 
@@ -116,6 +114,8 @@ static void qtcMenuShellCleanup(GtkWidget *widget)
 
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
       id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID");
+      g_signal_handler_disconnect(G_OBJECT(widget), id);
+      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_RELEASE_ID");
       g_signal_handler_disconnect(G_OBJECT(widget), id);
 #endif
 
@@ -269,6 +269,8 @@ static void qtcMenuShellSetup(GtkWidget *widget)
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
         id=g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(qtcMenuShellButtonPress), widget);
         g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID", (gpointer)id);
+        id=g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(qtcMenuShellButtonPress), widget);
+        g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_RELEASE_ID", (gpointer)id);
 #endif
       }
     }  

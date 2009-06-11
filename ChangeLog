@@ -1,3 +1,7 @@
+0.64.1
+------
+1. Make menubar items selectable right up to the top edge of the menubar.
+
 0.64.0
 ------
  1. Add option to not draw border around popupmenus.
