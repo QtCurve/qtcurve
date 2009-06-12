@@ -1783,6 +1783,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
     switch(metric)
     {
 #if QT_VERSION >= 0x040500
+        case PM_SubMenuOverlap:
+            return -2;
         case PM_ScrollView_ScrollBarSpacing:
 #else
         case PM_TextCursorWidth+3:
@@ -1790,8 +1792,6 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 3;
         case PM_MenuPanelWidth:
             return opts.popupBorder ? pixelMetric(PM_DefaultFrameWidth, option, widget) : 0;
-        case PM_SubMenuOverlap:
-            return -2;
         case PM_SizeGripSize:
             return SIZE_GRIP_SIZE;
         case PM_TabBarScrollButtonWidth:
