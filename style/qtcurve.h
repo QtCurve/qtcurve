@@ -159,14 +159,19 @@ class QtCurveStyle : public QWindowsStyle
     private Q_SLOTS:
 
     void           widgetDestroyed(QObject *o);
-    void           setupKde4();
-    void           setDecorationColors();
-    void           applyKdeSettings(bool pal);
     QIcon          standardIconImplementation(StandardPixmap pix, const QStyleOption *option=0, const QWidget *widget=0) const;
     int            layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
                                                Qt::Orientation orientation, const QStyleOption *option,
                                                const QWidget *widget) const;
     void           kdeGlobalSettingsChange(int type, int);
+
+    private:
+
+#if !defined QTC_QT_ONLY
+    void           setupKde4();
+    void           setDecorationColors();
+    void           applyKdeSettings(bool pal);
+#endif
 
     private:
 

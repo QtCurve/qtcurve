@@ -5,8 +5,8 @@
 #define KDE3PREFIX        "@KDE3PREFIX@"
 #define KDE4PREFIX        "@KDE4PREFIX@"
 
-#cmakedefine KDE4_FOUND 1
 #cmakedefine QTC_DISABLE_KDEFILEDIALOG_CALLS
 #cmakedefine QTC_XBAR_SUPPORT
+#cmakedefine QTC_QT_ONLY
 
 #endif

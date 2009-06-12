@@ -15,13 +15,13 @@ qt4_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
 add_library(qtcurve SHARED ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 set_target_properties(qtcurve PROPERTIES PREFIX "")
 
-install(FILES qtcurve.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes)
-if (NOT QTC_NO_KDE4_LINKING)
+if (NOT QTC_QT_ONLY)
+    install(FILES qtcurve.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes)
     set(QTC_KDE_LIBS ${KDE4_KDEUI_LIBS})
     if (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
         set(QTC_KFILEDIALOG_LIBS ${KDE4_KIO_LIBS} ${KDE4_KDECORE_LIBS} ${KDE4_KFILE_LIBS})
     endif (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
-endif (NOT QTC_NO_KDE4_LINKING)
+endif (NOT QTC_QT_ONLY)
 
 if(QTC_XBAR_SUPPORT)
     target_link_libraries(qtcurve ${QTC_KDE_LIBS} ${QTC_KFILEDIALOG_LIBS} ${QT_QTGUI_LIBRARY}
@@ -31,5 +31,9 @@ else (QTC_XBAR_SUPPORT)
                                   ${QT_QTCORE_LIBRARY} ${X11_X11_LIB})
 endif (QTC_XBAR_SUPPORT)
 
-install(TARGETS qtcurve DESTINATION ${QTCURVE_STYLE_DIR})
+if (NOT QTC_QT_ONLY)
+    install(TARGETS qtcurve DESTINATION ${QTCURVE_STYLE_DIR})
+else (NOT QTC_QT_ONLY)
+    install(TARGETS qtcurve LIBRARY DESTINATION ${QTCURVE_STYLE_DIR})
+endif (NOT QTC_QT_ONLY)
 

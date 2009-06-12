@@ -1060,7 +1060,7 @@ inline int limit(double c)
 }
 #endif
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+#if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
@@ -1172,7 +1172,7 @@ static void shade(const Options *opts, const color *ca, color *cb, double k)
             case SHADING_HCY:
             {
     #define QTC_HCY_FACTOR 0.15
-    #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    #if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
                 if(k>1.0)
                     *cb=KColorUtils::lighten(ca, (k*(1+QTC_HCY_FACTOR))-1.0, 1.0);
                 else
