@@ -20,6 +20,15 @@ The following options may be supplied to cmake:
             - shrink size of toolbars
         Edit user.js
             - disable instant apply
+        Note: This sometimes causes issues with newer versions of these
+              applications. Should such issues occur, you should recompile
+              QtCurve without this option - and you will have to remove BY HAND
+              the changes that QtCurve has made. This will entail removing lines
+              from userChrom.css that indicate 'Added by QtCurve' userChrome.css
+              is usually in a folder such as:
+                    ~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css
+                    ~/.thunderbird/xxxxxxx.default/chrome/userChrome.css
+              Where xxxxxxx is a series of random characters.
 
     -DQTC_REORDER_GTK_DIALOG_BUTTONS=true
        When set QtCurve will try to manually re-order the buttons of Gtk

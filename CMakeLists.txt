@@ -126,6 +126,25 @@ if (GTK_INCLUDE_DIR)
                 "             KDE_SESSION_VERSION is not set\n"
                 "**************************************************************\n")
     endif(QTC_DEFAULT_TO_KDE3)
+
+    if(QTC_MODIFY_MOZILLA)
+        message("\n**************************************************************\n"
+                "**************************************************************\n"
+                "Warning: You have enabled the option for QtCurve to modify the\n"
+                "         configuration files of Mozilla applications (Firefox, \n"
+                "         Thunderbird, Seamonkey). Note: This sometimes causes\n"
+                "         issues with newer versions of these applications. Should\n"
+                "         such issues occur, you should recompile QtCurve without\n"
+                "         this option - and you will have to remove BY HAND the \n"
+                "         changes that QtCurve has made. This will entail removing\n"
+                "         lines from userChrom.css that indicate 'Added by QtCurve'\n"
+                "         userChrome.css is usually in a folder such as:\n"
+                "             ~/.mozilla/firefox/xxxxxxx.default/chrome/userChrome.css\n"
+                "             ~/.thunderbird/xxxxxxx.default/chrome/userChrome.css\n"
+                "         Where xxxxxxx is a series of random characters.\n"
+                "**************************************************************\n"
+                "**************************************************************\n")
+    endif(QTC_MODIFY_MOZILLA)
 else (GTK_INCLUDE_DIR)
     message(FATAL_ERROR "Could not locate Gtk2 include files")
 endif (GTK_INCLUDE_DIR)

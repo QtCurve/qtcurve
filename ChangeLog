@@ -2,6 +2,7 @@
 ------
 1. When using shaded combo buttons, use button colours for border.
 2. Disable button order userChrome.css mods for Thunderbird>=3
+3. Added a verbose warning about the usage of QTC_MODIFY_MOZILLA
 
 0.64.1
 ------
