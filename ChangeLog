@@ -1,6 +1,7 @@
 0.64.2
 ------
-1. Fix compilation with Qt4 < 4.5 (PM_SubMenuOverlap was introduced in Qt4.5)
+1. When using shaded combo buttons, use button colours for border.
+2. Fix compilation with Qt4 < 4.5 (PM_SubMenuOverlap was introduced in Qt4.5)
 
 0.64.1
 ------

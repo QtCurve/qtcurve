@@ -8266,7 +8266,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
     
     if(doBorder)
     {
-        const QColor *borderCols=WIDGET_COMBO==w && border==itsComboBtnCols
+        const QColor *borderCols=(WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w) && border==itsComboBtnCols
                             ? option->state&State_MouseOver && MO_GLOW==opts.coloredMouseOver && !sunken
                                 ? itsMouseOverCols
                                 : itsButtonCols
