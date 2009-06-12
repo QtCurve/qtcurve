@@ -3264,23 +3264,19 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             painter->setClipping(false);
 
-            if(!doneShadow && doEtch && glow)
+            if(!doneShadow && doEtch && (glow || EFFECT_ETCH==opts.buttonEffect || sunken))
             {
-                QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black),
-                       botCol(getLowerEtchCol(widget));
+                QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
 
                 if(!glow)
-                {
                     topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                    botCol=getLowerEtchCol(widget);
-                }
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
                 painter->setPen(topCol);
                 painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
                 if(!glow)
-                    painter->setPen(botCol);
+                    painter->setPen(getLowerEtchCol(widget));
                 painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
                 painter->setRenderHint(QPainter::Antialiasing, false);
             }
@@ -9707,11 +9703,11 @@ QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
 //         doEtch=false;
 //         theNoEtchWidgets.insert(widget);
 //     }
-            
+
     if(doEtch)
     {
         QColor bgnd(widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole()));
-        
+
         if(bgnd.alpha()>0)
             return shade(bgnd, 1.06);
     }
