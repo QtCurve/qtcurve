@@ -3,7 +3,9 @@
 1. When using shaded combo buttons, use button colours for border.
 2. Disable button order userChrome.css mods for Thunderbird>=3
 3. Added a verbose warning about the usage of QTC_MODIFY_MOZILLA
-
+4. Fix spin widget entry field when widget is on a notebook - bug was caused
+   by fix for GEdit tabs.
+   
 0.64.1
 ------
 1. When using shaded combo buttons, use the combo splitter setting to
