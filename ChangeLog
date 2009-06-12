@@ -1,3 +1,7 @@
+0.64.2
+------
+1. Disable button order userChrome.css mods for Thunderbird>=3
+
 0.64.1
 ------
 1. When using shaded combo buttons, use the combo splitter setting to

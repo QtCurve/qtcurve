@@ -2076,9 +2076,9 @@ static gboolean qtInit(Options *opts)
                     if(firefox)
                         processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts->gtkButtonOrder, add_menu_colors, "firefox", TRUE);
                     else if(thunderbird)
-                        processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
+                        processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 0) && !opts->gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
                     else if(mozThunderbird)
-                        processMozillaApp(!opts->gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
+                        processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 0) && !opts->gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
 #endif
                     qtSettings.app=
 #ifndef QTC_OLD_MOZILLA
