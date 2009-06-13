@@ -5,7 +5,9 @@
 3. Added a verbose warning about the usage of QTC_MODIFY_MOZILLA
 4. Fix spin widget entry field when widget is on a notebook - bug was caused
    by fix for GEdit tabs.
-   
+5. Disabled coloured slider hack for Firefox apps. This hack attempts to solve the
+   miscolured top/bottom line of sliders when they are at the top/bottom.
+
 0.64.1
 ------
 1. When using shaded combo buttons, use the combo splitter setting to

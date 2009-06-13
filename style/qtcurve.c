@@ -2989,7 +2989,7 @@ debugDisplayWidget(widget, 3);
                         atEnd=TRUE;
                     }
 
-                    if(widget && lastSlider.widget==widget && !atEnd)
+                    if(!isMozilla() && widget && lastSlider.widget==widget && !atEnd)
                         lastSlider.widget=NULL;
                 }
 #endif
@@ -3038,7 +3038,7 @@ debugDisplayWidget(widget, 3);
                    overlaps (by 1 pixel) the buttons, then the top/bottom is vut off if this is shaded...
                    So, work-around this by re-drawing the slider here! */
                 if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType &&
-                   WIDGET_SB_BUTTON==widgetType && widget && widget==lastSlider.widget &&
+                   WIDGET_SB_BUTTON==widgetType && widget && widget==lastSlider.widget && !isMozilla() &&
                    ( (SCROLLBAR_NEXT==opts.scrollbarType && QTC_STEPPER_B==stepper) || QTC_STEPPER_D==stepper))
                 {
                     gtkDrawSlider(lastSlider.style, lastSlider.window, lastSlider.state,
@@ -5360,7 +5360,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle ||
        ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED)))
     {
-        if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType)
+        if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType && !isMozilla())
         {
             lastSlider.style=style;
             lastSlider.window=window;
