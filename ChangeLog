@@ -4,6 +4,7 @@
 2. Fix compilation with Qt4 < 4.5 (PM_SubMenuOverlap was introduced in Qt4.5)
 3. Allow style to be compile for Qt4 only, need to pass -DQTC_QT_ONLY=true to cmake
 4. Fix etched radio buttons.
+5. Draw a horizontal gradient for checkable menuitems.
 
 0.64.1
 ------

@@ -4514,7 +4514,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                                 sunkenRect = visualRect(menuItem->direction, menuItem->rect, sunkenRect);
                                 opt.state = menuItem->state;
-                                opt.state|=State_Raised;
+                                opt.state|=State_Raised|State_Horizontal;
                                 if (checked)
                                     opt.state |= State_On;
                                 drawLightBevel(painter, sunkenRect, &opt, widget, ROUNDED_ALL, getFill(&opt, itsButtonCols), itsButtonCols);
