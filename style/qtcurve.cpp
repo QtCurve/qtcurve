@@ -54,15 +54,14 @@ static bool useQt3Settings()
 #include <KDE/KConfigGroup>
 #include <KDE/KIconLoader>
 #include <KDE/KIcon>
-#include <KDE/KComponentData>
 #include <KDE/KTabWidget>
 #include <KDE/KColorScheme>
 #include <KDE/KStandardDirs>
-
-static KComponentData *theKComponentData=0;
-static int            theInstanceCount=0;
+#include <KDE/KComponentData>
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
+static int theInstanceCount=0;
+
 // KDE4.1 does this functionality for us!
 #include <KDE/KFileDialog>
 #include <KDE/KDirSelectDialog>
@@ -194,7 +193,7 @@ static QString getSaveFileName(QWidget *parent, const QString &caption, const QS
 
 static void setFileDialogs()
 {
-    if(1==theInstanceCount)
+    if(1==++theInstanceCount)
     {
         if(!qt_filedialog_existing_directory_hook)
             qt_filedialog_existing_directory_hook=&getExistingDirectory;
@@ -209,7 +208,7 @@ static void setFileDialogs()
 
 static void unsetFileDialogs()
 {
-    if(0==theInstanceCount)
+    if(0==--theInstanceCount)
     {
         if(qt_filedialog_existing_directory_hook==&getExistingDirectory)
             qt_filedialog_existing_directory_hook=0;
@@ -765,9 +764,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsQtVersion(VER_UNKNOWN)
 {
 #if !defined QTC_QT_ONLY
-    theInstanceCount++;
-
-    if(!theKComponentData && !KGlobal::hasMainComponent())
+    if(KGlobal::hasMainComponent())
     {
         //printf("Creating KComponentData\n");
 
@@ -779,9 +776,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
         if(name.isEmpty())
             name="QtApp";
 
-        //QByteArray utf8=name.toUtf8();
-        //theKComponentData=new KComponentData(KAboutData(utf8, utf8, ki18n(utf8), "0.1"));
-        theKComponentData=new KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
+        KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
@@ -931,15 +926,8 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
 QtCurveStyle::~QtCurveStyle()
 {
-#if !defined QTC_QT_ONLY
-    if(0==--theInstanceCount && theKComponentData)
-    {
-        delete theKComponentData;
-        theKComponentData=0L;
-    }
-#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
+#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0) && !defined QTC_QT_ONLY
     unsetFileDialogs();
-#endif
 #endif
 
     if(itsSidebarButtonsCols &&

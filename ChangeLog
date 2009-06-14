@@ -1,3 +1,7 @@
+0.64.3
+------
+1. Fix some K apps crashing due to KComponentData
+
 0.64.2
 ------
 1. When using shaded combo buttons, use button colours for border.
