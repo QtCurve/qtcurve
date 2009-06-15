@@ -1,3 +1,7 @@
+0.64.3
+------
+1. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+
 0.64.2
 ------
 1. When using shaded combo buttons, use button colours for border.
