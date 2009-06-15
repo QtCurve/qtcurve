@@ -34,6 +34,10 @@
 typedef qulonglong QtcKey;
 #include "common.h"
 
+#if !defined QTC_QT_ONLY
+#include <KDE/KComponentData>
+#endif
+
 // #ifdef QTC_KSTYLE
 // #include <kstyle.h>
 // #define QTC_BASE_STYLE KStyle
@@ -79,7 +83,6 @@ class QtCurveStyle : public QWindowsStyle
     int pixelMetric(PixelMetric metric, const QStyleOption *option=0, const QWidget *widget=0) const;
     int styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData=0) const;
     QPalette standardPalette() const;
-    QPixmap standardPixmap(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const;
     void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     void drawControl(ControlElement control, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
@@ -212,6 +215,9 @@ class QtCurveStyle : public QWindowsStyle
     mutable Version                    itsQtVersion;
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
+#if !defined QTC_QT_ONLY
+    KComponentData                     itsComponentData;
+#endif
 };
 
 #endif
