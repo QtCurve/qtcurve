@@ -1150,7 +1150,7 @@ static void readKdeGlobals(const char *rc, int rd, Options *opts)
 
     if(rd&RD_ICONS && !qtSettings.icons)
     {
-        qtSettings.icons=(char *)malloc(strlen(defaultIcons())+1);
+        qtSettings.icons=(char *)realloc(qtSettings.icons, strlen(defaultIcons())+1);
         strcpy(qtSettings.icons, defaultIcons());
     }
     if(rd&RD_TOOLBAR_STYLE && !(found&RD_TOOLBAR_STYLE))
