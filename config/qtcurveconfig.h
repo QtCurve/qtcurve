@@ -108,6 +108,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void activeTabAppearanceChanged();
     void tabMoChanged();
     void passwordCharClicked();
+    void unifySpinBtnsToggled();
+    void unifySpinToggled();
     void changeStack();
     void gradChanged(int i);
     void editItem(QTreeWidgetItem *i, int col);

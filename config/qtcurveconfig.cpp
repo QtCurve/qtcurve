@@ -505,7 +505,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboBtn, SIGNAL(currentIndexChanged(int)), SLOT(comboBtnChanged()));
     connect(customComboBtnColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
-    connect(unifySpinBtns, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(unifySpinBtns, SIGNAL(toggled(bool)), SLOT(unifySpinBtnsToggled()));
+    connect(unifySpin, SIGNAL(toggled(bool)), SLOT(unifySpinToggled()));
+    connect(unifyCombo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(vArrows, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xCheck, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(crHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -799,11 +801,26 @@ void QtCurveConfig::passwordCharClicked()
     }
 }
 
+void QtCurveConfig::unifySpinBtnsToggled()
+{
+    if(unifySpinBtns->isChecked())
+        unifySpin->setChecked(false);
+    unifySpin->setDisabled(unifySpinBtns->isChecked());
+}
+
+void QtCurveConfig::unifySpinToggled()
+{
+    if(unifySpin->isChecked())
+        unifySpinBtns->setChecked(false);
+    unifySpinBtns->setDisabled(unifySpin->isChecked());
+}
+
 void QtCurveConfig::setupStack()
 {
     int i=0;
     CStackItem *first=new CStackItem(stackList, i18n("General"), i++);
     new CStackItem(stackList, i18n("Combos"), i++);
+    new CStackItem(stackList, i18n("Spin Buttons"), i++);
     new CStackItem(stackList, i18n("Splitters"), i++);
     new CStackItem(stackList, i18n("Sliders and Scrollbars"), i++);
     new CStackItem(stackList, i18n("Progressbars"), i++);
@@ -1366,6 +1383,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.comboBtn=(EShade)comboBtn->currentIndex();
     opts.customComboBtnColor=customComboBtnColor->color();
     opts.unifySpinBtns=unifySpinBtns->isChecked();
+    opts.unifySpin=unifySpin->isChecked();
+    opts.unifyCombo=unifyCombo->isChecked();
     opts.vArrows=vArrows->isChecked();
     opts.xCheck=xCheck->isChecked();
     opts.crHighlight=crHighlight->isChecked();
@@ -1509,6 +1528,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     comboBtn->setCurrentIndex(opts.comboBtn);
     customComboBtnColor->setColor(opts.customComboBtnColor);
     unifySpinBtns->setChecked(opts.unifySpinBtns);
+    unifySpin->setChecked(opts.unifySpin);
+    unifyCombo->setChecked(opts.unifyCombo);
     vArrows->setChecked(opts.vArrows);
     xCheck->setChecked(opts.xCheck);
     crHighlight->setChecked(opts.crHighlight);
@@ -1642,6 +1663,8 @@ bool QtCurveConfig::settingsChanged()
          comboSplitter->isChecked()!=currentStyle.comboSplitter ||
          comboBtn->currentIndex()!=(int)currentStyle.comboBtn ||
          unifySpinBtns->isChecked()!=currentStyle.unifySpinBtns ||
+         unifySpin->isChecked()!=currentStyle.unifySpin ||
+         unifyCombo->isChecked()!=currentStyle.unifyCombo ||
          vArrows->isChecked()!=currentStyle.vArrows ||
          xCheck->isChecked()!=currentStyle.xCheck ||
          crHighlight->isChecked()!=currentStyle.crHighlight ||
