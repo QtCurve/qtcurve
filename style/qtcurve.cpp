@@ -1102,6 +1102,7 @@ void QtCurveStyle::polish(QPalette &palette)
     palette.setColor(QPalette::Disabled, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
 
     palette.setColor(QPalette::Disabled, QPalette::Base, palette.color(QPalette::Active, QPalette::Background));
+    palette.setColor(QPalette::Disabled, QPalette::Background, palette.color(QPalette::Active, QPalette::Background));
 
     // Fix KDE4's palette...
     for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)

@@ -2,6 +2,7 @@
 ------
 1. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
    set up KDE settings.
+2. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------
