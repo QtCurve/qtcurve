@@ -1979,10 +1979,8 @@ debugDisplayWidget(widget, 3);
                 width+=2;
     }
 
-/*
     if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
         drawAreaColor(cr, area, NULL, enabled ? &style->base[state] : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
-*/
 
     {
     int xo=x, yo=y, widtho=width, heighto=height;

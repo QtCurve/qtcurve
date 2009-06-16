@@ -1,6 +1,7 @@
 0.64.3
 ------
 1. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+2. Draw entry field backgrounds.
 
 0.64.2
 ------
