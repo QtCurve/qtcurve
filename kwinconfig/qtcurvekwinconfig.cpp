@@ -42,7 +42,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     itsWidget->show();
 
-#if !KDE_IS_VERSION(4,1,80)
+#if !KDE_IS_VERSION(4,1,80) || KDE_IS_VERSION(4,2,80)
     itsWidget->coloredShadow->setVisible(false);
 #endif
     load(configGroup);

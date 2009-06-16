@@ -225,7 +225,7 @@ bool QtCurveHandler::supports(Ability ability) const
         case AbilityColorTitleFore:
         case AbilityColorFrame:
             return true;
-#if KDE_IS_VERSION(4,1,80)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
         case AbilityCompositingShadow:
             return itsColoredShadow;
 #endif
