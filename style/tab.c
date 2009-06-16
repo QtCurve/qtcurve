@@ -4,7 +4,7 @@ typedef struct
     GdkRectangle rect;
 } QtCTab;
 
-static GHashTable     *tabHashTable                 = NULL;
+static GHashTable *tabHashTable = NULL;
 
 static QtCTab * lookupTabHash(void *hash, gboolean create)
 {
@@ -34,51 +34,29 @@ static void removeFromTabHash(void *hash)
 
 static void qtcTabCleanup(GtkWidget *widget)
 {
-  if (widget)
-    {
-      gint id = 0;
- 
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_MOTION_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-                                             
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_LEAVE_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-     
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_DESTROY_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-       
-      id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID");
-      g_signal_handler_disconnect(G_OBJECT(widget), id);
-
-      g_object_steal_data (G_OBJECT(widget), "QTC_TAB_HACK_SET");
-      removeFromTabHash(widget);
+    if (widget)
+    { 
+        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_MOTION_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_LEAVE_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_DESTROY_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID"));
+        g_object_steal_data(G_OBJECT(widget), "QTC_TAB_HACK_SET");
+        removeFromTabHash(widget);
     }
 }
 
-/***********************************************
- *   Style set signal to ensure menushell signals
- *   get cleaned up if the theme changes
- ***********************************************/
 static gboolean qtcTabStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
 {
     qtcTabCleanup(widget);
     return FALSE;
 }
- 
-/***********************************************
- *   Destroy signal to ensure menushell signals
- *   get cleaned if it is destroyed
- ***********************************************/
+
 static gboolean qtcTabDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     qtcTabCleanup (widget);
     return FALSE;
 }
- 
-/***********************************************
- *   Motion signal to ensure menushell items
- *   prelight state changes on mouse move.
- ***********************************************/
+
 static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     if (widget)
@@ -157,14 +135,10 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
  
     return FALSE;
 }
- 
-/***********************************************
- *   Leave signal to ensure menushell items
- *   normal state on mouse leave.
- ***********************************************/
+
 static gboolean qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-  if (widget)
+    if (widget)
     {
         QtCTab *prevTab=lookupTabHash(widget, FALSE);
 
@@ -176,43 +150,25 @@ static gboolean qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer
         }
     }
  
-  return FALSE;
+    return FALSE;
 }
- 
-/***********************************************
- *   Setup Menu Shell with signals to ensure
- *   prelight works on items
- ***********************************************/
+
 static void qtcTabSetup(GtkWidget *widget)
 {
-  if (widget)
-    {
-      gint id = 0;
- 
-      if (!g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_SET"))
-      {
-        id = g_signal_connect(G_OBJECT(widget), "motion-notify-event",
-                                             (GtkSignalFunc)qtcTabMotion,
-                                             NULL);
-                                  
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID", (gpointer)id);
-        
-        id = g_signal_connect(G_OBJECT(widget), "leave-notify-event",
-                                             (GtkSignalFunc)qtcTabLeave,
-                                             NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID", (gpointer)id);
-                                             
-        id = g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                             (GtkSignalFunc)qtcTabDestroy,
-                                             NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID", (gpointer)id);
- 
+    if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_SET"))
+    { 
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event",
+                                                                                            (GtkSignalFunc)qtcTabMotion,
+                                                                                            NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event",
+                                                                                           (GtkSignalFunc)qtcTabLeave,
+                                                                                            NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
+                                                                                             (GtkSignalFunc)qtcTabDestroy,
+                                                                                              NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
+                                                                                               (GtkSignalFunc)qtcTabStyleSet,
+                                                                                               NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_HACK_SET", (gpointer)1);
-        
-        id = g_signal_connect(G_OBJECT(widget), "style-set",
-                                             (GtkSignalFunc)qtcTabStyleSet,
-                                             NULL);
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID", (gpointer)id);
-      }
     }  
 }
