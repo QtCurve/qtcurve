@@ -2645,10 +2645,10 @@ static void qtExit()
     }
 }
 
-#define SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL) \
+#define SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL, USE_DIS) \
     st->itm[state]=rc->color_flags[state]&ITEM \
         ? rc->itm[state] \
-        : qtSettings.colors[state==GTK_STATE_INSENSITIVE \
+        : qtSettings.colors[state==GTK_STATE_INSENSITIVE && USE_DIS\
                                 ? PAL_DISABLED \
                                 : PAL ][QTP_COL];
 
@@ -2657,14 +2657,17 @@ static void qtExit()
         ? rc->itm[state] \
         : qtSettings.colors[PAL_ACTIVE][QTP_COL];
 
+#define SET_COLOR_X(st, rc, itm, ITEM, state, QTP_COL, USE_DIS) \
+    SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE, USE_DIS)
+    
 #define SET_COLOR(st, rc, itm, ITEM, state, QTP_COL) \
-    SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE)
+    SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE, TRUE)
 
 static void qtSetColors(GtkStyle *style, GtkRcStyle *rc_style, Options *opts)
 {
     SET_COLOR(style, rc_style, bg, GTK_RC_BG, GTK_STATE_NORMAL, COLOR_WINDOW)
     SET_COLOR(style, rc_style, bg, GTK_RC_BG, GTK_STATE_SELECTED, COLOR_SELECTED)
-    SET_COLOR(style, rc_style, bg, GTK_RC_BG, GTK_STATE_INSENSITIVE, COLOR_WINDOW)
+    SET_COLOR_X(style, rc_style, bg, GTK_RC_BG, GTK_STATE_INSENSITIVE, COLOR_WINDOW, FALSE)
     SET_COLOR(style, rc_style, bg, GTK_RC_BG, GTK_STATE_ACTIVE, COLOR_MID)
     SET_COLOR(style, rc_style, bg, GTK_RC_BG, GTK_STATE_PRELIGHT, COLOR_WINDOW)
 

@@ -2,6 +2,7 @@
 ------
 1. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
 2. Draw entry field backgrounds.
+3. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------
