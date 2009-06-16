@@ -1379,7 +1379,9 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                  yd=y+0.5;
     EAppearance  app=widgetApp(widget, &opts);
     gboolean     enabled=GTK_STATE_INSENSITIVE!=state,
-                 useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled;
+                 useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled,
+                 hasFocus=qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
+                 hasMouseOver=qtcPalette.mouseover && c_colors==qtcPalette.mouseover;
     GdkColor     *colors=c_colors ? c_colors : qtcPalette.background;
     int          useBorderVal=!enabled && WIDGET_BUTTON(widget)
                                 ? QT_DISABLED_BORDER
@@ -1387,7 +1389,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                                     ? QT_SLIDER_MO_BORDER
                                     : borderVal;
     GdkColor     *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
-    gboolean     hasFocus=colors==qtcPalette.focus; /* CPD USED TO INDICATE FOCUS! */
+
 
     setCairoClipping(cr, area, region);
 
@@ -1403,7 +1405,9 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
         {
             double radiusi=getRadius(&opts, width, height, widget, RADIUS_INTERNAL),
                    xdi=xd+1,
-                   ydi=yd+1;
+                   ydi=yd+1,
+                   alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
+                            ? QTC_ENTRY_INNER_ALPHA : QTC_BORDER_BLEND_ALPHA;
             int    widthi=width-2,
                    heighti=height-2;
 
@@ -1412,7 +1416,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
             {
                 GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? 0 : QT_FRAME_DARK_SHADOW];
                 if(flags&DF_BLEND)
-                    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_BORDER_BLEND_ALPHA);
+                    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
                 else
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
             }
@@ -1423,21 +1427,22 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
             cairo_stroke(cr);
             if(WIDGET_CHECKBOX!=widget)
             {
-                if(WIDGET_SCROLLVIEW==widget && !hasFocus)
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
-                else if(WIDGET_ENTRY==widget && !hasFocus)
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->base[state]));
-                else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app ||
-                                                         WIDGET_TAB_TOP==widget || WIDGET_TAB_BOT==widget))
-                {
-                    GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
-                    if(flags&DF_BLEND)
-                        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), QTC_BORDER_BLEND_ALPHA);
+                if(!hasFocus && !hasMouseOver)
+                    if(WIDGET_SCROLLVIEW==widget && !hasFocus)
+                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
+                    else if(WIDGET_ENTRY==widget && !hasFocus)
+                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->base[state]));
+                    else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app ||
+                                                            WIDGET_TAB_TOP==widget || WIDGET_TAB_BOT==widget))
+                    {
+                        GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
+                        if(flags&DF_BLEND)
+                            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
+                        else
+                            cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+                    }
                     else
-                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
-                }
-                else
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
+                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
 
                 createBRPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
                 cairo_stroke(cr);
