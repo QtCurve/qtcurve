@@ -167,11 +167,11 @@ class QtCurveStyle : public QWindowsStyle
                                                Qt::Orientation orientation, const QStyleOption *option,
                                                const QWidget *widget) const;
     void           kdeGlobalSettingsChange(int type, int);
+    void           setupKde4();
 
     private:
 
 #if !defined QTC_QT_ONLY
-    void           setupKde4();
     void           setDecorationColors();
     void           applyKdeSettings(bool pal);
 #endif
