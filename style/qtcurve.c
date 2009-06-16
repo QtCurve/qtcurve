@@ -59,6 +59,7 @@ static struct
 #include "animation.c"
 #include "menu.c"
 #include "tab.c"
+#include "widgetmap.c"
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -474,6 +475,36 @@ static gboolean isPathButton(GtkWidget *widget)
 //            (GTK_IS_NOTEBOOK(widget->parent) ||
 //             (widget->parent->parent && GTK_IS_BOX(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent)));
 // }
+
+static GtkWidget * getComboEntry(GtkWidget *widget)
+{
+    GList *child=gtk_container_get_children(GTK_CONTAINER(widget));
+
+    for(; child; child=child->next)
+    {
+        GtkBoxChild *boxChild=(GtkBoxChild *)child->data;
+
+        if(GTK_IS_ENTRY(boxChild))
+            return (GtkWidget *)boxChild;
+    }
+
+    return NULL;
+}
+
+static GtkWidget * getComboButton(GtkWidget *widget)
+{
+    GList *child=gtk_container_get_children(GTK_CONTAINER(widget));
+
+    for(; child; child=child->next)
+    {
+        GtkBoxChild *boxChild=(GtkBoxChild *)child->data;
+
+        if(GTK_IS_BUTTON(boxChild))
+            return (GtkWidget *)boxChild;
+    }
+
+    return NULL;
+}
 
 static gboolean isComboBoxButton(GtkWidget *widget)
 {
@@ -1922,7 +1953,7 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
 
 static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            GtkWidget *widget, GdkRectangle *area, gint x, gint y, gint width,
-                           gint height, int round, gboolean isCombo)
+                           gint height, int round, EWidget w)
 {
     gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget))),
              highlight=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app,
@@ -1980,7 +2011,9 @@ debugDisplayWidget(widget, 3);
     }
 
     if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
-        drawAreaColor(cr, area, NULL, enabled ? &style->base[state] : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
+        drawAreaColor(cr, area, NULL, enabled
+                                    ? &style->base[WIDGET_COMBO_BUTTON==w ? GTK_STATE_NORMAL : state]
+                                    : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
 
     {
     int xo=x, yo=y, widtho=width, heighto=height;
@@ -1998,10 +2031,13 @@ debugDisplayWidget(widget, 3);
         rect.x=x; rect.y=y; rect.width=width; rect.height=height;
         region=gdk_region_rectangle(&rect);
 
-        if(!(round&CORNER_TR) && !(round&CORNER_BR))
-            width+=4;
-        if(!(round&CORNER_TL) && !(round&CORNER_BL))
-            x-=4;
+        if(!(WIDGET_SPIN==w && opts.unifySpin) && !(WIDGET_COMBO_BUTTON==w && opts.unifyCombo))
+        {
+            if(!(round&CORNER_TR) && !(round&CORNER_BR))
+                width+=4;
+            if(!(round&CORNER_TL) && !(round&CORNER_BL))
+                x-=4;
+        }
 
         drawEtch(cr, region ? NULL : area, region, widget, x, y, width, height, FALSE, round, WIDGET_ENTRY);
         gdk_region_destroy(region);
@@ -2250,7 +2286,7 @@ debugDisplayWidget(widget, 3);
     else if(GTK_APP_INKSCAPE==qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") && GTK_IS_SPIN_BUTTON(widget) &&
             (height+(QTC_DO_EFFECT ? 2 : 0)+12)==widget->allocation.height)
         drawEntryField(cr, style, state, widget, area, x-2, y-2, width+4, height+4,
-                       reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, FALSE);
+                       reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, WIDGET_ENTRY);
     else if(DETAIL("tooltip"))
     {
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
@@ -2498,6 +2534,8 @@ debugDisplayWidget(widget, 3);
                                             ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
                                                                 [COLOR_BUTTON_TEXT]
                                             : &style->text[QTC_ARROW_STATE(state)];
+            if(onComboEntry && GTK_STATE_ACTIVE==state && opts.unifyCombo)
+                x--, y--;
             drawArrow(cr, QTC_MO_ARROW(false, col), area,  arrow_type, x+(width>>1), y+(height>>1), FALSE, TRUE);
         }
     }
@@ -2559,11 +2597,14 @@ debugDisplayWidget(widget, 3);
             y++;
 */
 
-        if(GTK_STATE_ACTIVE==state && ((sbar && !opts.flatSbarButtons) || isSpinButton))
+        if(GTK_STATE_ACTIVE==state && ((sbar && !opts.flatSbarButtons) || (isSpinButton && !opts.unifySpin)))
         {
             x++;
             y++;
         }
+
+        if(isSpinButton && opts.unifySpin)
+            x-=2;
 
         if(sbar)
             switch(stepper)
@@ -2602,7 +2643,7 @@ debugDisplayWidget(widget, 3);
                         ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT]
                         : &style->text[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
                                         ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)];
-        drawArrow(cr, QTC_MO_ARROW(isMenuItem, col), area, arrow_type, x, y, isSpinButton, TRUE);
+        drawArrow(cr, QTC_MO_ARROW(isMenuItem, col), area, arrow_type, x, y, isSpinButton && !opts.unifySpin, TRUE);
         }
     }
     QTC_CAIRO_END
@@ -2705,7 +2746,7 @@ debugDisplayWidget(widget, 3);
 
     if(spinUp || spinDown)
     {
-        if(!opts.unifySpinBtns || sunken || GTK_STATE_PRELIGHT==state)
+        if(!opts.unifySpin && (!opts.unifySpinBtns || sunken || GTK_STATE_PRELIGHT==state))
         {
             EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
             GdkRectangle *a=area,
@@ -2770,7 +2811,17 @@ debugDisplayWidget(widget, 3);
                                                 ? GTK_STATE_INSENSITIVE
                                                 : GTK_STATE_NORMAL,
                                            area, x, y, width, height);
-        if(opts.unifySpinBtns)
+
+        if(opts.unifySpin)
+        {
+            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent));
+
+            if(!rev)
+                x-=2;
+            width+=2;
+            drawEntryField(cr, style, state, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
+        }
+        else if(opts.unifySpinBtns)
         {
             int offset=(QTC_DO_EFFECT ? 1 : 0);
             drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE,
@@ -3002,7 +3053,26 @@ debugDisplayWidget(widget, 3);
                         x+=2, width-=2;
                 }
 
-                if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
+                if(opts.unifyCombo && WIDGET_COMBO_BUTTON==widgetType)
+                {
+                    GtkWidget *entry=getComboEntry(widget->parent);
+                    gboolean  rev=reverseLayout(entry);
+
+                    if(!rev)
+                        x-=2;
+                    width+=2;
+                    if(state==GTK_STATE_PRELIGHT || state==GTK_STATE_ACTIVE)
+                        state=GTK_STATE_NORMAL;
+
+                    // When we draw the entry, if its highlighted we want to highlight this button as well.
+                    // Unfortunately, when the entry of a GtkComboBoxEntry draws itself, there is no way to
+                    // determine the button associated with it. So, we store the mapping here...
+                    if(widget->parent && GTK_IS_COMBO_BOX_ENTRY(widget->parent))
+                        qtcWidgetMapSetup(widget->parent, widget);
+                    drawEntryField(cr, style, state, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
+                                   WIDGET_COMBO_BUTTON);
+                }
+                else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
                     //if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                         drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
@@ -3928,14 +3998,27 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                 x+=btnWidth;
         }
 #endif
-                
+
+        if((opts.unifySpin && isSpin)|| (combo && opts.unifyCombo))
+            width+=2;
+
         drawEntryField(cr, style, state, widget, area, x, y, width, height,
                        combo || isSpin
                            ? rev
                                 ? ROUNDED_RIGHT
                                 : ROUNDED_LEFT
                            : ROUNDED_ALL,
-                       combo);
+                       WIDGET_ENTRY);
+        if(combo && opts.unifyCombo && widget && widget->parent)
+        {
+            GtkWidget *btn=getComboButton(widget->parent);
+
+            if(!btn && widget->parent)
+                btn=getMappedWidget(widget->parent);
+
+            if(btn)
+                gtk_widget_queue_draw(btn);
+        }
     }
     else
     {
