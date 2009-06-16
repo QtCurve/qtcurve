@@ -26,6 +26,12 @@ static QtCTab * lookupTabHash(void *hash, gboolean create)
     return rv;
 }
 
+static void removeFromTabHash(void *hash)
+{
+    if(tabHashTable)
+        g_hash_table_remove(tabHashTable, hash);
+}
+
 static void qtcTabCleanup(GtkWidget *widget)
 {
   if (widget)
@@ -44,7 +50,8 @@ static void qtcTabCleanup(GtkWidget *widget)
       id = (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID");
       g_signal_handler_disconnect(G_OBJECT(widget), id);
 
-      g_object_steal_data (G_OBJECT(widget), "QTC_TAB_HACK_SET");      
+      g_object_steal_data (G_OBJECT(widget), "QTC_TAB_HACK_SET");
+      removeFromTabHash(widget);
     }
 }
 
