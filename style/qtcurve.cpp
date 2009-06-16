@@ -778,7 +778,6 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
         itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
-
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
     setFileDialogs();
 #endif
@@ -920,7 +919,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
         opts.titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
 
 #if !defined QTC_QT_ONLY
-    setupKde4();
+    QTimer::singleShot(0, this, SLOT(setupKde4()));
 #endif
 }
 
@@ -9589,9 +9588,9 @@ void QtCurveStyle::widgetDestroyed(QObject *o)
     }
 }
 
-#if !defined QTC_QT_ONLY
 void QtCurveStyle::setupKde4()
 {
+#if !defined QTC_QT_ONLY
     if(kapp)
         setDecorationColors();
     else
@@ -9599,8 +9598,10 @@ void QtCurveStyle::setupKde4()
         applyKdeSettings(true);
         applyKdeSettings(false);
     }
+#endif
 }
 
+#if !defined QTC_QT_ONLY
 void QtCurveStyle::setDecorationColors()
 {
     KColorScheme kcs(QPalette::Active);
@@ -9618,10 +9619,13 @@ void QtCurveStyle::applyKdeSettings(bool pal)
     }
     else
     {
-        QApplication::setFont(KGlobalSettings::generalFont());
-        QApplication::setFont(KGlobalSettings::menuFont(), "QMenuBar");
-        QApplication::setFont(KGlobalSettings::menuFont(), "QMenu");
-        QApplication::setFont(KGlobalSettings::menuFont(), "KPopupTitle");
+        KConfigGroup g(KGlobal::config(), "General");
+        QFont        mnu=g.readEntry("menuFont", QApplication::font());
+
+        QApplication::setFont(g.readEntry("font", QApplication::font()));
+        QApplication::setFont(mnu, "QMenuBar");
+        QApplication::setFont(mnu, "QMenu");
+        QApplication::setFont(mnu, "KPopupTitle");
 // Don't set toolbar font - messes things up with Arora...
 //         QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
     }

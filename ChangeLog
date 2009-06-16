@@ -1,6 +1,7 @@
 0.64.3
 ------
-1. Fix some K apps crashing due to KComponentData
+1. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+   set up KDE settings.
 
 0.64.2
 ------
