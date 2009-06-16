@@ -2,9 +2,10 @@
 ------
 1. Add options to draw editable combos, and spin widgets, as edit fields with
    embedded arrows - oxygen style.
-2. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+2. Enable mouse-over for entry fields.
+3. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
    set up KDE settings.
-3. Dont use KDE4's disabled background colour.
+4. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------

@@ -1157,13 +1157,17 @@ void QtCurveStyle::polish(QWidget *widget)
         qobject_cast<QSlider *>(widget) ||
         qobject_cast<QHeaderView *>(widget) ||
         qobject_cast<QTabBar *>(widget) ||
+        qobject_cast<QAbstractScrollArea *>(widget) ||
+        qobject_cast<QTextEdit *>(widget) ||
+        qobject_cast<QLineEdit *>(widget) ||
 //        qobject_cast<QDockWidget *>(widget) ||
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("QDockSeparator") ||
         widget->inherits("QDockWidgetSeparator") ||
         widget->inherits("Q3DockWindowResizeHandle")))
         widget->setAttribute(Qt::WA_Hover, true);
-    else if (qobject_cast<QScrollBar *>(widget))
+
+    if (qobject_cast<QScrollBar *>(widget))
     {
         if(enableMouseOver)
             widget->setAttribute(Qt::WA_Hover, true);
@@ -1355,13 +1359,16 @@ void QtCurveStyle::unpolish(QWidget *widget)
        qobject_cast<QSlider *>(widget) ||
        qobject_cast<QHeaderView *>(widget) ||
        qobject_cast<QTabBar *>(widget) ||
+       qobject_cast<QAbstractScrollArea *>(widget) ||
+       qobject_cast<QTextEdit *>(widget) ||
+       qobject_cast<QLineEdit *>(widget) ||
 //       qobject_cast<QDockWidget *>(widget) ||
        widget->inherits("QWorkspaceTitleBar") ||
        widget->inherits("QDockSeparator") ||
        widget->inherits("QDockWidgetSeparator") ||
        widget->inherits("Q3DockWindowResizeHandle"))
         widget->setAttribute(Qt::WA_Hover, false);
-    else if (qobject_cast<QScrollBar *>(widget))
+    if (qobject_cast<QScrollBar *>(widget))
     {
         widget->setAttribute(Qt::WA_Hover, false);
         if(QTC_ROUNDED && !opts.flatSbarButtons)
@@ -8345,13 +8352,16 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     State        state(option->state);
     bool         enabled(state&State_Enabled),
                  hasFocus(state&State_HasFocus),
-                 window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
-    const QColor *cols(enabled && hasFocus && (WIDGET_FRAME==w || WIDGET_ENTRY==w ||
-                                               (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews))
-                        ? itsFocusCols
-                        : custom
-                            ? custom
-                            : APP_KRUNNER==theThemedApp ? itsBackgroundCols : backgroundColors(option));
+                 mouseOver(state&State_MouseOver),
+                 window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w),
+                 entry(WIDGET_FRAME==w || WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews));
+    const QColor *cols(enabled && mouseOver && itsMouseOverCols && entry 
+                        ? itsMouseOverCols
+                        : enabled && hasFocus && itsFocusCols && entry
+                              ? itsFocusCols
+                              : custom
+                                ? custom
+                                : APP_KRUNNER==theThemedApp ? itsBackgroundCols : backgroundColors(option));
     QColor       border(WIDGET_DEF_BUTTON==w && IND_FONT_COLOR==opts.defBtnIndicator && enabled
                           ? option->palette.buttonText().color()
                           : cols[WIDGET_PROGRESSBAR==w
