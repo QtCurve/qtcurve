@@ -150,6 +150,7 @@ typedef GdkColor color;
 #define QTC_GLOW_DEFBTN    1
 #define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
 #define QTC_DEF_BNT_TINT   0.4
+#define QTC_ENTRY_INNER_ALPHA 0.4
 
 #define QT_STD_BORDER      5
 #define QT_PBAR_BORDER     4

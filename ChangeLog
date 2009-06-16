@@ -3,10 +3,12 @@
 1. Add options to draw editable combos, and spin widgets, as edit fields with
    embedded arrows - oxygen style.
 2. Enable mouse-over for entry fields.
-3. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+3. For mouse-over and focus, use same colour for top and bottom inner parts
+   of entry fields.
+4. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
    set up KDE settings.
-4. Dont use KDE4's disabled background colour.
-5. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
+5. Dont use KDE4's disabled background colour.
+6. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
    new kwin API.
 
 0.64.2

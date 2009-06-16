@@ -8352,10 +8352,10 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     State        state(option->state);
     bool         enabled(state&State_Enabled),
                  hasFocus(state&State_HasFocus),
-                 mouseOver(state&State_MouseOver),
+                 hasMouseOver(state&State_MouseOver),
                  window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w),
                  entry(WIDGET_FRAME==w || WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews));
-    const QColor *cols(enabled && mouseOver && itsMouseOverCols && entry 
+    const QColor *cols(enabled && hasMouseOver && itsMouseOverCols && entry 
                         ? itsMouseOverCols
                         : enabled && hasFocus && itsFocusCols && entry
                               ? itsFocusCols
@@ -8396,7 +8396,12 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 QPainterPath topPath,
                              botPath;
 
-                if(doBlend && !window)
+                if((hasMouseOver || hasFocus) && (WIDGET_ENTRY==w || WIDGET_SCROLLVIEW==w))
+                {
+                    tl.setAlphaF(QTC_ENTRY_INNER_ALPHA);
+                    br.setAlphaF(QTC_ENTRY_INNER_ALPHA);
+                }                    
+                else if(doBlend && !window)
                 {
                     tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
                     br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
@@ -8413,14 +8418,15 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                 ? tl
                                 : option->palette.background().color());
                 p->drawPath(topPath);
-                p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
-                            ? option->palette.background().color()
-                            : WIDGET_ENTRY==w && !hasFocus
-                                ? option->palette.base().color()
-                                : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app ||
-                                            WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
-                                    ? br
-                                    : option->palette.background().color());
+                if(!hasFocus && !hasMouseOver)
+                    p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
+                                ? option->palette.background().color()
+                                : WIDGET_ENTRY==w && !hasFocus
+                                    ? option->palette.base().color()
+                                    : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app ||
+                                      WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                        ? br
+                                        : option->palette.background().color());
                 p->drawPath(botPath);
             }
         }
