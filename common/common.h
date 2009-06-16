@@ -801,7 +801,9 @@ typedef struct
                      thinSbarGroove,
                      flatSbarButtons,
                      popupBorder,
-                     unifySpinBtns;
+                     unifySpinBtns,
+                     unifyCombo,
+                     unifySpin;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;

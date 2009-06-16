@@ -2416,7 +2416,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             const QColor *use(buttonColors(option));
             bool         down(PE_IndicatorSpinDown==element || PE_IndicatorSpinMinus==element);
 
-            if(!opts.unifySpinBtns || state&State_Sunken)
+            if((!opts.unifySpinBtns || state&State_Sunken) && !opts.unifySpin)
                 drawLightBevel(painter, sr, option, widget, down
                                                     ? reverse
                                                             ? ROUNDED_BOTTOMLEFT
@@ -2430,11 +2430,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 sr.setY(sr.y()+(down ? -2 : 1));
 
-                if(state&State_Sunken)
+                if(opts.unifySpin)
+                    sr.adjust(reverse ? 1 : -1, 0, reverse ? 1 : -1, 0);
+                else if(state&State_Sunken)
                     sr.adjust(1, 1, 1, 1);
 
                 drawArrow(painter, sr, PE_IndicatorSpinUp==element ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
-                          QTC_MO_ARROW(option->palette.buttonText().color()), true);
+                          QTC_MO_ARROW(option->palette.buttonText().color()), !opts.unifySpin);
             }
             else
             {
@@ -2445,7 +2447,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(l%2 != 0)
                     --l;
 
-                if(state&State_Sunken)
+                if(state&State_Sunken && !opts.unifySpin)
                     c+=QPoint(1, 1);
 
                 painter->setPen(MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled
@@ -5994,7 +5996,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             {
                 QRect frame(subControlRect(CC_SpinBox, option, SC_SpinBoxFrame, widget)),
                       up(subControlRect(CC_SpinBox, option, SC_SpinBoxUp, widget)),
-                      down(subControlRect(CC_SpinBox, option, SC_SpinBoxDown, widget));;
+                      down(subControlRect(CC_SpinBox, option, SC_SpinBoxDown, widget)),
+                      all(frame.united(up).united(down));
                 bool  doFrame(spinBox->frame && frame.isValid()),
                       sunken(state&State_Sunken),
                       enabled(state&State_Enabled),
@@ -6005,34 +6008,40 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(doEtch)
                 {
-                    drawEtch(painter, frame.united(up).united(down), widget, WIDGET_SPIN);
+                    drawEtch(painter, all, widget, WIDGET_SPIN);
                     down.adjust(reverse ? 1 : 0, 0, reverse ? 0 : -1, -1);
                     up.adjust(reverse ? 1 : 0, 1, reverse ? 0 : -1, 0);
                     frame.adjust(reverse ? 0 : 1, 1, reverse ? -1 : 0, -1);
+                    all.adjust(1, 1, -1, -1);
                 }
-
-                if(opts.unifySpinBtns)
+                    
+                if(opts.unifySpin)
+                    drawEntryField(painter, all, widget, option, ROUNDED_ALL, true, false);
+                else
                 {
-                    QRect btns=up.united(down);
-                    const QColor *use(buttonColors(option));
-                    QStyleOption opt(*option);
-
-                    opt.state&=~(State_Sunken|State_MouseOver);
-                    opt.state|=State_Horizontal;
-
-                    drawLightBevel(painter, btns, &opt, widget, reverse ?  ROUNDED_LEFT : ROUNDED_RIGHT,
-                                   getFill(&opt, use), use, true, WIDGET_SPIN);
-
-                    if(state&State_MouseOver && state&State_Enabled && !(state&State_Sunken))
+                    if(opts.unifySpinBtns)
                     {
-                        opt.state|=State_MouseOver;
-                        painter->save();
-                        painter->setClipRect(upIsActive ? up : down);
+                        QRect btns=up.united(down);
+                        const QColor *use(buttonColors(option));
+                        QStyleOption opt(*option);
+
+                        opt.state&=~(State_Sunken|State_MouseOver);
+                        opt.state|=State_Horizontal;
+
                         drawLightBevel(painter, btns, &opt, widget, reverse ?  ROUNDED_LEFT : ROUNDED_RIGHT,
-                                       getFill(&opt, use), use, true, WIDGET_SPIN);
-                        painter->restore();
+                                    getFill(&opt, use), use, true, WIDGET_SPIN);
+
+                        if(state&State_MouseOver && state&State_Enabled && !(state&State_Sunken))
+                        {
+                            opt.state|=State_MouseOver;
+                            painter->save();
+                            painter->setClipRect(upIsActive ? up : down);
+                            drawLightBevel(painter, btns, &opt, widget, reverse ?  ROUNDED_LEFT : ROUNDED_RIGHT,
+                                        getFill(&opt, use), use, true, WIDGET_SPIN);
+                            painter->restore();
+                        }
+                        drawFadedLine(painter, down.adjusted(2, 0, -2, 0), use[QT_BORDER(state&State_Enabled)], true, true, true);
                     }
-                    drawFadedLine(painter, down.adjusted(2, 0, -2, 0), use[QT_BORDER(state&State_Enabled)], true, true, true);
                 }
                 
                 if(up.isValid())
@@ -6061,7 +6070,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     drawPrimitive(QAbstractSpinBox::PlusMinus==spinBox->buttonSymbols ? PE_IndicatorSpinMinus : PE_IndicatorSpinDown,
                                   &opt, painter, widget);
                 }
-                if(doFrame)
+                if(doFrame && !opts.unifySpin)
                 {
                     if(reverse)
                         frame.setX(frame.x()-1);
@@ -6718,7 +6727,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 //                 painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
 //                 painter->setRenderHint(QPainter::Antialiasing, false);
 
-                if(/*comboBox->frame &&*/ frame.isValid())
+                if(/*comboBox->frame &&*/ frame.isValid() && (!comboBox->editable || !opts.unifyCombo))
                 {
                     const QColor *cols=itsComboBtnCols && comboBox->editable && state&State_Enabled ? itsComboBtnCols : use;
 
@@ -6742,60 +6751,27 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                    cols, true, comboBox->editable ? WIDGET_COMBO_BUTTON : WIDGET_COMBO);
                 }
 
-                if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
-                {
-                    bool mouseOver=comboBox->editable && !(comboBox->activeSubControls&SC_ComboBoxArrow)
-                                    ? false : (state&State_MouseOver ? true : false);
-
-                    if(!comboBox->editable && (SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
-                    {
-                        QStyleOption frameOpt(*option);
-                        QRect        btn(arrow.x(), frame.y(), arrow.width()+2, frame.height());
-                        const QColor *cols=SHADE_DARKEN==opts.comboBtn || !(state&State_Enabled) ? use : itsComboBtnCols;
-                        if(!sunken)
-                            frameOpt.state|=State_Raised;
-                        painter->save();
-                        painter->setClipRect(btn);
-                        drawLightBevel(painter, opts.comboSplitter
-                                                    ? btn
-                                                    : btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
-                                       &frameOpt, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT,
-                                       getFill(&frameOpt, cols, false,
-                                               SHADE_DARKEN==opts.comboBtn || (SHADE_NONE!=opts.comboBtn &&
-                                                                               !(state&State_Enabled))),
-                                       cols, true, WIDGET_COMBO);
-                        painter->restore();
-                    }
-                    
-                    if(sunken)
-                        arrow.adjust(1, 1, 1, 1);
-
-                    //if(comboBox->editable || !opts.gtkComboMenus)
-                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW_X(mouseOver, option->palette.buttonText().color()),
-                                  false, false);
-//                     else
-//                     {
-//                         int middle=arrow.y()+(arrow.height()>>1);
-//                         
-//                         QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+(opts.vArrows ? 2 : 1)), arrow.width(), LARGE_ARR_HEIGHT);
-//                         drawArrow(painter, ar, option, PE_IndicatorArrowUp);
-//                         ar=QRect(arrow.x(), middle+1, arrow.width(), LARGE_ARR_HEIGHT);
-//                         drawArrow(painter, ar, option, PE_IndicatorArrowDown);
-//                     }
-                }
-
                 if(/*controls&SC_ComboBoxEditField &&*/ field.isValid())
                 {
                     if(comboBox->editable)
                     {
+                        if(opts.unifyCombo)
+                        {
+                            field=r;
+                            if(QTC_DO_EFFECT)
+                                field.adjust(1, 1, -1, -1);
+                        }
                         //field.adjust(-1,-1, 0, 1);
                         painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
                         drawRect(painter, field);
                         // 2 for frame width
-                        int pad=opts.round>ROUND_FULL ? 2 : 0;
+                        if(!opts.unifyCombo)
+                        {
+                            int pad=opts.round>ROUND_FULL ? 2 : 0;
 
-                        field.adjust(-(2+pad),-2, (2+pad), 2);
-                        drawEntryField(painter, field, widget, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
+                            field.adjust(-(2+pad),-2, (2+pad), 2);
+                        }
+                        drawEntryField(painter, field, widget, option, opts.unifyCombo ? ROUNDED_ALL : reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
                     else if(opts.comboSplitter && !(SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
                     {
@@ -6832,6 +6808,48 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                         drawPrimitive(PE_FrameFocusRect, &focus, painter, widget);
                     }
+                }
+
+                if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
+                {
+                    bool mouseOver=comboBox->editable && !(comboBox->activeSubControls&SC_ComboBoxArrow)
+                                    ? false : (state&State_MouseOver ? true : false);
+
+                    if(!comboBox->editable && (SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
+                    {
+                        QStyleOption frameOpt(*option);
+                        QRect        btn(arrow.x(), frame.y(), arrow.width()+2, frame.height());
+                        const QColor *cols=SHADE_DARKEN==opts.comboBtn || !(state&State_Enabled) ? use : itsComboBtnCols;
+                        if(!sunken)
+                            frameOpt.state|=State_Raised;
+                        painter->save();
+                        painter->setClipRect(btn);
+                        drawLightBevel(painter, opts.comboSplitter
+                                                    ? btn
+                                                    : btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
+                                       &frameOpt, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT,
+                                       getFill(&frameOpt, cols, false,
+                                               SHADE_DARKEN==opts.comboBtn || (SHADE_NONE!=opts.comboBtn &&
+                                                                               !(state&State_Enabled))),
+                                       cols, true, WIDGET_COMBO);
+                        painter->restore();
+                    }
+
+                    if(sunken && !opts.unifyCombo)
+                        arrow.adjust(1, 1, 1, 1);
+
+                    //if(comboBox->editable || !opts.gtkComboMenus)
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW_X(mouseOver, option->palette.buttonText().color()),
+                                  false, false);
+//                     else
+//                     {
+//                         int middle=arrow.y()+(arrow.height()>>1);
+//
+//                         QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+(opts.vArrows ? 2 : 1)), arrow.width(), LARGE_ARR_HEIGHT);
+//                         drawArrow(painter, ar, option, PE_IndicatorArrowUp);
+//                         ar=QRect(arrow.x(), middle+1, arrow.width(), LARGE_ARR_HEIGHT);
+//                         drawArrow(painter, ar, option, PE_IndicatorArrowDown);
+//                     }
                 }
 
                 painter->restore();
