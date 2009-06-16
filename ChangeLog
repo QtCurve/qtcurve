@@ -2,9 +2,10 @@
 ------
 1. Add options to draw editable combos, and spin widgets, as edit fields with
    embedded arrows - oxygen style.
-2. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
-3. Draw entry field backgrounds.
-4. Dont use KDE4's disabled background colour.
+2. Enable mouse-over for entry fields.
+3. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+4. Draw entry field backgrounds.
+5. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------

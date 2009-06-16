@@ -60,6 +60,7 @@ static struct
 #include "menu.c"
 #include "tab.c"
 #include "widgetmap.c"
+#include "entry.c"
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -1956,9 +1957,17 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            gint height, int round, EWidget w)
 {
     gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget))),
-             highlight=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app,
+             highlight=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
+             mouseOver=enabled && (GTK_STATE_PRELIGHT==state || (lastMoEntry && widget==lastMoEntry) )&& qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
              doEtch=QTC_DO_EFFECT;
-    GdkColor *colors=highlight ? qtcPalette.focus : qtcPalette.background;
+    GdkColor *colors=mouseOver
+                        ? qtcPalette.mouseover
+                        : highlight
+                            ? qtcPalette.focus
+                            : qtcPalette.background;
+
+    if(GTK_APP_JAVA!=qtSettings.app)
+        qtcEntrySetup(widget);
 
     if(ROUND_NONE!=opts.round)
     {
@@ -2012,7 +2021,7 @@ debugDisplayWidget(widget, 3);
 
     if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
         drawAreaColor(cr, area, NULL, enabled
-                                    ? &style->base[WIDGET_COMBO_BUTTON==w ? GTK_STATE_NORMAL : state]
+                                    ? &style->base[WIDGET_COMBO_BUTTON==w || GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state]
                                     : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
 
     {
