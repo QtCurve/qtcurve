@@ -38,7 +38,7 @@
 #define QTC_MO_ARROW(MENU, COL) (!MENU && MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[QT_STD_BORDER] : (COL))
 
-#define SBAR_BTN_SIZE 15
+#define SBAR_BTN_SIZE opts.sliderWidth
 
 static struct
 {
@@ -54,6 +54,8 @@ static struct
              menu,
              *check_radio;
 } qtcPalette;
+
+static Options opts;
 
 #include "qt_settings.c"
 #include "animation.c"
@@ -176,7 +178,6 @@ typedef struct
 } QtCPixKey;
 
 static GtkStyleClass  *parent_class=NULL;
-static Options        opts;
 static GtkRequisition defaultOptionIndicatorSize    = { 6, 13 };
 static GtkBorder      defaultOptionIndicatorSpacing = { 7, 5, 1, 1 };
 static GCache         *pixbufCache                  = NULL;
@@ -2565,7 +2566,7 @@ debugDisplayWidget(widget, 3);
                  a_height=LARGE_ARR_HEIGHT;
         gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
                                   0==strcmp(detail, "stepper"));
-        int      stepper=sbar ? getStepper(widget, x, y, 15, 15) : QTC_STEPPER_NONE;
+        int      stepper=sbar ? getStepper(widget, x, y, opts.sliderWidth, opts.sliderWidth) : QTC_STEPPER_NONE;
 
 /*
 #if GTK_CHECK_VERSION(2, 10, 0)
@@ -6316,7 +6317,7 @@ static GtkStyle * qtcurve_rc_style_create_style(GtkRcStyle *rc_style)
 {
     GtkStyle *style=g_object_new(QTCURVE_TYPE_STYLE, NULL);
 
-    qtSetColors(style, rc_style, &opts);
+    qtSetColors(style, rc_style);
 
     return style;
 }
@@ -6350,7 +6351,7 @@ void qtcurve_style_register_type(GTypeModule *module)
 static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     lastSlider.widget=NULL;
-    if(qtInit(&opts))
+    if(qtInit())
         generateColors();
 #ifdef QTC_ADD_EVENT_FILTER____DISABLED
     qtcAddEventFilter();

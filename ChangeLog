@@ -1,17 +1,19 @@
 0.65.0
 ------
-1. Add options to draw editable combos, and spin widgets, as edit fields with
-   embedded arrows - oxygen style. (Enabled by default)
-2. Add option to draw a light border around tab widgets, as opposed to 3d look.
-   (Enabled by default)
-3. Enable mouse-over for entry fields.
-4. For mouse-over and focus, use same colour for top and bottom inner parts
-   of entry fields.
-5. When using filled/full focus with colored mouse over, then mouse over takes
-   precedence.
-6. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
-7. Draw entry field backgrounds.
-8. Dont use KDE4's disabled background colour.
+ 1. Add options to draw editable combos, and spin widgets, as edit fields with
+    embedded arrows - oxygen style. (Enabled by default)
+ 2. Add option to draw a light border around tab widgets, as opposed to 3d look.
+    (Enabled by default)
+ 3. Added ability to specify scrollbar width (11 -> 31, default 15)
+ 4. Base slider dimensions off of scrollbar width, unless using triangular slider.
+ 5. Enable mouse-over for entry fields.
+ 6. For mouse-over and focus, use same colour for top and bottom inner parts
+    of entry fields.
+ 7. When using filled/full focus with colored mouse over, then mouse over takes
+    precedence.
+ 8. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+ 9. Draw entry field backgrounds.
+10. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------
