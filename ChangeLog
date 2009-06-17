@@ -5,9 +5,11 @@
 2. Enable mouse-over for entry fields.
 3. For mouse-over and focus, use same colour for top and bottom inner parts
    of entry fields.
-4. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
-5. Draw entry field backgrounds.
-6. Dont use KDE4's disabled background colour.
+4. When using filled/full focus with colored mouse over, then mouse over takes
+   precedence.
+5. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+6. Draw entry field backgrounds.
+7. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------
