@@ -2621,7 +2621,7 @@ debugDisplayWidget(widget, 3);
             y++;
         }
 
-        if(isSpinButton && opts.unifySpin)
+        if(isSpinButton && opts.unifySpin && (!widget || widget->allocation.width>16))
             x--;
 
         if(sbar)
