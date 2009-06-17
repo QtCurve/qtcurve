@@ -8360,7 +8360,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     bool         enabled(state&State_Enabled),
                  entry(WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews)),
                  hasFocus(entry && state&State_HasFocus),
-                 hasMouseOver(entry && state&State_MouseOver),
+                 hasMouseOver(WIDGET_ENTRY==w && state&State_MouseOver),
                  window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
     const QColor *cols(enabled && hasMouseOver && itsMouseOverCols && entry 
                         ? itsMouseOverCols
@@ -8404,7 +8404,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 QPainterPath topPath,
                              botPath;
 
-                if((hasMouseOver || hasFocus) && (WIDGET_ENTRY==w || WIDGET_SCROLLVIEW==w))
+                if((hasMouseOver || hasFocus) && WIDGET_ENTRY==w)
                 {
                     tl.setAlphaF(QTC_ENTRY_INNER_ALPHA);
                     br.setAlphaF(QTC_ENTRY_INNER_ALPHA);
