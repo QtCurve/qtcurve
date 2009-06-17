@@ -2009,7 +2009,9 @@ debugDisplayWidget(widget, 3);
 #endif
     if(ROUNDED_ALL!=round)
     {
-        if(highlight)
+        if(WIDGET_SPIN==w || WIDGET_COMBO_BUTTON==w)
+            x--, width++;
+        else if(highlight)
         {
             if(doEtch)
                 if(ROUNDED_RIGHT==round)  /* RtoL */
@@ -2618,7 +2620,7 @@ debugDisplayWidget(widget, 3);
         }
 
         if(isSpinButton && opts.unifySpin)
-            x-=2;
+            x--;
 
         if(sbar)
             switch(stepper)
