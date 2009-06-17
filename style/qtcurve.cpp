@@ -6820,7 +6820,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->restore();
                     }
 
-                    if(sunken && !opts.unifyCombo)
+                    if(sunken && (!comboBox->editable || !opts.unifyCombo))
                         arrow.adjust(1, 1, 1, 1);
 
                     //if(comboBox->editable || !opts.gtkComboMenus)
