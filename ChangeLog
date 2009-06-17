@@ -5,11 +5,14 @@
 2. Enable mouse-over for entry fields.
 3. For mouse-over and focus, use same colour for top and bottom inner parts
    of entry fields.
-4. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+4. When using filled/full focus with colored mouse over, then mouse over takes
+   precedence.
+5. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
    set up KDE settings.
-5. Dont use KDE4's disabled background colour.
-6. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
+6. Dont use KDE4's disabled background colour.
+7. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
    new kwin API.
+
 
 0.64.2
 ------

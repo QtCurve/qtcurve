@@ -4473,7 +4473,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuVMargin:
         case CE_MenuEmptyArea:
             break;
-#if 0
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
@@ -4484,7 +4483,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 subopt.rect = subElementRect(SE_PushButtonContents, btn, widget);
                 drawControl(CE_PushButtonLabel, &subopt, painter, widget);
 
-                if (btn->state & State_HasFocus)
+                if (state&State_HasFocus &&
+                    !(state&State_MouseOver && QTC_FULL_FOCUS && MO_NONE!=opts.coloredMouseOver))
                 {
                     QStyleOptionFocusRect fropt;
                     fropt.QStyleOption::operator=(*btn);
@@ -4494,7 +4494,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
             }
             break;
-#endif
         case CE_PushButtonBevel:
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
@@ -5804,7 +5803,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #endif
                             fr.rect.adjust(0, 0, -(pixelMetric(QStyle::PM_MenuButtonIndicator, toolbutton, widget)-1), 0);
                     }
-                    drawPrimitive(PE_FrameFocusRect, &fr, painter, widget);
+                    if(!(state&State_MouseOver && QTC_FULL_FOCUS && MO_NONE!=opts.coloredMouseOver))
+                        drawPrimitive(PE_FrameFocusRect, &fr, painter, widget);
                 }
                 QStyleOptionToolButton label = *toolbutton;
                 int fw = pixelMetric(PM_DefaultFrameWidth, option, widget);
@@ -6713,12 +6713,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                              arrow(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget)),
                              field(subControlRect(CC_ComboBox, option, SC_ComboBoxEditField, widget));
                 const QColor *use(buttonColors(option));
-                bool         sunken(state&State_On); // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
+                bool         sunken(state&State_On), // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
+                             glowOverFocus(state&State_MouseOver && QTC_FULL_FOCUS &&
+                                           MO_GLOW==opts.coloredMouseOver && QTC_DO_EFFECT && !sunken && !comboBox->editable &&
+                                           state&State_Enabled && state&State_HasFocus);
 
                 painter->fillRect(r, Qt::transparent);
                 if(QTC_DO_EFFECT)
                 {
-                    if(!sunken && MO_GLOW==opts.coloredMouseOver &&
+                    if(!glowOverFocus && !sunken && MO_GLOW==opts.coloredMouseOver &&
                         ((QTC_FULL_FOCUS && state&State_HasFocus) || state&State_MouseOver) &&
                        state&State_Enabled && !comboBox->editable)
                         drawGlow(painter, r, QTC_FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO);
@@ -6729,10 +6732,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     frame.adjust(1, 1, -1, -1);
                 }
 
-//                 // This section fixes some drawng issues with krunner's combo on nvidia
-//                 painter->setRenderHint(QPainter::Antialiasing, true);
-//                 painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
-//                 painter->setRenderHint(QPainter::Antialiasing, false);
+                // This section fixes some drawng issues with krunner's combo on nvidia
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
+                painter->setRenderHint(QPainter::Antialiasing, false);
 
                 if(/*comboBox->frame &&*/ frame.isValid() && (!comboBox->editable || !opts.unifyCombo))
                 {
@@ -6790,31 +6793,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                                          1, arrow.height()-4),
                                           use[0], true, true, false);
                     }
-
-                    if(state&State_Enabled && state&State_HasFocus &&
-                       /*state&State_KeyboardFocusChange &&*/ !comboBox->editable)
-                    {
-                        QStyleOptionFocusRect focus;
-                        bool                  listViewCombo=comboBox->frame && widget && widget->rect().height()<(QTC_DO_EFFECT ? 22 : 20);
-
-                        if(QTC_FULL_FOCUS)
-                            focus.rect=frame;
-                        else if(opts.comboSplitter)
-                        {
-                            focus.rect=reverse
-                                        ? field.adjusted(0, -1, 1, 1)
-                                        : field.adjusted(-1, -1, 0, 1);
-
-                            if(listViewCombo)
-                                focus.rect.adjust(0, -2, 0, 2);
-                        }
-                        else if(listViewCombo)
-                            focus.rect=frame.adjusted(1, 1, -1, -1);
-                        else
-                            focus.rect=frame.adjusted(3, 3, -3, -3);
-
-                        drawPrimitive(PE_FrameFocusRect, &focus, painter, widget);
-                    }
                 }
 
                 if(/*controls&SC_ComboBoxArrow && */arrow.isValid())
@@ -6859,6 +6837,34 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 //                     }
                 }
 
+                if(state&State_Enabled && state&State_HasFocus &&
+                    /*state&State_KeyboardFocusChange &&*/ !comboBox->editable)
+                {
+                    QStyleOptionFocusRect focus;
+                    bool                  listViewCombo=comboBox->frame && widget && widget->rect().height()<(QTC_DO_EFFECT ? 22 : 20);
+
+                    if(QTC_FULL_FOCUS)
+                        focus.rect=frame;
+                    else if(opts.comboSplitter)
+                    {
+                        focus.rect=reverse
+                                    ? field.adjusted(0, -1, 1, 1)
+                                    : field.adjusted(-1, -1, 0, 1);
+
+                        if(listViewCombo)
+                            focus.rect.adjust(0, -2, 0, 2);
+                    }
+                    else if(listViewCombo)
+                        focus.rect=frame.adjusted(1, 1, -1, -1);
+                    else
+                        focus.rect=frame.adjusted(3, 3, -3, -3);
+
+                    // Draw glow over top of filled focus
+                    if(glowOverFocus)
+                        drawGlow(painter, frame.adjusted(-1, -1, 1, 1), WIDGET_COMBO);
+                    else
+                        drawPrimitive(PE_FrameFocusRect, &focus, painter, widget);
+                }
                 painter->restore();
             }
             break;
