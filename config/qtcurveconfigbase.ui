@@ -906,7 +906,21 @@ p, li { white-space: pre-wrap; }
        <item row="2" column="1">
         <widget class="QComboBox" name="tabMouseOver"/>
        </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="roundAllTabs">
+         <property name="text">
+          <string>Round all tabs</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
+        <widget class="QCheckBox" name="borderTab">
+         <property name="text">
+          <string>Draw a light border around tab widget</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -918,13 +932,6 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="roundAllTabs">
-         <property name="text">
-          <string>Round all tabs</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -2040,7 +2047,17 @@ p, li { white-space: pre-wrap; }
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
    <class>KDoubleNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
   </customwidget>
@@ -2048,16 +2065,6 @@ p, li { white-space: pre-wrap; }
    <class>KPushButton</class>
    <extends>QPushButton</extends>
    <header>kpushbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2115,6 +2122,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>tabAppearance</tabstop>
   <tabstop>tabMouseOver</tabstop>
   <tabstop>roundAllTabs</tabstop>
+  <tabstop>borderTab</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck</tabstop>

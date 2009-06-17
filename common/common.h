@@ -529,7 +529,8 @@ typedef enum
 {
     BORDER_FLAT,
     BORDER_RAISED,
-    BORDER_SUNKEN
+    BORDER_SUNKEN,
+    BORDER_LIGHT
 } EBorder;
 
 /*
@@ -804,7 +805,8 @@ typedef struct
                      popupBorder,
                      unifySpinBtns,
                      unifyCombo,
-                     unifySpin;
+                     unifySpin,
+                     borderTab;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;

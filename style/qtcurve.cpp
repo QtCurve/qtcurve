@@ -2698,9 +2698,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(QTabBar::RoundedSouth==tbb->shape && APPEARANCE_FLAT==opts.appearance)
                         painter->setPen(palette.background().color());
                     else
-                        painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? 5 : QT_FRAME_DARK_SHADOW]);
+                        painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? QT_STD_BORDER
+                                                                              : (opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW)]);
                     painter->drawLine(topLine);
-                    painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? 0 : 5]);
+                    painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER]);
                     painter->drawLine(bottomLine);
                     painter->restore();
                 }
@@ -3457,7 +3458,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             QStyleOption opt(*option);
 
             opt.state|=State_Enabled;
-            drawBorder(painter, r, &opt, round, backgroundColors(option), WIDGET_TAB_FRAME, BORDER_RAISED, false);
+            drawBorder(painter, r, &opt, round, backgroundColors(option), WIDGET_TAB_FRAME,
+                       opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, false);
             painter->restore();
             break;
         }
@@ -4916,6 +4918,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 const QColor *use(backgroundColors(option));
                 const QColor &fill(getTabFill(selected, mouseOver, use));
                 double radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
+                EBorder borderProfile(selected ? (opts.borderTab ? BORDER_LIGHT : BORDER_RAISED) : BORDER_FLAT);
 
                 painter->save();
                 switch(tab->shape)
@@ -4941,8 +4944,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         // This clipping helps with plasma's tabs and nvidia
                         if(selected)
                             painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
-                        drawBorder(painter, r.adjusted(sizeAdjust, 0, -sizeAdjust, 4), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_TOP,
-                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
+                        drawBorder(painter, r.adjusted(sizeAdjust, 0, -sizeAdjust, 4), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_TOP, borderProfile, false);
                         if(glowMo)
                             drawGlow(painter, r.adjusted(0, -1, 0, 5), WIDGET_TAB_TOP);
 
@@ -5013,14 +5015,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->setClipPath(buildPath(r.adjusted(0, -4, 0, 0), WIDGET_TAB_BOT, round, radius));
                         fillTab(painter, r.adjusted(1+sizeAdjust, 0, -(1+sizeAdjust), -1), option, fill, true, WIDGET_TAB_BOT);
                         painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(sizeAdjust, -4, -sizeAdjust, 0), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_BOT,
-                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
+                        drawBorder(painter, r.adjusted(sizeAdjust, -4, -sizeAdjust, 0), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_BOT, borderProfile, false);
                         if(glowMo)
                             drawGlow(painter, r.adjusted(0, -5, 0, 1), WIDGET_TAB_BOT);
 
                         if(selected)
                         {
-                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW]);
                             if(!fixLeft)
                                 painter->drawPoint(r2.left()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top());
                             if(!fixRight)
@@ -5032,7 +5033,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 r(fixRight ? r2.right()-2 : r2.right());
                             painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.top()+1, r, r2.top()+1);
-                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW]);
                             painter->drawLine(l, r2.top(), r, r2.top());
                         }
 
@@ -5080,8 +5081,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->setClipPath(buildPath(r.adjusted(0, 0, 4, 0), WIDGET_TAB_TOP, round, radius));
                         fillTab(painter, r.adjusted(1, sizeAdjust, 0, -(1+sizeAdjust)), option, fill, false, WIDGET_TAB_TOP);
                         painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(0, sizeAdjust, 4, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_TOP,
-                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
+                        drawBorder(painter, r.adjusted(0, sizeAdjust, 4, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_TOP, borderProfile, false);
                         if(glowMo)
                             drawGlow(painter, r.adjusted(-1, 0, 5, 0), WIDGET_TAB_TOP);
 
@@ -5147,14 +5147,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->setClipPath(buildPath(r.adjusted(-4, 0, 0, 0), WIDGET_TAB_BOT, round, radius));
                         fillTab(painter, r.adjusted(0, sizeAdjust, -1, -(1+sizeAdjust)), option, fill, false, WIDGET_TAB_BOT);
                         painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(-4, sizeAdjust, 0, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_BOT,
-                                   selected ? BORDER_RAISED : BORDER_FLAT, false);
+                        drawBorder(painter, r.adjusted(-4, sizeAdjust, 0, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, WIDGET_TAB_BOT, borderProfile, false);
                         if(glowMo)
                             drawGlow(painter, r.adjusted(-5, 0, 1, 0), WIDGET_TAB_BOT);
 
                         if(selected)
                         {
-                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW]);
                             if(!firstTab)
                                 painter->drawPoint(r2.left(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
                             painter->drawLine(r2.left(), r2.bottom()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.left(), r2.bottom());
@@ -5166,7 +5165,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                             painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(r2.left()+1, t, r2.left()+1, b);
-                            painter->setPen(use[QT_FRAME_DARK_SHADOW]);
+                            painter->setPen(use[opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW]);
                             painter->drawLine(r2.left(), t, r2.left(), b);
                         }
 
@@ -8392,6 +8391,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 break;
             case BORDER_RAISED:
             case BORDER_SUNKEN:
+            case BORDER_LIGHT:
             {
                 EAppearance  app(widgetApp(w, &opts));
                 int          dark=window ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
@@ -8399,7 +8399,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 if(APPEARANCE_FLAT==app && window)
                     app=APPEARANCE_RAISED;
 
-                QColor       tl(cols[BORDER_RAISED==borderProfile ? 0 : dark]),
+                QColor       tl(cols[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile ? 0 : dark]),
                              br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
                 QPainterPath topPath,
                              botPath;
@@ -8426,7 +8426,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                 ? tl
                                 : option->palette.background().color());
                 p->drawPath(topPath);
-                if(!hasFocus && !hasMouseOver)
+                if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
                     p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
                                 ? option->palette.background().color()
                                 : WIDGET_ENTRY==w && !hasFocus
