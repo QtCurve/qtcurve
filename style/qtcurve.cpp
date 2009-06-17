@@ -5764,7 +5764,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(mflags&State_Sunken)
                         tool.rect.adjust(1, 1, 1, 1);
-                    drawArrow(painter, tool.rect, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
+                    drawArrow(painter, tool.rect, PE_IndicatorArrowDown,
+                              QTC_MO_ARROW_X(toolbutton->activeSubControls&SC_ToolButtonMenu,
+                                             option->palette.buttonText().color()));
                 }
 /*
                 else if (toolbutton->features & QStyleOptionToolButton::HasMenu)

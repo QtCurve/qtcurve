@@ -12,7 +12,8 @@
 6. Dont use KDE4's disabled background colour.
 7. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
    new kwin API.
-
+8. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
+   segment.
 
 0.64.2
 ------
