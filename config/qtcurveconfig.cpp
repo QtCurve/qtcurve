@@ -471,15 +471,20 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     menuDelay->setRange(MIN_MENU_DELAY, MAX_MENU_DELAY);
     menuDelay->setValue(DEFAULT_MENU_DELAY);
-    
+
+    sliderWidth->setRange(MIN_SLIDER_WIDTH, MAX_SLIDER_WIDTH, 2);
+    sliderWidth->setValue(DEFAULT_SLIDER_WIDTH);
+    sliderWidth->setSuffix(i18n(" pixels"));
+
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuDelay, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
+    connect(sliderWidth, SIGNAL(valueChanged(int)), SLOT(sliderWidthChanged()));
     connect(menuStripe, SIGNAL(currentIndexChanged(int)), SLOT(menuStripeChanged()));
     connect(customMenuStripeColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(menuStripeAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(round, SIGNAL(currentIndexChanged(int)), SLOT(roundChanged()));
     connect(toolbarBorders, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(sliderThumbs, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(sliderThumbs, SIGNAL(currentIndexChanged(int)), SLOT(sliderThumbChanged()));
     connect(handles, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(appearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(customMenuTextColor, SIGNAL(toggled(bool)), SLOT(customMenuTextColorChanged()));
@@ -814,6 +819,21 @@ void QtCurveConfig::unifySpinToggled()
     if(unifySpin->isChecked())
         unifySpinBtns->setChecked(false);
     unifySpinBtns->setDisabled(unifySpin->isChecked());
+}
+
+void QtCurveConfig::sliderThumbChanged()
+{
+    if(LINE_NONE!=sliderThumbs->currentIndex() && sliderWidth->value()<DEFAULT_SLIDER_WIDTH)
+        sliderWidth->setValue(DEFAULT_SLIDER_WIDTH);
+}
+
+void QtCurveConfig::sliderWidthChanged()
+{
+    if(0==sliderWidth->value()%2)
+        sliderWidth->setValue(sliderWidth->value()+1);
+
+    if(LINE_NONE!=sliderThumbs->currentIndex() && sliderWidth->value()<DEFAULT_SLIDER_WIDTH)
+        sliderThumbs->setCurrentIndex(LINE_NONE);
 }
 
 void QtCurveConfig::setupStack()
@@ -1350,6 +1370,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.stripedProgress=(EStripe)stripedProgress->currentIndex();
     opts.lighterPopupMenuBgnd=lighterPopupMenuBgnd->value();
     opts.menuDelay=menuDelay->value();
+    opts.sliderWidth=sliderWidth->value();
     opts.menuStripe=(EShade)menuStripe->currentIndex();
     opts.customMenuStripeColor=customMenuStripeColor->color();
     opts.menuStripeAppearance=(EAppearance)menuStripeAppearance->currentIndex();
@@ -1472,6 +1493,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     scrollbarType->setCurrentIndex(opts.scrollbarType);
     lighterPopupMenuBgnd->setValue(opts.lighterPopupMenuBgnd);
     menuDelay->setValue(opts.menuDelay);
+    sliderWidth->setValue(opts.sliderWidth);
     menuStripe->setCurrentIndex(opts.menuStripe);
     customMenuStripeColor->setColor(opts.customMenuStripeColor);
     menuStripeAppearance->setCurrentIndex(opts.menuStripeAppearance);
@@ -1655,6 +1677,7 @@ bool QtCurveConfig::settingsChanged()
          stripedProgress->currentIndex()!=currentStyle.stripedProgress ||
          lighterPopupMenuBgnd->value()!=currentStyle.lighterPopupMenuBgnd ||
          menuDelay->value()!=currentStyle.menuDelay ||
+         sliderWidth->value()!=currentStyle.sliderWidth ||
          menuStripe->currentIndex()!=currentStyle.menuStripe ||
          menuStripeAppearance->currentIndex()!=currentStyle.menuStripeAppearance ||
          embolden->isChecked()!=currentStyle.embolden ||

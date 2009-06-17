@@ -990,6 +990,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_ROUND(round)
             QTC_CFG_READ_INT(highlightFactor)
             QTC_CFG_READ_INT(menuDelay)
+            QTC_CFG_READ_INT(sliderWidth)
             QTC_CFG_READ_INT_BOOL(lighterPopupMenuBgnd)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
@@ -1440,6 +1441,15 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
                 opts->menuDelay=DEFAULT_MENU_DELAY;
 
+            if(0==opts->sliderWidth%2)
+                opts->sliderWidth++;
+
+            if(opts->sliderWidth<MIN_SLIDER_WIDTH || opts->sliderWidth>MAX_SLIDER_WIDTH)
+                opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
+
+            if(opts->sliderWidth<DEFAULT_SLIDER_WIDTH)
+                opts->sliderThumbs=LINE_NONE;
+
             if(opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
                 opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
 
@@ -1553,6 +1563,7 @@ static void defaultSettings(Options *opts)
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
     opts->menuDelay=DEFAULT_MENU_DELAY;
+    opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
@@ -2085,6 +2096,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(round)
         CFG_WRITE_ENTRY_NUM(highlightFactor)
         CFG_WRITE_ENTRY_NUM(menuDelay)
+        CFG_WRITE_ENTRY_NUM(sliderWidth)
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_ENTRY(appearance)
         CFG_WRITE_ENTRY(fixParentlessDialogs)

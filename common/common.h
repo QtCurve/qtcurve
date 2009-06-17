@@ -145,7 +145,8 @@ typedef GdkColor color;
 
 #define QTC_SIMPLE_SHADING (!shading)
 
-#define QTC_THIN_SBAR_MOD  4
+#define QTC_THIN_SBAR_MOD  (opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? 3 : opts.sliderWidth>DEFAULT_SLIDER_WIDTH ? (opts.sliderWidth-9)/2 : 4)
+#define QTC_SLIDER_SIZE (opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? DEFAULT_SLIDER_WIDTH-2 : opts.sliderWidth)
 #define QTC_GLOW_MO        1 /*ORIGINAL_SHADE*/
 #define QTC_GLOW_DEFBTN    1
 #define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
@@ -206,6 +207,10 @@ typedef GdkColor color;
 #define DEFAULT_MENU_DELAY 100
 #define MIN_MENU_DELAY       0
 #define MAX_MENU_DELAY     500
+
+#define DEFAULT_SLIDER_WIDTH 15
+#define MIN_SLIDER_WIDTH     11
+#define MAX_SLIDER_WIDTH     31
 
 #define SIZE_GRIP_SIZE 12
 
@@ -745,7 +750,8 @@ typedef struct
                      passwordChar,
                      highlightFactor,
                      lighterPopupMenuBgnd,
-                     menuDelay;
+                     menuDelay,
+                     sliderWidth;
     ERound           round;
     bool             embolden,
                      highlightTab,

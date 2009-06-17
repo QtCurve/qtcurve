@@ -1920,17 +1920,17 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_SplitterWidth:
             return 6;
         case PM_ScrollBarSliderMin:
-            return 16;
+            return opts.sliderWidth+1;
         case PM_SliderThickness:
-            return QTC_ROTATED_SLIDER ? 26 : 21;
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6));
         case PM_SliderControlThickness:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_ROTATED_SLIDER ? 21 : 13);
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2));
          case PM_SliderTickmarkOffset:
              return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
-                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : (QTC_ROTATED_SLIDER ? 21 : 13));
+                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)));
 
                 if (slider->tickPosition & QSlider::TicksBelow)
                     ++size;
@@ -1940,11 +1940,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             }
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
         case PM_SliderLength:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_ROTATED_SLIDER ? 13 : 21);
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? -2 : 6));
         case PM_ScrollBarExtent:
-            return /*APP_KPRESENTER==theThemedApp ||
-                   ((APP_KONQUEROR==theThemedApp || APP_KONTACT==theThemedApp) && (!widget || isFormWidget(widget)))
-                        ? 16 : */ 15;
+            return opts.sliderWidth;
         case PM_MaximumDragDistance:
             return -1;
         case PM_TabBarTabHSpace:
@@ -6544,6 +6542,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(noButtons || opts.flatSbarButtons)
                 {
+                    int mod=QTC_THIN_SBAR_MOD;
                     // Draw complete groove here, as we want to round both ends...
                     opt.rect=subpage.united(addpage);
                     opt.state=scrollbar->state;
@@ -6556,8 +6555,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                     drawLightBevel(painter, opts.thinSbarGroove
                                                 ? horiz
-                                                    ? opt.rect.adjusted(0, QTC_THIN_SBAR_MOD, 0, -QTC_THIN_SBAR_MOD)
-                                                    : opt.rect.adjusted(QTC_THIN_SBAR_MOD, 0, -QTC_THIN_SBAR_MOD, 0)
+                                                    ? opt.rect.adjusted(0, mod, 0, -mod)
+                                                    : opt.rect.adjusted(mod, 0, -mod, 0)
                                                 : opt.rect, &opt, widget,
     #ifndef QTC_SIMPLE_SCROLLBARS
                                    SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons ? ROUNDED_ALL :
