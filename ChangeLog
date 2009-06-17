@@ -1,7 +1,7 @@
 0.65.0
 ------
 1. Add options to draw editable combos, and spin widgets, as edit fields with
-   embedded arrows - oxygen style.
+   embedded arrows - oxygen style. (Enabled by default)
 2. Enable mouse-over for entry fields.
 3. For mouse-over and focus, use same colour for top and bottom inner parts
    of entry fields.

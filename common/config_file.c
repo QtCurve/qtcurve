@@ -920,6 +920,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(0, 65))
+            {
+                def->unifySpin=false;
+                def->unifyCombo=false;
+            }
             if(version<QTC_MAKE_VERSION(0, 63))
             {
                 def->tabMouseOver=TAB_MO_TOP;
@@ -1619,8 +1624,8 @@ static void defaultSettings(Options *opts)
     opts->flatSbarButtons=true;
     opts->popupBorder=true;
     opts->unifySpinBtns=false;
-    opts->unifySpin=false;
-    opts->unifyCombo=false;
+    opts->unifySpin=true;
+    opts->unifyCombo=true;
     opts->thinSbarGroove=false;
     opts->colorSliderMouseOver=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
