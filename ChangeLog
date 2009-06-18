@@ -11,12 +11,13 @@
     of entry fields.
  7. When using filled/full focus with colored mouse over, then mouse over takes
     precedence.
- 8. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+ 8. Alter default settings; Use soft gradient for active tab.
+ 9. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
     set up KDE settings.
- 9. Dont use KDE4's disabled background colour.
-10. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
+10. Dont use KDE4's disabled background colour.
+11. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
     new kwin API.
-11. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
+12. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
     segment.
 
 0.64.2

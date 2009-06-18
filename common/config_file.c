@@ -922,6 +922,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 65))
             {
+                def->activeTabAppearance=APPEARANCE_FLAT;
                 def->unifySpin=false;
                 def->unifyCombo=false;
                 def->borderTab=false;
@@ -1584,7 +1585,7 @@ static void defaultSettings(Options *opts)
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->lvAppearance=APPEARANCE_BEVELLED;
     opts->tabAppearance=APPEARANCE_SOFT_GRADIENT;
-    opts->activeTabAppearance=APPEARANCE_FLAT;
+    opts->activeTabAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->sliderAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->menubarAppearance=APPEARANCE_FLAT;
     opts->menuitemAppearance=APPEARANCE_FADE;
