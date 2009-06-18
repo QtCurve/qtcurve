@@ -528,7 +528,7 @@ p, li { white-space: pre-wrap; }
        <item row="8" column="0">
         <widget class="QLabel" name="label_15">
          <property name="text">
-          <string>Mark thumbs with:</string>
+          <string>Slider thumbs:</string>
          </property>
         </widget>
        </item>
@@ -538,7 +538,7 @@ p, li { white-space: pre-wrap; }
        <item row="9" column="0">
         <widget class="QLabel" name="label_15a">
          <property name="text">
-          <string>Thumb size:</string>
+          <string>Slider width:</string>
          </property>
         </widget>
        </item>
