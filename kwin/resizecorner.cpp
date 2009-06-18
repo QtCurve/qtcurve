@@ -87,12 +87,21 @@ void ResizeCorner::move(int x, int y)
    QWidget::move(x-(l+r), y-(t+b));
 }
 
+static inline bool similar(const QColor &a, const QColor &b)
+{
+    static const int constDiff=3;
+
+    return abs(a.red()-b.red())<constDiff &&
+           abs(a.green()-b.green())<constDiff &&
+           abs(a.blue()-b.blue())<constDiff;
+}
+
 void ResizeCorner::setColor(const QColor &c)
 {
     QColor   col=c;
     QPalette pal(palette());
 
-    if(col==client->widget()->palette().color(backgroundRole()))
+    if(similar(col, client->widget()->palette().color(backgroundRole())))
         col = col.value() > 100 ? col.dark(130) : col.light(120);
     pal.setColor(backgroundRole(), col);
     setPalette(pal);
