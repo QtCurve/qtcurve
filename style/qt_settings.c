@@ -2456,6 +2456,7 @@ static gboolean qtInit()
 //                                     "{ GtkCheckButton::indicator_size = 15 } "
                                     "class \"*GtkRange\" style \""QTC_RC_SETTING"Etch\" "
                                     "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" "
+                                    "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" "
                                     "class \"*GtkEntry\" style  \""QTC_RC_SETTING"Etch\" "
                                     "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" "
                                     //"class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch\""

@@ -116,7 +116,7 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height);
 
-#ifdef QTC_DEBUG
+// #ifdef QTC_DEBUG
 static void dumpChildren(GtkWidget *widget, int level)
 {
     if(level<5)
@@ -168,7 +168,7 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
     else
         printf("\n");
 }
-#endif
+// #endif
 
 typedef struct
 {
@@ -2278,9 +2278,8 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
-    else if( GTK_APP_JAVA!=qtSettings.app && GTK_APP_INKSCAPE!=qtSettings.app &&
-             widget && opts.round>ROUND_FULL && DETAIL("entry_bg") &&
-             GTK_WIDGET_HAS_FOCUS(widget) && strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget)), "SexyIconEntry") )
+    else if( GTK_APP_JAVA!=qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") &&
+             (GTK_WIDGET_HAS_FOCUS(widget) || lastMoEntry==widget) && strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget)), "SexyIconEntry") )
     {
         /* Check that widget doesnt already have extra padding... (AS GEdit's seach entry does!)*/
         if((height+(QTC_DO_EFFECT ? 2 : 0)+4)==widget->allocation.height)
@@ -2301,11 +2300,6 @@ debugDisplayWidget(widget, 3);
                     round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
         }
     }
-    // TODO: This is not good, there must be a better and more consisten way!
-    else if(GTK_APP_INKSCAPE==qtSettings.app && widget && opts.round>ROUND_FULL && DETAIL("entry_bg") && GTK_IS_SPIN_BUTTON(widget) &&
-            (height+(QTC_DO_EFFECT ? 2 : 0)+12)==widget->allocation.height)
-        drawEntryField(cr, style, state, widget, area, x-2, y-2, width+4, height+4,
-                       reverseLayout(widget) || (widget->parent && reverseLayout(widget->parent)) ? ROUNDED_RIGHT : ROUNDED_LEFT, WIDGET_ENTRY);
     else if(DETAIL("tooltip"))
     {
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
