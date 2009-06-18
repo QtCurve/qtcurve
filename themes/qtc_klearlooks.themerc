@@ -75,3 +75,4 @@ selectionAppearance=gradient
 squareScrollViews=true
 sunkenAppearance=splitgradient
 sunkenScrollViews=false
+unifySpinBtns=true
