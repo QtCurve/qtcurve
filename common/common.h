@@ -1415,6 +1415,9 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 #define QTC_SLIGHT_ETCH_RADIUS   3
 #endif
 
+#define QTC_MAX_RADIUS_INTERNAL 9.0
+#define QTC_MAX_RADIUS_EXTERNAL (QTC_MAX_RADIUS_INTERNAL+2.0)
+
 typedef enum
 {
     RADIUS_SELECTION,
@@ -1475,7 +1478,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                        || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
 #endif
                        )
-                        return ((w>h ? h : w)-2)/2;
+                    {
+                        double r=((w>h ? h : w)-2)/2;
+                        return r>QTC_MAX_RADIUS_INTERNAL ? QTC_MAX_RADIUS_INTERNAL : r;
+                    }
                     if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_MAX_ROUND_WIDGET(widget))
                         return 8.5;
                 case ROUND_EXTRA:
@@ -1499,7 +1505,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                        || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
 #endif
                       )
-                        return (w>h ? h : w)/2;
+                    {
+                        double r=(w>h ? h : w)/2;
+                        return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
+                    }
                     if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_MAX_ROUND_WIDGET(widget))
                         return 9.5;
                 case ROUND_EXTRA:
@@ -1523,7 +1532,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                        || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
 #endif
                       )
-                        return (w>h ? h : w)/2;
+                    {
+                        double r=(w>h ? h : w)/2;
+                        return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
+                    }
                     if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_MAX_ROUND_WIDGET(widget))
                         return 10.5;
                 case ROUND_EXTRA:
