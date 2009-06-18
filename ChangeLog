@@ -11,9 +11,10 @@
     of entry fields.
  7. When using filled/full focus with colored mouse over, then mouse over takes
     precedence.
- 8. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
- 9. Draw entry field backgrounds.
-10. Dont use KDE4's disabled background colour.
+ 8. Alter default settings; Use soft gradient for active tab.
+ 9. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
+10. Draw entry field backgrounds.
+11. Dont use KDE4's disabled background colour.
 
 0.64.2
 ------
