@@ -4979,7 +4979,11 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
             if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
             else
+            {
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
+                if(gap_x>0)
+                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[2]), 1.0, x+1, y, 1);
+            }
             break;
         case GTK_POS_BOTTOM:
             if(gap_x > 0)
@@ -5021,7 +5025,11 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
             if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+1, 2);
             else
+            {
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y, 3);
+                if(gap_x>0)
+                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[2]), 1.0, x, y+1, 1);
+            }
             break;
         case GTK_POS_RIGHT:
             if(gap_x>0)
