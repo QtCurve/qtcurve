@@ -926,6 +926,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->unifySpin=false;
                 def->unifyCombo=false;
                 def->borderTab=false;
+                def->thinnerBtns=false;
             }
             if(version<QTC_MAKE_VERSION(0, 63))
             {
@@ -1024,6 +1025,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(useHighlightForMenu)
             QTC_CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
             QTC_CFG_READ_BOOL(thinnerMenuItems)
+            QTC_CFG_READ_BOOL(thinnerBtns)
             if(version<QTC_MAKE_VERSION(0, 63))
             {
                 if(QTC_IS_BLACK(opts->customSlidersColor))
@@ -1613,6 +1615,7 @@ static void defaultSettings(Options *opts)
     opts->useHighlightForMenu=false;
     opts->shadeMenubarOnlyWhenActive=false;
     opts->thinnerMenuItems=false;
+    opts->thinnerBtns=true;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_SHADOW;
     opts->focus=FOCUS_LINE;
@@ -2126,6 +2129,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(useHighlightForMenu)
         CFG_WRITE_ENTRY(shadeMenubarOnlyWhenActive)
         CFG_WRITE_ENTRY(thinnerMenuItems)
+        CFG_WRITE_ENTRY(thinnerBtns)
         CFG_WRITE_SHADE_ENTRY(shadeSliders, customSlidersColor)
         CFG_WRITE_SHADE_ENTRY(shadeMenubars, customMenubarsColor)
         CFG_WRITE_ENTRY(customMenuSelTextColor)

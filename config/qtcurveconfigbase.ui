@@ -214,7 +214,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="11" column="0" colspan="2">
+        <widget class="QCheckBox" name="thinnerBtns">
+         <property name="text">
+          <string>Thinner buttons when etched/shadowed</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -2088,6 +2095,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
   <tabstop>fadeLines</tabstop>
+  <tabstop>thinnerBtns</tabstop>
   <tabstop>comboSplitter</tabstop>
   <tabstop>unifyCombo</tabstop>
   <tabstop>comboBtn</tabstop>

@@ -6,18 +6,21 @@
     (Enabled by default)
  3. Added ability to specify scrollbar width (11 -> 31, default 15)
  4. Base slider dimensions off of scrollbar width, unless using triangular slider.
- 5. Enable mouse-over for entry fields.
- 6. For mouse-over and focus, use same colour for top and bottom inner parts
+ 5. Add option to have thinner buttons. (Enabled by default)
+ 6. Enable mouse-over for entry fields.
+ 7. For mouse-over and focus, use same colour for top and bottom inner parts
     of entry fields.
- 7. When using filled/full focus with colored mouse over, then mouse over takes
+ 8. When using filled/full focus with colored mouse over, then mouse over takes
     precedence.
- 8. Alter default settings; Use soft gradient for active tab.
- 9. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+ 9. Alter default settings; Use soft gradient for active tab.
+10. Modified how button, and combo, heights are calculated - no longer set a
+    minimum height.
+11. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
     set up KDE settings.
-10. Dont use KDE4's disabled background colour.
-11. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
+12. Dont use KDE4's disabled background colour.
+13. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
     new kwin API.
-12. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
+14. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
     segment.
 
 0.64.2

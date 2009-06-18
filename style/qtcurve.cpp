@@ -6911,16 +6911,13 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                const int constMinH(QTC_DO_EFFECT ? 29 : 27);
-
                 if (!btn->text.isEmpty() && "..."!=btn->text && size.width() < 80 && newSize.width()<size.width())
                     newSize.setWidth(80);
                 if (btn->features&QStyleOptionButton::HasMenu)
                     newSize+=QSize(4, 0);
+                newSize+=QSize(0, QTC_DO_EFFECT && !opts.thinnerBtns ? 4 : 2);
                 if (!btn->icon.isNull() && btn->iconSize.height() > 16)
                     newSize -= QSize(0, 2);
-                if(!btn->text.isEmpty() && size.height() < constMinH)
-                    newSize.setHeight(constMinH);
             }
             break;
         }
@@ -6990,14 +6987,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
         }
         case CT_ComboBox:
         {
-            const int constMinH(QTC_DO_EFFECT ? 26 : 24);
-
-            newSize = sizeFromContents(CT_PushButton, option, size, widget);
-            newSize.rwidth() += 30; // Make room for drop-down indicator
-            newSize.rheight() += 4;
-
-            if(size.height() < constMinH)
-                newSize.setHeight(constMinH);
+            newSize+=QSize(0, QTC_DO_EFFECT && !opts.thinnerBtns ? 6 : 4);
             break;
         }
         case CT_MenuItem:
