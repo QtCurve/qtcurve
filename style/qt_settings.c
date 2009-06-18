@@ -2450,19 +2450,18 @@ static gboolean qtInit()
                                         "{ xthickness = 3 ythickness = "Y"} " \
                                         "class \"*Button\" style \""QTC_RC_SETTING"Etch2\"" \
                                         "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\""
-                #define QTC_ETCH_RC(Y) "style \""QTC_RC_SETTING"Etch\" " \
-                                    "{ xthickness = 3 ythickness = "Y" } " \
-                                    /*"style \""QTC_RC_SETTING"EtchI\" "*/ \
-                                    /*"{ GtkCheckButton::indicator_size = 15 } "*/ \
-                                    "class \"*GtkRange\" style \""QTC_RC_SETTING"Etch\" " \
-                                    "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" " \
-                                    "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" " \
-                                    "class \"*GtkEntry\" style  \""QTC_RC_SETTING"Etch\" " \
-                                    "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" " \
-                                    /*"class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch\""*/ \
-                                    /*"class \"*GtkWidget\" style \"QtcEtchI\""*/
                 gtk_rc_parse_string(opts.thinnerBtns ? QTC_ETCH2_RC("1") : QTC_ETCH2_RC("2"));
-                gtk_rc_parse_string(/*opts.thinnerBtns ? QTC_ETCH_RC("3") : */QTC_ETCH_RC("3"));
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"Etch\" "
+                                    "{ xthickness = 3 ythickness = 3 } "
+                                    "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" ");
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"EtchE\" "
+                                    "{ xthickness = 4 ythickness = 4 } "
+                                    "style \""QTC_RC_SETTING"EtchS\" "
+                                    "{ xthickness = 4 ythickness = 4 } "
+                                    "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"EtchE\" "
+                                    "class \"*GtkEntry\" style  \""QTC_RC_SETTING"EtchE\" " \
+                                    "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"EtchE\" "
+                                    "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"EtchS\" ");
             }
 
             if(!opts.gtkScrollViews)

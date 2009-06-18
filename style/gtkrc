@@ -96,6 +96,24 @@ style "qtcurve-w2" = "qtcurve-default"
   ythickness = 2
 }
 
+style "qtcurve-entry" = "qtcurve-default"
+{
+  xthickness = 4
+  ythickness = 4
+  GtkWidget::interior-focus = 0
+  GtkWidget::focus-line-width = 0
+  GtkEntry::inner-border = { 0, 0, 0, 0}
+}
+
+style "qtcurve-range" = "qtcurve-default"
+{
+  xthickness = 4
+  ythickness = 4
+  GtkWidget::interior-focus = 0
+  GtkWidget::focus-line-width = 0
+  GtkEntry::inner-border = { 0, 0, 0, 0}
+}
+
 style "qtcurve-tasklist" = "qtcurve-default"
 {
   xthickness = 5
@@ -188,13 +206,13 @@ class "*GtkFrame" style "qtcurve-w2"
 class "*GtkStatusbar" style "qtcurve-default"
 class "*GtkRadioButton" style "qtcurve-default"
 class "*GtkCheckButton" style "qtcurve-default"
-class "*GtkSpinButton" style "qtcurve-w2"
+class "*GtkSpinButton" style "qtcurve-range"
 widget_class "*.GtkMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkAccelMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkRadioMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkCheckMenuItem.*" style "qtcurve-default"
 widget_class "*.GtkImageMenuItem.*" style "qtcurve-default"
-class "*GtkEntry" style "qtcurve-w2"
+class "*GtkEntry" style "qtcurve-entry"
 widget_class "*.tooltips.*.GtkToggleButton" style "qtcurve-tasklist"
 widget_class "*Tree*GtkButton" style "qtcurve-header"
 widget_class "*List*GtkButton" style "qtcurve-header"
@@ -206,8 +224,8 @@ widget_class "*HandleBox*SPButton" style "qtcurve-sptoolbarbutton"
 widget_class "*.GtkCombo.GtkEntry" style "qtcurve-combo"
 widget_class "*.GtkCombo.GtkButton" style "qtcurve-combo-button"
 widget_class "*.SwtFixed.GtkCombo.GtkButton" style "qtcurve-swt-combo"
-widget_class "*.SwtFixed.GtkCombo.GtkEntry" style "qtcurve-swt-combo"
-widget_class "*Toolbar*Entry" style "qtcurve-w2"
+widget_class "*.SwtFixed.GtkCombo.GtkEntry" style "qtcurve-entry"
+widget_class "*Toolbar*Entry" style "qtcurve-entry"
 class "GtkComboBoxEntry" style "qtcurve-w0"
 widget_class "*.GtkComboBoxEntry.*Button" style "qtcurve-w0"
 widget_class "*PathBar.*Button" style "qtcurve-pathbutton"
