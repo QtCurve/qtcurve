@@ -5881,6 +5881,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             x--, width+=2;
         else
             y--, height+=2;
+        if(opts.thinnerBtns)
+            y++, height-=2;
         btn=true;
     }
 

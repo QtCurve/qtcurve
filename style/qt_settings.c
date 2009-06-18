@@ -2446,21 +2446,23 @@ static gboolean qtInit()
 
             if(doEffect)
             {
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Etch2\" "
-                                    "{ xthickness = 3 ythickness = 2 } "
-                                    "class \"*Button\" style \""QTC_RC_SETTING"Etch2\""
-                                    "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\"");
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Etch\" "
-                                    "{ xthickness = 3 ythickness = 3 } "
-//                                     "style \""QTC_RC_SETTING"EtchI\" "
-//                                     "{ GtkCheckButton::indicator_size = 15 } "
-                                    "class \"*GtkRange\" style \""QTC_RC_SETTING"Etch\" "
-                                    "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" "
-                                    "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" "
-                                    "class \"*GtkEntry\" style  \""QTC_RC_SETTING"Etch\" "
-                                    "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" "
-                                    //"class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch\""
-                                    /*"class \"*GtkWidget\" style \"QtcEtchI\""*/);
+                #define QTC_ETCH2_RC(Y) "style \""QTC_RC_SETTING"Etch2\" " \
+                                        "{ xthickness = 3 ythickness = "Y"} " \
+                                        "class \"*Button\" style \""QTC_RC_SETTING"Etch2\"" \
+                                        "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\""
+                #define QTC_ETCH_RC(Y) "style \""QTC_RC_SETTING"Etch\" " \
+                                    "{ xthickness = 3 ythickness = "Y" } " \
+                                    /*"style \""QTC_RC_SETTING"EtchI\" "*/ \
+                                    /*"{ GtkCheckButton::indicator_size = 15 } "*/ \
+                                    "class \"*GtkRange\" style \""QTC_RC_SETTING"Etch\" " \
+                                    "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" " \
+                                    "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"Etch\" " \
+                                    "class \"*GtkEntry\" style  \""QTC_RC_SETTING"Etch\" " \
+                                    "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" " \
+                                    /*"class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch\""*/ \
+                                    /*"class \"*GtkWidget\" style \"QtcEtchI\""*/
+                gtk_rc_parse_string(opts.thinnerBtns ? QTC_ETCH2_RC("1") : QTC_ETCH2_RC("2"));
+                gtk_rc_parse_string(/*opts.thinnerBtns ? QTC_ETCH_RC("3") : */QTC_ETCH_RC("3"));
             }
 
             if(!opts.gtkScrollViews)
