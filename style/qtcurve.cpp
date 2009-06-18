@@ -6955,6 +6955,21 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
             {
+                // Make Kate/KWrite's option toolbuton have the same size as the next/prev buttons...
+                if(widget && !getToolBar(widget) && !tbOpt->text.isEmpty() &&
+                   tbOpt->features&QStyleOptionToolButton::MenuButtonPopup)
+                {
+                    QStyleOptionButton btn;
+
+                    btn.init(widget);
+                    btn.text=tbOpt->text;
+                    btn.icon=tbOpt->icon;
+                    btn.iconSize=tbOpt->iconSize;
+                    btn.features=tbOpt->features&QStyleOptionToolButton::MenuButtonPopup
+                                    ? QStyleOptionButton::HasMenu : QStyleOptionButton::None;
+                    return sizeFromContents(CT_PushButton, &btn, size, widget);
+                }
+            
                 if (!tbOpt->icon.isNull() && !tbOpt->text.isEmpty() && Qt::ToolButtonTextUnderIcon==tbOpt->toolButtonStyle)
                     newSize.setHeight(newSize.height()-4);
 
