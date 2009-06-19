@@ -922,6 +922,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 65))
             {
+                def->tabMouseOver=TAB_MO_BOTTOM;
                 def->activeTabAppearance=APPEARANCE_FLAT;
                 def->unifySpin=false;
                 def->unifyCombo=false;
@@ -1582,7 +1583,7 @@ static void defaultSettings(Options *opts)
     opts->highlightTab=false;
     opts->colorSelTab=false;
     opts->roundAllTabs=false;
-    opts->tabMouseOver=TAB_MO_BOTTOM;
+    opts->tabMouseOver=TAB_MO_GLOW;
     opts->embolden=false;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->lvAppearance=APPEARANCE_BEVELLED;

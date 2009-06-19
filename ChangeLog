@@ -14,8 +14,9 @@
  9. Alter default settings:
         Place arrows of spin buttons, and editable combos, in the edit field.
         Draw a light border around tab widget.
-        Thinner buttons
+        Thinner buttons.
         Use soft gradient for active tab.
+        Use glow style highlight for tab mouse-over (this introduces gaps between tabs).
 10. Modified how button, and combo, heights are calculated - no longer set a
     minimum height.
 11. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
