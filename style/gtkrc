@@ -158,7 +158,7 @@ style "qtcurve-swt-combo" = "qtcurve-default"
 style "qtcurve-combo" = "qtcurve-default"
 {
   xthickness = 4
-  ythickness = 3
+  ythickness = 4
 }
 
 style "qtcurve-combo-button" = "qtcurve-default"
