@@ -2051,20 +2051,11 @@ static gboolean qtInit()
                          thunderbird=!firefox && isMozApp(app, "thunderbird"),
                          mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(app, "seamonkey");
-                int      mozVersion=0;
 
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
-// If QTC_MODIFY_MOZILLA is set, then we always need to get version!
-#ifndef QTC_MODIFY_MOZILLA
-                    if(GTK_APP_MOZILLA==qtSettings.app)
-#endif
-                        mozVersion=getMozillaVersion(getpid());
-                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>QTC_MAKE_VERSION(2, 0))
-                        qtSettings.app=GTK_APP_NEW_MOZILLA;
-                    if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts.menuitemAppearance &&
-                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<QTC_MAKE_VERSION(2, 0))))
-                        opts.menuitemAppearance=APPEARANCE_GRADIENT;
+                    int mozVersion=getMozillaVersion(getpid());
+
 #ifdef QTC_MODIFY_MOZILLA
                     GdkColor *menu_col=SHADE_CUSTOM==opts.shadeMenubars
                                         ? &opts.customMenubarsColor
@@ -2085,6 +2076,11 @@ static gboolean qtInit()
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
+                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>QTC_MAKE_VERSION(2, 0))
+                        qtSettings.app=GTK_APP_NEW_MOZILLA;
+                    if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts.menuitemAppearance &&
+                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<QTC_MAKE_VERSION(2, 0))))
+                        opts.menuitemAppearance=APPEARANCE_GRADIENT;
                 }
                 else if(0==strcmp(app, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
