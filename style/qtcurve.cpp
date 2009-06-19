@@ -6694,7 +6694,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                            MO_GLOW==opts.coloredMouseOver && QTC_DO_EFFECT && !sunken && !comboBox->editable &&
                                            state&State_Enabled && state&State_HasFocus);
 
-                painter->fillRect(r, Qt::transparent);
+//                 painter->fillRect(r, Qt::transparent);
                 if(QTC_DO_EFFECT)
                 {
                     if(!glowOverFocus && !sunken && MO_GLOW==opts.coloredMouseOver &&
@@ -6708,10 +6708,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     frame.adjust(1, 1, -1, -1);
                 }
 
-                // This section fixes some drawng issues with krunner's combo on nvidia
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
-                painter->setRenderHint(QPainter::Antialiasing, false);
+//                 // This section fixes some drawng issues with krunner's combo on nvidia
+//                 painter->setRenderHint(QPainter::Antialiasing, true);
+//                 painter->fillRect(frame.adjusted(1, 1, -1, -1), palette.background().color());
+//                 painter->setRenderHint(QPainter::Antialiasing, false);
 
                 if(/*comboBox->frame &&*/ frame.isValid() && (!comboBox->editable || !opts.unifyCombo))
                 {
@@ -6748,8 +6748,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 field.adjust(1, 1, -1, -1);
                         }
                         //field.adjust(-1,-1, 0, 1);
-                        painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
-                        drawRect(painter, field);
+//                         painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
+//                         drawRect(painter, field);
                         // 2 for frame width
                         if(!opts.unifyCombo)
                         {
