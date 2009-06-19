@@ -116,7 +116,7 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height);
 
-// #ifdef QTC_DEBUG
+#ifdef QTC_DEBUG
 static void dumpChildren(GtkWidget *widget, int level)
 {
     if(level<5)
@@ -168,7 +168,7 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
     else
         printf("\n");
 }
-// #endif
+#endif
 
 typedef struct
 {
