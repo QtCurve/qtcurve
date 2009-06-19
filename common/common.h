@@ -832,6 +832,7 @@ typedef struct
     ETabMo           tabMouseOver;
 /* NOTE: If add an appearance setting, increase the number of custmo gradients to match! */
     EAppearance      appearance,
+                     bgndAppearance,
                      menubarAppearance,
                      menuitemAppearance,
                      toolbarAppearance,

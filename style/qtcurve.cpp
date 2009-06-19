@@ -1138,6 +1138,20 @@ void QtCurveStyle::polish(QWidget *widget)
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 
+    if(!IS_FLAT(opts.bgndAppearance))
+        switch (widget->windowFlags() & Qt::WindowType_Mask)
+        {
+            case Qt::Window:
+            case Qt::Dialog:
+                widget->installEventFilter(this);
+                widget->setAttribute(Qt::WA_StyledBackground);
+                break;
+            case Qt::Popup: // we currently don't want that kind of gradient on menus etc
+            case Qt::Tool: // this we exclude as it is used for dragging of icons etc
+            default:
+                break;
+        }
+
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
         itemView->viewport()->setAttribute(Qt::WA_Hover);
@@ -1199,6 +1213,8 @@ void QtCurveStyle::polish(QWidget *widget)
         if (!((APP_QTDESIGNER==theThemedApp) && widget->inherits("QDesignerMenuBar")))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 #endif
+        if(!IS_FLAT(opts.bgndAppearance))
+            widget->setBackgroundRole(QPalette::NoRole);
 
         widget->setAttribute(Qt::WA_Hover, true);
 
@@ -1393,7 +1409,6 @@ void QtCurveStyle::unpolish(QWidget *widget)
 #ifdef QTC_XBAR_SUPPORT
         Bespin::MacMenu::release((QMenuBar *)widget);
 #endif
-
         widget->setAttribute(Qt::WA_Hover, false);
 
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
@@ -1574,6 +1589,38 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                             return true;
                         }
                     }
+            }
+        }
+    }
+
+    if(!IS_FLAT(opts.bgndAppearance))
+    {
+        QWidget *widget=qobject_cast<QWidget *>(object);
+
+        if (widget && widget->isWindow() && widget->isVisible()) {
+            if (event->type() == QEvent::Paint)
+            {
+                if(widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
+                {
+                    QPainter p(widget);
+
+                    const QWidget* window = widget->window();
+                    // get coordinates relative to the client area
+                    const QWidget* w = widget;
+                    int x = 0, y = 0;
+                    while (!w->isWindow())
+                    {
+                        x += w->geometry().x();
+                        y += w->geometry().y();
+                        w = w->parentWidget();
+                    }
+
+                    p.setClipRegion(widget->rect(),Qt::IntersectClip);
+
+                    drawBevelGradientReal(widget->window()->palette().window().color(), &p,
+                                          QRect(x, y, window->rect().width(), window->rect().height()), true, false,
+                                          opts.bgndAppearance, WIDGET_OTHER);
+                }
             }
         }
     }
@@ -9056,10 +9103,11 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
 void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
 {
-    drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
-                        ? itsMenubarCols[ORIGINAL_SHADE]
-                        : option->palette.background().color(),
-                      p, r, horiz, false, menu ? opts.menubarAppearance : opts.toolbarAppearance);
+    if(!(!IS_FLAT(opts.bgndAppearance) && IS_FLAT(menu ? opts.menubarAppearance : opts.toolbarAppearance)))
+        drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
+                            ? itsMenubarCols[ORIGINAL_SHADE]
+                            : option->palette.background().color(),
+                          p, r, horiz, false, menu ? opts.menubarAppearance : opts.toolbarAppearance);
 }
 
 void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOption *option, bool tb,
