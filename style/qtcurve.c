@@ -3044,22 +3044,33 @@ debugDisplayWidget(widget, 3);
 
                 if(opts.unifyCombo && WIDGET_COMBO_BUTTON==widgetType)
                 {
-                    GtkWidget *entry=getComboEntry(widget->parent);
-                    gboolean  rev=reverseLayout(entry);
+                    GtkWidget *entry=widget ? getComboEntry(widget->parent) : NULL;
+                    gboolean  rev=FALSE;
+
+                    if(!entry && widget && widget->parent)
+                        entry=getMappedWidget(widget->parent, 1);
+
+                    if(entry)
+                        rev=reverseLayout(entry);
 
                     if(!rev)
                         x-=2;
                     width+=2;
-                    if(state==GTK_STATE_PRELIGHT || state==GTK_STATE_ACTIVE)
+                    if(/*state==GTK_STATE_PRELIGHT || */state==GTK_STATE_ACTIVE)
                         state=GTK_STATE_NORMAL;
 
                     // When we draw the entry, if its highlighted we want to highlight this button as well.
                     // Unfortunately, when the entry of a GtkComboBoxEntry draws itself, there is no way to
                     // determine the button associated with it. So, we store the mapping here...
                     if(widget->parent && GTK_IS_COMBO_BOX_ENTRY(widget->parent))
-                        qtcWidgetMapSetup(widget->parent, widget);
+                        qtcWidgetMapSetup(widget->parent, widget, 0);
                     drawEntryField(cr, style, state, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                    WIDGET_COMBO_BUTTON);
+
+                    // Get entry to redraw by setting its state...
+                    // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
+                    if(widget && entry && entry->state!=widget->state && GTK_STATE_INSENSITIVE!=entry->state)
+                        gtk_widget_set_state(entry, state);
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
@@ -3976,7 +3987,9 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean combo=isComboBoxEntry(widget),
                  isSpin=!combo && isSpinButton(widget),
                  rev=reverseLayout(widget) || (combo && widget && reverseLayout(widget->parent));
-
+        GtkWidget *btn=NULL;
+        GtkStateType savedState=state;
+        
 #if GTK_CHECK_VERSION(2, 16, 0)
         if(isSpin && widget && width==widget->allocation.width)
         {
@@ -3991,6 +4004,17 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         if((opts.unifySpin && isSpin) || (combo && opts.unifyCombo))
             width+=2;
 
+        // If we're a combo entry, and not prelight, check to see if the button is
+        // prelighted, if so so are we!
+        if(GTK_STATE_PRELIGHT!=state && combo && opts.unifyCombo && widget && widget->parent)
+        {
+            btn=getComboButton(widget->parent);
+            if(!btn && widget->parent)
+                btn=getMappedWidget(widget->parent, 0);
+            if(btn && GTK_STATE_PRELIGHT==btn->state)
+                state=widget->state=GTK_STATE_PRELIGHT;
+        }
+        
         drawEntryField(cr, style, state, widget, area, x, y, width, height,
                        combo || isSpin
                            ? rev
@@ -4000,13 +4024,11 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                        WIDGET_ENTRY);
         if(combo && opts.unifyCombo && widget && widget->parent)
         {
-            GtkWidget *btn=getComboButton(widget->parent);
-
-            if(!btn && widget->parent)
-                btn=getMappedWidget(widget->parent);
-
-            if(btn)
+            if(btn && GTK_STATE_INSENSITIVE!=widget->state)
                 gtk_widget_queue_draw(btn);
+
+            if(GTK_IS_COMBO_BOX_ENTRY(widget->parent))
+                qtcWidgetMapSetup(widget->parent, widget, 1);
         }
     }
     else
