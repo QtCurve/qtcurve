@@ -5735,7 +5735,7 @@ debugDisplayWidget(widget, 3);
         drawFadedLine(cr, x1<x2 ? x1 : x2, y, abs(x2-x1), 1, &qtcPalette.background[dark],
                       area, NULL, true, true, true);
     }
-    else if(DETAIL("menuitem"))
+    else if(DETAIL("menuitem") || (widget && DETAIL("hseparator") && QTC_IS_MENU_ITEM(widget)))
         //drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QTC_MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
         drawFadedLine(cr, x1<x2 ? x1 : x2, y+1, abs(x2-x1), 1, &qtcPalette.background[QTC_MENU_SEP_SHADE],
                       area, NULL, true, true, true);
