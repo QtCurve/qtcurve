@@ -2216,7 +2216,9 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if(widget && GTK_IS_TREE_VIEW(widget))
+    if(!IS_FLAT(opts.bgndAppearance) && widget && GTK_IS_WINDOW(widget))
+        drawBevelGradient(cr, style, area, NULL, x, y, width, height, &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+    else if(widget && GTK_IS_TREE_VIEW(widget))
     {
         if(opts.lvLines)
         {
