@@ -27,6 +27,7 @@
 14. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
     segment.
 15. Make Kate/Kwrite's option toolbuton have the same size as the next/prev buttons.
+16. Make listview lines better match Gtk2
 
 0.64.2
 ------

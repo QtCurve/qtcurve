@@ -2317,11 +2317,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorBranch:
         {
             int middleH((r.x() + r.width() / 2)-1),
-                middleV(r.y() + r.height() / 2),
-                beforeH(middleH),
-                beforeV(middleV),
-                afterH(middleH),
-                afterV(middleV);
+                middleV(r.y() + r.height() / 2);
 
             painter->save();
 
@@ -2330,42 +2326,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QRect ar(r.x()+((r.width()-(QTC_LV_SIZE+4))>>1), r.y()+((r.height()-(QTC_LV_SIZE+4))>>1), QTC_LV_SIZE+4,
                          QTC_LV_SIZE+4);
 
-                beforeH=ar.x();
-                beforeV=ar.y();
-                afterH=ar.x()+QTC_LV_SIZE+4;
-                afterV=ar.y()+QTC_LV_SIZE+4;
-
-                if(opts.lvLines)
-                {
-                    int lo(QTC_ROUNDED ? 2 : 0);
-
-                    painter->setPen(palette.mid().color());
-                    painter->drawLine(ar.x()+lo, ar.y(), (ar.x()+ar.width()-1)-lo, ar.y());
-                    painter->drawLine(ar.x()+lo, ar.y()+ar.height()-1, (ar.x()+ar.width()-1)-lo,
-                                      ar.y()+ar.height()-1);
-                    painter->drawLine(ar.x(), ar.y()+lo, ar.x(), (ar.y()+ar.height()-1)-lo);
-                    painter->drawLine(ar.x()+ar.width()-1, ar.y()+lo, ar.x()+ar.width()-1,
-                                      (ar.y()+ar.height()-1)-lo);
-
-                    if(QTC_ROUNDED)
-                    {
-                        painter->drawPoint(ar.x()+1, ar.y()+1);
-                        painter->drawPoint(ar.x()+1, ar.y()+ar.height()-2);
-                        painter->drawPoint(ar.x()+ar.width()-2, ar.y()+1);
-                        painter->drawPoint(ar.x()+ar.width()-2, ar.y()+ar.height()-2);
-
-                        QColor col(palette.mid().color());
-
-                        col.setAlphaF(0.5);
-                        painter->setPen(col);
-                        painter->drawLine(ar.x()+1, ar.y()+1, ar.x()+2, ar.y());
-                        painter->drawLine(ar.x()+ar.width()-2, ar.y(), ar.x()+ar.width()-1, ar.y()+1);
-                        painter->drawLine(ar.x()+1, ar.y()+ar.height()-2, ar.x()+2, ar.y()+ar.height()-1);
-                        painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1,
-                                          ar.y()+ar.height()-2);
-                    }
-                }
-
                 drawArrow(painter, ar, state&State_Open
                                                 ? PE_IndicatorArrowDown
                                                 : reverse
@@ -2373,18 +2333,21 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                     : PE_IndicatorArrowRight, palette.text().color());
             }
 
-            if(opts.lvLines)
+            const int constStep=widget && qobject_cast<const QTreeView *>(widget)
+                                    ? ((QTreeView *)widget)->indentation() : 20;
+
+            if(opts.lvLines && r.x()>=constStep && constStep>0)
             {
                 painter->setPen(palette.mid().color());
                 if (state&State_Item)
                     if (reverse)
-                        painter->drawLine(r.left(), middleV, afterH, middleV);
+                        painter->drawLine(r.left(), middleV, middleH, middleV);
                     else
-                        painter->drawLine(afterH, middleV, r.right(), middleV);
-                if (state&State_Sibling && afterV<r.bottom())
-                    painter->drawLine(middleH, afterV, middleH, r.bottom());
-                if (state & (State_Open | State_Children | State_Item | State_Sibling) && beforeV>r.y())
-                    painter->drawLine(middleH, r.y(), middleH, beforeV);
+                        painter->drawLine(middleH-constStep, middleV, r.right()-constStep, middleV);
+                if (state&State_Sibling && middleV<r.bottom())
+                    painter->drawLine(middleH-constStep, middleV, middleH-constStep, r.bottom());
+                if (state & (State_Open | State_Children | State_Item | State_Sibling))
+                    painter->drawLine(middleH-constStep, r.y(), middleH-constStep, middleV);
             }
             painter->restore();
             break;
@@ -5903,46 +5866,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 if (child.features & QStyleOptionQ3ListViewItem::Expandable
                                     || (child.childCount > 0 && child.height > 0))
                                 {
-                                    // needs a box
-
-                                    QRect ar(bx-4, linebot-4, 11, 11);
-
-                                    if(opts.lvLines)
-                                    {
-                                        int lo(QTC_ROUNDED ? 2 : 0);
-
-                                        painter->setPen(palette.mid().color());
-                                        painter->drawLine(ar.x()+lo, ar.y(), (ar.x()+ar.width()-1)-lo, ar.y());
-                                        painter->drawLine(ar.x()+lo, ar.y()+ar.height()-1, (ar.x()+ar.width()-1)-lo,
-                                                        ar.y()+ar.height()-1);
-                                        painter->drawLine(ar.x(), ar.y()+lo, ar.x(), (ar.y()+ar.height()-1)-lo);
-                                        painter->drawLine(ar.x()+ar.width()-1, ar.y()+lo, ar.x()+ar.width()-1,
-                                                        (ar.y()+ar.height()-1)-lo);
-
-                                        if(QTC_ROUNDED)
-                                        {
-                                            painter->drawPoint(ar.x()+1, ar.y()+1);
-                                            painter->drawPoint(ar.x()+1, ar.y()+ar.height()-2);
-                                            painter->drawPoint(ar.x()+ar.width()-2, ar.y()+1);
-                                            painter->drawPoint(ar.x()+ar.width()-2, ar.y()+ar.height()-2);
-
-                                            QColor col(palette.mid().color());
-
-                                            col.setAlphaF(0.5);
-                                            painter->setPen(col);
-                                            painter->drawLine(ar.x()+1, ar.y()+1, ar.x()+2, ar.y());
-                                            painter->drawLine(ar.x()+ar.width()-2, ar.y(), ar.x()+ar.width()-1, ar.y()+1);
-                                            painter->drawLine(ar.x()+1, ar.y()+ar.height()-2, ar.x()+2, ar.y()+ar.height()-1);
-                                            painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1,
-                                                            ar.y()+ar.height()-2);
-                                        }
-                                    }
-
-                                    drawArrow(painter, ar, child.state&State_Open
-                                                                ? PE_IndicatorArrowDown
-                                                                : reverse
-                                                                    ? PE_IndicatorArrowLeft
-                                                                    : PE_IndicatorArrowRight,
+                                    drawArrow(painter, QRect(bx-4, linebot-4, 11, 11),
+                                              child.state&State_Open
+                                                ? PE_IndicatorArrowDown
+                                                : reverse
+                                                    ? PE_IndicatorArrowLeft
+                                                    : PE_IndicatorArrowRight,
                                               palette.text().color());
 
                                     if(opts.lvLines)
