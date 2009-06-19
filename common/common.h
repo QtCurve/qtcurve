@@ -386,7 +386,7 @@ typedef enum
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
     PIX_SLIDER_LIGHT_V
-#if !defined __cplusplus && defined QTC_GTK2_MENU_STRIPE_HACK_MENU
+#if !defined __cplusplus
     , PIX_BLANK
 #endif
 } EPixmap;
@@ -782,6 +782,7 @@ typedef struct
 #endif
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
                      mapKdeIcons,
+                     gtkMenuStripe,
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
@@ -846,9 +847,7 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      selectionAppearance,
 #endif
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripeAppearance,
-#endif
                      progressAppearance,
                      progressGrooveAppearance,
                      grooveAppearance,
@@ -857,9 +856,7 @@ typedef struct
                      sliderFill;
     EShade           shadeSliders,
                      shadeMenubars,
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      menuStripe,
-#endif
                      shadeCheckRadio,
                      comboBtn;
     EColor           progressGrooveColor;
@@ -870,9 +867,7 @@ typedef struct
                      customSlidersColor,
                      customMenuNormTextColor,
                      customMenuSelTextColor,
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
                      customMenuStripeColor,
-#endif
                      customCheckRadioColor,
                      customComboBtnColor;
 #if defined __cplusplus

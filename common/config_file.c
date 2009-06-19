@@ -1093,12 +1093,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_INT(titlebarButtons)
             QTC_CFG_READ_TB_ICON(titlebarIcon)
 #endif
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             QTC_CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
             if(version<QTC_MAKE_VERSION(0, 63) && QTC_IS_BLACK(opts->customMenuStripeColor))
                 QTC_CFG_READ_COLOR(customMenuStripeColor)
-#endif
             QTC_CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             QTC_CFG_READ_BOOL(gtkScrollViews)
 #ifdef __cplusplus
@@ -1113,6 +1111,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
             QTC_CFG_READ_BOOL(mapKdeIcons)
+            QTC_CFG_READ_BOOL(gtkMenuStripe)
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
@@ -1386,9 +1385,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             checkAppearance(&opts->selectionAppearance, opts);
 #endif
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             checkAppearance(&opts->menuStripeAppearance, opts);
-#endif
             checkAppearance(&opts->progressAppearance, opts);
             checkAppearance(&opts->progressGrooveAppearance, opts);
             checkAppearance(&opts->grooveAppearance, opts);
@@ -1404,9 +1401,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkColor(&opts->shadeMenubars, &opts->customMenubarsColor);
             checkColor(&opts->shadeSliders, &opts->customSlidersColor);
             checkColor(&opts->shadeCheckRadio, &opts->customCheckRadioColor);
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             checkColor(&opts->menuStripe, &opts->customMenuStripeColor);
-#endif
             checkColor(&opts->comboBtn, &opts->customComboBtnColor);
             if(APPEARANCE_BEVELLED==opts->toolbarAppearance)
                 opts->toolbarAppearance=APPEARANCE_GRADIENT;
@@ -1433,12 +1428,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else if(APPEARANCE_BEVELLED==opts->selectionAppearance)
                 opts->selectionAppearance=APPEARANCE_GRADIENT;
 #endif
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
             if(APPEARANCE_RAISED==opts->menuStripeAppearance)
                 opts->menuStripeAppearance=APPEARANCE_FLAT;
             else if(APPEARANCE_BEVELLED==opts->menuStripeAppearance)
                 opts->menuStripeAppearance=APPEARANCE_GRADIENT;
-#endif
+
             if(opts->highlightFactor<MIN_HIGHLIGHT_FACTOR || opts->highlightFactor>MAX_HIGHLIGHT_FACTOR)
                 opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
 
@@ -1652,11 +1646,8 @@ static void defaultSettings(Options *opts)
     opts->titlebarButtons=QTC_TITLEBAR_BUTTON_HOVER_FRAME;
     opts->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
-#if defined __cplusplus || defined QTC_GTK2_MENU_STRIPE
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_GRADIENT;
-    opts->customMenuStripeColor.setRgb(0, 0, 0);
-#endif
     opts->shading=SHADING_HSL;
     opts->gtkScrollViews=false;
     opts->comboBtn=SHADE_NONE;
@@ -1670,6 +1661,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuSelTextColor.setRgb(0, 0, 0);
     opts->customCheckRadioColor.setRgb(0, 0, 0);
     opts->customComboBtnColor.setRgb(0, 0, 0);
+    opts->customMenuStripeColor.setRgb(0, 0, 0);
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
 #else
 /*
@@ -1681,10 +1673,12 @@ static void defaultSettings(Options *opts)
     opts->customMenuSelTextColor.red=opts->customMenuSelTextColor.green=opts->customMenuSelTextColor.blue=0;
     opts->customCheckRadioColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
     opts->customComboBtnColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
+    opts->customMenuStripeColor.red=opts->customMenuStripeColor.green=opts->customMenuStripeColor.blue=0;
 #endif
 
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
     opts->mapKdeIcons=true;
+    opts->gtkMenuStripe=false;
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
@@ -2217,6 +2211,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(colorTitlebarOnly)
         CFG_WRITE_ENTRY(gtkButtonOrder)
         CFG_WRITE_ENTRY(mapKdeIcons)
+        CFG_WRITE_ENTRY(gtkMenuStripe)
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
 
