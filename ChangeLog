@@ -20,6 +20,10 @@
 10. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
 11. Draw entry field backgrounds.
 12. Dont use KDE4's disabled background colour.
+13. Experimental support for menu-stripe. No GUI setting, edit ~/.config/qtcurvestylerc
+    and add:
+        gtkMenuStripe=true
+    (Needs menu stipe also enabled in KDE GUI)
 
 0.64.2
 ------

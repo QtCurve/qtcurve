@@ -18,12 +18,6 @@
   Boston, MA 02110-1301, USA.
  */
 
-/*
- * Menu stripe is disabled for Gtk2, as I'm not sure what todo about menus without icons!
-#define QTC_GTK2_MENU_STRIPE
-#define QTC_GTK2_MENU_STRIPE_HACK_MENU
-*/
-
 #include <gmodule.h>
 #include <gtk/gtk.h>
 #include <gtk/gtkstyle.h>
@@ -144,22 +138,6 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
             printf("[%d, %dx%d : %d,%d , %0X] ", widget->state, widget->allocation.x,
                    widget->allocation.y,
                    widget->allocation.width, widget->allocation.height, widget->window);*/
-#ifdef QTC_GTK2_MENU_STRIPE
-        if(GTK_IS_WINDOW(widget))
-        {
-            printf("{%X}", (int)GTK_WINDOW(widget)->transient_parent);
-            if(GTK_WINDOW(widget)->transient_parent && GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child)
-            {
-                printf("/%s(%s)[%x]/",
-                          gtk_type_name(GTK_WIDGET_TYPE(GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child)),
-                          GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child->name
-                             ? GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child->name : "NULL",
-                         (int)GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child);
-                if(GTK_IS_BOX(GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child))
-                    dumpChildren(GTK_BIN(GTK_WINDOW(widget)->transient_parent)->child, 0);
-            }
-        }
-#endif
         if(widget && widget->parent)
             debugDisplayWidget(widget->parent, --level);
         else
@@ -847,7 +825,6 @@ static gboolean isComboList(GtkWidget *widget)
     return widget && widget->parent && isComboPopupWindow(widget->parent, 0);
 }
 
-#ifdef QTC_GTK2_MENU_STRIPE
 static gboolean isComboMenu(GtkWidget *widget)
 {
     if(widget && widget->name && GTK_IS_MENU(widget) && 0==strcmp(widget->name, "gtk-combobox-popup-menu"))
@@ -856,14 +833,13 @@ static gboolean isComboMenu(GtkWidget *widget)
     {
         GtkWidget *top=gtk_widget_get_toplevel(widget);
 
-        return top && (isComboBoxPopupWindow(GTK_BIN(top)->child) ||
+        return top && (isComboBoxPopupWindow(GTK_BIN(top)->child, 0) ||
                        GTK_IS_DIALOG(top) || /* Dialogs should not have menus! */
                        (GTK_IS_WINDOW(top) && GTK_WINDOW(top)->transient_parent &&
                         GTK_BIN(GTK_WINDOW(top)->transient_parent)->child &&
                         isComboMenu(GTK_BIN(GTK_WINDOW(top)->transient_parent)->child)));
     }
 }
-#endif
 
 #if 0
 static gboolean isComboFrame(GtkWidget *widget)
@@ -1110,7 +1086,6 @@ static gboolean pixbufCacheKeyEqual(gconstpointer k1, gconstpointer k2)
            a->col.blue==b->col.blue;
 }
 
-#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU
 #ifdef __SUNPRO_C
 #pragma align 4 (my_pixbuf)
 #endif
@@ -1134,7 +1109,6 @@ static const guint8 blank16x16[] =
   "\0\0\0\20"
   /* pixel_data: */
   "\377\0\0\0\0\377\0\0\0\0\202\0\0\0\0"};
-#endif
 
 static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
 {
@@ -1179,10 +1153,8 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
             gdk_pixbuf_unref(rotated);
             break;
         }
-#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU
         case PIX_BLANK:
             return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
-#endif
     }
 
     adjustPix(gdk_pixbuf_get_pixels(res), gdk_pixbuf_get_n_channels(res), gdk_pixbuf_get_width(res),
@@ -3774,22 +3746,6 @@ debugDisplayWidget(widget, 3);
         GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
         gboolean   active_mb=isMozilla() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE);
 
-#ifdef QTC_GTK2_MENU_STRIPE_HACK_MENU /* This hack doesnt work! not all items are gtkImageMenuItems's
-         -> and if tey are they're drawn first incorrectly :-( */
-        if(!mb && menuitem && GTK_IS_IMAGE_MENU_ITEM(widget) &&
-           (0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)) ||
-            (GTK_IS_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))) &&
-             GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))))))
-        {
-            // Give it a blank icon - so that menuStripe looks ok, plus this matched KDE style!
-            if(0L==gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget)))
-                gtk_image_menu_item_set_image(GTK_IS_IMAGE_MENU_ITEM(widget),
-                                              gtk_image_new_from_pixbuf(getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0)));
-            else
-                gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(GTK_IMAGE_MENU_ITEM(widget))),
-                                          getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
-        }
-#endif
         // The handling of 'mouse pressed' in the menubar event handler doesn't seem to set the
         // menu as active, therefore the active_mb fails. However the check below works...
         if(mb && !active_mb && widget)
@@ -3888,12 +3844,51 @@ debugDisplayWidget(widget, 3);
             drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
         }
 
-#ifdef QTC_GTK2_MENU_STRIPE
-        if(opts.menuStripe && !isComboMenu(widget))
-            drawBevelGradient(cr, style, area, NULL, x+2, y+2, isMozilla() ? 18 : 22, height-4,
+        if(opts.menuStripe && opts.gtkMenuStripe && !isComboMenu(widget))
+        {
+            int stripeWidth=GTK_APP_OPEN_OFFICE==qtSettings.app ? 22 : 17;
+
+            // To determine stripe size, we iterate over all menuitems of this menu. If we find a GtkImageMenuItem then
+            // we can a width of 20. However, we need to check that at least one enttry actually has an image! So, if
+            // the first GtkImageMenuItem has an image then we're ok, otherwise we give it a blank pixmap.
+            if(GTK_APP_OPEN_OFFICE!=qtSettings.app && widget && !isMozilla())
+            {
+                GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
+                GList        *children=menuShell->children;
+
+                while (children)
+                {
+                    if(GTK_IS_IMAGE_MENU_ITEM(children->data))
+                    {
+                        GtkImageMenuItem *item=GTK_IMAGE_MENU_ITEM(children->data);
+                        stripeWidth=20;
+
+                        if(0L==gtk_image_menu_item_get_image(item) ||
+                           (GTK_IS_IMAGE(gtk_image_menu_item_get_image(item)) &&
+                                GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(
+                                        gtk_image_menu_item_get_image(item)))))
+                        {
+                            // Give it a blank icon - so that menuStripe looks ok, plus this matches KDE style!
+                            if(0L==gtk_image_menu_item_get_image(item))
+                                gtk_image_menu_item_set_image(item, gtk_image_new_from_pixbuf(getPixbuf(qtcPalette.check_radio,
+                                                                                                        PIX_BLANK, 1.0)));
+                            else
+                                gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image_menu_item_get_image(item)),
+                                                          getPixbuf(qtcPalette.check_radio, PIX_BLANK, 1.0));
+                            break;
+                        }
+                        else // TODO: Check image size!
+                            break;
+                    }
+                    children = children->next;
+                }
+            }
+
+            drawBevelGradient(cr, style, area, NULL, x+2, y+2, stripeWidth, height-4,
                               &qtcPalette.background[QTC_MENU_STRIPE_SHADE],
                               FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
-#endif
+        }
+
         if(opts.popupBorder)
         {
             cairo_new_path(cr);
