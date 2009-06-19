@@ -1965,12 +1965,13 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            gint height, int round, EWidget w)
 {
     gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget))),
-             highlight=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
+             highlightReal=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
              mouseOver=enabled && (GTK_STATE_PRELIGHT==state || (lastMoEntry && widget==lastMoEntry) )&& qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
+             highlight=highlightReal || mouseOver,
              doEtch=QTC_DO_EFFECT;
     GdkColor *colors=mouseOver
                         ? qtcPalette.mouseover
-                        : highlight
+                        : highlightReal
                             ? qtcPalette.focus
                             : qtcPalette.background;
 
@@ -3987,7 +3988,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
 #endif
 
-        if((opts.unifySpin && isSpin)|| (combo && opts.unifyCombo))
+        if((opts.unifySpin && isSpin) || (combo && opts.unifyCombo))
             width+=2;
 
         drawEntryField(cr, style, state, widget, area, x, y, width, height,
