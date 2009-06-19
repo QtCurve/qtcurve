@@ -2218,6 +2218,16 @@ debugDisplayWidget(widget, 3);
 
     if(widget && GTK_IS_TREE_VIEW(widget))
     {
+        if(opts.lvLines)
+        {
+            QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+
+            // GtkTreeView copies the black GC! But dont want black lines, so hack around this...
+            GdkGC *black=widget->style->black_gc;
+            widget->style->black_gc=qtcurveStyle->lv_lines_gc;
+            gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(widget), TRUE);
+            widget->style->black_gc=black; // Restore!
+        }
     /*
         int px, py;
         gtk_widget_get_pointer(widget, &px, &py);
@@ -6042,6 +6052,11 @@ static void styleRealize(GtkStyle *style)
     }
     else
         qtcurveStyle->menutext_gc[0]=NULL;
+
+    if(opts.lvLines)
+        qtcurveStyle->lv_lines_gc=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_MID]);
+    else
+        qtcurveStyle->lv_lines_gc=NULL;
 }
 
 static void styleUnrealize(GtkStyle *style)
@@ -6057,6 +6072,12 @@ static void styleUnrealize(GtkStyle *style)
         gtk_gc_release(qtcurveStyle->menutext_gc[0]);
         gtk_gc_release(qtcurveStyle->menutext_gc[1]);
         qtcurveStyle->menutext_gc[0]=qtcurveStyle->menutext_gc[1]=NULL;
+    }
+
+    if(opts.lvLines)
+    {
+        gtk_gc_release(qtcurveStyle->lv_lines_gc);
+        qtcurveStyle->lv_lines_gc=NULL;
     }
 }
 

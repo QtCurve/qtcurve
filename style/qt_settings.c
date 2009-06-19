@@ -2639,6 +2639,10 @@ static gboolean qtInit()
                 }
             }
 
+            if(opts.lvLines)
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"LvL\" { GtkTreeView::tree-line-pattern=\"\\111\\111\" } "
+                                    "class \"*GtkWidget\" style \""QTC_RC_SETTING"LvL\"");
+
             if(tmpStr)
                 free(tmpStr);
         }
