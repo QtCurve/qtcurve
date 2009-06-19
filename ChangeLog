@@ -14,8 +14,9 @@
  9. Alter default settings:
         Place arrows of spin buttons, and editable combos, in the edit field.
         Draw a light border around tab widget.
-        Thinner buttons
+        Thinner buttons.
         Use soft gradient for active tab.
+        Use glow style highlight for tab mouse-over (this introduces gaps between tabs).
 10. Re-add fix for icons on GEdit tabs - but only for GeditNotebook widgets.
 11. Draw entry field backgrounds.
 12. Dont use KDE4's disabled background colour.
