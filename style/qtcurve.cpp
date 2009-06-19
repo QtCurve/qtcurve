@@ -8408,7 +8408,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 QPainterPath topPath,
                              botPath;
 
-                if((hasMouseOver || hasFocus) && WIDGET_ENTRY==w)
+                if( ((hasMouseOver || hasFocus) && WIDGET_ENTRY==w) ||
+                    (hasFocus && WIDGET_SCROLLVIEW==w))
                 {
                     tl.setAlphaF(QTC_ENTRY_INNER_ALPHA);
                     br.setAlphaF(QTC_ENTRY_INNER_ALPHA);
