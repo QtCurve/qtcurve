@@ -38,17 +38,14 @@ static GtkWidget * getMappedWidget(GtkWidget *widget, int map)
 
 static void qtcWidgetMapCleanup(GtkWidget *widget)
 {
-    if (QTC_GE_IS_TOGGLEBUTTON(widget))
-    {
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_DESTROY_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID"));
-        g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(0));
-        g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(1));
-        if(widget->parent)
-            removeFromWidgetMapHash(widget);
-    }
+    g_signal_handler_disconnect(G_OBJECT(widget),
+                                (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_DESTROY_ID"));
+    g_signal_handler_disconnect(G_OBJECT(widget),
+                                (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID"));
+    g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(0));
+    g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(1));
+    if(widget->parent)
+        removeFromWidgetMapHash(widget);
 }
 
 static gboolean qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
