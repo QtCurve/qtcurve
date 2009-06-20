@@ -5292,7 +5292,7 @@ debugDisplayWidget(widget, 3);
                     height-=2;
                 }
     #endif
-                clipPath(cr, x, y, width, height+4, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
+                clipPath(cr, x+mod+sizeAdjust, y, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height+5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
                 fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y+1, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE,
                         WIDGET_TAB_TOP, NULL!=notebook);
                 cairo_restore(cr);
