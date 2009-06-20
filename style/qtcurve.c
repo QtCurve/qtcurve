@@ -5268,7 +5268,7 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(opts.colorSelTab && notebook && active)
-                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, true);
+                    colorTab(cr, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, round, WIDGET_TAB_BOT, true);
 
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1),
@@ -5320,7 +5320,7 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(opts.colorSelTab && notebook && active)
-                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, true);
+                    colorTab(cr, x+mod+sizeAdjust, y+1, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, round, WIDGET_TAB_TOP, true);
 
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(firstTab ? moOffset : 1), y+(TAB_MO_TOP==opts.tabMouseOver ? 0 : height-1),
@@ -5368,7 +5368,7 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(opts.colorSelTab && notebook && active)
-                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_BOT, false);
+                    colorTab(cr, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), round, WIDGET_TAB_BOT, false);
                     
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? width-2 : -1),
@@ -5418,7 +5418,7 @@ debugDisplayWidget(widget, 3);
                 }
 
                 if(opts.colorSelTab && notebook && active)
-                    colorTab(cr, x, y, width, height, round, WIDGET_TAB_TOP, false);
+                    colorTab(cr, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), round, WIDGET_TAB_TOP, false);
 
                 if(notebook && opts.coloredMouseOver && highlight && TAB_MO_GLOW!=opts.tabMouseOver)
                     drawHighlight(cr, x+(TAB_MO_TOP==opts.tabMouseOver ? 0 : width-1),
