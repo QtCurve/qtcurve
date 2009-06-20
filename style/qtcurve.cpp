@@ -4996,7 +4996,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
 
                             if(opts.colorSelTab)
-                                colorTab(painter, r, true, WIDGET_TAB_TOP, round);
+                                colorTab(painter, r.adjusted(1+sizeAdjust, 1, -(1+sizeAdjust), 0), true, WIDGET_TAB_TOP, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver && TAB_MO_GLOW!=opts.tabMouseOver)
                             drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1),
@@ -5062,7 +5062,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
 
                             if(opts.colorSelTab)
-                                colorTab(painter, r, true, WIDGET_TAB_BOT, round);
+                                colorTab(painter, r.adjusted(1+sizeAdjust, 0, -(1+sizeAdjust), -1), true, WIDGET_TAB_BOT, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver && TAB_MO_GLOW!=opts.tabMouseOver)
                             drawHighlight(painter, QRect(r.x()+(firstTab ? moOffset : 1),
@@ -5128,7 +5128,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
 
                             if(opts.colorSelTab)
-                                colorTab(painter, r, false, WIDGET_TAB_TOP, round);
+                                colorTab(painter, r.adjusted(1, sizeAdjust, 0, -(1+sizeAdjust)), false, WIDGET_TAB_TOP, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver && TAB_MO_GLOW!=opts.tabMouseOver)
                             drawHighlight(painter, QRect(r.x()+(TAB_MO_TOP==opts.tabMouseOver ? 0 : r.width()-1),
@@ -5194,7 +5194,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             }
 
                             if(opts.colorSelTab)
-                                colorTab(painter, r, false, WIDGET_TAB_BOT, round);
+                                colorTab(painter, r.adjusted(0, sizeAdjust, -1, -(1+sizeAdjust)), false, WIDGET_TAB_BOT, round);
                         }
                         else if(mouseOver && opts.coloredMouseOver && TAB_MO_GLOW!=opts.tabMouseOver)
                             drawHighlight(painter, QRect(r.x()+(TAB_MO_TOP==opts.tabMouseOver ? r.width()-2 : -1),
