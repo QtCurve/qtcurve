@@ -3897,8 +3897,7 @@ debugDisplayWidget(widget, 3);
             }
 
             drawBevelGradient(cr, style, area, NULL, x+2, y+2, stripeWidth, height-4,
-                              &qtcPalette.background[QTC_MENU_STRIPE_SHADE],
-                              FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
+                              &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
         }
 
         if(opts.popupBorder)
@@ -6228,6 +6227,25 @@ static void generateColors()
     }
 
     shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
+    
+    switch(opts.menuStripe)
+    {
+        default:
+        case SHADE_NONE:
+        case SHADE_DARKEN:
+            opts.customMenuStripeColor=qtcPalette.menu;
+            break;
+        case SHADE_CUSTOM:
+            break;
+        case SHADE_BLEND_SELECTED:
+            opts.customMenuStripeColor=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                                opts.lighterPopupMenuBgnd<0
+                                                    ? &qtcPalette.menu
+                                                    : &qtcPalette.background[ORIGINAL_SHADE]);
+            break;
+        case SHADE_SELECTED:
+            opts.customMenuStripeColor=qtcPalette.highlight[QTC_MENU_STRIPE_SHADE];
+    }
 }
 
 static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)
