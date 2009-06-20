@@ -3029,7 +3029,12 @@ debugDisplayWidget(widget, 3);
                 if(opts.unifyCombo && WIDGET_COMBO_BUTTON==widgetType)
                 {
                     GtkWidget *entry=widget ? getComboEntry(widget->parent) : NULL;
-                    gboolean  rev=FALSE;
+                    gboolean  rev=FALSE,
+                              mozToolbar=isMozilla() && widget && widget->parent && widget->parent->parent &&  widget->parent->parent->parent && 
+                                         widget->parent->parent->parent->name &&
+                                         GTK_IS_TOGGLE_BUTTON(widget) && GTK_IS_COMBO_BOX_ENTRY(widget->parent) &&
+                                         GTK_IS_FIXED(widget->parent->parent) && GTK_IS_WINDOW(widget->parent->parent->parent) &&
+                                         0==strcmp(widget->parent->parent->parent->name, "MozillaGtkWidget");
 
                     if(!entry && widget && widget->parent)
                         entry=getMappedWidget(widget->parent, 1);
@@ -3040,20 +3045,19 @@ debugDisplayWidget(widget, 3);
                     if(!rev)
                         x-=2;
                     width+=2;
-                    if(/*state==GTK_STATE_PRELIGHT || */state==GTK_STATE_ACTIVE)
+                    if((mozToolbar && state==GTK_STATE_PRELIGHT) || state==GTK_STATE_ACTIVE)
                         state=GTK_STATE_NORMAL;
 
                     // When we draw the entry, if its highlighted we want to highlight this button as well.
                     // Unfortunately, when the entry of a GtkComboBoxEntry draws itself, there is no way to
                     // determine the button associated with it. So, we store the mapping here...
-                    if(widget->parent && GTK_IS_COMBO_BOX_ENTRY(widget->parent))
+                    if(!mozToolbar && widget->parent && GTK_IS_COMBO_BOX_ENTRY(widget->parent))
                         qtcWidgetMapSetup(widget->parent, widget, 0);
                     drawEntryField(cr, style, state, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                    WIDGET_COMBO_BUTTON);
-
                     // Get entry to redraw by setting its state...
                     // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
-                    if(widget && entry && entry->state!=widget->state && GTK_STATE_INSENSITIVE!=entry->state)
+                    if(!mozToolbar && widget && entry && entry->state!=widget->state && GTK_STATE_INSENSITIVE!=entry->state)
                         gtk_widget_set_state(entry, state);
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
