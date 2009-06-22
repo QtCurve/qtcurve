@@ -9606,8 +9606,10 @@ void QtCurveStyle::shade(const color &ca, color *cb, double k) const
 }
 
 QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
-{ 
-    bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
+{
+    if(IS_FLAT(opts.bgndAppearance))
+    {
+        bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
 // CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
 // KPackageKit, and thats with its KTextBrowser - so just check when we draw scrollviews...
 //     if(doEtch && isInQAbstractItemView(widget->parentWidget()))
@@ -9616,16 +9618,18 @@ QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
 //         theNoEtchWidgets.insert(widget);
 //     }
 
-    if(doEtch)
-    {
-        QColor bgnd(widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole()));
+        if(doEtch)
+        {
+            QColor bgnd(widget->parentWidget()->palette().color(widget->parentWidget()->backgroundRole()));
 
-        if(bgnd.alpha()>0)
-            return shade(bgnd, 1.06);
+            if(bgnd.alpha()>0)
+                return shade(bgnd, 1.06);
+        }
     }
-        
+
     QColor col(Qt::white);
-    col.setAlphaF(0.25);
+    col.setAlphaF(IS_FLAT(opts.bgndAppearance) ? 0.25 : 0.4);
+        
     return col;
 }
 
