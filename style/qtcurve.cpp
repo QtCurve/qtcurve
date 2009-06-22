@@ -1318,8 +1318,8 @@ void QtCurveStyle::polish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                frame->setBackgroundRole(QPalette::Background);
-
+                frame->setAutoFillBackground(false);
+                
                 QLayout *layout(frame->layout());
 
                 if(layout)
@@ -1484,7 +1484,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                frame->setBackgroundRole(QPalette::Base);
+                frame->setAutoFillBackground(true);
 
                 QLayout *layout(frame->layout());
 
@@ -1623,12 +1623,11 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         }
     }
 
-    if(!IS_FLAT(opts.bgndAppearance))
+    if(!IS_FLAT(opts.bgndAppearance) && QEvent::Paint==event->type())
     {
         QWidget *widget=qobject_cast<QWidget *>(object);
 
         if(widget && widget->isWindow() && widget->isVisible() &&
-           QEvent::Paint==event->type() &&
            widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
             drawWindowBackground(widget);
     }
@@ -1641,15 +1640,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
             if (frame)
             {
-/*#ifdef QTC_QT_ONLY
-                if(!IS_FLAT(opts.bgndAppearance) && frame->parentWidget() &&
-                    frame->parentWidget()->inherits("KTitleWidget"))
-#else
-                if(!IS_FLAT(opts.bgndAppearance) && frame->parentWidget() &&
-                   qobject_cast<KTitleWidget *>(frame->parentWidget()))
-#endif
-                    drawWindowBackground(frame);
-                else*/ if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
+                if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 {
                     QPainter painter(frame);
                     QRect    r(QFrame::HLine==frame->frameShape()
