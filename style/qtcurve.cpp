@@ -1320,7 +1320,10 @@ void QtCurveStyle::polish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                frame->setAutoFillBackground(false);
+                if(IS_FLAT(opts.bgndAppearance))
+                    frame->setBackgroundRole(QPalette::Window);
+                else
+                    frame->setAutoFillBackground(false);
                 
                 QLayout *layout(frame->layout());
 
@@ -1486,7 +1489,10 @@ void QtCurveStyle::unpolish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                frame->setAutoFillBackground(true);
+                if(IS_FLAT(opts.bgndAppearance))
+                    frame->setBackgroundRole(QPalette::Base);
+                else
+                    frame->setAutoFillBackground(true);
 
                 QLayout *layout(frame->layout());
 
