@@ -977,17 +977,22 @@ static GdkColor * getParentBgCol(GtkWidget *widget)
 
 static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
-    GdkColor *parentBg=getParentBgCol(widget);
-
-    if(parentBg)
+    if(IS_FLAT(opts.bgndAppearance))
     {
-        GdkColor col;
+        GdkColor *parentBg=getParentBgCol(widget);
 
-        shade(&opts, parentBg, &col, 1.06);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(col));
+        if(parentBg)
+        {
+            GdkColor col;
+
+            shade(&opts, parentBg, &col, 1.06);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(col));
+        }
+        else
+            cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.25);
     }
     else
-        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.0);
+        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.4);
 }
 
 static void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
