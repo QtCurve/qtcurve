@@ -58,6 +58,7 @@ static bool useQt3Settings()
 #include <KDE/KColorScheme>
 #include <KDE/KStandardDirs>
 #include <KDE/KComponentData>
+#include <KDE/KTitleWidget>
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 static int theInstanceCount=0;
@@ -1139,6 +1140,7 @@ void QtCurveStyle::polish(QWidget *widget)
     }
 
     if(!IS_FLAT(opts.bgndAppearance))
+    {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
         {
             case Qt::Window:
@@ -1151,6 +1153,9 @@ void QtCurveStyle::polish(QWidget *widget)
             default:
                 break;
         }
+        if(qobject_cast<QSlider *>(widget))
+            widget->setBackgroundRole(QPalette::NoRole);
+    }
 
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
@@ -1307,7 +1312,11 @@ void QtCurveStyle::polish(QWidget *widget)
             //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                  widget->installEventFilter(this);
 
+#ifdef QTC_QT_ONLY
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
+#else
+            if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
+#endif
             {
                 frame->setBackgroundRole(QPalette::Background);
 
@@ -1365,6 +1374,20 @@ void QtCurveStyle::unpolish(QWidget *widget)
         disconnect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 
+    if(!IS_FLAT(opts.bgndAppearance))
+        switch (widget->windowFlags() & Qt::WindowType_Mask)
+        {
+            case Qt::Window:
+            case Qt::Dialog:
+                widget->removeEventFilter(this);
+                widget->setAttribute(Qt::WA_StyledBackground, false);
+                break;
+            case Qt::Popup: // we currently don't want that kind of gradient on menus etc
+            case Qt::Tool: // this we exclude as it is used for dragging of icons etc
+            default:
+                break;
+        }
+
     if(qobject_cast<QPushButton *>(widget) ||
        qobject_cast<QComboBox *>(widget) ||
        qobject_cast<QAbstractSpinBox *>(widget) ||
@@ -1411,6 +1434,9 @@ void QtCurveStyle::unpolish(QWidget *widget)
 #endif
         widget->setAttribute(Qt::WA_Hover, false);
 
+        if(!IS_FLAT(opts.bgndAppearance))
+            widget->setBackgroundRole(QPalette::Background);
+
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->removeEventFilter(this);
 
@@ -1452,7 +1478,11 @@ void QtCurveStyle::unpolish(QWidget *widget)
 //             if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                  widget->removeEventFilter(this);
 
+#ifdef QTC_QT_ONLY
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
+#else
+            if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
+#endif
             {
                 frame->setBackgroundRole(QPalette::Base);
 
@@ -1597,32 +1627,10 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
     {
         QWidget *widget=qobject_cast<QWidget *>(object);
 
-        if (widget && widget->isWindow() && widget->isVisible()) {
-            if (event->type() == QEvent::Paint)
-            {
-                if(widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
-                {
-                    QPainter p(widget);
-
-                    const QWidget* window = widget->window();
-                    // get coordinates relative to the client area
-                    const QWidget* w = widget;
-                    int x = 0, y = 0;
-                    while (!w->isWindow())
-                    {
-                        x += w->geometry().x();
-                        y += w->geometry().y();
-                        w = w->parentWidget();
-                    }
-
-                    p.setClipRegion(widget->rect(),Qt::IntersectClip);
-
-                    drawBevelGradientReal(widget->window()->palette().window().color(), &p,
-                                          QRect(x, y, window->rect().width(), window->rect().height()), true, false,
-                                          opts.bgndAppearance, WIDGET_OTHER);
-                }
-            }
-        }
+        if(widget && widget->isWindow() && widget->isVisible() &&
+           QEvent::Paint==event->type() &&
+           widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
+            drawWindowBackground(widget);
     }
 
     switch(event->type())
@@ -1633,7 +1641,15 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
             if (frame)
             {
-                if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
+/*#ifdef QTC_QT_ONLY
+                if(!IS_FLAT(opts.bgndAppearance) && frame->parentWidget() &&
+                    frame->parentWidget()->inherits("KTitleWidget"))
+#else
+                if(!IS_FLAT(opts.bgndAppearance) && frame->parentWidget() &&
+                   qobject_cast<KTitleWidget *>(frame->parentWidget()))
+#endif
+                    drawWindowBackground(frame);
+                else*/ if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 {
                     QPainter painter(frame);
                     QRect    r(QFrame::HLine==frame->frameShape()
@@ -2527,8 +2543,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             break;
         case PE_Frame:
+#ifdef QTC_QT_ONLY
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
                 break;
+#else
+            if(widget && widget->parent() && qobject_cast<const KTitleWidget *>(widget->parent()))
+                break;
+#endif
             else if(widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))
             {
                 if(opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
@@ -3701,9 +3722,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             const QColor &color(palette.color(QPalette::Active, QPalette::Window));
 
             painter->save();
-            painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled
-                                      ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
-                                      : color));
+            if(IS_FLAT(opts.bgndAppearance) || state&State_MouseOver && state&State_Enabled)
+                painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled
+                                                ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
+                                                : color));
             switch(opts.splitters)
             {
                 case LINE_NONE:
@@ -8234,6 +8256,27 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
 
     p->drawPath(br);
     p->setRenderHint(QPainter::Antialiasing, false);
+}
+
+void QtCurveStyle::drawWindowBackground(QWidget *widget)
+{
+    QPainter      p(widget);
+    const QWidget *window = widget->window();
+    // get coordinates relative to the client area
+    const QWidget *w = widget;
+    int           x = 0, y = 0;
+
+    while (!w->isWindow())
+    {
+        y += w->geometry().y();
+        w = w->parentWidget();
+    }
+
+    p.setClipRegion(widget->rect(), Qt::IntersectClip);
+
+    drawBevelGradientReal(window->palette().window().color(), &p,
+                          QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()), true, false,
+                          opts.bgndAppearance, WIDGET_OTHER);
 }
 
 QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius, double wmod, double hmod) const
