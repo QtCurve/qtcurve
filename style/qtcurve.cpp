@@ -926,8 +926,10 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
 QtCurveStyle::~QtCurveStyle()
 {
-#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0) && !defined QTC_QT_ONLY
+#if !defined QTC_QT_ONLY && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
+#if !KDE_IS_VERSION(4, 1, 0)
     unsetFileDialogs();
+#endif
 #endif
 
     if(itsSidebarButtonsCols &&
