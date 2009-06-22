@@ -5448,10 +5448,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     || Qt::ToolButtonTextOnly==tb->toolButtonStyle)
                 {
                     int alignment = Qt::AlignCenter|Qt::TextShowMnemonic;
-                
+
                     if (!styleHint(SH_UnderlineShortcut, option, widget))
                         alignment |= Qt::TextHideMnemonic;
-                    
+
                     r.translate(shiftX, shiftY);
                     drawItemText(painter, r, alignment, tb->palette, state&State_Enabled, tb->text, QPalette::ButtonText);
                 }
@@ -5476,8 +5476,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             int iconExtent = pixelMetric(PM_ToolBarIconSize);
                             iconSize = QSize(iconExtent, iconExtent);
                         }
+                        else if(iconSize.width()>iconSize.height())
+                            iconSize.setWidth(iconSize.height());
+                        else if(iconSize.width()<iconSize.height())
+                            iconSize.setHeight(iconSize.width());
 
-                        pm=getIconPixmap(tb->icon, tb->rect.size().boundedTo(iconSize), mode, state);
+                        if(iconSize.width()>tb->rect.size().width())
+                            iconSize=QSize(tb->rect.size().width(), tb->rect.size().width());
+                        if(iconSize.height()>tb->rect.size().height())
+                            iconSize=QSize(tb->rect.size().height(), tb->rect.size().height());
+                        
+                        pm=getIconPixmap(tb->icon, iconSize, mode, state);
                         pmSize = tb->icon.actualSize(iconSize, mode);
                         if(pmSize.width()<pm.width())
                             pr.setX(pr.x()+((pm.width()-pmSize.width())));
@@ -6938,65 +6947,65 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             //newSize.setHeight(sizeFromContents(CT_LineEdit, option, size, widget).height());
             newSize.rheight() -= ((1 - newSize.rheight()) & 1);
             break;
-        case CT_ToolButton:
-        {
-            newSize = QSize(size.width()+8, size.height()+8);
-            // -- from kstyle & oxygen --
-            // We want to avoid super-skiny buttons, for things like "up" when icons + text
-            // For this, we would like to make width >= height.
-            // However, once we get here, QToolButton may have already put in the menu area
-            // (PM_MenuButtonIndicator) into the width. So we may have to take it out, fix things
-            // up, and add it back in. So much for class-independent rendering...
-
-            int menuAreaWidth(0);
-
-            if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
-            {
-                // Make Kate/KWrite's option toolbuton have the same size as the next/prev buttons...
-                if(widget && !getToolBar(widget) && !tbOpt->text.isEmpty() &&
-                   tbOpt->features&QStyleOptionToolButton::MenuButtonPopup)
-                {
-                    QStyleOptionButton btn;
-
-                    btn.init(widget);
-                    btn.text=tbOpt->text;
-                    btn.icon=tbOpt->icon;
-                    btn.iconSize=tbOpt->iconSize;
-                    btn.features=tbOpt->features&QStyleOptionToolButton::MenuButtonPopup
-                                    ? QStyleOptionButton::HasMenu : QStyleOptionButton::None;
-                    return sizeFromContents(CT_PushButton, &btn, size, widget);
-                }
-            
-                if (!tbOpt->icon.isNull() && !tbOpt->text.isEmpty() && Qt::ToolButtonTextUnderIcon==tbOpt->toolButtonStyle)
-                    newSize.setHeight(newSize.height()-4);
-
-                if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
-                    menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
-                else if (tbOpt->features & QStyleOptionToolButton::HasMenu)
-                    switch(tbOpt->toolButtonStyle)
-                    {
-                        case Qt::ToolButtonIconOnly:
-                            newSize.setWidth(newSize.width()+LARGE_ARR_WIDTH+2);
-                            break;
-                        case Qt::ToolButtonTextBesideIcon:
-                            newSize.setWidth(newSize.width()+3);
-                            break;
-                        case Qt::ToolButtonTextOnly:
-                            newSize.setWidth(newSize.width()+8);
-                            break;
-                        case Qt::ToolButtonTextUnderIcon:
-                            newSize.setWidth(newSize.width()+8);
-                            break;
-                    }
-            }
-
-            newSize.setWidth(newSize.width() - menuAreaWidth);
-            if (newSize.width() < newSize.height())
-                newSize.setWidth(newSize.height());
-            newSize.setWidth(newSize.width() + menuAreaWidth);
-
-            break;
-        }
+//         case CT_ToolButton:
+//         {
+//             newSize = QSize(size.width()+8, size.height()+8);
+//             // -- from kstyle & oxygen --
+//             // We want to avoid super-skiny buttons, for things like "up" when icons + text
+//             // For this, we would like to make width >= height.
+//             // However, once we get here, QToolButton may have already put in the menu area
+//             // (PM_MenuButtonIndicator) into the width. So we may have to take it out, fix things
+//             // up, and add it back in. So much for class-independent rendering...
+// 
+//             int menuAreaWidth(0);
+// 
+//             if (const QStyleOptionToolButton* tbOpt = qstyleoption_cast<const QStyleOptionToolButton*>(option))
+//             {
+//                 // Make Kate/KWrite's option toolbuton have the same size as the next/prev buttons...
+//                 if(widget && !getToolBar(widget) && !tbOpt->text.isEmpty() &&
+//                    tbOpt->features&QStyleOptionToolButton::MenuButtonPopup)
+//                 {
+//                     QStyleOptionButton btn;
+// 
+//                     btn.init(widget);
+//                     btn.text=tbOpt->text;
+//                     btn.icon=tbOpt->icon;
+//                     btn.iconSize=tbOpt->iconSize;
+//                     btn.features=tbOpt->features&QStyleOptionToolButton::MenuButtonPopup
+//                                     ? QStyleOptionButton::HasMenu : QStyleOptionButton::None;
+//                     return sizeFromContents(CT_PushButton, &btn, size, widget);
+//                 }
+// 
+//                 if (!tbOpt->icon.isNull() && !tbOpt->text.isEmpty() && Qt::ToolButtonTextUnderIcon==tbOpt->toolButtonStyle)
+//                     newSize.setHeight(newSize.height()-4);
+// 
+//                 if (tbOpt->features & QStyleOptionToolButton::MenuButtonPopup)
+//                     menuAreaWidth = pixelMetric(QStyle::PM_MenuButtonIndicator, option, widget);
+//                 else if (tbOpt->features & QStyleOptionToolButton::HasMenu)
+//                     switch(tbOpt->toolButtonStyle)
+//                     {
+//                         case Qt::ToolButtonIconOnly:
+//                             newSize.setWidth(newSize.width()+LARGE_ARR_WIDTH+2);
+//                             break;
+//                         case Qt::ToolButtonTextBesideIcon:
+//                             newSize.setWidth(newSize.width()+3);
+//                             break;
+//                         case Qt::ToolButtonTextOnly:
+//                             newSize.setWidth(newSize.width()+8);
+//                             break;
+//                         case Qt::ToolButtonTextUnderIcon:
+//                             newSize.setWidth(newSize.width()+8);
+//                             break;
+//                     }
+//             }
+// 
+//             newSize.setWidth(newSize.width() - menuAreaWidth);
+//             if (newSize.width() < newSize.height())
+//                 newSize.setWidth(newSize.height());
+//             newSize.setWidth(newSize.width() + menuAreaWidth);
+// 
+//             break;
+//         }
         case CT_ComboBox:
         {
             newSize+=QSize(0, QTC_DO_EFFECT && !opts.thinnerBtns ? 6 : 4);
