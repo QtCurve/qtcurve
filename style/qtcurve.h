@@ -108,11 +108,13 @@ class QtCurveStyle : public QWindowsStyle
     void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz,
                                    EAppearance bevApp) const;
     void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
-                           bool horiz, bool sel, EAppearance bevApp, EWidget w=WIDGET_OTHER) const;
+                           bool horiz, bool sel, EAppearance bevApp, EWidget w=WIDGET_OTHER, bool useCache=true) const;
     void drawBevelGradientReal(const QColor &base, QPainter *p,
                                const QRect &r, bool horiz, bool sel, EAppearance bevApp, EWidget w) const;
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
+    void drawLightBevelReal(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
+                        const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER, bool useCache=true) const;
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;
     void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false) const;
     void drawWindowBackground(QWidget *widget);

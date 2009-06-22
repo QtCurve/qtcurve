@@ -18,6 +18,8 @@
   Boston, MA 02110-1301, USA.
 */
 
+static bool usePixmapCache=true;
+
 #include <QtGui>
 #include <QtDBus/QtDBus>
 #include <QX11Info>
@@ -7929,7 +7931,7 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
 }
 
 void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect,
-                                     bool horiz, bool sel, EAppearance bevApp, EWidget w) const
+                                     bool horiz, bool sel, EAppearance bevApp, EWidget w, bool useCache) const
 {
     if(origRect.width()<1 || origRect.height()<1)
         return;
@@ -7949,7 +7951,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
                                     ? bevApp
                                     : APPEARANCE_GRADIENT);
 
-        if(WIDGET_PROGRESSBAR==w)
+        if(WIDGET_PROGRESSBAR==w || !useCache)
             drawBevelGradientReal(base, p, origRect, horiz, sel, app, w);
         else
         {
@@ -8008,9 +8010,93 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
     p->fillRect(r, QBrush(g));
 }
 
-void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleOption *option,
+void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option,
                                   const QWidget *widget, int round, const QColor &fill, const QColor *custom,
                                   bool doBorder, EWidget w) const
+{
+    if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin) || !usePixmapCache)
+        drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true);
+    else
+    {
+        static const int constMaxCachePixmap = 128;
+
+        int    endSize=0,
+               middleSize=8;
+        bool   horiz(isHoriz(option, w));
+        double radius=0;
+
+        switch(opts.round)
+        {
+            case ROUND_SLIGHT:
+            case ROUND_NONE:
+                endSize=4;
+                break;
+            case ROUND_FULL:
+                endSize=5;
+                break;
+            case ROUND_EXTRA:
+                endSize=7;
+                break;                
+            case ROUND_MAX:
+            {
+                radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
+                endSize=WIDGET_SB_SLIDER==w
+                            ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
+                            : (int)(radius+2.5);
+                middleSize=(QTC_MIN_ROUND_MAX_WIDTH-(endSize*2))+4;
+                break;
+            }
+        }
+
+        int size((2*endSize)+middleSize);
+
+        if(size>constMaxCachePixmap)
+            drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true);
+        else
+        {
+            QString key;
+            bool    small((horiz ? r.width() : r.height())<(2*endSize));
+            QPixmap pix(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
+            uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver));
+
+            key.sprintf("qtc-%x-%x-%x-%x-%x-%x", w, pix.width(), pix.height(), state, fill.rgba(), (int)(radius*100));
+            if(!QPixmapCache::find(key, pix))
+            {
+                pix.fill(Qt::transparent);
+
+                QPainter pixPainter(&pix);
+                drawLightBevelReal(&pixPainter, QRect(0, 0, pix.width(), pix.height()), option, widget, round, fill, custom,
+                                   doBorder, w, false);
+                pixPainter.end();
+
+                QPixmapCache::insert(key, pix);
+            }
+            
+            if(small)
+                p->drawPixmap(r.topLeft(), pix);
+            else if(horiz)
+            {
+                int middle(qMin(r.width()-(2*endSize), middleSize));
+                if(middle>0)
+                    p->drawTiledPixmap(r.x()+endSize, r.y(), r.width()-(2*endSize), pix.height(), pix.copy(endSize, 0, middle, pix.height()));
+                p->drawPixmap(r.x(), r.y(), pix.copy(0, 0, endSize, pix.height()));
+                p->drawPixmap(r.x()+r.width()-endSize, r.y(), pix.copy(pix.width()-endSize, 0, endSize, pix.height()));
+            }
+            else
+            {
+                int middle(qMin(r.height()-(2*endSize), middleSize));
+                if(middle>0)
+                    p->drawTiledPixmap(r.x(), r.y()+endSize, pix.width(), r.height()-(2*endSize), pix.copy(0, endSize, pix.width(), middle));
+                p->drawPixmap(r.x(), r.y(), pix.copy(0, 0, pix.width(), endSize));
+                p->drawPixmap(r.x(), r.y()+r.height()-endSize, pix.copy(0, pix.height()-endSize, pix.width(), endSize));
+            }
+        }
+    }
+}
+
+void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option,
+                                      const QWidget *widget, int round, const QColor &fill, const QColor *custom,
+                                      bool doBorder, EWidget w, bool useCache) const
 {
     EAppearance  app(widgetApp(w, &opts, option->state&State_Active));
 
@@ -8069,7 +8155,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
         else
         {
             drawBevelGradient(fill, p, r.adjusted(1, 1, -1,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1),
-                              horiz, sunken, app, w);
+                              horiz, sunken, app, w, useCache);
 
             if(!sunken)
                 if(plastikMouseOver && !sunken)
@@ -8084,16 +8170,16 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &rOrig, const QStyleO
                         if(horiz)
                         {
                             drawBevelGradient(itsMouseOverCols[col], p, QRect(r.x()+so, r.y(), len, r.height()-1),
-                                              horiz, sunken, app, w);
+                                              horiz, sunken, app, w, useCache);
                             drawBevelGradient(itsMouseOverCols[col], p,
-                                              QRect(r.x()+r.width()-eo, r.y(), len, r.height()-1), horiz, sunken, app, w);
+                                              QRect(r.x()+r.width()-eo, r.y(), len, r.height()-1), horiz, sunken, app, w, useCache);
                         }
                         else
                         {
                             drawBevelGradient(itsMouseOverCols[col], p, QRect(r.x(), r.y()+so, r.width()-1, len),
-                                              horiz, sunken, app, w);
+                                              horiz, sunken, app, w, useCache);
                             drawBevelGradient(itsMouseOverCols[col], p,
-                                              QRect(r.x(), r.y()+r.height()-eo, r.width()-1, len), horiz, sunken, app, w);
+                                              QRect(r.x(), r.y()+r.height()-eo, r.width()-1, len), horiz, sunken, app, w, useCache);
                         }
                     }
                     else
@@ -9722,6 +9808,8 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
         case KGlobalSettings::PaletteChanged:
             KGlobal::config()->reparseConfiguration();
             applyKdeSettings(true);
+            if(usePixmapCache)
+                QPixmapCache::clear();
             break;
         case KGlobalSettings::FontChanged:
             KGlobal::config()->reparseConfiguration();

@@ -29,6 +29,7 @@
 15. Make Kate/Kwrite's option toolbuton have the same size as the next/prev buttons.
 16. Make listview lines match Gtk2 better.
 17. Experimental support for drawing of background gradients.
+18. Cache complete buttons, etc, pixmaps - as opposed to jusr the gradient fill.
 
 0.64.2
 ------
