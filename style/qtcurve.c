@@ -56,6 +56,7 @@ static Options opts;
 #include "menu.c"
 #include "tab.c"
 #include "widgetmap.c"
+#include "window.c"
 #include "entry.c"
 #include "pixmaps.h"
 #include "config.h"
@@ -2248,7 +2249,7 @@ debugDisplayWidget(widget, 3);
 
     if(!IS_FLAT(opts.bgndAppearance) && widget && GTK_IS_WINDOW(widget) &&
        drawBgndGradient(cr, style, area, widget, x, y, width, height))
-        ;
+        qtcWindowSetup(widget);
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
         if(opts.lvLines)
@@ -2345,8 +2346,9 @@ debugDisplayWidget(widget, 3);
 #endif
 
     sanitizeSize(window, &width, &height);
-    gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
-                                       area, x, y, width, height);
+    if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+        gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
+                                           area, x, y, width, height);
 
     if (DETAIL("dockitem") || paf)
     {
@@ -2815,11 +2817,12 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("spinbutton"))
     {
-        gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
-                                           GTK_STATE_INSENSITIVE==state
-                                                ? GTK_STATE_INSENSITIVE
-                                                : GTK_STATE_NORMAL,
-                                           area, x, y, width, height);
+        if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+            gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
+                                               GTK_STATE_INSENSITIVE==state
+                                                    ? GTK_STATE_INSENSITIVE
+                                                    : GTK_STATE_NORMAL,
+                                               area, x, y, width, height);
 
         if(opts.unifySpin)
         {

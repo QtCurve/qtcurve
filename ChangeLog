@@ -25,6 +25,7 @@
         gtkMenuStripe=true
     (Needs menu stipe also enabled in KDE GUI)
 14. Enable drawing of list (tree) view lines.
+15. Experimental support for drawing of background gradients.
 
 0.64.2
 ------
