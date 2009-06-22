@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>684</height>
+    <height>694</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1452,7 +1452,7 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="5" column="0" colspan="2">
+          <item row="5" column="0">
            <widget class="QCheckBox" name="colorMenubarMouseOver">
             <property name="text">
              <string>Color menubar items on mouse-over</string>
@@ -1523,6 +1523,23 @@ p, li { white-space: pre-wrap; }
             </property>
            </spacer>
           </item>
+          <item row="11" column="0">
+           <widget class="QLabel" name="label_45">
+            <property name="text">
+             <string>Sub-menu delay:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
+           <widget class="KIntNumInput" name="menuDelay">
+            <property name="suffix">
+             <string>ms</string>
+            </property>
+            <property name="prefix">
+             <string/>
+            </property>
+           </widget>
+          </item>
           <item row="12" column="0">
            <widget class="QCheckBox" name="thinnerMenuItems">
             <property name="text">
@@ -1554,27 +1571,23 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="14" column="0">
+          <item row="14" column="0" colspan="2">
+           <widget class="QCheckBox" name="gtkMenuStripe">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Apply menu-stripe to Gtk2 applications (Experimental)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="0">
            <widget class="QCheckBox" name="popupBorder">
             <property name="text">
              <string>Border popupmenus</string>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="0">
-           <widget class="QLabel" name="label_45">
-            <property name="text">
-             <string>Sub-menu delay:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="1">
-           <widget class="KIntNumInput" name="menuDelay">
-            <property name="suffix">
-             <string>ms</string>
-            </property>
-            <property name="prefix">
-             <string/>
             </property>
            </widget>
           </item>
@@ -2204,6 +2217,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>menuStripe</tabstop>
   <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>
+  <tabstop>gtkMenuStripe</tabstop>
   <tabstop>popupBorder</tabstop>
   <tabstop>toolbarAppearance</tabstop>
   <tabstop>toolbarSeparators</tabstop>

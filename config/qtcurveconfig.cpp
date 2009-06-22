@@ -483,6 +483,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(menuStripe, SIGNAL(currentIndexChanged(int)), SLOT(menuStripeChanged()));
     connect(customMenuStripeColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(menuStripeAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(gtkMenuStripe, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(round, SIGNAL(currentIndexChanged(int)), SLOT(roundChanged()));
     connect(toolbarBorders, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderThumbs, SIGNAL(currentIndexChanged(int)), SLOT(sliderThumbChanged()));
@@ -755,6 +756,9 @@ void QtCurveConfig::menuStripeChanged()
 {
     customMenuStripeColor->setEnabled(SHADE_CUSTOM==menuStripe->currentIndex());
     menuStripeAppearance->setEnabled(SHADE_NONE!=menuStripe->currentIndex());
+    gtkMenuStripe->setEnabled(SHADE_NONE!=menuStripe->currentIndex());
+    if(SHADE_NONE==menuStripe->currentIndex())
+        gtkMenuStripe->setChecked(false);
     updateChanged();
 }
 
@@ -1378,6 +1382,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menuStripe=(EShade)menuStripe->currentIndex();
     opts.customMenuStripeColor=customMenuStripeColor->color();
     opts.menuStripeAppearance=(EAppearance)menuStripeAppearance->currentIndex();
+    opts.gtkMenuStripe=gtkMenuStripe->isChecked();
     opts.embolden=embolden->isChecked();
     opts.scrollbarType=(EScrollbar)scrollbarType->currentIndex();
     opts.defBtnIndicator=(EDefBtnIndicator)defBtnIndicator->currentIndex();
@@ -1502,6 +1507,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     menuStripe->setCurrentIndex(opts.menuStripe);
     customMenuStripeColor->setColor(opts.customMenuStripeColor);
     menuStripeAppearance->setCurrentIndex(opts.menuStripeAppearance);
+    gtkMenuStripe->setChecked(opts.gtkMenuStripe);
     toolbarBorders->setCurrentIndex(opts.toolbarBorders);
     sliderThumbs->setCurrentIndex(opts.sliderThumbs);
     handles->setCurrentIndex(opts.handles);
@@ -1688,6 +1694,7 @@ bool QtCurveConfig::settingsChanged()
          sliderWidth->value()!=currentStyle.sliderWidth ||
          menuStripe->currentIndex()!=currentStyle.menuStripe ||
          menuStripeAppearance->currentIndex()!=currentStyle.menuStripeAppearance ||
+         gtkMenuStripe->isChecked()!=currentStyle.gtkMenuStripe ||
          embolden->isChecked()!=currentStyle.embolden ||
          fillSlider->isChecked()!=currentStyle.fillSlider ||
          sliderStyle->currentIndex()!=currentStyle.sliderStyle ||
