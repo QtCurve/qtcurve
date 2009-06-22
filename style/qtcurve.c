@@ -1932,6 +1932,31 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
     *color = parent->style->bg[GTK_WIDGET_STATE(parent)];
 }
 
+static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
+                                 gint x, gint y, gint width, gint height)
+{
+    if(!isFixedWidget(widget))
+    {
+        GtkWidget *window=widget;
+        int       yo=0;
+
+        while(window && !GTK_IS_WINDOW(window))
+        {
+            if(!GTK_WIDGET_NO_WINDOW(window))
+                yo+=widget->allocation.y;
+            window=window->parent;
+        }
+
+        if(window)
+        {
+            drawBevelGradient(cr, style, area, NULL, x, -yo, width, window->allocation.height,
+                              &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            GtkWidget *widget, GdkRectangle *area, gint x, gint y, gint width,
                            gint height, int round, EWidget w)
@@ -1952,28 +1977,33 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     if(ROUND_NONE!=opts.round)
     {
-        GdkColor parentBgCol;
-
-        getEntryParentBgCol(widget, &parentBgCol);
-        setCairoClipping(cr, area, NULL);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(parentBgCol));
-        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        if(doEtch)
-            cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-3);
-        if(opts.round>ROUND_FULL)
+        if(!IS_FLAT(opts.bgndAppearance) && widget && drawBgndGradient(cr, style, area, widget, x, y, width, height))
+            ;
+        else
         {
-            if(round&CORNER_TL)
-                cairo_rectangle(cr, x+2.5, y+2.5, 1, 1);
-            if(round&CORNER_BL)
-                cairo_rectangle(cr, x+2.5, y+height-3.5, 1, 1);
-            if(round&CORNER_TR)
-                cairo_rectangle(cr, x+width-2.5, y+2.5, 1, 1);
-            if(round&CORNER_BR)
-                cairo_rectangle(cr, x+width-2.5, y+height-3.5, 1, 1);
+            GdkColor parentBgCol;
+
+            getEntryParentBgCol(widget, &parentBgCol);
+            setCairoClipping(cr, area, NULL);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(parentBgCol));
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            if(doEtch)
+                cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-3);
+            if(opts.round>ROUND_FULL)
+            {
+                if(round&CORNER_TL)
+                    cairo_rectangle(cr, x+2.5, y+2.5, 1, 1);
+                if(round&CORNER_BL)
+                    cairo_rectangle(cr, x+2.5, y+height-3.5, 1, 1);
+                if(round&CORNER_TR)
+                    cairo_rectangle(cr, x+width-2.5, y+2.5, 1, 1);
+                if(round&CORNER_BR)
+                    cairo_rectangle(cr, x+width-2.5, y+height-3.5, 1, 1);
+            }
+            cairo_set_line_width(cr, 1);
+            cairo_stroke(cr);
+            unsetCairoClipping(cr);
         }
-        cairo_set_line_width(cr, 1);
-        cairo_stroke(cr);
-        unsetCairoClipping(cr);
     }
 
     if(doEtch)
@@ -2216,8 +2246,9 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if(!IS_FLAT(opts.bgndAppearance) && widget && GTK_IS_WINDOW(widget))
-        drawBevelGradient(cr, style, area, NULL, x, y, width, height, &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+    if(!IS_FLAT(opts.bgndAppearance) && widget && GTK_IS_WINDOW(widget) &&
+       drawBgndGradient(cr, style, area, widget, x, y, width, height))
+        ;
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
         if(opts.lvLines)
@@ -2263,6 +2294,11 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
+    else if(!IS_FLAT(opts.bgndAppearance) && widget &&
+            ( detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
+              ((GTK_STATE_PRELIGHT!=state || !opts.crHighlight) && 0==strcmp(detail, "checkbutton"))) ) &&
+            drawBgndGradient(cr, style, area, widget, x, y, width, height))
+        ;
     else if(DETAIL("tooltip"))
     {
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
@@ -3285,11 +3321,12 @@ debugDisplayWidget(widget, 3);
             if(horiz && rev)
                 inverted=!inverted;
 
-            gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
-                                               GTK_STATE_INSENSITIVE==state
-                                                   ? GTK_STATE_INSENSITIVE
-                                                   : GTK_STATE_NORMAL,
-                                               area, x, y, width, height);
+            if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+                gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
+                                                   GTK_STATE_INSENSITIVE==state
+                                                        ? GTK_STATE_INSENSITIVE
+                                                        : GTK_STATE_NORMAL,
+                                                   area, x, y, width, height);
 
             if(horiz)
             {
@@ -3366,7 +3403,8 @@ debugDisplayWidget(widget, 3);
                     col=&qtcPalette.background[2];
             }
 
-            if(!list)
+            if(!list && (IS_FLAT(opts.bgndAppearance) || !(widget &&
+                                                           drawBgndGradient(cr, style, area, widget, x, y, width, height))))
                 drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
             if(doEtch)
@@ -3519,7 +3557,8 @@ debugDisplayWidget(widget, 3);
                                             ? width<height
                                             : width>height,
                                 FALSE, app, WIDGET_OTHER);
-            else
+            else if(IS_FLAT(opts.bgndAppearance) || !(widget &&
+                                                      drawBgndGradient(cr, style, area, widget, x, y, width, height)))
                 drawAreaColor(cr, area, NULL, col, x, y, width, height);
 
             if(TB_NONE!=opts.toolbarBorders)
@@ -5980,7 +6019,8 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
     int size=SIZE_GRIP_SIZE-2;
 
     /* Clear background */
-    gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
+    if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+        gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
 
     switch(edge)
     {
