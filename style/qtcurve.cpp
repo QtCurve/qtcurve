@@ -61,6 +61,7 @@ static bool useQt3Settings()
 #include <KDE/KStandardDirs>
 #include <KDE/KComponentData>
 #include <KDE/KTitleWidget>
+#include <KDE/KTabBar>
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 static int theInstanceCount=0;
@@ -2047,11 +2048,19 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
 //.........
         case PM_TabBarBaseHeight:
+#ifdef QTC_QT_ONLY
             if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
+#else
+            if(widget && qobject_cast<const KTabBar*>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
+#endif
                 return 10;
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
         case PM_TabBarBaseOverlap:
+#ifdef QTC_QT_ONLY
             if(widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
+#else
+            if(widget && qobject_cast<const KTabBar*>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
+#endif
                 return 0;
             // Fall through!
 //.........
