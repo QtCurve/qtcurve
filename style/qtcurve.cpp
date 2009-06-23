@@ -1661,7 +1661,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 QWidget *widget=(QWidget*)object;
                 QPainter painter(widget);
 
-                drawBevelGradientReal(itsLighterPopupMenuBgndCol, &painter, widget->rect(), true, false,
+                drawBevelGradientReal(itsLighterPopupMenuBgndCol, &painter, widget->rect(), GT_HORIZ==opts.menuBgndGrad, false,
                                       opts.menuBgndAppearance, WIDGET_OTHER);
             }
             else
@@ -8431,8 +8431,8 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget)
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
     drawBevelGradientReal(window->palette().window().color(), &p,
-                          QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()), true, false,
-                          opts.bgndAppearance, WIDGET_OTHER);
+                          QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
+                          GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
 }
 
 QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius, double wmod, double hmod) const

@@ -398,18 +398,24 @@ enum ETitleBarButtonColoration
     TITLE_BTN_COL_CUSTOM
 };
 
-static void insertTitlebarIconEntriess(QComboBox *combo)
+static void insertTitlebarIconEntries(QComboBox *combo)
 {
     combo->insertItem(TITLEBAR_ICON_NONE, i18n("Do not show"));
     combo->insertItem(TITLEBAR_ICON_MENU_BUTTON, i18n("Place on menu button"));
     combo->insertItem(TITLEBAR_ICON_NEXT_TO_TITLE, i18n("Place next to title"));
 }
 
-static void insertTabMoEntriess(QComboBox *combo)
+static void insertTabMoEntries(QComboBox *combo)
 {
     combo->insertItem(TAB_MO_TOP, i18n("Highlight on top"));
     combo->insertItem(TAB_MO_BOTTOM, i18n("Highlight on bottom"));
     combo->insertItem(TAB_MO_GLOW, i18n("Add a slight glow"));
+}
+
+static void insertGradTypeEntries(QComboBox *combo)
+{
+    combo->insertItem(GT_HORIZ, i18n("Horizontal"));
+    combo->insertItem(GT_VERT, i18n("Vertical"));
 }
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
@@ -462,8 +468,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertFocusEntries(focus);
     insertGradBorderEntries(gradBorder);
     insertAlignEntries(titlebarAlignment);
-    insertTitlebarIconEntriess(titlebarIcon);
-    insertTabMoEntriess(tabMouseOver);
+    insertTitlebarIconEntries(titlebarIcon);
+    insertTabMoEntries(tabMouseOver);
+    insertGradTypeEntries(bgndGrad);
+    insertGradTypeEntries(menuBgndGrad);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -485,6 +493,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(customMenuStripeColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(menuStripeAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(gtkMenuStripe, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(bgndGrad, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(menuBgndGrad, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(round, SIGNAL(currentIndexChanged(int)), SLOT(roundChanged()));
     connect(toolbarBorders, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderThumbs, SIGNAL(currentIndexChanged(int)), SLOT(sliderThumbChanged()));
@@ -1385,6 +1395,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.customMenuStripeColor=customMenuStripeColor->color();
     opts.menuStripeAppearance=(EAppearance)menuStripeAppearance->currentIndex();
     opts.gtkMenuStripe=gtkMenuStripe->isChecked();
+    opts.bgndGrad=(EGradType)bgndGrad->currentIndex();
+    opts.menuBgndGrad=(EGradType)menuBgndGrad->currentIndex();
     opts.embolden=embolden->isChecked();
     opts.scrollbarType=(EScrollbar)scrollbarType->currentIndex();
     opts.defBtnIndicator=(EDefBtnIndicator)defBtnIndicator->currentIndex();
@@ -1511,6 +1523,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customMenuStripeColor->setColor(opts.customMenuStripeColor);
     menuStripeAppearance->setCurrentIndex(opts.menuStripeAppearance);
     gtkMenuStripe->setChecked(opts.gtkMenuStripe);
+    bgndGrad->setCurrentIndex(opts.bgndGrad);
+    menuBgndGrad->setCurrentIndex(opts.menuBgndGrad);
     toolbarBorders->setCurrentIndex(opts.toolbarBorders);
     sliderThumbs->setCurrentIndex(opts.sliderThumbs);
     handles->setCurrentIndex(opts.handles);
@@ -1699,6 +1713,8 @@ bool QtCurveConfig::settingsChanged()
          menuStripe->currentIndex()!=currentStyle.menuStripe ||
          menuStripeAppearance->currentIndex()!=currentStyle.menuStripeAppearance ||
          gtkMenuStripe->isChecked()!=currentStyle.gtkMenuStripe ||
+         bgndGrad->currentIndex()!=currentStyle.bgndGrad ||
+         menuBgndGrad->currentIndex()!=currentStyle.menuBgndGrad ||
          embolden->isChecked()!=currentStyle.embolden ||
          fillSlider->isChecked()!=currentStyle.fillSlider ||
          sliderStyle->currentIndex()!=currentStyle.sliderStyle ||

@@ -622,6 +622,12 @@ typedef enum
     TAB_MO_GLOW
 } ETabMo;
 
+typedef enum
+{
+    GT_HORIZ,
+    GT_VERT
+} EGradType;
+
 #define QTC_FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
 
 #if defined __cplusplus
@@ -817,6 +823,8 @@ typedef struct
                      unifyCombo,
                      unifySpin,
                      borderTab;
+    EGradType        bgndGrad,
+                     menuBgndGrad;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;

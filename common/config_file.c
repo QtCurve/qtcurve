@@ -360,6 +360,18 @@ static ETabMo toTabMo(const char *str, ETabMo def)
     return def;
 }
 
+static EGradType toGradType(const char *str, EGradType def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "horiz", 5))
+            return GT_HORIZ;
+        if(0==memcmp(str, "vert", 4))
+            return GT_VERT;
+    }
+    return def;
+}
+
 static EGradientBorder toGradientBorder(const char *str)
 {
     if(str)
@@ -787,6 +799,9 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_TAB_MO(ENTRY) \
     opts->ENTRY=toTabMo(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#define QTC_CFG_READ_GRAD_TYPE(ENTRY) \
+    opts->ENTRY=toGradType(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 #ifdef __cplusplus
 #define QTC_CFG_READ_ALIGN(ENTRY) \
     opts->ENTRY=toAlign(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -998,6 +1013,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
             QTC_CFG_READ_APPEARANCE(bgndAppearance, false)
+            QTC_CFG_READ_GRAD_TYPE(bgndGrad)
+            QTC_CFG_READ_GRAD_TYPE(menuBgndGrad)
             QTC_CFG_READ_APPEARANCE(menuBgndAppearance, false)
             QTC_CFG_READ_BOOL(fixParentlessDialogs)
             QTC_CFG_READ_STRIPE(stripedProgress)
@@ -1583,6 +1600,8 @@ static void defaultSettings(Options *opts)
     opts->roundAllTabs=false;
     opts->tabMouseOver=TAB_MO_GLOW;
     opts->embolden=false;
+    opts->bgndGrad=GT_HORIZ;
+    opts->menuBgndGrad=GT_HORIZ;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->bgndAppearance=APPEARANCE_FLAT;
     opts->menuBgndAppearance=APPEARANCE_FLAT;
@@ -2037,6 +2056,18 @@ static const char * toStr(ETitleBarIcon icn)
     }
 }
 
+static const char * toStr(EGradType gt)
+{
+    switch(gt)
+    {
+        case GT_VERT:
+            return "vert";
+        default:
+        case GT_HORIZ:
+            return "horiz";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -2105,6 +2136,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_ENTRY(appearance)
         CFG_WRITE_ENTRY(bgndAppearance)
+        CFG_WRITE_ENTRY(bgndGrad)
+        CFG_WRITE_ENTRY(menuBgndGrad)
         CFG_WRITE_ENTRY(menuBgndAppearance)
         CFG_WRITE_ENTRY(fixParentlessDialogs)
         CFG_WRITE_ENTRY(stripedProgress)
