@@ -32,7 +32,7 @@ style "qtcurve-default"
   GtkTreeView::row-ending-details = 1
   GtkMenu::vertical-padding = 0
   GtkMenu::horizontal-offset = -2
-  GtkMenu::vertical-offset = 0
+  GtkMenu::vertical-offset = 1
 
   xthickness = 1
   ythickness = 1
