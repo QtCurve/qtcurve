@@ -1963,7 +1963,7 @@ static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *are
         if(window)
         {
             drawBevelGradient(cr, style, area, NULL, x, -yo, width, window->allocation.height,
-                              &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+                              &style->bg[GTK_STATE_NORMAL], GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER);
             return TRUE;
         }
     }
@@ -3905,7 +3905,7 @@ debugDisplayWidget(widget, 3);
     {
         if(!IS_FLAT(opts.menuBgndAppearance))
             drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                              &qtcPalette.menu, TRUE, FALSE, opts.menuBgndAppearance, WIDGET_OTHER);
+                              &qtcPalette.menu, GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance, WIDGET_OTHER);
         else if(USE_LIGHTER_POPUP_MENU)
             drawAreaColor(cr, area, NULL, &qtcPalette.menu, x, y, width, height);
         else
