@@ -3453,44 +3453,73 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         {
             int round(ROUNDED_ALL);
 
-            if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
-            {
-                struct QtcTabWidget : public QTabWidget
+            painter->save();
+
+            if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
+                if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
                 {
-                    bool tabsVisible() const { return tabBar() && tabBar()->isVisible(); }
-                };
-
-                const QTabWidget *tw((const QTabWidget *)widget);
-
-                if(0==tw->currentIndex() && tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
-                    if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
+                    struct QtcTabWidget : public QTabWidget
                     {
-                        bool reverse(Qt::RightToLeft==twf->direction);
+                        bool  tabsVisible()    const { return tabBar() && tabBar()->isVisible(); }
+                        QRect currentTabRect() const { return tabBar()->tabRect(tabBar()->currentIndex()); }
+                    };
 
-                        switch(tw->tabPosition())
+                    const QTabWidget *tw((const QTabWidget *)widget);
+
+                    if(tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
+                    {
+                        if(!IS_FLAT(opts.bgndAppearance))
                         {
-                            case QTabWidget::North:
-                                if(reverse && twf->rightCornerWidgetSize.isEmpty())
-                                    round-=CORNER_TR;
-                                else if(!reverse && twf->leftCornerWidgetSize.isEmpty())
+                            QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
+
+                            switch(tw->tabPosition())
+                            {
+                                case QTabWidget::South:
+                                    tabRect=QRect(tabRect.x()+2, r.y()+r.height()-2, tabRect.width()-4, 4);
+                                    break;
+                                case QTabWidget::North:
+                                    tabRect.adjust(2, 0, -2, 2);
+                                    break;
+                                case QTabWidget::West:
+                                    tabRect.adjust(0, 2, 2, -2);
+                                    break;
+                                case QTabWidget::East:
+                                    tabRect=QRect(r.x()+r.width()-2, tabRect.y()+2, 4, tabRect.height()-4);
+                                    break;
+                            }
+
+                            painter->setClipRegion(QRegion(r).subtract(tabRect), Qt::IntersectClip);
+                        }
+                        
+                        if(0==tw->currentIndex())
+                        {
+                            bool reverse(Qt::RightToLeft==twf->direction);
+
+                            switch(tw->tabPosition())
+                            {
+                                case QTabWidget::North:
+                                    if(reverse && twf->rightCornerWidgetSize.isEmpty())
+                                        round-=CORNER_TR;
+                                    else if(!reverse && twf->leftCornerWidgetSize.isEmpty())
+                                        round-=CORNER_TL;
+                                    break;
+                                case QTabWidget::South:
+                                    if(reverse && twf->rightCornerWidgetSize.isEmpty())
+                                        round-=CORNER_BR;
+                                    else if(!reverse && twf->leftCornerWidgetSize.isEmpty())
+                                        round-=CORNER_BL;
+                                    break;
+                                case QTabWidget::West:
                                     round-=CORNER_TL;
-                                break;
-                            case QTabWidget::South:
-                                if(reverse && twf->rightCornerWidgetSize.isEmpty())
-                                    round-=CORNER_BR;
-                                else if(!reverse && twf->leftCornerWidgetSize.isEmpty())
-                                    round-=CORNER_BL;
-                                break;
-                            case QTabWidget::West:
-                                round-=CORNER_TL;
-                                break;
-                            case QTabWidget::East:
-                                round-=CORNER_TR;
-                                break;
+                                    break;
+                                case QTabWidget::East:
+                                    round-=CORNER_TR;
+                                    break;
+                            }
                         }
                     }
-            }
-            painter->save();
+                }
+
             QStyleOption opt(*option);
 
             opt.state|=State_Enabled;
@@ -7943,7 +7972,10 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
         return;
 
     if(IS_FLAT(bevApp))
-        p->fillRect(origRect, base);
+    {
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance))
+            p->fillRect(origRect, base);
+    }
     else
     {
         bool        tab(WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w),
@@ -8007,7 +8039,11 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         QColor col;
 
         if(sel && (topTab || botTab) && i==numStops-1)
+        {
             col=base;
+            if(!IS_FLAT(opts.bgndAppearance))
+                col.setAlphaF(0.0);
+        }
         else
             shade(base, &col, botTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
