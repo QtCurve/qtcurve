@@ -1215,7 +1215,10 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
                         : APPEARANCE_GRADIENT;
 
     if(IS_FLAT(bevApp))
-        drawAreaColorAlpha(cr, area, region, base, x, y, width, height, alpha);
+    {
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance))
+            drawAreaColorAlpha(cr, area, region, base, x, y, width, height, alpha);
+    }
     else
     {
         cairo_pattern_t *pt=cairo_pattern_create_linear(x, y, horiz ? x : x+width-1, horiz ? y+height-1 : y);
@@ -1239,7 +1242,11 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             GdkColor col;
             
             if(sel && (topTab || botTab) && i==grad->numStops-1)
+            {
+                if(!IS_FLAT(opts.bgndAppearance))
+                    alpha=0.0;
                 col=*base;
+            }
             else
             {
                 double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
@@ -2302,8 +2309,7 @@ debugDisplayWidget(widget, 3);
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
     else if(!IS_FLAT(opts.bgndAppearance) && widget &&
             ( detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
-              ((GTK_STATE_PRELIGHT!=state || !opts.crHighlight) && 0==strcmp(detail, "checkbutton"))) ) &&
-            drawBgndGradient(cr, style, area, widget, x, y, width, height))
+              ((GTK_STATE_PRELIGHT!=state || !opts.crHighlight) && 0==strcmp(detail, "checkbutton"))) ))
         ;
     else if(DETAIL("tooltip"))
     {
@@ -3970,7 +3976,10 @@ debugDisplayWidget(widget, 3);
                       orientation);
     }
     else if(detail && 0==strcmp(detail+1, "ruler"))
-        drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
+    {
+        if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x, y, width, height))
+            drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
+    }
     else if(DETAIL("hseparator"))
         drawFadedLine(cr, x+1, y+(height>>1), width-1, 1, &qtcPalette.background[QT_STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
     else if(DETAIL("vseparator"))
@@ -3978,7 +3987,8 @@ debugDisplayWidget(widget, 3);
     else
     {
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
-        drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
+        if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x+1, y+1, width-2, height-2))
+            drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
                    NULL, ROUNDED_ALL,
@@ -4250,32 +4260,42 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
                     break;
             }
 
+        if(gap_width>0)
+        {
+            GdkRectangle gapRect;
+            int          adjust=gap_x>1 ? 1 : 2;
+
+            switch(gap_side)
+            {
+                case GTK_POS_TOP:
+                    gapRect.x=x+gap_x+adjust, gapRect.y=y, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
+                    break;
+                case GTK_POS_BOTTOM:
+                    gapRect.x=x+gap_x+adjust, gapRect.y=y+height-2, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
+                    break;
+                case GTK_POS_LEFT:
+                    gapRect.x=x, gapRect.y=y+gap_x+adjust, gapRect.width=2, gapRect.height=gap_width-(2*adjust);
+                    break;
+                case GTK_POS_RIGHT:
+                    gapRect.x=x+width-2, gapRect.y=y+gap_x+adjust, gapRect.width=2, gapRect.height=gap_width-(2*adjust);
+                    break;
+            }
+
+            GdkRectangle r={x, y, width, height};
+            GdkRegion    *region=gdk_region_rectangle(area ? area : &r),
+                         *inner=gdk_region_rectangle(&gapRect);
+
+            gdk_region_xor(region, inner);
+            setCairoClipping(cr, NULL, region);
+            gdk_region_destroy(inner);
+            gdk_region_destroy(region);
+        }
+    
         drawBorder(cr, widget && widget->parent ? widget->parent->style : style, state,
                    area, NULL, x, y, width, height, NULL, round,
                    borderProfile, WIDGET_TAB_FRAME, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
-    }
-
-    if(gap_width>0)
-    {
-        cairo_new_path(cr);
-        switch(gap_side)
-        {
-            case GTK_POS_TOP:
-                cairo_rectangle(cr, (x+gap_x)-0.5, y, gap_width, 2);
-                break;
-            case GTK_POS_BOTTOM:
-                cairo_rectangle(cr, (x+gap_x)-0.5, y+height-2, gap_width, 2);
-                break;
-            case GTK_POS_LEFT:
-                cairo_rectangle(cr, x, (y+gap_x)-0.5, 2, gap_width);
-                break;
-            case GTK_POS_RIGHT:
-                cairo_rectangle(cr, x+width-2, (y+gap_x)-0.5, 2, gap_width);
-                break;
-        }
-
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
-        cairo_fill(cr);
+        if(gap_width>0)
+            unsetCairoClipping(cr);
     }
 }
 
@@ -5110,17 +5130,21 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
                     GdkColor *col, int x, int y, int width, int height, gboolean horiz,
                     EWidget tab, gboolean grad)
 {
-    if(GTK_STATE_NORMAL==state && APPEARANCE_INVERTED==opts.appearance)
-        drawAreaColor(cr, area, NULL, &style->bg[GTK_STATE_NORMAL], x, y, width, height);
-    else if(grad)
-    {
-        gboolean    selected=GTK_STATE_NORMAL==state;
-        EAppearance app=selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP;
+    gboolean selected=GTK_STATE_NORMAL==state,
+             flatBgnd=IS_FLAT(opts.bgndAppearance);
 
-        drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                          col, horiz, GTK_STATE_NORMAL==state, app, tab);
+//     if(selected && !flatBgnd)
+//         drawBgndGradient(cr, style, area, widget, x, y, width, height);
+
+    if(selected && APPEARANCE_INVERTED==opts.appearance)
+    {
+        if(flatBgnd)
+            drawAreaColor(cr, area, NULL, &style->bg[GTK_STATE_NORMAL], x, y, width, height);
     }
-    else
+    else if(grad)
+        drawBevelGradient(cr, style, area, NULL, x, y, width, height,
+                          col, horiz, selected, selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP, tab);
+    else if(!selected || flatBgnd)
         drawAreaColor(cr, area, NULL, col, x, y, width, height);
 }
 
