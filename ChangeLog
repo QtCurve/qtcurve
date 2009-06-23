@@ -6,31 +6,31 @@
  3. Added ability to specify scrollbar width (11 -> 31, default 15)
  4. Base slider dimensions off of scrollbar width, unless using triangular slider.
  5. Add option to have thinner buttons.
- 6. Enable mouse-over for entry fields.
- 7. For mouse-over and focus, use same colour for top and bottom inner parts
+ 6. Add option to specify gradient for background of popupmenus.
+ 7. Enable mouse-over for entry fields.
+ 8. For mouse-over and focus, use same colour for top and bottom inner parts
     of entry fields.
- 8. When using filled/full focus with colored mouse over, then mouse over takes
+ 9. When using filled/full focus with colored mouse over, then mouse over takes
     precedence.
- 9. Alter default settings:
+10. Alter default settings:
         Place arrows of spin buttons, and editable combos, in the edit field.
         Draw a light border around tab widget.
         Thinner buttons.
         Use soft gradient for active tab.
         Use glow style highlight for tab mouse-over (this introduces gaps between tabs).
-10. Modified how button, and combo, heights are calculated - no longer set a
+11. Modified how button, and combo, heights are calculated - no longer set a
     minimum height.
-11. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
+12. Fix some K apps crashing due to KComponentData. Use a QTimer::singleShot to
     set up KDE settings.
-12. Dont use KDE4's disabled background colour.
-13. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
+13. Dont use KDE4's disabled background colour.
+14. Disable QtCurve's coloures shadows for KDE>=4.3 - needs rewriting to support
     new kwin API.
-14. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
+15. Only use mouse-over colour for menu-toolbutton arrows when mouse is over menu
     segment.
-15. Make Kate/Kwrite's option toolbuton have the same size as the next/prev buttons.
-16. Make listview lines match Gtk2 better.
-17. Experimental support for drawing of background gradients.
-18. Cache complete buttons, etc, pixmaps - as opposed to jusr the gradient fill.
-19. Add option to specify gradient for background of popupmenus.
+16. Make Kate/Kwrite's option toolbuton have the same size as the next/prev buttons.
+17. Make listview lines match Gtk2 better.
+18. Experimental support for drawing of background gradients.
+19. Cache complete buttons, etc, pixmaps - as opposed to jusr the gradient fill.
 
 0.64.2
 ------
