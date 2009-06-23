@@ -3903,7 +3903,10 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("menu"))
     {
-        if(USE_LIGHTER_POPUP_MENU)
+        if(!IS_FLAT(opts.menuBgndAppearance))
+            drawBevelGradient(cr, style, area, NULL, x, y, width, height,
+                              &qtcPalette.menu, TRUE, FALSE, opts.menuBgndAppearance, WIDGET_OTHER);
+        else if(USE_LIGHTER_POPUP_MENU)
             drawAreaColor(cr, area, NULL, &qtcPalette.menu, x, y, width, height);
         else
         {

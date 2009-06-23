@@ -23,6 +23,7 @@
 13. Experimental support for menu-stripe. (Needs menu stipe also enabled in KDE GUI)
 14. Enable drawing of list (tree) view lines.
 15. Experimental support for drawing of background gradients.
+16. Add option to specify gradient for background of popupmenus.
 
 0.64.2
 ------
