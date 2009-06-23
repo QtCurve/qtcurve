@@ -30,6 +30,7 @@
 16. Make listview lines match Gtk2 better.
 17. Experimental support for drawing of background gradients.
 18. Cache complete buttons, etc, pixmaps - as opposed to jusr the gradient fill.
+19. Add option to specify gradient for background of popupmenus.
 
 0.64.2
 ------

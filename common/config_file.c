@@ -998,6 +998,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
             QTC_CFG_READ_APPEARANCE(bgndAppearance, false)
+            QTC_CFG_READ_APPEARANCE(menuBgndAppearance, false)
             QTC_CFG_READ_BOOL(fixParentlessDialogs)
             QTC_CFG_READ_STRIPE(stripedProgress)
             QTC_CFG_READ_SLIDER(sliderStyle)
@@ -1372,6 +1373,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* **Must** check appearance first, as the rest will default to this */
             checkAppearance(&opts->appearance, opts);
             checkAppearance(&opts->bgndAppearance, opts);
+            checkAppearance(&opts->menuBgndAppearance, opts);
             checkAppearance(&opts->menubarAppearance, opts);
             checkAppearance(&opts->menuitemAppearance, opts);
             checkAppearance(&opts->toolbarAppearance, opts);
@@ -1583,6 +1585,7 @@ static void defaultSettings(Options *opts)
     opts->embolden=false;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->bgndAppearance=APPEARANCE_FLAT;
+    opts->menuBgndAppearance=APPEARANCE_FLAT;
     opts->lvAppearance=APPEARANCE_BEVELLED;
     opts->tabAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->activeTabAppearance=APPEARANCE_SOFT_GRADIENT;
@@ -2102,6 +2105,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_ENTRY(appearance)
         CFG_WRITE_ENTRY(bgndAppearance)
+        CFG_WRITE_ENTRY(menuBgndAppearance)
         CFG_WRITE_ENTRY(fixParentlessDialogs)
         CFG_WRITE_ENTRY(stripedProgress)
         CFG_WRITE_ENTRY(sliderStyle)

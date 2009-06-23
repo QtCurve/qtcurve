@@ -436,6 +436,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(grooveAppearance);
     insertAppearanceEntries(sunkenAppearance);
     insertAppearanceEntries(menuitemAppearance, true, true, true);
+    insertAppearanceEntries(menuBgndAppearance);
     insertAppearanceEntries(titlebarAppearance, true, false);
     insertAppearanceEntries(inactiveTitlebarAppearance, true, false);
     insertAppearanceEntries(titlebarButtonAppearance);
@@ -532,6 +533,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sunkenAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(progressGrooveColor, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(menuitemAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(menuBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(inactiveTitlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarButtonAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1433,6 +1435,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sunkenAppearance=(EAppearance)sunkenAppearance->currentIndex();
     opts.progressGrooveColor=(EColor)progressGrooveColor->currentIndex();
     opts.menuitemAppearance=(EAppearance)menuitemAppearance->currentIndex();
+    opts.menuBgndAppearance=(EAppearance)menuBgndAppearance->currentIndex();
     opts.titlebarAppearance=(EAppearance)titlebarAppearance->currentIndex();
     opts.inactiveTitlebarAppearance=(EAppearance)inactiveTitlebarAppearance->currentIndex();
     opts.titlebarButtonAppearance=(EAppearance)titlebarButtonAppearance->currentIndex();
@@ -1583,6 +1586,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sunkenAppearance->setCurrentIndex(opts.sunkenAppearance);
     progressGrooveColor->setCurrentIndex(opts.progressGrooveColor);
     menuitemAppearance->setCurrentIndex(opts.menuitemAppearance);
+    menuBgndAppearance->setCurrentIndex(opts.menuBgndAppearance);
     titlebarAppearance->setCurrentIndex(opts.titlebarAppearance);
     inactiveTitlebarAppearance->setCurrentIndex(opts.inactiveTitlebarAppearance);
     titlebarButtonAppearance->setCurrentIndex(opts.titlebarButtonAppearance);
@@ -1737,6 +1741,7 @@ bool QtCurveConfig::settingsChanged()
          sunkenAppearance->currentIndex()!=currentStyle.sunkenAppearance ||
          progressGrooveColor->currentIndex()!=currentStyle.progressGrooveColor ||
          menuitemAppearance->currentIndex()!=currentStyle.menuitemAppearance ||
+         menuBgndAppearance->currentIndex()!=currentStyle.menuBgndAppearance ||
          titlebarAppearance->currentIndex()!=currentStyle.titlebarAppearance ||
          inactiveTitlebarAppearance->currentIndex()!=currentStyle.inactiveTitlebarAppearance ||
          titlebarButtonAppearance->currentIndex()!=currentStyle.titlebarButtonAppearance ||

@@ -460,6 +460,8 @@ typedef enum
     APPEARANCE_CUSTOM17,
     APPEARANCE_CUSTOM18,
     APPEARANCE_CUSTOM19,
+    APPEARANCE_CUSTOM20,
+    APPEARANCE_CUSTOM21,
 
         QTC_NUM_CUSTOM_GRAD,
 
@@ -833,6 +835,7 @@ typedef struct
 /* NOTE: If add an appearance setting, increase the number of custmo gradients to match! */
     EAppearance      appearance,
                      bgndAppearance,
+                     menuBgndAppearance,
                      menubarAppearance,
                      menuitemAppearance,
                      toolbarAppearance,
