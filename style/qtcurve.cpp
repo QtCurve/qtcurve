@@ -2463,7 +2463,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowLeft:
         case PE_IndicatorArrowRight:
-            if(state&(State_Sunken|State_On))
+            if(state&(State_Sunken|State_On) &&
+               !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
+                             (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
                 r.adjust(1, 1, 1, 1);
             drawArrow(painter, r, element, QTC_MO_ARROW(palette.text().color()));
             break;
