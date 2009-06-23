@@ -56,7 +56,6 @@ static bool useQt3Settings()
 #include <KDE/KConfigGroup>
 #include <KDE/KIconLoader>
 #include <KDE/KIcon>
-#include <KDE/KTabWidget>
 #include <KDE/KColorScheme>
 #include <KDE/KStandardDirs>
 #include <KDE/KComponentData>
@@ -3456,16 +3455,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
             {
-#if !defined QTC_QT_ONLY
-                const KTabWidget *ktw=::qobject_cast<const KTabWidget *>(widget);
-#endif
+                struct QtcTabWidget : public QTabWidget
+                {
+                    bool tabsVisible() const { return tabBar() && tabBar()->isVisible(); }
+                };
+
                 const QTabWidget *tw((const QTabWidget *)widget);
 
-                if(0==tw->currentIndex() && tw->count()>0
-#if !defined QTC_QT_ONLY
-                    && (!ktw || !ktw->isTabBarHidden())
-#endif
-                  )
+                if(0==tw->currentIndex() && tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
                     if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
                     {
                         bool reverse(Qt::RightToLeft==twf->direction);
