@@ -2307,9 +2307,8 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
-    else if(!IS_FLAT(opts.bgndAppearance) && widget &&
-            ( detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
-              ((GTK_STATE_PRELIGHT!=state || !opts.crHighlight) && 0==strcmp(detail, "checkbutton"))) ))
+    else if(!IS_FLAT(opts.bgndAppearance) && GTK_STATE_PRELIGHT!=state &&
+            ( detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") || 0==strcmp(detail, "checkbutton"))))
         ;
     else if(DETAIL("tooltip"))
     {
