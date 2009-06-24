@@ -2174,7 +2174,7 @@ static gboolean qtInit()
 
             /* Tear off menu items dont seem to draw they're background, and the default background
                is drawn :-(  Fix/hack this by making that background the correct color */
-            if(opts.lighterPopupMenuBgnd>1)
+            if(USE_LIGHTER_POPUP_MENU)
             {
                 static const char *format="style \""QTC_RC_SETTING"Mnu\" "
                                           "{bg[NORMAL]=\"#%02X%02X%02X\"} "
@@ -2529,7 +2529,7 @@ static gboolean qtInit()
             if(!opts.popupBorder)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
                                     "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
-            else if(opts.lighterPopupMenuBgnd && !opts.borderMenuitems)
+            else if((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
 
