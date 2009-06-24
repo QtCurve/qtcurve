@@ -1661,7 +1661,8 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 QWidget *widget=(QWidget*)object;
                 QPainter painter(widget);
 
-                drawBevelGradientReal(itsLighterPopupMenuBgndCol, &painter, widget->rect(), GT_HORIZ==opts.menuBgndGrad, false,
+                drawBevelGradientReal(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
+                                      &painter, widget->rect(), GT_HORIZ==opts.menuBgndGrad, false,
                                       opts.menuBgndAppearance, WIDGET_OTHER);
             }
             else
@@ -1972,7 +1973,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if (opts.squareScrollViews && widget && ::qobject_cast<const QAbstractScrollArea *>(widget))
                 return opts.gtkScrollViews ? 1 : 2;
 
-            if (USE_LIGHTER_POPUP_MENU && !opts.borderMenuitems &&
+            if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
                 qobject_cast<const QMenu *>(widget))
                 return 1;
 
@@ -2777,7 +2778,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->setPen(use[QT_STD_BORDER]);
             drawRect(painter, r);
 
-            if(!USE_LIGHTER_POPUP_MENU)
+            if(!USE_LIGHTER_POPUP_MENU && IS_FLAT(opts.menuBgndAppearance))
             /*
             {
                 painter->setPen(itsLighterPopupMenuBgndCol);
