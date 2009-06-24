@@ -219,7 +219,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor    col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
               windowCol(widget()->palette().color(QPalette::Window));
 
-#if KDE_IS_VERSION(4,1,80)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
     if(!(Handler()->coloredShadow() && shadowsActive() && active))
 #endif
     {
@@ -239,7 +239,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
-#if KDE_IS_VERSION(4,1,80)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
     if(Handler()->coloredShadow() && shadowsActive())
     {
         opt.state|=QtC_StateKWinShadows;
