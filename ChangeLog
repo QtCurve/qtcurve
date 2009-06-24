@@ -6,7 +6,9 @@
 4. Fix some issues with oxygen-style combo buttons. (QtCurve creates maps from
    the parent -> entry, and parent -> button - these maps were not being cleared
    when the widget was destroyed).
-
+5. Dont highlight background of checks/radios when this is not enabled, but
+   gradient background is.
+   
 0.65.0
 ------
  1. Add options to draw editable combos, and spin widgets, as edit fields with
