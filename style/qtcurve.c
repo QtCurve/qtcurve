@@ -4691,8 +4691,8 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                                   (opts.colorMenubarMouseOver
                                       ? GTK_STATE_PRELIGHT==state
                                       : ((!mb || activeMb) && GTK_STATE_PRELIGHT==state)),
-                     but=FALSE,
                      def_but=FALSE,
+                     but=isOnButton(widget, 0, &def_but),
                      swap_gc=FALSE;
         GdkRectangle area2;
 
@@ -4708,7 +4708,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         int      i=0;
 
 #ifdef QTC_DEBUG
-        printf("Draw layout %s %d %d %d %s  ", pango_layout_get_text(layout), state, use_text,
+        printf("Draw layout %s %d %d %d %d %d %s  ", pango_layout_get_text(layout), x, y, state, use_text,
                 QTC_IS_MENU_ITEM(widget), detail ? detail : "NULL");
         debugDisplayWidget(widget, 3);
 #endif
@@ -4735,7 +4735,10 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-        but=isOnButton(widget, 0, &def_but) || isOnComboBox(widget, 0);
+        if(but && widget && 0==widget->allocation.height%2)
+            y++;
+        
+        but= but || isOnComboBox(widget, 0);
 
         if(isOnListViewHeader(widget, 0))
             y--;
