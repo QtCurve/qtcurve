@@ -1922,6 +1922,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                                 : PM_DefaultChildMargin, option, widget);
         case PM_MenuBarItemSpacing:
             return 0;
+        case PM_FocusFrameVMargin:
+        case PM_FocusFrameHMargin:
+            return 2;
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
 #ifdef QTC_XBAR_SUPPORT
@@ -1935,7 +1938,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuButtonIndicator:
             return QTC_DO_EFFECT ? 16 : 15;
         case PM_ButtonMargin:
-            return 3;
+            return opts.thinnerBtns && QTC_DO_EFFECT ? 4 : 6;
         case PM_TabBarTabShiftVertical:
 #ifdef QTC_STYLE_QTABBAR
             if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
@@ -6973,17 +6976,27 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
     {
         case CT_PushButton:
         {
+            newSize=size;
             newSize.setWidth(newSize.width()+4);
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                if (!btn->text.isEmpty() && "..."!=btn->text && size.width() < 80 && newSize.width()<size.width())
+                if(!btn->icon.isNull() && size.height()<btn->iconSize.height()+2)
+                    newSize.setHeight(btn->iconSize.height()+2);
+
+                int margin = pixelMetric(PM_ButtonMargin, btn, widget)+
+                             (pixelMetric(PM_DefaultFrameWidth, btn, widget) * 2);
+
+                newSize+=QSize(margin, margin);
+
+                if (!btn->text.isEmpty() && "..."!=btn->text && newSize.width() < 80)
                     newSize.setWidth(80);
                 if (btn->features&QStyleOptionButton::HasMenu)
                     newSize+=QSize(4, 0);
-                newSize+=QSize(0, QTC_DO_EFFECT && !opts.thinnerBtns ? 4 : 2);
-                if (!btn->icon.isNull() && btn->iconSize.height() > 16)
-                    newSize -= QSize(0, 2);
+                newSize.rheight() += ((1 - newSize.rheight()) & 1);
+//                 if (!btn->icon.isNull() && btn->iconSize.height() > 16)
+//                     newSize -= QSize(0, 2);
+
             }
             break;
         }
@@ -7068,7 +7081,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
         }
         case CT_ComboBox:
         {
-            newSize+=QSize(0, QTC_DO_EFFECT && !opts.thinnerBtns ? 6 : 4);
+            newSize+=QSize(0, 2);
             break;
         }
         case CT_MenuItem:
