@@ -3917,12 +3917,13 @@ debugDisplayWidget(widget, 3);
 
         if(opts.menuStripe && opts.gtkMenuStripe && !isComboMenu(widget))
         {
-            int stripeWidth=GTK_APP_OPEN_OFFICE==qtSettings.app ? 22 : 17;
+            gboolean mozOo=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
+            int stripeWidth=mozOo ? 22 : 17;
 
             // To determine stripe size, we iterate over all menuitems of this menu. If we find a GtkImageMenuItem then
             // we can a width of 20. However, we need to check that at least one enttry actually has an image! So, if
             // the first GtkImageMenuItem has an image then we're ok, otherwise we give it a blank pixmap.
-            if(GTK_APP_OPEN_OFFICE!=qtSettings.app && widget && !isMozilla())
+            if(!mozOo && widget)
             {
                 GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
                 GList        *children=menuShell->children;

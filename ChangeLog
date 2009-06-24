@@ -1,6 +1,7 @@
 0.65.1
 ------
 1. Use a border width of 1 if gradienting popupmenus.
+2. Increase width of menu stripe for Mozilla apps.
 
 0.65.0
 ------
