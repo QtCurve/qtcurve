@@ -2439,7 +2439,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if (reverse)
                         painter->drawLine(r.left(), middleV, middleH, middleV);
                     else
-                        painter->drawLine(middleH-constStep, middleV, r.right()-constStep, middleV);
+                        painter->drawLine(middleH-constStep, middleV, r.right()-(state&State_Children ? constStep : QTC_LV_SIZE+4), middleV);
                 if (state&State_Sibling && middleV<r.bottom())
                     painter->drawLine(middleH-constStep, middleV, middleH-constStep, r.bottom());
                 if (state & (State_Open | State_Children | State_Item | State_Sibling))

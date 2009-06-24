@@ -3,6 +3,7 @@
 1. Use a border width of 1 if gradienting popupmenus.
 2. Match Gtk2 button size better.
 3. Fix gradient menus when not using lighter popup menu backgrounds.
+4. Slightly better looking listview lines.
 
 0.65.0
 ------
