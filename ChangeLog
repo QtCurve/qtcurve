@@ -2,6 +2,9 @@
 ------
 1. Use a border width of 1 if gradienting popupmenus.
 2. Increase width of menu stripe for Mozilla apps.
+3. Fix some issues with oxygen-style combo buttons. (QtCurve creates maps from
+   the parent -> entry, and parent -> button - these maps were not being cleared
+   when the widget was destroyed).
 
 0.65.0
 ------

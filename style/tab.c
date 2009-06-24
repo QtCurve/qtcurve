@@ -39,6 +39,7 @@ static void qtcTabCleanup(GtkWidget *widget)
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_MOTION_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_LEAVE_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_DESTROY_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_TAB_HACK_SET");
         removeFromTabHash(widget);
@@ -164,6 +165,9 @@ static void qtcTabSetup(GtkWidget *widget)
                                                                                            (GtkSignalFunc)qtcTabLeave,
                                                                                             NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
+                                                                                             (GtkSignalFunc)qtcTabDestroy,
+                                                                                              NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize",
                                                                                              (GtkSignalFunc)qtcTabDestroy,
                                                                                               NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
