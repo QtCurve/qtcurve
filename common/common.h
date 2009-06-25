@@ -1489,7 +1489,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                         double r=((w>h ? h : w)-2)/2;
                         return r>QTC_MAX_RADIUS_INTERNAL ? QTC_MAX_RADIUS_INTERNAL : r;
                     }
-                    if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_MAX_ROUND_WIDGET(widget))
+                    if(w>(QTC_MIN_ROUND_MAX_WIDTH-2) && h>(QTC_MIN_ROUND_MAX_HEIGHT-2) && QTC_MAX_ROUND_WIDGET(widget))
                         return 8.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
