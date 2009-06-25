@@ -2106,6 +2106,9 @@ static gboolean qtInit()
             /*if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
                 qtSettings.app=GTK_APP_JAVA_SWT;*/
 
+            if(GTK_APP_JAVA==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
+                opts.bgndAppearance=APPEARANCE_FLAT;
+
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
             {
