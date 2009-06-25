@@ -3986,7 +3986,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("hseparator"))
     {
-        int offset=opts.gtkMenuStripe && isMozilla() || (widget && GTK_IS_MENU_ITEM(widget)) ? 20 : 0;
+        int offset=opts.gtkMenuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
         if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
             offset+=2;
         drawFadedLine(cr, x+1+offset, y+(height>>1), width-(1+offset), 1, &qtcPalette.background[QT_STD_BORDER], area, NULL,
@@ -5853,7 +5853,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("menuitem") || (widget && DETAIL("hseparator") && QTC_IS_MENU_ITEM(widget)))
     {
-        int offset=opts.gtkMenuStripe && isMozilla() || (widget && GTK_IS_MENU_ITEM(widget)) ? 20 : 0;
+        int offset=opts.gtkMenuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
 
         if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
             offset+=2;
