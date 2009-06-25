@@ -1130,7 +1130,13 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
             QTC_CFG_READ_BOOL(mapKdeIcons)
-            QTC_CFG_READ_BOOL(gtkMenuStripe)
+            
+            if(SHADE_NONE==opts->menuStripe)
+                opts->gtkMenuStripe=false;
+            else
+            {
+                QTC_CFG_READ_BOOL(gtkMenuStripe)
+            }
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
