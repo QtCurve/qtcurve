@@ -13,7 +13,7 @@
  8. Export activeBackground, activeForeground, inactiveBackground, and
     inactiveForeground of window manager colours  (if KDE4 home != KDE3 home)
  9. Export KDE4 fonts to KDE3 (if KDE4 home != KDE3 home)
-10. Fix radious of internal border when max rounding.
+10. Fix radius of internal border when max rounding.
 11. Fix some text-clipping on combos.
 
 0.65.0
