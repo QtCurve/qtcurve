@@ -41,7 +41,9 @@ static void qtcWidgetMapCleanup(GtkWidget *widget)
     if(g_object_get_data(G_OBJECT(widget), QTC_MAP_ID(0)) || g_object_get_data(G_OBJECT(widget), QTC_MAP_ID(1)))
     {
         g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_DELETE_ID"));
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_DESTROY_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_UNREALIZE_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID"));
         g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(0));
@@ -56,7 +58,7 @@ static gboolean qtcWidgetMapStyleSet(GtkWidget *widget, GtkStyle *previous_style
     return FALSE;
 }
  
-static gboolean qtcWidgetMapDelete(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+static gboolean qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     qtcWidgetMapCleanup(widget);
     return FALSE;
@@ -67,9 +69,12 @@ static void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
     if (from && to && !g_object_get_data(G_OBJECT(from), QTC_MAP_ID(map)))
     {
         g_object_set_data(G_OBJECT(from), QTC_MAP_ID(map), (gpointer)1);
-        g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_DELETE_ID",
+        g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_DESTROY_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(from), "destroy-event",
+                                                     (GtkSignalFunc)qtcWidgetMapDestroy, NULL));
+        g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_UNREALIZE_ID",
                           (gpointer)g_signal_connect(G_OBJECT(from), "unrealize",
-                                                     (GtkSignalFunc)qtcWidgetMapDelete, NULL));
+                                                     (GtkSignalFunc)qtcWidgetMapDestroy, NULL));
         g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID",
                           (gpointer)g_signal_connect(G_OBJECT(from), "style-set",
                                                      (GtkSignalFunc)qtcWidgetMapStyleSet, NULL));
