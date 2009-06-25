@@ -7082,7 +7082,17 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
         }
         case CT_ComboBox:
         {
-            newSize+=QSize(0, 2);
+            newSize=size;
+            newSize.setWidth(newSize.width()+4);
+
+            int margin      = pixelMetric(PM_ButtonMargin, option, widget)+
+                              (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2),
+                textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
+                // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
+                other = qMax(QTC_DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
+
+            newSize+=QSize(margin+other, margin);
+            newSize.rheight() += ((1 - newSize.rheight()) & 1);
             break;
         }
         case CT_MenuItem:
