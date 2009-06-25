@@ -3,7 +3,7 @@
  1. Use a border width of 1 if gradienting popupmenus.
  2. When using darkened menu stripe use popupmenu background colour as the
     base colour.
- 3. Draw menu stripe flush eith edge of menu.
+ 3. Draw menu stripe flush with the edge of menu.
  4. Match 'darken' menuStripe to KDE4.
  5. When using menu stripe, adjust separators by 20 (2 for Mozilla/Oo.o) pixels left.
  6. Increase width of menu stripe for Mozilla apps.
