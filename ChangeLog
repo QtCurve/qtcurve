@@ -10,6 +10,7 @@
 5. Dont highlight background of checks/radios when this is not enabled, but
    gradient background is.
 6. Match 'darken' menuStripe to KDE4.
+7. When using menu stripe, adjust separators by 20 (2 for Mozilla/Oo.o) pixels left.
 
 0.65.0
 ------
