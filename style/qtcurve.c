@@ -6315,8 +6315,12 @@ static void generateColors()
     {
         default:
         case SHADE_NONE:
+            opts.customMenuStripeColor=qtcPalette.background[ORIGINAL_SHADE];
+            break;
         case SHADE_DARKEN:
-            opts.customMenuStripeColor=qtcPalette.menu;
+            opts.customMenuStripeColor=opts.lighterPopupMenuBgnd<0
+                ? qtcPalette.menu
+                : qtcPalette.background[QTC_MENU_STRIPE_SHADE];
             break;
         case SHADE_CUSTOM:
             break;

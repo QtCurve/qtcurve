@@ -9,7 +9,8 @@
    entry after its unrealized).
 5. Dont highlight background of checks/radios when this is not enabled, but
    gradient background is.
-   
+6. Match 'darken' menuStripe to KDE4.
+
 0.65.0
 ------
  1. Add options to draw editable combos, and spin widgets, as edit fields with
