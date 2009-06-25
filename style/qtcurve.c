@@ -1955,11 +1955,10 @@ static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *are
 
         while(window && !GTK_IS_WINDOW(window))
         {
-            if(!GTK_WIDGET_NO_WINDOW(window))
+            if(!GTK_WIDGET_NO_WINDOW(window) && 0==yo)
                 yo+=widget->allocation.y;
             window=window->parent;
         }
-
         if(window)
         {
             drawBevelGradient(cr, style, area, NULL, x, -yo, width, window->allocation.height,
