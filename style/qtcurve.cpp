@@ -9763,7 +9763,7 @@ const QColor & QtCurveStyle::menuStripeCol() const
         case SHADE_SELECTED:
             return itsHighlightCols[QTC_MENU_STRIPE_SHADE];
         case SHADE_DARKEN:
-            return opts.lighterPopupMenuBgnd<0
+            return USE_LIGHTER_POPUP_MENU
                 ? itsLighterPopupMenuBgndCol
                 : itsBackgroundCols[QTC_MENU_STRIPE_SHADE];
     }

@@ -1,18 +1,20 @@
 0.65.1
 ------
  1. Use a border width of 1 if gradienting popupmenus.
- 2. Match Gtk2 button size better.
- 3. Fix gradient menus when not using lighter popup menu backgrounds.
- 4. Slightly better looking listview lines.
- 5. Use QMetaObject::invokeMethod/Qt::QueuedConnection instead of QTimer to
+ 2. When using darkened menu stripe use popupmenu background colour as the
+    base colour.
+ 3. Match Gtk2 button size better.
+ 4. Fix gradient menus when not using lighter popup menu backgrounds.
+ 5. Slightly better looking listview lines.
+ 6. Use QMetaObject::invokeMethod/Qt::QueuedConnection instead of QTimer to
     initialise KDE4 settings. Thanks to Eike Hein for the idea.
- 6. When exporting KDE4 palette to KDE3, call kde-config to ascertain KDE3's
+ 7. When exporting KDE4 palette to KDE3, call kde-config to ascertain KDE3's
     config dir.
- 7. Export activeBackground, activeForeground, inactiveBackground, and
+ 8. Export activeBackground, activeForeground, inactiveBackground, and
     inactiveForeground of window manager colours  (if KDE4 home != KDE3 home)
- 8. Export KDE4 fonts to KDE3 (if KDE4 home != KDE3 home)
- 9. Fix radious of internal border when max rounding.
-10. Fix some text-clipping on combos.
+ 9. Export KDE4 fonts to KDE3 (if KDE4 home != KDE3 home)
+10. Fix radious of internal border when max rounding.
+11. Fix some text-clipping on combos.
 
 0.65.0
 ------
