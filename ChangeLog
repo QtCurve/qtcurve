@@ -14,7 +14,8 @@
     entry after its unrealized).
  9. Dont highlight background of checks/radios when this is not enabled, but
     gradient background is.
-10. Disable background gradients for Java, Mozilla, and OpenOffice
+10. Disable background gradients for Java, Mozilla, OpenOffice, GIMP toolbox, and
+    tooltip windows.
 11. Improve background gradients when drawing parts of entries, stc.
 
 0.65.0

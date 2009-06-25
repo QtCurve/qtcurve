@@ -875,6 +875,22 @@ static gboolean isFixedWidget(GtkWidget *widget)
            GTK_IS_FIXED(widget->parent) && GTK_IS_WINDOW(widget->parent->parent);
 }
 
+static gboolean isGimpDockable(GtkWidget *widget)
+{
+    if(GTK_APP_GIMP==qtSettings.app)
+    {
+        GtkWidget *wid=widget;
+        while(wid)
+        {
+            if(0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(wid)), "GimpDockable") ||
+               0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(wid)), "GimpToolbox"))
+                return TRUE;
+            wid=wid->parent;
+        }
+    }
+    return FALSE;
+}
+
 #define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
 
 static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down, int sliderWidth, int sliderHeight)
@@ -1948,18 +1964,23 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
 static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
                                  gint x, gint y, gint width, gint height)
 {
-    if(!isFixedWidget(widget))
+    if(!isFixedWidget(widget) && !isGimpDockable(widget))
     {
         GtkWidget *window=widget;
         int       yo=0;
 
+#ifdef QTC_DEBUG
+printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
+debugDisplayWidget(widget, 20);
+#endif
         while(window && !GTK_IS_WINDOW(window))
         {
             if(!GTK_WIDGET_NO_WINDOW(window) && 0==yo)
                 yo+=widget->allocation.y;
             window=window->parent;
         }
-        if(window)
+
+        if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
             drawBevelGradient(cr, style, area, NULL, x, -yo, width, window->allocation.height,
                               &style->bg[GTK_STATE_NORMAL], GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER);
