@@ -120,7 +120,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void removeGradStop();
     void updateGradStop();
     void stopSelected();
-    void exportColors();
+    void exportKDE3();
     void exportQt();
 
     private:

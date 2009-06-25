@@ -922,7 +922,8 @@ QtCurveStyle::QtCurveStyle(const QString &name)
         opts.titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
 
 #if !defined QTC_QT_ONLY
-    QTimer::singleShot(0, this, SLOT(setupKde4()));
+    QMetaObject::invokeMethod(this, SLOT(setupKde4()), Qt::QueuedConnection);
+    //QTimer::singleShot(0, this, SLOT(setupKde4()));
 #endif
 }
 

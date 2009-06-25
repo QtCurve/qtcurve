@@ -204,6 +204,50 @@ void CGradientPreview::setColor(const QColor &col)
     }
 }
 
+static QString readEnvPath(const char *env)
+{
+   const char *path=getenv(env);
+
+   return path ? QFile::decodeName(path) : QString::null;
+}
+static QString kdeHome(bool kde3)
+{
+    static QString kdeHome[2];
+
+    // Execute kde-config to ascertain users KDEHOME
+    if(kdeHome[kde3 ? 0 : 1].isEmpty())
+    {
+        FILE *fpipe;
+
+        if (fpipe = (FILE*)popen(kde3 ? "kde-config --localprefix" : "kde4-config --localprefix", "r"))
+        {
+            char line[1024];
+
+            while(fgets(line, sizeof line, fpipe))
+            {
+                kdeHome[kde3 ? 0 : 1]=QFile::decodeName(line).replace("\n", "");
+                break;
+            }
+            pclose(fpipe);
+        }
+    }
+
+    // Try env vars...
+    if(kdeHome[kde3 ? 0 : 1].isEmpty())
+    {
+        kdeHome[kde3 ? 0 : 1]=readEnvPath(getuid() ? "KDEHOME" : "KDEROOTHOME");
+        if (kdeHome[kde3 ? 0 : 1].isEmpty())
+        {
+            QDir    homeDir(QDir::homePath());
+            QString kdeConfDir("/.kde");
+            if (!kde3 && homeDir.exists(".kde4"))
+                kdeConfDir = QString("/.kde4");
+            kdeHome[kde3 ? 0 : 1] = QDir::homePath() + kdeConfDir;
+        }
+    }
+    return kdeHome[kde3 ? 0 : 1];
+}
+
 static int toInt(const QString &str)
 {
     return str.length()>1 ? str[0].unicode() : 0;
@@ -631,7 +675,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addSeparator();
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
     menu->addSeparator();
-    menu->addAction(i18n("Export KDE4 colors to KDE3..."), this, SLOT(exportColors()));
+    menu->addAction(i18n("Export KDE4 font && colors to KDE3..."), this, SLOT(exportKDE3()));
     menu->addAction(i18n("Export KDE4 font && colors to Qt3..."), this, SLOT(exportQt()));
     loadStyles(subMenu);
     setupGradientsTab();
@@ -667,8 +711,8 @@ void QtCurveConfig::save()
     writeConfig(NULL, opts, defaultStyle);
 
     // This is only read by KDE3...
-    KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
-    KConfigGroup kde(&kglobals, "KDE");
+    KConfig      k3globals(kdeHome(true)+"/share/config/kdeglobals", KConfig::CascadeConfig);
+    KConfigGroup kde(&k3globals, "KDE");
 
     if(opts.gtkButtonOrder)
         kde.writeEntry("ButtonLayout", 2);
@@ -1096,25 +1140,49 @@ void QtCurveConfig::stopSelected()
     }
 }
 
-void QtCurveConfig::exportColors()
+void QtCurveConfig::exportKDE3()
 {
-    if(KMessageBox::Yes==KMessageBox::questionYesNo(this, i18n("Export your current KDE4 color palette so that it "
-                                                               "can be used by KDE3 applications?")))
+    if(KMessageBox::Yes==KMessageBox::questionYesNo(this, i18n("Export your current KDE4 color palette, and font, so "
+                                                               "that they can be used by KDE3 applications?")))
     {
-        KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
-        KConfigGroup group(&kglobals, "General");
+        QString      kde3Home(kdeHome(true));
+        KConfig      k3globals(kde3Home+"/share/config/kdeglobals", KConfig::NoGlobals);
+        KConfigGroup general(&k3globals, "General");
+        KConfigGroup wm(&k3globals, "WM");
 
-        group.writeEntry("alternateBackground", palette().color(QPalette::Active, QPalette::AlternateBase));
-        group.writeEntry("background", palette().color(QPalette::Active, QPalette::Window));
-        group.writeEntry("buttonBackground", palette().color(QPalette::Active, QPalette::Button));
-        group.writeEntry("buttonForeground", palette().color(QPalette::Active, QPalette::ButtonText));
-        group.writeEntry("foreground", palette().color(QPalette::Active, QPalette::WindowText));
-        group.writeEntry("selectBackground", palette().color(QPalette::Active, QPalette::Highlight));
-        group.writeEntry("selectForeground", palette().color(QPalette::Active, QPalette::HighlightedText));
-        group.writeEntry("windowBackground", palette().color(QPalette::Active, QPalette::Base));
-        group.writeEntry("windowForeground", palette().color(QPalette::Active, QPalette::Text));
-        group.writeEntry("linkColor", palette().color(QPalette::Active, QPalette::Link));
-        group.writeEntry("visitedLinkColor", palette().color(QPalette::Active, QPalette::LinkVisited));
+        general.writeEntry("alternateBackground", palette().color(QPalette::Active, QPalette::AlternateBase));
+        general.writeEntry("background", palette().color(QPalette::Active, QPalette::Window));
+        general.writeEntry("buttonBackground", palette().color(QPalette::Active, QPalette::Button));
+        general.writeEntry("buttonForeground", palette().color(QPalette::Active, QPalette::ButtonText));
+        general.writeEntry("foreground", palette().color(QPalette::Active, QPalette::WindowText));
+        general.writeEntry("selectBackground", palette().color(QPalette::Active, QPalette::Highlight));
+        general.writeEntry("selectForeground", palette().color(QPalette::Active, QPalette::HighlightedText));
+        general.writeEntry("windowBackground", palette().color(QPalette::Active, QPalette::Base));
+        general.writeEntry("windowForeground", palette().color(QPalette::Active, QPalette::Text));
+        general.writeEntry("linkColor", palette().color(QPalette::Active, QPalette::Link));
+        general.writeEntry("visitedLinkColor", palette().color(QPalette::Active, QPalette::LinkVisited));
+
+        if(kdeHome(false)!=kde3Home)
+        {
+            KConfigGroup k4General(KGlobal::config(), "General");
+            KConfigGroup k4wm(KGlobal::config(), "WM");
+            
+            // Mainly for K3B...
+            wm.writeEntry("activeBackground", k4wm.readEntry("activeBackground",
+                                                             palette().color(QPalette::Active, QPalette::Window)));
+            wm.writeEntry("activeForeground", k4wm.readEntry("activeForeground",
+                                                             palette().color(QPalette::Active, QPalette::WindowText)));
+            wm.writeEntry("inactiveBackground", k4wm.readEntry("inactiveBackground",
+                                                               palette().color(QPalette::Inactive, QPalette::Window)));
+            wm.writeEntry("inactiveForeground", k4wm.readEntry("inactiveForeground",
+                                                               palette().color(QPalette::Inactive, QPalette::WindowText)));
+            // Font settings...
+            general.writeEntry("font", k4General.readEntry("font", font()));
+            general.writeEntry("fixed", k4General.readEntry("fixed", font()));
+            general.writeEntry("desktopFont", k4General.readEntry("desktopFont", font()));
+            general.writeEntry("taskbarFont", k4General.readEntry("taskbarFont", font()));
+            general.writeEntry("toolBarFont", k4General.readEntry("toolBarFont", font()));
+        }
     }
 }
 
@@ -1160,6 +1228,8 @@ void QtCurveConfig::exportQt()
             dis << p.color(QPalette::Disabled, roles[i]).name();
         }
 
+        KConfigGroup k4General(KGlobal::config(), "General");
+        gen.writeEntry("font", k4General.readEntry("font", font()));
         gen.writeEntry("font", font());
         pal.writeEntry("active", act.join(sep));
         pal.writeEntry("disabled", dis.join(sep));
