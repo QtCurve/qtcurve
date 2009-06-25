@@ -3957,7 +3957,7 @@ debugDisplayWidget(widget, 3);
                 }
             }
 
-            drawBevelGradient(cr, style, area, NULL, x+2, y+2, stripeWidth, height-4,
+            drawBevelGradient(cr, style, area, NULL, x+1, y+1, stripeWidth+1, height-2,
                               &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
         }
 

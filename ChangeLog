@@ -3,16 +3,17 @@
 1. Use a border width of 1 if gradienting popupmenus.
 2. When using darkened menu stripe use popupmenu background colour as the
    base colour.
-2. Match KDE4 button text position better.
-3. Increase width of menu stripe for Mozilla apps.
-4. Fix some issues with oxygen-style combo buttons. (QtCurve creates maps from
+3. Draw menu stripe flush eith edge of menu.
+4. Match 'darken' menuStripe to KDE4.
+5. When using menu stripe, adjust separators by 20 (2 for Mozilla/Oo.o) pixels left.
+6. Increase width of menu stripe for Mozilla apps.
+7. Match KDE4 button text position better.
+8. Fix some issues with oxygen-style combo buttons. (QtCurve creates maps from
    the parent -> entry, and parent -> button - these maps were not being cleared
    when the widget was destroyed. Also, dont keep reference to last moused-overed
    entry after its unrealized).
-5. Dont highlight background of checks/radios when this is not enabled, but
+9. Dont highlight background of checks/radios when this is not enabled, but
    gradient background is.
-6. Match 'darken' menuStripe to KDE4.
-7. When using menu stripe, adjust separators by 20 (2 for Mozilla/Oo.o) pixels left.
 
 0.65.0
 ------
