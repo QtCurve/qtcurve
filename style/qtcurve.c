@@ -3957,7 +3957,7 @@ debugDisplayWidget(widget, 3);
         if(opts.menuStripe && opts.gtkMenuStripe && !isComboMenu(widget))
         {
             gboolean mozOo=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
-            int stripeWidth=mozOo ? 22 : 17;
+            int stripeWidth=mozOo ? 22 : 21;
 
             // To determine stripe size, we iterate over all menuitems of this menu. If we find a GtkImageMenuItem then
             // we can a width of 20. However, we need to check that at least one enttry actually has an image! So, if
@@ -3972,7 +3972,7 @@ debugDisplayWidget(widget, 3);
                     if(GTK_IS_IMAGE_MENU_ITEM(children->data))
                     {
                         GtkImageMenuItem *item=GTK_IMAGE_MENU_ITEM(children->data);
-                        stripeWidth=20;
+                        stripeWidth=21;
 
                         if(0L==gtk_image_menu_item_get_image(item) ||
                            (GTK_IS_IMAGE(gtk_image_menu_item_get_image(item)) &&
@@ -4436,7 +4436,7 @@ debugDisplayWidget(widget, 3);
                                         : &style->base[GTK_STATE_NORMAL];
 
         if(mnu)
-            x--, y--, width=QTC_CHECK_SIZE, height=QTC_CHECK_SIZE;
+            y++, width=QTC_CHECK_SIZE, height=QTC_CHECK_SIZE;
         /*else if(list)
             y++, width=QTC_CHECK_SIZE, height=QTC_CHECK_SIZE;*/
 
@@ -4580,7 +4580,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 //             y++;
 
         if(mnu)
-            x-=2;
+            y+=2;
 
         {
             GdkColor  new_colors[TOTAL_SHADES+1],

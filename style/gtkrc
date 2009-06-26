@@ -34,7 +34,7 @@ style "qtcurve-default"
   GtkMenu::vertical-padding = 0
   GtkMenu::horizontal-offset = -2
   GtkMenu::vertical-offset = 1
-
+  GtkCheckMenuItem::indicator-size=17
   xthickness = 1
   ythickness = 1
 
