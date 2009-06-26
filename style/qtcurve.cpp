@@ -1939,7 +1939,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuButtonIndicator:
             return QTC_DO_EFFECT ? 16 : 15;
         case PM_ButtonMargin:
-            return opts.thinnerBtns && QTC_DO_EFFECT ? 4 : 6;
+            return QTC_DO_EFFECT
+                    ? opts.thinnerBtns ? 4 : 6
+                    : opts.thinnerBtns ? 2 : 4;
         case PM_TabBarTabShiftVertical:
 #ifdef QTC_STYLE_QTABBAR
             if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
