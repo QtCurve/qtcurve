@@ -15,13 +15,14 @@
     entry after its unrealized).
 10. Dont highlight background of checks/radios when this is not enabled, but
     gradient background is.
-11. Disable background gradients for Java, Mozilla, and OpenOffice.
-12. Dont use background gradient for GIMP toolbox or tooltip windows.
-13. Improve background gradients when drawing parts of entries, etc.
-14. Very hackish fix to the border around the icons within firefox's location and
+11. Disable background gradients for Java, Mozilla, OpenOffice, GIMP toolbox, and
+    tooltip windows.
+12. Improve background gradients when drawing parts of entries, etc.
+13. Very hackish fix to the border around the icons within firefox's location and
     search entry fields. Disabled by default, to enable pass
     -DQTC_FIX_FIREFOX_LOCATION_BAR=true to cmake. Note that enabling this may
     cause issues with other entry fields in firefox.
+14. Move radios in menus 2 pixels to the left.
 
 0.65.0
 ------

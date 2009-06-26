@@ -4579,6 +4579,9 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 //         if(mnu)
 //             y++;
 
+        if(mnu)
+            x-=2;
+
         {
             GdkColor  new_colors[TOTAL_SHADES+1],
                       *btn_colors;
