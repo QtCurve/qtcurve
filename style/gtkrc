@@ -25,6 +25,7 @@ style "qtcurve-default"
   GtkScrollbar::min_slider_length = 16
   GtkCheckButton::indicator_size = 13
   GtkMenuBar::internal-padding = 0
+  GtkToolbar::internal-padding = 2
   GtkNotebook::tab-overlap = 2
   GtkNotebook::tab-curvature = 4
   GtkStatusbar::shadow-type = 0
