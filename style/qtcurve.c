@@ -835,7 +835,7 @@ static gboolean isComboMenu(GtkWidget *widget)
         GtkWidget *top=gtk_widget_get_toplevel(widget);
 
         return top && (isComboBoxPopupWindow(GTK_BIN(top)->child, 0) ||
-                       GTK_IS_DIALOG(top) || /* Dialogs should not have menus! */
+                       //GTK_IS_DIALOG(top) || /* Dialogs should not have menus! */
                        (GTK_IS_WINDOW(top) && GTK_WINDOW(top)->transient_parent &&
                         GTK_BIN(GTK_WINDOW(top)->transient_parent)->child &&
                         isComboMenu(GTK_BIN(GTK_WINDOW(top)->transient_parent)->child)));
