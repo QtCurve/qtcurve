@@ -126,7 +126,16 @@ if (GTK_INCLUDE_DIR)
                 "             KDE_SESSION_VERSION is not set\n"
                 "**************************************************************\n")
     endif(QTC_DEFAULT_TO_KDE3)
-
+    if(QTC_FIX_FIREFOX_LOCATION_BAR)
+        message("\n**************************************************************\n"
+                "**************************************************************\n"
+                "Warning: You have enabled the option for QtCurve to attempt to\n"
+                "         improve the look for Firefox's location and seatch entry\n"
+                "         fields. Note: This may also have side-effects on other\n"
+                "         entry fields in firefox.\n"
+                "**************************************************************\n"
+                "**************************************************************\n")
+    endif(QTC_FIX_FIREFOX_LOCATION_BAR)
     if(QTC_MODIFY_MOZILLA)
         message("\n**************************************************************\n"
                 "**************************************************************\n"

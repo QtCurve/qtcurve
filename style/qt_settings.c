@@ -175,6 +175,10 @@ struct QtData
     EGtkApp         app;
     gboolean        qt4,
                     inactiveChangeSelectionColor;
+#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+    gboolean        isBrowser;
+    int             fontSize;
+#endif
 };
 
 #include <gmodule.h>
@@ -706,6 +710,11 @@ static void setFont(QtFontDetails *font, int f)
             weightStr(font->weight),
             italicStr(font->italic),
             (int)font->size);
+
+#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+    if(FONT_GENERAL==f)
+        qtSettings.fontSize=(int)(font->size);
+#endif
 
     /* Qt uses a bold font for progressbars, try to mimic this... */
     if(FONT_GENERAL==f && font->weight>=WEIGHT_NORMAL && font->weight<WEIGHT_DEMIBOLD)
@@ -2052,6 +2061,9 @@ static gboolean qtInit()
                          mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(app, "seamonkey");
 
+#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+                qtSettings.isBrowser=firefox;
+#endif
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
                     int mozVersion=getMozillaVersion(getpid());

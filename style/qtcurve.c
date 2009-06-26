@@ -2004,6 +2004,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                         : highlightReal
                             ? qtcPalette.focus
                             : qtcPalette.background;
+    int      origHeight=height;
 
     if(GTK_APP_JAVA!=qtSettings.app)
         qtcEntrySetup(widget);
@@ -2046,6 +2047,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
 printf("Draw entry_field %d %d %d %d %d %d ", state, x, y, width, height, round);
 debugDisplayWidget(widget, 3);
 #endif
+
     if(ROUNDED_ALL!=round)
     {
         if(WIDGET_SPIN==w || WIDGET_COMBO_BUTTON==w)
@@ -2097,6 +2099,22 @@ debugDisplayWidget(widget, 3);
         drawEtch(cr, region ? NULL : area, region, widget, x, y, width, height, FALSE, round, WIDGET_ENTRY);
         gdk_region_destroy(region);
     }
+
+#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+    if(qtSettings.isBrowser && isMozilla() && WIDGET_ENTRY==w && widget && 28==origHeight && qtSettings.fontSize<=12)
+    {
+        gboolean search=GTK_IS_ENTRY(widget) && isFixedWidget(widget),
+                 location=!search && widget->parent && GTK_IS_COMBO_BOX_ENTRY(widget->parent) && isFixedWidget(widget->parent);
+
+        if(search || location)
+        {
+            cairo_new_path(cr);
+            cairo_rectangle(cr, xo+2.5, yo+2.5, search ? 39 : 25, heighto-5);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[GTK_STATE_NORMAL]));
+            cairo_stroke(cr);
+        }
+    }
+#endif
 
     drawBorder(cr, style, !widget || GTK_WIDGET_IS_SENSITIVE(widget) ? state : GTK_STATE_INSENSITIVE, area, NULL, xo, yo, widtho, heighto,
                colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);

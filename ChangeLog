@@ -18,6 +18,10 @@
 11. Disable background gradients for Java, Mozilla, OpenOffice, GIMP toolbox, and
     tooltip windows.
 12. Improve background gradients when drawing parts of entries, etc.
+13. Very hackish fix to the border around the icons within firefox's location and
+    search entry fields. Disabled by default, to enable pass
+    -DQTC_FIX_FIREFOX_LOCATION_BAR=true to cmake. Note that enabling this may
+    cause issues with other entry fields in firefox.
 
 0.65.0
 ------
