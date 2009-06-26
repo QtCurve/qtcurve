@@ -17,7 +17,7 @@
     gradient background is.
 11. Disable background gradients for Java, Mozilla, OpenOffice, GIMP toolbox, and
     tooltip windows.
-12. Improve background gradients when drawing parts of entries, stc.
+12. Improve background gradients when drawing parts of entries, etc.
 
 0.65.0
 ------
