@@ -5604,7 +5604,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             drawTbArrow(this, tb, pr, painter, widget);
                         else
                         {
-                            if (tb->features&QStyleOptionToolButton::HasMenu)
+                            if (!(tb->subControls&SC_ToolButtonMenu) && tb->features&QStyleOptionToolButton::HasMenu)
                                 pr.adjust(-LARGE_ARR_WIDTH, 0, 0, 0);
                             drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
                         }
