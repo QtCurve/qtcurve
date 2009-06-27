@@ -8327,7 +8327,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     if(!colouredMouseOver && lightBorder)
     {
         p->setPen(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
-        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)));
+        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || (opts.titlebarBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w)) ||
             (draw3d && option->state&State_Raised))
@@ -8337,7 +8337,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         int          dark(/*bevelledButton ? */2/* : 4*/);
 
         buildSplitPath(r, w, round,
-                       getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL),
+                       getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
                        innerTlPath, innerBrPath);
 
         p->setPen(border[colouredMouseOver ? QTC_MO_STD_LIGHT(w, sunken) : (sunken ? dark : 0)]);
