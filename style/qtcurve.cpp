@@ -8449,7 +8449,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget)
     const QWidget *window = widget->window();
     // get coordinates relative to the client area
     const QWidget *w = widget;
-    int           x = 0, y = 0;
+    int           y = 0;
 
     while (!w->isWindow())
     {
@@ -8702,7 +8702,7 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
         drawMdiIcon(p, colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
                         ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
                         : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : textColor),
-                    shadow, rect, hover, sunken, sc,  colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL);
+                    shadow, rect, hover, sunken, sc);
     }
 }
                 
@@ -8728,22 +8728,20 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
 }
 
 void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r,
-                               bool hover, bool sunken, SubControl button, bool customCol) const
+                               bool hover, bool sunken, SubControl button) const
 {
-    static const int margin(6);
-
     if(!sunken) // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
-        drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, margin, button);
+        drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, button);
 
     QColor col(color);
 
     if(!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
         col.setAlphaF(HOVER_BUTTON_ALPHA);
 
-    drawWindowIcon(painter, col, r, sunken, margin, button);
+    drawWindowIcon(painter, col, r, sunken, button);
 }
 
-void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, int margin, SubControl button) const
+void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, SubControl button) const
 {
     static const int constIconSize=9;
     
