@@ -1375,6 +1375,9 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
+    width--;
+    height--;
+
     {
     double       radius=getRadius(&opts, width, height, widget, RADIUS_EXTERNAL),
                  xd=x+0.5,
@@ -1395,9 +1398,6 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
 
     setCairoClipping(cr, area, region);
 
-    width--;
-    height--;
-
     switch(borderProfile)
     {
         case BORDER_FLAT:
@@ -1406,7 +1406,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
         case BORDER_SUNKEN:
         case BORDER_LIGHT:
         {
-            double radiusi=getRadius(&opts, width, height, widget, RADIUS_INTERNAL),
+            double radiusi=getRadius(&opts, width-2, height-2, widget, RADIUS_INTERNAL),
                    xdi=xd+1,
                    ydi=yd+1,
                    alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
@@ -1559,7 +1559,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
     if(width>0 && height>0)
     {
-        clipPath(cr, x, y, width, height, widget, RADIUS_INTERNAL, round);
+        clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
         drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, base, horiz,
                           sunken && !IS_TROUGH(widget), app, widget);
 
