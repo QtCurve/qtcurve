@@ -23,6 +23,7 @@
     -DQTC_FIX_FIREFOX_LOCATION_BAR=true to cmake. Note that enabling this may
     cause issues with other entry fields in firefox.
 14. Adjust position of checks and radios in menus.
+15. Fix memory leak by calling parent class's fianlize method in QtCurve's.
 
 0.65.0
 ------

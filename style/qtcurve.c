@@ -6540,6 +6540,8 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 static void qtcurve_rc_style_finalize(GObject *object)
 {
     qtc_animation_cleanup();
+    if (G_OBJECT_CLASS(parent_rc_class)->finalize != NULL)
+        G_OBJECT_CLASS(parent_rc_class)->finalize(object);
 }
 
 static void qtcurve_rc_style_class_init(QtCurveRcStyleClass *klass)
