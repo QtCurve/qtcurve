@@ -1493,10 +1493,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                         return 8.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
-                       (WIDGET_SB_SLIDER==widget || (w>QTC_MIN_ROUND_EXTRA_SIZE(widget) && h>QTC_MIN_ROUND_EXTRA_SIZE(widget))))
+                       (WIDGET_SB_SLIDER==widget || (w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)-2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)-2))))
                         return QTC_EXTRA_INNER_RADIUS;
                 case ROUND_FULL:
-                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
+                    if(w>(QTC_MIN_ROUND_FULL_SIZE-2) && h>(QTC_MIN_ROUND_FULL_SIZE-2))
                         return QTC_FULL_INNER_RADIUS;
                 case ROUND_SLIGHT:
                     return QTC_SLIGHT_INNER_RADIUS;
@@ -1547,10 +1547,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                         return 10.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
-                       w>QTC_MIN_ROUND_EXTRA_SIZE(widget) && h>QTC_MIN_ROUND_EXTRA_SIZE(widget))
+                       w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2))
                         return QTC_EXTRA_ETCH_RADIUS;
                 case ROUND_FULL:
-                    if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
+                    if(w>(QTC_MIN_ROUND_FULL_SIZE+2) && h>(QTC_MIN_ROUND_FULL_SIZE+2))
                         return QTC_FULL_ETCH_RADIUS;
                 case ROUND_SLIGHT:
                     return QTC_SLIGHT_ETCH_RADIUS;

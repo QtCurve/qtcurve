@@ -8234,7 +8234,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
 
     if(r.width()>0 && r.height()>0)
     {
-        double radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+        double radius=getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL),
                modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
                modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
 
@@ -8327,7 +8327,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     if(!colouredMouseOver && lightBorder)
     {
         p->setPen(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
-        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
+        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || (opts.titlebarBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w)) ||
             (draw3d && option->state&State_Raised))
@@ -8337,7 +8337,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         int          dark(/*bevelledButton ? */2/* : 4*/);
 
         buildSplitPath(r, w, round,
-                       getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+                       getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL),
                        innerTlPath, innerBrPath);
 
         p->setPen(border[colouredMouseOver ? QTC_MO_STD_LIGHT(w, sunken) : (sunken ? dark : 0)]);
@@ -8627,7 +8627,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     //             if(window)
     //                 tl.setAlphaF(0.5);
 
-                buildSplitPath(r.adjusted(1, 1, -1, -1), w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+                QRect inner(r.adjusted(1, 1, -1, -1));
+                
+                buildSplitPath(inner, w, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL),
                                topPath, botPath);
 
                 p->setPen((enabled || BORDER_SUNKEN==borderProfile) &&
@@ -8807,7 +8809,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
     if(fill)
     {
         p->setClipPath(buildPath(r, WIDGET_ENTRY, round,
-                                 getRadius(&opts, r.width(), r.height(), WIDGET_ENTRY, RADIUS_INTERNAL)));
+                                 getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)));
         p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.brush(QPalette::Base));
         p->setClipping(false);
     }
