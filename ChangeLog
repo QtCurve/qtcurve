@@ -15,6 +15,7 @@
  9. Export KDE4 fonts to KDE3 (if KDE4 home != KDE3 home)
 10. Fix radius of internal border when max rounding.
 11. Fix some text-clipping on combos.
+12. Still draw menu/toolbar gradients if using background gradient.
 
 0.65.0
 ------
