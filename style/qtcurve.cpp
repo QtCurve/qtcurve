@@ -8234,12 +8234,8 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
 
     if(r.width()>0 && r.height()>0)
     {
-        double radius=getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL),
-               modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
-               modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
-
         p->save();
-        p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
+        p->setClipPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)), Qt::IntersectClip);
 
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
             drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
