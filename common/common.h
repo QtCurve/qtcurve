@@ -149,7 +149,7 @@ typedef GdkColor color;
 #define QTC_SLIDER_SIZE (opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? DEFAULT_SLIDER_WIDTH-2 : opts.sliderWidth)
 #define QTC_GLOW_MO        1 /*ORIGINAL_SHADE*/
 #define QTC_GLOW_DEFBTN    1
-#define QTC_GLOW_ALPHA(DEF) (DEF ? 0.5 : 0.65)
+#define QTC_GLOW_ALPHA(DEF) ((DEF) ? 0.5 : 0.65)
 #define QTC_DEF_BNT_TINT   0.4
 #define QTC_ENTRY_INNER_ALPHA 0.4
 
@@ -174,7 +174,7 @@ typedef GdkColor color;
 #define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
 #define QTC_COLOR_SEL_TAB_FACTOR 0.25
 
-#define INVERT_SHADE(A) (1.0+(1.0-A))
+#define INVERT_SHADE(A) (1.0+(1.0-(A)))
 
 #define QTC_ROUNDED (ROUND_NONE!=opts.round)
 
@@ -182,9 +182,9 @@ typedef GdkColor color;
 #define QTC_FADE_SIZE              0.4
 #define QTC_ETCHED_DARK            0.95
 
-#define IS_GLASS(A) (APPEARANCE_DULL_GLASS==A || APPEARANCE_SHINY_GLASS==A)
-#define IS_CUSTOM(A) (A>=APPEARANCE_CUSTOM1 && A<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
-#define IS_FLAT(A)  (APPEARANCE_FLAT==A || APPEARANCE_RAISED==A || APPEARANCE_FADE==A)
+#define IS_GLASS(A) (APPEARANCE_DULL_GLASS==(A) || APPEARANCE_SHINY_GLASS==(A))
+#define IS_CUSTOM(A) ((A)>=APPEARANCE_CUSTOM1 && (A)<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
+#define IS_FLAT(A)  (APPEARANCE_FLAT==(A) || APPEARANCE_RAISED==(A) || APPEARANCE_FADE==(A))
 
 #ifdef __cplusplus
 #define MENUBAR_DARK_LIMIT 160
@@ -194,7 +194,7 @@ typedef GdkColor color;
 #define TOO_DARK(A) ((A).red<MENUBAR_DARK_LIMIT || (A).green<MENUBAR_DARK_LIMIT || (A).blue<MENUBAR_DARK_LIMIT)
 #endif
 
-#define QTC_TO_FACTOR(A) ((100.0+((double)A))/100.0)
+#define QTC_TO_FACTOR(A) ((100.0+((double)(A)))/100.0)
 #define DEFAULT_HIGHLIGHT_FACTOR                   3
 #define MAX_HIGHLIGHT_FACTOR                      50
 #define MIN_HIGHLIGHT_FACTOR                     -50
@@ -224,40 +224,39 @@ typedef GdkColor color;
 #define NUM_SPLITTER_DASHES 21
 
 #ifdef __cplusplus
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
-                          WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_MDI_WINDOW_BUTTON==w || \
-                          WIDGET_TOOLBAR_BUTTON==w )
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
-                        WIDGET_FILLED_SLIDER_TROUGH==w || WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_TOOLBAR_BUTTON==w)
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
+                          WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || \
+                          WIDGET_TOOLBAR_BUTTON==(w) )
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
+                        WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
 #else
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_CHECKBOX==w || \
-                          WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w || WIDGET_UNCOLOURED_MO_BUTTON==w || \
-                          WIDGET_TOOLBAR_BUTTON==w)
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==w || WIDGET_DEF_BUTTON==w || WIDGET_TOGGLE_BUTTON==w || WIDGET_SLIDER_TROUGH==w || \
-                        WIDGET_FILLED_SLIDER_TROUGH==w || WIDGET_COMBO==w || WIDGET_UNCOLOURED_MO_BUTTON==w || \
-                        WIDGET_TOOLBAR_BUTTON==w)
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
+                          WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
+                          WIDGET_TOOLBAR_BUTTON==(w))
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
+                        WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_COMBO==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
+                        WIDGET_TOOLBAR_BUTTON==(w))
 #endif
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define QTC_DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    ((!SUKEN && (GB_LIGHT==getGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=WIDGET && !IS_TROUGH(WIDGET) && \
-                          (WIDGET_DEF_BUTTON!=WIDGET || IND_COLORED!=opts.defBtnIndicator)) || \
-                          (WIDGET_PROGRESSBAR==WIDGET && APPEARANCE_FLAT!=APP && \
-                           APPEARANCE_RAISED!=APP && APPEARANCE_INVERTED!=APP && APPEARANCE_BEVELLED!=APP))
+    ((!(SUKEN) && (GB_LIGHT==getGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=(WIDGET) && !IS_TROUGH(WIDGET) && \
+                          (WIDGET_DEF_BUTTON!=(WIDGET) || IND_COLORED!=opts.defBtnIndicator)) || \
+                          (WIDGET_PROGRESSBAR==(WIDGET) && APPEARANCE_FLAT!=(APP) && \
+                           APPEARANCE_RAISED!=(APP) && APPEARANCE_INVERTED!=(APP) && APPEARANCE_BEVELLED!=(APP)))
 
 #define QTC_DRAW_3D_FULL_BORDER(SUNKEN, APP) \
-    (!SUNKEN && GB_3D_FULL==getGradient(APP, &opts)->border)
+    (!(SUNKEN) && GB_3D_FULL==getGradient((APP), &opts)->border)
     
 #define QTC_DRAW_3D_BORDER(SUNKEN, APP) \
-    (!SUNKEN && GB_3D==getGradient(APP, &opts)->border)
+    (!(SUNKEN) && GB_3D==getGradient((APP), &opts)->border)
 
-#define QTC_LIGHT_BORDER(APP) (APPEARANCE_DULL_GLASS==APP ? 1 : 0)
+#define QTC_LIGHT_BORDER(APP) (APPEARANCE_DULL_GLASS==(APP) ? 1 : 0)
 
 #define PROGRESS_ANIMATION 100
-#define MIN_SLIDER_SIZE(A) (LINE_DOTS==A ? 24 : 20)
+#define MIN_SLIDER_SIZE(A) (LINE_DOTS==(A) ? 24 : 20)
 
-#define QTC_TAB_APP(A)   (APPEARANCE_BEVELLED==A || APPEARANCE_SPLIT_GRADIENT==A \
-                            ? APPEARANCE_GRADIENT : A)
+#define QTC_TAB_APP(A)   (APPEARANCE_BEVELLED==(A) || APPEARANCE_SPLIT_GRADIENT==(A) ? APPEARANCE_GRADIENT : (A))
 #define QTC_NORM_TAB_APP QTC_TAB_APP(opts.tabAppearance)
 #define QTC_SEL_TAB_APP  QTC_TAB_APP(opts.activeTabAppearance)
 
@@ -272,8 +271,8 @@ typedef GdkColor color;
 
 #define QTC_CR_MO_FILL          1
 #define QTC_MO_DEF_BTN          2
-#define QTC_MO_PLASTIK_DARK(W)  (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 3 : 2) /*? 2 : 1) */
-#define QTC_MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==W && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
+#define QTC_MO_PLASTIK_DARK(W)  (WIDGET_DEF_BUTTON==(W) && IND_COLORED==opts.defBtnIndicator ? 3 : 2) /*? 2 : 1) */
+#define QTC_MO_PLASTIK_LIGHT(W) (WIDGET_DEF_BUTTON==(W) && IND_COLORED==opts.defBtnIndicator ? 4 : 1) /*? 2 : 0) */
 
 #define QTC_MO_STD_DARK(W)     (MO_GLOW==opts.coloredMouseOver \
                                     ? 1 \
@@ -480,9 +479,9 @@ typedef enum
     QTC_NUM_STD_APP = APPEARANCE_LV_BEVELLED-QTC_NUM_CUSTOM_GRAD
 } EAppearance;
 
-#define IS_SLIDER(W)        (WIDGET_SLIDER==W || WIDGET_SB_SLIDER==W)
-#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==W || WIDGET_PBAR_TROUGH==W || WIDGET_TROUGH==W || WIDGET_FILLED_SLIDER_TROUGH==W)
-#define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==W || WIDGET_CHECKBOX==W)
+#define IS_SLIDER(W)        (WIDGET_SLIDER==(W) || WIDGET_SB_SLIDER==(W))
+#define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==(W) || WIDGET_PBAR_TROUGH==(W) || WIDGET_TROUGH==(W) || WIDGET_FILLED_SLIDER_TROUGH==(W))
+#define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==(W) || WIDGET_CHECKBOX==(W))
 
 typedef enum
 {
@@ -639,17 +638,6 @@ typedef enum
     ALIGN_RIGHT
 } EAlign;
 #endif
-
-#define DEF_IND_STR                "fontcolor"
-#define DEF_LINE_STR               "dots"
-#define DEF_TB_BORDER              "none"
-#define DEF_APPEARANCE_STR         "bevelled"
-#define DEF_MENU_APPEARANCE_STR    "gradient"
-#define DEF_TOOLBAR_APPEARANCE_STR "gradient"
-#define DEF_SLIDER_SHADE_STR       "selected"
-#define DEF_TBS_STR                "dots"
-#define DEF_COLOR_STR              "background"
-#define DEF_TOOLBAR_SHADE_STR      "none"
 
 #ifdef __cplusplus
 inline
@@ -1391,9 +1379,9 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 
 #define QTC_MIN_ROUND_FULL_SIZE     8
 #ifdef __cplusplus
-#define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==W ? 7 : 14)
+#define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==(W) ? 7 : 14)
 #else
-#define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==W || WIDGET_SPIN_DOWN==W || WIDGET_SPIN==W ? 7 : 14)
+#define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
 #endif
 #define QTC_MIN_ROUND_MAX_HEIGHT    19
 #define QTC_MIN_ROUND_MAX_WIDTH     32
