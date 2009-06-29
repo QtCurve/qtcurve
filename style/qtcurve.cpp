@@ -2416,7 +2416,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorBranch:
         {
             int middleH((r.x() + r.width() / 2)-1),
-                middleV(r.y() + r.height() / 2);
+                middleV(r.y() + r.height() / 2),
+                beforeH(middleH),
+                beforeV(middleV),
+                afterH(middleH),
+                afterV(middleV);
 
             painter->save();
 
@@ -2425,6 +2429,42 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QRect ar(r.x()+((r.width()-(QTC_LV_SIZE+4))>>1), r.y()+((r.height()-(QTC_LV_SIZE+4))>>1), QTC_LV_SIZE+4,
                          QTC_LV_SIZE+4);
 
+                if(LV_OLD==opts.lvLines)
+                {
+                    beforeH=ar.x();
+                    beforeV=ar.y();
+                    afterH=ar.x()+QTC_LV_SIZE+4;
+                    afterV=ar.y()+QTC_LV_SIZE+4;
+
+                    int lo(QTC_ROUNDED ? 2 : 0);
+
+                    painter->setPen(palette.mid().color());
+                    painter->drawLine(ar.x()+lo, ar.y(), (ar.x()+ar.width()-1)-lo, ar.y());
+                    painter->drawLine(ar.x()+lo, ar.y()+ar.height()-1, (ar.x()+ar.width()-1)-lo,
+                                    ar.y()+ar.height()-1);
+                    painter->drawLine(ar.x(), ar.y()+lo, ar.x(), (ar.y()+ar.height()-1)-lo);
+                    painter->drawLine(ar.x()+ar.width()-1, ar.y()+lo, ar.x()+ar.width()-1,
+                                    (ar.y()+ar.height()-1)-lo);
+
+                    if(QTC_ROUNDED)
+                    {
+                        painter->drawPoint(ar.x()+1, ar.y()+1);
+                        painter->drawPoint(ar.x()+1, ar.y()+ar.height()-2);
+                        painter->drawPoint(ar.x()+ar.width()-2, ar.y()+1);
+                        painter->drawPoint(ar.x()+ar.width()-2, ar.y()+ar.height()-2);
+
+                        QColor col(palette.mid().color());
+
+                        col.setAlphaF(0.5);
+                        painter->setPen(col);
+                        painter->drawLine(ar.x()+1, ar.y()+1, ar.x()+2, ar.y());
+                        painter->drawLine(ar.x()+ar.width()-2, ar.y(), ar.x()+ar.width()-1, ar.y()+1);
+                        painter->drawLine(ar.x()+1, ar.y()+ar.height()-2, ar.x()+2, ar.y()+ar.height()-1);
+                        painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1,
+                                        ar.y()+ar.height()-2);
+                    }
+                }
+                
                 drawArrow(painter, ar, state&State_Open
                                                 ? PE_IndicatorArrowDown
                                                 : reverse
@@ -2432,21 +2472,34 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                     : PE_IndicatorArrowRight, palette.text().color());
             }
 
-            const int constStep=widget && qobject_cast<const QTreeView *>(widget)
-                                    ? ((QTreeView *)widget)->indentation() : 20;
+            const int constStep=LV_OLD==opts.lvLines
+                                    ? 0
+                                    : widget && qobject_cast<const QTreeView *>(widget)
+                                        ? ((QTreeView *)widget)->indentation() : 20;
 
-            if(opts.lvLines && r.x()>=constStep && constStep>0)
+            if(opts.lvLines && (LV_OLD==opts.lvLines || (r.x()>=constStep && constStep>0)))
             {
                 painter->setPen(palette.mid().color());
                 if (state&State_Item)
                     if (reverse)
-                        painter->drawLine(r.left(), middleV, middleH, middleV);
+                        painter->drawLine(r.left(), middleV, afterH, middleV);
                     else
-                        painter->drawLine(middleH-constStep, middleV, r.right()-(state&State_Children ? constStep : QTC_LV_SIZE+4), middleV);
-                if (state&State_Sibling && middleV<r.bottom())
-                    painter->drawLine(middleH-constStep, middleV, middleH-constStep, r.bottom());
-                if (state & (State_Open | State_Children | State_Item | State_Sibling))
-                    painter->drawLine(middleH-constStep, r.y(), middleH-constStep, middleV);
+                    {
+                        if(LV_NEW==opts.lvLines)
+                        {
+                            if(state&State_Children)
+                                painter->drawLine(middleH-constStep, middleV, r.right()-constStep, middleV);
+                            else
+                                drawFadedLine(painter, QRect(middleH-constStep, middleV, r.right()-(middleH-constStep), middleV), palette.mid().color(), 
+                                              false, true, true);
+                        }
+                        else
+                            painter->drawLine(afterH, middleV, r.right(), middleV);
+                    }
+                if (state&State_Sibling && afterV<r.bottom())
+                    painter->drawLine(middleH-constStep, afterV, middleH-constStep, r.bottom());
+                if (state & (State_Open | State_Children | State_Item | State_Sibling) && (LV_NEW==opts.lvLines || beforeV>r.y()))
+                    painter->drawLine(middleH-constStep, r.y(), middleH-constStep, beforeV);
             }
             painter->restore();
             break;

@@ -372,6 +372,20 @@ static EGradType toGradType(const char *str, EGradType def)
     return def;
 }
 
+static ELvLines toLvLines(const char *str, ELvLines def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "true", 4) || 0==memcmp(str, "new", 3))
+            return LV_NEW;
+        if(0==memcmp(str, "old", 3))
+            return LV_OLD;
+        if(0==memcmp(str, "false", 5) || 0==memcmp(str, "none", 4))
+            return LV_NONE;
+    }
+    return def;
+}
+
 static EGradientBorder toGradientBorder(const char *str)
 {
     if(str)
@@ -802,6 +816,9 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_GRAD_TYPE(ENTRY) \
     opts->ENTRY=toGradType(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#define QTC_CFG_READ_LV_LINES(ENTRY) \
+    opts->ENTRY=toLvLines(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 #ifdef __cplusplus
 #define QTC_CFG_READ_ALIGN(ENTRY) \
     opts->ENTRY=toAlign(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
@@ -1078,7 +1095,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_ECOLOR(progressGrooveColor)
             QTC_CFG_READ_FOCUS(focus)
             QTC_CFG_READ_BOOL(lvButton)
-            QTC_CFG_READ_BOOL(lvLines)
+            QTC_CFG_READ_LV_LINES(lvLines)
             QTC_CFG_READ_BOOL(drawStatusBarFrames)
             QTC_CFG_READ_BOOL(fillSlider)
             QTC_CFG_READ_BOOL(roundMbTopOnly)
@@ -1646,7 +1663,7 @@ static void defaultSettings(Options *opts)
     opts->buttonEffect=EFFECT_SHADOW;
     opts->focus=FOCUS_LINE;
     opts->lvButton=false;
-    opts->lvLines=false;
+    opts->lvLines=LV_NONE;
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;
     opts->roundMbTopOnly=true;
@@ -2071,6 +2088,20 @@ static const char * toStr(EGradType gt)
         default:
         case GT_HORIZ:
             return "horiz";
+    }
+}
+
+static const char * toStr(ELvLines lv)
+{
+    switch(lv)
+    {
+        case LV_NEW:
+            return "new";
+        case LV_OLD:
+            return "old";
+        default:
+        case LV_NONE:
+            return "none";
     }
 }
 

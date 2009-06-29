@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>694</height>
+    <height>692</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -808,11 +808,14 @@ p, li { white-space: pre-wrap; }
         <widget class="QComboBox" name="selectionAppearance"/>
        </item>
        <item row="2" column="0">
-        <widget class="QCheckBox" name="lvLines">
+        <widget class="QLabel" name="label_48">
          <property name="text">
-          <string>Join items with lines (KDE)</string>
+          <string>Lines between items:</string>
          </property>
         </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="lvLines"/>
        </item>
        <item row="3" column="0">
         <spacer>
@@ -2150,8 +2153,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>highlightFactor</tabstop>
   <tabstop>lvAppearance</tabstop>
   <tabstop>lvButton</tabstop>
-  <tabstop>selectionAppearance</tabstop>
   <tabstop>lvLines</tabstop>
+  <tabstop>selectionAppearance</tabstop>
   <tabstop>gtkScrollViews</tabstop>
   <tabstop>highlightScrollViews</tabstop>
   <tabstop>squareScrollViews</tabstop>

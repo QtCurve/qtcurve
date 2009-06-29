@@ -686,6 +686,13 @@ typedef enum
     GB_3D_FULL
 } EGradientBorder;
 
+typedef enum
+{
+    LV_NONE,
+    LV_NEW,
+    LV_OLD
+} ELvLines;
+
 #ifdef __cplusplus
 struct GradientStopCont : public std::set<GradientStop>
 {
@@ -762,7 +769,6 @@ typedef struct
                      thinnerMenuItems,
                      thinnerBtns,
                      lvButton,
-                     lvLines,
                      drawStatusBarFrames,
                      fillSlider,
                      roundMbTopOnly,
@@ -811,6 +817,7 @@ typedef struct
                      unifyCombo,
                      unifySpin,
                      borderTab;
+    ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
