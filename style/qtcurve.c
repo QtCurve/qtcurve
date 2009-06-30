@@ -2646,7 +2646,7 @@ debugDisplayWidget(widget, 3);
             a_width = LARGE_ARR_HEIGHT;
             a_height = LARGE_ARR_WIDTH;
 
-            if(a_height && height<a_height)
+            if(isMozilla() && opts.vArrows && a_height && height<a_height)
                 smallArrows=true;
         }
 
