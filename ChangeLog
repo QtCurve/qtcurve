@@ -3,6 +3,8 @@
 1. If there is not enough space for large arrows in FireFox's menuitems,
    use small ones.
 2. Fix incorrect scrollbar trough border.
+3. Better, non-hacky, fix for Firefox's location bar.
+4. Make Firefox's entry fields smaller.
 
 0.65.1
 ------
