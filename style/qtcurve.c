@@ -1375,9 +1375,6 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
-    width--;
-    height--;
-
     {
     double       radius=getRadius(&opts, width, height, widget, RADIUS_EXTERNAL),
                  xd=x+0.5,
@@ -1395,6 +1392,8 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                                     : borderVal;
     GdkColor     *border_col= useText ? &style->text[GTK_STATE_NORMAL] : &colors[useBorderVal];
 
+    width--;
+    height--;
 
     setCairoClipping(cr, area, region);
 
