@@ -2,6 +2,7 @@
 ------
 1. Add option to draw list view lines in pre 0.65 style.
 2. Fix some inner gradient bleeding when using max rounding.
+3. Fix arora location bar for non gradient backgrounds.
 
 0.65.1
 ------

@@ -3020,12 +3020,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                 painter->save();
 
                                 // Only need to adjust coords if toolbar has a gradient...
-                                if(APPEARANCE_FLAT!=opts.toolbarAppearance && APPEARANCE_RAISED!=opts.toolbarAppearance)
+                                if(!IS_FLAT(opts.toolbarAppearance))
                                 {
                                     r2.setY(-widget->mapTo((QWidget *)tb, QPoint(r.x(), r.y())).y());
                                     r2.setHeight(tb->rect().height());
                                 }
                                 painter->setClipRegion(QRegion(r2).subtract(QRegion(r2.adjusted(2, 2, -2, -2))));
+//                                 if(!IS_FLAT(opts.bgndAppearance))
+//                                     drawWindowBackground((QWidget *)tb);
+//                                     painter->fillRect(r.x(), r.y()+2, r.width(), r.height()-4,
+//                                                      palette.window().color());
                                 drawMenuOrToolBarBackground(painter, r2, &opt, false, horiz);
                                 painter->restore();
                             }
@@ -8496,7 +8500,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-void QtCurveStyle::drawWindowBackground(QWidget *widget)
+void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 {
     QPainter      p(widget);
     const QWidget *window = widget->window();
@@ -9384,7 +9388,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
 void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
 {
-    if(!IS_FLAT(menu ? opts.menubarAppearance : opts.toolbarAppearance))
+    if(IS_FLAT(opts.bgndAppearance) || !IS_FLAT(menu ? opts.menubarAppearance : opts.toolbarAppearance))
         drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? itsMenubarCols[ORIGINAL_SHADE]
                             : option->palette.background().color(),
