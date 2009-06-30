@@ -1,6 +1,7 @@
 0.65.2
 ------
-1. If there is not enough space for large arrows in menuitems, use small ones.
+1. If there is not enough space for large arrows in FireFox's menuitems,
+   use small ones.
 2. Fix incorrect scrollbar trough border.
 
 0.65.1
