@@ -2609,7 +2609,8 @@ debugDisplayWidget(widget, 3);
                  a_width=LARGE_ARR_WIDTH,
                  a_height=LARGE_ARR_HEIGHT;
         gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
-                                  0==strcmp(detail, "stepper"));
+                                  0==strcmp(detail, "stepper")),
+                 smallArrows=isSpinButton && !opts.unifySpin;
         int      stepper=sbar ? getStepper(widget, x, y, opts.sliderWidth, opts.sliderWidth) : QTC_STEPPER_NONE;
 
 /*
@@ -2645,11 +2646,13 @@ debugDisplayWidget(widget, 3);
         {
             a_width = LARGE_ARR_HEIGHT;
             a_height = LARGE_ARR_WIDTH;
+
+            if(a_height && height<a_height)
+                smallArrows=true;
         }
 
         x+=width>>1;
         y+=height>>1;
-
 /*
     CPD 28/02/2008 Commented out as it messes up scrollbar button look
 
@@ -2703,7 +2706,7 @@ debugDisplayWidget(widget, 3);
                         ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT]
                         : &style->text[QTC_IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
                                         ? GTK_STATE_SELECTED : QTC_ARROW_STATE(state)];
-        drawArrow(cr, QTC_MO_ARROW(isMenuItem, col), area, arrow_type, x, y, isSpinButton && !opts.unifySpin, TRUE);
+        drawArrow(cr, QTC_MO_ARROW(isMenuItem, col), area, arrow_type, x, y, smallArrows, TRUE);
         }
     }
     QTC_CAIRO_END
