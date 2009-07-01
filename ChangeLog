@@ -3,6 +3,7 @@
 1. Add option to draw list view lines in pre 0.65 style.
 2. Fix some inner gradient bleeding when using max rounding.
 3. Fix arora location bar for non gradient backgrounds.
+4. Fix 'stripe effect' on scrollbars when using plastik style mouse over.
 
 0.65.1
 ------
@@ -55,7 +56,7 @@
 16. Make Kate/Kwrite's option toolbuton have the same size as the next/prev buttons.
 17. Make listview lines match Gtk2 better.
 18. Experimental support for drawing of background gradients.
-19. Cache complete buttons, etc, pixmaps - as opposed to jusr the gradient fill.
+19. Cache complete buttons, etc, pixmaps - as opposed to just the gradient fill.
 
 0.64.2
 ------

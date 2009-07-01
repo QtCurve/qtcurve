@@ -8177,10 +8177,10 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         {
             case ROUND_SLIGHT:
             case ROUND_NONE:
-                endSize=4;
+                endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 4;
                 break;
             case ROUND_FULL:
-                endSize=5;
+                endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 5;
                 break;
             case ROUND_EXTRA:
                 endSize=7;
@@ -8234,7 +8234,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
             {
                 int middle(qMin(r.height()-(2*endSize), middleSize));
                 if(middle>0)
-                    p->drawTiledPixmap(r.x(), r.y()+endSize, pix.width(), r.height()-(2*endSize), pix.copy(0, endSize, pix.width(), middle));
+                    p->drawTiledPixmap(r.x(), r.y()+endSize, pix.width(), r.height()-(2*endSize),
+                                       pix.copy(0, endSize, pix.width(), middle));
                 p->drawPixmap(r.x(), r.y(), pix.copy(0, 0, pix.width(), endSize));
                 p->drawPixmap(r.x(), r.y()+r.height()-endSize, pix.copy(0, pix.height()-endSize, pix.width(), endSize));
             }
