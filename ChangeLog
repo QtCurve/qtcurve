@@ -4,6 +4,8 @@
    indicator color.
 2. Fix usage of custom menu text colors.
 3. Fix custom menu stripe color.
+4. In config dialog - for gradient directions, use "Top to bottom" instead of
+   "Horizontal" and "Left to right" instead of "Vertical"
 
 0.65.2
 ------
