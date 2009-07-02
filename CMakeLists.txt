@@ -86,6 +86,7 @@ if (NOT QTC_QT_ONLY)
     add_subdirectory(config)
     add_subdirectory(themes)
     add_subdirectory(colors)
+    add_subdirectory(po)
 
     find_file(KWINGLOBALS_H kwinglobals.h ${KDE4_INCLUDES}) # kwinglobals.h is new for KDE4
 
