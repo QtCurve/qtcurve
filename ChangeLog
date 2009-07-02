@@ -6,6 +6,7 @@
    tabs.
 3. Fix background of some widgets when using "left to right" background
    gradients.
+4. Fix backgrounds of entry field when etching, but not rounded.
 
 0.65.2
 ------

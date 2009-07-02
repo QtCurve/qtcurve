@@ -2012,7 +2012,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(GTK_APP_JAVA!=qtSettings.app)
         qtcEntrySetup(widget);
 
-    if(ROUND_NONE!=opts.round)
+    if(doEtch || ROUND_NONE!=opts.round)
     {
         if(!IS_FLAT(opts.bgndAppearance) && widget && drawBgndGradient(cr, style, area, widget, x, y, width, height))
             ;
