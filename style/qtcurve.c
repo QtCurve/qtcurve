@@ -4338,7 +4338,7 @@ static GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean
     return !qtSettings.qt4 && mnu
                 ? &style->text[state]
                 : GTK_STATE_INSENSITIVE==state
-                    ? &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT]
+                    ? &qtSettings.colors[PAL_DISABLED][opts.crButton ? COLOR_BUTTON_TEXT : COLOR_TEXT]
                     : qtcPalette.check_radio;
 }
 
@@ -6339,7 +6339,7 @@ static void generateColors()
     switch(opts.shadeCheckRadio)
     {
         default:
-            qtcPalette.check_radio=&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT];
+            qtcPalette.check_radio=&qtSettings.colors[PAL_ACTIVE][opts.crButton ? COLOR_BUTTON_TEXT : COLOR_TEXT];
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
