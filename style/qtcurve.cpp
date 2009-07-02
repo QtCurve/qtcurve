@@ -3545,7 +3545,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->save();
 
             if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
-                if(opts.round && widget && ::qobject_cast<const QTabWidget *>(widget))
+                if((opts.round || !IS_FLAT(opts.bgndAppearance)) && widget && ::qobject_cast<const QTabWidget *>(widget))
                 {
                     struct QtcTabWidget : public QTabWidget
                     {
@@ -5119,7 +5119,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int l(fixLeft ? r2.left()+2 : r2.left()-1),
+                            int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right()+1);
                             painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.bottom()-1, r, r2.bottom()-1);
@@ -5185,7 +5185,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int l(fixLeft ? r2.left()+2 : r2.left()-1),
+                            int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right());
                             painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.top()+1, r, r2.top()+1);
@@ -5250,7 +5250,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int t(firstTab ? r2.top()+2 : r2.top()-1),
+                            int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
                             painter->setPen(use[QT_STD_BORDER]);
@@ -5316,7 +5316,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int t(firstTab ? r2.top()+2 : r2.top()-1),
+                            int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
                             painter->setPen(use[QT_STD_BORDER]);
