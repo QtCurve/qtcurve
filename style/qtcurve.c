@@ -1966,7 +1966,7 @@ static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *are
     if(!isFixedWidget(widget) && !isGimpDockable(widget))
     {
         GtkWidget *window=widget;
-        int       yo=0;
+        int       pos=0;
 
 #ifdef QTC_DEBUG
 printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
@@ -1974,15 +1974,19 @@ debugDisplayWidget(widget, 20);
 #endif
         while(window && !GTK_IS_WINDOW(window))
         {
-            if(!GTK_WIDGET_NO_WINDOW(window) && 0==yo)
-                yo+=widget->allocation.y;
+            if(!GTK_WIDGET_NO_WINDOW(window) && 0==pos)
+                pos+=(GT_HORIZ==opts.bgndGrad ? widget->allocation.y : widget->allocation.x);
             window=window->parent;
         }
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
-            drawBevelGradient(cr, style, area, NULL, x, -yo, width, window->allocation.height,
-                              &style->bg[GTK_STATE_NORMAL], GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+            if(GT_HORIZ==opts.bgndGrad)
+                drawBevelGradient(cr, style, area, NULL, x, -pos, width, window->allocation.height,
+                                  &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+            else
+                drawBevelGradient(cr, style, area, NULL, -pos, y, window->allocation.width, height,
+                                  &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
             return TRUE;
         }
     }

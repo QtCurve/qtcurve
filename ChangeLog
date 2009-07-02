@@ -4,6 +4,8 @@
    indicator color.
 2. Fix slight tab glitches when using glow tab mouse over and square
    tabs.
+3. Fix background of some widgets when using "left to right" background
+   gradients.
 
 0.65.2
 ------
