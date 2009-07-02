@@ -1127,7 +1127,8 @@ void QtCurveStyle::polish(QPalette &palette)
 //     }
 
     // Force this to be re-generated!
-    opts.customMenuStripeColor=Qt::black;
+    if(SHADE_BLEND_SELECTED==opts.menuStripe)
+        opts.customMenuStripeColor=Qt::black;
 }
 
 void QtCurveStyle::polish(QWidget *widget)
