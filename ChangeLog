@@ -1,3 +1,8 @@
+0.65.3
+------
+1. When not using button-like check/radio boxes, use view text as the
+   indicator color.
+
 0.65.2
 ------
 1. Add option to draw list view lines in pre 0.65 style.

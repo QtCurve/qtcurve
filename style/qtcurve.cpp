@@ -901,7 +901,8 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     switch(opts.shadeCheckRadio)
     {
         default:
-            itsCheckRadioCol=QApplication::palette().color(QPalette::Active, QPalette::ButtonText);
+            itsCheckRadioCol=QApplication::palette().color(QPalette::Active, opts.crButton
+                                                                                ? QPalette::ButtonText : QPalette::Text);
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
@@ -1089,7 +1090,8 @@ void QtCurveStyle::polish(QPalette &palette)
     switch(opts.shadeCheckRadio)
     {
         default:
-            itsCheckRadioCol=palette.color(QPalette::Active, QPalette::ButtonText);
+            itsCheckRadioCol=palette.color(QPalette::Active, opts.crButton
+                                                                 ? QPalette::ButtonText : QPalette::Text);
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
@@ -9833,7 +9835,9 @@ const QColor & QtCurveStyle::checkRadioCol(const QStyleOption *opt) const
 {
     return opt->state&State_Enabled
             ? itsCheckRadioCol
-            : opt->palette.buttonText().color();
+            : opts.crButton
+                ? opt->palette.buttonText().color()
+                : opt->palette.text().color();
 }
 
 QColor QtCurveStyle::shade(const QColor &a, float k) const
