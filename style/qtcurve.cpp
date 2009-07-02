@@ -2016,7 +2016,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ScrollBarSliderMin:
             return opts.sliderWidth+1;
         case PM_SliderThickness:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6));
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 19 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6));
         case PM_SliderControlThickness:
             return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2));
          case PM_SliderTickmarkOffset:
