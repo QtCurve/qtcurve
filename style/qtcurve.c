@@ -5085,14 +5085,15 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y, rightPos ? 1 : 0);
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y, 2);
             }
-            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
-            else
-            {
-                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
-                if(gap_x>0)
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[2]), 1.0, x+1, y, 1);
-            }
+            if(opts.round>ROUND_SLIGHT)
+                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                    drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
+                else
+                {
+                    drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
+                    if(gap_x>0)
+                        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[2]), 1.0, x+1, y, 1);
+                }
             break;
         case GTK_POS_BOTTOM:
             if(gap_x > 0)
@@ -5110,10 +5111,11 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-1, rightPos ? 1 : 0);
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y+height-1, 2);
             }
-            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
-            else
-                drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
+            if(opts.round>ROUND_SLIGHT)
+                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                    drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
+                else
+                    drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
             break;
         case GTK_POS_LEFT:
             if(gap_x>0)
@@ -5131,14 +5133,15 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x, y+gap_x+gap_width-2, 1);
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+gap_x+gap_width-1, 2);
             }
-            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+1, 2);
-            else
-            {
-                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y, 3);
-                if(gap_x>0)
-                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[2]), 1.0, x, y+1, 1);
-            }
+            if(opts.round>ROUND_SLIGHT)
+                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                    drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+1, 2);
+                else
+                {
+                    drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y, 3);
+                    if(gap_x>0)
+                        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[2]), 1.0, x, y+1, 1);
+                }
             break;
         case GTK_POS_RIGHT:
             if(gap_x>0)
@@ -5155,11 +5158,11 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-1, 2);
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x+gap_width-1, 2);
             }
-            if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
-            else
-                drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
-
+            if(opts.round>ROUND_SLIGHT)
+                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                    drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
+                else
+                    drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
             break;
     }
 

@@ -2,6 +2,8 @@
 ------
 1. When not using button-like check/radio boxes, use view text as the
    indicator color.
+2. Fix slight tab glitches when using glow tab mouse over and square
+   tabs.
 
 0.65.2
 ------
