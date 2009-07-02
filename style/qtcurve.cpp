@@ -4401,13 +4401,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
                 {
                     const QColor &col=state&State_Enabled
-                                        ? ((opts.colorMenubarMouseOver && active) || (!opts.colorMenubarMouseOver && down)) &&
-                                           opts.useHighlightForMenu
+                                        ? ((opts.colorMenubarMouseOver && active) || (!opts.colorMenubarMouseOver && down))
                                             ? opts.customMenuTextColor
                                                 ? opts.customMenuSelTextColor
-                                                : palette.highlightedText().color()
+                                                : opts.useHighlightForMenu
+                                                    ? palette.highlightedText().color()
+                                                    : palette.foreground().color()
                                             : palette.foreground().color()
-                                        : palette.foreground().color();
+                                         : palette.foreground().color();
 
 // #ifdef QTC_XBAR_SUPPORT
 //                     if(palette.foreground().color()==col && palette.foreground().color()!=QApplication::palette().foreground().color() &&
