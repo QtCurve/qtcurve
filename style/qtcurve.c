@@ -4089,51 +4089,58 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 #endif
     else if(DETAIL("entry") || DETAIL("text"))
     {
-        gboolean combo=isComboBoxEntry(widget),
-                 isSpin=!combo && isSpinButton(widget),
-                 rev=reverseLayout(widget) || (combo && widget && reverseLayout(widget->parent));
-        GtkWidget *btn=NULL;
-        GtkStateType savedState=state;
+        if(widget && widget->parent && isList(widget->parent))
+        {
+            // Dont draw shadow for entries in listviews...
+            // Fixes RealPlayer's in-line editing of its favourites.
+        }
+        else
+        {
+            gboolean combo=isComboBoxEntry(widget),
+                    isSpin=!combo && isSpinButton(widget),
+                    rev=reverseLayout(widget) || (combo && widget && reverseLayout(widget->parent));
+            GtkWidget *btn=NULL;
+            GtkStateType savedState=state;
         
 #if GTK_CHECK_VERSION(2, 16, 0)
-        if(isSpin && widget && width==widget->allocation.width)
-        {
-            int btnWidth, dummy;
-            gdk_drawable_get_size(GTK_SPIN_BUTTON(widget)->panel, &btnWidth, &dummy);
-            width-=btnWidth;
-            if(rev)
-                x+=btnWidth;
-        }
+            if(isSpin && widget && width==widget->allocation.width)
+            {
+                int btnWidth, dummy;
+                gdk_drawable_get_size(GTK_SPIN_BUTTON(widget)->panel, &btnWidth, &dummy);
+                width-=btnWidth;
+                if(rev)
+                    x+=btnWidth;
+            }
 #endif
+            if((opts.unifySpin && isSpin) || (combo && opts.unifyCombo))
+                width+=2;
 
-        if((opts.unifySpin && isSpin) || (combo && opts.unifyCombo))
-            width+=2;
+            // If we're a combo entry, and not prelight, check to see if the button is
+            // prelighted, if so so are we!
+            if(GTK_STATE_PRELIGHT!=state && combo && opts.unifyCombo && widget && widget->parent)
+            {
+                btn=getComboButton(widget->parent);
+                if(!btn && widget->parent)
+                    btn=getMappedWidget(widget->parent, 0);
+                if(btn && GTK_STATE_PRELIGHT==btn->state)
+                    state=widget->state=GTK_STATE_PRELIGHT;
+            }
 
-        // If we're a combo entry, and not prelight, check to see if the button is
-        // prelighted, if so so are we!
-        if(GTK_STATE_PRELIGHT!=state && combo && opts.unifyCombo && widget && widget->parent)
-        {
-            btn=getComboButton(widget->parent);
-            if(!btn && widget->parent)
-                btn=getMappedWidget(widget->parent, 0);
-            if(btn && GTK_STATE_PRELIGHT==btn->state)
-                state=widget->state=GTK_STATE_PRELIGHT;
-        }
-        
-        drawEntryField(cr, style, state, widget, area, x, y, width, height,
-                       combo || isSpin
-                           ? rev
-                                ? ROUNDED_RIGHT
-                                : ROUNDED_LEFT
-                           : ROUNDED_ALL,
-                       WIDGET_ENTRY);
-        if(combo && opts.unifyCombo && widget && widget->parent)
-        {
-            if(btn && GTK_STATE_INSENSITIVE!=widget->state)
-                gtk_widget_queue_draw(btn);
+            drawEntryField(cr, style, state, widget, area, x, y, width, height,
+                        combo || isSpin
+                            ? rev
+                                    ? ROUNDED_RIGHT
+                                    : ROUNDED_LEFT
+                            : ROUNDED_ALL,
+                        WIDGET_ENTRY);
+            if(combo && opts.unifyCombo && widget && widget->parent)
+            {
+                if(btn && GTK_STATE_INSENSITIVE!=widget->state)
+                    gtk_widget_queue_draw(btn);
 
-            if(GTK_IS_COMBO_BOX_ENTRY(widget->parent))
-                qtcWidgetMapSetup(widget->parent, widget, 1);
+                if(GTK_IS_COMBO_BOX_ENTRY(widget->parent))
+                    qtcWidgetMapSetup(widget->parent, widget, 1);
+            }
         }
     }
     else
