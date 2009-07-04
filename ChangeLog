@@ -7,7 +7,7 @@
 3. Fix background of some widgets when using "left to right" background
    gradients.
 4. Fix backgrounds of entry field when etching, but not rounded.
-5. Dont draw 'shadow' for entry fields within list/trees.
+5. Dont draw frame for entry fields within list/trees.
 
 0.65.2
 ------
