@@ -1,3 +1,8 @@
+0.65.4
+------
+1. Use 'MS Windows' and not 'Windows' for scrollbar type - to aid
+   translations.
+
 0.65.3
 ------
 1. When not using button-like check/radio boxes, use view text as the

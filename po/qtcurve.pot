@@ -187,7 +187,7 @@ msgid "KDE"
 msgstr ""
 
 #: config/qtcurveconfig.cpp:342 config/qtcurveconfig.cpp:925
-msgid "Windows"
+msgid "MS Windows"
 msgstr ""
 
 #: config/qtcurveconfig.cpp:343
