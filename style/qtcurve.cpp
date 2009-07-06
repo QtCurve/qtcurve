@@ -6070,7 +6070,41 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                 if (child.features & QStyleOptionQ3ListViewItem::Expandable
                                     || (child.childCount > 0 && child.height > 0))
                                 {
-                                    drawArrow(painter, QRect(bx-4, linebot-4, 11, 11),
+                                    
+                                    QRect ar(bx-4, linebot-4, 11, 11);
+
+                                    if(LV_OLD==opts.lvLines)
+                                    {
+                                        int lo(QTC_ROUNDED ? 2 : 0);
+
+                                        painter->setPen(palette.mid().color());
+                                        painter->drawLine(ar.x()+lo, ar.y(), (ar.x()+ar.width()-1)-lo, ar.y());
+                                        painter->drawLine(ar.x()+lo, ar.y()+ar.height()-1, (ar.x()+ar.width()-1)-lo,
+                                                        ar.y()+ar.height()-1);
+                                        painter->drawLine(ar.x(), ar.y()+lo, ar.x(), (ar.y()+ar.height()-1)-lo);
+                                        painter->drawLine(ar.x()+ar.width()-1, ar.y()+lo, ar.x()+ar.width()-1,
+                                                        (ar.y()+ar.height()-1)-lo);
+
+                                        if(QTC_ROUNDED)
+                                        {
+                                            painter->drawPoint(ar.x()+1, ar.y()+1);
+                                            painter->drawPoint(ar.x()+1, ar.y()+ar.height()-2);
+                                            painter->drawPoint(ar.x()+ar.width()-2, ar.y()+1);
+                                            painter->drawPoint(ar.x()+ar.width()-2, ar.y()+ar.height()-2);
+
+                                            QColor col(palette.mid().color());
+
+                                            col.setAlphaF(0.5);
+                                            painter->setPen(col);
+                                            painter->drawLine(ar.x()+1, ar.y()+1, ar.x()+2, ar.y());
+                                            painter->drawLine(ar.x()+ar.width()-2, ar.y(), ar.x()+ar.width()-1, ar.y()+1);
+                                            painter->drawLine(ar.x()+1, ar.y()+ar.height()-2, ar.x()+2, ar.y()+ar.height()-1);
+                                            painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1,
+                                                            ar.y()+ar.height()-2);
+                                        }
+                                    }
+                                    
+                                    drawArrow(painter, ar,
                                               child.state&State_Open
                                                 ? PE_IndicatorArrowDown
                                                 : reverse

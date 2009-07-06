@@ -2,6 +2,7 @@
 ------
 1. Use 'MS Windows' and not 'Windows' for scrollbar type - to aid
    translations.
+2. Apply old-style listview lines to Q3ListView's as well.
 
 0.65.3
 ------
