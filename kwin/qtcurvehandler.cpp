@@ -302,6 +302,7 @@ QList<QtCurveHandler::BorderSize> QtCurveHandler::borderSizes() const
 }
 
 #if KDE_IS_VERSION(4,1,80)
+#if !KDE_IS_VERSION(4,2,92)
 // Shadows - Taken from Oxygen! rev873805
 QList< QList<QImage> > QtCurveHandler::shadowTextures()
 {
@@ -513,6 +514,7 @@ double QtCurveHandler::shadowOpacity( ShadowType type ) const
 {
     return 1.0;
 }
+#endif
 #endif
 
 // make the handler accessible to other classes...

@@ -71,8 +71,10 @@ class QtCurveClient : public KCommonDecoration
     bool                      eventFilter(QObject *o, QEvent *e);
 
 #if KDE_IS_VERSION(4,1,80)
+#if !KDE_IS_VERSION(4,2,92)
     virtual QList<QRect>      shadowQuads(ShadowType type) const;
     virtual double            shadowOpacity(ShadowType type) const;
+#endif
 #endif
 
     private:

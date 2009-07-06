@@ -3,6 +3,7 @@
 1. Use 'MS Windows' and not 'Windows' for scrollbar type - to aid
    translations.
 2. Apply old-style listview lines to Q3ListView's as well.
+3. Fix KDE4.3 compilation - patch from Markus Ullmann
 
 0.65.3
 ------

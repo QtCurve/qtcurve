@@ -505,6 +505,7 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 }
 
 #if KDE_IS_VERSION(4,1,80)
+#if !KDE_IS_VERSION(4,2,92)
 // Taken form Oxygen! rev873805
 QList<QRect> QtCurveClient::shadowQuads(ShadowType type) const
 {
@@ -537,6 +538,7 @@ double QtCurveClient::shadowOpacity(ShadowType type) const
     }
     return 0;
 }
+#endif
 #endif
     
 void QtCurveClient::reset(unsigned long changed)
