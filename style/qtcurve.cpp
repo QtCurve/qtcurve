@@ -420,6 +420,15 @@ static bool isInQAbstractItemView(const QObject *w)
     return false;
 }
 
+/*
+static bool isKontactPreviewPane(const QWidget *widget)
+{
+    return APP_KONTACT==theThemedApp && widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+           widget->inherits("KHBox") && ::qobject_cast<const QSplitter *>(widget->parentWidget()) &&
+           widget->parentWidget()->parentWidget()->inherits("KMReaderWin");
+}
+*/
+
 static bool isNoEtchWidget(const QWidget *widget)
 {
     if(APP_KRUNNER==theThemedApp)
@@ -1986,10 +1995,13 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 qobject_cast<const QMenu *>(widget))
                 return 1;
 
-            if(QTC_DO_EFFECT && (!widget || // !isFormWidget(widget) &&
-               (::qobject_cast<const QLineEdit *>(widget) ||
+            if(QTC_DO_EFFECT &&
+                (!widget || // !isFormWidget(widget) &&
+                ::qobject_cast<const QLineEdit *>(widget) ||
                 (opts.sunkenScrollViews &&
-                    (::qobject_cast<const QAbstractScrollArea*>(widget) || widget->inherits("Q3ScrollView"))))))
+                    (::qobject_cast<const QAbstractScrollArea*>(widget) ||
+                     widget->inherits("Q3ScrollView") /*||
+                     isKontactPreviewPane(widget)*/))))
                 return 3;
             else
                 return 2;
@@ -2663,7 +2675,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             else
             {
                 bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
-                        (widget && widget->inherits("Q3ScrollView")));
+                        (widget && widget->inherits("Q3ScrollView")) /*||
+                        isKontactPreviewPane(widget)*/);
 
                 if(sv && (opts.sunkenScrollViews || opts.squareScrollViews))
                 {
