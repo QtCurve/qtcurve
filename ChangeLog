@@ -1,7 +1,11 @@
+0.65.4
+------
+1. For HCY shading, dont add +/- 15% to custom shades/gradients.
+
 0.65.3
 ------
 1. When not using button-like check/radio boxes, use view text as the
-   indicator color.
+   indicator colour.
 2. Fix slight tab glitches when using glow tab mouse over and square
    tabs.
 3. Fix background of some widgets when using "left to right" background
@@ -56,7 +60,7 @@
  7. Enable mouse-over for entry fields.
  8. For mouse-over and focus, use same colour for top and bottom inner parts
     of entry fields.
- 9. When using filled/full focus with colored mouse over, then mouse over takes
+ 9. When using filled/full focus with coloured mouse over, then mouse over takes
     precedence.
 10. Alter default settings:
         Place arrows of spin buttons, and editable combos, in the edit field.
@@ -96,7 +100,7 @@
  4. Use equal top/bottom padding on popupmenu separators.
  5. Add option to colour arrow part of combobox.
  6. Draw resize grip as a darkend triangle.
- 7. Add a 'thick colored border' mouse over type.
+ 7. Add a 'thick coloured border' mouse over type.
  8. Allow to darken sliders.
  9. Add new default button indicator - darken.
 10. Harmonize KDE4 & Gtk2 popupmenu overlaps.
@@ -120,7 +124,7 @@
  2. Use a lighter shade for the dark portion of gradient border.
  3. Flat dot for radio buttons.
  4. Option to use button colour for listview headers.
- 5. Use KDE4 colors for focus and mouse-over.
+ 5. Use KDE4 colours for focus and mouse-over.
  6. Removal of background focus option.
  7. Softer, and much nicer, colouration of selected tab.
  8. Tab mouse over options; top (as before), below, or glow.
@@ -130,7 +134,7 @@
      Align titlebars text in center
 10. Add appearance setting for background of flat scrollbar buttons.
 11. Add HCY colour space.
-12. Use tint and mix color routines from KDE4's KColorUtils.
+12. Use tint and mix colour routines from KDE4's KColourUtils.
 13. Remove QtCurve's 'inactiveHighlight' option, and use KDE4s setting
     instead.
 14. Add option to specify appearance setting of filler part of sliders.
@@ -138,14 +142,14 @@
     config items.
 16. When using glow style mouse over, use mouse over colour for arrows.
 17. Option to use a thinner groove for scrollbars (only when using flat, or no, buttons).
-18. Option to only color sliders on mouse over.
+18. Option to only colour sliders on mouse over.
 19. Option to round all tabs.
 20. Better tab highlighting.
 21. Don't max/extra round progressbars.
 22. Use faded lines for tab and listview header mouse-over.
 23. Create icon-mapping file in a more robust manner.
 24. Set "gtk-icon-theme-name" to user's theme (or the KDE default if not set),
-    and set "gtk-fallback-icon-theme" to "highcolor". This seems to map more icons.
+    and set "gtk-fallback-icon-theme" to "highcolour". This seems to map more icons.
 25. Fix spin widget entry highlighting under Gtk 2.16
 26. Don't round rulers.
 27. Fix faded menuitems when not rounding.
@@ -159,7 +163,7 @@
     colour for selected menubar items.
 33. Fix setting of custom shades, and gradients, when reading system config file.
 34. Dont crash when /etc/qtcurvestylerc is only readable by root!
-35. Use tooltip text color to draw its border, as per KDE4.
+35. Use tooltip text colour to draw its border, as per KDE4.
 36. Dont draw border around rulers.
 
 0.62.8
@@ -363,7 +367,7 @@
  9. Option to have flat scrollbar buttons.
 10. New slider styles - plain rotated, and round rotated.
 11. Fix crash if QTC_STYLE is set, but is empty.
-12. Alter the way the light part of etchibng is drawn - should help with darker color schemes.
+12. Alter the way the light part of etchibng is drawn - should help with darker colour schemes.
 13. Draw border around filled progress.
 14. Fix light spinbuttons on dark background.
 15. Option to have button-like checks/radios.
@@ -381,7 +385,7 @@
         <KDE4 prefix>/usr/share/config/kdeglobals or <KDE3 prefix>/usr/share/config/kdeglobals
         <KDE4 prefix>/usr/share/config/system.kdeglobals or <KDE3 prefix>/usr/share/config/system.kdeglobals
         $KDEHOME/share/config/kdeglobals
-22. Round internal corners of plain colored mouse over effect.
+22. Round internal corners of plain coloured mouse over effect.
 
 0.59.7
 ------
@@ -437,7 +441,7 @@
  4. Option to have progress fill groove - default to true.
  5. Option to display non-editable combo splitter - defaults to true.
  6. Dont do coloured mouse over for toolbar buttons.
- 7. Better colored mouse over for checks and radios.
+ 7. Better coloured mouse over for checks and radios.
  8. Don't use background colour for non-coloured mouse over of
     check/radios if highlighting text backgroud.
  9. If using Gtk2 >= 2.12, then respect the 'Gtk style scrollviews'
@@ -853,7 +857,7 @@
 0.45
 ----
 1. Option to control whether highlighted items should use
-   the highlight color in inactive windows.
+   the highlight colour in inactive windows.
 2. Option to control whether menubars should be shaded in
    inactive windows.
 3. Fix non-bevelling of toggle buttons.
@@ -907,7 +911,7 @@
  2. Option to draw light border around sliders.
  3. Dialog fix is now a config option, not compile option.
  4. Seperate specification of scollbar slider, and range slider, settings.
- 5. Option to specify menubar text colors.
+ 5. Option to specify menubar text colours.
  6. New 'flat' appearance.
  7. Dont create custom gcs per widget class, use globals instead - should 
     use less resources.
@@ -1026,7 +1030,7 @@
  7. KDE: Use dots also for general handles - more consistent.
  8. KDE: Theme dock window handles - i.e. no more text.
  9. KDE: Fix/hack look of MDI window buttons.
-10. GTK2: Hackish fix for firefox and KDE's "apply colors to non-KDE apps" 
+10. GTK2: Hackish fix for firefox and KDE's "apply colours to non-KDE apps"
           setting.
 11. GTK: Fix for tear of menu background.
 
@@ -1087,7 +1091,7 @@
  6. ALL: New gradient style: bevelled - gradient top/bot, and plain in the
          middle. Affects listview headers, buttons, and combos.
  7. ALL: Allow setting of listview appearance.
- 8. ALL: Allow setting of listview header color - background, button, or
+ 8. ALL: Allow setting of listview header colour - background, button, or
         custom.
  9. ALL: Option to only round top of selected menubar items.
 10. ALL: New toolbar handle style: dashes
@@ -1123,8 +1127,8 @@
          wont happen in Gtk2 apps until they are restarted.
 4. GTK: Dont draw dividers in listview headers, unless header is >10 pixels
 5. ALL: Gradient non-selected tabs as well as selected.
-6. GTK2: Also look in "hicolor" for icons. Search order will be:
-             <chosen theme>, crystalsvg, hicolor
+6. GTK2: Also look in "hicolour" for icons. Search order will be:
+             <chosen theme>, crystalsvg, hicolour
 7. GTK2: Map gt-add and gtk-remove stock icons
 
 0.30
@@ -1209,7 +1213,7 @@
 11. ALL: Fix for tab-bar highlight when using light selection colours.
 12. KDE: Fix for non-bordered gradient radio buttons.
 13. GTK: More KDE like menu sizing.
-14. KDE: Fix/hack for OO.o2.x menubars. If the selected menu color is toodark,
+14. KDE: Fix/hack for OO.o2.x menubars. If the selected menu colour is toodark,
          then lighten. This is required as OO.o always draws the menu text
          dark! It seems to have a check for plastik style though, and then
          it draws selected popup menu items white.
