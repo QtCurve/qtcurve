@@ -955,6 +955,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(version<QTC_MAKE_VERSION(0, 66))
             {
                 def->tabBgnd=0;
+                def->menuStripeAppearance=APPEARANCE_GRADIENT;
             }
             if(version<QTC_MAKE_VERSION(0, 65))
             {
@@ -1704,7 +1705,7 @@ static void defaultSettings(Options *opts)
     opts->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
     opts->menuStripe=SHADE_NONE;
-    opts->menuStripeAppearance=APPEARANCE_GRADIENT;
+    opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
     opts->shading=SHADING_HSL;
     opts->gtkScrollViews=false;
     opts->comboBtn=SHADE_NONE;

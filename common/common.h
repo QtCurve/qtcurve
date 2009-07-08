@@ -476,6 +476,7 @@ typedef enum
     APPEARANCE_GRADIENT,
     APPEARANCE_HARSH_GRADIENT,
     APPEARANCE_INVERTED,
+    APPEARANCE_DARK_INVERTED,
     APPEARANCE_SPLIT_GRADIENT,
     APPEARANCE_BEVELLED,
         APPEARANCE_FADE, /* Only for poupmenu items! */
@@ -1375,6 +1376,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
         setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.1,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.3,1.0,0.925);
         setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_RAISED], GB_3D,2,0.0,0.93,1.0,1.04);
+        setupGradient(&stdGradients[APPEARANCE_DARK_INVERTED-APPEARANCE_RAISED], GB_NONE,3,0.0,0.8,0.7,0.95,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], GB_3D,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
         setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
