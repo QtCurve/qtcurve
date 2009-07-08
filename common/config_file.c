@@ -952,6 +952,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(0, 66))
+            {
+                def->tabBgnd=0;
+            }
             if(version<QTC_MAKE_VERSION(0, 65))
             {
                 def->tabMouseOver=TAB_MO_BOTTOM;
@@ -1027,6 +1031,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_INT(menuDelay)
             QTC_CFG_READ_INT(sliderWidth)
             QTC_CFG_READ_INT_BOOL(lighterPopupMenuBgnd)
+            QTC_CFG_READ_INT(tabBgnd)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
             QTC_CFG_READ_APPEARANCE(bgndAppearance, false)
@@ -1492,8 +1497,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->sliderWidth<DEFAULT_SLIDER_WIDTH)
                 opts->sliderThumbs=LINE_NONE;
 
-            if(opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
+            if(opts->lighterPopupMenuBgnd<MIN_LIGHTER_POPUP_MENU || opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
                 opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
+
+            if(opts->tabBgnd<MIN_TAB_BGND || opts->tabBgnd>MAX_TAB_BGND)
+                opts->tabBgnd=DEF_TAB_BGND;
 
             if(opts->animatedProgress && !opts->stripedProgress)
                 opts->animatedProgress=false;
@@ -1615,6 +1623,7 @@ static void defaultSettings(Options *opts)
     opts->round=ROUND_FULL;
 #endif
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
+    opts->tabBgnd=DEF_TAB_BGND;
     opts->animatedProgress=false;
     opts->stripedProgress=STRIPE_NONE;
     opts->sliderStyle=SLIDER_PLAIN;
@@ -2181,6 +2190,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(sliderStyle)
         CFG_WRITE_ENTRY(animatedProgress)
         CFG_WRITE_ENTRY_NUM(lighterPopupMenuBgnd)
+        CFG_WRITE_ENTRY_NUM(tabBgnd)
         CFG_WRITE_ENTRY(embolden)
         CFG_WRITE_ENTRY(defBtnIndicator)
         CFG_WRITE_ENTRY_B(sliderThumbs, false)

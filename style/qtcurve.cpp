@@ -311,6 +311,7 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 #define QTC_STATE_MENU        (QStyle::StateFlag)0x20000000
 #define QTC_STATE_KWIN_BUTTON (QStyle::StateFlag)0x40000000
 #define QTC_STATE_TBAR_BUTTON (QStyle::StateFlag)0x80000000
+#define QTC_NO_BGND_BUTTON    (QStyle::StateFlag)0x80000000
 
 #define M_PI 3.14159265358979323846
 
@@ -3623,9 +3624,19 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
 
             QStyleOption opt(*option);
+            const QColor *use=backgroundColors(option);
 
             opt.state|=State_Enabled;
-            drawBorder(painter, r, &opt, round, backgroundColors(option), WIDGET_TAB_FRAME,
+            if(0!=opts.tabBgnd)
+            {
+                painter->save();
+                painter->setClipPath(buildPath(r, WIDGET_TAB_FRAME, ROUNDED_ALL,
+                                               getRadius(&opts, r.width(), r.height(), WIDGET_TAB_FRAME, RADIUS_EXTERNAL),
+                                               0, -0.5));
+                painter->fillRect(option->rect, shade(use[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd)));
+                painter->restore();
+            }
+            drawBorder(painter, r, &opt, round, use, WIDGET_TAB_FRAME,
                        opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, false);
             painter->restore();
             break;
@@ -5454,7 +5465,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                 drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, state&State_Horizontal, false,
                                       opts.sbarBgndAppearance, WIDGET_SB_BGND);
-            else if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
+            else if(!(state&QTC_NO_BGND_BUTTON) && (!widget || !widget->testAttribute(Qt::WA_NoSystemBackground)))
                 painter->fillRect(r, palette.brush(QPalette::Background));
 
             QStyleOption opt(*option);
@@ -6656,7 +6667,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                    horiz(Qt::Horizontal==scrollbar->orientation),
                                    maxed(scrollbar->minimum == scrollbar->maximum),
                                    atMin(maxed || scrollbar->sliderValue==scrollbar->minimum),
-                                   atMax(maxed || scrollbar->sliderValue==scrollbar->maximum);
+                                   atMax(maxed || scrollbar->sliderValue==scrollbar->maximum),
+                                   inStack((/*!IS_FLAT(opts.bgndAppearance) || */0!=opts.tabBgnd) &&
+                                         widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                                         widget->parentWidget()->parentWidget()->parentWidget() &&
+                                         ::qobject_cast<const QAbstractScrollArea *>(widget->parentWidget()->parentWidget()) &&
+                                         ((QFrame *)(widget->parentWidget()->parentWidget()))->lineWidth()<2 &&
+                                         ::qobject_cast<const QStackedWidget *>(widget->parentWidget()->parentWidget()->parentWidget()));
                 QRect              subline(subControlRect(control, option, SC_ScrollBarSubLine, widget)),
                                    addline(subControlRect(control, option, SC_ScrollBarAddLine, widget)),
                                    subpage(subControlRect(control, option, SC_ScrollBarSubPage, widget)),
@@ -6718,6 +6735,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
                         painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
+
+                    if(inStack)
+                    {
+//                         if(!IS_FLAT(opts.bgndAppearance))
+//                             drawWindowBackground((QWidget *)widget);
+//                         else if(0!=opts.tabBgnd)
+                            painter->fillRect(r, shade(option->palette.background().color(), QTC_TO_FACTOR(opts.tabBgnd)));
+                    }
                 }
 
                 if(noButtons || opts.flatSbarButtons)
@@ -6771,7 +6796,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if((option->subControls&SC_ScrollBarSubLine) && subline.isValid())
                 {
                     opt.rect=subline;
-                    opt.state=scrollbar->state;
+                    opt.state=scrollbar->state|(inStack ? QTC_NO_BGND_BUTTON : State_None);
                     if(maxed)
                         opt.state&=~State_Enabled;
                     if (!(scrollbar->activeSubControls&SC_ScrollBarSubLine) ||
@@ -6783,7 +6808,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if (useThreeButtonScrollBar && subline2.isValid())
                     {
                         opt.rect=subline2;
-                        opt.state=scrollbar->state;
+                        opt.state=scrollbar->state|(inStack ? QTC_NO_BGND_BUTTON : State_None);
                         if(maxed)
                             opt.state&=~State_Enabled;
                         if ((!(scrollbar->activeSubControls&SC_ScrollBarSubLine)) || (itsSbWidget && itsSbWidget!=widget))
@@ -6796,7 +6821,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if((option->subControls&SC_ScrollBarAddLine) && addline.isValid())
                 {
                     opt.rect=addline;
-                    opt.state=scrollbar->state;
+                    opt.state=scrollbar->state|(inStack ? QTC_NO_BGND_BUTTON : State_None);
                     if(maxed)
                         opt.state&=~State_Enabled;
                     if (!(scrollbar->activeSubControls&SC_ScrollBarAddLine))
@@ -9496,14 +9521,20 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
 
 void QtCurveStyle::fillTab(QPainter *p, const QRect &r, const QStyleOption *option, const QColor &fill, bool horiz, EWidget tab) const
 {
-    if(option->state&State_Selected && APPEARANCE_INVERTED==opts.appearance)
-        p->fillRect(r, option->palette.background().color());
+    bool   invertedSel=option->state&State_Selected && APPEARANCE_INVERTED==opts.appearance;
+    QColor col(invertedSel ? option->palette.background().color() : fill);
+
+    if(opts.tabBgnd)
+        col=shade(col, QTC_TO_FACTOR(opts.tabBgnd));
+
+    if(invertedSel)
+        p->fillRect(r, col);
     else
     {
         bool        selected(option->state&State_Selected);
         EAppearance app(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP);
 
-        drawBevelGradient(fill, p, r, horiz, option->state&State_Selected, app, tab);
+        drawBevelGradient(col, p, r, horiz, option->state&State_Selected, app, tab);
     }
 }
 

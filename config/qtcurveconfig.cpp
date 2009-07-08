@@ -538,7 +538,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     sliderWidth->setValue(DEFAULT_SLIDER_WIDTH);
     sliderWidth->setSuffix(i18n(" pixels"));
 
+    tabBgnd->setRange(MIN_TAB_BGND, MAX_TAB_BGND);
+    tabBgnd->setValue(DEF_TAB_BGND);
+
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
+    connect(tabBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuDelay, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(sliderWidth, SIGNAL(valueChanged(int)), SLOT(sliderWidthChanged()));
     connect(menuStripe, SIGNAL(currentIndexChanged(int)), SLOT(menuStripeChanged()));
@@ -1467,6 +1471,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.animatedProgress=animatedProgress->isChecked();
     opts.stripedProgress=(EStripe)stripedProgress->currentIndex();
     opts.lighterPopupMenuBgnd=lighterPopupMenuBgnd->value();
+    opts.tabBgnd=tabBgnd->value();
     opts.menuDelay=menuDelay->value();
     opts.sliderWidth=sliderWidth->value();
     opts.menuStripe=(EShade)menuStripe->currentIndex();
@@ -1595,6 +1600,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     round->setCurrentIndex(opts.round);
     scrollbarType->setCurrentIndex(opts.scrollbarType);
     lighterPopupMenuBgnd->setValue(opts.lighterPopupMenuBgnd);
+    tabBgnd->setValue(opts.tabBgnd);
     menuDelay->setValue(opts.menuDelay);
     sliderWidth->setValue(opts.sliderWidth);
     menuStripe->setCurrentIndex(opts.menuStripe);
@@ -1786,6 +1792,7 @@ bool QtCurveConfig::settingsChanged()
          animatedProgress->isChecked()!=currentStyle.animatedProgress ||
          stripedProgress->currentIndex()!=currentStyle.stripedProgress ||
          lighterPopupMenuBgnd->value()!=currentStyle.lighterPopupMenuBgnd ||
+         tabBgnd->value()!=currentStyle.tabBgnd ||
          menuDelay->value()!=currentStyle.menuDelay ||
          sliderWidth->value()!=currentStyle.sliderWidth ||
          menuStripe->currentIndex()!=currentStyle.menuStripe ||

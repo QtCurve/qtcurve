@@ -1,3 +1,7 @@
+0.66.0
+------
+1. Add option to lighten/darken the background of tabs.
+
 0.65.4
 ------
 1. Use 'MS Windows' and not 'Windows' for scrollbar type - to aid
