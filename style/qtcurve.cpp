@@ -1336,7 +1336,7 @@ void QtCurveStyle::polish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                if(IS_FLAT(opts.bgndAppearance))
+                if(IS_FLAT(opts.bgndAppearance) || 0!=opts.tabBgnd)
                     frame->setBackgroundRole(QPalette::Window);
                 else
                     frame->setAutoFillBackground(false);
@@ -3559,7 +3559,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->save();
 
             if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
-                if((opts.round || !IS_FLAT(opts.bgndAppearance)) && widget && ::qobject_cast<const QTabWidget *>(widget))
+                if((opts.round || (!IS_FLAT(opts.bgndAppearance && 0==opts.tabBgnd))) &&
+                    widget && ::qobject_cast<const QTabWidget *>(widget))
                 {
                     struct QtcTabWidget : public QTabWidget
                     {
@@ -3571,7 +3572,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     if(tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
                     {
-                        if(!IS_FLAT(opts.bgndAppearance))
+                        if(!IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
                         {
                             QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
 
@@ -8155,7 +8156,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
 
     if(IS_FLAT(bevApp))
     {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || !sel)
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || opts.tabBgnd || !sel)
             p->fillRect(origRect, base);
     }
     else
@@ -8223,7 +8224,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         if(sel && (topTab || botTab) && i==numStops-1)
         {
             col=base;
-            if(!IS_FLAT(opts.bgndAppearance))
+            if(!IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
                 col.setAlphaF(0.0);
         }
         else
