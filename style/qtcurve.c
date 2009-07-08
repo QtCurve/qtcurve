@@ -1951,8 +1951,15 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
 
     parent = widget->parent;
 
-    while (parent && GTK_WIDGET_NO_WINDOW(parent))
+    while (parent && (GTK_WIDGET_NO_WINDOW(parent)))
+    {
+        if(opts.tabBgnd && GTK_IS_NOTEBOOK(parent) && parent->style)
+        {
+            shade(&opts, &(parent->style->bg[GTK_STATE_NORMAL]), color, QTC_TO_FACTOR(opts.tabBgnd));
+            return;
+        }
         parent = parent->parent;
+    }
 
     if (!parent)
         parent = widget;
@@ -4282,7 +4289,15 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
     gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
                                        area, x, y, width, height);
 */
+
     sanitizeSize(window, &width, &height);
+
+    if(isTab && 0!=opts.tabBgnd)
+    {
+        clipPath(cr, x-1, y-1, width+2, height+2, WIDGET_TAB_FRAME, RADIUS_EXTERNAL, ROUNDED_ALL);
+        drawAreaMod(cr, style, state, area, NULL, QTC_TO_FACTOR(opts.tabBgnd), x, y, width, height);
+        unsetCairoClipping(cr);
+    }
 
     if(GTK_SHADOW_NONE!=shadow_type)
     {
@@ -5072,7 +5087,7 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     QTC_CAIRO_BEGIN
     FN_CHECK
-
+    
     drawBoxGap(cr, style, window, GTK_SHADOW_OUT, state, widget, area, x, y,
                width, height, gap_side, gap_x, gap_width, opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, TRUE);
 
@@ -5190,6 +5205,15 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
 //     if(selected && !flatBgnd)
 //         drawBgndGradient(cr, style, area, widget, x, y, width, height);
 
+    GdkColor *c=col,
+             b;
+
+    if(selected && 0!=opts.tabBgnd)
+    {
+        shade(&opts, col, &b, QTC_TO_FACTOR(opts.tabBgnd));
+        c=&b;
+    }
+    
     if(selected && APPEARANCE_INVERTED==opts.appearance)
     {
         if(flatBgnd)
@@ -5197,9 +5221,9 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
     }
     else if(grad)
         drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                          col, horiz, selected, selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP, tab);
+                          c, horiz, selected, selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP, tab);
     else if(!selected || flatBgnd)
-        drawAreaColor(cr, area, NULL, col, x, y, width, height);
+        drawAreaColor(cr, area, NULL, c, x, y, width, height);
 }
 
 static void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidget tab, gboolean horiz)
@@ -6467,10 +6491,14 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 {
     bool       destIsQtc=QTCURVE_IS_RC_STYLE(dest),
                srcIsQtc=!src->name || src->name==strstr(src->name, QTC_RC_SETTING) ||
-                        (getAppName() && src->name==strstr(src->name, getAppName()));
+                        (getAppName() && src->name==strstr(src->name, getAppName())),
+               isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg");
     GtkRcStyle copy;
 
-    if(destIsQtc && !srcIsQtc)
+    if(isQtCNoteBook)
+        shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &src->bg[GTK_STATE_NORMAL], QTC_TO_FACTOR(opts.tabBgnd));
+
+    if(destIsQtc && !srcIsQtc && !isQtCNoteBook)
     {
         memcpy(copy.color_flags, dest->color_flags, sizeof(GtkRcFlags)*5);
         memcpy(copy.fg, dest->fg, sizeof(GdkColor)*5);
@@ -6481,7 +6509,7 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 
     parent_rc_class->merge(dest, src);
 
-    if(destIsQtc && !srcIsQtc)
+    if(destIsQtc && !srcIsQtc && !isQtCNoteBook)
     {
         memcpy(dest->color_flags, copy.color_flags, sizeof(GtkRcFlags)*5);
         memcpy(dest->fg, copy.fg, sizeof(GdkColor)*5);
