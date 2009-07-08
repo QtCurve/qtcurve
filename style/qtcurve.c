@@ -1232,7 +1232,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
 
     if(IS_FLAT(bevApp))
     {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || !sel)
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || opts.tabBgnd || !sel)
             drawAreaColorAlpha(cr, area, region, base, x, y, width, height, alpha);
     }
     else
@@ -1259,7 +1259,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             
             if(sel && (topTab || botTab) && i==grad->numStops-1)
             {
-                if(!IS_FLAT(opts.bgndAppearance))
+                if(!IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
                     alpha=0.0;
                 col=*base;
             }
@@ -5200,7 +5200,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
                     EWidget tab, gboolean grad)
 {
     gboolean selected=GTK_STATE_NORMAL==state,
-             flatBgnd=IS_FLAT(opts.bgndAppearance);
+             flatBgnd=IS_FLAT(opts.bgndAppearance) || 0!=opts.tabBgnd;
 
 //     if(selected && !flatBgnd)
 //         drawBgndGradient(cr, style, area, widget, x, y, width, height);
