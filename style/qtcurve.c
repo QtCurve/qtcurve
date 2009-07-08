@@ -4299,6 +4299,9 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
         unsetCairoClipping(cr);
     }
 
+    if(TAB_MO_GLOW==opts.tabMouseOver && gap_width>4 && isMozillaWidget(widget))
+        gap_width-=2;
+        
     if(GTK_SHADOW_NONE!=shadow_type)
     {
         int round=ROUNDED_ALL;
