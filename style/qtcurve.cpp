@@ -540,12 +540,12 @@ static QString themeFile(const QString &dir, const QString &n, const char *sub)
     return QFile(name).exists() ? name : QString();
 }
 
-static QString themeFile(const QString &dir, const QString &n)
+static QString themeFile(const QString &dir, const QString &n, bool kde3=false)
 {
-    QString name(themeFile(dir, n, QTC_THEME_DIR));
+    QString name(themeFile(dir, n, kde3 ? QTC_THEME_DIR : QTC_THEME_DIR4));
 
     if(name.isEmpty())
-        name=themeFile(dir, n, QTC_THEME_DIR4);
+        name=themeFile(dir, n, kde3 ? QTC_THEME_DIR4 : QTC_THEME_DIR);
     return name;
 }
 
@@ -562,8 +562,8 @@ class QtCurveStylePlugin : public QStylePlugin
         styles.insert("QtCurve");
 
         getStyles(kdeHome(), styles);
-        getStyles(KDE_PREFIX(3), styles);
-        getStyles(KDE_PREFIX(4), styles);
+        getStyles(KDE_PREFIX(useQt3Settings() ? 3 : 4), styles);
+        getStyles(KDE_PREFIX(useQt3Settings() ? 4 : 3), styles);
 
         return styles.toList();
     }
@@ -806,9 +806,9 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
         if(rcFile.isEmpty())
         {
-            rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), name);
+            rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), name, useQt3Settings());
             if(rcFile.isEmpty())
-                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), name);
+                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), name, !useQt3Settings());
         }
     }
 
