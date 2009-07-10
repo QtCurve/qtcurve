@@ -162,6 +162,12 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
             return APPEARANCE_SHINY_GLASS;
         if(0==memcmp(str, "dullglass", 9))
             return APPEARANCE_DULL_GLASS;
+        if(0==memcmp(str, "agua", 4))
+#if defined __cplusplus && !defined QTC_CONFIG_DIALOG  && defined QT_VERSION && QT_VERSION < 0x040000
+            return APPEARANCE_AGUA_MOD;
+#else
+            return APPEARANCE_AGUA;
+#endif
         if(0==memcmp(str, "inverted", 8))
             return APPEARANCE_INVERTED;
         if(0==memcmp(str, "bevelled", 8))
@@ -1550,6 +1556,21 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                         free(def->customGradient[i]);
             }
 #endif
+
+#ifndef QTC_CONFIG_DIALOG
+            opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
+            opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
+            opts->lvAppearance=MODIFY_AGUA(opts->lvAppearance);
+            opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
+            opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
+            opts->menuBgndAppearance=MODIFY_AGUA(opts->menuBgndAppearance);
+            opts->menuStripeAppearance=MODIFY_AGUA(opts->menuStripeAppearance);
+            opts->grooveAppearance=MODIFY_AGUA(opts->grooveAppearance);
+            opts->progressAppearance=MODIFY_AGUA(opts->progressAppearance);
+#ifdef __cplusplus
+            opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
+#endif
+#endif
             return true;
         }
         else
@@ -1861,6 +1882,8 @@ static QString toStr(EAppearance exp)
             return "shinyglass";
         case APPEARANCE_FADE:
             return "fade";
+        case APPEARANCE_AGUA:
+            return "agua";
         default:
         {
             QString app;

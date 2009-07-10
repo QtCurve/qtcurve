@@ -299,6 +299,7 @@ static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=
     combo->insertItem(APPEARANCE_RAISED, i18n("Raised"));
     combo->insertItem(APPEARANCE_DULL_GLASS, i18n("Dull glass"));
     combo->insertItem(APPEARANCE_SHINY_GLASS, i18n("Shiny glass"));
+    combo->insertItem(APPEARANCE_AGUA, i18n("Agua"));
     combo->insertItem(APPEARANCE_SOFT_GRADIENT, i18n("Soft gradient"));
     combo->insertItem(APPEARANCE_GRADIENT, i18n("Standard gradient"));
     combo->insertItem(APPEARANCE_HARSH_GRADIENT, i18n("Harsh gradient"));

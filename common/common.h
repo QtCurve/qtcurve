@@ -233,6 +233,8 @@ typedef GdkColor color;
                           WIDGET_TOOLBAR_BUTTON==(w) )
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
+#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
+                        WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w))
 #else
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
                           WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
@@ -240,7 +242,12 @@ typedef GdkColor color;
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_COMBO==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
                         WIDGET_TOOLBAR_BUTTON==(w))
+#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
+                        WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w))
 #endif
+
+#define MODIFY_AGUA(A) (APPEARANCE_AGUA==(A) ?  APPEARANCE_AGUA_MOD : (A))
+
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10
 #define QTC_DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
@@ -472,6 +479,7 @@ typedef enum
     APPEARANCE_RAISED,
     APPEARANCE_DULL_GLASS,
     APPEARANCE_SHINY_GLASS,
+    APPEARANCE_AGUA,
     APPEARANCE_SOFT_GRADIENT,
     APPEARANCE_GRADIENT,
     APPEARANCE_HARSH_GRADIENT,
@@ -481,7 +489,8 @@ typedef enum
     APPEARANCE_BEVELLED,
         APPEARANCE_FADE, /* Only for poupmenu items! */
         APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
-    QTC_NUM_STD_APP = APPEARANCE_LV_BEVELLED-QTC_NUM_CUSTOM_GRAD
+        APPEARANCE_AGUA_MOD,
+    QTC_NUM_STD_APP = APPEARANCE_AGUA_MOD-QTC_NUM_CUSTOM_GRAD
 } EAppearance;
 
 #define IS_SLIDER(W)        (WIDGET_SLIDER==(W) || WIDGET_SB_SLIDER==(W))
@@ -1306,38 +1315,38 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
     switch(w)
     {
         case WIDGET_SB_BGND:
-            return opts->sbarBgndAppearance;
+            return MODIFY_AGUA(opts->sbarBgndAppearance);
         case WIDGET_LISTVIEW_HEADER:
-            return opts->lvAppearance;
+            return MODIFY_AGUA(opts->lvAppearance);
         case WIDGET_SB_BUTTON:
         case WIDGET_SLIDER:
         case WIDGET_SB_SLIDER:
             return opts->sliderAppearance;
         case WIDGET_FILLED_SLIDER_TROUGH:
-            return opts->sliderFill;
+            return MODIFY_AGUA(opts->sliderFill);
         case WIDGET_TAB_TOP:
         case WIDGET_TAB_BOT:
-            return opts->tabAppearance;
+            return MODIFY_AGUA(opts->tabAppearance);
         case WIDGET_MENU_ITEM:
-            return opts->menuitemAppearance;
+            return opts->borderMenuitems ? opts->menuitemAppearance : MODIFY_AGUA(opts->menuitemAppearance);
         case WIDGET_PROGRESSBAR:
             return opts->progressAppearance;
         case WIDGET_PBAR_TROUGH:
-            return opts->progressGrooveAppearance;
+            return MODIFY_AGUA(opts->progressGrooveAppearance);
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
         case WIDGET_SELECTION:
-            return opts->selectionAppearance;
+            return MODIFY_AGUA(opts->selectionAppearance);
 #endif
 #ifdef __cplusplus
         case WIDGET_MDI_WINDOW:
         case WIDGET_MDI_WINDOW_TITLE:
-            return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
+            return MODIFY_AGUA(active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance);
         case WIDGET_MDI_WINDOW_BUTTON:
             return opts->titlebarButtonAppearance;
 #endif
         case WIDGET_TROUGH:
         case WIDGET_SLIDER_TROUGH:
-            return opts->grooveAppearance;
+            return MODIFY_AGUA(opts->grooveAppearance);
         default:
             break;
     }
@@ -1372,6 +1381,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
         setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], GB_3D_FULL,2,0.0,1.0,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
+        setupGradient(&stdGradients[APPEARANCE_AGUA-APPEARANCE_RAISED], GB_NONE, 2,0.0,0.6,1.0,1.1);
         setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.04,1.0,0.98);
         setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.1,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.3,1.0,0.925);
@@ -1380,6 +1390,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
         setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], GB_3D,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
         setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
+        setupGradient(&stdGradients[APPEARANCE_AGUA_MOD-APPEARANCE_RAISED], GB_LIGHT,3,0.0,1.5,0.49,0.85,1.0,1.3);
         init=true;
     }
 

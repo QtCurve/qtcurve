@@ -3112,7 +3112,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
             else
                 drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true,
-                                  drawSunken, app, WIDGET_TROUGH);
+                                  drawSunken, MODIFY_AGUA(app), WIDGET_TROUGH);
 
             if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
             {
@@ -3247,7 +3247,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect, bgnd);
             else
-                drawBevelGradient(bgnd, painter, rect, true, drawSunken, app, wid);
+                drawBevelGradient(bgnd, painter, rect, true, drawSunken, MODIFY_AGUA(app), wid);
             if(coloredMo)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -6443,7 +6443,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(state&QtCStateKWinNoBorder)
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, true, false,
-                                      widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active), WIDGET_MDI_WINDOW);
+                                      MODIFY_AGUA(widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active)),
+                                      WIDGET_MDI_WINDOW);
                 else
                 {
                     drawLightBevel(painter, r, &opt, widget,
@@ -8441,6 +8442,53 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                     }
                 }
         }
+
+        if(APPEARANCE_AGUA==app && !sunken)
+        {
+            QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
+            double size=(QTC_MIN((horiz ? ra.height() : ra.width())/2.0, 16)),
+                   rad=size/2.0;
+            int    mod=4;
+
+            if(horiz)
+            {
+                if(!(ROUNDED_LEFT&round))
+                    ra.adjust(-8, 0, 0, 0);
+                if(!(ROUNDED_RIGHT&round))
+                    ra.adjust(0, 0, 8, 0);
+            }
+            else
+            {
+                if(!(ROUNDED_TOP&round))
+                    ra.adjust(0, -8, 0, 0);
+                if(!(ROUNDED_BOTTOM&round))
+                    ra.adjust(0, 0, 0, 8);
+            }
+
+/*            if(WIDGET_MDI_WINDOW_BUTTON==w)
+            {
+                rad/=1.5;
+                mod/=1.25;
+                ra.adjust(0, 0, 0, -4);
+            }
+            else */if(opts.round<ROUND_MAX || (!QTC_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
+            {
+                rad/=2.0;
+                mod=mod>>1;
+            }
+
+            QRectF          gr(horiz ? QRectF(ra.x()+mod, ra.y(), ra.width()-(mod*2)-1, size-1)
+                                     : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
+            QLinearGradient g(gr.topLeft(), horiz ? gr.bottomLeft() : gr.topRight());
+            QColor          white(Qt::white);
+
+            white.setAlphaF(0.9);
+            g.setColorAt(0.0, white);
+            white.setAlphaF(0.2);
+            g.setColorAt(1.0, white);
+            p->fillPath(buildPath(gr, w, round, rad), QBrush(g));
+        }
+        
         p->restore();
     }
 
@@ -8599,46 +8647,46 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                           GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
 }
 
-QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius, double wmod, double hmod) const
+QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, double radius) const
 {
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
-    double       xd(r.x()+0.5),
-                 yd(r.y()+0.5),
-                 diameter(radius*2),
-                 width((r.width()-1)+wmod),
-                 height((r.height()-1)+hmod);
-
+    double       diameter(radius*2);
     QPainterPath path;
 
     if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BR)
-        path.moveTo(xd+width, yd+height-radius);
+        path.moveTo(r.x()+r.width(), r.y()+r.height()-radius);
     else
-        path.moveTo(xd+width, yd+height);
+        path.moveTo(r.x()+r.width(), r.y()+r.height());
 
     if (round&CORNER_TR)
-        path.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 90);
+        path.arcTo(r.x()+r.width()-diameter, r.y(), diameter, diameter, 0, 90);
     else
-        path.lineTo(xd+width, yd);
+        path.lineTo(r.x()+r.width(), r.y());
 
     if (round&CORNER_TL)
-        path.arcTo(xd, yd, diameter, diameter, 90, 90);
+        path.arcTo(r.x(), r.y(), diameter, diameter, 90, 90);
     else
-        path.lineTo(xd, yd);
+        path.lineTo(r.x(), r.y());
 
     if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BL)
-        path.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 90);
+        path.arcTo(r.x(), r.y()+r.height()-diameter, diameter, diameter, 180, 90);
     else
-        path.lineTo(xd, yd+height);
+        path.lineTo(r.x(), r.y()+r.height());
 
     if(WIDGET_MDI_WINDOW_TITLE!=w)
         if (round&CORNER_BR)
-            path.arcTo(xd+width-diameter, yd+height-diameter, diameter, diameter, 270, 90);
+            path.arcTo(r.x()+r.width()-diameter, r.y()+r.height()-diameter, diameter, diameter, 270, 90);
         else
-            path.lineTo(xd+width, yd+height);
+            path.lineTo(r.x()+r.width(), r.y()+r.height());
 
     return path;
+}
+
+QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius, double wmod, double hmod) const
+{
+    return buildPath(QRectF(r.x()+0.5, r.y()+0.5, (r.width()-1)+wmod, (r.height()-1)+hmod), w, round, radius);
 }
 
 void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double radius, QPainterPath &tl, QPainterPath &br) const
@@ -9269,7 +9317,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         else
         {
             drawBevelGradient(fill, p, QRect(x, y, horiz ? r.width()-1 : size, horiz ? size : r.height()-1),
-                              horiz, false, opts.sliderAppearance);
+                              horiz, false, MODIFY_AGUA(opts.sliderAppearance));
 
             if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver)
             {
@@ -9279,16 +9327,16 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                 if(horiz)
                 {
                     drawBevelGradient(itsMouseOverCols[col], p, QRect(x+1, y+1, len, size-2),
-                                      horiz, false, opts.sliderAppearance);
+                                      horiz, false, MODIFY_AGUA(opts.sliderAppearance));
                     drawBevelGradient(itsMouseOverCols[col], p,  QRect(x+r.width()-(1+len), y+1, len, size-2),
-                                      horiz, false, opts.sliderAppearance);
+                                      horiz, false, MODIFY_AGUA(opts.sliderAppearance));
                 }
                 else
                 {
                     drawBevelGradient(itsMouseOverCols[col], p, QRect(x+1, y+1, size-2, len),
-                                      horiz, false, opts.sliderAppearance);
+                                      horiz, false, MODIFY_AGUA(opts.sliderAppearance));
                     drawBevelGradient(itsMouseOverCols[col], p,QRect(x+1, y+r.height()-(1+len), size-2, len),
-                                      horiz, false, opts.sliderAppearance);
+                                      horiz, false, MODIFY_AGUA(opts.sliderAppearance));
                 }
             }
         }
@@ -9533,7 +9581,7 @@ void QtCurveStyle::fillTab(QPainter *p, const QRect &r, const QStyleOption *opti
     else
     {
         bool        selected(option->state&State_Selected);
-        EAppearance app(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP);
+        EAppearance app(MODIFY_AGUA(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP));
 
         drawBevelGradient(col, p, r, horiz, option->state&State_Selected, app, tab);
     }
