@@ -1637,6 +1637,56 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 }
             }
         }
+        
+        if(APPEARANCE_AGUA==app && !sunken)
+        {
+            int             xa=x, ya=y, wa=width, ha=height;
+            double          size=(QTC_MIN((horiz ? ha : wa)/2.0, 16)),
+                            rad=size/2.0;
+            cairo_pattern_t *pt=NULL;
+            int             mod=4; 
+
+            if(horiz)
+            {
+                if(!(ROUNDED_LEFT&round))
+                    xa-=8, wa+=8;
+                if(!(ROUNDED_RIGHT&round))
+                    wa+=8;
+            }
+            else
+            {
+                if(!(ROUNDED_TOP&round))
+                    ya-=8, ha+=8;
+                if(!(ROUNDED_BOTTOM&round))
+                    ha+=8;
+            }
+            pt=cairo_pattern_create_linear(xa, ya, xa+(horiz ? 0.0 : size), ya+(horiz ? size : 0.0));
+            cairo_new_path(cr);
+            cairo_save(cr);
+            
+            if(opts.round<ROUND_MAX || (!QTC_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
+            {
+                rad/=2.0;
+                mod=mod>>1;
+            }
+
+            if(horiz)
+                createPath(cr, xa+mod+0.5, ya+0.5, wa-(mod*2)-1, size-1, rad, round);
+            else
+                createPath(cr, xa+0.5, ya+mod+0.5, size-1, ha-(mod*2)-1, rad, round);
+
+            cairo_clip(cr);
+
+            cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, 0.9);
+            cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, 0.2);
+
+            cairo_set_source(cr, pt);
+            cairo_rectangle(cr, xa, ya, horiz ? wa : size, horiz ? size : ha);
+            cairo_fill(cr);
+            cairo_pattern_destroy (pt);
+            cairo_restore(cr);
+        }
+        
         cairo_restore(cr);
     }
     xd+=1, x++, yd+=1, y++, width-=2, height-=2;
@@ -1644,7 +1694,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     if(plastikMouseOver && !sunken)
     {
         bool         thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN==widget || ((horiz ? height : width)<16),
-                        horizontal=WIDGET_SB_SLIDER==widget ? !horiz
+                     horizontal=WIDGET_SB_SLIDER==widget ? !horiz
                                                     : (horiz && WIDGET_SB_BUTTON!=widget) ||
                                                         (!horiz && WIDGET_SB_BUTTON==widget);
         int          len=WIDGET_SB_SLIDER==widget ? QTC_SB_SLIDER_MO_LEN(horiz ? width : height) : (thin ? 1 : 2);
@@ -3605,7 +3655,7 @@ debugDisplayWidget(widget, 3);
                                     : DETAIL("handlebox")
                                             ? width<height
                                             : width>height,
-                                FALSE, app, WIDGET_OTHER);
+                                FALSE, MODIFY_AGUA(app), WIDGET_OTHER);
             else if(IS_FLAT(opts.bgndAppearance) || !(widget &&
                                                       drawBgndGradient(cr, style, area, widget, x, y, width, height)))
                 drawAreaColor(cr, area, NULL, col, x, y, width, height);
@@ -3913,7 +3963,7 @@ debugDisplayWidget(widget, 3);
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
                 drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
-                                  TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+                                  TRUE, FALSE, MODIFY_AGUA(opts.menuitemAppearance), WIDGET_MENU_ITEM);
             else if(stdColors && opts.borderMenuitems)
             {
                 drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
@@ -3926,7 +3976,7 @@ debugDisplayWidget(widget, 3);
             {
                 if(width>2 && height>2)
                     drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, &itemCols[fillVal],
-                                      TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+                                      TRUE, FALSE, MODIFY_AGUA(opts.menuitemAppearance), WIDGET_MENU_ITEM);
 
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                                itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
@@ -4459,7 +4509,7 @@ debugDisplayWidget(widget, 3);
             drawAreaColor(cr, area, NULL, bgndCol, x+1, y+1, QTC_CHECK_SIZE-2, QTC_CHECK_SIZE-2);
         else
             drawBevelGradient(cr, style, area, NULL, x+1, y+1, QTC_CHECK_SIZE-2, QTC_CHECK_SIZE-2, bgndCol,
-                              TRUE, drawSunken, app, wid);
+                              TRUE, drawSunken, MODIFY_AGUA(app), wid);
 
         if(coloredMouseOver && !glow)
         {
@@ -4645,7 +4695,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawAreaColor(cr, NULL, region, bgndCol, x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2);
             else
                 drawBevelGradient(cr, style, NULL, region, x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2, bgndCol,
-                                  TRUE, drawSunken, app, wid);
+                                  TRUE, drawSunken, MODIFY_AGUA(app), wid);
 
             gdk_region_destroy(region);
 
@@ -5224,7 +5274,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
     }
     else if(grad)
         drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                          c, horiz, selected, selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP, tab);
+                          c, horiz, selected, MODIFY_AGUA(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP), tab);
     else if(!selected || flatBgnd)
         drawAreaColor(cr, area, NULL, c, x, y, width, height);
 }
@@ -5751,7 +5801,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         else
         {
             drawBevelGradient(cr, style, NULL, region, x, y, horiz ? width-1 : size, horiz ? size : height-1, &colors[bgnd],
-                              horiz, FALSE, opts.sliderAppearance, WIDGET_OTHER);
+                              horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
 
             if(MO_PLASTIK==opts.coloredMouseOver && coloredMouseOver)
             {
@@ -5761,16 +5811,16 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                 if(horiz)
                 {
                     drawBevelGradient(cr, style, NULL, region, x+1, y+1, len, size-2, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, opts.sliderAppearance, WIDGET_OTHER);
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
                     drawBevelGradient(cr, style, NULL, region, x+width-(1+len), y+1, len, size-2, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, opts.sliderAppearance, WIDGET_OTHER);
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
                 }
                 else
                 {
                     drawBevelGradient(cr, style, NULL, region, x+1, y+1, size-2, len, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, opts.sliderAppearance, WIDGET_OTHER);
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
                     drawBevelGradient(cr, style, NULL, region, x+1, y+height-(1+len), size-2, len, &qtcPalette.mouseover[col],
-                                      horiz, FALSE, opts.sliderAppearance, WIDGET_OTHER);
+                                      horiz, FALSE, MODIFY_AGUA(opts.sliderAppearance), WIDGET_OTHER);
                 }
             }
         }
