@@ -1570,6 +1570,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #ifdef __cplusplus
             opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
 #endif
+            if(APPEARANCE_FLAT==opts->tabAppearance)
+                opts->tabAppearance=APPEARANCE_RAISED;
 #endif
             return true;
         }

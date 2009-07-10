@@ -9583,7 +9583,7 @@ void QtCurveStyle::fillTab(QPainter *p, const QRect &r, const QStyleOption *opti
         bool        selected(option->state&State_Selected);
         EAppearance app(MODIFY_AGUA(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP));
 
-        drawBevelGradient(col, p, r, horiz, option->state&State_Selected, app, tab);
+        drawBevelGradient(col, p, r, horiz, selected, app, tab);
     }
 }
 
