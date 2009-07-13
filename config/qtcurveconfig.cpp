@@ -317,7 +317,7 @@ static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=
     }
 }
 
-static void insertLineEntries(QComboBox *combo, bool dashes=false)
+static void insertLineEntries(QComboBox *combo, bool dashes)
 {
     combo->insertItem(LINE_NONE, i18n("None"));
     combo->insertItem(LINE_SUNKEN, i18n("Sunken lines"));
@@ -506,7 +506,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(bgndAppearance);
     insertLineEntries(handles, true);
     insertLineEntries(sliderThumbs, false);
-    insertLineEntries(toolbarSeparators);
+    insertLineEntries(toolbarSeparators, false);
     insertLineEntries(splitters, true);
     insertDefBtnEntries(defBtnIndicator);
     insertScrollbarEntries(scrollbarType);

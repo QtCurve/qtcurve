@@ -1561,7 +1561,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
 #ifndef QTC_CONFIG_DIALOG
             opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
+#if (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
+#endif
             opts->lvAppearance=MODIFY_AGUA(opts->lvAppearance);
             opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
             opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
