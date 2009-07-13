@@ -3687,29 +3687,26 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
 
                 QPixmap pix(QSize(24, r.height()));
-                uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver));
                 QString key;
 
-                key.sprintf("qtc-sel-%x-%x-%x-%x", pix.width(), pix.height(), state, color.rgba());
+                key.sprintf("qtc-sel-%x-%x", pix.height(), color.rgba());
                 if(!usePixmapCache || !QPixmapCache::find(key, pix))
                 {
                     pix.fill(Qt::transparent);
 
                     QPainter pixPainter(&pix);
                     QRect    border(0, 0, pix.width(), pix.height());
+                    double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
 
                     pixPainter.setRenderHint(QPainter::Antialiasing, true);
-                    pixPainter.setClipPath(buildPath(border, WIDGET_OTHER, ROUNDED_ALL,
-                                                getRadius(&opts, border.width(), border.height(), WIDGET_OTHER, RADIUS_SELECTION), 0, -0.5));
+                    pixPainter.setClipPath(buildPath(border, WIDGET_OTHER, ROUNDED_ALL, radius, 0, -0.5));
 
                     drawBevelGradient(color, &pixPainter, border.adjusted(1, 1, -1, -1), true, false,
-                                    opts.selectionAppearance, WIDGET_SELECTION, !usePixmapCache);
+                                      opts.selectionAppearance, WIDGET_SELECTION, !usePixmapCache);
                     pixPainter.setBrush(Qt::NoBrush);
                     pixPainter.setPen(color);
                     pixPainter.setClipRect(border);
-                    pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL,
-                                                getRadius(&opts, border.width(), border.height(), WIDGET_OTHER,
-                                                            RADIUS_SELECTION)));
+                    pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
                     pixPainter.end();
 
                     if(usePixmapCache)
@@ -3717,7 +3714,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
 
                 bool roundedLeft  = false,
-                    roundedRight = false;
+                     roundedRight = false;
+
                 if (v4Opt)
                 {
                     roundedLeft  = (QStyleOptionViewItemV4::Beginning==v4Opt->viewItemPosition);
@@ -3856,26 +3854,25 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             break;
         case CE_RubberBand: // Rubber band used in such things as iconview.
         {
-            painter->save();
-            QColor c(itsHighlightCols[ORIGINAL_SHADE]);
-            double radius=QTC_ROUNDED ? getRadius(&opts, r.width(), r.height(), WIDGET_RUBBER_BAND, RADIUS_SELECTION) : 0.0;
-
-            painter->setClipRegion(r);
-            r.adjust(0, 0, -1, -1);
-            painter->setPen(c);
             if(r.width()>0 && r.height()>0)
             {
+                painter->save();
+                QColor c(itsHighlightCols[ORIGINAL_SHADE]);
+
+                painter->setClipRegion(r);
+                painter->setPen(c);
                 c.setAlpha(50);
                 painter->setBrush(c);
-                if(radius>0.0 && r.width()>(2*radius) && r.height()>(2*radius))
-                {
-                    painter->setRenderHint(QPainter::Antialiasing, true);
-                    painter->drawPath(buildPath(r, WIDGET_RUBBER_BAND, ROUNDED_ALL, radius));
-                }
-                else
+//                 double radius=QTC_ROUNDED ? getRadius(&opts, r.width(), r.height(), WIDGET_RUBBER_BAND, RADIUS_SELECTION) : 0.0;
+//                 if(radius>0.0 && r.width()>(2*radius) && r.height()>(2*radius))
+//                 {
+//                     painter->setRenderHint(QPainter::Antialiasing, true);
+//                     painter->drawPath(buildPath(r, WIDGET_RUBBER_BAND, ROUNDED_ALL, radius));
+//                 }
+//                 else
                     drawRect(painter, r);
+                painter->restore();
             }
-            painter->restore();
             break;
         }
         case CE_Splitter:

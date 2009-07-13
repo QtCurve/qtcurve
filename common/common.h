@@ -442,7 +442,7 @@ typedef enum
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     WIDGET_SELECTION,
-    WIDGET_RUBBER_BAND,
+//    WIDGET_RUBBER_BAND,
 #endif
     WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FOCUS,
@@ -1479,10 +1479,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             {
                 case ROUND_MAX:
                 case ROUND_EXTRA:
-                    if( (WIDGET_RUBBER_BAND==widget && w>14 && h>14) || (w>48 && h>48))
+                    if(/* (WIDGET_RUBBER_BAND==widget && w>14 && h>14) || */(w>48 && h>48))
                         return 6.0;
                 case ROUND_FULL:
-                    if( (WIDGET_RUBBER_BAND==widget && w>11 && h>11) || (w>48 && h>48))
+                    if( /*(WIDGET_RUBBER_BAND==widget && w>11 && h>11) || */(w>48 && h>48))
                         return 3.0;
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
                         return QTC_FULL_OUTER_RADIUS;

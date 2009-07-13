@@ -9,6 +9,7 @@
 5. Update Klearlooks to be more consistent with Clearlooks (lighten tab background,
    use highlight strip on active tab, dont colour active tab)
 6. Cache selection pixmaps to speed up drawing.
+7. Dont round rubber band, makes things more consistent with Gtk2 - and is faster.
 
 0.65.4
 ------
