@@ -2104,8 +2104,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(GTK_APP_JAVA!=qtSettings.app)
         qtcEntrySetup(widget);
 
-    if(doEtch || ROUND_NONE!=opts.round)
-    {
+    if((doEtch || ROUND_NONE!=opts.round) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
         if(!IS_FLAT(opts.bgndAppearance) && widget && drawBgndGradient(cr, style, area, widget, x, y, width, height))
             ;
         else
@@ -2133,7 +2132,6 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
             cairo_stroke(cr);
             unsetCairoClipping(cr);
         }
-    }
 
     if(doEtch)
         y++,  x++, height-=2,  width-=2;
@@ -2163,9 +2161,16 @@ debugDisplayWidget(widget, 3);
     }
 
     if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
+    {
+        if(opts.round>ROUND_FULL)
+            clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
+
         drawAreaColor(cr, area, NULL, enabled
                                     ? &style->base[WIDGET_COMBO_BUTTON==w || GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state]
                                     : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
+        if(opts.round>ROUND_FULL)
+            unsetCairoClipping(cr);
+    }
 
     {
     int xo=x, yo=y, widtho=width, heighto=height;
@@ -2442,7 +2447,7 @@ debugDisplayWidget(widget, 3);
     {
         if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))
             ;
-        else        
+        else
             parent_class->draw_flat_box(style, window, GTK_STATE_INSENSITIVE==state && DETAIL(QTC_PANED) ? GTK_STATE_NORMAL : state,
                                         shadow_type, area, widget, detail, x, y, width, height);
 
@@ -3464,7 +3469,8 @@ debugDisplayWidget(widget, 3);
             if(horiz && rev)
                 inverted=!inverted;
 
-            if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+            if((!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")) &&
+                IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
                 gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
                                                    GTK_STATE_INSENSITIVE==state
                                                         ? GTK_STATE_INSENSITIVE

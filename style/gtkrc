@@ -36,6 +36,7 @@ style "qtcurve-default"
   GtkMenu::horizontal-offset = -2
   GtkMenu::vertical-offset = 1
   GtkCheckMenuItem::indicator-size=17
+  GtkEntry::honors-transparent-bg-hint = 1
   xthickness = 1
   ythickness = 1
 
