@@ -30,3 +30,4 @@ titlebarButtons=85
 titlebarIcon=title
 inactiveTitlebarAppearance=customgradient1
 fixParentlessDialogs=true
+customShades=0
