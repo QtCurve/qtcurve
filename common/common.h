@@ -396,7 +396,7 @@ typedef enum
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
     PIX_SLIDER_LIGHT_V,
-    PIX_DOT
+    //PIX_DOT
 #if !defined __cplusplus
     , PIX_BLANK
 #endif

@@ -4,14 +4,13 @@
    for menu stripes.
 2. New 'Agua' style gradient - looks better under KDE4 and Gtk2.
 3. Add option to lighten/darken the background of tabs.
-4. New splitter / toolbar handle / slider thumb style - single dot.
-5. Make inactive tabs more consistent with active tabs.
-6. Use KDE_SESSION_VERSION to determine which KDE prefix (KDE3, or KDE4) to
+4. Make inactive tabs more consistent with active tabs.
+5. Use KDE_SESSION_VERSION to determine which KDE prefix (KDE3, or KDE4) to
    seach first for qtc_xxx.themerc files.
-7. Update Klearlooks to be more consistent with Clearlooks (lighten tab background,
+6. Update Klearlooks to be more consistent with Clearlooks (lighten tab background,
    use highlight strip on active tab, dont colour active tab)
-8. Cache selection pixmaps to speed up drawing.
-9. Dont round rubber band, makes things more consistent with Gtk2 - and is faster.
+7. Cache selection pixmaps to speed up drawing.
+8. Dont round rubber band, makes things more consistent with Gtk2 - and is faster.
 
 0.65.4
 ------
