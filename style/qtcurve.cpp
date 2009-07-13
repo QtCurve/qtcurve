@@ -3247,7 +3247,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(IS_FLAT(opts.appearance))
                 painter->fillRect(rect, bgnd);
             else
-                drawBevelGradient(bgnd, painter, rect, true, drawSunken, MODIFY_AGUA(app), wid);
+                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, drawSunken, MODIFY_AGUA(app), wid);
             if(coloredMo)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
