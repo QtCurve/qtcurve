@@ -1276,7 +1276,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
         cairo_set_source(cr, pt);
         cairo_rectangle(cr, x, y, width, height);
         cairo_fill(cr);
-        cairo_pattern_destroy (pt);
+        cairo_pattern_destroy(pt);
         unsetCairoClipping(cr);
     }
 }
@@ -1683,7 +1683,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
             cairo_set_source(cr, pt);
             cairo_rectangle(cr, xa, ya, horiz ? wa : size, horiz ? size : ha);
             cairo_fill(cr);
-            cairo_pattern_destroy (pt);
+            cairo_pattern_destroy(pt);
             cairo_restore(cr);
         }
         
@@ -1934,6 +1934,41 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
     unsetCairoClipping(cr);
     }
 }
+
+/*
+Not working :-(
+static void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
+{
+    double          dx=(x+((w-5)>>1))+0.5,
+                    dy=(y+((h-5)>>1))+0.5;
+    cairo_pattern_t *p1=cairo_pattern_create_linear(dx, dy, dx+4, dy+4),
+                    *p2=cairo_pattern_create_linear(dx+2, dy+2, dx+4, dx+4);
+
+    cairo_pattern_add_color_stop_rgba(p1, 0.0, QTC_CAIRO_COL(cols[QT_STD_BORDER]), 1.0);
+    cairo_pattern_add_color_stop_rgba(p1, 1.0, QTC_CAIRO_COL(cols[QT_STD_BORDER]), 0.4);
+    cairo_pattern_add_color_stop_rgba(p2, 1.0, 1.0, 1.0, 1.0, 1.0);
+    cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.8);
+
+    cairo_arc(cr, dx+2, dy+2, 2.75, 0, 2*M_PI);
+    cairo_clip(cr);
+    cairo_new_path(cr);
+    //cairo_set_source(cr, p1);
+    cairo_set_source_rgb(cr, QTC_CAIRO_COL(cols[QT_STD_BORDER]));
+    cairo_rectangle(cr, dx, dy, 4, 4);
+    cairo_fill(cr);
+
+    cairo_new_path(cr);
+    cairo_arc(cr, dx+3.5, dy+3.5, 1.75, 0, 2*M_PI);
+    cairo_clip(cr);
+    cairo_set_source(cr, p2);
+//     cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_rectangle(cr, dx+2, dy+2, 2, 2);
+    cairo_fill(cr);
+
+    cairo_pattern_destroy(p1);
+    cairo_pattern_destroy(p2);
+}
+*/
 
 static void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gboolean horiz,
                      int nLines, int offset, GdkColor *cols, GdkRectangle *area, int startOffset,
@@ -2464,6 +2499,9 @@ debugDisplayWidget(widget, 3);
 
         switch(opts.splitters)
         {
+//             case LINE_1DOT:
+//                 drawDot(cr, x, y, width, height, cols);
+//                 break;
             case LINE_NONE:
                 break;
             case LINE_DOTS:
@@ -2498,6 +2536,9 @@ debugDisplayWidget(widget, 3);
 
         switch(opts.handles)
         {
+//             case LINE_1DOT:
+//                 drawDot(cr, x, y, width, height, qtcPalette.background);
+//                 break;
             case LINE_NONE:
                 break;
             case LINE_DOTS:
@@ -3961,7 +4002,7 @@ debugDisplayWidget(widget, 3);
                     cairo_set_source(cr, pt);
                     cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
                     cairo_fill(cr);
-                    cairo_pattern_destroy (pt);
+                    cairo_pattern_destroy(pt);
                 }
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
@@ -5294,7 +5335,7 @@ static void colorTab(cairo_t *cr, int x, int y, int width, int height, int round
     cairo_set_source(cr, pt);
     cairo_rectangle(cr, x, y, width, height);
     cairo_fill(cr);
-    cairo_pattern_destroy (pt);
+    cairo_pattern_destroy(pt);
     unsetCairoClipping(cr);
 }
                     
@@ -5714,6 +5755,9 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
             switch(opts.sliderThumbs)
             {
+//                 case LINE_1DOT:
+//                     drawDot(cr, x, y, width, height, markers);
+//                     break;
                 case LINE_FLAT:
                     drawLines(cr, x, y, width, height,
                               GTK_ORIENTATION_HORIZONTAL!=orientation, 3, 5, markers, area, 5, opts.sliderThumbs);
