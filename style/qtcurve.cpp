@@ -8239,7 +8239,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
     {
         QColor col;
 
-        if(sel && (topTab || botTab) && i==numStops-1)
+        if(/*sel && */(topTab || botTab) && i==numStops-1)
         {
             col=base;
             if(!IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
