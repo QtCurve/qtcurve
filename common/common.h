@@ -395,7 +395,8 @@ typedef enum
     PIX_SLIDER,
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
-    PIX_SLIDER_LIGHT_V
+    PIX_SLIDER_LIGHT_V,
+    PIX_DOT
 #if !defined __cplusplus
     , PIX_BLANK
 #endif
@@ -534,6 +535,7 @@ typedef enum
     LINE_FLAT,
     LINE_DOTS,
     LINE_DASHES
+    //LINE_1DOT
 } ELine;
 
 typedef enum

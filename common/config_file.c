@@ -106,6 +106,8 @@ static ELine toLine(const char *str, ELine def)
             return LINE_DOTS;
         if(0==memcmp(str, "flat", 4))
             return LINE_FLAT;
+//         if(0==memcmp(str, "1dot", 5))
+//             return LINE_1DOT;
     }
     return def;
 }
@@ -1811,6 +1813,8 @@ static const char *toStr(ELine ind, bool dashes)
 {
     switch(ind)
     {
+//         case LINE_1DOT:
+//             return "1dot";
         case LINE_DOTS:
             return "dots";
         case LINE_DASHES:

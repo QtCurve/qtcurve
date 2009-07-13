@@ -2025,7 +2025,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 //         case PM_DockWindowHandleExtent:
 //             return 10;
         case PM_SplitterWidth:
-            return 6;
+            return /*LINE_1DOT==opts.splitters ? 7 : */6;
         case PM_ScrollBarSliderMin:
             return opts.sliderWidth+1;
         case PM_SliderThickness:
@@ -3869,17 +3869,24 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         {
             const QColor *use(buttonColors(option));
             const QColor *border(borderColors(option, use));
-            const QColor &color(palette.color(QPalette::Active, QPalette::Window));
 
             painter->save();
             if(IS_FLAT(opts.bgndAppearance) || state&State_MouseOver && state&State_Enabled)
+            {
+                const QColor &color(palette.color(QPalette::Active, QPalette::Window));
+
                 painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled
                                                 ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
                                                 : color));
+            }
+
             switch(opts.splitters)
             {
                 case LINE_NONE:
                     break;
+//                 case LINE_1DOT:
+//                     painter->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QT_STD_BORDER], PIX_DOT, 1.0));
+//                     break;
                 default:
                 case LINE_DOTS:
                     drawDots(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 5);
@@ -9218,6 +9225,9 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
     if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)))
         switch(opts.sliderThumbs)
         {
+//             case LINE_1DOT:
+//                 p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[QT_STD_BORDER], PIX_DOT, 1.0));
+//                 break;
             case LINE_FLAT:
                 drawLines(p, r, !(opt.state&State_Horizontal), 3, 5, markers, 0, 5, opts.sliderThumbs);
                 break;
@@ -9538,6 +9548,9 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
     {
         case LINE_NONE:
             break;
+//         case LINE_1DOT:
+//              p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QT_STD_BORDER], PIX_DOT, 1.0));
+//             break;
         case LINE_DOTS:
             drawDots(p, r, !(option->state&State_Horizontal), 2,
                      tb ? 5 : 3, border, tb ? -2 : 0, 5);
@@ -9845,49 +9858,82 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
 
     if(!pix)
     {
-        pix=new QPixmap();
-
-        QImage img;
-
-        switch(p)
+/*
+    Can't get Gtk2 version to look nice, so give up for now!
+        if(PIX_DOT==p)
         {
-            case PIX_RADIO_BORDER:
-                img.loadFromData(radio_frame_png_data, radio_frame_png_len);
-                break;
-            case PIX_RADIO_INNER:
-                img.loadFromData(radio_inner_png_data, radio_inner_png_len);
-                break;
-            case PIX_RADIO_LIGHT:
-                img.loadFromData(radio_light_png_data, radio_light_png_len);
-                break;
-            case PIX_RADIO_ON:
-                img.loadFromData(radio_on_png_data, radio_on_png_len);
-                break;
-            case PIX_CHECK:
-                img.loadFromData(opts.xCheck ? check_x_on_png_data : check_on_png_data, opts.xCheck ? check_x_on_png_len : check_on_png_len);
-                break;
-            case PIX_SLIDER:
-                img.loadFromData(slider_png_data, slider_png_len);
-                break;
-            case PIX_SLIDER_LIGHT:
-                img.loadFromData(slider_light_png_data, slider_light_png_len);
-                break;
-            case PIX_SLIDER_V:
-                img.loadFromData(slider_png_data, slider_png_len);
-                img=rotateImage(img);
-                break;
-            case PIX_SLIDER_LIGHT_V:
-                img.loadFromData(slider_light_png_data, slider_light_png_len);
-                img=rotateImage(img).mirrored(true, false);
-                break;
+            pix=new QPixmap(5, 5);
+            pix->fill(Qt::transparent);
+
+            QColor          c(col);
+            QPainter        p(pix);
+            QLinearGradient g1(0, 0, 5, 5),
+                            g2(0, 0, 3, 3);
+
+            g1.setColorAt(0.0, c);
+            c.setAlphaF(0.4);
+            g1.setColorAt(1.0, c);
+            c=Qt::white;
+            c.setAlphaF(1.0);
+            g2.setColorAt(0.0, c);
+            c.setAlphaF(0.8);
+            g2.setColorAt(1.0, c);
+            p.setRenderHint(QPainter::Antialiasing, true);
+            p.setPen(Qt::NoPen);
+            p.setBrush(g1);
+            p.drawEllipse(0, 0, 5, 5);
+            p.setBrush(g2);
+            p.drawEllipse(2, 2, 3, 3);
+            p.end();
         }
+        else
+*/
+        {
+            pix=new QPixmap();
 
-        if (img.depth()<32)
-            img=img.convertToFormat(QImage::Format_ARGB32);
+            QImage img;
 
-        adjustPix(img.bits(), 4, img.width(), img.height(), img.bytesPerLine(), col.red(),
-                  col.green(), col.blue(), shade);
-        *pix=QPixmap::fromImage(img);
+            switch(p)
+            {
+                case PIX_RADIO_BORDER:
+                    img.loadFromData(radio_frame_png_data, radio_frame_png_len);
+                    break;
+                case PIX_RADIO_INNER:
+                    img.loadFromData(radio_inner_png_data, radio_inner_png_len);
+                    break;
+                case PIX_RADIO_LIGHT:
+                    img.loadFromData(radio_light_png_data, radio_light_png_len);
+                    break;
+                case PIX_RADIO_ON:
+                    img.loadFromData(radio_on_png_data, radio_on_png_len);
+                    break;
+                case PIX_CHECK:
+                    img.loadFromData(opts.xCheck ? check_x_on_png_data : check_on_png_data, opts.xCheck ? check_x_on_png_len : check_on_png_len);
+                    break;
+                case PIX_SLIDER:
+                    img.loadFromData(slider_png_data, slider_png_len);
+                    break;
+                case PIX_SLIDER_LIGHT:
+                    img.loadFromData(slider_light_png_data, slider_light_png_len);
+                    break;
+                case PIX_SLIDER_V:
+                    img.loadFromData(slider_png_data, slider_png_len);
+                    img=rotateImage(img);
+                    break;
+                case PIX_SLIDER_LIGHT_V:
+                    img.loadFromData(slider_light_png_data, slider_light_png_len);
+                    img=rotateImage(img).mirrored(true, false);
+                default:
+                    break;
+            }
+
+            if (img.depth()<32)
+                img=img.convertToFormat(QImage::Format_ARGB32);
+
+            adjustPix(img.bits(), 4, img.width(), img.height(), img.bytesPerLine(), col.red(),
+                    col.green(), col.blue(), shade);
+            *pix=QPixmap::fromImage(img);
+        }
         itsPixmapCache.insert(key, pix, pix->depth()/8);
     }
 

@@ -36,3 +36,5 @@ titlebarButtons=85
 titlebarIcon=title
 inactiveTitlebarAppearance=customgradient1
 fixParentlessDialogs=true
+splitters=1dot
+handles=1dot
