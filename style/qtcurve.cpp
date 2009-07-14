@@ -1336,7 +1336,7 @@ void QtCurveStyle::polish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                if(IS_FLAT(opts.bgndAppearance) || 0!=opts.tabBgnd)
+                if(IS_FLAT(opts.bgndAppearance))
                     frame->setBackgroundRole(QPalette::Window);
                 else
                     frame->setAutoFillBackground(false);
