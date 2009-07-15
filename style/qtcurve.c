@@ -4013,7 +4013,7 @@ debugDisplayWidget(widget, 3);
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
                 drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
-                                  TRUE, FALSE, MODIFY_AGUA(opts.menuitemAppearance), WIDGET_MENU_ITEM);
+                                  TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
             else if(stdColors && opts.borderMenuitems)
             {
                 drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
@@ -4026,7 +4026,7 @@ debugDisplayWidget(widget, 3);
             {
                 if(width>2 && height>2)
                     drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, &itemCols[fillVal],
-                                      TRUE, FALSE, MODIFY_AGUA(opts.menuitemAppearance), WIDGET_MENU_ITEM);
+                                      TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
 
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                                itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
@@ -5324,7 +5324,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
     }
     else if(grad)
         drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                          c, horiz, selected, MODIFY_AGUA(selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP), tab);
+                          c, horiz, selected, selected ? QTC_SEL_TAB_APP : QTC_NORM_TAB_APP, tab);
     else if(!selected || flatBgnd)
         drawAreaColor(cr, area, NULL, c, x, y, width, height);
 }
