@@ -1909,7 +1909,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 #else
         case PM_TextCursorWidth+3:
 #endif
-            return 3;
+            return 2;
         case PM_MenuPanelWidth:
             return opts.popupBorder ? pixelMetric(PM_DefaultFrameWidth, option, widget) : 0;
         case PM_SizeGripSize:
