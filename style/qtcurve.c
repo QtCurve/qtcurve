@@ -3246,6 +3246,10 @@ debugDisplayWidget(widget, 3);
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
+                    if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
+                       GTK_IS_SCROLLED_WINDOW(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent))
+                        drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
+                    else
                     //if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                         drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
                                           &qtcPalette.background[ORIGINAL_SHADE],
@@ -3628,9 +3632,13 @@ debugDisplayWidget(widget, 3);
                 }
 
             if(drawBg)
-                drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
-                                  &qtcPalette.background[ORIGINAL_SHADE],
-                                  horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+                if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
+                   GTK_IS_SCROLLED_WINDOW(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent))
+                    drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
+                else
+                    drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
+                                      &qtcPalette.background[ORIGINAL_SHADE],
+                                      horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
             if(isMozilla())
             {
