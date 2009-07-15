@@ -421,14 +421,12 @@ static bool isInQAbstractItemView(const QObject *w)
     return false;
 }
 
-/*
 static bool isKontactPreviewPane(const QWidget *widget)
 {
     return APP_KONTACT==theThemedApp && widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
            widget->inherits("KHBox") && ::qobject_cast<const QSplitter *>(widget->parentWidget()) &&
            widget->parentWidget()->parentWidget()->inherits("KMReaderWin");
 }
-*/
 
 static bool isNoEtchWidget(const QWidget *widget)
 {
@@ -1989,7 +1987,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 widget->parentWidget()->inherits("KateView"))
                 return 0;
 
-            if (opts.squareScrollViews && widget && ::qobject_cast<const QAbstractScrollArea *>(widget))
+            if (opts.squareScrollViews && widget &&
+                (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget)))
                 return opts.gtkScrollViews ? 1 : 2;
 
             if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
@@ -2676,8 +2675,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             else
             {
                 bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
-                        (widget && widget->inherits("Q3ScrollView")) /*||
-                        isKontactPreviewPane(widget)*/);
+                        (widget && widget->inherits("Q3ScrollView")) ||
+                        (opts.squareScrollViews && isKontactPreviewPane(widget)));
 
                 if(sv && (opts.sunkenScrollViews || opts.squareScrollViews))
                 {
