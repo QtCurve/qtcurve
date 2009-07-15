@@ -1440,7 +1440,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                     {
                         GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
                         if(flags&DF_BLEND)
-                            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
+                            cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), BORDER_SUNKEN==borderProfile ? 0.0 : alpha);
                         else
                             cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
                     }
