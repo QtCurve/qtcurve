@@ -3661,7 +3661,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 break;
 
             if(hasCustomBackground)
+            {
+                const QPointF prevOrigin(painter->brushOrigin());
+
+                painter->setBrushOrigin(r.topLeft());
                 painter->fillRect(r, v4Opt->backgroundBrush);
+                painter->setBrushOrigin(prevOrigin);
+            }
 
             if(state&State_Selected || hover)
             {
