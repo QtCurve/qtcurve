@@ -8832,7 +8832,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 else if(doBlend && !window)
                 {
                     tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
-                    br.setAlphaF(QTC_BORDER_BLEND_ALPHA);
+                    br.setAlphaF(BORDER_SUNKEN ? 0.0 : QTC_BORDER_BLEND_ALPHA);
                 }
 
     //             if(window)
