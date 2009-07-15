@@ -6745,14 +6745,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
                         painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
-
-                    if(inStack)
-                    {
-//                         if(!IS_FLAT(opts.bgndAppearance))
-//                             drawWindowBackground((QWidget *)widget);
-//                         else if(0!=opts.tabBgnd)
-                            painter->fillRect(r, shade(option->palette.background().color(), QTC_TO_FACTOR(opts.tabBgnd)));
-                    }
+                        
+                    if(inStack && 0!=opts.tabBgnd)
+                        painter->fillRect(r, shade(option->palette.background().color(), QTC_TO_FACTOR(opts.tabBgnd)));
+//                     else if(opts.gtkScrollViews && !IS_FLAT(opts.bgndAppearance))
+//                         drawWindowBackground((QWidget *)widget);
                 }
 
                 if(noButtons || opts.flatSbarButtons)
