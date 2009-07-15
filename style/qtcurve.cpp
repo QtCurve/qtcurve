@@ -702,9 +702,9 @@ static QtcKey createKey(qulonglong size, const QColor &color, bool horiz, int ap
 
     return (color.rgba()<<1)+
            (((qulonglong)(horiz ? 1 : 0))<<33)  +
-           (((qulonglong)(size&0x7FFF))<<34)+
-           (((qulonglong)(app&0x1F))<<49)+
-           (((qulonglong)(type&0x03))<<54);
+           (((qulonglong)(size&0xFFFF))<<34)+
+           (((qulonglong)(app&0x1F))<<50)+
+           (((qulonglong)(type&0x03))<<55);
 }
 
 static QtcKey createKey(const QColor &color, EPixmap p)
@@ -2121,7 +2121,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             const QStyleOptionRubberBand *opt = qstyleoption_cast<const QStyleOptionRubberBand *>(option);
             if (!opt)
                 return true;
-            if (QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask*>(returnData)) 
+            if (QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask*>(returnData))
             {
                 mask->region = option->rect;
                 mask->region -= option->rect.adjusted(1,1,-1,-1);
@@ -2506,7 +2506,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             if(state&State_Children)
                                 painter->drawLine(middleH-constStep, middleV, r.right()-constStep, middleV);
                             else
-                                drawFadedLine(painter, QRect(middleH-constStep, middleV, r.right()-(middleH-constStep), middleV), palette.mid().color(), 
+                                drawFadedLine(painter, QRect(middleH-constStep, middleV, r.right()-(middleH-constStep), middleV), palette.mid().color(),
                                               false, true, true);
                         }
                         else
@@ -2532,7 +2532,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorHeaderArrow:
             if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
                 drawArrow(painter, r,
-                          header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown, 
+                          header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
                           QTC_MO_ARROW(option->palette.buttonText().color()));
             break;
         case PE_IndicatorArrowUp:
@@ -3781,7 +3781,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 break;
 
 //             const QStyleOptionToolBoxV2 *v2 = qstyleoption_cast<const QStyleOptionToolBoxV2 *>(option);
-// 
+//
 //             if (v2 && QStyleOptionToolBoxV2::Beginning==v2->position)
 //                 break;
 
@@ -4805,7 +4805,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
 //                     QRect              ir(button->rect);
 //                     QStyleOptionButton newBtn(*button);
-// 
+//
 //                     newBtn.rect = QRect(Qt::LeftToRight==button->direction
 //                                             ? ir.right() - mbi + 2
 //                                             : ir.x() + 6,
@@ -6439,12 +6439,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 //                 {
 //                     int     x(r.x()), y(r.y()), w(r.width()), h(r.height());
 //                     QRegion mask(x+5, y+0, w-10, h);
-// 
+//
 //                     mask += QRegion(x+0, y+5, 1, h-6);
 //                     mask += QRegion(x+1, y+3, 1, h-3);
 //                     mask += QRegion(x+2, y+2, 1, h-2);
 //                     mask += QRegion(x+3, y+1, 2, h-1);
-// 
+//
 //                     mask += QRegion(x+w-1, y+5, 1, h-6);
 //                     mask += QRegion(x+w-2, y+3, 1, h-3);
 //                     mask += QRegion(x+w-3, y+2, 1, h-2);
@@ -7641,9 +7641,9 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                         if(noButtons)
                         {
                             if (horizontal)
-                                ret=QRect(0, 0, scrollBar->rect.width(), scrollBar->rect.height()); 
+                                ret=QRect(0, 0, scrollBar->rect.width(), scrollBar->rect.height());
                             else
-                                ret=QRect(0, 0, scrollBar->rect.width(), scrollBar->rect.height()); 
+                                ret=QRect(0, 0, scrollBar->rect.width(), scrollBar->rect.height());
                         }
                         else
                         {
@@ -7658,7 +7658,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                                 fudge = sbextent;
 
                             if (horizontal)
-                                ret=QRect(fudge, 0, scrollBar->rect.width() - sbextent * multi, scrollBar->rect.height()); 
+                                ret=QRect(fudge, 0, scrollBar->rect.width() - sbextent * multi, scrollBar->rect.height());
                             else
                                 ret=QRect(0, fudge, scrollBar->rect.width(), scrollBar->rect.height() - sbextent * multi);
                         }
@@ -8215,10 +8215,17 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
                     inCache=false;
             }
 
-            if(path.isEmpty())
+            if(!path.isEmpty())
+            {
+                p->save();
+                p->setClipPath(path);
+            }
+            //if(path.isEmpty())
                 p->drawTiledPixmap(origRect, *pix);
-            else
-                p->fillPath(path, QBrush(*pix));
+            //else
+            //    p->fillPath(path, QBrush(*pix));  // Does nto work well :-(
+            if(!path.isEmpty())
+                p->restore();
             if(!inCache)
                 delete pix;
         }
@@ -8269,31 +8276,33 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
 
         int    endSize=0,
                middleSize=8;
-        bool   horiz(isHoriz(option, w));
+        bool   horiz(isHoriz(option, w)),
+               circular(WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND));
         double radius=0;
 
-        switch(opts.round)
-        {
-            case ROUND_SLIGHT:
-            case ROUND_NONE:
-                endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 4;
-                break;
-            case ROUND_FULL:
-                endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 5;
-                break;
-            case ROUND_EXTRA:
-                endSize=7;
-                break;                
-            case ROUND_MAX:
+        if(!circular)
+            switch(opts.round)
             {
-                radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
-                endSize=WIDGET_SB_SLIDER==w
-                            ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
-                            : (int)(radius+2.5);
-                middleSize=(QTC_MIN_ROUND_MAX_WIDTH-(endSize*2))+4;
-                break;
+                case ROUND_SLIGHT:
+                case ROUND_NONE:
+                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 4;
+                    break;
+                case ROUND_FULL:
+                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 5;
+                    break;
+                case ROUND_EXTRA:
+                    endSize=7;
+                    break;
+                case ROUND_MAX:
+                {
+                    radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
+                    endSize=WIDGET_SB_SLIDER==w
+                                ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
+                                : (int)(radius+2.5);
+                    middleSize=(QTC_MIN_ROUND_MAX_WIDTH-(endSize*2))+4;
+                    break;
+                }
             }
-        }
 
         int size((2*endSize)+middleSize);
 
@@ -8302,7 +8311,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         else
         {
             QString key;
-            bool    small((horiz ? r.width() : r.height())<(2*endSize));
+            bool    small(circular || (horiz ? r.width() : r.height())<(2*endSize));
             QPixmap pix(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
             uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver));
 
@@ -8664,11 +8673,18 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 
 QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, double radius) const
 {
+    QPainterPath path;
+
+    if(WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)
+    {
+        path.addEllipse(r);
+        return path;
+    }
+
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
 
     double       diameter(radius*2);
-    QPainterPath path;
 
     if (WIDGET_MDI_WINDOW_TITLE!=w && round&CORNER_BR)
         path.moveTo(r.x()+r.width(), r.y()+r.height()-radius);
@@ -8768,7 +8784,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                  hasFocus(entry && state&State_HasFocus),
                  hasMouseOver(WIDGET_ENTRY==w && state&State_MouseOver),
                  window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
-    const QColor *cols(enabled && hasMouseOver && itsMouseOverCols && entry 
+    const QColor *cols(enabled && hasMouseOver && itsMouseOverCols && entry
                         ? itsMouseOverCols
                         : enabled && hasFocus && itsFocusCols && entry
                               ? itsFocusCols
@@ -8815,7 +8831,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 {
                     tl.setAlphaF(QTC_ENTRY_INNER_ALPHA);
                     br.setAlphaF(QTC_ENTRY_INNER_ALPHA);
-                }                    
+                }
                 else if(doBlend && !window)
                 {
                     tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
@@ -9453,7 +9469,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
     else
     {
 //         QRect sr(r);
-// 
+//
 //         if(horiz)
 //             sr.adjust(0, 1, 0, 0);
 //         else
