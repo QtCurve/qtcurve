@@ -1559,7 +1559,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     if(width>0 && height>0)
     {
         clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
-        drawBevelGradient(cr, style, area, region, x+1, y+1, width-2, height-2, base, horiz,
+        drawBevelGradient(cr, style, area, region, x, y, width-1, height-1, base, horiz,
                           sunken && !IS_TROUGH(widget), app, widget);
 
         if(plastikMouseOver)
