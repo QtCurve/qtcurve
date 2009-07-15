@@ -13,6 +13,7 @@
  8. Cache selection pixmaps to speed up drawing.
  9. Dont round rubber band, makes things more consistent with Gtk2 - and is faster.
 10. If using squared scrollviews, also square kontact's preview pane.
+11. If using scrollbars outside of scrollview, draw frame around kwrite/kate contents.
 
 0.65.4
 ------

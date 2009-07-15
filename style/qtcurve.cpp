@@ -1982,9 +1982,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if (!opts.popupBorder && widget && widget->inherits("QComboBoxPrivateContainer"))
                 return 0;
 
-            if (widget && widget->parentWidget() &&
-                ::qobject_cast<const QFrame *>(widget) &&
-                widget->parentWidget()->inherits("KateView"))
+            if (!opts.gtkScrollViews && widget && widget->parentWidget() && ::qobject_cast<const QFrame *>(widget) && widget->parentWidget()->inherits("KateView"))
                 return 0;
 
             if (opts.squareScrollViews && widget &&
