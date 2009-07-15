@@ -37,6 +37,7 @@ style "qtcurve-default"
   GtkMenu::vertical-offset = 1
   GtkCheckMenuItem::indicator-size=17
   GtkEntry::honors-transparent-bg-hint = 1
+  GtkScrolledWindow::scrollbar-spacing = 2
   xthickness = 1
   ythickness = 1
 
