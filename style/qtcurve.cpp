@@ -2988,13 +2988,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(panel->lineWidth > 0)
                 {
                     QRect r2(r.adjusted(1, 1, -1, (QTC_DO_EFFECT ? -2 : -1)));
-                    painter->save();
-                    painter->setClipPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL,
-                                                   getRadius(&opts, r2.width(), r2.height(), WIDGET_ENTRY,
-                                                   RADIUS_INTERNAL)),
-                                         Qt::IntersectClip);
-                    painter->fillRect(r2, palette.brush(QPalette::Base));
-                    painter->restore();
+                    painter->fillPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL,
+                                                getRadius(&opts, r2.width(), r2.height(), WIDGET_ENTRY, RADIUS_INTERNAL)),
+                                      palette.brush(QPalette::Base));
                     drawPrimitive(PE_FrameLineEdit, option, painter, widget);
                 }
                 else
@@ -3629,14 +3625,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             opt.state|=State_Enabled;
             if(0!=opts.tabBgnd)
-            {
-                painter->save();
-                painter->setClipPath(buildPath(r, WIDGET_TAB_FRAME, ROUNDED_ALL,
-                                               getRadius(&opts, r.width(), r.height(), WIDGET_TAB_FRAME, RADIUS_EXTERNAL),
-                                               0, -0.5));
-                painter->fillRect(option->rect, shade(use[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd)));
-                painter->restore();
-            }
+                painter->fillPath(buildPath(r, WIDGET_TAB_FRAME, ROUNDED_ALL,
+                                            getRadius(&opts, r.width(), r.height(), WIDGET_TAB_FRAME, RADIUS_EXTERNAL)),
+                                            shade(use[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd)));
             drawBorder(painter, r, &opt, round, use, WIDGET_TAB_FRAME,
                        opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, false);
             painter->restore();
@@ -3699,13 +3690,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
 
                     pixPainter.setRenderHint(QPainter::Antialiasing, true);
-                    pixPainter.setClipPath(buildPath(border, WIDGET_OTHER, ROUNDED_ALL, radius, 0, -0.5));
-
-                    drawBevelGradient(color, &pixPainter, border.adjusted(1, 1, -1, -1), true, false,
+                    drawBevelGradient(color, &pixPainter, border,
+                                      buildPath(border, WIDGET_OTHER, ROUNDED_ALL, radius), true, false,
                                       opts.selectionAppearance, WIDGET_SELECTION, !usePixmapCache);
                     pixPainter.setBrush(Qt::NoBrush);
                     pixPainter.setPen(color);
-                    pixPainter.setClipRect(border);
                     pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
                     pixPainter.end();
 
@@ -4229,11 +4218,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     col=itsBackgroundCols[2];
             }
 
-            painter->setClipPath(buildPath(r, WIDGET_PBAR_TROUGH, ROUNDED_ALL,
-                                 getRadius(&opts, r.width(), r.height(), WIDGET_PBAR_TROUGH, RADIUS_EXTERNAL)));
-            drawBevelGradient(col, painter, r.adjusted(1, 1, -1, -1), horiz,
-                              false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
-            painter->setClipping(false);
+            drawBevelGradient(col, painter, r,
+                              buildPath(r, WIDGET_PBAR_TROUGH, ROUNDED_ALL,
+                                        getRadius(&opts, r.width(), r.height(), WIDGET_PBAR_TROUGH, RADIUS_EXTERNAL)),
+                              horiz, false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
             if(doEtch)
                 drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_PBAR_TROUGH);
@@ -8166,7 +8154,7 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
         delete pix;
 }
 
-void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect,
+void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect, const QPainterPath &path,
                                      bool horiz, bool sel, EAppearance bevApp, EWidget w, bool useCache) const
 {
     if(origRect.width()<1 || origRect.height()<1)
@@ -8175,7 +8163,10 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
     if(IS_FLAT(bevApp))
     {
         if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || opts.tabBgnd || !sel)
-            p->fillRect(origRect, base);
+            if(path.isEmpty())
+                p->fillRect(origRect, base);
+            else
+                p->fillPath(path, base);
     }
     else
     {
@@ -8191,7 +8182,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
                                     : APPEARANCE_GRADIENT);
 
         if(WIDGET_PROGRESSBAR==w || !useCache)
-            drawBevelGradientReal(base, p, origRect, horiz, sel, app, w);
+            drawBevelGradientReal(base, p, origRect, path, horiz, sel, app, w);
         else
         {
             QRect   r(0, 0, horiz ? QTC_PIXMAP_DIMENSION : origRect.width(),
@@ -8217,14 +8208,18 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
                 else
                     inCache=false;
             }
-            p->drawTiledPixmap(origRect, *pix);
+
+            if(path.isEmpty())
+                p->drawTiledPixmap(origRect, *pix);
+            else
+                p->fillPath(path, QBrush(*pix));
             if(!inCache)
                 delete pix;
         }
     }
 }
 
-void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r,
+void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r, const QPainterPath &path,
                                          bool horiz, bool sel, EAppearance app, EWidget w) const
 {
     bool                             topTab(WIDGET_TAB_TOP==w),
@@ -8250,7 +8245,10 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     //p->fillRect(r, base);
-    p->fillRect(r, QBrush(g));
+    if(path.isEmpty())
+        p->fillRect(r, QBrush(g));
+    else
+        p->fillPath(path, QBrush(g));
 }
 
 void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option,
@@ -8387,18 +8385,14 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
 
     if(r.width()>0 && r.height()>0)
     {
-        double radius=getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL),
-               modW=radius>QTC_EXTRA_ETCH_RADIUS && WIDGET_MDI_WINDOW_BUTTON!=w ? -0.75 : 0,
-               modH=radius>QTC_EXTRA_ETCH_RADIUS ? -0.75 : 0;
-
-        p->save();
-        p->setClipPath(buildPath(r, w, round, radius, modW, modH), Qt::IntersectClip);
-
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
             drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
         else
         {
-            drawBevelGradient(fill, p, r.adjusted(1, 1, -1,  WIDGET_MDI_WINDOW_TITLE==w ? 0 : -1),
+            QRect br(r.adjusted(0, 0, 0,  WIDGET_MDI_WINDOW_TITLE==w ? 1 : 0));
+            
+            drawBevelGradient(fill, p, br,
+                              buildPath(br, w, round, getRadius(&opts, br.width()-2, br.height()-2, w, RADIUS_INTERNAL)),
                               horiz, sunken, app, w, useCache);
 
             if(!sunken)
@@ -8505,8 +8499,6 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
             g.setColorAt(1.0, white);
             p->fillPath(buildPath(gr, w, round, rad), QBrush(g));
         }
-        
-        p->restore();
     }
 
     r.adjust(1, 1, -1, -1);
@@ -8701,9 +8693,9 @@ QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, doub
     return path;
 }
 
-QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius, double wmod, double hmod) const
+QPainterPath QtCurveStyle::buildPath(const QRect &r, EWidget w, int round, double radius) const
 {
-    return buildPath(QRectF(r.x()+0.5, r.y()+0.5, (r.width()-1)+wmod, (r.height()-1)+hmod), w, round, radius);
+    return buildPath(QRectF(r.x()+0.5, r.y()+0.5, r.width()-1, r.height()-1), w, round, radius);
 }
 
 void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double radius, QPainterPath &tl, QPainterPath &br) const
@@ -9005,12 +8997,9 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
         r.adjust(1, 1, -1, -1);
 
     if(fill)
-    {
-        p->setClipPath(buildPath(r, WIDGET_ENTRY, round,
-                                 getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)));
-        p->fillRect(r.adjusted(1, 1, -1, -1), option->palette.brush(QPalette::Base));
-        p->setClipping(false);
-    }
+        p->fillPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, round,
+                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)),
+                    option->palette.brush(QPalette::Base));
 
     if(doEtch)
         drawEtch(p, rx, widget, WIDGET_ENTRY, false);

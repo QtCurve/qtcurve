@@ -107,10 +107,22 @@ class QtCurveStyle : public QWindowsStyle
                    int dark, ELine type) const;
     void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz,
                                    EAppearance bevApp) const;
-    void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
+    void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r, const QPainterPath &path,
                            bool horiz, bool sel, EAppearance bevApp, EWidget w=WIDGET_OTHER, bool useCache=true) const;
-    void drawBevelGradientReal(const QColor &base, QPainter *p,
-                               const QRect &r, bool horiz, bool sel, EAppearance bevApp, EWidget w) const;
+    void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r, const QPainterPath &path,
+                               bool horiz, bool sel, EAppearance bevApp, EWidget w) const;
+
+    void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r,
+                           bool horiz, bool sel, EAppearance bevApp, EWidget w=WIDGET_OTHER, bool useCache=true) const
+    {
+        drawBevelGradient(base, p, r, QPainterPath(), horiz, sel, bevApp, w, useCache);
+    }
+    void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r, bool horiz, bool sel,
+                               EAppearance bevApp, EWidget w) const
+    {
+        drawBevelGradientReal(base, p, r, QPainterPath(), horiz, sel, bevApp, w);
+    }
+    
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawLightBevelReal(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
@@ -119,7 +131,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false) const;
     void drawWindowBackground(QWidget *widget) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
-    QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius, double wmod=0.0, double hmod=0.0) const;
+    QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
     void buildSplitPath(const QRect &r, EWidget w, int round, double radius, QPainterPath &tl, QPainterPath &br) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
