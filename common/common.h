@@ -1395,7 +1395,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
         setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
         setupGradient(&stdGradients[APPEARANCE_AGUA_MOD-APPEARANCE_RAISED], GB_LIGHT,3,0.0,1.5,0.49,0.85,1.0,1.3);
-        setupGradient(&stdGradients[APPEARANCE_LV_AGUA-APPEARANCE_RAISED], GB_NONE,4,0.0,0.95,0.3,0.9,0.35,0.88,1.0,1.2);
+        setupGradient(&stdGradients[APPEARANCE_LV_AGUA-APPEARANCE_RAISED], GB_NONE,4,0.0,0.98,0.35,0.94,0.4,0.92,1.0,1.2);
         init=true;
     }
 
