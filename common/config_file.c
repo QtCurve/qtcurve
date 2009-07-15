@@ -1564,14 +1564,21 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
 #endif
-            opts->lvAppearance=MODIFY_AGUA(opts->lvAppearance);
+            opts->lvAppearance=MODIFY_AGUA_X(opts->lvAppearance, APPEARANCE_LV_AGUA);
             opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
             opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
             opts->menuBgndAppearance=MODIFY_AGUA(opts->menuBgndAppearance);
             opts->menuStripeAppearance=MODIFY_AGUA(opts->menuStripeAppearance);
             opts->grooveAppearance=MODIFY_AGUA(opts->grooveAppearance);
             opts->progressAppearance=MODIFY_AGUA(opts->progressAppearance);
+            opts->sliderFill=MODIFY_AGUA(opts->sliderFill);
+            opts->tabAppearance=MODIFY_AGUA(opts->tabAppearance);
+            opts->activeTabAppearance=MODIFY_AGUA(opts->activeTabAppearance);
+            opts->menuitemAppearance=MODIFY_AGUA(opts->menuitemAppearance);
 #ifdef __cplusplus
+            opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
+            opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
+
             opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
 #endif
             if(APPEARANCE_FLAT==opts->tabAppearance)
