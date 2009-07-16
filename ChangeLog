@@ -8,6 +8,7 @@
 5. When using scrollbars outside of scrollview, reduce gap to 2 pixels.
 6. Set, and use, honors-transparent-bg-hint / transparent-bg-hint. Fixes corners
    of entry fields in Firefox 3.5
+7. Remove userChrome.css settings if firefox executable name is firefox-3.5
 
 0.65.3
 ------

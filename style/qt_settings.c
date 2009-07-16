@@ -2076,7 +2076,11 @@ static gboolean qtInit()
                                              (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) );
 
                     if(firefox)
+                    {
                         processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
+                        if(mozVersion>=QTC_MAKE_VERSION(3, 5) && 0==strcmp(app, "firefox-3.5"))
+                            processMozillaApp(FALSE, add_menu_colors, "firefox-3.5", TRUE);
+                    }
                     else if(thunderbird)
                         processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 0) && !opts.gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
                     else if(mozThunderbird)
