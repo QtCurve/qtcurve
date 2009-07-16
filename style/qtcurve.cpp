@@ -1993,7 +1993,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 qobject_cast<const QMenu *>(widget))
                 return 1;
 
-            if(QTC_DO_EFFECT &&
+            if(QTC_DO_EFFECT && opts.etchEntry &&
                 (!widget || // !isFormWidget(widget) &&
                 ::qobject_cast<const QLineEdit *>(widget) ||
                 (opts.sunkenScrollViews &&
@@ -2703,7 +2703,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         // If we are set to have sunken scrollviews, then the frame width is set to 3.
                         // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
                         // need to draw inner border...
-                        bool doEtch=QTC_DO_EFFECT,
+                        bool doEtch=QTC_DO_EFFECT && opts.etchEntry,
                              noEtchW=doEtch && theNoEtchWidgets.contains(widget);
                         if(doEtch && noEtchW)
                         {
@@ -6210,7 +6210,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                       mouseOver(state&State_MouseOver),
                       upIsActive(SC_SpinBoxUp==spinBox->activeSubControls),
                       downIsActive(SC_SpinBoxDown==spinBox->activeSubControls),
-                      doEtch(QTC_DO_EFFECT);
+                      doEtch(QTC_DO_EFFECT && opts.etchEntry);
 
                 if(doEtch)
                 {
@@ -6928,10 +6928,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 bool         sunken(state&State_On), // comboBox->listBox() ? comboBox->listBox()->isShown() : false),
                              glowOverFocus(state&State_MouseOver && QTC_FULL_FOCUS &&
                                            MO_GLOW==opts.coloredMouseOver && QTC_DO_EFFECT && !sunken && !comboBox->editable &&
-                                           state&State_Enabled && state&State_HasFocus);
+                                           state&State_Enabled && state&State_HasFocus),
+                             doEffect(QTC_DO_EFFECT && (!comboBox->editable || opts.etchEntry));
 
 //                 painter->fillRect(r, Qt::transparent);
-                if(QTC_DO_EFFECT)
+                if(doEffect)
                 {
                     if(!glowOverFocus && !sunken && MO_GLOW==opts.coloredMouseOver &&
                         ((QTC_FULL_FOCUS && state&State_HasFocus) || state&State_MouseOver) &&
@@ -9009,7 +9010,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
 {
     QRect r(rx);
 
-    if(doEtch)
+    if(doEtch && opts.etchEntry)
         r.adjust(1, 1, -1, -1);
 
     if(fill)
@@ -9017,7 +9018,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
                               getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)),
                     option->palette.brush(QPalette::Base));
 
-    if(doEtch)
+    if(doEtch && opts.etchEntry)
         drawEtch(p, rx, widget, WIDGET_ENTRY, false);
 
     drawBorder(p, r, option, round, 0L, w, BORDER_SUNKEN);

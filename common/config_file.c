@@ -964,6 +964,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 def->tabBgnd=0;
                 def->menuStripeAppearance=APPEARANCE_GRADIENT;
+                def->etchEntry=true;
             }
             if(version<QTC_MAKE_VERSION(0, 65))
             {
@@ -1130,6 +1131,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(squareScrollViews)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(sunkenScrollViews)
+            QTC_CFG_READ_BOOL(etchEntry)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(popupBorder)
             QTC_CFG_READ_BOOL(unifySpinBtns)
@@ -1543,6 +1545,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
                 opts->sunkenScrollViews=false;
 
+            if(EFFECT_NONE==opts->buttonEffect)
+                opts->etchEntry=false;
+
             if(opts->squareScrollViews)
                 opts->highlightScrollViews=false;
 
@@ -1725,6 +1730,7 @@ static void defaultSettings(Options *opts)
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->sunkenScrollViews=true;
+    opts->etchEntry=false;
     opts->flatSbarButtons=true;
     opts->popupBorder=true;
     opts->unifySpinBtns=false;
@@ -2290,6 +2296,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareScrollViews)
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(sunkenScrollViews)
+        CFG_WRITE_ENTRY(etchEntry)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(popupBorder)
         CFG_WRITE_ENTRY(unifySpinBtns)
