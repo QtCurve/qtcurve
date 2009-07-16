@@ -1001,7 +1001,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->crButton=false;
                 def->customShades[0]=0;
                 def->stripedProgress=STRIPE_DIAGONAL;
-                def->sunkenScrollViews=false;
                 def->sunkenAppearance=APPEARANCE_INVERTED;
                 def->focus=FOCUS_FILLED;
             }
@@ -1130,7 +1129,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(comboSplitter)
             QTC_CFG_READ_BOOL(squareScrollViews)
             QTC_CFG_READ_BOOL(highlightScrollViews)
-            QTC_CFG_READ_BOOL(sunkenScrollViews)
             QTC_CFG_READ_BOOL(etchEntry)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(popupBorder)
@@ -1546,12 +1544,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(EFFECT_NONE==opts->buttonEffect)
                 opts->etchEntry=false;
 
-            if(!opts->etchEntry)
-                opts->sunkenScrollViews=false;
-
-            if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
-                opts->sunkenScrollViews=false;
-
             if(EFFECT_NONE==opts->buttonEffect)
                 opts->etchEntry=false;
 
@@ -1737,7 +1729,6 @@ static void defaultSettings(Options *opts)
     opts->comboSplitter=false;
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
-    opts->sunkenScrollViews=true;
     opts->etchEntry=false;
     opts->flatSbarButtons=true;
     opts->popupBorder=true;
@@ -2303,7 +2294,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(comboSplitter)
         CFG_WRITE_ENTRY(squareScrollViews)
         CFG_WRITE_ENTRY(highlightScrollViews)
-        CFG_WRITE_ENTRY(sunkenScrollViews)
         CFG_WRITE_ENTRY(etchEntry)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(popupBorder)

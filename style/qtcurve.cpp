@@ -1996,10 +1996,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if(QTC_DO_EFFECT && opts.etchEntry &&
                 (!widget || // !isFormWidget(widget) &&
                 ::qobject_cast<const QLineEdit *>(widget) ||
-                (opts.sunkenScrollViews &&
-                    (::qobject_cast<const QAbstractScrollArea*>(widget) ||
-                     widget->inherits("Q3ScrollView") /*||
-                     isKontactPreviewPane(widget)*/))))
+                ::qobject_cast<const QAbstractScrollArea*>(widget) ||
+                widget->inherits("Q3ScrollView") /*||
+                     isKontactPreviewPane(widget)*/))
                 return 3;
             else
                 return 2;
@@ -2676,7 +2675,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         (widget && widget->inherits("Q3ScrollView")) ||
                         (opts.squareScrollViews && isKontactPreviewPane(widget)));
 
-                if(sv && (opts.sunkenScrollViews || opts.squareScrollViews))
+                if(sv && (opts.etchEntry || opts.squareScrollViews))
                 {
                     bool arora(APP_ARORA==theThemedApp && widget && !widget->parentWidget());
 

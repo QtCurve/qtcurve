@@ -93,6 +93,19 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="4">
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_47">
          <property name="text">
@@ -102,6 +115,9 @@
        </item>
        <item row="1" column="2">
         <widget class="QComboBox" name="bgndAppearance"/>
+       </item>
+       <item row="1" column="3">
+        <widget class="QComboBox" name="bgndGrad"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_29">
@@ -177,7 +193,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="2">
+       <item row="9" column="0">
         <widget class="QCheckBox" name="stdSidebarButtons">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -197,7 +213,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="2">
+       <item row="11" column="0">
         <widget class="QCheckBox" name="fadeLines">
          <property name="text">
           <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
@@ -211,7 +227,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="13" column="0" colspan="5">
+        <widget class="QCheckBox" name="etchEntry">
+         <property name="text">
+          <string>Etch entries and scrollviews when button effect set to etched/shadowed.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -220,22 +243,6 @@ p, li { white-space: pre-wrap; }
           <size>
            <width>20</width>
            <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="3">
-        <widget class="QComboBox" name="bgndGrad"/>
-       </item>
-       <item row="0" column="4">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>20</height>
           </size>
          </property>
         </spacer>
@@ -852,13 +859,6 @@ p, li { white-space: pre-wrap; }
         <widget class="QCheckBox" name="squareScrollViews">
          <property name="text">
           <string>Always draw with a square frame - regardless of the general round setting.</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="sunkenScrollViews">
-         <property name="text">
-          <string>Draw etched when button effect set to etched/shadow.</string>
          </property>
         </widget>
        </item>
@@ -2103,9 +2103,9 @@ p, li { white-space: pre-wrap; }
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
+   <class>KIntSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>knuminput.h</header>
   </customwidget>
   <customwidget>
    <class>KDoubleNumInput</class>
@@ -2113,19 +2113,19 @@ p, li { white-space: pre-wrap; }
    <header>knuminput.h</header>
   </customwidget>
   <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
    <class>KPushButton</class>
    <extends>QPushButton</extends>
    <header>kpushbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2142,6 +2142,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>darkerBorders</tabstop>
   <tabstop>fadeLines</tabstop>
   <tabstop>thinnerBtns</tabstop>
+  <tabstop>etchEntry</tabstop>
   <tabstop>comboSplitter</tabstop>
   <tabstop>unifyCombo</tabstop>
   <tabstop>comboBtn</tabstop>
@@ -2180,7 +2181,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>gtkScrollViews</tabstop>
   <tabstop>highlightScrollViews</tabstop>
   <tabstop>squareScrollViews</tabstop>
-  <tabstop>sunkenScrollViews</tabstop>
   <tabstop>activeTabAppearance</tabstop>
   <tabstop>highlightTab</tabstop>
   <tabstop>colorSelTab</tabstop>

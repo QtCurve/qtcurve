@@ -631,7 +631,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(gtkScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squareScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(highlightScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(sunkenScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(etchEntry, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(flatSbarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1544,7 +1544,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.gtkScrollViews=gtkScrollViews->isChecked();
     opts.highlightScrollViews=highlightScrollViews->isChecked();
     opts.squareScrollViews=squareScrollViews->isChecked();
-    opts.sunkenScrollViews=sunkenScrollViews->isChecked();
+    opts.etchEntry=etchEntry->isChecked();
     opts.flatSbarButtons=flatSbarButtons->isChecked();
     opts.thinSbarGroove=thinSbarGroove->isChecked();
     opts.colorSliderMouseOver=colorSliderMouseOver->isChecked();
@@ -1705,7 +1705,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     gtkScrollViews->setChecked(opts.gtkScrollViews);
     highlightScrollViews->setChecked(opts.highlightScrollViews);
     squareScrollViews->setChecked(opts.squareScrollViews);
-    sunkenScrollViews->setChecked(opts.sunkenScrollViews);
+    etchEntry->setChecked(opts.etchEntry);
     flatSbarButtons->setChecked(opts.flatSbarButtons);
     thinSbarGroove->setChecked(opts.thinSbarGroove);
     colorSliderMouseOver->setChecked(opts.colorSliderMouseOver);
@@ -1863,7 +1863,7 @@ bool QtCurveConfig::settingsChanged()
          gtkScrollViews->isChecked()!=currentStyle.gtkScrollViews ||
          highlightScrollViews->isChecked()!=currentStyle.highlightScrollViews ||
          squareScrollViews->isChecked()!=currentStyle.squareScrollViews ||
-         sunkenScrollViews->isChecked()!=currentStyle.sunkenScrollViews ||
+         etchEntry->isChecked()!=currentStyle.etchEntry ||
          flatSbarButtons->isChecked()!=currentStyle.flatSbarButtons ||
          thinSbarGroove->isChecked()!=currentStyle.thinSbarGroove ||
          colorSliderMouseOver->isChecked()!=currentStyle.colorSliderMouseOver ||
