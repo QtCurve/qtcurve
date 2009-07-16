@@ -993,7 +993,7 @@ static GdkColor * getParentBgCol(GtkWidget *widget)
 
 static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
-    if(IS_FLAT(opts.bgndAppearance))
+    if(IS_FLAT(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
     {
         GdkColor *parentBg=getParentBgCol(widget);
 
@@ -3558,7 +3558,8 @@ debugDisplayWidget(widget, 3);
             }
 
             if(!list && (IS_FLAT(opts.bgndAppearance) || !(widget &&
-                                                           drawBgndGradient(cr, style, area, widget, x, y, width, height))))
+                                                           drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+                && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
                 drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
             if(doEtch)
