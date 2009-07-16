@@ -4311,7 +4311,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                                    NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_SCROLLVIEW, 0);
                         doBorder=false;
                     }
-                    else if(opts.sunkenScrollViews && opts.etchEntry)
+                    else if(opts.etchEntry)
                     {
                         drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE, ROUNDED_ALL, WIDGET_SCROLLVIEW);
                         x++, y++, width-=2, height-=2;

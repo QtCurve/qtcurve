@@ -2504,7 +2504,7 @@ static gboolean qtInit()
             /* Scrolled windows */
             if(opts.squareScrollViews)
                 thickness=opts.gtkScrollViews ? 1 : 2;
-            else if(opts.sunkenScrollViews && opts.etchEntry)
+            else if(opts.etchEntry)
                 thickness=3;
 
             { /* C-Scope */
