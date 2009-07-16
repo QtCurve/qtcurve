@@ -2932,7 +2932,7 @@ debugDisplayWidget(widget, 3);
 
             if(WIDGET_SPIN_UP==wid)
             {
-                if(QTC_DO_EFFECT)
+                if(QTC_DO_EFFECT && opts.etchEntry)
                 {
                     if(!opts.unifySpinBtns)
                         drawEtch(cr, a, NULL, widget, x-2, y, width+2, height*2, FALSE, ROUNDED_RIGHT, WIDGET_SPIN_UP);
@@ -2947,7 +2947,7 @@ debugDisplayWidget(widget, 3);
                     area=&unified;
                 }
             }
-            else if (QTC_DO_EFFECT)
+            else if (QTC_DO_EFFECT && opts.etchEntry)
             {
                 GdkRectangle clip;
 
@@ -2994,9 +2994,10 @@ debugDisplayWidget(widget, 3);
         }
         else if(opts.unifySpinBtns)
         {
-            int offset=(QTC_DO_EFFECT ? 1 : 0);
-            drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE,
-                     ROUNDED_RIGHT, WIDGET_SPIN);
+            int offset=(QTC_DO_EFFECT && opts.etchEntry ? 1 : 0);
+            if(offset)
+                drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE,
+                         ROUNDED_RIGHT, WIDGET_SPIN);
             drawLightBevel(cr, style, window, state, area, NULL, x, y+offset,
                            width-offset, height-(2*offset), &btn_colors[bgnd],
                            btn_colors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
@@ -4310,7 +4311,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                                    NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_SCROLLVIEW, 0);
                         doBorder=false;
                     }
-                    else if(opts.sunkenScrollViews)
+                    else if(opts.sunkenScrollViews && opts.etchEntry)
                     {
                         drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE, ROUNDED_ALL, WIDGET_SCROLLVIEW);
                         x++, y++, width-=2, height-=2;
