@@ -1453,9 +1453,23 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
         }
     }
 
-    cairo_set_source_rgb(cr, QTC_CAIRO_COL(*border_col));
-    createPath(cr, xd, yd, width, height, radius, round);
-    cairo_stroke(cr);
+    if(BORDER_SUNKEN==borderProfile &&
+       (WIDGET_FRAME==widget || ((WIDGET_ENTRY==widget || WIDGET_SCROLLVIEW==widget) &&
+                                 !opts.etchEntry && !hasFocus && !hasMouseOver)))
+    {
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), enabled ? 1.0 : 0.65);
+        createTLPath(cr, xd, yd, width, height, radius, round);
+        cairo_stroke(cr);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), 0.65);
+        createBRPath(cr, xd, yd, width, height, radius, round);
+        cairo_stroke(cr);
+    }
+    else
+    {
+        cairo_set_source_rgb(cr, QTC_CAIRO_COL(*border_col));
+        createPath(cr, xd, yd, width, height, radius, round);
+        cairo_stroke(cr);
+    }
     unsetCairoClipping(cr);
     }
 }
@@ -4152,7 +4166,7 @@ debugDisplayWidget(widget, 3);
                                         ? BORDER_FLAT
                                         : GTK_SHADOW_IN==shadow_type || GTK_SHADOW_ETCHED_IN==shadow_type
                                             ? BORDER_SUNKEN
-                                            : BORDER_RAISED, WIDGET_OTHER, QT_STD_BORDER);
+                                            : BORDER_RAISED, WIDGET_FRAME, QT_STD_BORDER);
     }
 
     QTC_CAIRO_END
@@ -4315,7 +4329,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                 else if(doBorder)
                     drawBorder(cr, style, state, area, NULL, x, y, width, height,
                                NULL, ROUNDED_ALL, scrolledWindow ? BORDER_SUNKEN : BORDER_FLAT,
-                               scrolledWindow ? WIDGET_SCROLLVIEW : WIDGET_OTHER, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
+                               scrolledWindow ? WIDGET_SCROLLVIEW : WIDGET_FRAME, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
             }
         }
         else if(!statusBar || opts.drawStatusBarFrames)
