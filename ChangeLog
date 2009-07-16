@@ -7,10 +7,13 @@
 4. Make inactive tabs more consistent with active tabs.
 5. Remove sunken scroll views config item, and replace with option to control
    if entries and scroll views should be etched (sunken).
-6. When using scrollbars outside of scrollview, reduce gap to 2 pixels if sunken.
-7. Set, and use, honors-transparent-bg-hint / transparent-bg-hint. Fixes corners
+6. Modify defaults:
+       Scrollbars outside of scrollview (Gtk/oxygen style)
+       Thin scrollbar groove.
+7. When using scrollbars outside of scrollview, reduce gap to 2 pixels if sunken.
+8. Set, and use, honors-transparent-bg-hint / transparent-bg-hint. Fixes corners
    of entry fields in Firefox 3.5
-8. Remove userChrome.css settings if firefox executable name is firefox-3.5
+9. Remove userChrome.css settings if firefox executable name is firefox-3.5
 
 0.65.3
 ------
