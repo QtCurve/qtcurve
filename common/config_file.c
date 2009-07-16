@@ -1542,6 +1542,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->round>ROUND_EXTRA)
                 opts->focus=FOCUS_LINE;
 
+            if(!opts->etchEntry)
+                opts->sunkenScrollViews=false;
+
             if(opts->squareScrollViews || EFFECT_NONE==opts->buttonEffect)
                 opts->sunkenScrollViews=false;
 

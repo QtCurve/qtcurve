@@ -8859,8 +8859,29 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             }
         }
 
-    p->setPen(window && state&QtC_StateKWinHighlight ? itsFocusCols[0] : border);
-    p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
+    if(BORDER_SUNKEN==borderProfile &&
+       (WIDGET_FRAME==w || ((WIDGET_ENTRY==w || WIDGET_SCROLLVIEW==w) && !opts.etchEntry && !hasFocus && !hasMouseOver)))
+    {
+        QPainterPath topPath,
+                     botPath;
+        QColor       col(border);
+        
+        col.setAlphaF(0.65);
+        buildSplitPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL), topPath, botPath);
+        p->setPen(enabled ? border : col);
+        p->drawPath(topPath);
+        if(enabled)
+            p->setPen(col);
+        p->drawPath(botPath);
+        if(enabled)
+            p->setPen(border);
+    }
+    else
+    {
+        p->setPen(window && state&QtC_StateKWinHighlight ? itsFocusCols[0] : border);
+        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
+    }
+
 //     if(!window)
         p->setRenderHint(QPainter::Antialiasing, false);
 

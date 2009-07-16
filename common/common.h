@@ -438,13 +438,13 @@ typedef enum
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
-    WIDGET_FRAME,
     WIDGET_NO_ETCH_BTN,
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     WIDGET_SELECTION,
 //    WIDGET_RUBBER_BAND,
 #endif
+    WIDGET_FRAME,
     WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FOCUS,
     WIDGET_TAB_FRAME,
