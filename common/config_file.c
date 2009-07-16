@@ -1539,8 +1539,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
                 opts->defBtnIndicator=IND_TINT;
 #endif
+#ifndef QTC_CONFIG_DIALOG
             if(opts->round>ROUND_EXTRA)
                 opts->focus=FOCUS_LINE;
+
+            if(EFFECT_NONE==opts->buttonEffect)
+                opts->etchEntry=false;
 
             if(!opts->etchEntry)
                 opts->sunkenScrollViews=false;
@@ -1556,6 +1560,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(!opts->framelessGroupBoxes)
                 opts->groupBoxLine=false;
+#endif
 #ifndef __cplusplus
             if(!defOpts)
             {
