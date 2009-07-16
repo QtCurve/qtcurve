@@ -385,6 +385,18 @@ static QWidget * getActiveWindow(QWidget *widget)
     return activeWindow && activeWindow!=widget ? activeWindow : 0L;
 }
 
+static bool inStackWidget(const QWidget *w)
+{
+    while(w)
+    {
+        if(::qobject_cast<const QStackedWidget *>(w))
+            return true;
+        w=w->parentWidget();
+    }
+    
+    return false;
+}
+
 static const QWidget * getToolBar(const QWidget *w/*, bool checkQ3*/)
 {
     return w
@@ -3874,8 +3886,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             painter->save();
             if(IS_FLAT(opts.bgndAppearance) || state&State_MouseOver && state&State_Enabled)
             {
-                const QColor &color(palette.color(QPalette::Active, QPalette::Window));
+                QColor color(palette.color(QPalette::Active, QPalette::Window));
 
+                if(0!=opts.tabBgnd && inStackWidget(widget))
+                    color=shade(color, QTC_TO_FACTOR(opts.tabBgnd));
                 painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled
                                                 ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
                                                 : color));
@@ -6677,12 +6691,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                    maxed(scrollbar->minimum == scrollbar->maximum),
                                    atMin(maxed || scrollbar->sliderValue==scrollbar->minimum),
                                    atMax(maxed || scrollbar->sliderValue==scrollbar->maximum),
-                                   inStack((/*!IS_FLAT(opts.bgndAppearance) || */0!=opts.tabBgnd) &&
-                                         widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                                         widget->parentWidget()->parentWidget()->parentWidget() &&
-                                         ::qobject_cast<const QAbstractScrollArea *>(widget->parentWidget()->parentWidget()) &&
-                                         ((QFrame *)(widget->parentWidget()->parentWidget()))->lineWidth()<2 &&
-                                         ::qobject_cast<const QStackedWidget *>(widget->parentWidget()->parentWidget()->parentWidget()));
+                                   inStack(0!=opts.tabBgnd && inStackWidget(widget));
                 QRect              subline(subControlRect(control, option, SC_ScrollBarSubLine, widget)),
                                    addline(subControlRect(control, option, SC_ScrollBarAddLine, widget)),
                                    subpage(subControlRect(control, option, SC_ScrollBarSubPage, widget)),
