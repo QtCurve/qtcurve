@@ -8212,7 +8212,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
             if(!path.isEmpty())
             {
                 p->save();
-                p->setClipPath(path);
+                p->setClipPath(path, Qt::IntersectClip);
             }
             //if(path.isEmpty())
                 p->drawTiledPixmap(origRect, *pix);
