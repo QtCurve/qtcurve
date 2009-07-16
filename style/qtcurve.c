@@ -1382,8 +1382,8 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     EAppearance  app=widgetApp(widget, &opts);
     gboolean     enabled=GTK_STATE_INSENSITIVE!=state,
                  useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled,
-                 hasFocus=qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
-                 hasMouseOver=qtcPalette.mouseover && c_colors==qtcPalette.mouseover;
+                 hasFocus=enabled && qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
+                 hasMouseOver=enabled && qtcPalette.mouseover && c_colors==qtcPalette.mouseover;
     GdkColor     *colors=c_colors ? c_colors : qtcPalette.background;
     int          useBorderVal=!enabled && WIDGET_BUTTON(widget)
                                 ? QT_DISABLED_BORDER
