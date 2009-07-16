@@ -962,9 +962,14 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 66))
             {
-                def->tabBgnd=0;
                 def->menuStripeAppearance=APPEARANCE_GRADIENT;
                 def->etchEntry=true;
+                def->gtkScrollViews=false;
+                def->thinSbarGroove=false;
+#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                def->titlebarButtons=QTC_TITLEBAR_BUTTON_HOVER_FRAME;
+                def->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
+#endif
             }
             if(version<QTC_MAKE_VERSION(0, 65))
             {
@@ -1736,17 +1741,17 @@ static void defaultSettings(Options *opts)
     opts->unifySpin=true;
     opts->unifyCombo=true;
     opts->borderTab=true;
-    opts->thinSbarGroove=false;
+    opts->thinSbarGroove=true;
     opts->colorSliderMouseOver=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->titlebarBorder=true;
-    opts->titlebarButtons=QTC_TITLEBAR_BUTTON_HOVER_FRAME;
-    opts->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
+    opts->titlebarButtons=QTC_TITLEBAR_BUTTON_ROUND|QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
+    opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;
 #endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
     opts->shading=SHADING_HSL;
-    opts->gtkScrollViews=false;
+    opts->gtkScrollViews=true;
     opts->comboBtn=SHADE_NONE;
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;

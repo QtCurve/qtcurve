@@ -204,7 +204,7 @@ typedef GdkColor color;
 #define MIN_LIGHTER_POPUP_MENU                  -100
 #define MAX_LIGHTER_POPUP_MENU                   100
 
-#define DEF_TAB_BGND         2
+#define DEF_TAB_BGND         0
 #define MIN_TAB_BGND        -5
 #define MAX_TAB_BGND         5
 
