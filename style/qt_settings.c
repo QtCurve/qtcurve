@@ -2461,23 +2461,34 @@ static gboolean qtInit()
 
             if(doEffect)
             {
-                #define QTC_ETCH2_RC(Y) "style \""QTC_RC_SETTING"Etch2\" " \
-                                        "{ xthickness = 3 ythickness = "Y"} " \
+                {
+                static const char *constStrFormat="style \""QTC_RC_SETTING"Etch2\" " \
+                                        "{ xthickness = 3 ythickness = %d} " \
                                         "class \"*Button\" style \""QTC_RC_SETTING"Etch2\"" \
-                                        "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\""
-                #define QTC_ETCH_RC(T)  "style \""QTC_RC_SETTING"EtchE\" " \
-                                        "{ xthickness = "T" ythickness = "T" } " \
-                                        "style \""QTC_RC_SETTING"EtchS\" " \
-                                        "{ xthickness = "T" ythickness = "T" } " \
-                                        "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"EtchE\" " \
-                                        "class \"*GtkEntry\" style  \""QTC_RC_SETTING"EtchE\" " \
-                                        "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"EtchE\" " \
-                                        "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"EtchS\" "
-                gtk_rc_parse_string(opts.thinnerBtns ? QTC_ETCH2_RC("1") : QTC_ETCH2_RC("2"));
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Etch\" "
-                                    "{ xthickness = 3 ythickness = 3 } "
-                                    "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"Etch\" ");
-                gtk_rc_parse_string(isMozilla() ? QTC_ETCH_RC("3") : QTC_ETCH_RC("4"));
+                                        "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\"";
+
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+2);
+                sprintf(tmpStr, constStrFormat, opts.thinnerBtns ? 1 : 2);
+                gtk_rc_parse_string(tmpStr);
+                }
+
+                {
+                static const char *constStrFormat="style \""QTC_RC_SETTING"EtchE\" "
+                                        "{ xthickness = %d ythickness = %d } "
+                                        "style \""QTC_RC_SETTING"EtchS\" "
+                                        "{ xthickness = %d ythickness = %d } "
+                                        "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"EtchE\" "
+                                        "class \"*GtkEntry\" style  \""QTC_RC_SETTING"EtchE\" "
+                                        "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"EtchE\" "
+                                        "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"EtchS\" ";
+
+                int thick=opts.etchEntry ? 4 : 3;
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
+                if(isMozilla())
+                    thick--;
+                sprintf(tmpStr, constStrFormat, thick, thick, thick, thick);
+                gtk_rc_parse_string(tmpStr);
+                }
             }
 
             if(!opts.gtkScrollViews)
@@ -2489,7 +2500,7 @@ static gboolean qtInit()
             /* Scrolled windows */
             if(opts.squareScrollViews)
                 thickness=opts.gtkScrollViews ? 1 : 2;
-            else if(opts.sunkenScrollViews)
+            else if(opts.sunkenScrollViews && opts.etchEntry)
                 thickness=3;
 
             { /* C-Scope */

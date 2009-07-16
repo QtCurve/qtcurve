@@ -2093,7 +2093,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
              highlightReal=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
              mouseOver=enabled && (GTK_STATE_PRELIGHT==state || (lastMoEntry && widget==lastMoEntry) )&& qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
              highlight=highlightReal || mouseOver,
-             doEtch=QTC_DO_EFFECT;
+             doEtch=QTC_DO_EFFECT && opts.etchEntry;
     GdkColor *colors=mouseOver
                         ? qtcPalette.mouseover
                         : highlightReal
