@@ -2142,7 +2142,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 if(round&CORNER_BR)
                     cairo_rectangle(cr, x+width-2.5, y+height-3.5, 1, 1);
             }
-            cairo_set_line_width(cr, 1);
+            cairo_set_line_width(cr, opts.round>ROUND_FULL && GTK_APP_OPEN_OFFICE!=qtSettings.app ? 2 : 1);
             cairo_stroke(cr);
             unsetCairoClipping(cr);
         }
@@ -2443,7 +2443,7 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
-    else if(/*!IS_FLAT(opts.bgndAppearance) &&*/ detail && 
+    else if(/*!IS_FLAT(opts.bgndAppearance) &&*/ detail &&
             ( (GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton")) ||
               (GTK_STATE_PRELIGHT!=state && ( 0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") || 0==strcmp(detail, "checkbutton")))))
         ;
