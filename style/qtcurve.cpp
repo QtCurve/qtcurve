@@ -7171,7 +7171,10 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             break;
         case CT_SpinBox:
             //newSize.setHeight(sizeFromContents(CT_LineEdit, option, size, widget).height());
-            newSize.rheight() -= ((1 - newSize.rheight()) & 1);
+            if(opts.unifySpin)
+                newSize.rheight() --;
+            else
+                newSize.rheight() -= ((1 - newSize.rheight()) & 1);
             break;
         case CT_ToolButton:
         {
@@ -7474,18 +7477,20 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                 bs.setHeight(r.height()>>1);
                 if(bs.height()< 8)
                     bs.setHeight(8);
-                bs.setWidth(QTC_DO_EFFECT ? 16 : 15);
+                bs.setWidth(QTC_DO_EFFECT && opts.etchEntry ? 16 : 15);
                 bs=bs.expandedTo(QApplication::globalStrut());
 
-                int extra(bs.height()*2==r.height() ? 0 : 1),
-                    y(0), x(reverse ? 0 : r.width()-bs.width());
+                int y(0), x(reverse ? 0 : r.width()-bs.width());
 
                 switch(subControl)
                 {
                     case SC_SpinBoxUp:
                         return QRect(x, y, bs.width(), bs.height());
                     case SC_SpinBoxDown:
+                    {
+                        int extra(bs.height()*2==r.height() ? 0 : 1);
                         return QRect(x, y+bs.height(), bs.width(), bs.height()+extra);
+                    }
                     case SC_SpinBoxEditField:
                     {
                         int pad=opts.round>ROUND_FULL ? 2 : 0;
