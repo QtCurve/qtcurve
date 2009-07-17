@@ -8163,7 +8163,10 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
             fillRect.adjust(0, animShift-PROGRESS_CHUNK_WIDTH, 0, PROGRESS_CHUNK_WIDTH);
     }
 
+    p->save();
+    p->setClipRect(origRect, Qt::IntersectClip);
     p->drawTiledPixmap(fillRect, *pix);
+    p->restore();
 
     if(!inCache)
         delete pix;
