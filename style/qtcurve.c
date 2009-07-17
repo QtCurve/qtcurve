@@ -1659,6 +1659,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                             rad=size/2.0;
             cairo_pattern_t *pt=NULL;
             int             mod=4; 
+            gboolean        mo=GTK_STATE_PRELIGHT==state && opts.highlightFactor;
 
             if(horiz)
             {
@@ -1691,8 +1692,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
 
             cairo_clip(cr);
 
-            cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, 0.9);
-            cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, 0.2);
+            cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
+            cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
 
             cairo_set_source(cr, pt);
             cairo_rectangle(cr, xa, ya, horiz ? wa : size, horiz ? size : ha);
