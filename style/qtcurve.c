@@ -2443,7 +2443,7 @@ debugDisplayWidget(widget, 3);
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
-    else if(!IS_FLAT(opts.bgndAppearance) && detail && 
+    else if(/*!IS_FLAT(opts.bgndAppearance) &&*/ detail && 
             ( (GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton")) ||
               (GTK_STATE_PRELIGHT!=state && ( 0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") || 0==strcmp(detail, "checkbutton")))))
         ;
@@ -3261,17 +3261,19 @@ debugDisplayWidget(widget, 3);
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
-                    if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
+                   /* if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
                        GTK_IS_SCROLLED_WINDOW(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent))
                         drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-                    else if(IS_FLAT(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 
+                    else*/ if(IS_FLAT(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 
                                                               widget && drawBgndGradient(cr, style, area, widget, xo, yo, wo, ho)))
-                    //if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
-                        drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
-                                          &qtcPalette.background[ORIGINAL_SHADE],
-                                          horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
-//                     else
-//                         drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
+                    {
+                        if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                            drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
+                                            &qtcPalette.background[ORIGINAL_SHADE],
+                                            horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+//                          else
+//                              drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
+                    }
                 }
                 else
                 {
