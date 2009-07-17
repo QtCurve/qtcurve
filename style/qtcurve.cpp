@@ -1274,9 +1274,9 @@ void QtCurveStyle::polish(QWidget *widget)
     }
     else if(qobject_cast<QLabel*>(widget))
         widget->installEventFilter(this);
-    else if(!opts.gtkScrollViews && qobject_cast<QAbstractScrollArea *>(widget))
+    else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
     {
-        if((((QFrame *)widget)->frameWidth()>0))
+        if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
             widget->installEventFilter(this);
         if(APP_KONTACT==theThemedApp && widget->parentWidget())
         {
@@ -1485,9 +1485,9 @@ void QtCurveStyle::unpolish(QWidget *widget)
     }
     else if(qobject_cast<QLabel*>(widget))
         widget->removeEventFilter(this);
-    else if(!opts.gtkScrollViews && qobject_cast<QAbstractScrollArea *>(widget))
+    else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
     {
-        if((((QFrame *)widget)->frameWidth()>0))
+        if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
             widget->removeEventFilter(this);
         if(APP_KONTACT==theThemedApp && widget->parentWidget())
         {
@@ -1590,7 +1590,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             return true;
     }
     
-    if(::qobject_cast<QAbstractScrollArea *>(object) || isSViewCont)
+    if((!opts.gtkScrollViews &&  ::qobject_cast<QAbstractScrollArea *>(object)) || isSViewCont)
     {
         QPoint pos;
         switch(event->type())
