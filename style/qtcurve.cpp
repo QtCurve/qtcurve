@@ -8516,10 +8516,11 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                                      : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
             QLinearGradient g(gr.topLeft(), horiz ? gr.bottomLeft() : gr.topRight());
             QColor          white(Qt::white);
+            bool            mo(option->state&State_MouseOver && opts.highlightFactor);
 
-            white.setAlphaF(0.9);
+            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
             g.setColorAt(0.0, white);
-            white.setAlphaF(0.2);
+            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
             g.setColorAt(1.0, white);
             p->fillPath(buildPath(gr, w, round, rad), QBrush(g));
         }
