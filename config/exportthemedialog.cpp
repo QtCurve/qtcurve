@@ -47,6 +47,7 @@ CExportThemeDialog::CExportThemeDialog(QWidget *parent)
     layout->addWidget(themeName=new QLineEdit(page), 0, 1);
     layout->addWidget(themeComment=new QLineEdit(i18n("QtCurve based theme"), page), 1, 1);
     layout->addWidget(themeUrl=new KUrlRequester(page), 2, 1);
+    layout->addItem(new QSpacerItem(2, 2, QSizePolicy::Minimum, QSizePolicy::Expanding), 3, 1);
 
     themeUrl->setMode(KFile::Directory|KFile::ExistingOnly|KFile::LocalOnly);
     themeUrl->lineEdit()->setReadOnly(true);
@@ -58,6 +59,11 @@ void CExportThemeDialog::run(const Options &o)
 {
     opts=o;
     exec();
+}
+
+QSize CExportThemeDialog::sizeHint() const
+{
+    return QSize(400, 120);
 }
 
 void CExportThemeDialog::slotButtonClicked(int button)

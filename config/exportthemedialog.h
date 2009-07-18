@@ -36,7 +36,8 @@ class CExportThemeDialog : public KDialog
 
     CExportThemeDialog(QWidget *parent);
 
-    void run(const Options &o);
+    void  run(const Options &o);
+    QSize sizeHint() const;
 
     private slots:
 
