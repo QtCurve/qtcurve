@@ -8291,9 +8291,11 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         bool   horiz(isHoriz(option, w)),
                circular(WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND));
         double radius=0;
+        ERound realRound=getRound(&opts, r.width(), r.height(), w);
 
         if(!circular)
-            switch(opts.round)
+        {
+            switch(realRound)
             {
                 case ROUND_SLIGHT:
                 case ROUND_NONE:
@@ -8315,6 +8317,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                     break;
                 }
             }
+        }
 
         int size((2*endSize)+middleSize);
 
@@ -8327,14 +8330,17 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
             QPixmap pix(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
             uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver));
 
-            key.sprintf("qtc-%x-%x-%x-%x-%x-%x", w, pix.width(), pix.height(), state, fill.rgba(), (int)(radius*100));
+            key.sprintf("qtc-%x-%d-%x-%x-%x-%x-%x", w, (int)realRound, pix.width(), pix.height(), state, fill.rgba(), (int)(radius*100));
             if(!QPixmapCache::find(key, pix))
             {
                 pix.fill(Qt::transparent);
 
                 QPainter pixPainter(&pix);
+                ERound   oldRound=opts.round;
+                opts.round=realRound;
                 drawLightBevelReal(&pixPainter, QRect(0, 0, pix.width(), pix.height()), option, widget, round, fill, custom,
                                    doBorder, w, false);
+                opts.round=oldRound;
                 pixPainter.end();
 
                 QPixmapCache::insert(key, pix);

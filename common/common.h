@@ -1464,6 +1464,49 @@ typedef enum
             (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
 #endif
 
+#ifdef __cplusplus
+// **NOTE** MUST KEEP IN SYNC WITH getRadius/RADIUS_ETCH !!!
+ERound getRound(const Options *opts, int w, int h, EWidget widget)
+{
+    ERound r=opts->round;
+
+    if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
+        r=ROUND_SLIGHT;
+
+#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    if(WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+       r=ROUND_MAX;
+#endif
+    switch(r)
+    {
+        case ROUND_MAX:
+            if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
+#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
+                    || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+#endif
+                )
+            {
+                return ROUND_MAX;
+            }
+            if(w>(QTC_MIN_ROUND_MAX_WIDTH+2) && h>(QTC_MIN_ROUND_MAX_HEIGHT+2) && QTC_MAX_ROUND_WIDGET(widget))
+                return ROUND_MAX;
+        case ROUND_EXTRA:
+            if(QTC_EXTRA_ROUND_WIDGET(widget) &&
+                w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2))
+                return ROUND_EXTRA;
+        case ROUND_FULL:
+            if(w>(QTC_MIN_ROUND_FULL_SIZE+2) && h>(QTC_MIN_ROUND_FULL_SIZE+2))
+                return ROUND_FULL;
+        case ROUND_SLIGHT:
+            return ROUND_SLIGHT;
+        case ROUND_NONE:
+            return ROUND_NONE;
+    }
+    
+    return ROUND_NONE;
+}
+#endif
+
 static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad)
 {
     ERound r=opts->round;
@@ -1550,6 +1593,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                     return 0;
             }
         case RADIUS_ETCH:
+            // **NOTE** MUST KEEP IN SYNC WITH getRound !!!
             switch(r)
             {
                 case ROUND_MAX:
