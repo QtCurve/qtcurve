@@ -8756,8 +8756,8 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
 
     if (rounded && !window && round&CORNER_TR)
     {
-        tl.arcMoveTo(xd+width-diameter, yd, diameter, diameter, 45);
-        tl.arcTo(xd+width-diameter, yd, diameter, diameter, 45, 45);
+        tl.arcMoveTo(xd+width-diameter, yd, diameter, diameter, 36);
+        tl.arcTo(xd+width-diameter, yd, diameter, diameter, 36, 36);
     }
     else
         tl.moveTo(xd+width, yd);
@@ -8769,9 +8769,9 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
 
     if (rounded && !window && round&CORNER_BL)
     {
-        tl.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 55);
-        br.arcMoveTo(xd, yd+height-diameter, diameter, diameter, 180+55);
-        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+45, 40);
+        tl.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 36);
+        br.arcMoveTo(xd, yd+height-diameter, diameter, diameter, 180+36);
+        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+36, 36);
     }
     else
     {
@@ -8785,7 +8785,7 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
         br.lineTo(xd+width, yd+height);
 
     if (rounded && !window && round&CORNER_TR)
-        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 40);
+        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 36);
     else
         br.lineTo(xd+width, yd);
 }
