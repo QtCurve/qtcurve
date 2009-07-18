@@ -69,6 +69,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     QtCurveConfig(QWidget *parent);
     virtual ~QtCurveConfig();
 
+    QSize    sizeHint() const;
     EShading currentShading() const { return (EShading)shading->currentIndex(); }
 
     Q_SIGNALS:

@@ -131,6 +131,7 @@ class CStackItem : public QTreeWidgetItem
         : QTreeWidgetItem(p, toList(text)),
           stackId(s)
     {
+        setTextAlignment(0, Qt::AlignRight);
     }
 
     bool operator<(const QTreeWidgetItem &o) const
@@ -700,6 +701,11 @@ QtCurveConfig::~QtCurveConfig()
 {
 }
 
+QSize QtCurveConfig::sizeHint() const
+{
+    return QSize(600, 400);
+}
+
 void QtCurveConfig::loadStyles(QMenu *menu)
 {
     QStringList files(KGlobal::dirs()->findAllResources("data", "QtCurve/*"QTC_EXTENSION, KStandardDirs::NoDuplicates));
@@ -862,6 +868,7 @@ void QtCurveConfig::tabMoChanged()
     if(TAB_MO_GLOW==tabMouseOver->currentIndex())
         roundAllTabs->setChecked(true);
     roundAllTabs->setEnabled(TAB_MO_GLOW!=tabMouseOver->currentIndex());
+    roundAllTabs_false->setEnabled(TAB_MO_GLOW!=tabMouseOver->currentIndex());
     updateChanged();
 }
 
@@ -917,6 +924,7 @@ void QtCurveConfig::setupStack()
 {
     int i=0;
     CStackItem *first=new CStackItem(stackList, i18n("General"), i++);
+    new CStackItem(stackList, i18n("Group Boxes"), i++);
     new CStackItem(stackList, i18n("Combos"), i++);
     new CStackItem(stackList, i18n("Spin Buttons"), i++);
     new CStackItem(stackList, i18n("Splitters"), i++);
@@ -929,7 +937,11 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Tabs"), i++);
     new CStackItem(stackList, i18n("Checks and Radios"), i++);
     new CStackItem(stackList, i18n("Windows"), i++);
-    new CStackItem(stackList, i18n("Menus and Toolbars"), i++);
+    new CStackItem(stackList, i18n("Window buttons"), i++);
+    new CStackItem(stackList, i18n("Window button colors"), i++);
+    new CStackItem(stackList, i18n("Menubars"), i++);
+    new CStackItem(stackList, i18n("Popup menus"), i++);
+    new CStackItem(stackList, i18n("Toolbars"), i++);
     new CStackItem(stackList, i18n("Advanced Settings"), i++);
     new CStackItem(stackList, i18n("Custom Gradients"), i++);
     new CStackItem(stackList, i18n("Custom Shades"), i++);
@@ -1671,11 +1683,14 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     unifyCombo->setChecked(opts.unifyCombo);
     vArrows->setChecked(opts.vArrows);
     xCheck->setChecked(opts.xCheck);
+    xCheck_false->setChecked(!opts.xCheck);
     crHighlight->setChecked(opts.crHighlight);
     crButton->setChecked(opts.crButton);
     colorSelTab->setChecked(opts.colorSelTab);
     roundAllTabs->setChecked(opts.roundAllTabs);
+    roundAllTabs_false->setChecked(!opts.roundAllTabs);
     borderTab->setChecked(opts.borderTab);
+    borderTab_false->setChecked(!opts.borderTab);
     tabMouseOver->setCurrentIndex(opts.tabMouseOver);
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     borderMenuitems->setChecked(opts.borderMenuitems);
@@ -1691,6 +1706,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     inactiveTitlebarAppearance->setCurrentIndex(opts.inactiveTitlebarAppearance);
     titlebarButtonAppearance->setCurrentIndex(opts.titlebarButtonAppearance);
     colorTitlebarOnly->setChecked(opts.colorTitlebarOnly);
+    colorTitlebarOnly_false->setChecked(!opts.colorTitlebarOnly);
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);

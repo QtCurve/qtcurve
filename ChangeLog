@@ -21,6 +21,7 @@
 11. Dont round rubber band, makes things more consistent with Gtk2 - and is faster.
 12. If using squared scrollviews, also square kontact's preview pane.
 13. If using scrollbars outside of scrollview, draw frame around kwrite/kate contents.
+14. Improve config dialog - use KDE4 HIG.
 
 0.65.4
 ------
