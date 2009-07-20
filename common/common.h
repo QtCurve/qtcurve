@@ -1492,7 +1492,7 @@ ERound getRound(const Options *opts, int w, int h, EWidget widget)
                 return ROUND_MAX;
         case ROUND_EXTRA:
             if(QTC_EXTRA_ROUND_WIDGET(widget) &&
-                w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2))
+               (WIDGET_SB_SLIDER==widget || w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2)))
                 return ROUND_EXTRA;
         case ROUND_FULL:
             if(w>(QTC_MIN_ROUND_FULL_SIZE+2) && h>(QTC_MIN_ROUND_FULL_SIZE+2))
@@ -1610,7 +1610,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                         return 10.5;
                 case ROUND_EXTRA:
                     if(QTC_EXTRA_ROUND_WIDGET(widget) &&
-                       w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2))
+                       (WIDGET_SB_SLIDER==widget || (w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2) && h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+2))))
                         return QTC_EXTRA_ETCH_RADIUS;
                 case ROUND_FULL:
                     if(w>(QTC_MIN_ROUND_FULL_SIZE+2) && h>(QTC_MIN_ROUND_FULL_SIZE+2))

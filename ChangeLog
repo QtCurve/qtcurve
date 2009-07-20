@@ -3,6 +3,7 @@
 1. Fix some issues with the config dialog.
 2. Improve text alignment in QFormLayouts by copying the polish code from
    Skulpture.
+3. Allow scrollbars to be extra rounded!
 
 0.66.0
 ------
