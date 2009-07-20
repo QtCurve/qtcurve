@@ -703,7 +703,7 @@ QtCurveConfig::~QtCurveConfig()
 
 QSize QtCurveConfig::sizeHint() const
 {
-    return QSize(600, 400);
+    return QSize(700, 500);
 }
 
 void QtCurveConfig::loadStyles(QMenu *menu)

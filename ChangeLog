@@ -1,3 +1,7 @@
+0.66.1
+------
+1. Fix some issues with the config dialog.
+
 0.66.0
 ------
  1. Add a new 'Dark Inverted Gradient' and use this as the default gradient
