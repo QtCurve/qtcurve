@@ -30,6 +30,9 @@
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+#include <QFormLayout>
+#endif
 #include <Q_UINT64>
 typedef qulonglong QtcKey;
 #include "common.h"
@@ -76,6 +79,12 @@ class QtCurveStyle : public QWindowsStyle
     void polish(QApplication *app);
     void polish(QPalette &palette);
     void polish(QWidget *widget);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+    void polishFormLayout(QFormLayout *layout);
+    void polishLayout(QLayout *layout);
+#endif
+
     void unpolish(QApplication *app) { QTC_BASE_STYLE::unpolish(app); }
     void unpolish(QWidget *widget);
     bool eventFilter(QObject *object, QEvent *event);

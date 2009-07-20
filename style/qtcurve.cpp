@@ -1398,7 +1398,147 @@ void QtCurveStyle::polish(QWidget *widget)
        qobject_cast<QFrame *>(widget->parentWidget()) &&
        qobject_cast<QTabWidget *>(widget->parentWidget()->parentWidget()))
         ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
+
+    if (QLayout *layout = widget->layout())
+    {
+        // explicitely check public layout classes, QMainWindowLayout doesn't work here
+        if (qobject_cast<QBoxLayout *>(layout)
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+             || qobject_cast<QFormLayout *>(layout)
+#endif
+             || qobject_cast<QGridLayout *>(layout)
+             || qobject_cast<QStackedLayout *>(layout))
+                polishLayout(layout);
+    }
 }
+
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+static QFontMetrics styledFontMetrics(const QStyleOption *option, const QWidget *widget)
+{
+    if (option) {
+        return option->fontMetrics;
+    } else if (widget) {
+        return widget->fontMetrics();
+    }
+    return qApp->fontMetrics();
+}
+
+static int fontHeight(const QStyleOption *option, const QWidget *widget)
+{
+    return styledFontMetrics(option, widget).height();
+}
+
+
+// Taken from skulpture 0.2.3
+void QtCurveStyle::polishFormLayout(QFormLayout *layout)
+{
+int widgetSize=-1;
+
+    if (layout->labelAlignment() & Qt::AlignVCenter)
+        return;
+
+    int addedHeight = -1;
+    for (int row = 0; row < layout->rowCount(); ++row)
+    {
+        QLayoutItem *labelItem = layout->itemAt(row, QFormLayout::LabelRole);
+        if (!labelItem)
+            continue;
+
+        QLayoutItem *fieldItem = layout->itemAt(row, QFormLayout::FieldRole);
+        if (!fieldItem)
+            continue;
+
+        QWidget *label = labelItem->widget();
+        if (!label)
+            continue;
+
+        int labelHeight;
+        if (addedHeight < 0)
+        {
+#if 0
+            // fixed value in Qt
+            static const int verticalMargin = 1;
+            QStyleOptionFrame option;
+            option.initFrom(label);
+            option.lineWidth = label->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, &option, label);
+            option.midLineWidth = 0;
+            option.rect = QRect(0, 0, 10, fontHeight(option, label) + 2 * verticalMargin);
+            // label should be aligned centered to LineEdit, so use its size
+            addedHeight = label->style()->sizeFromContents(QStyle::CT_LineEdit, &option, option.rect.size(), label).height() - fontHeight(option, height);
+#else
+            addedHeight = 4 + 2 * widgetSize;
+#endif
+        }
+        if (qobject_cast<QLabel *>(label))
+            labelHeight = label->sizeHint().height() + addedHeight;
+        else if (qobject_cast<QCheckBox *>(label))
+            labelHeight = label->sizeHint().height();
+        else
+            continue;
+
+        int fieldHeight = fieldItem->sizeHint().height();
+        // work around KIntNumInput::sizeHint() bug
+        if (fieldItem->widget() && fieldItem->widget()->inherits("KIntNumInput"))
+        {
+            fieldHeight -= 2;
+            fieldItem->widget()->setMaximumHeight(fieldHeight);
+        }
+        /* for large fields, we don't center */
+        if (fieldHeight <= 2 * fontHeight(0, label) + addedHeight)
+        {
+            if (fieldHeight > labelHeight)
+                labelHeight = fieldHeight;
+        }
+//         else if (verticalTextShift(label->fontMetrics()) & 1)
+//                 labelHeight += 1;
+        if (qobject_cast<QCheckBox *>(label))
+            label->setMinimumHeight(labelHeight);
+        else
+        {
+            // QFormLayout determines label size as height * 5 / 4, so revert that
+            label->setMinimumHeight((labelHeight * 4 + 4) / 5);
+        }
+    }
+}
+
+void QtCurveStyle::polishLayout(QLayout *layout)
+{
+//    if (forceSpacingAndMargins) {
+// #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+//         if (QFormLayout *formLayout = qobject_cast<QFormLayout *>(layout)) {
+//             if (formLayout->spacing() >= 2) {
+//                 formLayout->setSpacing(-1);
+//             }
+//         } else
+// #endif
+//         if (QGridLayout *gridLayout = qobject_cast<QGridLayout *>(layout)) {
+//             if (gridLayout->spacing() >= 2) {
+//                 gridLayout->setSpacing(-1);
+//             }
+//         } else if (QBoxLayout *boxLayout = qobject_cast<QBoxLayout *>(layout)) {
+//             if (boxLayout->spacing() >= 2) {
+//                 boxLayout->setSpacing(-1);
+//             }
+//         } else {
+//             if (layout->spacing() >= 2) {
+//                 layout->setSpacing(-1);
+//             }
+//         }
+//         if (layout->margin() >= 4) {
+//             layout->setMargin(-1);
+//         }
+//     }
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
+    if (QFormLayout *formLayout = qobject_cast<QFormLayout *>(layout))
+        polishFormLayout(formLayout);
+#endif
+    // recurse into layouts
+    for (int i = 0; i < layout->count(); ++i)
+        if (QLayout *l = layout->itemAt(i)->layout())
+            polishLayout(l);
+
+}
+#endif
 
 void QtCurveStyle::unpolish(QWidget *widget)
 {
