@@ -29,6 +29,11 @@ static bool usePixmapCache=true;
 #define CONFIG_READ
 #include "config_file.c"
 
+// WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
+// if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
+// in CT_PushButton and CT_ComboBox
+#define QTC_MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
+
 #ifdef QTC_XBAR_SUPPORT
 #include "macmenu.h"
 #endif
@@ -2107,9 +2112,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuButtonIndicator:
             return QTC_DO_EFFECT ? 16 : 15;
         case PM_ButtonMargin:
-            return QTC_DO_EFFECT
+            return (QTC_DO_EFFECT
                     ? opts.thinnerBtns ? 4 : 6
-                    : opts.thinnerBtns ? 2 : 4;
+                    : opts.thinnerBtns ? 2 : 4)+QTC_MAX_ROUND_BTN_PAD;
         case PM_TabBarTabShiftVertical:
 #ifdef QTC_STYLE_QTABBAR
             if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
@@ -7286,8 +7291,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 if(!btn->icon.isNull() && size.height()<btn->iconSize.height()+2)
                     newSize.setHeight(btn->iconSize.height()+2);
 
-                int margin = pixelMetric(PM_ButtonMargin, btn, widget)+
-                             (pixelMetric(PM_DefaultFrameWidth, btn, widget) * 2);
+                int margin = (pixelMetric(PM_ButtonMargin, btn, widget)+
+                             (pixelMetric(PM_DefaultFrameWidth, btn, widget) * 2))-QTC_MAX_ROUND_BTN_PAD;
 
                 newSize+=QSize(margin, margin);
 
@@ -7389,8 +7394,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             newSize=size;
             newSize.setWidth(newSize.width()+4);
 
-            int margin      = pixelMetric(PM_ButtonMargin, option, widget)+
-                              (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2),
+            int margin      = (pixelMetric(PM_ButtonMargin, option, widget)+
+                              (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-QTC_MAX_ROUND_BTN_PAD,
                 textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
                 // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
                 other = qMax(QTC_DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
