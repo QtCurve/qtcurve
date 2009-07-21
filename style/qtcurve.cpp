@@ -36,7 +36,11 @@ static bool usePixmapCache=true;
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define QTC_FIX_DISABLED_ICONS
 
-#define QTC_MO_ARROW_X(MO, COL) (MO_GLOW==opts.coloredMouseOver && state&State_Enabled && MO ? itsMouseOverCols[QT_STD_BORDER] : COL)
+#define QTC_MO_ARROW_X(MO, COL) (state&State_Enabled \
+                                    ? (MO_GLOW==opts.coloredMouseOver && MO \
+                                        ? itsMouseOverCols[QT_STD_BORDER] \
+                                        : palette.color(COL)) \
+                                    : palette.color(QPalette::Disabled, COL))
 #define QTC_MO_ARROW(COL)       QTC_MO_ARROW_X(state&State_MouseOver, COL)
 
 static bool useQt3Settings()
@@ -2349,6 +2353,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 #endif
 
             return 0;
+        case SH_SpinControls_DisableOnBounds:
+            return true;
         case SH_DialogButtonLayout:
             return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
         case SH_MessageBox_TextInteractionFlags:
@@ -2684,7 +2690,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
                 drawArrow(painter, r,
                           header->sortIndicator & QStyleOptionHeader::SortUp ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
-                          QTC_MO_ARROW(option->palette.buttonText().color()));
+                          QTC_MO_ARROW(QPalette::ButtonText));
             break;
         case PE_IndicatorArrowUp:
         case PE_IndicatorArrowDown:
@@ -2694,7 +2700,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
                              (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
                 r.adjust(1, 1, 1, 1);
-            drawArrow(painter, r, element, QTC_MO_ARROW(palette.text().color()));
+            drawArrow(painter, r, element, QTC_MO_ARROW(QPalette::Text));
             break;
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
@@ -2702,7 +2708,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorSpinDown:
         {
             QRect        sr(r);
-            const QColor *use(buttonColors(option));
+            const QColor *use(buttonColors(option)),
+                         col(QTC_MO_ARROW(QPalette::ButtonText));
             bool         down(PE_IndicatorSpinDown==element || PE_IndicatorSpinMinus==element);
 
             if((!opts.unifySpinBtns || state&State_Sunken) && !opts.unifySpin)
@@ -2725,7 +2732,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     sr.adjust(1, 1, 1, 1);
 
                 drawArrow(painter, sr, PE_IndicatorSpinUp==element ? PE_IndicatorArrowUp : PE_IndicatorArrowDown,
-                          QTC_MO_ARROW(option->palette.buttonText().color()), !opts.unifySpin);
+                          col, !opts.unifySpin);
             }
             else
             {
@@ -2739,8 +2746,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(state&State_Sunken && !opts.unifySpin)
                     c+=QPoint(1, 1);
 
-                painter->setPen(MO_GLOW==opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled
-                                 ? itsMouseOverCols[QT_STD_BORDER] : palette.buttonText().color());
+                painter->setPen(col);
                 painter->drawLine(c.x()-l, c.y(), c.x()+l, c.y());
                 if(!down)
                     painter->drawLine(c.x(), c.y()-l, c.x(), c.y()+l);
@@ -4873,7 +4879,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(option->state &(State_On | State_Sunken))
                         ar.adjust(1, 1, 1, 1);
 
-                    drawArrow(painter, ar, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
+                    drawArrow(painter, ar, PE_IndicatorArrowDown, QTC_MO_ARROW(QPalette::ButtonText));
                 }
             }
             break;
@@ -4952,7 +4958,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         if(option->state &(State_On | State_Sunken))
                             ar.adjust(1, 1, 1, 1);
-                        drawArrow(painter, ar, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
+                        drawArrow(painter, ar, PE_IndicatorArrowDown, QTC_MO_ARROW(QPalette::ButtonText));
                     }
 
 //                     QRect              ir(button->rect);
@@ -6118,7 +6124,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         tool.rect.adjust(1, 1, 1, 1);
                     drawArrow(painter, tool.rect, PE_IndicatorArrowDown,
                               QTC_MO_ARROW_X(toolbutton->activeSubControls&SC_ToolButtonMenu,
-                                             option->palette.buttonText().color()));
+                                             QPalette::ButtonText));
                 }
 /*
                 else if (toolbutton->features & QStyleOptionToolButton::HasMenu)
@@ -6176,7 +6182,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(bflags&State_Sunken)
                         arrow.adjust(1, 1, 1, 1);
 
-                    drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW(option->palette.buttonText().color()));
+                    drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW(QPalette::ButtonText));
                 }
             }
             break;
@@ -6412,7 +6418,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     up.setHeight(up.height()+1);
                     opt.rect=up;
                     opt.direction=option->direction;
-                    opt.state=(enabled ? State_Enabled : State_None)|(upIsActive && sunken ? State_Sunken : State_Raised)|
+                    opt.state=(enabled && spinBox->stepEnabled&QAbstractSpinBox::StepUpEnabled ? State_Enabled : State_None)|
+                              (upIsActive && sunken ? State_Sunken : State_Raised)|
                               (upIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;;
 
                     drawPrimitive(QAbstractSpinBox::PlusMinus==spinBox->buttonSymbols ? PE_IndicatorSpinPlus : PE_IndicatorSpinUp,
@@ -6424,7 +6431,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QStyleOption opt(*option);
 
                     opt.rect=down;
-                    opt.state=(enabled ? State_Enabled : State_None)|(downIsActive && sunken ? State_Sunken : State_Raised)|
+                    opt.state=(enabled && spinBox->stepEnabled&QAbstractSpinBox::StepDownEnabled ? State_Enabled : State_None)|
+                              (downIsActive && sunken ? State_Sunken : State_Raised)|
                               (downIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;
                     opt.direction=option->direction;
 
@@ -7187,7 +7195,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         arrow.adjust(1, 1, 1, 1);
 
                     //if(comboBox->editable || !opts.gtkComboMenus)
-                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW_X(mouseOver, option->palette.buttonText().color()),
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW_X(mouseOver, QPalette::ButtonText),
                                   false, false);
 //                     else
 //                     {

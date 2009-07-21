@@ -2,6 +2,7 @@
 ------
 1. For scrollviews that are windows, dont round and always place scrollbar within
    frame.
+2. Disable spin button when at min/max - matches Gtk2.
 
 0.66.1
 ------
