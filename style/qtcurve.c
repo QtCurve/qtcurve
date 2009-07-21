@@ -893,74 +893,6 @@ static gboolean isGimpDockable(GtkWidget *widget)
 
 #define isMozillaWidget(widget) (isMozilla() && isFixedWidget(widget))
 
-static void setState(GtkWidget *widget, GtkStateType *state, gboolean *btn_down, int sliderWidth, int sliderHeight)
-{
-    if(isMozillaWidget(widget))
-    {
-        if(GTK_STATE_INSENSITIVE==*state)
-        {
-            *state=GTK_STATE_NORMAL;
-            if(btn_down)
-                *btn_down=FALSE;
-        }
-    }
-    else
-    {
-        GtkRange *range=GTK_RANGE(widget);
-        gboolean horiz=range->orientation,
-                 disableLeft=FALSE,
-                 disableRight=FALSE;
-        int      len=horiz ? sliderHeight : sliderWidth,
-                 max=horiz ? range->range_rect.height
-                           : range->range_rect.width,
-                leftBtns=0,
-                rightBtns=0;
-
-        switch(opts.scrollbarType)
-        {
-            case SCROLLBAR_KDE:
-                leftBtns=SBAR_BTN_SIZE;
-                rightBtns=SBAR_BTN_SIZE*2;
-                break;
-            default:
-            case SCROLLBAR_WINDOWS:
-                leftBtns=SBAR_BTN_SIZE;
-                rightBtns=SBAR_BTN_SIZE;
-                break;
-            case SCROLLBAR_PLATINUM:
-                leftBtns=0;
-                rightBtns=SBAR_BTN_SIZE*2;
-                break;
-            case SCROLLBAR_NEXT:
-                leftBtns=SBAR_BTN_SIZE*2;
-                rightBtns=0;
-                break;
-            case SCROLLBAR_NONE:
-                break;
-        }
-        if(-1!=len)
-            disableLeft=disableRight=len==(max-(leftBtns+rightBtns));
-        else if(/*GTK_APP_JAVA_SWT!=qtSettings.app || */!widget || !widget->parent || !widget->parent->parent ||
-                !GTK_IS_FIXED(widget->parent) || !widget->parent->parent->name ||
-                strcmp(widget->parent->parent->name, "MozillaGtkWidget"))
-        {
-            if(range->slider_start==leftBtns)
-                disableLeft=TRUE;
-            if(range->slider_end+rightBtns==max)
-                disableRight=TRUE;
-        }
-
-        if(disableLeft && disableRight)
-            *state=GTK_STATE_INSENSITIVE;
-        else if(GTK_STATE_INSENSITIVE==*state)
-        {
-            *state=GTK_STATE_NORMAL;
-            if(btn_down)
-                *btn_down=FALSE;
-        }
-    }
-}
-
 #define drawAreaColor(cr, area, region, col, x, y, width, height) \
         drawAreaColorAlpha(cr, area, region, col, x, y, width, height, 1.0)
 
@@ -2721,17 +2653,6 @@ debugDisplayWidget(widget, 3);
                  smallArrows=isSpinButton && !opts.unifySpin;
         int      stepper=sbar ? getStepper(widget, x, y, opts.sliderWidth, opts.sliderWidth) : QTC_STEPPER_NONE;
 
-/*
-#if GTK_CHECK_VERSION(2, 10, 0)
-        if(sbar && GTK_STATE_INSENSITIVE==state)
-            state=GTK_STATE_NORMAL;
-#else
-*/
-        if(GTK_IS_RANGE(widget) && sbar)
-            setState(widget, &state, NULL, -1, -1);
-/*
-#endif
-*/
         sanitizeSize(window, &width, &height);
 
 #if 0
@@ -2826,13 +2747,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     gint height, gboolean btn_down)
 {
     gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
-                              0==strcmp(detail, "stepper"));
-
-    if(GTK_IS_RANGE(widget) && sbar)
-        setState(widget, &state, &btn_down, -1, -1);
-    {
-
-    gboolean pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
+                              0==strcmp(detail, "stepper")),
+             pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
              qtc_paned=!pbar && IS_QTC_PANED,
              slider=!qtc_paned && (DETAIL("slider") || DETAIL("qtc-slider")),
              hscale=!slider && DETAIL("hscale"),
@@ -4174,7 +4090,6 @@ debugDisplayWidget(widget, 3);
     }
 
     QTC_CAIRO_END
-    }   /* C-Scpoing... */
 }
 
 static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -5731,8 +5646,6 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     QTC_CAIRO_BEGIN
 
     lastSlider.widget=NULL;
-    if(GTK_IS_RANGE(widget) && scrollbar)
-        setState(widget, &state, NULL, width, height);
 
     if(useButtonColor(detail))
     {
