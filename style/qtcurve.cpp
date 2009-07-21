@@ -2370,7 +2370,9 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             // Always return 1, as setting to 0 dissables the effect when a menu is shown.
             return 1; // opts.menubarMouseOver ? 1 : 0;
         case SH_ScrollView_FrameOnlyAroundContents:
-            return opts.gtkScrollViews && (!widget || !widget->inherits("QComboBoxListView"));
+            return widget && widget->isWindow()
+                    ? false
+                    : opts.gtkScrollViews && (!widget || !widget->inherits("QComboBoxListView"));
         case SH_ComboBox_Popup:
             if(opts.gtkComboMenus)
             {
@@ -2826,17 +2828,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
                         (widget && widget->inherits("Q3ScrollView")) ||
-                        (opts.squareScrollViews && isKontactPreviewPane(widget)));
+                        (opts.squareScrollViews && isKontactPreviewPane(widget))),
+                     squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow())));
 
-                if(sv && (opts.etchEntry || opts.squareScrollViews))
+                if(sv && (opts.etchEntry || squareSv))
                 {
-                    bool arora(APP_ARORA==theThemedApp && widget && !widget->parentWidget());
-
-                    if(opts.squareScrollViews || arora)
+                    if(squareSv)
                     {
                         const QColor *use(backgroundColors(option));
 
-                        if(arora)
+                        if(APP_ARORA==theThemedApp)
                             painter->fillRect(r, palette.brush(QPalette::Base));
                         painter->setPen(use[QT_STD_BORDER]);
                         drawRect(painter, r);

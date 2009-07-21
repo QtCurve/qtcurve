@@ -1,3 +1,8 @@
+0.66.2
+------
+1. For scrollviews that are windows, dont round and always place scrollbar within
+   frame.
+
 0.66.1
 ------
 1. Fix some issues with the config dialog.
