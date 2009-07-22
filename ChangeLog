@@ -1,6 +1,7 @@
 0.66.1
 ------
 1. Disable scrollbar buttons when at min/max - to match spin buttons.
+2. Increase the amount of rounding when round set to max.
 
 0.66.0
 ------
