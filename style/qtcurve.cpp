@@ -3884,15 +3884,17 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
                 }
 
+                int size(roundedLeft && roundedRight ? qMin(8, r.width()/2) : 8);
+
                 if (!reverse ? roundedLeft : roundedRight)
                 {
-                    painter->drawPixmap(r.topLeft(), pix.copy(0, 0, 8, r.height()));
-                    r.adjust(8, 0, 0, 0);
+                    painter->drawPixmap(r.topLeft(), pix.copy(0, 0, size, r.height()));
+                    r.adjust(size, 0, 0, 0);
                 }
                 if (!reverse ? roundedRight : roundedLeft)
                 {
-                    painter->drawPixmap(r.right() - 8 + 1, r.top(), pix.copy(16, 0, 8, r.height()));
-                    r.adjust(0, 0, -8, 0);
+                    painter->drawPixmap(r.right() - size + 1, r.top(), pix.copy(24-size, 0, size, r.height()));
+                    r.adjust(0, 0, -size, 0);
                 }
                 if (r.isValid())
                     painter->drawTiledPixmap(r, pix.copy(7, 0, 8, r.height()));
