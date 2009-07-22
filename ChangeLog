@@ -4,6 +4,8 @@
 2. Increase the amount of rounding when round set to max.
 3. Match gradient width/height to KDE4.
 4. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+5. Fix entry borders of standard entry widgets in Mozilla apps. (The Mozilla
+   widgets need a thinner border than the Gtk ones)
 
 0.66.0
 ------

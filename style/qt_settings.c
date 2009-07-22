@@ -2484,10 +2484,21 @@ static gboolean qtInit()
 
                 int thick=opts.etchEntry ? 4 : 3;
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
-                if(isMozilla())
-                    thick--;
                 sprintf(tmpStr, constStrFormat, thick, thick, thick, thick);
                 gtk_rc_parse_string(tmpStr);
+                }
+
+                if(isMozilla())
+                {
+                    static const char *constStrFormat="style \""QTC_RC_SETTING"EtchEM\" "
+                        "{ xthickness = %d ythickness = %d } "
+                        "widget_class \"*GtkFixed*GtkSpinButton\" style \""QTC_RC_SETTING"EtchEM\" "
+                        "widget_class \"*GtkFixed*Entry\" style \""QTC_RC_SETTING"EtchEM\" ";
+
+                    int thick=opts.etchEntry ? 3 : 2;
+                    tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+4);
+                    sprintf(tmpStr, constStrFormat, thick, thick);
+                    gtk_rc_parse_string(tmpStr);
                 }
             }
 
