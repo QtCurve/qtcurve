@@ -4,7 +4,7 @@
    frame.
 2. Disable spin button when at min/max - matches Gtk2.
 3. Disable scrollbar buttons when at min/max - to match spin buttons.
-4. Improve appearance of max rouded pushbuttons in Arora.
+4. Improve appearance of max rounded pushbuttons in Arora.
 5. Increase the amount of rounding when round set to max.
 6. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
 
