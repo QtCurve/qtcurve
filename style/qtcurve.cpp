@@ -8686,7 +8686,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 mod/=1.25;
                 ra.adjust(0, 0, 0, -4);
             }
-            else */if(opts.round<ROUND_MAX || (!QTC_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
+            else */if(opts.round<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
             {
                 rad/=2.0;
                 mod=mod>>1;
