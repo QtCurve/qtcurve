@@ -5258,16 +5258,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
                      rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
                                    (rtlHorTabs && Qt::AlignLeft==tabBarAlignment)),
-                     fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab
+                     docMode(
 #if QT_VERSION >= 0x040500
-                             && !tabV3.documentMode
-#endif
-                            ),
-                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab
-#if QT_VERSION >= 0x040500
-                             && !tabV3.documentMode
+                             tabV3.documentMode
+#else
+                             false
 #endif
                              ),
+                     docFixLeft(!leftCornerWidget && leftAligned && firstTab && (docMode || onlyBase)),
+                     fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab && !docMode),
+                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab && !docMode),
                      mouseOver(state&State_Enabled && state&State_MouseOver),
                      glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver);
                 const QColor *use(backgroundColors(option));
@@ -5315,6 +5315,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->drawLine(r2.left()-1, r2.bottom(), r2.left(), r2.bottom());
                             if(!fixRight)
                                 painter->drawLine(r2.right()-1, r2.bottom(), r2.right(), r2.bottom());
+
+                            if(docFixLeft)
+                            {
+                                QColor col(use[QT_STD_BORDER]);
+                                col.setAlphaF(0.5);
+                                painter->setPen(col);
+                                painter->drawPoint(r2.x(), r2.y()+r2.height()-1);
+                            }
                         }
                         else
                         {
@@ -5381,6 +5389,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 painter->drawPoint(r2.left()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top());
                             if(!fixRight)
                                 painter->drawLine(r2.right()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top(), r2.right(), r2.top());
+                            if(docFixLeft)
+                            {
+                                QColor col(use[QT_STD_BORDER]);
+                                col.setAlphaF(0.5);
+                                painter->setPen(col);
+                                painter->drawPoint(r2.x(), r2.y());
+                            }
                         }
                         else
                         {
