@@ -1611,7 +1611,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
             cairo_new_path(cr);
             cairo_save(cr);
             
-            if(opts.round<ROUND_MAX || (!QTC_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
+            if(opts.round<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
             {
                 rad/=2.0;
                 mod=mod>>1;
