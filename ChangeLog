@@ -3,6 +3,7 @@
 1. Disable scrollbar buttons when at min/max - to match spin buttons.
 2. Increase the amount of rounding when round set to max.
 3. Match gradient width/height to KDE4.
+4. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
 
 0.66.0
 ------

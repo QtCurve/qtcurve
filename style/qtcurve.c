@@ -1191,7 +1191,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             
             if(/*sel && */(topTab || botTab) && i==grad->numStops-1)
             {
-                if(!IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
+                if(sel && !IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
                     alpha=0.0;
                 col=*base;
             }
