@@ -7,6 +7,7 @@
 4. Improve appearance of max rounded pushbuttons in Arora.
 5. Increase the amount of rounding when round set to max.
 6. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+7. Try to match Gtk2's text position in buttons.
 
 0.66.1
 ------

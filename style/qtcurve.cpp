@@ -4945,6 +4945,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 //                 if (button->fontMetrics.height() > 14)
 //                     r.translate(0, 1);
 
+                if(((r.height()-(4+button->fontMetrics.height()))>>1)>0)
+                    r.translate(0, 1);
+   
                 if (button->features&QStyleOptionButton::HasMenu)
                 {
                     int mbi(pixelMetric(PM_MenuButtonIndicator, button, widget));
