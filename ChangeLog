@@ -1,10 +1,11 @@
-0.66.1
+0.67.0
 ------
-1. Disable scrollbar buttons when at min/max - to match spin buttons.
-2. Increase the amount of rounding when round set to max.
-3. Match gradient width/height to KDE4.
-4. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
-5. Fix entry borders of standard entry widgets in Mozilla apps. (The Mozilla
+1. Add option to draw insider border of inactive tabs.
+2. Disable scrollbar buttons when at min/max - to match spin buttons.
+3. Increase the amount of rounding when round set to max.
+4. Match gradient width/height to KDE4.
+5. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+6. Fix entry borders of standard entry widgets in Mozilla apps. (The Mozilla
    widgets need a thinner border than the Gtk ones)
 
 0.66.0

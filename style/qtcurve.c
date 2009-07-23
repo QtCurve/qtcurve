@@ -1329,6 +1329,9 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
 
     setCairoClipping(cr, area, region);
 
+    if(WIDGET_TAB_BOT==widget || WIDGET_TAB_TOP==widget)
+        colors=qtcPalette.background;
+
     switch(borderProfile)
     {
         case BORDER_FLAT:
@@ -5331,7 +5334,11 @@ debugDisplayWidget(widget, 3);
                     *selCol1=&qtcPalette.highlight[0],
                     *selCol2=&qtcPalette.highlight[IS_FLAT(opts.appearance) ? 0 : 3];
         GdkRectangle clipArea;
-        EBorder     borderProfile=active ? (opts.borderTab ? BORDER_LIGHT : BORDER_RAISED) : BORDER_FLAT;
+        EBorder     borderProfile=active || opts.borderInactiveTab
+                                    ? opts.borderTab
+                                        ? BORDER_LIGHT
+                                        : BORDER_RAISED
+                                    : BORDER_FLAT;
 
         FN_CHECK
 
@@ -5446,7 +5453,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y-4, width-(2*sizeAdjust), height+4,
                            glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
-                           borderProfile, WIDGET_OTHER, 0);
+                           borderProfile, WIDGET_TAB_BOT, 0);
                 if(glowMo)
                 {
                     if(area)
@@ -5498,7 +5505,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y, width-(2*(mozTab ? 2 : 1)*sizeAdjust), height+4,
                            glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
-                           borderProfile, WIDGET_OTHER, 0);
+                           borderProfile, WIDGET_TAB_TOP, 0);
                 if(glowMo)
                 {
                     if(area)
@@ -5546,7 +5553,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x-4, y+sizeAdjust, width+4, height-(2*sizeAdjust),
                            glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
-                           borderProfile, WIDGET_OTHER, 0);
+                           borderProfile, WIDGET_TAB_BOT, 0);
                 if(glowMo)
                 {
                     if(area)
@@ -5597,7 +5604,7 @@ debugDisplayWidget(widget, 3);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y+sizeAdjust, width+4, height-(2*sizeAdjust),
                            glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
-                           borderProfile, WIDGET_OTHER, 0);
+                           borderProfile, WIDGET_TAB_TOP, 0);
                 if(glowMo)
                 {
                     if(area)
