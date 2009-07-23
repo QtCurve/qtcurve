@@ -313,7 +313,7 @@ static gboolean isSortColumn(GtkWidget *button)
                         : qtcPalette.button[PAL_ACTIVE]; \
     else if(LISTVIEW) \
     { \
-        if(qtcPalette.sortedlv && isSortColumn(widget)) \
+        if(GTK_STATE_INSENSITIVE!=state && qtcPalette.sortedlv && isSortColumn(widget)) \
             btn_colors=qtcPalette.sortedlv;  \
         else if(opts.lvButton) \
             btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
@@ -6432,6 +6432,16 @@ static void generateColors()
     qtcPalette.sortedlv=NULL;
     switch(opts.sortedLv)
     {
+        case SHADE_DARKEN:
+        {
+            GdkColor color;
+
+            qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            shade(&opts, opts.lvButton ? &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]
+                                       : &qtcPalette.background[ORIGINAL_SHADE], &color, LV_HEADER_DARK_FACTOR);
+            shadeColors(&color, qtcPalette.sortedlv);
+            break;
+        }
         case SHADE_SELECTED:
             qtcPalette.sortedlv=qtcPalette.highlight;
             break;
@@ -6485,7 +6495,7 @@ static void generateColors()
             else
             {
                 GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                                    &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+                                      &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
                 qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
                 shadeColors(&mid, qtcPalette.defbtn);
