@@ -2905,6 +2905,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         if(!opts.highlightScrollViews)
                             opt.state&=~State_HasFocus;
 
+                        if(sv)
+                        {
+                            painter->setRenderHint(QPainter::Antialiasing, true);
+                            painter->setPen(option->palette.brush(QPalette::Base).color());
+                            painter->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, ROUNDED_ALL,
+                                                        getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY,
+                                                                  RADIUS_INTERNAL)));
+                            painter->setRenderHint(QPainter::Antialiasing, false);
+                        }
+                        
                         drawBorder(painter, r, &opt,
                                    opts.round &&
                                     ( (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
@@ -8946,7 +8956,7 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
     {
         tl.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 36);
         br.arcMoveTo(xd, yd+height-diameter, diameter, diameter, 180+36);
-        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+36, 36);
+        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+36, 54);
     }
     else
     {
@@ -8960,7 +8970,7 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
         br.lineTo(xd+width, yd+height);
 
     if (rounded && !window && round&CORNER_TR)
-        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 36);
+        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 54);
     else
         br.lineTo(xd+width, yd);
 }
@@ -9237,6 +9247,14 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
         p->fillPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, round,
                               getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)),
                     option->palette.brush(QPalette::Base));
+    else
+    {
+        p->setRenderHint(QPainter::Antialiasing, true);
+        p->setPen(option->palette.brush(QPalette::Base).color());
+        p->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, round,
+                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)));
+        p->setRenderHint(QPainter::Antialiasing, false);
+    }
 
     if(doEtch && opts.etchEntry)
         drawEtch(p, rx, widget, WIDGET_ENTRY, false);
