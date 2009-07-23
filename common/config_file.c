@@ -1071,6 +1071,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_SHADE(shadeSliders, true, false, &opts->customSlidersColor)
             QTC_CFG_READ_SHADE(shadeMenubars, true, false, &opts->customMenubarsColor)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor)
+            QTC_CFG_READ_SHADE(sortedLv, false, false, &opts->customSortedLvColor)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
             QTC_CFG_READ_APPEARANCE(menuitemAppearance, true)
             QTC_CFG_READ_APPEARANCE(toolbarAppearance, false)
@@ -1472,6 +1473,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkColor(&opts->shadeCheckRadio, &opts->customCheckRadioColor);
             checkColor(&opts->menuStripe, &opts->customMenuStripeColor);
             checkColor(&opts->comboBtn, &opts->customComboBtnColor);
+            checkColor(&opts->sortedLv, &opts->customSortedLvColor);
             if(APPEARANCE_BEVELLED==opts->toolbarAppearance)
                 opts->toolbarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->toolbarAppearance)
@@ -1708,6 +1710,7 @@ static void defaultSettings(Options *opts)
     opts->shadeSliders=SHADE_NONE;
     opts->shadeMenubars=SHADE_NONE;
     opts->shadeCheckRadio=SHADE_NONE;
+    opts->sortedLv=SHADE_NONE;
     opts->toolbarBorders=TB_NONE;
     opts->toolbarSeparators=LINE_SUNKEN;
     opts->splitters=LINE_FLAT;
@@ -2272,6 +2275,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(thinnerBtns)
         CFG_WRITE_SHADE_ENTRY(shadeSliders, customSlidersColor)
         CFG_WRITE_SHADE_ENTRY(shadeMenubars, customMenubarsColor)
+        CFG_WRITE_SHADE_ENTRY(sortedLv, customSortedLvColor)
         CFG_WRITE_ENTRY(customMenuSelTextColor)
         CFG_WRITE_ENTRY(customMenuNormTextColor)
         CFG_WRITE_SHADE_ENTRY(shadeCheckRadio, customCheckRadioColor)

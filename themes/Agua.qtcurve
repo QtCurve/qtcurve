@@ -27,3 +27,4 @@ fixParentlessDialogs=true
 customShades=0
 gtkComboMenus=true
 doubleGtkComboArrow=true
+sortedLv=true

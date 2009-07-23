@@ -887,7 +887,8 @@ typedef struct
                      shadeMenubars,
                      menuStripe,
                      shadeCheckRadio,
-                     comboBtn;
+                     comboBtn,
+                     sortedLv;
     EColor           progressGrooveColor;
     EEffect          buttonEffect;
     EScrollbar       scrollbarType;
@@ -898,7 +899,8 @@ typedef struct
                      customMenuSelTextColor,
                      customMenuStripeColor,
                      customCheckRadioColor,
-                     customComboBtnColor;
+                     customComboBtnColor,
+                     customSortedLvColor;
 #if defined __cplusplus
     EAlign           titlebarAlignment;
 #endif

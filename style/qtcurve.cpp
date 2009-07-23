@@ -782,6 +782,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsDefBtnCols(0L),
               itsMouseOverCols(0L),
               itsComboBtnCols(0L),
+              itsSortedLvColors(0L),
               itsSidebarButtonsCols(0L),
               itsActiveMdiColors(0L),
               itsMdiColors(0L),
@@ -921,6 +922,46 @@ QtCurveStyle::QtCurveStyle(const QString &name)
                         itsComboBtnCols);
     }
 
+    switch(opts.sortedLv)
+    {
+        default:
+        case SHADE_DARKEN:
+        case SHADE_NONE:
+            break;
+        case SHADE_SELECTED:
+            itsSortedLvColors=itsHighlightCols;
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(opts.shadeSliders==SHADE_BLEND_SELECTED)
+            {
+                itsSortedLvColors=itsSliderCols;
+                break;
+            }
+            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+            {
+                itsSortedLvColors=itsComboBtnCols;
+                break;
+            }
+        case SHADE_CUSTOM:
+            if(opts.shadeSliders==SHADE_CUSTOM && opts.customSlidersColor==opts.customSortedLvColor)
+            {
+                itsSortedLvColors=itsSliderCols;
+                break;
+            }
+            if(opts.comboBtn==SHADE_CUSTOM && opts.customComboBtnColor==opts.customSortedLvColor)
+            {
+                itsSortedLvColors=itsComboBtnCols;
+                break;
+            }
+            if(!itsSortedLvColors)
+                itsSortedLvColors=new QColor [TOTAL_SHADES+1];
+            shadeColors(SHADE_BLEND_SELECTED==opts.comboBtn
+                            ? midColor(itsHighlightCols[ORIGINAL_SHADE],
+                                       (opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]))
+                            : opts.customSortedLvColor,
+                        itsSortedLvColors);
+    }
+
     setMenuColors(QApplication::palette().color(QPalette::Active, QPalette::Background));
 
     if(USE_LIGHTER_POPUP_MENU)
@@ -982,7 +1023,9 @@ QtCurveStyle::~QtCurveStyle()
         delete [] itsSliderCols;
     if(itsComboBtnCols && itsComboBtnCols!=itsHighlightCols && itsComboBtnCols!=itsSliderCols)
         delete [] itsComboBtnCols;
-
+    if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
+       itsSortedLvColors!=itsComboBtnCols)
+        delete [] itsSortedLvColors;
     if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
             delete [] itsTitleBarButtonsCols[i];
@@ -1073,7 +1116,11 @@ void QtCurveStyle::polish(QPalette &palette)
                      (newContrast || newButton || newMenu)),
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
-                     (newContrast || newButton || newMenu));
+                     (newContrast || newButton || newMenu)),
+         newSortedLv(itsSortedLvColors && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
+                     itsComboBtnCols!=itsSortedLvColors &&
+                     SHADE_BLEND_SELECTED==opts.sortedLv &&
+                     (newContrast || (opts.lvButton ? newButton : newGray) || newMenu));
 
     if(newGray)
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
@@ -1098,6 +1145,10 @@ void QtCurveStyle::polish(QPalette &palette)
     if(newComboBtn)
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                     itsButtonCols[ORIGINAL_SHADE]), itsComboBtnCols);
+
+    if(newSortedLv)
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                    opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]), itsSortedLvColors);
 
     if(newDefBtn)
         if(IND_TINT==opts.defBtnIndicator)
@@ -4276,7 +4327,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_HeaderSection:
             if (const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
-                const QColor *use(opts.lvButton ? buttonColors(option) : backgroundColors(option));
+                const QColor *use(itsSortedLvColors && QStyleOptionHeader::None!=ho->sortIndicator
+                                    ? itsSortedLvColors
+                                    : opts.lvButton ? buttonColors(option) : backgroundColors(option));
 
                 painter->save();
 
