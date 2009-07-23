@@ -42,6 +42,7 @@ static struct
              *defbtn,
              *mouseover,
              *combobtn,
+             *sortedlv,
              menubar[TOTAL_SHADES+1],
              highlight[TOTAL_SHADES+1],
              focus[TOTAL_SHADES+1],
@@ -277,6 +278,30 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
     return gtk_gc_get(style->depth, style->colormap, &gc_values, GDK_GC_FOREGROUND);
 }
 
+static gboolean isSortColumn(GtkWidget *button)
+{
+    if(button && button->parent && GTK_IS_TREE_VIEW(button->parent))
+    {
+        GtkWidget *sort=NULL;;
+        GList     *columns=gtk_tree_view_get_columns(GTK_TREE_VIEW(button->parent)),
+                  *column;
+
+        for (column = columns; column && !sort && sort!=button; column=g_list_next(column))
+            if(GTK_IS_TREE_VIEW_COLUMN(column->data))
+            {
+                GtkTreeViewColumn *c=GTK_TREE_VIEW_COLUMN(column->data);
+
+                if(gtk_tree_view_column_get_sort_indicator(c))
+                    sort=c->button;
+            }
+
+        g_list_free(columns);
+        return sort==button;
+    }
+
+    return FALSE;
+};
+
 #define QTC_SET_BTN_COLS(SCROLLBAR, SCALE, LISTVIEW, STATE) \
 { \
     if(SCROLLBAR || SCALE) \
@@ -286,8 +311,15 @@ static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
                       (!opts.colorSliderMouseOver || GTK_STATE_PRELIGHT==STATE) \
                         ? qtcPalette.slider \
                         : qtcPalette.button[PAL_ACTIVE]; \
-    else if(LISTVIEW && !opts.lvButton) \
-        btn_colors=qtcPalette.background; \
+    else if(LISTVIEW) \
+    { \
+        if(qtcPalette.sortedlv && isSortColumn(widget)) \
+            btn_colors=qtcPalette.sortedlv;  \
+        else if(opts.lvButton) \
+            btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
+        else \
+            btn_colors=qtcPalette.background; \
+    } \
     else \
         btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==STATE ? PAL_DISABLED : PAL_ACTIVE]; \
 }
@@ -6392,6 +6424,41 @@ static void generateColors()
 
                 qtcPalette.combobtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
                 shadeColors(&mid, qtcPalette.combobtn);
+            }
+        default:
+            break;
+    }
+
+    qtcPalette.sortedlv=NULL;
+    switch(opts.sortedLv)
+    {
+        case SHADE_SELECTED:
+            qtcPalette.sortedlv=qtcPalette.highlight;
+            break;
+        case SHADE_CUSTOM:
+            if(SHADE_CUSTOM==opts.shadeSliders && QTC_EQUAL_COLOR(opts.customSlidersColor, opts.customSortedLvColor))
+                qtcPalette.sortedlv=qtcPalette.slider;
+            else if(SHADE_CUSTOM==opts.comboBtn && QTC_EQUAL_COLOR(opts.customComboBtnColor, opts.customSortedLvColor))
+                qtcPalette.sortedlv=qtcPalette.combobtn;
+            else
+            {
+                qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&opts.customSortedLvColor, qtcPalette.sortedlv);
+            }
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                qtcPalette.sortedlv=qtcPalette.slider;
+            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+                qtcPalette.sortedlv=qtcPalette.combobtn;
+            else
+            {
+                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                      opts.lvButton ? &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]
+                                                    : &qtcPalette.background[ORIGINAL_SHADE]);
+
+                qtcPalette.sortedlv=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&mid, qtcPalette.sortedlv);
             }
         default:
             break;
