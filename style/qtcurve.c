@@ -2619,19 +2619,21 @@ debugDisplayWidget(widget, 3);
 
         if(isOnComboBox(widget, 0) && !onComboEntry)
         {
+            GdkColor *arrowColor=QTC_MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
+                                                                            ? PAL_DISABLED : PAL_ACTIVE]
+                                                                       [COLOR_BUTTON_TEXT]);
             x++;
 
-//             if(opts.singleComboArrow)
-                drawArrow(cr, QTC_MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                                                                    [COLOR_BUTTON_TEXT]),
-                          area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
-//             else
-//             {
-//                 drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], area,  GTK_ARROW_UP,
-//                           x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-(opts.vArrows ? 0 : 1)), FALSE, TRUE);
-//                 drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], area,  GTK_ARROW_DOWN,
-//                           x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
-//             }
+            if(opts.doubleGtkComboArrow)
+            {
+                int pad=opts.vArrows ? 0 : 1;
+                drawArrow(cr, arrowColor, area,  GTK_ARROW_UP,
+                          x+(width>>1), y+(height>>1)-(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+                drawArrow(cr, arrowColor, area,  GTK_ARROW_DOWN,
+                          x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+            }
+            else
+                drawArrow(cr, arrowColor, area,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
         }
         else
         {
