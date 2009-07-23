@@ -104,6 +104,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void customMenuTextColorChanged();
     void menuStripeChanged();
     void comboBtnChanged();
+    void sortedLvChanged();
     void stripedProgressChanged();
     void shadingChanged();
     void activeTabAppearanceChanged();
@@ -134,7 +135,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     bool diffShades(const Options &opts);
     void setPasswordChar(int ch);
     void loadStyle(const QString &file);
-    int getTitleBarButtonFlags();
+    int  getTitleBarButtonFlags();
     void setOptions(Options &opts);
     void setWidgetOptions(const Options &opts);
     bool diffTitleBarButtonColors(const Options &opts);

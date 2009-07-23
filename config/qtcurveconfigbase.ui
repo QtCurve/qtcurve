@@ -114,7 +114,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_47">
          <property name="text">
-          <string>Background (KDE4 &amp; Gtk2)</string>
+          <string>Background (KDE4 &amp; Gtk2):</string>
          </property>
         </widget>
        </item>
@@ -272,10 +272,27 @@ p, li { white-space: pre-wrap; }
      </widget>
      <widget class="QWidget" name="page_16">
       <layout class="QFormLayout" name="formLayout_2">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::ExpandingFieldsGrow</enum>
-       </property>
-       <item row="0" column="0" colspan="2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_46">
+         <property name="text">
+          <string>Button:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboBtn"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="KColorButton" name="customComboBtnColor">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
         <widget class="QCheckBox" name="comboSplitter">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -288,34 +305,48 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="unifyCombo">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_64">
          <property name="text">
-          <string>Draw arrow of editable combos within edit field</string>
+          <string>Editable style:</string>
          </property>
         </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_46">
-         <property name="text">
-          <string>Button shade:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="comboBtn"/>
        </item>
        <item row="3" column="1">
-        <widget class="KColorButton" name="customComboBtnColor">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <widget class="QCheckBox" name="unifyCombo">
+         <property name="text">
+          <string>Draw arrow within edit field</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_63">
+         <property name="text">
+          <string>Non-editable style:</string>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
+        <widget class="QCheckBox" name="gtkComboMenus">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Gtk-style (KDE4)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QCheckBox" name="doubleGtkComboArrow">
+         <property name="text">
+          <string>Draw double-arrow for Gtk style</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -710,6 +741,29 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="0">
+        <widget class="QLabel" name="label_65">
+         <property name="text">
+          <string>Shade header of sorted column:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="sortedLv"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="KColorButton" name="customSortedLvColor">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QLabel" name="textLabel1_8_2_4">
          <property name="whatsThis">
           <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
@@ -722,17 +776,17 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="4" column="1">
         <widget class="QComboBox" name="selectionAppearance"/>
        </item>
-       <item row="3" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_48">
          <property name="text">
           <string>Lines between items:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="lvLines"/>
        </item>
       </layout>
@@ -934,6 +988,51 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_62">
+         <property name="text">
+          <string>Inactive tab inner border:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QFrame" name="frame_5">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="borderInactiveTab">
+            <property name="text">
+             <string>Same as active tab</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="borderInactiveTab_false">
+            <property name="text">
+             <string>No inner border</string>
             </property>
            </widget>
           </item>
@@ -1691,33 +1790,20 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="page_12">
       <layout class="QGridLayout">
        <item row="0" column="0" colspan="4">
-        <widget class="QCheckBox" name="gtkComboMenus">
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Gtk style comboboxes (KDE4)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="4">
         <widget class="QCheckBox" name="gtkButtonOrder">
          <property name="text">
           <string>Gtk button order</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="4">
+       <item row="1" column="0" colspan="4">
         <widget class="QCheckBox" name="mapKdeIcons">
          <property name="text">
           <string>Map KDE icons (Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="4">
+       <item row="2" column="0" colspan="4">
         <widget class="QCheckBox" name="fixParentlessDialogs">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -1735,14 +1821,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Character to use for password entries:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="3" column="1">
         <widget class="QPushButton" name="passwordChar">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1752,7 +1838,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="3" column="2">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1765,7 +1851,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -2120,9 +2206,9 @@ p, li { white-space: pre-wrap; }
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
+   <class>KIntSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>knuminput.h</header>
   </customwidget>
   <customwidget>
    <class>KDoubleNumInput</class>
@@ -2130,19 +2216,19 @@ p, li { white-space: pre-wrap; }
    <header>knuminput.h</header>
   </customwidget>
   <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
    <class>KPushButton</class>
    <extends>QPushButton</extends>
    <header>kpushbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2163,10 +2249,12 @@ p, li { white-space: pre-wrap; }
   <tabstop>fadeLines</tabstop>
   <tabstop>framelessGroupBoxes</tabstop>
   <tabstop>groupBoxLine</tabstop>
-  <tabstop>comboSplitter</tabstop>
-  <tabstop>unifyCombo</tabstop>
   <tabstop>comboBtn</tabstop>
   <tabstop>customComboBtnColor</tabstop>
+  <tabstop>comboSplitter</tabstop>
+  <tabstop>unifyCombo</tabstop>
+  <tabstop>gtkComboMenus</tabstop>
+  <tabstop>doubleGtkComboArrow</tabstop>
   <tabstop>unifySpinBtns</tabstop>
   <tabstop>unifySpin</tabstop>
   <tabstop>splitters</tabstop>
@@ -2195,6 +2283,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>highlightFactor</tabstop>
   <tabstop>lvAppearance</tabstop>
   <tabstop>lvButton</tabstop>
+  <tabstop>sortedLv</tabstop>
+  <tabstop>customSortedLvColor</tabstop>
   <tabstop>selectionAppearance</tabstop>
   <tabstop>lvLines</tabstop>
   <tabstop>gtkScrollViews</tabstop>
@@ -2210,6 +2300,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>roundAllTabs</tabstop>
   <tabstop>borderTab_false</tabstop>
   <tabstop>borderTab</tabstop>
+  <tabstop>borderInactiveTab_false</tabstop>
+  <tabstop>borderInactiveTab</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck_false</tabstop>
@@ -2267,7 +2359,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>handles</tabstop>
   <tabstop>toolbarSeparators</tabstop>
   <tabstop>toolbarBorders</tabstop>
-  <tabstop>gtkComboMenus</tabstop>
   <tabstop>gtkButtonOrder</tabstop>
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>
