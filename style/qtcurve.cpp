@@ -2790,7 +2790,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 sr.setY(sr.y()+(down ? -2 : 1));
 
                 if(opts.unifySpin)
+                {
                     sr.adjust(reverse ? 1 : -1, 0, reverse ? 1 : -1, 0);
+                    if(!opts.vArrows)
+                        sr.setY(sr.y()+(down ? -2 : 2));
+                }
                 else if(state&State_Sunken)
                     sr.adjust(1, 1, 1, 1);
 
