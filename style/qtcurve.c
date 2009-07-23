@@ -2759,11 +2759,11 @@ debugDisplayWidget(widget, 3);
             x--;
 
         if(isSpinButton && !QTC_DO_EFFECT)
-            if(GTK_ARROW_UP==arrow_type)
-                y--;
-            else
-                y++;
+            y+=(GTK_ARROW_UP==arrow_type ? -1 : 1);
 
+        if(opts.unifySpin && isSpinButton && !opts.vArrows && GTK_ARROW_DOWN==arrow_type)
+            y--;
+ 
         if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
             state=GTK_STATE_PRELIGHT;
 

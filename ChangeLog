@@ -4,10 +4,11 @@
 2. Add option to draw double arrows for non-editable combos.
 3. Add option to colour the sorted listview header.
 4. Disable scrollbar buttons when at min/max - to match spin buttons.
-5. Increase the amount of rounding when round set to max.
-6. Match gradient width/height to KDE4.
-7. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
-8. Fix entry borders of standard entry widgets in Mozilla apps. (The Mozilla
+5. Place non-V arrows of unified spin widgets closer together.
+6. Increase the amount of rounding when round set to max.
+7. Match gradient width/height to KDE4.
+8. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+9. Fix entry borders of standard entry widgets in Mozilla apps. (The Mozilla
    widgets need a thinner border than the Gtk ones)
 
 0.66.0
