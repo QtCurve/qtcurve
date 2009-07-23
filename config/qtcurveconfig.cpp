@@ -289,8 +289,7 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
     if(SW_CHECK_RADIO!=sw) // For check/radio, we dont blend, and dont allow darken
     {
         combo->insertItem(SHADE_BLEND_SELECTED, i18n("Blended selected background"));
-        if(SW_LV_HEADER!=sw)
-            combo->insertItem(SHADE_DARKEN, SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken"));
+        combo->insertItem(SHADE_DARKEN, SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken"));
     }
 }
 

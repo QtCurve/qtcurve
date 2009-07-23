@@ -924,8 +924,12 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
     switch(opts.sortedLv)
     {
-        default:
         case SHADE_DARKEN:
+            if(!itsSortedLvColors)
+                itsSortedLvColors=new QColor [TOTAL_SHADES+1];
+            shadeColors(shade(opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsSortedLvColors);
+            break;
+        default:
         case SHADE_NONE:
             break;
         case SHADE_SELECTED:
@@ -1117,10 +1121,10 @@ void QtCurveStyle::polish(QPalette &palette)
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
                      (newContrast || newButton || newMenu)),
-         newSortedLv(itsSortedLvColors && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
-                     itsComboBtnCols!=itsSortedLvColors &&
-                     SHADE_BLEND_SELECTED==opts.sortedLv &&
-                     (newContrast || (opts.lvButton ? newButton : newGray) || newMenu));
+         newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
+                                             itsComboBtnCols!=itsSortedLvColors) || 
+                                             SHADE_DARKEN==opts.sortedLv) &&
+                     (newContrast || (opts.lvButton ? newButton : newGray)));
 
     if(newGray)
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
@@ -1147,8 +1151,11 @@ void QtCurveStyle::polish(QPalette &palette)
                     itsButtonCols[ORIGINAL_SHADE]), itsComboBtnCols);
 
     if(newSortedLv)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                    opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]), itsSortedLvColors);
+        if(SHADE_BLEND_SELECTED==opts.sortedLv)
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                        opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]), itsSortedLvColors);
+        else
+            shadeColors(shade(opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsSortedLvColors);
 
     if(newDefBtn)
         if(IND_TINT==opts.defBtnIndicator)
@@ -4327,7 +4334,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_HeaderSection:
             if (const QStyleOptionHeader *ho = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
-                const QColor *use(itsSortedLvColors && QStyleOptionHeader::None!=ho->sortIndicator
+                const QColor *use(state&State_Enabled && itsSortedLvColors && QStyleOptionHeader::None!=ho->sortIndicator
                                     ? itsSortedLvColors
                                     : opts.lvButton ? buttonColors(option) : backgroundColors(option));
 
