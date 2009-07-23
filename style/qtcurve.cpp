@@ -5289,7 +5289,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 const QColor *use(backgroundColors(option));
                 const QColor &fill(getTabFill(selected, mouseOver, use));
                 double radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
-                EBorder borderProfile(selected ? (opts.borderTab ? BORDER_LIGHT : BORDER_RAISED) : BORDER_FLAT);
+                EBorder borderProfile(selected || opts.borderInactiveTab
+                                        ? opts.borderTab
+                                            ? BORDER_LIGHT
+                                            : BORDER_RAISED
+                                        : BORDER_FLAT);
 
                 painter->save();
                 switch(tab->shape)
@@ -9011,6 +9015,10 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     p->setBrush(Qt::NoBrush);
 
     if(!window || opts.titlebarBorder)
+    {
+        if(WIDGET_TAB_BOT==w || WIDGET_TAB_TOP==w)
+            cols=itsBackgroundCols;
+
         switch(borderProfile)
         {
             case BORDER_FLAT:
@@ -9067,6 +9075,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 p->drawPath(botPath);
             }
         }
+    }
 
     if(BORDER_SUNKEN==borderProfile &&
        (WIDGET_FRAME==w || ((WIDGET_ENTRY==w || WIDGET_SCROLLVIEW==w) && !opts.etchEntry && !hasFocus && !hasMouseOver)))

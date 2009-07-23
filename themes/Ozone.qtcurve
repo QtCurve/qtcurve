@@ -3,9 +3,10 @@ Name=Ozone
 [KDE]
 WidgetStyle=qtc_ozone
 [Settings]
-version=0.66.0
+version=0.67.0
 sliderStyle=r-plain
 sliderThumbs=none
 thinSbarGroove=false
 framelessGroupBoxes=false
 fillSlider=false
+borderInactiveTab=true

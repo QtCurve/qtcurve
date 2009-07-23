@@ -1,12 +1,13 @@
-0.66.2
+0.67.0
 ------
-1. For scrollviews that are windows, dont round and always place scrollbar within
+1. Add option to draw insider border of inactive tabs.
+2. For scrollviews that are windows, dont round and always place scrollbar within
    frame.
-2. Disable spin button when at min/max - matches Gtk2.
-3. Disable scrollbar buttons when at min/max - to match spin buttons.
-4. Improve appearance of max rounded pushbuttons in Arora.
-5. Increase the amount of rounding when round set to max.
-6. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+3. Disable spin button when at min/max - matches Gtk2.
+4. Disable scrollbar buttons when at min/max - to match spin buttons.
+5. Improve appearance of max rounded pushbuttons in Arora.
+6. Increase the amount of rounding when round set to max.
+7. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
 
 0.66.1
 ------

@@ -1141,6 +1141,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(unifySpin)
             QTC_CFG_READ_BOOL(unifyCombo)
             QTC_CFG_READ_BOOL(borderTab)
+            QTC_CFG_READ_BOOL(borderInactiveTab)
             QTC_CFG_READ_BOOL(thinSbarGroove)
             QTC_CFG_READ_BOOL(colorSliderMouseOver)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -1741,6 +1742,7 @@ static void defaultSettings(Options *opts)
     opts->unifySpin=true;
     opts->unifyCombo=true;
     opts->borderTab=true;
+    opts->borderInactiveTab=false;
     opts->thinSbarGroove=true;
     opts->colorSliderMouseOver=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -2306,6 +2308,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(unifySpin)
         CFG_WRITE_ENTRY(unifyCombo)
         CFG_WRITE_ENTRY(borderTab)
+        CFG_WRITE_ENTRY(borderInactiveTab)
         CFG_WRITE_ENTRY(thinSbarGroove)
         CFG_WRITE_ENTRY(colorSliderMouseOver)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
