@@ -7234,18 +7234,19 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(sunken && (!comboBox->editable || !opts.unifyCombo))
                         arrow.adjust(1, 1, 1, 1);
 
-                    //if(comboBox->editable || !opts.gtkComboMenus)
-                        drawArrow(painter, arrow, PE_IndicatorArrowDown, QTC_MO_ARROW_X(mouseOver, QPalette::ButtonText),
-                                  false, false);
-//                     else
-//                     {
-//                         int middle=arrow.y()+(arrow.height()>>1);
-//
-//                         QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+(opts.vArrows ? 2 : 1)), arrow.width(), LARGE_ARR_HEIGHT);
-//                         drawArrow(painter, ar, option, PE_IndicatorArrowUp);
-//                         ar=QRect(arrow.x(), middle+1, arrow.width(), LARGE_ARR_HEIGHT);
-//                         drawArrow(painter, ar, option, PE_IndicatorArrowDown);
-//                     }
+                    QColor arrowColor(QTC_MO_ARROW_X(mouseOver, QPalette::ButtonText));
+                    if(comboBox->editable || !(opts.gtkComboMenus && opts.doubleGtkComboArrow))
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, arrowColor, false, false);
+                    else
+                    {
+                        int middle=arrow.y()+(arrow.height()>>1),
+                            gap=(opts.vArrows ? 2 : 1);
+
+                        QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+gap), arrow.width(), LARGE_ARR_HEIGHT);
+                        drawArrow(painter, ar, PE_IndicatorArrowUp, arrowColor, false, false);
+                        ar=QRect(arrow.x(), middle+gap, arrow.width(), LARGE_ARR_HEIGHT);
+                        drawArrow(painter, ar, PE_IndicatorArrowDown, arrowColor, false, false);
+                    }
                 }
 
                 if(state&State_Enabled && state&State_HasFocus &&

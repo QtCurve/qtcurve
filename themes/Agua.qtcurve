@@ -3,7 +3,7 @@ Name=Agua
 [KDE]
 WidgetStyle=qtc_agua
 [Settings]
-version=0.66.0
+version=0.67.0
 appearance=agua
 sliderAppearance=agua
 sunkenAppearance=inverted
@@ -25,3 +25,5 @@ titlebarButtons=85
 inactiveTitlebarAppearance=customgradient1
 fixParentlessDialogs=true
 customShades=0
+gtkComboMenus=true
+doubleGtkComboArrow=true

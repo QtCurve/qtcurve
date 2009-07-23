@@ -960,6 +960,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(0, 67))
+            {
+                def->doubleGtkComboArrow=false;
+            }
             if(version<QTC_MAKE_VERSION(0, 66))
             {
                 def->menuStripeAppearance=APPEARANCE_GRADIENT;
@@ -1155,6 +1159,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 QTC_CFG_READ_COLOR(customMenuStripeColor)
             QTC_CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             QTC_CFG_READ_BOOL(gtkScrollViews)
+            QTC_CFG_READ_BOOL(doubleGtkComboArrow)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)
             QTC_CFG_READ_BOOL(stdSidebarButtons)
@@ -1758,6 +1763,7 @@ static void defaultSettings(Options *opts)
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
     opts->gtkComboMenus=false;
+    opts->doubleGtkComboArrow=true;
     opts->colorTitlebarOnly=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);
     opts->customSlidersColor.setRgb(0, 0, 0);
@@ -2348,6 +2354,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(titlebarButtonAppearance)
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
+        CFG_WRITE_ENTRY(doubleGtkComboArrow)
         CFG_WRITE_ENTRY(colorTitlebarOnly)
         CFG_WRITE_ENTRY(gtkButtonOrder)
         CFG_WRITE_ENTRY(mapKdeIcons)

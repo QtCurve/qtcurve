@@ -837,7 +837,8 @@ typedef struct
                      unifyCombo,
                      unifySpin,
                      borderTab,
-                     borderInactiveTab;
+                     borderInactiveTab,
+                     doubleGtkComboArrow;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;

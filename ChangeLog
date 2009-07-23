@@ -1,13 +1,14 @@
 0.67.0
 ------
 1. Add option to draw insider border of inactive tabs.
-2. For scrollviews that are windows, dont round and always place scrollbar within
+2. Add option to draw double arrows for Gtk style combos.
+3. For scrollviews that are windows, dont round and always place scrollbar within
    frame.
-3. Disable spin button when at min/max - matches Gtk2.
-4. Disable scrollbar buttons when at min/max - to match spin buttons.
-5. Improve appearance of max rounded pushbuttons in Arora.
-6. Increase the amount of rounding when round set to max.
-7. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
+4. Disable spin button when at min/max - matches Gtk2.
+5. Disable scrollbar buttons when at min/max - to match spin buttons.
+6. Improve appearance of max rounded pushbuttons in Arora.
+7. Increase the amount of rounding when round set to max.
+8. Only selected tabs need to fade to 100% alpha when using gradient backgrounds.
 
 0.66.1
 ------
