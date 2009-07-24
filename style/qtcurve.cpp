@@ -7495,9 +7495,10 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             newSize=size;
             newSize.setWidth(newSize.width()+4);
 
-            int iconHeight=/*btn->icon.isNull() ? btn->iconSize.height() : */16;
-            if(size.height()<iconHeight+2)
-                newSize.setHeight(iconHeight+2);
+// Not sure about this - makes combos the same as pushbuttons, bu sometimes they are too big?
+//             int iconHeight=/*btn->icon.isNull() ? btn->iconSize.height() : */16;
+//             if(size.height()<iconHeight+2)
+//                 newSize.setHeight(iconHeight+2);
                     
             int margin      = (pixelMetric(PM_ButtonMargin, option, widget)+
                               (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-QTC_MAX_ROUND_BTN_PAD,
