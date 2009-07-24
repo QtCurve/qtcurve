@@ -2499,7 +2499,7 @@ debugDisplayWidget(widget, 3);
             case LINE_FLAT:
             case LINE_SUNKEN:
             case LINE_DASHES:
-                drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 3,
+                drawLines(cr, x, y, width, height, height>width, NUM_SPLITTER_DASHES, 2,
                           cols, area, 3, opts.splitters);
         }
     }
