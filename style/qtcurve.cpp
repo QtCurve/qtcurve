@@ -7388,8 +7388,9 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                if(!btn->icon.isNull() && size.height()<btn->iconSize.height()+2)
-                    newSize.setHeight(btn->iconSize.height()+2);
+                int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
+                if(size.height()<iconHeight+2)
+                    newSize.setHeight(iconHeight+2);
 
                 int margin = (pixelMetric(PM_ButtonMargin, btn, widget)+
                              (pixelMetric(PM_DefaultFrameWidth, btn, widget) * 2))-QTC_MAX_ROUND_BTN_PAD;
@@ -7494,6 +7495,10 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             newSize=size;
             newSize.setWidth(newSize.width()+4);
 
+            int iconHeight=/*btn->icon.isNull() ? btn->iconSize.height() : */16;
+            if(size.height()<iconHeight+2)
+                newSize.setHeight(iconHeight+2);
+                    
             int margin      = (pixelMetric(PM_ButtonMargin, option, widget)+
                               (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-QTC_MAX_ROUND_BTN_PAD,
                 textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),

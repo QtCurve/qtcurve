@@ -1,6 +1,7 @@
 0.67.1
 ------
 1. Fix rounding of scrollbar groove.
+2. Fix different size button in some dialogs.
 
 0.67.0
 ------
