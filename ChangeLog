@@ -1,3 +1,7 @@
+0.67.1
+------
+1. Fix rounding of scrollbar groove.
+
 0.67.0
 ------
  1. Add option to draw insider border of inactive tabs.
