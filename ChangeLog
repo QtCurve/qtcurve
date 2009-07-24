@@ -2,6 +2,7 @@
 ------
 1. Adjust Agua overlay if widget is not max rounded.
 2. Fix flat/sunken/dashed splitter handles!
+3. KDE4 default for is 9pt, not 10pt
 
 0.67.0
 ------

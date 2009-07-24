@@ -202,7 +202,7 @@ struct QtData
 #endif
 
 #define DEFAULT_KDE_FONT      "Sans Serif"
-#define DEFAULT_KDE_FONT_SIZE 10.0
+#define DEFAULT_KDE_FONT_SIZE (qtSettings.qt4 ? 9.0 : 10.0)
 #define MAX_LINE_LEN 1024
 
 struct QtData qtSettings;
