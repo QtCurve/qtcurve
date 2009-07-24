@@ -135,7 +135,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawLightBevelReal(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
-                        const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER, bool useCache=true) const;
+                            const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound) const;
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;
     void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false) const;
     void drawWindowBackground(QWidget *widget) const;

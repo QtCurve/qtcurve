@@ -8557,7 +8557,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                                   bool doBorder, EWidget w) const
 {
     if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin) || !usePixmapCache)
-        drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true);
+        drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round);
     else
     {
         static const int constMaxCachePixmap = 128;
@@ -8567,7 +8567,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         bool   horiz(isHoriz(option, w)),
                circular(WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND));
         double radius=0;
-        ERound realRound=getRound(&opts, r.width(), r.height(), w);
+        ERound realRound=getWidgetRound(&opts, r.width(), r.height(), w);
 
         if(!circular)
         {
@@ -8598,7 +8598,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         int size((2*endSize)+middleSize);
 
         if(size>constMaxCachePixmap)
-            drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true);
+            drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, realRound);
         else
         {
             QString key;
@@ -8615,7 +8615,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                 ERound   oldRound=opts.round;
                 opts.round=realRound;
                 drawLightBevelReal(&pixPainter, QRect(0, 0, pix.width(), pix.height()), option, widget, round, fill, custom,
-                                   doBorder, w, false);
+                                   doBorder, w, false, realRound);
                 opts.round=oldRound;
                 pixPainter.end();
 
@@ -8647,7 +8647,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
 
 void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option,
                                       const QWidget *widget, int round, const QColor &fill, const QColor *custom,
-                                      bool doBorder, EWidget w, bool useCache) const
+                                      bool doBorder, EWidget w, bool useCache, ERound realRound) const
 {
     EAppearance  app(widgetApp(w, &opts, option->state&State_Active));
 
@@ -8791,7 +8791,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 mod/=1.25;
                 ra.adjust(0, 0, 0, -4);
             }
-            else */if(opts.round<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
+            else */if(realRound<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
             {
                 rad/=2.0;
                 mod=mod>>1;
