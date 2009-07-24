@@ -2,6 +2,8 @@
 ------
 1. Fix rounding of scrollbar groove.
 2. Fix different size button in some dialogs.
+3. If linked agains KDE, use KDE4's icon size settings to control the
+   size of icons in menus, buttons, and toolbars.
 
 0.67.0
 ------

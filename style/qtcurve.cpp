@@ -2120,6 +2120,19 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
+#ifndef QTC_QT_ONLY
+        case PM_ButtonIconSize:
+        case PM_SmallIconSize:
+        {
+            KConfigGroup g(KGlobal::config(), "SmallIcons");
+            return g.readEntry("Size", 16);
+        }
+        case PM_ToolBarIconSize:
+        {
+            KConfigGroup g(KGlobal::config(), "MainToolbarIcons");
+            return g.readEntry("Size", 22);
+        }
+#endif
 #if QT_VERSION >= 0x040500
         case PM_SubMenuOverlap:
             return -2;
