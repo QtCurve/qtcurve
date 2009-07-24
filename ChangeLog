@@ -2,10 +2,10 @@
 ------
 1. Adjust Agua overlay if widget is not max rounded.
 2. Fix rounding of scrollbar groove.
-3. Fix different size button in some dialogs. This should now better match Gtk2
+3. Use icon metrics for all 'AutoDefault' buttons. This should now better match Gtk2
    - where 'can default' buttons always seem to reserve enough height for an icon.
-4. If linked agains KDE, use KDE4's icon size settings to control the
-   size of icons in menus, buttons, and toolbars.
+4. If linked against KDE, use KDE4's icon size settings to control the size of icons
+   in menus, buttons, and toolbars.
 
 0.67.0
 ------
