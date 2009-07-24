@@ -2369,6 +2369,16 @@ debugDisplayWidget(widget, 3);
         qtcWindowSetup(widget);
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
+        int round=detail && GTK_STATE_SELECTED==state && QTC_ROUNDED
+                    ? 0!=strstr(detail, "_start")
+                        ? ROUNDED_LEFT
+                        : 0!=strstr(detail, "_end")
+                            ? ROUNDED_RIGHT
+                            : 0!=strstr(detail, "_middle")
+                                ? ROUNDED_NONE
+                                : ROUNDED_ALL
+                    : ROUNDED_NONE;
+
         if(opts.lvLines)
         {
             QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
@@ -2386,28 +2396,15 @@ debugDisplayWidget(widget, 3);
             state=GTK_STATE_PRELIGHT;
     */
 
-        if(GTK_STATE_SELECTED==state)
-        {
-            int round=detail
-                    ? 0!=strstr(detail, "_start")
-                        ? ROUNDED_LEFT
-                        : 0!=strstr(detail, "_end")
-                            ? ROUNDED_RIGHT
-                            : 0!=strstr(detail, "_middle")
-                                ? ROUNDED_NONE
-                                : ROUNDED_ALL
-                    : ROUNDED_NONE;
-
-            if(!QTC_ROUNDED)
-                round=ROUNDED_NONE;
-            drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round);
-        }
-        else
+        if(GTK_STATE_SELECTED!=state || ROUNDED_NONE!=round)
             drawAreaColor(cr, area, NULL,
                           getCellCol(haveAlternareListViewCol() && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_odd")
                                         ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
                                         : &style->base[GTK_STATE_NORMAL], detail),
                               x, y, width, height);
+
+        if(GTK_STATE_SELECTED==state)
+            drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round);
     }
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
