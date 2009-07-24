@@ -4502,6 +4502,8 @@ debugDisplayWidget(widget, 3);
 
     if(mnu && GTK_APP_OPEN_OFFICE==qtSettings.app)
         x+=2, y-=2;
+    else if(mnu && GTK_APP_MOZILLA==qtSettings.app)
+        y-=4;
 
     if(mnu && GTK_STATE_PRELIGHT==state)
         state=GTK_STATE_NORMAL;
@@ -4674,7 +4676,10 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 //             y++;
 
         if(mnu)
-            y+=2;
+            if(GTK_APP_MOZILLA==qtSettings.app)
+                y-=2;
+            else
+                y+=2;
 
         {
             GdkColor  new_colors[TOTAL_SHADES+1],
