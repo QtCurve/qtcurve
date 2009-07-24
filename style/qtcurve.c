@@ -1525,7 +1525,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || WIDGET_COMBO_BUTTON==widget) && QTC_DO_EFFECT,
                 horiz=!(flags&DF_VERT);
-    int         xe=x, ye=y, we=width, he=height;
+    int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
     double      xd=x+0.5, yd=y+0.5;
 
     if(WIDGET_COMBO_BUTTON==widget && doEtch)
@@ -1646,7 +1646,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
             cairo_new_path(cr);
             cairo_save(cr);
             
-            if(opts.round<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
+            if(getWidgetRound(&opts, origWidth, origHeight, widget)<ROUND_MAX ||
+               (!QTC_IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
             {
                 rad/=2.0;
                 mod=mod>>1;

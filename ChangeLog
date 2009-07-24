@@ -1,6 +1,7 @@
 0.67.1
 ------
-1. Fix flat/sunken/dashed splitter handles!
+1. Adjust Agua overlay if widget is not max rounded.
+2. Fix flat/sunken/dashed splitter handles!
 
 0.67.0
 ------
