@@ -998,7 +998,6 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
 #if !defined QTC_QT_ONLY
     QMetaObject::invokeMethod(this, "setupKde4", Qt::QueuedConnection);
-    //QTimer::singleShot(0, this, SLOT(setupKde4()));
 #endif
 }
 
@@ -1092,8 +1091,8 @@ void QtCurveStyle::polish(QApplication *app)
 
 void QtCurveStyle::polish(QPalette &palette)
 {
-    int      contrast(QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt());
-    bool     newContrast(false);
+    int  contrast(QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt());
+    bool newContrast(false);
 
     if(contrast<0 || contrast>10)
         contrast=7;
@@ -1499,7 +1498,7 @@ static int fontHeight(const QStyleOption *option, const QWidget *widget)
 // Taken from skulpture 0.2.3
 void QtCurveStyle::polishFormLayout(QFormLayout *layout)
 {
-int widgetSize=-1;
+    int widgetSize=-1;
 
     if (layout->labelAlignment() & Qt::AlignVCenter)
         return;
@@ -2655,10 +2654,10 @@ int QtCurveStyle::layoutSpacingImplementation(QSizePolicy::ControlType control1,
 void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
                                  const QWidget *widget) const
 {
-    QRect                 r(option->rect);
-    const QFlags<State> & state(option->state);
-    const QPalette &      palette(option->palette);
-    bool                  reverse(Qt::RightToLeft==option->direction);
+    QRect               r(option->rect);
+    const QFlags<State> &state(option->state);
+    const QPalette      &palette(option->palette);
+    bool                reverse(Qt::RightToLeft==option->direction);
 
     switch (element)
     {
@@ -3883,12 +3882,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelItemViewItem:
         {
             const QStyleOptionViewItemV4 *v4Opt = qstyleoption_cast<const QStyleOptionViewItemV4*>(option);
-            const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
-            bool hover = state&State_MouseOver && state&State_Enabled && (!view ||
-                         QAbstractItemView::NoSelection!=view->selectionMode()),
-                 hasCustomBackground = v4Opt->backgroundBrush.style() != Qt::NoBrush &&
-                                        !(option->state & State_Selected),
-                 hasSolidBackground = !hasCustomBackground || Qt::SolidPattern==v4Opt->backgroundBrush.style();
+            const QAbstractItemView      *view = qobject_cast<const QAbstractItemView *>(widget);
+            bool                         hover = state&State_MouseOver && state&State_Enabled && (!view ||
+                                                 QAbstractItemView::NoSelection!=view->selectionMode()),
+                                         hasCustomBackground = v4Opt->backgroundBrush.style() != Qt::NoBrush &&
+                                                               !(option->state & State_Selected),
+                                         hasSolidBackground = !hasCustomBackground || Qt::SolidPattern==v4Opt->backgroundBrush.style();
 
             if (!hover && !(state & State_Selected) && !hasCustomBackground &&
                 !(v4Opt->features & QStyleOptionViewItemV2::Alternate))
@@ -3996,10 +3995,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter,
                                const QWidget *widget) const
 {
-    QRect                 r(option->rect);
-    const QFlags<State> & state(option->state);
-    const QPalette &      palette(option->palette);
-    bool                  reverse(Qt::RightToLeft==option->direction);
+    QRect               r(option->rect);
+    const QFlags<State> &state(option->state);
+    const QPalette      &palette(option->palette);
+    bool                reverse(Qt::RightToLeft==option->direction);
 
     switch(element)
     {
@@ -4253,7 +4252,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
 #if QT_VERSION >= 0x040300
                 const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
-                bool verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
+                bool                           verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
 #endif
                 // This section fixes the look of KOffice's dock widget titlebars...
                 QRect fillRect(r);
@@ -4623,9 +4622,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 double vc6Workaround(((bar->progress - qint64(bar->minimum)) / double(qint64(bar->maximum) - qint64(bar->minimum))) * r.width());
                 int    progressIndicatorPos=(int)vc6Workaround;
-
-                bool flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || ((Qt::LeftToRight==bar->direction) && inverted))) ||
-                          (vertical && ((!inverted && !bottomToTop) || (inverted && bottomToTop))));
+                bool   flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || ((Qt::LeftToRight==bar->direction) && inverted))) ||
+                            (vertical && ((!inverted && !bottomToTop) || (inverted && bottomToTop))));
 
                 if (flip)
                 {
@@ -4859,8 +4857,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         ? palette.highlightedText().color()
                                         : palette.foreground().color());
 
-                int    x, y, w, h,
-                       tab(menuItem->tabWidth);
+                int x, y, w, h,
+                    tab(menuItem->tabWidth);
 
                 menuItem->rect.getRect(&x, &y, &w, &h);
 
@@ -5166,8 +5164,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #else
                 QStyleOptionTabV2 tabV2(*tab);
 #endif
-                bool              verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
-                                               QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape);
+                bool verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
+                                  QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape);
 
                 if (verticalTabs)
                 {
@@ -5332,41 +5330,41 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #if QT_VERSION >= 0x040500
                 QStyleOptionTabV3 tabV3(*tab);
 #endif
-                QRect r2(r);
-                bool rtlHorTabs(Qt::RightToLeft==tab->direction && horiz),
-                     onlyTab(QStyleOptionTab::OnlyOneTab==tab->position),
-                     leftCornerWidget(tab->cornerWidgets&QStyleOptionTab::LeftCornerWidget),
-                     rightCornerWidget(tab->cornerWidgets&QStyleOptionTab::RightCornerWidget),
-                     firstTab((tab->position == (Qt::LeftToRight==tab->direction || !horiz ?
-                                  QStyleOptionTab::Beginning : QStyleOptionTab::End)) || onlyTab),
-                     lastTab((tab->position == (Qt::LeftToRight==tab->direction  || !horiz ?
-                                  QStyleOptionTab::End : QStyleOptionTab::Beginning)) || onlyTab);
-                int  tabBarAlignment(styleHint(SH_TabBar_Alignment, tab, widget)),
-                     tabOverlap(onlyTab ? 0 : pixelMetric(PM_TabBarTabOverlap, option, widget)),
-                     moOffset(ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round),
-                     highlightOffset(opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1),
-                     highlightBorder(opts.round>ROUND_FULL ? 4 : 3),
-                     sizeAdjust(!selected && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0);
-                bool leftAligned((!rtlHorTabs && Qt::AlignLeft==tabBarAlignment) ||
+                QRect        r2(r);
+                bool         rtlHorTabs(Qt::RightToLeft==tab->direction && horiz),
+                             onlyTab(QStyleOptionTab::OnlyOneTab==tab->position),
+                             leftCornerWidget(tab->cornerWidgets&QStyleOptionTab::LeftCornerWidget),
+                             rightCornerWidget(tab->cornerWidgets&QStyleOptionTab::RightCornerWidget),
+                             firstTab((tab->position == (Qt::LeftToRight==tab->direction || !horiz ?
+                                       QStyleOptionTab::Beginning : QStyleOptionTab::End)) || onlyTab),
+                             lastTab((tab->position == (Qt::LeftToRight==tab->direction  || !horiz ?
+                                     QStyleOptionTab::End : QStyleOptionTab::Beginning)) || onlyTab);
+                int          tabBarAlignment(styleHint(SH_TabBar_Alignment, tab, widget)),
+                             tabOverlap(onlyTab ? 0 : pixelMetric(PM_TabBarTabOverlap, option, widget)),
+                             moOffset(ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round),
+                             highlightOffset(opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1),
+                             highlightBorder(opts.round>ROUND_FULL ? 4 : 3),
+                             sizeAdjust(!selected && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0);
+                bool         leftAligned((!rtlHorTabs && Qt::AlignLeft==tabBarAlignment) ||
                                  (rtlHorTabs && Qt::AlignRight==tabBarAlignment)),
-                     rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
-                                   (rtlHorTabs && Qt::AlignLeft==tabBarAlignment)),
-                     docMode(
+                             rightAligned((!rtlHorTabs && Qt::AlignRight==tabBarAlignment) ||
+                                          (rtlHorTabs && Qt::AlignLeft==tabBarAlignment)),
+                             docMode(
 #if QT_VERSION >= 0x040500
-                             tabV3.documentMode
+                                      tabV3.documentMode
 #else
-                             false
+                                    false
 #endif
-                             ),
-                     docFixLeft(!leftCornerWidget && leftAligned && firstTab && (docMode || onlyBase)),
-                     fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab && !docMode),
-                     fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab && !docMode),
-                     mouseOver(state&State_Enabled && state&State_MouseOver),
-                     glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver);
+                                   ),
+                             docFixLeft(!leftCornerWidget && leftAligned && firstTab && (docMode || onlyBase)),
+                             fixLeft(!onlyBase && !leftCornerWidget && leftAligned && firstTab && !docMode),
+                             fixRight(!onlyBase && !rightCornerWidget && rightAligned && lastTab && !docMode),
+                             mouseOver(state&State_Enabled && state&State_MouseOver),
+                             glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver);
                 const QColor *use(backgroundColors(option));
                 const QColor &fill(getTabFill(selected, mouseOver, use));
-                double radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
-                EBorder borderProfile(selected || opts.borderInactiveTab
+                double       radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
+                EBorder      borderProfile(selected || opts.borderInactiveTab
                                         ? opts.borderTab
                                             ? BORDER_LIGHT
                                             : BORDER_RAISED
@@ -5669,19 +5667,18 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_ScrollBarAddLine:
         case CE_ScrollBarSubLine:
         {
-            QRect        br(r),
-                         ar(r);
-            const QColor *use(state&State_Enabled ? itsButtonCols : itsBackgroundCols); // buttonColors(option));
-            bool         reverse(option && Qt::RightToLeft==option->direction);
+            QRect            br(r),
+                             ar(r);
+            const QColor     *use(state&State_Enabled ? itsButtonCols : itsBackgroundCols); // buttonColors(option));
+            bool             reverse(option && Qt::RightToLeft==option->direction);
             PrimitiveElement pe=state&State_Horizontal
-                   ? CE_ScrollBarAddLine==element ? (reverse ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight)
-                                                  : (reverse ? PE_IndicatorArrowRight : PE_IndicatorArrowLeft)
-                   : CE_ScrollBarAddLine==element ? PE_IndicatorArrowDown : PE_IndicatorArrowUp;
-
-            int round=PE_IndicatorArrowRight==pe ? ROUNDED_RIGHT :
-                      PE_IndicatorArrowLeft==pe ? ROUNDED_LEFT :
-                      PE_IndicatorArrowDown==pe ? ROUNDED_BOTTOM :
-                      PE_IndicatorArrowUp==pe ? ROUNDED_TOP : ROUNDED_NONE;
+                                 ? CE_ScrollBarAddLine==element ? (reverse ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight)
+                                                                : (reverse ? PE_IndicatorArrowRight : PE_IndicatorArrowLeft)
+                                 : CE_ScrollBarAddLine==element ? PE_IndicatorArrowDown : PE_IndicatorArrowUp;
+            int              round=PE_IndicatorArrowRight==pe ? ROUNDED_RIGHT :
+                                   PE_IndicatorArrowLeft==pe ? ROUNDED_LEFT :
+                                   PE_IndicatorArrowDown==pe ? ROUNDED_BOTTOM :
+                                   PE_IndicatorArrowUp==pe ? ROUNDED_TOP : ROUNDED_NONE;
 
             switch(opts.scrollbarType)
             {
@@ -6092,10 +6089,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
 void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
-    QRect                 r(option->rect);
-    const QFlags<State> & state(option->state);
-    const QPalette &      palette(option->palette);
-    bool                  reverse(Qt::RightToLeft==option->direction);
+    QRect               r(option->rect);
+    const QFlags<State> &state(option->state);
+    const QPalette      &palette(option->palette);
+    bool                reverse(Qt::RightToLeft==option->direction);
 
     switch (control)
     {
@@ -6198,7 +6195,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     mflags |= State_Sunken;
 #endif
 
-                bool drawMenu=mflags & (State_Sunken | State_On | State_Raised);
+                bool         drawMenu=mflags & (State_Sunken | State_On | State_Raised);
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
 
