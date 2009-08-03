@@ -4882,8 +4882,9 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-        if(but && widget && 0==widget->allocation.height%2)
-            y++;
+// This seems to place the text too low down, not sure why it was here!
+//         if(but && widget && 0==widget->allocation.height%2)
+//             y++;
         
         but= but || isOnComboBox(widget, 0);
 
