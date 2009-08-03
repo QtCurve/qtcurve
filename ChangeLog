@@ -1,6 +1,8 @@
 0.67.2
 ------
 1. Fix text placement in pushbuttons.
+2. Set the insensitive foreground colour to the disabled text colour, and not
+   the mid colour. Fixes appearance of disabled items in Mozilla apps.
 
 0.67.1
 ------
