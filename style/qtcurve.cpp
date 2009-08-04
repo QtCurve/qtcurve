@@ -9206,9 +9206,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
             p->drawPoint(r.x(), r.y()+2);
             p->drawPoint(r.x()+r.width()-1, r.y()+2);
             p->drawPoint(r.x()+r.width()-3, r.y());
-            p->setPen(cols[0]);
-            p->drawPoint(r.x()+1, r.y()+2);
-            p->drawPoint(r.x()+2, r.y()+1);
+//             p->setPen(cols[0]);
+//             p->drawPoint(r.x()+1, r.y()+2);
+//             p->drawPoint(r.x()+2, r.y()+1);
         }
     }
 }
