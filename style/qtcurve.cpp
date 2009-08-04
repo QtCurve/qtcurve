@@ -2988,7 +2988,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                                   RADIUS_INTERNAL)));
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
-                        
+
                         drawBorder(painter, r, &opt,
                                    opts.round &&
                                     ( (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
@@ -6728,7 +6728,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(state&QtCStateKWinNoBorder)
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, true, false,
-                                      MODIFY_AGUA(widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active)),
+                                      widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active),
                                       WIDGET_MDI_WINDOW);
                 else
                 {
@@ -8553,7 +8553,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                                   const QWidget *widget, int round, const QColor &fill, const QColor *custom,
                                   bool doBorder, EWidget w) const
 {
-    if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin) || !usePixmapCache)
+    if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
+       (WIDGET_SPIN==w && !opts.unifySpin) || !usePixmapCache)
         drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round);
     else
     {

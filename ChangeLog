@@ -1,3 +1,7 @@
+0.67.2
+------
+1. Fix titlebar gradients when inactive!=active
+
 0.67.1
 ------
 1. Adjust Agua overlay if widget is not max rounded.
