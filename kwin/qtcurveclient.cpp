@@ -49,7 +49,7 @@ namespace KWinQtCurve
 {
 
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory)
-#if KDE_IS_VERSION(4,1,80)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
              : KCommonDecorationUnstable(bridge, factory),
 #else
              : KCommonDecoration(bridge, factory),
@@ -135,10 +135,13 @@ void QtCurveClient::init()
     itsTitleFont = isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
     KCommonDecoration::init();
+    /*
+    Disabled as it produces errors when not compoisiting
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_NoSystemBackground, true);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent);
     widget()->setAttribute(Qt::WA_PaintOnScreen, false);
+    */
     if(Handler()->showResizeGrip() && isResizable())
         itsResizeGrip=new ResizeCorner(this, KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
 }
@@ -504,8 +507,7 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
     return KCommonDecoration::eventFilter(o, e);
 }
 
-#if KDE_IS_VERSION(4,1,80)
-#if !KDE_IS_VERSION(4,2,92)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
 // Taken form Oxygen! rev873805
 QList<QRect> QtCurveClient::shadowQuads(ShadowType type) const
 {
@@ -538,7 +540,6 @@ double QtCurveClient::shadowOpacity(ShadowType type) const
     }
     return 0;
 }
-#endif
 #endif
     
 void QtCurveClient::reset(unsigned long changed)

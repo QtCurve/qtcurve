@@ -38,7 +38,7 @@ namespace KWinQtCurve
 
 class ResizeCorner;
 
-#if KDE_IS_VERSION(4,1,80)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
 class QtCurveClient : public KCommonDecorationUnstable
 #else
 class QtCurveClient : public KCommonDecoration
@@ -70,11 +70,9 @@ class QtCurveClient : public KCommonDecoration
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
 
-#if KDE_IS_VERSION(4,1,80)
-#if !KDE_IS_VERSION(4,2,92)
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
     virtual QList<QRect>      shadowQuads(ShadowType type) const;
     virtual double            shadowOpacity(ShadowType type) const;
-#endif
 #endif
 
     private:

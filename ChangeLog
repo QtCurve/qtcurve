@@ -1,6 +1,7 @@
 0.67.2
 ------
 1. Fix titlebar gradients when inactive!=active
+2. Fix garbage on window decoration under KDE4.3 when not compositing
 
 0.67.1
 ------
