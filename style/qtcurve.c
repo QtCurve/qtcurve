@@ -4884,9 +4884,13 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-// This seems to place the text too low down, not sure why it was here!
-//         if(but && widget && 0==widget->allocation.height%2)
-//             y++;
+        /*
+           This check of 'requisition' size (and not 'allocation') seems to match better
+           with Qt4's text positioning. For example, 10pt verdana - no shift is required
+           9pt DejaVu Sans requires the shift
+        */
+        if(but && widget && widget->requisition.height%2)
+            y++;
         
         but= but || isOnComboBox(widget, 0);
 
