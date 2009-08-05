@@ -1253,7 +1253,11 @@ void QtCurveStyle::polish(QWidget *widget)
 
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
+    {
         itemView->viewport()->setAttribute(Qt::WA_Hover);
+        if(opts.forceAlternateLvCols && !widget->inherits("KFilePlacesView"))
+            itemView->setAlternatingRowColors(true);
+    }
 
     if(APP_KONTACT==theThemedApp && qobject_cast<QToolButton *>(widget))
         ((QToolButton *)widget)->setAutoRaise(true);

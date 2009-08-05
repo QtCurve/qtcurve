@@ -840,7 +840,8 @@ typedef struct
                      borderTab,
                      borderInactiveTab,
                      doubleGtkComboArrow,
-                     menuIcons;
+                     menuIcons,
+                     forceAlternateLvCols;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
