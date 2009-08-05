@@ -1,3 +1,7 @@
+0.67.3
+------
+1. Fix crash in system settings when changing colours.
+
 0.67.2
 ------
 1. Fix titlebar gradients when inactive!=active
