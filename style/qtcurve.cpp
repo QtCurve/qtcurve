@@ -4794,7 +4794,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            if (menuItem->icon.isNull())
+                            if (menuItem->icon.isNull() || !opts.menuIcons)
                             {
                                 QStyleOptionButton button;
                                 button.rect = checkRect;
@@ -4829,7 +4829,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                             QRect(menuItem->rect.x(), menuItem->rect.y(),
                                                   checkcol, menuItem->rect.height())));
 
-                if (!menuItem->icon.isNull())
+                if (opts.menuIcons && !menuItem->icon.isNull())
                 {
                     QIcon::Mode mode(dis ? QIcon::Disabled : QIcon::Normal);
 

@@ -1149,6 +1149,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(borderInactiveTab)
             QTC_CFG_READ_BOOL(thinSbarGroove)
             QTC_CFG_READ_BOOL(colorSliderMouseOver)
+            QTC_CFG_READ_BOOL(menuIcons)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(titlebarBorder)
             QTC_CFG_READ_INT(titlebarButtons)
@@ -1753,6 +1754,7 @@ static void defaultSettings(Options *opts)
     opts->borderInactiveTab=false;
     opts->thinSbarGroove=true;
     opts->colorSliderMouseOver=false;
+    opts->menuIcons=true;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->titlebarBorder=true;
     opts->titlebarButtons=QTC_TITLEBAR_BUTTON_ROUND|QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
@@ -2321,6 +2323,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(borderInactiveTab)
         CFG_WRITE_ENTRY(thinSbarGroove)
         CFG_WRITE_ENTRY(colorSliderMouseOver)
+        CFG_WRITE_ENTRY(menuIcons)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(titlebarBorder)
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
