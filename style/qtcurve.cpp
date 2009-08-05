@@ -5020,14 +5020,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     r.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
                                 pixelMetric(PM_ButtonShiftVertical, option, widget));
 
-                //this tweak ensures the font is perfectly centered on small sizes
-                //but slightly downward to make it more gnomeish if not
-//                 if (button->fontMetrics.height() > 14)
-//                     r.translate(0, 1);
-
-// Doesn't always work :-(
-//                if(((r.height()-(4+button->fontMetrics.height()))>>1)>0)
-//                    r.translate(0, 1);
+                // The following is mainly for DejaVu Sans 11...
+                if(button->fontMetrics.height()==19 && r.height()==(23+(opts.thinnerBtns ? 0 : 2)))
+                    r.translate(0, 1);
    
                 if (button->features&QStyleOptionButton::HasMenu)
                 {
