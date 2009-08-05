@@ -2,6 +2,7 @@
 ------
 1. If a buttons requested size is not a multiple of 2, then shift the text 1
    pixel lower.
+2. Fix plastik style mouse over on scrollbars.
 
 0.67.2
 ------

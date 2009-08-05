@@ -1680,7 +1680,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                      horizontal=WIDGET_SB_SLIDER==widget ? !horiz
                                                     : (horiz && WIDGET_SB_BUTTON!=widget) ||
                                                         (!horiz && WIDGET_SB_BUTTON==widget);
-        int          len=WIDGET_SB_SLIDER==widget ? QTC_SB_SLIDER_MO_LEN(horiz ? width : height) : (thin ? 1 : 2);
+        int          len=WIDGET_SB_SLIDER==widget ? QTC_SB_SLIDER_MO_LEN(horiz ? width : height)+1 : (thin ? 1 : 2);
         GdkRectangle rect;
         if(horizontal)
             rect.x=x, rect.y=y+len, rect.width=width, rect.height=height-(len*2);
@@ -4889,7 +4889,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
            with Qt4's text positioning. For example, 10pt verdana - no shift is required
            9pt DejaVu Sans requires the shift
         */
-        if(but && widget && widget->requisition.height%2)
+        if(but && widget && widget->requisition.height<widget->allocation.height && widget->requisition.height%2)
             y++;
         
         but= but || isOnComboBox(widget, 0);
