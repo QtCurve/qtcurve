@@ -10443,7 +10443,8 @@ void QtCurveStyle::applyKdeSettings(bool pal)
 {
     if(pal)
     {
-        QApplication::setPalette(standardPalette());
+        if(!kapp)
+            QApplication::setPalette(standardPalette());
         setDecorationColors();
     }
     else
