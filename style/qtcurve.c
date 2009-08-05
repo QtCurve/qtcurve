@@ -2398,10 +2398,12 @@ debugDisplayWidget(widget, 3);
 
         if(GTK_STATE_SELECTED!=state || ROUNDED_NONE!=round)
             drawAreaColor(cr, area, NULL,
-                          getCellCol(haveAlternareListViewCol() && gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget)) && DETAILHAS("cell_odd")
-                                        ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
-                                        : &style->base[GTK_STATE_NORMAL], detail),
-                              x, y, width, height);
+                          getCellCol(haveAlternareListViewCol() &&
+                          (opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget))) &&
+                          DETAILHAS("cell_odd")
+                            ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
+                            : &style->base[GTK_STATE_NORMAL], detail),
+                          x, y, width, height);
 
         if(GTK_STATE_SELECTED==state)
             drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round);
