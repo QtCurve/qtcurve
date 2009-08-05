@@ -2,6 +2,7 @@
 ------
 1. Fix crash in system settings when changing colours.
 2. Yet another attempt to better align button text with Gtk2.
+3. Fix plastik style mouse over on scrollbars.
 
 0.67.2
 ------

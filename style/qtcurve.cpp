@@ -8562,10 +8562,10 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
             {
                 case ROUND_SLIGHT:
                 case ROUND_NONE:
-                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 4;
+                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 7 : 4;
                     break;
                 case ROUND_FULL:
-                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 6 : 5;
+                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 7 : 5;
                     break;
                 case ROUND_EXTRA:
                     endSize=7;
@@ -8697,7 +8697,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 {
                     if(WIDGET_SB_SLIDER==w)
                     {
-                        int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())),
+                        int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())+1),
                             so(lightBorder ? QTC_SLIDER_MO_BORDER : 1),
                             eo(len+so),
                             col(QTC_SLIDER_MO_SHADE);
@@ -8804,8 +8804,8 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     if(plastikMouseOver && !sunken)
     {
         bool thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16)),
-                horizontal(WIDGET_SB_SLIDER==w ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
-        int  len(WIDGET_SB_SLIDER==w ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height()) : (thin ? 1 : 2));
+             horizontal(WIDGET_SB_SLIDER==w ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
+        int  len(WIDGET_SB_SLIDER==w ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())+2 : (thin ? 1 : 2));
 
         p->save();
         if(horizontal)
