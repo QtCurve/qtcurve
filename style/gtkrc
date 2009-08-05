@@ -1,3 +1,5 @@
+gtk-menu-images = 1
+
 style "qtcurve-default"
 {
   GtkButton::default_border = { 0, 0, 0, 0 }
