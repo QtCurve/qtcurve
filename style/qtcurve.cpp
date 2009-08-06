@@ -1365,6 +1365,17 @@ void QtCurveStyle::polish(QWidget *widget)
     {
         widget->topLevelWidget()->setWindowTitle(widget->parentWidget()->topLevelWidget()->windowTitle());
     }
+    else if(widget->inherits("QWhatsThat"))
+    {
+        QPalette pal(widget->palette());
+        QColor   shadow(pal.shadow().color());
+
+        shadow.setAlpha(20);
+        pal.setColor(QPalette::Shadow, shadow);
+        widget->setPalette(pal);
+        widget->setMask(QRegion(widget->rect().adjusted(0, 0, -6, -6))+
+                        QRegion(widget->rect().adjusted(6, 6, 0, 0)));
+    }
     else if(opts.fixParentlessDialogs)
         if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
         {
