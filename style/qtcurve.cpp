@@ -4714,7 +4714,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 bool comboMenu(qobject_cast<const QComboBox*>(widget)),
                      reverse(Qt::RightToLeft==menuItem->direction);
                 int  checkcol(qMax(menuItem->maxIconWidth, 20)),
-                     stripeWidth(qMax(checkcol, constMenuPixmapWidth));
+                     stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
 
                 painter->save();
 
@@ -4782,7 +4782,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
                 {
                     // Check
-                    QRect checkRect(r.left() + 4, r.center().y() - 6, 13, 13);
+                    QRect checkRect(r.left() + 3, r.center().y() - 6, QTC_CHECK_SIZE, QTC_CHECK_SIZE);
                     checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
                     if (checkable)
                     {
@@ -4866,7 +4866,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 menuItem->rect.getRect(&x, &y, &w, &h);
 
-                int     xm(windowsItemFrame + checkcol + windowsItemHMargin),
+                int     xm(windowsItemFrame + checkcol + windowsItemHMargin -2),
                         xpos(menuItem->rect.x() + xm);
                 QRect   textRect(xpos, y + windowsItemVMargin, w - xm - windowsRightBorder - tab + 1, h - 2 * windowsItemVMargin),
                         vTextRect = visualRect(option->direction, menuItem->rect, textRect);
@@ -7541,6 +7541,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 }
 
                 newSize.setHeight(h);
+                // Gtk2's icon->text spacing is 2 pixels smaller - so adjust here...
+                newSize.setWidth(newSize.width()-2);
             }
             break;
         case CT_MenuBarItem:

@@ -1,6 +1,7 @@
 0.67.4
 ------
 1. Dont create a KComponentData if KGlobal::hasMainComponent() is true.
+2. Move menu text 2 pixels closer to icon - matches Gtk2 better.
 
 0.67.3
 ------
