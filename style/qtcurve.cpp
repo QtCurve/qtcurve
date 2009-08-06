@@ -1370,7 +1370,7 @@ void QtCurveStyle::polish(QWidget *widget)
         QPalette pal(widget->palette());
         QColor   shadow(pal.shadow().color());
 
-        shadow.setAlpha(20);
+        shadow.setAlpha(32);
         pal.setColor(QPalette::Shadow, shadow);
         widget->setPalette(pal);
         widget->setMask(QRegion(widget->rect().adjusted(0, 0, -6, -6))+
