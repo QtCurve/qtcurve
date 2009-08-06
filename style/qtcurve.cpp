@@ -4895,7 +4895,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (QStyleOptionMenuItem::SubMenu==menuItem->menuItemType) // draw sub menu arrow
                 {
                     int              dim((menuItem->rect.height() - 4) / 2),
-                                     xpos(menuItem->rect.left() + menuItem->rect.width() - 6 - 2 - dim);
+                                     xpos(menuItem->rect.left() + menuItem->rect.width() - 3 - dim);
                     PrimitiveElement arrow(Qt::RightToLeft==option->direction ? PE_IndicatorArrowLeft : PE_IndicatorArrowRight);
                     QRect            vSubMenuRect(visualRect(option->direction, menuItem->rect,
                                                              QRect(xpos, menuItem->rect.top() + menuItem->rect.height() / 2 - dim / 2, dim, dim)));
