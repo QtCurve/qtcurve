@@ -797,6 +797,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
         itsComponentData=KGlobal::mainComponent();
+    else
     {
         //printf("Creating KComponentData\n");
 
