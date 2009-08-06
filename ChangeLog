@@ -4,6 +4,7 @@
 2. Yet another attempt to better align button text with Gtk2.
 3. Fix plastik style mouse over on scrollbars.
 4. Draw arrows in popupmenus closer to edge - matches Gtk2 better.
+5. Fix border width of Gtk style combobox menus.
 
 0.67.2
 ------

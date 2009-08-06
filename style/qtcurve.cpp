@@ -2210,6 +2210,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if (!opts.popupBorder && widget && widget->inherits("QComboBoxPrivateContainer"))
                 return 0;
 
+            if(opts.gtkComboMenus && widget && widget->inherits("QComboBoxPrivateContainer"))
+                return 1;
+
             if (!opts.gtkScrollViews && widget && widget->parentWidget() && ::qobject_cast<const QFrame *>(widget) && widget->parentWidget()->inherits("KateView"))
                 return 0;
 
@@ -4761,7 +4764,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                 if (selected && enabled)
-                    drawMenuItem(painter, r.adjusted(0, 0, -1, 0), option, false, ROUNDED_ALL,
+                    drawMenuItem(painter,
+                                 comboMenu && opts.gtkComboMenus
+                                    ? r
+                                    : r.adjusted(0, 0, -1, 0),
+                                 option, false, ROUNDED_ALL,
                                  opts.useHighlightForMenu ? itsHighlightCols : itsBackgroundCols);
 
                 if(comboMenu)
