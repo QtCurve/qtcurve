@@ -1,3 +1,7 @@
+0.67.4
+------
+1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.
+
 0.67.3
 ------
 1. If a buttons requested size is not a multiple of 2, then shift the text 1

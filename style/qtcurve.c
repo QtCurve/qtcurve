@@ -1424,10 +1424,10 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
        (WIDGET_FRAME==widget || ((WIDGET_ENTRY==widget || WIDGET_SCROLLVIEW==widget) &&
                                  !opts.etchEntry && !hasFocus && !hasMouseOver)))
     {
-        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), enabled ? 1.0 : 0.65);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), enabled ? 1.0 : QT_LOWER_BORDER_ALPHA);
         createTLPath(cr, xd, yd, width, height, radius, round);
         cairo_stroke(cr);
-        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), 0.65);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), QT_LOWER_BORDER_ALPHA);
         createBRPath(cr, xd, yd, width, height, radius, round);
         cairo_stroke(cr);
     }
@@ -4262,8 +4262,17 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     /* See code in qt_settings.c as to isMozill part */
                     if(opts.squareScrollViews || isMozillaWidget(widget))
                     {
+                        /* Flat style...
                         drawBorder(cr, style, state, area, NULL, x, y, width, height,
                                    NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_SCROLLVIEW, 0);
+                        */
+                        /* 3d... */
+                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+                        createTLPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
+                        cairo_stroke(cr);
+                        cairo_set_source_rgba(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), QT_LOWER_BORDER_ALPHA);
+                        createBRPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
+                        cairo_stroke(cr);
                         doBorder=false;
                     }
                     else if(opts.etchEntry)
