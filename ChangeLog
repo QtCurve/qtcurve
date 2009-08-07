@@ -2,6 +2,7 @@
 ------
 1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.
 2. If using squared scrollviews, also square Kate/Kwrite view.
+3. Disable parentless dialog fix for plasma.
 
 0.67.4
 ------

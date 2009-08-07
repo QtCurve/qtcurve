@@ -464,7 +464,7 @@ static bool isNoEtchWidget(const QWidget *widget)
     {
         const QWidget *top=widget->window();
 
-        return !top || (!qobject_cast<const QDialog *>(top) || !qobject_cast<const QMainWindow *>(top));
+        return !top || (!qobject_cast<const QDialog *>(top) && !qobject_cast<const QMainWindow *>(top));
     }
 
     if(widget && widget->inherits("QWebView"))
@@ -843,6 +843,10 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=7;
 
+    // Plasma does not like the 'Fix parentless dialogs' option...
+    if(APP_PLASMA==theThemedApp && opts.fixParentlessDialogs)
+        opts.fixParentlessDialogs=false;
+
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsHighlightCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Background), itsBackgroundCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Button), itsButtonCols);
@@ -1069,7 +1073,7 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KWIN;
         else if("systemsettings"==appName)
             theThemedApp=APP_SYSTEMSETTINGS;
-        else if("plasma"==appName)
+        else if("plasma"==appName || appName.startsWith("plasma-"))
             theThemedApp=APP_PLASMA;
         else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
             theThemedApp=APP_KRUNNER;
