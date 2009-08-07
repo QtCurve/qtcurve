@@ -1,6 +1,7 @@
 0.67.4
 ------
 1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.
+2. Move menuitem arrows 2 pixels to the left, to match KDE4 better.
 
 0.67.3
 ------

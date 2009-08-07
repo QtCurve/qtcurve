@@ -2767,6 +2767,9 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
             state=GTK_STATE_PRELIGHT;
 
+        if(isMenuItem && GTK_ARROW_RIGHT==arrow_type && !isMozilla() && GTK_APP_OPEN_OFFICE!=qtSettings.app)
+            x-=2;
+
         {
         GdkColor *col=isSpinButton || sbar
                         ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT]
