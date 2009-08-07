@@ -1559,9 +1559,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(EFFECT_NONE==opts->buttonEffect)
                 opts->etchEntry=false;
 
-            if(EFFECT_NONE==opts->buttonEffect)
-                opts->etchEntry=false;
-
             if(opts->squareScrollViews)
                 opts->highlightScrollViews=false;
 
