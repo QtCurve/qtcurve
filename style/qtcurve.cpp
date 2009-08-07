@@ -449,6 +449,12 @@ static bool isKontactPreviewPane(const QWidget *widget)
            widget->parentWidget()->parentWidget()->inherits("KMReaderWin");
 }
 
+static bool isKateView(const QWidget *widget)
+{
+    return widget && widget->parentWidget() &&
+           ::qobject_cast<const QFrame *>(widget) && widget->parentWidget()->inherits("KateView");
+}
+
 static bool isNoEtchWidget(const QWidget *widget)
 {
     if(APP_KRUNNER==theThemedApp)
@@ -2219,14 +2225,11 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ButtonDefaultIndicator:
             return 0;
         case PM_DefaultFrameWidth:
-            if (!opts.popupBorder && widget && widget->inherits("QComboBoxPrivateContainer"))
-                return 0;
+            if ((!opts.popupBorder || opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
+                return opts.gtkComboMenus ? 1 : 0;
 
-            if(opts.gtkComboMenus && widget && widget->inherits("QComboBoxPrivateContainer"))
-                return 1;
-
-            if (!opts.gtkScrollViews && widget && widget->parentWidget() && ::qobject_cast<const QFrame *>(widget) && widget->parentWidget()->inherits("KateView"))
-                return 0;
+            if ((!opts.gtkScrollViews || opts.squareScrollViews) && isKateView(widget))
+                return opts.squareScrollViews ? 1 : 0;
 
             if (opts.squareScrollViews && widget &&
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget)))
@@ -2924,7 +2927,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
                         (widget && widget->inherits("Q3ScrollView")) ||
-                        (opts.squareScrollViews && isKontactPreviewPane(widget))),
+                        (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
                      squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow())));
 
                 if(sv && (opts.etchEntry || squareSv))
