@@ -2934,12 +2934,21 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 {
                     if(squareSv)
                     {
-                        const QColor *use(backgroundColors(option));
+                        QColor col(backgroundColors(option)[QT_STD_BORDER]);
 
                         if(APP_ARORA==theThemedApp)
                             painter->fillRect(r, palette.brush(QPalette::Base));
-                        painter->setPen(use[QT_STD_BORDER]);
-                        drawRect(painter, r);
+                        painter->setPen(col);
+
+                        // Flat style...
+                        //drawRect(painter, r);
+                        // 3d style...
+                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+                        col.setAlphaF(QT_LOWER_BORDER_ALPHA);
+                        painter->setPen(col);
+                        painter->drawLine(r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
+                        painter->drawLine(r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
                     }
                     else
                     {
@@ -9180,7 +9189,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                      botPath;
         QColor       col(border);
 
-        col.setAlphaF(0.65);
+        col.setAlphaF(QT_LOWER_BORDER_ALPHA);
         buildSplitPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL), topPath, botPath);
         p->setPen(enabled ? border : col);
         p->drawPath(topPath);

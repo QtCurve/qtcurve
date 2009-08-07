@@ -1,6 +1,7 @@
 0.67.5
 ------
-1. In using squared scrollviews, also square Kate/Kwrite view.
+1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.
+2. If using squared scrollviews, also square Kate/Kwrite view.
 
 0.67.4
 ------
