@@ -2897,14 +2897,15 @@ debugDisplayWidget(widget, 3);
                     width--;
                 }
                 height++;
-                if(!opts.etchEntry)
-                    height++;
+
                 if(opts.unifySpinBtns)
                 {
                     unified.x=x, unified.y=y, unified.width=width, unified.height=height-(GTK_STATE_PRELIGHT==state ? 2 : 1);
                     height*=2;
                     area=&unified;
                 }
+                else if(!opts.etchEntry)
+                    height++;
             }
             else if (QTC_DO_EFFECT && opts.etchEntry)
             {
