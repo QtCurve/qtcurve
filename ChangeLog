@@ -2,6 +2,7 @@
 ------
 1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.
 2. Move menuitem arrows 2 pixels to the left, to match KDE4 better.
+3. Fix button of non-editable combos when not etching entries.
 
 0.67.3
 ------

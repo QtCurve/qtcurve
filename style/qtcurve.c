@@ -1523,7 +1523,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
                 draw3dfull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app),
                 draw3d=draw3dfull || (!lightBorder && QTC_DRAW_3D_BORDER(sunken, app)),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
-                doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || WIDGET_COMBO_BUTTON==widget) && QTC_DO_EFFECT,
+                doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && QTC_DO_EFFECT,
                 horiz=!(flags&DF_VERT);
     int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
     double      xd=x+0.5, yd=y+0.5;
@@ -1742,8 +1742,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     {
         GdkColor *borderCols=(WIDGET_COMBO==widget || WIDGET_COMBO_BUTTON==widget) && colors==qtcPalette.combobtn
                             ? GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver && !sunken
-                                ? &qtcPalette.mouseover
-                                : &qtcPalette.button[PAL_ACTIVE]
+                                ? qtcPalette.mouseover
+                                : qtcPalette.button[PAL_ACTIVE]
                             : colors;
                             
         cairo_new_path(cr);
