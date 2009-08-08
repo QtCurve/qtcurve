@@ -7279,7 +7279,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         if(opts.unifyCombo)
                         {
                             field=r;
-                            if(QTC_DO_EFFECT)
+                            if(doEffect)
                                 field.adjust(1, 1, -1, -1);
                         }
                         //field.adjust(-1,-1, 0, 1);
@@ -7728,7 +7728,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
         case CC_ComboBox:
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
-                bool doEtch(QTC_DO_EFFECT),
+                bool doEtch(opts.etchEntry && QTC_DO_EFFECT),
                      ed(comboBox->editable);
                 int  x(r.x()),
                      y(r.y()),
