@@ -5,6 +5,7 @@
 3. Disable parentless dialog fix for plasma.
 4. Fix button of non-editable combos when not etching entries.
 5. When using coloured mouse over, use mouse over colour for arrows.
+6. Fix clipping of plastik style mosue over for max/extra round.
 
 0.67.4
 ------

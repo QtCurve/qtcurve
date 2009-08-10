@@ -8733,6 +8733,9 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
             if(!sunken)
                 if(plastikMouseOver && !sunken)
                 {
+                    p->save();
+                    p->setClipPath(buildPath(br.adjusted(0, 0, 0, -1), w, round,
+                                             getRadius(&opts, br.width()-2, br.height()-2, w, RADIUS_INTERNAL)));
                     if(WIDGET_SB_SLIDER==w)
                     {
                         int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())+1),
@@ -8786,6 +8789,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                             }
                         }
                     }
+                    p->restore();
                 }
         }
 
