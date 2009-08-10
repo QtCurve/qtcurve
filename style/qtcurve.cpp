@@ -7061,7 +7061,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(opts.thinSbarGroove && slider.isValid())
                     {
                         painter->save();
-                        painter->setClipRegion(QRegion(opt.rect).subtract(slider));
+                        painter->setClipRegion(QRegion(opt.rect).subtract(slider.adjusted(1, 1, -1, -1)));
                     }
                     drawLightBevel(painter, opts.thinSbarGroove
                                                 ? horiz
