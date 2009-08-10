@@ -3337,7 +3337,13 @@ debugDisplayWidget(widget, 3);
                     if(rev)
                         btn.width+=3;
                     else
-                        btn.x-=3, btn.width+=3;
+                    {
+                        btn.x-=3;
+                        if(QTC_DO_EFFECT)
+                            btn.width+=3;
+                        else
+                            btn.width--;
+                    }
                     drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
@@ -3396,7 +3402,11 @@ debugDisplayWidget(widget, 3);
                         if(rev)
                             btn.width+=3;
                         else
-                            btn.x-=3, btn.width+=3;
+                        {
+                            btn.x-=3;
+                            if(QTC_DO_EFFECT)
+                                btn.width+=3;
+                        }
                         drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                     &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                     BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);

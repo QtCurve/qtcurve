@@ -8,6 +8,7 @@
 6. Only do mouse over for entries if combos and spin widgets are unified.
 7. If not etching/shadowing, when mosue over set to 'glow' use 'thick coloured'
 8. If not etching/shadowing, make descrease thinner scrollbar groove.
+9. Fix clipping of shaded button on combos when not etching/shadowing.
 
 0.67.3
 ------
