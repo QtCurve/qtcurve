@@ -7547,6 +7547,11 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             newSize+=QSize(margin+other, margin);
             newSize.rheight() += ((1 - newSize.rheight()) & 1);
+
+            if(!opts.etchEntry)
+                if (const QStyleOptionComboBox *combo = qstyleoption_cast<const QStyleOptionComboBox *>(option))
+                    if(combo->editable)
+                        newSize.rheight()-=2;
             break;
         }
         case CT_MenuItem:
