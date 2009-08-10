@@ -6169,8 +6169,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if(doEtch)
             x--, width+=2;
         else
-            y--, height+=2;
-        if(opts.thinnerBtns)
+            x-=2, width+=4;
+        if(doEtch && opts.thinnerBtns)
             y++, height-=2;
         btn=true;
     }
