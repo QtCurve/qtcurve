@@ -8605,9 +8605,6 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
             {
                 case ROUND_SLIGHT:
                 case ROUND_NONE:
-                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 7 : 4;
-                    break;
-                case ROUND_FULL:
                     endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 7 : 5;
                     break;
                 case ROUND_EXTRA:

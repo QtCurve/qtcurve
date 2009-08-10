@@ -11,6 +11,8 @@
  9. If not etching/shadowing, when mouse over set to 'glow' use 'thick coloured'
 10. If not etching/shadowing, decrease thinner scrollbar groove.
 11. Remove hard-coding of light border in progressbars - use gradient setting.
+12. Use smaller kwin title bar, if not bordered or round < full.
+13. Fix agua buttons when round < full.
 
 0.67.4
 ------
