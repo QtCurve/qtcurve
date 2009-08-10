@@ -3903,13 +3903,13 @@ debugDisplayWidget(widget, 3);
                 drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
                             width, height, &itemCols[fillVal],
                             itemCols, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
-                            DF_DRAW_INSIDE|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+                            (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
             if(opts.stripedProgress && width>4 && height>4)
                 drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
                             width, height, &itemCols[1],
                             qtcPalette.highlight, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
-                            DF_DRAW_INSIDE|(opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+                            (opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
             if(width>2 && height>2)
                 realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
