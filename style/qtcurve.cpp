@@ -42,7 +42,7 @@ static bool usePixmapCache=true;
 #define QTC_FIX_DISABLED_ICONS
 
 #define QTC_MO_ARROW_X(MO, COL) (state&State_Enabled \
-                                    ? (MO_GLOW==opts.coloredMouseOver && MO \
+                                    ? (MO_NONE!=opts.coloredMouseOver && MO \
                                         ? itsMouseOverCols[QT_STD_BORDER] \
                                         : palette.color(COL)) \
                                     : palette.color(QPalette::Disabled, COL))
