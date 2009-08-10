@@ -8,6 +8,7 @@
 6. Fix clipping of plastik style mosue over for max/extra round.
 7. Only do mouse over for entries if combos and spin widgets are unified.
 8. If not etching entries, reduce height of editable combo by 2 pixels.
+9. If not etching/shadowing, when mosue over set to 'glow' use 'thick coloured'
 
 0.67.4
 ------

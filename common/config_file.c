@@ -1601,6 +1601,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(APPEARANCE_FLAT==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_RAISED;
 #endif
+            if(EFFECT_NONE==opts->buttonEffect && MO_GLOW==opts->coloredMouseOver)
+                opts->coloredMouseOver=MO_COLORED_THICK;
+
             return true;
         }
         else
