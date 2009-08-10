@@ -1360,6 +1360,12 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
         case WIDGET_TROUGH:
         case WIDGET_SLIDER_TROUGH:
             return opts->grooveAppearance;
+#ifndef __cplusplus     
+        case WIDGET_SPIN_UP:
+        case WIDGET_SPIN_DOWN:
+#endif
+        case WIDGET_SPIN:
+            return MODIFY_AGUA(opts->appearance);
         default:
             break;
     }
