@@ -5,6 +5,7 @@
 3. Fix button of non-editable combos when not etching entries.
 4. Fix spin buttons when not etching entries.
 5. When using coloured mouse over, use mouse over colour for arrows.
+6. Only do mouse over for entries if combos and spin widgets are unified.
 
 0.67.3
 ------

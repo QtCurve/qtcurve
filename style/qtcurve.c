@@ -1347,7 +1347,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     gboolean     enabled=GTK_STATE_INSENSITIVE!=state,
                  useText=GTK_STATE_INSENSITIVE!=state && WIDGET_DEF_BUTTON==widget && IND_FONT_COLOR==opts.defBtnIndicator && enabled,
                  hasFocus=enabled && qtcPalette.focus && c_colors==qtcPalette.focus, /* CPD USED TO INDICATE FOCUS! */
-                 hasMouseOver=enabled && qtcPalette.mouseover && c_colors==qtcPalette.mouseover;
+                 hasMouseOver=enabled && qtcPalette.mouseover && c_colors==qtcPalette.mouseover && QTC_ENTRY_MO;
     GdkColor     *colors=c_colors ? c_colors : qtcPalette.background;
     int          useBorderVal=!enabled && WIDGET_BUTTON(widget)
                                 ? QT_DISABLED_BORDER
@@ -2074,7 +2074,8 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
 {
     gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !GTK_WIDGET_IS_SENSITIVE(widget))),
              highlightReal=enabled && widget && GTK_WIDGET_HAS_FOCUS(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
-             mouseOver=enabled && (GTK_STATE_PRELIGHT==state || (lastMoEntry && widget==lastMoEntry) )&& qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
+             mouseOver=QTC_ENTRY_MO && enabled && (GTK_STATE_PRELIGHT==state || (lastMoEntry && widget==lastMoEntry) ) &&
+                       qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
              highlight=highlightReal || mouseOver,
              doEtch=QTC_DO_EFFECT && opts.etchEntry;
     GdkColor *colors=mouseOver
@@ -3189,7 +3190,7 @@ debugDisplayWidget(widget, 3);
                 {
                     GtkWidget *entry=widget ? getComboEntry(widget->parent) : NULL;
                     gboolean  rev=FALSE,
-                              mozToolbar=isMozilla() && widget && widget->parent && widget->parent->parent &&  widget->parent->parent->parent && 
+                              mozToolbar=isMozilla() && widget && widget->parent && widget->parent->parent &&  widget->parent->parent->parent &&
                                          widget->parent->parent->parent->name &&
                                          GTK_IS_TOGGLE_BUTTON(widget) && GTK_IS_COMBO_BOX_ENTRY(widget->parent) &&
                                          GTK_IS_FIXED(widget->parent->parent) && GTK_IS_WINDOW(widget->parent->parent->parent) &&
