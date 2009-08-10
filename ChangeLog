@@ -4,6 +4,7 @@
 2. Move menuitem arrows 2 pixels to the left, to match KDE4 better.
 3. Fix button of non-editable combos when not etching entries.
 4. Fix spin buttons when not etching entries.
+5. When using coloured mouse over, use mouse over colour for arrows.
 
 0.67.3
 ------
