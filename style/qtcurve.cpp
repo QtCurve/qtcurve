@@ -8722,7 +8722,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         r.adjust(1, 1, -1, -1);
 
     p->setRenderHint(QPainter::Antialiasing, true);
-
+    
     if(r.width()>0 && r.height()>0)
     {
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)

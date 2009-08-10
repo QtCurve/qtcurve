@@ -10,6 +10,7 @@
  8. If not etching entries, reduce height of editable combo by 2 pixels.
  9. If not etching/shadowing, when mosue over set to 'glow' use 'thick coloured'
 10. If not etching/shadowing, make descrease thinner scrollbar groove.
+11. Remove hard-coding of light border in progressbars - use gradient setting.
 
 0.67.4
 ------
