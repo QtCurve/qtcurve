@@ -2461,7 +2461,6 @@ static gboolean qtInit()
             bool doEffect=EFFECT_NONE!=opts.buttonEffect;
             int  thickness=2;
 
-            if(doEffect)
             {
                 {
                 static const char *constStrFormat="style \""QTC_RC_SETTING"Etch2\" " \
@@ -2470,7 +2469,7 @@ static gboolean qtInit()
                                         "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+2);
-                sprintf(tmpStr, constStrFormat, opts.thinnerBtns ? 1 : 2);
+                sprintf(tmpStr, constStrFormat, opts.thinnerBtns || !doEffect ? 1 : 2);
                 gtk_rc_parse_string(tmpStr);
                 }
 
@@ -2484,7 +2483,7 @@ static gboolean qtInit()
                                         "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"EtchE\" "
                                         "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"EtchS\" ";
 
-                int thick=opts.etchEntry ? 4 : 3;
+                int thick=opts.etchEntry && doEffect ? 4 : 3;
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
                 sprintf(tmpStr, constStrFormat, thick, thick, thick, thick);
                 gtk_rc_parse_string(tmpStr);
@@ -2497,7 +2496,7 @@ static gboolean qtInit()
                         "widget_class \"*GtkFixed*GtkSpinButton\" style \""QTC_RC_SETTING"EtchEM\" "
                         "widget_class \"*GtkFixed*Entry\" style \""QTC_RC_SETTING"EtchEM\" ";
 
-                    int thick=opts.etchEntry ? 3 : 2;
+                    int thick=opts.etchEntry && doEffect ? 3 : 2;
                     tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+4);
                     sprintf(tmpStr, constStrFormat, thick, thick);
                     gtk_rc_parse_string(tmpStr);

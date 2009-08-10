@@ -3342,7 +3342,7 @@ debugDisplayWidget(widget, 3);
                         if(QTC_DO_EFFECT)
                             btn.width+=3;
                         else
-                            btn.width--;
+                            btn.width+=1;
                     }
                     drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,

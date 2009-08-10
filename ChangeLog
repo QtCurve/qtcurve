@@ -10,6 +10,7 @@
  8. If not etching/shadowing, make descrease thinner scrollbar groove.
  9. Fix clipping of shaded button on combos when not etching/shadowing.
 10. Remove hard-coding of light border in progressbars - use gradient setting.
+11. Slightly better button metrics when not etching/shadowing.
 
 0.67.3
 ------
