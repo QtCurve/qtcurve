@@ -89,12 +89,12 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
         case LM_BorderBottom:
             return respectWindowState && maximized ? 0 : Handler()->borderSize();
         case LM_TitleEdgeTop:
-            return respectWindowState && maximized ? 0 : 3;
+            return respectWindowState && maximized ? 0 : (Handler()->smallBorder() ? 1 : 3);
         case LM_TitleEdgeBottom:
-            return /*respectWindowState && maximized ? 1 : */ 3;
+            return /*respectWindowState && maximized ? 1 : */ (Handler()->smallBorder() ? 1 : 3);
         case LM_TitleEdgeLeft:
         case LM_TitleEdgeRight:
-            return respectWindowState && maximized ? 0 : 3;
+            return respectWindowState && maximized ? 0 : (Handler()->smallBorder() ? 1 : 3);
         case LM_TitleBorderLeft:
         case LM_TitleBorderRight:
             return 5;

@@ -43,6 +43,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <kde_file.h>
+#include "common.h"
 
 static time_t getTimeStamp(const QString &item)
 {
@@ -288,6 +289,14 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
     QBitmap *bitmap = new QBitmap(bmp);
     itsBitmaps[toolWindow][typeIndex] = bitmap;
     return *bitmap;
+}
+
+bool QtCurveHandler::smallBorder() const
+{
+    QtCurveHandler *that=(QtCurveHandler *)this;
+
+    return noBorder() ||
+           (BorderTiny!=KDecoration::options()->preferredBorderSize(that) && wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL)<ROUND_FULL);
 }
 
 QList<QtCurveHandler::BorderSize> QtCurveHandler::borderSizes() const
