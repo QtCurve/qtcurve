@@ -2873,7 +2873,7 @@ debugDisplayWidget(widget, 3);
 
     if(spinUp || spinDown)
     {
-        if(!opts.unifySpin && (!opts.unifySpinBtns || sunken || GTK_STATE_PRELIGHT==state))
+        if(!opts.unifySpin && (!opts.unifySpinBtns || sunken/* || GTK_STATE_PRELIGHT==state*/))
         {
             EWidget      wid=spinUp ? WIDGET_SPIN_UP : WIDGET_SPIN_DOWN;
             GdkRectangle *a=area,
