@@ -9103,7 +9103,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     bool         enabled(state&State_Enabled),
                  entry(WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews)),
                  hasFocus(enabled && entry && state&State_HasFocus),
-                 hasMouseOver(enabled && WIDGET_ENTRY==w && state&State_MouseOver),
+                 hasMouseOver(enabled && WIDGET_ENTRY==w && state&State_MouseOver && QTC_ENTRY_MO),
                  window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
     const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
                         ? itsMouseOverCols

@@ -302,6 +302,8 @@ typedef GdkColor color;
 #define QTC_DO_EFFECT          (QTC_FULLLY_ROUNDED && EFFECT_NONE!=opts.buttonEffect)
 #endif
 
+#define QTC_ENTRY_MO (opts.unifyCombo && opts.unifySpin)
+
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define QTC_FOCUS_ALPHA              0.08
 #define QTC_BORDER_BLEND_ALPHA       0.7
