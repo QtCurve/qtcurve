@@ -4,13 +4,12 @@
  2. Move menuitem arrows 2 pixels to the left, to match KDE4 better.
  3. Fix button of non-editable combos when not etching entries.
  4. Fix spin buttons when not etching entries.
- 5. When using coloured mouse over, use mouse over colour for arrows.
- 6. Only do mouse over for entries if combos and spin widgets are unified.
- 7. If not etching/shadowing, when mouse over set to 'glow' use 'thick coloured'
- 8. If not etching/shadowing, decrease thinner scrollbar groove.
- 9. Fix clipping of shaded button on combos when not etching/shadowing.
-10. Remove hard-coding of light border in progressbars - use gradient setting.
-11. Slightly better button metrics when not etching/shadowing.
+ 5. Only do mouse over for entries if combos and spin widgets are unified.
+ 6. If not etching/shadowing, when mouse over set to 'glow' use 'thick coloured'
+ 7. If not etching/shadowing, decrease thinner scrollbar groove.
+ 8. Fix clipping of shaded button on combos when not etching/shadowing.
+ 9. Remove hard-coding of light border in progressbars - use gradient setting.
+10. Slightly better button metrics when not etching/shadowing.
 
 0.67.3
 ------
