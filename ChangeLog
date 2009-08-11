@@ -4,15 +4,14 @@
  2. If using squared scrollviews, also square Kate/Kwrite view.
  3. Disable parentless dialog fix for plasma.
  4. Fix button of non-editable combos when not etching entries.
- 5. When using coloured mouse over, use mouse over colour for arrows.
- 6. Fix clipping of plastik style mouse over for max/extra round.
- 7. Only do mouse over for entries if combos and spin widgets are unified.
- 8. If not etching entries, reduce height of editable combo by 2 pixels.
- 9. If not etching/shadowing, when mouse over set to 'glow' use 'thick coloured'
-10. If not etching/shadowing, decrease thinner scrollbar groove.
-11. Remove hard-coding of light border in progressbars - use gradient setting.
-12. Use smaller kwin title bar, if not bordered or round < full.
-13. Fix agua buttons when round < full.
+ 5. Fix clipping of plastik style mouse over for max/extra round.
+ 6. Only do mouse over for entries if combos and spin widgets are unified.
+ 7. If not etching entries, reduce height of editable combo by 2 pixels.
+ 8. If not etching/shadowing, when mouse over set to 'glow' use 'thick coloured'
+ 9. If not etching/shadowing, decrease thinner scrollbar groove.
+10. Remove hard-coding of light border in progressbars - use gradient setting.
+11. Use smaller kwin title bar, if not bordered or round < full.
+12. Fix agua buttons when round < full.
 
 0.67.4
 ------
