@@ -1258,8 +1258,14 @@ void QtCurveStyle::polish(QWidget *widget)
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
     {
-        itemView->viewport()->setAttribute(Qt::WA_Hover);
-        if(opts.forceAlternateLvCols && !widget->inherits("KFilePlacesView"))
+        QWidget *viewport=itemView->viewport();
+        viewport->setAttribute(Qt::WA_Hover);
+
+        if(opts.forceAlternateLvCols &&
+           viewport->autoFillBackground() && // Dolphins Folders panel
+           255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
+           (qobject_cast<QTreeView *>(widget) ||
+            (qobject_cast<QListView *>(widget) && QListView::IconMode!=((QListView *)widget)->viewMode())))
             itemView->setAlternatingRowColors(true);
     }
 
