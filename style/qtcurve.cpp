@@ -9630,31 +9630,37 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
                     ? ROUNDED_ALL : ROUNDED_NONE,
                    getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders), use, true, WIDGET_SB_SLIDER);
 
-    const QColor *markers(/*opts.coloredMouseOver && opt.state&State_MouseOver
-                              ? itsMouseOverCols
-                              : */use);
-
-    if(opt.state&State_Horizontal)
-        r.setX(r.x()+1);
-    else
-        r.setY(r.y()+1);
-
     if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)))
+    {
+        const QColor *markers(/*opts.coloredMouseOver && opt.state&State_MouseOver
+                                ? itsMouseOverCols
+                                : */use);
+        bool         horiz(opt.state&State_Horizontal);
+
+        if(LINE_SUNKEN==opts.sliderThumbs)
+            if(horiz)
+                r.adjust(0, -1, 0, 0);
+            else
+                r.adjust(-1, 0, 0, 0);
+        else
+            r.adjust(horiz ? 1 : 0, horiz ? 0 : 1, 0, 0);
+    
         switch(opts.sliderThumbs)
         {
 //             case LINE_1DOT:
 //                 p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[QT_STD_BORDER], PIX_DOT, 1.0));
 //                 break;
             case LINE_FLAT:
-                drawLines(p, r, !(opt.state&State_Horizontal), 3, 5, markers, 0, 5, opts.sliderThumbs);
+                drawLines(p, r, !horiz, 3, 5, markers, 0, 5, opts.sliderThumbs);
                 break;
             case LINE_SUNKEN:
-                drawLines(p, r, !(opt.state&State_Horizontal), 4, 3, markers, 0, 3, opts.sliderThumbs);
+                drawLines(p, r, !horiz, 4, 3, markers, 0, 3, opts.sliderThumbs);
                 break;
             case LINE_DOTS:
             default:
-                drawDots(p, r, !(opt.state&State_Horizontal), slider ? 3 : 5, slider ? 5 : 2, markers, 0, 5);
+                drawDots(p, r, !horiz, slider ? 3 : 5, slider ? 5 : 2, markers, 0, 5);
         }
+    }
 }
 
 void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const

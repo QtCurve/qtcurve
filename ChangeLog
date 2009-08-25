@@ -8,6 +8,7 @@
    konqueror's location and search edit fields.
 4. Fix saving of menubar item 'colour on mouse over' setting.
 5. Fix bleed of Agua shine in scrollbar buttons.
+6. Offset sunken slider thumbs to improve appearance.
 
 0.67.5
 ------
