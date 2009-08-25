@@ -1857,7 +1857,7 @@ static void drawLines(cairo_t *cr, double rx, double ry, int rwidth, int rheight
                     y2 = ry + rheight-1;
     GdkColor        *col1 = &cols[dark],
                     *col2 = &cols[0];
-    cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>16)
+    cairo_pattern_t *pt1=(opts.fadeLines && (horiz ? rwidth : rheight)>(16+etchedDisp))
                           ? cairo_pattern_create_linear(rx, ry, horiz ? x2 : rx+1, horiz ? ry+1 : y2)
                           : NULL,
                     *pt2=(pt1 && LINE_FLAT!=type)
@@ -5774,9 +5774,15 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
             GdkColor *markers=/*opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
                                 ? qtcPalette.mouseover
                                 : */btn_colors;
+            gboolean horiz=GTK_ORIENTATION_HORIZONTAL==orientation;
                               
-            if(LINE_SUNKEN!=opts.sliderThumbs)
-                if(GTK_ORIENTATION_HORIZONTAL==orientation)
+            if(LINE_SUNKEN==opts.sliderThumbs)
+                if(horiz)
+                    y--, height++;
+                else
+                    x--, width++;
+            else
+                if(horiz)
                     x++;
                 else
                     y++;
@@ -5787,17 +5793,14 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 //                     drawDot(cr, x, y, width, height, markers);
 //                     break;
                 case LINE_FLAT:
-                    drawLines(cr, x, y, width, height,
-                              GTK_ORIENTATION_HORIZONTAL!=orientation, 3, 5, markers, area, 5, opts.sliderThumbs);
+                    drawLines(cr, x, y, width, height, !horiz, 3, 5, markers, area, 5, opts.sliderThumbs);
                     break;
                 case LINE_SUNKEN:
-                    drawLines(cr, x, y, width, height,
-                              GTK_ORIENTATION_HORIZONTAL!=orientation, 4, 3, markers, area, 3, opts.sliderThumbs);
+                    drawLines(cr, x, y, width, height, !horiz, 4, 3, markers, area, 3, opts.sliderThumbs);
                     break;
                 default:
                 case LINE_DOTS:
-                    drawDots(cr, x, y, width, height,
-                             GTK_ORIENTATION_HORIZONTAL!=orientation, scale ? 3 : 5, scale ? 4 : 2, markers, area, 0, 5);
+                    drawDots(cr, x, y, width, height, !horiz, scale ? 3 : 5, scale ? 4 : 2, markers, area, 0, 5);
             }
         }
     }
