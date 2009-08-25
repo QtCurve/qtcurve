@@ -8871,7 +8871,14 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
             g.setColorAt(0.0, white);
             white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
             g.setColorAt(1.0, white);
+            if(WIDGET_SB_BUTTON==w)
+            {
+                p->save();
+                p->setClipRect(r);
+            }
             p->fillPath(buildPath(gr, w, round, rad), QBrush(g));
+            if(WIDGET_SB_BUTTON==w)
+                p->restore();
         }
     }
 
