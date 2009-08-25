@@ -70,6 +70,7 @@ static bool useQt3Settings()
 #include <KDE/KComponentData>
 #include <KDE/KTitleWidget>
 #include <KDE/KTabBar>
+#include <KDE/KFileWidget>
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 static int theInstanceCount=0;
@@ -7433,7 +7434,15 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                if(btn->features&QStyleOptionButton::AutoDefaultButton)
+                if(btn->features&QStyleOptionButton::AutoDefaultButton &&
+                   widget && widget->parentWidget() &&
+                    (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) ||
+#ifdef QTC_QT_ONLY
+                     widget->parentWidget()->inherits("KFileWidget")
+#else
+                     ::qobject_cast<const KFileWidget *>(widget->parentWidget())
+#endif
+                    ))
                 {
                     int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
                     if(size.height()<iconHeight+2)

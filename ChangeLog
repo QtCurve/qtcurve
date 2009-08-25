@@ -2,6 +2,8 @@
 ------
 1. Fix corners of round frames where frame background is different to window
    background.
+2. Only use icon metrics for auto-deault buttons that are either within a
+   QDialogButtonBox, or are on a KFileWidget.
 
 0.67.5
 ------
