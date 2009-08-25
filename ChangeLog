@@ -1,3 +1,8 @@
+0.67.6
+------
+1. Fix corners of round frames where frame background is different to window
+   background.
+
 0.67.5
 ------
  1. If drawing square scrollviews, give these a similar 3d effect to rounded ones.

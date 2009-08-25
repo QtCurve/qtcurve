@@ -3016,6 +3016,15 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
 
+                        if(opts.round && IS_FLAT(opts.bgndAppearance) &&
+                           widget && widget->parentWidget()/* &&
+                           widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/)
+                        {
+                            painter->setPen(widget->parentWidget()->palette().background().color());
+                            painter->drawRect(r);
+                            painter->drawRect(r.adjusted(1, 1, -1, -1));
+                        }
+
                         drawBorder(painter, r, &opt,
                                    opts.round &&
                                     ( (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
