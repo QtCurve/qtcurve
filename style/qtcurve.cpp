@@ -4915,7 +4915,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 int     xm(windowsItemFrame + checkcol + windowsItemHMargin -2),
                         xpos(menuItem->rect.x() + xm);
-                QRect   textRect(xpos, y + windowsItemVMargin, w - xm - windowsRightBorder - tab + 1, h - 2 * windowsItemVMargin),
+                QRect   textRect(xpos, y + windowsItemVMargin,
+                                 opts.menuIcons ? (w - xm - windowsRightBorder - tab + 1)
+                                                : (w - ((xm*2) + tab)),
+                                 h - 2 * windowsItemVMargin),
                         vTextRect = visualRect(option->direction, menuItem->rect, textRect);
                 QString s(menuItem->text);
 
