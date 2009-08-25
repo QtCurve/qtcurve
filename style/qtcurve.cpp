@@ -2185,6 +2185,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                                 : PM_DefaultChildMargin, option, widget);
         case PM_MenuBarItemSpacing:
             return 0;
+        case PM_ToolBarItemMargin:
+            return 0;
+        case PM_ToolBarItemSpacing:
+            return 1;
         case PM_FocusFrameVMargin:
         case PM_FocusFrameHMargin:
             return 2;

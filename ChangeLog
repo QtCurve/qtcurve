@@ -4,6 +4,8 @@
    background.
 2. Only use icon metrics for auto-deault buttons that are either within a
    QDialogButtonBox, or are on a KFileWidget.
+3. Give toolbar items a 1 pixel spacing - so that there is at least a gap between
+   konqueror's location and search edit fields.
 
 0.67.5
 ------
