@@ -1,6 +1,7 @@
 0.67.5
 ------
 1. Use same shade for all menu item separators.
+2. Fix clipping of non-V style right arrow.
 
 0.67.4
 ------

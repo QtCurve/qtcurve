@@ -2620,7 +2620,7 @@ static void drawArrow(cairo_t *cr, GdkColor *col, GdkRectangle *area, GtkArrowTy
             }
             case GTK_ARROW_RIGHT:
             {
-                GdkPoint a[]={{x-1,y-3},  {x+2,y},  {x-1,y+3},   {x-2,y+3}, {x-2, y+2},  {x,y}, {x-2, y-2},  {x-2,y-3}};
+                GdkPoint a[]={{x-1,y+3},  {x+2,y},  {x-1,y-3},   {x-2,y-3}, {x-2, y-2},  {x,y}, {x-2, y+2},  {x-2,y+3}};
                 drawPolygon(cr, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
