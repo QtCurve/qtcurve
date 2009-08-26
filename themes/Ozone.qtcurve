@@ -10,3 +10,5 @@ thinSbarGroove=false
 framelessGroupBoxes=false
 fillSlider=false
 borderInactiveTab=true
+highlightScrollViews=true
+lvLines=old
