@@ -1,3 +1,7 @@
+0.67.7
+------
+1. Fix compilation under KDE 4.2
+
 0.67.6
 ------
 1. Fix corners of round frames where frame background is different to window

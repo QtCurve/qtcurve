@@ -70,7 +70,11 @@ static bool useQt3Settings()
 #include <KDE/KComponentData>
 #include <KDE/KTitleWidget>
 #include <KDE/KTabBar>
+#if KDE_IS_VERSION(4, 3, 0)
 #include <KDE/KFileWidget>
+#else
+#include <kfilewidget.h>
+#endif
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 static int theInstanceCount=0;
