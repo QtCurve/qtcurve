@@ -25,7 +25,6 @@ fadeLines=false
 fillProgress=true
 fillSlider=true
 focus=filled
-fixParentlessDialogs=true
 framelessGroupBoxes=true
 groupBoxLine=false
 gtkButtonOrder=false

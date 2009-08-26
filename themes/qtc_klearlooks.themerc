@@ -26,7 +26,6 @@ embolden=false
 fadeLines=true
 fillProgress=true
 fillSlider=true
-fixParentlessDialogs=true
 focus=filled
 framelessGroupBoxes=true
 groupBoxLine=false
