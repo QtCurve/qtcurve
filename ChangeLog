@@ -1,6 +1,11 @@
-0.67.7
+0.68.0
 ------
-1. Fix compilation under KDE 4.2
+1. New options:
+    Control whether icons are displayed in menus
+    Force alternate colours in listviews
+    Square selections in listviews
+    Dont make 'auto-default' buttons larger - makes them less Gtk2 like though.
+2. Fix compilation under KDE 4.2
 
 0.67.6
 ------

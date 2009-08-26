@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>761</width>
-    <height>479</height>
+    <width>759</width>
+    <height>471</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -764,6 +764,20 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="0">
+        <widget class="QLabel" name="label_66">
+         <property name="text">
+          <string>Columns:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="forceAlternateLvCols">
+         <property name="text">
+          <string>Force alternate colors</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <widget class="QLabel" name="textLabel1_8_2_4">
          <property name="whatsThis">
           <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
@@ -776,17 +790,24 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="selectionAppearance"/>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="1">
+        <widget class="QCheckBox" name="squareLvSelection">
+         <property name="text">
+          <string>Square</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
         <widget class="QLabel" name="label_48">
          <property name="text">
           <string>Lines between items:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="7" column="1">
         <widget class="QComboBox" name="lvLines"/>
        </item>
       </layout>
@@ -1635,34 +1656,41 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="menuIcons">
+         <property name="text">
+          <string>Show icons</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QLabel" name="label_26">
          <property name="text">
           <string>Shade background by:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="KIntNumInput" name="lighterPopupMenuBgnd">
          <property name="suffix">
           <string>%</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="menuBgndAppearance"/>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QComboBox" name="menuBgndGrad"/>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_45">
          <property name="text">
           <string>Sub-menu delay:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="KIntNumInput" name="menuDelay">
          <property name="suffix">
           <string>ms</string>
@@ -1672,17 +1700,17 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_44">
          <property name="text">
           <string>Stripe:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QComboBox" name="menuStripe"/>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="KColorButton" name="customMenuStripeColor">
          <property name="enabled">
           <bool>false</bool>
@@ -1695,14 +1723,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QComboBox" name="menuStripeAppearance">
          <property name="enabled">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QCheckBox" name="gtkMenuStripe">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1715,14 +1743,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_61">
          <property name="text">
           <string>Border popupmenus</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QCheckBox" name="popupBorder">
          <property name="text">
           <string>Enabled</string>
@@ -1788,22 +1816,22 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="page_12">
-      <layout class="QGridLayout">
-       <item row="0" column="0" colspan="4">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
         <widget class="QCheckBox" name="gtkButtonOrder">
          <property name="text">
           <string>Gtk button order</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="4">
+       <item row="1" column="0">
         <widget class="QCheckBox" name="mapKdeIcons">
          <property name="text">
           <string>Map KDE icons (Gtk2)</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="4">
+       <item row="2" column="0">
         <widget class="QCheckBox" name="fixParentlessDialogs">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -1822,13 +1850,20 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="3" column="0">
+        <widget class="QCheckBox" name="stdBtnSizes">
+         <property name="text">
+          <string>Don't make 'auto-default' buttons larger (KDE4)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Character to use for password entries:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QPushButton" name="passwordChar">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1838,7 +1873,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
+       <item row="4" column="2">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1851,7 +1886,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
