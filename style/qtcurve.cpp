@@ -7462,7 +7462,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                if(btn->features&QStyleOptionButton::AutoDefaultButton &&
+                if(!opts.stdBtnSizes &&
+                   btn->features&QStyleOptionButton::AutoDefaultButton &&
                    widget && widget->parentWidget() &&
                     (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) ||
 #ifdef QTC_QT_ONLY
@@ -7584,9 +7585,10 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 //             int iconHeight=/*btn->icon.isNull() ? btn->iconSize.height() : */16;
 //             if(size.height()<iconHeight+2)
 //                 newSize.setHeight(iconHeight+2);
-                    
+
             int margin      = (pixelMetric(PM_ButtonMargin, option, widget)+
-                              (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-QTC_MAX_ROUND_BTN_PAD,
+                               (pixelMetric(PM_DefaultFrameWidth, option, widget) * (opts.stdBtnSizes ? 1 : 2)))
+                               -QTC_MAX_ROUND_BTN_PAD,
                 textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
                 // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
                 other = qMax(QTC_DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
