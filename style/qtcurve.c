@@ -2246,43 +2246,40 @@ static void dialogMapEvent(GtkWidget *widget, gpointer user_data)
 }
 
 static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          const gchar *detail, int x, int y, int width, int height, int round)
+                          const gchar *detail, int x, int y, int width, int height, int round, gboolean isSelection)
 {
-    double   radius=QTC_ROUNDED
-                        ? height>48 && width>48
-                            ? 3.0
-                            : height>24 && width>24
-                                ? QTC_FULL_OUTER_RADIUS
-                                : QTC_SLIGHT_OUTER_RADIUS
-                        : 0.0,
-                xd=x+0.5,
-                yd=y+0.5,
-                alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
-    int      xo=x, yo=y, widtho=width;
+    double   xd=x+0.5,
+             yd=y+0.5,
+             alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
+    int      xo=x, yo=y, widtho=width, mod=isSelection && opts.squareScrollViews && opts.squareLvSelection ? 0 : 1;
     GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
 
-    if(detail && ROUNDED_ALL!=round)
-    {
-        if(!(round&ROUNDED_LEFT))
+    if(mod)
+        if(detail && ROUNDED_ALL!=round)
         {
-            x-=2;
-            xd-=2;
-            width+=2;
+            if(!(round&ROUNDED_LEFT))
+            {
+                x-=2;
+                xd-=2;
+                width+=2;
+            }
+            if(!(round&ROUNDED_RIGHT))
+                width+=2;
         }
-        if(!(round&ROUNDED_RIGHT))
-            width+=2;
-    }
             
-    drawBevelGradientAlpha(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
+    drawBevelGradientAlpha(cr, style, area, NULL, x+mod, y+mod, width-(2*mod), height-(2*mod), col,
                            TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
 
-    cairo_save(cr);
-    cairo_rectangle(cr, xo, yo, widtho, height);
-    cairo_clip(cr);
-    cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
-    createPath(cr, xd, yd, width-1, height-1,  getRadius(&opts, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
-    cairo_stroke(cr);
-    cairo_restore(cr);
+    if(mod)
+    {
+        cairo_save(cr);
+        cairo_rectangle(cr, xo, yo, widtho, height);
+        cairo_clip(cr);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
+        createPath(cr, xd, yd, width-1, height-1,  getRadius(&opts, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
+        cairo_stroke(cr);
+        cairo_restore(cr);
+    }
 }
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -2407,7 +2404,7 @@ debugDisplayWidget(widget, 3);
                           x, y, width, height);
 
         if(GTK_STATE_SELECTED==state)
-            drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round);
+            drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round, TRUE);
     }
     else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
                                                   (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
@@ -3017,7 +3014,7 @@ debugDisplayWidget(widget, 3);
             else if(isPathButton(widget))
             {
                 if(GTK_STATE_PRELIGHT==state)
-                    drawSelection(cr, style, state, area, widget, NULL, x, y, width, height, ROUNDED_ALL);
+                    drawSelection(cr, style, state, area, widget, NULL, x, y, width, height, ROUNDED_ALL, FALSE);
 
                 if(GTK_IS_TOGGLE_BUTTON(widget))
                 {
