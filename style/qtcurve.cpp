@@ -3970,6 +3970,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QColor color(hasCustomBackground && hasSolidBackground
                                 ? v4Opt->backgroundBrush.color()
                                 : palette.color(cg, QPalette::Highlight));
+                bool   square(opts.squareScrollViews && opts.squareLvSelection &&
+                              v4Opt->widget &&
+                              !v4Opt->widget->inherits("KFilePlacesView") &&
+                              (dynamic_cast<const QTreeView *>(v4Opt->widget) ||
+                                (dynamic_cast<const QListView *>(v4Opt->widget) &&
+                                QListView::IconMode!=((const QListView *)v4Opt->widget)->viewMode())));
 
                 if (hover && !hasCustomBackground)
                 {
@@ -3979,60 +3985,65 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         color = color.lighter(110);
                 }
 
-                QPixmap pix(QSize(24, r.height()));
-                QString key;
-
-                key.sprintf("qtc-sel-%x-%x", pix.height(), color.rgba());
-                if(!usePixmapCache || !QPixmapCache::find(key, pix))
+                if(square)
+                    drawBevelGradient(color, painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);
+                else
                 {
-                    pix.fill(Qt::transparent);
+                    QPixmap pix(QSize(24, r.height()));
+                    QString key;
 
-                    QPainter pixPainter(&pix);
-                    QRect    border(0, 0, pix.width(), pix.height());
-                    double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
-
-                    pixPainter.setRenderHint(QPainter::Antialiasing, true);
-                    drawBevelGradient(color, &pixPainter, border,
-                                      buildPath(border, WIDGET_OTHER, ROUNDED_ALL, radius), true, false,
-                                      opts.selectionAppearance, WIDGET_SELECTION, !usePixmapCache);
-                    pixPainter.setBrush(Qt::NoBrush);
-                    pixPainter.setPen(color);
-                    pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
-                    pixPainter.end();
-
-                    if(usePixmapCache)
-                        QPixmapCache::insert(key, pix);
-                }
-
-                bool roundedLeft  = false,
-                     roundedRight = false;
-
-                if (v4Opt)
-                {
-                    roundedLeft  = (QStyleOptionViewItemV4::Beginning==v4Opt->viewItemPosition);
-                    roundedRight = (QStyleOptionViewItemV4::End==v4Opt->viewItemPosition);
-                    if (QStyleOptionViewItemV4::OnlyOne==v4Opt->viewItemPosition ||
-                        QStyleOptionViewItemV4::Invalid==v4Opt->viewItemPosition ||
-                        (view && view->selectionBehavior() != QAbstractItemView::SelectRows))
+                    key.sprintf("qtc-sel-%x-%x", pix.height(), color.rgba());
+                    if(!usePixmapCache || !QPixmapCache::find(key, pix))
                     {
-                        roundedLeft=roundedRight=true;
+                        pix.fill(Qt::transparent);
+
+                        QPainter pixPainter(&pix);
+                        QRect    border(0, 0, pix.width(), pix.height());
+                        double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
+
+                        pixPainter.setRenderHint(QPainter::Antialiasing, true);
+                        drawBevelGradient(color, &pixPainter, border,
+                                          buildPath(border, WIDGET_OTHER, ROUNDED_ALL, radius), true, false,
+                                          opts.selectionAppearance, WIDGET_SELECTION, !usePixmapCache);
+                        pixPainter.setBrush(Qt::NoBrush);
+                        pixPainter.setPen(color);
+                        pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
+                        pixPainter.end();
+
+                        if(usePixmapCache)
+                            QPixmapCache::insert(key, pix);
                     }
-                }
 
-                int size(roundedLeft && roundedRight ? qMin(8, r.width()/2) : 8);
+                    bool roundedLeft  = false,
+                         roundedRight = false;
 
-                if (!reverse ? roundedLeft : roundedRight)
-                {
-                    painter->drawPixmap(r.topLeft(), pix.copy(0, 0, size, r.height()));
-                    r.adjust(size, 0, 0, 0);
+                    if (v4Opt)
+                    {
+                        roundedLeft  = (QStyleOptionViewItemV4::Beginning==v4Opt->viewItemPosition);
+                        roundedRight = (QStyleOptionViewItemV4::End==v4Opt->viewItemPosition);
+                        if (QStyleOptionViewItemV4::OnlyOne==v4Opt->viewItemPosition ||
+                            QStyleOptionViewItemV4::Invalid==v4Opt->viewItemPosition ||
+                            (view && view->selectionBehavior() != QAbstractItemView::SelectRows))
+                        {
+                            roundedLeft=roundedRight=true;
+                        }
+                    }
+
+                    int size(roundedLeft && roundedRight ? qMin(8, r.width()/2) : 8);
+
+                    if (!reverse ? roundedLeft : roundedRight)
+                    {
+                        painter->drawPixmap(r.topLeft(), pix.copy(0, 0, size, r.height()));
+                        r.adjust(size, 0, 0, 0);
+                    }
+                    if (!reverse ? roundedRight : roundedLeft)
+                    {
+                        painter->drawPixmap(r.right() - size + 1, r.top(), pix.copy(24-size, 0, size, r.height()));
+                        r.adjust(0, 0, -size, 0);
+                    }
+                    if (r.isValid())
+                        painter->drawTiledPixmap(r, pix.copy(7, 0, 8, r.height()));
                 }
-                if (!reverse ? roundedRight : roundedLeft)
-                {
-                    painter->drawPixmap(r.right() - size + 1, r.top(), pix.copy(24-size, 0, size, r.height()));
-                    r.adjust(0, 0, -size, 0);
-                }
-                if (r.isValid())
-                    painter->drawTiledPixmap(r, pix.copy(7, 0, 8, r.height()));
             }
             break;
         }
