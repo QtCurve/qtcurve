@@ -3951,7 +3951,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         : QPalette::Disabled);
 
             if (v4Opt && (v4Opt->features & QStyleOptionViewItemV2::Alternate))
-                painter->fillRect(option->rect, option->palette.brush(cg, QPalette::AlternateBase));
+                painter->fillRect(r, option->palette.brush(cg, QPalette::AlternateBase));
 
             if (!hover && !(state&State_Selected) && !hasCustomBackground)
                 break;
@@ -5067,7 +5067,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                  iconSpacing (4);//### 4 is currently hardcoded in QPushButton::sizeHint()
 
                     if (!button->text.isEmpty())
-                        labelWidth += (button->fontMetrics.boundingRect(option->rect, tf, button->text).width() + iconSpacing);
+                        labelWidth += (button->fontMetrics.boundingRect(r, tf, button->text).width() + iconSpacing);
 
                     QRect iconRect(r.x() + (r.width() - labelWidth) / 2,
                                    r.y() + (r.height() - labelHeight) / 2,
