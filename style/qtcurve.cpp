@@ -3970,7 +3970,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QColor color(hasCustomBackground && hasSolidBackground
                                 ? v4Opt->backgroundBrush.color()
                                 : palette.color(cg, QPalette::Highlight));
-                bool   square(opts.squareScrollViews && opts.squareLvSelection &&
+                bool   square(opts.squareLvSelection &&
                               v4Opt->widget &&
                               !v4Opt->widget->inherits("KFilePlacesView") &&
                               (dynamic_cast<const QTreeView *>(v4Opt->widget) ||
