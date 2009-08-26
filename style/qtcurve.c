@@ -2251,7 +2251,7 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
     double   xd=x+0.5,
              yd=y+0.5,
              alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
-    int      xo=x, yo=y, widtho=width, mod=isSelection && opts.squareScrollViews && opts.squareLvSelection ? 0 : 1;
+    int      xo=x, yo=y, widtho=width, mod=isSelection && opts.squareLvSelection ? 0 : 1;
     GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
 
     if(mod)
