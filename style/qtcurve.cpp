@@ -7587,7 +7587,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 //                 newSize.setHeight(iconHeight+2);
 
             int margin      = (pixelMetric(PM_ButtonMargin, option, widget)+
-                               (pixelMetric(PM_DefaultFrameWidth, option, widget) * (opts.stdBtnSizes ? 1 : 2)))
+                               pixelMetric(PM_DefaultFrameWidth, option, widget))
                                -QTC_MAX_ROUND_BTN_PAD,
                 textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
                 // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
