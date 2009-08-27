@@ -1,5 +1,9 @@
 0.68.0
 ------
+1. Allow toggle buttons to be max rounded.
+
+0.68.0
+------
 1. New options:
     Control whether icons are displayed in menus
     Force alternate colours in listviews
