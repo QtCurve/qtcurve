@@ -230,12 +230,12 @@ typedef GdkColor color;
 #define NUM_SPLITTER_DASHES 21
 
 #ifdef __cplusplus
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
                           WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || \
                           WIDGET_TOOLBAR_BUTTON==(w) )
-#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
+#define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
-#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
+#define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || IS_SLIDER((w)) || \
                         WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w))
 #else
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
@@ -421,26 +421,25 @@ typedef enum
     WIDGET_SB_BGND,
     WIDGET_TROUGH,
     WIDGET_CHECKBOX,
-    WIDGET_TOGGLE_BUTTON,
     WIDGET_COMBO,
     WIDGET_COMBO_BUTTON,
     WIDGET_MENU_ITEM,
     WIDGET_PROGRESSBAR,
     WIDGET_PBAR_TROUGH,
 #ifndef __cplusplus
+    WIDGET_TOGGLE_BUTTON,
     WIDGET_SPIN_UP,
     WIDGET_SPIN_DOWN,
     WIDGET_UNCOLOURED_MO_BUTTON,
-#endif
-    WIDGET_SPIN,
-    WIDGET_ENTRY,
-    WIDGET_SCROLLVIEW,
-#ifdef __cplusplus
+#else
     WIDGET_CHECKBUTTON,        // Qt4 only
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
 #endif
+    WIDGET_SPIN,
+    WIDGET_ENTRY,
+    WIDGET_SCROLLVIEW,
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     WIDGET_SELECTION,
 //    WIDGET_RUBBER_BAND,
@@ -500,7 +499,9 @@ typedef enum
 
 #define IS_SLIDER(W)        (WIDGET_SLIDER==(W) || WIDGET_SB_SLIDER==(W))
 #define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==(W) || WIDGET_PBAR_TROUGH==(W) || WIDGET_TROUGH==(W) || WIDGET_FILLED_SLIDER_TROUGH==(W))
+#ifndef __cplusplus
 #define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==(W) || WIDGET_CHECKBOX==(W))
+#endif
 
 typedef enum
 {
@@ -1470,14 +1471,15 @@ typedef enum
     RADIUS_ETCH
 } ERadius;
 
+#ifdef __cplusplus
 #define QTC_IS_MAX_ROUND_WIDGET(A) \
             (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
-
-#ifdef __cplusplus
 #define QTC_IS_EXTRA_ROUND_WIDGET(A) \
             (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR && \
              A!=WIDGET_MDI_WINDOW && A!=WIDGET_MDI_WINDOW_TITLE)
 #else
+#define QTC_IS_MAX_ROUND_WIDGET(A) \
+            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_TOGGLE_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
 #define QTC_IS_EXTRA_ROUND_WIDGET(A) \
             (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
 #endif
