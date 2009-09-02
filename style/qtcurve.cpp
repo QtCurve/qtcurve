@@ -7463,16 +7463,19 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                if(!opts.stdBtnSizes &&
-                   btn->features&QStyleOptionButton::AutoDefaultButton &&
-                   widget && widget->parentWidget() &&
-                    (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) ||
+                bool dialogButton=
+                            // Cant rely on AutoDefaultButton - as VirtualBox does not set this!!!
+                            // btn->features&QStyleOptionButton::AutoDefaultButton &&
+                            widget && widget->parentWidget() &&
+                            (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) ||
 #ifdef QTC_QT_ONLY
-                     widget->parentWidget()->inherits("KFileWidget")
+                                widget->parentWidget()->inherits("KFileWidget")
 #else
-                     ::qobject_cast<const KFileWidget *>(widget->parentWidget())
+                                ::qobject_cast<const KFileWidget *>(widget->parentWidget())
 #endif
-                    ))
+                            );
+
+                if(!opts.stdBtnSizes && dialogButton)
                 {
                     int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
                     if(size.height()<iconHeight+2)
@@ -7487,8 +7490,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 if (btn->features&QStyleOptionButton::HasMenu)
                     newSize+=QSize(4, 0);
                     
-                if (!btn->text.isEmpty() && "..."!=btn->text && newSize.width() < 80 &&
-                    btn->features&QStyleOptionButton::AutoDefaultButton)
+                if (!btn->text.isEmpty() && "..."!=btn->text && newSize.width() < 80 && dialogButton)
                     newSize.setWidth(80);
 
                 newSize.rheight() += ((1 - newSize.rheight()) & 1);

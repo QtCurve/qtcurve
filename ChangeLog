@@ -2,6 +2,9 @@
 ------
 1. Fix reading, and saving, of 'dark inverted gradient' setting.
 2. Better button metrics - especially for buttons with menus.
+3. Fix different sized buttons in VirtualBox dialogs. (When determing if
+   button should take icon size into account (a la Gtk2), dont use the
+   'auto-default' setting, just check if its in a QDialogButtonBox).
 
 0.68.0
 ------
