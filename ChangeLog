@@ -1,6 +1,7 @@
 0.68.1
 ------
 1. Fix reading, and saving, of 'dark inverted gradient' setting.
+2. Better button metrics - especially for buttons with menus.
 
 0.68.0
 ------

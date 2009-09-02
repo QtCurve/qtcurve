@@ -2213,7 +2213,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_MenuVMargin:
             return 0;
         case PM_MenuButtonIndicator:
-            return QTC_DO_EFFECT ? 16 : 15;
+            return (QTC_DO_EFFECT ? 10 : 9)+
+                    (!widget || qobject_cast<const QToolButton *>(widget) ? 6 : 0);
         case PM_ButtonMargin:
             return (QTC_DO_EFFECT
                     ? opts.thinnerBtns ? 4 : 6
@@ -5032,10 +5033,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 {
                     int   mbi(pixelMetric(PM_MenuButtonIndicator, btn, widget));
                     QRect ar(Qt::LeftToRight==btn->direction
-                                ? btn->rect.right() - mbi
+                                ? btn->rect.right() - (mbi+6)
                                 : btn->rect.x() + 6,
                              ((btn->rect.height() - mbi)/2),
-                             mbi - 6, mbi);
+                             mbi, mbi);
 
                     if(option->state &(State_On | State_Sunken))
                         ar.adjust(1, 1, 1, 1);
@@ -7483,10 +7484,13 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
                 newSize+=QSize(margin, margin);
 
-                if (!btn->text.isEmpty() && "..."!=btn->text && newSize.width() < 80)
-                    newSize.setWidth(80);
                 if (btn->features&QStyleOptionButton::HasMenu)
                     newSize+=QSize(4, 0);
+                    
+                if (!btn->text.isEmpty() && "..."!=btn->text && newSize.width() < 80 &&
+                    btn->features&QStyleOptionButton::AutoDefaultButton)
+                    newSize.setWidth(80);
+
                 newSize.rheight() += ((1 - newSize.rheight()) & 1);
 //                 if (!btn->icon.isNull() && btn->iconSize.height() > 16)
 //                     newSize -= QSize(0, 2);
