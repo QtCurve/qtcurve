@@ -152,26 +152,28 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
             return APPEARANCE_FLAT;
         if(0==memcmp(str, "raised", 6))
             return APPEARANCE_RAISED;
-        if(0==memcmp(str, "gradient", 8) || 0==memcmp(str, "lightgradient", 13))
-            return APPEARANCE_GRADIENT;
-        if(0==memcmp(str, "soft", 4))
-            return APPEARANCE_SOFT_GRADIENT;
-        if(0==memcmp(str, "harsh", 5))
-            return APPEARANCE_HARSH_GRADIENT;
-        if(0==memcmp(str, "splitgradient", 13))
-            return APPEARANCE_SPLIT_GRADIENT;
-        if(0==memcmp(str, "glass", 5) || 0==memcmp(str, "shinyglass", 10))
-            return APPEARANCE_SHINY_GLASS;
         if(0==memcmp(str, "dullglass", 9))
             return APPEARANCE_DULL_GLASS;
+        if(0==memcmp(str, "glass", 5) || 0==memcmp(str, "shinyglass", 10))
+            return APPEARANCE_SHINY_GLASS;
         if(0==memcmp(str, "agua", 4))
 #if defined __cplusplus && !defined QTC_CONFIG_DIALOG  && defined QT_VERSION && QT_VERSION < 0x040000
             return APPEARANCE_AGUA_MOD;
 #else
             return APPEARANCE_AGUA;
 #endif
+        if(0==memcmp(str, "soft", 4))
+            return APPEARANCE_SOFT_GRADIENT;
+        if(0==memcmp(str, "gradient", 8) || 0==memcmp(str, "lightgradient", 13))
+            return APPEARANCE_GRADIENT;
+        if(0==memcmp(str, "harsh", 5))
+            return APPEARANCE_HARSH_GRADIENT;
         if(0==memcmp(str, "inverted", 8))
             return APPEARANCE_INVERTED;
+        if(0==memcmp(str, "darkinverted", 12))
+            return APPEARANCE_DARK_INVERTED;
+        if(0==memcmp(str, "splitgradient", 13))
+            return APPEARANCE_SPLIT_GRADIENT;
         if(0==memcmp(str, "bevelled", 8))
             return APPEARANCE_BEVELLED;
         if(allowFade && 0==memcmp(str, "fade", 4))
@@ -1912,26 +1914,28 @@ static QString toStr(EAppearance exp)
             return "flat";
         case APPEARANCE_RAISED:
             return "raised";
+        case APPEARANCE_DULL_GLASS:
+            return "dullglass";
+        case APPEARANCE_SHINY_GLASS:
+            return "shinyglass";
+        case APPEARANCE_AGUA:
+            return "agua";
         case APPEARANCE_SOFT_GRADIENT:
             return "soft";
         case APPEARANCE_GRADIENT:
             return "gradient";
         case APPEARANCE_HARSH_GRADIENT:
             return "harsh";
-        case APPEARANCE_SPLIT_GRADIENT:
-            return "splitgradient";
-        case APPEARANCE_DULL_GLASS:
-            return "dullglass";
-        case APPEARANCE_BEVELLED:
-            return "bevelled";
         case APPEARANCE_INVERTED:
             return "inverted";
-        case APPEARANCE_SHINY_GLASS:
-            return "shinyglass";
+        case APPEARANCE_DARK_INVERTED:
+            return "darkinverted";
+        case APPEARANCE_SPLIT_GRADIENT:
+            return "splitgradient";
+        case APPEARANCE_BEVELLED:
+            return "bevelled";
         case APPEARANCE_FADE:
             return "fade";
-        case APPEARANCE_AGUA:
-            return "agua";
         default:
         {
             QString app;

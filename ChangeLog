@@ -1,6 +1,7 @@
 0.68.1
 ------
-1. Thinner combos.
+1. Fix reading, and saving, of 'dark inverted gradient' setting.
+2. Thinner combos.
 
 0.68.0
 ------
