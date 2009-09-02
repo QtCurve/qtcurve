@@ -4,6 +4,7 @@
 2. Allow toggle buttons to be max rounded.
 3. Fix combo-box arrow position when not etched/shadowed.
 4. Fix default value for 'double Gtk combo arrow' setting.
+5. Fix https://bugzilla.novell.com/show_bug.cgi?id=529607
 
 0.68.0
 ------

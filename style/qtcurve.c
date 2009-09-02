@@ -4853,6 +4853,8 @@ static void qtcDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         gdk_gc_set_clip_rectangle(gc, NULL);
 }
 
+#define QTC_NUM_GCS 5
+
 static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text,
                           GdkRectangle *area, GtkWidget *widget, const gchar *detail, gint x, gint y,
                           PangoLayout *layout)
@@ -4881,7 +4883,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         GtkNotebook *nb=mb || isMenuItem || !GTK_IS_LABEL(widget) ||
                        !widget->parent || !GTK_IS_NOTEBOOK(widget->parent) ? NULL : GTK_NOTEBOOK(widget->parent);
 #endif
-        GdkGC    *prevGcs[4];
+        GdkGC    *prevGcs[QTC_NUM_GCS];
         gboolean activeWindow=TRUE;
         int      i=0;
 
@@ -4930,7 +4932,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
             use_text=TRUE;
             swap_gc=TRUE;
-            for(i=0; i<5; ++i)
+            for(i=0; i<QTC_NUM_GCS; ++i)
             {
                 prevGcs[i]=style->text_gc[i];
                 style->text_gc[i]=qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
@@ -4944,7 +4946,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             {
                 if(opts.customMenuTextColor && qtcurveStyle->menutext_gc[0])
                 {
-                    for(i=0; i<5; ++i)
+                    for(i=0; i<QTC_NUM_GCS; ++i)
                         prevGcs[i]=style->text_gc[i];
                     swap_gc=TRUE;
                     style->text_gc[GTK_STATE_NORMAL]=qtcurveStyle->menutext_gc[0];
