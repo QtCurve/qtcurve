@@ -1,8 +1,9 @@
 0.68.1
 ------
-1. Allow toggle buttons to be max rounded.
-2. Fix combo-box arrow position when not etched/shadowed.
-3. Fix default value for 'double Gtk combo arrow' setting.
+1. Fix reading of 'dark inverted gradient' setting.
+2. Allow toggle buttons to be max rounded.
+3. Fix combo-box arrow position when not etched/shadowed.
+4. Fix default value for 'double Gtk combo arrow' setting.
 
 0.68.0
 ------
