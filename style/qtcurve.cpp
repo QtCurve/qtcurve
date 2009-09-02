@@ -7459,7 +7459,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
         case CT_PushButton:
         {
             newSize=size;
-            newSize.setWidth(newSize.width()+8);
+            newSize.setWidth(newSize.width()+(ROUND_MAX==opts.round ? 12 : 8));
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
