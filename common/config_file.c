@@ -1775,10 +1775,10 @@ static void defaultSettings(Options *opts)
     opts->shading=SHADING_HSL;
     opts->gtkScrollViews=true;
     opts->comboBtn=SHADE_NONE;
+    opts->doubleGtkComboArrow=true;
 #ifdef __cplusplus
     opts->stdSidebarButtons=false;
     opts->gtkComboMenus=false;
-    opts->doubleGtkComboArrow=true;
     opts->colorTitlebarOnly=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);
     opts->customSlidersColor.setRgb(0, 0, 0);
