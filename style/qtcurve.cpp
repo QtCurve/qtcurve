@@ -7586,9 +7586,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 //             if(size.height()<iconHeight+2)
 //                 newSize.setHeight(iconHeight+2);
 
-            int margin      = (pixelMetric(PM_ButtonMargin, option, widget)+
-                               pixelMetric(PM_DefaultFrameWidth, option, widget))
-                               -QTC_MAX_ROUND_BTN_PAD,
+            int margin = (pixelMetric(PM_ButtonMargin, option, widget)+
+                             (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-QTC_MAX_ROUND_BTN_PAD,
                 textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
                 // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
                 other = qMax(QTC_DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
