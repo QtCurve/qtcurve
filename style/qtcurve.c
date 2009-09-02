@@ -2654,6 +2654,9 @@ debugDisplayWidget(widget, 3);
                                                                        [COLOR_BUTTON_TEXT]);
             x++;
 
+            if(!QTC_DO_EFFECT)
+                x+=2;
+
             if(opts.doubleGtkComboArrow)
             {
                 int pad=opts.vArrows ? 0 : 1;

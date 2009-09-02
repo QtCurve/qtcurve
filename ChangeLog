@@ -1,6 +1,7 @@
 0.68.1
 ------
 1. Allow toggle buttons to be max rounded.
+2. Fix combo-box arrow position when not etched/shadowed.
 
 0.68.0
 ------
