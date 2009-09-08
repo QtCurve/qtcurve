@@ -7816,7 +7816,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                             r.adjust(2, 0, 0, 0);
                         break;
                     case SC_ComboBoxEditField:
-                        r.setRect(x + (ed ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
+                        r.setRect(x + (ed && opts.unifyCombo ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
                         if(doEtch)
                             r.adjust(1, 1, -1, -1);
                         if(ed)
