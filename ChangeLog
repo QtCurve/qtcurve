@@ -8,7 +8,10 @@
 4. Add 2 pixels to the left/right of max rounded buttons.
 5. Dont draw window border/buttons into pixmaps when compositing is active.
 6. Use KIconLoader to determine icon sizes - if compiled against KDE4.
-
+7. Dont do 'fix corners of round frames where frame background is different to window
+   background' (from 0.67.6) for frames within QAbstractItemView. Improves
+   appearance of KPackageKit.
+   
 0.68.0
 ------
 1. New options:

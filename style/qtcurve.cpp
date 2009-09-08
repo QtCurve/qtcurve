@@ -2947,7 +2947,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
                         (widget && widget->inherits("Q3ScrollView")) ||
                         (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
-                     squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow())));
+                     squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow()))),
+                     inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
 
                 if(sv && (opts.etchEntry || squareSv))
                 {
@@ -2977,7 +2978,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         // but is when painted. So check here if it should not be etched.
                         // Also, see not in getLowerEtchCol()
                         if(QTC_DO_EFFECT && widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget) &&
-                           isInQAbstractItemView(widget->parentWidget()))
+                           inQAbstractItemView)
                             theNoEtchWidgets.insert(widget);
 
                         // If we are set to have sunken scrollviews, then the frame width is set to 3.
@@ -3032,7 +3033,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         }
 
                         if(opts.round && IS_FLAT(opts.bgndAppearance) &&
-                           widget && widget->parentWidget()/* &&
+                           widget && widget->parentWidget() && !inQAbstractItemView/* &&
                            widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/)
                         {
                             painter->setPen(widget->parentWidget()->palette().background().color());
