@@ -7,6 +7,7 @@
    'auto-default' setting, just check if its in a QDialogButtonBox).
 4. Add 2 pixels to the left/right of max rounded buttons.
 5. Dont draw window border/buttons into pixmaps when compositing is active.
+6. Use KIconLoader to determine icon sizes - if compiled against KDE4.
 
 0.68.0
 ------

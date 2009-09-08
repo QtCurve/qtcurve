@@ -2149,17 +2149,16 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
     switch(metric)
     {
 #ifndef QTC_QT_ONLY
-        case PM_ButtonIconSize:
         case PM_SmallIconSize:
-        {
-            KConfigGroup g(KGlobal::config(), "SmallIcons");
-            return g.readEntry("Size", 16);
-        }
+        case PM_ButtonIconSize:
+            return KIconLoader::global()->currentSize(KIconLoader::Small);
         case PM_ToolBarIconSize:
-        {
-            KConfigGroup g(KGlobal::config(), "MainToolbarIcons");
-            return g.readEntry("Size", 22);
-        }
+            return KIconLoader::global()->currentSize(KIconLoader::Toolbar);
+        case PM_LargeIconSize:
+            return KIconLoader::global()->currentSize(KIconLoader::Dialog);
+        case PM_MessageBoxIconSize:
+            // TODO return KIconLoader::global()->currentSize(KIconLoader::MessageBox);
+            return KIconLoader::SizeHuge;
 #endif
 #if QT_VERSION >= 0x040500
         case PM_SubMenuOverlap:
@@ -7489,9 +7488,14 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
                 if (btn->features&QStyleOptionButton::HasMenu)
                     newSize+=QSize(4, 0);
-                    
-                if (!btn->text.isEmpty() && "..."!=btn->text && newSize.width() < 80 && dialogButton)
-                    newSize.setWidth(80);
+
+                if (!btn->text.isEmpty() && "..."!=btn->text)
+                {
+                    if(size.width()+22>newSize.width())
+                        newSize.setWidth(size.width()+22);
+                    if(newSize.width() < 80 && dialogButton)
+                        newSize.setWidth(80);
+                }
 
                 newSize.rheight() += ((1 - newSize.rheight()) & 1);
 //                 if (!btn->icon.isNull() && btn->iconSize.height() > 16)
@@ -7811,7 +7815,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                             r.adjust(2, 0, 0, 0);
                         break;
                     case SC_ComboBoxEditField:
-                        r.setRect(x + margin +1, y + margin + 1, w - 2 * margin - 19, h - 2 * margin -2);
+                        r.setRect(x + (ed ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
                         if(doEtch)
                             r.adjust(1, 1, -1, -1);
                         if(ed)
@@ -7853,7 +7857,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     case SC_SpinBoxEditField:
                     {
                         int pad=opts.round>ROUND_FULL ? 2 : 0;
-                        return QRect(fw+(reverse ? bs.width() : 0)+pad, fw, (x-fw*2)-pad, r.height()-2*fw);
+                        return QRect(fw+(reverse ? bs.width() : 0), fw, (x-fw*2)-pad, r.height()-2*fw);
                     }
                     case SC_SpinBoxFrame:
                         return reverse
