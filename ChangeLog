@@ -11,6 +11,8 @@
 7. Dont do 'fix corners of round frames where frame background is different to window
    background' (from 0.67.6) for frames within QAbstractItemView. Improves
    appearance of KPackageKit.
+8. Workaround some issues with window style and compositing - where parts of the frame
+   are not updated.
    
 0.68.0
 ------

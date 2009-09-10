@@ -47,7 +47,6 @@
 #define QTC_KWIN
 #include "common.h"
 
-
 namespace KWinQtCurve
 {
 
@@ -138,13 +137,14 @@ void QtCurveClient::init()
     itsTitleFont = isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
     KCommonDecoration::init();
-    /*
-    Disabled as it produces errors when not compoisiting
+    // If WA_PaintOnScreen is set to false when not compositnig then get redraw errors
+    // ...if set to true when compositing, then sometimes only part of the titlebar is updated!
+    // ...hence in reset() we need to alter this setting
+    // ... :-(
+    widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
     widget()->setAutoFillBackground(false);
-    widget()->setAttribute(Qt::WA_NoSystemBackground, true);
-    widget()->setAttribute(Qt::WA_OpaquePaintEvent);
-    widget()->setAttribute(Qt::WA_PaintOnScreen, false);
-    */
+    widget()->setAttribute(Qt::WA_OpaquePaintEvent, true);
+    
     if(Handler()->showResizeGrip() && isResizable())
         itsResizeGrip=new ResizeCorner(this, KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
 }
@@ -556,6 +556,10 @@ double QtCurveClient::shadowOpacity(ShadowType type) const
     
 void QtCurveClient::reset(unsigned long changed)
 {
+    // Set note in init() above
+    if(0==changed)
+        widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
+    
     if (changed&SettingBorder)
         if (maximizeMode() == MaximizeFull)
         {
