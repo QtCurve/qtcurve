@@ -9058,9 +9058,27 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    drawBevelGradientReal(window->palette().window().color(), &p,
-                          QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
-                          GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
+    static const int constPixmapWidth  = 16;
+    static const int constPixmapHeight = 256;
+    QString key;
+    QColor  col(window->palette().window().color());
+    QSize   scaledSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : window->rect().width(),
+                                 GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
+    QPixmap pix(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
+                      GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
+
+    key.sprintf("qtc-bgnd-%x", col.rgba());
+    if(!usePixmapCache || !QPixmapCache::find(key, pix))
+    {
+        QPainter pixPainter(&pix);
+
+        drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
+                              GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
+                            
+    }
+
+    p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
+                      scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
 }
 
 QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, double radius) const

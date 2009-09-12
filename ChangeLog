@@ -13,6 +13,8 @@
    appearance of KPackageKit.
 8. Workaround some issues with window style and compositing - where parts of the frame
    are not updated.
+9. Speed up background gradients by drawing into a 16*256 size pixmap, scaling        
+   this to the correct height, and then tiling the pixmap.
    
 0.68.0
 ------
