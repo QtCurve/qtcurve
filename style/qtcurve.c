@@ -5173,8 +5173,15 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        const gchar *detail, gint x, gint y, gint width, gint height)
 {
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+    GdkColor     *arrowColor=QTC_MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
+                                                                            ? PAL_DISABLED : PAL_ACTIVE]
+                                                                   [COLOR_BUTTON_TEXT]);
     //if(QTC_DO_EFFECT)
     //    x--;
+#ifdef QTC_DEBUG
+printf("Draw tab %d %d %s  ", state, shadow_type, detail ? detail : "NULL");
+debugDisplayWidget(widget, 5);
+#endif
 
     if(isActiveCombo(widget))
         x++, y++;
@@ -5184,16 +5191,17 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 : x+(width>>1);
 
     QTC_CAIRO_BEGIN
-//     if(opts.singleComboArrow)
-        drawArrow(cr, &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT], NULL,
-                  GTK_ARROW_DOWN, x, y+(height>>1), FALSE, TRUE);
-//     else
-//     {
-//         drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_UP, x,
-//                   y+(height>>1)-(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
-//         drawArrow(window, qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE], NULL, GTK_ARROW_DOWN, x,
-//                   y+(height>>1)+(LARGE_ARR_HEIGHT-1), FALSE, TRUE);
-//     }
+
+    if(opts.doubleGtkComboArrow)
+    {
+        int pad=opts.vArrows ? 0 : 1;
+        drawArrow(cr, arrowColor, area,  GTK_ARROW_UP,
+                  x, y+(height>>1)-(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+        drawArrow(cr, arrowColor, area,  GTK_ARROW_DOWN,
+                  x, y+(height>>1)+(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
+    }
+    else
+        drawArrow(cr, arrowColor, area,  GTK_ARROW_DOWN, x, y+(height>>1), FALSE, TRUE);
 
     QTC_CAIRO_END
 }

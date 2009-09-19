@@ -1,3 +1,10 @@
+0.68.2
+------
+1. Respect double arrow setting for non-editable combos on more Gtk2
+   combo types. (Affects combos in pidgin.)
+2. Colour arrows on mouse over of non-editable combos on more Gtk2
+   combo types. (Affects combos in pidgin.)
+
 0.68.1
 ------
 1. Fix reading of 'dark inverted gradient' setting.
