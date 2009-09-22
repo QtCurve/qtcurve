@@ -3,6 +3,8 @@
 1. Update versions XBar menu files - taken from Bespin r641
 2. Disable XBar support for KDevelop - as per Bespin.
 3. Classic style for QWizzard.
+4. Fix issues with Amarok nightly's splitters - where the horizontal
+   flag does not seem to be always set.
 
 0.68.1
 ------

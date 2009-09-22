@@ -4189,6 +4189,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         {
             const QColor *use(buttonColors(option));
             const QColor *border(borderColors(option, use));
+            // In Amarok nightly (2.2) State_Horizontal doesn't seem to always be set...
+            bool         horiz(state&State_Horizontal || (r.height()>6 && r.height()>r.width()));
 
             painter->save();
             if(/*IS_FLAT(opts.bgndAppearance) || */state&State_MouseOver && state&State_Enabled)
@@ -4211,12 +4213,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 //                     break;
                 default:
                 case LINE_DOTS:
-                    drawDots(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 1, border, 0, 5);
+                    drawDots(painter, r, horiz, NUM_SPLITTER_DASHES, 1, border, 0, 5);
                     break;
                 case LINE_FLAT:
                 case LINE_SUNKEN:
                 case LINE_DASHES:
-                    drawLines(painter, r, state&State_Horizontal, NUM_SPLITTER_DASHES, 3, border, 0, 3, opts.splitters);
+                    drawLines(painter, r, horiz, NUM_SPLITTER_DASHES, 3, border, 0, 3, opts.splitters);
             }
             painter->restore();
             break;
