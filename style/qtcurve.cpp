@@ -348,6 +348,7 @@ static enum
     APP_KMIX,
 #ifdef QTC_XBAR_SUPPORT
     APP_QTDESIGNER,
+    APP_KDEVELOP,
 #endif
     APP_OTHER
 } theThemedApp=APP_OTHER;
@@ -1091,6 +1092,8 @@ void QtCurveStyle::polish(QApplication *app)
 #ifdef QTC_XBAR_SUPPORT
         else if("Designer"==QCoreApplication::applicationName())
             theThemedApp=APP_QTDESIGNER;
+        else if("kdevelop"==appName)
+            theThemedApp=APP_KDEVELOP;
 #endif
 
     // Plasma does not like the 'Fix parentless dialogs' option...
@@ -1328,7 +1331,7 @@ void QtCurveStyle::polish(QWidget *widget)
     else if(qobject_cast<QMenuBar *>(widget))
     {
 #ifdef QTC_XBAR_SUPPORT
-        if (!((APP_QTDESIGNER==theThemedApp) && widget->inherits("QDesignerMenuBar")))
+        if (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar")))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 #endif
         if(!IS_FLAT(opts.bgndAppearance))

@@ -1,3 +1,8 @@
+0.68.2
+------
+1. Update versions XBar menu files - taken from Bespin r641
+2. Disable XBar support for KDevelop - as per Bespin.
+
 0.68.1
 ------
 1. Fix reading, and saving, of 'dark inverted gradient' setting.
