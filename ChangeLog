@@ -2,6 +2,7 @@
 ------
 1. Update versions XBar menu files - taken from Bespin r641
 2. Disable XBar support for KDevelop - as per Bespin.
+3. Classic style for QWizzard.
 
 0.68.1
 ------

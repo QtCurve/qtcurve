@@ -1132,7 +1132,7 @@ void QtCurveStyle::polish(QPalette &palette)
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
                      (newContrast || newButton || newMenu)),
          newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
-                                             itsComboBtnCols!=itsSortedLvColors) || 
+                                             itsComboBtnCols!=itsSortedLvColors) ||
                                              SHADE_DARKEN==opts.sortedLv) &&
                      (newContrast || (opts.lvButton ? newButton : newGray)));
 
@@ -2380,6 +2380,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
+        case SH_WizardStyle:
+            return QWizard::ClassicStyle;
         case SH_RubberBand_Mask:
         {
             const QStyleOptionRubberBand *opt = qstyleoption_cast<const QStyleOptionRubberBand *>(option);
