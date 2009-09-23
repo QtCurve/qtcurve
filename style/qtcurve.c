@@ -1229,8 +1229,8 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             }
             else
             {
-                double val=botTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
-                shade(&opts, base, &col, botTab ? QTC_MAX(val, 0.9) : val);
+                double val=botTab && opts.invertBotTab ? INVERT_SHADE(grad->stops[i].val) : grad->stops[i].val;
+                shade(&opts, base, &col, botTab && opts.invertBotTab ? QTC_MAX(val, 0.9) : val);
             }
 
             cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,

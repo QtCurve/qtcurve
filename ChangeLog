@@ -1,8 +1,10 @@
-0.68.2
+0.69.0
 ------
-1. Respect double arrow setting for non-editable combos on more Gtk2
+1. Add option to control whether bottom tabs should have their gradient
+   shades inverted.
+2. Respect double arrow setting for non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
-2. Colour arrows on mouse over of non-editable combos on more Gtk2
+3. Colour arrows on mouse over of non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
 
 0.68.1
