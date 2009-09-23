@@ -598,6 +598,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(roundAllTabs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderInactiveTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(invertBotTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(doubleGtkComboArrow, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(tabMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(tabMoChanged()));
     connect(stdSidebarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1554,6 +1555,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.roundAllTabs=roundAllTabs->isChecked();
     opts.borderTab=borderTab->isChecked();
     opts.borderInactiveTab=borderInactiveTab->isChecked();
+    opts.invertBotTab=invertBotTab->isChecked();
     opts.doubleGtkComboArrow=doubleGtkComboArrow->isChecked();
     opts.tabMouseOver=(ETabMo)tabMouseOver->currentIndex();
     opts.stdSidebarButtons=stdSidebarButtons->isChecked();
@@ -1718,9 +1720,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     roundAllTabs_false->setChecked(!opts.roundAllTabs);
     borderTab->setChecked(opts.borderTab);
     borderInactiveTab->setChecked(opts.borderInactiveTab);
+    invertBotTab->setChecked(opts.invertBotTab);
     doubleGtkComboArrow->setChecked(opts.doubleGtkComboArrow);
     borderTab_false->setChecked(!opts.borderTab);
     borderInactiveTab_false->setChecked(!opts.borderInactiveTab);
+    invertBotTab_false->setChecked(!opts.invertBotTab);
     tabMouseOver->setCurrentIndex(opts.tabMouseOver);
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     borderMenuitems->setChecked(opts.borderMenuitems);
@@ -1872,6 +1876,7 @@ bool QtCurveConfig::settingsChanged()
          roundAllTabs->isChecked()!=currentStyle.roundAllTabs ||
          borderTab->isChecked()!=currentStyle.borderTab ||
          borderInactiveTab->isChecked()!=currentStyle.borderInactiveTab ||
+         invertBotTab->isChecked()!=currentStyle.invertBotTab ||
          doubleGtkComboArrow->isChecked()!=currentStyle.doubleGtkComboArrow ||
          tabMouseOver->currentIndex()!=currentStyle.tabMouseOver ||
          stdSidebarButtons->isChecked()!=currentStyle.stdSidebarButtons ||

@@ -8640,7 +8640,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
                 col.setAlphaF(0.0);
         }
         else
-            shade(base, &col, botTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
+            shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     //p->fillRect(r, base);

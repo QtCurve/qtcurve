@@ -1060,6 +1060,45 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_67">
+         <property name="text">
+          <string>Shade of bottom tabs:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="QFrame" name="frame_6">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="invertBotTab_false">
+            <property name="text">
+             <string>Same as per top tabs</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="invertBotTab">
+            <property name="text">
+             <string>Invert</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_9">
@@ -2337,6 +2376,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>borderTab</tabstop>
   <tabstop>borderInactiveTab_false</tabstop>
   <tabstop>borderInactiveTab</tabstop>
+  <tabstop>invertBotTab_false</tabstop>
+  <tabstop>invertBotTab</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck_false</tabstop>

@@ -847,7 +847,8 @@ typedef struct
                      stdBtnSizes,
 #endif
                      forceAlternateLvCols,
-                     squareLvSelection;
+                     squareLvSelection,
+                     invertBotTab;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
