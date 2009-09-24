@@ -1261,6 +1261,8 @@ void QtCurveStyle::polish(QWidget *widget)
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::NoRole);
     }
+    else if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+        widget->installEventFilter(this);
 
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
@@ -1664,6 +1666,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::Window);
     }
+    else if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+        widget->removeEventFilter(this);
 
     if(qobject_cast<QPushButton *>(widget) ||
        qobject_cast<QComboBox *>(widget) ||
@@ -1913,6 +1917,19 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         if(widget && widget->isWindow() && widget->isVisible() &&
            widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
             drawWindowBackground(widget);
+    }
+
+    if(opts.menubarHiding && QEvent::ShortcutOverride==event->type() && qobject_cast<QMainWindow *>(object))
+    {
+        QMainWindow *window=static_cast<QMainWindow *>(object);
+
+        if(window->isVisible() && window->menuBar())
+        {
+            QKeyEvent *k=static_cast<QKeyEvent *>(event);
+
+            if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
+                window->menuBar()->setHidden(window->menuBar()->isVisible());
+        }
     }
 
     switch(event->type())

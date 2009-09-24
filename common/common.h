@@ -848,7 +848,8 @@ typedef struct
 #endif
                      forceAlternateLvCols,
                      squareLvSelection,
-                     invertBotTab;
+                     invertBotTab,
+                     menubarHiding;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;

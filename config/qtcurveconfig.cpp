@@ -580,6 +580,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(fillSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(menubarHiding, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1537,6 +1538,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.fillSlider=fillSlider->isChecked();
     opts.sliderStyle=(ESliderStyle)sliderStyle->currentIndex();
     opts.roundMbTopOnly=roundMbTopOnly->isChecked();
+    opts.menubarHiding=menubarHiding->isChecked();
     opts.fillProgress=fillProgress->isChecked();
     opts.darkerBorders=darkerBorders->isChecked();
     opts.comboSplitter=comboSplitter->isChecked();
@@ -1700,6 +1702,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     fillSlider->setChecked(opts.fillSlider);
     sliderStyle->setCurrentIndex(opts.sliderStyle);
     roundMbTopOnly->setChecked(opts.roundMbTopOnly);
+    menubarHiding->setChecked(opts.menubarHiding);
     fillProgress->setChecked(opts.fillProgress);
     darkerBorders->setChecked(opts.darkerBorders);
     comboSplitter->setChecked(opts.comboSplitter);
@@ -1860,6 +1863,7 @@ bool QtCurveConfig::settingsChanged()
          fillSlider->isChecked()!=currentStyle.fillSlider ||
          sliderStyle->currentIndex()!=currentStyle.sliderStyle ||
          roundMbTopOnly->isChecked()!=currentStyle.roundMbTopOnly ||
+         menubarHiding->isChecked()!=currentStyle.menubarHiding ||
          fillProgress->isChecked()!=currentStyle.fillProgress ||
          darkerBorders->isChecked()!=currentStyle.darkerBorders ||
          comboSplitter->isChecked()!=currentStyle.comboSplitter ||
