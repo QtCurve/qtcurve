@@ -2,9 +2,10 @@
 ------
 1. Add option to control whether bottom tabs should have their gradient
    shades inverted.
-2. Respect double arrow setting for non-editable combos on more Gtk2
+2. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
+3. Respect double arrow setting for non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
-3. Colour arrows on mouse over of non-editable combos on more Gtk2
+4. Colour arrows on mouse over of non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
 
 0.68.1
