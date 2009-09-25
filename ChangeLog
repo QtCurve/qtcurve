@@ -4,7 +4,7 @@
    shades inverted.
 2. Config files now stored under $XDG_CONFIG_HOME/qtcurve (e.g. ~/.config/qtcurve)
 2. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
-3. Update versions XBar menu files - taken from Bespin r641
+3. Update versions XBar menu files - taken from Bespin r652
 4. Disable XBar support for KDevelop - as per Bespin.
 5. Classic style for QWizzard.
 6. Fix issues with Amarok nightly's splitters - where the horizontal
