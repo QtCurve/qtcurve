@@ -1098,7 +1098,7 @@ void QtCurveStyle::polish(QApplication *app)
 #endif
 
     if(opts.menubarHiding)
-        itsSaveMenuBarStatus="kcalc"==appName;
+        itsSaveMenuBarStatus="kcalc"==appName || "amarok"==appName;
 
     // Plasma does not like the 'Fix parentless dialogs' option...
     if(APP_PLASMA==theThemedApp && opts.fixParentlessDialogs)
