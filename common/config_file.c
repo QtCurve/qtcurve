@@ -33,7 +33,8 @@
 
 #define QTC_MAX_FILENAME_LEN   1024
 #define QTC_MAX_INPUT_LINE_LEN 256
-#define QTC_FILE               "qtcurvestylerc"
+#define QTC_FILE               "stylerc"
+#define QTC_OLD_FILE           "qtcurvestylerc"
 #define QTC_VERSION_KEY        "version"
 
 #ifdef CONFIG_READ
@@ -449,7 +450,7 @@ static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 
 #endif
 
-#ifdef CONFIG_WRITE
+#ifdef __cplusplus
 #include <kstandarddirs.h>
 #endif
 
@@ -478,11 +479,11 @@ static const char * getHome()
     return home;
 }
 
-static const char *xdgConfigFolder()
+static const char *qtcConfDir()
 {
-    static char xdgDir[QTC_MAX_FILENAME_LEN]={'\0'};
+    static char *cfgDir=NULL;
 
-    if(!xdgDir[0])
+    if(!cfgDir)
     {
         static const char *home=NULL;
 
@@ -520,29 +521,91 @@ static const char *xdgConfigFolder()
             if(!home)
                 home=getHome();
 
-            sprintf(xdgDir, "%s/.config", home);
+            cfgDir=(char *)malloc(strlen(home)+18);
+            sprintf(cfgDir, "%s/.config/qtcurve/", home);
         }
         else
-            strcpy(xdgDir, env);
+        {
+            cfgDir=(char *)malloc(strlen(env)+10);
+            sprintf(cfgDir, "%s/qtcurve/", env);
+        }
 
-#if defined CONFIG_WRITE || !defined __cplusplus
+//#if defined CONFIG_WRITE || !defined __cplusplus
         {
         struct stat info;
 
-        if(0!=lstat(xdgDir, &info))
+        if(0!=lstat(cfgDir, &info))
         {
 #ifdef __cplusplus
-            KStandardDirs::makeDir(xdgDir, 0755);
+            KStandardDirs::makeDir(cfgDir, 0755);
 #else
-            g_mkdir_with_parents(xdgDir, 0755);
+            g_mkdir_with_parents(cfgDir, 0755);
 #endif
         }
         }
-#endif
+//#endif
     }
 
-    return xdgDir;
+    return cfgDir;
 }
+
+#if !defined QT_VERSION || QT_VERSION >= 0x040000
+
+#define QTC_MENU_FILE_PREFIX "menubar-"
+
+#ifdef __cplusplus
+static bool qtcMenuBarHidden(const QString &app)
+{
+    return QFile::exists(QFile::decodeName(qtcConfDir())+QTC_MENU_FILE_PREFIX+app);
+}
+
+static void qtcSetMenuBarHidden(const QString &app, bool hidden)
+{
+    if(!hidden)
+        QFile::remove(QFile::decodeName(qtcConfDir())+QTC_MENU_FILE_PREFIX+app);
+    else
+        QFile(QFile::decodeName(qtcConfDir())+QTC_MENU_FILE_PREFIX+app).open(QIODevice::WriteOnly);
+}
+#else
+static bool qtcFileExists(const char *name)
+{
+    struct stat info;
+
+    return 0==lstat(name, &info) && S_ISREG(info.st_mode);
+}
+
+static char * qtcGetMenuBarFileName(const char *app)
+{
+    char *filename=NULL;
+
+    if(!filename)
+    {
+        filename=(char *)malloc(strlen(qtcConfDir())+strlen(QTC_MENU_FILE_PREFIX)+strlen(app)+1);
+        sprintf(filename, "%s"QTC_MENU_FILE_PREFIX"%s", qtcConfDir(), app);
+    }
+
+    return filename;
+}
+
+static bool qtcMenuBarHidden(const char *app)
+{
+    return qtcFileExists(qtcGetMenuBarFileName(app));
+}
+
+static void qtcSetMenuBarHidden(const char *app, bool hidden)
+{
+    if(!hidden)
+        unlink(qtcGetMenuBarFileName(app));
+    else
+    {
+        FILE *f=fopen(qtcGetMenuBarFileName(app), "w");
+
+        if(f)
+            fclose(f);
+    }
+}
+#endif
+#endif
 
 #ifdef CONFIG_READ
 
@@ -899,27 +962,33 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #ifdef __cplusplus
     if(file.isEmpty())
     {
-        const char *xdg=xdgConfigFolder();
+        const char *cfgDir=qtcConfDir();
 
-        if(xdg)
+        if(cfgDir)
         {
-            QString filename(xdg);
+            QString filename(QFile::decodeName(cfgDir)+QTC_FILE);
 
-            filename+="/"QTC_FILE;
+            if(!QFile::exists(filename))
+                filename=QFile::decodeName(cfgDir)+"../"QTC_OLD_FILE;
             return readConfig(filename, opts, defOpts);
         }
     }
 #else
     if(!file)
     {
-        const char *xdg=xdgConfigFolder();
+        const char *cfgDir=qtcConfDir();
 
-        if(xdg)
+        if(cfgDir)
         {
-            char filename[QTC_MAX_FILENAME_LEN];
+            char *filename=(char *)malloc(strlen(cfgDir)+strlen(QTC_OLD_FILE)+4);
+            bool rv=false;
 
-            sprintf(filename, "%s/"QTC_FILE, xdg);
-            return readConfig(filename, opts, defOpts);
+            sprintf(filename, "%s"QTC_FILE, cfgDir);
+            if(!qtcFileExists(filename))
+                sprintf(filename, "%s../"QTC_OLD_FILE, cfgDir);
+            rv=readConfig(filename, opts, defOpts);
+            free(filename);
+            return rv;
         }
     }
 #endif
@@ -2229,18 +2298,14 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 {
     if(!cfg)
     {
-        const char *xdg=xdgConfigFolder();
+        const char *cfgDir=qtcConfDir();
 
-        if(xdg)
+        if(cfgDir)
         {
-            char filename[QTC_MAX_FILENAME_LEN];
-
-            sprintf(filename, "%s/"QTC_FILE, xdg);
-
 #if QT_VERSION >= 0x040000
-            KConfig defCfg(filename, KConfig::SimpleConfig);
+            KConfig defCfg(QFile::decodeName(cfgDir)+QTC_FILE, KConfig::SimpleConfig);
 #else
-            KConfig defCfg(filename, false, false);
+            KConfig defCfg(QFile::decodeName(cfgDir)+QTC_FILE, false, false);
 #endif
 
             return writeConfig(&defCfg, opts, def, exportingStyle);

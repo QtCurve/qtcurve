@@ -794,6 +794,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
               itsDefBtnCols(0L),
               itsComboBtnCols(0L),
               itsSortedLvColors(0L),
+              itsSaveMenuBarStatus(false),
               itsSidebarButtonsCols(0L),
               itsActiveMdiColors(0L),
               itsMdiColors(0L),
@@ -1096,6 +1097,9 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KDEVELOP;
 #endif
 
+    if(opts.menubarHiding)
+        itsSaveMenuBarStatus="kcalc"==appName;
+
     // Plasma does not like the 'Fix parentless dialogs' option...
     if(APP_PLASMA==theThemedApp && opts.fixParentlessDialogs)
         opts.fixParentlessDialogs=false;
@@ -1261,8 +1265,13 @@ void QtCurveStyle::polish(QWidget *widget)
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::NoRole);
     }
-    else if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+
+    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+    {
         widget->installEventFilter(this);
+        if(itsSaveMenuBarStatus && qtcMenuBarHidden(QCoreApplication::applicationName()))
+            static_cast<QMainWindow *>(widget)->menuBar()->setHidden(true);
+    }
 
     // Enable hover effects in all itemviews
     if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>(widget))
@@ -1666,7 +1675,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::Window);
     }
-    else if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+
+    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
         widget->removeEventFilter(this);
 
     if(qobject_cast<QPushButton *>(widget) ||
@@ -1928,7 +1938,12 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             QKeyEvent *k=static_cast<QKeyEvent *>(event);
 
             if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
+            {
                 window->menuBar()->setHidden(window->menuBar()->isVisible());
+                if(itsSaveMenuBarStatus)
+                    qtcSetMenuBarHidden(QCoreApplication::applicationName(),
+                                        window->menuBar()->isHidden());
+            }
         }
     }
 
