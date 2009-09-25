@@ -323,6 +323,8 @@ MacMenu::popDown(qlonglong key)
             continue;
         disconnect (pop, SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
         pop->hide();
+//         menu->activateWindow();
+        break;
     }
 }
 
@@ -349,14 +351,34 @@ MacMenu::hover(qlonglong key, int idx,  int x, int y)
     }
 }
 
+static QMenuBar *bar4menu(QMenu *menu)
+{
+    if (!menu->menuAction())
+        return 0;
+    if (menu->menuAction()->associatedWidgets().isEmpty())
+        return 0;
+    foreach (QWidget *w, menu->menuAction()->associatedWidgets())
+        if (qobject_cast<QMenuBar*>(w))
+            return static_cast<QMenuBar *>(w);
+    return 0;
+}
+
 void
 MacMenu::menuClosed()
 {
-    if (!sender()) return;
+    QObject * _sender = sender();
+    
+    if (!_sender)
+        return;
+
     disconnect (sender(), SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
     if (!inHover)
     {
         xbar->call(QDBus::NoBlock, "setOpenPopup", -500);
+
+        if (QMenu *menu = qobject_cast<QMenu*>(_sender))
+        if (QMenuBar *bar = bar4menu(menu))
+            bar->setActiveWindow();
     }
 }
 
