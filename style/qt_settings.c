@@ -167,7 +167,8 @@ struct QtData
                     inactiveSelectCol;*/
     char            *fonts[FONT_NUM_TOTAL],
                     *icons,
-                    *styleName;
+                    *styleName,
+                    *appName;
     GtkToolbarStyle toolbarStyle;
     struct QtIcons  iconSizes;
     gboolean        buttonIcons,
@@ -1896,10 +1897,10 @@ static void qtcAddEventFilter() /* GdkWindow *widget) */
 
 #endif
 
-static void getGtk2CfgFile(char **tmpStr, const char *xdg, const char *f)
+static void getGtk2CfgFile(char **tmpStr, const char *f)
 {
-    *tmpStr=(char *)realloc(*tmpStr, strlen(xdg)+1+strlen(f)+1);
-    sprintf(*tmpStr, "%s/%s", xdg, f);
+    *tmpStr=(char *)realloc(*tmpStr, strlen(qtcConfDir())+strlen(f)+1);
+    sprintf(*tmpStr, "%s%s", qtcConfDir(), f);
 }
 
 static gboolean checkFileVersion(const char *fname, const char *versionStr, int versionStrLen)
@@ -1961,12 +1962,10 @@ static gboolean qtInit()
 
         if(abs(now-lastRead)>1)
         {
-            char        *app=NULL,
-                        *path=NULL,
+            char        *path=NULL,
                         *tmpStr=NULL,
                         *rcFile=NULL;
             GtkSettings *settings=NULL;
-            const char  *xdg=xdgConfigFolder();
 
             qtSettings.icons=NULL;
             memset(qtSettings.fonts, 0, sizeof(char *)*FONT_NUM_TOTAL);
@@ -1981,6 +1980,7 @@ static gboolean qtInit()
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=setGdkColor(0xFF, 0xFF, 192);
             qtSettings.styleName=NULL;
             qtSettings.inactiveChangeSelectionColor=FALSE;
+            qtSettings.appName=NULL;
 
             lastRead=now;
 
@@ -2054,14 +2054,14 @@ static gboolean qtInit()
 */
 
             /* Check if we're firefox... */
-            if((app=getAppName()))
+            if((qtSettings.appName=getAppName()))
             {
-                gboolean firefox=isMozApp(app, "firefox") || isMozApp(app, "iceweasel") ||
-                                 isMozApp(app, "swiftfox") || isMozApp(app, "xulrunner") ||
-                                 isMozApp(app, "abrowser"),
-                         thunderbird=!firefox && isMozApp(app, "thunderbird"),
-                         mozThunderbird=!thunderbird && !firefox && isMozApp(app, "mozilla-thunderbird"),
-                         seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(app, "seamonkey");
+                gboolean firefox=isMozApp(qtSettings.appName, "firefox") || isMozApp(qtSettings.appName, "iceweasel") ||
+                                 isMozApp(qtSettings.appName, "swiftfox") || isMozApp(qtSettings.appName, "xulrunner") ||
+                                 isMozApp(qtSettings.appName, "abrowser"),
+                         thunderbird=!firefox && isMozApp(qtSettings.appName, "thunderbird"),
+                         mozThunderbird=!thunderbird && !firefox && isMozApp(qtSettings.appName, "mozilla-thunderbird"),
+                         seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(qtSettings.appName, "seamonkey");
 
 #ifdef QTC_FIX_FIREFOX_LOCATION_BAR
                 qtSettings.isBrowser=firefox;
@@ -2080,7 +2080,7 @@ static gboolean qtInit()
                     if(firefox)
                     {
                         processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
-                        if(mozVersion>=QTC_MAKE_VERSION(3, 5) && 0==strcmp(app, "firefox-3.5"))
+                        if(mozVersion>=QTC_MAKE_VERSION(3, 5) && 0==strcmp(qtSettings.appName, "firefox-3.5"))
                             processMozillaApp(FALSE, add_menu_colors, "firefox-3.5", TRUE);
                     }
                     else if(thunderbird)
@@ -2100,23 +2100,23 @@ static gboolean qtInit()
                        (thunderbird || mozThunderbird || (seamonkey && mozVersion<QTC_MAKE_VERSION(2, 0))))
                         opts.menuitemAppearance=APPEARANCE_GRADIENT;
                 }
-                else if(0==strcmp(app, "soffice.bin"))
+                else if(0==strcmp(qtSettings.appName, "soffice.bin"))
                     qtSettings.app=GTK_APP_OPEN_OFFICE;
-                else if(0==strcmp(app, "vmplayer"))
+                else if(0==strcmp(qtSettings.appName, "vmplayer"))
                     qtSettings.app=GTK_APP_VMPLAYER;
-                else if(0==strcmp(app, GIMP_PLUGIN))
+                else if(0==strcmp(qtSettings.appName, GIMP_PLUGIN))
                     qtSettings.app=GTK_APP_GIMP_PLUGIN;
-                else if(app==strstr(app, "gimp"))
+                else if(qtSettings.appName==strstr(qtSettings.appName, "gimp"))
                     qtSettings.app=GTK_APP_GIMP;
-                else if(0==strcmp(app, "java"))
+                else if(0==strcmp(qtSettings.appName, "java"))
                     qtSettings.app=GTK_APP_JAVA;
-                else if(0==strcmp(app, "evolution"))
+                else if(0==strcmp(qtSettings.appName, "evolution"))
                     qtSettings.app=GTK_APP_EVOLUTION;
-                else if(0==strcmp(app, "inkscape"))
+                else if(0==strcmp(qtSettings.appName, "inkscape"))
                     qtSettings.app=GTK_APP_INKSCAPE;
-                /*else if(0==strcmp(app, "eclipse"))
+                /*else if(0==strcmp(qtSettings.appName, "eclipse"))
                     qtSettings.app=GTK_APP_JAVA_SWT;*/
-                /*else if(app==strstr(app, "gaim"))
+                /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }
 
@@ -2230,7 +2230,7 @@ static gboolean qtInit()
                 int  versionLen=1+strlen(VERSION)+1+strlen(iconTheme)+1+2+(6*2)+1;  /* '#' VERSION ' '<kde version> <..nums above..>\0 */
                 char *version=(char *)malloc(versionLen);
 
-                getGtk2CfgFile(&tmpStr, xdg, "qtcurve.gtk-icons");
+                getGtk2CfgFile(&tmpStr, "gtk-icons");
                 sprintf(version, "#%s %s %02X%02X%02X%02X%02X%02X%02X",
                                  VERSION,
                                  iconTheme,

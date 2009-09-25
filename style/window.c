@@ -73,10 +73,13 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
         GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
 
         if(menuBar)
+        {
+            qtcSetMenuBarHidden(qtSettings.appName, GTK_WIDGET_VISIBLE(menuBar));
             if(GTK_WIDGET_VISIBLE(menuBar))
                 gtk_widget_hide(menuBar);
             else
                 gtk_widget_show(menuBar);
+        }
     }
     return FALSE;
 }

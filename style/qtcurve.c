@@ -2364,7 +2364,16 @@ debugDisplayWidget(widget, 3);
 
     if (opts.menubarHiding && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) && !isGimpDockable(widget) &&
        (!widget->name || strcmp(widget->name, "gtk-tooltip")))
+    {
         qtcWindowSetup(widget);
+        if(qtcMenuBarHidden(qtSettings.appName))
+        {
+            GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
+
+            if(menuBar)
+                gtk_widget_hide(menuBar);
+        }
+    }
 
     if(!IS_FLAT(opts.bgndAppearance) && widget && GTK_IS_WINDOW(widget) &&
        drawBgndGradient(cr, style, area, widget, x, y, width, height))
