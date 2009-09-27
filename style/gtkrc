@@ -254,3 +254,12 @@ class "*SeparatorMenuItem" style "qtcurve-separator"
 widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-separator"
 widget_class "*.GeditNotebook.GtkHBox.GtkButton" style "qtcurve-tabbutton"
 widget_class "*MenuBar*MenuItem" style "qtcurve-menubaritem"
+
+# Seems to fix issues with pidgin where some buttons have icons, and others not.
+style "qtcurve-box" = "qtcurve-default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+widget_class "*.*Box.*" style "qtcurve-box"
