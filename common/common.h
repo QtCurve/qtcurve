@@ -494,7 +494,7 @@ typedef enum
         APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
         APPEARANCE_AGUA_MOD,
         APPEARANCE_LV_AGUA,
-    QTC_NUM_STD_APP = APPEARANCE_LV_AGUA-QTC_NUM_CUSTOM_GRAD
+    QTC_NUM_STD_APP = (APPEARANCE_LV_AGUA-QTC_NUM_CUSTOM_GRAD)+1
 } EAppearance;
 
 #define IS_SLIDER(W)        (WIDGET_SLIDER==(W) || WIDGET_SB_SLIDER==(W))
@@ -1404,26 +1404,25 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 
     if(!init)
     {
-        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_RAISED], GB_3D_FULL,2,0.0,1.0,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_RAISED], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
-        setupGradient(&stdGradients[APPEARANCE_AGUA-APPEARANCE_RAISED], GB_NONE, 2,0.0,0.6,1.0,1.1);
-        setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.04,1.0,0.98);
-        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.1,1.0,0.94);
-        setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_RAISED], GB_3D,2,0.0,1.3,1.0,0.925);
-        setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_RAISED], GB_3D,2,0.0,0.93,1.0,1.04);
-        setupGradient(&stdGradients[APPEARANCE_DARK_INVERTED-APPEARANCE_RAISED], GB_NONE,3,0.0,0.8,0.7,0.95,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_RAISED], GB_3D,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
-        setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_RAISED], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
-        setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_RAISED], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
-        setupGradient(&stdGradients[APPEARANCE_AGUA_MOD-APPEARANCE_RAISED], GB_NONE,3,0.0,1.5,0.49,0.85,1.0,1.3);
-        setupGradient(&stdGradients[APPEARANCE_LV_AGUA-APPEARANCE_RAISED], GB_NONE,4,0.0,0.98,0.35,0.95,0.4,0.93,1.0,1.15);
+        setupGradient(&stdGradients[APPEARANCE_FLAT-APPEARANCE_FLAT], GB_3D,2,0.0,1.0,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_FLAT], GB_3D_FULL,2,0.0,1.0,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_FLAT], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_FLAT], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
+        setupGradient(&stdGradients[APPEARANCE_AGUA-APPEARANCE_FLAT], GB_NONE, 2,0.0,0.6,1.0,1.1);
+        setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.04,1.0,0.98);
+        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.1,1.0,0.94);
+        setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.3,1.0,0.925);
+        setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_FLAT], GB_3D,2,0.0,0.93,1.0,1.04);
+        setupGradient(&stdGradients[APPEARANCE_DARK_INVERTED-APPEARANCE_FLAT], GB_NONE,3,0.0,0.8,0.7,0.95,1.0,1.0);
+        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_FLAT], GB_3D,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
+        setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_FLAT], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
+        setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_FLAT], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
+        setupGradient(&stdGradients[APPEARANCE_AGUA_MOD-APPEARANCE_FLAT], GB_NONE,3,0.0,1.5,0.49,0.85,1.0,1.3);
+        setupGradient(&stdGradients[APPEARANCE_LV_AGUA-APPEARANCE_FLAT], GB_NONE,4,0.0,0.98,0.35,0.95,0.4,0.93,1.0,1.15);
         init=true;
     }
 
-    if(APPEARANCE_FLAT==app)
-        app=APPEARANCE_RAISED;
-    return &stdGradients[app-APPEARANCE_RAISED];
+    return &stdGradients[app-APPEARANCE_FLAT];
     }
 
     return 0L; /* Will never happen! */
