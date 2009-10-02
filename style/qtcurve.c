@@ -1381,7 +1381,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                    heighti=height-2;
 
             if((GTK_STATE_INSENSITIVE!=state || BORDER_SUNKEN==borderProfile) &&
-               (BORDER_RAISED==borderProfile || APPEARANCE_FLAT!=app))
+               (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || APPEARANCE_FLAT!=app))
             {
                 GdkColor *col=col=&colors[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile
                                             ? 0 : QT_FRAME_DARK_SHADOW];
