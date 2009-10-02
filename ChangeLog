@@ -10,6 +10,7 @@
 7. Classic style for QWizzard.
 8. Fix issues with Amarok nightly's splitters - where the horizontal
    flag does not seem to be always set.
+9. Fix size of plastik-style mouse over on sliders.
 
 0.68.1
 ------
