@@ -9300,7 +9300,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                topPath, botPath);
 
                 p->setPen((enabled || BORDER_SUNKEN==borderProfile) &&
-                          (BORDER_RAISED==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
+                          (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
                                 ? tl
                                 : option->palette.background().color());
                 p->drawPath(topPath);
