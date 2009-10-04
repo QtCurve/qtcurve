@@ -12,6 +12,7 @@
  9. Fix issues with Amarok nightly's splitters - where the horizontal
     flag does not seem to be always set.
 10. Fix size of plastik-style mouse over on sliders.
+11. Fix issues with left-hand side of editable combos with icons when round<=full
 
 0.68.1
 ------

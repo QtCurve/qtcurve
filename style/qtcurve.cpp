@@ -7863,7 +7863,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                             r.adjust(1, 1, -1, -1);
                         if(ed)
                         {
-                            int pad=opts.round>ROUND_FULL ? 2 : 0;
+                            int pad=/*opts.round>ROUND_FULL ? */2/* : 0*/;
                             r.adjust(-2+pad, -2, 2-pad, 2);
                         }
                         break;
