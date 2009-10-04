@@ -13,6 +13,7 @@
     flag does not seem to be always set.
 10. Fix size of plastik-style mouse over on sliders.
 11. Fix issues with left-hand side of editable combos with icons when round<=full
+12. Fix compile on OSX - remove unused #include <QX11Info>
 
 0.68.1
 ------

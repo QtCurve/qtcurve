@@ -22,7 +22,6 @@ static bool usePixmapCache=true;
 
 #include <QtGui>
 #include <QtDBus/QtDBus>
-#include <QX11Info>
 #define QTC_COMMON_FUNCTIONS
 #include "qtcurve.h"
 #include "pixmaps.h"
