@@ -9298,8 +9298,8 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 buildSplitPath(inner, w, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL),
                                topPath, botPath);
 
-                p->setPen((enabled || BORDER_SUNKEN==borderProfile) &&
-                          (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)
+                p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
+                          (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
                                 ? tl
                                 : option->palette.background().color());
                 p->drawPath(topPath);
@@ -9308,7 +9308,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                 ? option->palette.background().color()
                                 : WIDGET_ENTRY==w && !hasFocus
                                     ? option->palette.base().color()
-                                    : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || APPEARANCE_FLAT!=app ||
+                                    : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
                                       WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
                                         ? br
                                         : option->palette.background().color());
