@@ -3,18 +3,16 @@
  1. Add option to control whether bottom tabs should have their gradient
     shades inverted.
  2. Config files now stored under $XDG_CONFIG_HOME/qtcurve (e.g. ~/.config/qtcurve)
- 3. Fix usage of 'flat' appearance.
- 4. Fix light tab border when appearance set to flat.
- 5. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
- 6. Fix mouse-over/focus of entry fields when appearance set to flat.
- 7. Update versions of XBar menu files - taken from Bespin r652
- 8. Disable XBar support for KDevelop - as per Bespin.
- 9. Classic style for QWizzard.
-10. Fix issues with Amarok nightly's splitters - where the horizontal
+ 3. Fix some issue with 'flat' appearance.
+ 4. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
+ 5. Update versions of XBar menu files - taken from Bespin r652
+ 6. Disable XBar support for KDevelop - as per Bespin.
+ 7. Classic style for QWizzard.
+ 8. Fix issues with Amarok nightly's splitters - where the horizontal
     flag does not seem to be always set.
-11. Fix size of plastik-style mouse over on sliders.
-12. Fix issues with left-hand side of editable combos with icons when round<=full
-13. Fix compile on OSX - remove unused #include <QX11Info>
+ 9. Fix size of plastik-style mouse over on sliders.
+10. Fix issues with left-hand side of editable combos with icons when round<=full
+11. Fix compile on OSX - remove unused #include <QX11Info>
 
 0.68.1
 ------
