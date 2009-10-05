@@ -6,7 +6,7 @@
  3. Fix usage of 'flat' appearance.
  4. Fix light tab border when appearance set to flat.
  5. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
- 6. Update versions XBar menu files - taken from Bespin r652
+ 6. Update versions of XBar menu files - taken from Bespin r652
  7. Disable XBar support for KDevelop - as per Bespin.
  8. Classic style for QWizzard.
  9. Fix issues with Amarok nightly's splitters - where the horizontal
