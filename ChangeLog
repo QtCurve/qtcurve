@@ -5,12 +5,13 @@
 2. Config files now stored under $XDG_CONFIG_HOME/qtcurve (e.g. ~/.config/qtcurve)
 3. Fix usage of 'flat' appearance.
 4. Fix light tab border when appearance set to flat.
-5. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
-6. Respect double arrow setting for non-editable combos on more Gtk2
+5. Fix mouse-over/focus of entry fields when appearance set to flat.
+6. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
+7. Respect double arrow setting for non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
-7. Colour arrows on mouse over of non-editable combos on more Gtk2
+8. Colour arrows on mouse over of non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
-8. Fix disabled editable combos.
+9. Fix disabled editable combos.
 
 0.68.1
 ------

@@ -1380,15 +1380,16 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
             int    widthi=width-2,
                    heighti=height-2;
 
-            if((GTK_STATE_INSENSITIVE!=state || BORDER_SUNKEN==borderProfile) &&
-               (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || APPEARANCE_FLAT!=app))
+            if((GTK_STATE_INSENSITIVE!=state || BORDER_SUNKEN==borderProfile) /*&&
+               (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || APPEARANCE_FLAT!=app)*/)
             {
-                GdkColor *col=col=&colors[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile
+                GdkColor *col=&colors[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile
                                             ? 0 : QT_FRAME_DARK_SHADOW];
                 if(flags&DF_BLEND)
                     cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
                 else
                     cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+                
             }
             else
                 cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
@@ -1402,10 +1403,10 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                         cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->bg[state]));
                     else if(WIDGET_ENTRY==widget && !hasFocus)
                         cairo_set_source_rgb(cr, QTC_CAIRO_COL(style->base[state]));
-                    else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || APPEARANCE_FLAT!=app ||
+                    else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || /*APPEARANCE_FLAT!=app ||*/
                                                             WIDGET_TAB_TOP==widget || WIDGET_TAB_BOT==widget))
                     {
-                        GdkColor *col=col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
+                        GdkColor *col=&colors[BORDER_RAISED==borderProfile ? QT_FRAME_DARK_SHADOW : 0];
                         if(flags&DF_BLEND)
                             cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), BORDER_SUNKEN==borderProfile ? 0.0 : alpha);
                         else
