@@ -378,7 +378,7 @@ MacMenu::menuClosed()
 
         if (QMenu *menu = qobject_cast<QMenu*>(_sender))
         if (QMenuBar *bar = bar4menu(menu))
-            bar->setActiveWindow();
+            bar->activateWindow(); // CDP: QtCurve fix 'setActiveWindow' is in Qt3Support! ORIG: bar->setActiveWindow();
     }
 }
 
