@@ -3226,11 +3226,16 @@ debugDisplayWidget(widget, 3);
                     // determine the button associated with it. So, we store the mapping here...
                     if(!mozToolbar && widget->parent && GTK_IS_COMBO_BOX_ENTRY(widget->parent))
                         qtcWidgetMapSetup(widget->parent, widget, 0);
+                    // If the button is disabled, but the entry field is not - then use entry field's state
+                    // for the button. This fixes an issue with LinuxDC++ and Gtk 2.18
+                    if(GTK_STATE_INSENSITIVE==state && entry && GTK_STATE_INSENSITIVE!=entry->state)
+                        state=entry->state;
                     drawEntryField(cr, style, state, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                    WIDGET_COMBO_BUTTON);
                     // Get entry to redraw by setting its state...
                     // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
-                    if(!mozToolbar && widget && entry && entry->state!=widget->state && GTK_STATE_INSENSITIVE!=entry->state)
+                    if(!mozToolbar && widget && entry && entry->state!=widget->state && GTK_STATE_INSENSITIVE!=entry->state &&
+                       GTK_STATE_INSENSITIVE!=state)
                         gtk_widget_set_state(entry, state);
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)

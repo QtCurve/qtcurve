@@ -10,6 +10,7 @@
    combo types. (Affects combos in pidgin.)
 7. Colour arrows on mouse over of non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
+8. Fix disabled editable combos.
 
 0.68.1
 ------
