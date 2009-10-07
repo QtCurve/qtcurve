@@ -18,6 +18,7 @@
 10. Fix issues with left-hand side of editable combos with icons when round<=full
 11. Fix compile on OSX - remove unused #include <QX11Info>
 12. Fix Arora's new style gradiented location bar.
+13. Fix gap between combo button and edit field when round < max.
 
 0.68.1
 ------

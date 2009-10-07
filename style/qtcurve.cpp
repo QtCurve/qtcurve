@@ -7376,7 +7376,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         // 2 for frame width
                         if(!opts.unifyCombo)
                         {
-                            int pad=opts.round>ROUND_FULL ? 2 : 0;
+                            int pad=/*opts.round>ROUND_FULL ? */2/* : 0*/;
 
                             field.adjust(-(2+pad),-2, (2+pad), 2);
                         }
