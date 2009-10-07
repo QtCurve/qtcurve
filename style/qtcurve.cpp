@@ -499,6 +499,15 @@ static QWidget * scrollViewFrame(QWidget *widget)
     return 0L;
 }
 
+static QColor checkColour(const QStyleOption *option, QPalette::ColorRole role)
+{
+    QColor col(option->palette.brush(role).color());
+
+    if(col.alpha()==255 && QTC_IS_BLACK(col))
+        return QApplication::palette().brush(role).color();
+    return col;
+}
+
 // from windows style
 static const int windowsItemFrame    =  2; // menu item frame width
 static const int windowsItemHMargin  =  3; // menu item hor text margin
@@ -3343,7 +3352,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(opt.state&State_Enabled && state&State_ReadOnly)
                         opt.state^=State_Enabled;
 
-                    if(QTC_DO_EFFECT && APP_ARORA==theThemedApp && widget && widget->parentWidget() && 0==strcmp(widget->metaObject()->className(), "LocationBar"))
+                    if(QTC_DO_EFFECT && opts.etchEntry && APP_ARORA==theThemedApp && widget &&
+                       widget->parentWidget() && 0==strcmp(widget->metaObject()->className(), "LocationBar"))
                     {
                         const QToolBar *tb=(const QToolBar *)getToolBar(widget->parentWidget()/*, false*/);
 
@@ -9305,13 +9315,13 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                 p->drawPath(topPath);
                 if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
                     p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
-                                ? option->palette.background().color()
+                                ? checkColour(option, QPalette::Window)
                                 : WIDGET_ENTRY==w && !hasFocus
-                                    ? option->palette.base().color()
+                                    ? checkColour(option, QPalette::Base)
                                     : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
                                       WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
                                         ? br
-                                        : option->palette.background().color());
+                                        : checkColour(option, QPalette::Window));
                 p->drawPath(botPath);
             }
         }
@@ -9499,7 +9509,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
     else
     {
         p->setRenderHint(QPainter::Antialiasing, true);
-        p->setPen(option->palette.brush(QPalette::Base).color());
+        p->setPen(checkColour(option, QPalette::Base));
         p->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, round,
                               getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)));
         p->setRenderHint(QPainter::Antialiasing, false);

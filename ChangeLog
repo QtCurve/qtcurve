@@ -13,6 +13,7 @@
  9. Fix size of plastik-style mouse over on sliders.
 10. Fix issues with left-hand side of editable combos with icons when round<=full
 11. Fix compile on OSX - remove unused #include <QX11Info>
+12. Fix Arora's new style gradiented location bar.
 
 0.68.1
 ------
