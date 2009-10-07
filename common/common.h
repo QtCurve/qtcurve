@@ -68,6 +68,10 @@ typedef enum
 #endif
 #include <map>
 #include <set>
+#if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <QtCore/QSet>
+#include <QtCore/QString>
+#endif
 #else
 #include <glib.h>
 #endif
@@ -914,6 +918,9 @@ typedef struct
                      customSortedLvColor;
 #if defined __cplusplus
     EAlign           titlebarAlignment;
+#if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
+    QSet<QString>    menubarApps;
+#endif
 #endif
     EShading         shading;
 #ifdef __cplusplus

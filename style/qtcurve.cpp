@@ -352,6 +352,8 @@ static enum
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
+static QString appName;
+
 int static toHint(int sc)
 {
     switch(sc)
@@ -1063,7 +1065,7 @@ static QString getFile(const QString &f)
 
 void QtCurveStyle::polish(QApplication *app)
 {
-    QString appName(getFile(app->argv()[0]));
+    appName=getFile(app->argv()[0]);
 
     if(opts.fixParentlessDialogs)
     {
@@ -1106,7 +1108,7 @@ void QtCurveStyle::polish(QApplication *app)
 #endif
 
     if(opts.menubarHiding)
-        itsSaveMenuBarStatus="kcalc"==appName || "amarok"==appName;
+        itsSaveMenuBarStatus=opts.menubarApps.contains(appName);
 
     // Plasma does not like the 'Fix parentless dialogs' option...
     if(APP_PLASMA==theThemedApp && opts.fixParentlessDialogs)
@@ -1277,7 +1279,7 @@ void QtCurveStyle::polish(QWidget *widget)
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
     {
         widget->installEventFilter(this);
-        if(itsSaveMenuBarStatus && qtcMenuBarHidden(QCoreApplication::applicationName()))
+        if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
             static_cast<QMainWindow *>(widget)->menuBar()->setHidden(true);
     }
 
@@ -1949,8 +1951,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             {
                 window->menuBar()->setHidden(window->menuBar()->isVisible());
                 if(itsSaveMenuBarStatus)
-                    qtcSetMenuBarHidden(QCoreApplication::applicationName(),
-                                        window->menuBar()->isHidden());
+                    qtcSetMenuBarHidden(appName, window->menuBar()->isHidden());
             }
         }
     }

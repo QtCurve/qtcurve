@@ -1019,6 +1019,15 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(opts!=def)
                 opts->customGradient=def->customGradient;
+
+#if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
+            if(opts!=def)
+            {
+                opts->menubarApps=QSet<QString>::fromList(readStringEntry(cfg, "menubarApps").split(','));
+                opts->menubarApps << "kcalc" << "amarok";
+            }
+#endif
+
 #else
             Options newOpts;
             Options *def=&newOpts;

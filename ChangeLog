@@ -5,6 +5,10 @@
  2. Config files now stored under $XDG_CONFIG_HOME/qtcurve (e.g. ~/.config/qtcurve)
  3. Fix some issue with 'flat' appearance.
  4. Add an experimental option to hide/unhide menubars using Ctrl-Alt-M.
+    Some applications, such as kcalc, do not save the menubar's state - and so this
+    wil be reshown when the apps starts. IF this happens, edit ~/.config/qtcurve/stylerc
+    and add application name to 'menubarApps', e.g:
+        menubarApps=app1,app2,app3
  5. Update versions of XBar menu files - taken from Bespin r652
  6. Disable XBar support for KDevelop - as per Bespin.
  7. Classic style for QWizzard.
