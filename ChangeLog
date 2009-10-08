@@ -20,6 +20,9 @@
 12. Fix Arora's new style gradiented location bar.
 13. Fix gap between combo button and edit field when round < max.
 14. Dont move icon in editable combobox when button pressed.
+15. Remove nvidia arrow work-around. (Old plmasma and nvidia releases used to
+    have re-draw errors with some arrows.) To re-enable this, use
+    -DQTC_OLD_NVIDIA_ARROW_FIX=true at cmake time.
 
 0.68.1
 ------

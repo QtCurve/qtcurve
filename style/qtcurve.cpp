@@ -9681,22 +9681,28 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
 
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
 
+
+#ifdef QTC_OLD_NVIDIA_ARROW_FIX
     path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
     for(int i=1; i<a.size(); ++i)
         path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
     path.lineTo(a[0].x()+0.5, a[0].y()+0.5);
-
+#endif
     // This all looks like overkill - but seems to fix issues with plasma and nvidia
     // Just using 'aa' and drawing the arrows would be fine - but this makes them look
     // slightly blurry, and I dont like that.
     p->save();
     if(!mdi)
         col.setAlpha(255);
+#ifdef QTC_OLD_NVIDIA_ARROW_FIX
     p->setRenderHint(QPainter::Antialiasing, true);
+#endif
     p->setPen(col);
     p->setBrush(col);
+#ifdef QTC_OLD_NVIDIA_ARROW_FIX
     p->fillPath(path, col);
     p->setRenderHint(QPainter::Antialiasing, false);
+#endif
     p->drawPolygon(a);
     p->restore();
 }
