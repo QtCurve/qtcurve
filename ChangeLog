@@ -10,6 +10,13 @@
 6. Colour arrows on mouse over of non-editable combos on more Gtk2
    combo types. (Affects combos in pidgin.)
 7. Fix disabled editable combos.
+8. It has been reported that under intel Xorg drivers > 2.8, that QtCurve's
+   arrows are not appearing. This seems to be due to the fact that QtCurve is
+   using cairo to draw non-antialised lines in this case. To work-around this
+   issue QtCurve has been changed to use the older Gdk to draw arrows. To
+   revert back to cairo, use the following cmake option:
+
+    -DQTC_USE_CAIRO_FOR_ARROWS=true
 
 0.68.1
 ------

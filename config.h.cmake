@@ -14,5 +14,6 @@
 #cmakedefine QTC_REORDER_GTK_DIALOG_BUTTONS
 #cmakedefine QTC_OLD_MOZILLA
 #cmakedefine QTC_DEFAULT_TO_KDE3
+#cmakedefine QTC_USE_CAIRO_FOR_ARROWS
 
 #endif

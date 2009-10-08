@@ -144,6 +144,17 @@ if (GTK_INCLUDE_DIR)
                 "**************************************************************\n"
                 "**************************************************************\n")
     endif(QTC_MODIFY_MOZILLA)
+
+    if(QTC_USE_CAIRO_FOR_ARROWS)
+        message("\n**************************************************************\n"
+                "Warning: Using ciaro to draw arrows - this has been reported to \n"
+                "         fail with intel Xorg driver > 2.8\n"
+                "**************************************************************\n")
+    else(QTC_USE_CAIRO_FOR_ARROWS)
+        message("\n**************************************************************\n"
+                "Information: Using Gdk to draw arrows.\n"
+                "**************************************************************\n")
+    endif(QTC_USE_CAIRO_FOR_ARROWS)
 else (GTK_INCLUDE_DIR)
     message(FATAL_ERROR "Could not locate Gtk2 include files")
 endif (GTK_INCLUDE_DIR)

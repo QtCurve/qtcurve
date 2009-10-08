@@ -23,6 +23,7 @@
 
 #include <gtk/gtk.h>
 #include "common.h"
+#include "config.h"
 
 typedef struct _QtCurveStyleClass QtCurveStyleClass;
 
@@ -65,6 +66,9 @@ typedef struct
     GdkGC   *button_text_gc[2],
             *menutext_gc[2],
             *lv_lines_gc;
+#ifndef QTC_USE_CAIRO_FOR_ARROWS
+    GdkGC   *arrow_gc;
+#endif
 } QtCurveStyle;
 
 struct _QtCurveStyleClass
