@@ -2689,11 +2689,12 @@ debugDisplayWidget(widget, 3);
             GdkColor *arrowColor=QTC_MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
                                                                             ? PAL_DISABLED : PAL_ACTIVE]
                                                                        [COLOR_BUTTON_TEXT]);
-            gboolean moz=isMozilla() && widget && widget->parent && widget->parent->parent && widget->parent->parent->parent &&
-                         isFixedWidget(widget->parent->parent->parent);
+            //gboolean moz=isMozilla() && widget && widget->parent && widget->parent->parent && widget->parent->parent->parent &&
+            //             isFixedWidget(widget->parent->parent->parent);
             x++;
 
-            if(!QTC_DO_EFFECT || moz)
+            // NOTE: Dont do this for moz - as looks odd fir widgets in HTML pages - arrow is shifted too much :-(
+            if(!QTC_DO_EFFECT) // || moz)
                 x+=2;
 
             if(opts.doubleGtkComboArrow)

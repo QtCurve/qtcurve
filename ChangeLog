@@ -18,8 +18,6 @@
 
     -DQTC_USE_CAIRO_FOR_ARROWS=true
 
-9. Better positioning of arrows in Firefox combos.
-
 0.68.1
 ------
 1. Fix reading of 'dark inverted gradient' setting.
