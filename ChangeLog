@@ -23,6 +23,7 @@
 15. Remove nvidia arrow work-around. (Old plmasma and nvidia releases used to
     have re-draw errors with some arrows.) To re-enable this, use
     -DQTC_OLD_NVIDIA_ARROW_FIX=true at cmake time.
+16. Fix shaded lsitview header sometime being unintialised.
 
 0.68.1
 ------
