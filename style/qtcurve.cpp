@@ -2247,11 +2247,12 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 2;
         case PM_MenuBarVMargin:
         case PM_MenuBarHMargin:
-#ifdef QTC_XBAR_SUPPORT
-            if(widget && 0==widget->size().height())
-                return 0;
-#endif
-            return 2;
+            // Bangarang (media player) has a 4 pixel high menubar at the top - when it doesn't actually have a menubar!
+            // Seems to be because of the return 2 below (which was previously always returned unless XBar support and
+            // size was 0). So, if we are askes for these metrics for a widet whose size<6, then return 0.
+            return widget && widget->size().height() < 6
+                    ? 0
+                    : 2;
         case PM_MenuHMargin:
         case PM_MenuVMargin:
             return 0;
