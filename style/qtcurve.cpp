@@ -7405,7 +7405,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(!comboBox->editable && (SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
                     {
                         QStyleOption frameOpt(*option);
-                        QRect        btn(arrow.x(), frame.y(), arrow.width()+2, frame.height());
+                        QRect        btn(arrow.x(), frame.y(), arrow.width()+1, frame.height());
                         const QColor *cols=SHADE_DARKEN==opts.comboBtn || !(state&State_Enabled) ? use : itsComboBtnCols;
                         if(!sunken)
                             frameOpt.state|=State_Raised;
