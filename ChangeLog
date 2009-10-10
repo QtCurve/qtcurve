@@ -1,6 +1,7 @@
 0.69.1
 ------
 1. Fix glow-style mouse over for combos with coloured buttons.
+2. Fix issue with faded menuitems when not rounding.
 
 0.69.0
 ------

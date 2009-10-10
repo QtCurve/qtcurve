@@ -9539,7 +9539,7 @@ void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption 
         bool  reverse=Qt::RightToLeft==option->direction;
         int   roundOffet=QTC_ROUNDED ? 1 : 0;
         QRect main(r.adjusted(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1, roundOffet+1,
-                              reverse ? -(roundOffet+1) : -(1+MENUITEM_FADE_SIZE), -(roundOffet+1))),
+                              reverse ? -(roundOffet+1) : -(roundOffet+MENUITEM_FADE_SIZE), -(roundOffet+1))),
               fade(reverse ? r.x()+1 : r.width()-MENUITEM_FADE_SIZE, r.y()+1, MENUITEM_FADE_SIZE, r.height()-2);
 
         p->fillRect(main, cols[fill]);
