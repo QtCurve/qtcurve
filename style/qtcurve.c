@@ -3374,7 +3374,7 @@ debugDisplayWidget(widget, 3);
 
                     btn.x=cx + (rev ? ind_width+QT_STYLE->xthickness
                                     : (cwidth - ind_width - QT_STYLE->xthickness)+1),
-                    btn.y=y, btn.width=ind_width+4, btn.height=height;
+                    btn.y=y, btn.width=ind_width+3, btn.height=height;
 
                     if(!opts.comboSplitter)
                         setCairoClipping(cr, &btn, NULL);
@@ -3439,7 +3439,7 @@ debugDisplayWidget(widget, 3);
                                         ? getFillReal(state, btn_down, true) : bgnd;
                                         
                         btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
-                        btn.y=y, btn.width=20+4, btn.height=height;
+                        btn.y=y, btn.width=20+3, btn.height=height;
 
                         if(!opts.comboSplitter)
                             setCairoClipping(cr, &btn, NULL);
