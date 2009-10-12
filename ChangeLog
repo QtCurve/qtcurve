@@ -4,6 +4,7 @@
 2. Fix issue with faded menuitems when not rounding.
 3. Fix crash with Dolphin and square list view selection.
 4. Fix Qt only compile.
+5. Fix inner border of some buttons in OpenOffice.org
 
 0.69.0
 ------

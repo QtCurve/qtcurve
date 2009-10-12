@@ -8984,7 +8984,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || (opts.titlebarBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w)) ||
-            (draw3d && option->state&State_Raised))
+            (draw3d && !sunken /*option->state&State_Raised*/))
     {
         QPainterPath innerTlPath,
                      innerBrPath;
