@@ -479,6 +479,55 @@ static const char * getHome()
     return home;
 }
 
+#if defined __cplusplus && defined QTC_QT_ONLY
+// Take from KStandardDirs::makeDir
+bool makeDir(const QString& dir, int mode)
+{
+    // we want an absolute path
+    if (QDir::isRelativePath(dir))
+        return false;
+
+#ifdef Q_WS_WIN
+    return QDir().mkpath(dir);
+#else
+    QString target = dir;
+    uint len = target.length();
+
+    // append trailing slash if missing
+    if (dir.at(len - 1) != '/')
+        target += '/';
+
+    QString base;
+    uint i = 1;
+
+    while( i < len )
+    {
+        struct stat st;
+        int pos = target.indexOf('/', i);
+        base += target.mid(i - 1, pos - i + 1);
+        QByteArray baseEncoded = QFile::encodeName(base);
+        // bail out if we encountered a problem
+        if (stat(baseEncoded, &st) != 0)
+        {
+            // Directory does not exist....
+            // Or maybe a dangling symlink ?
+            if (lstat(baseEncoded, &st) == 0)
+                (void)unlink(baseEncoded); // try removing
+
+            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0) {
+                baseEncoded.prepend( "trying to create local folder " );
+                perror(baseEncoded.constData());
+                return false; // Couldn't create it :-(
+            }
+        }
+        i = pos + 1;
+    }
+    return true;
+#endif
+}
+
+#endif
+
 static const char *qtcConfDir()
 {
     static char *cfgDir=NULL;
@@ -537,7 +586,11 @@ static const char *qtcConfDir()
         if(0!=lstat(cfgDir, &info))
         {
 #ifdef __cplusplus
+#ifdef QTC_QT_ONLY
+            makeDir(cfgDir, 0755);
+#else
             KStandardDirs::makeDir(cfgDir, 0755);
+#endif
 #else
             g_mkdir_with_parents(cfgDir, 0755);
 #endif
