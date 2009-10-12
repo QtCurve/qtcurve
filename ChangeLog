@@ -2,6 +2,7 @@
 ------
 1. Fix glow-style mouse over for combos with coloured buttons.
 2. Fix issue with faded menuitems when not rounding.
+3. Fix crash with Dolphin and square list view selection.
 
 0.69.0
 ------

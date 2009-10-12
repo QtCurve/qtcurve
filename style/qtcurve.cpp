@@ -4019,12 +4019,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QColor color(hasCustomBackground && hasSolidBackground
                                 ? v4Opt->backgroundBrush.color()
                                 : palette.color(cg, QPalette::Highlight));
-                bool   square(opts.squareLvSelection &&
-                              v4Opt->widget &&
-                              !v4Opt->widget->inherits("KFilePlacesView") &&
-                              (dynamic_cast<const QTreeView *>(v4Opt->widget) ||
-                                (dynamic_cast<const QListView *>(v4Opt->widget) &&
-                                QListView::IconMode!=((const QListView *)v4Opt->widget)->viewMode())));
+                bool   square(opts.squareLvSelection && widget &&
+                              !widget->inherits("KFilePlacesView") &&
+                              (dynamic_cast<const QTreeView *>(widget) ||
+                                (dynamic_cast<const QListView *>(widget) &&
+                                QListView::IconMode!=((const QListView *)widget)->viewMode())));
 
                 if (hover && !hasCustomBackground)
                 {
