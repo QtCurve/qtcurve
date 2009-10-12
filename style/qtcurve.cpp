@@ -3740,6 +3740,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(!(opt.state&State_Enabled))
                 opt.state&=~State_MouseOver;
 
+            // For some reason with OO.o not all buttons are set as raised!
+            if(!(opt.state&State_AutoRaise))
+                opt.state|=State_Raised;
+
             isDefault=isDefault || (doEtch && QTC_FULL_FOCUS && MO_GLOW==opts.coloredMouseOver &&
                                     opt.state&State_HasFocus && opt.state&State_Enabled);
             if(isFlat && !isDown && !(opt.state&State_MouseOver))
@@ -8984,7 +8988,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || (opts.titlebarBorder && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w)) ||
-            (draw3d && !sunken /*option->state&State_Raised*/))
+            (draw3d && option->state&State_Raised))
     {
         QPainterPath innerTlPath,
                      innerBrPath;
