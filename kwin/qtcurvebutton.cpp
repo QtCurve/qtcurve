@@ -221,7 +221,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
         bool          customCol(false),
                       faded(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL);
-        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active || faded));
+        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active/* || faded*/));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
 
@@ -243,9 +243,10 @@ void QtCurveButton::drawButton(QPainter *painter)
         }
         else if (!faded)
         {
-            QColor shadow();
+            QColor shadow(Qt::black);
 
-            bP.setPen(QtCurveClient::shadowColor(col));
+            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA);
+            bP.setPen(shadow);
             bP.drawPixmap(dX+1, dY+1, icon);
         }
 

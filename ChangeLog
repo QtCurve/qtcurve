@@ -10,6 +10,7 @@
  8. Use QtCurve's icons for dock widget buttons.
  9. Use same button shape for dock widget buttons as per window buttons.
 10. Don't draw shadows for window button icons if 'hover icons' is set to true.
+11. dont shadow text of inactive windows.
 
 0.69.0
 ------

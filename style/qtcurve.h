@@ -105,11 +105,6 @@ class QtCurveStyle : public QWindowsStyle
 
     private:
 
-    static QColor shadowColor(const QColor &col)
-    {
-        return qGray(col.rgb()) < 100 ? QColor(255, 255, 255, 75) : QColor(0, 0, 0, 75);
-    }
-
     void drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) const;
     void drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz) const;
     void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset, const QColor *cols, int startOffset,

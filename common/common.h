@@ -342,7 +342,8 @@ typedef enum
 #define QtCStateKWinNoBorder   ((QStyle::StateFlag)0x08000000)
 
 #define CLOSE_COLOR QColor(191, 82, 82)
-#define HOVER_BUTTON_ALPHA 0.2
+#define HOVER_BUTTON_ALPHA       0.25
+#define WINDOW_TEXT_SHADOW_ALPHA 0.10
 #endif
 
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))

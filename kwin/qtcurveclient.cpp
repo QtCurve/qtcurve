@@ -413,9 +413,17 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             }
 
         painter.setClipRect(itsCaptionRect.adjusted(-2, 0, 2, 0));
-        painter.setPen(shadowColor(KDecoration::options()->color(KDecoration::ColorFont, active)));
+        QColor shadow(Qt::black);
+        shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA);
+        painter.setPen(shadow);
         painter.drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
-        painter.setPen(KDecoration::options()->color(KDecoration::ColorFont, active));
+
+        QColor color(KDecoration::options()->color(KDecoration::ColorFont, active));
+
+        if (!active)
+             color.setAlpha((color.alpha() * 180) >> 8);
+
+        painter.setPen(color);
         painter.drawText(textRect, alignment, str);
         painter.setClipping(false);
     }

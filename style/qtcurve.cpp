@@ -6898,12 +6898,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         : active
                                             ? itsActiveMdiTextColor
                                             : itsMdiTextColor),
-                             iconColor(theThemedApp==APP_KWIN
+                             iconColor(textColor/*theThemedApp==APP_KWIN
                                         ? option->palette.color(QPalette::WindowText)
                                         : active || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL
                                             ? itsActiveMdiTextColor
-                                            : itsMdiTextColor),
-                             shadow(shadowColor(textColor));
+                                            : itsMdiTextColor*/),
+                             shadow(Qt::black);
                 QStyleOption opt(*option);
                 bool         drawLine=opts.colorTitlebarOnly &&
                                         (kwin ? titleBar->titleBarState&QtCStateKWinDrawLine
@@ -7085,8 +7085,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QTextOption textOpt(alignment|Qt::AlignVCenter);
                     textOpt.setWrapMode(QTextOption::NoWrap);
 
+                    shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA);
                     painter->setPen(shadow);
                     painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
+
+                    if (!active)
+                        textColor.setAlpha((textColor.alpha() * 180) >> 8);
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
                 }
