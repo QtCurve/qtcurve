@@ -324,6 +324,7 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 #define QTC_STATE_MENU        (QStyle::StateFlag)0x20000000
 #define QTC_STATE_KWIN_BUTTON (QStyle::StateFlag)0x40000000
 #define QTC_STATE_TBAR_BUTTON (QStyle::StateFlag)0x80000000
+#define QTC_STATE_DWT_BUTTON  (QStyle::StateFlag)0x20000000
 // #define QTC_NO_BGND_BUTTON    (QStyle::StateFlag)0x80000000
 
 #define M_PI 3.14159265358979323846
@@ -3377,7 +3378,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QStyleOption opt(*option);
 
                 if(dwt)
-                    opt.state|=QTC_STATE_TBAR_BUTTON;
+                    opt.state|=QTC_STATE_DWT_BUTTON;
                 drawPrimitive(PE_PanelButtonCommand, &opt, painter, widget);
             }
             break;
@@ -3839,7 +3840,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                       : getFill(&opt, use, false,
                                                 isDefault && state&State_Enabled && IND_DARKEN==opts.defBtnIndicator),
                            coloredDef ? itsDefBtnCols : use,
-                           true, isKWin
+                           true, isKWin || state&QTC_STATE_DWT_BUTTON
                                     ? WIDGET_MDI_WINDOW_BUTTON
                                     : isOnListView
                                         ? WIDGET_NO_ETCH_BTN
