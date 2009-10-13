@@ -145,7 +145,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
-                        ETitleBarButtons btn, const QColor &textColor, const QColor &shadow, const QColor *btnCols, const QColor *bgndCols) const;
+                        ETitleBarButtons btn, const QColor &iconColor, const QColor &shadow, const QColor *btnCols, const QColor *bgndCols) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
     void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QColor *btnCols, const QRect &r,
                      bool hover, bool sunken, SubControl button) const;

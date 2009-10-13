@@ -6898,6 +6898,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         : active
                                             ? itsActiveMdiTextColor
                                             : itsMdiTextColor),
+                             iconColor(theThemedApp==APP_KWIN
+                                        ? option->palette.color(QPalette::WindowText)
+                                        : active || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL
+                                            ? itsActiveMdiTextColor
+                                            : itsMdiTextColor),
                              shadow(shadowColor(textColor));
                 QStyleOption opt(*option);
                 bool         drawLine=opts.colorTitlebarOnly &&
@@ -7091,30 +7096,30 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if ((titleBar->subControls&SC_TitleBarMinButton) && (titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMinimized))
-                    drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, iconColor, shadow, btnCols, bgndCols);
 
                 if ((titleBar->subControls&SC_TitleBarMaxButton) && (titleBar->titleBarFlags&Qt::WindowMaximizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMaximized))
-                    drawMdiControl(painter, titleBar, SC_TitleBarMaxButton, widget, TITLEBAR_MAX, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarMaxButton, widget, TITLEBAR_MAX, iconColor, shadow, btnCols, bgndCols);
 
                 if ((titleBar->subControls&SC_TitleBarCloseButton) && (titleBar->titleBarFlags&Qt::WindowSystemMenuHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarCloseButton, widget, TITLEBAR_CLOSE, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarCloseButton, widget, TITLEBAR_CLOSE, iconColor, shadow, btnCols, bgndCols);
 
                 if ((titleBar->subControls&SC_TitleBarNormalButton) &&
                     (((titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     (titleBar->titleBarState&Qt::WindowMinimized)) ||
                     ((titleBar->titleBarFlags&Qt::WindowMaximizeButtonHint) &&
                     (titleBar->titleBarState&Qt::WindowMaximized))))
-                    drawMdiControl(painter, titleBar, SC_TitleBarNormalButton, widget, TITLEBAR_MAX, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarNormalButton, widget, TITLEBAR_MAX, iconColor, shadow, btnCols, bgndCols);
 
                 if (titleBar->subControls&SC_TitleBarContextHelpButton && (titleBar->titleBarFlags&Qt::WindowContextHelpButtonHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarContextHelpButton, widget, TITLEBAR_HELP, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarContextHelpButton, widget, TITLEBAR_HELP, iconColor, shadow, btnCols, bgndCols);
 
                 if (titleBar->subControls&SC_TitleBarShadeButton && (titleBar->titleBarFlags&Qt::WindowShadeButtonHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarShadeButton, widget, TITLEBAR_SHADE, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarShadeButton, widget, TITLEBAR_SHADE, iconColor, shadow, btnCols, bgndCols);
 
                 if (titleBar->subControls&SC_TitleBarUnshadeButton && (titleBar->titleBarFlags&Qt::WindowShadeButtonHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarUnshadeButton, widget, TITLEBAR_SHADE, textColor, shadow, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarUnshadeButton, widget, TITLEBAR_SHADE, iconColor, shadow, btnCols, bgndCols);
 
                 if ((titleBar->subControls&SC_TitleBarSysMenu) && (titleBar->titleBarFlags&Qt::WindowSystemMenuHint))
                     if(TITLEBAR_ICON_MENU_BUTTON==opts.titlebarIcon)
@@ -7145,7 +7150,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         }
                     }
                     else
-                        drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, textColor, shadow, btnCols, bgndCols);
+                        drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, shadow, btnCols, bgndCols);
                 painter->restore();
             }
             break;
@@ -9468,7 +9473,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 }
 
 void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
-                                  ETitleBarButtons btn, const QColor &textColor, const QColor &shadow,
+                                  ETitleBarButtons btn, const QColor &iconColor, const QColor &shadow,
                                   const QColor *btnCols, const QColor *bgndCols) const
 {
     QRect rect(subControlRect(CC_TitleBar, titleBar, sc, widget));
@@ -9484,12 +9489,12 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                           opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR));
         const QColor *buttonColors=colored && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL)
                                     ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols);
-        const QColor &iconColor=colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
+        const QColor &icnColor=colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
                         ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
-                        : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : textColor);
+                        : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
 
         drawMdiButton(p, rect, hover, sunken, buttonColors);
-        drawMdiIcon(p, iconColor, shadow, buttonColors, rect, hover, sunken, sc);
+        drawMdiIcon(p, icnColor, shadow, buttonColors, rect, hover, sunken, sc);
     }
 }
 

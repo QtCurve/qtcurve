@@ -219,11 +219,11 @@ void QtCurveButton::drawButton(QPainter *painter)
     else
     {
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
-        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active));
-        int           dX(r.x()+(r.width()-icon.width())/2),
-                      dY(r.y()+(r.height()-icon.height())/2);
         bool          customCol(false),
                       faded(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL);
+        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active || faded));
+        int           dX(r.x()+(r.width()-icon.width())/2),
+                      dY(r.y()+(r.height()-icon.height())/2);
 
         if(flags&QTC_TITLEBAR_BUTTON_COLOR && flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL &&
            (itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)))
