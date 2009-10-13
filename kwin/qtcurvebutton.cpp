@@ -254,7 +254,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             col=CLOSE_COLOR;
 
         if(faded)
-            col.setAlphaF(HOVER_BUTTON_ALPHA);
+            col.setAlphaF(HOVER_BUTTON_ALPHA(col));
 
         bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);

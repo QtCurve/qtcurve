@@ -7091,7 +7091,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     painter->setPen(shadow);
                     painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
 
-                    if (!active)
+                    if (!active && QTC_DARK_WINDOW_TEXT(textColor))
                         textColor.setAlpha((textColor.alpha() * 180) >> 8);
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
@@ -9544,12 +9544,7 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
     QColor col(color);
 
     if(faded)
-    {
-//         if(APP_KWIN==theThemedApp)
-            col.setAlphaF(HOVER_BUTTON_ALPHA);
-//         else
-//             col=KColorUtils::mix(col, btnCols[ORIGINAL_SHADE], 0.75);
-    }
+        col.setAlphaF(HOVER_BUTTON_ALPHA(col));
 
     drawWindowIcon(painter, col, r, sunken, button);
 }

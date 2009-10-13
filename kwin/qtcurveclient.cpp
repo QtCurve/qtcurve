@@ -423,7 +423,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
         QColor color(KDecoration::options()->color(KDecoration::ColorFont, active));
 
-        if (!active)
+        if (!active && QTC_DARK_WINDOW_TEXT(color))
              color.setAlpha((color.alpha() * 180) >> 8);
 
         painter.setPen(color);
