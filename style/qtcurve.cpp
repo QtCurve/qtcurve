@@ -9417,7 +9417,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                 : WIDGET_ENTRY==w && !hasFocus
                                     ? checkColour(option, QPalette::Base)
                                     : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                      WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                      WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w || (window && opts.titlebarBorder))
                                         ? br
                                         : checkColour(option, QPalette::Window));
                 p->drawPath(botPath);
