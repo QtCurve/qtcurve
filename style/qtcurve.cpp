@@ -2446,7 +2446,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_Menu_AllowActiveAndDisabled:
             return false;
         case SH_ComboBox_PopupFrameStyle:
-            return QFrame::StyledPanel|QFrame::Plain;
+            return opts.popupBorder ? QFrame::StyledPanel|QFrame::Plain : QFrame::NoFrame;
         case SH_TabBar_Alignment:
             return Qt::AlignLeft;
         case SH_Header_ArrowAlignment:

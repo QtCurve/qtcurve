@@ -12,6 +12,8 @@
 10. Don't draw shadows for window button icons if 'hover icons' is set to true.
 11. Dont shadow text of inactive windows.
 12. Fix very slight window button background gradient mismatch with borders.
+13. Remove border around scrollbar in popup of combobox when not drawing popupmenu
+    borders.
 
 0.69.0
 ------
