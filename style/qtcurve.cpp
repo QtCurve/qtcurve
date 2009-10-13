@@ -2661,7 +2661,7 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
                                                                itsComponentData.config()).foreground().color();
 #endif*/
 
-            drawWindowIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, sc);
+            drawWindowIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, sc, false);
             return QIcon(pm);
         }
 #if !defined QTC_QT_ONLY
@@ -9519,9 +9519,10 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
     drawWindowIcon(painter, col, r, sunken, button);
 }
 
-void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, SubControl button) const
+void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, SubControl button, bool stdSize) const
 {
     static const int constIconSize=9;
+    static const int constSmallIconSize=7;
 
     QRect rect(r);
 
@@ -9545,21 +9546,39 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
             painter->drawLine(rect.left() + 1, rect.top() + 1,  rect.right() - 1, rect.top() + 1);
             break;
         case SC_TitleBarCloseButton:
-        {
-            static unsigned char xbm[] = { 0x83, 0x01, 0xc7, 0x01, 0xee, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x7c, 0x00,
-                                           0xee, 0x00, 0xc7, 0x01, 0x83, 0x01 };
-            static QBitmap bitmap=QBitmap::fromData(QSize(constIconSize, constIconSize), xbm);
-            painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2, rect.y()+(rect.height()-bitmap.height())/2, bitmap);
+            if(stdSize)
+            {
+                static unsigned char xbm[] = { 0x83, 0x01, 0xc7, 0x01, 0xee, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x7c, 0x00,
+                                               0xee, 0x00, 0xc7, 0x01, 0x83, 0x01 };
+                static QBitmap bitmap=QBitmap::fromData(QSize(constIconSize, constIconSize), xbm);
+                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
+                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
+            }
+            else
+            {
+                static unsigned char xbm[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
+                static QBitmap bitmap=QBitmap::fromData(QSize(constSmallIconSize, constSmallIconSize), xbm);
+                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
+                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
+            }
             break;
-        }
         case SC_TitleBarNormalButton:
-        {
-            static unsigned char xbm[] = {0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
-                                          0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
-            static QBitmap bitmap=QBitmap::fromData(QSize(constIconSize, constIconSize), xbm);
-            painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2, rect.y()+(rect.height()-bitmap.height())/2, bitmap);
+            if(stdSize)
+            {
+                static unsigned char xbm[] = { 0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
+                                               0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
+                static QBitmap bitmap=QBitmap::fromData(QSize(constIconSize, constIconSize), xbm);
+                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
+                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
+            }
+            else
+            {
+                static unsigned char xbm[] = { 0x7c, 0x7c, 0x44, 0x5f, 0x7f, 0x11, 0x11, 0x1f };
+                static QBitmap bitmap=QBitmap::fromData(QSize(constSmallIconSize, constSmallIconSize+1), xbm);
+                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
+                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
+            }
             break;
-        }
         case SC_TitleBarShadeButton:
             drawArrow(painter, rect, PE_IndicatorArrowUp, color, false, true);
             break;
