@@ -9400,14 +9400,14 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                          (hover ||
                           !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER) ||
                           opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR));
-
-        drawMdiButton(p, rect, hover, sunken,
-                      colored && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL)
-                        ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols));
-        drawMdiIcon(p, colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
+        const QColor *buttonColors=colored && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL)
+                                    ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols);
+        const QColor &iconColor=colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
                         ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
-                        : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : textColor),
-                    shadow, rect, hover, sunken, sc);
+                        : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : textColor);
+
+        drawMdiButton(p, rect, hover, sunken, buttonColors);
+        drawMdiIcon(p, iconColor, shadow, buttonColors, rect, hover, sunken, sc);
     }
 }
 
@@ -9432,8 +9432,8 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
     }
 }
 
-void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r,
-                               bool hover, bool sunken, SubControl button) const
+void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QColor *btnCols,
+                               const QRect &r, bool hover, bool sunken, SubControl button) const
 {
     if(!sunken) // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, button);
@@ -9441,7 +9441,12 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
     QColor col(color);
 
     if(!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
-        col.setAlphaF(HOVER_BUTTON_ALPHA);
+    {
+        if(APP_KWIN==theThemedApp)
+            col.setAlphaF(HOVER_BUTTON_ALPHA);
+        else
+            col=KColorUtils::mix(col, btnCols[ORIGINAL_SHADE], 0.75);
+    }
 
     drawWindowIcon(painter, col, r, sunken, button);
 }
