@@ -2583,20 +2583,87 @@ QPalette QtCurveStyle::standardPalette() const
 #endif
 }
 
+static QStyle::SubControl pix2Control(QStyle::StandardPixmap pix)
+{
+    switch(pix)
+    {
+        case QStyle::SP_TitleBarNormalButton:
+            return QStyle::SC_TitleBarNormalButton;
+        case QStyle::SP_TitleBarShadeButton:
+            return QStyle::SC_TitleBarUnshadeButton;
+        case QStyle::SP_TitleBarUnshadeButton:
+            return QStyle::SC_TitleBarShadeButton;
+        default:
+        case QStyle::SP_DockWidgetCloseButton:
+        case QStyle::SP_TitleBarCloseButton:
+            return QStyle::SC_TitleBarCloseButton;
+    }
+}
+
+/*
+static int pix2Button(QStyle::StandardPixmap pix)
+{
+    switch(pix)
+    {
+        case QStyle::SP_TitleBarNormalButton:
+            return TITLEBAR_MAX;
+        case QStyle::SP_TitleBarUnshadeButton:
+        case QStyle::SP_TitleBarShadeButton:
+            return TITLEBAR_SHADE;
+        default:
+        case QStyle::SP_DockWidgetCloseButton:
+        case QStyle::SP_TitleBarCloseButton:
+            return TITLEBAR_CLOSE;
+    }
+}
+*/
+
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
-#if !defined QTC_QT_ONLY
     switch(pix)
     {
 //         case SP_TitleBarMenuButton:
 //         case SP_TitleBarMinButton:
 //         case SP_TitleBarMaxButton:
-//         case SP_TitleBarCloseButton:
-//         case SP_TitleBarNormalButton:
-//         case SP_TitleBarShadeButton:
-//         case SP_TitleBarUnshadeButton:
 //         case SP_TitleBarContextHelpButton:
-//         case SP_DockWidgetCloseButton:
+        case SP_TitleBarNormalButton:
+        case SP_TitleBarShadeButton:
+        case SP_TitleBarUnshadeButton:
+        case SP_DockWidgetCloseButton:
+        case SP_TitleBarCloseButton:
+        {
+            QBitmap            pm(13, 13);
+            QStyle::SubControl sc=pix2Control(pix);
+
+            pm.clear();
+
+            QPainter painter(&pm);
+/*
+            bool   sunken(option ? (option->state&State_Sunken ? true : false) : false),
+                   hover(option ? (option->state&State_MouseOver ? true : false) : false),
+                   colored=coloredMdiButtons(option ? option->state&State_Active : true, hover);
+            QColor col=colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
+                                ? itsTitleBarButtonsCols[pix2Button(pix)][ORIGINAL_SHADE]
+                                : SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) &&
+                                    (hover || sunken)
+                                    ? CLOSE_COLOR
+                                    : option
+                                        ? option->palette.buttonText().color()
+                                        : widget
+                                            ? widget->palette().buttonText().color()
+                                            : qApp
+                                                ? qApp->palette().buttonText().color()
+#if defined QTC_QT_ONLY
+                                                : Qt::black;
+#else
+                                                : KColorScheme(QPalette::Active, KColorScheme::Button,
+                                                               itsComponentData.config()).foreground().color();
+#endif*/
+
+            drawWindowIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, sc);
+            return QIcon(pm);
+        }
+#if !defined QTC_QT_ONLY
         case SP_MessageBoxInformation:
             return KIcon("dialog-information");
         case SP_MessageBoxWarning:
@@ -2715,10 +2782,10 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
             return KIcon("player-volume");
         case SP_MediaVolumeMuted:
             return KIcon("player-volume-muted");
+#endif
         default:
             break;
     }
-#endif
     return QTC_BASE_STYLE::standardIconImplementation(pix, option, widget);
 }
 

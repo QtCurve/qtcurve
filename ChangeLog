@@ -7,6 +7,7 @@
 5. Fix crash with Dolphin and square list view selection.
 6. Fix Qt only compile.
 7. Fix inner border of some buttons in OpenOffice.org
+8. Use QtCurve's icons for dock widget buttons.
 
 0.69.0
 ------
