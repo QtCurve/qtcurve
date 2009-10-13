@@ -6895,7 +6895,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                             ? btnCols : getMdiColors(titleBar, active));
                 QColor       textColor(theThemedApp==APP_KWIN
                                         ? option->palette.color(QPalette::WindowText)
-                                        : active || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL
+                                        : active
                                             ? itsActiveMdiTextColor
                                             : itsMdiTextColor),
                              shadow(shadowColor(textColor));
@@ -9517,17 +9517,19 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
 void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QColor *btnCols,
                                const QRect &r, bool hover, bool sunken, SubControl button) const
 {
-    if(!sunken) // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+    bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
+
+    if(!sunken && !faded) // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, button);
 
     QColor col(color);
 
-    if(!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
+    if(faded)
     {
-        if(APP_KWIN==theThemedApp)
+//         if(APP_KWIN==theThemedApp)
             col.setAlphaF(HOVER_BUTTON_ALPHA);
-        else
-            col=KColorUtils::mix(col, btnCols[ORIGINAL_SHADE], 0.75);
+//         else
+//             col=KColorUtils::mix(col, btnCols[ORIGINAL_SHADE], 0.75);
     }
 
     drawWindowIcon(painter, col, r, sunken, button);

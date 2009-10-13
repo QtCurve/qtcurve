@@ -219,11 +219,11 @@ void QtCurveButton::drawButton(QPainter *painter)
     else
     {
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
-        QColor        col(KDecoration::options()->color(KDecoration::ColorFont,
-                            active || flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL));
+        QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
-        bool          customCol(false);
+        bool          customCol(false),
+                      faded(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL);
 
         if(flags&QTC_TITLEBAR_BUTTON_COLOR && flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL &&
            (itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)))
@@ -241,7 +241,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             dY++;
             dX++;
         }
-        else // if(!(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+        else if (!faded)
         {
             QColor shadow();
 
@@ -252,7 +252,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(CloseButton==type() && itsHover && !(flags&QTC_TITLEBAR_BUTTON_COLOR) && !customCol)
             col=CLOSE_COLOR;
 
-        if(!itsHover && flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)
+        if(faded)
             col.setAlphaF(HOVER_BUTTON_ALPHA);
 
         bP.setPen(col);
