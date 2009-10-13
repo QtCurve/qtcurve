@@ -2,7 +2,7 @@
 ------
  1. Remove line beneath dock widget titles.
  2. Fix glow-style mouse over for combos with coloured buttons.
- 3. Improve appearance of plastik mouser over on scrollbar sliders.
+ 3. Improve appearance of plastik style mouse-over on scrollbar sliders.
  4. Fix issue with faded menuitems when not rounding.
  5. Fix crash with Dolphin and square list view selection.
  6. Fix Qt only compile.
@@ -10,11 +10,9 @@
  8. Use QtCurve's icons for dock widget buttons.
  9. Use same button shape for dock widget buttons as per window buttons.
 10. Don't draw shadows for window button icons if 'hover icons' is set to true.
-11. Dont shadow text of inactive windows.
-12. Fix very slight window button background gradient mismatch with borders.
-13. Remove border around scrollbar in popup of combobox when not drawing popupmenu
+11. Remove border around scrollbar in popup of combobox when not drawing popupmenu
     borders.
-14. Use 'base' colour as background for scrollbars with thin groove, or flat buttons, that
+12. Use 'base' colour as background for scrollbars with thin groove, or flat buttons, that
     are part of a combo-box popup or are within qbstractscrollarea.
 
 0.69.0
