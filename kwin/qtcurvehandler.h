@@ -89,7 +89,7 @@ class QtCurveHandler : public QObject,
     bool            roundBottom() const     { return itsRoundBottom && itsBorderSize>1; }
     bool            noBorder() const        { return itsNoBorder; }
     QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
-    bool            smallBorder() const;
+    int             borderEdgeSize() const;
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
 

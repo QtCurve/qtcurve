@@ -291,12 +291,18 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
     return *bitmap;
 }
 
-bool QtCurveHandler::smallBorder() const
+int QtCurveHandler::borderEdgeSize() const
 {
     QtCurveHandler *that=(QtCurveHandler *)this;
 
-    return noBorder() ||
-           (BorderTiny!=KDecoration::options()->preferredBorderSize(that) && wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL)<ROUND_FULL);
+    return noBorder()
+                ? 1
+                : (BorderTiny!=KDecoration::options()->preferredBorderSize(that) &&
+                    wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL)<ROUND_FULL)
+                    ? wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarBorder, NULL, NULL)
+                        ? 2
+                        : 1
+                    : 3;
 }
 
 QList<QtCurveHandler::BorderSize> QtCurveHandler::borderSizes() const

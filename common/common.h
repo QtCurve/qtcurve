@@ -331,7 +331,8 @@ typedef enum
     QtC_TitleAlignment,
     QtC_TitleBarButtons,
     QtC_TitleBarIcon,
-    QtC_TitleBarIconColor
+    QtC_TitleBarIconColor,
+    QtC_TitleBarBorder
 } QtCMetrics;
 
 #define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)

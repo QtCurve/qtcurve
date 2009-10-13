@@ -2392,6 +2392,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return opts.titlebarIcon;
         case QtC_TitleBarIconColor:
             return buttonColors(option)[ORIGINAL_SHADE].rgb();
+        case QtC_TitleBarBorder:
+            return opts.titlebarBorder;
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
