@@ -3369,15 +3369,15 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
         case PE_IndicatorButtonDropDown: // This should never be called, but just in case - draw as a normal toolbutton...
         {
-            bool dwt(widget && (widget->inherits("QDockWidgetTitleButton") ||
-                                (widget->parentWidget() && widget->parentWidget()->inherits("KoDockWidgetTitleBar"))));
+            bool dwt(widget && widget->inherits("QDockWidgetTitleButton")),
+                 koDwt(!dwt && widget && widget->parentWidget() && widget->parentWidget()->inherits("KoDockWidgetTitleBar"));
 
             if( ((state&State_Enabled) || !(state&State_AutoRaise)) &&
-               (!widget || !dwt || (state&State_MouseOver)) )
+               (!widget || !(dwt || koDwt)|| (state&State_MouseOver)) )
             {
                 QStyleOption opt(*option);
 
-                if(dwt)
+                if(dwt || koDwt)
                     opt.state|=QTC_STATE_DWT_BUTTON;
                 drawPrimitive(PE_PanelButtonCommand, &opt, painter, widget);
             }
@@ -3824,7 +3824,21 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
                 use=itsDefBtnCols;
-
+// Disabled as it does not work for KoDockWidgetTitleBar buttons :-(
+// Leave until 0.70, and add option to enable
+//             else if(state&QTC_STATE_DWT_BUTTON && widget && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR &&
+//                     coloredMdiButtons(state&State_Active, state&State_MouseOver) &&
+//                     !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL))
+//             {
+//                 int btn=QLatin1String("qt_dockwidget_closebutton")==widget->objectName()
+//                             ? TITLEBAR_CLOSE
+//                             : QLatin1String("qt_dockwidget_floatbutton")==widget->objectName()
+//                                 ? TITLEBAR_MAX
+//                                 : TITLEBAR_SHADE;
+// 
+//                 use=itsTitleBarButtonsCols[btn];
+//             }
+            
             if(isKWin)
                 opt.state|=QTC_STATE_KWIN_BUTTON;
 
