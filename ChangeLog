@@ -1,11 +1,12 @@
 0.69.1
 ------
-1. Fix glow-style mouse over for combos with coloured buttons.
-2. Improve appearance of plastik mouser over on scrollbar sliders.
-3. Fix issue with faded menuitems when not rounding.
-4. Fix crash with Dolphin and square list view selection.
-5. Fix Qt only compile.
-6. Fix inner border of some buttons in OpenOffice.org
+1. Remove line beneath dock widget titles.
+2. Fix glow-style mouse over for combos with coloured buttons.
+3. Improve appearance of plastik mouser over on scrollbar sliders.
+4. Fix issue with faded menuitems when not rounding.
+5. Fix crash with Dolphin and square list view selection.
+6. Fix Qt only compile.
+7. Fix inner border of some buttons in OpenOffice.org
 
 0.69.0
 ------
