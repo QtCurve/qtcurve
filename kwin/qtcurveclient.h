@@ -84,7 +84,7 @@ class QtCurveClient : public KCommonDecoration
     };
 
     ResizeCorner *itsResizeGrip;
-    ButtonBgnd   itsButtonBackground[2];
+    ButtonBgnd   itsButtonBackground[4];
     QRect        itsCaptionRect;
     QString      itsOldCaption;
     QFont        itsTitleFont;
