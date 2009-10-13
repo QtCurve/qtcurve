@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-10-07 20:27+0100\n"
+"POT-Creation-Date: 2009-10-13 20:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1257,7 +1257,7 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1132
 #. i18n: ectx: property (text), widget (QLabel, label_53)
 #: po/rc.cpp:335 rc.cpp:335
-msgid "Checkmarks"
+msgid "Checkmarks:"
 msgstr ""
 
 #. i18n: file: config/qtcurveconfigbase.ui:1157
@@ -1581,7 +1581,7 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1802
 #. i18n: ectx: property (text), widget (QLabel, label_61)
 #: po/rc.cpp:507 rc.cpp:507
-msgid "Border popupmenus"
+msgid "Border popupmenus:"
 msgstr ""
 
 #. i18n: file: config/qtcurveconfigbase.ui:1833

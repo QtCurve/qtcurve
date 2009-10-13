@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kde4-qtcurve\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-10-07 20:27+0100\n"
+"POT-Creation-Date: 2009-10-13 20:05+0100\n"
 "PO-Revision-Date: 2009-07-04 02:05+0300\n"
 "Last-Translator: Necmettin Begiter <necmettin.begiter@gmail.com>\n"
 "Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
@@ -1378,7 +1378,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QLabel, label_53)
 #: po/rc.cpp:335 rc.cpp:335
 #, fuzzy
-msgid "Checkmarks"
+msgid "Checkmarks:"
 msgstr "'X' biçemli işaretler"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1157
@@ -1726,7 +1726,8 @@ msgstr "Menü şeridini Gtk2 pencerelere uygula (Deneysel)"
 #. i18n: file: config/qtcurveconfigbase.ui:1802
 #. i18n: ectx: property (text), widget (QLabel, label_61)
 #: po/rc.cpp:507 rc.cpp:507
-msgid "Border popupmenus"
+#, fuzzy
+msgid "Border popupmenus:"
 msgstr "Açılır menülere kenarlık ekle"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1833
