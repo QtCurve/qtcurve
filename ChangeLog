@@ -14,6 +14,8 @@
 12. Fix very slight window button background gradient mismatch with borders.
 13. Remove border around scrollbar in popup of combobox when not drawing popupmenu
     borders.
+14. Use 'base' colour as background for scrollbars with thin groove, or flat buttons, that
+    are part of a combo-box popup or are within qbstractscrollarea.
 
 0.69.0
 ------

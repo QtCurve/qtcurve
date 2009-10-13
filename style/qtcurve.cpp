@@ -7220,6 +7220,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 painter->save();
 
+                bool needsBaseBgnd=(opts.thinSbarGroove || opts.flatSbarButtons) && 
+                                   widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                                   (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView") ||
+                                    !opts.gtkScrollViews && widget->parentWidget()->parentWidget()->inherits("QAbstractScrollArea"));
+
+                if(needsBaseBgnd)
+                    painter->fillRect(r, palette.brush(QPalette::Base));
+
                 if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                     drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,
                                           opts.sbarBgndAppearance, WIDGET_SB_BGND);
