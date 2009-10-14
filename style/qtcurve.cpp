@@ -7222,8 +7222,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 bool needsBaseBgnd=(opts.thinSbarGroove || opts.flatSbarButtons) && 
                                    widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                                   (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView") ||
-                                    !opts.gtkScrollViews && widget->parentWidget()->parentWidget()->inherits("QAbstractScrollArea"));
+                                   (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")/* ||
+                                    !opts.gtkScrollViews && widget->parentWidget()->parentWidget()->inherits("QAbstractScrollArea")*/);
 
                 if(needsBaseBgnd)
                     painter->fillRect(r, palette.brush(QPalette::Base));
