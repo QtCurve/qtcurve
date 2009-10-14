@@ -1085,7 +1085,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QRadioButton" name="invertBotTab_false">
             <property name="text">
-             <string>Same as per top tabs</string>
+             <string>Same as top tabs</string>
             </property>
            </widget>
           </item>
