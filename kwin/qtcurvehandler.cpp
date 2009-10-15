@@ -79,7 +79,8 @@ namespace KWinQtCurve
 {
 
 QtCurveHandler::QtCurveHandler()
-              : itsStyle(NULL)
+              : itsTitleBarPad(0)
+              , itsStyle(NULL)
 {
     setStyle();
 
@@ -263,6 +264,8 @@ bool QtCurveHandler::readConfig()
          oldShowResizeGrip=itsShowResizeGrip,
          oldRoundBottom=itsRoundBottom,
          oldOuterBorder=itsOuterBorder;
+    int  oldTitleBarPad=itsTitleBarPad;
+    
 #if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
     itsColoredShadow = config.readEntry("ColoredShadow", false);
 #endif
@@ -272,14 +275,18 @@ bool QtCurveHandler::readConfig()
     itsOuterBorder = config.hasKey("NoBorder")
                         ? !config.readEntry("NoBorder", false)
                         : config.readEntry("OuterBorder", true);
-                                        
+    itsTitleBarPad = config.readEntry("TitleBarPad", 0);
+
+    itsTitleHeight+=2*itsTitleBarPad;
+
     return oldMenuClose!=itsMenuClose ||
            oldShowResizeGrip!=itsShowResizeGrip ||
 #if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
            oldColoredShadow!=itsColoredShadow ||
 #endif
            oldRoundBottom!=itsRoundBottom ||
-           oldOuterBorder!=itsOuterBorder;
+           oldOuterBorder!=itsOuterBorder ||
+           oldTitleBarPad!=itsTitleBarPad;
 }
 
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)
