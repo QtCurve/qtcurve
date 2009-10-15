@@ -571,6 +571,12 @@ void QtCurveClient::reset(unsigned long changed)
     // Set note in init() above
     if(0==changed)
         widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
+    else  if (changed&(SettingColors|SettingFont|SettingBorder))
+    {
+        // Reset button backgrounds...
+        for(int i=0; i<constNumButtonStates; ++i)
+           itsButtonBackground[i].pix=QPixmap();
+    }
     
     if (changed&SettingBorder)
         if (maximizeMode() == MaximizeFull)

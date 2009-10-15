@@ -83,8 +83,10 @@ class QtCurveClient : public KCommonDecoration
         QColor  col;
     };
 
+    static const int constNumButtonStates=4;
+
     ResizeCorner *itsResizeGrip;
-    ButtonBgnd   itsButtonBackground[4];
+    ButtonBgnd   itsButtonBackground[constNumButtonStates];
     QRect        itsCaptionRect;
     QString      itsOldCaption;
     QFont        itsTitleFont;
