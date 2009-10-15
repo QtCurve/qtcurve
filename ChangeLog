@@ -1,3 +1,8 @@
+0.69.2
+------
+1. For SWT apps (such as eclipse), if a scrollbar slider is maxed-out,
+   then shade it as disabled - matches KDE.
+
 0.69.1
 ------
 1. Fix glow-style mouse over for combos with coloured buttons.

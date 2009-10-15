@@ -3183,6 +3183,23 @@ debugDisplayWidget(widget, 3);
                 }
 #endif
 
+                if(GTK_APP_JAVA_SWT==qtSettings.app && WIDGET_SB_SLIDER==widgetType && widget && GTK_STATE_INSENSITIVE!=state)
+                {
+                    gboolean horizontal    = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
+                    int      sbarTroughLen = (horizontal ? widget->allocation.height : widget->allocation.width)-
+                                             ( (GTK_RANGE(widget)->has_stepper_a ? opts.sliderWidth : 0)+
+                                               (GTK_RANGE(widget)->has_stepper_b ? opts.sliderWidth : 0)+
+                                               (GTK_RANGE(widget)->has_stepper_c ? opts.sliderWidth : 0)+
+                                               (GTK_RANGE(widget)->has_stepper_d ? opts.sliderWidth : 0)),
+                             sliderLen     = (horizontal ? height : width);
+
+                    if(sbarTroughLen==sliderLen)
+                    {
+                        state=GTK_STATE_INSENSITIVE;
+                        btn_colors=qtcPalette.background;
+                        bgnd=getFill(state, FALSE);
+                    }
+                }
 #ifdef QTC_INCREASE_SB_SLIDER
                 if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons && SCROLLBAR_NONE!=opts.scrollbarType
                    /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
