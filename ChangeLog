@@ -1,6 +1,7 @@
 0.69.2
 ------
 1. Change 'Dont draw outer dark border' to 'Draw dark outer border'
+2. Invalidate button background cache on settings change.
 
 0.69.1
 ------
