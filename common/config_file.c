@@ -450,10 +450,6 @@ static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 
 #endif
 
-#ifdef __cplusplus
-#include <kstandarddirs.h>
-#endif
-
 static const char * getHome()
 {
     static const char *home=NULL;
@@ -479,7 +475,9 @@ static const char * getHome()
     return home;
 }
 
-#if defined __cplusplus && defined QTC_QT_ONLY
+#ifdef __cplusplus
+
+#ifdef QTC_QT_ONLY
 // Take from KStandardDirs::makeDir
 bool makeDir(const QString& dir, int mode)
 {
@@ -526,6 +524,9 @@ bool makeDir(const QString& dir, int mode)
 #endif
 }
 
+#else
+#include <kstandarddirs.h>
+#endif
 #endif
 
 static const char *qtcConfDir()

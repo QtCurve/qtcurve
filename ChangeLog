@@ -2,6 +2,7 @@
 ------
 1. Change 'Dont draw outer dark border' to 'Draw dark outer border'
 2. Invalidate button background cache on settings change.
+3. Fix Qt only compile - don't include kstandardirs.h!
 
 0.69.1
 ------
