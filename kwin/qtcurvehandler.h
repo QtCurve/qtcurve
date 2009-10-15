@@ -90,6 +90,7 @@ class QtCurveHandler : public QObject,
     bool            outerBorder() const     { return itsOuterBorder; }
     QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
     int             borderEdgeSize() const;
+    int             titleBarPad() const     { return itsTitleBarPad; }
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
 

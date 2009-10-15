@@ -410,7 +410,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 }
                 else
                 {
-                    iconX=textRect.x()+textRect.width()-textWidth;
+                    iconX=textRect.x()+textRect.width()-(textWidth+constPad);
                     if(iconX<textRect.x())
                         iconX=textRect.x();
                 }
