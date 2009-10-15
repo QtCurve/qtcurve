@@ -256,11 +256,16 @@ bool QtCurveHandler::readConfig()
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;
 
-    bool oldColoredShadow=itsColoredShadow,
-         oldMenuClose=itsMenuClose,
+    bool oldMenuClose=itsMenuClose,
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
+         oldColoredShadow=itsColoredShadow,
+#endif
          oldShowResizeGrip=itsShowResizeGrip,
-         oldRoundBottom=itsRoundBottom;
+         oldRoundBottom=itsRoundBottom,
+         oldOuterBorder=itsOuterBorder;
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
     itsColoredShadow = config.readEntry("ColoredShadow", false);
+#endif
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
     itsRoundBottom = config.readEntry("RoundBottom", true);
@@ -268,8 +273,13 @@ bool QtCurveHandler::readConfig()
                         ? !config.readEntry("NoBorder", false)
                         : config.readEntry("OuterBorder", true);
                                         
-    return oldColoredShadow!=itsColoredShadow || oldMenuClose!=itsMenuClose || oldShowResizeGrip!=itsShowResizeGrip ||
-           oldRoundBottom!=itsRoundBottom;
+    return oldMenuClose!=itsMenuClose ||
+           oldShowResizeGrip!=itsShowResizeGrip ||
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
+           oldColoredShadow!=itsColoredShadow ||
+#endif
+           oldRoundBottom!=itsRoundBottom ||
+           oldOuterBorder!=itsOuterBorder;
 }
 
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)
