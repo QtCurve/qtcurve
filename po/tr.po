@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kde4-qtcurve\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-10-14 20:05+0100\n"
+"POT-Creation-Date: 2009-10-15 19:20+0100\n"
 "PO-Revision-Date: 2009-07-04 02:05+0300\n"
 "Last-Translator: Necmettin Begiter <necmettin.begiter@gmail.com>\n"
 "Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
@@ -2069,9 +2069,10 @@ msgstr ""
 "kalınlığı 'çok ince' olarak seçili değilse geçerlidir)"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:51
-#. i18n: ectx: property (text), widget (QCheckBox, noBorder)
+#. i18n: ectx: property (text), widget (QCheckBox, outerBorder)
 #: po/rc.cpp:631 rc.cpp:631
-msgid "Dont draw outer dark border."
+#, fuzzy
+msgid "Draw dark outer border."
 msgstr "Dış koyu renk kenarlığı çizme."
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:74

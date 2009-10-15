@@ -51,7 +51,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
     connect(itsWidget->coloredShadow, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->resizeGrip, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(itsWidget->noBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->outerBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
 }
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
@@ -68,7 +68,9 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
     itsWidget->coloredShadow->setChecked(configGroup.readEntry("ColoredShadow", false));
     itsWidget->resizeGrip->setChecked(configGroup.readEntry("ShowResizeGrip", false));
     itsWidget->roundBottom->setChecked(configGroup.readEntry("RoundBottom", true));
-    itsWidget->noBorder->setChecked(configGroup.readEntry("NoBorder", false));
+    itsWidget->outerBorder->setChecked(configGroup.hasKey("NoBorder")
+                                        ? !configGroup.readEntry("NoBorder", false)
+                                        : configGroup.readEntry("OuterBorder", true));
 }
 
 void QtCurveKWinConfig::save(KConfigGroup &)
@@ -79,7 +81,8 @@ void QtCurveKWinConfig::save(KConfigGroup &)
     configGroup.writeEntry("ColoredShadow", itsWidget->coloredShadow->isChecked());
     configGroup.writeEntry("ShowResizeGrip", itsWidget->resizeGrip->isChecked());
     configGroup.writeEntry("RoundBottom", itsWidget->roundBottom->isChecked());
-    configGroup.writeEntry("NoBorder", itsWidget->noBorder->isChecked());
+    configGroup.writeEntry("OuterBorder", itsWidget->outerBorder->isChecked());
+    configGroup.deleteEntry("NoBorder");
     itsConfig->sync();
 }
 
@@ -89,7 +92,7 @@ void QtCurveKWinConfig::defaults()
     itsWidget->coloredShadow->setChecked(false);
     itsWidget->resizeGrip->setChecked(false);
     itsWidget->roundBottom->setChecked(true);
-    itsWidget->noBorder->setChecked(false);
+    itsWidget->outerBorder->setChecked(true);
 }
 
 extern "C"

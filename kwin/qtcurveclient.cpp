@@ -213,7 +213,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                         NULL, NULL)),
                          mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows()),
                          roundBottom(Handler()->roundBottom()),
-                         noBorder(Handler()->noBorder());
+                         outerBorder(Handler()->outerBorder());
     const int            maximiseOffset(mximised ? 3 : 0),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -262,9 +262,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(!roundBottom)
         opt.state|=QtCStateKWinNotFull;
-    if(noBorder)
-        opt.state|=QtCStateKWinNoBorder;
-    else
+
+    if(outerBorder)
     {
 #ifdef QTC_DRAW_INTO_PIXMAPS
         if(!compositing)
@@ -286,6 +285,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
     }
+    else
+        opt.state|=QtCStateKWinNoBorder;
 
     if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
     {

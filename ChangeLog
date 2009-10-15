@@ -1,3 +1,7 @@
+0.69.2
+------
+1. Change 'Dont draw outer dark border' to 'Draw dark outer border'
+
 0.69.1
 ------
  1. Remove line beneath dock widget titles.

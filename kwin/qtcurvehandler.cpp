@@ -171,7 +171,7 @@ bool QtCurveHandler::reset(unsigned long changed)
                     4;
     }
 
-    if(itsNoBorder && (itsBorderSize==1 || itsBorderSize>4))
+    if(!itsOuterBorder && (itsBorderSize==1 || itsBorderSize>4))
         itsBorderSize--;
 
     for (int t=0; t < 2; ++t)
@@ -264,8 +264,10 @@ bool QtCurveHandler::readConfig()
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
     itsRoundBottom = config.readEntry("RoundBottom", true);
-    itsNoBorder = config.readEntry("NoBorder", false);
-
+    itsOuterBorder = config.hasKey("NoBorder")
+                        ? !config.readEntry("NoBorder", false)
+                        : config.readEntry("OuterBorder", true);
+                                        
     return oldColoredShadow!=itsColoredShadow || oldMenuClose!=itsMenuClose || oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom;
 }
@@ -295,14 +297,14 @@ int QtCurveHandler::borderEdgeSize() const
 {
     QtCurveHandler *that=(QtCurveHandler *)this;
 
-    return noBorder()
-                ? 1
-                : (BorderTiny!=KDecoration::options()->preferredBorderSize(that) &&
+    return outerBorder()
+                ? (BorderTiny!=KDecoration::options()->preferredBorderSize(that) &&
                     wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL)<ROUND_FULL)
                     ? wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarBorder, NULL, NULL)
                         ? 2
                         : 1
-                    : 3;
+                    : 3
+                : 1;
 }
 
 QList<QtCurveHandler::BorderSize> QtCurveHandler::borderSizes() const

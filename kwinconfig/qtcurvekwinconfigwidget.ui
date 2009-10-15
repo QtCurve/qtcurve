@@ -46,9 +46,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="noBorder">
+    <widget class="QCheckBox" name="outerBorder">
      <property name="text">
-      <string>Dont draw outer dark border.</string>
+      <string>Draw dark outer border.</string>
      </property>
     </widget>
    </item>
