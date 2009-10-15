@@ -68,8 +68,13 @@ static GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
 
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-    if((GDK_CONTROL_MASK+GDK_MOD1_MASK)==event->state && GDK_m==event->keyval && !event->is_modifier)
+    if(GDK_CONTROL_MASK&event->state &&
+       GDK_MOD1_MASK&event->state &&
+       0==(event->state&0xFFF0) && // Ensure only ctrl/alt/shift/capsLock are pressed...
+       (GDK_m==event->keyval || GDK_M==event->keyval) &&
+       !event->is_modifier)
     {
+        
         GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
 
         if(menuBar)
