@@ -9889,7 +9889,7 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
                 break;
             case LINE_DOTS:
             default:
-                drawDots(p, r, !horiz, slider ? 3 : 5, slider ? 5 : 2, markers, 0, 5);
+                drawDots(p, r, !horiz, slider ? 3 : 5, slider ? 4 : 2, markers, 0, 5);
         }
     }
 }
