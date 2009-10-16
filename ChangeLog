@@ -4,6 +4,8 @@
 2. Invalidate button background cache on settings change.
 3. Fix Qt only compile - don't include kstandardirs.h!
 4. Better postion of dots on slider handles.
+5. If custom button colours have been defined for window buttons, use the same
+   colours to colour dock widget buttons.
 
 0.69.1
 ------

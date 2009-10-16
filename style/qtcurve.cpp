@@ -520,6 +520,9 @@ static const int windowsArrowHMargin =  6; // arrow horizontal margin
 static const int constProgressBarFps = 20;
 static const int constTabPad         = 6;
 
+static const QLatin1String constDwtClose("qt_dockwidget_closebutton");
+static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
+
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 static QString kdeHome()
@@ -3826,20 +3829,44 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
                 use=itsDefBtnCols;
-// Disabled as it does not work for KoDockWidgetTitleBar buttons :-(
-// Leave until 0.70, and add option to enable
-//             else if(state&QTC_STATE_DWT_BUTTON && widget && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR &&
-//                     coloredMdiButtons(state&State_Active, state&State_MouseOver) &&
-//                     !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL))
-//             {
-//                 int btn=QLatin1String("qt_dockwidget_closebutton")==widget->objectName()
-//                             ? TITLEBAR_CLOSE
-//                             : QLatin1String("qt_dockwidget_floatbutton")==widget->objectName()
-//                                 ? TITLEBAR_MAX
-//                                 : TITLEBAR_SHADE;
-// 
-//                 use=itsTitleBarButtonsCols[btn];
-//             }
+            else if(state&QTC_STATE_DWT_BUTTON && widget && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR &&
+                    coloredMdiButtons(state&State_Active, state&State_MouseOver) &&
+                    !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL))
+            {
+                if(constDwtClose==widget->objectName())
+                    use=itsTitleBarButtonsCols[TITLEBAR_CLOSE];
+                else if(constDwtFloat==widget->objectName())
+                    use=itsTitleBarButtonsCols[TITLEBAR_MAX];
+                else if(widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                        widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
+                        ::qobject_cast<QDockWidget *>(widget->parentWidget()->parentWidget()))
+                {
+                    QDockWidget              *dw   = (QDockWidget *)widget->parentWidget()->parentWidget();
+                    QWidget                  *koDw = widget->parentWidget();
+                    int                      fw    = dw->isFloating()
+                                                        ? pixelMetric(QStyle::PM_DockWidgetFrameWidth, 0, dw)
+                                                        : 0;
+                    QRect                    geom(widget->geometry());
+                    QStyleOptionDockWidgetV2 dwOpt;
+                    dwOpt.initFrom(dw);
+                    dwOpt.rect = QRect(QPoint(fw, fw), QSize(koDw->geometry().width() - (fw * 2),
+                                                             koDw->geometry().height() - (fw * 2)));
+                    dwOpt.title = dw->windowTitle();
+                    dwOpt.closable = (dw->features()&QDockWidget::DockWidgetClosable)==QDockWidget::DockWidgetClosable;
+                    dwOpt.floatable = (dw->features()&QDockWidget::DockWidgetFloatable)==QDockWidget::DockWidgetFloatable;
+
+                    if(dwOpt.closable &&
+                       subElementRect(QStyle::SE_DockWidgetCloseButton, &dwOpt,
+                                      widget->parentWidget()->parentWidget())==geom)
+                        use=itsTitleBarButtonsCols[TITLEBAR_CLOSE];
+                    else if(dwOpt.floatable &&
+                       subElementRect(QStyle::SE_DockWidgetFloatButton, &dwOpt,
+                                      widget->parentWidget()->parentWidget())==geom)
+                        use=itsTitleBarButtonsCols[TITLEBAR_MAX];
+                    else
+                        use=itsTitleBarButtonsCols[TITLEBAR_SHADE];
+                }
+            }
             
             if(isKWin)
                 opt.state|=QTC_STATE_KWIN_BUTTON;
