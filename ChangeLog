@@ -3,6 +3,7 @@
 1. If a scrollbar slider is maxed-out, then shade it as disabled - matches KDE.
 2. When detecting Ctrl-Alt-M for menubar hiding, check for uppercase M
    as well as lower case. Also, ignore state of shift and caps-lock keys.
+3. Set default contrast to 7
 
 0.69.1
 ------

@@ -1016,7 +1016,7 @@ static void readKdeGlobals(const char *rc, int rd)
             {
                 opts.contrast=readInt(line, 9);
                 if(opts.contrast>10 || opts.contrast<0)
-                    opts.contrast=7;
+                    opts.contrast=QTC_DEFAULT_CONTRAST;
                 found|=RD_CONTRAST;
             }
             else if(qtSettings.qt4 && SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) &&
@@ -1981,6 +1981,7 @@ static gboolean qtInit()
             qtSettings.styleName=NULL;
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
+            opts.contrast=QTC_DEFAULT_CONTRAST;
 
             lastRead=now;
 
