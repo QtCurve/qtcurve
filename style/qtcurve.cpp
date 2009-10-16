@@ -859,7 +859,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     readConfig(rcFile, &opts);
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
     if(opts.contrast<0 || opts.contrast>10)
-        opts.contrast=7;
+        opts.contrast=QTC_DEFAULT_CONTRAST;
 
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsHighlightCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Background), itsBackgroundCols);
