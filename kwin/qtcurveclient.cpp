@@ -184,7 +184,7 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
         QPainter             pixPainter(&(itsButtonBackground[state].pix));
         int                  border(Handler()->borderEdgeSize());
 
-        br.adjust(-6, -border, 6, 0);
+        br.adjust(-6, -border, 6, border);
         opt.rect=br;
 
         opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
