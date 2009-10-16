@@ -70,7 +70,7 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
 {
     if(GDK_CONTROL_MASK&event->state &&
        GDK_MOD1_MASK&event->state &&
-       0==(event->state&0xFFF0) && // Ensure only ctrl/alt/shift/capsLock are pressed...
+       0==(event->state&0xFF00) && // Ensure only ctrl/alt/shift/capsLock are pressed...
        (GDK_m==event->keyval || GDK_M==event->keyval) &&
        !event->is_modifier)
     {
