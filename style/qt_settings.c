@@ -130,7 +130,7 @@ typedef enum
     GTK_APP_GIMP_PLUGIN,
     GTK_APP_JAVA,
     GTK_APP_INKSCAPE,
-    GTK_APP_JAVA_SWT,
+    /*GTK_APP_JAVA_SWT,*/
     GTK_APP_EVOLUTION
     /*GTK_APP_GAIM*/
 } EGtkApp;
@@ -2114,15 +2114,15 @@ static gboolean qtInit()
                     qtSettings.app=GTK_APP_EVOLUTION;
                 else if(0==strcmp(qtSettings.appName, "inkscape"))
                     qtSettings.app=GTK_APP_INKSCAPE;
-                else if(0==strcmp(qtSettings.appName, "eclipse"))
-                    qtSettings.app=GTK_APP_JAVA_SWT;
+                /*else if(0==strcmp(qtSettings.appName, "eclipse"))
+                    qtSettings.app=GTK_APP_JAVA_SWT;*/
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }
 
             /* Eclipse sets a application name, so if this is set then we're not a Swing java app */
-            if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
-                qtSettings.app=GTK_APP_JAVA_SWT;
+            /*if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
+                qtSettings.app=GTK_APP_JAVA_SWT;*/
 
             if(GTK_APP_JAVA==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
                 opts.bgndAppearance=APPEARANCE_FLAT;

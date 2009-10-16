@@ -3183,7 +3183,8 @@ debugDisplayWidget(widget, 3);
                 }
 #endif
 
-                if(GTK_APP_JAVA_SWT==qtSettings.app && WIDGET_SB_SLIDER==widgetType && widget && GTK_STATE_INSENSITIVE!=state)
+                if(/*GTK_APP_JAVA_SWT==qtSettings.app && */
+                   WIDGET_SB_SLIDER==widgetType && widget && GTK_STATE_INSENSITIVE!=state)
                 {
                     gboolean horizontal    = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
                     int      sbarTroughLen = (horizontal ? widget->allocation.height : widget->allocation.width)-
