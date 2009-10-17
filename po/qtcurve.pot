@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-10-17 11:04+0100\n"
+"POT-Creation-Date: 2009-10-17 11:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1823,9 +1823,7 @@ msgstr ""
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:66
 #. i18n: ectx: property (text), widget (QCheckBox, roundBottom)
 #: po/rc.cpp:628 rc.cpp:628
-msgid ""
-"Round bottom corners (applies only when style is round, and borders are not "
-"tiny)"
+msgid "Round bottom corners (style must be rounded, and borders not tiny)"
 msgstr ""
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:73

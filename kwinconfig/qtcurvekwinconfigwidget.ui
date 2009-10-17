@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>669</width>
-    <height>226</height>
+    <width>583</width>
+    <height>232</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -63,7 +63,7 @@
       <item row="2" column="1">
        <widget class="QCheckBox" name="roundBottom">
         <property name="text">
-         <string>Round bottom corners (applies only when style is round, and borders are not tiny)</string>
+         <string>Round bottom corners (style must be rounded, and borders not tiny)</string>
         </property>
        </widget>
       </item>
