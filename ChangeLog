@@ -7,6 +7,9 @@
 5. If custom button colours have been defined for window buttons, use the same
    colours to colour dock widget buttons.
 6. Add option to add extra paddnig to kwin titlebars.
+7. Add vlc and smplayer to default list of KDE4 apps that needs manual
+   saving of menubar state.
+
 
 0.69.1
 ------
