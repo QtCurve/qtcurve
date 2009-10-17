@@ -6,6 +6,7 @@
 4. Better postion of dots on slider handles.
 5. If custom button colours have been defined for window buttons, use the same
    colours to colour dock widget buttons.
+6. Add option to add extra paddnig to kwin titlebars.
 
 0.69.1
 ------

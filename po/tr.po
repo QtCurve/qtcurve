@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kde4-qtcurve\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-10-15 19:20+0100\n"
+"POT-Creation-Date: 2009-10-17 11:04+0100\n"
 "PO-Revision-Date: 2009-07-04 02:05+0300\n"
 "Last-Translator: Necmettin Begiter <necmettin.begiter@gmail.com>\n"
 "Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
@@ -2020,25 +2020,16 @@ msgstr ""
 msgid "Options"
 msgstr "Seçenekler"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:17
-#. i18n: ectx: property (whatsThis), widget (QCheckBox, coloredShadow)
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:35
+#. i18n: ectx: property (text), widget (QLabel, label_3)
 #: po/rc.cpp:613 rc.cpp:613
-msgid ""
-"Check this option if you want the active window to have a colored glow "
-"instead of a shadow."
-msgstr ""
-"Bu seçenekle etkin pencerenin gölge yerine renkli bir parlamaya sahip "
-"olmasını sağlayabilirsiniz."
+#, fuzzy
+msgid "Closing:"
+msgstr "Kapat:"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:20
-#. i18n: ectx: property (text), widget (QCheckBox, coloredShadow)
-#: po/rc.cpp:616 rc.cpp:616
-msgid "Give active window a 'glow' when shadows are enabled"
-msgstr "Gölgeler açıksa etkin pencereye bir 'parlama' ver"
-
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:27
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:42
 #. i18n: ectx: property (whatsThis), widget (QCheckBox, menuClose)
-#: po/rc.cpp:619 rc.cpp:619
+#: po/rc.cpp:616 rc.cpp:616
 msgid ""
 "Check this option if you want windows to be closed when you double click the "
 "menu button, similar to Microsoft Windows."
@@ -2046,19 +2037,26 @@ msgstr ""
 "Bu seçenekle pencerelerin menü düğmesine çift tıkladığınızda Microsoft "
 "Windows'da olduğu gibi kapatılmalarını sağlayabilirsiniz."
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:30
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:45
 #. i18n: ectx: property (text), widget (QCheckBox, menuClose)
-#: po/rc.cpp:622 rc.cpp:622
+#: po/rc.cpp:619 rc.cpp:619
 msgid "Close windows by double clicking the menu button"
 msgstr "Menü düğmesine çift tıklayarak pencereleri kapat"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:37
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:52
+#. i18n: ectx: property (text), widget (QLabel, label_4)
+#: po/rc.cpp:622 rc.cpp:622
+#, fuzzy
+msgid "Borders:"
+msgstr "Kenarlık:"
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:59
 #. i18n: ectx: property (text), widget (QCheckBox, resizeGrip)
 #: po/rc.cpp:625 rc.cpp:625
 msgid "Show resize grip"
 msgstr "Boyut değiştirme çizgilerini göster"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:44
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:66
 #. i18n: ectx: property (text), widget (QCheckBox, roundBottom)
 #: po/rc.cpp:628 rc.cpp:628
 msgid ""
@@ -2068,16 +2066,45 @@ msgstr ""
 "Alt köşeleri yuvarlat (sadece biçem 'yuvarlak' olarak atandığında ve çerçeve "
 "kalınlığı 'çok ince' olarak seçili değilse geçerlidir)"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:51
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:73
 #. i18n: ectx: property (text), widget (QCheckBox, outerBorder)
 #: po/rc.cpp:631 rc.cpp:631
 #, fuzzy
 msgid "Draw dark outer border."
 msgstr "Dış koyu renk kenarlığı çizme."
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:74
-#. i18n: ectx: property (text), widget (QLabel, label)
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:80
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, coloredShadow)
 #: po/rc.cpp:634 rc.cpp:634
+msgid ""
+"Check this option if you want the active window to have a colored glow "
+"instead of a shadow."
+msgstr ""
+"Bu seçenekle etkin pencerenin gölge yerine renkli bir parlamaya sahip "
+"olmasını sağlayabilirsiniz."
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:83
+#. i18n: ectx: property (text), widget (QCheckBox, coloredShadow)
+#: po/rc.cpp:637 rc.cpp:637
+msgid "Give active window a 'glow' when shadows are enabled"
+msgstr "Gölgeler açıksa etkin pencereye bir 'parlama' ver"
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:90
+#. i18n: ectx: property (text), widget (QLabel, label_2)
+#: po/rc.cpp:640 rc.cpp:640
+#, fuzzy
+msgid "Titlebar padding:"
+msgstr "Sadece başlık çubuğu renkli (KDE4)"
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:97
+#. i18n: ectx: property (suffix), widget (KIntSpinBox, titleBarPad)
+#: po/rc.cpp:643 rc.cpp:643
+msgid "px"
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:123
+#. i18n: ectx: property (text), widget (QLabel, label)
+#: po/rc.cpp:646 rc.cpp:646
 msgid ""
 "<p><b>NOTE:</b><i>This window decoration uses the QtCurve widget style, and "
 "shares its configuration. To alter settings such as the titlebar gradient, "
@@ -2089,12 +2116,12 @@ msgstr ""
 "hizalaması gibi ayarları değiştirmek için gereç biçeminde ilgili yerleri "
 "değiştirmeniz gerekir</i></p>"
 
-#: po/rc.cpp:635 rc.cpp:635
+#: po/rc.cpp:647 rc.cpp:647
 msgctxt "NAME OF TRANSLATORS"
 msgid "Your names"
 msgstr "Necmettin Begiter"
 
-#: po/rc.cpp:636 rc.cpp:636
+#: po/rc.cpp:648 rc.cpp:648
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "necmettin.begiter@gmail.com"
