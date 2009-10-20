@@ -1760,6 +1760,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(EFFECT_NONE==opts->buttonEffect)
                 opts->etchEntry=false;
+            if(opts->colorSliderMouseOver &&
+               (SHADE_NONE==opts->shadeSliders || SHADE_DARKEN==opts->shadeSliders))
+                opts->colorSliderMouseOver=false;
 #endif
 
             return true;

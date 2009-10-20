@@ -8958,7 +8958,8 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                             QTC_DRAW_3D_BORDER(sunken, app)))),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
-                                     (WIDGET_SPIN!=w || !opts.unifySpinBtns) &&
+                                     WIDGET_SPIN!=w && WIDGET_COMBO_BUTTON!=w && WIDGET_SB_BUTTON!=w &&
+                                     (WIDGET_SB_SLIDER!=w || !opts.colorSliderMouseOver) &&
                                      !(option->state&QTC_STATE_KWIN_BUTTON) &&
 #ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                                      !(option->state&QTC_STATE_TBAR_BUTTON) &&
@@ -10006,7 +10007,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
         {
             p->fillRect(r, fill);
 
-            if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver)
+            if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver && !opts.colorSliderMouseOver)
             {
                 int col(QTC_SLIDER_MO_SHADE),
                     len(QTC_SLIDER_MO_LEN);
@@ -10028,7 +10029,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
             drawBevelGradient(fill, p, QRect(x, y, horiz ? r.width()-1 : size, horiz ? size : r.height()-1),
                               horiz, false, MODIFY_AGUA(opts.sliderAppearance));
 
-            if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver)
+            if(MO_PLASTIK==opts.coloredMouseOver && opt.state&State_MouseOver && !opts.colorSliderMouseOver)
             {
                 int col(QTC_SLIDER_MO_SHADE),
                     len(QTC_SLIDER_MO_LEN);
