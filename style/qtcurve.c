@@ -6676,7 +6676,7 @@ static void generateColors()
     if(opts.crColor)
         if(SHADE_BLEND_SELECTED==opts.shadeSliders)
             qtcPalette.selectedcr=qtcPalette.defbtn;
-        if(IND_COLORED==opts.defBtnIndicator)
+        else if(IND_COLORED==opts.defBtnIndicator)
             qtcPalette.selectedcr=qtcPalette.defbtn;
         else if(SHADE_BLEND_SELECTED==opts.comboBtn)
             qtcPalette.selectedcr=qtcPalette.combobtn;
