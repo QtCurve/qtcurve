@@ -1113,7 +1113,7 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
             res=gdk_pixbuf_new_from_inline(-1, radio_light, TRUE, NULL);
             break;
         case PIX_RADIO_ON:
-            res=gdk_pixbuf_new_from_inline(-1, radio_on, TRUE, NULL);
+            res=gdk_pixbuf_new_from_inline(-1, opts.smallRadio ? radio_on_small : radio_on, TRUE, NULL);
             break;
         case PIX_CHECK:
             res=gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :check_on, TRUE, NULL);
