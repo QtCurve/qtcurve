@@ -1297,6 +1297,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_INT(titlebarButtons)
             QTC_CFG_READ_TB_ICON(titlebarIcon)
 #endif
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+            QTC_CFG_READ_BOOL(xbar)
+#endif
             QTC_CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
             if(version<QTC_MAKE_VERSION(0, 63) && QTC_IS_BLACK(opts->customMenuStripeColor))
@@ -1341,6 +1344,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+            if(opts->xbar && opts->menubarHiding)
+                opts->xbar=false;
+#endif
 #endif
             QTC_CFG_READ_SHADING(shading);
 
@@ -1918,6 +1925,9 @@ static void defaultSettings(Options *opts)
     opts->titlebarButtons=QTC_TITLEBAR_BUTTON_ROUND|QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
     opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;
 #endif
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    opts->xbar=false;
+#endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
     opts->shading=SHADING_HSL;
@@ -2488,6 +2498,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareLvSelection)
         CFG_WRITE_ENTRY(invertBotTab)
         CFG_WRITE_ENTRY(menubarHiding)
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+        CFG_WRITE_ENTRY(xbar)
+#endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY(titlebarBorder)

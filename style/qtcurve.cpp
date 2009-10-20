@@ -33,9 +33,7 @@ static bool usePixmapCache=true;
 // in CT_PushButton and CT_ComboBox
 #define QTC_MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
 
-#ifdef QTC_XBAR_SUPPORT
 #include "macmenu.h"
-#endif
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define QTC_FIX_DISABLED_ICONS
@@ -346,10 +344,8 @@ static enum
     APP_KONTACT,
     APP_ARORA,
     APP_KMIX,
-#ifdef QTC_XBAR_SUPPORT
     APP_QTDESIGNER,
     APP_KDEVELOP,
-#endif
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1104,12 +1100,10 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_ARORA;
         else if("kmix"==appName)
             theThemedApp=APP_KMIX;
-#ifdef QTC_XBAR_SUPPORT
         else if("Designer"==QCoreApplication::applicationName())
             theThemedApp=APP_QTDESIGNER;
         else if("kdevelop"==appName)
             theThemedApp=APP_KDEVELOP;
-#endif
 
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains(appName);
@@ -1250,11 +1244,9 @@ void QtCurveStyle::polish(QWidget *widget)
 {
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
-#ifndef QTC_XBAR_SUPPORT
     // 'Fix' konqueror's large menubar...
-    if(APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
+    if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
         widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
-#endif
 
     if(EFFECT_NONE!=opts.buttonEffect && isNoEtchWidget(widget))
     {
@@ -1355,10 +1347,10 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->installEventFilter(this);
     else if(qobject_cast<QMenuBar *>(widget))
     {
-#ifdef QTC_XBAR_SUPPORT
-        if (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar")))
+        if (opts.xbar &&
+            (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar *)widget);
-#endif
+
         if(!IS_FLAT(opts.bgndAppearance))
             widget->setBackgroundRole(QPalette::NoRole);
 
@@ -1734,9 +1726,9 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->removeEventFilter(this);
     else if(qobject_cast<QMenuBar *>(widget))
     {
-#ifdef QTC_XBAR_SUPPORT
-        Bespin::MacMenu::release((QMenuBar *)widget);
-#endif
+        if(opts.xbar)
+            Bespin::MacMenu::release((QMenuBar *)widget);
+
         widget->setAttribute(Qt::WA_Hover, false);
 
         if(!IS_FLAT(opts.bgndAppearance))
@@ -2504,14 +2496,13 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_ScrollBar_MiddleClickAbsolutePosition:
             return true;
         case SH_MainWindow_SpaceBelowMenuBar:
-#ifdef QTC_XBAR_SUPPORT
-            if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
-                if (0==menubar->height() && !menubar->actions().isEmpty())
-                {   // we trick menubars if we use macmenus - hehehe...
-                    // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
-                    return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
-                }
-#endif
+            if(opts.xbar)
+                if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
+                    if (0==menubar->height() && !menubar->actions().isEmpty())
+                    {   // we trick menubars if we use macmenus - hehehe...
+                        // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
+                        return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
+                    }
 
             return 0;
         case SH_SpinControls_DisableOnBounds:
@@ -3184,10 +3175,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                                      widget->parentWidget()->inherits("Q3MainWindow")))
             {
                 painter->save();
-#ifdef QTC_XBAR_SUPPORT
-                if(!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))
-#endif
-                drawMenuOrToolBarBackground(painter, r, option);
+                if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
+                    drawMenuOrToolBarBackground(painter, r, option);
                 if(TB_NONE!=opts.toolbarBorders)
                 {
                     const QColor *use=itsActive
@@ -4907,10 +4896,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 painter->save();
 
-#ifdef QTC_XBAR_SUPPORT
-                if(!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))
-#endif
-                drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
+                if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
+                    drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
                     drawMenuItem(painter, r, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
@@ -5363,10 +5350,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 painter->save();
 
-#ifdef QTC_XBAR_SUPPORT
-                if(!widget || 0!=strcmp("QWidget", widget->metaObject()->className()))
-#endif
-                drawMenuOrToolBarBackground(painter, r, option);
+                if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
+                    drawMenuOrToolBarBackground(painter, r, option);
                 if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
                     (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
                 {
@@ -7841,10 +7826,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             if(APP_KONQUEROR==theThemedApp && widget && qobject_cast<const QMenuBar *>(widget))
             {
                 int height=konqMenuBarSize((const QMenuBar *)widget);
-#ifdef QTC_XBAR_SUPPORT
-                if(size.height()>height)
-#endif
-                newSize.setHeight(height);
+                if(!opts.xbar || (size.height()>height))
+                    newSize.setHeight(height);
             }
             break;
         default:

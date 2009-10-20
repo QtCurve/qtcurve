@@ -1,6 +1,7 @@
 0.70.0
 ------
 1. Add option to specify appearance of dock-widget titlebars.
+2. Made XBar support a config, and not cmake, option.
 
 0.69.2
 ------

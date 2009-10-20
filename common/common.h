@@ -855,6 +855,9 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                      stdBtnSizes,
 #endif
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+                     xbar,
+#endif
                      forceAlternateLvCols,
                      squareLvSelection,
                      invertBotTab,
