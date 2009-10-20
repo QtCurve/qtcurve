@@ -1095,7 +1095,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 70))
+            {
                 def->smallRadio=false;
+                def->splitterHighlight=true;
+            }
             if(version<QTC_MAKE_VERSION(0, 67))
                 def->doubleGtkComboArrow=false;
             if(version<QTC_MAKE_VERSION(0, 66))
@@ -1279,6 +1282,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(squareScrollViews)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(etchEntry)
+            QTC_CFG_READ_BOOL(splitterHighlight)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(popupBorder)
             QTC_CFG_READ_BOOL(unifySpinBtns)
@@ -1912,6 +1916,7 @@ static void defaultSettings(Options *opts)
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->etchEntry=false;
+    opts->splitterHighlight=false;
     opts->flatSbarButtons=true;
     opts->popupBorder=true;
     opts->unifySpinBtns=false;
@@ -2493,6 +2498,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareScrollViews)
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(etchEntry)
+        CFG_WRITE_ENTRY(splitterHighlight)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(popupBorder)
         CFG_WRITE_ENTRY(unifySpinBtns)

@@ -6,6 +6,7 @@ WidgetStyle=qtc_ozone
 version=0.67.0
 sliderStyle=r-plain
 sliderThumbs=none
+splitterHighlight=false
 thinSbarGroove=false
 framelessGroupBoxes=false
 fillSlider=false

@@ -4373,7 +4373,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
 //                 if(0!=opts.tabBgnd && inStackWidget(widget))
 //                     color=shade(color, QTC_TO_FACTOR(opts.tabBgnd));
-                painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled
+                painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled && opts.splitterHighlight
                                                 ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
                                                 : color));
             }

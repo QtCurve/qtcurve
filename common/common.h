@@ -840,6 +840,7 @@ typedef struct
                      highlightScrollViews,
                      sunkenScrollViews,
                      etchEntry,
+                     splitterHighlight,
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                      titlebarBorder,
 #endif

@@ -2,12 +2,14 @@
 ------
 1. Added option to colour selected check/radios.
 2. Added option to use a smaller dot for radios.
-3. Don't do coloured mouse over for buttons of editable combos, spin buttons,
+3. Added option to control whether the background of splitters should be
+   highlighted on mouse over.
+4. Don't do coloured mouse over for buttons of editable combos, spin buttons,
    or scrollbar buttons.
-4. Don't do regular coloured mouse over of sliders when theese are seto to be
+5. Don't do regular coloured mouse over of sliders when theese are seto to be
    coloured on mouse over.
-5. Add option to specify appearance of dock-widget titlebars.
-6. Made XBar support a config, and not cmake, option.
+6. Add option to specify appearance of dock-widget titlebars.
+7. Made XBar support a config, and not cmake, option.
 
 0.69.2
 ------
@@ -17,9 +19,9 @@
 4. Better postion of dots on slider handles.
 5. If custom button colours have been defined for window buttons, use the same
    colours to colour dock widget buttons.
-6. Add option to add extra paddnig to kwin titlebars.
-7. Add vlc and smplayer to default list of KDE4 apps that needs manual
-   saving of menubar state
+6. Add option to add extra paddnig to kwin titlebars.                                                                                                                                                     
+7. Add vlc and smplayer to default list of KDE4 apps that needs manual                                                                                                                                    
+   saving of menubar state  
 
 0.69.1
 ------
