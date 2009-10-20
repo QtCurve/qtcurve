@@ -2696,12 +2696,11 @@ static gboolean qtInit()
 
             if(!opts.menuIcons)
                 gtk_rc_parse_string("gtk-menu-images = 0");
-
-            /*
+            
             if(LINE_1DOT==opts.splitters)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"Spl\" { GtkPaned::handle_size=7 GtkPaned::handle_width = 7 } "
                                     "class \"*GtkWidget\" style \""QTC_RC_SETTING"Spl\"");
-            */
+
             if(tmpStr)
                 free(tmpStr);
         }
