@@ -2511,11 +2511,11 @@ static gboolean qtInit()
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"SV\""
                                     " { GtkScrolledWindow::scrollbar-spacing = 0 "
                                       " GtkScrolledWindow::scrollbars-within-bevel = 1 } "
-                                    "class \"*GtkWidget\" style \""QTC_RC_SETTING"SV\"");
+                                    "class \"GtkScrolledWindow\" style \""QTC_RC_SETTING"SV\"");
             else if(opts.etchEntry)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"SV\""
                                     " { GtkScrolledWindow::scrollbar-spacing = 2 } "
-                                    "class \"*GtkWidget\" style \""QTC_RC_SETTING"SV\"");
+                                    "class \"GtkScrolledWindow\" style \""QTC_RC_SETTING"SV\"");
 
             /* Scrolled windows */
             if(opts.squareScrollViews)

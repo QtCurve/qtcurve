@@ -2,6 +2,7 @@
 ------
 1. Added option to colour selected check/radios.
 2. Added option to use a smaller dot for radios.
+3. Fix internal padding of scrolled windows where scrollbars are within window.
 
 0.69.2
 ------
