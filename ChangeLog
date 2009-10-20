@@ -9,6 +9,7 @@
 5. Don't do regular coloured mouse over of sliders when theese are seto to be
    coloured on mouse over.
 6. Fix internal padding of scrolled windows where scrollbars are within window.
+7. When drawing frames, respect shadow state (in/out).
 
 0.69.2
 ------

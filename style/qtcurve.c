@@ -221,6 +221,21 @@ static void drawVLine(cairo_t *cr, double r, double g, double b, double a, int x
     cairo_stroke(cr);
 }
 
+static EBorder shadowToBorder(GtkShadowType shadow)
+{
+    switch(shadow)
+    {
+        case GTK_SHADOW_NONE:
+            return BORDER_FLAT;
+        case GTK_SHADOW_IN:
+        case GTK_SHADOW_ETCHED_IN:
+            return BORDER_SUNKEN;
+        case GTK_SHADOW_OUT:
+        case GTK_SHADOW_ETCHED_OUT:
+            return BORDER_RAISED;
+    }
+}
+
 static gboolean useButtonColor(const gchar *detail)
 {
     return detail &&( 0==strcmp(detail, "optionmenu") ||
@@ -4204,12 +4219,7 @@ debugDisplayWidget(widget, 3);
             drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                   NULL, ROUNDED_ALL,
-                   GTK_SHADOW_NONE==shadow_type
-                                        ? BORDER_FLAT
-                                        : GTK_SHADOW_IN==shadow_type || GTK_SHADOW_ETCHED_IN==shadow_type
-                                            ? BORDER_SUNKEN
-                                            : BORDER_RAISED, WIDGET_FRAME, QT_STD_BORDER);
+                   NULL, ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, QT_STD_BORDER);
     }
 
     QTC_CAIRO_END
@@ -6068,7 +6078,7 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
     }
     QTC_CAIRO_BEGIN
     drawBoxGap(cr, style, window, shadow_type, state, widget, area, x, y,
-               width, height, gap_side, gap_x, gap_width, BORDER_FLAT, FALSE);
+            width, height, gap_side, gap_x, gap_width, shadowToBorder(shadow_type), FALSE);
     QTC_CAIRO_END
 }
 
