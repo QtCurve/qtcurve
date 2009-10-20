@@ -2422,8 +2422,9 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_SELECTED==state)
             drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round, TRUE);
     }
-    else if( ( GTK_STATE_PRELIGHT==state && (detail && (0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") ||
-                                                  (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
+    else if( ( GTK_STATE_PRELIGHT==state && (detail && ( (opts.splitterHighlight && 0==strcmp(detail, QTC_PANED)) ||
+                                                          0==strcmp(detail, "expander") ||
+                                                          (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
     else if(/*!IS_FLAT(opts.bgndAppearance) &&*/ detail &&
             ( (GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton")) ||
