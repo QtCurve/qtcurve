@@ -1,3 +1,7 @@
+0.70.0
+------
+1. Add option to specify appearance of dock-widget titlebars.
+
 0.69.2
 ------
 1. Change 'Dont draw outer dark border' to 'Draw dark outer border'

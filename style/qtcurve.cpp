@@ -4481,10 +4481,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
                 bool                           verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
 #endif
-//                 // This section fixes the look of KOffice's dock widget titlebars...
-//                 QRect fillRect(r);
-//                 if(widget && widget->inherits("KoDockWidgetTitleBar"))
-//                     fillRect.adjust(-r.x(), -r.y(), r.x(), r.y());
+                if(!IS_FLAT(opts.dwtAppearance))
+                {
+                    // This section fixes the look of KOffice's dock widget titlebars...
+                    QRect fillRect(r);
+                    if(widget && widget->inherits("KoDockWidgetTitleBar"))
+                        fillRect.adjust(-r.x(), -r.y(), r.x(), r.y());
+                    painter->save();
+                    drawBevelGradient(palette.background().color(), painter, fillRect, !verticalTitleBar,
+                                      false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
+                    painter->restore();
+                }
 
 //                 painter->save();
 //     #if QT_VERSION >= 0x040300

@@ -1212,6 +1212,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_APPEARANCE(selectionAppearance, false)
 #endif
+#ifdef __cplusplus
+            QTC_CFG_READ_APPEARANCE(dwtAppearance, false)
+#endif
             QTC_CFG_READ_LINE(toolbarSeparators)
             QTC_CFG_READ_LINE(splitters)
             QTC_CFG_READ_BOOL(customMenuTextColor)
@@ -1595,6 +1598,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             checkAppearance(&opts->selectionAppearance, opts);
 #endif
+#ifdef __cplusplus
+            checkAppearance(&opts->dwtAppearance, opts);
+#endif
             checkAppearance(&opts->menuStripeAppearance, opts);
             checkAppearance(&opts->progressAppearance, opts);
             checkAppearance(&opts->progressGrooveAppearance, opts);
@@ -1735,6 +1741,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
 
             opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
+            opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
 #endif
             if(APPEARANCE_FLAT==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_RAISED;
@@ -1818,6 +1825,9 @@ static void defaultSettings(Options *opts)
     opts->gtkButtonOrder=false;
 #else
     opts->round=ROUND_FULL;
+#endif
+#ifdef __cplusplus
+    opts->dwtAppearance=APPEARANCE_FLAT;
 #endif
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;
@@ -2411,6 +2421,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(menuitemAppearance)
         CFG_WRITE_ENTRY(toolbarAppearance)
         CFG_WRITE_ENTRY(selectionAppearance)
+#ifdef __cplusplus
+        CFG_WRITE_ENTRY(dwtAppearance)
+#endif
         CFG_WRITE_ENTRY(menuStripeAppearance)
         CFG_WRITE_ENTRY_B(toolbarSeparators, false)
         CFG_WRITE_ENTRY_B(splitters, true)

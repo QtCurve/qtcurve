@@ -444,6 +444,7 @@ typedef enum
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
+    WIDGET_DOCK_WIDGET_TITLE,
 #endif
     WIDGET_SPIN,
     WIDGET_ENTRY,
@@ -891,6 +892,7 @@ typedef struct
                      titlebarAppearance,
                      inactiveTitlebarAppearance,
                      titlebarButtonAppearance,
+                     dwtAppearance,
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      selectionAppearance,
@@ -1369,6 +1371,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
             return opts->selectionAppearance;
 #endif
 #ifdef __cplusplus
+        case WIDGET_DOCK_WIDGET_TITLE:
+            return opts->dwtAppearance;
         case WIDGET_MDI_WINDOW:
         case WIDGET_MDI_WINDOW_TITLE:
             return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
