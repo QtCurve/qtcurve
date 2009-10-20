@@ -1,3 +1,7 @@
+0.70.0
+------
+1. Added option to colour selected check/radios.
+
 0.69.2
 ------
 1. If a scrollbar slider is maxed-out, then shade it as disabled - matches KDE.

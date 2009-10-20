@@ -42,6 +42,7 @@ static struct
              *defbtn,
              *mouseover,
              *combobtn,
+             *selectedcr,
              *sortedlv,
              menubar[TOTAL_SHADES+1],
              highlight[TOTAL_SHADES+1],
@@ -4564,7 +4565,9 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     QTC_CAIRO_BEGIN
 
-    if(QT_CUSTOM_COLOR_BUTTON(style))
+    if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
+        btn_colors=qtcPalette.selectedcr;
+    else if(QT_CUSTOM_COLOR_BUTTON(style))
     {
         shadeColors(&(style->bg[state]), new_colors);
         btn_colors=new_colors;
@@ -4786,7 +4789,9 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
             GdkRegion *region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
 
-            if(QT_CUSTOM_COLOR_BUTTON(style))
+            if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
+                btn_colors=qtcPalette.selectedcr;
+            else if(QT_CUSTOM_COLOR_BUTTON(style))
             {
                 shadeColors(&(style->bg[state]), new_colors);
                 btn_colors=new_colors;
@@ -6665,6 +6670,26 @@ static void generateColors()
         case SHADE_SELECTED:
             opts.customMenuStripeColor=qtcPalette.highlight[QTC_MENU_STRIPE_SHADE];
     }
+
+    qtcPalette.selectedcr=NULL;
+
+    if(opts.crColor)
+        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            qtcPalette.selectedcr=qtcPalette.defbtn;
+        if(IND_COLORED==opts.defBtnIndicator)
+            qtcPalette.selectedcr=qtcPalette.defbtn;
+        else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+            qtcPalette.selectedcr=qtcPalette.combobtn;
+        else if(SHADE_BLEND_SELECTED==opts.sortedLv && opts.lvButton)
+            qtcPalette.selectedcr=qtcPalette.sortedlv;
+        else
+        {
+            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                  &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+
+            qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            shadeColors(&mid, qtcPalette.selectedcr);
+        }
 }
 
 static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)
