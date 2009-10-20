@@ -107,8 +107,8 @@ static ELine toLine(const char *str, ELine def)
             return LINE_DOTS;
         if(0==memcmp(str, "flat", 4))
             return LINE_FLAT;
-//         if(0==memcmp(str, "1dot", 5))
-//             return LINE_1DOT;
+        if(0==memcmp(str, "1dot", 5))
+            return LINE_1DOT;
     }
     return def;
 }
@@ -1098,6 +1098,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 def->smallRadio=false;
                 def->splitterHighlight=true;
+                def->splitters=LINE_FLAT;
+                def->handles=LINE_SUNKEN;
             }
             if(version<QTC_MAKE_VERSION(0, 67))
                 def->doubleGtkComboArrow=false;
@@ -1769,6 +1771,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->colorSliderMouseOver=false;
 #endif
 
+            if(LINE_1DOT==opts->toolbarSeparators)
+                opts->toolbarSeparators=LINE_DOTS;
+
             return true;
         }
         else
@@ -1876,14 +1881,14 @@ static void defaultSettings(Options *opts)
     opts->sliderFill=APPEARANCE_GRADIENT;
     opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
-    opts->handles=LINE_SUNKEN;
+    opts->handles=LINE_1DOT;
     opts->shadeSliders=SHADE_NONE;
     opts->shadeMenubars=SHADE_NONE;
     opts->shadeCheckRadio=SHADE_NONE;
     opts->sortedLv=SHADE_NONE;
     opts->toolbarBorders=TB_NONE;
     opts->toolbarSeparators=LINE_SUNKEN;
-    opts->splitters=LINE_FLAT;
+    opts->splitters=LINE_1DOT;
     opts->fixParentlessDialogs=false;
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_GLOW;
@@ -2025,8 +2030,8 @@ static const char *toStr(ELine ind, bool dashes)
 {
     switch(ind)
     {
-//         case LINE_1DOT:
-//             return "1dot";
+        case LINE_1DOT:
+            return "1dot";
         case LINE_DOTS:
             return "dots";
         case LINE_DASHES:

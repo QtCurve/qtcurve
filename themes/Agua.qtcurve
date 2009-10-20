@@ -3,11 +3,10 @@ Name=Agua
 [KDE]
 WidgetStyle=qtc_agua
 [Settings]
-version=0.67.0
+version=0.70.0
 appearance=agua
 crColor=true
 sliderAppearance=agua
-splitterHighlight=false
 sunkenAppearance=inverted
 round=max
 lvAppearance=agua

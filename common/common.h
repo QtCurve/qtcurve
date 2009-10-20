@@ -406,10 +406,11 @@ typedef enum
     PIX_SLIDER,
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
-    PIX_SLIDER_LIGHT_V
-    //PIX_DOT
-#if !defined __cplusplus
-    , PIX_BLANK
+    PIX_SLIDER_LIGHT_V,
+#if defined __cplusplus
+    PIX_DOT
+#else
+    PIX_BLANK
 #endif
 } EPixmap;
 
@@ -548,8 +549,8 @@ typedef enum
     LINE_SUNKEN,
     LINE_FLAT,
     LINE_DOTS,
-    LINE_DASHES
-    //LINE_1DOT
+    LINE_1DOT,
+    LINE_DASHES,
 } ELine;
 
 typedef enum

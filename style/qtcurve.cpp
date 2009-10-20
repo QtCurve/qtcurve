@@ -2355,7 +2355,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 //         case PM_DockWindowHandleExtent:
 //             return 10;
         case PM_SplitterWidth:
-            return /*LINE_1DOT==opts.splitters ? 7 : */6;
+            return LINE_1DOT==opts.splitters ? 7 : 6;
         case PM_ScrollBarSliderMin:
             return opts.sliderWidth+1;
         case PM_SliderThickness:
@@ -4382,9 +4382,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 case LINE_NONE:
                     break;
-//                 case LINE_1DOT:
-//                     painter->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QT_STD_BORDER], PIX_DOT, 1.0));
-//                     break;
+                case LINE_1DOT:
+                    painter->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QT_STD_BORDER], PIX_DOT, 1.0));
+                    break;
                 default:
                 case LINE_DOTS:
                     drawDots(painter, r, horiz, NUM_SPLITTER_DASHES, 1, border, 0, 5);
@@ -9924,9 +9924,9 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
     
         switch(opts.sliderThumbs)
         {
-//             case LINE_1DOT:
-//                 p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[QT_STD_BORDER], PIX_DOT, 1.0));
-//                 break;
+            case LINE_1DOT:
+                p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(markers[QT_STD_BORDER], PIX_DOT, 1.0));
+                break;
             case LINE_FLAT:
                 drawLines(p, r, !horiz, 3, 5, markers, 0, 5, opts.sliderThumbs);
                 break;
@@ -10248,9 +10248,9 @@ void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOp
     {
         case LINE_NONE:
             break;
-//         case LINE_1DOT:
-//              p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QT_STD_BORDER], PIX_DOT, 1.0));
-//             break;
+        case LINE_1DOT:
+             p->drawPixmap(r.x()+((r.width()-5)/2), r.y()+((r.height()-5)/2), *getPixmap(border[QT_STD_BORDER], PIX_DOT, 1.0));
+            break;
         case LINE_DOTS:
             drawDots(p, r, !(option->state&State_Horizontal), 2,
                      tb ? 5 : 3, border, tb ? -2 : 0, 5);
@@ -10566,8 +10566,6 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
 
     if(!pix)
     {
-/*
-    Can't get Gtk2 version to look nice, so give up for now!
         if(PIX_DOT==p)
         {
             pix=new QPixmap(5, 5);
@@ -10591,11 +10589,10 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
             p.setBrush(g1);
             p.drawEllipse(0, 0, 5, 5);
             p.setBrush(g2);
-            p.drawEllipse(2, 2, 3, 3);
+            p.drawEllipse(1, 1, 4, 4);
             p.end();
         }
         else
-*/
         {
             pix=new QPixmap();
 
