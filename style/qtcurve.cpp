@@ -803,6 +803,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
             : itsSliderCols(0L),
               itsDefBtnCols(0L),
               itsComboBtnCols(0L),
+              itsCheckRadioSelCols(0L),
               itsSortedLvColors(0L),
               itsSaveMenuBarStatus(false),
               itsSidebarButtonsCols(0L),
@@ -985,6 +986,22 @@ QtCurveStyle::QtCurveStyle(const QString &name)
                         itsSortedLvColors);
     }
 
+    if(opts.crColor)
+        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+            itsCheckRadioSelCols=itsSliderCols;
+        else if(IND_COLORED==opts.defBtnIndicator)
+            itsCheckRadioSelCols=itsDefBtnCols;
+        else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+            itsCheckRadioSelCols=itsComboBtnCols;
+        else if(SHADE_BLEND_SELECTED==opts.sortedLv && opts.lvButton)
+            itsCheckRadioSelCols=itsSortedLvColors;
+        else
+        {
+            itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                                 itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
+        }
+
     setMenuColors(QApplication::palette().color(QPalette::Active, QPalette::Background));
 
     if(USE_LIGHTER_POPUP_MENU)
@@ -1046,6 +1063,9 @@ QtCurveStyle::~QtCurveStyle()
     if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
        itsSortedLvColors!=itsComboBtnCols)
         delete [] itsSortedLvColors;
+    if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
+       itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors)
+        delete [] itsCheckRadioSelCols;
     if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
             delete [] itsTitleBarButtonsCols[i];
@@ -1146,7 +1166,11 @@ void QtCurveStyle::polish(QPalette &palette)
          newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
                                              itsComboBtnCols!=itsSortedLvColors) ||
                                              SHADE_DARKEN==opts.sortedLv) &&
-                     (newContrast || (opts.lvButton ? newButton : newGray)));
+                     (newContrast || (opts.lvButton ? newButton : newGray))),
+         newCheckRadioSelCols((newButton || newGray) &&
+                              itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols &&
+                              itsCheckRadioSelCols!=itsSliderCols &&
+                              itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors);
 
     if(newGray)
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
@@ -1209,6 +1233,10 @@ void QtCurveStyle::polish(QPalette &palette)
         case SHADE_CUSTOM:
              itsCheckRadioCol=opts.customCheckRadioColor;
     }
+
+    if(newCheckRadioSelCols)
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                             itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
 
     palette.setColor(QPalette::Active, QPalette::Light, itsBackgroundCols[0]);
     palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
@@ -3492,7 +3520,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                           glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
             QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
             const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
-                         *btn(buttonColors(option)),
+                         *btn(checkRadioColors(option)),
                          *use(bc ? bc : btn);
             const QColor &bgnd(opts.crButton
                                 ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
@@ -3621,7 +3649,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                      x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
 
             const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
-                         *btn(buttonColors(option)),
+                         *btn(checkRadioColors(option)),
                          *use(bc ? bc : btn);
             const QColor &bgnd(opts.crButton
                                 ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
@@ -10317,6 +10345,13 @@ const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
     }
 
     return itsButtonCols;
+}
+
+const QColor * QtCurveStyle::checkRadioColors(const QStyleOption *option) const
+{
+    return opts.crColor && option  && option->state&State_Enabled && (option->state&State_On || option->state&State_NoChange)
+        ? itsCheckRadioSelCols
+        : buttonColors(option);
 }
 
 const QColor * QtCurveStyle::sliderColors(const QStyleOption *option) const

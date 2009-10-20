@@ -159,6 +159,7 @@ class QtCurveStyle : public QWindowsStyle
     void colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int round) const;
     void shadeColors(const QColor &base, QColor *vals) const;
     const QColor * buttonColors(const QStyleOption *option) const;
+    const QColor * checkRadioColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;
     const QColor * backgroundColors(const QStyleOption *option) const
@@ -208,6 +209,7 @@ class QtCurveStyle : public QWindowsStyle
                                        *itsSliderCols,
                                        *itsDefBtnCols,
                                        *itsComboBtnCols,
+                                       *itsCheckRadioSelCols,
                                        *itsSortedLvColors,
                                        itsButtonCols[TOTAL_SHADES+1],
                                        itsLighterPopupMenuBgndCol,

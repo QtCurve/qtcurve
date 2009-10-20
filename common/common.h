@@ -832,6 +832,7 @@ typedef struct
 #endif
                      crHighlight,
                      crButton,
+                     crColor,
                      fillProgress,
                      comboSplitter,
                      squareScrollViews,
