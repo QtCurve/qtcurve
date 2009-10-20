@@ -857,7 +857,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     }
 
     readConfig(rcFile, &opts);
-    opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt();
+    opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", QTC_DEFAULT_CONTRAST).toInt();
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=QTC_DEFAULT_CONTRAST;
 
@@ -1135,11 +1135,11 @@ void QtCurveStyle::polish(QApplication *app)
 
 void QtCurveStyle::polish(QPalette &palette)
 {
-    int  contrast(QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt());
+    int  contrast(QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", QTC_DEFAULT_CONTRAST).toInt());
     bool newContrast(false);
 
     if(contrast<0 || contrast>10)
-        contrast=7;
+        contrast=QTC_DEFAULT_CONTRAST;
 
     if(contrast!=opts.contrast)
     {
