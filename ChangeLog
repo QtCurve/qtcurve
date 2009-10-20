@@ -2,7 +2,11 @@
 ------
 1. Added option to colour selected check/radios.
 2. Added option to use a smaller dot for radios.
-3. Fix internal padding of scrolled windows where scrollbars are within window.
+3. Don't do coloured mouse over for buttons of editable combos, spin buttons,
+   or scrollbar buttons.
+4. Don't do regular coloured mouse over of sliders when theese are seto to be
+   coloured on mouse over.
+5. Fix internal padding of scrolled windows where scrollbars are within window.
 
 0.69.2
 ------

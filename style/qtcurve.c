@@ -1513,8 +1513,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkS
     EAppearance app=widgetApp(widget, &opts);
     gboolean    sunken=flags&DF_SUNKEN,
                 doColouredMouseOver=opts.coloredMouseOver && qtcPalette.mouseover &&
-                                  (!opts.unifySpinBtns || (WIDGET_SPIN!=widget && WIDGET_SPIN_DOWN!=widget &&
-                                                           WIDGET_SPIN_UP!=widget)) &&
+                                  WIDGET_SPIN!=widget && WIDGET_SPIN_DOWN!=widget && WIDGET_SPIN_UP!=widget &&
+                                  WIDGET_COMBO_BUTTON!=widget && WIDGET_SB_BUTTON!=widget &&
+                                  (WIDGET_SB_SLIDER!=widget || !opts.colorSliderMouseOver) &&
                                   WIDGET_UNCOLOURED_MO_BUTTON!=widget &&
                                   GTK_STATE_PRELIGHT==state &&
                                   (IS_TOGGLE_BUTTON(widget) || !sunken),
@@ -5880,7 +5881,8 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
     else
     {
-        gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
+        gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver &&
+                                      !opts.colorSliderMouseOver,
                      horiz=SLIDER_TRIANGULAR==opts.sliderStyle ? height>width : width>height;
         int          bgnd=getFillReal(state, FALSE, SHADE_DARKEN==opts.shadeSliders),
                      xo=horiz ? 8 : 0,
