@@ -114,6 +114,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void unifySpinToggled();
     void sliderThumbChanged();
     void sliderWidthChanged();
+    void menubarHidingChanged();
+    void xbarChanged();
     void changeStack();
     void gradChanged(int i);
     void editItem(QTreeWidgetItem *i, int col);
