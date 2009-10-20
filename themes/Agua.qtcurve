@@ -5,12 +5,14 @@ WidgetStyle=qtc_agua
 [Settings]
 version=0.67.0
 appearance=agua
+crColor=true
 sliderAppearance=agua
 sunkenAppearance=inverted
 round=max
 lvAppearance=agua
 menuitemAppearance=harshgradient
 useHighlightForMenu=true
+smallRadio=true
 sliderThumbs=none
 shadeSliders=selected
 defBtnIndicator=tint

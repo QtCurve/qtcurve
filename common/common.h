@@ -833,6 +833,7 @@ typedef struct
                      crHighlight,
                      crButton,
                      crColor,
+                     smallRadio,
                      fillProgress,
                      comboSplitter,
                      squareScrollViews,

@@ -1094,10 +1094,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(0, 70))
+                def->smallRadio=false;
             if(version<QTC_MAKE_VERSION(0, 67))
-            {
                 def->doubleGtkComboArrow=false;
-            }
             if(version<QTC_MAKE_VERSION(0, 66))
             {
                 def->menuStripeAppearance=APPEARANCE_GRADIENT;
@@ -1273,6 +1273,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(crHighlight)
             QTC_CFG_READ_BOOL(crButton)
             QTC_CFG_READ_BOOL(crColor)
+            QTC_CFG_READ_BOOL(smallRadio)
             QTC_CFG_READ_BOOL(fillProgress)
             QTC_CFG_READ_BOOL(comboSplitter)
             QTC_CFG_READ_BOOL(squareScrollViews)
@@ -1902,6 +1903,7 @@ static void defaultSettings(Options *opts)
     opts->crHighlight=false;
     opts->crButton=true;
     opts->crColor=false;
+    opts->smallRadio=true;
     opts->fillProgress=true;
     opts->comboSplitter=false;
     opts->squareScrollViews=false;
@@ -2482,6 +2484,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(crHighlight)
         CFG_WRITE_ENTRY(crButton)
         CFG_WRITE_ENTRY(crColor)
+        CFG_WRITE_ENTRY(smallRadio)
         CFG_WRITE_ENTRY(fillProgress)
         CFG_WRITE_ENTRY(comboSplitter)
         CFG_WRITE_ENTRY(squareScrollViews)

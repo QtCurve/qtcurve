@@ -10612,10 +10612,16 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
                     img.loadFromData(radio_light_png_data, radio_light_png_len);
                     break;
                 case PIX_RADIO_ON:
-                    img.loadFromData(radio_on_png_data, radio_on_png_len);
+                    if(opts.smallRadio)
+                        img.loadFromData(radio_on_small_png_data, radio_on_small_png_len);
+                    else
+                        img.loadFromData(radio_on_png_data, radio_on_png_len);
                     break;
                 case PIX_CHECK:
-                    img.loadFromData(opts.xCheck ? check_x_on_png_data : check_on_png_data, opts.xCheck ? check_x_on_png_len : check_on_png_len);
+                    if(opts.xCheck)
+                        img.loadFromData(check_x_on_png_data, check_x_on_png_len);
+                    else
+                        img.loadFromData(check_on_png_data, check_on_png_len);
                     break;
                 case PIX_SLIDER:
                     img.loadFromData(slider_png_data, slider_png_len);
