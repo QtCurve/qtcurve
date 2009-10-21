@@ -2350,12 +2350,13 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1;
         case PM_ProgressBarChunkWidth:
             return 4;
-//         case PM_DockWindowSeparatorExtent:
-//             return 4;
 //         case PM_DockWindowHandleExtent:
 //             return 10;
+        case PM_DockWidgetSeparatorExtent:
         case PM_SplitterWidth:
             return LINE_1DOT==opts.splitters ? 7 : 6;
+        case PM_ToolBarHandleExtent:
+            return LINE_1DOT==opts.handles ? 7 : 8;
         case PM_ScrollBarSliderMin:
             return opts.sliderWidth+1;
         case PM_SliderThickness:
