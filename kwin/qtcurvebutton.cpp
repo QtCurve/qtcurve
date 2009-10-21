@@ -224,6 +224,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         QColor        col(KDecoration::options()->color(KDecoration::ColorFont, active/* || faded*/));
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
+        EEffect       effect((EEffect)(style()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
 
         if(flags&QTC_TITLEBAR_BUTTON_COLOR && flags&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL &&
            (itsHover || !(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL)))
@@ -241,11 +242,11 @@ void QtCurveButton::drawButton(QPainter *painter)
             dY++;
             dX++;
         }
-        else if (!faded)
+        else if (!faded && EFFECT_NONE!=effect)
         {
-            QColor shadow(Qt::black);
+            QColor shadow(WINDOW_SHADOW_COLOR(effect));
 
-            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA);
+            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
             bP.setPen(shadow);
             bP.drawPixmap(dX+1, dY+1, icon);
         }

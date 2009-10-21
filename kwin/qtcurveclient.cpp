@@ -364,6 +364,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                     : itsCaptionRect);
         int           textWidth=alignFull || (showIcon && alignment&Qt::AlignHCenter)
                                     ? fm.boundingRect(str).width()+(showIcon ? iconSize+constPad : 0) : 0;
+        EEffect       effect((EEffect)(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
 
         if(alignFull)
             if(itsCaptionRect.left()>((textRect.width()-textWidth)>>1))
@@ -417,15 +418,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             }
 
         painter.setClipRect(itsCaptionRect.adjusted(-2, 0, 2, 0));
-        QColor shadow(Qt::black);
-        shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA);
-        painter.setPen(shadow);
-        painter.drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
-
         QColor color(KDecoration::options()->color(KDecoration::ColorFont, active));
 
-        if (!active && QTC_DARK_WINDOW_TEXT(color))
-             color.setAlpha((color.alpha() * 180) >> 8);
+        if(EFFECT_NONE!=effect)
+        {
+            QColor shadow(WINDOW_SHADOW_COLOR(effect));
+            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
+            painter.setPen(shadow);
+            painter.drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
+
+            if (!active && QTC_DARK_WINDOW_TEXT(color))
+                color.setAlpha((color.alpha() * 180) >> 8);
+        }
 
         painter.setPen(color);
         painter.drawText(textRect, alignment, str);
