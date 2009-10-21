@@ -4509,6 +4509,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     drawBevelGradient(palette.background().color(), painter, fillRect, !verticalTitleBar,
                                       false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
                     painter->restore();
+
+                    /* With border, but is a bit too much :-(
+                    QStyleOption opt(*option);
+
+                    if(opt.state&State_Horizontal)
+                        opt.state^=State_Horizontal;
+                    else
+                        opt.state|=State_Horizontal;
+                    drawLightBevel(painter, fillRect, &opt, widget, ROUNDED_ALL, getFill(&opt, itsBackgroundCols),
+                                   itsBackgroundCols, true, WIDGET_DOCK_WIDGET_TITLE);
+                    */
                 }
 
 //                 painter->save();
