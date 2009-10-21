@@ -530,6 +530,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertFocusEntries(focus);
     insertGradBorderEntries(gradBorder);
     insertAlignEntries(titlebarAlignment);
+    insertEffectEntries(titlebarEffect);
     insertTitlebarIconEntries(titlebarIcon);
     insertTabMoEntries(tabMouseOver);
     insertGradTypeEntries(bgndGrad);
@@ -676,6 +677,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(forceAlternateLvCols, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squareLvSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarAlignment, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(titlebarEffect, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarIcon, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
 
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1641,6 +1643,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.forceAlternateLvCols=forceAlternateLvCols->isChecked();
     opts.squareLvSelection=squareLvSelection->isChecked();
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
+    opts.titlebarEffect=(EEffect)titlebarEffect->currentIndex();
     opts.titlebarIcon=(ETitleBarIcon)titlebarIcon->currentIndex();
 
     if(customShading->isChecked())
@@ -1793,6 +1796,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     forceAlternateLvCols->setChecked(opts.forceAlternateLvCols);
     squareLvSelection->setChecked(opts.squareLvSelection);
     titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
+    titlebarEffect->setCurrentIndex(opts.titlebarEffect);
     titlebarIcon->setCurrentIndex(opts.titlebarIcon);
 
     shading->setCurrentIndex(opts.shading);
@@ -1966,6 +1970,7 @@ bool QtCurveConfig::settingsChanged()
          forceAlternateLvCols->isChecked()!=currentStyle.forceAlternateLvCols ||
          squareLvSelection->isChecked()!=currentStyle.squareLvSelection ||
          titlebarAlignment->currentIndex()!=currentStyle.titlebarAlignment ||
+         titlebarEffect->currentIndex()!=currentStyle.titlebarEffect ||
          titlebarIcon->currentIndex()!=currentStyle.titlebarIcon ||
 
          shading->currentIndex()!=(int)currentStyle.shading ||

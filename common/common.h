@@ -337,7 +337,8 @@ typedef enum
     QtC_TitleBarButtons,
     QtC_TitleBarIcon,
     QtC_TitleBarIconColor,
-    QtC_TitleBarBorder
+    QtC_TitleBarBorder,
+    QtC_TitleBarEffect
 } QtCMetrics;
 
 #define QtC_StateKWin          ((QStyle::StateFlag)0x10000000)
@@ -350,7 +351,8 @@ typedef enum
 #define CLOSE_COLOR              QColor(191, 82, 82)
 #define QTC_DARK_WINDOW_TEXT(A)  ((A).red()<230 || (A).green()<230 || (A).blue()<230)
 #define HOVER_BUTTON_ALPHA(A)    (QTC_DARK_WINDOW_TEXT(A) ? 0.25 : 0.65)
-#define WINDOW_TEXT_SHADOW_ALPHA 0.10
+#define WINDOW_TEXT_SHADOW_ALPHA(A) (EFFECT_SHADOW==(A) ? 0.10 : 0.45)
+#define WINDOW_SHADOW_COLOR(A)      (EFFECT_SHADOW==(A) ? Qt::black : Qt::white)
 #endif
 
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -936,6 +938,7 @@ typedef struct
                      customSortedLvColor;
 #if defined __cplusplus
     EAlign           titlebarAlignment;
+    EEffect          titlebarEffect;
 #if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
     QSet<QString>    menubarApps;
 #endif

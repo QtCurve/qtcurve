@@ -2418,6 +2418,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return buttonColors(option)[ORIGINAL_SHADE].rgb();
         case QtC_TitleBarBorder:
             return opts.titlebarBorder;
+        case QtC_TitleBarEffect:
+            return opts.titlebarEffect;
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
@@ -6964,7 +6966,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         : active || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL
                                             ? itsActiveMdiTextColor
                                             : itsMdiTextColor*/),
-                             shadow(Qt::black);
+                             shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                 QStyleOption opt(*option);
                 bool         drawLine=opts.colorTitlebarOnly &&
                                         (kwin ? titleBar->titleBarState&QtCStateKWinDrawLine
@@ -7146,12 +7148,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QTextOption textOpt(alignment|Qt::AlignVCenter);
                     textOpt.setWrapMode(QTextOption::NoWrap);
 
-                    shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA);
-                    painter->setPen(shadow);
-                    painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
+                    if(EFFECT_NONE!=opts.titlebarEffect)
+                    {
+                        shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
+                        painter->setPen(shadow);
+                        painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
 
-                    if (!active && QTC_DARK_WINDOW_TEXT(textColor))
-                        textColor.setAlpha((textColor.alpha() * 180) >> 8);
+                        if (!active && QTC_DARK_WINDOW_TEXT(textColor))
+                            textColor.setAlpha((textColor.alpha() * 180) >> 8);
+                    }
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
                 }
@@ -9596,7 +9601,8 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
 {
     bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
 
-    if(!sunken && !faded) // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+    if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
+        // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, button);
 
     QColor col(color);

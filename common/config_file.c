@@ -1317,6 +1317,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(doubleGtkComboArrow)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)
+            QTC_CFG_READ_EFFECT(titlebarEffect)
             QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkComboMenus)
             QTC_CFG_READ_BOOL(colorTitlebarOnly)
@@ -1957,6 +1958,7 @@ static void defaultSettings(Options *opts)
     opts->customComboBtnColor.setRgb(0, 0, 0);
     opts->customMenuStripeColor.setRgb(0, 0, 0);
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
+    opts->titlebarEffect=EFFECT_SHADOW;
 #else
 /*
     opts->setDialogButtonOrder=false;
