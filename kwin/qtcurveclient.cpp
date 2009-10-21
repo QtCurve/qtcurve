@@ -260,6 +260,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(!roundBottom)
         opt.state|=QtCStateKWinNotFull;
+    if(isShade())
+        opt.state|=QtCStateKWinShaded;
 
     if(outerBorder)
     {

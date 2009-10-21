@@ -3958,6 +3958,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             ERound oldRound=opts.round;
             if(state&QtCStateKWinNotFull && state&QtC_StateKWin)
                 opts.round=ROUND_NONE;
+            else if(state&QtCStateKWinShaded && state&QtC_StateKWin && opts.round>ROUND_SLIGHT)
+                opts.round=ROUND_SLIGHT;
 
             const QColor *borderCols(opts.colorTitlebarOnly
                                         ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
@@ -3969,8 +3971,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                        (APP_KWIN==theThemedApp || state&QtC_StateKWin));
 
             opt.state=State_Horizontal|State_Enabled|State_Raised;
+
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
             if(state&QtC_StateKWinHighlight)
                 opt.state|=QtC_StateKWinHighlight;
+#endif
 
             if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
             {
@@ -3994,7 +3999,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(roundKWinFull)
             {
-                bool   kwinHighlight(state&QtC_StateKWinHighlight);
+                bool   kwinHighlight(
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
+                                     state&QtC_StateKWinHighlight
+#else
+                                     false
+#endif
+                                    );
+                                     
                 QColor col(opts.colorTitlebarOnly
                             ? backgroundColors(option)[QT_STD_BORDER]
                             : kwinHighlight ? itsFocusCols[0] : buttonColors(option)[QT_STD_BORDER]);
@@ -6945,6 +6957,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             {
                 painter->save();
 
+                ERound oldRound=opts.round;
+                if(state&QtCStateKWinShaded && state&QtC_StateKWin && opts.round>ROUND_SLIGHT)
+                    opts.round=ROUND_SLIGHT;
+            
                 bool         active(state&State_Active),
                              kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin),
                              roundKWinFull(QTC_FULLLY_ROUNDED &&
@@ -6976,8 +6992,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                                   itsMdiColors[ORIGINAL_SHADE]!=itsBackgroundCols[ORIGINAL_SHADE])) );
 
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
                 if(state&QtC_StateKWinHighlight)
                     opt.state|=QtC_StateKWinHighlight;
+#endif
 
 //                 if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
 //                 {
@@ -7019,7 +7037,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(roundKWinFull)
                     {
-                        bool   kwinHighlight(state&QtC_StateKWinHighlight);
+                        bool   kwinHighlight(
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
+                                             state&QtC_StateKWinHighlight
+#else
+                                             false
+#endif
+                                            );
+                                             
                         QColor col(kwinHighlight ? itsFocusCols[0] : btnCols[QT_STD_BORDER]);
 
                         painter->setPen(col);
@@ -7221,6 +7246,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                     else
                         drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, shadow, btnCols, bgndCols);
+                opts.round=oldRound;
                 painter->restore();
             }
             break;
@@ -9517,7 +9543,11 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     }
     else
     {
+#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
         p->setPen(window && state&QtC_StateKWinHighlight ? itsFocusCols[0] : border);
+#else
+        p->setPen(border);
+#endif
         p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
     }
 
