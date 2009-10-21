@@ -13,6 +13,7 @@
  8. Add option to specify appearance of dock-widget titlebars.
  9. Made XBar support a config, and not cmake, option.
 10. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
+11. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
 
 0.69.2
 ------

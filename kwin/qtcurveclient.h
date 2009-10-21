@@ -61,9 +61,11 @@ class QtCurveClient : public KCommonDecoration
     void                      drawBtnBgnd(QPainter *p, const QRect &r, bool active);
     void                      paintEvent(QPaintEvent *e);
     void                      updateWindowShape();
-    QRegion                   getMask(int round, int w, int h, bool maximised=false) const;
+    QRegion                   getMask(int round, int w, int h) const;
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
+
+    bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
 
 #if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
     virtual QList<QRect>      shadowQuads(ShadowType type) const;

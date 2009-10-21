@@ -82,21 +82,19 @@ bool QtCurveClient::decorationBehaviour(DecorationBehaviour behaviour) const
 int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
                                 const KCommonDecorationButton *btn) const
 {
-    bool maximized(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
-
     switch (lm)
     {
         case LM_BorderLeft:
         case LM_BorderRight:
         case LM_BorderBottom:
-            return respectWindowState && maximized ? 0 : Handler()->borderSize();
+            return respectWindowState && isMaximized() ? 0 : Handler()->borderSize();
         case LM_TitleEdgeTop:
-            return respectWindowState && maximized ? 0 : Handler()->borderEdgeSize();
+            return respectWindowState && isMaximized() ? 0 : Handler()->borderEdgeSize();
         case LM_TitleEdgeBottom:
-            return /*respectWindowState && maximized ? 1 : */ Handler()->borderEdgeSize();
+            return /*respectWindowState && isMaximized() ? 1 : */ Handler()->borderEdgeSize();
         case LM_TitleEdgeLeft:
         case LM_TitleEdgeRight:
-            return respectWindowState && maximized ? 0 : Handler()->borderEdgeSize();
+            return respectWindowState && isMaximized() ? 0 : Handler()->borderEdgeSize();
         case LM_TitleBorderLeft:
         case LM_TitleBorderRight:
             return 5;
@@ -167,8 +165,7 @@ void QtCurveClient::activeChange()
 
 void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 {
-    bool   mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows());
-    int    state((active ? 1 : 0)+((mximised ? 1 : 0)<<1));
+    int    state((active ? 1 : 0)+((isMaximized() ? 1 : 0)<<1));
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     bool   diffSize(itsButtonBackground[state].pix.width()!=r.width() ||
                     itsButtonBackground[state].pix.height()!=r.height());
@@ -211,10 +208,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     bool                 active(isActive()),
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
                                         NULL, NULL)),
-                         mximised(maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows()),
                          roundBottom(Handler()->roundBottom()),
                          outerBorder(Handler()->outerBorder());
-    const int            maximiseOffset(mximised ? 3 : 0),
+    const int            maximiseOffset(isMaximized() ? 3 : 0),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
@@ -231,9 +227,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
 
+    if(!isShade()
 #if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
-    if(!(Handler()->coloredShadow() && shadowsActive() && active))
+      && !(Handler()->coloredShadow() && shadowsActive() && active)
 #endif
+      )
     {
         painter.setClipRegion(e->region());
         painter.fillRect(r, windowCol); // Makes hings look nicer for kcmshell preview...
@@ -243,7 +241,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     opt.init(widget());
 
-    if(mximised)
+    if(isMaximized())
         r.adjust(-3, -border, 3, 0);
     opt.palette.setColor(QPalette::Button, col);
     opt.palette.setColor(QPalette::Window, windowCol);
@@ -444,14 +442,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
 void QtCurveClient::updateWindowShape()
 {
-    setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
-                    widget()->width(), widget()->height(),
-                    maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows()));
+    if(isMaximized())
+        clearMask();
+    else
+        setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
+                        widget()->width(), widget()->height()));
 }
 
-QRegion QtCurveClient::getMask(int round, int w, int h, bool maximised) const
+QRegion QtCurveClient::getMask(int round, int w, int h) const
 {  
-    switch(maximised ? ROUND_NONE : round)
+    if(isShade())
+        round=ROUND_SLIGHT;
+    switch(round)
     {
         case ROUND_NONE:
             return  QRegion(0, 0, w, h);
