@@ -1,17 +1,18 @@
 0.70.0
 ------
-1. Added option to colour selected check/radios.
-2. Added option to use a smaller dot for radios.
-3. Added option to control whether the background of splitters should be
-   highlighted on mouse over.
-4. Added new splitter/handle/thumb style: single dot.
-5. Don't do coloured mouse over for buttons of editable combos, spin buttons,
-   or scrollbar buttons.
-6. Don't do regular coloured mouse over of sliders when theese are seto to be
-   coloured on mouse over.
-7. Allow to specify strength when colouring selected tab.
-8. Fix internal padding of scrolled windows where scrollbars are within window.
-9. When drawing frames, respect shadow state (in/out).
+ 1. Added option to colour selected check/radios.
+ 2. Added option to use a smaller dot for radios.
+ 3. Added option to control whether the background of splitters should be
+    highlighted on mouse over.
+ 4. Added new splitter/handle/thumb style: single dot.
+ 5. Don't do coloured mouse over for buttons of editable combos, spin buttons,
+    or scrollbar buttons.
+ 6. Don't do regular coloured mouse over of sliders when theese are seto to be
+    coloured on mouse over.
+ 7. Allow to specify strength when colouring selected tab.
+ 8. Fix internal padding of scrolled windows where scrollbars are within window.
+ 9. When drawing frames, respect shadow state (in/out).
+10. Draw inkscape's sidebar buttons as per QtCurve's KDE style.
 
 0.69.2
 ------

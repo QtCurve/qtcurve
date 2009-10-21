@@ -3021,6 +3021,67 @@ debugDisplayWidget(widget, 3);
         }
 
     }
+    else if(!opts.stdSidebarButtons && button && widget && widget->parent &&
+            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GdlDockBar"))
+    {
+        if(GTK_STATE_PRELIGHT==state || sunken)
+        {
+            gboolean horiz=false;
+            GdkColor *col=&qtcPalette.mouseover[1];
+            drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
+                            &btn_colors[bgnd], btn_colors, ROUNDED_NONE, WIDGET_MENU_ITEM,
+                            BORDER_FLAT, (horiz ? 0 : DF_VERT)|(sunken ? DF_SUNKEN : 0), widget);
+
+            if(opts.coloredMouseOver && GTK_STATE_PRELIGHT==state)
+            {
+                if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                {
+                    cairo_new_path(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+                    cairo_move_to(cr, x, y+0.5);
+                    cairo_line_to(cr, x+width-1, y+0.5);
+                    cairo_move_to(cr, x+1, y+1.5);
+                    cairo_line_to(cr, x+width-2, y+1.5);
+                    cairo_stroke(cr);
+                }
+
+                if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                {
+                    cairo_new_path(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+                    cairo_move_to(cr, x+0.5, y);
+                    cairo_line_to(cr, x+0.5, y+height-1);
+                    cairo_move_to(cr, x+1.5, y+1);
+                    cairo_line_to(cr, x+1.5, y+height-2);
+                    cairo_stroke(cr);
+                    if(MO_PLASTIK!=opts.coloredMouseOver)
+                        col=&qtcPalette.mouseover[2];
+                }
+
+                if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                {
+                    cairo_new_path(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+                    cairo_move_to(cr, x, y+height-1.5);
+                    cairo_line_to(cr, x+width-1, y+height-1.5);
+                    cairo_move_to(cr, x+1, y+height-2.5);
+                    cairo_line_to(cr, x+width-2, y+height-2.5);
+                    cairo_stroke(cr);
+                }
+
+                if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+                {
+                    cairo_new_path(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+                    cairo_move_to(cr, x+width-1.5, y);
+                    cairo_line_to(cr, x+width-1.5, y+height-1);
+                    cairo_move_to(cr, x+width-2.5, y+1);
+                    cairo_line_to(cr, x+width-2.5, y+height-2);
+                    cairo_stroke(cr);
+                }
+            }
+        }
+    }
     else if(detail &&( button || togglebutton || optionmenu || checkbox || sbar || hscale || vscale ||
                        stepper || slider || qtc_paned))
     {
