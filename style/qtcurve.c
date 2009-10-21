@@ -5436,9 +5436,9 @@ static void colorTab(cairo_t *cr, int x, int y, int width, int height, int round
 
     clipPath(cr, x, y, width, height, tab, RADIUS_EXTERNAL, round);
     cairo_pattern_add_color_stop_rgba(pt, 0, QTC_CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
-                                      WIDGET_TAB_TOP==tab ? QTC_COLOR_SEL_TAB_FACTOR : 0.0);
+                                      WIDGET_TAB_TOP==tab ? (QTC_TO_ALPHA(opts.colorSelTab)) : 0.0);
     cairo_pattern_add_color_stop_rgba(pt, 1, QTC_CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
-                                      WIDGET_TAB_TOP==tab ? 0.0 : QTC_COLOR_SEL_TAB_FACTOR);
+                                      WIDGET_TAB_TOP==tab ? 0.0 : (QTC_TO_ALPHA(opts.colorSelTab)));
     cairo_set_source(cr, pt);
     cairo_rectangle(cr, x, y, width, height);
     cairo_fill(cr);
