@@ -1315,10 +1315,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             QTC_CFG_READ_BOOL(gtkScrollViews)
             QTC_CFG_READ_BOOL(doubleGtkComboArrow)
+            QTC_CFG_READ_BOOL(stdSidebarButtons)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)
             QTC_CFG_READ_EFFECT(titlebarEffect)
-            QTC_CFG_READ_BOOL(stdSidebarButtons)
             QTC_CFG_READ_BOOL(gtkComboMenus)
             QTC_CFG_READ_BOOL(colorTitlebarOnly)
 /*
@@ -1946,8 +1946,8 @@ static void defaultSettings(Options *opts)
     opts->gtkScrollViews=true;
     opts->comboBtn=SHADE_NONE;
     opts->doubleGtkComboArrow=true;
-#ifdef __cplusplus
     opts->stdSidebarButtons=false;
+#ifdef __cplusplus
     opts->gtkComboMenus=false;
     opts->colorTitlebarOnly=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);

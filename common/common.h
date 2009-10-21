@@ -812,8 +812,8 @@ typedef struct
                      fillSlider,
                      roundMbTopOnly,
                      gtkScrollViews,
-#ifdef __cplusplus
                      stdSidebarButtons,
+#ifdef __cplusplus
                      gtkComboMenus,
                      colorTitlebarOnly,
 /*
