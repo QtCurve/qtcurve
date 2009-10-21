@@ -887,9 +887,9 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_INT(ENTRY) \
     opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
 
-#define QTC_CFG_READ_INT_BOOL(ENTRY) \
+#define QTC_CFG_READ_INT_BOOL(ENTRY, DEF) \
     if(readBoolEntry(cfg, #ENTRY, false)) \
-        opts->ENTRY=def->ENTRY; \
+        opts->ENTRY=DEF; \
     else \
         opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
     
@@ -1187,7 +1187,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_INT(highlightFactor)
             QTC_CFG_READ_INT(menuDelay)
             QTC_CFG_READ_INT(sliderWidth)
-            QTC_CFG_READ_INT_BOOL(lighterPopupMenuBgnd)
+            QTC_CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd)
             QTC_CFG_READ_INT(tabBgnd)
             QTC_CFG_READ_TB_BORDER(toolbarBorders)
             QTC_CFG_READ_APPEARANCE(appearance, false)
@@ -1204,7 +1204,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_LINE(sliderThumbs)
             QTC_CFG_READ_LINE(handles)
             QTC_CFG_READ_BOOL(highlightTab)
-            QTC_CFG_READ_BOOL(colorSelTab)
+            QTC_CFG_READ_INT_BOOL(colorSelTab, DEF_COLOR_SEL_TAB_FACTOR)
             QTC_CFG_READ_BOOL(roundAllTabs)
             QTC_CFG_READ_TAB_MO(tabMouseOver)
             QTC_CFG_READ_SHADE(shadeSliders, true, false, &opts->customSlidersColor)
@@ -1690,12 +1690,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->animatedProgress=false;
 
 /*
-            if(opts->colorSelTab && APPEARANCE_GRADIENT!=opts->activeTabAppearance &&
-                                    APPEARANCE_INVERTED!=opts->activeTabAppearance)
-                opts->colorSelTab=false;
-*/
-
-/*
 ??
             if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
                 opts->colorMenubarMouseOver=true;
@@ -1856,7 +1850,7 @@ static void defaultSettings(Options *opts)
     opts->stripedProgress=STRIPE_NONE;
     opts->sliderStyle=SLIDER_PLAIN;
     opts->highlightTab=false;
-    opts->colorSelTab=false;
+    opts->colorSelTab=0;
     opts->roundAllTabs=false;
     opts->tabMouseOver=TAB_MO_GLOW;
     opts->embolden=false;
@@ -2441,7 +2435,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_B(sliderThumbs, false)
         CFG_WRITE_ENTRY_B(handles, true)
         CFG_WRITE_ENTRY(highlightTab)
-        CFG_WRITE_ENTRY(colorSelTab)
+        CFG_WRITE_ENTRY_NUM(colorSelTab)
         CFG_WRITE_ENTRY(roundAllTabs)
         CFG_WRITE_ENTRY(tabMouseOver)
         CFG_WRITE_ENTRY(menubarAppearance)

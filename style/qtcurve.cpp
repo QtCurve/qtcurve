@@ -10321,7 +10321,7 @@ void QtCurveStyle::colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab
     QColor          start(itsHighlightCols[ORIGINAL_SHADE]),
                     end(itsHighlightCols[ORIGINAL_SHADE]);
 
-    start.setAlphaF(QTC_COLOR_SEL_TAB_FACTOR);
+    start.setAlphaF(QTC_TO_ALPHA(opts.colorSelTab));
     end.setAlphaF(0.0);
     grad.setColorAt(0, WIDGET_TAB_TOP==tab ? start : end);
     grad.setColorAt(1, WIDGET_TAB_TOP==tab ? end : start);

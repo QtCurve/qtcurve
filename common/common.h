@@ -178,7 +178,6 @@ typedef GdkColor color;
             : shades[SHADING_SIMPLE==opts.shading ? 1 : 0][c][s] )
 
 #define TAB_APPEARANCE(A)   (A) /* (APPEARANCE_GLASS==(A) ? APPEARANCE_GRADIENT : (A)) */
-#define QTC_COLOR_SEL_TAB_FACTOR 0.25
 
 #define INVERT_SHADE(A) (1.0+(1.0-(A)))
 
@@ -210,6 +209,11 @@ typedef GdkColor color;
 #define DEF_POPUPMENU_LIGHT_FACTOR                 2
 #define MIN_LIGHTER_POPUP_MENU                  -100
 #define MAX_LIGHTER_POPUP_MENU                   100
+
+#define QTC_TO_ALPHA(A) (((double)(A))/100.0)
+#define DEF_COLOR_SEL_TAB_FACTOR  25
+#define MIN_COLOR_SEL_TAB_FACTOR   0
+#define MAX_COLOR_SEL_TAB_FACTOR 100
 
 #define DEF_TAB_BGND         0
 #define MIN_TAB_BGND        -5
@@ -787,11 +791,11 @@ typedef struct
                      lighterPopupMenuBgnd,
                      menuDelay,
                      sliderWidth,
-                     tabBgnd;
+                     tabBgnd,
+                     colorSelTab;
     ERound           round;
     bool             embolden,
                      highlightTab,
-                     colorSelTab,
                      roundAllTabs,
                      animatedProgress,
                      fixParentlessDialogs,
