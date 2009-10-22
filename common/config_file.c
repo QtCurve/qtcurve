@@ -603,7 +603,7 @@ static const char *qtcConfDir()
     return cfgDir;
 }
 
-#if !defined QT_VERSION || QT_VERSION >= 0x040000
+#if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined QTC_CONFIG_DIALOG
 
 #define QTC_MENU_FILE_PREFIX "menubar-"
 
