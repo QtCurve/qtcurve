@@ -3109,8 +3109,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
                         col.setAlphaF(QT_LOWER_BORDER_ALPHA);
                         painter->setPen(col);
-                        painter->drawLine(r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->drawLine(r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+
+                        // Again. more intel 2.9 xorg driver issues :-(
+                        painter->save();
+                        painter->setRenderHint(QPainter::Antialiasing, true);
+                        drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
+                        drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                        painter->restore();
                     }
                     else
                     {
