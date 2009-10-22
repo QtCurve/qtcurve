@@ -1881,10 +1881,10 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
     if (qobject_cast<QAbstractScrollArea *>(object) && object->inherits("KFilePlacesView"))
     {
-        QWidget  *view=((QAbstractScrollArea *)object)->viewport();
+        QWidget  *view   = ((QAbstractScrollArea *)object)->viewport();
         QPalette palette = view->palette();
 
-        palette.setColor(view->backgroundRole(), QApplication::palette().background().color());
+        palette.setColor(view->backgroundRole(), ((QWidget *)object)->palette().background().color());
         view->setPalette(palette);
         object->removeEventFilter(this);
     }
