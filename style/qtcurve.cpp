@@ -1356,6 +1356,8 @@ void QtCurveStyle::polish(QWidget *widget)
         if(!opts.gtkScrollViews)
             widget->installEventFilter(this);
     }
+    else if (qobject_cast<QAbstractScrollArea *>(widget) && widget->inherits("KFilePlacesView"))
+        installEventFilter(this);
     else if (qobject_cast<QProgressBar *>(widget))
     {
         if(widget->palette().color(QPalette::Inactive, QPalette::HighlightedText)!=widget->palette().color(QPalette::Active, QPalette::HighlightedText))
@@ -1877,6 +1879,16 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             return true;
     }
 
+    if (qobject_cast<QAbstractScrollArea *>(object) && object->inherits("KFilePlacesView"))
+    {
+        QWidget  *view=((QAbstractScrollArea *)object)->viewport();
+        QPalette palette = view->palette();
+
+        palette.setColor(view->backgroundRole(), QApplication::palette().background().color());
+        view->setPalette(palette);
+        object->removeEventFilter(this);
+    }
+        
     if((!opts.gtkScrollViews &&  ::qobject_cast<QAbstractScrollArea *>(object)) || isSViewCont)
     {
         QPoint pos;

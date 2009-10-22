@@ -17,6 +17,8 @@
 12. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
     lines with an alpha channel set but anti-aliasing disabled. Affects MDI window
     icons (when 'hover icon' is enabled) - these are now drawn to bitmaps instead.
+13. Fix KDE4.4's palette changes to KFilePlacesView.
+14. Fix slight redraw error with the inner shadow of sunken frames.
 
 0.69.2
 ------
