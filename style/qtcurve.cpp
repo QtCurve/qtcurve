@@ -7702,6 +7702,11 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
     switch (type)
     {
+        case CT_Splitter:
+        {
+            int sw=pixelMetric(PM_SplitterWidth, 0L, 0L);
+            return QSize(sw, sw);
+        }
         case CT_PushButton:
         {
             newSize=size;
