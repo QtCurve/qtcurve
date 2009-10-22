@@ -13,6 +13,7 @@
  8. Fix internal padding of scrolled windows where scrollbars are within window.
  9. When drawing frames, respect shadow state (in/out).
 10. Draw inkscape's sidebar buttons as per QtCurve's KDE style.
+11. Improve appearance of unified spin widgets under Firefox.
 
 0.69.2
 ------

@@ -2998,12 +2998,23 @@ debugDisplayWidget(widget, 3);
 
         if(opts.unifySpin)
         {
-            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent));
+            gboolean rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent)),
+                     moz=isMozillaWidget(widget);
 
             if(!rev)
                 x-=2;
             width+=2;
+            
+            if(moz)
+            {
+                GdkRectangle a;
+                
+                a.x=x+2, a.y=y, a.width=width-2, a.height=height;
+                setCairoClipping(cr, &a, NULL);
+            }
             drawEntryField(cr, style, state, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
+            if(moz)
+                unsetCairoClipping(cr);
         }
         else if(opts.unifySpinBtns)
         {
