@@ -30,6 +30,7 @@
 #include <QCache>
 #include <QColor>
 #include <QStyleOption>
+#include <QBitmap>
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
 #include <QFormLayout>
 #endif
@@ -72,7 +73,22 @@ class QtCurveStyle : public QWindowsStyle
     {
         CE_QtC_KCapacityBar = CE_CustomBase+0xFFFF00
     };
-    
+
+    enum MdiIcons
+    {
+        MDI_MIN,
+        MDI_MAX,
+        MDI_RESTORE,
+        MDI_RESTORE_SMALL,
+        MDI_SHADE,
+        MDI_UNSHADE,
+        MDI_CLOSE,
+        MDI_CLOSE_SMALL,
+        MDI_MENU,
+
+        MDI_NUM_ICONS
+    };
+
     QtCurveStyle(const QString &name=QString());
     ~QtCurveStyle();
 
@@ -240,6 +256,7 @@ class QtCurveStyle : public QWindowsStyle
     mutable Version                    itsQtVersion;
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
+    mutable QBitmap                    itsMdiIcons[MDI_NUM_ICONS];
 #if !defined QTC_QT_ONLY
     KComponentData                     itsComponentData;
 #endif

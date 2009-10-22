@@ -14,6 +14,9 @@
  9. Made XBar support a config, and not cmake, option.
 10. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
 11. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
+12. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
+    lines with an alpha channel set but anti-aliasing disabled. Affects MDI window
+    icons (when 'hover icon' is enabled) - these are now drawn to bitmaps instead.
 
 0.69.2
 ------

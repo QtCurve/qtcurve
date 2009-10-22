@@ -9645,10 +9645,17 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
 
 void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, SubControl button, bool stdSize) const
 {
+    //
+    // NOTE: Intel 2.9 xorg driver does not seemt to like drawing lines with alpha set, but qpainter set
+    //       to no anti-aliasing - nothing is drawn. (Enabling QPainter::Antialiasing works around this,
+    //       but produces blurry lines). So, draw all MDI icons into QBitmaps - and then just use qpainter
+    //       to draw these.
+    //
     static const int constIconSize=9;
     static const int constSmallIconSize=7;
 
     QRect rect(r);
+    int   icon=0;
 
     int diff=(rect.height()-constIconSize)/2;
     rect.adjust(diff, diff, -diff, -diff);
@@ -9663,58 +9670,91 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
     switch(button)
     {
         case SC_TitleBarMinButton:
-            drawRect(painter, QRect(rect.left(), rect.bottom()-1, rect.width(), 2));
+            icon=MDI_MIN;
             break;
         case SC_TitleBarMaxButton:
-            drawRect(painter, rect);
-            painter->drawLine(rect.left() + 1, rect.top() + 1,  rect.right() - 1, rect.top() + 1);
+            icon=MDI_MAX;
             break;
         case SC_TitleBarCloseButton:
-            if(stdSize)
-            {
-                static unsigned char xbm[] = { 0x83, 0x01, 0xc7, 0x01, 0xee, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x7c, 0x00,
-                                               0xee, 0x00, 0xc7, 0x01, 0x83, 0x01 };
-                static QBitmap bitmap=QBitmap::fromData(QSize(constIconSize, constIconSize), xbm);
-                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
-                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
-            }
-            else
-            {
-                static unsigned char xbm[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-                static QBitmap bitmap=QBitmap::fromData(QSize(constSmallIconSize, constSmallIconSize), xbm);
-                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
-                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
-            }
+            icon=stdSize ? MDI_CLOSE : MDI_CLOSE_SMALL;
             break;
         case SC_TitleBarNormalButton:
-            if(stdSize)
-            {
-                static unsigned char xbm[] = { 0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
-                                               0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
-                static QBitmap bitmap=QBitmap::fromData(QSize(constIconSize, constIconSize), xbm);
-                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
-                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
-            }
-            else
-            {
-                static unsigned char xbm[] = { 0x7c, 0x7c, 0x44, 0x5f, 0x7f, 0x11, 0x11, 0x1f };
-                static QBitmap bitmap=QBitmap::fromData(QSize(constSmallIconSize, constSmallIconSize+1), xbm);
-                painter->drawPixmap(rect.x()+(rect.width()-bitmap.width())/2,
-                                    rect.y()+(rect.height()-bitmap.height())/2, bitmap);
-            }
+            icon=stdSize ? MDI_RESTORE : MDI_RESTORE_SMALL;
             break;
         case SC_TitleBarShadeButton:
-            drawArrow(painter, rect, PE_IndicatorArrowUp, color, false, true);
+            icon=MDI_SHADE;
             break;
         case SC_TitleBarUnshadeButton:
-            drawArrow(painter, rect, PE_IndicatorArrowDown, color, false, true);
+            icon=MDI_UNSHADE;
             break;
         case SC_TitleBarSysMenu:
-            for(int i=1; i<=constIconSize; i+=3)
-                painter->drawLine(rect.left() + 1, rect.top() + i,  rect.right() - 1, rect.top() + i);
+            icon=MDI_MENU;
         default:
             break;
     }
+
+    if(itsMdiIcons[icon].isNull())
+    {
+        QPainter *p=NULL;
+        QRect    br(0, 0, constIconSize, constIconSize);
+        int      iconSize=0;
+
+        if(SC_TitleBarCloseButton!=button && SC_TitleBarNormalButton!=button)
+        {
+            itsMdiIcons[icon]=QBitmap(constIconSize, constIconSize);
+            p=new QPainter(&itsMdiIcons[icon]);
+            p->fillRect(br, Qt::color0);
+            p->setPen(Qt::color1);
+        }
+        else
+            iconSize=stdSize ? constIconSize : constSmallIconSize;
+
+        switch(button)
+        {
+            case SC_TitleBarMinButton:
+                drawRect(p, QRect(br.left(), br.bottom()-1, br.width(), 2));
+                break;
+            case SC_TitleBarMaxButton:
+                drawRect(p, br);
+                p->drawLine(br.left() + 1, br.top() + 1,  br.right() - 1, br.top() + 1);
+                break;
+            case SC_TitleBarCloseButton:
+            {
+                static unsigned char xbmL[] = { 0x83, 0x01, 0xc7, 0x01, 0xee, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x7c, 0x00,
+                                                0xee, 0x00, 0xc7, 0x01, 0x83, 0x01 };
+                static unsigned char xbmS[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
+                itsMdiIcons[icon]=QBitmap::fromData(QSize(iconSize, iconSize), stdSize ? xbmL : xbmS);
+                break;
+            }
+            case SC_TitleBarNormalButton:
+            {
+                static unsigned char xbmL[] = { 0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
+                                                0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
+                static unsigned char xbmS[] = { 0x7c, 0x7c, 0x44, 0x5f, 0x7f, 0x11, 0x11, 0x1f };
+                itsMdiIcons[icon]=QBitmap::fromData(QSize(iconSize, iconSize), stdSize ? xbmL : xbmS);
+                break;
+            }
+            case SC_TitleBarShadeButton:
+                drawArrow(p, br, PE_IndicatorArrowUp, Qt::color1, false, true);
+                break;
+            case SC_TitleBarUnshadeButton:
+                drawArrow(p, br, PE_IndicatorArrowDown, Qt::color1, false, true);
+                break;
+            case SC_TitleBarSysMenu:
+                for(int i=1; i<=constIconSize; i+=3)
+                    p->drawLine(br.left() + 1, br.top() + i,  br.right() - 1, br.top() + i);
+            default:
+                break;
+        }
+
+        if(p)
+        {
+            p->end();
+            delete p;
+        }
+    }
+    painter->drawPixmap(rect.x()+(rect.width()-itsMdiIcons[icon].width())/2,
+                        rect.y()+(rect.height()-itsMdiIcons[icon].height())/2, itsMdiIcons[icon]);
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
