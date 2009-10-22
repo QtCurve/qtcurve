@@ -9736,7 +9736,7 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
                 static unsigned char xbmL[] = { 0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
                                                 0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
                 static unsigned char xbmS[] = { 0x7c, 0x7c, 0x44, 0x5f, 0x7f, 0x11, 0x11, 0x1f };
-                itsMdiIcons[icon]=QBitmap::fromData(QSize(iconSize, iconSize), stdSize ? xbmL : xbmS);
+                itsMdiIcons[icon]=QBitmap::fromData(QSize(iconSize, stdSize ? iconSize : iconSize+1), stdSize ? xbmL : xbmS);
                 break;
             }
             case SC_TitleBarShadeButton:
