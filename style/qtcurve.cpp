@@ -1159,7 +1159,6 @@ void QtCurveStyle::polish(QPalette &palette)
                                        SHADE_BLEND_SELECTED!=opts.shadeSliders/*) ||*/ // If so, def btn == slider!
                                       /*(IND_TINT==opts.defBtnIndicator) )*/ &&
                    (newContrast || newButton || newMenu)),
-         newMouseOver(newContrast || newButton || newMenu),
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
                      (newContrast || newButton || newMenu)),
@@ -9525,7 +9524,7 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                         : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
 
         drawMdiButton(p, rect, hover, sunken, buttonColors);
-        drawMdiIcon(p, icnColor, shadow, buttonColors, rect, hover, sunken, sc);
+        drawMdiIcon(p, icnColor, shadow, rect, hover, sunken, sc);
     }
 }
 
@@ -9550,7 +9549,7 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
     }
 }
 
-void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QColor *btnCols,
+void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow,
                                const QRect &r, bool hover, bool sunken, SubControl button) const
 {
     bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
