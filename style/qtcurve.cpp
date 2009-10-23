@@ -10691,9 +10691,9 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
             c.setAlphaF(0.4);
             g1.setColorAt(1.0, c);
             c=Qt::white;
-            c.setAlphaF(1.0);
+            c.setAlphaF(0.9);
             g2.setColorAt(0.0, c);
-            c.setAlphaF(0.8);
+            c.setAlphaF(0.7);
             g2.setColorAt(1.0, c);
             p.setRenderHint(QPainter::Antialiasing, true);
             p.setPen(Qt::NoPen);
