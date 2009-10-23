@@ -38,11 +38,7 @@ namespace KWinQtCurve
 
 class ResizeCorner;
 
-#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
-class QtCurveClient : public KCommonDecorationUnstable
-#else
 class QtCurveClient : public KCommonDecoration
-#endif
 {
     public:
 
@@ -66,11 +62,6 @@ class QtCurveClient : public KCommonDecoration
     bool                      eventFilter(QObject *o, QEvent *e);
 
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
-
-#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
-    virtual QList<QRect>      shadowQuads(ShadowType type) const;
-    virtual double            shadowOpacity(ShadowType type) const;
-#endif
 
     private:
 

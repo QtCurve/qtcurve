@@ -51,11 +51,7 @@ namespace KWinQtCurve
 {
 
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory)
-#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
-             : KCommonDecorationUnstable(bridge, factory),
-#else
              : KCommonDecoration(bridge, factory),
-#endif
                itsResizeGrip(0L),
                itsTitleFont(QFont())
 {
@@ -227,11 +223,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
 
-    if(!isShade()
-#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
-      && !(Handler()->coloredShadow() && shadowsActive() && active)
-#endif
-      )
+    if(!isShade())
     {
         painter.setClipRegion(e->region());
         painter.fillRect(r, windowCol); // Makes hings look nicer for kcmshell preview...
@@ -249,19 +241,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
-#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,80)
-    if(Handler()->coloredShadow() && shadowsActive())
-    {
-        opt.state|=QtC_StateKWinShadows;
-        if(active)
-            opt.state|=QtC_StateKWinHighlight;
-    }
-#endif
-
     if(!roundBottom)
-        opt.state|=QtCStateKWinNotFull;
+        opt.state|=QtC_StateKWinNotFull;
     if(isShade())
-        opt.state|=QtCStateKWinShaded;
+        opt.state|=QtC_StateKWinShaded;
 
     if(outerBorder)
     {
@@ -286,7 +269,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
     }
     else
-        opt.state|=QtCStateKWinNoBorder;
+        opt.state|=QtC_StateKWinNoBorder;
 
 // Commented out as leads to a 1 pixel window coloured line down the side of konsole windows...
 //     if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
@@ -309,9 +292,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
-    if(KDecoration::options()->color(KDecoration::ColorTitleBar, true)!=windowCol ||
-       KDecoration::options()->color(KDecoration::ColorTitleBar, false)!=windowCol)
-       opt.titleBarState|=QtCStateKWinDrawLine;
+//     if(KDecoration::options()->color(KDecoration::ColorTitleBar, true)!=windowCol ||
+//        KDecoration::options()->color(KDecoration::ColorTitleBar, false)!=windowCol)
+//        opt.titleBarState|=QtC_StateKWinDrawLine;
 #ifdef QTC_DRAW_INTO_PIXMAPS
     if(!compositing)
     {
@@ -539,41 +522,6 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 
     return KCommonDecoration::eventFilter(o, e);
 }
-
-#if KDE_IS_VERSION(4,1,80) && !KDE_IS_VERSION(4,2,92)
-// Taken form Oxygen! rev873805
-QList<QRect> QtCurveClient::shadowQuads(ShadowType type) const
-{
-    Q_UNUSED(type)
-
-    QSize size = widget()->size();
-    int outside=20, underlap=5, cornersize=25;
-    // These are underlap under the decoration so the corners look nicer 10px on the outside
-    QList<QRect> quads;
-    quads.append(QRect(-outside, size.height()-underlap, cornersize, cornersize));
-    quads.append(QRect(underlap, size.height()-underlap, size.width()-2*underlap, cornersize));
-    quads.append(QRect(size.width()-underlap, size.height()-underlap, cornersize, cornersize));
-    quads.append(QRect(-outside, underlap, cornersize, size.height()-2*underlap));
-    quads.append(QRect(size.width()-underlap, underlap, cornersize, size.height()-2*underlap));
-    quads.append(QRect(-outside, -outside, cornersize, cornersize));
-    quads.append(QRect(underlap, -outside, size.width()-2*underlap, cornersize));
-    quads.append(QRect(size.width()-underlap, -outside, cornersize, cornersize));
-    return quads;
-}
-
-double QtCurveClient::shadowOpacity(ShadowType type) const
-{
-    switch( type ) {
-        case ShadowBorderedActive:
-            return isActive() ? 1.0 : 0.0;
-        case ShadowBorderedInactive:
-            return isActive() ? 0.0 : 1.0;
-        default:
-            return 0;
-    }
-    return 0;
-}
-#endif
     
 void QtCurveClient::reset(unsigned long changed)
 {

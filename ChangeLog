@@ -23,6 +23,8 @@
     qtcurve/stylerc - so need to monitor that one!
 16. Remove 1 pixel background colour border from kwin decoration - was only used
     to provide sodter rounded corners at the bottom.
+17. Completely remove old code for coloured shadows.
+18. Dont draw dark line between ttitlebar and contents when colouring titlebar only.
 
 0.69.2
 ------
