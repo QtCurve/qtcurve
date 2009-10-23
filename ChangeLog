@@ -21,6 +21,8 @@
 14. Fix slight redraw error with the inner shadow of sunken frames.
 15. Get kwin decoration to update on style change. Config file has changed to
     qtcurve/stylerc - so need to monitor that one!
+16. Remove 1 pixel background colour border from kwin decoration - was only used
+    to provide sodter rounded corners at the bottom.
 
 0.69.2
 ------

@@ -288,22 +288,23 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else
         opt.state|=QtCStateKWinNoBorder;
 
-    if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
-    {
-        QColor cornerCol(col);
-        painter.setPen(windowCol);
-        painter.drawRect(rx.x()+borderSize-1, rx.y()+borderSize-1,
-                         rx.x()+rx.width()-((borderSize*2)-1), rx.y()+rx.height()-((borderSize*2)-1));
-        painter.setPen(cornerCol);
-        painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize));
-        painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-borderSize);
-        cornerCol.setAlphaF(0.5);
-        painter.setPen(cornerCol);
-        painter.drawPoint(rx.x()+borderSize, rx.y()+rx.height()-(borderSize));
-        painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize+1));
-        painter.drawPoint(rx.x()+rx.width()-borderSize-1, rx.y()+rx.height()-borderSize);
-        painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-(borderSize+1));
-    }
+// Commented out as leads to a 1 pixel window coloured line down the side of konsole windows...
+//     if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
+//     {
+//         QColor cornerCol(col);
+//         painter.setPen(windowCol);
+//         painter.drawRect(rx.x()+borderSize-1, rx.y()+borderSize-1,
+//                          rx.x()+rx.width()-((borderSize*2)-1), rx.y()+rx.height()-((borderSize*2)-1));
+//         painter.setPen(cornerCol);
+//         painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize));
+//         painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-borderSize);
+//         cornerCol.setAlphaF(0.5);
+//         painter.setPen(cornerCol);
+//         painter.drawPoint(rx.x()+borderSize, rx.y()+rx.height()-(borderSize));
+//         painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize+1));
+//         painter.drawPoint(rx.x()+rx.width()-borderSize-1, rx.y()+rx.height()-borderSize);
+//         painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-(borderSize+1));
+//     }
 
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
