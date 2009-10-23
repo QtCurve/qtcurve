@@ -1946,8 +1946,8 @@ static void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
 
     cairo_pattern_add_color_stop_rgba(p1, 0.0, QTC_CAIRO_COL(cols[QT_STD_BORDER]), 1.0);
     cairo_pattern_add_color_stop_rgba(p1, 1.0, QTC_CAIRO_COL(cols[QT_STD_BORDER]), 0.4);
-    cairo_pattern_add_color_stop_rgba(p2, 1.0, 1.0, 1.0, 1.0, 1.0);
-    cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.8);
+    cairo_pattern_add_color_stop_rgba(p2, 1.0, 1.0, 1.0, 1.0, 0.9);
+    cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.7);
 
     cairo_new_path(cr);
     cairo_arc(cr, dx+2.5, dy+2.5, 2.5, 0, 2*M_PI);
