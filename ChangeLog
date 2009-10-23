@@ -19,6 +19,8 @@
     icons (when 'hover icon' is enabled) - these are now drawn to bitmaps instead.
 13. Fix KDE4.4's palette changes to KFilePlacesView.
 14. Fix slight redraw error with the inner shadow of sunken frames.
+15. Get kwin decoration to update on style change. Config file has changed to
+    qtcurve/stylerc - so need to monitor that one!
 
 0.69.2
 ------

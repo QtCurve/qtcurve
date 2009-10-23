@@ -120,14 +120,14 @@ void QtCurveHandler::setStyle()
 
         itsStyle=QStyleFactory::create(styleName.isEmpty() || styleName=="qtcurve" || !styleName.startsWith("qtc_")
                                         ? QString("QtCurve") : styleName);
-        itsTimeStamp=getTimeStamp(xdgConfigFolder()+"/qtcurvestylerc");
+        itsTimeStamp=getTimeStamp(xdgConfigFolder()+"/qtcurve/stylerc");
     }
 }
 
 bool QtCurveHandler::reset(unsigned long changed)
 {
     bool styleChanged=false;
-    if(abs(itsTimeStamp-getTimeStamp(xdgConfigFolder()+"/qtcurvestylerc"))>2)
+    if(abs(itsTimeStamp-getTimeStamp(xdgConfigFolder()+"/qtcurve/stylerc"))>2)
     {
         delete itsStyle;
         itsStyle=0L;
