@@ -17,6 +17,7 @@
 12. Don't draw background of dock widgets as if they were toolbars!
 13. Only draw toolbar/menubar background if shadow typew is not set to none.
     (Removes toolbar gradient from Rhytmbox's search buttons)
+14. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
 
 0.69.2
 ------

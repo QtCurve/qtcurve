@@ -2577,6 +2577,13 @@ static gboolean qtInit()
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \""QTC_RC_SETTING"Swt\""
                                     "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \""QTC_RC_SETTING"Swt\"");
 
+
+            gtk_rc_parse_string("style \""QTC_RC_SETTING"MnuTb\" "
+                                "{ xthickness=1 ythickness=1"
+                                " GtkButton::focus-padding=0 GtkWidget::focus-line-width=0} "
+                                "class \"*GtkMenuToolButton\" style \""QTC_RC_SETTING"MnuTb\""
+                                "widget_class \"*.GtkMenuToolButton.*Box.GtkToggleButton\" style \""QTC_RC_SETTING"MnuTb\"");
+
             if(!opts.popupBorder)
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
                                     "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
