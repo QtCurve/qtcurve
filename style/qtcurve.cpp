@@ -276,6 +276,61 @@ inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, int flags, QI
     return getIconPixmap(icon, size, flags&QStyle::State_Enabled ? QIcon::Normal : QIcon::Disabled, state);
 }
 
+static QtCurveStyle::Icon pix2Icon(QStyle::StandardPixmap pix)
+{
+    switch(pix)
+    {
+        case QStyle::SP_TitleBarNormalButton:
+            return QtCurveStyle::ICN_RESTORE;
+        case QStyle::SP_TitleBarShadeButton:
+            return QtCurveStyle::ICN_UP;
+        case QStyle::SP_TitleBarUnshadeButton:
+            return QtCurveStyle::ICN_DOWN;
+        default:
+        case QStyle::SP_DockWidgetCloseButton:
+        case QStyle::SP_TitleBarCloseButton:
+            return QtCurveStyle::ICN_CLOSE;
+    }
+}
+
+static QtCurveStyle::Icon primitive2Icon(QStyle::PrimitiveElement p)
+{
+    switch(p)
+    {
+        case QStyle::PE_IndicatorArrowLeft:
+            return QtCurveStyle::ICN_LEFT;
+        case QStyle::PE_IndicatorArrowRight:
+            return QtCurveStyle::ICN_RIGHT;
+        case QStyle::PE_IndicatorArrowUp:
+            return QtCurveStyle::ICN_UP;
+        default:
+        case QStyle::PE_IndicatorArrowDown:
+            return QtCurveStyle::ICN_DOWN;
+    }
+}
+
+static QtCurveStyle::Icon subControlToIcon(QStyle::SubControl sc)
+{
+    switch(sc)
+    {
+        case QStyle::SC_TitleBarMinButton:
+            return QtCurveStyle::ICN_MIN;
+        case QStyle::SC_TitleBarMaxButton:
+            return QtCurveStyle::ICN_MAX;
+        case QStyle::SC_TitleBarCloseButton:
+        default:
+            return QtCurveStyle::ICN_CLOSE;
+        case QStyle::SC_TitleBarNormalButton:
+            return QtCurveStyle::ICN_RESTORE;
+        case QStyle::SC_TitleBarShadeButton:
+            return QtCurveStyle::ICN_UP;
+        case QStyle::SC_TitleBarUnshadeButton:
+            return QtCurveStyle::ICN_DOWN;
+        case QStyle::SC_TitleBarSysMenu:
+            return QtCurveStyle::ICN_MENU;
+    }
+}
+
 static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
                         const QRect &rect, QPainter *painter, const QWidget *widget = 0)
 {
@@ -2622,41 +2677,6 @@ QPalette QtCurveStyle::standardPalette() const
 #endif
 }
 
-static QStyle::SubControl pix2Control(QStyle::StandardPixmap pix)
-{
-    switch(pix)
-    {
-        case QStyle::SP_TitleBarNormalButton:
-            return QStyle::SC_TitleBarNormalButton;
-        case QStyle::SP_TitleBarShadeButton:
-            return QStyle::SC_TitleBarUnshadeButton;
-        case QStyle::SP_TitleBarUnshadeButton:
-            return QStyle::SC_TitleBarShadeButton;
-        default:
-        case QStyle::SP_DockWidgetCloseButton:
-        case QStyle::SP_TitleBarCloseButton:
-            return QStyle::SC_TitleBarCloseButton;
-    }
-}
-
-/*
-static int pix2Button(QStyle::StandardPixmap pix)
-{
-    switch(pix)
-    {
-        case QStyle::SP_TitleBarNormalButton:
-            return TITLEBAR_MAX;
-        case QStyle::SP_TitleBarUnshadeButton:
-        case QStyle::SP_TitleBarShadeButton:
-            return TITLEBAR_SHADE;
-        default:
-        case QStyle::SP_DockWidgetCloseButton:
-        case QStyle::SP_TitleBarCloseButton:
-            return TITLEBAR_CLOSE;
-    }
-}
-*/
-
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
     switch(pix)
@@ -2672,34 +2692,13 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_TitleBarCloseButton:
         {
             QBitmap            pm(13, 13);
-            QStyle::SubControl sc=pix2Control(pix);
 
             pm.clear();
 
             QPainter painter(&pm);
-/*
-            bool   sunken(option ? (option->state&State_Sunken ? true : false) : false),
-                   hover(option ? (option->state&State_MouseOver ? true : false) : false),
-                   colored=coloredMdiButtons(option ? option->state&State_Active : true, hover);
-            QColor col=colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
-                                ? itsTitleBarButtonsCols[pix2Button(pix)][ORIGINAL_SHADE]
-                                : SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) &&
-                                    (hover || sunken)
-                                    ? CLOSE_COLOR
-                                    : option
-                                        ? option->palette.buttonText().color()
-                                        : widget
-                                            ? widget->palette().buttonText().color()
-                                            : qApp
-                                                ? qApp->palette().buttonText().color()
-#if defined QTC_QT_ONLY
-                                                : Qt::black;
-#else
-                                                : KColorScheme(QPalette::Active, KColorScheme::Button,
-                                                               itsComponentData.config()).foreground().color();
-#endif*/
 
-            drawWindowIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, sc, false);
+            drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix),
+                     SP_TitleBarShadeButton==pix || SP_TitleBarUnshadeButton==pix);
             return QIcon(pm);
         }
 #if !defined QTC_QT_ONLY
@@ -2961,7 +2960,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
                              (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
                 r.adjust(1, 1, 1, 1);
-            drawArrow(painter, r, element, QTC_MO_ARROW(QPalette::Text));
+            drawArrow(painter, r, element, QTC_MO_ARROW(QPalette::Text), false);
             break;
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
@@ -7545,16 +7544,16 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     QColor arrowColor(QTC_MO_ARROW_X(mouseOver, QPalette::ButtonText));
                     if(comboBox->editable || !(opts.gtkComboMenus && opts.doubleGtkComboArrow))
-                        drawArrow(painter, arrow, PE_IndicatorArrowDown, arrowColor, false, false);
+                        drawArrow(painter, arrow, PE_IndicatorArrowDown, arrowColor, false);
                     else
                     {
                         int middle=arrow.y()+(arrow.height()>>1),
                             gap=(opts.vArrows ? 2 : 1);
 
                         QRect ar=QRect(arrow.x(), middle-(LARGE_ARR_HEIGHT+gap), arrow.width(), LARGE_ARR_HEIGHT);
-                        drawArrow(painter, ar, PE_IndicatorArrowUp, arrowColor, false, false);
+                        drawArrow(painter, ar, PE_IndicatorArrowUp, arrowColor, false);
                         ar=QRect(arrow.x(), middle+gap, arrow.width(), LARGE_ARR_HEIGHT);
-                        drawArrow(painter, ar, PE_IndicatorArrowDown, arrowColor, false, false);
+                        drawArrow(painter, ar, PE_IndicatorArrowDown, arrowColor, false);
                     }
                 }
 
@@ -9556,20 +9555,33 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
                                const QRect &r, bool hover, bool sunken, SubControl button) const
 {
     bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
+    Icon icon  = subControlToIcon(button);
 
     if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
-        drawWindowIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, button);
+        drawIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, icon);
 
     QColor col(color);
 
     if(faded)
         col.setAlphaF(HOVER_BUTTON_ALPHA(col));
 
-    drawWindowIcon(painter, col, r, sunken, button);
+    drawIcon(painter, col, r, sunken, icon);
 }
 
-void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, SubControl button, bool stdSize) const
+static QBitmap rotateBitmap(const QBitmap &bmp, double angle=90.0)
+{
+    QMatrix matrix;
+    matrix.translate(bmp.width()/2, bmp.height()/2);
+    matrix.rotate(angle);
+
+    QRect newRect(matrix.mapRect(QRect(0, 0, bmp.width(), bmp.height())));
+
+    return bmp.transformed(QMatrix(matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(),
+                                   matrix.dx() - newRect.left(), matrix.dy() - newRect.top()));
+}
+
+void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize) const
 {
     //
     // NOTE: Intel 2.9 xorg driver does not seemt to like drawing lines with alpha set, but qpainter set
@@ -9580,93 +9592,89 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
     static const int constIconSize=9;
     static const int constSmallIconSize=7;
 
+    Icon  icn=stdSize ? icon : (Icon)(icon+ICN_RESTORE_SMALL-ICN_RESTORE);
     QRect rect(r);
-    int   icon=0;
-
-    int diff=(rect.height()-constIconSize)/2;
-    rect.adjust(diff, diff, -diff, -diff);
-    rect.setHeight(constIconSize);
-    rect.setWidth(constIconSize);
 
     if(sunken)
         rect.adjust(1, 1, 1, 1);
 
     painter->setPen(color);
 
-    switch(button)
-    {
-        case SC_TitleBarMinButton:
-            icon=MDI_MIN;
-            break;
-        case SC_TitleBarMaxButton:
-            icon=MDI_MAX;
-            break;
-        case SC_TitleBarCloseButton:
-            icon=stdSize ? MDI_CLOSE : MDI_CLOSE_SMALL;
-            break;
-        case SC_TitleBarNormalButton:
-            icon=stdSize ? MDI_RESTORE : MDI_RESTORE_SMALL;
-            break;
-        case SC_TitleBarShadeButton:
-            icon=MDI_SHADE;
-            break;
-        case SC_TitleBarUnshadeButton:
-            icon=MDI_UNSHADE;
-            break;
-        case SC_TitleBarSysMenu:
-            icon=MDI_MENU;
-        default:
-            break;
-    }
-
-    if(itsMdiIcons[icon].isNull())
+    if(itsIcons[icn].isNull())
     {
         QPainter *p=NULL;
-        QRect    br(0, 0, constIconSize, constIconSize);
-        int      iconSize=0;
+        QSize    iconSize(stdSize ? constIconSize : constSmallIconSize, stdSize ? constIconSize : constSmallIconSize);
+        QRect    br(0, 0, iconSize.width(), iconSize.height());
 
-        if(SC_TitleBarCloseButton!=button && SC_TitleBarNormalButton!=button)
+        if(ICN_MIN==icon || ICN_MAX==icon || ICN_MENU==icon)
         {
-            itsMdiIcons[icon]=QBitmap(constIconSize, constIconSize);
-            p=new QPainter(&itsMdiIcons[icon]);
+            itsIcons[icn]=QBitmap(iconSize);
+            p=new QPainter(&itsIcons[icn]);
             p->fillRect(br, Qt::color0);
             p->setPen(Qt::color1);
         }
-        else
-            iconSize=stdSize ? constIconSize : constSmallIconSize;
 
-        switch(button)
+        switch(icn)
         {
-            case SC_TitleBarMinButton:
+            case ICN_MIN:
                 drawRect(p, QRect(br.left(), br.bottom()-1, br.width(), 2));
                 break;
-            case SC_TitleBarMaxButton:
+            case ICN_MAX:
                 drawRect(p, br);
                 p->drawLine(br.left() + 1, br.top() + 1,  br.right() - 1, br.top() + 1);
                 break;
-            case SC_TitleBarCloseButton:
+            case ICN_CLOSE:
+            case ICN_CLOSE_SMALL:
             {
                 static unsigned char xbmL[] = { 0x83, 0x01, 0xc7, 0x01, 0xee, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x7c, 0x00,
                                                 0xee, 0x00, 0xc7, 0x01, 0x83, 0x01 };
                 static unsigned char xbmS[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-                itsMdiIcons[icon]=QBitmap::fromData(QSize(iconSize, iconSize), stdSize ? xbmL : xbmS);
+                itsIcons[icn]=QBitmap::fromData(iconSize, stdSize ? xbmL : xbmS);
                 break;
             }
-            case SC_TitleBarNormalButton:
+            case ICN_RESTORE:
+            case ICN_RESTORE_SMALL:
             {
                 static unsigned char xbmL[] = { 0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
                                                 0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
                 static unsigned char xbmS[] = { 0x7c, 0x7c, 0x44, 0x5f, 0x7f, 0x11, 0x11, 0x1f };
-                itsMdiIcons[icon]=QBitmap::fromData(QSize(iconSize, stdSize ? iconSize : iconSize+1), stdSize ? xbmL : xbmS);
+                itsIcons[icn]=QBitmap::fromData(QSize(iconSize.width(), stdSize ? iconSize.height() : iconSize.height()+1), stdSize ? xbmL : xbmS);
                 break;
             }
-            case SC_TitleBarShadeButton:
-                drawArrow(p, br, PE_IndicatorArrowUp, Qt::color1, false, true);
+            case ICN_UP:
+            case ICN_UP_SMALL:
+            case ICN_DOWN:
+            case ICN_DOWN_SMALL:
+            case ICN_LEFT:
+            case ICN_LEFT_SMALL:
+            case ICN_RIGHT:
+            case ICN_RIGHT_SMALL:
+            {
+                static unsigned char vArrowLargeXbm[] = { 0x08, 0x1c, 0x3e, 0x77, 0x63 }; // 7*5
+                static unsigned char vArrowSmallXbm[] = { 0x04, 0x0e, 0x1b, 0x11 };  // 5*4
+                static unsigned char arrowLargeXbm[]  = { 0x08, 0x1c, 0x3e, 0x7f }; // 7*4
+                static unsigned char arrowSmallXbm[]  = { 0x04, 0x0e, 0x1f }; // 5*3
+                
+                itsIcons[icn]=QBitmap::fromData(QSize(stdSize ? LARGE_ARR_WIDTH : SMALL_ARR_WIDTH, 
+                                                     (stdSize ? LARGE_ARR_HEIGHT : SMALL_ARR_HEIGHT)+(opts.vArrows ? 1 : 0)),
+                                                stdSize ? (opts.vArrows ? vArrowLargeXbm :arrowLargeXbm) : (opts.vArrows ? vArrowSmallXbm :arrowSmallXbm) );
+                                                 
+                switch(icon)
+                {
+                    case ICN_DOWN:
+                        itsIcons[icn]=rotateBitmap(itsIcons[icn], 180);
+                        break;
+                    case ICN_LEFT:
+                        itsIcons[icn]=rotateBitmap(itsIcons[icn], 270);
+                        break;
+                    case ICN_RIGHT:
+                        itsIcons[icn]=rotateBitmap(itsIcons[icn], 90);
+                    default:
+                        break;
+                }
                 break;
-            case SC_TitleBarUnshadeButton:
-                drawArrow(p, br, PE_IndicatorArrowDown, Qt::color1, false, true);
-                break;
-            case SC_TitleBarSysMenu:
+            }
+            case ICN_MENU:
                 for(int i=1; i<=constIconSize; i+=3)
                     p->drawLine(br.left() + 1, br.top() + i,  br.right() - 1, br.top() + i);
             default:
@@ -9679,8 +9687,36 @@ void QtCurveStyle::drawWindowIcon(QPainter *painter, const QColor &color, const 
             delete p;
         }
     }
-    painter->drawPixmap(rect.x()+(rect.width()-itsMdiIcons[icon].width())/2,
-                        rect.y()+(rect.height()-itsMdiIcons[icon].height())/2, itsMdiIcons[icon]);
+
+    int xMod(0), yMod(0), hMod(0), wMod(0);
+    
+    if(opts.vArrows)
+        switch(icon)
+        {
+            case ICN_UP:
+            case ICN_DOWN:
+                hMod=1;
+                break;
+            case ICN_LEFT:
+            case ICN_RIGHT:
+                wMod=1;
+            default:
+                break;
+        }
+    else
+        switch(icon)
+        {
+            case ICN_DOWN:
+                yMod=1;
+                break;
+            case ICN_RIGHT:
+                xMod=1;
+            default:
+                break;
+        }
+        
+    painter->drawPixmap(rect.x()+((rect.width()-(itsIcons[icn].width()-wMod))>>1)+xMod,
+                        rect.y()+((rect.height()-(itsIcons[icn].height()-hMod))>>1)+yMod, itsIcons[icn]);
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
@@ -9823,74 +9859,9 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
 }
 
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small, bool mdi) const
+void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, const QColor &col, bool small) const
 {
-    QPolygon     a;
-    QPainterPath path;
-
-    if(small)
-        switch(pe)
-        {
-            case PE_IndicatorArrowUp:
-                a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,-2,  -2,0,   -2,1, 0,-1, 2,1);
-                break;
-            case PE_IndicatorArrowDown:
-                a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,2,  -2,0,   -2,-1, 0,1, 2,-1);
-                break;
-            case PE_IndicatorArrowRight:
-                a.setPoints(opts.vArrows ? 6 : 3,  0,-2,  2,0,  0,2,   -1,2, 1,0, -1,-2);
-                break;
-            case PE_IndicatorArrowLeft:
-                a.setPoints(opts.vArrows ? 6 : 3,  0,-2,  -2,0,  0,2,   1,2, -1,0, 1,-2);
-                break;
-            default:
-                return;
-        }
-    else // Large arrows...
-        switch(pe)
-        {
-            case PE_IndicatorArrowUp:
-                a.setPoints(opts.vArrows ? 8 : 3,  3,1,  0,-2,  -3,1,    -3,2,  -2,2, 0,0,  2,2, 3,2);
-                break;
-            case PE_IndicatorArrowDown:
-                a.setPoints(opts.vArrows ? 8 : 3,  3,-1,  0,2,  -3,-1,   -3,-2,  -2,-2, 0,0, 2,-2, 3,-2);
-                break;
-            case PE_IndicatorArrowRight:
-                a.setPoints(opts.vArrows ? 8 : 3,  -1,-3,  2,0,  -1,3,   -2,3, -2,2, 0,0, -2,-2, -2,-3);
-                break;
-            case PE_IndicatorArrowLeft:
-                a.setPoints(opts.vArrows ? 8 : 3,  1,-3,  -2,0,  1,3,    2,3, 2,2, 0,0, 2,-2, 2,-3);
-                break;
-            default:
-                return;
-        }
-
-    a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
-
-
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
-    path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
-    for(int i=1; i<a.size(); ++i)
-        path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
-    path.lineTo(a[0].x()+0.5, a[0].y()+0.5);
-#endif
-    // This all looks like overkill - but seems to fix issues with plasma and nvidia
-    // Just using 'aa' and drawing the arrows would be fine - but this makes them look
-    // slightly blurry, and I dont like that.
-    p->save();
-    if(!mdi)
-        col.setAlpha(255);
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
-    p->setRenderHint(QPainter::Antialiasing, true);
-#endif
-    p->setPen(col);
-    p->setBrush(col);
-#ifdef QTC_OLD_NVIDIA_ARROW_FIX
-    p->fillPath(path, col);
-    p->setRenderHint(QPainter::Antialiasing, false);
-#endif
-    p->drawPolygon(a);
-    p->restore();
+    drawIcon(p, col, r, false, primitive2Icon(pe), !small);
 }
 
 void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const

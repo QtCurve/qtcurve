@@ -16,13 +16,6 @@ The following options may be supplied to cmake:
     -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
         Do not override Qt's file dialogs with KDE ones.
 
-    -DQTC_OLD_NVIDIA_ARROW_FIX=true
-        Due to QtCurve mixing AA-drawing, with non-AA drawing (specifically for
-        arrows) - sometimes the arrows would not draw correctly under NVidia. To
-        work-around this, QtCurve filled the arrows using AA-ed drawing, and used
-        non-AA drawing for the edges. As of 0.69.0 this code is no longer enabled
-        by default - use this config option to re-enable the code.
-
 XBar/MacMenu
 ------------
 The XBar support was copied directly from Bespin. The relevant files are named macmenu*

@@ -27,6 +27,9 @@
 18. Dont draw dark line between ttitlebar and contents when colouring titlebar only.
 19. Only draw toolbar gradients for toolbars in main window. Removes gradient from
     file selector toolbar.
+20. No need for NVIDIA arrow workaround, bitmaps are used for arrows.
+21. Respect alpha setting when drawing arrows - makes URL navigator arrows of inactive
+    Dolphin pane fade as per text.
 
 0.69.2
 ------
