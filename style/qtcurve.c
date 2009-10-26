@@ -3842,7 +3842,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(detail && (0==strcmp(detail,"dockitem") || 0==strcmp(detail,"dockitem_bin")))
     {
-        if(!IS_FLAT(opts.bgndAppearance && widget))
+        if(!IS_FLAT(opts.bgndAppearance) && widget)
             drawBgndGradient(cr, style, area, widget, x, y, width, height);
     }
     else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") ||
