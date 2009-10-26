@@ -44,6 +44,7 @@ static struct
              *combobtn,
              *selectedcr,
              *sortedlv,
+             *sidebar,
              menubar[TOTAL_SHADES+1],
              highlight[TOTAL_SHADES+1],
              focus[TOTAL_SHADES+1],
@@ -113,7 +114,7 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height);
 
-#ifdef QTC_DEBUG
+// #ifdef QTC_DEBUG
 static void dumpChildren(GtkWidget *widget, int level)
 {
     if(level<5)
@@ -149,7 +150,7 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
     else
         printf("\n");
 }
-#endif
+// #endif
 
 typedef struct
 {
@@ -533,6 +534,15 @@ static GtkWidget * getComboButton(GtkWidget *widget)
     }
 
     return NULL;
+}
+
+static gboolean isSideBarBtn(GtkWidget *widget)
+{
+    return widget && widget->parent &&
+           (0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GdlDockBar") ||
+            (0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GdlSwitcher")/* &&
+             widget->parent->parent &&
+             0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GdlDockNotebook")*/) );
 }
 
 static gboolean isComboBoxButton(GtkWidget *widget)
@@ -2874,11 +2884,11 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         button=FALSE;
         togglebutton=TRUE;
     }
-#ifdef QTC_DEBUG
+// #ifdef QTC_DEBUG
 printf("Draw box %d %d %d %d %d %d %d %s  ", btn_down, state, shadow_type, x, y, width, height,
        detail ? detail : "NULL");
 debugDisplayWidget(widget, 3);
-#endif
+// #endif
 
     sanitizeSize(window, &width, &height);
 
@@ -3032,19 +3042,20 @@ debugDisplayWidget(widget, 3);
         }
 
     }
-    else if(!opts.stdSidebarButtons && button && widget && widget->parent &&
-            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "GdlDockBar"))
-    {
-        if(GTK_STATE_PRELIGHT==state || sunken)
+    else if(!opts.stdSidebarButtons && (button || togglebutton) && isSideBarBtn(widget))
+    {     
+        if(GTK_STATE_PRELIGHT==state || sunken || GTK_STATE_ACTIVE==state)
         {
-            gboolean horiz=false;
-            GdkColor *col=&qtcPalette.mouseover[1];
+            gboolean horiz=width>height;
+            GdkColor *cols=GTK_STATE_ACTIVE==state ? qtcPalette.sidebar : qtcPalette.background;
             drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
-                            &btn_colors[bgnd], btn_colors, ROUNDED_NONE, WIDGET_MENU_ITEM,
+                            &cols[bgnd], cols, ROUNDED_NONE, WIDGET_MENU_ITEM,
                             BORDER_FLAT, (horiz ? 0 : DF_VERT)|(sunken ? DF_SUNKEN : 0), widget);
 
             if(opts.coloredMouseOver && GTK_STATE_PRELIGHT==state)
             {
+                GdkColor *col=&qtcPalette.mouseover[1];
+
                 if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
                 {
                     cairo_new_path(cr);
@@ -6772,6 +6783,21 @@ static void generateColors()
 
             qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.selectedcr);
+        }
+
+    qtcPalette.sidebar=NULL;
+    if(!opts.stdSidebarButtons)
+        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+             qtcPalette.sidebar=qtcPalette.slider;
+        else if(IND_COLORED==opts.defBtnIndicator)
+            qtcPalette.sidebar=qtcPalette.defbtn;
+        else
+        {
+            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                  &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+
+            qtcPalette.sidebar=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            shadeColors(&mid, qtcPalette.sidebar);
         }
 }
 
