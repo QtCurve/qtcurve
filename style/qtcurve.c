@@ -3858,7 +3858,7 @@ debugDisplayWidget(widget, 3);
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
 
             /* Toolbars and menus */
-            if(!IS_FLAT(app))
+            if(GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app))
                 drawBevelGradient(cr, style, area, NULL, x, y, width,
                                 height, col,
                                 menubar
@@ -3871,7 +3871,7 @@ debugDisplayWidget(widget, 3);
                                                       drawBgndGradient(cr, style, area, widget, x, y, width, height)))
                 drawAreaColor(cr, area, NULL, col, x, y, width, height);
 
-            if(TB_NONE!=opts.toolbarBorders)
+            if(GTK_SHADOW_NONE!=shadow_type && TB_NONE!=opts.toolbarBorders)
             {
                 gboolean top=FALSE,
                          bottom=FALSE,
