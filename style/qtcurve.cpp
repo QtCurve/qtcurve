@@ -7539,6 +7539,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->restore();
                     }
 
+                    if(!comboBox->editable && !opts.unifyCombo)
+                        arrow.adjust(reverse ? -1 : 1, 0, reverse ? -1 : 1, 0);
                     if(sunken && (!comboBox->editable || !opts.unifyCombo))
                         arrow.adjust(1, 1, 1, 1);
 
