@@ -6781,7 +6781,7 @@ static void generateColors()
             GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
                                   &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
-            qtcPalette.defbtn=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.selectedcr);
         }
 
