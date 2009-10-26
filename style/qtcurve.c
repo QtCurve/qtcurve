@@ -114,7 +114,7 @@ static void gtkDrawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                        GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                        const gchar *detail, gint x, gint y, gint width, gint height);
 
-// #ifdef QTC_DEBUG
+#ifdef QTC_DEBUG
 static void dumpChildren(GtkWidget *widget, int level)
 {
     if(level<5)
@@ -150,7 +150,7 @@ static void debugDisplayWidget(GtkWidget *widget, int level)
     else
         printf("\n");
 }
-// #endif
+#endif
 
 typedef struct
 {
@@ -2884,11 +2884,11 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         button=FALSE;
         togglebutton=TRUE;
     }
-// #ifdef QTC_DEBUG
+#ifdef QTC_DEBUG
 printf("Draw box %d %d %d %d %d %d %d %s  ", btn_down, state, shadow_type, x, y, width, height,
        detail ? detail : "NULL");
 debugDisplayWidget(widget, 3);
-// #endif
+#endif
 
     sanitizeSize(window, &width, &height);
 
