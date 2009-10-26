@@ -4437,57 +4437,60 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_ToolBar:
             if (const QStyleOptionToolBar *toolbar = qstyleoption_cast<const QStyleOptionToolBar *>(option))
             {
-                painter->save();
-                drawMenuOrToolBarBackground(painter, r, option, false, Qt::NoToolBarArea==toolbar->toolBarArea ||
-                                                                       Qt::BottomToolBarArea==toolbar->toolBarArea ||
-                                                                       Qt::TopToolBarArea==toolbar->toolBarArea);
-                if(TB_NONE!=opts.toolbarBorders && (!widget->parent() || qobject_cast<QMainWindow *>(widget->parent())))
+                if(!widget || !widget->parent() || qobject_cast<QMainWindow *>(widget->parent()))
                 {
-                    const QColor *use=/*PE_PanelMenuBar==pe && itsActive
-                                        ? itsMenubarCols
-                                        : */ backgroundColors(option);
-                    bool         dark(TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders);
-
-                    if(TB_DARK_ALL==opts.toolbarBorders || TB_LIGHT_ALL==opts.toolbarBorders)
+                    painter->save();
+                    drawMenuOrToolBarBackground(painter, r, option, false, Qt::NoToolBarArea==toolbar->toolBarArea ||
+                                                                           Qt::BottomToolBarArea==toolbar->toolBarArea ||
+                                                                           Qt::TopToolBarArea==toolbar->toolBarArea);
+                    if(TB_NONE!=opts.toolbarBorders)
                     {
-                        painter->setPen(use[0]);
-                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-                        painter->setPen(use[dark ? 3 : 4]);
-                        painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
-                    }
-                    else
-                    {
-                        bool paintH(true),
-                             paintV(true);
+                        const QColor *use=/*PE_PanelMenuBar==pe && itsActive
+                                            ? itsMenubarCols
+                                            : */ backgroundColors(option);
+                        bool         dark(TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders);
 
-                        switch (toolbar->toolBarArea)
+                        if(TB_DARK_ALL==opts.toolbarBorders || TB_LIGHT_ALL==opts.toolbarBorders)
                         {
-                            case Qt::BottomToolBarArea:
-                            case Qt::TopToolBarArea:
-                                paintV=false;
-                                break;
-                            case Qt::RightToolBarArea:
-                            case Qt::LeftToolBarArea:
-                                paintH=false;
-                            default:
-                                break;
-                        }
-
-                        painter->setPen(use[0]);
-                        if(paintH)
+                            painter->setPen(use[0]);
                             painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        if(paintV)
                             painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-                        painter->setPen(use[dark ? 3 : 4]);
-                        if(paintH)
+                            painter->setPen(use[dark ? 3 : 4]);
                             painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        if(paintV)
                             painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                        }
+                        else
+                        {
+                            bool paintH(true),
+                                 paintV(true);
+
+                            switch (toolbar->toolBarArea)
+                            {
+                                case Qt::BottomToolBarArea:
+                                case Qt::TopToolBarArea:
+                                    paintV=false;
+                                    break;
+                                case Qt::RightToolBarArea:
+                                case Qt::LeftToolBarArea:
+                                    paintH=false;
+                                default:
+                                    break;
+                            }
+
+                            painter->setPen(use[0]);
+                            if(paintH)
+                                painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+                            if(paintV)
+                                painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+                            painter->setPen(use[dark ? 3 : 4]);
+                            if(paintH)
+                                painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                            if(paintV)
+                                painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                        }
                     }
+                    painter->restore();
                 }
-                painter->restore();
             }
             break;
         case CE_DockWidgetTitle:
