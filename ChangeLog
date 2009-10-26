@@ -14,6 +14,7 @@
  9. When drawing frames, respect shadow state (in/out).
 10. Draw inkscape's sidebar buttons as per QtCurve's KDE style.
 11. Improve appearance of unified spin widgets under Firefox.
+12. Don't draw background of dock widgets as if they were toolbars!
 
 0.69.2
 ------
