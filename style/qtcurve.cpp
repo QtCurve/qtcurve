@@ -284,6 +284,9 @@ static QtCurveStyle::Icon pix2Icon(QStyle::StandardPixmap pix)
             return QtCurveStyle::ICN_RESTORE;
         case QStyle::SP_TitleBarShadeButton:
             return QtCurveStyle::ICN_UP;
+        case QStyle::SP_ToolBarHorizontalExtensionButton:
+            return QtCurveStyle::ICN_RIGHT;
+        case QStyle::SP_ToolBarVerticalExtensionButton:
         case QStyle::SP_TitleBarUnshadeButton:
             return QtCurveStyle::ICN_DOWN;
         default:
@@ -2282,6 +2285,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
+        case PM_ToolBarExtensionExtent:
+            return 15;
 #ifndef QTC_QT_ONLY
         case PM_SmallIconSize:
         case PM_ButtonIconSize:
@@ -2691,7 +2696,7 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_DockWidgetCloseButton:
         case SP_TitleBarCloseButton:
         {
-            QBitmap            pm(13, 13);
+            QBitmap pm(13, 13);
 
             pm.clear();
 
@@ -2699,6 +2704,18 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
 
             drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix),
                      SP_TitleBarShadeButton==pix || SP_TitleBarUnshadeButton==pix);
+            return QIcon(pm);
+        }
+        case SP_ToolBarHorizontalExtensionButton:
+        case SP_ToolBarVerticalExtensionButton:
+        {
+            QBitmap pm(11, 11);
+
+            pm.clear();
+
+            QPainter painter(&pm);
+
+            drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix), true);
             return QIcon(pm);
         }
 #if !defined QTC_QT_ONLY
@@ -2734,8 +2751,6 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_FileIcon:
             return KIcon("application-x-zerosize");
 //         case SP_FileLinkIcon:
-//         case SP_ToolBarHorizontalExtensionButton:
-//         case SP_ToolBarVerticalExtensionButton:
         case SP_FileDialogStart:
             return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
                                                     ? "go-edn" : "go-first");
