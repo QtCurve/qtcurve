@@ -9735,7 +9735,7 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
             default:
                 break;
         }
-        
+
     painter->drawPixmap(rect.x()+((rect.width()-(itsIcons[icn].width()-wMod))>>1)+xMod,
                         rect.y()+((rect.height()-(itsIcons[icn].height()-hMod))>>1)+yMod, itsIcons[icn]);
 }
@@ -9880,8 +9880,14 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
 }
 
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, const QColor &col, bool small) const
+void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small) const
 {
+    // For some reason, with compositing enabled, konsole's arrows are transparent! i.e. When they should be black
+    // the background colour seeps through! Setting the alpha to 254 if it was 255 seems to work around this issue.
+    // ...very strange!
+    if(255==col.alpha())
+        col.setAlpha(254);
+
     drawIcon(p, col, r, false, primitive2Icon(pe), !small);
 }
 
