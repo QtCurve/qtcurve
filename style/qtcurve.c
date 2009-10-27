@@ -6338,6 +6338,12 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             x++, y++, width-=2, height-=2;
         btn=comboButton=true;
     }
+    else if(isGimpCombo(widget))
+    {
+        x-=2, width+=4;
+        if(!doEtch)
+            x--, y--, width+=2, height+=2;
+    }
     else if(GTK_IS_BUTTON(widget))
     {
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
