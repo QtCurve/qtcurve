@@ -7859,6 +7859,10 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
     switch (element)
     {
 #if QT_VERSION >= 0x040500
+        case SE_TabBarTabLeftButton:
+            return QTC_BASE_STYLE::subElementRect(element, option, widget).translated(-2, -1);
+        case SE_TabBarTabRightButton:
+            return QTC_BASE_STYLE::subElementRect(element, option, widget).translated(2, -1);
         case SE_TabBarTabText:
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             {
