@@ -7,7 +7,7 @@
  4. Added new splitter/handle/thumb style: single dot.
  5. Don't do coloured mouse over for buttons of editable combos, spin buttons,
     or scrollbar buttons.
- 6. Don't do regular coloured mouse over of sliders when theese are seto to be
+ 6. Don't do regular coloured mouse over of sliders when theese are set to be
     coloured on mouse over.
  7. Allow to specify strength when colouring selected tab.
  8. Fix internal padding of scrolled windows where scrollbars are within window.
@@ -15,7 +15,7 @@
 10. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
 11. Improve appearance of unified spin widgets under Firefox.
 12. Don't draw background of dock widgets as if they were toolbars!
-13. Only draw toolbar/menubar background if shadow typew is not set to none.
+13. Only draw toolbar/menubar background if shadow type is not set to none.
     (Removes toolbar gradient from Rhytmbox's search buttons)
 14. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
 
