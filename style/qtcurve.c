@@ -6338,15 +6338,34 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             x++, y++, width-=2, height-=2;
         btn=comboButton=true;
     }
-    else if(GTK_IS_BUTTON(widget) && !GTK_IS_RADIO_BUTTON(widget) && !GTK_IS_CHECK_BUTTON(widget))
+    else if(GTK_IS_BUTTON(widget))
     {
-        if(doEtch)
-            x--, width+=2;
+        if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
+        {
+            // Gimps buttons in its toolbox are
+            if(NULL==GTK_BUTTON(widget)->label_text || NULL==GTK_BUTTON(widget)->label_text[0])
+                
+            {
+                if(FOCUS_LINE==opts.focus)
+                    height--;
+                else if(QTC_FULL_FOCUS)
+                {
+                    y--, x-=3, width+=6, height+=2;
+                    if(!doEtch)
+                        y--, x--, width+=2, height+=2;
+                }
+            }
+        }
         else
-            x-=2, width+=4;
-        if(doEtch && opts.thinnerBtns)
-            y++, height-=2;
-        btn=true;
+        {
+            if(doEtch)
+                x--, width+=2;
+            else
+                x-=2, width+=4;
+            if(doEtch && opts.thinnerBtns)
+                y++, height-=2;
+            btn=true;
+        }
     }
 
     if(GTK_STATE_PRELIGHT==state && QTC_FULL_FOCUS && MO_NONE!=opts.coloredMouseOver &&
