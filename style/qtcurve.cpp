@@ -4519,10 +4519,22 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     // This section fixes the look of KOffice's dock widget titlebars...
                     QRect fillRect(r);
                     if(widget && widget->inherits("KoDockWidgetTitleBar"))
-                        fillRect.adjust(-r.x(), -r.y(), r.x(), r.y());
+                        fillRect.adjust(-r.x(), -r.y(), 0, 0);
                     painter->save();
-                    drawBevelGradient(palette.background().color(), painter, fillRect, !verticalTitleBar,
-                                      false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
+
+                    if(opts.round<ROUND_FULL)
+                        drawBevelGradient(palette.background().color(), painter, fillRect, !verticalTitleBar,
+                                          false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
+                    else
+                    {
+                        double radius(getRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
+
+                        painter->setRenderHint(QPainter::Antialiasing, true);
+                        drawBevelGradient(palette.background().color(), painter, fillRect,
+                                          buildPath(fillRect, WIDGET_OTHER, ROUNDED_ALL, radius), !verticalTitleBar,
+                                          false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
+                    }
+
                     painter->restore();
 
                     /* With border, but is a bit too much :-(
