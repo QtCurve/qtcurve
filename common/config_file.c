@@ -2404,7 +2404,18 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             KConfig defCfg(QFile::decodeName(cfgDir)+QTC_FILE, false, false);
 #endif
 
-            return writeConfig(&defCfg, opts, def, exportingStyle);
+            if(writeConfig(&defCfg, opts, def, exportingStyle))
+            {
+                const char *oldFiles[]={ QTC_OLD_FILE, "qtcurve.gtk-icons", 0};
+
+                for(int i=0; oldFiles[i]; ++i)
+                {
+                    QString oldFileName(QFile::decodeName(cfgDir)+QString("../")+oldFiles[i]);
+
+                    if(QFile::exists(oldFileName))
+                        QFile::remove(oldFileName);
+                }
+            }
         }
     }
     else

@@ -33,6 +33,9 @@
 22. Style toolbar-extension icons (the arrows that appear when window is too small for
     toolbar).
 23. Better positioning of close button on tabs.
+24. When saving settings to $XDG_CONFIG_HOME/qtcurve/stylerc, remove the older
+    $XDG_CONFIG_HOME/qtcurvestylerc, and $XDG_CONFIG_HOME/qtcurve.gtk-icons if they
+    exist.
 
 0.69.2
 ------
