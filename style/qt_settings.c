@@ -2487,7 +2487,7 @@ static gboolean qtInit()
                                         "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"EtchE\" "
                                         "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"EtchS\" ";
 
-                int thick=opts.etchEntry && doEffect ? 4 : 3;
+                int thick=/*opts.etchEntry && doEffect ?*/ 4 /*: 3*/;
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
                 sprintf(tmpStr, constStrFormat, thick, thick, thick, thick);
                 gtk_rc_parse_string(tmpStr);

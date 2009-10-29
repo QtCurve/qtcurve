@@ -18,6 +18,7 @@
 13. Only draw toolbar/menubar background if shadow type is not set to none.
     (Removes toolbar gradient from Rhytmbox's search buttons)
 14. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
+15. Better match of line-edit and spinbutton heights to KDE4.
 
 0.69.2
 ------
