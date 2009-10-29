@@ -1096,6 +1096,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(0, 70))
             {
+                def->roundAllTabs=false;
                 def->smallRadio=false;
                 def->splitterHighlight=true;
                 def->splitters=LINE_FLAT;
@@ -1852,7 +1853,7 @@ static void defaultSettings(Options *opts)
     opts->sliderStyle=SLIDER_PLAIN;
     opts->highlightTab=false;
     opts->colorSelTab=0;
-    opts->roundAllTabs=false;
+    opts->roundAllTabs=true;
     opts->tabMouseOver=TAB_MO_GLOW;
     opts->embolden=false;
     opts->bgndGrad=GT_HORIZ;
