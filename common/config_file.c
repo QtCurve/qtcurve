@@ -1101,6 +1101,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->splitterHighlight=true;
                 def->splitters=LINE_FLAT;
                 def->handles=LINE_SUNKEN;
+#ifdef __cplusplus
+                def->dwtAppearance=APPEARANCE_FLAT;
+#endif
             }
             if(version<QTC_MAKE_VERSION(0, 67))
                 def->doubleGtkComboArrow=false;
@@ -1844,7 +1847,7 @@ static void defaultSettings(Options *opts)
     opts->round=ROUND_FULL;
 #endif
 #ifdef __cplusplus
-    opts->dwtAppearance=APPEARANCE_FLAT;
+    opts->dwtAppearance=APPEARANCE_SPLIT_GRADIENT;
 #endif
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;

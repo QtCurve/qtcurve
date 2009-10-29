@@ -36,6 +36,7 @@
 24. When saving settings to $XDG_CONFIG_HOME/qtcurve/stylerc, remove the older
     $XDG_CONFIG_HOME/qtcurvestylerc, and $XDG_CONFIG_HOME/qtcurve.gtk-icons if they
     exist.
+25. Use split gradient for dock-widget titlebars.
 
 0.69.2
 ------
