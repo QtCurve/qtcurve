@@ -79,27 +79,11 @@ class QtCurveStyle : public QWindowsStyle
         ICN_MIN,
         ICN_MAX,
         ICN_MENU,
-        
         ICN_RESTORE,
-        ICN_RESTORE_SMALL,
         ICN_CLOSE,
-        ICN_CLOSE_SMALL,
         ICN_UP,
-#ifdef QTC_BITMAP_ARROWS
-        ICN_UP_SMALL,
-#endif
         ICN_DOWN,
-#ifdef QTC_BITMAP_ARROWS
-        ICN_DOWN_SMALL,
-        ICN_LEFT,
-        ICN_LEFT_SMALL,
-#endif
-        ICN_RIGHT,
-#ifdef QTC_BITMAP_ARROWS
-        ICN_RIGHT_SMALL,
-#endif
-
-        NUM_ICONS
+        ICN_RIGHT
     };
 
     QtCurveStyle(const QString &name=QString());
@@ -171,14 +155,14 @@ class QtCurveStyle : public QWindowsStyle
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
                         ETitleBarButtons btn, const QColor &iconColor, const QColor &shadow, const QColor *btnCols, const QColor *bgndCols) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
-    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow, const QRect &r,
+    void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QColor &shadow, const QRect &r,
                      bool hover, bool sunken, SubControl button) const;
     void drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize=true) const;
     void drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option, int round,
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;
     void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const;
     void drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical=false, bool reverse=false) const;
-    void drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small=false, bool mdi=false) const;
+    void drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small=false) const;
     void drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleOption *option, bool slider=false) const;
     void drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const;
     void drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle, const QStyleOptionSlider *slider, const QWidget *widget) const;
@@ -269,7 +253,6 @@ class QtCurveStyle : public QWindowsStyle
     mutable Version                    itsQtVersion;
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
-    mutable QBitmap                    itsIcons[NUM_ICONS];
 #if !defined QTC_QT_ONLY
     KComponentData                     itsComponentData;
 #endif

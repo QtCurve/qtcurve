@@ -296,24 +296,6 @@ static QtCurveStyle::Icon pix2Icon(QStyle::StandardPixmap pix)
     }
 }
 
-#ifdef QTC_BITMAP_ARROWS
-static QtCurveStyle::Icon primitive2Icon(QStyle::PrimitiveElement p)
-{
-    switch(p)
-    {
-        case QStyle::PE_IndicatorArrowLeft:
-            return QtCurveStyle::ICN_LEFT;
-        case QStyle::PE_IndicatorArrowRight:
-            return QtCurveStyle::ICN_RIGHT;
-        case QStyle::PE_IndicatorArrowUp:
-            return QtCurveStyle::ICN_UP;
-        default:
-        case QStyle::PE_IndicatorArrowDown:
-            return QtCurveStyle::ICN_DOWN;
-    }
-}
-#endif
-
 static QtCurveStyle::Icon subControlToIcon(QStyle::SubControl sc)
 {
     switch(sc)
@@ -9559,7 +9541,7 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                         : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
 
         drawMdiButton(p, rect, hover, sunken, buttonColors);
-        drawMdiIcon(p, icnColor, shadow, rect, hover, sunken, sc);
+        drawMdiIcon(p, icnColor, buttonColors[ORIGINAL_SHADE], shadow, rect, hover, sunken, sc);
     }
 }
 
@@ -9584,20 +9566,25 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
     }
 }
 
-void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &shadow,
+void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QColor &shadow,
                                const QRect &r, bool hover, bool sunken, SubControl button) const
 {
     bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
     Icon icon  = subControlToIcon(button);
 
     if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
-        // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
-        drawIcon(painter, shadow, r.adjusted(1, 1, 1, 1), sunken, icon);
+//         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+    {
+        QColor sh=KColorUtils::mix(bgnd, shadow, shadow.alphaF());
+
+        sh.setAlpha(255);
+        drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon);
+    }
 
     QColor col(color);
 
     if(faded)
-        col.setAlphaF(HOVER_BUTTON_ALPHA(col));
+        col=KColorUtils::mix(bgnd, col, HOVER_BUTTON_ALPHA(col));
 
     drawIcon(painter, col, r, sunken, icon);
 }
@@ -9616,161 +9603,59 @@ static QBitmap rotateBitmap(const QBitmap &bmp, double angle=90.0)
 
 void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize) const
 {
-    //
-    // NOTE: Intel 2.9 xorg driver does not seem to like drawing lines with alpha set, but qpainter set
-    //       to no anti-aliasing - nothing is drawn. (Enabling QPainter::Antialiasing works around this,
-    //       but produces blurry lines). So, draw all MDI icons into QBitmaps - and then just use qpainter
-    //       to draw these.
-    //
     static const int constIconSize=9;
     static const int constSmallIconSize=7;
 
-    Icon  icn=stdSize ? icon : (Icon)(icon+1);
-    QRect rect(r);
-
-    if(sunken)
-        rect.adjust(1, 1, 1, 1);
-
     painter->setPen(color);
 
-    if(itsIcons[icn].isNull())
+    QSize    iconSize(stdSize ? constIconSize : constSmallIconSize, stdSize ? constIconSize : (ICN_RESTORE==icon ? constSmallIconSize+1 : constSmallIconSize));
+    QRect    br(r.x()+((r.width()-iconSize.width())>>1),
+                r.y()+((r.height()-iconSize.height())>>1),
+                iconSize.width(), iconSize.height());
+    if(sunken)
+        br.adjust(1, 1, 1, 1);
+ 
+    switch(icon)
     {
-        QPainter *p=NULL;
-        QSize    iconSize(stdSize ? constIconSize : constSmallIconSize, stdSize ? constIconSize : constSmallIconSize);
-        QRect    br(0, 0, iconSize.width(), iconSize.height());
-
-#ifdef QTC_BITMAP_ARROWS
-        if(ICN_MIN==icon || ICN_MAX==icon || ICN_MENU==icon)
-#else
-        if(icon!=ICN_CLOSE && icon!=ICN_RESTORE)
-#endif
-        {
-            itsIcons[icn]=QBitmap(iconSize);
-            p=new QPainter(&itsIcons[icn]);
-            p->fillRect(br, Qt::color0);
-            p->setPen(Qt::color1);
-        }
-
-        switch(icn)
-        {
-            case ICN_MIN:
-                drawRect(p, QRect(br.left(), br.bottom()-1, br.width(), 2));
-                break;
-            case ICN_MAX:
-                drawRect(p, br);
-                p->drawLine(br.left() + 1, br.top() + 1,  br.right() - 1, br.top() + 1);
-                break;
-            case ICN_CLOSE:
-            case ICN_CLOSE_SMALL:
-            {
-                static unsigned char xbmL[] = { 0x83, 0x01, 0xc7, 0x01, 0xee, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x7c, 0x00,
-                                                0xee, 0x00, 0xc7, 0x01, 0x83, 0x01 };
-                static unsigned char xbmS[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-                itsIcons[icn]=QBitmap::fromData(iconSize, stdSize ? xbmL : xbmS);
-                break;
-            }
-            case ICN_RESTORE:
-            case ICN_RESTORE_SMALL:
-            {
-                static unsigned char xbmL[] = { 0xfc, 0x01, 0xfc, 0x01, 0x04, 0x01, 0x7f, 0x01, 0x7f, 0x01, 0xc1, 0x01,
-                                                0x41, 0x00, 0x41, 0x00, 0x7f, 0x00 };
-                static unsigned char xbmS[] = { 0x7c, 0x7c, 0x44, 0x5f, 0x7f, 0x11, 0x11, 0x1f };
-                itsIcons[icn]=QBitmap::fromData(QSize(iconSize.width(), stdSize ? iconSize.height() : iconSize.height()+1), stdSize ? xbmL : xbmS);
-                break;
-            }
-#ifdef QTC_BITMAP_ARROWS
-            case ICN_UP:
-            case ICN_UP_SMALL:
-            case ICN_DOWN:
-            case ICN_DOWN_SMALL:
-            case ICN_LEFT:
-            case ICN_LEFT_SMALL:
-            case ICN_RIGHT:
-            case ICN_RIGHT_SMALL:
-            {
-                static unsigned char vArrowLargeXbm[] = { 0x08, 0x1c, 0x3e, 0x77, 0x63 }; // 7*5
-                static unsigned char vArrowSmallXbm[] = { 0x04, 0x0e, 0x1b, 0x11 };  // 5*4
-                static unsigned char arrowLargeXbm[]  = { 0x08, 0x1c, 0x3e, 0x7f }; // 7*4
-                static unsigned char arrowSmallXbm[]  = { 0x04, 0x0e, 0x1f }; // 5*3
-                
-                itsIcons[icn]=QBitmap::fromData(QSize(stdSize ? LARGE_ARR_WIDTH : SMALL_ARR_WIDTH, 
-                                                     (stdSize ? LARGE_ARR_HEIGHT : SMALL_ARR_HEIGHT)+(opts.vArrows ? 1 : 0)),
-                                                stdSize ? (opts.vArrows ? vArrowLargeXbm :arrowLargeXbm) : (opts.vArrows ? vArrowSmallXbm :arrowSmallXbm) );
-                                                 
-                switch(icon)
-                {
-                    case ICN_DOWN:
-                        itsIcons[icn]=rotateBitmap(itsIcons[icn], 180);
-                        break;
-                    case ICN_LEFT:
-                        itsIcons[icn]=rotateBitmap(itsIcons[icn], 270);
-                        break;
-                    case ICN_RIGHT:
-                        itsIcons[icn]=rotateBitmap(itsIcons[icn], 90);
-                    default:
-                        break;
-                }
-                break;
-            }
-#else
-            case ICN_UP:
-                drawArrow(p, br, PE_IndicatorArrowUp, Qt::color1, false, true);
-                break;
-            case ICN_DOWN:
-                drawArrow(p, br, PE_IndicatorArrowDown, Qt::color1, false, true);
-                break;
-            case ICN_RIGHT:
-                drawArrow(p, br, PE_IndicatorArrowRight, Qt::color1, false, true);
-                break;
-#endif
-            case ICN_MENU:
-                for(int i=1; i<=constIconSize; i+=3)
-                    p->drawLine(br.left() + 1, br.top() + i,  br.right() - 1, br.top() + i);
-            default:
-                break;
-        }
-
-        if(p)
-        {
-            p->end();
-            delete p;
-        }
+        case ICN_MIN:
+            drawRect(painter, QRect(br.left(), br.bottom()-1, br.width(), 2));
+            break;
+        case ICN_MAX:
+            drawRect(painter, br);
+            painter->drawLine(br.left() + 1, br.top() + 1,  br.right() - 1, br.top() + 1);
+            break;
+        case ICN_CLOSE:
+            painter->save();
+            painter->setClipRect(br);
+            painter->setPen(QPen(color, 2));
+            painter->drawLine(br.left(), br.top(), br.right(), br.bottom());
+            painter->drawLine(br.right(), br.top(), br.left(), br.bottom());
+            painter->restore();
+            break;
+        case ICN_RESTORE:
+            drawRect(painter, QRect(br.x(), br.y()+3, br.width()-2, br.height()-3));
+            painter->drawLine(br.x()+1, br.y()+4, br.x()+br.width()-4, br.y()+4);
+            painter->drawLine(br.x()+2, br.y(), br.x()+br.width()-1, br.y());
+            painter->drawLine(br.x()+2, br.y()+1, br.x()+br.width()-1, br.y()+1);
+            painter->drawLine(br.x()+br.width()-1, br.y()+2, br.x()+br.width()-1, br.y()+(stdSize ? 5 : 4));
+            painter->drawPoint(br.x()+br.width()-2, br.y()+(stdSize ? 5 : 4));
+            painter->drawPoint(br.x()+2, br.y()+2);
+            break;
+        case ICN_UP:
+            drawArrow(painter, br, PE_IndicatorArrowUp, Qt::color1, false);
+            break;
+        case ICN_DOWN:
+            drawArrow(painter, br, PE_IndicatorArrowDown, Qt::color1, false);
+            break;
+        case ICN_RIGHT:
+            drawArrow(painter, br, PE_IndicatorArrowRight, Qt::color1, false);
+            break;
+        case ICN_MENU:
+            for(int i=1; i<=constIconSize; i+=3)
+                painter->drawLine(br.left() + 1, br.top() + i,  br.right() - 1, br.top() + i);
+        default:
+            break;
     }
-
-#ifdef QTC_BITMAP_ARROWS
-    int xMod(0), yMod(0), hMod(0), wMod(0);
-    
-    if(opts.vArrows)
-        switch(icon)
-        {
-            case ICN_UP:
-            case ICN_DOWN:
-                hMod=1;
-                break;
-            case ICN_LEFT:
-            case ICN_RIGHT:
-                wMod=1;
-            default:
-                break;
-        }
-    else
-        switch(icon)
-        {
-            case ICN_DOWN:
-                yMod=1;
-                break;
-            case ICN_RIGHT:
-                xMod=1;
-            default:
-                break;
-        }
-
-    painter->drawPixmap(rect.x()+((rect.width()-(itsIcons[icn].width()-wMod))>>1)+xMod,
-                        rect.y()+((rect.height()-(itsIcons[icn].height()-hMod))>>1)+yMod, itsIcons[icn]);
-#else
-    painter->drawPixmap(rect.x()+((rect.width()-(itsIcons[icn].width()))>>1),
-                        rect.y()+((rect.height()-(itsIcons[icn].height()))>>1), itsIcons[icn]);
-#endif
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
@@ -9913,17 +9798,8 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
 }
 
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small, bool mdi) const
+void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small) const
 {
-#ifdef QTC_BITMAP_ARROWS
-    // For some reason, with compositing enabled, konsole's arrows are transparent! i.e. When they should be black
-    // the background colour seeps through! Setting the alpha to 254 if it was 255 seems to work around this issue.
-    // ...very strange!
-    if(255==col.alpha())
-        col.setAlpha(254);
-
-    drawIcon(p, col, r, false, primitive2Icon(pe), !small);
-#else
     QPolygon     a;
     QPainterPath path;
 
@@ -9966,7 +9842,6 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
 
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
 
-
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
     path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
     for(int i=1; i<a.size(); ++i)
@@ -9977,8 +9852,7 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
     // Just using 'aa' and drawing the arrows would be fine - but this makes them look
     // slightly blurry, and I dont like that.
     p->save();
-    if(!mdi)
-        col.setAlpha(255);
+    col.setAlpha(255);
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
     p->setRenderHint(QPainter::Antialiasing, true);
 #endif
@@ -9990,7 +9864,6 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
 #endif
     p->drawPolygon(a);
     p->restore();
-#endif  // QTC_BITMAP_ARROWS
 }
 
 void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const

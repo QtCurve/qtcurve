@@ -7,7 +7,6 @@
 
 #cmakedefine QTC_DISABLE_KDEFILEDIALOG_CALLS
 #cmakedefine QTC_QT_ONLY
-#cmakedefine QTC_BITMAP_ARROWS
 #cmakedefine QTC_OLD_NVIDIA_ARROW_FIX
 
 #endif
