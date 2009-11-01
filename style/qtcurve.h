@@ -81,18 +81,23 @@ class QtCurveStyle : public QWindowsStyle
         ICN_MENU,
         
         ICN_RESTORE,
-        ICN_UP,
-        ICN_DOWN,
-        ICN_LEFT,
-        ICN_RIGHT,
-        ICN_CLOSE,
-
         ICN_RESTORE_SMALL,
-        ICN_UP_SMALL,
-        ICN_DOWN_SMALL,
-        ICN_LEFT_SMALL,
-        ICN_RIGHT_SMALL,
+        ICN_CLOSE,
         ICN_CLOSE_SMALL,
+        ICN_UP,
+#ifdef QTC_BITMAP_ARROWS
+        ICN_UP_SMALL,
+#endif
+        ICN_DOWN,
+#ifdef QTC_BITMAP_ARROWS
+        ICN_DOWN_SMALL,
+        ICN_LEFT,
+        ICN_LEFT_SMALL,
+#endif
+        ICN_RIGHT,
+#ifdef QTC_BITMAP_ARROWS
+        ICN_RIGHT_SMALL,
+#endif
 
         NUM_ICONS
     };
@@ -173,7 +178,7 @@ class QtCurveStyle : public QWindowsStyle
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;
     void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const;
     void drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical=false, bool reverse=false) const;
-    void drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small=false) const;
+    void drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small=false, bool mdi=false) const;
     void drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleOption *option, bool slider=false) const;
     void drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const;
     void drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle, const QStyleOptionSlider *slider, const QWidget *widget) const;

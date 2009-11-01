@@ -296,6 +296,7 @@ static QtCurveStyle::Icon pix2Icon(QStyle::StandardPixmap pix)
     }
 }
 
+#ifdef QTC_BITMAP_ARROWS
 static QtCurveStyle::Icon primitive2Icon(QStyle::PrimitiveElement p)
 {
     switch(p)
@@ -311,6 +312,7 @@ static QtCurveStyle::Icon primitive2Icon(QStyle::PrimitiveElement p)
             return QtCurveStyle::ICN_DOWN;
     }
 }
+#endif
 
 static QtCurveStyle::Icon subControlToIcon(QStyle::SubControl sc)
 {
@@ -7566,8 +7568,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->restore();
                     }
 
-                    if(!comboBox->editable && !opts.unifyCombo)
-                        arrow.adjust(reverse ? -1 : 1, 0, reverse ? -1 : 1, 0);
                     if(sunken && (!comboBox->editable || !opts.unifyCombo))
                         arrow.adjust(1, 1, 1, 1);
 
@@ -8021,7 +8021,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     case SC_ComboBoxArrow:
                         r.setRect(x + w - bmarg - (doEtch ? 17 : 16), y + bmarg, 16, h - 2*bmarg);
                         if(ed)
-                            r.adjust(2, 0, 0, 0);
+                            r.adjust(1, 0, 0, 0);
                         break;
                     case SC_ComboBoxEditField:
                         r.setRect(x + (ed && opts.unifyCombo ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
@@ -9617,7 +9617,7 @@ static QBitmap rotateBitmap(const QBitmap &bmp, double angle=90.0)
 void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize) const
 {
     //
-    // NOTE: Intel 2.9 xorg driver does not seemt to like drawing lines with alpha set, but qpainter set
+    // NOTE: Intel 2.9 xorg driver does not seem to like drawing lines with alpha set, but qpainter set
     //       to no anti-aliasing - nothing is drawn. (Enabling QPainter::Antialiasing works around this,
     //       but produces blurry lines). So, draw all MDI icons into QBitmaps - and then just use qpainter
     //       to draw these.
@@ -9625,7 +9625,7 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
     static const int constIconSize=9;
     static const int constSmallIconSize=7;
 
-    Icon  icn=stdSize ? icon : (Icon)(icon+ICN_RESTORE_SMALL-ICN_RESTORE);
+    Icon  icn=stdSize ? icon : (Icon)(icon+1);
     QRect rect(r);
 
     if(sunken)
@@ -9639,7 +9639,11 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
         QSize    iconSize(stdSize ? constIconSize : constSmallIconSize, stdSize ? constIconSize : constSmallIconSize);
         QRect    br(0, 0, iconSize.width(), iconSize.height());
 
+#ifdef QTC_BITMAP_ARROWS
         if(ICN_MIN==icon || ICN_MAX==icon || ICN_MENU==icon)
+#else
+        if(icon!=ICN_CLOSE && icon!=ICN_RESTORE)
+#endif
         {
             itsIcons[icn]=QBitmap(iconSize);
             p=new QPainter(&itsIcons[icn]);
@@ -9674,6 +9678,7 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
                 itsIcons[icn]=QBitmap::fromData(QSize(iconSize.width(), stdSize ? iconSize.height() : iconSize.height()+1), stdSize ? xbmL : xbmS);
                 break;
             }
+#ifdef QTC_BITMAP_ARROWS
             case ICN_UP:
             case ICN_UP_SMALL:
             case ICN_DOWN:
@@ -9707,6 +9712,17 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
                 }
                 break;
             }
+#else
+            case ICN_UP:
+                drawArrow(p, br, PE_IndicatorArrowUp, Qt::color1, false, true);
+                break;
+            case ICN_DOWN:
+                drawArrow(p, br, PE_IndicatorArrowDown, Qt::color1, false, true);
+                break;
+            case ICN_RIGHT:
+                drawArrow(p, br, PE_IndicatorArrowRight, Qt::color1, false, true);
+                break;
+#endif
             case ICN_MENU:
                 for(int i=1; i<=constIconSize; i+=3)
                     p->drawLine(br.left() + 1, br.top() + i,  br.right() - 1, br.top() + i);
@@ -9721,6 +9737,7 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
         }
     }
 
+#ifdef QTC_BITMAP_ARROWS
     int xMod(0), yMod(0), hMod(0), wMod(0);
     
     if(opts.vArrows)
@@ -9750,6 +9767,10 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
 
     painter->drawPixmap(rect.x()+((rect.width()-(itsIcons[icn].width()-wMod))>>1)+xMod,
                         rect.y()+((rect.height()-(itsIcons[icn].height()-hMod))>>1)+yMod, itsIcons[icn]);
+#else
+    painter->drawPixmap(rect.x()+((rect.width()-(itsIcons[icn].width()))>>1),
+                        rect.y()+((rect.height()-(itsIcons[icn].height()))>>1), itsIcons[icn]);
+#endif
 }
 
 void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
@@ -9892,8 +9913,9 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
 }
 
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small) const
+void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small, bool mdi) const
 {
+#ifdef QTC_BITMAP_ARROWS
     // For some reason, with compositing enabled, konsole's arrows are transparent! i.e. When they should be black
     // the background colour seeps through! Setting the alpha to 254 if it was 255 seems to work around this issue.
     // ...very strange!
@@ -9901,6 +9923,74 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, Q
         col.setAlpha(254);
 
     drawIcon(p, col, r, false, primitive2Icon(pe), !small);
+#else
+    QPolygon     a;
+    QPainterPath path;
+
+    if(small)
+        switch(pe)
+        {
+            case PE_IndicatorArrowUp:
+                a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,-2,  -2,0,   -2,1, 0,-1, 2,1);
+                break;
+            case PE_IndicatorArrowDown:
+                a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,2,  -2,0,   -2,-1, 0,1, 2,-1);
+                break;
+            case PE_IndicatorArrowRight:
+                a.setPoints(opts.vArrows ? 6 : 3,  0,-2,  2,0,  0,2,   -1,2, 1,0, -1,-2);
+                break;
+            case PE_IndicatorArrowLeft:
+                a.setPoints(opts.vArrows ? 6 : 3,  0,-2,  -2,0,  0,2,   1,2, -1,0, 1,-2);
+                break;
+            default:
+                return;
+        }
+    else // Large arrows...
+        switch(pe)
+        {
+            case PE_IndicatorArrowUp:
+                a.setPoints(opts.vArrows ? 8 : 3,  3,1,  0,-2,  -3,1,    -3,2,  -2,2, 0,0,  2,2, 3,2);
+                break;
+            case PE_IndicatorArrowDown:
+                a.setPoints(opts.vArrows ? 8 : 3,  3,-1,  0,2,  -3,-1,   -3,-2,  -2,-2, 0,0, 2,-2, 3,-2);
+                break;
+            case PE_IndicatorArrowRight:
+                a.setPoints(opts.vArrows ? 8 : 3,  -1,-3,  2,0,  -1,3,   -2,3, -2,2, 0,0, -2,-2, -2,-3);
+                break;
+            case PE_IndicatorArrowLeft:
+                a.setPoints(opts.vArrows ? 8 : 3,  1,-3,  -2,0,  1,3,    2,3, 2,2, 0,0, 2,-2, 2,-3);
+                break;
+            default:
+                return;
+        }
+
+    a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
+
+
+#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+    path.moveTo(a[0].x()+0.5, a[0].y()+0.5);
+    for(int i=1; i<a.size(); ++i)
+        path.lineTo(a[i].x()+0.5, a[i].y()+0.5);
+    path.lineTo(a[0].x()+0.5, a[0].y()+0.5);
+#endif
+    // This all looks like overkill - but seems to fix issues with plasma and nvidia
+    // Just using 'aa' and drawing the arrows would be fine - but this makes them look
+    // slightly blurry, and I dont like that.
+    p->save();
+    if(!mdi)
+        col.setAlpha(255);
+#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+    p->setRenderHint(QPainter::Antialiasing, true);
+#endif
+    p->setPen(col);
+    p->setBrush(col);
+#ifdef QTC_OLD_NVIDIA_ARROW_FIX
+    p->fillPath(path, col);
+    p->setRenderHint(QPainter::Antialiasing, false);
+#endif
+    p->drawPolygon(a);
+    p->restore();
+#endif  // QTC_BITMAP_ARROWS
 }
 
 void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOption *option, bool slider) const
