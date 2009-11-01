@@ -2955,12 +2955,20 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowLeft:
         case PE_IndicatorArrowRight:
+        {
+            QColor col(QTC_MO_ARROW(QPalette::Text));
             if(state&(State_Sunken|State_On) &&
                !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
                              (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
                 r.adjust(1, 1, 1, 1);
-            drawArrow(painter, r, element, QTC_MO_ARROW(QPalette::Text), false);
+            if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlDropDownButton"))
+            {
+                col=KColorUtils::mix(palette.background().color(), col, col.alphaF());
+                col.setAlpha(255);
+            }
+            drawArrow(painter, r, element, col, false);
             break;
+        }
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
         case PE_IndicatorSpinUp:
