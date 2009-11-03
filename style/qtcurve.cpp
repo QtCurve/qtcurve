@@ -1354,7 +1354,8 @@ void QtCurveStyle::polish(QWidget *widget)
 
         if(opts.forceAlternateLvCols &&
            viewport->autoFillBackground() && // Dolphins Folders panel
-           255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
+           //255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
+           !widget->inherits("KFilePlacesView") &&
            (qobject_cast<QTreeView *>(widget) ||
             (qobject_cast<QListView *>(widget) && QListView::IconMode!=((QListView *)widget)->viewMode())))
             itemView->setAlternatingRowColors(true);
@@ -1918,7 +1919,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             return true;
     }
 
-    if (qobject_cast<QAbstractScrollArea *>(object) && object->inherits("KFilePlacesView"))
+    if (QEvent::Show==event->type() && qobject_cast<QAbstractScrollArea *>(object) && object->inherits("KFilePlacesView"))
     {
         QWidget  *view   = ((QAbstractScrollArea *)object)->viewport();
         QPalette palette = view->palette();
