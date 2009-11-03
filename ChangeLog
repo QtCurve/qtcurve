@@ -35,6 +35,7 @@
     exist.
 23. Use split gradient for dock-widget titlebars.
 24. Round gradients of dock-widget titlebars.
+25. Setup KDE4 palette and fonts in constructor.
 
 0.69.2
 ------

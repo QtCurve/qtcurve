@@ -877,6 +877,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
 
         itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
+    setupKde4();
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
     setFileDialogs();
 #endif
@@ -1073,10 +1074,6 @@ QtCurveStyle::QtCurveStyle(const QString &name)
         }
     else
         opts.titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
-
-#if !defined QTC_QT_ONLY
-    QMetaObject::invokeMethod(this, "setupKde4", Qt::QueuedConnection);
-#endif
 }
 
 QtCurveStyle::~QtCurveStyle()
@@ -1189,21 +1186,21 @@ void QtCurveStyle::polish(QPalette &palette)
         newContrast=true;
     }
 
-    bool newMenu(newContrast ||
+    bool newHighlight(newContrast ||
                  itsHighlightCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Highlight)),
          newGray(newContrast ||
                  itsBackgroundCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Background)),
          newButton(newContrast ||
                    itsButtonCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Button)),
          newSlider(itsSliderCols && itsHighlightCols!=itsSliderCols && SHADE_BLEND_SELECTED==opts.shadeSliders &&
-                   (newContrast || newButton || newMenu)),
+                   (newButton || newHighlight)),
          newDefBtn(itsDefBtnCols && /*( (IND_COLORED==opts.defBtnIndicator &&*/
                                        SHADE_BLEND_SELECTED!=opts.shadeSliders/*) ||*/ // If so, def btn == slider!
                                       /*(IND_TINT==opts.defBtnIndicator) )*/ &&
-                   (newContrast || newButton || newMenu)),
+                   (newContrast || newButton || newHighlight)),
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
-                     (newContrast || newButton || newMenu)),
+                     (newButton || newHighlight)),
          newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
                                              itsComboBtnCols!=itsSortedLvColors) ||
                                              SHADE_DARKEN==opts.sortedLv) &&
@@ -1219,7 +1216,7 @@ void QtCurveStyle::polish(QPalette &palette)
     if(newButton)
         shadeColors(palette.color(QPalette::Active, QPalette::Button), itsButtonCols);
 
-    if(newMenu)
+    if(newHighlight)
         shadeColors(palette.color(QPalette::Active, QPalette::Highlight), itsHighlightCols);
 
 // Dont set these here, they will be updated in setDecorationColors()...
@@ -1229,9 +1226,18 @@ void QtCurveStyle::polish(QPalette &palette)
 
     setMenuColors(palette.color(QPalette::Active, QPalette::Background));
 
+// printf("%d %d %d %d %d %d %d %d %d\n", newContrast, newHighlight, newGray, newButton, newSlider, newDefBtn, newComboBtn, newSortedLv, newCheckRadioSelCols);
     if(newSlider)
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                     itsButtonCols[ORIGINAL_SHADE]), itsSliderCols);
+
+    if(newDefBtn)
+        if(IND_TINT==opts.defBtnIndicator)
+            shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
+                        itsHighlightCols[ORIGINAL_SHADE], QTC_DEF_BNT_TINT), itsDefBtnCols);
+        else if(IND_GLOW!=opts.defBtnIndicator)
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
+                        itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
 
     if(newComboBtn)
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
@@ -1243,14 +1249,6 @@ void QtCurveStyle::polish(QPalette &palette)
                         opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE]), itsSortedLvColors);
         else
             shadeColors(shade(opts.lvButton ? itsButtonCols[ORIGINAL_SHADE] : itsBackgroundCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsSortedLvColors);
-
-    if(newDefBtn)
-        if(IND_TINT==opts.defBtnIndicator)
-            shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
-                        itsHighlightCols[ORIGINAL_SHADE], QTC_DEF_BNT_TINT), itsDefBtnCols);
-        else if(IND_GLOW!=opts.defBtnIndicator)
-            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                        itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
 
     if(itsSidebarButtonsCols && SHADE_BLEND_SELECTED!=opts.shadeSliders &&
        IND_COLORED!=opts.defBtnIndicator)
@@ -10788,9 +10786,9 @@ void QtCurveStyle::widgetDestroyed(QObject *o)
     }
 }
 
+#if !defined QTC_QT_ONLY
 void QtCurveStyle::setupKde4()
 {
-#if !defined QTC_QT_ONLY
     if(kapp)
         setDecorationColors();
     else
@@ -10798,10 +10796,8 @@ void QtCurveStyle::setupKde4()
         applyKdeSettings(true);
         applyKdeSettings(false);
     }
-#endif
 }
 
-#if !defined QTC_QT_ONLY
 void QtCurveStyle::setDecorationColors()
 {
     KColorScheme kcs(QPalette::Active);
