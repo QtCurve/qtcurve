@@ -3281,7 +3281,7 @@ debugDisplayWidget(widget, 3);
 
                 if(/*GTK_APP_JAVA_SWT==qtSettings.app && */
                    widget && !isFixedWidget(widget) && /* Don't do for Firefox, etc. */
-                   WIDGET_SB_SLIDER==widgetType && GTK_STATE_INSENSITIVE!=state)
+                   WIDGET_SB_SLIDER==widgetType && GTK_STATE_INSENSITIVE!=state && GTK_IS_RANGE(widget))
                 {
                     gboolean horizontal    = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
                     int      sbarTroughLen = (horizontal ? widget->allocation.height : widget->allocation.width)-
