@@ -2959,7 +2959,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
                              (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
                 r.adjust(1, 1, 1, 1);
-            if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlDropDownButton"))
+            if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
             {
                 col=KColorUtils::mix(palette.background().color(), col, col.alphaF());
                 col.setAlpha(255);
