@@ -2767,8 +2767,8 @@ debugDisplayWidget(widget, 3);
 #endif
         if(isSpinButton)
         {
-            if(GTK_ARROW_UP==arrow_type)
-                y++;
+//             if(GTK_ARROW_UP==arrow_type)
+//                 y++;
             a_height = SMALL_ARR_HEIGHT;
             a_width = SMALL_ARR_WIDTH;
         }
