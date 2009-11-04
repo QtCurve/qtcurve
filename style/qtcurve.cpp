@@ -388,6 +388,7 @@ static enum
     APP_KMIX,
     APP_QTDESIGNER,
     APP_KDEVELOP,
+    APP_K3B,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1153,6 +1154,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KONQUEROR;
         else if("kontact"==appName)
             theThemedApp=APP_KONTACT;
+        else if("k3b"==appName)
+            theThemedApp=APP_K3B;
         else if("skype"==appName)
             theThemedApp=APP_SKYPE;
         else if("arora"==appName)
@@ -3077,6 +3080,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             break;
         case PE_Frame:
+        {
 #ifdef QTC_QT_ONLY
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
                 break;
@@ -3102,76 +3106,81 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             else
             {
-                bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
-                        (widget && widget->inherits("Q3ScrollView")) ||
-                        (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
-                     squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow()))),
-                     inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
+                const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
 
-                if(sv && (opts.etchEntry || squareSv))
+                if(APP_K3B==theThemedApp && !(state&(State_Sunken|State_Raised)) && fo && 1==fo->lineWidth)
                 {
-                    if(squareSv)
-                    {
-                        QColor col(backgroundColors(option)[QT_STD_BORDER]);
-
-                        if(APP_ARORA==theThemedApp)
-                            painter->fillRect(r, palette.brush(QPalette::Base));
-                        painter->setPen(col);
-
-                        // Flat style...
-                        //drawRect(painter, r);
-                        // 3d style...
-                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        col.setAlphaF(QT_LOWER_BORDER_ALPHA);
-                        painter->setPen(col);
-
-                        // Again. more intel 2.9 xorg driver issues :-(
-                        painter->save();
-                        painter->setRenderHint(QPainter::Antialiasing, true);
-                        drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->restore();
-                    }
-                    else
-                    {
-                        const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
-
-                        // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
-                        // but is when painted. So check here if it should not be etched.
-                        // Also, see not in getLowerEtchCol()
-                        if(QTC_DO_EFFECT && widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget) &&
-                           inQAbstractItemView)
-                            theNoEtchWidgets.insert(widget);
-
-                        // If we are set to have sunken scrollviews, then the frame width is set to 3.
-                        // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
-                        // need to draw inner border...
-                        bool doEtch=QTC_DO_EFFECT && opts.etchEntry,
-                             noEtchW=doEtch && theNoEtchWidgets.contains(widget);
-                        if(doEtch && noEtchW)
-                        {
-                            painter->setPen(palette.brush(QPalette::Base).color());
-                            drawRect(painter, r.adjusted(2, 2, -2, -2));
-                        }
-
-                        if(!opts.highlightScrollViews && fo)
-                        {
-                            QStyleOptionFrame opt(*fo);
-                            opt.state&=~State_HasFocus;
-                            drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false,
-                                           doEtch && !noEtchW, WIDGET_SCROLLVIEW);
-                        }
-                        else
-                            drawEntryField(painter, r, widget, option, ROUNDED_ALL, false,
-                                           doEtch && !noEtchW, WIDGET_SCROLLVIEW);
-                    }
+                    painter->save();
+                    painter->setPen(backgroundColors(option)[QT_STD_BORDER]);
+                    drawRect(painter, r);
+                    painter->restore();
                 }
                 else
                 {
-                    const QStyleOptionFrame *fo = qstyleoption_cast<const QStyleOptionFrame *>(option);
+                    bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
+                            (widget && widget->inherits("Q3ScrollView")) ||
+                            (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
+                        squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow()))),
+                        inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
 
-                    if (fo && fo->lineWidth>0)
+                    if(sv && (opts.etchEntry || squareSv))
+                    {
+                        if(squareSv)
+                        {
+                            QColor col(backgroundColors(option)[QT_STD_BORDER]);
+
+                            if(APP_ARORA==theThemedApp)
+                                painter->fillRect(r, palette.brush(QPalette::Base));
+                            painter->setPen(col);
+
+                            // Flat style...
+                            //drawRect(painter, r);
+                            // 3d style...
+                            painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+                            painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+                            col.setAlphaF(QT_LOWER_BORDER_ALPHA);
+                            painter->setPen(col);
+
+                            // Again. more intel 2.9 xorg driver issues :-(
+                            painter->save();
+                            painter->setRenderHint(QPainter::Antialiasing, true);
+                            drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
+                            drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                            painter->restore();
+                        }
+                        else
+                        {
+                            // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
+                            // but is when painted. So check here if it should not be etched.
+                            // Also, see not in getLowerEtchCol()
+                            if(QTC_DO_EFFECT && widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget) &&
+                            inQAbstractItemView)
+                                theNoEtchWidgets.insert(widget);
+
+                            // If we are set to have sunken scrollviews, then the frame width is set to 3.
+                            // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
+                            // need to draw inner border...
+                            bool doEtch=QTC_DO_EFFECT && opts.etchEntry,
+                                noEtchW=doEtch && theNoEtchWidgets.contains(widget);
+                            if(doEtch && noEtchW)
+                            {
+                                painter->setPen(palette.brush(QPalette::Base).color());
+                                drawRect(painter, r.adjusted(2, 2, -2, -2));
+                            }
+
+                            if(!opts.highlightScrollViews && fo)
+                            {
+                                QStyleOptionFrame opt(*fo);
+                                opt.state&=~State_HasFocus;
+                                drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false,
+                                            doEtch && !noEtchW, WIDGET_SCROLLVIEW);
+                            }
+                            else
+                                drawEntryField(painter, r, widget, option, ROUNDED_ALL, false,
+                                            doEtch && !noEtchW, WIDGET_SCROLLVIEW);
+                        }
+                    }
+                    else if (fo && fo->lineWidth>0)
                     {
                         bool         kwinTab(APP_KWIN==theThemedApp &&  widget && !widget->parentWidget() &&
                                              0==strcmp(widget->metaObject()->className(), "KWin::TabBox"));
@@ -3222,6 +3231,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
             }
             break;
+        }
         case PE_PanelMenuBar:
             if (widget && widget->parentWidget() && (qobject_cast<const QMainWindow *>(widget->parentWidget()) ||
                                                      widget->parentWidget()->inherits("Q3MainWindow")))
