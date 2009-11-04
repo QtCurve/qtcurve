@@ -9606,18 +9606,6 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
     drawIcon(painter, col, r, sunken, icon);
 }
 
-static QBitmap rotateBitmap(const QBitmap &bmp, double angle=90.0)
-{
-    QMatrix matrix;
-    matrix.translate(bmp.width()/2, bmp.height()/2);
-    matrix.rotate(angle);
-
-    QRect newRect(matrix.mapRect(QRect(0, 0, bmp.width(), bmp.height())));
-
-    return bmp.transformed(QMatrix(matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(),
-                                   matrix.dx() - newRect.left(), matrix.dy() - newRect.top()));
-}
-
 void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize) const
 {
     static const int constIconSize=9;
