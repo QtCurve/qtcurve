@@ -37,7 +37,9 @@
 24. Round gradients of dock-widget titlebars.
 25. Setup KDE4 palette and fonts in constructor.
 26. Fix K3B buttons.
-    
+27. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
+    a menu.
+
 0.69.2
 ------
 1. Change 'Dont draw outer dark border' to 'Draw dark outer border'

@@ -6467,7 +6467,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 else if(bflags&State_AutoRaise)
                     bflags &= ~State_Raised;
 
-                //if(state&State_AutoRaise)
+                if(state&State_AutoRaise || toolbutton->subControls&SC_ToolButtonMenu)
                     bflags|=QTC_STATE_TBAR_BUTTON;
 
                 State mflags(bflags);
