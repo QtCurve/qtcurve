@@ -39,6 +39,8 @@
 26. Fix K3B buttons.
 27. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
     a menu.
+28. Add arora to default list of KDE4 apps that needs manual saving of menubar
+    state.
 
 0.69.2
 ------
@@ -48,7 +50,7 @@
 4. Better postion of dots on slider handles.
 5. If custom button colours have been defined for window buttons, use the same
    colours to colour dock widget buttons.
-6. Add option to add extra paddnig to kwin titlebars.
+6. Add option to add extra padding to kwin titlebars.
 7. Add vlc and smplayer to default list of KDE4 apps that needs manual
    saving of menubar state.
 
