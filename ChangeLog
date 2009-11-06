@@ -41,6 +41,7 @@
     a menu.
 28. Add arora to default list of KDE4 apps that needs manual saving of menubar
     state.
+29. Enable 'Apply' button on kwnin config when change paddding setting.
 
 0.69.2
 ------
