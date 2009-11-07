@@ -2271,6 +2271,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
+        case PM_DockWidgetFrameWidth:
+            return 2;
         case PM_ToolBarExtensionExtent:
             return 15;
 #ifndef QTC_QT_ONLY
