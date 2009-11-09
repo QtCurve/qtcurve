@@ -478,6 +478,10 @@ static const char * getHome()
 #ifdef __cplusplus
 
 #ifdef QTC_QT_ONLY
+#if QT_VERSION < 0x040000
+#include <qdir.h>
+#include <qfile.h>
+#endif
 // Take from KStandardDirs::makeDir
 bool makeDir(const QString& dir, int mode)
 {
@@ -501,7 +505,11 @@ bool makeDir(const QString& dir, int mode)
     while( i < len )
     {
         struct stat st;
+#if QT_VERSION >= 0x040000
         int pos = target.indexOf('/', i);
+#else
+        int pos = target.find('/', i);
+#endif
         base += target.mid(i - 1, pos - i + 1);
         QByteArray baseEncoded = QFile::encodeName(base);
         // bail out if we encountered a problem
@@ -513,8 +521,12 @@ bool makeDir(const QString& dir, int mode)
                 (void)unlink(baseEncoded); // try removing
 
             if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0) {
+#if QT_VERSION >= 0x040000
                 baseEncoded.prepend( "trying to create local folder " );
                 perror(baseEncoded.constData());
+#else
+                perror("trying to create QtCurve config folder ");
+#endif
                 return false; // Couldn't create it :-(
             }
         }
