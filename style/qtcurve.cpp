@@ -45,15 +45,6 @@ static bool usePixmapCache=true;
                                     : palette.color(QPalette::Disabled, COL))
 #define QTC_MO_ARROW(COL)       QTC_MO_ARROW_X(state&State_MouseOver, COL)
 
-static bool useQt3Settings()
-{
-    static const char *full = getenv("KDE_FULL_SESSION");
-    static const char *vers = full ? getenv("KDE_SESSION_VERSION") : 0;
-    static bool       use   = full && (!vers || atoi(vers)<4);
-
-    return use;
-}
-
 #ifndef QTC_QT_ONLY
 #include <KDE/KApplication>
 #include <KDE/KAboutData>
@@ -565,6 +556,15 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef QTC_STYLE_SUPPORT
+static bool useQt3Settings()
+{
+    static const char *full = getenv("KDE_FULL_SESSION");
+    static const char *vers = full ? getenv("KDE_SESSION_VERSION") : 0;
+    static bool       use   = full && (!vers || atoi(vers)<4);
+
+    return use;
+}
+
 static QString kdeHome()
 {
 // #if defined QTC_QT_ONLY
