@@ -866,6 +866,7 @@ typedef struct
 #endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      xbar,
+                     dwtBtnAsPerTitleBar,
 #endif
                      forceAlternateLvCols,
                      squareLvSelection,

@@ -1971,6 +1971,51 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="1">
         <widget class="QComboBox" name="dwtAppearance"/>
        </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_75">
+         <property name="text">
+          <string>Button appearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QFrame" name="frame_8">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="dwtBtnAsPerTitleBar_false">
+            <property name="text">
+             <string>Plain (no bevel until mouse-over)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="dwtBtnAsPerTitleBar">
+            <property name="text">
+             <string>Style as per titlebar button settings</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_12">
@@ -2562,6 +2607,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>toolbarSeparators</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>dwtAppearance</tabstop>
+  <tabstop>dwtBtnAsPerTitleBar_false</tabstop>
+  <tabstop>dwtBtnAsPerTitleBar</tabstop>
   <tabstop>gtkButtonOrder</tabstop>
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>

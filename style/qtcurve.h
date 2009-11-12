@@ -158,9 +158,12 @@ class QtCurveStyle : public QWindowsStyle
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
                         ETitleBarButtons btn, const QColor &iconColor, const QColor &shadow, const QColor *btnCols, const QColor *bgndCols) const;
+    void drawDwtControl(QPainter *p, const QFlags<State> &state, const QRect &rect, ETitleBarButtons btn, Icon icon,
+                        const QColor &iconColor, const QColor &shadow,
+                        const QColor *btnCols, const QColor *bgndCols) const;
     void drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
     void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QColor &shadow, const QRect &r,
-                     bool hover, bool sunken, SubControl button) const;
+                     bool hover, bool sunken, Icon icon, bool stdSize=true) const;
     void drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize=true) const;
     void drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option, int round,
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;

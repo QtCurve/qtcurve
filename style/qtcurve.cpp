@@ -3848,6 +3848,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonBevel:
         case PE_PanelButtonCommand:
         {
+            if(state&QTC_STATE_DWT_BUTTON && opts.dwtBtnAsPerTitleBar)
+                break;
+
             bool doEtch(QTC_DO_EFFECT);
 
             // This fixes the "Sign in" button at mail.lycos.co.uk
@@ -6408,6 +6411,53 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             {
                 if (widget)
                 {
+                    if(opts.dwtBtnAsPerTitleBar &&
+                        (widget->inherits("QDockWidgetTitleButton") ||
+                         (widget->parentWidget() && widget->parentWidget()->inherits("KoDockWidgetTitleBar"))))
+                    {
+                        ETitleBarButtons btn=TITLEBAR_CLOSE;
+                        Icon             icon=ICN_CLOSE;
+
+                        if(constDwtFloat==widget->objectName())
+                            btn=TITLEBAR_MAX, icon=ICN_RESTORE;
+                        else if(constDwtClose!=widget->objectName() &&
+                                widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                                widget->parentWidget()->inherits("KoDockWidgetTitleBar") &&
+                                ::qobject_cast<QDockWidget *>(widget->parentWidget()->parentWidget()))
+                        {
+                            QDockWidget              *dw   = (QDockWidget *)widget->parentWidget()->parentWidget();
+                            QWidget                  *koDw = widget->parentWidget();
+                            int                      fw    = dw->isFloating()
+                                                                ? pixelMetric(QStyle::PM_DockWidgetFrameWidth, 0, dw)
+                                                                : 0;
+                            QRect                    geom(widget->geometry());
+                            QStyleOptionDockWidgetV2 dwOpt;
+                            dwOpt.initFrom(dw);
+                            dwOpt.rect = QRect(QPoint(fw, fw), QSize(koDw->geometry().width() - (fw * 2),
+                                                                    koDw->geometry().height() - (fw * 2)));
+                            dwOpt.title = dw->windowTitle();
+                            dwOpt.closable = (dw->features()&QDockWidget::DockWidgetClosable)==QDockWidget::DockWidgetClosable;
+                            dwOpt.floatable = (dw->features()&QDockWidget::DockWidgetFloatable)==
+                                                    QDockWidget::DockWidgetFloatable;
+
+                            if(dwOpt.closable && subElementRect(QStyle::SE_DockWidgetCloseButton, &dwOpt,
+                                                                widget->parentWidget()->parentWidget())==geom)
+                                btn=TITLEBAR_CLOSE, icon=ICN_CLOSE;
+                            else if(dwOpt.floatable && subElementRect(QStyle::SE_DockWidgetFloatButton, &dwOpt,
+                                                                    widget->parentWidget()->parentWidget())==geom)
+                                btn=TITLEBAR_MAX, icon=ICN_RESTORE;
+                            else
+                                btn=TITLEBAR_SHADE, icon=dw && dw->widget() && dw->widget()->isVisible() ? ICN_UP : ICN_DOWN;
+                        }
+                        
+                        QColor        shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
+                        const QColor *use=buttonColors(option);
+
+                        if(EFFECT_NONE!=opts.titlebarEffect)
+                            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
+                        drawDwtControl(painter, state, r.adjusted(-1, -1, 1, 1), btn, icon, option->palette.color(QPalette::WindowText), shadow, use, use);
+                        break;
+                    }
                     if(qobject_cast<QTabBar *>(widget->parentWidget()))
                     {
                         QStyleOptionToolButton btn(*toolbutton);
@@ -9575,8 +9625,29 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                         : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
 
         drawMdiButton(p, rect, hover, sunken, buttonColors);
-        drawMdiIcon(p, icnColor, buttonColors[ORIGINAL_SHADE], shadow, rect, hover, sunken, sc);
+        drawMdiIcon(p, icnColor, buttonColors[ORIGINAL_SHADE], shadow, rect, hover, sunken, subControlToIcon(sc), true);
     }
+}
+
+void QtCurveStyle::drawDwtControl(QPainter *p, const QFlags<State> &state, const QRect &rect, ETitleBarButtons btn, Icon icon,
+                                  const QColor &iconColor, const QColor &shadow,
+                                  const QColor *btnCols, const QColor *bgndCols) const
+{
+    bool    sunken(state&State_Sunken),
+            hover(state&State_MouseOver),
+            colored=coloredMdiButtons(state&State_Active, hover),
+            useBtnCols(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_STD_COLOR &&
+                        (hover ||
+                        !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER) ||
+                        opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR));
+    const QColor *buttonColors=colored && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL)
+                                ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols);
+    const QColor &icnColor=colored && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL
+                    ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
+                    : (TITLEBAR_CLOSE==btn && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
+
+    drawMdiButton(p, rect, hover, sunken, buttonColors);
+    drawMdiIcon(p, icnColor, buttonColors[ORIGINAL_SHADE], shadow, rect, hover, sunken, icon, false);
 }
 
 void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const
@@ -9601,10 +9672,9 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
 }
 
 void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QColor &shadow,
-                               const QRect &r, bool hover, bool sunken, SubControl button) const
+                               const QRect &r, bool hover, bool sunken, Icon icon, bool stdSize) const
 {
     bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
-    Icon icon  = subControlToIcon(button);
 
     if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
 //         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
@@ -9612,7 +9682,7 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
         QColor sh=KColorUtils::mix(bgnd, shadow, shadow.alphaF());
 
         sh.setAlpha(255);
-        drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon);
+        drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
     }
 
     QColor col(color);
@@ -9620,7 +9690,7 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
     if(faded)
         col=KColorUtils::mix(bgnd, col, HOVER_BUTTON_ALPHA(col));
 
-    drawIcon(painter, col, r, sunken, icon);
+    drawIcon(painter, col, r, sunken, icon, stdSize);
 }
 
 void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize) const
@@ -9664,13 +9734,13 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
             painter->drawPoint(br.x()+2, br.y()+2);
             break;
         case ICN_UP:
-            drawArrow(painter, br, PE_IndicatorArrowUp, Qt::color1, false);
+            drawArrow(painter, br, PE_IndicatorArrowUp, color, false);
             break;
         case ICN_DOWN:
-            drawArrow(painter, br, PE_IndicatorArrowDown, Qt::color1, false);
+            drawArrow(painter, opts.vArrows ? br.adjusted(0, 1, 0, 1) : br, PE_IndicatorArrowDown, color, false);
             break;
         case ICN_RIGHT:
-            drawArrow(painter, br, PE_IndicatorArrowRight, Qt::color1, false);
+            drawArrow(painter, br, PE_IndicatorArrowRight, color, false);
             break;
         case ICN_MENU:
             for(int i=1; i<=constIconSize; i+=3)

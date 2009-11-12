@@ -45,6 +45,7 @@
 29. Add arora to default list of KDE4 apps that needs manual saving of menubar
     state.
 30. Enable 'Apply' button on kwnin config when change paddding setting.
+31. Add option to style dock widget buttons as per titlebar button settings.
 
 0.69.2
 ------
