@@ -4533,6 +4533,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #if QT_VERSION >= 0x040300
                 const QStyleOptionDockWidgetV2 *v2 = qstyleoption_cast<const QStyleOptionDockWidgetV2*>(dwOpt);
                 bool                           verticalTitleBar(v2 == 0 ? false : v2->verticalTitleBar);
+#else
+                bool                           verticalTitleBar(false);
 #endif
                 if(!IS_FLAT(opts.dwtAppearance))
                 {
