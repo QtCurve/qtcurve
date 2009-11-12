@@ -167,7 +167,9 @@ struct QtData
                     inactiveSelectCol;*/
     char            *fonts[FONT_NUM_TOTAL],
                     *icons,
+#ifdef QTC_STYLE_SUPPORT
                     *styleName,
+#endif
                     *appName;
     GtkToolbarStyle toolbarStyle;
     struct QtIcons  iconSizes;
@@ -326,7 +328,11 @@ enum
     RD_BUTTON_ICONS      = 0x0100,
     RD_SMALL_ICON_SIZE   = 0x0200,
     RD_LIST_COLOR        = 0x0400,
+#ifdef QTC_STYLE_SUPPORT
     RD_STYLE             = 0x0800,
+#else
+    RD_STYLE             = 0x0000,
+#endif
     RD_LIST_SHADE        = 0x1000,
     RD_KDE4_PAL          = 0x2000,
 
@@ -1019,6 +1025,7 @@ static void readKdeGlobals(const char *rc, int rd)
                     opts.contrast=QTC_DEFAULT_CONTRAST;
                 found|=RD_CONTRAST;
             }
+#ifdef QTC_STYLE_SUPPORT
             else if(qtSettings.qt4 && SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) &&
                      0==strncmp_i(line, "widgetStyle=", 12))
             {
@@ -1029,6 +1036,7 @@ static void readKdeGlobals(const char *rc, int rd)
                 strcpy(qtSettings.styleName, &line[12]);
                 found|=RD_STYLE;
             }
+#endif
             else if(qtSettings.qt4 && (SECT_KDE4_EFFECT_DISABLED==section || SECT_KDE4_EFFECT_INACTIVE==section) &&
                     rd&RD_KDE4_PAL && !(found&RD_KDE4_PAL))
             {
@@ -1241,6 +1249,7 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
                     found|=RD_INACT_PALETTE;
                 }
 #endif
+#ifdef QTC_STYLE_SUPPORT
                 else if (SECT_GENERAL==section && rd&RD_STYLE && !(found&RD_STYLE) && 0==strncmp_i(line, "style=", 6))
                 {
                     int len=strlen(line);
@@ -1250,6 +1259,7 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
                     strcpy(qtSettings.styleName, &line[6]);
                     found|=RD_STYLE;
                 }
+#endif
                 else if (SECT_GENERAL==section && rd&RD_FONT && !(found&RD_FONT) && 0==strncmp_i(line, "font=", 5))
                 {
                     parseFontLine(line, &font);
@@ -1978,7 +1988,9 @@ static gboolean qtInit()
             qtSettings.colors[PAL_ACTIVE][COLOR_LV]=setGdkColor(0, 0, 0);
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]=setGdkColor(0, 0, 0);
             qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP]=setGdkColor(0xFF, 0xFF, 192);
+#ifdef QTC_STYLE_SUPPORT
             qtSettings.styleName=NULL;
+#endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
             opts.contrast=QTC_DEFAULT_CONTRAST;
@@ -2013,6 +2025,7 @@ static gboolean qtInit()
                                          (qtSettings.qt4 ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE : RD_LIST_COLOR));
             }
 
+#ifdef QTC_STYLE_SUPPORT
             /* Only for testing - allows me to simulate Qt's -style parameter. e.g start Gtk2 app as follows:
 
                 QTC_STYLE=qtc_klearlooks gtk-demo
@@ -2044,6 +2057,9 @@ static gboolean qtInit()
             }
 
             readConfig(rcFile, &opts, 0L);
+#else
+            readConfig(0L, &opts, 0L);
+#endif
 
 /*
             if(opts.inactiveHighlight)

@@ -10,15 +10,18 @@
  6. Don't do regular coloured mouse over of sliders when theese are set to be
     coloured on mouse over.
  7. Allow to specify strength when colouring selected tab.
- 8. Fix internal padding of scrolled windows where scrollbars are within window.
- 9. When drawing frames, respect shadow state (in/out).
-10. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
-11. Improve appearance of unified spin widgets under Firefox.
-12. Don't draw background of dock widgets as if they were toolbars!
-13. Only draw toolbar/menubar background if shadow type is not set to none.
+ 8. Remove support for QtCurve styles (these appear as uniq KDE styles in the
+    main KDE style selection dialog). Re-enable support by passing
+    -DQTC_STYLE_SUPPORT=true to cmake.
+ 9. Fix internal padding of scrolled windows where scrollbars are within window.
+10. When drawing frames, respect shadow state (in/out).
+11. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
+12. Improve appearance of unified spin widgets under Firefox.
+13. Don't draw background of dock widgets as if they were toolbars!
+14. Only draw toolbar/menubar background if shadow type is not set to none.
     (Removes toolbar gradient from Rhytmbox's search buttons)
-14. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
-15. Better match of line-edit and spinbutton heights to KDE4.
+15. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
+16. Better match of line-edit and spinbutton heights to KDE4.
 
 0.69.2
 ------
