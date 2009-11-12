@@ -867,8 +867,10 @@ QtCurveStyle::QtCurveStyle()
               itsProgressBarAnimateTimer(0),
               itsAnimateStep(0),
               itsPos(-1, -1),
-              itsHoverWidget(0L),
-              itsQtVersion(VER_UNKNOWN)
+              itsHoverWidget(0L)
+#if QT_VERSION < 0x040500
+              , itsQtVersion(VER_UNKNOWN)
+#endif
 {
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
@@ -10747,6 +10749,7 @@ int QtCurveStyle::konqMenuBarSize(const QMenuBar *menu) const
     return sz.height()+6;
 }
 
+#if QT_VERSION < 0x040500
 QtCurveStyle::Version QtCurveStyle::qtVersion() const
 {
     if(VER_UNKNOWN==itsQtVersion)
@@ -10763,6 +10766,7 @@ QtCurveStyle::Version QtCurveStyle::qtVersion() const
 
     return itsQtVersion;
 }
+#endif
 
 const QColor & QtCurveStyle::getTabFill(bool current, bool highlight, const QColor *use) const
 {

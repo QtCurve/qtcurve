@@ -62,12 +62,14 @@ class QtCurveStyle : public QWindowsStyle
 
     public:
 
+#if QT_VERSION < 0x040500
     enum Version
     {
         VER_UNKNOWN,
         VER_4x,  // <=4.4
         VER_45   // >=4.5
     };
+#endif
 
     enum CustomElements
     {
@@ -195,7 +197,9 @@ class QtCurveStyle : public QWindowsStyle
     const QColor & menuStripeCol() const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     int            konqMenuBarSize(const QMenuBar *menu) const;
+#if QT_VERSION < 0x040500
     Version        qtVersion() const;
+#endif
     const QColor & checkRadioCol(const QStyleOption *opt) const;
     QColor         shade(const QColor &a, float k) const;
     void           shade(const color &ca, color *cb, double k) const;
@@ -259,7 +263,9 @@ class QtCurveStyle : public QWindowsStyle
     // Required for Q3Header hover...
     QPoint                             itsPos;
     QWidget                            *itsHoverWidget;
+#if QT_VERSION < 0x040500
     mutable Version                    itsQtVersion;
+#endif
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
 #if !defined QTC_QT_ONLY
