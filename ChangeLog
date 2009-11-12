@@ -7,10 +7,10 @@
  4. Added new splitter/handle/thumb style: single dot.
  5. Don't do coloured mouse over for buttons of editable combos, spin buttons,
     or scrollbar buttons.
- 6. Don't do regular coloured mouse over of sliders when theese are set to be
+ 6. Don't do regular coloured mouse over of sliders when these are set to be
     coloured on mouse over.
  7. Allow to specify strength when colouring selected tab.
- 8. Remove support for QtCurve styles (these appear as uniq KDE styles in the
+ 8. Remove support for QtCurve styles (these appear as unique KDE styles in the
     main KDE style selection dialog). Re-enable support by passing
     -DQTC_STYLE_SUPPORT=true to cmake.
  9. Add option to specify appearance of dock-widget titlebars.
@@ -19,13 +19,14 @@
 12. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
 13. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
     lines with an alpha channel set but anti-aliasing disabled. Affects MDI window
-    icons (when 'hover icon' is enabled) - these are now drawn to bitmaps instead.
+    icons (when 'hover icon' is enabled) - instead of using an alpha channel, the colour
+    is mixed with the background colour.
 14. Fix KDE4.4's palette changes to KFilePlacesView.
 15. Fix slight redraw error with the inner shadow of sunken frames.
 16. Get kwin decoration to update on style change. Config file has changed to
     qtcurve/stylerc - so need to monitor that one!
 17. Remove 1 pixel background colour border from kwin decoration - was only used
-    to provide sodter rounded corners at the bottom.
+    to provide softer rounded corners at the bottom.
 18. Completely remove old code for coloured shadows.
 19. Dont draw dark line between titlebar and contents when colouring titlebar only.
 20. Only draw toolbar gradients for toolbars in main window. Removes gradient from
@@ -43,7 +44,7 @@
     a menu.
 28. Add arora to default list of KDE4 apps that needs manual saving of menubar
     state.
-29. Enable 'Apply' button on kwnin config when change paddding setting.
+29. Enable 'Apply' button on kwnin config when change padding setting.
 30. Add option to style dock widget buttons as per titlebar button settings.
 
 0.69.2
