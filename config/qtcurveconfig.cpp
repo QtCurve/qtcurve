@@ -19,7 +19,9 @@
 */
 
 #include "qtcurveconfig.h"
+#ifdef QTC_STYLE_SUPPORT
 #include "exportthemedialog.h"
+#endif
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGroupBox>
@@ -480,7 +482,9 @@ static void insertLvLinesEntries(QComboBox *combo)
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
+#ifdef QTC_STYLE_SUPPORT
                exportDialog(NULL),
+#endif
                gradPreview(NULL)
 {
     setupUi(this);
@@ -716,8 +720,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menu->addAction(i18n("Import..."), this, SLOT(importStyle()));
     menu->addAction(i18n("Export..."), this, SLOT(exportStyle()));
     menu->addSeparator();
+#ifdef QTC_STYLE_SUPPORT
     menu->addAction(i18n("Export Theme..."), this, SLOT(exportTheme()));
     menu->addSeparator();
+#endif
     menu->addAction(i18n("Export KDE4 font && colors to KDE3..."), this, SLOT(exportKDE3()));
     menu->addAction(i18n("Export KDE4 font && colors to Qt3..."), this, SLOT(exportQt()));
     loadStyles(subMenu);
@@ -1473,6 +1479,7 @@ void QtCurveConfig::exportStyle()
 
 void QtCurveConfig::exportTheme()
 {
+#ifdef QTC_STYLE_SUPPORT
     if(!exportDialog)
         exportDialog=new CExportThemeDialog(this);
 
@@ -1480,6 +1487,7 @@ void QtCurveConfig::exportTheme()
 
     setOptions(opts);
     exportDialog->run(opts);
+#endif
 }
 
 void QtCurveConfig::loadStyle(const QString &file)

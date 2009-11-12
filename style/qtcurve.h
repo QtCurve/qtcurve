@@ -86,7 +86,11 @@ class QtCurveStyle : public QWindowsStyle
         ICN_RIGHT
     };
 
+#ifdef QTC_STYLE_SUPPORT
     QtCurveStyle(const QString &name=QString());
+#else
+    QtCurveStyle();
+#endif
     ~QtCurveStyle();
 
     void polish(QApplication *app);

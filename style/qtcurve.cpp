@@ -564,6 +564,7 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
+#ifdef QTC_STYLE_SUPPORT
 static QString kdeHome()
 {
 // #if defined QTC_QT_ONLY
@@ -632,6 +633,7 @@ static QString themeFile(const QString &dir, const QString &n, bool kde3=false)
         name=themeFile(dir, n, kde3 ? QTC_THEME_DIR4 : QTC_THEME_DIR);
     return name;
 }
+#endif
 
 class QtCurveStylePlugin : public QStylePlugin
 {
@@ -645,10 +647,11 @@ class QtCurveStylePlugin : public QStylePlugin
         QSet<QString> styles;
         styles.insert("QtCurve");
 
+#ifdef QTC_STYLE_SUPPORT        
         getStyles(kdeHome(), styles);
         getStyles(KDE_PREFIX(useQt3Settings() ? 3 : 4), styles);
         getStyles(KDE_PREFIX(useQt3Settings() ? 4 : 3), styles);
-
+#endif
         return styles.toList();
     }
 
@@ -656,8 +659,10 @@ class QtCurveStylePlugin : public QStylePlugin
     {
         return "qtcurve"==key.toLower()
                     ? new QtCurveStyle
+#ifdef QTC_STYLE_SUPPORT
                     : 0==key.indexOf(QTC_THEME_PREFIX)
                         ? new QtCurveStyle(key)
+#endif
                         : 0;
     }
 };
@@ -842,7 +847,11 @@ inline bool isMultiTabBarTab(const QPushButton *button)
     return button && button->isFlat() && button->inherits("KMultiTabBarTab");
 }
 
+#ifdef QTC_STYLE_SUPPORT
 QtCurveStyle::QtCurveStyle(const QString &name)
+#else
+QtCurveStyle::QtCurveStyle()
+#endif
             : itsSliderCols(0L),
               itsDefBtnCols(0L),
               itsComboBtnCols(0L),
@@ -886,6 +895,7 @@ QtCurveStyle::QtCurveStyle(const QString &name)
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
 #endif
 
+#ifdef QTC_STYLE_SUPPORT
     QString rcFile;
 
     if(!name.isEmpty())
@@ -901,6 +911,10 @@ QtCurveStyle::QtCurveStyle(const QString &name)
     }
 
     readConfig(rcFile, &opts);
+#else
+    readConfig(QString(), &opts);
+#endif
+
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", QTC_DEFAULT_CONTRAST).toInt();
     if(opts.contrast<0 || opts.contrast>10)
         opts.contrast=QTC_DEFAULT_CONTRAST;

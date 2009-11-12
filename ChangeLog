@@ -10,38 +10,41 @@
  6. Don't do regular coloured mouse over of sliders when theese are set to be
     coloured on mouse over.
  7. Allow to specify strength when colouring selected tab.
- 8. Add option to specify appearance of dock-widget titlebars.
- 9. Made XBar support a config, and not cmake, option.
-10. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
-11. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
-12. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
+ 8. Remove support for QtCurve styles (these appear as uniq KDE styles in the
+    main KDE style selection dialog). Re-enable support by passing
+    -DQTC_STYLE_SUPPORT=true to cmake.
+ 9. Add option to specify appearance of dock-widget titlebars.
+10. Made XBar support a config, and not cmake, option.
+11. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
+12. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
+13. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
     lines with an alpha channel set but anti-aliasing disabled. Affects MDI window
     icons (when 'hover icon' is enabled) - these are now drawn to bitmaps instead.
-13. Fix KDE4.4's palette changes to KFilePlacesView.
-14. Fix slight redraw error with the inner shadow of sunken frames.
-15. Get kwin decoration to update on style change. Config file has changed to
+14. Fix KDE4.4's palette changes to KFilePlacesView.
+15. Fix slight redraw error with the inner shadow of sunken frames.
+16. Get kwin decoration to update on style change. Config file has changed to
     qtcurve/stylerc - so need to monitor that one!
-16. Remove 1 pixel background colour border from kwin decoration - was only used
+17. Remove 1 pixel background colour border from kwin decoration - was only used
     to provide sodter rounded corners at the bottom.
-17. Completely remove old code for coloured shadows.
-18. Dont draw dark line between titlebar and contents when colouring titlebar only.
-19. Only draw toolbar gradients for toolbars in main window. Removes gradient from
+18. Completely remove old code for coloured shadows.
+19. Dont draw dark line between titlebar and contents when colouring titlebar only.
+20. Only draw toolbar gradients for toolbars in main window. Removes gradient from
     file selector toolbar.
-20. Style toolbar-extension icons (the arrows that appear when window is too small for
+21. Style toolbar-extension icons (the arrows that appear when window is too small for
     toolbar).
-21. Better positioning of close button on tabs.
-22. When saving settings to $XDG_CONFIG_HOME/qtcurve/stylerc, remove the older
+22. Better positioning of close button on tabs.
+23. When saving settings to $XDG_CONFIG_HOME/qtcurve/stylerc, remove the older
     $XDG_CONFIG_HOME/qtcurvestylerc, and $XDG_CONFIG_HOME/qtcurve.gtk-icons if they
     exist.
-23. Use split gradient for dock-widget titlebars.
-24. Round gradients of dock-widget titlebars.
-25. Setup KDE4 palette and fonts in constructor.
-26. Fix K3B buttons.
-27. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
+24. Use split gradient for dock-widget titlebars.
+25. Round gradients of dock-widget titlebars.
+26. Setup KDE4 palette and fonts in constructor.
+27. Fix K3B buttons.
+28. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
     a menu.
-28. Add arora to default list of KDE4 apps that needs manual saving of menubar
+29. Add arora to default list of KDE4 apps that needs manual saving of menubar
     state.
-29. Enable 'Apply' button on kwnin config when change paddding setting.
+30. Enable 'Apply' button on kwnin config when change paddding setting.
 
 0.69.2
 ------

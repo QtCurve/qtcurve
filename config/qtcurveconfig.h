@@ -33,7 +33,9 @@ class QMenu;
 class QAction;
 class QComboBox;
 class KDoubleNumInput;
+#ifdef QTC_STYLE_SUPPORT
 class CExportThemeDialog;
+#endif
 class QtCurveConfig;
 
 class CGradientPreview : public QWidget
@@ -148,7 +150,9 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     Options                  currentStyle,
                              defaultStyle;
     QMap<QAction *, QString> styles;
+#ifdef QTC_STYLE_SUPPORT
     CExportThemeDialog       *exportDialog;
+#endif
     CGradientPreview         *gradPreview;
     GradientCont             customGradient;
     KDoubleNumInput          *shadeVals[NUM_STD_SHADES];

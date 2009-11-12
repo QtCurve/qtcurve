@@ -23,6 +23,10 @@ The following options may be supplied to cmake:
         non-AA drawing for the edges. As of 0.69.0 this code is no longer enabled
         by default - use this config option to re-enable the code.
 
+    -DQTC_STYLE_SUPPORT=true
+       Support QtCurve style files. These are stored as
+       <kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc
+
 XBar/MacMenu
 ------------
 The XBar support was copied directly from Bespin. The relevant files are named macmenu*
