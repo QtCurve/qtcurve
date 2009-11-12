@@ -9370,7 +9370,8 @@ void QtCurveStyle::buildSplitPath(const QRect &r, EWidget w, int round, double r
     {
         tl.arcMoveTo(xd+width-diameter, yd, diameter, diameter, 36);
         tl.arcTo(xd+width-diameter, yd, diameter, diameter, 36, 36);
-        tl.lineTo(xd+width-diameter, yd);
+        if(width>diameter)
+            tl.lineTo(xd+width-diameter, yd);
     }
     else
         tl.moveTo(xd+width, yd);
