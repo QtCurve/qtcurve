@@ -4542,18 +4542,19 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillRect.adjust(-r.x(), -r.y(), 0, 0);
                     painter->save();
 
-                    if(opts.round<ROUND_FULL)
+// Not sure about rounded DWT titlebars...
+//                     if(opts.round<ROUND_FULL)
                         drawBevelGradient(palette.background().color(), painter, fillRect, !verticalTitleBar,
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
-                    else
-                    {
-                        double radius(getRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
-
-                        painter->setRenderHint(QPainter::Antialiasing, true);
-                        drawBevelGradient(palette.background().color(), painter, fillRect,
-                                          buildPath(fillRect, WIDGET_OTHER, ROUNDED_ALL, radius), !verticalTitleBar,
-                                          false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
-                    }
+//                     else
+//                     {
+//                         double radius(getRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
+// 
+//                         painter->setRenderHint(QPainter::Antialiasing, true);
+//                         drawBevelGradient(palette.background().color(), painter, fillRect,
+//                                           buildPath(fillRect, WIDGET_OTHER, ROUNDED_ALL, radius), !verticalTitleBar,
+//                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
+//                     }
 
                     painter->restore();
 
