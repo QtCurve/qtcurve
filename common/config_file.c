@@ -1327,6 +1327,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             QTC_CFG_READ_BOOL(xbar)
             QTC_CFG_READ_BOOL(dwtBtnAsPerTitleBar)
+            QTC_CFG_READ_BOOL(dwtColAsPerTitleBar)
 #endif
             QTC_CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             QTC_CFG_READ_APPEARANCE(menuStripeAppearance, false)
@@ -1960,6 +1961,7 @@ static void defaultSettings(Options *opts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtBtnAsPerTitleBar=true;
+    opts->dwtColAsPerTitleBar=false;
 #endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
@@ -2549,6 +2551,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY(dwtBtnAsPerTitleBar)
+        CFG_WRITE_ENTRY(dwtColAsPerTitleBar)
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)

@@ -665,6 +665,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar_false, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtColAsPerTitleBar_false, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xbar, SIGNAL(toggled(bool)), SLOT(xbarChanged()));
     connect(crColor, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(smallRadio, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1635,6 +1637,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
     opts.dwtBtnAsPerTitleBar=dwtBtnAsPerTitleBar->isChecked();
+    opts.dwtColAsPerTitleBar=dwtColAsPerTitleBar->isChecked();
     opts.xbar=xbar->isChecked();
     opts.crColor=crColor->isChecked();
     opts.smallRadio=smallRadio->isChecked();
@@ -1825,6 +1828,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtBtnAsPerTitleBar);
     dwtBtnAsPerTitleBar_false->setChecked(!opts.dwtBtnAsPerTitleBar);
+    dwtColAsPerTitleBar->setChecked(opts.dwtColAsPerTitleBar);
+    dwtColAsPerTitleBar_false->setChecked(!opts.dwtColAsPerTitleBar);
     xbar->setChecked(opts.xbar);
     crColor->setChecked(opts.crColor);
     smallRadio->setChecked(opts.smallRadio);
@@ -2000,6 +2005,7 @@ bool QtCurveConfig::settingsChanged()
          bgndAppearance->currentIndex()!=currentStyle.bgndAppearance ||
          dwtAppearance->currentIndex()!=currentStyle.dwtAppearance ||
          dwtBtnAsPerTitleBar->isChecked()!=currentStyle.dwtBtnAsPerTitleBar ||
+         dwtColAsPerTitleBar->isChecked()!=currentStyle.dwtColAsPerTitleBar ||
          xbar->isChecked()!=currentStyle.xbar ||
          crColor->isChecked()!=currentStyle.crColor ||
          smallRadio->isChecked()!=currentStyle.smallRadio ||

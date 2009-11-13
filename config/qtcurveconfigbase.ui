@@ -2009,7 +2009,52 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QRadioButton" name="dwtBtnAsPerTitleBar">
             <property name="text">
-             <string>Style as per titlebar button settings</string>
+             <string>As per window button settings</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_75a">
+         <property name="text">
+          <string>Titlebar color:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QFrame" name="frame_8">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_12a">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="dwtColAsPerTitleBar_false">
+            <property name="text">
+             <string>Background</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="dwtColAsPerTitleBar">
+            <property name="text">
+             <string>As per window titlebar settings</string>
             </property>
            </widget>
           </item>
@@ -2609,6 +2654,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>dwtAppearance</tabstop>
   <tabstop>dwtBtnAsPerTitleBar_false</tabstop>
   <tabstop>dwtBtnAsPerTitleBar</tabstop>
+  <tabstop>dwtColAsPerTitleBar_false</tabstop>
+  <tabstop>dwtColAsPerTitleBar</tabstop>
   <tabstop>gtkButtonOrder</tabstop>
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>

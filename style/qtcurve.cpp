@@ -4546,15 +4546,18 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillRect.adjust(-r.x(), -r.y(), 0, 0);
                     painter->save();
 
+                    QColor col(opts.dwtColAsPerTitleBar
+                                ? getMdiColors(option, state&State_Active)[ORIGINAL_SHADE]
+                                : palette.background().color());
                     if(opts.round<ROUND_FULL)
-                        drawBevelGradient(palette.background().color(), painter, fillRect, !verticalTitleBar,
+                        drawBevelGradient(col, painter, fillRect, !verticalTitleBar,
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
                     else
                     {
                         double radius(getRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
 
                         painter->setRenderHint(QPainter::Antialiasing, true);
-                        drawBevelGradient(palette.background().color(), painter, fillRect,
+                        drawBevelGradient(col, painter, fillRect,
                                           buildPath(QRectF(r.x(), r.y(), r.width(), r.height()),
                                                     WIDGET_OTHER, ROUNDED_ALL, radius), !verticalTitleBar,
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE, false);
@@ -6456,11 +6459,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         }
                         
                         QColor        shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
-                        const QColor *use=buttonColors(option);
-
+                        const QColor *bgndCols(opts.dwtColAsPerTitleBar
+                                                ? getMdiColors(option, state&State_Active)
+                                                : buttonColors(option)),
+                                     *btnCols(opts.dwtColAsPerTitleBar
+                                                ? opts.titlebarButtons&QTC_TITLEBAR_BUTTON_STD_COLOR
+                                                    ? buttonColors(option)
+                                                    : getMdiColors(option, state&State_Active)
+                                                : bgndCols);
                         if(EFFECT_NONE!=opts.titlebarEffect)
                             shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
-                        drawDwtControl(painter, state, r.adjusted(-1, -1, 1, 1), btn, icon, option->palette.color(QPalette::WindowText), shadow, use, use);
+                        drawDwtControl(painter, state, r.adjusted(-1, -1, 1, 1), btn, icon, option->palette.color(QPalette::WindowText), shadow, btnCols, bgndCols);
                         break;
                     }
                     if(qobject_cast<QTabBar *>(widget->parentWidget()))

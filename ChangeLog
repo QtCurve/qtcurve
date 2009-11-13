@@ -47,6 +47,8 @@
     state.
 30. Enable 'Apply' button on kwnin config when change padding setting.
 31. Add option to style dock widget buttons as per titlebar button settings.
+32. Add option to colour dock widget titlebar and buttons as per titlebar
+    settings.
 
 0.69.2
 ------
