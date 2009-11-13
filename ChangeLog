@@ -38,14 +38,15 @@
     $XDG_CONFIG_HOME/qtcurvestylerc, and $XDG_CONFIG_HOME/qtcurve.gtk-icons if they
     exist.
 24. Use split gradient for dock-widget titlebars.
-25. Setup KDE4 palette and fonts in constructor.
-26. Fix K3B buttons.
-27. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
+25. Round gradients of dock-widget titlebars.
+26. Setup KDE4 palette and fonts in constructor.
+27. Fix K3B buttons.
+28. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
     a menu.
-28. Add arora to default list of KDE4 apps that needs manual saving of menubar
+29. Add arora to default list of KDE4 apps that needs manual saving of menubar
     state.
-29. Enable 'Apply' button on kwnin config when change padding setting.
-30. Add option to style dock widget buttons as per titlebar button settings.
+30. Enable 'Apply' button on kwnin config when change padding setting.
+31. Add option to style dock widget buttons as per titlebar button settings.
 
 0.69.2
 ------
