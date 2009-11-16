@@ -1161,7 +1161,7 @@ void QtCurveConfig::setupPreview()
 
     CStylePreview *stylePreview = new CStylePreview;
     QMdiSubWindow *mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
-    mdiWindow->move(1, 1);
+    mdiWindow->move(4, 4);
     mdiWindow->show();
     updatePreview();
 }

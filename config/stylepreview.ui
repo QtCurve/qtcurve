@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
-    <height>297</height>
+    <width>547</width>
+    <height>280</height>
    </rect>
   </property>
   <layout class="QVBoxLayout">
@@ -222,16 +222,34 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="childrenCollapsible">
+          <bool>false</bool>
+         </property>
          <widget class="QDockWidget" name="dockWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="windowTitle">
            <string>Dock Widget</string>
           </property>
           <widget class="QWidget" name="dockWidgetContents">
            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QTreeWidget" name="treeWidget">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -242,12 +260,6 @@
               <property name="allColumnsShowFocus">
                <bool>true</bool>
               </property>
-              <attribute name="headerDefaultSectionSize">
-               <number>80</number>
-              </attribute>
-              <attribute name="headerMinimumSectionSize">
-               <number>32</number>
-              </attribute>
               <attribute name="headerDefaultSectionSize">
                <number>80</number>
               </attribute>
@@ -284,19 +296,18 @@
            </layout>
           </widget>
          </widget>
-         <widget class="QTextEdit" name="textEdit">
+         <widget class="QPlainTextEdit" name="plainTextEdit">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Eleven saintly shrouded men&lt;br /&gt;Silhouettes stand against the sky&lt;br /&gt;One in front with a cross held high&lt;br /&gt;Come to wash my sins away...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="plainText">
+           <string>Eleven saintly shrouded men
+Silhouettes stand against the sky
+One in front with a cross held high
+Come to wash my sins away...</string>
           </property>
          </widget>
         </widget>
