@@ -4635,37 +4635,33 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     QString title(painter->fontMetrics().elidedText(dwOpt->title, Qt::ElideRight, titleRect.width(),
                                                                     QPalette::WindowText));
-                    if(opts.dwtColAsPerTitleBar)
-                    {
-                        painter->save();
-                        getMdiColors(option, state&State_Active);
+                    painter->save();
+                    getMdiColors(option, state&State_Active);
 
-                        QColor textColor(state&State_Active
+                    QColor textColor(opts.dwtColAsPerTitleBar
+                                        ? state&State_Active
                                             ? itsActiveMdiTextColor
-                                            : itsMdiTextColor),
-                               shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
-                        int    textOpt(Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
+                                            : itsMdiTextColor
+                                        : palette.color(QPalette::WindowText)),
+                           shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
+                    int    textOpt(Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
 
 #if !defined QTC_QT_ONLY
-                        // TODO: dwtFontAsPerTitleBar
-                        painter->setFont(KGlobalSettings::windowTitleFont());
+                    // TODO: dwtFontAsPerTitleBar
+                    painter->setFont(KGlobalSettings::windowTitleFont());
 #endif
-                        if(EFFECT_NONE!=opts.titlebarEffect)
-                        {
-                            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
-                            painter->setPen(shadow);
-                            painter->drawText(titleRect.adjusted(1, 1, 1, 1), textOpt, title);
+                    if(EFFECT_NONE!=opts.titlebarEffect)
+                    {
+                        shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
+                        painter->setPen(shadow);
+                        painter->drawText(titleRect.adjusted(1, 1, 1, 1), textOpt, title);
 
-                            if (!(state&State_Active) && QTC_DARK_WINDOW_TEXT(textColor))
-                                textColor.setAlpha((textColor.alpha() * 180) >> 8);
-                        }
-                        painter->setPen(textColor);
-                        painter->drawText(titleRect, textOpt, title);
-                        painter->restore();
+                        if (!(state&State_Active) && QTC_DARK_WINDOW_TEXT(textColor))
+                            textColor.setAlpha((textColor.alpha() * 180) >> 8);
                     }
-                    else
-                        drawItemText(painter, titleRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic, palette,
-                                     dwOpt->state&State_Enabled, title);
+                    painter->setPen(textColor);
+                    painter->drawText(titleRect, textOpt, title);
+                    painter->restore();
                 }
 
 //                 painter->restore();
