@@ -354,6 +354,8 @@ typedef enum
 #endif
 
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#define QTCURVE_PREVIEW_CONFIG "QTCURVE_PREVIEW_CONFIG"
+
 typedef enum
 {
     QTC_TITLEBAR_BUTTON_ROUND            = 0x0001,
@@ -785,6 +787,7 @@ struct Options
 typedef struct
 #endif
 {
+
     int              contrast,
                      passwordChar,
                      highlightFactor,
@@ -825,6 +828,7 @@ typedef struct
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
+                     fadeLines,
 #endif
                      borderMenuitems,
                      colorMenubarMouseOver,
@@ -833,9 +837,6 @@ typedef struct
                      xCheck,
                      framelessGroupBoxes,
                      groupBoxLine,
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-                     fadeLines,
-#endif
                      crHighlight,
                      crButton,
                      crColor,
@@ -847,9 +848,6 @@ typedef struct
                      sunkenScrollViews,
                      etchEntry,
                      splitterHighlight,
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                     titlebarBorder,
-#endif
                      colorSliderMouseOver,
                      thinSbarGroove,
                      flatSbarButtons,
@@ -863,6 +861,7 @@ typedef struct
                      menuIcons,
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                      stdBtnSizes,
+                     titlebarBorder,
 #endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      xbar,
@@ -936,20 +935,20 @@ typedef struct
                      customCheckRadioColor,
                      customComboBtnColor,
                      customSortedLvColor;
+    EShading         shading;
 #if defined __cplusplus
     EAlign           titlebarAlignment;
     EEffect          titlebarEffect;
-#if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#endif
+    double           customShades[NUM_STD_SHADES];
+#if defined __cplusplus && !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
     QSet<QString>    menubarApps;
 #endif
-#endif
-    EShading         shading;
 #ifdef __cplusplus
     GradientCont     customGradient;
 #else
     Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD];
 #endif
-    double           customShades[NUM_STD_SHADES];
 #ifndef __cplusplus
 } Options;
 #else

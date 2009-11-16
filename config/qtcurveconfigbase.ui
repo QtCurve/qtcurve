@@ -89,6 +89,82 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <widget class="QWidget" name="page_24">
+      <layout class="QVBoxLayout" name="verticalLayout_14">
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Presets</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <widget class="QComboBox" name="presetsCombo"/>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="KPushButton" name="saveButton"/>
+            </item>
+            <item>
+             <widget class="KPushButton" name="deleteButton"/>
+            </item>
+            <item>
+             <widget class="KPushButton" name="importButton"/>
+            </item>
+            <item>
+             <widget class="KPushButton" name="exportButton"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Preview</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_13">
+          <item>
+           <widget class="QFrame" name="previewFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Sunken</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page">
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
@@ -2149,6 +2225,37 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_25">
+      <layout class="QVBoxLayout" name="verticalLayout_16">
+       <item>
+        <widget class="KPushButton" name="exportKde3Button">
+         <property name="text">
+          <string>Export colors and fonts for KDE3 applications...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="KPushButton" name="exportQt3Button">
+         <property name="text">
+          <string>Export colors and fonts for pure-Qt3 applications...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>359</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_13">
       <layout class="QVBoxLayout">
        <item>
@@ -2476,13 +2583,6 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="optionBtn">
-     <property name="text">
-      <string>Options</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -2516,6 +2616,11 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <tabstops>
   <tabstop>stackList</tabstop>
+  <tabstop>presetsCombo</tabstop>
+  <tabstop>saveButton</tabstop>
+  <tabstop>deleteButton</tabstop>
+  <tabstop>importButton</tabstop>
+  <tabstop>exportButton</tabstop>
   <tabstop>appearance</tabstop>
   <tabstop>bgndAppearance</tabstop>
   <tabstop>bgndGrad</tabstop>
@@ -2660,6 +2765,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>
   <tabstop>passwordChar</tabstop>
+  <tabstop>exportKde3Button</tabstop>
+  <tabstop>exportQt3Button</tabstop>
   <tabstop>gradCombo</tabstop>
   <tabstop>gradStops</tabstop>
   <tabstop>updateButton</tabstop>
@@ -2669,7 +2776,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>previewColor</tabstop>
   <tabstop>shading</tabstop>
   <tabstop>customShading</tabstop>
-  <tabstop>optionBtn</tabstop>
  </tabstops>
  <includes>
   <include location="local">kcolorbutton.h</include>
@@ -2687,14 +2793,50 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>505</x>
-     <y>210</y>
+     <x>261</x>
+     <y>58</y>
     </hint>
     <hint type="destinationlabel">
-     <x>530</x>
-     <y>181</y>
+     <x>261</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exportKde3Button</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>QtCurveConfigBase</receiver>
+   <slot>exportKDE3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>344</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>662</x>
+     <y>-11</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exportQt3Button</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>QtCurveConfigBase</receiver>
+   <slot>exportQt()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>532</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>exportKDE3()</slot>
+  <slot>exportQt()</slot>
+ </slots>
 </ui>

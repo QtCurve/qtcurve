@@ -240,7 +240,8 @@ class QtCurveStyle : public QWindowsStyle
                                        itsButtonCols[TOTAL_SHADES+1],
                                        itsLighterPopupMenuBgndCol,
                                        itsCheckRadioCol;
-    bool                               itsSaveMenuBarStatus;
+    bool                               itsSaveMenuBarStatus,
+                                       itsUsePixmapCache;
     mutable QColor                     *itsSidebarButtonsCols;
     mutable QColor                     *itsActiveMdiColors;
     mutable QColor                     *itsMdiColors;

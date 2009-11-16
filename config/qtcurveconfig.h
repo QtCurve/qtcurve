@@ -29,14 +29,13 @@
 #include <QComboBox>
 #include "common.h"
 
-class QMenu;
-class QAction;
 class QComboBox;
 class KDoubleNumInput;
 #ifdef QTC_STYLE_SUPPORT
 class CExportThemeDialog;
 #endif
 class QtCurveConfig;
+class QStyle;
 
 class CGradientPreview : public QWidget
 {
@@ -62,6 +61,15 @@ class CGradientPreview : public QWidget
     GradientStopCont stops;
 };
 
+struct Preset
+{
+    Preset() { }
+    Preset(const Options &o, const QString &f=QString()) : opts(o), fileName(f) { }
+
+    Options opts;
+    QString fileName;
+};
+
 class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 {
     Q_OBJECT
@@ -78,10 +86,6 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     void changed(bool);
 
-    private:
-
-    void loadStyles(QMenu *menu);
-
     public Q_SLOTS:
 
     void save();
@@ -89,12 +93,14 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     private Q_SLOTS:
 
-    void setStyle(QAction *s);
+    void setPreset();
     void updateChanged();
     void focusChanged();
     void roundChanged();
-    void importStyle();
-    void exportStyle();
+    void savePreset();
+    void deletePreset();
+    void importPreset();
+    void exportPreset();
     void exportTheme();
     void emboldenToggled();
     void defBtnIndicatorChanged();
@@ -128,34 +134,41 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void stopSelected();
     void exportKDE3();
     void exportQt();
+    void updatePreview();
 
     private:
 
+    bool savePreset(const QString &name);
+    QString getPresetName(const QString &cap, QString label, QString def, QString name=QString());
     void setupStack();
+    void setupPresets(const Options &currentStyle);
+    void setupPreview();
     void setupGradientsTab();
     void setupShadesTab();
     void setupShade(KDoubleNumInput *w, int shade);
     void populateShades(const Options &opts);
     bool diffShades(const Options &opts);
     void setPasswordChar(int ch);
-    void loadStyle(const QString &file);
     int  getTitleBarButtonFlags();
     void setOptions(Options &opts);
     void setWidgetOptions(const Options &opts);
     bool diffTitleBarButtonColors(const Options &opts);
-    bool settingsChanged();
+    bool settingsChanged(const Options &opts);
+    bool settingsChanged() { return settingsChanged(presets[currentText].opts); }
 
     private:
 
-    Options                  currentStyle,
-                             defaultStyle;
-    QMap<QAction *, QString> styles;
+    Options               defaultStyle,
+                          previewStyle;
+    QStyle                *widgetStyle;
+    QMap<QString, Preset> presets;
 #ifdef QTC_STYLE_SUPPORT
-    CExportThemeDialog       *exportDialog;
+    CExportThemeDialog    *exportDialog;
 #endif
-    CGradientPreview         *gradPreview;
-    GradientCont             customGradient;
-    KDoubleNumInput          *shadeVals[NUM_STD_SHADES];
+    CGradientPreview      *gradPreview;
+    GradientCont          customGradient;
+    KDoubleNumInput       *shadeVals[NUM_STD_SHADES];
+    QString               currentText;
 };
 
 #endif

@@ -18,8 +18,6 @@
   Boston, MA 02110-1301, USA.
 */
 
-static bool usePixmapCache=true;
-
 #include <QtGui>
 #include <QtDBus/QtDBus>
 #define QTC_COMMON_FUNCTIONS
@@ -858,6 +856,7 @@ QtCurveStyle::QtCurveStyle()
               itsCheckRadioSelCols(0L),
               itsSortedLvColors(0L),
               itsSaveMenuBarStatus(false),
+              itsUsePixmapCache(false),
               itsSidebarButtonsCols(0L),
               itsActiveMdiColors(0L),
               itsMdiColors(0L),
@@ -896,11 +895,15 @@ QtCurveStyle::QtCurveStyle()
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
 #endif
+    // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
+    // to a temporary filename. If this is set, we read the settings from there - and dont not use
+    // the QPixmapCache - as it will interfere with that of the kcm's widgets!
+    QString rcFile=QString::fromLocal8Bit(qgetenv(QTCURVE_PREVIEW_CONFIG));
 
+    if(!rcFile.isEmpty())
+        itsUsePixmapCache=false;
 #ifdef QTC_STYLE_SUPPORT
-    QString rcFile;
-
-    if(!name.isEmpty())
+    if(rcFile.isEmpty() && !name.isEmpty())
     {
         rcFile=themeFile(kdeHome(), name);
 
@@ -912,10 +915,8 @@ QtCurveStyle::QtCurveStyle()
         }
     }
 
-    readConfig(rcFile, &opts);
-#else
-    readConfig(QString(), &opts);
 #endif
+    readConfig(rcFile, &opts);
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", QTC_DEFAULT_CONTRAST).toInt();
     if(opts.contrast<0 || opts.contrast>10)
@@ -2287,6 +2288,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 {
     switch(metric)
     {
+        case PM_MdiSubWindowFrameWidth:
+            return 1;
         case PM_DockWidgetFrameWidth:
             return 2;
         case PM_ToolBarExtensionExtent:
@@ -4208,7 +4211,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     QString key;
 
                     key.sprintf("qtc-sel-%x-%x", pix.height(), color.rgba());
-                    if(!usePixmapCache || !QPixmapCache::find(key, pix))
+                    if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
                     {
                         pix.fill(Qt::transparent);
 
@@ -4219,13 +4222,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         pixPainter.setRenderHint(QPainter::Antialiasing, true);
                         drawBevelGradient(color, &pixPainter, border,
                                           buildPath(border, WIDGET_OTHER, ROUNDED_ALL, radius), true, false,
-                                          opts.selectionAppearance, WIDGET_SELECTION, !usePixmapCache);
+                                          opts.selectionAppearance, WIDGET_SELECTION, !itsUsePixmapCache);
                         pixPainter.setBrush(Qt::NoBrush);
                         pixPainter.setPen(color);
                         pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
                         pixPainter.end();
 
-                        if(usePixmapCache)
+                        if(itsUsePixmapCache)
                             QPixmapCache::insert(key, pix);
                     }
 
@@ -8931,7 +8934,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                                   const QWidget *widget, int round, const QColor &fill, const QColor *custom,
                                   bool doBorder, EWidget w) const
 {
-    if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin) || !usePixmapCache)
+    if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin)/* || !itsUsePixmapCache*/)
         drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round);
     else
     {
@@ -8981,7 +8984,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                           (WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ? State_Active : State_None)));
 
             key.sprintf("qtc-%x-%d-%x-%x-%x-%x-%x", w, (int)realRound, pix.width(), pix.height(), state, fill.rgba(), (int)(radius*100));
-            if(!QPixmapCache::find(key, pix))
+            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
                 pix.fill(Qt::transparent);
 
@@ -8993,7 +8996,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                 opts.round=oldRound;
                 pixPainter.end();
 
-                QPixmapCache::insert(key, pix);
+                if(itsUsePixmapCache)
+                    QPixmapCache::insert(key, pix);
             }
 
             if(small)
@@ -9353,13 +9357,14 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                       GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
 
     key.sprintf("qtc-bgnd-%x", col.rgba());
-    if(!usePixmapCache || !QPixmapCache::find(key, pix))
+    if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
     {
         QPainter pixPainter(&pix);
 
         drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
                               GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
-                            
+        if(itsUsePixmapCache)
+            QPixmapCache::insert(key, pix);
     }
 
     p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
@@ -10941,7 +10946,7 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
         case KGlobalSettings::PaletteChanged:
             KGlobal::config()->reparseConfiguration();
             applyKdeSettings(true);
-            if(usePixmapCache)
+            if(itsUsePixmapCache)
                 QPixmapCache::clear();
             break;
         case KGlobalSettings::FontChanged:
