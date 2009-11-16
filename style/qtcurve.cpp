@@ -4633,10 +4633,33 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
 #endif
 
-                    drawItemText(painter, titleRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic, palette,
-                                 dwOpt->state&State_Enabled,
-                                 painter->fontMetrics().elidedText(dwOpt->title, Qt::ElideRight, titleRect.width(),
-                                 QPalette::WindowText));
+                    QString title(painter->fontMetrics().elidedText(dwOpt->title, Qt::ElideRight, titleRect.width(),
+                                                                    QPalette::WindowText));
+                    if(opts.dwtColAsPerTitleBar)
+                    {
+                        getMdiColors(option, state&State_Active);
+
+                        QColor textColor(state&State_Active
+                                            ? itsActiveMdiTextColor
+                                            : itsMdiTextColor),
+                               shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
+                        int    textOpt(Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
+
+                        if(EFFECT_NONE!=opts.titlebarEffect)
+                        {
+                            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
+                            painter->setPen(shadow);
+                            painter->drawText(titleRect.adjusted(1, 1, 1, 1), textOpt, title);
+
+                            if (!(state&State_Active) && QTC_DARK_WINDOW_TEXT(textColor))
+                                textColor.setAlpha((textColor.alpha() * 180) >> 8);
+                        }
+                        painter->setPen(textColor);
+                        painter->drawText(titleRect, textOpt, title);
+                    }
+                    else
+                        drawItemText(painter, titleRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic, palette,
+                                     dwOpt->state&State_Enabled, title);
                 }
 
 //                 painter->restore();
