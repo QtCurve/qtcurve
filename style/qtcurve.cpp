@@ -4637,6 +4637,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                                                     QPalette::WindowText));
                     if(opts.dwtColAsPerTitleBar)
                     {
+                        painter->save();
                         getMdiColors(option, state&State_Active);
 
                         QColor textColor(state&State_Active
@@ -4645,6 +4646,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                         int    textOpt(Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
 
+#if !defined QTC_QT_ONLY
+                        // TODO: dwtFontAsPerTitleBar
+                        painter->setFont(KGlobalSettings::windowTitleFont());
+#endif
                         if(EFFECT_NONE!=opts.titlebarEffect)
                         {
                             shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
@@ -4656,6 +4661,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         painter->setPen(textColor);
                         painter->drawText(titleRect, textOpt, title);
+                        painter->restore();
                     }
                     else
                         drawItemText(painter, titleRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic, palette,
@@ -7170,7 +7176,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     static const int constPad=4;
 
-                    QFont         font(painter->font());
                     Qt::Alignment alignment((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
                     bool          alignFull(Qt::AlignHCenter==alignment),
                                   iconRight((!reverse && alignment&Qt::AlignRight) || (reverse && alignment&Qt::AlignLeft));
@@ -7179,8 +7184,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                             ? QRect(r.x(), captionRect.y(), r.width(), captionRect.height())
                                             : captionRect);
 
+#ifdef QTC_QT_ONLY
+                    QFont         font(painter->font());
                     font.setBold(true);
                     painter->setFont(font);
+#else
+                    painter->setFont(KGlobalSettings::windowTitleFont());
+#endif
 
                     QFontMetrics fm(painter->fontMetrics());
                     QString str(fm.elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
