@@ -56,6 +56,7 @@
 #include <KDE/KComponentData>
 #include <KDE/KTitleWidget>
 #include <KDE/KTabBar>
+#include <KDE/KFileDialog>
 #if KDE_IS_VERSION(4, 3, 0)
 #include <KDE/KFileWidget>
 #else
@@ -66,7 +67,6 @@
 static int theInstanceCount=0;
 
 // KDE4.1 does this functionality for us!
-#include <KDE/KFileDialog>
 #include <KDE/KDirSelectDialog>
 #include <KDE/KGlobal>
 
@@ -1092,6 +1092,14 @@ QtCurveStyle::QtCurveStyle()
         }
     else
         opts.titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
+#if !defined QTC_QT_ONLY
+    // Ensure the link to libkio is not stripped, by placing a call to a kio function.
+    // NOTE: This call will never actually happen, its only here so that the qtcurve.so
+    // contains a kio link so that this is not removed by some 'optimisation' of the
+    // link process.
+    if((int)this==(int)itsHoverWidget)
+        (void)KFileDialog::getSaveFileName();
+#endif
 }
 
 QtCurveStyle::~QtCurveStyle()
