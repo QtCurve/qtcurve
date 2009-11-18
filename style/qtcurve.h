@@ -51,13 +51,11 @@ extern GType qtcurve_type_rc_style;
 struct _QtCurveRcStyle
 {
     GtkRcStyle parent_instance;
-    int dummy;
 };
 
 struct _QtCurveRcStyleClass
 {
     GtkRcStyleClass parent_class;
-    int dummy;
 };
 
 void qtcurve_rc_style_register_type (GTypeModule *module);
@@ -76,7 +74,6 @@ typedef struct
 struct _QtCurveStyleClass
 {
     GtkStyleClass parent_class;
-    int dummy;
 };
 
 #endif
