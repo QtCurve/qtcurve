@@ -9209,83 +9209,83 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         }
 
         if(APPEARANCE_AGUA==app && !sunken)
-        if(WIDGET_MDI_WINDOW_BUTTON==w)
-        {
-            QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
-            double botSize=(ra.height()*0.4),
-                   botRad=botSize/1.5,
-                   topSize=(ra.height()*0.4),
-                   topRad=botSize/2.0,
-                   botWidthAdjust=4.5,
-                   topWidthAdjust=4.75;
-
-            QRectF          botGradRect(ra.x()+botWidthAdjust, ra.y()+(ra.height()-botSize),
-                                        ra.width()-(botWidthAdjust*2)-1, botSize-1),
-                            topGradRect(ra.x()+topWidthAdjust, ra.y(),
-                                        ra.width()-(topWidthAdjust*2)-1, topSize-1);
-            QLinearGradient botGrad(botGradRect.topLeft(), botGradRect.bottomLeft()),
-                            topGrad(topGradRect.topLeft(), topGradRect.bottomLeft());
-            QColor          white(Qt::white);
-            bool            mo(option->state&State_MouseOver && opts.highlightFactor);
-
-            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
-            botGrad.setColorAt(0.0, white);
-            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.45 : 0.25) : 0.35);
-            botGrad.setColorAt(1.0, white);
-            p->fillPath(buildPath(botGradRect, w, round, botSize), QBrush(botGrad));
-            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.8 : 0.7) : 0.75);
-            topGrad.setColorAt(0.0, white);
-            white.setAlphaF(/*mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : */0.2);
-            topGrad.setColorAt(1.0, white);
-            p->fillPath(buildPath(topGradRect, w, round, botSize), QBrush(topGrad));
-        }
-        else
-        {
-            QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
-            double size=(QTC_MIN((horiz ? ra.height() : ra.width())/2.0, 16)),
-                   rad=size/2.0;
-            int    mod=4;
-
-            if(horiz)
+            if(WIDGET_MDI_WINDOW_BUTTON==w)
             {
-                if(!(ROUNDED_LEFT&round))
-                    ra.adjust(-8, 0, 0, 0);
-                if(!(ROUNDED_RIGHT&round))
-                    ra.adjust(0, 0, 8, 0);
+                QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
+                double //botSize=(ra.height()*0.4),
+                       //botRad=botSize/1.5,
+                       topSize=(ra.height()*0.4),
+                       topRad=topSize/2.0,
+                       //botWidthAdjust=4.5,
+                       topWidthAdjust=4.75;
+
+                QRectF          //botGradRect(ra.x()+botWidthAdjust, ra.y()+(ra.height()-botSize),
+                                //            ra.width()-(botWidthAdjust*2)-1, botSize-1),
+                                topGradRect(ra.x()+topWidthAdjust, ra.y(),
+                                            ra.width()-(topWidthAdjust*2)-1, topSize-1);
+                QLinearGradient //botGrad(botGradRect.topLeft(), botGradRect.bottomLeft()),
+                                topGrad(topGradRect.topLeft(), topGradRect.bottomLeft());
+                QColor          white(Qt::white);
+                bool            mo(option->state&State_MouseOver && opts.highlightFactor);
+
+//                 white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
+//                 botGrad.setColorAt(0.0, white);
+//                 white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.45 : 0.25) : 0.35);
+//                 botGrad.setColorAt(1.0, white);
+//                 p->fillPath(buildPath(botGradRect, w, round, botSize), QBrush(botGrad));
+                white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.8 : 0.7) : 0.75);
+                topGrad.setColorAt(0.0, white);
+                white.setAlphaF(/*mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : */0.2);
+                topGrad.setColorAt(1.0, white);
+                p->fillPath(buildPath(topGradRect, w, round, topSize), QBrush(topGrad));
             }
             else
             {
-                if(!(ROUNDED_TOP&round))
-                    ra.adjust(0, -8, 0, 0);
-                if(!(ROUNDED_BOTTOM&round))
-                    ra.adjust(0, 0, 0, 8);
-            }
+                QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
+                double size=(QTC_MIN((horiz ? ra.height() : ra.width())/2.0, 16)),
+                       rad=size/2.0;
+                int    mod=4;
 
-            if(realRound<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
-            {
-                rad/=2.0;
-                mod=mod>>1;
-            }
+                if(horiz)
+                {
+                    if(!(ROUNDED_LEFT&round))
+                        ra.adjust(-8, 0, 0, 0);
+                    if(!(ROUNDED_RIGHT&round))
+                        ra.adjust(0, 0, 8, 0);
+                }
+                else
+                {
+                    if(!(ROUNDED_TOP&round))
+                        ra.adjust(0, -8, 0, 0);
+                    if(!(ROUNDED_BOTTOM&round))
+                        ra.adjust(0, 0, 0, 8);
+                }
 
-            QRectF          gr(horiz ? QRectF(ra.x()+mod, ra.y(), ra.width()-(mod*2)-1, size-1)
-                                     : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
-            QLinearGradient g(gr.topLeft(), horiz ? gr.bottomLeft() : gr.topRight());
-            QColor          white(Qt::white);
-            bool            mo(option->state&State_MouseOver && opts.highlightFactor);
+                if(realRound<ROUND_MAX || (!QTC_IS_MAX_ROUND_WIDGET(w) && !IS_SLIDER(w)))
+                {
+                    rad/=2.0;
+                    mod=mod>>1;
+                }
 
-            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
-            g.setColorAt(0.0, white);
-            white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
-            g.setColorAt(1.0, white);
-            if(WIDGET_SB_BUTTON==w)
-            {
-                p->save();
-                p->setClipRect(r);
+                QRectF          gr(horiz ? QRectF(ra.x()+mod, ra.y(), ra.width()-(mod*2)-1, size-1)
+                                        : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
+                QLinearGradient g(gr.topLeft(), horiz ? gr.bottomLeft() : gr.topRight());
+                QColor          white(Qt::white);
+                bool            mo(option->state&State_MouseOver && opts.highlightFactor);
+
+                white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
+                g.setColorAt(0.0, white);
+                white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
+                g.setColorAt(1.0, white);
+                if(WIDGET_SB_BUTTON==w)
+                {
+                    p->save();
+                    p->setClipRect(r);
+                }
+                p->fillPath(buildPath(gr, w, round, rad), QBrush(g));
+                if(WIDGET_SB_BUTTON==w)
+                    p->restore();
             }
-            p->fillPath(buildPath(gr, w, round, rad), QBrush(g));
-            if(WIDGET_SB_BUTTON==w)
-                p->restore();
-        }
     }
 
     r.adjust(1, 1, -1, -1);
