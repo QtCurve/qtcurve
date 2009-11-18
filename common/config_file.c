@@ -1863,7 +1863,7 @@ static void defaultSettings(Options *opts)
     opts->round=ROUND_FULL;
 #endif
 #ifdef __cplusplus
-    opts->dwtAppearance=APPEARANCE_SPLIT_GRADIENT;
+    opts->dwtAppearance=APPEARANCE_CUSTOM1;
 #endif
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;
@@ -1959,7 +1959,7 @@ static void defaultSettings(Options *opts)
 #endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
-    opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR;
+    opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
 #endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
