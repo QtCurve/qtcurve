@@ -808,6 +808,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtons_round, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_hoverFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_hoverSymbol, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(titlebarButtons_hoverSymbolFull, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_colorOnMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_colorSymbolsOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_colorInactive, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1899,6 +1900,8 @@ int QtCurveConfig::getTitleBarButtonFlags()
         titlebarButtons+=QTC_TITLEBAR_BUTTON_HOVER_FRAME;
     if(titlebarButtons_hoverSymbol->isChecked())
         titlebarButtons+=QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
+    if(titlebarButtons_hoverSymbolFull->isChecked())
+        titlebarButtons+=QTC_TITLEBAR_BUTTON_HOVER_SYMBOL_FULL;
     if(titlebarButtons_colorOnMouseOver->isChecked())
         titlebarButtons+=QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER;
     if(titlebarButtons_colorInactive->isChecked())
@@ -2254,6 +2257,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtons_round->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND);
     titlebarButtons_hoverFrame->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_FRAME);
     titlebarButtons_hoverSymbol->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL);
+    titlebarButtons_hoverSymbolFull->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL_FULL);
     titlebarButtons_colorOnMouseOver->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_MOUSE_OVER);
     titlebarButtons_colorInactive->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_INACTIVE);
     titlebarButtons_colorSymbolsOnly->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL);

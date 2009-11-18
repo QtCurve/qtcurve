@@ -216,7 +216,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         }
         bP.drawPixmap(dX, dY, menuIcon);
     }
-    else
+    else if(!(flags&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL_FULL) || sunken || itsHover)
     {
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
         bool          customCol(false),

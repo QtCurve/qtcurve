@@ -9780,23 +9780,26 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
 void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QColor &shadow,
                                const QRect &r, bool hover, bool sunken, Icon icon, bool stdSize) const
 {
-    bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
-
-    if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
-//         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+    if(!(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL_FULL) || hover || sunken)
     {
-        QColor sh=KColorUtils::mix(bgnd, shadow, shadow.alphaF());
+        bool faded=!sunken && !hover && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
 
-        sh.setAlpha(255);
-        drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
+        if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
+    //         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
+        {
+            QColor sh=KColorUtils::mix(bgnd, shadow, shadow.alphaF());
+
+            sh.setAlpha(255);
+            drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
+        }
+
+        QColor col(color);
+
+        if(faded)
+            col=KColorUtils::mix(bgnd, col, HOVER_BUTTON_ALPHA(col));
+
+        drawIcon(painter, col, r, sunken, icon, stdSize);
     }
-
-    QColor col(color);
-
-    if(faded)
-        col=KColorUtils::mix(bgnd, col, HOVER_BUTTON_ALPHA(col));
-
-    drawIcon(painter, col, r, sunken, icon, stdSize);
 }
 
 void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize) const

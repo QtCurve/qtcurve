@@ -1490,45 +1490,52 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="titlebarButtons_button">
          <property name="text">
           <string>Standard button color</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QCheckBox" name="titlebarButtons_custom">
          <property name="text">
           <string>Use custom colors</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorOnMouseOver">
          <property name="text">
           <string>Use color only for mouse-over</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_57">
          <property name="text">
           <string>Custom colors:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorSymbolsOnly">
          <property name="text">
           <string>Use only for symbols</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorInactive">
          <property name="text">
           <string>Also apply to inactive windows</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QCheckBox" name="titlebarButtons_hoverSymbolFull">
+         <property name="text">
+          <string>Hide symbol until mouse-over</string>
          </property>
         </widget>
        </item>
@@ -2674,6 +2681,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>titlebarButtons_round</tabstop>
   <tabstop>titlebarButtons_hoverFrame</tabstop>
   <tabstop>titlebarButtons_hoverSymbol</tabstop>
+  <tabstop>titlebarButtons_hoverSymbolFull</tabstop>
   <tabstop>titlebarButtons_button</tabstop>
   <tabstop>titlebarButtons_custom</tabstop>
   <tabstop>titlebarButtons_colorOnMouseOver</tabstop>
