@@ -57,8 +57,6 @@
 #include <KDE/KTemporaryFile>
 #include <KDE/KXmlGuiWindow>
 #include <KDE/KStandardAction>
-#include <KDE/KHelpMenu>
-#include <KDE/KMenuBar>
 #include <KDE/KStatusBar>
 #include <KDE/KAboutData>
 #include <KDE/KComponentData>
@@ -120,13 +118,10 @@ class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
         QWidget *main=new QWidget(this);
         setupUi(main);
         setCentralWidget(main);
-        setHelpMenuEnabled(false);
         setComponentData(*componentData);
         for (uint i = 0; standardAction[i] != KStandardAction::ActionNone; ++i)
             actionCollection()->addAction(standardAction[i]);
         createGUI();
-        KHelpMenu *helpMenu = new KHelpMenu(this, componentData->aboutData(), false);
-        menuBar()->addMenu((QMenu *) helpMenu->menu());
         statusBar()->setSizeGripEnabled(true);
         toolBar()->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         setCaption(i18n("Preview Window"));
