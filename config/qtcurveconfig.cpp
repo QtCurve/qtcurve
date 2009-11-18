@@ -819,7 +819,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtons_colorShade, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_colorAllDesktops, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
 
-    Options currentStyle;
+    Options currentStyle,
+            defaultStyle;
 
     defaultSettings(&defaultStyle);
     if(!readConfig(NULL, &currentStyle, &defaultStyle))
@@ -831,7 +832,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     setupGradientsTab();
     setupStack();
-    setupPresets(currentStyle);
+    setupPresets(currentStyle, defaultStyle);
     setupPreview();
 }
 
@@ -860,7 +861,7 @@ void QtCurveConfig::save()
     Options opts=presets[currentText].opts;
 
     setOptions(opts);
-    writeConfig(NULL, opts, defaultStyle);
+    writeConfig(NULL, opts, presets[defaultText].opts);
 
     // This is only read by KDE3...
     KConfig      k3globals(kdeHome(true)+"/share/config/kdeglobals", KConfig::CascadeConfig);
@@ -885,11 +886,14 @@ void QtCurveConfig::save()
 
 void QtCurveConfig::defaults()
 {
-    setWidgetOptions(defaultStyle);
-    if (settingsChanged())
-        emit changed(true);
-    if (settingsChanged(previewStyle))
-        updatePreview();
+    int index=-1;
+
+    for(int i=0; i<presetsCombo->count() && -1==index; ++i)
+        if(presetsCombo->itemText(i)==defaultText)
+            index=i;
+
+    presetsCombo->setCurrentIndex(index);
+    setPreset();
 }
 
 void QtCurveConfig::emboldenToggled()
@@ -1112,7 +1116,7 @@ void QtCurveConfig::setupStack()
     connect(stackList, SIGNAL(itemSelectionChanged()), SLOT(changeStack()));
 }
 
-void QtCurveConfig::setupPresets(const Options &currentStyle)
+void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &defaultStyle)
 {
     QStringList files(KGlobal::dirs()->findAllResources("data", "QtCurve/*"QTC_EXTENSION, KStandardDirs::NoDuplicates));
 
@@ -1130,11 +1134,14 @@ void QtCurveConfig::setupPresets(const Options &currentStyle)
     deleteButton->setEnabled(false);
 
     currentText=i18n("(Current)");
+    defaultText=i18n("(Default)");
+    presets[currentText]=Preset(currentStyle);
+    presets[defaultText]=Preset(defaultStyle);
     for(; it!=end; ++it)
     {
         QString name(QFileInfo(*it).fileName().remove(QTC_EXTENSION).replace('_', ' '));
 
-        if(!name.isEmpty() && name!=currentText && readConfig(*it, &opts, &defaultStyle))
+        if(!name.isEmpty() && name!=currentText && name!=defaultText && readConfig(*it, &opts, &presets[defaultText].opts))
         {
             presetsCombo->insertItem(0, name);
             presets[name]=Preset(opts, *it);
@@ -1142,7 +1149,7 @@ void QtCurveConfig::setupPresets(const Options &currentStyle)
     }
 
     presetsCombo->insertItem(0, currentText);
-    presets[currentText]=Preset(currentStyle);
+    presetsCombo->insertItem(0, defaultText);
     presetsCombo->model()->sort(0);
     connect(presetsCombo, SIGNAL(currentIndexChanged(int)), SLOT(setPreset()));
     connect(saveButton, SIGNAL(clicked(bool)), SLOT(savePreset()));
@@ -1504,7 +1511,7 @@ void QtCurveConfig::updatePreview()
         if(rv)
         {
             setOptions(previewStyle);
-            rv=writeConfig(&cfg, previewStyle, defaultStyle, true);
+            rv=writeConfig(&cfg, previewStyle, presets[defaultText].opts, true);
         }
 
         if(rv)
@@ -1655,13 +1662,15 @@ void QtCurveConfig::setPreset()
         emit changed(true);
 
     deleteButton->setEnabled(currentText!=presetsCombo->currentText() &&
+                             defaultText!=presetsCombo->currentText() &&
                              0==presets[presetsCombo->currentText()].fileName.indexOf(QDir::homePath()));
 }
 
 void QtCurveConfig::savePreset()
 {
     QString name=getPresetName(i18n("Save Preset"), i18n("Please enter a name for the preset:"),
-                               currentText==presetsCombo->currentText() ? i18n("New preset") : presetsCombo->currentText());
+                               currentText==presetsCombo->currentText() || defaultText==presetsCombo->currentText()
+                                ? i18n("New preset") : presetsCombo->currentText());
 
     if(!name.isEmpty() && !savePreset(name))
         KMessageBox::error(this, i18n("Sorry, failed to save preset"));
@@ -1675,7 +1684,7 @@ bool QtCurveConfig::savePreset(const QString &name)
     Options opts;
 
     setOptions(opts);
-    if(writeConfig(&cfg, opts, defaultStyle, true))
+    if(writeConfig(&cfg, opts, presets[defaultText].opts, true))
     {
         QMap<QString, Preset>::iterator it(presets.find(name)),
                                         end(presets.end());
@@ -1725,10 +1734,10 @@ QString QtCurveConfig::getPresetName(const QString &cap, QString label, QString 
                      .replace('`', ' ')
                      .simplified();
 
-            if(name==currentText)
+            if(name==currentText || name==defaultText)
             {
                 label=i18n("<p>You cannot use the name \"%1\".</p>"
-                           "<p>Please enter a different name:<p>", currentText);
+                           "<p>Please enter a different name:<p>", name);
                 def=name+i18n("_new");
                 name=QString();
             }
@@ -1796,10 +1805,10 @@ void QtCurveConfig::importPreset()
 
         if(name.isEmpty())
             KMessageBox::error(this, i18n("<p>Sorry, failed to load file.</p><p><i>Empty preset name?</i></p>"));
-        else if(name==currentText)
+        else if(name==currentText || name==defaultText)
             KMessageBox::error(this, i18n("<p>Sorry, failed to load file.</p><p><i>Cannot have a preset named "
-                                          "\"%1\"</i></p>", currentText));
-        else if (readConfig(file, &opts, &defaultStyle))
+                                          "\"%1\"</i></p>", name));
+        else if (readConfig(file, &opts, &presets[defaultText].opts))
         {
             name=getPresetName(i18n("Import Preset"), QString(), name, name);
             if(!name.isEmpty())
@@ -1841,7 +1850,7 @@ void QtCurveConfig::exportPreset()
             Options opts;
 
             setOptions(opts);
-            rv=writeConfig(&cfg, opts, defaultStyle, true);
+            rv=writeConfig(&cfg, opts, presets[defaultText].opts, true);
         }
 
         if(!rv)

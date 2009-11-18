@@ -141,7 +141,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     bool savePreset(const QString &name);
     QString getPresetName(const QString &cap, QString label, QString def, QString name=QString());
     void setupStack();
-    void setupPresets(const Options &currentStyle);
+    void setupPresets(const Options &currentStyle, const Options &defaultStyle);
     void setupPreview();
     void setupGradientsTab();
     void setupShadesTab();
@@ -159,8 +159,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     private:
 
-    Options               defaultStyle,
-                          previewStyle;
+    Options               previewStyle;
     QStyle                *widgetStyle;
     QMap<QString, Preset> presets;
 #ifdef QTC_STYLE_SUPPORT
@@ -169,7 +168,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     CGradientPreview      *gradPreview;
     GradientCont          customGradient;
     KDoubleNumInput       *shadeVals[NUM_STD_SHADES];
-    QString               currentText;
+    QString               currentText,
+                          defaultText;
 };
 
 #endif
