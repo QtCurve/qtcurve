@@ -51,6 +51,8 @@
 32. Add option to only round the top/left of dock widget titlebars.
 33. If compiled against KDE, use configured window font for MDI windows and dock
     widget titlebars.
+34. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
+    save custom presets, and preview before applying.
 
 0.69.2
 ------
