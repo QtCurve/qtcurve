@@ -13,15 +13,16 @@
  8. Remove support for QtCurve styles (these appear as unique KDE styles in the
     main KDE style selection dialog). Re-enable support by passing
     -DQTC_STYLE_SUPPORT=true to cmake.
- 9. Fix internal padding of scrolled windows where scrollbars are within window.
-10. When drawing frames, respect shadow state (in/out).
-11. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
-12. Improve appearance of unified spin widgets under Firefox.
-13. Don't draw background of dock widgets as if they were toolbars!
-14. Only draw toolbar/menubar background if shadow type is not set to none.
+ 9. Dont draw border around rounded selection.
+10. Fix internal padding of scrolled windows where scrollbars are within window.
+11. When drawing frames, respect shadow state (in/out).
+12. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
+13. Improve appearance of unified spin widgets under Firefox.
+14. Don't draw background of dock widgets as if they were toolbars!
+15. Only draw toolbar/menubar background if shadow type is not set to none.
     (Removes toolbar gradient from Rhythmbox's search buttons)
-15. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
-16. Better match of line-edit and spinbutton heights to KDE4.
+16. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
+17. Better match of line-edit and spinbutton heights to KDE4.
 
 0.69.2
 ------

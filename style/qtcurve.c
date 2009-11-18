@@ -2271,38 +2271,21 @@ static void dialogMapEvent(GtkWidget *widget, gpointer user_data)
 static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
                           const gchar *detail, int x, int y, int width, int height, int round, gboolean isSelection)
 {
-    double   xd=x+0.5,
-             yd=y+0.5,
-             alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
-    int      xo=x, yo=y, widtho=width, mod=isSelection && opts.squareLvSelection ? 0 : 1;
+    double   alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
     GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
 
-    if(mod)
-        if(detail && ROUNDED_ALL!=round)
-        {
-            if(!(round&ROUNDED_LEFT))
-            {
-                x-=2;
-                xd-=2;
-                width+=2;
-            }
-            if(!(round&ROUNDED_RIGHT))
-                width+=2;
-        }
-            
-    drawBevelGradientAlpha(cr, style, area, NULL, x+mod, y+mod, width-(2*mod), height-(2*mod), col,
-                           TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
 
-    if(mod)
+    if((!isSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
     {
+        cairo_new_path(cr);
         cairo_save(cr);
-        cairo_rectangle(cr, xo, yo, widtho, height);
+        createPath(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION), round);
         cairo_clip(cr);
-        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
-        createPath(cr, xd, yd, width-1, height-1,  getRadius(&opts, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
-        cairo_stroke(cr);
-        cairo_restore(cr);
     }
+    drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height, col,
+                           TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
+    if((!isSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
+        cairo_restore(cr);
 }
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
