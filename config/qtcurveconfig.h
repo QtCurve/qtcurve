@@ -63,9 +63,10 @@ class CGradientPreview : public QWidget
 
 struct Preset
 {
-    Preset() { }
-    Preset(const Options &o, const QString &f=QString()) : opts(o), fileName(f) { }
+    Preset(const Options &o, const QString &f=QString()) : loaded(true), opts(o), fileName(f) { }
+    Preset(const QString &f=QString()) : loaded(false), fileName(f) { }
 
+    bool    loaded;
     Options opts;
     QString fileName;
 };

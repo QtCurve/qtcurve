@@ -1126,7 +1126,6 @@ void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &def
 
     QStringList::Iterator it(files.begin()),
                           end(files.end());
-    Options               opts;
 
     saveButton->setGuiItem(KGuiItem(i18n("Save"), "document-save"));
     deleteButton->setGuiItem(KGuiItem(i18n("Delete"), "edit-delete"));
@@ -1143,10 +1142,10 @@ void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &def
     {
         QString name(QFileInfo(*it).fileName().remove(QTC_EXTENSION).replace('_', ' '));
 
-        if(!name.isEmpty() && name!=currentText && name!=defaultText && readConfig(*it, &opts, &presets[defaultText].opts))
+        if(!name.isEmpty() && name!=currentText && name!=defaultText)
         {
             presetsCombo->insertItem(0, name);
-            presets[name]=Preset(opts, *it);
+            presets[name]=Preset(*it);
         }
     }
 
@@ -1657,7 +1656,12 @@ void QtCurveConfig::roundChanged()
 
 void QtCurveConfig::setPreset()
 {
-    setWidgetOptions(presets[presetsCombo->currentText()].opts);
+    Preset &p(presets[presetsCombo->currentText()]);
+
+    if(!p.loaded)
+        readConfig(p.fileName, &p.opts, &presets[defaultText].opts);
+
+    setWidgetOptions(p.opts);
     if (settingsChanged(previewStyle))
         updatePreview();
     if (settingsChanged())
