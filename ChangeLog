@@ -13,45 +13,46 @@
  8. Remove support for QtCurve styles (these appear as unique KDE styles in the
     main KDE style selection dialog). Re-enable support by passing
     -DQTC_STYLE_SUPPORT=true to cmake.
- 9. Add option to specify appearance of dock-widget titlebars.
-10. Made XBar support a config, and not cmake, option.
-11. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
-12. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
-13. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
+ 9. Dont draw border around rounded selection.
+10. Add option to specify appearance of dock-widget titlebars.
+11. Made XBar support a config, and not cmake, option.
+12. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
+13. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
+14. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
     lines with an alpha channel set but anti-aliasing disabled. Affects MDI window
     icons (when 'hover icon' is enabled) - instead of using an alpha channel, the colour
     is mixed with the background colour.
-14. Fix KDE4.4's palette changes to KFilePlacesView.
-15. Fix slight redraw error with the inner shadow of sunken frames.
-16. Get kwin decoration to update on style change. Config file has changed to
+15. Fix KDE4.4's palette changes to KFilePlacesView.
+16. Fix slight redraw error with the inner shadow of sunken frames.
+17. Get kwin decoration to update on style change. Config file has changed to
     qtcurve/stylerc - so need to monitor that one!
-17. Remove 1 pixel background colour border from kwin decoration - was only used
+18. Remove 1 pixel background colour border from kwin decoration - was only used
     to provide softer rounded corners at the bottom.
-18. Completely remove old code for coloured shadows.
-19. Dont draw dark line between titlebar and contents when colouring titlebar only.
-20. Only draw toolbar gradients for toolbars in main window. Removes gradient from
+19. Completely remove old code for coloured shadows.
+20. Dont draw dark line between titlebar and contents when colouring titlebar only.
+21. Only draw toolbar gradients for toolbars in main window. Removes gradient from
     file selector toolbar.
-21. Style toolbar-extension icons (the arrows that appear when window is too small for
+22. Style toolbar-extension icons (the arrows that appear when window is too small for
     toolbar).
-22. Better positioning of close button on tabs.
-23. When saving settings to $XDG_CONFIG_HOME/qtcurve/stylerc, remove the older
+23. Better positioning of close button on tabs.
+24. When saving settings to $XDG_CONFIG_HOME/qtcurve/stylerc, remove the older
     $XDG_CONFIG_HOME/qtcurvestylerc, and $XDG_CONFIG_HOME/qtcurve.gtk-icons if they
     exist.
-24. Setup KDE4 palette and fonts in constructor.
-25. Fix K3B buttons.
-26. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
+25. Setup KDE4 palette and fonts in constructor.
+26. Fix K3B buttons.
+27. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
     a menu.
-27. Add arora to default list of KDE4 apps that needs manual saving of menubar
+28. Add arora to default list of KDE4 apps that needs manual saving of menubar
     state.
-28. Enable 'Apply' button on kwnin config when change padding setting.
-29. Add options to use titlebar button style, colour, font, text aligntment, and
+29. Enable 'Apply' button on kwnin config when change padding setting.
+30. Add options to use titlebar button style, colour, font, text aligntment, and
     text effect for dock widget titlebars.
-30. Add option to only round the top/left of dock widget titlebars.
-31. If compiled against KDE, use configured window font for MDI windows and dock
+31. Add option to only round the top/left of dock widget titlebars.
+32. If compiled against KDE, use configured window font for MDI windows and dock
     widget titlebars.
-32. Use custum gradient 1 for dock widget titlebars.
-33. Round gradients of dock-widget titlebars - top/left only be default.
-34. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
+33. Use custum gradient 1 for dock widget titlebars.
+34. Round gradients of dock-widget titlebars - top/left only be default.
+35. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
     save custom presets, and preview before applying.
 
 0.69.2
