@@ -1951,7 +1951,7 @@ static gboolean isMozApp(const char *app, const char *check)
 
         /* OK check for xulrunner-1.9 */
         {
-        double dummy;
+        float dummy;
         if(app_len>(check_len+1) && 1==sscanf(&app[check_len+1], "%f", &dummy))
             return TRUE;
         }
@@ -2286,7 +2286,7 @@ static gboolean qtInit()
                                     tmpStr,
                                     getpid(),
                                     tmpStr);
-                    system(cmdStr);
+                    (void)system(cmdStr);
                     free(cmdStr);
                 }
                 free(version);

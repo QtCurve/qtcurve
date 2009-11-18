@@ -6332,7 +6332,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
             // Gimps buttons in its toolbox are
-            if(NULL==GTK_BUTTON(widget)->label_text || NULL==GTK_BUTTON(widget)->label_text[0])
+            if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])
                 
             {
                 if(FOCUS_LINE==opts.focus)
