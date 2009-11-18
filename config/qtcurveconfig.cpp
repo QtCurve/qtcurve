@@ -237,6 +237,13 @@ class CStackItem : public QTreeWidgetItem
         : QTreeWidgetItem(p, toList(text)),
           stackId(s)
     {
+        if(0==s)
+        {
+            QFont fnt(font(0));
+
+            fnt.setBold(true);
+            setFont(0, fnt);
+        }
         setTextAlignment(0, Qt::AlignRight);
     }
 
