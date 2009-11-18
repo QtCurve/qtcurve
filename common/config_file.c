@@ -1770,7 +1770,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
             opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
 
-            opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
+            if(!(opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+                opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
             opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
 #endif
             if(APPEARANCE_FLAT==opts->tabAppearance)

@@ -54,6 +54,7 @@
 34. Round gradients of dock-widget titlebars - top/left only be default.
 35. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
     save custom presets, and preview before applying.
+36. Nicer 'Agua' look for MDI/window/dock widget buttons.
 
 0.69.2
 ------
