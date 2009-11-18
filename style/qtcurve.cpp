@@ -901,7 +901,10 @@ QtCurveStyle::QtCurveStyle()
     QString rcFile=QString::fromLocal8Bit(qgetenv(QTCURVE_PREVIEW_CONFIG));
 
     if(!rcFile.isEmpty())
-        itsUsePixmapCache=false;
+        if(QFile::exists(rcFile))
+            itsUsePixmapCache=false;
+        else
+            rcFile=QString();
 #ifdef QTC_STYLE_SUPPORT
     if(rcFile.isEmpty() && !name.isEmpty())
     {

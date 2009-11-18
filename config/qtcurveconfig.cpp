@@ -837,6 +837,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
 QtCurveConfig::~QtCurveConfig()
 {
+    // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview does not revert to
+    // default settings!
+    qputenv(QTCURVE_PREVIEW_CONFIG, "");
     previewFrame->hide();
     previewFrame->setParent(0);
     // When KMainWindow closes it dereferences KGlobal. When KGlobal's refs get to 0 it quits!
@@ -874,6 +877,10 @@ void QtCurveConfig::save()
 
     if(style.readEntry("PluginLib", QString())=="kwin3_qtcurve")
         QDBusConnection::sessionBus().send(QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig"));
+
+    // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview does not revert to
+    // default settings!
+    qputenv(QTCURVE_PREVIEW_CONFIG, "");
 }
 
 void QtCurveConfig::defaults()
