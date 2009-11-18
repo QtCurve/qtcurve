@@ -1665,7 +1665,10 @@ void QtCurveConfig::savePreset()
 {
     QString name=getPresetName(i18n("Save Preset"), i18n("Please enter a name for the preset:"),
                                currentText==presetsCombo->currentText() || defaultText==presetsCombo->currentText()
-                                ? i18n("New preset") : presetsCombo->currentText());
+                                ? i18n("New preset")
+                                : 0==presets[presetsCombo->currentText()].fileName.indexOf(QDir::homePath())
+                                    ? presetsCombo->currentText()
+                                    : i18n("%1 New", presetsCombo->currentText()));
 
     if(!name.isEmpty() && !savePreset(name))
         KMessageBox::error(this, i18n("Sorry, failed to save preset"));
@@ -1733,7 +1736,7 @@ QString QtCurveConfig::getPresetName(const QString &cap, QString label, QString 
             {
                 label=i18n("<p>You cannot use the name \"%1\".</p>"
                            "<p>Please enter a different name:<p>", name);
-                def=name+i18n("_new");
+                def=i18n("%1 New", name);
                 name=QString();
             }
             else
@@ -1746,18 +1749,21 @@ QString QtCurveConfig::getPresetName(const QString &cap, QString label, QString 
                     if(0!=(*it).fileName.indexOf(QDir::homePath()))
                     {
                         label=i18n("<p>A system defined preset named\"%1\" aleady exists.</p>"
-                                "<p>Please enter a new name:<p>", name);
-                        def=name+i18n("_new");
+                                   "<p>Please enter a new name:<p>", name);
+                        def=i18n("%1 New", name);
                         name=QString();
                     }
                     else
-                        if(KMessageBox::warningYesNo(this, i18n("<p>A preset named \"%1\" aleady exists.</p>"
-                                                                "<p>Do you wish to overwrite this?<p>", name)))
+                        if(name==presetsCombo->currentText() ||
+                            KMessageBox::Yes==KMessageBox::warningYesNo(this, i18n("<p>A preset named \"%1\" "
+                                                                                   "aleady exists.</p>"
+                                                                                   "<p>Do you wish to overwrite this?<p>",
+                                                                                   name)))
                             return name;
                         else
                         {
                             label=i18n("<p>Please enter a new name:<p>");
-                            def=name+i18n("_new");
+                            def=i18n("%1 New", name);
                             name=QString();
                         }
                 }
