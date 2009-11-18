@@ -773,10 +773,12 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(dwtBtnAsPerTitleBar_false, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(dwtColAsPerTitleBar_false, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtFontAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtTextAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtEffectAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtRoundTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xbar, SIGNAL(toggled(bool)), SLOT(xbarChanged()));
     connect(crColor, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(smallRadio, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1983,8 +1985,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
-    opts.dwtBtnAsPerTitleBar=dwtBtnAsPerTitleBar->isChecked();
-    opts.dwtColAsPerTitleBar=dwtColAsPerTitleBar->isChecked();
     opts.xbar=xbar->isChecked();
     opts.crColor=crColor->isChecked();
     opts.smallRadio=smallRadio->isChecked();
@@ -2006,6 +2006,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
     opts.titlebarEffect=(EEffect)titlebarEffect->currentIndex();
     opts.titlebarIcon=(ETitleBarIcon)titlebarIcon->currentIndex();
+    opts.dwtSettings=getDwtSettingsFlags();
 
     if(customShading->isChecked())
     {
@@ -2173,10 +2174,12 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
-    dwtBtnAsPerTitleBar->setChecked(opts.dwtBtnAsPerTitleBar);
-    dwtBtnAsPerTitleBar_false->setChecked(!opts.dwtBtnAsPerTitleBar);
-    dwtColAsPerTitleBar->setChecked(opts.dwtColAsPerTitleBar);
-    dwtColAsPerTitleBar_false->setChecked(!opts.dwtColAsPerTitleBar);
+    dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR);
+    dwtColAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR);
+    dwtFontAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_FONT_AS_PER_TITLEBAR);
+    dwtTextAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_TEXT_ALIGN_AS_PER_TITLEBAR);
+    dwtEffectAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_EFFECT_AS_PER_TITLEBAR);
+    dwtRoundTopOnly->setChecked(opts.dwtSettings&QTC_DWT_ROUND_TOP_ONLY);
     xbar->setChecked(opts.xbar);
     crColor->setChecked(opts.crColor);
     smallRadio->setChecked(opts.smallRadio);
@@ -2228,6 +2231,25 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtons_colorSymbolsOnly->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL);
 
     populateShades(opts);
+}
+
+int QtCurveConfig::getDwtSettingsFlags()
+{
+    int dwt(0);
+
+    if(dwtBtnAsPerTitleBar->isChecked())
+        dwt|=QTC_DWT_BUTTONS_AS_PER_TITLEBAR;
+    if(dwtColAsPerTitleBar->isChecked())
+        dwt|=QTC_DWT_COLOR_AS_PER_TITLEBAR;
+    if(dwtFontAsPerTitleBar->isChecked())
+        dwt|=QTC_DWT_FONT_AS_PER_TITLEBAR;
+    if(dwtTextAsPerTitleBar->isChecked())
+        dwt|=QTC_DWT_TEXT_ALIGN_AS_PER_TITLEBAR;
+    if(dwtEffectAsPerTitleBar->isChecked())
+        dwt|=QTC_DWT_EFFECT_AS_PER_TITLEBAR;
+    if(dwtRoundTopOnly->isChecked())
+        dwt|=QTC_DWT_ROUND_TOP_ONLY;
+    return dwt;
 }
 
 bool QtCurveConfig::diffTitleBarButtonColors(const Options &opts)
@@ -2351,8 +2373,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          sliderFill->currentIndex()!=opts.sliderFill ||
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
-         dwtBtnAsPerTitleBar->isChecked()!=opts.dwtBtnAsPerTitleBar ||
-         dwtColAsPerTitleBar->isChecked()!=opts.dwtColAsPerTitleBar ||
          xbar->isChecked()!=opts.xbar ||
          crColor->isChecked()!=opts.crColor ||
          smallRadio->isChecked()!=opts.smallRadio ||
@@ -2365,6 +2385,8 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          toInt(passwordChar->text())!=opts.passwordChar ||
          highlightFactor->value()!=opts.highlightFactor ||
          getTitleBarButtonFlags()!=opts.titlebarButtons ||
+
+         getDwtSettingsFlags()!=opts.dwtSettings ||
 
          diffTitleBarButtonColors(opts) ||
          

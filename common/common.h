@@ -358,6 +358,16 @@ typedef enum
 
 typedef enum
 {
+    QTC_DWT_BUTTONS_AS_PER_TITLEBAR    = 0x0001,
+    QTC_DWT_COLOR_AS_PER_TITLEBAR      = 0x0002,
+    QTC_DWT_FONT_AS_PER_TITLEBAR       = 0x0004,
+    QTC_DWT_TEXT_ALIGN_AS_PER_TITLEBAR = 0x0008,
+    QTC_DWT_EFFECT_AS_PER_TITLEBAR     = 0x0010,
+    QTC_DWT_ROUND_TOP_ONLY             = 0x0020
+} EDwtSettingsFlags;
+
+typedef enum
+{
     QTC_TITLEBAR_BUTTON_ROUND            = 0x0001,
     QTC_TITLEBAR_BUTTON_HOVER_FRAME      = 0x0002,
     QTC_TITLEBAR_BUTTON_HOVER_SYMBOL     = 0x0004,
@@ -865,8 +875,6 @@ typedef struct
 #endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      xbar,
-                     dwtBtnAsPerTitleBar,
-                     dwtColAsPerTitleBar,
 #endif
                      forceAlternateLvCols,
                      squareLvSelection,
@@ -875,6 +883,9 @@ typedef struct
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    int              dwtSettings;
+#endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;

@@ -3861,7 +3861,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonBevel:
         case PE_PanelButtonCommand:
         {
-            if(state&QTC_STATE_DWT_BUTTON && opts.dwtBtnAsPerTitleBar)
+            if(state&QTC_STATE_DWT_BUTTON && (opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR))
                 break;
 
             bool doEtch(QTC_DO_EFFECT);
@@ -4557,7 +4557,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         fillRect.adjust(-r.x(), -r.y(), 0, 0);
                     painter->save();
 
-                    QColor col(opts.dwtColAsPerTitleBar
+                    QColor col((opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR)
                                 ? getMdiColors(option, state&State_Active)[ORIGINAL_SHADE]
                                 : palette.background().color());
                     if(opts.round<ROUND_FULL)
@@ -4566,11 +4566,16 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     else
                     {
                         double radius(getRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
+                        int    round=ROUNDED_ALL;
 
+#if QT_VERSION >= 0x040300
+                        if(opts.dwtSettings&QTC_DWT_ROUND_TOP_ONLY)
+                            round=verticalTitleBar ? ROUNDED_LEFT : ROUNDED_TOP;
+#endif
                         painter->setRenderHint(QPainter::Antialiasing, true);
                         drawBevelGradient(col, painter, fillRect,
                                           buildPath(QRectF(r.x(), r.y(), r.width(), r.height()),
-                                                    WIDGET_OTHER, ROUNDED_ALL, radius), !verticalTitleBar,
+                                                    WIDGET_OTHER, round, radius), !verticalTitleBar,
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE, false);
                     }
 
@@ -4638,19 +4643,36 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->save();
                     getMdiColors(option, state&State_Active);
 
-                    QColor textColor(opts.dwtColAsPerTitleBar
+                    QColor textColor((opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR)
                                         ? state&State_Active
                                             ? itsActiveMdiTextColor
                                             : itsMdiTextColor
                                         : palette.color(QPalette::WindowText)),
                            shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
-                    int    textOpt(Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
+                    int    textOpt(Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
 
+                    if(opts.dwtSettings&QTC_DWT_TEXT_ALIGN_AS_PER_TITLEBAR)
+                        switch(opts.titlebarAlignment)
+                        {
+                            case ALIGN_FULL_CENTER:
+                            case ALIGN_CENTER:
+                                textOpt|=Qt::AlignHCenter;
+                                break;
+                            case ALIGN_RIGHT:
+                                textOpt|=Qt::AlignRight;
+                                break;
+                            default:
+                            case ALIGN_LEFT:
+                                textOpt|=Qt::AlignLeft;
+                        }
+                    else
+                        textOpt|=Qt::AlignLeft;
 #if !defined QTC_QT_ONLY
-                    // TODO: dwtFontAsPerTitleBar
-                    painter->setFont(KGlobalSettings::windowTitleFont());
+                    if(opts.dwtSettings&QTC_DWT_FONT_AS_PER_TITLEBAR)
+                        painter->setFont(KGlobalSettings::windowTitleFont());
 #endif
-                    if(EFFECT_NONE!=opts.titlebarEffect)
+                    if((opts.dwtSettings&QTC_DWT_EFFECT_AS_PER_TITLEBAR) &&
+                       EFFECT_NONE!=opts.titlebarEffect)
                     {
                         shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
                         painter->setPen(shadow);
@@ -6455,7 +6477,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             {
                 if (widget)
                 {
-                    if(opts.dwtBtnAsPerTitleBar &&
+                    if((opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR) &&
                         (widget->inherits("QDockWidgetTitleButton") ||
                          (widget->parentWidget() && widget->parentWidget()->inherits("KoDockWidgetTitleBar"))))
                     {
@@ -6495,10 +6517,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         }
                         
                         QColor        shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
-                        const QColor *bgndCols(opts.dwtColAsPerTitleBar
+                        const QColor *bgndCols((opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR)
                                                 ? getMdiColors(option, state&State_Active)
                                                 : buttonColors(option)),
-                                     *btnCols(opts.dwtColAsPerTitleBar
+                                     *btnCols((opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR)
                                                 ? opts.titlebarButtons&QTC_TITLEBAR_BUTTON_STD_COLOR
                                                     ? buttonColors(option)
                                                     : getMdiColors(option, state&State_Active)

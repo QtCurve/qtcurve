@@ -152,6 +152,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     int  getTitleBarButtonFlags();
     void setOptions(Options &opts);
     void setWidgetOptions(const Options &opts);
+    int  getDwtSettingsFlags();
     bool diffTitleBarButtonColors(const Options &opts);
     bool settingsChanged(const Options &opts);
     bool settingsChanged() { return settingsChanged(presets[currentText].opts); }
