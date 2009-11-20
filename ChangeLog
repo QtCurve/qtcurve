@@ -26,6 +26,8 @@
 18. If user is using menubar colouring, and this would require changing the text
     colour, then need to modify the user's userChrome.css for this - regardless
     of the QTC_MODIFY_MOZILLA cmake option.
+19. If editing/creating userChrome.css and chrome folder does not exist, then
+    create it.
 
 0.69.2
 ------

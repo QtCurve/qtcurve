@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <errno.h>
 
 #define QTC_READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
 #define QTC_RC_SETTING "QtC__"
@@ -1835,6 +1836,10 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
 
                     /* Now do userChrome.css */
                     sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name, USER_CHROME_DIR);
+
+                    /* If chrome folder does not exist, then create it... */
+                    if(-1==lstat(sub, &statbuf) && ENOENT==errno)
+                        g_mkdir_with_parents(sub, 0755);
 
                     if(-1!=lstat(sub, &statbuf) && S_ISDIR(statbuf.st_mode))
                     {
