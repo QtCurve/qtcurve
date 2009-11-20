@@ -1106,7 +1106,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
             /* Check if the config file expects old default values... */
-            if(version<QTC_MAKE_VERSION(0, 70))
+            if(version<QTC_MAKE_VERSION(1, 0))
             {
                 def->roundAllTabs=false;
                 def->smallRadio=false;
@@ -1118,6 +1118,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                 def->dwtSettings=0;
 #endif
+                def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
 #endif
             }
             if(version<QTC_MAKE_VERSION(0, 67))
@@ -2002,7 +2003,7 @@ static void defaultSettings(Options *opts)
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
-    opts->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
+    opts->inactiveTitlebarAppearance=APPEARANCE_CUSTOM1;
     opts->titlebarButtonAppearance=APPEARANCE_GRADIENT;
 #endif
     /* Read system config file... */
