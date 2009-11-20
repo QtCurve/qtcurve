@@ -23,6 +23,9 @@
     (Removes toolbar gradient from Rhythmbox's search buttons)
 16. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
 17. Better match of line-edit and spinbutton heights to KDE4.
+18. If user is using menubar colouring, and this would require changing the text
+    colour, then need to modify the user's userChrome.css for this - regardless
+    of the QTC_MODIFY_MOZILLA cmake option.
 
 0.69.2
 ------

@@ -1616,8 +1616,6 @@ static char * getAppName()
     return name;
 }
 
-#ifdef QTC_MODIFY_MOZILLA
-
 #define MAX_CSS_HOME     256
 #define CSS_DEFAULT      ".default"
 #define CSS_DEFAULT_ALT  "default."
@@ -1638,9 +1636,11 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
 {
     FILE        *f=fopen(file, "r");
     char        *contents=NULL;
+    gboolean    remove_menu_colors=FALSE;
+#ifdef QTC_MODIFY_MOZILLA
     gboolean    remove_btn_css=FALSE,
-                remove_menu_colors=FALSE,
                 add_css=TRUE;
+#endif
     struct stat st;
     size_t      file_size=0,
                 new_size=0;
@@ -1663,6 +1663,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                 {
                     gboolean write_line=TRUE;
 
+#ifdef QTC_MODIFY_MOZILLA
                     if(0==strcmp(line, BTN_CSS_FILE_STR))
                     {
                         if (add_btn_css)
@@ -1675,7 +1676,9 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                     }
                     else if(0==strcmp(line, CSS_FILE_STR))
                         add_css=FALSE;
-                    else if(0==strcmp(line, MENU_TEXT_STR))
+                    else
+#endif
+                        if(0==strcmp(line, MENU_TEXT_STR))
                     {
                         if (add_menu_colors)
                             add_menu_colors=FALSE;
@@ -1696,7 +1699,11 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         fclose(f);
     }
 
+#ifdef QTC_MODIFY_MOZILLA
     if(!contents || add_btn_css || add_menu_colors || add_css)
+#else
+    if(!contents || add_menu_colors)
+#endif
     {
         if(!contents)
         {
@@ -1709,6 +1716,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
 
         if(contents)
         {
+#ifdef QTC_MODIFY_MOZILLA
             if(add_css)
             {
                 char *css_contents=(char *)malloc(new_size);
@@ -1735,6 +1743,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                     contents=css_contents;
                 }
             }
+#endif
             if(add_menu_colors)  /* This can be on last line */
             {
                 int len=strlen(contents);
@@ -1746,7 +1755,11 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         }
     }
 
+#ifdef QTC_MODIFY_MOZILLA
     if(contents && (add_btn_css || remove_btn_css || add_menu_colors || remove_menu_colors))
+#else
+    if(contents && (add_menu_colors || remove_menu_colors))
+#endif
     {
         f=fopen(file, "w");
 
@@ -1785,6 +1798,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                  {
                     char        sub[MAX_CSS_HOME];
                     struct stat statbuf;
+#ifdef QTC_MODIFY_MOZILLA
                     FILE        *userJs=NULL;
                     gboolean    alterUserJs=TRUE;
 
@@ -1817,6 +1831,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                         fputs("\nuser_pref(\"browser.preferences.instantApply\", false);\n", userJs);
                         fclose(userJs);
                     }
+#endif
 
                     /* Now do userChrome.css */
                     sprintf(sub, "%s%s%s/", cssHome, dir_ent->d_name, USER_CHROME_DIR);
@@ -1833,7 +1848,6 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
         }
     }
 }
-#endif
 
 #ifdef QTC_ADD_EVENT_FILTER____DISABLED
 /* ... Taken from Qt engine ... */
@@ -2085,15 +2099,22 @@ static gboolean qtInit()
 #endif
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
-                    int mozVersion=getMozillaVersion(getpid());
-
-#ifdef QTC_MODIFY_MOZILLA
+                    int      mozVersion=getMozillaVersion(getpid());
                     GdkColor *menu_col=SHADE_CUSTOM==opts.shadeMenubars
                                         ? &opts.customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
                     gboolean add_menu_colors=SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
-                                             (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) );
+                                             (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) ),
+                             add_btn_css=
+#ifdef QTC_MODIFY_MOZILLA
+                                              mozVersion<QTC_MAKE_VERSION(3, 0) && !opts.gtkButtonOrder;
+#else
+                                              FALSE;
+#endif
 
+#ifndef QTC_MODIFY_MOZILLA
+                    if(add_menu_colors)
+#endif
                     if(firefox)
                     {
                         processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
@@ -2101,10 +2122,10 @@ static gboolean qtInit()
                             processMozillaApp(FALSE, add_menu_colors, "firefox-3.5", TRUE);
                     }
                     else if(thunderbird)
-                        processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 0) && !opts.gtkButtonOrder, add_menu_colors, "thunderbird", FALSE);
+                        processMozillaApp(add_btn_css, add_menu_colors, "thunderbird", FALSE);
                     else if(mozThunderbird)
-                        processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 0) && !opts.gtkButtonOrder, add_menu_colors, "mozilla-thunderbird", FALSE);
-#endif
+                        processMozillaApp(add_btn_css, add_menu_colors, "mozilla-thunderbird", FALSE);
+
                     qtSettings.app=
 #ifndef QTC_OLD_MOZILLA
                         firefox || NULL!=getenv("QTC_NEW_MOZILLA")
