@@ -57,6 +57,7 @@
 36. Nicer 'Agua' look for MDI/window/dock widget buttons.
 37. Added option to hide MDI/window/dock widget button icons until mouse-over.
 38. Added 'Whats This?' text to most config items.
+39. Correctly theme separators with titles.
 
 0.69.2
 ------

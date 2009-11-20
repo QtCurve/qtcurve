@@ -5112,19 +5112,31 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                                          stripeWidth, r.height()), false,
                                           false, opts.menuStripeAppearance, WIDGET_OTHER);
 
-                    QRect miRect(menuItem->rect.left() + 3 +
-                                    (!reverse && doStripe ? stripeWidth : 0),
-                                    menuItem->rect.center().y(),
-                                    menuItem->rect.width() - (7 + (doStripe ? stripeWidth : 0)),
-                                    1);
-                    drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
+                    if(!menuItem->text.isEmpty())
+                    {
+                        QStyleOption opt;
+                        opt.rect = r.adjusted(2, 2, -3, -2);
+                        opt.state=State_Raised|State_Enabled|State_Horizontal;
+                        drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
+                                       getFill(&opt, itsBackgroundCols), itsBackgroundCols,
+                                       true, WIDGET_NO_ETCH_BTN);
 
-//                     if (!menuItem->text.isEmpty())
-//                     {
-//                         painter->setFont(menuItem->font);
-//                         drawItemText(painter, menuItem->rect.adjusted(5, 0, -5, 0), Qt::AlignLeft | Qt::AlignVCenter,
-//                                      palette, state&State_Enabled, menuItem->text, QPalette::Text);
-//                     }
+                        QFont font(menuItem->font);
+
+                        font.setBold(true);
+                        painter->setFont(font);
+                        drawItemText(painter, r, Qt::AlignHCenter | Qt::AlignVCenter,
+                                     palette, state&State_Enabled, menuItem->text, QPalette::Text);
+                    }
+                    else
+                    {
+                        QRect miRect(menuItem->rect.left() + 3 +
+                                        (!reverse && doStripe ? stripeWidth : 0),
+                                        menuItem->rect.center().y(),
+                                        menuItem->rect.width() - (7 + (doStripe ? stripeWidth : 0)),
+                                        1);
+                        drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
+                    }
 
                     painter->restore();
                     break;
@@ -7967,7 +7979,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
             {
                 int h(newSize.height()-8); // Fix mainly for Qt4.4
 
-                if (QStyleOptionMenuItem::Separator==mi->menuItemType)
+                if (QStyleOptionMenuItem::Separator==mi->menuItemType && mi->text.isEmpty())
                     h = 7;
                 else
                 {
@@ -7978,6 +7990,9 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                     if (h < 18)
                         h = 18;
                     h+=(opts.thinnerMenuItems ? 2 : 4);
+
+                    if(QStyleOptionMenuItem::Separator==mi->menuItemType)
+                        h+=4;
                 }
 
                 newSize.setHeight(h);
