@@ -2322,27 +2322,19 @@ static gboolean qtInit()
 
             if((settings=gtk_settings_get_default()))
             {
-                GtkSettingsValue svalue;
-
                 if(qtSettings.fonts[FONT_GENERAL])
                     g_object_set(settings, "gtk-font-name", qtSettings.fonts[FONT_GENERAL], NULL);
 
-                svalue.origin="KDE-Settings";
-                svalue.value.g_type=G_TYPE_INVALID;
-                g_value_init(&svalue.value, G_TYPE_LONG);
-                g_value_set_long(&svalue.value, qtSettings.toolbarStyle);
-                gtk_settings_set_property_value(settings, "gtk-toolbar-style", &svalue);
+                gtk_settings_set_long_property(settings, "gtk-toolbar-style", qtSettings.toolbarStyle, "KDE-Settings");
 #ifdef QTC_DEBUG
                 printf("gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
 #endif
                 if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
                 {
-                    g_value_set_long(&svalue.value, qtSettings.buttonIcons);
 #ifdef QTC_DEBUG
                     printf("gtk-button-images %d\n", qtSettings.buttonIcons);
 #endif
-                    gtk_settings_set_property_value(settings, "gtk-button-images", &svalue);
-
+                    gtk_settings_set_long_property(settings, "gtk-button-images", qtSettings.buttonIcons, "KDE-Settings");
 #if 0
                     if(opts.drawStatusBarFrames)
                         gtk_rc_parse_string("style \""QTC_RC_SETTING"StBar\""
