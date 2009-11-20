@@ -6582,6 +6582,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
                        widget->parentWidget() && widget->parentWidget()->inherits("KMenu"))
                     {
+                        painter->save();
                         if(opts.menuStripe)
                         {
                             int stripeWidth(qMax(20, constMenuPixmapWidth));
@@ -6601,9 +6602,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
                                        getFill(&opt, itsBackgroundCols), itsBackgroundCols,
                                        true, WIDGET_NO_ETCH_BTN);
-                        int fw = pixelMetric(PM_DefaultFrameWidth, option, widget);
-                        opt.rect.adjust(fw, fw, -fw, -fw);
-                        drawControl(CE_ToolButtonLabel, &opt, painter, widget);
+
+                        QFont font(toolbutton->font);
+
+                        font.setBold(true);
+                        painter->setFont(font);
+                        drawItemText(painter, r, Qt::AlignHCenter | Qt::AlignVCenter,
+                                     palette, state&State_Enabled, toolbutton->text, QPalette::Text);
+                        painter->restore();
                         break;
                     }
                 }
