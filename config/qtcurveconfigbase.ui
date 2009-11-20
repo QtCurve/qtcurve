@@ -104,7 +104,15 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_15">
           <item>
-           <widget class="QComboBox" name="presetsCombo"/>
+           <widget class="QComboBox" name="presetsCombo">
+            <property name="whatsThis">
+             <string>&lt;p&gt;This combo contains th elist of pre-defined settings.
+&lt;ul&gt;
+&lt;li&gt;&lt;i&gt;(Current)&lt;/i&gt; will discard any changes, and revert to the currently saved style.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;(Default)&lt;/i&gt; will discard any changes, and revert to the QtCurve default style.&lt;/li&gt;
+&lt;/ul&gt;</string>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -122,16 +130,32 @@
              </spacer>
             </item>
             <item>
-             <widget class="KPushButton" name="saveButton"/>
+             <widget class="KPushButton" name="saveButton">
+              <property name="whatsThis">
+               <string>Save the current settings to be retrieved later.</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="KPushButton" name="deleteButton"/>
+             <widget class="KPushButton" name="deleteButton">
+              <property name="whatsThis">
+               <string>Delete a previously stored setting.</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="KPushButton" name="importButton"/>
+             <widget class="KPushButton" name="importButton">
+              <property name="whatsThis">
+               <string>&lt;p&gt;Import a QtCurve settings file - such as one downloaded from www.kde-look.org&lt;/p&gt;</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="KPushButton" name="exportButton"/>
+             <widget class="KPushButton" name="exportButton">
+              <property name="whatsThis">
+               <string>Export the currently defined settings to a file, so that these may be shared with others.</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -195,10 +219,18 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="bgndAppearance"/>
+        <widget class="QComboBox" name="bgndAppearance">
+         <property name="whatsThis">
+          <string>&lt;p&gt;Sets a gradient to be used as the background for windows and dialogs.&lt;/p&gt;&lt;p&gt;&lt;b&gt;NOTE&lt;/b&gt; This is an experimental option, and will (probably) have a detrimental effect on performance.&lt;/p&gt;</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="bgndGrad"/>
+        <widget class="QComboBox" name="bgndGrad">
+         <property name="whatsThis">
+          <string>Control the orientation of the background gradient.</string>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_29">
@@ -208,7 +240,11 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="sunkenAppearance"/>
+        <widget class="QComboBox" name="sunkenAppearance">
+         <property name="whatsThis">
+          <string>Define the gradient to be used for sunken widgets - e.g. pressed buttons.</string>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_8">
@@ -218,7 +254,11 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QComboBox" name="round"/>
+        <widget class="QComboBox" name="round">
+         <property name="whatsThis">
+          <string>Set how 'rounded' widget can be. The 'max' round setting only applies to buttons.</string>
+         </property>
+        </widget>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_9">
@@ -228,10 +268,17 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QComboBox" name="buttonEffect"/>
+        <widget class="QComboBox" name="buttonEffect">
+         <property name="whatsThis">
+          <string>Control what effect should be applied to buttons, comboboxes, etc.</string>
+         </property>
+        </widget>
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="thinnerBtns">
+         <property name="whatsThis">
+          <string>Make buttons, and other widgets, slightly thinner.</string>
+         </property>
          <property name="text">
           <string>Thinner buttons</string>
          </property>
@@ -239,6 +286,9 @@
        </item>
        <item row="7" column="1">
         <widget class="QCheckBox" name="etchEntry">
+         <property name="whatsThis">
+          <string>When the 'Button effect' is set to etched or shadowed, then this option controls whether line-edits and scrollviews (such as listviews and treeviews) should have an etched look.</string>
+         </property>
          <property name="text">
           <string>Etch entries and scrollviews </string>
          </property>
@@ -252,7 +302,11 @@
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="QComboBox" name="focus"/>
+        <widget class="QComboBox" name="focus">
+         <property name="whatsThis">
+          <string>Controls how QtCurve indicates that a widget has keyboard focus.</string>
+         </property>
+        </widget>
        </item>
        <item row="9" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_4">
@@ -265,6 +319,9 @@
           </property>
           <item>
            <widget class="QCheckBox" name="drawStatusBarFrames">
+            <property name="whatsThis">
+             <string>Control whether QtCurve should draw frames around items in statusbars.</string>
+            </property>
             <property name="text">
              <string>Draw statusbar frames</string>
             </property>
@@ -272,6 +329,9 @@
           </item>
           <item>
            <widget class="QCheckBox" name="vArrows">
+            <property name="whatsThis">
+             <string>QtCurve supports 2 arrows types; plain (i.e. triangular) and the more modern looking 'V' style arrows.</string>
+            </property>
             <property name="text">
              <string>'V' style arrows</string>
             </property>
@@ -280,10 +340,7 @@
           <item>
            <widget class="QCheckBox" name="stdSidebarButtons">
             <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, drawn as per normal buttons - otherwise they will be drawn in a more flat style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;p&gt;Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, drawn as per normal buttons - otherwise they will be drawn in a more flat style.&lt;/p&gt;</string>
             </property>
             <property name="text">
              <string>Standard buttons for sidebars</string>
@@ -292,6 +349,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QCheckBox" name="darkerBorders">
+            <property name="whatsThis">
+             <string>Darkens the borders of frames, buttons, etc.</string>
+            </property>
             <property name="text">
              <string>Darker borders</string>
             </property>
@@ -299,6 +359,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QCheckBox" name="fadeLines">
+            <property name="whatsThis">
+             <string>Controls whether horizontal and vertical lines should be drawn with fading ends.</string>
+            </property>
             <property name="text">
              <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
             </property>
@@ -313,6 +376,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QCheckBox" name="framelessGroupBoxes">
+         <property name="whatsThis">
+          <string>Controls whether group-boxes should have an outer frame, or jsut an emboldened title.</string>
+         </property>
          <property name="text">
           <string>Frameless</string>
          </property>
@@ -325,6 +391,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>With frame-less group boxes, this controls whether these should have a dividing line drawn after the title.</string>
          </property>
          <property name="text">
           <string>Draw line after title</string>
@@ -356,7 +425,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="comboBtn"/>
+        <widget class="QComboBox" name="comboBtn">
+         <property name="whatsThis">
+          <string>Controls the coloration of the button (i.e. the part with the arrow) part of comboboxes.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="KColorButton" name="customComboBtnColor">
@@ -366,15 +439,15 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
+         </property>
         </widget>
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="comboSplitter">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This option controls whether a line is drawn near non-editable combo box arrows.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>This option controls whether a line is drawn near non-editable combobox arrow buttons.</string>
          </property>
          <property name="text">
           <string>Draw splitter</string>
@@ -390,6 +463,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="unifyCombo">
+         <property name="whatsThis">
+          <string>Controls whether the combobox button, of editable combos, should appear as a button or an arrow within the edit field.</string>
+         </property>
          <property name="text">
           <string>Draw arrow within edit field</string>
          </property>
@@ -405,10 +481,7 @@ p, li { white-space: pre-wrap; }
        <item row="4" column="1">
         <widget class="QCheckBox" name="gtkComboMenus">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.</string>
          </property>
          <property name="text">
           <string>Gtk-style (KDE4)</string>
@@ -417,6 +490,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="1">
         <widget class="QCheckBox" name="doubleGtkComboArrow">
+         <property name="whatsThis">
+          <string>Controls whether a single down arrow, or a up and down arrow, should be drawn on non-editable comboboxes.</string>
+         </property>
          <property name="text">
           <string>Draw double-arrow for Gtk style</string>
          </property>
@@ -441,6 +517,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QCheckBox" name="unifySpinBtns">
+         <property name="whatsThis">
+          <string>Controls whether the up and down buttons should appear as individual buttons, or be combined.</string>
+         </property>
          <property name="text">
           <string>Combine both buttons</string>
          </property>
@@ -448,6 +527,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QCheckBox" name="unifySpin">
+         <property name="whatsThis">
+          <string>Controls whether the up and down buttons should appear as buttons or arrows within the edit field.</string>
+         </property>
          <property name="text">
           <string>Draw arrows within edit field</string>
          </property>
@@ -481,7 +563,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="splitters"/>
+        <widget class="QComboBox" name="splitters">
+         <property name="whatsThis">
+          <string>Sets the visual indicator.</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_69">
@@ -492,6 +578,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="splitterHighlight">
+         <property name="whatsThis">
+          <string>Controls whether the background of the splitter should light-up when the mouse is passed over.</string>
+         </property>
          <property name="text">
           <string>Highlight on mouse-over</string>
          </property>
@@ -511,10 +600,7 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="1">
         <widget class="QComboBox" name="sliderAppearance">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This appearance setting affects both scrollbar sliders, and other sliders.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Controls the appearance of both scrollbar sliders and other sliders.</string>
          </property>
         </widget>
        </item>
@@ -528,10 +614,7 @@ p, li { white-space: pre-wrap; }
        <item row="1" column="1">
         <widget class="QComboBox" name="shadeSliders">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This color setting affects both scrollbar sliders, and other sliders.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Controls the  color setting of both scrollbar sliders and other sliders.</string>
          </property>
         </widget>
        </item>
@@ -543,6 +626,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -550,6 +636,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="colorSliderMouseOver">
+         <property name="whatsThis">
+          <string>Controls whether the coloration happens all the time, or only when the mouse passes over the slider.</string>
+         </property>
          <property name="text">
           <string>Mouse-over only</string>
          </property>
@@ -565,10 +654,7 @@ p, li { white-space: pre-wrap; }
        <item row="4" column="1">
         <widget class="QComboBox" name="sliderStyle">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This setting only affects standard sliders - i.e. not scrollbar sliders. 'Triangular' is a very similar style to plastik's sliders. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Controsl the appearance of standard sliders - i.e. not scrollbar sliders. 'Triangular' is a very similar style to plastik's sliders.</string>
          </property>
         </widget>
        </item>
@@ -581,6 +667,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="1">
         <widget class="QCheckBox" name="fillSlider">
+         <property name="whatsThis">
+          <string>Indicates whether the used part of a slider's groove should be filled or not. (Only affects sliders, not scrollbar sliders).</string>
+         </property>
          <property name="text">
           <string>Fill</string>
          </property>
@@ -589,10 +678,7 @@ p, li { white-space: pre-wrap; }
        <item row="6" column="1">
         <widget class="QComboBox" name="sliderFill">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This appearance setting affects both scrollbar sliders, and other sliders.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Controls the gradient setting used for the used part of a standard sliders' groove.</string>
          </property>
         </widget>
        </item>
@@ -604,10 +690,17 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QComboBox" name="grooveAppearance"/>
+        <widget class="QComboBox" name="grooveAppearance">
+         <property name="whatsThis">
+          <string>Controls the gradient setting used for both scrollbar sliders, and other sliders.</string>
+         </property>
+        </widget>
        </item>
        <item row="8" column="1">
         <widget class="QCheckBox" name="thinSbarGroove">
+         <property name="whatsThis">
+          <string>Controls whether scrollbar slider grooves should be the same thickness as the slider, or be thinner (and more like the groove of a standard slider).</string>
+         </property>
          <property name="text">
           <string>Thin</string>
          </property>
@@ -623,17 +716,8 @@ p, li { white-space: pre-wrap; }
        <item row="9" column="1">
         <widget class="QComboBox" name="scrollbarType">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This controls the position, and number, of buttons on a scrollbar.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;KDE - 1 button at the top/left, and two at the bottom/right&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Windows - 1 botton at each end&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Platinum -  no buttons at the top/left, two at bottom/right&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Next - two buttons at the top/left, none at bottom/right&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;None - no buttons, only the slider&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;p&gt;This controls the position, and number, of buttons on a scrollbar.
+            &lt;ul&gt;&lt;li&gt;KDE - 1 button at the top/left, and two at the bottom/right&lt;/li&gt;&lt;li&gt;Windows - 1 botton at each end&lt;/li&gt;&lt;li&gt;Platinum -  no buttons at the top/left, two at bottom/right&lt;/li&gt;&lt;li&gt;Next - two buttons at the top/left, none at bottom/right&lt;/li&gt;&lt;li&gt;None - no buttons, only the slider&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -654,17 +738,7 @@ p, li { white-space: pre-wrap; }
        <item row="11" column="1">
         <widget class="QComboBox" name="sbarBgndAppearance">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This controls the position, and number, of buttons on a scrollbar.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;KDE - 1 button at the top/left, and two at the bottom/right&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Windows - 1 botton at each end&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Platinum -  no buttons at the top/left, two at bottom/right&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Next - two buttons at the top/left, none at bottom/right&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;None - no buttons, only the slider&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>Configures the background gradient to be used with 'Flat' scrollbar buttons.</string>
          </property>
         </widget>
        </item>
@@ -676,7 +750,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="12" column="1">
-        <widget class="QComboBox" name="sliderThumbs"/>
+        <widget class="QComboBox" name="sliderThumbs">
+         <property name="whatsThis">
+          <string>Defines what markings should be placed in the center of scrollbar sliders (and plain style sliders).</string>
+         </property>
+        </widget>
        </item>
        <item row="13" column="0">
         <widget class="QLabel" name="label_15a">
@@ -687,6 +765,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="13" column="1">
         <widget class="KIntNumInput" name="sliderWidth">
+         <property name="whatsThis">
+          <string>Controls the width of scrollbar sliders, and plain style sliders.</string>
+         </property>
          <property name="suffix">
           <string> pixels</string>
          </property>
@@ -707,13 +788,24 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="progressAppearance"/>
+        <widget class="QComboBox" name="progressAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to be used for the progress part of a progressbar.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="stripedProgress"/>
+        <widget class="QComboBox" name="stripedProgress">
+         <property name="whatsThis">
+          <string>Defines the stripe type to be used for the progress part of a progressbar.</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="animatedProgress">
+         <property name="whatsThis">
+          <string>Determines if the sripes on progressbars should be aninmated, or not.</string>
+         </property>
          <property name="text">
           <string>Animated</string>
          </property>
@@ -743,10 +835,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QComboBox" name="progressGrooveAppearance"/>
+        <widget class="QComboBox" name="progressGrooveAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to be used for the groove part of a progressbar.</string>
+         </property>
+        </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QComboBox" name="progressGrooveColor"/>
+        <widget class="QComboBox" name="progressGrooveColor">
+         <property name="whatsThis">
+          <string>Defines the color to be used for the groove part of a progressbar.</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -760,10 +860,17 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="defBtnIndicator"/>
+        <widget class="QComboBox" name="defBtnIndicator">
+         <property name="whatsThis">
+          <string>Defines the way in which the theme indicates which button is the 'default' button.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="embolden">
+         <property name="whatsThis">
+          <string>If enabled, the text of the 'default' button will be drawn twice - the second time will be 1 pixel to the left. This gives it a more 'bold' look.</string>
+         </property>
          <property name="text">
           <string>Embolden text</string>
          </property>
@@ -781,7 +888,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="coloredMouseOver"/>
+        <widget class="QComboBox" name="coloredMouseOver">
+         <property name="whatsThis">
+          <string>Defines how the theme can use color to indicate which active widget is under the mouse.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="textLabel1_8">
@@ -798,6 +909,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="1" column="1">
         <widget class="QSpinBox" name="highlightFactor">
+         <property name="whatsThis">
+          <string>Defines by how much the theme should brighen (or darken) the color of the active widget under the mouse.</string>
+         </property>
          <property name="suffix">
           <string>%</string>
          </property>
@@ -815,7 +929,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="lvAppearance"/>
+        <widget class="QComboBox" name="lvAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to ge used in the header of listviews and treeviews.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="lvButton">
@@ -824,6 +942,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>If enabled, headers will be drawn using the button color, otherwise the standard window background color will be used.</string>
          </property>
          <property name="text">
           <string>Button color</string>
@@ -838,7 +959,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="sortedLv"/>
+        <widget class="QComboBox" name="sortedLv">
+         <property name="whatsThis">
+          <string>Controls the coloration to be applied to the header of the currently sorted column.</string>
+         </property>
+        </widget>
        </item>
        <item row="3" column="1">
         <widget class="KColorButton" name="customSortedLvColor">
@@ -851,17 +976,23 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
+         </property>
         </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_66">
          <property name="text">
-          <string>Columns:</string>
+          <string>Rows:</string>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
         <widget class="QCheckBox" name="forceAlternateLvCols">
+         <property name="whatsThis">
+          <string>If this is enabled, QtCurve will attempt to make all listviews and treeviews halver alternating row colors - regardless of whether the application author has enabled this or not.</string>
+         </property>
          <property name="text">
           <string>Force alternate colors</string>
          </property>
@@ -881,10 +1012,17 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QComboBox" name="selectionAppearance"/>
+        <widget class="QComboBox" name="selectionAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to be used when selecting items.</string>
+         </property>
+        </widget>
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="squareLvSelection">
+         <property name="whatsThis">
+          <string>If enabled, then selected items in listviews and treeviews will be drawn with square edges, regardless of the general round setting.</string>
+         </property>
          <property name="text">
           <string>Square</string>
          </property>
@@ -898,7 +1036,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QComboBox" name="lvLines"/>
+        <widget class="QComboBox" name="lvLines">
+         <property name="whatsThis">
+          <string>Controls the style of lines drawn between items in a treeview.</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -906,6 +1048,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QVBoxLayout">
        <item>
         <widget class="QCheckBox" name="gtkScrollViews">
+         <property name="whatsThis">
+          <string>Controls whether the scrollbars should be detaqched from the scrollview (i.e. on the outside), or embedded within the scrollview.</string>
+         </property>
          <property name="text">
           <string>Scrollbars on the outside</string>
          </property>
@@ -913,6 +1058,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QCheckBox" name="highlightScrollViews">
+         <property name="whatsThis">
+          <string>Controls whether the active scrollview should be highlighted as per line-edits.</string>
+         </property>
          <property name="text">
           <string>Highlight on focus (KDE)</string>
          </property>
@@ -920,6 +1068,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QCheckBox" name="squareScrollViews">
+         <property name="whatsThis">
+          <string>Controls whether the frame of a scrollview should respect the general round setting, or always be square.</string>
+         </property>
          <property name="text">
           <string>Always draw with a square frame - regardless of the general round setting.</string>
          </property>
@@ -950,12 +1101,16 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="activeTabAppearance"/>
+        <widget class="QComboBox" name="activeTabAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to be used for the currently active tab.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="highlightTab">
          <property name="whatsThis">
-          <string>This will cause a coloured stripe to be drawn over the current tab.</string>
+          <string>This will cause a colored stripe to be drawn over the current tab.</string>
          </property>
          <property name="text">
           <string>Highlight</string>
@@ -964,6 +1119,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="2" column="1">
         <widget class="KIntNumInput" name="colorSelTab">
+         <property name="whatsThis">
+          <string>Controls the amount of tinting applied to the active tab. The active tab is tinted by blending the 'highlight' color with the background color.</string>
+         </property>
          <property name="suffix">
           <string>%</string>
          </property>
@@ -980,7 +1138,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="tabAppearance"/>
+        <widget class="QComboBox" name="tabAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to be used for the inactive tabs.</string>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_33">
@@ -990,7 +1152,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QComboBox" name="tabMouseOver"/>
+        <widget class="QComboBox" name="tabMouseOver">
+         <property name="whatsThis">
+          <string>Controls the mouse-over effect applied to the tab currently under the mouse. Note, if 'glow' is selected, then 'Round tabs' will be set to all - and this creates a 2 pixel gap between tabs.</string>
+         </property>
+        </widget>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_49">
@@ -1001,6 +1167,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="1">
         <widget class="KIntSpinBox" name="tabBgnd">
+         <property name="whatsThis">
+          <string>Lightens, or darkens, the background of the whole tab widget.</string>
+         </property>
          <property name="suffix">
           <string>%</string>
          </property>
@@ -1036,6 +1205,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="roundAllTabs_false">
+            <property name="whatsThis">
+             <string>If enabled, only the active tab is rounded - and all the inactive tabs appear closer together.</string>
+            </property>
             <property name="text">
              <string>Selected only</string>
             </property>
@@ -1046,6 +1218,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="roundAllTabs">
+            <property name="whatsThis">
+             <string>If enabled, all tabs are rounded - and there will be a 2 pixel gap between each tab.</string>
+            </property>
             <property name="text">
              <string>All</string>
             </property>
@@ -1084,6 +1259,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="borderTab_false">
+            <property name="whatsThis">
+             <string>If enabled, the tabs and the tab widget will have a 3D style border - with a light shade on the top and left, and a dark shade on the bottom and right.</string>
+            </property>
             <property name="text">
              <string>Standard</string>
             </property>
@@ -1091,6 +1269,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="borderTab">
+            <property name="whatsThis">
+             <string>If enabled, the tabs and tab widget will have an outer dak border, and a light inner border.</string>
+            </property>
             <property name="text">
              <string>Light</string>
             </property>
@@ -1129,6 +1310,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="borderInactiveTab">
+            <property name="whatsThis">
+             <string>If enabled, inactive tabs will have a border as per the 'Border' setting.</string>
+            </property>
             <property name="text">
              <string>Same as active tab</string>
             </property>
@@ -1139,6 +1323,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="borderInactiveTab_false">
+            <property name="whatsThis">
+             <string>If enabled, inactive tabs will have no inner border.</string>
+            </property>
             <property name="text">
              <string>No inner border</string>
             </property>
@@ -1171,6 +1358,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="invertBotTab_false">
+            <property name="whatsThis">
+             <string>If enabled, tabs on the bottom will use the same gradient as tabs on the top. i.e. if the top tabs shades from light to the background color, then the bottom tabs will go from the background color to light - this can sometimes give the appearance that the bottom tabs are sticking out.</string>
+            </property>
             <property name="text">
              <string>Same as top tabs</string>
             </property>
@@ -1178,6 +1368,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="invertBotTab">
+            <property name="whatsThis">
+             <string>If enabled, tabs on the bottom will use the an inverted gradient to tabs on the top. i.e. if the top tabs shades from light to the background color, then  bottom tabs will go from the background color to dark.</string>
+            </property>
             <property name="text">
              <string>Invert</string>
             </property>
@@ -1198,7 +1391,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="shadeCheckRadio"/>
+        <widget class="QComboBox" name="shadeCheckRadio">
+         <property name="whatsThis">
+          <string>Controls the color of the indicator part of a check or radio - ie. the 'dot' or 'check' mark.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="KColorButton" name="customCheckRadioColor">
@@ -1207,6 +1404,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
          </property>
          <property name="text">
           <string/>
@@ -1240,6 +1440,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="xCheck_false">
+            <property name="whatsThis">
+             <string>If enabled, checkboxes with have a 'tick' to indicate that they are selected.</string>
+            </property>
             <property name="text">
              <string>Tick</string>
             </property>
@@ -1250,6 +1453,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="xCheck">
+            <property name="whatsThis">
+             <string>If enabled, checkboxes with have a 'cross' (or 'X') to indicate that they are selected.</string>
+            </property>
             <property name="text">
              <string>Cross</string>
             </property>
@@ -1285,6 +1491,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="smallRadio_false">
+            <property name="whatsThis">
+             <string>If enabled, radio buttons with have a large 'dot' to indicate that they are selected.</string>
+            </property>
             <property name="text">
              <string>Large</string>
             </property>
@@ -1292,6 +1501,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="smallRadio">
+            <property name="whatsThis">
+             <string>If enabled, radio buttons with have a large 'dot' to indicate that they are selected.</string>
+            </property>
             <property name="text">
              <string>Small</string>
             </property>
@@ -1309,6 +1521,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="4" column="1">
         <widget class="QCheckBox" name="crHighlight">
+         <property name="whatsThis">
+          <string>Controls wether the background of the text associated with a cehckbox, or radio button, should highlight when the mouse pases over it.</string>
+         </property>
          <property name="text">
           <string>Highlight on mouse-over.</string>
          </property>
@@ -1323,6 +1538,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="1">
         <widget class="QCheckBox" name="crButton">
+         <property name="whatsThis">
+          <string>Controls whether the background of the checkbox, or radio button, should appear sunken like or button like.</string>
+         </property>
          <property name="text">
           <string>Button like</string>
          </property>
@@ -1330,6 +1548,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="crColor">
+         <property name="whatsThis">
+          <string>Controls whether the background of a selected checkbox, or radio button, should be tinted with the 'highlight' color.</string>
+         </property>
          <property name="text">
           <string>Color when selected</string>
          </property>
@@ -1347,7 +1568,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="titlebarAppearance"/>
+        <widget class="QComboBox" name="titlebarAppearance">
+         <property name="whatsThis">
+          <string>Controls the gradient applied to the titlebar of active windows.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_28">
@@ -1357,7 +1582,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="inactiveTitlebarAppearance"/>
+        <widget class="QComboBox" name="inactiveTitlebarAppearance">
+         <property name="whatsThis">
+          <string>Controls the gradient applied to the titlebar of inactive windows.</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_31">
@@ -1367,7 +1596,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="titlebarAlignment"/>
+        <widget class="QComboBox" name="titlebarAlignment">
+         <property name="whatsThis">
+          <string>Controls the alignment of the titlebar text. 'Center (full width)' means that the text is centered in the middle of the complete titlebar, whereas with 'Center (between controls)' the text is centered in the between the window controls to the left and right.</string>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_43">
@@ -1377,7 +1610,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QComboBox" name="titlebarIcon"/>
+        <widget class="QComboBox" name="titlebarIcon">
+         <property name="whatsThis">
+          <string>Controls where the applicaitons icons should be drawn on the titlebar. If 'Place on menu button' is selected, then the icon takes place of the menu button.</string>
+         </property>
+        </widget>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_27">
@@ -1406,6 +1643,9 @@ p, li { white-space: pre-wrap; }
           </property>
           <item>
            <widget class="QRadioButton" name="colorTitlebarOnly_false">
+            <property name="whatsThis">
+             <string>If enabled, both the top titlebar and the frame surrounding the window will be colored.</string>
+            </property>
             <property name="text">
              <string>Titlebar and frame</string>
             </property>
@@ -1416,6 +1656,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QRadioButton" name="colorTitlebarOnly">
+            <property name="whatsThis">
+             <string>If enabled, only the top titlebar and not the frame surrounding the window will be colored.</string>
+            </property>
             <property name="text">
              <string>Titlebar only</string>
             </property>
@@ -1433,6 +1676,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="titlebarBorder">
+         <property name="whatsThis">
+          <string>If enabled, a 1 pixel light border is added to the top and left of the window.</string>
+         </property>
          <property name="text">
           <string>Enabled</string>
          </property>
@@ -1446,7 +1692,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="titlebarEffect"/>
+        <widget class="QComboBox" name="titlebarEffect">
+         <property name="whatsThis">
+          <string>Controls the 'effect' applied to the text and icons - shadow, etching, or none.</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -1460,10 +1710,17 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="titlebarButtonAppearance"/>
+        <widget class="QComboBox" name="titlebarButtonAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient used to fill the titlebar buttons.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="titlebarButtons_noFrame">
+         <property name="whatsThis">
+          <string>If enabled, only the symbol is drawn - and not the button background.</string>
+         </property>
          <property name="text">
           <string>Only show symbols</string>
          </property>
@@ -1471,6 +1728,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="titlebarButtons_round">
+         <property name="whatsThis">
+          <string>If enabled, the buttons will have a circular background - regardless of the general round setting.</string>
+         </property>
          <property name="text">
           <string>Circular</string>
          </property>
@@ -1478,6 +1738,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="titlebarButtons_hoverFrame">
+         <property name="whatsThis">
+          <string>If enabled, the button background (or frame) will only be shown when under the mouse.</string>
+         </property>
          <property name="text">
           <string>Show frame on mouse-over</string>
          </property>
@@ -1485,6 +1748,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="4" column="1">
         <widget class="QCheckBox" name="titlebarButtons_hoverSymbol">
+         <property name="whatsThis">
+          <string>If enabled, the icon will only be shown at full strength when under the mouse - otherwise it will be blended with the background.</string>
+         </property>
          <property name="text">
           <string>Highlight symbol on mouse-over</string>
          </property>
@@ -1492,6 +1758,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="titlebarButtons_button">
+         <property name="whatsThis">
+          <string>If enabled, the titlebar buttons will be drawn using the standard button color - otherwise the titlebar color will be used.</string>
+         </property>
          <property name="text">
           <string>Standard button color</string>
          </property>
@@ -1499,6 +1768,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="7" column="1">
         <widget class="QCheckBox" name="titlebarButtons_custom">
+         <property name="whatsThis">
+          <string>If enabled, the titlebar buttons will be drawn using the cusom colors defined in the next page.</string>
+         </property>
          <property name="text">
           <string>Use custom colors</string>
          </property>
@@ -1506,6 +1778,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="8" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorOnMouseOver">
+         <property name="whatsThis">
+          <string>If enabled, the colors will only be used when the button is under the mouse.</string>
+         </property>
          <property name="text">
           <string>Use color only for mouse-over</string>
          </property>
@@ -1520,6 +1795,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="9" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorSymbolsOnly">
+         <property name="whatsThis">
+          <string>If enabled, custom colors will be applied to the symbols, otherwise they will be applied to the button background.</string>
+         </property>
          <property name="text">
           <string>Use only for symbols</string>
          </property>
@@ -1527,6 +1805,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="10" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorInactive">
+         <property name="whatsThis">
+          <string>If enabled, custom colors will be applied to active and inactive windows, otherwise they will be applied only to active windows.</string>
+         </property>
          <property name="text">
           <string>Also apply to inactive windows</string>
          </property>
@@ -1534,6 +1815,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="1">
         <widget class="QCheckBox" name="titlebarButtons_hoverSymbolFull">
+         <property name="whatsThis">
+          <string>If enabled, the symbol will not be drawn unless under the mouse.</string>
+         </property>
          <property name="text">
           <string>Hide symbol until mouse-over</string>
          </property>
@@ -1558,6 +1842,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Close' buttons.</string>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
@@ -1574,6 +1861,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Minimise' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1592,6 +1882,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Maximise', and 'Restore, buttons.</string>
+         </property>
         </widget>
        </item>
        <item row="3" column="0">
@@ -1608,6 +1901,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Help' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1626,6 +1922,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Menu' buttons.</string>
+         </property>
         </widget>
        </item>
        <item row="5" column="0">
@@ -1642,6 +1941,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Shade', and 'Un-Shade', buttons.</string>
          </property>
         </widget>
        </item>
@@ -1660,6 +1962,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'On All Desktop' buttons.</string>
+         </property>
         </widget>
        </item>
        <item row="7" column="0">
@@ -1676,6 +1981,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Keep Above' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1694,6 +2002,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the cusotm color for 'Keep Below' buttons.</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -1711,7 +2022,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="menubarAppearance"/>
+        <widget class="QComboBox" name="menubarAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient used for the background of menubars.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="textLabel1_4_2_5">
@@ -1724,7 +2039,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="shadeMenubars"/>
+        <widget class="QComboBox" name="shadeMenubars">
+         <property name="whatsThis">
+          <string>Defines the color applied to the background of menubars.</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="1">
         <widget class="KColorButton" name="customMenubarsColor">
@@ -1734,6 +2053,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -1741,6 +2063,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="shadeMenubarOnlyWhenActive">
+         <property name="whatsThis">
+          <string>Drfines wether the background coloration should be applied to all menubars, or just those in active windows.</string>
+         </property>
          <property name="text">
           <string>Active window only</string>
          </property>
@@ -1761,6 +2086,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>If enabled, then the following to color boxes are used to set the text color to be used for normal and selected menubar items.</string>
+         </property>
          <property name="text">
           <string>Custom colors (normal/selected)</string>
          </property>
@@ -1773,6 +2101,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the text color of normal menubar items.</string>
          </property>
          <property name="text">
           <string/>
@@ -1787,6 +2118,9 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the text color of selected menubar items.</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -1800,10 +2134,17 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QComboBox" name="menuitemAppearance"/>
+        <widget class="QComboBox" name="menuitemAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient to be applied to selected menubar items.</string>
+         </property>
+        </widget>
        </item>
        <item row="8" column="1">
         <widget class="QCheckBox" name="menubarMouseOver">
+         <property name="whatsThis">
+          <string>If enabled, menubar items will have their background gradient applied when the mouse passes over them.</string>
+         </property>
          <property name="text">
           <string>Enable mouse-over</string>
          </property>
@@ -1811,6 +2152,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="9" column="1">
         <widget class="QCheckBox" name="colorMenubarMouseOver">
+         <property name="whatsThis">
+          <string>If enabled, when the mouse passes over a menubar item (and 'Enable mouse-over' is enabled) then it will also be colored, otherwise it wll use a shade of the background color.</string>
+         </property>
          <property name="text">
           <string>Color on mouse-over</string>
          </property>
@@ -1818,6 +2162,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="10" column="1">
         <widget class="QCheckBox" name="roundMbTopOnly">
+         <property name="whatsThis">
+          <string>If enabled, only the top (and not bottom) of selected menubar items will be rounded.</string>
+         </property>
          <property name="text">
           <string>Round selected items on top only</string>
          </property>
@@ -1832,6 +2179,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="12" column="1">
         <widget class="QCheckBox" name="menubarHiding">
+         <property name="whatsThis">
+          <string>If enabled, menubars may be hidden (and re-shown), by using the 'Ctrl-Alt-M' key combination.</string>
+         </property>
          <property name="text">
           <string>Use Ctrl-Alt-M (experimental)</string>
          </property>
@@ -1839,6 +2189,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="13" column="1">
         <widget class="QCheckBox" name="xbar">
+         <property name="whatsThis">
+          <string>If enabled, the theme will support embedding the menubar of KDE4 applications in Bespin's XBar.</string>
+         </property>
          <property name="text">
           <string>Enabled</string>
          </property>
@@ -1864,6 +2217,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="0" column="1">
         <widget class="QCheckBox" name="borderMenuitems">
+         <property name="whatsThis">
+          <string>If enabled, selcted menuitems will be drawn with a border around the gradient. This will cause the to have a rounded look if the general round setting is not set to none.</string>
+         </property>
          <property name="text">
           <string>Border</string>
          </property>
@@ -1871,6 +2227,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="useHighlightForMenu">
+         <property name="whatsThis">
+          <string>If enabled, selected menuitems will be drawn using the 'highlight' color, otherwise a darkened shade of the background color will be used instead.</string>
+         </property>
          <property name="text">
           <string>Use 'highlight' color for active items</string>
          </property>
@@ -1878,6 +2237,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="thinnerMenuItems">
+         <property name="whatsThis">
+          <string>Enable to reduce the height of menuitems.</string>
+         </property>
          <property name="text">
           <string>Thinner</string>
          </property>
@@ -1885,6 +2247,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="menuIcons">
+         <property name="whatsThis">
+          <string>If enabled, then icons associated with menuitems will be drawn, otherwise they will be hidden (but the space they would have occupied will still be there).</string>
+         </property>
          <property name="text">
           <string>Show icons</string>
          </property>
@@ -1899,16 +2264,27 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="4" column="1">
         <widget class="KIntNumInput" name="lighterPopupMenuBgnd">
+         <property name="whatsThis">
+          <string>Defines the amount by which the popup menubackground will be lightened (or darkened).</string>
+         </property>
          <property name="suffix">
           <string>%</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QComboBox" name="menuBgndAppearance"/>
+        <widget class="QComboBox" name="menuBgndAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient applied to the background of the popup menus.</string>
+         </property>
+        </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QComboBox" name="menuBgndGrad"/>
+        <widget class="QComboBox" name="menuBgndGrad">
+         <property name="whatsThis">
+          <string>Defines background gradient orientation.</string>
+         </property>
+        </widget>
        </item>
        <item row="7" column="0">
         <widget class="QLabel" name="label_45">
@@ -1919,6 +2295,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="7" column="1">
         <widget class="KIntNumInput" name="menuDelay">
+         <property name="whatsThis">
+          <string>Defines the delay before a sub-menu appears.</string>
+         </property>
          <property name="suffix">
           <string>ms</string>
          </property>
@@ -1935,7 +2314,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="QComboBox" name="menuStripe"/>
+        <widget class="QComboBox" name="menuStripe">
+         <property name="whatsThis">
+          <string>Defines the coloration of the menu-stripe that will be drawn on the left of poup menus - but only if this option is not set to 'none'.</string>
+         </property>
+        </widget>
        </item>
        <item row="9" column="1">
         <widget class="KColorButton" name="customMenuStripeColor">
@@ -1948,12 +2331,18 @@ p, li { white-space: pre-wrap; }
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
+         </property>
         </widget>
        </item>
        <item row="10" column="1">
         <widget class="QComboBox" name="menuStripeAppearance">
          <property name="enabled">
           <bool>false</bool>
+         </property>
+         <property name="whatsThis">
+          <string>Defines the gradient to be used for the menu stripe.</string>
          </property>
         </widget>
        </item>
@@ -1964,6 +2353,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>If enabled, Gtk2 applications will also have a menu stripe. Note - due to the way Gtk2 works, this may not always look correct.</string>
          </property>
          <property name="text">
           <string>Apply to Gtk2 applications (Experimental)</string>
@@ -1979,8 +2371,18 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="12" column="1">
         <widget class="QCheckBox" name="popupBorder">
+         <property name="whatsThis">
+          <string>If enabled, the whole popup menu will have a border, otherwise no border will be drawn. This option should be enabled unless you have shadows enabled in your window manager.</string>
+         </property>
          <property name="text">
           <string>Enabled</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_75">
+         <property name="text">
+          <string>Background appearance:</string>
          </property>
         </widget>
        </item>
@@ -1999,7 +2401,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="toolbarAppearance"/>
+        <widget class="QComboBox" name="toolbarAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient used to draw the background of toolbars.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="textLabel2">
@@ -2012,7 +2418,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="handles"/>
+        <widget class="QComboBox" name="handles">
+         <property name="whatsThis">
+          <string>Defines the look of the toolbar handles.</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="textLabel2_3">
@@ -2025,7 +2435,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="toolbarSeparators"/>
+        <widget class="QComboBox" name="toolbarSeparators">
+         <property name="whatsThis">
+          <string>Defines the style used to draw toolbar separators.</string>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="textLabel1_4">
@@ -2038,7 +2452,11 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="toolbarBorders"/>
+        <widget class="QComboBox" name="toolbarBorders">
+         <property name="whatsThis">
+          <string>Defines the border type drawn around the toolbar. (This setting also affects menubars).</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -2052,10 +2470,17 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="dwtAppearance"/>
+        <widget class="QComboBox" name="dwtAppearance">
+         <property name="whatsThis">
+          <string>Defines the gradient used to draw the background of the 'title' part of a dock windows.</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="dwtRoundTopOnly">
+         <property name="whatsThis">
+          <string>If enabled, only the top (for horizontal dock windows), or left (for vertial dock windows) will be rounded.</string>
+         </property>
          <property name="text">
           <string>Round top/left only</string>
          </property>
@@ -2064,12 +2489,15 @@ p, li { white-space: pre-wrap; }
        <item row="2" column="0">
         <widget class="QLabel" name="label_76">
          <property name="text">
-          <string>Use titlebar settings for:</string>
+          <string>Use window settings for:</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="dwtBtnAsPerTitleBar">
+         <property name="whatsThis">
+          <string>If enabled, the buttons on dock windows will have a similar appearance (and behaviour) to the buttons on standard windows, otherwise they will only have their symbols drawn until the mouse passes over (when the button background will be drawn).</string>
+         </property>
          <property name="text">
           <string>Button appearance</string>
          </property>
@@ -2077,6 +2505,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="dwtColAsPerTitleBar">
+         <property name="whatsThis">
+          <string>If enabled, the background of dock window titlebars will have use the color settings of standard windows, otherwise they will use the standard background color.</string>
+         </property>
          <property name="text">
           <string>Colors</string>
          </property>
@@ -2084,6 +2515,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="4" column="1">
         <widget class="QCheckBox" name="dwtFontAsPerTitleBar">
+         <property name="whatsThis">
+          <string>If enabled, the font of dock window titlebars will have use the font settings of standard windows, otherwise they will use the standard font.</string>
+         </property>
          <property name="text">
           <string>Font</string>
          </property>
@@ -2091,6 +2525,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="1">
         <widget class="QCheckBox" name="dwtTextAsPerTitleBar">
+         <property name="whatsThis">
+          <string>If enabled, the text of dock window titlebars will have use the text alignment settings of standard windows, otherwise they will be left aligned.</string>
+         </property>
          <property name="text">
           <string>Text alignment</string>
          </property>
@@ -2098,6 +2535,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="dwtEffectAsPerTitleBar">
+         <property name="whatsThis">
+          <string>If enabled, the text of dock window titlebars will have use the text effect settings of standard windows, otherwise they will be drawn with no effect.</string>
+         </property>
          <property name="text">
           <string>Text effect</string>
          </property>
@@ -2109,6 +2549,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QCheckBox" name="gtkButtonOrder">
+         <property name="whatsThis">
+          <string>If enabled, dialogs will use the 'Cancel / OK' button order as used in the GNOME ond OSX desktops, otherwise the 'OK / Cancel' order will be used.</string>
+         </property>
          <property name="text">
           <string>Gtk button order</string>
          </property>
@@ -2116,6 +2559,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="1" column="0">
         <widget class="QCheckBox" name="mapKdeIcons">
+         <property name="whatsThis">
+          <string>Eanble this option so that QtCurve can attempt to map from the KDE icon names to their Gtk equivalant for Gtk applications.</string>
+         </property>
          <property name="text">
           <string>Map KDE icons (Gtk2)</string>
          </property>
@@ -2124,15 +2570,12 @@ p, li { white-space: pre-wrap; }
        <item row="2" column="0">
         <widget class="QCheckBox" name="fixParentlessDialogs">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;Warning: Experimental!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;p&gt;&lt;b&gt;Warning: Experimental!&lt;/b&gt;&lt;/p&gt;
+&lt;p&gt;Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p&gt;
+
+&lt;p&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;&lt;b&gt;Note:&lt;/b&gt; This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/i&gt;&lt;/p&gt;</string>
          </property>
          <property name="text">
           <string>'Fix' parentless dialogs</string>
@@ -2141,6 +2584,10 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="0">
         <widget class="QCheckBox" name="stdBtnSizes">
+         <property name="whatsThis">
+          <string>&lt;p&gt;Auto-default buttons are buttons that can become 'default' buttons - i.e. will react the the user pressing 'return'.&lt;/p&gt;
+&lt;p&gt;In Gtk2 applications, most 'auto-default' buttons have a taller appearance than standard buttons. QtCurve attempts to mimic this for KDE4 applications - this may be disabled by enabling this option.&lt;/p&gt;</string>
+         </property>
          <property name="text">
           <string>Don't make 'auto-default' buttons larger (KDE4)</string>
          </property>
@@ -2160,6 +2607,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the character used to hide password entries.</string>
          </property>
         </widget>
        </item>
@@ -2195,6 +2645,9 @@ p, li { white-space: pre-wrap; }
       <layout class="QVBoxLayout" name="verticalLayout_16">
        <item>
         <widget class="KPushButton" name="exportKde3Button">
+         <property name="whatsThis">
+          <string>Exports your current color palette and font settings so that they may be used by KDE3 applications. This creates the relevant entries within the KDE3 kdeglobals file.</string>
+         </property>
          <property name="text">
           <string>Export colors and fonts for KDE3 applications...</string>
          </property>
@@ -2202,6 +2655,9 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="KPushButton" name="exportQt3Button">
+         <property name="whatsThis">
+          <string>Exports your current color palette and font settings so that they may be used by pure-Qt3 applications. This creates the relevant entries within the Qt3 ~/.qt/qtrc file.</string>
+         </property>
          <property name="text">
           <string>Export colors and fonts for pure-Qt3 applications...</string>
          </property>
@@ -2225,7 +2681,11 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="page_13">
       <layout class="QVBoxLayout">
        <item>
-        <widget class="QComboBox" name="gradCombo"/>
+        <widget class="QComboBox" name="gradCombo">
+         <property name="whatsThis">
+          <string>Select the custom gradient to be configured.</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
@@ -2260,7 +2720,20 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QComboBox" name="gradBorder"/>
+           <widget class="QComboBox" name="gradBorder">
+            <property name="whatsThis">
+             <string>&lt;p&gt;Defines the inner border used when drawing buttons, etc, with this gradient.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;i&gt;No border&lt;/i&gt; - no inner border is drawn, and the gradient will extend to the outer edges.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;Light border&lt;/i&gt; - A 'light' line is drawn around all edges.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;3D border (light only)&lt;/i&gt; - A 'light' line is drawn around the top and left edges.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;3D border (light only)&lt;/i&gt; - A 'light' line is drawn around the top and left edges, and a darker one around the bottom and right edges.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;i&gt;Note: This setting is not used when drawing the preview below.&lt;/i&gt;&lt;/p&gt;
+
+</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="2">
            <widget class="QGroupBox" name="groupBox_2">
@@ -2291,6 +2764,9 @@ p, li { white-space: pre-wrap; }
                </item>
                <item row="0" column="1">
                 <widget class="KIntNumInput" name="stopPosition">
+                 <property name="whatsThis">
+                  <string>Set the position of the gradient value. 0% means the top of horizontal gradients, and the left for vertical gradients.</string>
+                 </property>
                  <property name="maximum">
                   <number>100</number>
                  </property>
@@ -2308,6 +2784,9 @@ p, li { white-space: pre-wrap; }
                </item>
                <item row="1" column="1">
                 <widget class="KIntNumInput" name="stopValue">
+                 <property name="whatsThis">
+                  <string>Sets the strength of the gradient at the defined position. 110% would lighten a color by 10%, 90% would darken it by 10%, and 100% would mean the original color.</string>
+                 </property>
                  <property name="maximum">
                   <number>200</number>
                  </property>
@@ -2361,12 +2840,9 @@ p, li { white-space: pre-wrap; }
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;NOTE:&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt; font-style:italic;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Position&lt;/span&gt; has a range of 0% to 100% - 0% being top/left, and 100% being bottom/right.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt; font-style:italic;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Value&lt;/span&gt; has a range of 0% to 200%. A value of 120% implies lightening by 20%, and a value of 80% implies darkening by 20%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;p&gt;&lt;b&gt;NOTE: &lt;/b&gt;&lt;/p&gt;
+&lt;p&gt;&lt;i&gt;&lt;u&gt;Position&lt;/u&gt; has a range of 0% to 100% - 0% being top/left, and 100% being bottom/right.&lt;/i&gt;&lt;/p&gt;
+&lt;p&gt;&lt;i&gt;&lt;u&gt;Value&lt;/u&gt; has a range of 0% to 200%. A value of 120% implies lightening by 20%, and a value of 80% implies darkening by 20%&lt;/i&gt;&lt;/p&gt;</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -2405,6 +2881,9 @@ p, li { white-space: pre-wrap; }
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="whatsThis">
+             <string>Set the color to be used in the preview.</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -2428,6 +2907,9 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Sets the color space that is used when shading a color.</string>
          </property>
         </widget>
        </item>
@@ -2459,17 +2941,15 @@ p, li { white-space: pre-wrap; }
              </sizepolicy>
             </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;QtCurve uses various hard-coded shading values to draw elements such as button frames, the background for pressed buttons, etc. The following is a brief overview of how each shade is used - use this as a guide only, as shades are used for various things.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;1 Is used for the light part of 3d elements - such as the border of tab widgets.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;2 Is used for the lighter shade of striped progressbars.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;3 Is used for the dark part of 3d elements - such as the border of tab widgets.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;4 Is used for the shaded border of checks and radios, toolbar borders (when set to dark), the dark part of sunken/raised slider handles, etc.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;5 Is used for the background of pressed widgets, and the border of toolbars (when not dark).&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;6 Is used as the border of most widgets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;i&gt;&lt;p&gt;QtCurve uses various hard-coded shading values to draw elements such as button frames, the background for pressed buttons, etc. The following is a brief overview of how each shade is used - use this as a guide only, as shades are used for various things.&lt;/p&gt;
+&lt;p&gt;&lt;ol&gt;
+&lt;li&gt;Is used for the light part of 3d elements - such as the border of tab widgets.&lt;/li&gt;
+&lt;li&gt;Is used for the lighter shade of striped progressbars.&lt;/li&gt;
+&lt;li&gt;Is used for the dark part of 3d elements - such as the border of tab widgets.&lt;/li&gt;
+&lt;li&gt;Is used for the shaded border of checks and radios, toolbar borders (when set to dark), the dark part of sunken/raised slider handles, etc.&lt;/li&gt;
+&lt;li&gt;Is used for the background of pressed widgets, and the border of toolbars (when not dark).&lt;/li&gt;
+&lt;li&gt;Is used as the border of most widgets.&lt;/li&gt;
+&lt;/ol&gt;&lt;/p&gt;&lt;/i&gt;</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
