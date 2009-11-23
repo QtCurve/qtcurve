@@ -1,6 +1,6 @@
 [Settings]
 activeTabAppearance=flat
-animatedProgress=true
+animatedProgress=false
 appearance=gradient
 borderMenuitems=false
 buttonEffect=none

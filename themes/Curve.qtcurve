@@ -1,4 +1,5 @@
 [Settings]
+activeTabAppearance=raised
 animatedProgress=false
 appearance=raised
 borderMenuitems=true

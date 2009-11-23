@@ -1,8 +1,4 @@
-install(FILES Silk.qtcurve Clear.qtcurve Dull_Glass.qtcurve Shiny_Glass.qtcurve Inverted.qtcurve Plain.qtcurve Glass.qtcurve
-        Human.qtcurve Plastic.qtcurve Murrine.qtcurve Curve.qtcurve Clean.qtcurve Glow.qtcurve Agua.qtcurve Ozone.qtcurve DESTINATION ${DATA_INSTALL_DIR}/QtCurve)
+install(FILES Agua.qtcurve Curve.qtcurve Flat.qtcurve Human.qtcurve Inverted.qtcurve
+              Klearlooks.qtcurve Murrine.qtcurve Ozone.qtcurve Plastic.qtcurve Silk.qtcurve
+        DESTINATION ${DATA_INSTALL_DIR}/QtCurve)
 
-if (QTC_STYLE_SUPPORT)
-    install(FILES qtc_klearlooks.themerc DESTINATION ${DATA_INSTALL_DIR}/kstyle/themes)
-else (QTC_STYLE_SUPPORT)
-    install(FILES Klearlooks.qtcurve DESTINATION ${DATA_INSTALL_DIR}/QtCurve)
-endif (QTC_STYLE_SUPPORT)

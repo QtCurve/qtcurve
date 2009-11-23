@@ -1,5 +1,5 @@
 [Settings]
-animatedProgress=true
+animatedProgress=false
 appearance=dullglass
 borderMenuitems=false
 buttonEffect=shadow
