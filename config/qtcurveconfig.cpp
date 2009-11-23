@@ -1825,7 +1825,10 @@ void QtCurveConfig::importPreset()
         {
             name=getPresetName(i18n("Import Preset"), QString(), name, name);
             if(!name.isEmpty())
+            {
+                setWidgetOptions(opts);
                 savePreset(name);
+            }
         }
         else
             KMessageBox::error(this, i18n("Sorry, failed to load file."));
