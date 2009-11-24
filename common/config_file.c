@@ -2482,6 +2482,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(selectionAppearance)
 #ifdef __cplusplus
         CFG_WRITE_ENTRY(dwtAppearance)
+        CFG_WRITE_ENTRY(titlebarEffect)
 #endif
         CFG_WRITE_ENTRY(menuStripeAppearance)
         CFG_WRITE_ENTRY_B(toolbarSeparators, false)
