@@ -202,6 +202,9 @@ typedef GdkColor color;
 
 #define QTC_TO_FACTOR(A) ((100.0+((double)(A)))/100.0)
 #define DEFAULT_HIGHLIGHT_FACTOR                   3
+#define DEFAULT_SPLITTER_HIGHLIGHT_FACTOR          0
+#define DEFAULT_CR_HIGHLIGHT_FACTOR                0
+#define DEFAULT_EXPANDER_HIGHLIGHT_FACTOR          3
 #define MAX_HIGHLIGHT_FACTOR                      50
 #define MIN_HIGHLIGHT_FACTOR                     -50
 #define MENUBAR_DARK_FACTOR        QTC_TO_FACTOR(-3)
@@ -477,6 +480,7 @@ typedef enum
     WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FOCUS,
     WIDGET_TAB_FRAME,
+    WIDGET_HIGHLIGHT_BG,       // Background behind check/radio/expander text
     WIDGET_OTHER
 } EWidget;
 
@@ -807,7 +811,12 @@ typedef struct
                      menuDelay,
                      sliderWidth,
                      tabBgnd,
-                     colorSelTab;
+                     colorSelTab,
+#if !defined __cplusplus || defined QTC_CONFIG_DIALOG
+                     expanderHighlight,
+#endif
+                     crHighlight,
+                     splitterHighlight;
     ERound           round;
     bool             embolden,
                      highlightTab,
@@ -849,7 +858,6 @@ typedef struct
                      xCheck,
                      framelessGroupBoxes,
                      groupBoxLine,
-                     crHighlight,
                      crButton,
                      crColor,
                      smallRadio,
@@ -859,7 +867,6 @@ typedef struct
                      highlightScrollViews,
                      sunkenScrollViews,
                      etchEntry,
-                     splitterHighlight,
                      colorSliderMouseOver,
                      thinSbarGroove,
                      flatSbarButtons,
@@ -1529,7 +1536,7 @@ typedef enum
 
 #define QTC_CAN_EXTRA_ROUND(MOD) \
             (QTC_IS_EXTRA_ROUND_WIDGET(widget) && \
-            (WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget || \
+            (WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget || WIDGET_HIGHLIGHT_BG==widget || \
             ( ( (w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+MOD)) || (WIDGET_NO_ETCH_BTN==widget || WIDGET_MENU_BUTTON==widget) ) &&\
                                              (h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+MOD)))))
 #define QTC_CAN_FULL_ROUND(MOD) (w>(QTC_MIN_ROUND_FULL_SIZE+MOD) && h>(QTC_MIN_ROUND_FULL_SIZE+MOD))

@@ -4423,7 +4423,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 //                 if(0!=opts.tabBgnd && inStackWidget(widget))
 //                     color=shade(color, QTC_TO_FACTOR(opts.tabBgnd));
                 painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled && opts.splitterHighlight
-                                                ? shade(color, QTC_TO_FACTOR(opts.highlightFactor))
+                                                ? shade(color, QTC_TO_FACTOR(opts.splitterHighlight))
                                                 : color));
             }
 
@@ -6466,8 +6466,22 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             highlightRect.setRight(r.right());
                         else
                             highlightRect.setX(r.x());
-                        painter->fillRect(highlightRect,
-                                          shade(palette.background().color(), QTC_TO_FACTOR(opts.highlightFactor)));
+                        highlightRect.setWidth(highlightRect.width()+2);
+                        if(ROUND_NONE!=opts.round)
+                        {
+                            painter->save();
+                            painter->setRenderHint(QPainter::Antialiasing, true);
+                            painter->fillPath(buildPath(QRectF(highlightRect.x(), highlightRect.y(),
+                                                               highlightRect.width(), highlightRect.height()),
+                                                        WIDGET_HIGHLIGHT_BG, ROUNDED_ALL,
+                                                        getRadius(&opts, highlightRect.width(), highlightRect.height(),
+                                                                  WIDGET_HIGHLIGHT_BG, RADIUS_EXTERNAL)),
+                                              shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)));
+                            painter->restore();
+                        }
+                        else
+                            painter->fillRect(highlightRect,
+                                              shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)));
                     }
                     QTC_BASE_STYLE::drawControl(element, &copy, painter, widget);
                     break;

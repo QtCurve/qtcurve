@@ -656,9 +656,18 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
 
+    crHighlight->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
+    crHighlight->setValue(DEFAULT_CR_HIGHLIGHT_FACTOR);
+
+    splitterHighlight->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
+    splitterHighlight->setValue(DEFAULT_SPLITTER_HIGHLIGHT_FACTOR);
+
     lighterPopupMenuBgnd->setRange(MIN_LIGHTER_POPUP_MENU, MAX_LIGHTER_POPUP_MENU);
     lighterPopupMenuBgnd->setValue(DEF_POPUPMENU_LIGHT_FACTOR);
 
+    expanderHighlight->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
+    expanderHighlight->setValue(DEFAULT_EXPANDER_HIGHLIGHT_FACTOR);
+   
     menuDelay->setRange(MIN_MENU_DELAY, MAX_MENU_DELAY);
     menuDelay->setValue(DEFAULT_MENU_DELAY);
 
@@ -718,7 +727,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(unifyCombo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(vArrows, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xCheck, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(crHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(crHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
+    connect(expanderHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(crButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorSelTab, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(roundAllTabs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -784,7 +794,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(xbar, SIGNAL(toggled(bool)), SLOT(xbarChanged()));
     connect(crColor, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(smallRadio, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(splitterHighlight, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(splitterHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(gtkComboMenus, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(gtkButtonOrder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(mapKdeIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1980,7 +1990,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.unifyCombo=unifyCombo->isChecked();
     opts.vArrows=vArrows->isChecked();
     opts.xCheck=xCheck->isChecked();
-    opts.crHighlight=crHighlight->isChecked();
+    opts.crHighlight=crHighlight->value();
+    opts.expanderHighlight=expanderHighlight->value();
     opts.crButton=crButton->isChecked();
     opts.colorSelTab=colorSelTab->value();
     opts.roundAllTabs=roundAllTabs->isChecked();
@@ -2022,7 +2033,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.xbar=xbar->isChecked();
     opts.crColor=crColor->isChecked();
     opts.smallRadio=smallRadio->isChecked();
-    opts.splitterHighlight=splitterHighlight->isChecked();
+    opts.splitterHighlight=splitterHighlight->value();
     opts.gtkComboMenus=gtkComboMenus->isChecked();
     opts.gtkButtonOrder=gtkButtonOrder->isChecked();
     opts.mapKdeIcons=mapKdeIcons->isChecked();
@@ -2152,7 +2163,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     vArrows->setChecked(opts.vArrows);
     xCheck->setChecked(opts.xCheck);
     xCheck_false->setChecked(!opts.xCheck);
-    crHighlight->setChecked(opts.crHighlight);
+    crHighlight->setValue(opts.crHighlight);
+    expanderHighlight->setValue(opts.expanderHighlight);
     crButton->setChecked(opts.crButton);
     colorSelTab->setValue(opts.colorSelTab);
     roundAllTabs->setChecked(opts.roundAllTabs);
@@ -2218,7 +2230,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     crColor->setChecked(opts.crColor);
     smallRadio->setChecked(opts.smallRadio);
     smallRadio_false->setChecked(!opts.smallRadio);
-    splitterHighlight->setChecked(opts.splitterHighlight);
+    splitterHighlight->setValue(opts.splitterHighlight);
     gtkComboMenus->setChecked(opts.gtkComboMenus);
     gtkButtonOrder->setChecked(opts.gtkButtonOrder);
     mapKdeIcons->setChecked(opts.mapKdeIcons);
@@ -2343,7 +2355,8 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          unifyCombo->isChecked()!=opts.unifyCombo ||
          vArrows->isChecked()!=opts.vArrows ||
          xCheck->isChecked()!=opts.xCheck ||
-         crHighlight->isChecked()!=opts.crHighlight ||
+         crHighlight->value()!=opts.crHighlight ||
+         expanderHighlight->value()!=opts.expanderHighlight ||
          crButton->isChecked()!=opts.crButton ||
          colorSelTab->value()!=opts.colorSelTab ||
          roundAllTabs->isChecked()!=opts.roundAllTabs ||
@@ -2411,7 +2424,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          xbar->isChecked()!=opts.xbar ||
          crColor->isChecked()!=opts.crColor ||
          smallRadio->isChecked()!=opts.smallRadio ||
-         splitterHighlight->isChecked()!=opts.splitterHighlight ||
+         splitterHighlight->value()!=opts.splitterHighlight ||
          gtkComboMenus->isChecked()!=opts.gtkComboMenus ||
          gtkButtonOrder->isChecked()!=opts.gtkButtonOrder ||
          mapKdeIcons->isChecked()!=opts.mapKdeIcons ||

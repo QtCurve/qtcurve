@@ -1110,7 +1110,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 def->roundAllTabs=false;
                 def->smallRadio=false;
-                def->splitterHighlight=true;
+                def->splitterHighlight=DEFAULT_HIGHLIGHT_FACTOR;
                 def->splitters=LINE_FLAT;
                 def->handles=LINE_SUNKEN;
 #ifdef __cplusplus
@@ -1295,7 +1295,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(fadeLines)
 #endif
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
-            QTC_CFG_READ_BOOL(crHighlight)
+            QTC_CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
             QTC_CFG_READ_BOOL(crButton)
             QTC_CFG_READ_BOOL(crColor)
             QTC_CFG_READ_BOOL(smallRadio)
@@ -1304,7 +1304,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(squareScrollViews)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(etchEntry)
-            QTC_CFG_READ_BOOL(splitterHighlight)
+            QTC_CFG_READ_INT_BOOL(splitterHighlight, opts->highlightFactor)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(popupBorder)
             QTC_CFG_READ_BOOL(unifySpinBtns)
@@ -1348,6 +1348,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 */
 #endif
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
+            QTC_CFG_READ_INT(expanderHighlight)
             QTC_CFG_READ_BOOL(mapKdeIcons)
             
             if(SHADE_NONE==opts->menuStripe)
@@ -1690,6 +1691,17 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->highlightFactor<MIN_HIGHLIGHT_FACTOR || opts->highlightFactor>MAX_HIGHLIGHT_FACTOR)
                 opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
 
+            if(opts->crHighlight<MIN_HIGHLIGHT_FACTOR || opts->crHighlight>MAX_HIGHLIGHT_FACTOR)
+                opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
+
+            if(opts->splitterHighlight<MIN_HIGHLIGHT_FACTOR || opts->splitterHighlight>MAX_HIGHLIGHT_FACTOR)
+                opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
+
+#if !defined __cplusplus || defined QTC_CONFIG_DIALOG
+            if(opts->expanderHighlight<MIN_HIGHLIGHT_FACTOR || opts->expanderHighlight>MAX_HIGHLIGHT_FACTOR)
+                opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
+#endif
+
             if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
                 opts->menuDelay=DEFAULT_MENU_DELAY;
 
@@ -1856,6 +1868,8 @@ static void defaultSettings(Options *opts)
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
+    opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
+    opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
     opts->menuDelay=DEFAULT_MENU_DELAY;
     opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
@@ -1931,7 +1945,6 @@ static void defaultSettings(Options *opts)
     opts->framelessGroupBoxes=true;
     opts->groupBoxLine=true;
     opts->colorMenubarMouseOver=true;
-    opts->crHighlight=false;
     opts->crButton=true;
     opts->crColor=false;
     opts->smallRadio=true;
@@ -1940,7 +1953,6 @@ static void defaultSettings(Options *opts)
     opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->etchEntry=false;
-    opts->splitterHighlight=false;
     opts->flatSbarButtons=true;
     opts->popupBorder=true;
     opts->unifySpinBtns=false;
@@ -2000,6 +2012,7 @@ static void defaultSettings(Options *opts)
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
     opts->mapKdeIcons=true;
     opts->gtkMenuStripe=false;
+    opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
 #endif
 #ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
@@ -2527,7 +2540,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(groupBoxLine)
         CFG_WRITE_ENTRY(fadeLines)
         CFG_WRITE_ENTRY(colorMenubarMouseOver)
-        CFG_WRITE_ENTRY(crHighlight)
+        CFG_WRITE_ENTRY_NUM(crHighlight)
         CFG_WRITE_ENTRY(crButton)
         CFG_WRITE_ENTRY(crColor)
         CFG_WRITE_ENTRY(smallRadio)
@@ -2536,7 +2549,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareScrollViews)
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(etchEntry)
-        CFG_WRITE_ENTRY(splitterHighlight)
+        CFG_WRITE_ENTRY_NUM(splitterHighlight)
+        CFG_WRITE_ENTRY_NUM(expanderHighlight)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(popupBorder)
         CFG_WRITE_ENTRY(unifySpinBtns)

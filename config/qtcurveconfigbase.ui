@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>759</width>
+    <width>763</width>
     <height>471</height>
    </rect>
   </property>
@@ -87,7 +87,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_24">
       <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -572,17 +572,17 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_69">
          <property name="text">
-          <string>Background:</string>
+          <string>Background mouse-over highlight:</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QCheckBox" name="splitterHighlight">
+        <widget class="KIntNumInput" name="splitterHighlight">
          <property name="whatsThis">
-          <string>Controls whether the background of the splitter should light-up when the mouse is hovers over.</string>
+          <string>Defines by how much the theme should brighen (or darken) the color of background of the splitter when the mosue hovers over.</string>
          </property>
-         <property name="text">
-          <string>Highlight on mouse-over</string>
+         <property name="suffix">
+          <string>%</string>
          </property>
         </widget>
        </item>
@@ -723,11 +723,11 @@
        </item>
        <item row="10" column="1">
         <widget class="QCheckBox" name="flatSbarButtons">
-         <property name="text">
-          <string>Flat</string>
-         </property>
          <property name="whatsThis">
           <string>If enabled, then scrollbar buttons are not drawn and only the arrows will appear.</string>
+         </property>
+         <property name="text">
+          <string>Flat</string>
          </property>
         </widget>
        </item>
@@ -1518,17 +1518,17 @@
        <item row="4" column="0">
         <widget class="QLabel" name="label_54">
          <property name="text">
-          <string>Text background:</string>
+          <string>Background mouse-over highlight:</string>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QCheckBox" name="crHighlight">
+        <widget class="KIntNumInput" name="crHighlight">
          <property name="whatsThis">
-          <string>Controls wether the background of the text associated with a checkbox, or radio button, should highlight when the mouse pases over it.</string>
+          <string>Defines by how much the theme should brighen (or darken) the background of the text associated with a checkbox, or radio button, when the mouse hovers over it.</string>
          </property>
-         <property name="text">
-          <string>Highlight on mouse-over.</string>
+         <property name="suffix">
+          <string>%</string>
          </property>
         </widget>
        </item>
@@ -2549,43 +2549,25 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_12">
-      <layout class="QGridLayout" name="gridLayout_2">
+      <layout class="QFormLayout" name="formLayout_19">
        <item row="0" column="0">
+        <widget class="QLabel" name="label_80">
+         <property name="text">
+          <string>Dialog buttons:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
         <widget class="QCheckBox" name="gtkButtonOrder">
          <property name="whatsThis">
           <string>If enabled, dialogs will use the 'Cancel / OK' button order as used in the GNOME ond OSX desktops, otherwise the 'OK / Cancel' order will be used.</string>
          </property>
          <property name="text">
-          <string>Gtk button order</string>
+          <string>Use Gtk button order</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="mapKdeIcons">
-         <property name="whatsThis">
-          <string>Eanble this option so that QtCurve can attempt to map from the KDE icon names to their Gtk equivalant for Gtk applications.</string>
-         </property>
-         <property name="text">
-          <string>Map KDE icons (Gtk2)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="fixParentlessDialogs">
-         <property name="whatsThis">
-          <string>&lt;p&gt;&lt;b&gt;Warning: Experimental!&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p&gt;
-
-&lt;p&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
-
-&lt;p&gt;&lt;i&gt;&lt;b&gt;Note:&lt;/b&gt; This may break some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/i&gt;&lt;/p&gt;</string>
-         </property>
-         <property name="text">
-          <string>'Fix' parentless dialogs</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
+       <item row="1" column="1">
         <widget class="QCheckBox" name="stdBtnSizes">
          <property name="whatsThis">
           <string>&lt;p&gt;Auto-default buttons are buttons that can become 'default' buttons - i.e. will react the the user pressing 'return'.&lt;/p&gt;
@@ -2596,10 +2578,49 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_79">
+         <property name="text">
+          <string>Gtk icons</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="mapKdeIcons">
+         <property name="whatsThis">
+          <string>Eanble this option so that QtCurve can attempt to map from the KDE icon names to their Gtk equivalant for Gtk applications.</string>
+         </property>
+         <property name="text">
+          <string>Use KDE equivalent</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_78">
+         <property name="text">
+          <string>'Parent-less' dialogs:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="fixParentlessDialogs">
+         <property name="whatsThis">
+          <string>&lt;p&gt;&lt;b&gt;Warning: Experimental!&lt;/b&gt;&lt;/p&gt;
+&lt;p&gt;Some applications - such as Kate, Kaffeine, and GIMP - produce dialogs that have no 'parent'. This causes the dialog to recieve an entry in the taskbar, and allows the dialog to be minimised independantly of the main application window.&lt;/p&gt;
+
+&lt;p&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
+
+&lt;p&gt;&lt;i&gt;&lt;b&gt;Note:&lt;/b&gt; This may break some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/i&gt;&lt;/p&gt;</string>
+         </property>
+         <property name="text">
+          <string>Re-parent to currently active window</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Character to use for password entries:</string>
+          <string>Password character:</string>
          </property>
         </widget>
        </item>
@@ -2616,31 +2637,22 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_77">
+         <property name="text">
+          <string>Gtk expander highlight:</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
+        </widget>
        </item>
        <item row="5" column="1">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="KIntNumInput" name="expanderHighlight">
+         <property name="whatsThis">
+          <string>Defines the amount by which the popup menu background will be lightened (or darkened).</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>261</height>
-          </size>
+         <property name="suffix">
+          <string>%</string>
          </property>
-        </spacer>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -3214,9 +3226,11 @@
   <tabstop>dwtTextAsPerTitleBar</tabstop>
   <tabstop>dwtEffectAsPerTitleBar</tabstop>
   <tabstop>gtkButtonOrder</tabstop>
+  <tabstop>stdBtnSizes</tabstop>
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>
   <tabstop>passwordChar</tabstop>
+  <tabstop>expanderHighlight</tabstop>
   <tabstop>exportKde3Button</tabstop>
   <tabstop>exportQt3Button</tabstop>
   <tabstop>gradCombo</tabstop>
