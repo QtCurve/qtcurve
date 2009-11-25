@@ -2443,6 +2443,8 @@ debugDisplayWidget(widget, 3);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
         cairo_stroke(cr);
     }
+    else if(DETAIL("icon_view_item"))
+        drawSelection(cr, style, state, area, widget, NULL, x, y, width, height, ROUNDED_ALL, FALSE);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))

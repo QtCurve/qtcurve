@@ -29,6 +29,7 @@
     of the QTC_MODIFY_MOZILLA cmake option.
 20. If editing/creating userChrome.css and chrome folder does not exist, then
     create it.
+21. Theme icon view selections.
 
 0.69.2
 ------
