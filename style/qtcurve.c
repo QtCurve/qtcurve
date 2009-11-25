@@ -30,7 +30,7 @@
 #include "qtcurve.h"
 
 #define QTC_MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
-                                    ? &qtcPalette.mouseover[QT_STD_BORDER] : (COL))
+                                    ? &qtcPalette.mouseover[QT_ARROW_MO] : (COL))
 
 #define SBAR_BTN_SIZE opts.sliderWidth
 
