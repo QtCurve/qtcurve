@@ -53,13 +53,14 @@
     widget titlebars.
 34. Use custum gradient 1 for dock widget titlebars.
 35. Round gradients of dock-widget titlebars - top/left only be default.
-36. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
+36. Reduce number of supplied presets.
+37. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
     save custom presets, and preview before applying.
-37. Nicer 'Agua' look for MDI/window/dock widget buttons.
-38. Added option to hide MDI/window/dock widget button icons until mouse-over.
-39. Added 'Whats This?' text to most config items.
-40. Correctly theme menu separators with titles.
-41. Draw titles in KMenu's the same as menu separators with titles - bold, and
+38. Nicer 'Agua' look for MDI/window/dock widget buttons.
+39. Added option to hide MDI/window/dock widget button icons until mouse-over.
+40. Added 'Whats This?' text to most config items.
+41. Correctly theme menu separators with titles.
+42. Draw titles in KMenu's the same as menu separators with titles - bold, and
     with no icon.
 
 0.69.2
