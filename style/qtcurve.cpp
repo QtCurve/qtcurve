@@ -38,7 +38,7 @@
 
 #define QTC_MO_ARROW_X(MO, COL) (state&State_Enabled \
                                     ? (MO_NONE!=opts.coloredMouseOver && MO \
-                                        ? itsMouseOverCols[QT_STD_BORDER] \
+                                        ? itsMouseOverCols[QT_ARROW_MO] \
                                         : palette.color(COL)) \
                                     : palette.color(QPalette::Disabled, COL))
 #define QTC_MO_ARROW(COL)       QTC_MO_ARROW_X(state&State_MouseOver, COL)

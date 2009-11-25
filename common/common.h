@@ -160,6 +160,7 @@ typedef GdkColor color;
 
 #define QT_STD_BORDER      5
 #define QT_PBAR_BORDER     4
+#define QT_ARROW_MO        4
 #define QT_LOWER_BORDER_ALPHA 0.65
 #define QT_DISABLED_BORDER QT_STD_BORDER /*3*/
 #define QT_BORDER(E) (/*(E) ?*/ QT_STD_BORDER/* : QT_DISABLED_BORDER*/)
