@@ -2425,14 +2425,26 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_SELECTED==state)
             drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round, TRUE);
     }
-    else if( ( GTK_STATE_PRELIGHT==state && (detail && ( (opts.splitterHighlight && 0==strcmp(detail, QTC_PANED)) ||
-                                                          0==strcmp(detail, "expander") ||
-                                                          (opts.crHighlight && 0==strcmp(detail, "checkbutton")))) ) )
-        drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.highlightFactor), x, y, width, height);
-    else if(/*!IS_FLAT(opts.bgndAppearance) &&*/ detail &&
-            ( (GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton")) ||
-              (GTK_STATE_PRELIGHT!=state && ( 0==strcmp(detail, QTC_PANED) || 0==strcmp(detail, "expander") || 0==strcmp(detail, "checkbutton")))))
-        ;
+    else if( GTK_STATE_PRELIGHT==state && detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED) )
+        drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.splitterHighlight), x, y, width, height);
+    else if( GTK_STATE_PRELIGHT==state && detail && 0==strcmp(detail, "checkbutton") )
+    {
+        if(opts.crHighlight)
+        {
+            clipPath(cr, x, y, width, height, WIDGET_HIGHLIGHT_BG, RADIUS_EXTERNAL, ROUNDED_ALL);
+            drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.crHighlight), x, y, width, height);
+            unsetCairoClipping(cr);
+        }
+    }
+    else if( GTK_STATE_PRELIGHT==state && detail && 0==strcmp(detail, "expander") )
+    {
+        if(opts.expanderHighlight)
+        {
+            clipPath(cr, x, y, width, height, WIDGET_HIGHLIGHT_BG, RADIUS_EXTERNAL, ROUNDED_ALL);
+            drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.expanderHighlight), x, y, width, height);
+            unsetCairoClipping(cr);
+        }
+    }
     else if(DETAIL("tooltip"))
     {
         cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);

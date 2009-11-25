@@ -4,32 +4,36 @@
  2. Added option to use a smaller dot for radios.
  3. Added option to control whether the background of splitters should be
     highlighted on mouse over.
- 4. Added new splitter/handle/thumb style: single dot.
- 5. Don't do coloured mouse over for buttons of editable combos, spin buttons,
+ 4. Made check/radio and splitter highlight options a configurable % - i.e.
+    not based on standard hightlight %
+ 5. Added option to set expander highlight factor.
+ 6. When highlighting check/radio/expander background, round the corners.
+ 7. Added new splitter/handle/thumb style: single dot.
+ 8. Don't do coloured mouse over for buttons of editable combos, spin buttons,
     or scrollbar buttons.
- 6. Don't do regular coloured mouse over of sliders when these are set to be
+ 9. Don't do regular coloured mouse over of sliders when these are set to be
     coloured on mouse over.
- 7. Allow to specify strength when colouring selected tab.
- 8. Remove support for QtCurve styles (these appear as unique KDE styles in the
+10. Allow to specify strength when colouring selected tab.
+11. Remove support for QtCurve styles (these appear as unique KDE styles in the
     main KDE style selection dialog). Re-enable support by passing
     -DQTC_STYLE_SUPPORT=true to cmake.
- 9. Slightly lighter shade used for coloured mouse over of arrows.
-10. Dont draw border around rounded selection.
-11. Fix internal padding of scrolled windows where scrollbars are within window.
-12. When drawing frames, respect shadow state (in/out).
-13. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
-14. Improve appearance of unified spin widgets under Firefox.
-15. Don't draw background of dock widgets as if they were toolbars!
-16. Only draw toolbar/menubar background if shadow type is not set to none.
+12. Slightly lighter shade used for coloured mouse over of arrows.
+13. Dont draw border around rounded selection.
+14. Fix internal padding of scrolled windows where scrollbars are within window.
+15. When drawing frames, respect shadow state (in/out).
+16. Draw Inkscape and Anjuta sidebar buttons as per QtCurve's KDE style.
+17. Improve appearance of unified spin widgets under Firefox.
+18. Don't draw background of dock widgets as if they were toolbars!
+19. Only draw toolbar/menubar background if shadow type is not set to none.
     (Removes toolbar gradient from Rhythmbox's search buttons)
-17. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
-18. Better match of line-edit and spinbutton heights to KDE4.
-19. If user is using menubar colouring, and this would require changing the text
+20. Reduce thickness of menu toolbar buttons (e.g. the buttons with just the arrow)
+21. Better match of line-edit and spinbutton heights to KDE4.
+22. If user is using menubar colouring, and this would require changing the text
     colour, then need to modify the user's userChrome.css for this - regardless
     of the QTC_MODIFY_MOZILLA cmake option.
-20. If editing/creating userChrome.css and chrome folder does not exist, then
+23. If editing/creating userChrome.css and chrome folder does not exist, then
     create it.
-21. Theme icon view selections.
+24. Theme icon view selections.
 
 0.69.2
 ------
