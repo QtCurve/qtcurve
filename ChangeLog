@@ -65,6 +65,7 @@
 43. Correctly theme menu separators with titles.
 44. Draw titles in KMenu's the same as menu separators with titles - bold, and
     with no icon.
+45. Fade ends of tab widget base - used in document mode tabs.
 
 0.69.2
 ------

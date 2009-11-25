@@ -336,13 +336,6 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
     style->drawPrimitive(pe, &arrowOpt, painter, widget);
 }
 
-// The tabs used in multi-dock widgets, and KDE's properties dialog, look odd,
-// as the QTabBar is not a child of a QTabWidget! the QTC_STYLE_QTABBAR controls
-// whether we should style this differently.
-// CPD:TODO Check if this is OK with KDE's properties dialog, this looks broken
-//          in KDE4 betas, etc. But this may be changed/fixed when released!
-//#define QTC_STYLE_QTABBAR
-
 //KDE Properties dialog: QTabBar::KDEPrivate::KPageTabbedView
 //  --fixed in KDE4.0
 //Dolphin's views:       QTabBar::DolphinMainWindow
@@ -2377,10 +2370,6 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                     ? opts.thinnerBtns ? 4 : 6
                     : opts.thinnerBtns ? 2 : 4)+QTC_MAX_ROUND_BTN_PAD;
         case PM_TabBarTabShiftVertical:
-#ifdef QTC_STYLE_QTABBAR
-            if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
-                return option && option->state & State_Selected ? 0 : -2;
-#endif
 #if QT_VERSION < 0x040500
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             {
@@ -2390,10 +2379,6 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 #endif
             return 2;
         case PM_TabBarTabShiftHorizontal:
-#ifdef QTC_STYLE_QTABBAR
-            if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
-                return option && option->state & State_Selected ? 0 : -1;
-#endif
             return 0;
         case PM_ButtonShiftHorizontal:
             // return Qt::RightToLeft==QApplication::layoutDirection() ? -1 : 1;
@@ -3303,43 +3288,39 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
                 else
                 {
-#ifdef QTC_STYLE_QTABBAR
-                    // Is this tabbar part of a tab widget?
-                    if(widget && widget->parentWidget() && !qobject_cast<const QTabWidget *>(widget->parentWidget()))
-                    {
-#if 0
-                        QRect r2(tbb->tabBarRect);
-
-                        if(QTabBar::RoundedSouth==tbb->shape)
-                            r2.adjust(0, 0, 0, -4);
-                        else
-                            r2.adjust(0, 4, 0, 0);
-                        painter->setClipRect(r2);
-
-                        drawBorder(painter, tbb->tabBarRect, option, ROUNDED_ALL, backgroundColors(option), WIDGET_OTHER, BORDER_RAISED);
-
-                        painter->setClipping(false);
-#endif
-                        break;
-                    }
-#endif
+                    static const int constSidePad=16*2;
                     const QColor *use(backgroundColors(option));
                     QRegion      region(tbb->rect);
                     QLine        topLine(tbb->rect.bottomLeft() - QPoint(0, 1), tbb->rect.bottomRight() - QPoint(0, 1)),
                                  bottomLine(tbb->rect.bottomLeft(), tbb->rect.bottomRight());
+                    bool         horiz(QTabBar::RoundedNorth==tbb->shape || QTabBar::RoundedSouth==tbb->shape);
+                    double       size=horiz ? tbb->rect.width() : tbb->rect.height(),
+                                 tabRectSize=horiz ? tbb->tabBarRect.width() : tbb->tabBarRect.height(),
+                                 tabFadeSize=tabRectSize+constSidePad > size ? 0.0 : 1.0-((tabRectSize+constSidePad)/size),
+                                 minFadeSize=1.0-((size-constSidePad)/size),
+                                 fadeSize=tabFadeSize<minFadeSize ? minFadeSize : (tabFadeSize>QTC_FADE_SIZE ? QTC_FADE_SIZE : tabFadeSize);
 
                     region -= tbb->tabBarRect;
 
                     painter->save();
                     painter->setClipRegion(region);
-                    if(QTabBar::RoundedSouth==tbb->shape && APPEARANCE_FLAT==opts.appearance)
-                        painter->setPen(palette.background().color());
-                    else
-                        painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? QT_STD_BORDER
-                                                                              : (opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW)]);
-                    painter->drawLine(topLine);
-                    painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER]);
-                    painter->drawLine(bottomLine);
+//                     if(QTabBar::RoundedSouth==tbb->shape && APPEARANCE_FLAT==opts.appearance)
+//                         painter->setPen(palette.background().color());
+//                     else
+//                         painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? QT_STD_BORDER
+//                                                                               : (opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW)]);
+//                     painter->drawLine(topLine);
+//                     painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER]);
+//                     painter->drawLine(bottomLine);
+
+                    drawFadedLine(painter, QRect(topLine.p1(), topLine.p2()),
+                                  QTabBar::RoundedSouth==tbb->shape && APPEARANCE_FLAT==opts.appearance
+                                    ? palette.background().color()
+                                    : use[QTabBar::RoundedNorth==tbb->shape ? QT_STD_BORDER
+                                                                            : (opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW)], 
+                                  true, true, horiz, fadeSize);
+                    drawFadedLine(painter, QRect(bottomLine.p1(), bottomLine.p2()), use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER],
+                                  true, true, horiz, fadeSize);
                     painter->restore();
                 }
             break;
@@ -5692,32 +5673,6 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                      selected(state&State_Selected),
                      horiz(QTabBar::RoundedNorth==tab->shape || QTabBar::RoundedSouth==tab->shape);
 
-#ifdef QTC_STYLE_QTABBAR
-                if(onlyTab)
-                {
-                    if(selected || state&State_MouseOver)
-                    {
-                        QStyleOption opt(*option);
-                        const QColor *use(buttonColors(option));
-
-                        if(selected)
-                            opt.state|=State_On;
-                        if(horiz)
-                            opt.state|=State_Horizontal;
-                        else
-                            opt.state^=State_Horizontal;
-
-//                         drawBorder(painter, r, option, ROUNDED_ALL, state&State_MouseOver && opts.coloredMouseOver
-//                                                                         ? itsMouseOverCols
-//                                                                         : use, WIDGET_OTHER,
-//                                    selected ? BORDER_SUNKEN : BORDER_RAISED);
-
-                        drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
-                                       /*selected ? use[ORIGINAL_SHADE] :*/ getFill(&opt, use), use, true, WIDGET_STD_BUTTON);
-                    }
-                    break;
-                }
-#endif
 #if QT_VERSION >= 0x040500
                 QStyleOptionTabV3 tabV3(*tab);
 #endif
@@ -8714,7 +8669,7 @@ void QtCurveStyle::drawHighlight(QPainter *p, const QRect &r, bool horiz, bool i
     drawFadedLine(p, r.adjusted(horiz ? 0 : 1, horiz ? 1 : 0, 0, 0), inc ? itsMouseOverCols[ORIGINAL_SHADE] : col1, true, true, horiz);
 }
 
-void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz) const
+void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz, double fadeSize) const
 {
     bool            aa(p->testRenderHint(QPainter::Antialiasing));
     QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),
@@ -8728,8 +8683,8 @@ void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col,
 
         fade.setAlphaF(0.0);
         grad.setColorAt(0, fadeStart && opts.fadeLines ? fade : col);
-        grad.setColorAt(QTC_FADE_SIZE, col);
-        grad.setColorAt(1.0-QTC_FADE_SIZE, col);
+        grad.setColorAt(fadeSize, col);
+        grad.setColorAt(1.0-fadeSize, col);
         grad.setColorAt(1, fadeEnd && opts.fadeLines ? fade : col);
         p->setPen(QPen(QBrush(grad), 1));
     }
