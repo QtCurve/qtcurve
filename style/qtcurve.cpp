@@ -9751,8 +9751,9 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
                         ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
                         : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
 
-        drawMdiButton(p, rect, hover, sunken, buttonColors);
-        drawMdiIcon(p, icnColor, buttonColors[ORIGINAL_SHADE], shadow, rect, hover, sunken, subControlToIcon(sc), true);
+        bool drewFrame=drawMdiButton(p, rect, hover, sunken, buttonColors);
+        drawMdiIcon(p, icnColor, (drewFrame ? buttonColors : bgndCols)[ORIGINAL_SHADE],
+                    shadow, rect, hover, sunken, subControlToIcon(sc), true);
     }
 }
 
@@ -9773,11 +9774,11 @@ void QtCurveStyle::drawDwtControl(QPainter *p, const QFlags<State> &state, const
                     ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
                     : (TITLEBAR_CLOSE==btn && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
 
-    drawMdiButton(p, rect, hover, sunken, buttonColors);
-    drawMdiIcon(p, icnColor, buttonColors[ORIGINAL_SHADE], shadow, rect, hover, sunken, icon, false);
+    bool drewFrame=drawMdiButton(p, rect, hover, sunken, buttonColors);
+    drawMdiIcon(p, icnColor, (drewFrame ? buttonColors : bgndCols)[ORIGINAL_SHADE], shadow, rect, hover, sunken, icon, false);
 }
 
-void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const
+bool QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const
 {
     if(!(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_NO_FRAME) &&
        (hover || sunken || !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_FRAME)))
@@ -9795,7 +9796,10 @@ void QtCurveStyle::drawMdiButton(QPainter *painter, const QRect &r, bool hover, 
 
         drawLightBevel(painter, opt.rect, &opt, 0L, ROUNDED_ALL, getFill(&opt, cols), cols, true,
                        WIDGET_MDI_WINDOW_BUTTON);
+        return true;
     }
+
+    return false;
 }
 
 void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QColor &shadow,
