@@ -106,7 +106,7 @@
           <item>
            <widget class="QComboBox" name="presetsCombo">
             <property name="whatsThis">
-             <string>&lt;p&gt;This combo contains th elist of pre-defined settings.
+             <string>&lt;p&gt;This combo contains the list of pre-defined settings.
 &lt;ul&gt;
 &lt;li&gt;&lt;i&gt;(Current)&lt;/i&gt; will discard any changes, and revert to the currently saved style.&lt;/li&gt;
 &lt;li&gt;&lt;i&gt;(Default)&lt;/i&gt; will discard any changes, and revert to the QtCurve default style.&lt;/li&gt;
@@ -270,7 +270,7 @@
        <item row="5" column="1">
         <widget class="QComboBox" name="buttonEffect">
          <property name="whatsThis">
-          <string>Control what effect should be applied to buttons, comboboxes, etc.</string>
+          <string>Control what effect should be applied to buttons, combo boxes, etc.</string>
          </property>
         </widget>
        </item>
@@ -340,7 +340,7 @@
           <item>
            <widget class="QCheckBox" name="stdSidebarButtons">
             <property name="whatsThis">
-             <string>&lt;p&gt;Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, drawn as per normal buttons - otherwise they will be drawn in a more flat style.&lt;/p&gt;</string>
+             <string>&lt;p&gt;Select this to have the sidebar buttons in konqueror, kate, kaffeine, ktorrent, etc., drawn as per normal buttons - otherwise they will be drawn in a more flat style with the active tab colored with the highlght color.&lt;/p&gt;</string>
             </property>
             <property name="text">
              <string>Standard buttons for sidebars</string>
@@ -377,7 +377,7 @@
        <item>
         <widget class="QCheckBox" name="framelessGroupBoxes">
          <property name="whatsThis">
-          <string>Controls whether group-boxes should have an outer frame, or jsut an emboldened title.</string>
+          <string>Controls whether group-boxes should have an outer frame, or just an emboldened title.</string>
          </property>
          <property name="text">
           <string>Frameless</string>
@@ -427,7 +427,7 @@
        <item row="0" column="1">
         <widget class="QComboBox" name="comboBtn">
          <property name="whatsThis">
-          <string>Controls the coloration of the button (i.e. the part with the arrow) part of comboboxes.</string>
+          <string>Controls the coloration of the button part (i.e. the part with the arrow) of combo boxes.</string>
          </property>
         </widget>
        </item>
@@ -447,7 +447,7 @@
        <item row="2" column="1">
         <widget class="QCheckBox" name="comboSplitter">
          <property name="whatsThis">
-          <string>This option controls whether a line is drawn near non-editable combobox arrow buttons.</string>
+          <string>This option controls whether a line is drawn near non-editable combo box arrow buttons.</string>
          </property>
          <property name="text">
           <string>Draw splitter</string>
@@ -464,7 +464,7 @@
        <item row="3" column="1">
         <widget class="QCheckBox" name="unifyCombo">
          <property name="whatsThis">
-          <string>Controls whether the combobox button, of editable combos, should appear as a button or an arrow within the edit field.</string>
+          <string>Controls whether the combo box button, of editable combos, should appear as a button or an arrow within the edit field.</string>
          </property>
          <property name="text">
           <string>Draw arrow within edit field</string>
@@ -491,7 +491,7 @@
        <item row="5" column="1">
         <widget class="QCheckBox" name="doubleGtkComboArrow">
          <property name="whatsThis">
-          <string>Controls whether a single down arrow, or a up and down arrow, should be drawn on non-editable comboboxes.</string>
+          <string>Controls whether a single down arrow, or a up and down arrow, should be drawn on non-editable combo boxes.</string>
          </property>
          <property name="text">
           <string>Draw double-arrow for Gtk style</string>
@@ -528,7 +528,7 @@
        <item>
         <widget class="QCheckBox" name="unifySpin">
          <property name="whatsThis">
-          <string>Controls whether the up and down buttons should appear as buttons or arrows within the edit field.</string>
+          <string>Controls whether the up and down buttons should appear as buttons, or just arrows within the edit field.</string>
          </property>
          <property name="text">
           <string>Draw arrows within edit field</string>
@@ -565,7 +565,7 @@
        <item row="1" column="1">
         <widget class="QComboBox" name="splitters">
          <property name="whatsThis">
-          <string>Sets the visual indicator.</string>
+          <string>Sets the makring used to indicate that the widget is a splitter.</string>
          </property>
         </widget>
        </item>
@@ -579,7 +579,7 @@
        <item row="2" column="1">
         <widget class="QCheckBox" name="splitterHighlight">
          <property name="whatsThis">
-          <string>Controls whether the background of the splitter should light-up when the mouse is passed over.</string>
+          <string>Controls whether the background of the splitter should light-up when the mouse is hovers over.</string>
          </property>
          <property name="text">
           <string>Highlight on mouse-over</string>
@@ -637,7 +637,7 @@
        <item row="3" column="1">
         <widget class="QCheckBox" name="colorSliderMouseOver">
          <property name="whatsThis">
-          <string>Controls whether the coloration happens all the time, or only when the mouse passes over the slider.</string>
+          <string>Controls whether the coloration happens all the time, or only when the mouse hovers over the slider.</string>
          </property>
          <property name="text">
           <string>Mouse-over only</string>
@@ -654,7 +654,7 @@
        <item row="4" column="1">
         <widget class="QComboBox" name="sliderStyle">
          <property name="whatsThis">
-          <string>Controsl the appearance of standard sliders - i.e. not scrollbar sliders. 'Triangular' is a very similar style to plastik's sliders.</string>
+          <string>Controls the appearance of standard sliders - i.e. not scrollbar sliders. 'Triangular' is very similar to plastik's sliders.</string>
          </property>
         </widget>
        </item>
@@ -668,7 +668,7 @@
        <item row="5" column="1">
         <widget class="QCheckBox" name="fillSlider">
          <property name="whatsThis">
-          <string>Indicates whether the used part of a slider's groove should be filled or not. (Only affects sliders, not scrollbar sliders).</string>
+          <string>Indicates whether the used part of a slider's groove should be filled or not. (Does not affect scrollbar sliders).</string>
          </property>
          <property name="text">
           <string>Fill</string>
@@ -717,7 +717,7 @@
         <widget class="QComboBox" name="scrollbarType">
          <property name="whatsThis">
           <string>&lt;p&gt;This controls the position, and number, of buttons on a scrollbar.
-            &lt;ul&gt;&lt;li&gt;KDE - 1 button at the top/left, and two at the bottom/right&lt;/li&gt;&lt;li&gt;Windows - 1 botton at each end&lt;/li&gt;&lt;li&gt;Platinum -  no buttons at the top/left, two at bottom/right&lt;/li&gt;&lt;li&gt;Next - two buttons at the top/left, none at bottom/right&lt;/li&gt;&lt;li&gt;None - no buttons, only the slider&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+            &lt;ul&gt;&lt;li&gt;KDE - 1 button at the top/left, and two at the bottom/right&lt;/li&gt;&lt;li&gt;Windows - 1 botton at each end&lt;/li&gt;&lt;li&gt;Platinum - no buttons at the top/left, two at bottom/right&lt;/li&gt;&lt;li&gt;Next - two buttons at the top/left, none at bottom/right&lt;/li&gt;&lt;li&gt;None - no buttons, only the slider&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -725,6 +725,9 @@
         <widget class="QCheckBox" name="flatSbarButtons">
          <property name="text">
           <string>Flat</string>
+         </property>
+         <property name="whatsThis">
+          <string>If enabled, then scrollbar buttons are not drawn and only the arrows will appear.</string>
          </property>
         </widget>
        </item>
@@ -991,7 +994,7 @@
        <item row="4" column="1">
         <widget class="QCheckBox" name="forceAlternateLvCols">
          <property name="whatsThis">
-          <string>If this is enabled, QtCurve will attempt to make all listviews and treeviews halver alternating row colors - regardless of whether the application author has enabled this or not.</string>
+          <string>If this is enabled, QtCurve will attempt to make all listviews and treeviews have alternating row colors - regardless of whether the application author has enabled this or not.</string>
          </property>
          <property name="text">
           <string>Force alternate colors</string>
@@ -1049,7 +1052,7 @@
        <item>
         <widget class="QCheckBox" name="gtkScrollViews">
          <property name="whatsThis">
-          <string>Controls whether the scrollbars should be detaqched from the scrollview (i.e. on the outside), or embedded within the scrollview.</string>
+          <string>Controls whether the scrollbars should be detached from the scrollview (i.e. on the outside), or embedded within the scrollview.</string>
          </property>
          <property name="text">
           <string>Scrollbars on the outside</string>
@@ -1110,7 +1113,7 @@
        <item row="1" column="1">
         <widget class="QCheckBox" name="highlightTab">
          <property name="whatsThis">
-          <string>This will cause a colored stripe to be drawn over the current tab.</string>
+          <string>This will cause a colored stripe to be drawn at the top/bottom of the current tab.</string>
          </property>
          <property name="text">
           <string>Highlight</string>
@@ -1154,7 +1157,7 @@
        <item row="4" column="1">
         <widget class="QComboBox" name="tabMouseOver">
          <property name="whatsThis">
-          <string>Controls the mouse-over effect applied to the tab currently under the mouse. Note, if 'glow' is selected, then 'Round tabs' will be set to all - and this creates a 2 pixel gap between tabs.</string>
+          <string>Controls the mouse-over effect applied to the tab currently under the mouse. Note, if 'glow' is selected, then 'Round tabs' will be set to 'All' - and this creates a 2 pixel gap between tabs.</string>
          </property>
         </widget>
        </item>
@@ -1502,7 +1505,7 @@
           <item>
            <widget class="QRadioButton" name="smallRadio">
             <property name="whatsThis">
-             <string>If enabled, radio buttons with have a large 'dot' to indicate that they are selected.</string>
+             <string>If enabled, radio buttons with have a small 'dot' to indicate that they are selected.</string>
             </property>
             <property name="text">
              <string>Small</string>
@@ -1522,7 +1525,7 @@
        <item row="4" column="1">
         <widget class="QCheckBox" name="crHighlight">
          <property name="whatsThis">
-          <string>Controls wether the background of the text associated with a cehckbox, or radio button, should highlight when the mouse pases over it.</string>
+          <string>Controls wether the background of the text associated with a checkbox, or radio button, should highlight when the mouse pases over it.</string>
          </property>
          <property name="text">
           <string>Highlight on mouse-over.</string>
@@ -1598,7 +1601,7 @@
        <item row="2" column="1">
         <widget class="QComboBox" name="titlebarAlignment">
          <property name="whatsThis">
-          <string>Controls the alignment of the titlebar text. 'Center (full width)' means that the text is centered in the middle of the complete titlebar, whereas with 'Center (between controls)' the text is centered in the between the window controls to the left and right.</string>
+          <string>Controls the alignment of the titlebar text. 'Center (full width)' means that the text is centered in the middle of the complete titlebar, whereas with 'Center (between controls)' the text is centered between the window controls to the left and right.</string>
          </property>
         </widget>
        </item>
@@ -1612,7 +1615,7 @@
        <item row="4" column="1">
         <widget class="QComboBox" name="titlebarIcon">
          <property name="whatsThis">
-          <string>Controls where the applicaitons icons should be drawn on the titlebar. If 'Place on menu button' is selected, then the icon takes place of the menu button.</string>
+          <string>Controls where the application's icon should be drawn on the titlebar. If 'Place on menu button' is selected, then the icon takes place of the menu button.</string>
          </property>
         </widget>
        </item>
@@ -1806,7 +1809,7 @@
        <item row="10" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorInactive">
          <property name="whatsThis">
-          <string>If enabled, custom colors will be applied to active and inactive windows, otherwise they will be applied only to active windows.</string>
+          <string>If enabled, custom colors will be applied to active and inactive windows, otherwise they will only be applied to active windows.</string>
          </property>
          <property name="text">
           <string>Also apply to inactive windows</string>
@@ -1843,7 +1846,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Close' buttons.</string>
+          <string>Sets the custom color for 'Close' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1863,7 +1866,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Minimise' buttons.</string>
+          <string>Sets the custom color for 'Minimise' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1883,7 +1886,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Maximise', and 'Restore, buttons.</string>
+          <string>Sets the custom color for 'Maximise', and 'Restore, buttons.</string>
          </property>
         </widget>
        </item>
@@ -1903,7 +1906,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Help' buttons.</string>
+          <string>Sets the custom color for 'Help' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1923,7 +1926,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Menu' buttons.</string>
+          <string>Sets the custom color for 'Menu' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1943,7 +1946,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Shade', and 'Un-Shade', buttons.</string>
+          <string>Sets the custom color for 'Shade', and 'Un-Shade', buttons.</string>
          </property>
         </widget>
        </item>
@@ -1963,7 +1966,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'On All Desktop' buttons.</string>
+          <string>Sets the custom color for 'On All Desktop' buttons.</string>
          </property>
         </widget>
        </item>
@@ -1983,7 +1986,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Keep Above' buttons.</string>
+          <string>Sets the custom color for 'Keep Above' buttons.</string>
          </property>
         </widget>
        </item>
@@ -2003,7 +2006,7 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>Sets the cusotm color for 'Keep Below' buttons.</string>
+          <string>Sets the custom color for 'Keep Below' buttons.</string>
          </property>
         </widget>
        </item>
@@ -2064,7 +2067,7 @@
        <item row="3" column="1">
         <widget class="QCheckBox" name="shadeMenubarOnlyWhenActive">
          <property name="whatsThis">
-          <string>Drfines wether the background coloration should be applied to all menubars, or just those in active windows.</string>
+          <string>Defines whether the background coloration should be applied to all menubars, or just those in active windows.</string>
          </property>
          <property name="text">
           <string>Active window only</string>
@@ -2143,7 +2146,7 @@
        <item row="8" column="1">
         <widget class="QCheckBox" name="menubarMouseOver">
          <property name="whatsThis">
-          <string>If enabled, menubar items will have their background gradient applied when the mouse passes over them.</string>
+          <string>If enabled, menubar items will have their background gradient applied when the mouse hovers over them.</string>
          </property>
          <property name="text">
           <string>Enable mouse-over</string>
@@ -2153,7 +2156,7 @@
        <item row="9" column="1">
         <widget class="QCheckBox" name="colorMenubarMouseOver">
          <property name="whatsThis">
-          <string>If enabled, when the mouse passes over a menubar item (and 'Enable mouse-over' is enabled) then it will also be colored, otherwise it wll use a shade of the background color.</string>
+          <string>If enabled, when the mouse hovers over a menubar item (and 'Enable mouse-over' is enabled) then it will also be colored, otherwise it wll use a shade of the background color.</string>
          </property>
          <property name="text">
           <string>Color on mouse-over</string>
@@ -2218,7 +2221,7 @@
        <item row="0" column="1">
         <widget class="QCheckBox" name="borderMenuitems">
          <property name="whatsThis">
-          <string>If enabled, selcted menuitems will be drawn with a border around the gradient. This will cause the to have a rounded look if the general round setting is not set to none.</string>
+          <string>If enabled, selcted menuitems will be drawn with a border around the gradient. This will cause them to have a rounded look if the general round setting is not set to none.</string>
          </property>
          <property name="text">
           <string>Border</string>
@@ -2238,7 +2241,7 @@
        <item row="2" column="1">
         <widget class="QCheckBox" name="thinnerMenuItems">
          <property name="whatsThis">
-          <string>Enable to reduce the height of menuitems.</string>
+          <string>Enable this to reduce the height of menuitems.</string>
          </property>
          <property name="text">
           <string>Thinner</string>
@@ -2265,7 +2268,7 @@
        <item row="4" column="1">
         <widget class="KIntNumInput" name="lighterPopupMenuBgnd">
          <property name="whatsThis">
-          <string>Defines the amount by which the popup menubackground will be lightened (or darkened).</string>
+          <string>Defines the amount by which the popup menu background will be lightened (or darkened).</string>
          </property>
          <property name="suffix">
           <string>%</string>
@@ -2372,7 +2375,7 @@
        <item row="12" column="1">
         <widget class="QCheckBox" name="popupBorder">
          <property name="whatsThis">
-          <string>If enabled, the whole popup menu will have a border, otherwise no border will be drawn. This option should be enabled unless you have shadows enabled in your window manager.</string>
+          <string>If enabled, the whole popup menu will have a border, otherwise no border will be drawn. This option should be enabled unless you have also enabled shadows in your window manager.</string>
          </property>
          <property name="text">
           <string>Enabled</string>
@@ -2496,7 +2499,7 @@
        <item row="2" column="1">
         <widget class="QCheckBox" name="dwtBtnAsPerTitleBar">
          <property name="whatsThis">
-          <string>If enabled, the buttons on dock windows will have a similar appearance (and behaviour) to the buttons on standard windows, otherwise they will only have their symbols drawn until the mouse passes over (when the button background will be drawn).</string>
+          <string>If enabled, the buttons on dock windows will have a similar appearance (and behaviour) to the buttons on standard windows, otherwise they will only have their symbols drawn until the mouse hovers over (when the button background will be drawn).</string>
          </property>
          <property name="text">
           <string>Button appearance</string>
@@ -2575,7 +2578,7 @@
 
 &lt;p&gt;If you enable this option, QtCurve will try to 'fix' this by assigning the dialogs a parent. &lt;/p&gt;
 
-&lt;p&gt;&lt;i&gt;&lt;b&gt;Note:&lt;/b&gt; This may brake some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/i&gt;&lt;/p&gt;</string>
+&lt;p&gt;&lt;i&gt;&lt;b&gt;Note:&lt;/b&gt; This may break some applications, as it wiill alter the behaviour of dialogs in a way the application has not intended. Therefore, please use with care.&lt;/i&gt;&lt;/p&gt;</string>
          </property>
          <property name="text">
           <string>'Fix' parentless dialogs</string>
@@ -2589,7 +2592,7 @@
 &lt;p&gt;In Gtk2 applications, most 'auto-default' buttons have a taller appearance than standard buttons. QtCurve attempts to mimic this for KDE4 applications - this may be disabled by enabling this option.&lt;/p&gt;</string>
          </property>
          <property name="text">
-          <string>Don't make 'auto-default' buttons larger (KDE4)</string>
+          <string>Use standard size for 'auto-default' buttons (KDE4)</string>
          </property>
         </widget>
        </item>
@@ -2785,7 +2788,7 @@
                <item row="1" column="1">
                 <widget class="KIntNumInput" name="stopValue">
                  <property name="whatsThis">
-                  <string>Sets the strength of the gradient at the defined position. 110% would lighten a color by 10%, 90% would darken it by 10%, and 100% would mean the original color.</string>
+                  <string>Sets the strength of the gradient at the defined position. 110% would lighten a color by 10%, 90% would darken it by 10%, and 100% would be the original color.</string>
                  </property>
                  <property name="maximum">
                   <number>200</number>
