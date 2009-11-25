@@ -6491,7 +6491,7 @@ debugDisplayWidget(widget, 5);
     gboolean isExpander=widget && GTK_IS_EXPANDER(widget),
              fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;
     GdkColor *col=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
-                    ? &qtcPalette.mouseover[QT_STD_BORDER]
+                    ? &qtcPalette.mouseover[QT_ARROW_MO]
                     : &style->text[QTC_ARROW_STATE(state)];
 
     x-=QTC_LV_SIZE>>1;
