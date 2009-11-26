@@ -480,7 +480,6 @@ typedef enum
     WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FOCUS,
     WIDGET_TAB_FRAME,
-    WIDGET_HIGHLIGHT_BG,       // Background behind check/radio/expander text
     WIDGET_OTHER
 } EWidget;
 
@@ -1536,7 +1535,7 @@ typedef enum
 
 #define QTC_CAN_EXTRA_ROUND(MOD) \
             (QTC_IS_EXTRA_ROUND_WIDGET(widget) && \
-            (WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget || WIDGET_HIGHLIGHT_BG==widget || \
+            (WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget || \
             ( ( (w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+MOD)) || (WIDGET_NO_ETCH_BTN==widget || WIDGET_MENU_BUTTON==widget) ) &&\
                                              (h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+MOD)))))
 #define QTC_CAN_FULL_ROUND(MOD) (w>(QTC_MIN_ROUND_FULL_SIZE+MOD) && h>(QTC_MIN_ROUND_FULL_SIZE+MOD))

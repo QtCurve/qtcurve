@@ -6421,22 +6421,26 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             highlightRect.setRight(r.right());
                         else
                             highlightRect.setX(r.x());
-                        highlightRect.setWidth(highlightRect.width()+2);
+                        highlightRect.setWidth(highlightRect.width()+1);
+
                         if(ROUND_NONE!=opts.round)
                         {
                             painter->save();
                             painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->fillPath(buildPath(QRectF(highlightRect.x(), highlightRect.y(),
+                            double   radius(getRadius(&opts, highlightRect.width(), highlightRect.height(),
+                                                      WIDGET_OTHER, RADIUS_SELECTION));
+
+                            drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)),
+                                              painter, highlightRect,
+                                              buildPath(QRectF(highlightRect.x(), highlightRect.y(),
                                                                highlightRect.width(), highlightRect.height()),
-                                                        WIDGET_HIGHLIGHT_BG, ROUNDED_ALL,
-                                                        getRadius(&opts, highlightRect.width(), highlightRect.height(),
-                                                                  WIDGET_HIGHLIGHT_BG, RADIUS_EXTERNAL)),
-                                              shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)));
+                                                        WIDGET_OTHER, ROUNDED_ALL, radius), true,
+                                              false, opts.selectionAppearance, WIDGET_SELECTION, false);
                             painter->restore();
                         }
                         else
-                            painter->fillRect(highlightRect,
-                                              shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)));
+                            drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)), painter,
+                                              highlightRect, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                     }
                     QTC_BASE_STYLE::drawControl(element, &copy, painter, widget);
                     break;
