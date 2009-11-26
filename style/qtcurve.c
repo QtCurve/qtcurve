@@ -1010,16 +1010,22 @@ static void drawBgnd(cairo_t *cr, GdkColor *col, GtkWidget *widget,
     drawAreaColor(cr, area, NULL, parent_col ? parent_col : col, x, y, width, height);
 }
 
+static GdkColor shadeColor(GdkColor *orig, double mod)
+{
+    if(!equal(mod, 0.0))
+    {
+        GdkColor modified;
+        shade(&opts, orig, &modified, mod);
+        return modified;
+    }
+    return *orig;
+}
+
 static void drawAreaModColor(cairo_t *cr, GdkRectangle *area,
                              GdkRegion *region, GdkColor *orig, double mod, gint x, gint y,
                              gint width, gint height)
 {
-    GdkColor modified;
-
-    if(!equal(mod, 0.0))
-        shade(&opts, orig, &modified, mod);
-    else
-        modified=*orig;
+    GdkColor modified=shadeColor(orig, mod);
 
     drawAreaColor(cr, area, region, &modified, x, y, width, height);
 }
@@ -2268,13 +2274,10 @@ static void dialogMapEvent(GtkWidget *widget, gpointer user_data)
     }
 }
 
-static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          const gchar *detail, int x, int y, int width, int height, int round, gboolean isSelection)
+static void drawSelectionReal(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
+                              int x, int y, int width, int height, int round, gboolean isSelection,
+                              double alpha, GdkColor *col)
 {
-    double   alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
-    GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
-
-
     if((!isSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
     {
         cairo_new_path(cr);
@@ -2286,6 +2289,14 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
                            TRUE, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
     if((!isSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
         cairo_restore(cr);
+}
+
+static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
+                          int x, int y, int width, int height, int round, gboolean isSelection)
+{
+    drawSelectionReal(cr, style, state, area, widget, x, y, width, height, round, isSelection,
+                      GTK_STATE_PRELIGHT==state ? 0.20 : 1.0,
+                      &style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE]);
 }
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -2423,7 +2434,7 @@ debugDisplayWidget(widget, 3);
                           x, y, width, height);
 
         if(GTK_STATE_SELECTED==state)
-            drawSelection(cr, style, state, area, widget, detail, x, y, width, height, round, TRUE);
+            drawSelection(cr, style, state, area, widget, x, y, width, height, round, TRUE);
     }
     else if( GTK_STATE_PRELIGHT==state && detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED) )
         drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.splitterHighlight), x, y, width, height);
@@ -2431,18 +2442,16 @@ debugDisplayWidget(widget, 3);
     {
         if(opts.crHighlight)
         {
-            clipPath(cr, x, y, width, height, WIDGET_HIGHLIGHT_BG, RADIUS_EXTERNAL, ROUNDED_ALL);
-            drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.crHighlight), x, y, width, height);
-            unsetCairoClipping(cr);
+            GdkColor col=shadeColor(&style->bg[state], opts.crHighlight);
+            drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col);
         }
     }
     else if( GTK_STATE_PRELIGHT==state && detail && 0==strcmp(detail, "expander") )
     {
         if(opts.expanderHighlight)
         {
-            clipPath(cr, x, y, width, height, WIDGET_HIGHLIGHT_BG, RADIUS_EXTERNAL, ROUNDED_ALL);
-            drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.expanderHighlight), x, y, width, height);
-            unsetCairoClipping(cr);
+            GdkColor col=shadeColor(&style->bg[state], opts.expanderHighlight);
+            drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col);
         }
     }
     else if(DETAIL("tooltip"))
@@ -2456,7 +2465,7 @@ debugDisplayWidget(widget, 3);
         cairo_stroke(cr);
     }
     else if(DETAIL("icon_view_item"))
-        drawSelection(cr, style, state, area, widget, NULL, x, y, width, height, ROUNDED_ALL, FALSE);
+        drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))
@@ -3149,7 +3158,7 @@ debugDisplayWidget(widget, 3);
             else if(isPathButton(widget))
             {
                 if(GTK_STATE_PRELIGHT==state)
-                    drawSelection(cr, style, state, area, widget, NULL, x, y, width, height, ROUNDED_ALL, FALSE);
+                    drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
 
                 if(GTK_IS_TOGGLE_BUTTON(widget))
                 {
