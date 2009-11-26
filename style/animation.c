@@ -162,6 +162,14 @@ update_animation_info (gpointer key, gpointer value, gpointer user_data)
         if (fraction <= 0.0 || fraction >= 1.0)
             return TRUE;
     }
+    else if(GTK_IS_ENTRY(widget))
+    {
+        gfloat fraction = gtk_entry_get_progress_fraction (GTK_ENTRY (widget));
+
+        /* stop animation for filled/not filled progress bars */
+        if (fraction <= 0.0 || fraction >= 1.0)
+            return TRUE;
+    }
 
     force_widget_redraw (widget);
 
@@ -254,9 +262,10 @@ find_signal_info (gconstpointer signal_info, gconstpointer widget)
 
 /* adds a progress bar */
 static void
-qtc_animation_progressbar_add (GtkWidget *progressbar)
+qtc_animation_progressbar_add (GtkWidget *progressbar, gboolean isEntry)
 {
-    gdouble fraction = gtk_progress_bar_get_fraction (GTK_PROGRESS_BAR (progressbar));
+    gdouble fraction = isEntry ? gtk_entry_get_progress_fraction(GTK_ENTRY(progressbar))
+                               : gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressbar));
 
     if (fraction < 1.0 && fraction > 0.0)
         add_animation ((GtkWidget*) progressbar, 0.0);

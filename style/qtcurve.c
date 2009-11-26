@@ -1536,7 +1536,7 @@ static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, in
     cairo_clip(cr);
 }
 
-static void drawLightBevel(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkStateType state,
+static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            GdkRectangle *area, GdkRegion *region, gint x, gint y, gint width,
                            gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
                            EBorder borderProfile, int flags, GtkWidget *wid)
@@ -2219,6 +2219,165 @@ debugDisplayWidget(widget, 3);
                
     if(GTK_IS_ENTRY(widget) && !gtk_entry_get_visibility(GTK_ENTRY(widget)))
         gtk_entry_set_invisible_char(GTK_ENTRY(widget), opts.passwordChar);
+}
+
+static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
+                         GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height,
+                         gboolean rev, gboolean isEntryProg)
+{
+    GdkRegion *region=NULL;
+    gboolean  horiz=isHorizontalProgressbar(widget);
+    int       wid=isEntryProg ? WIDGET_ENTRY_PROGRESSBAR : WIDGET_PROGRESSBAR;
+
+    if(opts.fillProgress)
+        x--, y--, width+=2, height+=2;
+
+    if(STRIPE_NONE!=opts.stripedProgress)
+    {
+        GdkRectangle              rect={x, y, width-2, height-2};
+        GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
+                                    ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
+                                    : GTK_PROGRESS_LEFT_TO_RIGHT;
+        gboolean                  revProg=GTK_PROGRESS_LEFT_TO_RIGHT!=orientation;
+        int                       animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH,
+                                  stripeOffset;
+
+        if(opts.animatedProgress && (isEntryProg || QTC_IS_PROGRESS_BAR(widget)))
+        {
+            if(isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
+                qtc_animation_progressbar_add((gpointer)widget, isEntryProg);
+
+            animShift+=(revProg ? -1 : 1)*
+                        (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
+        }
+
+        constrainRect(&rect, area);
+        region=gdk_region_rectangle(&rect);
+
+        switch(opts.stripedProgress)
+        {
+            default:
+            case STRIPE_PLAIN:
+                if(horiz)
+                    for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                    {
+                        GdkRectangle inner_rect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
+
+                        constrainRect(&inner_rect, area);
+                        if(inner_rect.width>0 && inner_rect.height>0)
+                        {
+                            GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+
+                            gdk_region_xor(region, inner_region);
+                            gdk_region_destroy(inner_region);
+                        }
+                    }
+                else
+                    for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                    {
+                        GdkRectangle inner_rect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
+
+                        /*constrainRect(&inner_rect, area);*/
+                        if(inner_rect.width>0 && inner_rect.height>0)
+                        {
+                            GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+
+                            gdk_region_xor(region, inner_region);
+                            gdk_region_destroy(inner_region);
+                        }
+                    }
+                break;
+            case STRIPE_DIAGONAL:
+                if(horiz)
+                    for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                    {
+                        GdkPoint  a[4]={ {x+stripeOffset+animShift,                               y},
+                                            {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
+                                            {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
+                                            {(x+stripeOffset+animShift)-height,                      y+height-1}};
+                        GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
+
+                        gdk_region_xor(region, inner_region);
+                        gdk_region_destroy(inner_region);
+                    }
+                else
+                    for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
+                    {
+                        GdkPoint  a[4]={{x,         y+stripeOffset+animShift},
+                                        {x+width-1, (y+stripeOffset+animShift)-width},
+                                        {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
+                                        {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
+                        GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
+
+                        gdk_region_xor(region, inner_region);
+                        gdk_region_destroy(inner_region);
+                    }
+                if(area)
+                {
+                    GdkRegion *outer_region=gdk_region_rectangle(area);
+
+                    gdk_region_intersect(region, outer_region);
+                    gdk_region_destroy(outer_region);
+                }
+        }
+    }
+
+    {
+        gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
+        GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
+        int      round=opts.fillProgress || isEntryProg ? ROUNDED_ALL : progressbarRound(widget, rev),
+                    new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
+        int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
+                    borderVal=0;
+
+        x++, y++, width-=2, height-=2;
+
+        if(opts.round>ROUND_SLIGHT && (horiz ? width : height)<4)
+            clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
+
+        if((horiz ? width : height)>1)
+            drawLightBevel(cr, style, new_state, area, NULL, x, y,
+                        width, height, &itemCols[fillVal],
+                        itemCols, round, wid, BORDER_FLAT,
+                        (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+
+        if(opts.stripedProgress && width>4 && height>4)
+            drawLightBevel(cr, style, new_state, NULL, region, x, y,
+                        width, height, &itemCols[1],
+                        qtcPalette.highlight, round, wid, BORDER_FLAT,
+                        (opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+
+        if(width>2 && height>2)
+            realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
+                            itemCols, round, BORDER_FLAT, wid, 0, QT_PBAR_BORDER);
+        if(!opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
+        {
+            /*if(!isMozilla())
+            {
+                x--; y--; width+=2; height+=2;
+            }*/
+            cairo_new_path(cr);
+            if(opts.fillProgress)
+            {
+                x++, y++, width-=2, height-=2;
+                cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+            }
+            else
+                cairo_set_source_rgba(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]), 0.75);
+            if(!(round&CORNER_TL))
+                cairo_rectangle(cr, x, y, 1, 1);
+            if(!(round&CORNER_TR))
+                cairo_rectangle(cr, x+width-1, y, 1, 1);
+            if(!(round&CORNER_BR))
+                cairo_rectangle(cr, x+width-1, y+height-1, 1, 1);
+            if(!(round&CORNER_BL))
+                cairo_rectangle(cr, x, y+height-1, 1, 1);
+            cairo_fill(cr);
+        }
+    }
+
+    if(region)
+        gdk_region_destroy(region);
 }
 
 #define QTC_GIMP_MAIN   "GimpToolbox"      /* Main GIMP toolbox */
@@ -2996,7 +3155,7 @@ debugDisplayWidget(widget, 3);
             }
 
             drawBgnd(cr, &btn_colors[bgnd], widget, area, x+1, y+1, width-2, height-2);
-            drawLightBevel(cr, style, window, state, area, NULL, x, y, width,
+            drawLightBevel(cr, style, state, area, NULL, x, y, width,
                            height-(WIDGET_SPIN_UP==wid && QTC_DO_EFFECT ? 1 : 0), &btn_colors[bgnd],
                            btn_colors, round, wid, BORDER_FLAT,
                            DF_DO_CORNERS|DF_DO_BORDER|
@@ -3038,7 +3197,7 @@ debugDisplayWidget(widget, 3);
             if(offset)
                 drawEtch(cr, area, NULL, widget, x, y, width, height, FALSE,
                          ROUNDED_RIGHT, WIDGET_SPIN);
-            drawLightBevel(cr, style, window, state, area, NULL, x, y+offset,
+            drawLightBevel(cr, style, state, area, NULL, x, y+offset,
                            width-offset, height-(2*offset), &btn_colors[bgnd],
                            btn_colors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
                            DF_DO_CORNERS|DF_DO_BORDER|
@@ -3054,7 +3213,7 @@ debugDisplayWidget(widget, 3);
         {
             gboolean horiz=width>height;
             GdkColor *cols=GTK_STATE_ACTIVE==state ? qtcPalette.sidebar : qtcPalette.background;
-            drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
+            drawLightBevel(cr, style, state, area, NULL, x, y, width, height,
                             &cols[bgnd], cols, ROUNDED_NONE, WIDGET_MENU_ITEM,
                             BORDER_FLAT, (horiz ? 0 : DF_VERT)|(sunken ? DF_SUNKEN : 0), widget);
 
@@ -3415,7 +3574,7 @@ debugDisplayWidget(widget, 3);
                                 (defBtn && IND_DARKEN==opts.defBtnIndicator)
                                     ? getFillReal(state, btn_down, true) : bgnd;
 
-                    drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
+                    drawLightBevel(cr, style, state, area, NULL, x, y, width, height,
                                    &cols[bg], cols, round, widgetType,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
                                                 (lvh ? 0 : DF_DO_BORDER)|
@@ -3509,7 +3668,7 @@ debugDisplayWidget(widget, 3);
                         else
                             btn.width+=1;
                     }
-                    drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
+                    drawLightBevel(cr, style, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
                     if(!opts.comboSplitter)
@@ -3572,7 +3731,7 @@ debugDisplayWidget(widget, 3);
                             if(QTC_DO_EFFECT)
                                 btn.width+=3;
                         }
-                        drawLightBevel(cr, style, window, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
+                        drawLightBevel(cr, style, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                     &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
                                     BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
                         if(!opts.comboSplitter)
@@ -3658,7 +3817,7 @@ debugDisplayWidget(widget, 3);
                 bgndcol=&usedcols[ORIGINAL_SHADE];
                 wid=WIDGET_FILLED_SLIDER_TROUGH;
             }
-            drawLightBevel(cr, style, window, state, area, NULL, x, y, width, height,
+            drawLightBevel(cr, style, state, area, NULL, x, y, width, height,
                            bgndcol, bgndcols, ROUNDED_ALL, wid,
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT), widget);
@@ -3684,7 +3843,7 @@ debugDisplayWidget(widget, 3);
 
                 if(used_w>0 && used_h>0)
                 {
-                    drawLightBevel(cr, style, window, state, area, NULL, used_x, used_y, used_w, used_h,
+                    drawLightBevel(cr, style, state, area, NULL, used_x, used_y, used_w, used_h,
                                    &usedcols[ORIGINAL_SHADE], usedcols,
                                    ROUNDED_ALL, WIDGET_FILLED_SLIDER_TROUGH,
                                    BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
@@ -3835,7 +3994,7 @@ debugDisplayWidget(widget, 3);
                 //drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
                 drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, x, y, width, height);
 
-            drawLightBevel(cr, style, window, state, area, NULL,
+            drawLightBevel(cr, style, state, area, NULL,
                            thinner && !horiz ? x+QTC_THIN_SBAR_MOD : x,
                            thinner && horiz  ? y+QTC_THIN_SBAR_MOD : y,
                            thinner && !horiz ? width-(QTC_THIN_SBAR_MOD*2) : width,
@@ -3845,6 +4004,11 @@ debugDisplayWidget(widget, 3);
                            BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT), widget);
         }
+    }
+    else if(DETAIL("entry-progress"))
+    {
+        int adjust=(opts.fillProgress ? 4 : 3)-(opts.etchEntry ? 1 : 0);
+        drawProgress(cr, style, state, widget, area, x-adjust, y-adjust, width+adjust, height+(2*adjust), rev, TRUE);
     }
     else if(detail && (0==strcmp(detail,"dockitem") || 0==strcmp(detail,"dockitem_bin")))
     {
@@ -3957,160 +4121,7 @@ debugDisplayWidget(widget, 3);
         }
     }
     else if(widget && pbar)
-    {
-        GdkRegion *region=NULL;
-        gboolean  horiz=isHorizontalProgressbar(widget);
-
-        if(opts.fillProgress)
-            x--, y--, width+=2, height+=2;
-
-        if(STRIPE_NONE!=opts.stripedProgress)
-        {
-            GdkRectangle              rect={x, y, width-2, height-2};
-            GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
-                                        ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
-                                        : GTK_PROGRESS_LEFT_TO_RIGHT;
-            gboolean                  revProg=GTK_PROGRESS_LEFT_TO_RIGHT!=orientation;
-            int                       animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH,
-                                      stripeOffset;
-
-            if(opts.animatedProgress && QTC_IS_PROGRESS_BAR(widget))
-            {
-                if(!GTK_PROGRESS(widget)->activity_mode)
-                    qtc_animation_progressbar_add((gpointer)widget);
-
-                animShift+=(revProg ? -1 : 1)*
-                           (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
-            }
-
-            constrainRect(&rect, area);
-            region=gdk_region_rectangle(&rect);
-
-            switch(opts.stripedProgress)
-            {
-                default:
-                case STRIPE_PLAIN:
-                    if(horiz)
-                        for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                        {
-                            GdkRectangle inner_rect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
-
-                            constrainRect(&inner_rect, area);
-                            if(inner_rect.width>0 && inner_rect.height>0)
-                            {
-                                GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
-
-                                gdk_region_xor(region, inner_region);
-                                gdk_region_destroy(inner_region);
-                            }
-                        }
-                    else
-                        for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                        {
-                            GdkRectangle inner_rect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
-
-                            /*constrainRect(&inner_rect, area);*/
-                            if(inner_rect.width>0 && inner_rect.height>0)
-                            {
-                                GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
-
-                                gdk_region_xor(region, inner_region);
-                                gdk_region_destroy(inner_region);
-                            }
-                        }
-                    break;
-                case STRIPE_DIAGONAL:
-                    if(horiz)
-                        for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                        {
-                            GdkPoint  a[4]={ {x+stripeOffset+animShift,                               y},
-                                             {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
-                                             {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
-                                             {(x+stripeOffset+animShift)-height,                      y+height-1}};
-                            GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
-
-                            gdk_region_xor(region, inner_region);
-                            gdk_region_destroy(inner_region);
-                        }
-                    else
-                        for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
-                        {
-                            GdkPoint  a[4]={{x,         y+stripeOffset+animShift},
-                                            {x+width-1, (y+stripeOffset+animShift)-width},
-                                            {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
-                                            {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
-                            GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
-
-                            gdk_region_xor(region, inner_region);
-                            gdk_region_destroy(inner_region);
-                        }
-                    if(area)
-                    {
-                        GdkRegion *outer_region=gdk_region_rectangle(area);
-
-                        gdk_region_intersect(region, outer_region);
-                        gdk_region_destroy(outer_region);
-                    }
-            }
-        }
-
-        {
-            gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
-            GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
-            int      round=opts.fillProgress ? ROUNDED_ALL : progressbarRound(widget, rev),
-                     new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
-            int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
-                     borderVal=0;
-
-            x++, y++, width-=2, height-=2;
-
-            if(opts.round>ROUND_SLIGHT && (horiz ? width : height)<4)
-                clipPath(cr, x, y, width, height, WIDGET_PROGRESSBAR, RADIUS_EXTERNAL, ROUNDED_ALL);
-
-            if((horiz ? width : height)>1)
-                drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
-                            width, height, &itemCols[fillVal],
-                            itemCols, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
-                            (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
-
-            if(opts.stripedProgress && width>4 && height>4)
-                drawLightBevel(cr, style, window, new_state, NULL, region, x, y,
-                            width, height, &itemCols[1],
-                            qtcPalette.highlight, round, WIDGET_PROGRESSBAR, BORDER_FLAT,
-                            (opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
-
-            if(width>2 && height>2)
-                realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, WIDGET_PROGRESSBAR, 0, QT_PBAR_BORDER);
-            if(!opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
-            {
-                /*if(!isMozilla())
-                {
-                    x--; y--; width+=2; height+=2;
-                }*/
-                cairo_new_path(cr);
-                if(opts.fillProgress)
-                {
-                    x++, y++, width-=2, height-=2;
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
-                }
-                else
-                    cairo_set_source_rgba(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]), 0.75);
-                if(!(round&CORNER_TL))
-                    cairo_rectangle(cr, x, y, 1, 1);
-                if(!(round&CORNER_TR))
-                    cairo_rectangle(cr, x+width-1, y, 1, 1);
-                if(!(round&CORNER_BR))
-                    cairo_rectangle(cr, x+width-1, y+height-1, 1, 1);
-                if(!(round&CORNER_BL))
-                    cairo_rectangle(cr, x, y+height-1, 1, 1);
-                cairo_fill(cr);
-            }
-        }
-
-        if(region)
-            gdk_region_destroy(region);
-    }
+        drawProgress(cr, style, state, widget, area, x, y, width, height, rev, FALSE);
     else if(widget && menuitem)
     {
         GdkRegion  *region=NULL;
@@ -4183,7 +4194,7 @@ debugDisplayWidget(widget, 3);
                                   TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
             else if(stdColors && opts.borderMenuitems)
             {
-                drawLightBevel(cr, style, window, new_state, area, NULL, x, y,
+                drawLightBevel(cr, style, new_state, area, NULL, x, y,
                                 width, height, &itemCols[fillVal],
                                 itemCols, round, WIDGET_MENU_ITEM, BORDER_FLAT, DF_DRAW_INSIDE|
                                 (stdColors ? DF_DO_BORDER : 0)|

@@ -35,6 +35,7 @@
 23. If editing/creating userChrome.css and chrome folder does not exist, then
     create it.
 24. Theme icon view selections.
+25. Theme entry progress.
 
 0.69.2
 ------
