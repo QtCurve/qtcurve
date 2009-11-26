@@ -457,6 +457,7 @@ typedef enum
     WIDGET_PROGRESSBAR,
     WIDGET_PBAR_TROUGH,
 #ifndef __cplusplus
+    WIDGET_ENTRY_PROGRESSBAR,
     WIDGET_TOGGLE_BUTTON,
     WIDGET_SPIN_UP,
     WIDGET_SPIN_DOWN,
@@ -1396,6 +1397,9 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
         case WIDGET_MENU_ITEM:
             return opts->menuitemAppearance;
         case WIDGET_PROGRESSBAR:
+#ifndef __cplusplus
+        case WIDGET_ENTRY_PROGRESSBAR:
+#endif
             return opts->progressAppearance;
         case WIDGET_PBAR_TROUGH:
             return opts->progressGrooveAppearance;
