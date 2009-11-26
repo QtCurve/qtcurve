@@ -927,9 +927,7 @@ typedef struct
                      titlebarButtonAppearance,
                      dwtAppearance,
 #endif
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      selectionAppearance,
-#endif
                      menuStripeAppearance,
                      progressAppearance,
                      progressGrooveAppearance,
@@ -1403,10 +1401,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
             return opts->progressAppearance;
         case WIDGET_PBAR_TROUGH:
             return opts->progressGrooveAppearance;
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
         case WIDGET_SELECTION:
             return opts->selectionAppearance;
-#endif
 #ifdef __cplusplus
         case WIDGET_DOCK_WIDGET_TITLE:
             return opts->dwtAppearance;

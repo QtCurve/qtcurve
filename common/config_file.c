@@ -1180,9 +1180,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->vArrows=false;
                 def->toolbarAppearance=APPEARANCE_GRADIENT;
                 def->focus=FOCUS_STANDARD;
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                 def->selectionAppearance=APPEARANCE_FLAT;
-#endif
                 def->flatSbarButtons=false;
                 def->comboSplitter=true;
                 def->handles=LINE_DOTS;
@@ -1234,9 +1232,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
             QTC_CFG_READ_APPEARANCE(menuitemAppearance, true)
             QTC_CFG_READ_APPEARANCE(toolbarAppearance, false)
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_APPEARANCE(selectionAppearance, false)
-#endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(dwtAppearance, false)
 #endif
@@ -1628,15 +1624,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkAppearance(&opts->tabAppearance, opts);
             checkAppearance(&opts->activeTabAppearance, opts);
             checkAppearance(&opts->sliderAppearance, opts);
+            checkAppearance(&opts->selectionAppearance, opts);
 #ifdef __cplusplus
             checkAppearance(&opts->titlebarAppearance, opts);
             checkAppearance(&opts->inactiveTitlebarAppearance, opts);
             checkAppearance(&opts->titlebarButtonAppearance, opts);
-#endif
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             checkAppearance(&opts->selectionAppearance, opts);
-#endif
-#ifdef __cplusplus
             checkAppearance(&opts->dwtAppearance, opts);
 #endif
             checkAppearance(&opts->menuStripeAppearance, opts);
@@ -1677,12 +1670,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(APPEARANCE_BEVELLED==opts->activeTabAppearance)
                 opts->activeTabAppearance=APPEARANCE_GRADIENT;
 
-#if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             if(APPEARANCE_RAISED==opts->selectionAppearance)
                 opts->selectionAppearance=APPEARANCE_FLAT;
             else if(APPEARANCE_BEVELLED==opts->selectionAppearance)
                 opts->selectionAppearance=APPEARANCE_GRADIENT;
-#endif
+
             if(APPEARANCE_RAISED==opts->menuStripeAppearance)
                 opts->menuStripeAppearance=APPEARANCE_FLAT;
             else if(APPEARANCE_BEVELLED==opts->menuStripeAppearance)
@@ -1765,9 +1757,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
 #ifndef QTC_CONFIG_DIALOG
             opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
-#endif
             opts->lvAppearance=MODIFY_AGUA_X(opts->lvAppearance, APPEARANCE_LV_AGUA);
             opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
             opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
@@ -1872,10 +1862,10 @@ static void defaultSettings(Options *opts)
     opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
     opts->menuDelay=DEFAULT_MENU_DELAY;
     opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
+    opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
-    opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
     opts->gtkButtonOrder=false;
 #else
     opts->round=ROUND_FULL;
