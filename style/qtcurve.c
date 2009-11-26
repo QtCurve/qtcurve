@@ -2596,7 +2596,14 @@ debugDisplayWidget(widget, 3);
             drawSelection(cr, style, state, area, widget, x, y, width, height, round, TRUE);
     }
     else if( GTK_STATE_PRELIGHT==state && detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED) )
-        drawAreaMod(cr, style, GTK_STATE_PRELIGHT, area, NULL, QTC_TO_FACTOR(opts.splitterHighlight), x, y, width, height);
+    {
+        if(opts.splitterHighlight)
+        {
+            GdkColor col=shadeColor(&style->bg[state], opts.splitterHighlight);
+            drawBevelGradient(cr, style, area, NULL, x, y, width, height, &col,
+                              width>height, FALSE, opts.selectionAppearance, WIDGET_SELECTION);
+        }
+    }
     else if( GTK_STATE_PRELIGHT==state && detail && 0==strcmp(detail, "checkbutton") )
     {
         if(opts.crHighlight)

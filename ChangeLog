@@ -7,7 +7,7 @@
  4. Made check/radio and splitter highlight options a configurable % - i.e.
     not based on standard hightlight %
  5. Added option to set expander highlight factor.
- 6. When highlighting check/radio/expander background, round the corners and
+ 6. When highlighting check/radio/splitter/expander background, round the corners and
     use the selection gradient.
  7. Added new splitter/handle/thumb style: single dot.
  8. Don't do coloured mouse over for buttons of editable combos, spin buttons,
