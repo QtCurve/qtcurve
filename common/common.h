@@ -1600,12 +1600,12 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                     if(/* (WIDGET_RUBBER_BAND==widget && w>14 && h>14) || */(w>48 && h>48))
                         return 6.0;
                 case ROUND_FULL:
-                    if( /*(WIDGET_RUBBER_BAND==widget && w>11 && h>11) || */(w>48 && h>48))
-                        return 3.0;
+//                     if( /*(WIDGET_RUBBER_BAND==widget && w>11 && h>11) || */(w>48 && h>48))
+//                         return 3.0;
                     if(w>QTC_MIN_ROUND_FULL_SIZE && h>QTC_MIN_ROUND_FULL_SIZE)
-                        return QTC_FULL_ETCH_RADIUS;
+                        return 3.0;
                 case ROUND_SLIGHT:
-                    return QTC_SLIGHT_ETCH_RADIUS;
+                    return 2.0;
                 case ROUND_NONE:
                     return 0;
             }
