@@ -4401,11 +4401,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             {
                 QColor color(palette.color(QPalette::Active, QPalette::Window));
 
-//                 if(0!=opts.tabBgnd && inStackWidget(widget))
-//                     color=shade(color, QTC_TO_FACTOR(opts.tabBgnd));
-                painter->fillRect(r, QColor(state&State_MouseOver && state&State_Enabled && opts.splitterHighlight
-                                                ? shade(color, QTC_TO_FACTOR(opts.splitterHighlight))
-                                                : color));
+                if(state&State_MouseOver && state&State_Enabled && opts.splitterHighlight)
+                    drawBevelGradient(shade(color, QTC_TO_FACTOR(opts.splitterHighlight)),
+                                      painter, r, !(state&State_Horizontal), false, opts.selectionAppearance, WIDGET_SELECTION);
+                else
+                    painter->fillRect(r, color);
             }
 
             switch(opts.splitters)
