@@ -1479,8 +1479,8 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 #else
 #define QTC_MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
 #endif
-#define QTC_MIN_ROUND_MAX_HEIGHT    17
-#define QTC_MIN_ROUND_MAX_WIDTH     32
+#define QTC_MIN_ROUND_MAX_HEIGHT    12
+#define QTC_MIN_ROUND_MAX_WIDTH     18
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
@@ -1622,7 +1622,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                     if(w>(QTC_MIN_ROUND_MAX_WIDTH-2) && h>(QTC_MIN_ROUND_MAX_HEIGHT-2) && QTC_IS_MAX_ROUND_WIDGET(widget))
                     {
                         double r=((w>h ? h : w)-2.0)/2.0;
-                        return r>9.5 ? 9.5 : r;
+                        return r>10.5 ? 10.5 : r;
                     }
                 case ROUND_EXTRA:
                     if(QTC_CAN_EXTRA_ROUND(-2))
@@ -1651,7 +1651,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                     if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_IS_MAX_ROUND_WIDGET(widget))
                     {
                         double r=((w>h ? h : w)-2.0)/2.0;
-                        return r>10.5 ? 10.5 : r;
+                        return r>11.5 ? 11.5 : r;
                     }
                 case ROUND_EXTRA:
                     if(QTC_CAN_EXTRA_ROUND(0))
@@ -1681,7 +1681,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                     if(w>(QTC_MIN_ROUND_MAX_WIDTH+2) && h>(QTC_MIN_ROUND_MAX_HEIGHT+2) && QTC_IS_MAX_ROUND_WIDGET(widget))
                     {
                         double r=((w>h ? h : w)-2.0)/2.0;
-                        return r>11.5 ? 11.5 : r;
+                        return r>12.5 ? 12.5 : r;
                     }
                 case ROUND_EXTRA:
                     if(QTC_CAN_FULL_ROUND(2))

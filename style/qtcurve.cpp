@@ -9035,6 +9035,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                                 ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
                                 : (int)(radius+2.5);
                     middleSize=(QTC_MIN_ROUND_MAX_WIDTH-(endSize*2))+4;
+                    if(middleSize<4)
+                        middleSize=4;
                     break;
                 }
             }
