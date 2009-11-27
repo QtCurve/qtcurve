@@ -6,5 +6,5 @@ add_definitions(-DQTC_MOZILLA_DIR=\\\"${GTK_THEME_DIR}/mozilla\\\")
 target_link_libraries(qtcurve ${GTK_LINK_FLAGS})
 
 install(TARGETS qtcurve LIBRARY DESTINATION ${GTK_LIB_DIR}/gtk-2.0/${GTK_VERSION}/engines )
-install(FILES gtkrc icons3 icons4 map_kde_icons.pl
+install(FILES gtkrc icons3 icons4 map_kde_icons.pl kdeglobals
         DESTINATION ${GTK_THEME_DIR}/gtk-2.0)

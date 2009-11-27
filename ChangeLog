@@ -36,6 +36,8 @@
     create it.
 24. Theme icon view selections.
 25. Theme entry progress.
+26. Supply a default kdeglobs file (installed into QtCurve's gtk-2.0 folder) so
+    as to allow easy modifications of default settings.
 
 0.69.2
 ------
