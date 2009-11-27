@@ -202,8 +202,8 @@ typedef GdkColor color;
 
 #define QTC_TO_FACTOR(A) ((100.0+((double)(A)))/100.0)
 #define DEFAULT_HIGHLIGHT_FACTOR                   3
-#define DEFAULT_SPLITTER_HIGHLIGHT_FACTOR          0
-#define DEFAULT_CR_HIGHLIGHT_FACTOR                0
+#define DEFAULT_SPLITTER_HIGHLIGHT_FACTOR          3
+#define DEFAULT_CR_HIGHLIGHT_FACTOR                3
 #define DEFAULT_EXPANDER_HIGHLIGHT_FACTOR          3
 #define MAX_HIGHLIGHT_FACTOR                      50
 #define MIN_HIGHLIGHT_FACTOR                     -50

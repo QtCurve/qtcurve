@@ -1110,9 +1110,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 def->roundAllTabs=false;
                 def->smallRadio=false;
-                def->splitterHighlight=DEFAULT_HIGHLIGHT_FACTOR;
                 def->splitters=LINE_FLAT;
                 def->handles=LINE_SUNKEN;
+                def->crHighlight=0;
 #ifdef __cplusplus
                 def->dwtAppearance=APPEARANCE_FLAT;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
