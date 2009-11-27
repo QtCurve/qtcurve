@@ -1180,7 +1180,8 @@ static void readKdeGlobals(const char *rc, int rd)
         qtSettings.buttonIcons=TRUE;
     if(rd&RD_LIST_SHADE && !(found&RD_LIST_SHADE))
         qtSettings.shadeSortedList=TRUE;
-    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && qtSettings.qt4)))  /* No need to check if read in */
+    //if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && qtSettings.qt4)))  /* No need to check if read in */
+    if(rd&RD_FONT && found&RD_FONT)
         setFont(&fonts[FONT_GENERAL], FONT_GENERAL);
     if(rd&RD_MENU_FONT && found&RD_MENU_FONT)
         setFont(&fonts[FONT_MENU], FONT_MENU);
@@ -1319,7 +1320,8 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
 */
 #endif
 
-    if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /* No need to check if read in */
+    //if(rd&RD_FONT && (found&RD_FONT || (!qtSettings.fonts[FONT_GENERAL] && setDefaultFont)))  /* No need to check if read in */
+    if(rd&RD_FONT && found&RD_FONT)
         setFont(&font, FONT_GENERAL);
 }
 
@@ -2364,7 +2366,7 @@ static gboolean qtInit()
                 gtk_rc_parse_string(tmpStr);
             }
 
-            if(qtSettings.fonts[FONT_BOLD])
+            if(qtSettings.fonts[FONT_BOLD] && qtSettings.fonts[FONT_GENERAL] && strcmp(qtSettings.fonts[FONT_BOLD], qtSettings.fonts[FONT_GENERAL]))
             {
                 static const char *constBoldPrefix="style \""QTC_RC_SETTING"BFnt\"{font_name=\"";
                 static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""QTC_RC_SETTING"BFnt\" "
