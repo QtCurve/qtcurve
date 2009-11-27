@@ -2,13 +2,13 @@
 -----
  1. Added option to colour selected check/radios.
  2. Added option to use a smaller dot for radios.
- 3. Added option to control whether the background of splitters should be
     highlighted on mouse over.
- 4. Made check/radio and splitter highlight options a configurable % - i.e.
+ 3. Made check/radio and splitter highlight options a configurable % - i.e.
     not based on standard hightlight %
- 5. Added option to set expander highlight factor.
- 6. When highlighting check/radio/splitter/expander background, round the corners and
+ 4. Added option to set expander highlight factor.
+ 5. When highlighting check/radio/splitter/expander background, round the corners and
     use the selection gradient.
+ 6. Default check/radio/splitter/expander highlight set to 3%
  7. Added new splitter/handle/thumb style: single dot.
  8. Don't do coloured mouse over for buttons of editable combos, spin buttons,
     or scrollbar buttons.
