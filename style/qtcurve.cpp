@@ -4402,8 +4402,21 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 QColor color(palette.color(QPalette::Active, QPalette::Window));
 
                 if(state&State_MouseOver && state&State_Enabled && opts.splitterHighlight)
-                    drawBevelGradient(shade(color, QTC_TO_FACTOR(opts.splitterHighlight)),
-                                      painter, r, !(state&State_Horizontal), false, opts.selectionAppearance, WIDGET_SELECTION);
+                    if(ROUND_NONE!=opts.round)
+                    {
+                        painter->save();
+                        painter->setRenderHint(QPainter::Antialiasing, true);
+                        double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
+
+                        drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.splitterHighlight)),
+                                          painter, r, buildPath(QRectF(r.x(), r.y(), r.width(), r.height()),
+                                                                WIDGET_OTHER, ROUNDED_ALL, radius),
+                                          !(state&State_Horizontal), false, opts.selectionAppearance, WIDGET_SELECTION, false);
+                        painter->restore();
+                    }
+                    else
+                        drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)), painter,
+                                          r, !(state&State_Horizontal), false, opts.selectionAppearance, WIDGET_SELECTION);
                 else
                     painter->fillRect(r, color);
             }
