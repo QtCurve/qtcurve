@@ -77,6 +77,7 @@ typedef enum
 #endif
 
 #ifdef __cplusplus
+#include <qpixmap.h>
 typedef QColor color;
 #else
 typedef gboolean bool;
