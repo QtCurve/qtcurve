@@ -2,7 +2,6 @@
 -----
  1. Added option to colour selected check/radios.
  2. Added option to use a smaller dot for radios.
-    highlighted on mouse over.
  3. Made check/radio and splitter highlight options a configurable % - i.e.
     not based on standard hightlight %
  4. Added option to set expander highlight factor.
@@ -38,6 +37,7 @@
 25. Theme entry progress.
 26. Supply a default kdeglobs file (installed into QtCurve's gtk-2.0 folder) so
     as to allow easy modifications of default settings.
+27. Added option to draw Air-like background rings.
 
 0.69.2
 ------

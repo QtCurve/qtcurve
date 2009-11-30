@@ -983,7 +983,7 @@ static GdkColor * getParentBgCol(GtkWidget *widget)
 
 static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
-    if(IS_FLAT(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
+    if(!QTC_CUSTOM_BGND && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
     {
         GdkColor *parentBg=getParentBgCol(widget);
 
@@ -1228,7 +1228,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
 
     if(IS_FLAT(bevApp))
     {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || opts.tabBgnd || !sel)
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !QTC_CUSTOM_BGND || opts.tabBgnd || !sel)
             drawAreaColorAlpha(cr, area, region, base, x, y, width, height, alpha);
     }
     else
@@ -1255,7 +1255,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             
             if(/*sel && */(topTab || botTab) && i==grad->numStops-1)
             {
-                if(sel && !IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
+                if(sel && QTC_CUSTOM_BGND && 0==opts.tabBgnd)
                     alpha=0.0;
                 col=*base;
             }
@@ -2064,6 +2064,18 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
     *color = parent->style->bg[GTK_WIDGET_STATE(parent)];
 }
 
+static void drawBgndRing(cairo_t *cr, int xpos, int x, int y, int size, int size2, double alpha)
+{
+    double width=(size-size2)/2.0,
+           width2=width/2.0,
+           radius=(size2+width)/2.0;
+
+    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, alpha);
+    cairo_set_line_width(cr, width);
+    cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, radius, 0, 2*M_PI);
+    cairo_stroke(cr);
+}
+
 static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
                                  gint x, gint y, gint width, gint height)
 {
@@ -2085,12 +2097,35 @@ debugDisplayWidget(widget, 20);
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
-            if(GT_HORIZ==opts.bgndGrad)
-                drawBevelGradient(cr, style, area, NULL, x, -pos, width, window->allocation.height,
-                                  &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
-            else
-                drawBevelGradient(cr, style, area, NULL, -pos, y, window->allocation.width, height,
-                                  &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+            if(!IS_FLAT(opts.bgndAppearance))
+            {
+                if(GT_HORIZ==opts.bgndGrad)
+                    drawBevelGradient(cr, style, area, NULL, x, -pos, width, window->allocation.height,
+                                      &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+                else
+                    drawBevelGradient(cr, style, area, NULL, -pos, y, window->allocation.width, height,
+                                      &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+            }
+
+            if(opts.bgndRings)
+            {
+                int xpos=window->allocation.width-QTC_RINGS_WIDTH;
+
+                cairo_save(cr);
+                drawBgndRing(cr, xpos, 0, 0, 200, 140, QTC_RINGS_ALPHA);
+
+                drawBgndRing(cr, xpos, 210, 10, 230, 214, QTC_RINGS_ALPHA);
+                drawBgndRing(cr, xpos, 226, 26, 198, 182, QTC_RINGS_ALPHA);
+                drawBgndRing(cr, xpos, 300, 100, 50, 0, QTC_RINGS_ALPHA);
+
+                drawBgndRing(cr, xpos, 100, 96, 160, 144, QTC_RINGS_ALPHA);
+                drawBgndRing(cr, xpos, 116, 112, 128, 112, QTC_RINGS_ALPHA);
+
+                drawBgndRing(cr, xpos, 250, 160, 200, 140, QTC_RINGS_ALPHA);
+                drawBgndRing(cr, xpos, 310, 220, 80, 0, QTC_RINGS_ALPHA);
+
+                cairo_restore(cr);
+            }
             return TRUE;
         }
     }
@@ -2118,7 +2153,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         qtcEntrySetup(widget);
 
     if((doEtch || ROUND_NONE!=opts.round) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-        if(!IS_FLAT(opts.bgndAppearance) && widget && drawBgndGradient(cr, style, area, widget, x, y, width, height))
+        if(QTC_CUSTOM_BGND && widget && drawBgndGradient(cr, style, area, widget, x, y, width, height))
             ;
         else
         {
@@ -2551,7 +2586,7 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if(!IS_FLAT(opts.bgndAppearance) && widget && GTK_IS_WINDOW(widget) &&
+    if(QTC_CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) &&
        drawBgndGradient(cr, style, area, widget, x, y, width, height))
         qtcWindowSetup(widget);
     else if(widget && GTK_IS_TREE_VIEW(widget))
@@ -2672,8 +2707,12 @@ debugDisplayWidget(widget, 3);
 
     sanitizeSize(window, &width, &height);
     if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+    {
         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
                                            area, x, y, width, height);
+        if(widget && opts.bgndRings)
+            drawBgndGradient(cr, style, area, widget, x, y, width, height);
+    }
 
     if (DETAIL("dockitem") || paf)
     {
@@ -3172,11 +3211,15 @@ debugDisplayWidget(widget, 3);
     else if(DETAIL("spinbutton"))
     {
         if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+        {
             gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
                                                GTK_STATE_INSENSITIVE==state
                                                     ? GTK_STATE_INSENSITIVE
                                                     : GTK_STATE_NORMAL,
                                                area, x, y, width, height);
+            if(widget && opts.bgndRings)
+                drawBgndGradient(cr, style, area, widget, x, y, width, height);
+        }
 
         if(opts.unifySpin)
         {
@@ -3556,7 +3599,7 @@ debugDisplayWidget(widget, 3);
                    /* if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
                        GTK_IS_SCROLLED_WINDOW(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent))
                         drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-                    else*/ if(IS_FLAT(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 
+                    else*/ if(!QTC_CUSTOM_BGND || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
                                                               widget && drawBgndGradient(cr, style, area, widget, xo, yo, wo, ho)))
                     {
                         if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
@@ -3795,11 +3838,15 @@ debugDisplayWidget(widget, 3);
 
             if((!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")) &&
                 IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+            {
                 gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
                                                    GTK_STATE_INSENSITIVE==state
                                                         ? GTK_STATE_INSENSITIVE
                                                         : GTK_STATE_NORMAL,
                                                    area, x, y, width, height);
+                if(widget && opts.bgndRings)
+                    drawBgndGradient(cr, style, area, widget, x, y, width, height);
+            }
 
             if(horiz)
             {
@@ -3956,7 +4003,7 @@ debugDisplayWidget(widget, 3);
                 if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
                    GTK_IS_SCROLLED_WINDOW(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent))
                     drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-                else if(IS_FLAT(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 
+                else if(!QTC_CUSTOM_BGND || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
                                                           widget && drawBgndGradient(cr, style, area, widget, xo, yo, wo, ho)))
                     drawBevelGradient(cr, style, area, NULL, xo, yo, wo, ho,
                                       &qtcPalette.background[ORIGINAL_SHADE],
@@ -4019,7 +4066,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(detail && (0==strcmp(detail,"dockitem") || 0==strcmp(detail,"dockitem_bin")))
     {
-        if(!IS_FLAT(opts.bgndAppearance) && widget)
+        if(QTC_CUSTOM_BGND && widget)
             drawBgndGradient(cr, style, area, widget, x, y, width, height);
     }
     else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") ||
@@ -4046,7 +4093,11 @@ debugDisplayWidget(widget, 3);
                                 FALSE, MODIFY_AGUA(app), WIDGET_OTHER);
             else if(IS_FLAT(opts.bgndAppearance) || !(widget &&
                                                       drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+            {
                 drawAreaColor(cr, area, NULL, col, x, y, width, height);
+                if(widget && opts.bgndRings)
+                    drawBgndGradient(cr, style, area, widget, x, y, width, height);
+            }
 
             if(GTK_SHADOW_NONE!=shadow_type && TB_NONE!=opts.toolbarBorders)
             {
@@ -4302,7 +4353,11 @@ debugDisplayWidget(widget, 3);
     else if(detail && 0==strcmp(detail+1, "ruler"))
     {
         if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x, y, width, height))
+        {
             drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
+            if(widget && opts.bgndRings)
+                drawBgndGradient(cr, style, area, widget, x, y, width, height);
+        }
     }
     else if(DETAIL("hseparator"))
     {
@@ -4321,7 +4376,11 @@ debugDisplayWidget(widget, 3);
     {
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
         if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x+1, y+1, width-2, height-2))
+        {
             drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
+            if(widget && opts.bgndRings)
+                drawBgndGradient(cr, style, area, widget, x, y, width, height);
+        }
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
                    NULL, ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, QT_STD_BORDER);
@@ -5514,7 +5573,7 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
                     EWidget tab, gboolean grad)
 {
     gboolean selected=GTK_STATE_NORMAL==state,
-             flatBgnd=IS_FLAT(opts.bgndAppearance) || 0!=opts.tabBgnd;
+             flatBgnd=!QTC_CUSTOM_BGND || 0!=opts.tabBgnd;
 
 //     if(selected && !flatBgnd)
 //         drawBgndGradient(cr, style, area, widget, x, y, width, height);
@@ -6485,7 +6544,11 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
 
     /* Clear background */
     if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
+    {
         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
+        if(widget && opts.bgndRings)
+            drawBgndGradient(cr, style, area, widget, x, y, width, height);
+    }
 
     switch(edge)
     {
