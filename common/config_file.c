@@ -937,6 +937,7 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_IMAGE(ENTRY) \
     { \
         opts->ENTRY.use=readBoolEntry(cfg, #ENTRY, def->ENTRY.use); \
+        opts->ENTRY.loaded=false; \
         if(opts->ENTRY.use) \
         { \
             const char *file=readStringEntry(cfg, #ENTRY ".file"); \
@@ -1936,10 +1937,10 @@ static void defaultSettings(Options *opts)
 #else
     opts->round=ROUND_FULL;
 #endif
-    opts->bgndImage.use=false;
 #ifdef __cplusplus
     opts->dwtAppearance=APPEARANCE_CUSTOM1;
 #endif
+    opts->bgndImage.use=false;
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;
     opts->animatedProgress=false;
