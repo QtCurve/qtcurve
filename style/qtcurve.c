@@ -2398,7 +2398,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
             cairo_rectangle(cr, x, y, width, height);
             cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
-            cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0, 0.5);
+            cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0, QTC_GLOW_PROG_ALPHA);
             cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0, 0.0);
             cairo_set_source(cr, pat);
             cairo_pattern_destroy(pat);
