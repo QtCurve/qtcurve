@@ -329,7 +329,7 @@ typedef GdkColor color;
 #define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
 
-#define QTC_RINGS_ALPHA  0.18
+#define QTC_RINGS_ALPHA  0.25
 #define QTC_RINGS_WIDTH  450
 #define QTC_RINGS_HEIGHT 360
 
