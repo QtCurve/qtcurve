@@ -784,6 +784,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(bgndRings, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2029,6 +2030,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
+    opts.bgndRings=bgndRings->isChecked();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
     opts.xbar=xbar->isChecked();
     opts.crColor=crColor->isChecked();
@@ -2219,6 +2221,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
+    bgndRings->setChecked(opts.bgndRings);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR);
     dwtColAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR);
@@ -2420,6 +2423,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          sbarBgndAppearance->currentIndex()!=opts.sbarBgndAppearance ||
          sliderFill->currentIndex()!=opts.sliderFill ||
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||
+         bgndRings->isChecked()!=opts.bgndRings ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
          xbar->isChecked()!=opts.xbar ||
          crColor->isChecked()!=opts.crColor ||

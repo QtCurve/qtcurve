@@ -66,6 +66,7 @@
 44. Draw titles in KMenu's the same as menu separators with titles - bold, and
     with no icon.
 45. Fade ends of tab widget base - used in document mode tabs.
+46. Added option to draw Air-like background rings.
 
 0.69.2
 ------

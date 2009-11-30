@@ -1289,6 +1289,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(groupBoxLine)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(fadeLines)
+            QTC_CFG_READ_BOOL(bgndRings)
 #endif
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
             QTC_CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
@@ -1866,6 +1867,7 @@ static void defaultSettings(Options *opts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
+    opts->bgndRings=false;
     opts->gtkButtonOrder=false;
 #else
     opts->round=ROUND_FULL;
@@ -2529,6 +2531,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(groupBoxLine)
         CFG_WRITE_ENTRY(fadeLines)
+        CFG_WRITE_ENTRY(bgndRings)
         CFG_WRITE_ENTRY(colorMenubarMouseOver)
         CFG_WRITE_ENTRY_NUM(crHighlight)
         CFG_WRITE_ENTRY(crButton)

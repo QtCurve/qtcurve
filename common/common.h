@@ -327,6 +327,13 @@ typedef GdkColor color;
 #define QTC_ETCH_RADIO_TOP_ALPHA     0.09
 #define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
+
+#define QTC_RINGS_ALPHA  0.18
+#define QTC_RINGS_WIDTH  450
+#define QTC_RINGS_HEIGHT 360
+
+#define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || opts.bgndRings)
+
 #endif
 
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -847,6 +854,7 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
                      fadeLines,
+                     bgndRings,
 #endif
                      borderMenuitems,
                      colorMenubarMouseOver,

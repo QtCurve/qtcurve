@@ -1345,7 +1345,7 @@ void QtCurveStyle::polish(QWidget *widget)
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 
-    if(!IS_FLAT(opts.bgndAppearance))
+    if(QTC_CUSTOM_BGND)
     {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
         {
@@ -1445,7 +1445,7 @@ void QtCurveStyle::polish(QWidget *widget)
             (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
-        if(!IS_FLAT(opts.bgndAppearance))
+        if(QTC_CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::NoRole);
 
         widget->setAttribute(Qt::WA_Hover, true);
@@ -1556,10 +1556,10 @@ void QtCurveStyle::polish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                if(IS_FLAT(opts.bgndAppearance))
-                    frame->setBackgroundRole(QPalette::Window);
-                else
+                if(QTC_CUSTOM_BGND)
                     frame->setAutoFillBackground(false);
+                else
+                    frame->setBackgroundRole(QPalette::Window);
 
                 QLayout *layout(frame->layout());
 
@@ -1757,7 +1757,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
         disconnect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 
-    if(!IS_FLAT(opts.bgndAppearance))
+    if(QTC_CUSTOM_BGND)
     {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
         {
@@ -1825,7 +1825,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
         widget->setAttribute(Qt::WA_Hover, false);
 
-        if(!IS_FLAT(opts.bgndAppearance))
+        if(QTC_CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::Background);
 
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
@@ -1875,10 +1875,10 @@ void QtCurveStyle::unpolish(QWidget *widget)
             if(widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
 #endif
             {
-                if(IS_FLAT(opts.bgndAppearance))
-                    frame->setBackgroundRole(QPalette::Base);
-                else
+                if(QTC_CUSTOM_BGND)
                     frame->setAutoFillBackground(true);
+                else
+                    frame->setBackgroundRole(QPalette::Base);
 
                 QLayout *layout(frame->layout());
 
@@ -2030,7 +2030,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         }
     }
 
-    if(!IS_FLAT(opts.bgndAppearance) && QEvent::Paint==event->type())
+    if(QTC_CUSTOM_BGND && QEvent::Paint==event->type())
     {
         QWidget *widget=qobject_cast<QWidget *>(object);
 
@@ -4062,7 +4062,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->save();
 
             if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
-                if((opts.round || (!IS_FLAT(opts.bgndAppearance && 0==opts.tabBgnd))) &&
+                if((opts.round || (QTC_CUSTOM_BGND && 0==opts.tabBgnd)) &&
                     widget && ::qobject_cast<const QTabWidget *>(widget))
                 {
                     struct QtcTabWidget : public QTabWidget
@@ -4075,7 +4075,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     if(tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
                     {
-                        if(!IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
+                        if(QTC_CUSTOM_BGND && 0==opts.tabBgnd)
                         {
                             QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
 
@@ -8903,7 +8903,7 @@ void QtCurveStyle::drawBevelGradient(const QColor &base, QPainter *p, const QRec
 
     if(IS_FLAT(bevApp))
     {
-        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || IS_FLAT(opts.bgndAppearance) || opts.tabBgnd || !sel)
+        if((WIDGET_TAB_TOP!=w && WIDGET_TAB_BOT!=w) || !QTC_CUSTOM_BGND || opts.tabBgnd || !sel)
             if(path.isEmpty())
                 p->fillRect(origRect, base);
             else
@@ -8985,7 +8985,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         if(/*sel && */(topTab || botTab) && i==numStops-1)
         {
             col=base;
-            if(sel && !IS_FLAT(opts.bgndAppearance) && 0==opts.tabBgnd)
+            if(sel && QTC_CUSTOM_BGND && 0==opts.tabBgnd)
                 col.setAlphaF(0.0);
         }
         else
@@ -9427,6 +9427,18 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
+static void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, double alpha)
+{
+    double width=(size-size2)/2.0,
+           width2=width/2.0,
+           radius=(size2+width)/2.0;
+    QColor col(Qt::white);
+
+    col.setAlphaF(alpha);
+    painter.setPen(QPen(col, width));
+    painter.drawEllipse(QRectF(x+width2, y+width2, size-width, size-width));
+}
+
 void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 {
     QPainter      p(widget);
@@ -9443,28 +9455,62 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    static const int constPixmapWidth  = 16;
-    static const int constPixmapHeight = 256;
-    QString key;
-    QColor  col(window->palette().window().color());
-    QSize   scaledSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : window->rect().width(),
-                                 GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
-    QPixmap pix(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
-                      GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
-
-    key.sprintf("qtc-bgnd-%x", col.rgba());
-    if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+    if(!IS_FLAT(opts.bgndAppearance))
     {
-        QPainter pixPainter(&pix);
+        static const int constPixmapWidth  = 16;
+        static const int constPixmapHeight = 256;
+        QString key;
+        QColor  col(window->palette().window().color());
+        QSize   scaledSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : window->rect().width(),
+                                    GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
+        QPixmap pix(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
+                        GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
 
-        drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
-                              GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
-        if(itsUsePixmapCache)
-            QPixmapCache::insert(key, pix);
+        key.sprintf("qtc-bgnd-%x", col.rgba());
+        if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+        {
+            QPainter pixPainter(&pix);
+
+            drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
+                                GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
+            if(itsUsePixmapCache)
+                QPixmapCache::insert(key, pix);
+        }
+
+        p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
+                        scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
 
-    p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
-                      scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+    if(opts.bgndRings)
+    {
+        QPixmap pix(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
+        QString key("qtc-rings");
+
+        if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+        {
+            pix.fill(Qt::transparent);
+            QPainter pixPainter(&pix);
+
+            pixPainter.setRenderHint(QPainter::Antialiasing);
+            drawBgndRing(pixPainter, 0, 0, 200, 140, QTC_RINGS_ALPHA);
+
+            drawBgndRing(pixPainter, 210, 10, 230, 214, QTC_RINGS_ALPHA);
+            drawBgndRing(pixPainter, 226, 26, 198, 182, QTC_RINGS_ALPHA);
+            drawBgndRing(pixPainter, 300, 100, 50, 0, QTC_RINGS_ALPHA);
+
+            drawBgndRing(pixPainter, 100, 96, 160, 144, QTC_RINGS_ALPHA);
+            drawBgndRing(pixPainter, 116, 112, 128, 112, QTC_RINGS_ALPHA);
+
+            drawBgndRing(pixPainter, 250, 160, 200, 140, QTC_RINGS_ALPHA);
+            drawBgndRing(pixPainter, 310, 220, 80, 0, QTC_RINGS_ALPHA);
+            pixPainter.end();
+
+            if(itsUsePixmapCache)
+                QPixmapCache::insert(key, pix);
+        }
+
+        p.drawPixmap(widget->width()-pix.width(), 0, pix);
+    }
 }
 
 QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, double radius) const
@@ -10425,7 +10471,7 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
 void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
 {
-    if(IS_FLAT(opts.bgndAppearance) || !IS_FLAT(menu ? opts.menubarAppearance : opts.toolbarAppearance))
+    if(!QTC_CUSTOM_BGND || !IS_FLAT(menu ? opts.menubarAppearance : opts.toolbarAppearance))
         drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? itsMenubarCols[ORIGINAL_SHADE]
                             : option->palette.background().color(),
