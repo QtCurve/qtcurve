@@ -671,6 +671,39 @@ static void qtcSetMenuBarHidden(const char *app, bool hidden)
     }
 }
 #endif
+
+#ifdef __cplusplus
+#include <QtSvg/QSvgRenderer>
+#endif
+
+static void loadBgndImage(QtCImage *img)
+{
+    if(!img->loaded &&
+        img->width>16 && img->width<1024 && img->height>16 && img->height<1024)
+    {
+        img->loaded=true;
+#ifdef __cplusplus
+        if(!img->file.isEmpty())
+        {
+            QSvgRenderer svg(img->file);
+
+            if(svg.isValid())
+            {
+                img->pix=QPixmap(img->width, img->height);
+                img->pix.fill(Qt::transparent);
+                QPainter painter(&img->pix);
+                svg.render(&painter);
+                painter.end();
+            }
+        }
+#else
+        img->pix=0L;
+        if(img->file)
+            img->pix=gdk_pixbuf_new_from_file_at_scale(img->file, img->width, img->height, FALSE, NULL);
+#endif
+    }
+}
+
 #endif
 
 #ifdef CONFIG_READ
@@ -787,6 +820,22 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
             setRgb(&(opts->ENTRY), QTC_LATIN1(sVal)); \
     }
 
+#define QTC_CFG_READ_IMAGE(ENTRY) \
+    { \
+        opts->ENTRY.use=readBoolEntry(cfg, #ENTRY, def->ENTRY.use); \
+        opts->ENTRY.loaded=false; \
+        if(opts->ENTRY.use) \
+        { \
+            QString file(cfg.readEntry(#ENTRY ".file")); \
+            if(!file.isEmpty()) \
+            { \
+                opts->ENTRY.file=file; \
+                opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
+                opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
+            } \
+        } \
+    }
+
 #else
 
 static char * lookupCfgHash(GHashTable **cfg, char *key, char *val)
@@ -885,6 +934,21 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
         else \
             opts->ENTRY=def->ENTRY; \
     }
+#define QTC_CFG_READ_IMAGE(ENTRY) \
+    { \
+        opts->ENTRY.use=readBoolEntry(cfg, #ENTRY, def->ENTRY.use); \
+        if(opts->ENTRY.use) \
+        { \
+            const char *file=readStringEntry(cfg, #ENTRY ".file"); \
+            if(file) \
+            { \
+                opts->ENTRY.file=file; \
+                opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
+                opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
+            } \
+        } \
+    }
+
 #endif
 
 #define QTC_CFG_READ_NUM(ENTRY) \
@@ -1289,7 +1353,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(groupBoxLine)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(fadeLines)
-            QTC_CFG_READ_BOOL(bgndRings)
 #endif
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
             QTC_CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
@@ -1378,7 +1441,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 #endif
             QTC_CFG_READ_SHADING(shading);
-
+            QTC_CFG_READ_IMAGE(bgndImage)
 #ifdef __cplusplus
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             if(opts->titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
@@ -1867,11 +1930,11 @@ static void defaultSettings(Options *opts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
-    opts->bgndRings=false;
     opts->gtkButtonOrder=false;
 #else
     opts->round=ROUND_FULL;
 #endif
+    opts->bgndImage.use=false;
 #ifdef __cplusplus
     opts->dwtAppearance=APPEARANCE_CUSTOM1;
 #endif
@@ -2420,6 +2483,12 @@ static const char * toStr(ELvLines lv)
     else \
         CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, opts.COL));
 
+#define CFG_WRITE_IMAGE_ENTRY(ENTRY) \
+    if (!exportingStyle && def.ENTRY.use==opts.ENTRY.use) \
+        CFG.deleteEntry(#ENTRY); \
+    else \
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY.use));
+
 bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false)
 {
     if(!cfg)
@@ -2531,7 +2600,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(framelessGroupBoxes)
         CFG_WRITE_ENTRY(groupBoxLine)
         CFG_WRITE_ENTRY(fadeLines)
-        CFG_WRITE_ENTRY(bgndRings)
+        CFG_WRITE_IMAGE_ENTRY(bgndImage)
         CFG_WRITE_ENTRY(colorMenubarMouseOver)
         CFG_WRITE_ENTRY_NUM(crHighlight)
         CFG_WRITE_ENTRY(crButton)

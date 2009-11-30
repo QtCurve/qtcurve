@@ -371,7 +371,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QCheckBox" name="bgndRings">
+        <widget class="QCheckBox" name="bgndImage">
          <property name="whatsThis">
           <string>Adds a few semi-transparent rings to the top right of dialogs and windows.</string>
          </property>
@@ -3095,7 +3095,7 @@
   <tabstop>appearance</tabstop>
   <tabstop>bgndAppearance</tabstop>
   <tabstop>bgndGrad</tabstop>
-  <tabstop>bgndRings</tabstop>
+  <tabstop>bgndImage</tabstop>
   <tabstop>sunkenAppearance</tabstop>
   <tabstop>round</tabstop>
   <tabstop>buttonEffect</tabstop>

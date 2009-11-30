@@ -67,6 +67,13 @@
     with no icon.
 45. Fade ends of tab widget base - used in document mode tabs.
 46. Added option to draw Air-like background rings.
+    Note: to use an SVG instead of the hard-coded air-like rings, edit
+          ~/.config/qtcurve/stylerc (or /etc/qtcurvestylerc) and add:
+
+          bgndImage=true
+          bgndImage.file=/path/to/svg/file.svg
+          bgndImage.width=120
+          bgndImage.height=160
 
 0.69.2
 ------

@@ -9488,35 +9488,41 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                         scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
 
-    if(opts.bgndRings)
+    if(opts.bgndImage.use)
     {
-        QPixmap pix(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
-        QString key("qtc-rings");
-
-        if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+        loadBgndImage(&opts.bgndImage);
+        if(opts.bgndImage.pix.isNull())
         {
-            pix.fill(Qt::transparent);
-            QPainter pixPainter(&pix);
+            QPixmap pix(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
+            QString key("qtc-rings");
 
-            pixPainter.setRenderHint(QPainter::Antialiasing);
-            drawBgndRing(pixPainter, 0, 0, 200, 140, QTC_RINGS_ALPHA);
+            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+            {
+                pix.fill(Qt::transparent);
+                QPainter pixPainter(&pix);
 
-            drawBgndRing(pixPainter, 210, 10, 230, 214, QTC_RINGS_ALPHA);
-            drawBgndRing(pixPainter, 226, 26, 198, 182, QTC_RINGS_ALPHA);
-            drawBgndRing(pixPainter, 300, 100, 50, 0, QTC_RINGS_ALPHA);
+                pixPainter.setRenderHint(QPainter::Antialiasing);
+                drawBgndRing(pixPainter, 0, 0, 200, 140, QTC_RINGS_ALPHA);
 
-            drawBgndRing(pixPainter, 100, 96, 160, 144, QTC_RINGS_ALPHA);
-            drawBgndRing(pixPainter, 116, 112, 128, 112, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 210, 10, 230, 214, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 226, 26, 198, 182, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 300, 100, 50, 0, QTC_RINGS_ALPHA);
 
-            drawBgndRing(pixPainter, 250, 160, 200, 140, QTC_RINGS_ALPHA);
-            drawBgndRing(pixPainter, 310, 220, 80, 0, QTC_RINGS_ALPHA);
-            pixPainter.end();
+                drawBgndRing(pixPainter, 100, 96, 160, 144, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 116, 112, 128, 112, QTC_RINGS_ALPHA);
 
-            if(itsUsePixmapCache)
-                QPixmapCache::insert(key, pix);
+                drawBgndRing(pixPainter, 250, 160, 200, 140, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 310, 220, 80, 0, QTC_RINGS_ALPHA);
+                pixPainter.end();
+
+                if(itsUsePixmapCache)
+                    QPixmapCache::insert(key, pix);
+            }
+
+            p.drawPixmap(widget->width()-pix.width(), 0, pix);
         }
-
-        p.drawPixmap(widget->width()-pix.width(), 0, pix);
+        else
+            p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), 0, opts.bgndImage.pix);
     }
 }
 

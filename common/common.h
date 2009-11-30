@@ -332,7 +332,7 @@ typedef GdkColor color;
 #define QTC_RINGS_WIDTH  450
 #define QTC_RINGS_HEIGHT 360
 
-#define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || opts.bgndRings)
+#define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || opts.bgndImage.use)
 
 #endif
 
@@ -416,6 +416,20 @@ typedef enum
 
 typedef std::map<ETitleBarButtons, QColor> TBCols;
 #endif
+
+typedef struct
+{
+    bool      use,
+              loaded;
+#if defined __cplusplus
+    QString   file;
+    QPixmap   pix;
+#else // __cplusplus
+    const char *file;
+    GdkPixbuf  *pix;
+#endif // __cplusplus
+    int width, height;
+} QtCImage;
 
 typedef enum
 {
@@ -854,7 +868,6 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
                      fadeLines,
-                     bgndRings,
 #endif
                      borderMenuitems,
                      colorMenubarMouseOver,
@@ -972,6 +985,11 @@ typedef struct
 #else
     Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD];
 #endif
+
+#if (!defined QT_VERSION || QT_VERSION >= 0x040000)
+    QtCImage         bgndImage;
+#endif
+
 #ifndef __cplusplus
 } Options;
 #else
