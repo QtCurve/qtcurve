@@ -10055,6 +10055,21 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, true,
                    WIDGET_PROGRESSBAR);
 
+    if(opts.glowProgress)
+    {
+        QLinearGradient grad(rx.x(), rx.y(), rx.width(), 0);
+        QColor          col(Qt::white);
+
+        col.setAlphaF(0);
+        grad.setColorAt(0, col);
+        col.setAlphaF(0.5);
+        grad.setColorAt(0.5, col);
+        col.setAlphaF(0);
+        grad.setColorAt(1, col);
+
+        p->fillRect(rx, grad);
+    }
+    
     if(!opts.fillProgress && QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
     {
         bool drawFull(length > 3);

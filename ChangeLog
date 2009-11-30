@@ -75,6 +75,8 @@
           bgndImage.width=120
           bgndImage.height=160
 
+47. Added option to add a 'glow' to progressbars.
+
 0.69.2
 ------
 1. Change 'Dont draw outer dark border' to 'Draw dark outer border'
