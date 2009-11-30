@@ -2392,6 +2392,19 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                         qtcPalette.highlight, round, wid, BORDER_FLAT,
                         (opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
+        if(opts.glowProgress)
+        {
+            cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, width, 0);
+
+            cairo_rectangle(cr, x, y, width, height);
+            cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
+            cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0, 0.5);
+            cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0, 0.0);
+            cairo_set_source(cr, pat);
+            cairo_pattern_destroy(pat);
+            cairo_fill(cr);
+        }
+
         if(width>2 && height>2)
             realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                             itemCols, round, BORDER_FLAT, wid, 0, QT_PBAR_BORDER);
