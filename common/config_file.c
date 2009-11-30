@@ -1890,7 +1890,7 @@ static bool fileExists(const char *path)
 
 static const char * getSystemConfigFile()
 {
-    static const char * constFiles[]={ "/etc/qt4/"QTC_FILE, "/etc/qt3/"QTC_FILE, "/etc/qt/"QTC_FILE, "/etc/"QTC_FILE, NULL };
+    static const char * constFiles[]={ /*"/etc/qt4/"QTC_FILE, "/etc/qt3/"QTC_FILE, "/etc/qt/"QTC_FILE,*/ "/etc/"QTC_FILE, NULL };
 
     int i;
 
