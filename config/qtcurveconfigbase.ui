@@ -372,6 +372,9 @@
        </item>
        <item row="3" column="1">
         <widget class="QCheckBox" name="bgndRings">
+         <property name="whatsThis">
+          <string>Adds a few semi-transparent rings to the top right of dialogs and windows.</string>
+         </property>
          <property name="text">
           <string>'Air' style rings</string>
          </property>
