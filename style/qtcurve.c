@@ -2394,7 +2394,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         if(opts.glowProgress)
         {
-            cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, width, 0);
+            cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, horiz ? width : 0, horiz ? 0 : width);
 
             cairo_rectangle(cr, x, y, width, height);
             cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
