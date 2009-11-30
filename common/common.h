@@ -986,11 +986,7 @@ typedef struct
 #else
     Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD];
 #endif
-
-#if (!defined QT_VERSION || QT_VERSION >= 0x040000)
     QtCImage         bgndImage;
-#endif
-
 #ifndef __cplusplus
 } Options;
 #else
