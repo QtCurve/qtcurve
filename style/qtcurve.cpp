@@ -10062,7 +10062,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
 
         col.setAlphaF(0);
         grad.setColorAt(0, col);
-        col.setAlphaF(0.5);
+        col.setAlphaF(QTC_GLOW_PROG_ALPHA);
         grad.setColorAt(0.5, col);
         col.setAlphaF(0);
         grad.setColorAt(1, col);

@@ -335,6 +335,8 @@ typedef GdkColor color;
 
 #define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || opts.bgndImage.use)
 
+#define QTC_GLOW_PROG_ALPHA 0.55
+
 #endif
 
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
