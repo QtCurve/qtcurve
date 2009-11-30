@@ -10057,7 +10057,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
 
     if(opts.glowProgress)
     {
-        QLinearGradient grad(rx.x(), rx.y(), rx.width(), 0);
+        QLinearGradient grad(rx.x(), rx.y(), vertical ? 0 : rx.width(), vertical ? rx.height() : 0);
         QColor          col(Qt::white);
 
         col.setAlphaF(0);
