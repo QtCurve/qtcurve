@@ -3298,7 +3298,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                  tabRectSize=horiz ? tbb->tabBarRect.width() : tbb->tabBarRect.height(),
                                  tabFadeSize=tabRectSize+constSidePad > size ? 0.0 : 1.0-((tabRectSize+constSidePad)/size),
                                  minFadeSize=1.0-((size-constSidePad)/size),
-                                 fadeSize=tabFadeSize<minFadeSize ? minFadeSize : (tabFadeSize>QTC_FADE_SIZE ? QTC_FADE_SIZE : tabFadeSize);
+                                 fadeSizeStart=minFadeSize,
+                                 fadeSizeEnd=tabFadeSize<minFadeSize ? minFadeSize : (tabFadeSize>QTC_FADE_SIZE ? QTC_FADE_SIZE : tabFadeSize);
+
+                    if(reverse && horiz)
+                        fadeSizeStart=fadeSizeEnd, fadeSizeEnd=minFadeSize;
 
                     region -= tbb->tabBarRect;
 
@@ -3318,9 +3322,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     ? palette.background().color()
                                     : use[QTabBar::RoundedNorth==tbb->shape ? QT_STD_BORDER
                                                                             : (opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW)], 
-                                  true, true, horiz, fadeSize);
+                                  true, true, horiz, fadeSizeStart, fadeSizeEnd);
                     drawFadedLine(painter, QRect(bottomLine.p1(), bottomLine.p2()), use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER],
-                                  true, true, horiz, fadeSize);
+                                  true, true, horiz, fadeSizeStart, fadeSizeEnd);
                     painter->restore();
                 }
             break;
@@ -8686,7 +8690,8 @@ void QtCurveStyle::drawHighlight(QPainter *p, const QRect &r, bool horiz, bool i
     drawFadedLine(p, r.adjusted(horiz ? 0 : 1, horiz ? 1 : 0, 0, 0), inc ? itsMouseOverCols[ORIGINAL_SHADE] : col1, true, true, horiz);
 }
 
-void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz, double fadeSize) const
+void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz,
+                                 double fadeSizeStart, double fadeSizeEnd) const
 {
     bool            aa(p->testRenderHint(QPainter::Antialiasing));
     QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),
@@ -8700,8 +8705,10 @@ void QtCurveStyle::drawFadedLine(QPainter *p, const QRect &r, const QColor &col,
 
         fade.setAlphaF(0.0);
         grad.setColorAt(0, fadeStart && opts.fadeLines ? fade : col);
-        grad.setColorAt(fadeSize, col);
-        grad.setColorAt(1.0-fadeSize, col);
+        if(fadeSizeStart>=0 && fadeSizeStart<=1.0)
+            grad.setColorAt(fadeSizeStart, col);
+        if(fadeSizeEnd>=0 && fadeSizeEnd<=1.0)
+            grad.setColorAt(1.0-fadeSizeEnd, col);
         grad.setColorAt(1, fadeEnd && opts.fadeLines ? fade : col);
         p->setPen(QPen(QBrush(grad), 1));
     }
@@ -9224,7 +9231,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 double //botSize=(ra.height()*0.4),
                        //botRad=botSize/1.5,
                        topSize=(ra.height()*0.4),
-                       topRad=topSize/2.0,
+//                        topRad=topSize/2.0,
                        //botWidthAdjust=4.5,
                        topWidthAdjust=4.75;
 
@@ -9430,8 +9437,8 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
 static void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, double alpha)
 {
     double width=(size-size2)/2.0,
-           width2=width/2.0,
-           radius=(size2+width)/2.0;
+           width2=width/2.0;
+//            radius=(size2+width)/2.0;
     QColor col(Qt::white);
 
     col.setAlphaF(alpha);
