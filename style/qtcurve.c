@@ -2064,7 +2064,7 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
     *color = parent->style->bg[GTK_WIDGET_STATE(parent)];
 }
 
-static void drawBgndRing(cairo_t *cr, int xpos, int x, int y, int size, int size2)
+static void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2)
 {
     double width=(size-size2)/2.0,
            width2=width/2.0,
@@ -2072,18 +2072,18 @@ static void drawBgndRing(cairo_t *cr, int xpos, int x, int y, int size, int size
 
     cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_RINGS_INNER_ALPHA);
     cairo_set_line_width(cr, width);
-    cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, radius, 0, 2*M_PI);
+    cairo_arc(cr, x+radius+width2+0.5, y+radius+width2+0.5, radius, 0, 2*M_PI);
     cairo_stroke(cr);
 
     if(IMG_BORDERED_RINGS==opts.bgndImage.type)
     {
         cairo_set_line_width(cr, 1);
         cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_RINGS_OUTER_ALPHA);
-        cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, size/2.0, 0, 2*M_PI);
+        cairo_arc(cr, x+radius+width2+0.5, y+radius+width2+0.5, size/2.0, 0, 2*M_PI);
         if(size2)
         {
             cairo_stroke(cr);
-            cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, size2/2.0, 0, 2*M_PI);
+            cairo_arc(cr, x+radius+width2+0.5, y+radius+width2+0.5, size2/2.0, 0, 2*M_PI);
         }
         cairo_stroke(cr);
     }
@@ -2095,7 +2095,8 @@ static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *are
     if(!isFixedWidget(widget) && !isGimpDockable(widget))
     {
         GtkWidget *window=widget;
-        int       pos=0;
+        int       xpos=0,
+                  ypos=0;
 
 #ifdef QTC_DEBUG
 printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
@@ -2103,8 +2104,13 @@ debugDisplayWidget(widget, 20);
 #endif
         while(window && !GTK_IS_WINDOW(window))
         {
-            if(!GTK_WIDGET_NO_WINDOW(window) && 0==pos)
-                pos+=(GT_HORIZ==opts.bgndGrad ? widget->allocation.y : widget->allocation.x);
+            if(!GTK_WIDGET_NO_WINDOW(window))
+            {
+                if(0==xpos)
+                    xpos+=widget->allocation.x;
+                if(0==ypos)
+                    ypos+=widget->allocation.y;
+            }
             window=window->parent;
         }
 
@@ -2113,10 +2119,10 @@ debugDisplayWidget(widget, 20);
             if(!IS_FLAT(opts.bgndAppearance))
             {
                 if(GT_HORIZ==opts.bgndGrad)
-                    drawBevelGradient(cr, style, area, NULL, x, -pos, width, window->allocation.height,
+                    drawBevelGradient(cr, style, area, NULL, x, -ypos, width, window->allocation.height,
                                       &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
                 else
-                    drawBevelGradient(cr, style, area, NULL, -pos, y, window->allocation.width, height,
+                    drawBevelGradient(cr, style, area, NULL, -xpos, y, window->allocation.width, height,
                                       &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
             }
 
@@ -2136,20 +2142,20 @@ debugDisplayWidget(widget, 20);
                 case IMG_PLAIN_RINGS:
                 case IMG_BORDERED_RINGS:
                 {
-                    int xpos=window->allocation.width-QTC_RINGS_WIDTH;
+                    xpos=window->allocation.width-QTC_RINGS_WIDTH;
 
                     cairo_save(cr);
-                    drawBgndRing(cr, xpos, 0, 0, 200, 140);
+                    drawBgndRing(cr, xpos+0, 0-ypos, 200, 140);
 
-                    drawBgndRing(cr, xpos, 210, 10, 230, 214);
-                    drawBgndRing(cr, xpos, 226, 26, 198, 182);
-                    drawBgndRing(cr, xpos, 300, 100, 50, 0);
+                    drawBgndRing(cr, xpos+210, 10-ypos, 230, 214);
+                    drawBgndRing(cr, xpos+226, 26-ypos, 198, 182);
+                    drawBgndRing(cr, xpos+300, 100-ypos, 50, 0);
 
-                    drawBgndRing(cr, xpos, 100, 96, 160, 144);
-                    drawBgndRing(cr, xpos, 116, 112, 128, 112);
+                    drawBgndRing(cr, xpos+100, 96-ypos, 160, 144);
+                    drawBgndRing(cr, xpos+116, 112-ypos, 128, 112);
 
-                    drawBgndRing(cr, xpos, 250, 160, 200, 140);
-                    drawBgndRing(cr, xpos, 310, 220, 80, 0);
+                    drawBgndRing(cr, xpos+250, 160-ypos, 200, 140);
+                    drawBgndRing(cr, xpos+310, 220-ypos, 80, 0);
 
                     cairo_restore(cr);
                 }
