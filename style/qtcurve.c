@@ -2075,7 +2075,7 @@ static void drawBgndRing(cairo_t *cr, int xpos, int x, int y, int size, int size
     cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, radius, 0, 2*M_PI);
     cairo_stroke(cr);
 
-    if(IMG_BORDERD_RINGS==opts.bgndImage.type)
+    if(IMG_BORDERED_RINGS==opts.bgndImage.type)
     {
         cairo_set_line_width(cr, 1);
         cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_RINGS_OUTER_ALPHA);
@@ -2134,7 +2134,7 @@ debugDisplayWidget(widget, 20);
                         break;
                     }
                 case IMG_PLAIN_RINGS:
-                case IMG_BORDERD_RINGS:
+                case IMG_BORDERED_RINGS:
                 {
                     int xpos=window->allocation.width-QTC_RINGS_WIDTH;
 
