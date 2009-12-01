@@ -10088,14 +10088,15 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     if(opts.glowProgress)
     {
         QLinearGradient grad(rx.x(), rx.y(), vertical ? 0 : rx.width(), vertical ? rx.height() : 0);
-        QColor          col(Qt::white);
+        QColor          glow(Qt::white),
+                        blank(Qt::white);
 
-        col.setAlphaF(0);
-        grad.setColorAt(0, col);
-        col.setAlphaF(QTC_GLOW_PROG_ALPHA);
-        grad.setColorAt(0.5, col);
-        col.setAlphaF(0);
-        grad.setColorAt(1, col);
+        blank.setAlphaF(0);
+        glow.setAlphaF(QTC_GLOW_PROG_ALPHA);
+        grad.setColorAt(0, GLOW_LEFT==opts.glowProgress ? glow : blank);
+        if(GLOW_CENTER==opts.glowProgress)
+            grad.setColorAt(0.5, glow);
+        grad.setColorAt(1, GLOW_RIGHT==opts.glowProgress ? glow : blank);
 
         p->fillRect(rx, grad);
     }

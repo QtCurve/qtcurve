@@ -711,6 +711,14 @@ typedef enum
     GT_VERT
 } EGradType;
 
+typedef enum
+{
+    GLOW_NONE,
+    GLOW_LEFT,
+    GLOW_CENTER,
+    GLOW_RIGHT
+} EGlow;
+
 #define QTC_FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
 
 #if defined __cplusplus
@@ -880,7 +888,6 @@ typedef struct
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
                      fadeLines,
-                     glowProgress,
 #endif
                      borderMenuitems,
                      colorMenubarMouseOver,
@@ -920,6 +927,7 @@ typedef struct
                      squareLvSelection,
                      invertBotTab,
                      menubarHiding;
+    EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;

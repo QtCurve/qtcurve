@@ -463,6 +463,22 @@ static EImageType toImageType(const char *str, EImageType def)
     }
     return def;
 }
+
+static EGlow toGlow(const char *str, EGlow def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "none", 4))
+            return GLOW_NONE;
+        if(0==memcmp(str, "left", 4))
+            return GLOW_LEFT;
+        if(0==memcmp(str, "center", 6))
+            return GLOW_CENTER;
+        if(0==memcmp(str, "right", 5))
+            return GLOW_RIGHT;
+    }
+    return def;
+}
 #endif
 
 static const char * getHome()
@@ -1047,7 +1063,10 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
 #define QTC_CFG_READ_TB_ICON(ENTRY) \
     opts->ENTRY=toTitlebarIcon(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 #endif
-    
+
+#define QTC_CFG_READ_GLOW(ENTRY) \
+    opts->ENTRY=toGlow(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
     if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
@@ -1369,7 +1388,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(groupBoxLine)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(fadeLines)
-            QTC_CFG_READ_BOOL(glowProgress)
+            QTC_CFG_READ_GLOW(glowProgress)
 #endif
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
             QTC_CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
@@ -1947,7 +1966,7 @@ static void defaultSettings(Options *opts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
     opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
-    opts->glowProgress=false;
+    opts->glowProgress=GLOW_NONE;
     opts->gtkButtonOrder=false;
 #else
     opts->round=ROUND_FULL;
@@ -2483,6 +2502,22 @@ static const char * toStr(EImageType lv)
             return "rings";
         case IMG_FILE:
             return "file";
+    }
+}
+
+static const char * toStr(EGlow lv)
+{
+    switch(lv)
+    {
+        default:
+        case GLOW_NONE:
+            return "none";
+        case GLOW_LEFT:
+            return "left";
+        case GLOW_CENTER:
+            return "center";
+        case GLOW_RIGHT:
+            return "right";
     }
 }
 

@@ -599,6 +599,14 @@ static void insertImageEntries(QComboBox *combo)
     //combo->insertItem(IMG_FILE, i18n("File:"));
 }
 
+static void insertGlowEntries(QComboBox *combo)
+{
+    combo->insertItem(GLOW_NONE, i18n("No glow"));
+    combo->insertItem(GLOW_LEFT, i18n("Add glow on the left"));
+    combo->insertItem(GLOW_CENTER, i18n("Add glow in the middle"));
+    combo->insertItem(GLOW_RIGHT, i18n("Add glow on the right"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                widgetStyle(NULL),
@@ -661,6 +669,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertGradTypeEntries(menuBgndGrad);
     insertLvLinesEntries(lvLines);
     insertImageEntries(bgndImage);
+    insertGlowEntries(glowProgress);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -725,7 +734,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menubarHiding, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(glowProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(glowProgress, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboBtn, SIGNAL(currentIndexChanged(int)), SLOT(comboBtnChanged()));
@@ -1990,7 +1999,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.roundMbTopOnly=roundMbTopOnly->isChecked();
     opts.menubarHiding=menubarHiding->isChecked();
     opts.fillProgress=fillProgress->isChecked();
-    opts.glowProgress=glowProgress->isChecked();
+    opts.glowProgress=(EGlow)glowProgress->currentIndex();
     opts.darkerBorders=darkerBorders->isChecked();
     opts.comboSplitter=comboSplitter->isChecked();
     opts.comboBtn=(EShade)comboBtn->currentIndex();
@@ -2164,7 +2173,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     roundMbTopOnly->setChecked(opts.roundMbTopOnly);
     menubarHiding->setChecked(opts.menubarHiding);
     fillProgress->setChecked(opts.fillProgress);
-    glowProgress->setChecked(opts.glowProgress);
+    glowProgress->setCurrentIndex(opts.glowProgress);
     darkerBorders->setChecked(opts.darkerBorders);
     comboSplitter->setChecked(opts.comboSplitter);
     comboBtn->setCurrentIndex(opts.comboBtn);
@@ -2362,7 +2371,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          roundMbTopOnly->isChecked()!=opts.roundMbTopOnly ||
          menubarHiding->isChecked()!=opts.menubarHiding ||
          fillProgress->isChecked()!=opts.fillProgress ||
-         glowProgress->isChecked()!=opts.glowProgress ||
+         glowProgress->currentIndex()!=opts.glowProgress ||
          darkerBorders->isChecked()!=opts.darkerBorders ||
          comboSplitter->isChecked()!=opts.comboSplitter ||
          comboBtn->currentIndex()!=(int)opts.comboBtn ||
