@@ -673,6 +673,11 @@ static gboolean isMenuitem(GtkWidget *w, int level)
 
 #define QTC_IS_MENU_ITEM(WIDGET) isMenuitem(WIDGET, 0)
 
+static gboolean isMenuWindow(GtkWidget *w)
+{
+    return GTK_WINDOW(w)->default_widget && GTK_IS_MENU(GTK_WINDOW(w)->default_widget);
+}
+
 static gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
 {
     if(w)
@@ -2554,6 +2559,9 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 {
     QTC_CAIRO_BEGIN
 
+    gboolean isMenuOrToolTipWindow=widget && GTK_IS_WINDOW(widget) &&
+                                   ((widget->name && 0==strcmp(widget->name, "gtk-tooltip")) ||
+                                    isMenuWindow(widget));
 #ifdef QTC_DEBUG
 printf("Draw flat box %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height, detail ? detail : "NULL");
 debugDisplayWidget(widget, 3);
@@ -2581,7 +2589,7 @@ debugDisplayWidget(widget, 3);
     }
 #endif
 #endif
-    if(widget && opts.fixParentlessDialogs && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
+    if(widget && opts.fixParentlessDialogs && !isMenuOrToolTipWindow && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 
@@ -2624,7 +2632,7 @@ debugDisplayWidget(widget, 3);
     }
 
     if (opts.menubarHiding && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) && !isGimpDockable(widget) &&
-       (!widget->name || strcmp(widget->name, "gtk-tooltip")))
+        !isMenuOrToolTipWindow)
     {
         qtcWindowSetup(widget);
         if(qtcMenuBarHidden(qtSettings.appName))
@@ -2636,7 +2644,7 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if(QTC_CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) &&
+    if(QTC_CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) && !isMenuOrToolTipWindow &&
        drawBgndGradient(cr, style, area, widget, x, y, width, height))
         qtcWindowSetup(widget);
     else if(widget && GTK_IS_TREE_VIEW(widget))
@@ -2680,26 +2688,26 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_SELECTED==state)
             drawSelection(cr, style, state, area, widget, x, y, width, height, round, TRUE);
     }
-    else if( GTK_STATE_PRELIGHT==state && detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED) )
+    else if(detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED))
     {
-        if(opts.splitterHighlight)
+        if(GTK_STATE_PRELIGHT==state && opts.splitterHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], opts.splitterHighlight);
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col,
                               width>height);
         }
     }
-    else if( GTK_STATE_PRELIGHT==state && detail && 0==strcmp(detail, "checkbutton") )
+    else if(detail && 0==strcmp(detail, "checkbutton"))
     {
-        if(opts.crHighlight)
+        if(GTK_STATE_PRELIGHT==state && opts.crHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], opts.crHighlight);
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
         }
     }
-    else if( GTK_STATE_PRELIGHT==state && detail && 0==strcmp(detail, "expander") )
+    else if(detail && 0==strcmp(detail, "expander"))
     {
-        if(opts.expanderHighlight)
+        if(GTK_STATE_PRELIGHT==state && opts.expanderHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], opts.expanderHighlight);
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
