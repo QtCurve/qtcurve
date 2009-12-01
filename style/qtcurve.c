@@ -2064,16 +2064,29 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
     *color = parent->style->bg[GTK_WIDGET_STATE(parent)];
 }
 
-static void drawBgndRing(cairo_t *cr, int xpos, int x, int y, int size, int size2, double alpha)
+static void drawBgndRing(cairo_t *cr, int xpos, int x, int y, int size, int size2)
 {
     double width=(size-size2)/2.0,
            width2=width/2.0,
            radius=(size2+width)/2.0;
 
-    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, alpha);
+    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_RINGS_INNER_ALPHA);
     cairo_set_line_width(cr, width);
     cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, radius, 0, 2*M_PI);
     cairo_stroke(cr);
+
+    if(IMG_BORDERD_RINGS==opts.bgndImage.type)
+    {
+        cairo_set_line_width(cr, 1);
+        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, QTC_RINGS_OUTER_ALPHA);
+        cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, size/2.0, 0, 2*M_PI);
+        if(size2)
+        {
+            cairo_stroke(cr);
+            cairo_arc(cr, xpos+x+radius+width2+0.5, y+radius+width2+0.5, size2/2.0, 0, 2*M_PI);
+        }
+        cairo_stroke(cr);
+    }
 }
 
 static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
@@ -2107,31 +2120,36 @@ debugDisplayWidget(widget, 20);
                                       &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
             }
 
-            if(opts.bgndImage.use)
+            switch(opts.bgndImage.type)
             {
-                loadBgndImage(&opts.bgndImage);
-                if(opts.bgndImage.pix)
-                {
-                    gdk_cairo_set_source_pixbuf(cr, opts.bgndImage.pix,
-                                                window->allocation.width-opts.bgndImage.width, 0);
-                    cairo_paint(cr);
-                }
-                else
+                case IMG_NONE:
+                    break;
+                case IMG_FILE:
+                    loadBgndImage(&opts.bgndImage);
+                    if(opts.bgndImage.pix)
+                    {
+                        gdk_cairo_set_source_pixbuf(cr, opts.bgndImage.pix,
+                                                    window->allocation.width-opts.bgndImage.width, 0);
+                        cairo_paint(cr);
+                        break;
+                    }
+                case IMG_PLAIN_RINGS:
+                case IMG_BORDERD_RINGS:
                 {
                     int xpos=window->allocation.width-QTC_RINGS_WIDTH;
 
                     cairo_save(cr);
-                    drawBgndRing(cr, xpos, 0, 0, 200, 140, QTC_RINGS_ALPHA);
+                    drawBgndRing(cr, xpos, 0, 0, 200, 140);
 
-                    drawBgndRing(cr, xpos, 210, 10, 230, 214, QTC_RINGS_ALPHA);
-                    drawBgndRing(cr, xpos, 226, 26, 198, 182, QTC_RINGS_ALPHA);
-                    drawBgndRing(cr, xpos, 300, 100, 50, 0, QTC_RINGS_ALPHA);
+                    drawBgndRing(cr, xpos, 210, 10, 230, 214);
+                    drawBgndRing(cr, xpos, 226, 26, 198, 182);
+                    drawBgndRing(cr, xpos, 300, 100, 50, 0);
 
-                    drawBgndRing(cr, xpos, 100, 96, 160, 144, QTC_RINGS_ALPHA);
-                    drawBgndRing(cr, xpos, 116, 112, 128, 112, QTC_RINGS_ALPHA);
+                    drawBgndRing(cr, xpos, 100, 96, 160, 144);
+                    drawBgndRing(cr, xpos, 116, 112, 128, 112);
 
-                    drawBgndRing(cr, xpos, 250, 160, 200, 140, QTC_RINGS_ALPHA);
-                    drawBgndRing(cr, xpos, 310, 220, 80, 0, QTC_RINGS_ALPHA);
+                    drawBgndRing(cr, xpos, 250, 160, 200, 140);
+                    drawBgndRing(cr, xpos, 310, 220, 80, 0);
 
                     cairo_restore(cr);
                 }
@@ -2733,7 +2751,7 @@ debugDisplayWidget(widget, 3);
     {
         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
                                            area, x, y, width, height);
-        if(widget && opts.bgndImage.use)
+        if(widget && IMG_NONE!=opts.bgndImage.type)
             drawBgndGradient(cr, style, area, widget, x, y, width, height);
     }
 
@@ -3240,7 +3258,7 @@ debugDisplayWidget(widget, 3);
                                                     ? GTK_STATE_INSENSITIVE
                                                     : GTK_STATE_NORMAL,
                                                area, x, y, width, height);
-            if(widget && opts.bgndImage.use)
+            if(widget && IMG_NONE!=opts.bgndImage.type)
                 drawBgndGradient(cr, style, area, widget, x, y, width, height);
         }
 
@@ -3867,7 +3885,7 @@ debugDisplayWidget(widget, 3);
                                                         ? GTK_STATE_INSENSITIVE
                                                         : GTK_STATE_NORMAL,
                                                    area, x, y, width, height);
-                if(widget && opts.bgndImage.use)
+                if(widget && IMG_NONE!=opts.bgndImage.type)
                     drawBgndGradient(cr, style, area, widget, x, y, width, height);
             }
 
@@ -4118,7 +4136,7 @@ debugDisplayWidget(widget, 3);
                                                       drawBgndGradient(cr, style, area, widget, x, y, width, height)))
             {
                 drawAreaColor(cr, area, NULL, col, x, y, width, height);
-                if(widget && opts.bgndImage.use)
+                if(widget && IMG_NONE!=opts.bgndImage.type)
                     drawBgndGradient(cr, style, area, widget, x, y, width, height);
             }
 
@@ -4378,7 +4396,7 @@ debugDisplayWidget(widget, 3);
         if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x, y, width, height))
         {
             drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
-            if(widget && opts.bgndImage.use)
+            if(widget && IMG_NONE!=opts.bgndImage.type)
                 drawBgndGradient(cr, style, area, widget, x, y, width, height);
         }
     }
@@ -4401,7 +4419,7 @@ debugDisplayWidget(widget, 3);
         if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x+1, y+1, width-2, height-2))
         {
             drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
-            if(widget && opts.bgndImage.use)
+            if(widget && IMG_NONE!=opts.bgndImage.type)
                 drawBgndGradient(cr, style, area, widget, x, y, width, height);
         }
         unsetCairoClipping(cr);
@@ -6569,7 +6587,7 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
     if(IS_FLAT(opts.bgndAppearance) || !(widget && drawBgndGradient(cr, style, area, widget, x, y, width, height)))
     {
         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
-        if(widget && opts.bgndImage.use)
+        if(widget && IMG_NONE!=opts.bgndImage.type)
             drawBgndGradient(cr, style, area, widget, x, y, width, height);
     }
 

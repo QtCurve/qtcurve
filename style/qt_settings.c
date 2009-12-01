@@ -2172,7 +2172,7 @@ static gboolean qtInit()
                 qtSettings.app=GTK_APP_JAVA_SWT;*/
 
             if(GTK_APP_JAVA==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
-                opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.use=false;
+                opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
 
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
