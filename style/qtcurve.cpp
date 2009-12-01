@@ -1361,6 +1361,17 @@ void QtCurveStyle::polish(QWidget *widget)
         }
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::NoRole);
+
+        if (widget->autoFillBackground() && widget->parentWidget() &&
+            "qt_scrollarea_viewport"==widget->parentWidget()->objectName() &&
+            widget->parentWidget()->parentWidget() && //grampa
+            qobject_cast<QAbstractScrollArea*>(widget->parentWidget()->parentWidget()) &&
+            widget->parentWidget()->parentWidget()->parentWidget() && // grangrampa
+            widget->parentWidget()->parentWidget()->parentWidget()->inherits("QToolBox"))
+        {
+            widget->parentWidget()->setAutoFillBackground(false);
+            widget->setAutoFillBackground(false);
+        }
     }
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
@@ -1947,8 +1958,12 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
     {
         QWidget  *view   = ((QAbstractScrollArea *)object)->viewport();
         QPalette palette = view->palette();
+        QColor   color   = ((QWidget *)object)->palette().background().color();
 
-        palette.setColor(view->backgroundRole(), ((QWidget *)object)->palette().background().color());
+        if(QTC_CUSTOM_BGND)
+            color.setAlphaF(0.0);
+
+        palette.setColor(view->backgroundRole(), color);
         view->setPalette(palette);
         object->removeEventFilter(this);
     }

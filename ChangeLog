@@ -76,6 +76,7 @@
           bgndImage.height=160
 
 47. Added option to add a 'glow' to progressbars.
+48. Fix QToolBox background when using background image and/or gradients.
 
 0.69.2
 ------
