@@ -52,6 +52,8 @@ static struct
              *check_radio;
 } qtcPalette;
 
+static cairo_surface_t *bgndImage=NULL;
+
 static Options opts;
 
 #include "qt_settings.c"
@@ -2147,22 +2149,29 @@ debugDisplayWidget(widget, 20);
                 case IMG_PLAIN_RINGS:
                 case IMG_BORDERED_RINGS:
                 {
-                    xpos=window->allocation.width-QTC_RINGS_WIDTH;
+                    static cairo_surface_t *img=NULL;
 
-                    cairo_save(cr);
-                    drawBgndRing(cr, xpos+0, 0-ypos, 200, 140);
+                    if(!bgndImage)
+                    {
+                        cairo_t *ci;
+                        bgndImage=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
+                        ci=cairo_create(bgndImage);
+                        drawBgndRing(ci, 0, 0, 200, 140);
 
-                    drawBgndRing(cr, xpos+210, 10-ypos, 230, 214);
-                    drawBgndRing(cr, xpos+226, 26-ypos, 198, 182);
-                    drawBgndRing(cr, xpos+300, 100-ypos, 50, 0);
+                        drawBgndRing(ci, 210, 10, 230, 214);
+                        drawBgndRing(ci, 226, 26, 198, 182);
+                        drawBgndRing(ci, 300, 100, 50, 0);
 
-                    drawBgndRing(cr, xpos+100, 96-ypos, 160, 144);
-                    drawBgndRing(cr, xpos+116, 112-ypos, 128, 112);
+                        drawBgndRing(ci, 100, 96, 160, 144);
+                        drawBgndRing(ci, 116, 112, 128, 112);
 
-                    drawBgndRing(cr, xpos+250, 160-ypos, 200, 140);
-                    drawBgndRing(cr, xpos+310, 220-ypos, 80, 0);
+                        drawBgndRing(ci, 250, 160, 200, 140);
+                        drawBgndRing(ci, 310, 220, 80, 0);
+                        cairo_destroy(ci);
+                    }
 
-                    cairo_restore(cr);
+                    cairo_set_source_surface(cr, bgndImage, window->allocation.width-QTC_RINGS_WIDTH, 0);
+                    cairo_paint(cr);
                 }
             }
             return TRUE;
