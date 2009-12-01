@@ -10087,7 +10087,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
 
     if(opts.glowProgress)
     {
-        QLinearGradient grad(rx.x(), rx.y(), vertical ? 0 : rx.width(), vertical ? rx.height() : 0);
+        QLinearGradient grad(rx.x()+1, rx.y()+1, vertical ? 0 : rx.width()-2, vertical ? rx.height()-2 : 0);
         QColor          glow(Qt::white),
                         blank(Qt::white);
 
@@ -10098,7 +10098,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
             grad.setColorAt(0.5, glow);
         grad.setColorAt(1, GLOW_RIGHT==opts.glowProgress ? glow : blank);
 
-        p->fillRect(rx, grad);
+        p->fillRect(rx.adjusted(1, 1, -1, -1), grad);
     }
     
     if(!opts.fillProgress && QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
