@@ -371,12 +371,10 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QCheckBox" name="bgndImage">
+        <widget class="QComboBox" name="bgndImage">
          <property name="whatsThis">
-          <string>Adds a few semi-transparent rings to the top right of dialogs and windows.</string>
-         </property>
-         <property name="text">
-          <string>'Air' style rings</string>
+          <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
+            &lt;ul&gt;&lt;li&gt;No background image - No image&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
          </property>
         </widget>
        </item>

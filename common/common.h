@@ -329,11 +329,12 @@ typedef GdkColor color;
 #define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
 
-#define QTC_RINGS_ALPHA  0.25
-#define QTC_RINGS_WIDTH  450
-#define QTC_RINGS_HEIGHT 360
+#define QTC_RINGS_INNER_ALPHA (IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
+#define QTC_RINGS_OUTER_ALPHA 0.5
+#define QTC_RINGS_WIDTH       450
+#define QTC_RINGS_HEIGHT      360
 
-#define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || opts.bgndImage.use)
+#define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
 
 #define QTC_GLOW_PROG_ALPHA 0.55
 
@@ -420,13 +421,21 @@ typedef enum
 typedef std::map<ETitleBarButtons, QColor> TBCols;
 #endif
 
+typedef enum
+{
+    IMG_NONE,
+    IMG_BORDERD_RINGS,
+    IMG_PLAIN_RINGS,
+    IMG_FILE
+} EImageType;
+
 typedef struct
 {
-    bool      use,
-              loaded;
+    EImageType type;
+    bool       loaded;
 #if defined __cplusplus
-    QString   file;
-    QPixmap   pix;
+    QString    file;
+    QPixmap    pix;
 #else // __cplusplus
     const char *file;
     GdkPixbuf  *pix;

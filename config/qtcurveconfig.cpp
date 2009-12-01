@@ -591,6 +591,14 @@ static void insertLvLinesEntries(QComboBox *combo)
     combo->insertItem(LV_OLD, i18n("Old style (KDE and Gtk2 different)"));
 }
 
+static void insertImageEntries(QComboBox *combo)
+{
+    combo->insertItem(IMG_NONE, i18n("No background image"));
+    combo->insertItem(IMG_BORDERD_RINGS, i18n("Bordered rings"));
+    combo->insertItem(IMG_PLAIN_RINGS, i18n("Plain rings"));
+    //combo->insertItem(IMG_FILE, i18n("File:"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                widgetStyle(NULL),
@@ -652,6 +660,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertGradTypeEntries(bgndGrad);
     insertGradTypeEntries(menuBgndGrad);
     insertLvLinesEntries(lvLines);
+    insertImageEntries(bgndImage);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -785,7 +794,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(bgndImage, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(bgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2032,7 +2041,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
-    opts.bgndImage.use=bgndImage->isChecked();
+    opts.bgndImage.type=(EImageType)bgndImage->currentIndex();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
     opts.xbar=xbar->isChecked();
     opts.crColor=crColor->isChecked();
@@ -2224,7 +2233,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
-    bgndImage->setChecked(opts.bgndImage.use);
+    // TODO: Add UI to specify file? Needs thought as to how to export, etc?
+    bgndImage->setCurrentIndex(IMG_FILE==opts.bgndImage.type ? IMG_BORDERD_RINGS : opts.bgndImage.type);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR);
     dwtColAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR);
@@ -2427,7 +2437,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          sbarBgndAppearance->currentIndex()!=opts.sbarBgndAppearance ||
          sliderFill->currentIndex()!=opts.sliderFill ||
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||
-         bgndImage->isChecked()!=opts.bgndImage.use ||
+         bgndImage->currentIndex()!=opts.bgndImage.type ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
          xbar->isChecked()!=opts.xbar ||
          crColor->isChecked()!=opts.crColor ||

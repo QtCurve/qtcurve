@@ -448,6 +448,21 @@ static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 }
 #endif
 
+static EImageType toImageType(const char *str, EImageType def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "none", 4))
+            return IMG_NONE;
+        if(0==memcmp(str, "plainrings", 10))
+            return IMG_PLAIN_RINGS;
+        if(0==memcmp(str, "rings", 5))
+            return IMG_BORDERD_RINGS;
+        if(0==memcmp(str, "file", 4))
+            return IMG_FILE;
+    }
+    return def;
+}
 #endif
 
 static const char * getHome()
@@ -822,9 +837,9 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
 
 #define QTC_CFG_READ_IMAGE(ENTRY) \
     { \
-        opts->ENTRY.use=readBoolEntry(cfg, #ENTRY, def->ENTRY.use); \
+        opts->ENTRY.type=toImageType(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY.type); \
         opts->ENTRY.loaded=false; \
-        if(opts->ENTRY.use) \
+        if(IMG_FILE==opts->ENTRY.type) \
         { \
             QString file(cfg.readEntry(#ENTRY ".file")); \
             if(!file.isEmpty()) \
@@ -936,9 +951,9 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     }
 #define QTC_CFG_READ_IMAGE(ENTRY) \
     { \
-        opts->ENTRY.use=readBoolEntry(cfg, #ENTRY, def->ENTRY.use); \
+        opts->ENTRY.type=toImageType(QTC_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY.type); \
         opts->ENTRY.loaded=false; \
-        if(opts->ENTRY.use) \
+        if(IMG_FILE==opts->ENTRY.type) \
         { \
             const char *file=readStringEntry(cfg, #ENTRY ".file"); \
             if(file) \
@@ -1940,7 +1955,7 @@ static void defaultSettings(Options *opts)
 #ifdef __cplusplus
     opts->dwtAppearance=APPEARANCE_CUSTOM1;
 #endif
-    opts->bgndImage.use=false;
+    opts->bgndImage.type=IMG_NONE;
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;
     opts->animatedProgress=false;
@@ -2455,6 +2470,22 @@ static const char * toStr(ELvLines lv)
     }
 }
 
+static const char * toStr(EImageType lv)
+{
+    switch(lv)
+    {
+        default:
+        case IMG_NONE:
+            return "none";
+        case IMG_PLAIN_RINGS:
+            return "plainrings";
+        case IMG_BORDERD_RINGS:
+            return "rings";
+        case IMG_FILE:
+            return "file";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -2487,10 +2518,22 @@ static const char * toStr(ELvLines lv)
         CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, opts.COL));
 
 #define CFG_WRITE_IMAGE_ENTRY(ENTRY) \
-    if (!exportingStyle && def.ENTRY.use==opts.ENTRY.use) \
+    if (!exportingStyle && def.ENTRY.type==opts.ENTRY.type) \
         CFG.deleteEntry(#ENTRY); \
     else \
-        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY.use));
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY.type)); \
+    if(IMG_FILE!=opts.ENTRY.type) \
+    { \
+        CFG.deleteEntry(#ENTRY ".file"); \
+        CFG.deleteEntry(#ENTRY ".width"); \
+        CFG.deleteEntry(#ENTRY ".height"); \
+    } \
+    else \
+    { \
+        CFG.writeEntry(#ENTRY ".file", opts.ENTRY.file); \
+        CFG.writeEntry(#ENTRY ".width", opts.ENTRY.width); \
+        CFG.writeEntry(#ENTRY ".height", opts.ENTRY.height); \
+    }
 
 bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false)
 {

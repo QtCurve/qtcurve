@@ -9434,16 +9434,24 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-static void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, double alpha)
+void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int size2) const
 {
     double width=(size-size2)/2.0,
            width2=width/2.0;
-//            radius=(size2+width)/2.0;
     QColor col(Qt::white);
 
-    col.setAlphaF(alpha);
+    col.setAlphaF(QTC_RINGS_INNER_ALPHA);
     painter.setPen(QPen(col, width));
     painter.drawEllipse(QRectF(x+width2, y+width2, size-width, size-width));
+
+    if(IMG_BORDERD_RINGS==opts.bgndImage.type)
+    {
+        col.setAlphaF(QTC_RINGS_OUTER_ALPHA);
+        painter.setPen(QPen(col, 1));
+        painter.drawEllipse(QRectF(x, y, size, size));
+        if(size2)
+            painter.drawEllipse(QRectF(x+width, y+width, size2, size2));
+    }
 }
 
 void QtCurveStyle::drawWindowBackground(QWidget *widget) const
@@ -9488,10 +9496,19 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                         scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
 
-    if(opts.bgndImage.use)
+    switch(opts.bgndImage.type)
     {
-        loadBgndImage(&opts.bgndImage);
-        if(opts.bgndImage.pix.isNull())
+        case IMG_NONE:
+            break;
+        case IMG_FILE:
+            loadBgndImage(&opts.bgndImage);
+            if(!opts.bgndImage.pix.isNull())
+            {
+                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), 0, opts.bgndImage.pix);;
+                break;
+            }
+        case IMG_PLAIN_RINGS:
+        case IMG_BORDERD_RINGS:
         {
             QPixmap pix(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
             QString key("qtc-rings");
@@ -9502,17 +9519,17 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                 QPainter pixPainter(&pix);
 
                 pixPainter.setRenderHint(QPainter::Antialiasing);
-                drawBgndRing(pixPainter, 0, 0, 200, 140, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 0, 0, 200, 140);
 
-                drawBgndRing(pixPainter, 210, 10, 230, 214, QTC_RINGS_ALPHA);
-                drawBgndRing(pixPainter, 226, 26, 198, 182, QTC_RINGS_ALPHA);
-                drawBgndRing(pixPainter, 300, 100, 50, 0, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 210, 10, 230, 214);
+                drawBgndRing(pixPainter, 226, 26, 198, 182);
+                drawBgndRing(pixPainter, 300, 100, 50, 0);
 
-                drawBgndRing(pixPainter, 100, 96, 160, 144, QTC_RINGS_ALPHA);
-                drawBgndRing(pixPainter, 116, 112, 128, 112, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 100, 96, 160, 144);
+                drawBgndRing(pixPainter, 116, 112, 128, 112);
 
-                drawBgndRing(pixPainter, 250, 160, 200, 140, QTC_RINGS_ALPHA);
-                drawBgndRing(pixPainter, 310, 220, 80, 0, QTC_RINGS_ALPHA);
+                drawBgndRing(pixPainter, 250, 160, 200, 140);
+                drawBgndRing(pixPainter, 310, 220, 80, 0);
                 pixPainter.end();
 
                 if(itsUsePixmapCache)
@@ -9521,8 +9538,6 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 
             p.drawPixmap(widget->width()-pix.width(), 0, pix);
         }
-        else
-            p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), 0, opts.bgndImage.pix);
     }
 }
 

@@ -70,7 +70,7 @@
     Note: to use an SVG instead of the hard-coded air-like rings, edit
           ~/.config/qtcurve/stylerc (or /etc/qtcurvestylerc) and add:
 
-          bgndImage=true
+          bgndImage=file
           bgndImage.file=/path/to/svg/file.svg
           bgndImage.width=120
           bgndImage.height=160
