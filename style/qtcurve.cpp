@@ -10082,12 +10082,13 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor
                     ? itsHighlightCols : itsBackgroundCols;
 
-    drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, true,
+    drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,
                    WIDGET_PROGRESSBAR);
 
     if(opts.glowProgress)
     {
-        QLinearGradient grad(rx.x()+1, rx.y()+1, vertical ? 0 : rx.width()-2, vertical ? rx.height()-2 : 0);
+        QRect           ri(rx.adjusted(1, 1, -1, -1));
+        QLinearGradient grad(ri.x(), ri.y(), vertical ? 0 : ri.width(), vertical ? ri.height() : 0);
         QColor          glow(Qt::white),
                         blank(Qt::white);
 
@@ -10097,10 +10098,11 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
         if(GLOW_CENTER==opts.glowProgress)
             grad.setColorAt(0.5, glow);
         grad.setColorAt(1, GLOW_RIGHT==opts.glowProgress ? glow : blank);
-
-        p->fillRect(rx.adjusted(1, 1, -1, -1), grad);
+        p->fillRect(ri, grad);
     }
-    
+
+    drawBorder(p, rx, option, opts.fillProgress ? ROUNDED_ALL : round, use, WIDGET_PROGRESSBAR);
+
     if(!opts.fillProgress && QTC_ROUNDED && length>2 && ROUNDED_ALL!=round)
     {
         bool drawFull(length > 3);
