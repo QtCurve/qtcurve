@@ -594,7 +594,7 @@ static void insertLvLinesEntries(QComboBox *combo)
 static void insertImageEntries(QComboBox *combo)
 {
     combo->insertItem(IMG_NONE, i18n("No background image"));
-    combo->insertItem(IMG_BORDERD_RINGS, i18n("Bordered rings"));
+    combo->insertItem(IMG_BORDERED_RINGS, i18n("Bordered rings"));
     combo->insertItem(IMG_PLAIN_RINGS, i18n("Plain rings"));
     //combo->insertItem(IMG_FILE, i18n("File:"));
 }
@@ -2243,7 +2243,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
     // TODO: Add UI to specify file? Needs thought as to how to export, etc?
-    bgndImage->setCurrentIndex(IMG_FILE==opts.bgndImage.type ? IMG_BORDERD_RINGS : opts.bgndImage.type);
+    bgndImage->setCurrentIndex(IMG_FILE==opts.bgndImage.type ? IMG_BORDERED_RINGS : opts.bgndImage.type);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR);
     dwtColAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR);

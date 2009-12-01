@@ -9459,7 +9459,7 @@ void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int s
     painter.setPen(QPen(col, width));
     painter.drawEllipse(QRectF(x+width2, y+width2, size-width, size-width));
 
-    if(IMG_BORDERD_RINGS==opts.bgndImage.type)
+    if(IMG_BORDERED_RINGS==opts.bgndImage.type)
     {
         col.setAlphaF(QTC_RINGS_OUTER_ALPHA);
         painter.setPen(QPen(col, 1));
@@ -9523,7 +9523,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                 break;
             }
         case IMG_PLAIN_RINGS:
-        case IMG_BORDERD_RINGS:
+        case IMG_BORDERED_RINGS:
         {
             QPixmap pix(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
             QString key("qtc-rings");

@@ -424,7 +424,7 @@ typedef std::map<ETitleBarButtons, QColor> TBCols;
 typedef enum
 {
     IMG_NONE,
-    IMG_BORDERD_RINGS,
+    IMG_BORDERED_RINGS,
     IMG_PLAIN_RINGS,
     IMG_FILE
 } EImageType;
