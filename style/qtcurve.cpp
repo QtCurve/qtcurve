@@ -1191,6 +1191,11 @@ void QtCurveStyle::polish(QApplication *app)
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains(appName);
 
+    if(!IS_FLAT(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
+        opts.bgndAppearance=APPEARANCE_FLAT;
+    if(IMG_NONE!=opts.bgndImage.type && opts.noBgndImageApps.contains(appName))
+        opts.bgndImage.type=IMG_NONE;
+
     // Plasma does not like the 'Fix parentless dialogs' option...
     if(APP_PLASMA==theThemedApp && opts.fixParentlessDialogs)
         opts.fixParentlessDialogs=false;

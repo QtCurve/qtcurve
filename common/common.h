@@ -79,9 +79,15 @@ typedef enum
 #ifdef __cplusplus
 #include <qpixmap.h>
 typedef QColor color;
+
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+typedef QSet<QString> Strings;
+#endif
+
 #else
 typedef gboolean bool;
 typedef GdkColor color;
+typedef gchar ** Strings;
 #define true TRUE
 #define false FALSE
 #endif
@@ -1007,6 +1013,12 @@ typedef struct
     Gradient         *customGradient[QTC_NUM_CUSTOM_GRAD];
 #endif
     QtCImage         bgndImage;
+
+#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    Strings          noBgndGradientApps,
+                     noBgndImageApps;
+#endif
+
 #ifndef __cplusplus
 } Options;
 #else

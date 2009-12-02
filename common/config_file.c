@@ -1204,6 +1204,27 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts!=def)
                 copyGradients(def, opts);
 #endif
+
+#if !defined __cplusplus
+            opts->noBgndGradientApps=NULL;
+            opts->noBgndImageApps=NULL;
+            if(opts!=def)
+            {
+                const gchar *str=readStringEntry(cfg, "noBgndGradientApps");
+                if(str)
+                    opts->noBgndGradientApps=g_strsplit(str, ",", -1);
+                str=readStringEntry(cfg, "noBgndImageApps");
+                if(str)
+                    opts->noBgndImageApps=g_strsplit(str, ",", -1);
+            }
+#elif defined QT_VERSION && (QT_VERSION >= 0x040000)
+            if(opts!=def)
+            {
+                opts->noBgndGradientApps=QSet<QString>::fromList(readStringEntry(cfg, "noBgndGradientApps").split(','));
+                opts->noBgndImageApps=QSet<QString>::fromList(readStringEntry(cfg, "noBgndImageApps").split(','));
+            }
+#endif
+
             /* Check if the config file expects old default values... */
             if(version<QTC_MAKE_VERSION(1, 0))
             {

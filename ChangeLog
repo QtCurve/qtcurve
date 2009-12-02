@@ -78,6 +78,12 @@
 47. Added option to add a 'glow' to progressbars.
 48. Fix QToolBox background when using background image and/or gradients.
 49. Unset non-editable combobox popup menu palette when unpolishing the widget.
+50. To disable background gradient, or image,  for a particular app, edit
+    ~/.config/qtcurve/stylerc  and add:
+        noBgndGradientApps=inkscape,gimp
+        noBgndImageApps=inkscape,gimp
+
+    ...using 'gtk' (e.g. noBgndImageApps=gtk) will disable for all Gtk apps.
 
 0.69.2
 ------
