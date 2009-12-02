@@ -4442,15 +4442,16 @@ debugDisplayWidget(widget, 3);
     }
     else if(detail && 0==strcmp(detail+1, "ruler"))
     {
-        if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x, y, width, height))
-        {
-            drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                              &qtcPalette.background[ORIGINAL_SHADE],
-                              'h'==detail[0], FALSE, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
+        drawBevelGradient(cr, style, area, NULL, x, y, width, height,
+                          &qtcPalette.background[ORIGINAL_SHADE],
+                          'h'==detail[0], FALSE, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
+
+//        if(IS_FLAT(opts.bgndAppearance) || !widget || !drawBgndGradient(cr, style, area, widget, x, y, width, height))
+//        {
 //             drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
 //             if(widget && IMG_NONE!=opts.bgndImage.type)
 //                 drawBgndGradient(cr, style, area, widget, x, y, width, height);
-        }
+//        }
     }
     else if(DETAIL("hseparator"))
     {
