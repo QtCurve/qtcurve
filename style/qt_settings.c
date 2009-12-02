@@ -2174,6 +2174,30 @@ static gboolean qtInit()
             if(GTK_APP_JAVA==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
                 opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
 
+            if(qtSettings.appName && opts.noBgndGradientApps && !IS_FLAT(opts.bgndAppearance))
+            {
+                int i;
+                for(i=0; opts.noBgndGradientApps[i]; ++i)
+                    if(0==strcmp("gtk",  opts.noBgndGradientApps[i]) ||
+                       0==strcmp(qtSettings.appName, opts.noBgndGradientApps[i]))
+                    {
+                        opts.bgndAppearance=APPEARANCE_FLAT;
+                        break;
+                    }
+            }
+
+            if(qtSettings.appName &&  opts.noBgndImageApps && IMG_NONE!=opts.bgndImage.type)
+            {
+                int i;
+                for(i=0; opts.noBgndImageApps[i]; ++i)
+                    if(0==strcmp("gtk",  opts.noBgndImageApps[i]) ||
+                       0==strcmp(qtSettings.appName, opts.noBgndImageApps[i]))
+                    {
+                        opts.bgndImage.type=IMG_NONE;
+                        break;
+                    }
+            }
+
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
             {

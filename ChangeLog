@@ -48,6 +48,12 @@
 
 28. Added option to add a 'glow' to progressbars.
 29. Use listview header appearance setting for background of rulers.
+30. To disable background gradient, or image,  for a particular app, edit
+    ~/.config/qtcurve/stylerc  and add:
+        noBgndGradientApps=inkscape,gimp
+        noBgndImageApps=inkscape,gimp
+
+    ...using 'gtk' (e.g. noBgndImageApps=gtk) will disable for all Gtk apps.
 
 0.69.2
 ------
