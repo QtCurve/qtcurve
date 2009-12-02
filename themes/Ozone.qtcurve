@@ -13,4 +13,4 @@ fillSlider=false
 borderInactiveTab=true
 highlightScrollViews=true
 lvLines=old
-glowProgress=center
+glowProgress=middle
