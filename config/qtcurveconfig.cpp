@@ -602,9 +602,9 @@ static void insertImageEntries(QComboBox *combo)
 static void insertGlowEntries(QComboBox *combo)
 {
     combo->insertItem(GLOW_NONE, i18n("No glow"));
-    combo->insertItem(GLOW_LEFT, i18n("Add glow on the left"));
-    combo->insertItem(GLOW_CENTER, i18n("Add glow in the middle"));
-    combo->insertItem(GLOW_RIGHT, i18n("Add glow on the right"));
+    combo->insertItem(GLOW_START, i18n("Add glow at the start"));
+    combo->insertItem(GLOW_MIDDLE, i18n("Add glow in the middle"));
+    combo->insertItem(GLOW_END, i18n("Add glow at the end"));
 }
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)

@@ -470,12 +470,12 @@ static EGlow toGlow(const char *str, EGlow def)
     {
         if(0==memcmp(str, "none", 4))
             return GLOW_NONE;
-        if(0==memcmp(str, "left", 4))
-            return GLOW_LEFT;
-        if(0==memcmp(str, "center", 6))
-            return GLOW_CENTER;
-        if(0==memcmp(str, "right", 5))
-            return GLOW_RIGHT;
+        if(0==memcmp(str, "start", 5))
+            return GLOW_START;
+        if(0==memcmp(str, "middle", 6))
+            return GLOW_MIDDLE;
+        if(0==memcmp(str, "end", 3))
+            return GLOW_END;
     }
     return def;
 }
@@ -2512,12 +2512,12 @@ static const char * toStr(EGlow lv)
         default:
         case GLOW_NONE:
             return "none";
-        case GLOW_LEFT:
-            return "left";
-        case GLOW_CENTER:
-            return "center";
-        case GLOW_RIGHT:
-            return "right";
+        case GLOW_START:
+            return "start";
+        case GLOW_MIDDLE:
+            return "middle";
+        case GLOW_END:
+            return "end";
     }
 }
 

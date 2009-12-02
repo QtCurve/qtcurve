@@ -10085,19 +10085,20 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,
                    WIDGET_PROGRESSBAR);
 
-    if(opts.glowProgress)
+    if(opts.glowProgress && (vertical ? rx.height() : rx.width())>3)
     {
         QRect           ri(rx.adjusted(1, 1, -1, -1));
-        QLinearGradient grad(ri.x(), ri.y(), vertical ? 0 : ri.width(), vertical ? ri.height() : 0);
+        QLinearGradient grad(0, 0, vertical ? 0 : 1, vertical ? 1 : 0);
         QColor          glow(Qt::white),
                         blank(Qt::white);
 
         blank.setAlphaF(0);
         glow.setAlphaF(QTC_GLOW_PROG_ALPHA);
-        grad.setColorAt(0, GLOW_LEFT==opts.glowProgress ? glow : blank);
-        if(GLOW_CENTER==opts.glowProgress)
+        grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+        grad.setColorAt(0, (reverse ? GLOW_END : GLOW_START)==opts.glowProgress ? glow : blank);
+        if(GLOW_MIDDLE==opts.glowProgress)
             grad.setColorAt(0.5, glow);
-        grad.setColorAt(1, GLOW_RIGHT==opts.glowProgress ? glow : blank);
+        grad.setColorAt(1, (reverse ? GLOW_START : GLOW_END)==opts.glowProgress ? glow : blank);
         p->fillRect(ri, grad);
     }
 

@@ -714,9 +714,9 @@ typedef enum
 typedef enum
 {
     GLOW_NONE,
-    GLOW_LEFT,
-    GLOW_CENTER,
-    GLOW_RIGHT
+    GLOW_START,
+    GLOW_MIDDLE,
+    GLOW_END
 } EGlow;
 
 #define QTC_FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
