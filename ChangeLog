@@ -47,6 +47,7 @@
           bgndImage.height=160
 
 28. Added option to add a 'glow' to progressbars.
+29. Use listview header appearance setting for background of rulers.
 
 0.69.2
 ------
