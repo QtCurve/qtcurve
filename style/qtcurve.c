@@ -2409,9 +2409,9 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
         gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
         GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
         int      round=opts.fillProgress || isEntryProg ? ROUNDED_ALL : progressbarRound(widget, rev),
-                    new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
+                 new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
         int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
-                    borderVal=0;
+                 borderVal=0;
 
         x++, y++, width-=2, height-=2;
 
@@ -2430,20 +2430,37 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                         qtcPalette.highlight, round, wid, BORDER_FLAT,
                         (opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
-        if(opts.glowProgress)
+        if(opts.glowProgress && (horiz ? width : height)>3)
         {
-            cairo_pattern_t *pat=cairo_pattern_create_linear(x+1, y+1, horiz ? width-2 : 0, horiz ? 0 : width-2);
+            cairo_pattern_t *pat=cairo_pattern_create_linear(x+1, y+1, horiz ? x+width-4 : 0, horiz ? 0 : y+height-4);
+            gboolean        inverted=FALSE;
+            
+            if(GLOW_MIDDLE!=opts.glowProgress && widget && GTK_IS_PROGRESS_BAR(widget))
+                switch(GTK_PROGRESS_BAR(widget)->orientation)
+                {
+                    default:
+                    case GTK_PROGRESS_LEFT_TO_RIGHT:
+                        inverted=rev;
+                        break;
+                    case GTK_PROGRESS_RIGHT_TO_LEFT:
+                        inverted=!rev;
+                        break;
+                    case GTK_PROGRESS_BOTTOM_TO_TOP:
+                        inverted=TRUE;
+                    case GTK_PROGRESS_TOP_TO_BOTTOM:
+                        break;
+                }
 
-            cairo_rectangle(cr, x+1, y+1, width-2, height-2);
             cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0,
-                                              GLOW_LEFT==opts.glowProgress ? QTC_GLOW_PROG_ALPHA : 0.0);
-            if(GLOW_CENTER==opts.glowProgress)
+                                              (inverted ? GLOW_END : GLOW_START)==opts.glowProgress ? QTC_GLOW_PROG_ALPHA : 0.0);
+            if(GLOW_MIDDLE==opts.glowProgress)
                 cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0, QTC_GLOW_PROG_ALPHA);
             cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0,
-                                              GLOW_RIGHT==opts.glowProgress ? QTC_GLOW_PROG_ALPHA : 0.0);
+                                              (inverted ? GLOW_START : GLOW_END)==opts.glowProgress ? QTC_GLOW_PROG_ALPHA : 0.0);
             cairo_set_source(cr, pat);
-            cairo_pattern_destroy(pat);
+            cairo_rectangle(cr, x+1, y+1, width-2, height-2);
             cairo_fill(cr);
+            cairo_pattern_destroy(pat);
         }
 
         if(width>2 && height>2)
