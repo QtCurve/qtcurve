@@ -1896,6 +1896,17 @@ void QtCurveStyle::unpolish(QWidget *widget)
                 if(layout)
                     layout->setMargin(6);
             }
+
+            QWidget *p=0L;
+
+            if(opts.gtkComboMenus && widget->parentWidget() && (p=widget->parentWidget()->parentWidget()) &&
+               qobject_cast<QComboBox *>(p) && !((QComboBox *)(p))->isEditable())
+            {
+                QPalette pal(widget->palette());
+
+                pal.setBrush(QPalette::Active, QPalette::Base, QApplication::palette().brush(QPalette::Base));
+                widget->setPalette(pal);
+            }
         }
 
     if(!IS_FLAT(opts.menuBgndAppearance))

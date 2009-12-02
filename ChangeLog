@@ -77,6 +77,7 @@
 
 47. Added option to add a 'glow' to progressbars.
 48. Fix QToolBox background when using background image and/or gradients.
+49. Unset non-editable combobox popup menu palette when unpolishing the widget.
 
 0.69.2
 ------
