@@ -2099,6 +2099,9 @@ static void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2)
 static gboolean drawBgndGradient(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
                                  gint x, gint y, gint width, gint height)
 {
+    if(widget && widget->parent && isOnHandlebox(widget->parent, NULL, 0))
+        return TRUE;
+
     if(!isFixedWidget(widget) && !isGimpDockable(widget))
     {
         GtkWidget *window=widget;
@@ -2142,7 +2145,7 @@ debugDisplayWidget(widget, 20);
                     if(opts.bgndImage.pix)
                     {
                         gdk_cairo_set_source_pixbuf(cr, opts.bgndImage.pix,
-                                                    window->allocation.width-opts.bgndImage.width, 0);
+                                                    window->allocation.width-opts.bgndImage.width, -ypos);
                         cairo_paint(cr);
                         break;
                     }
@@ -2170,7 +2173,7 @@ debugDisplayWidget(widget, 20);
                         cairo_destroy(ci);
                     }
 
-                    cairo_set_source_surface(cr, bgndImage, window->allocation.width-QTC_RINGS_WIDTH, 0);
+                    cairo_set_source_surface(cr, bgndImage, window->allocation.width-QTC_RINGS_WIDTH, -ypos);
                     cairo_paint(cr);
                 }
             }
@@ -4178,9 +4181,12 @@ debugDisplayWidget(widget, 3);
             else if(IS_FLAT(opts.bgndAppearance) || !(widget &&
                                                       drawBgndGradient(cr, style, area, widget, x, y, width, height)))
             {
-                drawAreaColor(cr, area, NULL, col, x, y, width, height);
-                if(widget && IMG_NONE!=opts.bgndImage.type)
-                    drawBgndGradient(cr, style, area, widget, x, y, width, height);
+                if(menubar)
+                {
+                    drawAreaColor(cr, area, NULL, col, x, y, width, height);
+                    if(widget && IMG_NONE!=opts.bgndImage.type)
+                        drawBgndGradient(cr, style, area, widget, x, y, width, height);
+                }
             }
 
             if(GTK_SHADOW_NONE!=shadow_type && TB_NONE!=opts.toolbarBorders)
