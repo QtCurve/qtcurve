@@ -84,6 +84,10 @@
         noBgndImageApps=inkscape,gimp
 
     ...using 'gtk' (e.g. noBgndImageApps=gtk) will disable for all Gtk apps.
+51. Added a option to manually re-order the buttons of Gtk dialogs to match
+    KDE style. Note: This is experimental, and may produce unexpected results!
+52. Disable parentless-dialog fix for Kate (not required anyway), as this causes
+    disappearing pointers when using embedded konsole!
 
 0.69.2
 ------

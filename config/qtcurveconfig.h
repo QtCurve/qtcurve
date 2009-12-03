@@ -96,6 +96,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     void setPreset();
     void updateChanged();
+    void gtkButtonOrderChanged();
+    void reorderGtkButtonsChanged();
     void focusChanged();
     void roundChanged();
     void savePreset();

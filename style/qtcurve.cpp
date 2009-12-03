@@ -1196,8 +1196,10 @@ void QtCurveStyle::polish(QApplication *app)
     if(IMG_NONE!=opts.bgndImage.type && opts.noBgndImageApps.contains(appName))
         opts.bgndImage.type=IMG_NONE;
 
-    // Plasma does not like the 'Fix parentless dialogs' option...
-    if(APP_PLASMA==theThemedApp && opts.fixParentlessDialogs)
+    // Plasma and Kate do not like the 'Fix parentless dialogs' option...
+    if(opts.fixParentlessDialogs &&
+       (APP_PLASMA==theThemedApp ||
+        (APP_OTHER==theThemedApp && "kate"==appName) ) )
         opts.fixParentlessDialogs=false;
 }
 

@@ -2583,6 +2583,16 @@
         </widget>
        </item>
        <item row="1" column="1">
+        <widget class="QCheckBox" name="reorderGtkButtons">
+         <property name="whatsThis">
+          <string>&lt;p&gt;If this is enabled and 'Use Gtk button order' is not, QtCurve will attempt to manually set hte order of buttonsiin Gtk dialogs.&lt;/p&gt;&lt;p&gt;&lt;b&gt;NOTE&lt;b&gt; This is experimental, and may produce unexpected results!&lt;/p&gt;</string>
+         </property>
+         <property name="text">
+          <string>Manually re-order Gtk buttons</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
         <widget class="QCheckBox" name="stdBtnSizes">
          <property name="whatsThis">
           <string>&lt;p&gt;Auto-default buttons are buttons that can become 'default' buttons - i.e. will react the the user pressing 'return'.&lt;/p&gt;
@@ -2593,14 +2603,14 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_79">
          <property name="text">
           <string>Gtk icons</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QCheckBox" name="mapKdeIcons">
          <property name="whatsThis">
           <string>Eanble this option so that QtCurve can attempt to map from the KDE icon names to their Gtk equivalant for Gtk applications.</string>
@@ -2610,14 +2620,14 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="label_78">
          <property name="text">
           <string>'Parent-less' dialogs:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QCheckBox" name="fixParentlessDialogs">
          <property name="whatsThis">
           <string>&lt;p&gt;&lt;b&gt;Warning: Experimental!&lt;/b&gt;&lt;/p&gt;
@@ -2632,14 +2642,14 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Password character:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QPushButton" name="passwordChar">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -2652,14 +2662,14 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_77">
          <property name="text">
           <string>Gtk expander highlight:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="KIntNumInput" name="expanderHighlight">
          <property name="whatsThis">
           <string>Defines the amount by which the popup menu background will be lightened (or darkened).</string>
@@ -3243,6 +3253,7 @@
   <tabstop>dwtTextAsPerTitleBar</tabstop>
   <tabstop>dwtEffectAsPerTitleBar</tabstop>
   <tabstop>gtkButtonOrder</tabstop>
+  <tabstop>reorderGtkButtons</tabstop>
   <tabstop>stdBtnSizes</tabstop>
   <tabstop>mapKdeIcons</tabstop>
   <tabstop>fixParentlessDialogs</tabstop>

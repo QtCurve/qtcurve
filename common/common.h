@@ -895,6 +895,9 @@ typedef struct
                      gtkButtonOrder,
                      fadeLines,
 #endif
+#if !defined __cplusplus || (defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+                     reorderGtkButtons,
+#endif
                      borderMenuitems,
                      colorMenubarMouseOver,
                      darkerBorders,

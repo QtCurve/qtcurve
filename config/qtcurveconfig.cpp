@@ -816,7 +816,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(smallRadio, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(splitterHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(gtkComboMenus, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(gtkButtonOrder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(gtkButtonOrder, SIGNAL(toggled(bool)), SLOT(gtkButtonOrderChanged()));
+    connect(reorderGtkButtons, SIGNAL(toggled(bool)), SLOT(reorderGtkButtonsChanged()));
     connect(mapKdeIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(passwordChar, SIGNAL(clicked()), SLOT(passwordCharClicked()));
     connect(framelessGroupBoxes, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1668,6 +1669,20 @@ void QtCurveConfig::updateChanged()
         emit changed(true);
 }
 
+void QtCurveConfig::gtkButtonOrderChanged()
+{
+    if(gtkButtonOrder->isChecked())
+        reorderGtkButtons->setChecked(false);
+    updateChanged();
+}
+
+void QtCurveConfig::reorderGtkButtonsChanged()
+{
+    if(reorderGtkButtons->isChecked())
+        gtkButtonOrder->setChecked(false);
+    updateChanged();
+}
+    
 void QtCurveConfig::focusChanged()
 {
     if(ROUND_MAX==round->currentIndex() && FOCUS_LINE!=focus->currentIndex())
@@ -2058,6 +2073,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.splitterHighlight=splitterHighlight->value();
     opts.gtkComboMenus=gtkComboMenus->isChecked();
     opts.gtkButtonOrder=gtkButtonOrder->isChecked();
+    opts.reorderGtkButtons=reorderGtkButtons->isChecked();
     opts.mapKdeIcons=mapKdeIcons->isChecked();
     opts.passwordChar=toInt(passwordChar->text());
     opts.framelessGroupBoxes=framelessGroupBoxes->isChecked();
@@ -2258,6 +2274,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     splitterHighlight->setValue(opts.splitterHighlight);
     gtkComboMenus->setChecked(opts.gtkComboMenus);
     gtkButtonOrder->setChecked(opts.gtkButtonOrder);
+    reorderGtkButtons->setChecked(opts.reorderGtkButtons);
     mapKdeIcons->setChecked(opts.mapKdeIcons);
     setPasswordChar(opts.passwordChar);
     framelessGroupBoxes->setChecked(opts.framelessGroupBoxes);
@@ -2454,6 +2471,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          splitterHighlight->value()!=opts.splitterHighlight ||
          gtkComboMenus->isChecked()!=opts.gtkComboMenus ||
          gtkButtonOrder->isChecked()!=opts.gtkButtonOrder ||
+         reorderGtkButtons->isChecked()!=opts.reorderGtkButtons ||
          mapKdeIcons->isChecked()!=opts.mapKdeIcons ||
          framelessGroupBoxes->isChecked()!=opts.framelessGroupBoxes ||
 

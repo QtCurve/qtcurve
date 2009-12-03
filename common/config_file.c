@@ -1478,6 +1478,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
 #endif
+#if !defined __cplusplus || (defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+            QTC_CFG_READ_BOOL(reorderGtkButtons)
+#endif
 #ifdef __cplusplus
             QTC_CFG_READ_APPEARANCE(titlebarAppearance, false)
             QTC_CFG_READ_APPEARANCE(inactiveTitlebarAppearance, false)
@@ -1994,6 +1997,9 @@ static void defaultSettings(Options *opts)
 #endif
 #ifdef __cplusplus
     opts->dwtAppearance=APPEARANCE_CUSTOM1;
+#endif
+#if !defined __cplusplus || (defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+    opts->reorderGtkButtons=false;
 #endif
     opts->bgndImage.type=IMG_NONE;
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
@@ -2775,6 +2781,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(doubleGtkComboArrow)
         CFG_WRITE_ENTRY(colorTitlebarOnly)
         CFG_WRITE_ENTRY(gtkButtonOrder)
+#if !defined __cplusplus || (defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
+        CFG_WRITE_ENTRY(reorderGtkButtons)
+#endif
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(gtkMenuStripe)
         CFG_WRITE_ENTRY(shading)
