@@ -850,6 +850,7 @@ QtCurveStyle::QtCurveStyle()
               itsSortedLvColors(0L),
               itsSaveMenuBarStatus(false),
               itsUsePixmapCache(false),
+              itsIsPreview(false),
               itsSidebarButtonsCols(0L),
               itsActiveMdiColors(0L),
               itsMdiColors(0L),
@@ -895,7 +896,10 @@ QtCurveStyle::QtCurveStyle()
 
     if(!rcFile.isEmpty())
         if(QFile::exists(rcFile))
+        {
             itsUsePixmapCache=false;
+            itsIsPreview=true;
+        }
         else
             rcFile=QString();
 #ifdef QTC_STYLE_SUPPORT
@@ -1379,6 +1383,12 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->parentWidget()->setAutoFillBackground(false);
             widget->setAutoFillBackground(false);
         }
+        
+        if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+        {
+            widget->installEventFilter(this);
+            widget->setAttribute(Qt::WA_StyledBackground);
+        }
     }
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
@@ -1792,6 +1802,12 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::Window);
+        
+        if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+        {
+            widget->removeEventFilter(this);
+            widget->setAttribute(Qt::WA_StyledBackground, false);
+        }
     }
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
@@ -2067,7 +2083,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
     {
         QWidget *widget=qobject_cast<QWidget *>(object);
 
-        if(widget && widget->isWindow() && widget->isVisible() &&
+        if(widget && (widget->isWindow() || (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))) && widget->isVisible() &&
            widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
             drawWindowBackground(widget);
     }
@@ -9493,12 +9509,19 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
     const QWidget *window = widget->window();
     // get coordinates relative to the client area
     const QWidget *w = widget;
-    int           y = 0;
+    int           y = 0,
+                  yAdjust = 0;
 
-    while (!w->isWindow())
+    while (!w->isWindow() && (!itsIsPreview || !qobject_cast<const QMdiSubWindow *>(w)))
     {
         y += w->geometry().y();
         w = w->parentWidget();
+    }
+
+    if(itsIsPreview && qobject_cast<const QMdiSubWindow *>(w))
+    {
+        yAdjust=pixelMetric(PM_TitleBarHeight, 0L, w);
+        y+=yAdjust;
     }
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
@@ -9537,7 +9560,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
             loadBgndImage(&opts.bgndImage);
             if(!opts.bgndImage.pix.isNull())
             {
-                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), 0, opts.bgndImage.pix);;
+                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), yAdjust, opts.bgndImage.pix);;
                 break;
             }
         case IMG_PLAIN_RINGS:
@@ -9569,7 +9592,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                     QPixmapCache::insert(key, pix);
             }
 
-            p.drawPixmap(widget->width()-pix.width(), 0, pix);
+            p.drawPixmap(widget->width()-pix.width(), yAdjust, pix);
         }
     }
 }
