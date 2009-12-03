@@ -9533,9 +9533,9 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
         QString key;
         QColor  col(window->palette().window().color());
         QSize   scaledSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : window->rect().width(),
-                                    GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
+                           GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
         QPixmap pix(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
-                        GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
+                          GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
 
         key.sprintf("qtc-bgnd-%x", col.rgba());
         if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
@@ -9543,13 +9543,13 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
             QPainter pixPainter(&pix);
 
             drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
-                                GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
+                                  GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
             if(itsUsePixmapCache)
                 QPixmapCache::insert(key, pix);
         }
 
         p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
-                        scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+                          scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
 
     switch(opts.bgndImage.type)
