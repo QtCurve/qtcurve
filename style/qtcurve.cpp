@@ -9506,22 +9506,29 @@ void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int s
 void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 {
     QPainter      p(widget);
-    const QWidget *window = widget->window();
+    const QWidget *window = itsIsPreview ? widget : widget->window();
     // get coordinates relative to the client area
     const QWidget *w = widget;
     int           y = 0,
                   yAdjust = 0;
 
-    while (!w->isWindow() && (!itsIsPreview || !qobject_cast<const QMdiSubWindow *>(w)))
+    if(itsIsPreview)
     {
-        y += w->geometry().y();
-        w = w->parentWidget();
-    }
-
-    if(itsIsPreview && qobject_cast<const QMdiSubWindow *>(w))
-    {
+        while (!qobject_cast<const QMdiSubWindow *>(w))
+        {
+            y += w->geometry().y();
+            w = w->parentWidget();
+        }
         yAdjust=pixelMetric(PM_TitleBarHeight, 0L, w);
         y+=yAdjust;
+    }
+    else
+    {
+        while (!w->isWindow())
+        {
+            y += w->geometry().y();
+            w = w->parentWidget();
+        }
     }
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
