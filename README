@@ -30,11 +30,6 @@ The following options may be supplied to cmake:
                     ~/.thunderbird/xxxxxxx.default/chrome/userChrome.css
               Where xxxxxxx is a series of random characters.
 
-    -DQTC_REORDER_GTK_DIALOG_BUTTONS=true
-       When set QtCurve will try to manually re-order the buttons of Gtk
-       dialogs. Note: This will cause errors to be printed to the console,
-       and is only an experiment!
-
     -DQTC_DEFAULT_TO_KDE3=true
        If the KDE_SESSION_VERSION is not set, then assume we are running
        under KDE3. If this cmake option is not set, then KDE4 is assumed.

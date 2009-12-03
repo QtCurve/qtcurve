@@ -470,7 +470,12 @@ static gboolean isList(GtkWidget *widget)
 
 static gboolean isListViewHeader(GtkWidget *widget)
 {
-    return widget && GTK_IS_BUTTON(widget) && widget->parent && isList(widget->parent);
+    return widget && GTK_IS_BUTTON(widget) && widget->parent &&
+           (isList(widget->parent) ||
+            (GTK_APP_GIMP==qtSettings.app && GTK_IS_BOX(widget->parent) &&
+             widget->parent->parent && widget->parent->parent->parent &&
+             GTK_IS_EVENT_BOX(widget->parent->parent) &&
+             0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent->parent->parent)), "GimpThumbBox")));
 }
 
 static gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail)
@@ -2126,7 +2131,19 @@ debugDisplayWidget(widget, 20);
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
-            if(!IS_FLAT(opts.bgndAppearance))
+            GdkRectangle clip;
+
+            clip.x=x, clip.y=y, clip.width=width, clip.height=height;
+//             setCairoClipping(cr, &clip, NULL);
+                    
+            if(IS_FLAT(opts.bgndAppearance))
+            {
+                GdkColor *parent_col=getParentBgCol(widget);
+
+                if(parent_col)
+                    drawAreaColor(cr, area, NULL, parent_col , x, y, width, height);
+            }
+            else
             {
                 if(GT_HORIZ==opts.bgndGrad)
                     drawBevelGradient(cr, style, area, NULL, x, -ypos, width, window->allocation.height,
@@ -2135,7 +2152,7 @@ debugDisplayWidget(widget, 20);
                     drawBevelGradient(cr, style, area, NULL, -xpos, y, window->allocation.width, height,
                                       &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
             }
-
+   
             switch(opts.bgndImage.type)
             {
                 case IMG_NONE:
@@ -2177,6 +2194,8 @@ debugDisplayWidget(widget, 20);
                     cairo_paint(cr);
                 }
             }
+
+//             unsetCairoClipping(cr);
             return TRUE;
         }
     }
@@ -2581,7 +2600,11 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                           GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                           const gchar *detail, gint x, gint y, gint width, gint height,
                           GtkOrientation orientation);
-                          
+
+static void qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar *msg, gpointer data)
+{
+}
+
 static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                            GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
                            const gchar *detail, gint x, gint y, gint width, gint height)
@@ -2599,24 +2622,27 @@ debugDisplayWidget(widget, 3);
     sanitizeSize(window, &width, &height);
 
 #define QTC_MODAL_HACK  "QTC_MODAL_HACK_SET"
-#ifdef QTC_REORDER_GTK_DIALOG_BUTTONS
 #define QTC_BUTTON_HACK "QTC_BUTTON_ORDER_HACK_SET"
 
 #if GTK_CHECK_VERSION(2, 6, 0)
-    if(!opts.gtkButtonOrder && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
+    if(!opts.gtkButtonOrder && opts.reorderGtkButtons && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
         GtkWidget *topLevel=gtk_widget_get_toplevel(widget);
 
         if(topLevel && GTK_IS_DIALOG(topLevel) && !g_object_get_data(G_OBJECT(topLevel), QTC_BUTTON_HACK))
         {
+            // gtk_dialog_set_alternative_button_order will cause errors to be logged, but dont want these
+            // so register ur own error handler, and then unregister afterwards...
+            guint id=g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL, qtcLogHandler, NULL);
             g_object_set_data(G_OBJECT(topLevel), QTC_BUTTON_HACK, (gpointer)1);
+            
             gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
                                                     GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
                                                     GTK_RESPONSE_REJECT, GTK_RESPONSE_CLOSE, GTK_RESPONSE_NO, GTK_RESPONSE_CANCEL, -1);
-
+            g_log_remove_handler("Gtk", id);
+            g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL, g_log_default_handler, NULL);
         }
     }
-#endif
 #endif
     if(widget && opts.fixParentlessDialogs && !isMenuOrToolTipWindow && GTK_IS_WINDOW(widget) && detail && 0==strcmp(detail, "base"))
     {
@@ -4101,7 +4127,7 @@ debugDisplayWidget(widget, 3);
                 if(!drawBg)
                 {
                     GdkColor *parent_col=getParentBgCol(widget),
-                            *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
+                             *bgnd_col=parent_col ? parent_col : &qtcPalette.background[ORIGINAL_SHADE];
 
                     setCairoClipping(cr, area, NULL);
 

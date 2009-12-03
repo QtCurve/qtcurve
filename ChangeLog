@@ -54,6 +54,9 @@
         noBgndImageApps=inkscape,gimp
 
     ...using 'gtk' (e.g. noBgndImageApps=gtk) will disable for all Gtk apps.
+31. Removed the '-DQTC_REORDER_GTK_DIALOG_BUTTONS=true' cmake option, and replaced
+    with a config option.
+32. Draw Preview button in GIMP file dialog as a listview header.
 
 0.69.2
 ------
