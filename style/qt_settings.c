@@ -2770,6 +2770,9 @@ static gboolean qtInit()
                 gtk_rc_parse_string("style \""QTC_RC_SETTING"Spl\" { GtkPaned::handle_size=7 GtkPaned::handle_width = 7 } "
                                     "class \"*GtkWidget\" style \""QTC_RC_SETTING"Spl\"");
 
+            if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type)
+                calcRingAlphas(&opts, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
+
             if(tmpStr)
                 free(tmpStr);
         }
