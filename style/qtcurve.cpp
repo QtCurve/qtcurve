@@ -930,6 +930,9 @@ QtCurveStyle::QtCurveStyle()
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsFocusCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
 
+    if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type)
+        calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
+
     switch(opts.shadeSliders)
     {
         default:
@@ -1246,7 +1249,15 @@ void QtCurveStyle::polish(QPalette &palette)
                               itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors);
 
     if(newGray)
+    {
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
+        if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type)
+        {
+            calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
+            if(itsUsePixmapCache)
+                QPixmapCache::clear();
+        }
+    }
 
     if(newButton)
         shadeColors(palette.color(QPalette::Active, QPalette::Button), itsButtonCols);
@@ -9567,7 +9578,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
             loadBgndImage(&opts.bgndImage);
             if(!opts.bgndImage.pix.isNull())
             {
-                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), yAdjust, opts.bgndImage.pix);;
+                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), yAdjust, opts.bgndImage.pix);
                 break;
             }
         case IMG_PLAIN_RINGS:

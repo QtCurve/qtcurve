@@ -335,8 +335,8 @@ typedef gchar ** Strings;
 #define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
 
-#define QTC_RINGS_INNER_ALPHA (IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
-#define QTC_RINGS_OUTER_ALPHA 0.5
+#define QTC_RINGS_INNER_ALPHA qtcRingInnerAlpha //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
+#define QTC_RINGS_OUTER_ALPHA qtcRingOuterAlpha //0.5
 #define QTC_RINGS_WIDTH       450
 #define QTC_RINGS_HEIGHT      360
 
@@ -1756,9 +1756,31 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 
     return 0;
 }
+
+static double qtcRingInnerAlpha=0.125;
+static double qtcRingOuterAlpha=0.5;
+
+static void calcRingAlphas(Options *opts, const color *bgnd)
+{
+#ifdef __cplusplus
+    double r=bgnd->red()/255.0,
+           g=bgnd->green()/255.0,
+           b=bgnd->blue()/255.0,
+#else
+    double r=bgnd->red/65535.0,
+           g=bgnd->green/65535.0,
+           b=bgnd->blue/65535.0,
 #endif
+           h=0,
+           s=0,
+           v=0;
+    rgbToHsv(r, g, b, &h, &s, &v);
+    qtcRingInnerAlpha=v*(IMG_PLAIN_RINGS==opts->bgndImage.type ? 0.26 : 0.14);
+    qtcRingOuterAlpha=v*0.55;
+}
 
 #endif
 
 #endif
 
+#endif // __COMMON_H__
