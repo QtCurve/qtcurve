@@ -9038,7 +9038,8 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
                                          bool horiz, bool sel, EAppearance app, EWidget w) const
 {
     bool                             topTab(WIDGET_TAB_TOP==w),
-                                     botTab(WIDGET_TAB_BOT==w);
+                                     botTab(WIDGET_TAB_BOT==w),
+                                     dwt(QTC_CUSTOM_BGND && WIDGET_DOCK_WIDGET_TITLE==w);
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
@@ -9049,10 +9050,10 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
     {
         QColor col;
 
-        if(/*sel && */(topTab || botTab) && i==numStops-1)
+        if(/*sel && */(topTab || botTab || dwt) && i==numStops-1)
         {
             col=base;
-            if(sel && QTC_CUSTOM_BGND && 0==opts.tabBgnd)
+            if((sel && QTC_CUSTOM_BGND && 0==opts.tabBgnd) || dwt)
                 col.setAlphaF(0.0);
         }
         else
