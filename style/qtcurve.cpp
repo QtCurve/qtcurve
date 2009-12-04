@@ -1658,6 +1658,12 @@ void QtCurveStyle::polish(QWidget *widget)
              || qobject_cast<QStackedLayout *>(layout))
                 polishLayout(layout);
     }
+
+    if(APP_K3B==theThemedApp && widget->inherits("K3b::ThemedHeader") && qobject_cast<QFrame *>(widget))
+    {
+        ((QFrame *)widget)->setLineWidth(0);
+        ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
+    }
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
@@ -3257,6 +3263,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                             doEtch && !noEtchW, WIDGET_SCROLLVIEW);
                         }
                     }
+                    // K3b's Disk usage status bar, etc...
+//                     else if(APP_K3B==theThemedApp && widget && widget->inherits("K3b::FillStatusDisplay"))
                     else if (fo && fo->lineWidth>0)
                     {
                         bool         kwinTab(APP_KWIN==theThemedApp &&  widget && !widget->parentWidget() &&
