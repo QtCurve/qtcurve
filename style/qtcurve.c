@@ -2133,15 +2133,15 @@ debugDisplayWidget(widget, 20);
         {
             GdkRectangle clip;
 
-            clip.x=x, clip.y=y, clip.width=width, clip.height=height;
-//             setCairoClipping(cr, &clip, NULL);
+            clip.x=x, clip.y=-ypos, clip.width=width, clip.height=window->allocation.height;
+            setCairoClipping(cr, &clip, NULL);
                     
             if(IS_FLAT(opts.bgndAppearance))
             {
                 GdkColor *parent_col=getParentBgCol(widget);
 
                 if(parent_col)
-                    drawAreaColor(cr, area, NULL, parent_col , x, y, width, height);
+                    drawAreaColor(cr, area, NULL, parent_col , x, -ypos, width, window->allocation.height);
             }
             else
             {
@@ -2195,7 +2195,7 @@ debugDisplayWidget(widget, 20);
                 }
             }
 
-//             unsetCairoClipping(cr);
+            unsetCairoClipping(cr);
             return TRUE;
         }
     }
@@ -4204,14 +4204,14 @@ debugDisplayWidget(widget, 3);
                                             ? width<height
                                             : width>height,
                                 FALSE, MODIFY_AGUA(app), WIDGET_OTHER);
-            else if(IS_FLAT(opts.bgndAppearance) || !(widget &&
+            else if(!QTC_CUSTOM_BGND || !(widget &&
                                                       drawBgndGradient(cr, style, area, widget, x, y, width, height)))
             {
                 if(menubar)
                 {
                     drawAreaColor(cr, area, NULL, col, x, y, width, height);
-                    if(widget && IMG_NONE!=opts.bgndImage.type)
-                        drawBgndGradient(cr, style, area, widget, x, y, width, height);
+//                     if(widget && IMG_NONE!=opts.bgndImage.type)
+//                         drawBgndGradient(cr, style, area, widget, x, y, width, height);
                 }
             }
 
