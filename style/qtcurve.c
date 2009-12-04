@@ -2174,7 +2174,7 @@ debugDisplayWidget(widget, 20);
                     if(!bgndImage)
                     {
                         cairo_t *ci;
-                        bgndImage=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
+                        bgndImage=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, QTC_RINGS_WIDTH+1, QTC_RINGS_HEIGHT+1);
                         ci=cairo_create(bgndImage);
                         drawBgndRing(ci, 0, 0, 200, 140);
 
