@@ -2190,7 +2190,7 @@ debugDisplayWidget(widget, 20);
                         cairo_destroy(ci);
                     }
 
-                    cairo_set_source_surface(cr, bgndImage, window->allocation.width-QTC_RINGS_WIDTH, -ypos);
+                    cairo_set_source_surface(cr, bgndImage, window->allocation.width-QTC_RINGS_WIDTH, (-ypos)+1);
                     cairo_paint(cr);
                 }
             }
