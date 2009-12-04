@@ -9599,7 +9599,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                     QPixmapCache::insert(key, pix);
             }
 
-            p.drawPixmap(widget->width()-pix.width(), yAdjust, pix);
+            p.drawPixmap(widget->width()-pix.width(), yAdjust+1, pix);
         }
     }
 }
