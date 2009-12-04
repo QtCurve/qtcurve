@@ -2772,7 +2772,7 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_ToolBarHorizontalExtensionButton:
         case SP_ToolBarVerticalExtensionButton:
         {
-            QBitmap pm(11, 11);
+            QBitmap pm(9, 9);
 
             pm.clear();
 
@@ -6540,6 +6540,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
         case CC_ToolButton:
             if (const QStyleOptionToolButton *toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option))
             {
+                int widthAdjust(0),
+                    heightAdjust(0);
+
                 if (widget)
                 {
                     if((opts.dwtSettings&QTC_DWT_BUTTONS_AS_PER_TITLEBAR) &&
@@ -6662,6 +6665,16 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->restore();
                         break;
                     }
+
+                    // Amarok's toolbars (the one just above the collection list) are much thinner then normal,
+                    // and QToolBarExtension does not seem to take this into account - so adjust the size here...
+                    if(widget->inherits("QToolBarExtension") && widget->parentWidget())
+                    {
+                        if(r.height()>widget->parentWidget()->rect().height())
+                            heightAdjust=(r.height()-widget->parentWidget()->rect().height())+2;
+                        if(r.width()>widget->parentWidget()->rect().width())
+                            widthAdjust=(r.width()-widget->parentWidget()->rect().width())+2;
+                    }
                 }
                 QRect button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
                       menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
@@ -6705,6 +6718,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     tool.rect = toolbutton->subControls&SC_ToolButtonMenu ? button.united(menuarea) : button;
                     tool.state = bflags;
 
+                    tool.rect.adjust(0, 0, -widthAdjust, -heightAdjust);
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
                         tool.state &= ~State_MouseOver;
 
@@ -6782,7 +6796,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 }
                 QStyleOptionToolButton label = *toolbutton;
                 int fw = pixelMetric(PM_DefaultFrameWidth, option, widget);
-                label.rect = button.adjusted(fw, fw, -fw, -fw);
+                label.rect = button.adjusted(fw, fw, -(fw+widthAdjust), -(fw+heightAdjust));
                 label.state = bflags;
                 drawControl(CE_ToolButtonLabel, &label, painter, widget);
 

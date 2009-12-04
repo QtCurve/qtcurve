@@ -88,6 +88,8 @@
     KDE style. Note: This is experimental, and may produce unexpected results!
 52. Disable parentless-dialog fix for Kate (not required anyway), as this causes
     disappearing pointers when using embedded konsole!
+53. Alter the size of a QtoolBarExtension if its width/height is greater than
+    its parent - as occurs on Amarok's thin toolbars.
 
 0.69.2
 ------
