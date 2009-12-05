@@ -2593,7 +2593,7 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
 {
     drawSelectionReal(cr, style, state, area, widget, x, y, width, height, round, isSelection,
                       GTK_STATE_PRELIGHT==state ? 0.20 : 1.0,
-                      &style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE], TRUE);
+                      &style->base[widget && GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE], TRUE);
 }
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -3457,7 +3457,7 @@ debugDisplayWidget(widget, 3);
                                : (slider && width<height) || vscrollbar || vscale
                                    ? FALSE
                                    : TRUE,
-                     defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && GTK_WIDGET_HAS_DEFAULT(widget);
+                     defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && widget && GTK_WIDGET_HAS_DEFAULT(widget);
 
             if(lvh)
             {
@@ -3498,7 +3498,7 @@ debugDisplayWidget(widget, 3);
 //             }
             else
             {
-                gboolean glowFocus=GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && QTC_FULL_FOCUS;
+                gboolean glowFocus=widget && GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && QTC_FULL_FOCUS;
                 EWidget  widgetType=isComboBoxButton(widget)
                                     ? WIDGET_COMBO_BUTTON
                                     : slider
@@ -5820,7 +5820,7 @@ debugDisplayWidget(widget, 3);
                     p=tab_label;
                 }
 
-                if(GTK_WIDGET_VISIBLE(page))
+                if(page && GTK_WIDGET_VISIBLE(page))
                 {
                     if(i>last_shown)
                         last_shown=i;
