@@ -4271,12 +4271,13 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     drawBevelGradient(color, painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                 else
                 {
-                    QPixmap pix(QSize(24, r.height()));
+                    QPixmap pix;
                     QString key;
 
                     key.sprintf("qtc-sel-%x-%x", pix.height(), color.rgba());
                     if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
                     {
+                        pix=QPixmap(QSize(24, r.height()));
                         pix.fill(Qt::transparent);
 
                         QPainter pixPainter(&pix);
@@ -9140,13 +9141,14 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         {
             QString key;
             bool    small(circular || (horiz ? r.width() : r.height())<(2*endSize));
-            QPixmap pix(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
+            QPixmap pix;
             uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver|
                           (WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ? State_Active : State_None)));
 
             key.sprintf("qtc-%x-%d-%x-%x-%x-%x-%x", w, (int)realRound, pix.width(), pix.height(), state, fill.rgba(), (int)(radius*100));
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
+                pix=QPixmap(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
                 pix.fill(Qt::transparent);
 
                 QPainter pixPainter(&pix);
@@ -9548,22 +9550,22 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 
     if(itsIsPreview)
     {
-        while (!qobject_cast<const QMdiSubWindow *>(w))
-        {
-            y += w->geometry().y();
-            w = w->parentWidget();
-        }
+//         while (!qobject_cast<const QMdiSubWindow *>(w))
+//         {
+//             y += w->geometry().y();
+//             w = w->parentWidget();
+//         }
         yAdjust=pixelMetric(PM_TitleBarHeight, 0L, w);
         y+=yAdjust;
     }
-    else
-    {
-        while (!w->isWindow())
-        {
-            y += w->geometry().y();
-            w = w->parentWidget();
-        }
-    }
+//     else
+//     {
+//         while (!w->isWindow())
+//         {
+//             y += w->geometry().y();
+//             w = w->parentWidget();
+//         }
+//     }
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
@@ -9575,12 +9577,13 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
         QColor  col(window->palette().window().color());
         QSize   scaledSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : window->rect().width(),
                            GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
-        QPixmap pix(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
-                          GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
+        QPixmap pix;
 
         key.sprintf("qtc-bgnd-%x", col.rgba());
         if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
         {
+            pix=QPixmap(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
+                              GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
             QPainter pixPainter(&pix);
 
             drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
@@ -9606,14 +9609,11 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
             }
         case IMG_PLAIN_RINGS:
         case IMG_BORDERED_RINGS:
-        {
-            QPixmap pix(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
-            QString key("qtc-rings");
-
-            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+            if(opts.bgndImage.pix.isNull())
             {
-                pix.fill(Qt::transparent);
-                QPainter pixPainter(&pix);
+                opts.bgndImage.pix=QPixmap(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
+                opts.bgndImage.pix.fill(Qt::transparent);
+                QPainter pixPainter(&opts.bgndImage.pix);
 
                 pixPainter.setRenderHint(QPainter::Antialiasing);
                 drawBgndRing(pixPainter, 0, 0, 200, 140);
@@ -9628,13 +9628,9 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                 drawBgndRing(pixPainter, 250, 160, 200, 140);
                 drawBgndRing(pixPainter, 310, 220, 80, 0);
                 pixPainter.end();
-
-                if(itsUsePixmapCache)
-                    QPixmapCache::insert(key, pix);
             }
 
-            p.drawPixmap(widget->width()-pix.width(), yAdjust+1, pix);
-        }
+            p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), yAdjust+1, opts.bgndImage.pix);
     }
 }
 
