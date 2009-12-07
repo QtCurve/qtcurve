@@ -1232,9 +1232,7 @@ void QtCurveStyle::polish(QPalette &palette)
                    itsButtonCols[ORIGINAL_SHADE]!=palette.color(QPalette::Active, QPalette::Button)),
          newSlider(itsSliderCols && itsHighlightCols!=itsSliderCols && SHADE_BLEND_SELECTED==opts.shadeSliders &&
                    (newButton || newHighlight)),
-         newDefBtn(itsDefBtnCols && /*( (IND_COLORED==opts.defBtnIndicator &&*/
-                                       SHADE_BLEND_SELECTED!=opts.shadeSliders/*) ||*/ // If so, def btn == slider!
-                                      /*(IND_TINT==opts.defBtnIndicator) )*/ &&
+         newDefBtn(itsDefBtnCols && (IND_COLORED!=opts.defBtnIndicator || SHADE_BLEND_SELECTED!=opts.shadeSliders) &&
                    (newContrast || newButton || newHighlight)),
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
@@ -1351,6 +1349,7 @@ void QtCurveStyle::polish(QPalette &palette)
     // Force this to be re-generated!
     if(SHADE_BLEND_SELECTED==opts.menuStripe)
         opts.customMenuStripeColor=Qt::black;
+    setupKde4();
 }
 
 void QtCurveStyle::polish(QWidget *widget)
