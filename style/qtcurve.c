@@ -2754,7 +2754,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(detail && 0==strcmp(detail, "checkbutton"))
     {
-        if(GTK_STATE_PRELIGHT==state && opts.crHighlight)
+        if(GTK_STATE_PRELIGHT==state && opts.crHighlight && width>(QTC_CHECK_SIZE*2))
         {
             GdkColor col=shadeColor(&style->bg[state], opts.crHighlight);
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
