@@ -4488,7 +4488,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->restore();
                     }
                     else
-                        drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)), painter,
+                        drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.splitterHighlight)), painter,
                                           r, !(state&State_Horizontal), false, opts.selectionAppearance, WIDGET_SELECTION);
                 else
                     painter->fillRect(r, color);
@@ -6491,7 +6491,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
         case CE_RadioButton:
         case CE_CheckBox:
-            if (opts.crHighlight)
+            if (opts.crHighlight && (r.width()>QTC_CHECK_SIZE*2))
                 if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton *>(option))
                 {
                     QStyleOptionButton copy(*button);
