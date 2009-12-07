@@ -4157,8 +4157,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     tabRect=QRect(tabRect.x()+2, r.y()+r.height()-2, tabRect.width()-4, 4);
                                     break;
                                 case QTabWidget::North:
-                                    tabRect.adjust(2, 0, -2, 2);
+                                {
+                                    int leftAdjust=twf->leftCornerWidgetSize.width()>0 ? twf->leftCornerWidgetSize.width() : 0;
+                                    tabRect.adjust(leftAdjust+2, 0, leftAdjust-2, 2);
                                     break;
+                                }
                                 case QTabWidget::West:
                                     tabRect.adjust(0, 2, 2, -2);
                                     break;
