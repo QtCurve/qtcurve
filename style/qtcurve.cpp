@@ -1349,7 +1349,11 @@ void QtCurveStyle::polish(QPalette &palette)
     // Force this to be re-generated!
     if(SHADE_BLEND_SELECTED==opts.menuStripe)
         opts.customMenuStripeColor=Qt::black;
-    setupKde4();
+#if !defined QTC_QT_ONLY
+    // Only set palette here...
+    if(kapp)
+        setDecorationColors();
+#endif
 }
 
 void QtCurveStyle::polish(QWidget *widget)
