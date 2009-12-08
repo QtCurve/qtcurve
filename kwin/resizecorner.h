@@ -1,6 +1,6 @@
 /*
   QtCurve KWin window decoration
-  Copyright (C) 2007 - 2009 Craig Drummond <ee11cd@googlemail.com>
+  Copyright (C) 2007 - 2009 Craig Drummond <craig.p.drummond@googlemail.com>
 
   This class is taken, and modified from the Bespin KWin window decoration.
   Copyright (c) 2008 Thomas Lübking <baghira-style@gmx.net>
