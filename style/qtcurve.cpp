@@ -1408,6 +1408,8 @@ void QtCurveStyle::polish(QWidget *widget)
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
     {
         widget->installEventFilter(this);
+        if(itsSaveMenuBarStatus)
+            static_cast<QMainWindow *>(widget)->menuBar()->installEventFilter(this);
         if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
             static_cast<QMainWindow *>(widget)->menuBar()->setHidden(true);
     }
@@ -1831,7 +1833,11 @@ void QtCurveStyle::unpolish(QWidget *widget)
     }
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+    {
         widget->removeEventFilter(this);
+        if(itsSaveMenuBarStatus)
+            static_cast<QMainWindow *>(widget)->menuBar()->removeEventFilter(this);
+    }
 
     if(qobject_cast<QPushButton *>(widget) ||
        qobject_cast<QComboBox *>(widget) ||
@@ -2108,25 +2114,31 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             drawWindowBackground(widget);
     }
 
-    if(opts.menubarHiding && QEvent::ShortcutOverride==event->type() && qobject_cast<QMainWindow *>(object))
-    {
-        QMainWindow *window=static_cast<QMainWindow *>(object);
-
-        if(window->isVisible() && window->menuBar())
-        {
-            QKeyEvent *k=static_cast<QKeyEvent *>(event);
-
-            if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
-            {
-                window->menuBar()->setHidden(window->menuBar()->isVisible());
-                if(itsSaveMenuBarStatus)
-                    qtcSetMenuBarHidden(appName, window->menuBar()->isHidden());
-            }
-        }
-    }
-
     switch(event->type())
     {
+        case QEvent::ShortcutOverride:
+            if(opts.menubarHiding && qobject_cast<QMainWindow *>(object))
+            {
+                QMainWindow *window=static_cast<QMainWindow *>(object);
+
+                if(window->isVisible() && window->menuBar())
+                {
+                    QKeyEvent *k=static_cast<QKeyEvent *>(event);
+
+                    if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
+                    {
+                        if(itsSaveMenuBarStatus)
+                            qtcSetMenuBarHidden(appName, window->menuBar()->isVisible());
+                        window->menuBar()->setHidden(window->menuBar()->isVisible());
+                    }
+                }
+            }
+            break;
+        case QEvent::ShowToParent:
+            if(opts.menubarHiding && itsSaveMenuBarStatus && qobject_cast<QMenuBar *>(object) &&
+               qtcMenuBarHidden(appName))
+                static_cast<QMenuBar *>(object)->setHidden(true);
+            break;
         case QEvent::Paint:
         {
             if(!IS_FLAT(opts.menuBgndAppearance) && qobject_cast<QMenu*>(object))

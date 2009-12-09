@@ -46,27 +46,28 @@
 29. Fix K3B buttons.
 30. Only draw toolbuttons as toolbar buttons if they are set to auto raise or have
     a menu.
-31. Add arora to default list of KDE4 apps that needs manual saving of menubar
-    state.
-32. Enable 'Apply' button on kwnin config when change padding setting.
-33. Add options to use titlebar button style, colour, font, text aligntment, and
+31. Add arora and kaffeine to default list of KDE4 apps that needs manual saving of
+    menubar state.
+32. Fix hidding of kaffeine menu when exiting full screen.
+33. Enable 'Apply' button on kwnin config when change padding setting.
+34. Add options to use titlebar button style, colour, font, text aligntment, and
     text effect for dock widget titlebars.
-34. Add option to only round the top/left of dock widget titlebars.
-35. If compiled against KDE, use configured window font for MDI windows and dock
+35. Add option to only round the top/left of dock widget titlebars.
+36. If compiled against KDE, use configured window font for MDI windows and dock
     widget titlebars.
-36. Use custum gradient 1 for dock widget titlebars.
-37. Round gradients of dock-widget titlebars - top/left only be default.
-38. Reduce number of supplied presets.
-39. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
+37. Use custum gradient 1 for dock widget titlebars.
+38. Round gradients of dock-widget titlebars - top/left only be default.
+39. Reduce number of supplied presets.
+40. Add a 'Presets and Preview' initial page to the settings dialog - allowing to
     save custom presets, and preview before applying.
-40. Nicer 'Agua' look for MDI/window/dock widget buttons.
-41. Added option to hide MDI/window/dock widget button icons until mouse-over.
-42. Added 'Whats This?' text to most config items.
-43. Correctly theme menu separators with titles.
-44. Draw titles in KMenu's the same as menu separators with titles - bold, and
+41. Nicer 'Agua' look for MDI/window/dock widget buttons.
+42. Added option to hide MDI/window/dock widget button icons until mouse-over.
+43. Added 'Whats This?' text to most config items.
+44. Correctly theme menu separators with titles.
+45. Draw titles in KMenu's the same as menu separators with titles - bold, and
     with no icon.
-45. Fade ends of tab widget base - used in document mode tabs.
-46. Added option to draw Air-like background rings.
+46. Fade ends of tab widget base - used in document mode tabs.
+47. Added option to draw Air-like background rings.
     Note: to use an SVG instead of the hard-coded air-like rings, edit
           ~/.config/qtcurve/stylerc (or /etc/qtcurvestylerc) and add:
 
@@ -75,20 +76,20 @@
           bgndImage.width=120
           bgndImage.height=160
 
-47. Added option to add a 'glow' to progressbars.
-48. Fix QToolBox background when using background image and/or gradients.
-49. Unset non-editable combobox popup menu palette when unpolishing the widget.
-50. To disable background gradient, or image,  for a particular app, edit
+48. Added option to add a 'glow' to progressbars.
+49. Fix QToolBox background when using background image and/or gradients.
+50. Unset non-editable combobox popup menu palette when unpolishing the widget.
+51. To disable background gradient, or image,  for a particular app, edit
     ~/.config/qtcurve/stylerc  and add:
         noBgndGradientApps=inkscape,gimp
         noBgndImageApps=inkscape,gimp
 
     ...using 'gtk' (e.g. noBgndImageApps=gtk) will disable for all Gtk apps.
-51. Added a option to manually re-order the buttons of Gtk dialogs to match
+52. Added a option to manually re-order the buttons of Gtk dialogs to match
     KDE style. Note: This is experimental, and may produce unexpected results!
-52. Disable parentless-dialog fix for Kate (not required anyway), as this causes
+53. Disable parentless-dialog fix for Kate (not required anyway), as this causes
     disappearing pointers when using embedded konsole!
-53. Alter the size of a QtoolBarExtension if its width/height is greater than
+54. Alter the size of a QtoolBarExtension if its width/height is greater than
     its parent - as occurs on Amarok's thin toolbars.
 
 0.69.2

@@ -1189,7 +1189,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts!=def)
             {
                 opts->menubarApps=QSet<QString>::fromList(readStringEntry(cfg, "menubarApps").split(','));
-                opts->menubarApps << "kcalc" << "amarok" << "vlc" << "smplayer" << "arora";
+                opts->menubarApps << "kcalc" << "amarok" << "vlc" << "smplayer" << "arora" << "kaffeine";
             }
 #endif
 
