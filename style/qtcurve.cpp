@@ -3458,69 +3458,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_PanelButtonTool:
             if(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)))
             {
-                QRect        r2(r);
-                QStyleOption opt(*option);
-
-                if(r2.height()>r2.width() || (r2.height()<r2.width() && r2.width()<=32))
-                    opt.state&=~State_Horizontal;
-                else
-                    opt.state|=State_Horizontal;
-
-                const QColor *use(opt.state&State_On ? getSidebarButtons() : buttonColors(option));
-                bool         horiz(opt.state&State_Horizontal);
-
-                painter->save();
-                if(opt.state&State_On || opt.state&State_MouseOver)
-                {
-                    r2.adjust(-1, -1, 1, 1);
-                    drawLightBevel(painter, r2, &opt, widget, ROUNDED_NONE, getFill(&opt, use), use, false, WIDGET_MENU_ITEM);
-                }
-                else
-                    painter->fillRect(r2, palette.background().color());
-
-                if(opt.state&State_MouseOver && opts.coloredMouseOver)
-                {
-                    r2=r;
-                    if(MO_PLASTIK==opts.coloredMouseOver)
-                        if(horiz)
-                            r2.adjust(0, 1, 0, -1);
-                        else
-                            r2.adjust(1, 0, -1, 0);
-                    else
-                        r2.adjust(1, 1, -1, -1);
-
-                    painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
-
-                    if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
-                    {
-                        painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                        painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
-                    }
-
-                    if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
-                    {
-                        painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-                        painter->drawLine(r2.x(), r2.y(), r2.x(), r2.y()+r2.height()-1);
-                        if(MO_PLASTIK!=opts.coloredMouseOver)
-                            painter->setPen(itsMouseOverCols[opt.state&State_On ? 1 : 2]);
-                    }
-
-                    if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
-                    {
-                        painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->drawLine(r2.x(), r2.y()+r2.height()-1, r2.x()+r2.width()-1,
-                                          r2.y()+r2.height()-1);
-                    }
-
-                    if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
-                    {
-                        painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
-                        painter->drawLine(r2.x()+r2.width()-1, r2.y(), r2.x()+r2.width()-1,
-                                        r2.y()+r2.height()-1);
-                    }
-                }
-
-                painter->restore();
+                drawSideBarButton(painter, r, option, widget);
                 break;
             }
         case PE_IndicatorButtonDropDown: // This should never be called, but just in case - draw as a normal toolbutton...
@@ -5641,7 +5579,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 QStyleOptionTabV2 tabV2(*tab);
 #endif
                 bool verticalTabs(QTabBar::RoundedEast==tabV2.shape || QTabBar::RoundedWest==tabV2.shape ||
-                                  QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape);
+                                  QTabBar::TriangularEast==tabV2.shape || QTabBar::TriangularWest==tabV2.shape),
+                     toolbarTab=!opts.toolbarTabs && widget && widget->parentWidget() &&
+                                qobject_cast<QToolBar *>(widget->parentWidget());
 
                 if (verticalTabs)
                 {
@@ -5673,12 +5613,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     alignment |= Qt::TextHideMnemonic;
 
 #if QT_VERSION >= 0x040500
-                r = subElementRect(SE_TabBarTabText, option, widget);
+                if(toolbarTab)
+                    tabV2.state&=~State_Selected;
+                r = subElementRect(SE_TabBarTabText, &tabV2, widget);
 #else
                 r.adjust(0, 0, pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget),
                                pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
 
-                if (state&State_Selected)
+                if (!toolbarTab && state&State_Selected)
                 {
                     r.setBottom(r.bottom() - pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget));
                     r.setRight(r.right() - pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget));
@@ -5722,7 +5664,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     r.adjust(constTabPad, 0, -constTabPad, 0);
 #endif
                     drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text,
-                                 QPalette::WindowText);
+                                 toolbarTab && state&State_Selected ? QPalette::HighlightedText : QPalette::WindowText);
                 }
 
                 if (verticalTabs)
@@ -5769,7 +5711,20 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             }
             break;
         case CE_TabBarTabShape:
-            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
+            if(!opts.toolbarTabs && widget && widget->parentWidget() && qobject_cast<QToolBar *>(widget->parentWidget()))
+            {
+                QStyleOption opt(*option);
+                if(state&State_Selected)
+                    opt.state|=State_On;
+                if(opts.stdSidebarButtons)
+                {
+                    if(state&(State_Selected|State_MouseOver))
+                        drawPrimitive(PE_PanelButtonTool, &opt, painter, widget);
+                }
+                else
+                    drawSideBarButton(painter, r, &opt, widget);
+            }
+            else if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
             {
                 bool onlyTab(widget && widget->parentWidget()
                                 ? qobject_cast<const QTabWidget *>(widget->parentWidget()) ? false : true
@@ -8780,6 +8735,74 @@ QStyle::SubControl QtCurveStyle::hitTestComplexControl(ComplexControl control, c
     }
 
     return QTC_BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
+}
+
+void QtCurveStyle::drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const
+{
+    const QPalette &palette(option->palette);
+    QRect          r2(r);
+    QStyleOption   opt(*option);
+
+    if(r2.height()>r2.width() || (r2.height()<r2.width() && r2.width()<=32))
+        opt.state&=~State_Horizontal;
+    else
+        opt.state|=State_Horizontal;
+
+    const QColor *use(opt.state&State_On ? getSidebarButtons() : buttonColors(option));
+    bool         horiz(opt.state&State_Horizontal);
+
+    painter->save();
+    if(opt.state&State_On || opt.state&State_MouseOver)
+    {
+        r2.adjust(-1, -1, 1, 1);
+        drawLightBevel(painter, r2, &opt, widget, ROUNDED_NONE, getFill(&opt, use), use, false, WIDGET_MENU_ITEM);
+    }
+    else
+        painter->fillRect(r2, palette.background().color());
+
+    if(opt.state&State_MouseOver && opts.coloredMouseOver)
+    {
+        r2=r;
+        if(MO_PLASTIK==opts.coloredMouseOver)
+            if(horiz)
+                r2.adjust(0, 1, 0, -1);
+            else
+                r2.adjust(1, 0, -1, 0);
+        else
+            r2.adjust(1, 1, -1, -1);
+
+        painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
+
+        if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+        {
+            painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+            painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
+        }
+
+        if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+        {
+            painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+            painter->drawLine(r2.x(), r2.y(), r2.x(), r2.y()+r2.height()-1);
+            if(MO_PLASTIK!=opts.coloredMouseOver)
+                painter->setPen(itsMouseOverCols[opt.state&State_On ? 1 : 2]);
+        }
+
+        if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+        {
+            painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+            painter->drawLine(r2.x(), r2.y()+r2.height()-1, r2.x()+r2.width()-1,
+                              r2.y()+r2.height()-1);
+        }
+
+        if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+        {
+            painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+            painter->drawLine(r2.x()+r2.width()-1, r2.y(), r2.x()+r2.width()-1,
+                              r2.y()+r2.height()-1);
+        }
+    }
+
+    painter->restore();
 }
 
 void QtCurveStyle::drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) const

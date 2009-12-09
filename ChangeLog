@@ -91,6 +91,8 @@
     disappearing pointers when using embedded konsole!
 54. Alter the size of a QtoolBarExtension if its width/height is greater than
     its parent - as occurs on Amarok's thin toolbars.
+55. Add option to control whether tabs that are in toolbars are drawn as tabs, or
+    as per side bar button settings.
 
 0.69.2
 ------

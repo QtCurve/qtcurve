@@ -1454,6 +1454,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(gtkScrollViews)
             QTC_CFG_READ_BOOL(doubleGtkComboArrow)
             QTC_CFG_READ_BOOL(stdSidebarButtons)
+            QTC_CFG_READ_BOOL(toolbarTabs)
 #ifdef __cplusplus
             QTC_CFG_READ_ALIGN(titlebarAlignment)
             QTC_CFG_READ_EFFECT(titlebarEffect)
@@ -2103,6 +2104,7 @@ static void defaultSettings(Options *opts)
     opts->comboBtn=SHADE_NONE;
     opts->doubleGtkComboArrow=true;
     opts->stdSidebarButtons=false;
+    opts->toolbarTabs=false;
 #ifdef __cplusplus
     opts->gtkComboMenus=false;
     opts->colorTitlebarOnly=false;
@@ -2773,6 +2775,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_SHADE_ENTRY(menuStripe, customMenuStripeColor)
         CFG_WRITE_SHADE_ENTRY(comboBtn, customComboBtnColor)
         CFG_WRITE_ENTRY(stdSidebarButtons)
+        CFG_WRITE_ENTRY(toolbarTabs)
         CFG_WRITE_ENTRY(titlebarAppearance)
         CFG_WRITE_ENTRY(inactiveTitlebarAppearance)
         CFG_WRITE_ENTRY(titlebarButtonAppearance)

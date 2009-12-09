@@ -1397,6 +1397,51 @@
          </layout>
         </widget>
        </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_67a">
+         <property name="text">
+          <string>Tabs within toolbars:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QFrame" name="frame_6">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10a">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="toolbarTabs">
+            <property name="whatsThis">
+             <string>If enabled, tabs that are within toolbars will be drawn as normal.</string>
+            </property>
+            <property name="text">
+             <string>Draw as standard tabs</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="toolbarTabs_false">
+            <property name="whatsThis">
+             <string>If enabled, tabs that are within toolbars will be drawn the same as sidebar buttons.</string>
+            </property>
+            <property name="text">
+             <string>Draw as per sidebar button settings</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_9">
@@ -3181,6 +3226,8 @@
   <tabstop>borderInactiveTab</tabstop>
   <tabstop>invertBotTab_false</tabstop>
   <tabstop>invertBotTab</tabstop>
+  <tabstop>toolbarTabs</tabstop>
+  <tabstop>toolbarTabs_false</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
   <tabstop>xCheck_false</tabstop>

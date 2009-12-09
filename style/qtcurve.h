@@ -124,6 +124,7 @@ class QtCurveStyle : public QWindowsStyle
 
     private:
 
+    void drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const;
     void drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) const;
     void drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz,
                        double fadeSizeStart=QTC_FADE_SIZE, double fadeSizeEnd=QTC_FADE_SIZE) const;
