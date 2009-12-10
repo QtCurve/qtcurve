@@ -59,6 +59,7 @@
 32. Draw Preview button in GIMP file dialog as a listview header.
 33. Fix crashes with 'deadbeef' (??) 0.3.1 - need to check widget pointer before
     calling GTK_WIDGET_??? macros.
+34. Dont max round toggle buttons that are almost square, or GIMPs GimpViewableButtons
 
 0.69.2
 ------
