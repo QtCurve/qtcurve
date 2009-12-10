@@ -69,7 +69,6 @@ typedef enum
 #include <map>
 #include <set>
 #if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <QtCore/QSet>
 #include <QtCore/QString>
 #endif
 #else
@@ -81,6 +80,7 @@ typedef enum
 typedef QColor color;
 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <QtCore/QSet>
 typedef QSet<QString> Strings;
 #endif
 

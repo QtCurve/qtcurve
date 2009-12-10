@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kde4-qtcurve\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-12-10 19:49+0000\n"
+"POT-Creation-Date: 2009-12-10 19:56+0000\n"
 "PO-Revision-Date: 2009-07-04 02:05+0300\n"
 "Last-Translator: Necmettin Begiter <necmettin.begiter@gmail.com>\n"
 "Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
@@ -702,7 +702,7 @@ msgstr ""
 msgid "<p>Sorry, failed to remove the preset file:</p><p><i>%1</i></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1856 config/qtcurveconfig.cpp:1903
+#: config/qtcurveconfig.cpp:1856 config/qtcurveconfig.cpp:1904
 msgid "*"
 msgstr "*"
 
@@ -733,14 +733,19 @@ msgid ""
 msgstr ""
 
 #: config/qtcurveconfig.cpp:1892
+#, fuzzy
+msgid "Export Settings"
+msgstr "Ayarlar"
+
+#: config/qtcurveconfig.cpp:1893
 msgid "QtCurve Settings File"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1892
+#: config/qtcurveconfig.cpp:1893
 msgid "Standalone Theme"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1919
+#: config/qtcurveconfig.cpp:1920
 msgid ""
 "Could not write to file:\n"
 "%1"

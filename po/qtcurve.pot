@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2009-12-10 19:49+0000\n"
+"POT-Creation-Date: 2009-12-10 19:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -683,7 +683,7 @@ msgstr ""
 msgid "<p>Sorry, failed to remove the preset file:</p><p><i>%1</i></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1856 config/qtcurveconfig.cpp:1903
+#: config/qtcurveconfig.cpp:1856 config/qtcurveconfig.cpp:1904
 msgid "*"
 msgstr ""
 
@@ -714,14 +714,18 @@ msgid ""
 msgstr ""
 
 #: config/qtcurveconfig.cpp:1892
+msgid "Export Settings"
+msgstr ""
+
+#: config/qtcurveconfig.cpp:1893
 msgid "QtCurve Settings File"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1892
+#: config/qtcurveconfig.cpp:1893
 msgid "Standalone Theme"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1919
+#: config/qtcurveconfig.cpp:1920
 msgid ""
 "Could not write to file:\n"
 "%1"
