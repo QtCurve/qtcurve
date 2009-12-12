@@ -44,6 +44,19 @@
 #define QTC_MO_ARROW(COL)       QTC_MO_ARROW_X(state&State_MouseOver, COL)
 
 #ifndef QTC_QT_ONLY
+
+typedef QString (*_qt_filedialog_existing_directory_hook)(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options);
+extern _qt_filedialog_existing_directory_hook qt_filedialog_existing_directory_hook;
+
+typedef QString (*_qt_filedialog_open_filename_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
+extern _qt_filedialog_open_filename_hook qt_filedialog_open_filename_hook;
+
+typedef QStringList (*_qt_filedialog_open_filenames_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
+extern _qt_filedialog_open_filenames_hook qt_filedialog_open_filenames_hook;
+
+typedef QString (*_qt_filedialog_save_filename_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
+extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
+
 #include <KDE/KApplication>
 #include <KDE/KAboutData>
 #include <KDE/KGlobalSettings>
@@ -69,18 +82,6 @@ static int theInstanceCount=0;
 // KDE4.1 does this functionality for us!
 #include <KDE/KDirSelectDialog>
 #include <KDE/KGlobal>
-
-typedef QString (*_qt_filedialog_existing_directory_hook)(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options);
-extern _qt_filedialog_existing_directory_hook qt_filedialog_existing_directory_hook;
-
-typedef QString (*_qt_filedialog_open_filename_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
-extern _qt_filedialog_open_filename_hook qt_filedialog_open_filename_hook;
-
-typedef QStringList (*_qt_filedialog_open_filenames_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
-extern _qt_filedialog_open_filenames_hook qt_filedialog_open_filenames_hook;
-
-typedef QString (*_qt_filedialog_save_filename_hook)(QWidget * parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
-extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 
 static QString qt2KdeFilter(const QString &f)
 {
@@ -1208,6 +1209,16 @@ void QtCurveStyle::polish(QApplication *app)
        (APP_PLASMA==theThemedApp ||
         (APP_OTHER==theThemedApp && "kate"==appName) ) )
         opts.fixParentlessDialogs=false;
+      
+#ifndef QTC_QT_ONLY
+    if(opts.useQtFileDialogApps.contains(appName))
+    {
+        qt_filedialog_existing_directory_hook=0L;
+        qt_filedialog_open_filename_hook=0L;
+        qt_filedialog_open_filenames_hook=0L;
+        qt_filedialog_save_filename_hook=0L;
+    }
+#endif
 }
 
 void QtCurveStyle::polish(QPalette &palette)

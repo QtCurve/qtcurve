@@ -1020,7 +1020,8 @@ typedef struct
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     Strings          noBgndGradientApps,
-                     noBgndImageApps;
+                     noBgndImageApps,
+                     useQtFileDialogApps;
 #endif
 
 #ifndef __cplusplus

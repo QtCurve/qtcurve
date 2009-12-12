@@ -93,6 +93,10 @@
     its parent - as occurs on Amarok's thin toolbars.
 55. Add option to control whether tabs that are in toolbars are drawn as tabs, or
     as per side bar button settings.
+56. Googleearth crashes when using file dialogs, if linked to KDE4. So, for googleearth
+    the usage of KDE4 dialogs is removed. To remove for other apps, edit
+    ~/.config/qtcurve/stylerc  and add:
+        useQtFileDialogApps=designer
 
 0.69.2
 ------

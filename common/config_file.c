@@ -1222,6 +1222,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 opts->noBgndGradientApps=QSet<QString>::fromList(readStringEntry(cfg, "noBgndGradientApps").split(','));
                 opts->noBgndImageApps=QSet<QString>::fromList(readStringEntry(cfg, "noBgndImageApps").split(','));
+                opts->useQtFileDialogApps=QSet<QString>::fromList(readStringEntry(cfg, "useQtFileDialogApps").split(','));
+                opts->useQtFileDialogApps+="googleearth-bin";
             }
 #endif
 
