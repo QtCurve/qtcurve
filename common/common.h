@@ -1008,9 +1008,6 @@ typedef struct
     EEffect          titlebarEffect;
 #endif
     double           customShades[NUM_STD_SHADES];
-#if defined __cplusplus && !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
-    QSet<QString>    menubarApps;
-#endif
 #ifdef __cplusplus
     GradientCont     customGradient;
 #else
@@ -1019,8 +1016,12 @@ typedef struct
     QtCImage         bgndImage;
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    /* NOTE: If add any more settings here, need to alter copyOpts/freeOpts in config_file.c */
     Strings          noBgndGradientApps,
-                     noBgndImageApps,
+                     noBgndImageApps;
+#endif
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    Strings          menubarApps,
                      useQtFileDialogApps;
 #endif
 

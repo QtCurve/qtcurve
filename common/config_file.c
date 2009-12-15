@@ -867,8 +867,15 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
         } \
     }
 
-#else
+#define QTC_READ_STRING_LIST(ENTRY) \
+    { \
+        QString val=readStringEntry(cfg, #ENTRY); \
+        Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(", ", QString::SkipEmptyParts)); \
+        opts->ENTRY=set.count() ? set : def->ENTRY; \
+    }
 
+#else
+         
 static char * lookupCfgHash(GHashTable **cfg, char *key, char *val)
 {
     char *rv=NULL;
@@ -978,6 +985,17 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
             } \
+        } \
+    }
+#define QTC_READ_STRING_LIST(ENTRY) \
+    { \
+        const gchar *str=readStringEntry(cfg, #ENTRY); \
+        if(str) \
+            opts->ENTRY=g_strsplit(str, ", ", -1); \
+        else if(def->ENTRY) \
+        { \
+            opts->ENTRY=def->ENTRY; \
+            def->ENTRY=NULL; \
         } \
     }
 
@@ -1112,8 +1130,30 @@ static void copyOpts(Options *src, Options *dest)
     if(src && dest && src!=dest)
     {
         memcpy(dest, src, sizeof(Options));
+        src->noBgndGradientApps=src->noBgndImageApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
         copyGradients(src, dest);
+    }
+}
+
+static void freeOpts(Options *opts)
+{
+    if(opts)
+    {
+        int i;
+
+        if(opts->noBgndGradientApps)
+            g_strfreev(opts->noBgndGradientApps);
+        if(opts->noBgndGradientApps)
+            g_strfreev(opts->noBgndImageApps);
+
+        for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
+            if(opts->customGradient[i])
+            {
+                if(opts->customGradient[i]->stops)
+                    free(opts->customGradient[i]->stops);
+                free(opts->customGradient[i]);
+            }
     }
 }
 #endif
@@ -1185,14 +1225,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts!=def)
                 opts->customGradient=def->customGradient;
 
-#if !defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
-            if(opts!=def)
-            {
-                opts->menubarApps=QSet<QString>::fromList(readStringEntry(cfg, "menubarApps").split(','));
-                opts->menubarApps << "kcalc" << "amarok" << "vlc" << "smplayer" << "arora" << "kaffeine";
-            }
-#endif
-
 #else
             Options newOpts;
             Options *def=&newOpts;
@@ -1203,28 +1235,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 defaultSettings(&newOpts);
             if(opts!=def)
                 copyGradients(def, opts);
-#endif
-
-#if !defined __cplusplus
-            opts->noBgndGradientApps=NULL;
-            opts->noBgndImageApps=NULL;
-            if(opts!=def)
-            {
-                const gchar *str=readStringEntry(cfg, "noBgndGradientApps");
-                if(str)
-                    opts->noBgndGradientApps=g_strsplit(str, ",", -1);
-                str=readStringEntry(cfg, "noBgndImageApps");
-                if(str)
-                    opts->noBgndImageApps=g_strsplit(str, ",", -1);
-            }
-#elif defined QT_VERSION && (QT_VERSION >= 0x040000)
-            if(opts!=def)
-            {
-                opts->noBgndGradientApps=QSet<QString>::fromList(readStringEntry(cfg, "noBgndGradientApps").split(','));
-                opts->noBgndImageApps=QSet<QString>::fromList(readStringEntry(cfg, "noBgndImageApps").split(','));
-                opts->useQtFileDialogApps=QSet<QString>::fromList(readStringEntry(cfg, "useQtFileDialogApps").split(','));
-                opts->useQtFileDialogApps+="googleearth-bin";
-            }
 #endif
 
             /* Check if the config file expects old default values... */
@@ -1503,8 +1513,18 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->xbar=false;
 #endif
 #endif
-            QTC_CFG_READ_SHADING(shading);
+            QTC_CFG_READ_SHADING(shading)
             QTC_CFG_READ_IMAGE(bgndImage)
+            
+#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+            QTC_READ_STRING_LIST(noBgndGradientApps)
+            QTC_READ_STRING_LIST(noBgndImageApps)
+#endif 
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+            QTC_READ_STRING_LIST(menubarApps)
+            QTC_READ_STRING_LIST(useQtFileDialogApps)
+#endif
+
 #ifdef __cplusplus
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             if(opts->titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
@@ -1922,6 +1942,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(LINE_1DOT==opts->toolbarSeparators)
                 opts->toolbarSeparators=LINE_DOTS;
 
+#ifndef __cplusplus
+            freeOpts(defOpts);
+#endif
             return true;
         }
         else
@@ -1953,7 +1976,7 @@ static bool fileExists(const char *path)
 
 static const char * getSystemConfigFile()
 {
-    static const char * constFiles[]={ /*"/etc/qt4/"QTC_FILE, "/etc/qt3/"QTC_FILE, "/etc/qt/"QTC_FILE,*/ "/etc/"QTC_FILE, NULL };
+    static const char * constFiles[]={ /*"/etc/qt4/"QTC_OLD_FILE, "/etc/qt3/"QTC_OLD_FILE, "/etc/qt/"QTC_OLD_FILE,*/ "/etc/"QTC_OLD_FILE, NULL };
 
     int i;
 
@@ -2098,6 +2121,8 @@ static void defaultSettings(Options *opts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
+    opts->menubarApps << "kcalc" << "amarok" << "vlc" << "smplayer" << "arora" << "kaffeine";
+    opts->useQtFileDialogApps << "googleearth-bin";
 #endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
@@ -2120,6 +2145,8 @@ static void defaultSettings(Options *opts)
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
 #else
+    opts->noBgndGradientApps=NULL;
+    opts->noBgndImageApps=NULL;
 /*
     opts->setDialogButtonOrder=false;
 */
@@ -2601,6 +2628,12 @@ static const char * toStr(EGlow lv)
         CFG.writeEntry(#ENTRY ".height", opts.ENTRY.height); \
     }
 
+#define QTC_WRITE_STRING_LIST_ENTRY(ENTRY) \
+    if (!exportingStyle && def.ENTRY==opts.ENTRY) \
+        CFG.deleteEntry(#ENTRY); \
+    else \
+        CFG.writeEntry(#ENTRY, QStringList(opts.ENTRY.toList()).join(", ")); \
+
 bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false)
 {
     if(!cfg)
@@ -2793,6 +2826,12 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(gtkMenuStripe)
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+        QTC_WRITE_STRING_LIST_ENTRY(noBgndGradientApps)
+        QTC_WRITE_STRING_LIST_ENTRY(noBgndImageApps)
+        QTC_WRITE_STRING_LIST_ENTRY(menubarApps)
+        QTC_WRITE_STRING_LIST_ENTRY(useQtFileDialogApps)
+#endif
 
         for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
         {

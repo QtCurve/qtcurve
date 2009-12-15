@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>763</width>
-    <height>498</height>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -2726,6 +2726,66 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_26">
+      <layout class="QFormLayout" name="formLayout_20">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_81">
+         <property name="text">
+          <string>No background gradient:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="KLineEdit" name="noBgndGradientApps">
+         <property name="whatsThis">
+          <string>Comma seperated list of names of applications which should not use the background gradient setting.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_82">
+         <property name="text">
+          <string>No background image:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="KLineEdit" name="noBgndImageApps">
+         <property name="whatsThis">
+          <string>Comma seperated list of names of applications which should not use the background image setting.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_83">
+         <property name="text">
+          <string>Use Qt file dialog:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="KLineEdit" name="useQtFileDialogApps">
+         <property name="whatsThis">
+          <string>Comma seperated list of names of Qt4 applications which should not use the KDE4 file dialog.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_83">
+         <property name="text">
+          <string>Save menubar visibility:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="KLineEdit" name="menubarApps">
+         <property name="whatsThis">
+          <string>Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the menubar is hidden or not.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_25">
       <layout class="QVBoxLayout" name="verticalLayout_16">
        <item>
@@ -3135,6 +3195,11 @@
    <header>kpushbutton.h</header>
   </customwidget>
   <customwidget>
+   <class>KLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>klineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
@@ -3306,6 +3371,10 @@
   <tabstop>fixParentlessDialogs</tabstop>
   <tabstop>passwordChar</tabstop>
   <tabstop>expanderHighlight</tabstop>
+  <tabstop>noBgndGradientApps</tabstop>
+  <tabstop>noBgndImageApps</tabstop>
+  <tabstop>useQtFileDialogApps</tabstop>
+  <tabstop>menubarApps</tabstop>
   <tabstop>exportKde3Button</tabstop>
   <tabstop>exportQt3Button</tabstop>
   <tabstop>gradCombo</tabstop>

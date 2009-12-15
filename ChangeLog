@@ -96,7 +96,10 @@
 56. Googleearth crashes when using file dialogs, if linked to KDE4. So, for googleearth
     the usage of KDE4 dialogs is removed. To remove for other apps, edit
     ~/.config/qtcurve/stylerc  and add:
-        useQtFileDialogApps=designer
+        useQtFileDialogApps=googleearth-bin
+57. Added 'Applications' page to config dialog where you can set which apps will
+    not have background gradients, background image, should use Qt file dialog,
+    and need menubar state saving.
 
 0.69.2
 ------

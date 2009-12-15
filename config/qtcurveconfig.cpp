@@ -854,6 +854,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtons_colorShade, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_colorAllDesktops, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
 
+    connect(noBgndGradientApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(noBgndImageApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(useQtFileDialogApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(menubarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+
     Options currentStyle,
             defaultStyle;
 
@@ -1141,6 +1146,7 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Toolbars"), i++);
     new CStackItem(stackList, i18n("Dock windows"), i++);
     new CStackItem(stackList, i18n("Advanced Settings"), i++);
+    new CStackItem(stackList, i18n("Applications"), i++);
     new CStackItem(stackList, i18n("Legacy"), i++);
     new CStackItem(stackList, i18n("Custom Gradients"), i++);
     new CStackItem(stackList, i18n("Custom Shades"), i++);
@@ -2117,6 +2123,11 @@ void QtCurveConfig::setOptions(Options &opts)
     }
     else
         opts.titlebarButtonColors.clear();
+
+    opts.noBgndGradientApps=QSet<QString>::fromList(noBgndGradientApps->text().simplified().split(", ", QString::SkipEmptyParts));
+    opts.noBgndImageApps=QSet<QString>::fromList(noBgndImageApps->text().simplified().split(", ", QString::SkipEmptyParts));
+    opts.useQtFileDialogApps=QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts));
+    opts.menubarApps=QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts));
 }
 
 static QColor getColor(const TBCols &cols, ETitleBarButtons btn)
@@ -2325,6 +2336,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtons_colorSymbolsOnly->setChecked(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR_SYMBOL);
 
     populateShades(opts);
+
+    noBgndGradientApps->setText(QStringList(opts.noBgndGradientApps.toList()).join(", "));
+    noBgndImageApps->setText(QStringList(opts.noBgndImageApps.toList()).join(", "));
+    useQtFileDialogApps->setText(QStringList(opts.useQtFileDialogApps.toList()).join(", "));
+    menubarApps->setText(QStringList(opts.menubarApps.toList()).join(", "));
 }
 
 int QtCurveConfig::getDwtSettingsFlags()
@@ -2508,6 +2524,11 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
                customSortedLvColor->color()!=opts.customSortedLvColor) ||
 
          customGradient!=opts.customGradient ||
+
+         QSet<QString>::fromList(noBgndGradientApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noBgndGradientApps ||
+         QSet<QString>::fromList(noBgndImageApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noBgndImageApps ||
+         QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.useQtFileDialogApps ||
+         QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.menubarApps ||
 
          diffShades(opts);
 }
