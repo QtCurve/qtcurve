@@ -773,6 +773,7 @@ class QtCConfig
     QtCConfig(const QString &filename);
 
     bool            ok() const { return values.count()>0; }
+    bool            hasKey(const QString &key) { return values.contains(key); }
     const QString & readEntry(const QString &key, const QString &def=QString::null);
 
     private:
@@ -867,12 +868,21 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
         } \
     }
 
-#define QTC_READ_STRING_LIST(ENTRY) \
-    { \
-        QString val=readStringEntry(cfg, #ENTRY); \
-        Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(", ", QString::SkipEmptyParts)); \
-        opts->ENTRY=set.count() ? set : def->ENTRY; \
-    }
+#if QT_VERSION >= 0x040000
+    #define QTC_READ_STRING_LIST(ENTRY) \
+        { \
+            QString val=readStringEntry(cfg, #ENTRY); \
+            Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(", ", QString::SkipEmptyParts)); \
+            opts->ENTRY=set.count() || cfg.hasKey(#ENTRY) ? set : def->ENTRY; \
+        }
+#else
+    #define QTC_READ_STRING_LIST(ENTRY) \
+        { \
+            QString val=readStringEntry(cfg, #ENTRY); \
+            Strings list=val.isEmpty() ? Strings() : Strings::split(", ", val, false); \
+            opts->ENTRY=list.count() || cfg.hasKey(#ENTRY) ? list : def->ENTRY; \
+        }
+#endif
 
 #else
          
@@ -1130,7 +1140,7 @@ static void copyOpts(Options *src, Options *dest)
     if(src && dest && src!=dest)
     {
         memcpy(dest, src, sizeof(Options));
-        src->noBgndGradientApps=src->noBgndImageApps=src->noDlgFixApps=NULL;
+        src->noBgndGradientApps=src->noBgndImageApps=src->noDlgFixApps=src->noMenuStripeApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
         copyGradients(src, dest);
     }
@@ -1146,9 +1156,10 @@ static void freeOpts(Options *opts)
             g_strfreev(opts->noBgndGradientApps);
         if(opts->noBgndGradientApps)
             g_strfreev(opts->noBgndImageApps);
-         if(opts->noDlgFixApps)
+        if(opts->noDlgFixApps)
             g_strfreev(opts->noDlgFixApps);       
-
+        if(opts->noMenuStripeApps)
+            g_strfreev(opts->noMenuStripeApps); 
         for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
             if(opts->customGradient[i])
             {
@@ -1482,13 +1493,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
             QTC_CFG_READ_INT(expanderHighlight)
             QTC_CFG_READ_BOOL(mapKdeIcons)
-            
-            if(SHADE_NONE==opts->menuStripe)
-                opts->gtkMenuStripe=false;
-            else
-            {
-                QTC_CFG_READ_BOOL(gtkMenuStripe)
-            }
 #endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             QTC_CFG_READ_BOOL(gtkButtonOrder)
@@ -1517,11 +1521,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             QTC_CFG_READ_SHADING(shading)
             QTC_CFG_READ_IMAGE(bgndImage)
-            
+            QTC_READ_STRING_LIST(noDlgFixApps)
+            QTC_READ_STRING_LIST(noMenuStripeApps)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_READ_STRING_LIST(noBgndGradientApps)
             QTC_READ_STRING_LIST(noBgndImageApps)
-            QTC_READ_STRING_LIST(noDlgFixApps)
 #endif 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             QTC_READ_STRING_LIST(menubarApps)
@@ -2121,13 +2125,6 @@ static void defaultSettings(Options *opts)
     opts->titlebarButtons=QTC_TITLEBAR_BUTTON_ROUND|QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
     opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;
 #endif
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    opts->xbar=false;
-    opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
-    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer";
-    opts->useQtFileDialogApps << "googleearth-bin";
-    opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
-#endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
     opts->shading=SHADING_HSL;
@@ -2148,10 +2145,19 @@ static void defaultSettings(Options *opts)
     opts->customMenuStripeColor.setRgb(0, 0, 0);
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    opts->xbar=false;
+    opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
+    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer";
+    opts->useQtFileDialogApps << "googleearth-bin";
+#endif
+    opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
+    opts->noMenuStripeApps << "gtk";
 #else
     opts->noBgndGradientApps=NULL;
     opts->noBgndImageApps=NULL;
     opts->noDlgFixApps=NULL;
+    opts->noMenuStripeApps=g_strsplit("gtk", ", ", -1);
 /*
     opts->setDialogButtonOrder=false;
 */
@@ -2166,7 +2172,6 @@ static void defaultSettings(Options *opts)
 
 #if !defined __cplusplus || defined QTC_CONFIG_DIALOG
     opts->mapKdeIcons=true;
-    opts->gtkMenuStripe=false;
     opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
 #endif
 #ifdef __cplusplus
@@ -2828,13 +2833,13 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(reorderGtkButtons)
 #endif
         CFG_WRITE_ENTRY(mapKdeIcons)
-        CFG_WRITE_ENTRY(gtkMenuStripe)
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         QTC_WRITE_STRING_LIST_ENTRY(noBgndGradientApps)
         QTC_WRITE_STRING_LIST_ENTRY(noBgndImageApps)
         QTC_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
+        QTC_WRITE_STRING_LIST_ENTRY(noMenuStripeApps)
         QTC_WRITE_STRING_LIST_ENTRY(menubarApps)
         QTC_WRITE_STRING_LIST_ENTRY(useQtFileDialogApps)
 #endif

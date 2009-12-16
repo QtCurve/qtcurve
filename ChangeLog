@@ -99,7 +99,8 @@
         useQtFileDialogApps=googleearth-bin
 57. Added 'Applications' page to config dialog where you can set which apps will
     not have background gradients, background image, should use Qt file dialog,
-    need menubar state saving, and should not use 'parentless dialog' fix.
+    need menubar state saving, not use menustripe, and should not use 'parentless
+    dialog' fix.
 58. If drawing standard buttons for sidebar buttons, then draw these as per toolbar
     buttons.
 

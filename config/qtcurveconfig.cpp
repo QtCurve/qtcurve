@@ -714,7 +714,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(menuStripe, SIGNAL(currentIndexChanged(int)), SLOT(menuStripeChanged()));
     connect(customMenuStripeColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(menuStripeAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(gtkMenuStripe, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(bgndGrad, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(menuBgndGrad, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(round, SIGNAL(currentIndexChanged(int)), SLOT(roundChanged()));
@@ -867,6 +866,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(useQtFileDialogApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(menubarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
     Options currentStyle,
             defaultStyle;
@@ -1018,9 +1018,6 @@ void QtCurveConfig::menuStripeChanged()
 {
     customMenuStripeColor->setEnabled(SHADE_CUSTOM==menuStripe->currentIndex());
     menuStripeAppearance->setEnabled(SHADE_NONE!=menuStripe->currentIndex());
-    gtkMenuStripe->setEnabled(SHADE_NONE!=menuStripe->currentIndex());
-    if(SHADE_NONE==menuStripe->currentIndex())
-        gtkMenuStripe->setChecked(false);
     updateChanged();
 }
 
@@ -2001,7 +1998,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menuStripe=(EShade)menuStripe->currentIndex();
     opts.customMenuStripeColor=customMenuStripeColor->color();
     opts.menuStripeAppearance=(EAppearance)menuStripeAppearance->currentIndex();
-    opts.gtkMenuStripe=gtkMenuStripe->isChecked();
     opts.bgndGrad=(EGradType)bgndGrad->currentIndex();
     opts.menuBgndGrad=(EGradType)menuBgndGrad->currentIndex();
     opts.embolden=embolden->isChecked();
@@ -2138,6 +2134,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.useQtFileDialogApps=QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts));
     opts.menubarApps=QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts));
     opts.noDlgFixApps=QSet<QString>::fromList(noDlgFixApps->text().simplified().split(", ", QString::SkipEmptyParts));
+    opts.noMenuStripeApps=QSet<QString>::fromList(noMenuStripeApps->text().simplified().split(", ", QString::SkipEmptyParts));
 }
 
 static QColor getColor(const TBCols &cols, ETitleBarButtons btn)
@@ -2158,7 +2155,6 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     menuStripe->setCurrentIndex(opts.menuStripe);
     customMenuStripeColor->setColor(opts.customMenuStripeColor);
     menuStripeAppearance->setCurrentIndex(opts.menuStripeAppearance);
-    gtkMenuStripe->setChecked(opts.gtkMenuStripe);
     bgndGrad->setCurrentIndex(opts.bgndGrad);
     menuBgndGrad->setCurrentIndex(opts.menuBgndGrad);
     toolbarBorders->setCurrentIndex(opts.toolbarBorders);
@@ -2352,6 +2348,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     useQtFileDialogApps->setText(toString(opts.useQtFileDialogApps));
     menubarApps->setText(toString(opts.menubarApps));
     noDlgFixApps->setText(toString(opts.noDlgFixApps));
+    noMenuStripeApps->setText(toString(opts.noMenuStripeApps));
 }
 
 int QtCurveConfig::getDwtSettingsFlags()
@@ -2411,7 +2408,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          sliderWidth->value()!=opts.sliderWidth ||
          menuStripe->currentIndex()!=opts.menuStripe ||
          menuStripeAppearance->currentIndex()!=opts.menuStripeAppearance ||
-         gtkMenuStripe->isChecked()!=opts.gtkMenuStripe ||
          bgndGrad->currentIndex()!=opts.bgndGrad ||
          menuBgndGrad->currentIndex()!=opts.menuBgndGrad ||
          embolden->isChecked()!=opts.embolden ||
@@ -2541,6 +2537,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.useQtFileDialogApps ||
          QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.menubarApps ||
          QSet<QString>::fromList(noDlgFixApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noDlgFixApps ||
+         QSet<QString>::fromList(noMenuStripeApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noMenuStripeApps ||
 
          diffShades(opts);
 }

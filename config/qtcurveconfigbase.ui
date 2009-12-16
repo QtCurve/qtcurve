@@ -2409,30 +2409,14 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
-        <widget class="QCheckBox" name="gtkMenuStripe">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>If enabled, Gtk2 applications will also have a menu stripe. Note - due to the way Gtk2 works, this may not always look correct.</string>
-         </property>
-         <property name="text">
-          <string>Apply to Gtk2 applications (Experimental)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
+       <item row="11" column="0">
         <widget class="QLabel" name="label_61">
          <property name="text">
           <string>Border popupmenus:</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="11" column="1">
         <widget class="QCheckBox" name="popupBorder">
          <property name="whatsThis">
           <string>If enabled, the whole popup menu will have a border, otherwise no border will be drawn. This option should be enabled unless you have also enabled shadows in your window manager.</string>
@@ -2752,46 +2736,60 @@
        <item row="1" column="1">
         <widget class="KLineEdit" name="noBgndImageApps">
          <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background image setting. &lt;p&gt;</string>
+          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background image setting. &lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_83">
+        <widget class="QLabel" name="label_82y">
          <property name="text">
-          <string>Use Qt file dialog:</string>
+          <string>No menu stripe:</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="KLineEdit" name="useQtFileDialogApps">
+        <widget class="KLineEdit" name="noMenuStripeApps">
          <property name="whatsThis">
-          <string>Comma seperated list of names of Qt4 applications which should not use the KDE4 file dialog.</string>
+          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu stripe setting. &lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_83">
          <property name="text">
-          <string>Save menubar visibility:</string>
+          <string>Use Qt file dialog:</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
+        <widget class="KLineEdit" name="useQtFileDialogApps">
+         <property name="whatsThis">
+          <string>Comma seperated list of names of Qt4 applications which should not use the KDE4 file dialog.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_83">
+         <property name="text">
+          <string>Save menubar visibility:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
         <widget class="KLineEdit" name="menubarApps">
          <property name="whatsThis">
           <string>Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the menubar is hidden or not.</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_83x">
          <property name="text">
           <string>Don't apply parent-less dialog fix:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="KLineEdit" name="noDlgFixApps">
          <property name="whatsThis">
           <string>&lt;p&gt;Comma seperated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
@@ -3365,7 +3363,6 @@
   <tabstop>menuStripe</tabstop>
   <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>
-  <tabstop>gtkMenuStripe</tabstop>
   <tabstop>popupBorder</tabstop>
   <tabstop>toolbarAppearance</tabstop>
   <tabstop>handles</tabstop>
@@ -3387,6 +3384,7 @@
   <tabstop>expanderHighlight</tabstop>
   <tabstop>noBgndGradientApps</tabstop>
   <tabstop>noBgndImageApps</tabstop>
+  <tabstop>noMenuStripeApps</tabstop>
   <tabstop>useQtFileDialogApps</tabstop>
   <tabstop>menubarApps</tabstop>
   <tabstop>noDlgFixApps</tabstop>
