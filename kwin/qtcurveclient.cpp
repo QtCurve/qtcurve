@@ -242,7 +242,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 //         painter.setClipRegion(e->region());
 //         painter.fillRect(r, windowCol); // Makes things look nicer for kcmshell preview...
 //     }
-    painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
+    if(isMaximized())
+         painter.setClipRegion(e->region());
+    else
+        painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
     painter.fillRect(r, colorTitleOnly ? windowCol : col);
 
     opt.init(widget());
