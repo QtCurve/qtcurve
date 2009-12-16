@@ -3465,9 +3465,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
         case PE_PanelButtonTool:
-            if(!opts.stdSidebarButtons && isMultiTabBarTab(getButton(widget, painter)))
+            if(isMultiTabBarTab(getButton(widget, painter)))
             {
-                drawSideBarButton(painter, r, option, widget);
+                if(!opts.stdSidebarButtons)
+                    drawSideBarButton(painter, r, option, widget);
+                else if( (state&State_Enabled) || !(state&State_AutoRaise) )
+                {
+                    QStyleOption opt(*option);
+                    opt.state|=QTC_STATE_TBAR_BUTTON;
+                    drawPrimitive(PE_PanelButtonCommand, &opt, painter, widget);
+                }
                 break;
             }
         case PE_IndicatorButtonDropDown: // This should never be called, but just in case - draw as a normal toolbutton...
@@ -5728,7 +5735,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if(opts.stdSidebarButtons)
                 {
                     if(state&(State_Selected|State_MouseOver))
+                    {
+                        opt.state|=QTC_STATE_TBAR_BUTTON;
                         drawPrimitive(PE_PanelButtonTool, &opt, painter, widget);
+                    }
                 }
                 else
                     drawSideBarButton(painter, r, &opt, widget);

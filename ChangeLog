@@ -21,7 +21,7 @@
 13. Add option to specify appearance of dock-widget titlebars.
 14. Made XBar support a config, and not cmake, option.
 15. Added option to specify effect for window titlebar text/icon: shadow/etch/none.
-16. Fix window corners when 'shaded'. When 'shaded' use only 'slight' rounding.
+16. Fix window corners when 'shaded'.
 17. Work-around issue with Intel 2.9 Xorg driver - doesnt seem to like drawing
     lines with an alpha channel set but anti-aliasing disabled. Affects MDI window
     icons (when 'hover icon' is enabled) - instead of using an alpha channel, the colour
@@ -100,6 +100,8 @@
 57. Added 'Applications' page to config dialog where you can set which apps will
     not have background gradients, background image, should use Qt file dialog,
     need menubar state saving, and should not use 'parentless dialog' fix.
+58. If drawing standard buttons for sidebar buttons, then draw these as per toolbar
+    buttons.
 
 0.69.2
 ------
