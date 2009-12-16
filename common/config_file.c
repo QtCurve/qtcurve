@@ -1130,7 +1130,7 @@ static void copyOpts(Options *src, Options *dest)
     if(src && dest && src!=dest)
     {
         memcpy(dest, src, sizeof(Options));
-        src->noBgndGradientApps=src->noBgndImageApps=NULL;
+        src->noBgndGradientApps=src->noBgndImageApps=src->noDlgFixApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
         copyGradients(src, dest);
     }
@@ -1146,6 +1146,8 @@ static void freeOpts(Options *opts)
             g_strfreev(opts->noBgndGradientApps);
         if(opts->noBgndGradientApps)
             g_strfreev(opts->noBgndImageApps);
+         if(opts->noDlgFixApps)
+            g_strfreev(opts->noDlgFixApps);       
 
         for(i=0; i<QTC_NUM_CUSTOM_GRAD; ++i)
             if(opts->customGradient[i])
@@ -1519,6 +1521,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_READ_STRING_LIST(noBgndGradientApps)
             QTC_READ_STRING_LIST(noBgndImageApps)
+            QTC_READ_STRING_LIST(noDlgFixApps)
 #endif 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             QTC_READ_STRING_LIST(menubarApps)
@@ -2121,8 +2124,9 @@ static void defaultSettings(Options *opts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
-    opts->menubarApps << "kcalc" << "amarok" << "vlc" << "smplayer" << "arora" << "kaffeine";
+    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer";
     opts->useQtFileDialogApps << "googleearth-bin";
+    opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
 #endif
     opts->menuStripe=SHADE_NONE;
     opts->menuStripeAppearance=APPEARANCE_DARK_INVERTED;
@@ -2147,6 +2151,7 @@ static void defaultSettings(Options *opts)
 #else
     opts->noBgndGradientApps=NULL;
     opts->noBgndImageApps=NULL;
+    opts->noDlgFixApps=NULL;
 /*
     opts->setDialogButtonOrder=false;
 */
@@ -2829,6 +2834,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         QTC_WRITE_STRING_LIST_ENTRY(noBgndGradientApps)
         QTC_WRITE_STRING_LIST_ENTRY(noBgndImageApps)
+        QTC_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
         QTC_WRITE_STRING_LIST_ENTRY(menubarApps)
         QTC_WRITE_STRING_LIST_ENTRY(useQtFileDialogApps)
 #endif

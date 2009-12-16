@@ -100,6 +100,14 @@ static const KStandardAction::StandardAction standardAction[] =
     KStandardAction::ActionNone
 };
 
+static QString toString(const QSet<QString> &set)
+{
+    QStringList list=set.toList();
+
+    qSort(list);
+    return list.join(", ");
+}
+
 class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
 {
     public:
@@ -858,6 +866,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(noBgndImageApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(useQtFileDialogApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(menubarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
     Options currentStyle,
             defaultStyle;
@@ -2128,6 +2137,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.noBgndImageApps=QSet<QString>::fromList(noBgndImageApps->text().simplified().split(", ", QString::SkipEmptyParts));
     opts.useQtFileDialogApps=QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts));
     opts.menubarApps=QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts));
+    opts.noDlgFixApps=QSet<QString>::fromList(noDlgFixApps->text().simplified().split(", ", QString::SkipEmptyParts));
 }
 
 static QColor getColor(const TBCols &cols, ETitleBarButtons btn)
@@ -2337,10 +2347,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
 
     populateShades(opts);
 
-    noBgndGradientApps->setText(QStringList(opts.noBgndGradientApps.toList()).join(", "));
-    noBgndImageApps->setText(QStringList(opts.noBgndImageApps.toList()).join(", "));
-    useQtFileDialogApps->setText(QStringList(opts.useQtFileDialogApps.toList()).join(", "));
-    menubarApps->setText(QStringList(opts.menubarApps.toList()).join(", "));
+    noBgndGradientApps->setText(toString(opts.noBgndGradientApps));
+    noBgndImageApps->setText(toString(opts.noBgndImageApps));
+    useQtFileDialogApps->setText(toString(opts.useQtFileDialogApps));
+    menubarApps->setText(toString(opts.menubarApps));
+    noDlgFixApps->setText(toString(opts.noDlgFixApps));
 }
 
 int QtCurveConfig::getDwtSettingsFlags()
@@ -2529,6 +2540,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          QSet<QString>::fromList(noBgndImageApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noBgndImageApps ||
          QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.useQtFileDialogApps ||
          QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.menubarApps ||
+         QSet<QString>::fromList(noDlgFixApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noDlgFixApps ||
 
          diffShades(opts);
 }
