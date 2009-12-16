@@ -60,6 +60,8 @@
 33. Fix crashes with 'deadbeef' (??) 0.3.1 - need to check widget pointer before
     calling GTK_WIDGET_??? macros.
 34. Dont max round toggle buttons that are almost square, or GIMPs GimpViewableButtons
+35. gtkMenuStripe option replaced by noMenuStripeApps option. noMenuStripeApps=gtk is
+    the equivalent of gtkMenuStripe=false
 
 0.69.2
 ------

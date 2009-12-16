@@ -4401,7 +4401,7 @@ debugDisplayWidget(widget, 3);
         else if(USE_LIGHTER_POPUP_MENU)
             drawAreaColor(cr, area, NULL, &qtcPalette.menu, x, y, width, height);
 
-        if(opts.menuStripe && opts.gtkMenuStripe && !isComboMenu(widget))
+        if(opts.menuStripe && !isComboMenu(widget))
         {
             gboolean mozOo=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
             int stripeWidth=mozOo ? 22 : 21;
@@ -4488,7 +4488,7 @@ debugDisplayWidget(widget, 3);
     {
         gboolean isMenuItem=widget && GTK_IS_MENU_ITEM(widget);
 
-        int offset=opts.gtkMenuStripe && (isMozilla() || isMenuItem) ? 20 : 0;
+        int offset=opts.menuStripe && (isMozilla() || isMenuItem) ? 20 : 0;
         if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
             offset+=2;
         drawFadedLine(cr, x+1+offset, y+(height>>1), width-(1+offset), 1,
@@ -6425,7 +6425,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("menuitem") || (widget && DETAIL("hseparator") && QTC_IS_MENU_ITEM(widget)))
     {
-        int offset=opts.gtkMenuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
+        int offset=opts.menuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
 
         if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
             offset+=2;

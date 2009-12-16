@@ -2195,6 +2195,9 @@ static gboolean qtInit()
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
                 opts.fixParentlessDialogs=FALSE;
 
+            if(opts.menuStripe && excludedApp(opts.noMenuStripeApps))
+                opts.menuStripe=SHADE_NONE;
+            
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
             {
