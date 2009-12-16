@@ -62,6 +62,7 @@
 34. Dont max round toggle buttons that are almost square, or GIMPs GimpViewableButtons
 35. gtkMenuStripe option replaced by noMenuStripeApps option. noMenuStripeApps=gtk is
     the equivalent of gtkMenuStripe=false
+36. Better Agua gradients for large buttons.
 
 0.69.2
 ------
