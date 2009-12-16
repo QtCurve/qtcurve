@@ -451,8 +451,8 @@ void QtCurveClient::updateWindowShape()
 
 QRegion QtCurveClient::getMask(int round, int w, int h) const
 {  
-    if(isShade())
-        round=ROUND_SLIGHT;
+//     if(isShade())
+//         round=ROUND_SLIGHT;
     switch(round)
     {
         case ROUND_NONE:
@@ -468,7 +468,7 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
         default: // ROUND_FULL
         {
             QRegion mask(5, 0, w-10, h);
-            bool    roundBottom=Handler()->roundBottom();
+            bool    roundBottom=isShade() || Handler()->roundBottom();
 
             if(roundBottom)
             {

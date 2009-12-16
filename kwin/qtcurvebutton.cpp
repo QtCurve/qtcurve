@@ -92,6 +92,13 @@ void QtCurveButton::reset(unsigned long changed)
         }
 
         this->update();
+
+        int round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
+
+        if(round>ROUND_SLIGHT)
+            setMask(QRegion(rect().adjusted(2, 2, -2, -2))+
+                    QRegion(rect().adjusted(0, 2, 0, -2))+
+                    QRegion(rect().adjusted(2, 0, -2, 0)));
     }
 }
 
@@ -111,9 +118,10 @@ void QtCurveButton::leaveEvent(QEvent *e)
     repaint();
 }
 
-void QtCurveButton::paintEvent(QPaintEvent *)
+void QtCurveButton::paintEvent(QPaintEvent *ev)
 {
     QPainter p(this);
+    p.setClipRect(rect().intersected(ev->rect()));
     drawButton(&p);
 }
 
