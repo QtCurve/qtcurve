@@ -36,14 +36,14 @@
 namespace KWinQtCurve
 {
 
-class ResizeCorner;
+class QtCurveSizeGrip;
 
 class QtCurveClient : public KCommonDecoration
 {
     public:
 
     QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory);
-    ~QtCurveClient() { }
+    virtual ~QtCurveClient();
 
     QString                   visibleName() const;
     bool                      decorationBehaviour(DecorationBehaviour behaviour) const;
@@ -52,6 +52,7 @@ class QtCurveClient : public KCommonDecoration
     KCommonDecorationButton * createButton(ButtonType type);
     void                      init();
     void                      maximizeChange();
+    void                      shadeChange();
     void                      activeChange();
     void                      reset(unsigned long changed);
     void                      drawBtnBgnd(QPainter *p, const QRect &r, bool active);
@@ -66,6 +67,8 @@ class QtCurveClient : public KCommonDecoration
     private:
 
     QRect                     captionRect() const;
+    void                      createSizeGrip();
+    void                      deleteSizeGrip();
 
     private:
 
@@ -78,11 +81,11 @@ class QtCurveClient : public KCommonDecoration
 
     static const int constNumButtonStates=4;
 
-    ResizeCorner *itsResizeGrip;
-    ButtonBgnd   itsButtonBackground[constNumButtonStates];
-    QRect        itsCaptionRect;
-    QString      itsOldCaption;
-    QFont        itsTitleFont;
+    QtCurveSizeGrip *itsResizeGrip;
+    ButtonBgnd      itsButtonBackground[constNumButtonStates];
+    QRect           itsCaptionRect;
+    QString         itsOldCaption;
+    QFont           itsTitleFont;
 };
 
 }

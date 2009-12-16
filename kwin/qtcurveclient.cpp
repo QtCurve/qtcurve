@@ -43,7 +43,7 @@
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
-#include "resizecorner.h"
+#include "qtcurvesizegrip.h"
 #define QTC_KWIN
 #include "common.h"
 
@@ -55,6 +55,11 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *fact
                itsResizeGrip(0L),
                itsTitleFont(QFont())
 {
+}
+
+QtCurveClient::~QtCurveClient()
+{
+    deleteSizeGrip();
 }
 
 QString QtCurveClient::visibleName() const
@@ -138,22 +143,31 @@ void QtCurveClient::init()
     widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, true);
-    
-    if(Handler()->showResizeGrip() && isResizable())
-        itsResizeGrip=new ResizeCorner(this, KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
+
+    if(Handler()->showResizeGrip())
+        createSizeGrip();
 }
 
 void QtCurveClient::maximizeChange()
 {
     reset(SettingBorder);
+    if(itsResizeGrip)
+        itsResizeGrip->setVisible(!(isShade() || isMaximized()));
     KCommonDecoration::maximizeChange();
+}
+
+void QtCurveClient::shadeChange()
+{
+    if(itsResizeGrip)
+        itsResizeGrip->setVisible(!(isShade() || isMaximized()));
+    KCommonDecoration::shadeChange();
 }
 
 void QtCurveClient::activeChange()
 {
-    if (itsResizeGrip)
+    if(itsResizeGrip && !(isShade() || isMaximized()))
     {
-        itsResizeGrip->setColor(KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
+        itsResizeGrip->activeChange();
         itsResizeGrip->update();
     }
     KCommonDecoration::activeChange();
@@ -558,8 +572,31 @@ void QtCurveClient::reset(unsigned long changed)
         updateLayout();
         widget()->update();
     }
-    
+
+    if(Handler()->showResizeGrip())
+        createSizeGrip();
+    else
+        deleteSizeGrip();
+
     KCommonDecoration::reset(changed);
+}
+
+void QtCurveClient::createSizeGrip()
+{
+    if(!itsResizeGrip && ((isResizable() && 0!=windowId()) || isPreview()))
+    {
+        itsResizeGrip=new QtCurveSizeGrip(this);
+        itsResizeGrip->setVisible(!(isMaximized() || isShade()));
+    }
+}
+
+void QtCurveClient::deleteSizeGrip()
+{
+    if(itsResizeGrip)
+    {
+        delete itsResizeGrip;
+        itsResizeGrip=0L;
+    }
 }
 
 }
