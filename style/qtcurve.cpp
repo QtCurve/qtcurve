@@ -1634,15 +1634,16 @@ void QtCurveStyle::polish(QWidget *widget)
             }
         }
 
-    if(!IS_FLAT(opts.menuBgndAppearance))
-        widget->installEventFilter(this);
-    else if(USE_LIGHTER_POPUP_MENU && qobject_cast<QMenu *>(widget))
-    {
-        QPalette pal(widget->palette());
+    if(qobject_cast<QMenu *>(widget))
+        if(!IS_FLAT(opts.menuBgndAppearance))
+            widget->installEventFilter(this);
+        else if(USE_LIGHTER_POPUP_MENU)
+        {
+            QPalette pal(widget->palette());
 
-        pal.setBrush(QPalette::Active, QPalette::Window, itsLighterPopupMenuBgndCol);
-        widget->setPalette(pal);
-    }
+            pal.setBrush(QPalette::Active, QPalette::Window, itsLighterPopupMenuBgndCol);
+            widget->setPalette(pal);
+        }
 
     //bool onToolBar(widget && widget->parent() && 0L!=getToolBar(widget->parentWidget(), true));
     bool parentIsToolbar(widget && widget->parent() && (qobject_cast<QToolBar *>(widget->parent()) || widget->parent()->inherits("Q3ToolBar")));
@@ -1969,7 +1970,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
             }
         }
 
-    if(!IS_FLAT(opts.menuBgndAppearance))
+    if(!IS_FLAT(opts.menuBgndAppearance) && qobject_cast<QMenu *>(widget))
         widget->removeEventFilter(this);
 
     if (qobject_cast<QMenuBar *>(widget) ||
