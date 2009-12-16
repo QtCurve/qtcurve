@@ -237,11 +237,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
 
-    if(!isShade())
-    {
-        painter.setClipRegion(e->region());
-        painter.fillRect(r, windowCol); // Makes hings look nicer for kcmshell preview...
-    }
+//     if(!isShade())
+//     {
+//         painter.setClipRegion(e->region());
+//         painter.fillRect(r, windowCol); // Makes things look nicer for kcmshell preview...
+//     }
     painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
     painter.fillRect(r, colorTitleOnly ? windowCol : col);
 
