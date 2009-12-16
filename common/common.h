@@ -272,6 +272,8 @@ typedef gchar ** Strings;
 
 #define MODIFY_AGUA_X(A, X) (APPEARANCE_AGUA==(A) ?  (X) : (A))
 #define MODIFY_AGUA(A)      MODIFY_AGUA_X((A), APPEARANCE_AGUA_MOD)
+#define AGUA_MAX 32.0
+#define AGUA_MID_SHADE 0.85
 
 #define COLORED_BORDER_SIZE 3
 #define PROGRESS_CHUNK_WIDTH 10

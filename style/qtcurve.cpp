@@ -9131,7 +9131,7 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
     GradientStopCont::const_iterator it(grad->stops.begin()),
                                      end(grad->stops.end());
     int                              numStops(grad->stops.size());
-
+  
     for(int i=0; it!=end; ++it, ++i)
     {
         QColor col;
@@ -9146,6 +9146,17 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
             shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
+    
+    if(APPEARANCE_AGUA==app && !(topTab || botTab || dwt) &&
+        (horiz ? r.height() : r.width())>AGUA_MAX)
+    {
+        QColor col;
+        double pos=AGUA_MAX/((horiz ? r.height() : r.width())*2.0);
+        shade(base, &col, AGUA_MID_SHADE);
+        g.setColorAt(pos, col);
+        g.setColorAt(1.0-pos, col);
+    }
+    
     //p->fillRect(r, base);
     if(path.isEmpty())
         p->fillRect(r, QBrush(g));
