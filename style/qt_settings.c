@@ -1981,6 +1981,18 @@ static gboolean isMozApp(const char *app, const char *check)
     return FALSE;
 }
 
+static gboolean excludedApp(Strings config)
+{
+    if(qtSettings.appName && config)
+    {
+        int i;
+        for(i=0; config[i]; ++i)
+            if(0==strcmp("gtk", config[i]) || 0==strcmp(qtSettings.appName, config[i]))
+                return TRUE;
+    }
+    return FALSE;
+}
+
 static gboolean qtInit()
 {
     if(0==qt_refs++)
@@ -2174,29 +2186,14 @@ static gboolean qtInit()
             if(GTK_APP_JAVA==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
                 opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
 
-            if(qtSettings.appName && opts.noBgndGradientApps && !IS_FLAT(opts.bgndAppearance))
-            {
-                int i;
-                for(i=0; opts.noBgndGradientApps[i]; ++i)
-                    if(0==strcmp("gtk",  opts.noBgndGradientApps[i]) ||
-                       0==strcmp(qtSettings.appName, opts.noBgndGradientApps[i]))
-                    {
-                        opts.bgndAppearance=APPEARANCE_FLAT;
-                        break;
-                    }
-            }
+            if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
+                opts.bgndAppearance=APPEARANCE_FLAT;
 
-            if(qtSettings.appName &&  opts.noBgndImageApps && IMG_NONE!=opts.bgndImage.type)
-            {
-                int i;
-                for(i=0; opts.noBgndImageApps[i]; ++i)
-                    if(0==strcmp("gtk",  opts.noBgndImageApps[i]) ||
-                       0==strcmp(qtSettings.appName, opts.noBgndImageApps[i]))
-                    {
-                        opts.bgndImage.type=IMG_NONE;
-                        break;
-                    }
-            }
+            if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
+                opts.bgndImage.type=IMG_NONE;
+
+            if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
+                opts.fixParentlessDialogs=FALSE;
 
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
