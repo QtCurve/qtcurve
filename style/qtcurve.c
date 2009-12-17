@@ -3547,7 +3547,8 @@ debugDisplayWidget(widget, 3);
 
                 if(ROUND_MAX==opts.round &&
                     ( (WIDGET_TOGGLE_BUTTON==widgetType && height>(QTC_CHECK_SIZE+8) && width<(height+10)) ||
-                      (GTK_APP_GIMP==qtSettings.app && WIDGET_STD_BUTTON==widgetType && WIDGET_TYPE_NAME("GimpViewableButton")) ) )
+                      (GTK_APP_GIMP==qtSettings.app && WIDGET_STD_BUTTON==widgetType && WIDGET_TYPE_NAME("GimpViewableButton")) ||
+                      (opts.stdSidebarButtons && WIDGET_STD_BUTTON==widgetType && widget && isSideBarBtn(widget)) ) )
                     widgetType=WIDGET_TOOLBAR_BUTTON;
 
                 /* For some reason SWT combo's dont un-prelight when activated! So dont pre-light at all! */
