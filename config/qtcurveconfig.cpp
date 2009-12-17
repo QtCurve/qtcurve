@@ -108,6 +108,18 @@ static QString toString(const QSet<QString> &set)
     return list.join(", ");
 }
 
+static QSet<QString> toSet(const QString &str)
+{
+    QStringList           list=str.simplified().split(QRegExp("\\s*,\\s*"), QString::SkipEmptyParts);
+    QStringList::Iterator it(list.begin()),
+                          end(list.end());
+
+    for(; it!=end; ++it)
+        (*it)=(*it).simplified();
+
+    return QSet<QString>::fromList(list);
+}
+
 class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
 {
     public:
@@ -2129,12 +2141,12 @@ void QtCurveConfig::setOptions(Options &opts)
     else
         opts.titlebarButtonColors.clear();
 
-    opts.noBgndGradientApps=QSet<QString>::fromList(noBgndGradientApps->text().simplified().split(", ", QString::SkipEmptyParts));
-    opts.noBgndImageApps=QSet<QString>::fromList(noBgndImageApps->text().simplified().split(", ", QString::SkipEmptyParts));
-    opts.useQtFileDialogApps=QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts));
-    opts.menubarApps=QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts));
-    opts.noDlgFixApps=QSet<QString>::fromList(noDlgFixApps->text().simplified().split(", ", QString::SkipEmptyParts));
-    opts.noMenuStripeApps=QSet<QString>::fromList(noMenuStripeApps->text().simplified().split(", ", QString::SkipEmptyParts));
+    opts.noBgndGradientApps=toSet(noBgndGradientApps->text());
+    opts.noBgndImageApps=toSet(noBgndImageApps->text());
+    opts.useQtFileDialogApps=toSet(useQtFileDialogApps->text());
+    opts.menubarApps=toSet(menubarApps->text());
+    opts.noDlgFixApps=toSet(noDlgFixApps->text());
+    opts.noMenuStripeApps=toSet(noMenuStripeApps->text());
 }
 
 static QColor getColor(const TBCols &cols, ETitleBarButtons btn)
@@ -2532,12 +2544,12 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
 
          customGradient!=opts.customGradient ||
 
-         QSet<QString>::fromList(noBgndGradientApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noBgndGradientApps ||
-         QSet<QString>::fromList(noBgndImageApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noBgndImageApps ||
-         QSet<QString>::fromList(useQtFileDialogApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.useQtFileDialogApps ||
-         QSet<QString>::fromList(menubarApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.menubarApps ||
-         QSet<QString>::fromList(noDlgFixApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noDlgFixApps ||
-         QSet<QString>::fromList(noMenuStripeApps->text().simplified().split(", ", QString::SkipEmptyParts))!=opts.noMenuStripeApps ||
+         toSet(noBgndGradientApps->text())!=opts.noBgndGradientApps ||
+         toSet(noBgndImageApps->text())!=opts.noBgndImageApps ||
+         toSet(useQtFileDialogApps->text())!=opts.useQtFileDialogApps ||
+         toSet(menubarApps->text())!=opts.menubarApps ||
+         toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||
+         toSet(noMenuStripeApps->text())!=opts.noMenuStripeApps ||
 
          diffShades(opts);
 }

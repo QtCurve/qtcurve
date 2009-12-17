@@ -872,14 +872,14 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
     #define QTC_READ_STRING_LIST(ENTRY) \
         { \
             QString val=readStringEntry(cfg, #ENTRY); \
-            Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(", ", QString::SkipEmptyParts)); \
+            Strings set=val.isEmpty() ? Strings() : Strings::fromList(val.split(",", QString::SkipEmptyParts)); \
             opts->ENTRY=set.count() || cfg.hasKey(#ENTRY) ? set : def->ENTRY; \
         }
 #else
     #define QTC_READ_STRING_LIST(ENTRY) \
         { \
             QString val=readStringEntry(cfg, #ENTRY); \
-            Strings list=val.isEmpty() ? Strings() : Strings::split(", ", val, false); \
+            Strings list=val.isEmpty() ? Strings() : Strings::split(",", val, false); \
             opts->ENTRY=list.count() || cfg.hasKey(#ENTRY) ? list : def->ENTRY; \
         }
 #endif
@@ -1001,7 +1001,7 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     { \
         const gchar *str=readStringEntry(cfg, #ENTRY); \
         if(str) \
-            opts->ENTRY=g_strsplit(str, ", ", -1); \
+            opts->ENTRY=g_strsplit(str, ",", -1); \
         else if(def->ENTRY) \
         { \
             opts->ENTRY=def->ENTRY; \
@@ -2157,7 +2157,7 @@ static void defaultSettings(Options *opts)
     opts->noBgndGradientApps=NULL;
     opts->noBgndImageApps=NULL;
     opts->noDlgFixApps=NULL;
-    opts->noMenuStripeApps=g_strsplit("gtk", ", ", -1);
+    opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
 /*
     opts->setDialogButtonOrder=false;
 */
@@ -2642,7 +2642,7 @@ static const char * toStr(EGlow lv)
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
     else \
-        CFG.writeEntry(#ENTRY, QStringList(opts.ENTRY.toList()).join(", ")); \
+        CFG.writeEntry(#ENTRY, QStringList(opts.ENTRY.toList()).join(",")); \
 
 bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false)
 {
