@@ -108,6 +108,7 @@
 60. Better Agua gradients for large buttons.
 61. Fix flat flat square in bottom right of scrollviews when using external scrollbars
     and background gradient.
+62. Remove titlebar from 'Places' dock widget in KFileDialog.
 
 0.69.2
 ------

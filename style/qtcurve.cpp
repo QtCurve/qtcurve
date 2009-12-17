@@ -627,6 +627,15 @@ static QString themeFile(const QString &dir, const QString &n, bool kde3=false)
 }
 #endif
 
+class QtCurveDockWidgetTitleBar : public QWidget
+{
+    public:
+        
+    QtCurveDockWidgetTitleBar(QWidget* parent) : QWidget(parent) { }
+    virtual ~QtCurveDockWidgetTitleBar() { }
+    QSize sizeHint() const { return QSize(0, 0); }
+}; 
+
 class QtCurveStylePlugin : public QStylePlugin
 {
     public:
@@ -1566,6 +1575,14 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->setMask(QRegion(widget->rect().adjusted(0, 0, -6, -6))+
                         QRegion(widget->rect().adjusted(6, 6, 0, 0)));
     }
+    else if(qobject_cast<QDockWidget *>(widget) && 
+            widget->parentWidget() &&
+            widget->parentWidget()->parentWidget() &&
+            widget->parentWidget()->parentWidget()->parentWidget() &&
+            qobject_cast<QSplitter *>(widget->parentWidget()) &&
+            widget->parentWidget()->parentWidget()->inherits("KFileWidget") &&
+            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog"))
+        ((QDockWidget *)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
     else if(opts.fixParentlessDialogs)
         if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
         {
@@ -1932,6 +1949,19 @@ void QtCurveStyle::unpolish(QWidget *widget)
                 }
             }
         }
+    }
+    else if(qobject_cast<QDockWidget *>(widget) && 
+            ((QDockWidget *)widget)->titleBarWidget() &&
+            dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
+            widget->parentWidget() &&
+            widget->parentWidget()->parentWidget() &&
+            widget->parentWidget()->parentWidget()->parentWidget() &&
+            qobject_cast<QSplitter *>(widget->parentWidget()) &&
+            widget->parentWidget()->parentWidget()->inherits("KFileWidget") &&
+            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog"))
+    {
+        delete ((QDockWidget *)widget)->titleBarWidget();
+        ((QDockWidget *)widget)->setTitleBarWidget(0L);
     }
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
