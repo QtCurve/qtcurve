@@ -106,6 +106,8 @@
 59. Dont use highlighted text for selected sidebar buttons if drawing as per toolbar
     buttons.
 60. Better Agua gradients for large buttons.
+61. Fix flat flat square in bottom right of scrollviews when using external scrollbars
+    and background gradient.
 
 0.69.2
 ------

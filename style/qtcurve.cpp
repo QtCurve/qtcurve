@@ -2957,6 +2957,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
     switch (element)
     {
+        case PE_PanelScrollAreaCorner:
+            // disable painting of PE_PanelScrollAreaCorner
+            // the default implementation fills the rect with the window background color
+            // which does not work for windows that have gradients.
+            break;
         case PE_IndicatorBranch:
         {
             int middleH((r.x() + r.width() / 2)-1),
