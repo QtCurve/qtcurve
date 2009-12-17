@@ -103,7 +103,9 @@
     dialog' fix.
 58. If drawing standard buttons for sidebar buttons, then draw these as per toolbar
     buttons.
-59. Better Agua gradients for large buttons.
+59. Dont use highlighted text for selected sidebar buttons if drawing as per toolbar
+    buttons.
+60. Better Agua gradients for large buttons.
 
 0.69.2
 ------

@@ -5683,7 +5683,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     r.adjust(constTabPad, 0, -constTabPad, 0);
 #endif
                     drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text,
-                                 toolbarTab && state&State_Selected ? QPalette::HighlightedText : QPalette::WindowText);
+                                 !opts.stdSidebarButtons && toolbarTab && state&State_Selected
+                                    ? QPalette::HighlightedText : QPalette::WindowText);
                 }
 
                 if (verticalTabs)
@@ -7856,7 +7857,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
                                 QPalette::ColorRole textRole) const
 {
-    if(QPalette::ButtonText==textRole)
+    if(QPalette::ButtonText==textRole && !opts.stdSidebarButtons)
     {
         const QPushButton *button=getButton(0L, painter);
 
