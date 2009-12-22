@@ -7306,6 +7306,20 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
                         }
                     }
+                    
+                    if(opts.titlebarBlend && (!kwin || !(state&QtC_StateKWinNoBorder)))
+                    {
+                        static const int constFadeLen=8;
+                        QPoint          start(0, r.y()+r.height()-(1+constFadeLen)),
+                                        end(start.x(), start.y()+constFadeLen);
+                        QLinearGradient grad(start, end);
+
+                        grad.setColorAt(0, btnCols[QT_STD_BORDER]);
+                        grad.setColorAt(1, itsBackgroundCols[QT_STD_BORDER]);
+                        painter->setPen(QPen(QBrush(grad), 1));
+                        painter->drawLine(r.x(), start.y(), r.x(), end.y());
+                        painter->drawLine(r.x()+r.width()-1, start.y(), r.x()+r.width()-1, end.y());
+                    }
                 }
 
                 bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && !titleBar->icon.isNull();
@@ -9162,7 +9176,10 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
 {
     bool                             topTab(WIDGET_TAB_TOP==w),
                                      botTab(WIDGET_TAB_BOT==w),
-                                     dwt(QTC_CUSTOM_BGND && WIDGET_DOCK_WIDGET_TITLE==w);
+                                     dwt(QTC_CUSTOM_BGND && WIDGET_DOCK_WIDGET_TITLE==w),
+                                     titleBar(opts.titlebarBlend && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
+                                                                    (opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR && 
+                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt)));
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
@@ -9173,11 +9190,16 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
     {
         QColor col;
 
-        if(/*sel && */(topTab || botTab || dwt) && i==numStops-1)
+        if(/*sel && */(topTab || botTab || dwt || titleBar) && i==numStops-1)
         {
-            col=base;
-            if((sel && QTC_CUSTOM_BGND && 0==opts.tabBgnd) || dwt)
-                col.setAlphaF(0.0);
+            if(titleBar)
+                col=itsBackgroundCols[ORIGINAL_SHADE];
+            else
+            {
+                col=base;
+                if((sel && QTC_CUSTOM_BGND && 0==opts.tabBgnd) || dwt)
+                    col.setAlphaF(0.0);
+            }
         }
         else
             shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);

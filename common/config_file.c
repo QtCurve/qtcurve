@@ -1464,6 +1464,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(stdBtnSizes)
             QTC_CFG_READ_BOOL(titlebarBorder)
+            QTC_CFG_READ_BOOL(titlebarBlend)
             QTC_CFG_READ_INT(titlebarButtons)
             QTC_CFG_READ_TB_ICON(titlebarIcon)
 #endif
@@ -1517,6 +1518,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             if(opts->xbar && opts->menubarHiding)
                 opts->xbar=false;
+            if(opts->titlebarBlend && !opts->colorTitlebarOnly)
+                opts->titlebarBlend=false;
 #endif
 #endif
             QTC_CFG_READ_SHADING(shading)
@@ -2122,6 +2125,7 @@ static void defaultSettings(Options *opts)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarBorder=true;
+    opts->titlebarBlend=false;
     opts->titlebarButtons=QTC_TITLEBAR_BUTTON_ROUND|QTC_TITLEBAR_BUTTON_HOVER_SYMBOL;
     opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;
 #endif
@@ -2790,6 +2794,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY(titlebarBorder)
+        CFG_WRITE_ENTRY(titlebarBlend);
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
         CFG_WRITE_ENTRY(titlebarIcon)
 

@@ -789,7 +789,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(inactiveTitlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarButtonAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(colorTitlebarOnlyChanged()));
+    connect(titlebarBlend, SIGNAL(toggled(bool)), SLOT(titlebarBlendChanged()));
     connect(selectionAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(shadeCheckRadio, SIGNAL(currentIndexChanged(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -1136,6 +1137,20 @@ void QtCurveConfig::xbarChanged()
 {
     if(xbar->isChecked())
         menubarHiding->setChecked(false);
+    updateChanged();
+}
+ 
+void QtCurveConfig::colorTitlebarOnlyChanged()
+{
+    if(colorTitlebarOnly->isChecked())
+        titlebarBlend->setChecked(false);
+    updateChanged();
+}
+
+void QtCurveConfig::titlebarBlendChanged()
+{
+    if(titlebarBlend->isChecked())
+        colorTitlebarOnly->setChecked(false);
     updateChanged();
 }
     
@@ -2076,6 +2091,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.inactiveTitlebarAppearance=(EAppearance)inactiveTitlebarAppearance->currentIndex();
     opts.titlebarButtonAppearance=(EAppearance)titlebarButtonAppearance->currentIndex();
     opts.colorTitlebarOnly=colorTitlebarOnly->isChecked();
+    opts.titlebarBlend=titlebarBlend->isChecked();
     opts.selectionAppearance=(EAppearance)selectionAppearance->currentIndex();
     opts.shadeCheckRadio=(EShade)shadeCheckRadio->currentIndex();
     opts.customCheckRadioColor=customCheckRadioColor->color();
@@ -2264,7 +2280,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     inactiveTitlebarAppearance->setCurrentIndex(opts.inactiveTitlebarAppearance);
     titlebarButtonAppearance->setCurrentIndex(opts.titlebarButtonAppearance);
     colorTitlebarOnly->setChecked(opts.colorTitlebarOnly);
-    colorTitlebarOnly_false->setChecked(!opts.colorTitlebarOnly);
+    titlebarBlend->setChecked(opts.titlebarBlend);
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
@@ -2477,6 +2493,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          inactiveTitlebarAppearance->currentIndex()!=opts.inactiveTitlebarAppearance ||
          titlebarButtonAppearance->currentIndex()!=opts.titlebarButtonAppearance ||
          colorTitlebarOnly->isChecked()!=opts.colorTitlebarOnly ||
+         titlebarBlend->isChecked()!=opts.titlebarBlend ||
          selectionAppearance->currentIndex()!=opts.selectionAppearance ||
          toolbarSeparators->currentIndex()!=opts.toolbarSeparators ||
          splitters->currentIndex()!=opts.splitters ||

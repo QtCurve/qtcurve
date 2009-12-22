@@ -127,6 +127,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void sliderWidthChanged();
     void menubarHidingChanged();
     void xbarChanged();
+    void colorTitlebarOnlyChanged();
+    void titlebarBlendChanged();
     void changeStack();
     void gradChanged(int i);
     void editItem(QTreeWidgetItem *i, int col);

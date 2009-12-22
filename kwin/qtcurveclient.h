@@ -79,13 +79,14 @@ class QtCurveClient : public KCommonDecoration
         QColor  col;
     };
 
-    static const int constNumButtonStates=4;
+    static const int constNumButtonStates=2;
 
     QtCurveSizeGrip *itsResizeGrip;
     ButtonBgnd      itsButtonBackground[constNumButtonStates];
     QRect           itsCaptionRect;
     QString         itsOldCaption;
     QFont           itsTitleFont;
+    bool            itsIsPreview;
 };
 
 }

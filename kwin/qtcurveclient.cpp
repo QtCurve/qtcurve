@@ -53,7 +53,8 @@ namespace KWinQtCurve
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory)
              : KCommonDecoration(bridge, factory),
                itsResizeGrip(0L),
-               itsTitleFont(QFont())
+               itsTitleFont(QFont()),
+               itsIsPreview(!QApplication::applicationName().startsWith("kwin"))
 {
 }
 
@@ -175,7 +176,7 @@ void QtCurveClient::activeChange()
 
 void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
 {
-    int    state((active ? 1 : 0)+((isMaximized() ? 1 : 0)<<1));
+    int    state(active ? 1 : 0);
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     bool   diffSize(itsButtonBackground[state].pix.width()!=r.width() ||
                     itsButtonBackground[state].pix.height()!=r.height());
@@ -186,14 +187,17 @@ void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
         if(diffSize)
             itsButtonBackground[state].pix=QPixmap(r.width(), r.height());
 
-        QRect                br(r);
         QStyleOptionTitleBar opt;
+        bool                 maximised(isMaximized()),
+                             outerBorder(Handler()->outerBorder());
         QPainter             pixPainter(&(itsButtonBackground[state].pix));
-        int                  border(Handler()->borderEdgeSize());
+        int                  border(isMaximized() ? Handler()->borderEdgeSize() : 0),
+                             titleHeight(layoutMetric(LM_TitleHeight)),
+                             titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
+                             titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
+                             titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+border);
 
-        br.adjust(-6, -border, 6, border);
-        opt.rect=br;
-
+        opt.rect=QRect(-6, maximised ? -border : (outerBorder ? -3 : -2), r.width()+12, titleBarHeight+(outerBorder ? 0 : (maximised ? -1 : 1)));
         opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
                  (active ? QStyle::State_Active : QStyle::State_None);
         opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
@@ -220,17 +224,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                         NULL, NULL)),
                          roundBottom(Handler()->roundBottom()),
                          outerBorder(Handler()->outerBorder());
-    const int            maximiseOffset(isMaximized() ? 3 : 0),
+    const int            borderSize(Handler()->borderSize()),
+                         border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
                          titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
-                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+maximiseOffset),
-                         borderSize(Handler()->borderSize()),
+                         titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+(isMaximized() ? border : 0)),
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-    int                  rectX, rectY, rectX2, rectY2,
-                         border(Handler()->borderEdgeSize());
+    int                  rectX, rectY, rectX2, rectY2;
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
@@ -266,7 +269,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(outerBorder)
     {
 #ifdef QTC_DRAW_INTO_PIXMAPS
-        if(!compositing)
+        if(!compositing || itsIsPreview)
         {
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
             QPixmap pix(32, 32);
@@ -313,7 +316,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 //        KDecoration::options()->color(KDecoration::ColorTitleBar, false)!=windowCol)
 //        opt.titleBarState|=QtC_StateKWinDrawLine;
 #ifdef QTC_DRAW_INTO_PIXMAPS
-    if(!compositing)
+    if(!compositing || itsIsPreview)
     {
         QPixmap  tPix(32, titleBarHeight);
         QPainter tPainter(&tPix);

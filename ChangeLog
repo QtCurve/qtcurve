@@ -110,6 +110,7 @@
     and background gradient.
 62. Remove titlebar from 'Places' dock widget in KFileDialog.
 63. Fix icon position on konsole toolbuttons.
+64. Add option to blend titlebar into background colour.
 
 0.69.2
 ------

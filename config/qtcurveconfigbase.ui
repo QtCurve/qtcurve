@@ -1665,6 +1665,20 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_74">
+         <property name="text">
+          <string>Text/icon effect:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="titlebarEffect">
+         <property name="whatsThis">
+          <string>Controls the 'effect' applied to the text and icons - shadow, etching, or none.</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_43">
          <property name="text">
@@ -1682,82 +1696,44 @@
        <item row="5" column="0">
         <widget class="QLabel" name="label_27">
          <property name="text">
-          <string>Color:</string>
+          <string>Coloration:</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QFrame" name="frame_4">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+        <widget class="QCheckBox" name="colorTitlebarOnly">
+         <property name="text">
+          <string>Only color titlebar</string>
          </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+         <property name="whatsThis">
+          <string>If enabled, only the titlebar, and not the border, of windows will be colored.</string>
          </property>
-         <property name="lineWidth">
-          <number>0</number>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_8">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="colorTitlebarOnly_false">
-            <property name="whatsThis">
-             <string>If enabled, both the top titlebar and the frame surrounding the window will be colored.</string>
-            </property>
-            <property name="text">
-             <string>Titlebar and frame</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="colorTitlebarOnly">
-            <property name="whatsThis">
-             <string>If enabled, only the top titlebar and not the frame surrounding the window will be colored.</string>
-            </property>
-            <property name="text">
-             <string>Titlebar only</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="6" column="1">
+        <widget class="QCheckBox" name="titlebarBlend">
+         <property name="text">
+          <string>Blend titlebar color into background color</string>
+         </property>
+         <property name="whatsThis">
+          <string>If enabled, the background color will be used as the last part of the titlebar gradient.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
         <widget class="QLabel" name="label_55">
          <property name="text">
           <string>Add a light border:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QCheckBox" name="titlebarBorder">
          <property name="whatsThis">
           <string>If enabled, a 1 pixel light border is added to the top and left of the window.</string>
          </property>
          <property name="text">
           <string>Enabled</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_74">
-         <property name="text">
-          <string>Text/icon effect:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="titlebarEffect">
-         <property name="whatsThis">
-          <string>Controls the 'effect' applied to the text and icons - shadow, etching, or none.</string>
          </property>
         </widget>
        </item>
@@ -3319,8 +3295,8 @@
   <tabstop>titlebarAlignment</tabstop>
   <tabstop>titlebarEffect</tabstop>
   <tabstop>titlebarIcon</tabstop>
-  <tabstop>colorTitlebarOnly_false</tabstop>
   <tabstop>colorTitlebarOnly</tabstop>
+  <tabstop>titlebarBlend</tabstop>
   <tabstop>titlebarBorder</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>titlebarButtons_noFrame</tabstop>
