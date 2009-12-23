@@ -55,7 +55,6 @@ class QtCurveClient : public KCommonDecoration
     void                      shadeChange();
     void                      activeChange();
     void                      reset(unsigned long changed);
-    void                      drawBtnBgnd(QPainter *p, const QRect &r, bool active);
     void                      paintEvent(QPaintEvent *e);
     void                      updateWindowShape();
     QRegion                   getMask(int round, int w, int h) const;

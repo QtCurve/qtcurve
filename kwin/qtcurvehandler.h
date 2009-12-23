@@ -27,8 +27,9 @@
 #ifndef KWIN_QTCURVE_H
 #define KWIN_QTCURVE_H
 
-#include <QFont>
+#include <QtGui/QFont>
 #include <QtGui/QApplication>
+#include <QtGui/QBitmap>
 #include <kdeversion.h>
 #include <kdecoration.h>
 #include <kdecorationfactory.h>
@@ -109,7 +110,7 @@ class QtCurveHandler : public QObject,
     QFont   itsTitleFont,
             itsTitleFontTool;
     QStyle  *itsStyle;
-    QBitmap *itsBitmaps[2][NumButtonIcons];
+    QBitmap itsBitmaps[2][NumButtonIcons];
 };
 
 QtCurveHandler * Handler();

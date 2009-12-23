@@ -83,16 +83,11 @@ QtCurveHandler::QtCurveHandler()
               , itsStyle(NULL)
 {
     setStyle();
-
-    memset(itsBitmaps, 0, sizeof(QBitmap*)*NumButtonIcons*2);
     reset(0);
 }
 
 QtCurveHandler::~QtCurveHandler()
 {
-    for (int t=0; t < 2; ++t)
-        for (int i=0; i < NumButtonIcons; ++i)
-            delete itsBitmaps[t][i];
     delete itsStyle;
 }
 
@@ -173,11 +168,7 @@ bool QtCurveHandler::reset(unsigned long changed)
 
     for (int t=0; t < 2; ++t)
         for (int i=0; i < NumButtonIcons; i++)
-            if (itsBitmaps[t][i])
-            {
-                delete itsBitmaps[t][i];
-                itsBitmaps[t][i] = 0;
-            }
+            itsBitmaps[t][i]=QPixmap();
 
     // Do we need to "hit the wooden hammer" ?
     bool needHardReset = true;
@@ -280,17 +271,9 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
         w(size.width() - reduceW),
         h(size.height() - reduceH);
 
-    if (itsBitmaps[toolWindow][typeIndex] && itsBitmaps[toolWindow][typeIndex]->size()==QSize(w,h))
-        return *itsBitmaps[toolWindow][typeIndex];
-
-    // no matching pixmap found, create a new one...
-    delete itsBitmaps[toolWindow][typeIndex];
-    itsBitmaps[toolWindow][typeIndex] = 0;
-
-    QBitmap bmp = IconEngine::icon(type /*icon*/, qMin(w, h), wStyle());
-    QBitmap *bitmap = new QBitmap(bmp);
-    itsBitmaps[toolWindow][typeIndex] = bitmap;
-    return *bitmap;
+    if (itsBitmaps[toolWindow][typeIndex].size()!=QSize(w,h))
+        itsBitmaps[toolWindow][typeIndex] = IconEngine::icon(type /*icon*/, qMin(w, h), wStyle());
+    return itsBitmaps[toolWindow][typeIndex];
 }
 
 int QtCurveHandler::borderEdgeSize() const

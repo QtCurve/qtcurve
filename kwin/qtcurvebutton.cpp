@@ -92,7 +92,6 @@ void QtCurveButton::reset(unsigned long changed)
         }
 
         this->update();
-        updateMask();
     }
 }
 
@@ -116,6 +115,7 @@ void QtCurveButton::paintEvent(QPaintEvent *ev)
 {
     QPainter p(this);
     p.setClipRect(rect().intersected(ev->rect()));
+    p.setRenderHints(QPainter::Antialiasing);
     drawButton(&p);
 }
 
@@ -142,17 +142,13 @@ void QtCurveButton::drawButton(QPainter *painter)
                        (itsHover || sunken || !(flags&QTC_TITLEBAR_BUTTON_HOVER_FRAME))),
              iconForMenu(TITLEBAR_ICON_MENU_BUTTON==
                             Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon, 0L, 0L));
-    QPixmap  tempPixmap;
     QColor   buttonColor(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     QPixmap  buffer(width(), height());
+    buffer.fill(Qt::transparent);
     QPainter bP(&buffer);
-
-    updateMask();
     
 //     if(CloseButton==type())
 //         buttonColor=midColor(QColor(180,64,32), buttonColor);
-
-    itsClient->drawBtnBgnd(&bP, r, active);
 
     if(flags&QTC_TITLEBAR_BUTTON_COLOR)
         switch(type())
@@ -260,6 +256,8 @@ void QtCurveButton::drawButton(QPainter *painter)
 
         if(faded)
             col.setAlphaF(HOVER_BUTTON_ALPHA(col));
+        else // If dont set an alpha level here, then (at least on intel) the background colour is used!
+            col.setAlphaF(0.99);
 
         bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);
@@ -267,25 +265,6 @@ void QtCurveButton::drawButton(QPainter *painter)
 
     bP.end();
     painter->drawPixmap(0, 0, buffer);
-}
-
-void QtCurveButton::updateMask()
-{
-    // If we have a rounded frame, then need to set a mask around the button
-    // ...but if maximised, then want to clear this so that (for instance) the top right
-    // pixel of the screen is still 'active' (for the close button).
-    int round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-
-    if(round>ROUND_SLIGHT)
-        if(((QtCurveClient *)decoration())->isMaximized() && !((QtCurveClient *)decoration())->isPreview())
-        {
-            if(!mask().isEmpty())
-                clearMask();
-        }
-        else if(mask().isEmpty())
-            setMask(QRegion(rect().adjusted(2, 2, -2, -2))+
-                    QRegion(rect().adjusted(0, 2, 0, -2))+
-                    QRegion(rect().adjusted(2, 0, -2, 0)));
 }
 
 QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)

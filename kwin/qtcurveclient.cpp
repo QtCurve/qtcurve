@@ -174,42 +174,6 @@ void QtCurveClient::activeChange()
     KCommonDecoration::activeChange();
 }
 
-void QtCurveClient::drawBtnBgnd(QPainter *p, const QRect &r, bool active)
-{
-    int    state(active ? 1 : 0);
-    QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
-    bool   diffSize(itsButtonBackground[state].pix.width()!=r.width() ||
-                    itsButtonBackground[state].pix.height()!=r.height());
-    int    app(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtonAppearance, NULL, NULL));
-
-    if(diffSize || itsButtonBackground[state].col!=col || itsButtonBackground[state].app!=app)
-    {
-        if(diffSize)
-            itsButtonBackground[state].pix=QPixmap(r.width(), r.height());
-
-        QStyleOptionTitleBar opt;
-        bool                 maximised(isMaximized()),
-                             outerBorder(Handler()->outerBorder());
-        QPainter             pixPainter(&(itsButtonBackground[state].pix));
-        int                  border(isMaximized() ? Handler()->borderEdgeSize() : 0),
-                             titleHeight(layoutMetric(LM_TitleHeight)),
-                             titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
-                             titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
-                             titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+border);
-
-        opt.rect=QRect(-6, maximised ? -border : (outerBorder ? -3 : -2), r.width()+12, titleBarHeight+(outerBorder ? 0 : (maximised ? -1 : 1)));
-        opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
-                 (active ? QStyle::State_Active : QStyle::State_None);
-        opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None);
-        opt.palette.setColor(QPalette::Button, col);
-        Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &pixPainter, widget());
-        itsButtonBackground[state].col=col;
-        itsButtonBackground[state].app=app;
-    }
-
-    p->drawPixmap(r, itsButtonBackground[state].pix);
-}
-
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
 #ifdef QTC_DRAW_INTO_PIXMAPS
