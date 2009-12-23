@@ -2822,9 +2822,9 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_DockWidgetCloseButton:
         case SP_TitleBarCloseButton:
         {
-            QBitmap pm(13, 13);
+            QPixmap pm(13, 13);
 
-            pm.clear();
+            pm.fill(Qt::transparent);
 
             QPainter painter(&pm);
 
@@ -2835,9 +2835,9 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_ToolBarHorizontalExtensionButton:
         case SP_ToolBarVerticalExtensionButton:
         {
-            QBitmap pm(9, 9);
+            QPixmap pm(9, 9);
 
-            pm.clear();
+            pm.fill(Qt::transparent);
 
             QPainter painter(&pm);
 
