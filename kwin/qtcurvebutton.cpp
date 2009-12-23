@@ -92,13 +92,7 @@ void QtCurveButton::reset(unsigned long changed)
         }
 
         this->update();
-
-        int round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-
-        if(round>ROUND_SLIGHT)
-            setMask(QRegion(rect().adjusted(2, 2, -2, -2))+
-                    QRegion(rect().adjusted(0, 2, 0, -2))+
-                    QRegion(rect().adjusted(2, 0, -2, 0)));
+        updateMask();
     }
 }
 
@@ -153,6 +147,8 @@ void QtCurveButton::drawButton(QPainter *painter)
     QPixmap  buffer(width(), height());
     QPainter bP(&buffer);
 
+    updateMask();
+    
 //     if(CloseButton==type())
 //         buttonColor=midColor(QColor(180,64,32), buttonColor);
 
@@ -271,6 +267,25 @@ void QtCurveButton::drawButton(QPainter *painter)
 
     bP.end();
     painter->drawPixmap(0, 0, buffer);
+}
+
+void QtCurveButton::updateMask()
+{
+    // If we have a rounded frame, then need to set a mask around the button
+    // ...but if maximised, then want to clear this so that (for instance) the top right
+    // pixel of the screen is still 'active' (for the close button).
+    int round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
+
+    if(round>ROUND_SLIGHT)
+        if(((QtCurveClient *)decoration())->isMaximized() && !((QtCurveClient *)decoration())->isPreview())
+        {
+            if(!mask().isEmpty())
+                clearMask();
+        }
+        else if(mask().isEmpty())
+            setMask(QRegion(rect().adjusted(2, 2, -2, -2))+
+                    QRegion(rect().adjusted(0, 2, 0, -2))+
+                    QRegion(rect().adjusted(2, 0, -2, 0)));
 }
 
 QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)

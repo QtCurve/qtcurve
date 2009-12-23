@@ -58,6 +58,7 @@ class QtCurveButton : public KCommonDecorationButton
     void enterEvent(QEvent *e);
     void leaveEvent(QEvent *e);
     void drawButton(QPainter *painter);
+    void updateMask();
 
     private:
 
