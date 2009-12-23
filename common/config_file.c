@@ -2156,7 +2156,7 @@ static void defaultSettings(Options *opts)
     opts->useQtFileDialogApps << "googleearth-bin";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
-    opts->noMenuStripeApps << "gtk";
+    opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
     opts->noBgndImageApps=NULL;

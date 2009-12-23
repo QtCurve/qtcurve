@@ -113,6 +113,8 @@
 64. Add option to blend titlebar into background colour.
 65. Fix appearance of some disabled icons.
 66. Fix borders of large circular window buttons.
+67. Improve OpenOffice.org menus a little - disable menu stripe, border to left and
+    right, and if drawing borderd menu items then add gaps to the left and right.
 
 0.69.2
 ------

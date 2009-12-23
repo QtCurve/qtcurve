@@ -372,6 +372,7 @@ static enum
     APP_QTDESIGNER,
     APP_KDEVELOP,
     APP_K3B,
+    APP_OPENOFFICE,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1204,6 +1205,8 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_QTDESIGNER;
         else if("kdevelop"==appName)
             theThemedApp=APP_KDEVELOP;
+        else if("soffice.bin"==appName)
+            theThemedApp=APP_OPENOFFICE;
 
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains(appName);
@@ -5165,11 +5168,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_MenuItem:
             if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
-                bool comboMenu(qobject_cast<const QComboBox*>(widget)),
-                     reverse(Qt::RightToLeft==menuItem->direction);
-                int  checkcol(qMax(menuItem->maxIconWidth, 20)),
-                     stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
+                bool  comboMenu(qobject_cast<const QComboBox*>(widget)),
+                      reverse(Qt::RightToLeft==menuItem->direction);
+                int   checkcol(qMax(menuItem->maxIconWidth, 20)),
+                      stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
+                QRect rx(r);
 
+                if(APP_OPENOFFICE==theThemedApp && opts.borderMenuitems)
+                    r.adjust(2, 0, -2, 0);
+                    
                 painter->save();
 
                 if (QStyleOptionMenuItem::Separator==menuItem->menuItemType)
@@ -5215,6 +5222,12 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
                     }
 
+                    if(APP_OPENOFFICE==theThemedApp)
+                    {
+                        painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                        painter->drawLine(rx.topLeft(), rx.bottomLeft());
+                        painter->drawLine(rx.topRight(), rx.bottomRight());
+                    }
                     painter->restore();
                     break;
                 }
@@ -5382,7 +5395,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 ? palette.highlightedText().color()
                                 : palette.text().color());
                 }
-
+                
+                if(APP_OPENOFFICE==theThemedApp)
+                {
+                    painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                    painter->drawLine(rx.topLeft(), rx.bottomLeft());
+                    painter->drawLine(rx.topRight(), rx.bottomRight());
+                }                
                 painter->restore();
             }
             break;
