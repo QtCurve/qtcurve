@@ -1614,19 +1614,14 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if(WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-       r=ROUND_MAX;
+       return ROUND_MAX;
 #endif
     switch(r)
     {
         case ROUND_MAX:
-            if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                    || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-#endif
-                || (w>(QTC_MIN_ROUND_MAX_WIDTH+2) && h>(QTC_MIN_ROUND_MAX_HEIGHT+2) && QTC_IS_MAX_ROUND_WIDGET(widget)))
-            {
+            if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget ||
+               (w>(QTC_MIN_ROUND_MAX_WIDTH+2) && h>(QTC_MIN_ROUND_MAX_HEIGHT+2) && QTC_IS_MAX_ROUND_WIDGET(widget)))
                 return ROUND_MAX;
-            }
         case ROUND_EXTRA:
             if(QTC_CAN_EXTRA_ROUND(2))
                 return ROUND_EXTRA;
@@ -1651,7 +1646,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if(WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-       r=ROUND_MAX;
+        return (w>h ? h : w)/2.0;
 #endif
 
     switch(rad)
@@ -1677,11 +1672,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                       || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-#endif
-                       )
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                     {
                         double r=(w>h ? h : w)/2.0;
                         return r>QTC_MAX_RADIUS_INTERNAL ? QTC_MAX_RADIUS_INTERNAL : r;
@@ -1706,11 +1697,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                       || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-#endif
-                      )
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                     {
                         double r=(w>h ? h : w)/2.0;
                         return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
@@ -1736,11 +1723,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                       || (WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
-#endif
-                      )
+                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
                     {
                         double r=(w>h ? h : w)/2.0;
                         return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;

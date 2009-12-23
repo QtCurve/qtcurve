@@ -112,6 +112,7 @@
 63. Fix icon position on konsole toolbuttons.
 64. Add option to blend titlebar into background colour.
 65. Fix appearance of some disabled icons.
+66. Fix borders of large circular window buttons.
 
 0.69.2
 ------
