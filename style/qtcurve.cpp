@@ -5174,8 +5174,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                       stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
                 QRect rx(r);
 
-                if(APP_OPENOFFICE==theThemedApp && opts.borderMenuitems)
-                    r.adjust(2, 0, -2, 0);
+                if(APP_OPENOFFICE==theThemedApp)
+                    if(opts.borderMenuitems)
+                        r.adjust(2, 0, -2, 0);
+                    else if(APPEARANCE_FADE==opts.menuitemAppearance)
+                        r.adjust(1, 0, -1, 0);
                     
                 painter->save();
 
