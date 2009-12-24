@@ -9698,29 +9698,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
 {
     QPainter      p(widget);
     const QWidget *window = itsIsPreview ? widget : widget->window();
-    // get coordinates relative to the client area
-    const QWidget *w = widget;
-    int           y = 0,
-                  yAdjust = 0;
-
-    if(itsIsPreview)
-    {
-//         while (!qobject_cast<const QMdiSubWindow *>(w))
-//         {
-//             y += w->geometry().y();
-//             w = w->parentWidget();
-//         }
-        yAdjust=pixelMetric(PM_TitleBarHeight, 0L, w);
-        y+=yAdjust;
-    }
-//     else
-//     {
-//         while (!w->isWindow())
-//         {
-//             y += w->geometry().y();
-//             w = w->parentWidget();
-//         }
-//     }
+    int           y = itsIsPreview ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
@@ -9759,7 +9737,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
             loadBgndImage(&opts.bgndImage);
             if(!opts.bgndImage.pix.isNull())
             {
-                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), yAdjust, opts.bgndImage.pix);
+                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), y, opts.bgndImage.pix);
                 break;
             }
         case IMG_PLAIN_RINGS:
@@ -9785,7 +9763,7 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                 pixPainter.end();
             }
 
-            p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), yAdjust+1, opts.bgndImage.pix);
+            p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), y+1, opts.bgndImage.pix);
     }
 }
 
