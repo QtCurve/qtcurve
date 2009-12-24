@@ -1142,7 +1142,7 @@ void QtCurveConfig::xbarChanged()
  
 void QtCurveConfig::colorTitlebarOnlyChanged()
 {
-    if(colorTitlebarOnly->isChecked())
+    if(!colorTitlebarOnly->isChecked())
         titlebarBlend->setChecked(false);
     updateChanged();
 }
@@ -1150,7 +1150,7 @@ void QtCurveConfig::colorTitlebarOnlyChanged()
 void QtCurveConfig::titlebarBlendChanged()
 {
     if(titlebarBlend->isChecked())
-        colorTitlebarOnly->setChecked(false);
+        colorTitlebarOnly->setChecked(true);
     updateChanged();
 }
     
