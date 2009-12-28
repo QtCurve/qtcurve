@@ -67,7 +67,7 @@
 45. Draw titles in KMenu's the same as menu separators with titles - bold, and
     with no icon.
 46. Fade ends of tab widget base - used in document mode tabs.
-47. Added option to draw Air-like background rings.
+47. Added option to draw Air-like background rings in windows and/or menus.
     Note: to use an SVG instead of the hard-coded air-like rings, edit
           ~/.config/qtcurve/stylerc (or /etc/qtcurvestylerc) and add:
 
@@ -75,6 +75,8 @@
           bgndImage.file=/path/to/svg/file.svg
           bgndImage.width=120
           bgndImage.height=160
+          
+          (Use menuBgndImage for menus)
 
 48. Added option to add a 'glow' to progressbars.
 49. Fix QToolBox background when using background image and/or gradients.

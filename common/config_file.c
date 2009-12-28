@@ -1524,6 +1524,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             QTC_CFG_READ_SHADING(shading)
             QTC_CFG_READ_IMAGE(bgndImage)
+            QTC_CFG_READ_IMAGE(menuBgndImage)
             QTC_READ_STRING_LIST(noDlgFixApps)
             QTC_READ_STRING_LIST(noMenuStripeApps)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -2038,6 +2039,7 @@ static void defaultSettings(Options *opts)
     opts->reorderGtkButtons=false;
 #endif
     opts->bgndImage.type=IMG_NONE;
+    opts->menuBgndImage.type=IMG_NONE;
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;
     opts->animatedProgress=false;
@@ -2761,6 +2763,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(fadeLines)
         CFG_WRITE_ENTRY(glowProgress)
         CFG_WRITE_IMAGE_ENTRY(bgndImage)
+        CFG_WRITE_IMAGE_ENTRY(menuBgndImage)
         CFG_WRITE_ENTRY(colorMenubarMouseOver)
         CFG_WRITE_ENTRY_NUM(crHighlight)
         CFG_WRITE_ENTRY(crButton)

@@ -941,9 +941,6 @@ QtCurveStyle::QtCurveStyle()
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsFocusCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
 
-    if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type)
-        calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
-
     switch(opts.shadeSliders)
     {
         default:
@@ -1106,6 +1103,11 @@ QtCurveStyle::QtCurveStyle()
         }
     else
         opts.titlebarButtons&=~QTC_TITLEBAR_BUTTON_COLOR;
+    
+    if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
+       IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type)
+        calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
+
 #if !defined QTC_QT_ONLY
     // Ensure the link to libkio is not stripped, by placing a call to a kio function.
     // NOTE: This call will never actually happen, its only here so that the qtcurve.so
@@ -1272,7 +1274,8 @@ void QtCurveStyle::polish(QPalette &palette)
     if(newGray)
     {
         shadeColors(palette.color(QPalette::Active, QPalette::Background), itsBackgroundCols);
-        if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type)
+        if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
+           IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type)
         {
             calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
             if(itsUsePixmapCache)
@@ -1663,6 +1666,8 @@ void QtCurveStyle::polish(QWidget *widget)
 
             pal.setBrush(QPalette::Active, QPalette::Window, itsLighterPopupMenuBgndCol);
             widget->setPalette(pal);
+            if(IMG_NONE!=opts.menuBgndImage.type)
+                 widget->installEventFilter(this);
         }
 
     //bool onToolBar(widget && widget->parent() && 0L!=getToolBar(widget->parentWidget(), true));
@@ -2003,7 +2008,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
             }
         }
 
-    if(!IS_FLAT(opts.menuBgndAppearance) && qobject_cast<QMenu *>(widget))
+    if((!IS_FLAT(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu *>(widget))
         widget->removeEventFilter(this);
 
     if (qobject_cast<QMenuBar *>(widget) ||
@@ -2156,7 +2161,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
         if(widget && (widget->isWindow() || (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))) && widget->isVisible() &&
            widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
-            drawWindowBackground(widget);
+            drawBackground(widget);
     }
 
     switch(event->type())
@@ -2186,15 +2191,8 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             break;
         case QEvent::Paint:
         {
-            if(!IS_FLAT(opts.menuBgndAppearance) && qobject_cast<QMenu*>(object))
-            {
-                QWidget *widget=(QWidget*)object;
-                QPainter painter(widget);
-
-                drawBevelGradientReal(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
-                                      &painter, widget->rect(), GT_HORIZ==opts.menuBgndGrad, false,
-                                      opts.menuBgndAppearance, WIDGET_OTHER);
-            }
+            if((!IS_FLAT(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu*>(object))
+                drawBackground((QWidget*)object, false);
             else
             {
                 QFrame *frame = qobject_cast<QFrame*>(object);
@@ -3603,10 +3601,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                     r2.setHeight(tb->rect().height());
                                 }
                                 painter->setClipRegion(QRegion(r2).subtract(QRegion(r2.adjusted(2, 2, -2, -2))));
-//                                 if(!IS_FLAT(opts.bgndAppearance))
-//                                     drawWindowBackground((QWidget *)tb);
-//                                     painter->fillRect(r.x(), r.y()+2, r.width(), r.height()-4,
-//                                                      palette.window().color());
                                 drawMenuOrToolBarBackground(painter, r2, &opt, false, horiz);
                                 painter->restore();
                             }
@@ -7576,19 +7570,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                     drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,
                                           opts.sbarBgndAppearance, WIDGET_SB_BGND);
-//                 else
-//                 {
-//                     if(!widget || !widget->testAttribute(Qt::WA_NoSystemBackground))
-//                         painter->fillRect(r, palette.brush(QPalette::Background));
-// 
-//                     if(opts.flatSbarButtons && APP_KRUNNER==theThemedApp)
-//                         painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
-// 
-//                     if(inStack && 0!=opts.tabBgnd)
-//                         painter->fillRect(r, shade(option->palette.background().color(), QTC_TO_FACTOR(opts.tabBgnd)));
-// //                     else if(opts.gtkScrollViews && !IS_FLAT(opts.bgndAppearance))
-// //                         drawWindowBackground((QWidget *)widget);
-//                 }
 
                 if(noButtons || opts.flatSbarButtons)
                 {
@@ -9674,17 +9655,17 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int size2) const
+void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int size2, bool isWindow) const
 {
     double width=(size-size2)/2.0,
            width2=width/2.0;
     QColor col(Qt::white);
 
-    col.setAlphaF(QTC_RINGS_INNER_ALPHA);
+    col.setAlphaF(QTC_RINGS_INNER_ALPHA(isWindow ? opts.bgndImage.type : opts.menuBgndImage.type));
     painter.setPen(QPen(col, width));
     painter.drawEllipse(QRectF(x+width2, y+width2, size-width, size-width));
 
-    if(IMG_BORDERED_RINGS==opts.bgndImage.type)
+    if(IMG_BORDERED_RINGS==(isWindow ? opts.bgndImage.type : opts.menuBgndImage.type))
     {
         col.setAlphaF(QTC_RINGS_OUTER_ALPHA);
         painter.setPen(QPen(col, 1));
@@ -9694,33 +9675,35 @@ void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int s
     }
 }
 
-void QtCurveStyle::drawWindowBackground(QWidget *widget) const
+void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
 {
     QPainter      p(widget);
     const QWidget *window = itsIsPreview ? widget : widget->window();
-    int           y = itsIsPreview ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
+    int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
+    EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    if(!IS_FLAT(opts.bgndAppearance))
+    if(!IS_FLAT(app))
     {
         static const int constPixmapWidth  = 16;
         static const int constPixmapHeight = 256;
-        QString key;
-        QColor  col(window->palette().window().color());
-        QSize   scaledSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : window->rect().width(),
-                           GT_HORIZ==opts.bgndGrad ? window->rect().height() : constPixmapWidth);
+        QString   key;
+        QColor    col(isWindow ? window->palette().window().color() : (USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE]));
+        EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
+        QSize     scaledSize(GT_HORIZ==grad ? constPixmapWidth : window->rect().width(),
+                             GT_HORIZ==grad ? window->rect().height() : constPixmapWidth);
         QPixmap pix;
 
-        key.sprintf("qtc-bgnd-%x", col.rgba());
+        key.sprintf("qtc-bgnd-%x-%d-%d", col.rgba(), grad, app);
         if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
         {
-            pix=QPixmap(QSize(GT_HORIZ==opts.bgndGrad ? constPixmapWidth : constPixmapHeight,
-                              GT_HORIZ==opts.bgndGrad ? constPixmapHeight : constPixmapWidth));
+            pix=QPixmap(QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight,
+                              GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
             QPainter pixPainter(&pix);
 
             drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
-                                  GT_HORIZ==opts.bgndGrad, false, opts.bgndAppearance, WIDGET_OTHER);
+                                  GT_HORIZ==grad, false, app, WIDGET_OTHER);
             if(itsUsePixmapCache)
                 QPixmapCache::insert(key, pix);
         }
@@ -9729,41 +9712,48 @@ void QtCurveStyle::drawWindowBackground(QWidget *widget) const
                           scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
 
-    switch(opts.bgndImage.type)
+    QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
+                              (IMG_FILE!=opts.bgndImage.type || 
+                                (opts.bgndImage.height==opts.bgndImage.height &&
+                                 opts.bgndImage.width==opts.bgndImage.width &&
+                                 opts.bgndImage.file==opts.menuBgndImage.file)))
+                    ? opts.bgndImage : opts.menuBgndImage;
+
+    switch(img.type)
     {
         case IMG_NONE:
             break;
         case IMG_FILE:
-            loadBgndImage(&opts.bgndImage);
-            if(!opts.bgndImage.pix.isNull())
+            loadBgndImage(&img);
+            if(!img.pix.isNull())
             {
-                p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), y, opts.bgndImage.pix);
+                p.drawPixmap(widget->width()-img.pix.width(), y, img.pix);
                 break;
             }
         case IMG_PLAIN_RINGS:
         case IMG_BORDERED_RINGS:
-            if(opts.bgndImage.pix.isNull())
+            if(img.pix.isNull())
             {
-                opts.bgndImage.pix=QPixmap(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
-                opts.bgndImage.pix.fill(Qt::transparent);
-                QPainter pixPainter(&opts.bgndImage.pix);
+                img.pix=QPixmap(QTC_RINGS_WIDTH, QTC_RINGS_HEIGHT);
+                img.pix.fill(Qt::transparent);
+                QPainter pixPainter(&img.pix);
 
                 pixPainter.setRenderHint(QPainter::Antialiasing);
-                drawBgndRing(pixPainter, 0, 0, 200, 140);
+                drawBgndRing(pixPainter, 0, 0, 200, 140, isWindow);
 
-                drawBgndRing(pixPainter, 210, 10, 230, 214);
-                drawBgndRing(pixPainter, 226, 26, 198, 182);
-                drawBgndRing(pixPainter, 300, 100, 50, 0);
+                drawBgndRing(pixPainter, 210, 10, 230, 214, isWindow);
+                drawBgndRing(pixPainter, 226, 26, 198, 182, isWindow);
+                drawBgndRing(pixPainter, 300, 100, 50, 0, isWindow);
 
-                drawBgndRing(pixPainter, 100, 96, 160, 144);
-                drawBgndRing(pixPainter, 116, 112, 128, 112);
+                drawBgndRing(pixPainter, 100, 96, 160, 144, isWindow);
+                drawBgndRing(pixPainter, 116, 112, 128, 112, isWindow);
 
-                drawBgndRing(pixPainter, 250, 160, 200, 140);
-                drawBgndRing(pixPainter, 310, 220, 80, 0);
+                drawBgndRing(pixPainter, 250, 160, 200, 140, isWindow);
+                drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
                 pixPainter.end();
             }
 
-            p.drawPixmap(widget->width()-opts.bgndImage.pix.width(), y+1, opts.bgndImage.pix);
+            p.drawPixmap(widget->width()-img.pix.width(), y+1, img.pix);
     }
 }
 

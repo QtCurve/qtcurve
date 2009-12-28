@@ -1702,21 +1702,21 @@
        </item>
        <item row="5" column="1">
         <widget class="QCheckBox" name="colorTitlebarOnly">
-         <property name="text">
-          <string>Only color titlebar</string>
-         </property>
          <property name="whatsThis">
           <string>If enabled, only the titlebar, and not the border, of windows will be colored.</string>
+         </property>
+         <property name="text">
+          <string>Only color titlebar</string>
          </property>
         </widget>
        </item>
        <item row="6" column="1">
         <widget class="QCheckBox" name="titlebarBlend">
-         <property name="text">
-          <string>Blend titlebar color into background color</string>
-         </property>
          <property name="whatsThis">
           <string>If enabled, the background color will be used as the last part of the titlebar gradient.</string>
+         </property>
+         <property name="text">
+          <string>Blend titlebar color into background color</string>
          </property>
         </widget>
        </item>
@@ -2311,6 +2311,13 @@
          </property>
         </widget>
        </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_75">
+         <property name="text">
+          <string>Background appearance:</string>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="1">
         <widget class="QComboBox" name="menuBgndAppearance">
          <property name="whatsThis">
@@ -2325,14 +2332,22 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="7" column="1">
+        <widget class="QComboBox" name="menuBgndImage">
+         <property name="whatsThis">
+          <string>&lt;p&gt;This adds a background image to menus.
+            &lt;ul&gt;&lt;li&gt;No background image - No image&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
         <widget class="QLabel" name="label_45">
          <property name="text">
           <string>Sub-menu delay:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="KIntNumInput" name="menuDelay">
          <property name="whatsThis">
           <string>Defines the delay before a sub-menu appears.</string>
@@ -2345,21 +2360,21 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_44">
          <property name="text">
           <string>Stripe:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QComboBox" name="menuStripe">
          <property name="whatsThis">
           <string>Defines the coloration of the menu-stripe that will be drawn on the left of poup menus - but only if this option is not set to 'none'.</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="KColorButton" name="customMenuStripeColor">
          <property name="enabled">
           <bool>false</bool>
@@ -2375,7 +2390,7 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QComboBox" name="menuStripeAppearance">
          <property name="enabled">
           <bool>false</bool>
@@ -2385,27 +2400,20 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_61">
          <property name="text">
           <string>Border popupmenus:</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QCheckBox" name="popupBorder">
          <property name="whatsThis">
           <string>If enabled, the whole popup menu will have a border, otherwise no border will be drawn. This option should be enabled unless you have also enabled shadows in your window manager.</string>
          </property>
          <property name="text">
           <string>Enabled</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_75">
-         <property name="text">
-          <string>Background appearance:</string>
          </property>
         </widget>
        </item>
@@ -3336,6 +3344,7 @@
   <tabstop>thinnerMenuItems</tabstop>
   <tabstop>menuBgndAppearance</tabstop>
   <tabstop>menuBgndGrad</tabstop>
+  <tabstop>menuBgndImage</tabstop>
   <tabstop>menuStripe</tabstop>
   <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>
