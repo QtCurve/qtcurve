@@ -37,7 +37,7 @@
 25. Theme entry progress.
 26. Supply a default kdeglobs file (installed into QtCurve's gtk-2.0 folder) so
     as to allow easy modifications of default settings.
-27. Added option to draw Air-like background rings.
+27. Added option to draw Air-like background rings in windows and/or menus.
     Note: to use an SVG instead of the hard-coded air-like rings, edit
           ~/.config/qtcurve/stylerc (or /etc/qtcurvestylerc) and add:
 
@@ -45,6 +45,8 @@
           bgndImage.file=/path/to/svg/file.svg
           bgndImage.width=120
           bgndImage.height=160
+          
+          (Use menuBgndImage for menus)
 
 28. Added option to add a 'glow' to progressbars.
 29. Use listview header appearance setting for background of rulers.
