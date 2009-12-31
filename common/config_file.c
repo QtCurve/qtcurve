@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2009 craig.p.drummond@googlemail.com
+  QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@googlemail.com
 
   ----
 
