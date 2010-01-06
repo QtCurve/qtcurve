@@ -1,6 +1,7 @@
 1.0.1
 -----
 1. Remove QWidget->int casting that was causing compile failures for some.
+2. Fix Qt only compilation due to KColorUtils usage.
 
 1.0.0
 -----

@@ -3111,7 +3111,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 r.adjust(1, 1, 1, 1);
             if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
             {
+#if defined QTC_QT_ONLY
+                QColor bgnd=palette.background().color();
+                col=ColorUtils_mix(&bgnd, &col, col.alphaF());
+#else
                 col=KColorUtils::mix(palette.background().color(), col, col.alphaF());
+#endif
                 col.setAlpha(255);
             }
             drawArrow(painter, r, element, col, false);
@@ -10090,7 +10095,11 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
         if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
     //         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
         {
+#if defined QTC_QT_ONLY
+            QColor sh=ColorUtils_mix(&bgnd, &shadow, shadow.alphaF());
+#else
             QColor sh=KColorUtils::mix(bgnd, shadow, shadow.alphaF());
+#endif
 
             sh.setAlpha(255);
             drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
@@ -10098,8 +10107,13 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
 
         QColor col(color);
 
+#if defined QTC_QT_ONLY
+        if(faded)
+            col=ColorUtils_mix(&bgnd, &col, HOVER_BUTTON_ALPHA(col));
+#else
         if(faded)
             col=KColorUtils::mix(bgnd, col, HOVER_BUTTON_ALPHA(col));
+#endif
 
         drawIcon(painter, col, r, sunken, icon, stdSize);
     }
