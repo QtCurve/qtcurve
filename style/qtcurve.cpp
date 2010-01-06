@@ -1113,7 +1113,7 @@ QtCurveStyle::QtCurveStyle()
     // NOTE: This call will never actually happen, its only here so that the qtcurve.so
     // contains a kio link so that this is not removed by some 'optimisation' of the
     // link process.
-    if((int)this==(int)itsHoverWidget)
+    if(itsPos.x()>65534)
         (void)KFileDialog::getSaveFileName();
 #endif
 }
