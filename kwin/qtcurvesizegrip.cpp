@@ -225,6 +225,7 @@ static inline bool similar(const QColor &a, const QColor &b)
       client().width() - GRIP_SIZE - OFFSET,
       client().height() - GRIP_SIZE - OFFSET );
 
+#if KDE_IS_VERSION(4, 3, 0)
     if( client().isPreview() )
     {
 
@@ -236,11 +237,13 @@ static inline bool similar(const QColor &a, const QColor &b)
         );
 
     } else {
-
+#endif
       position -= QPoint(
         client().layoutMetric( QtCurveClient::LM_BorderRight ),
         client().layoutMetric( QtCurveClient::LM_BorderBottom ) );
+#if KDE_IS_VERSION(4, 3, 0)
     }
+#endif
 
     move( position );
 
