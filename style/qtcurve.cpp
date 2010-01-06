@@ -9002,14 +9002,13 @@ void QtCurveStyle::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, EAppearance bevApp) const
+void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz, EAppearance bevApp, const QColor *cols) const
 {
-    const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor ? itsHighlightCols : itsBackgroundCols;
     bool    vertical(!horiz),
             inCache(true);
     QRect   r(0, 0, horiz ? PROGRESS_CHUNK_WIDTH*2 : origRect.width(),
                     horiz ? origRect.height() : PROGRESS_CHUNK_WIDTH*2);
-    QtcKey  key(createKey(horiz ? r.height() : r.width(), use[ORIGINAL_SHADE], horiz, bevApp, WIDGET_PROGRESSBAR));
+    QtcKey  key(createKey(horiz ? r.height() : r.width(), cols[ORIGINAL_SHADE], horiz, bevApp, WIDGET_PROGRESSBAR));
     QPixmap *pix(itsPixmapCache.object(key));
 
     if(!pix)
@@ -9019,9 +9018,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
         QPainter pixPainter(pix);
 
         if(IS_FLAT(bevApp))
-            pixPainter.fillRect(r, use[ORIGINAL_SHADE]);
+            pixPainter.fillRect(r, cols[ORIGINAL_SHADE]);
         else
-            drawBevelGradientReal(use[ORIGINAL_SHADE], &pixPainter, r, horiz, false,
+            drawBevelGradientReal(cols[ORIGINAL_SHADE], &pixPainter, r, horiz, false,
                                   bevApp, WIDGET_PROGRESSBAR);
 
         switch(opts.stripedProgress)
@@ -9036,9 +9035,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
                             : QRect(r.x(), r.y(), r.width(), PROGRESS_CHUNK_WIDTH));
 
                 if(IS_FLAT(bevApp))
-                    pixPainter.fillRect(r2, use[1]);
+                    pixPainter.fillRect(r2, cols[1]);
                 else
-                    drawBevelGradientReal(use[1], &pixPainter, r2, horiz, false, bevApp,
+                    drawBevelGradientReal(cols[1], &pixPainter, r2, horiz, false, bevApp,
                                           WIDGET_PROGRESSBAR);
                 break;
             }
@@ -9067,9 +9066,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
 
                 pixPainter.setClipRegion(reg);
                 if(IS_FLAT(bevApp))
-                    pixPainter.fillRect(r, use[1]);
+                    pixPainter.fillRect(r, cols[1]);
                 else
-                    drawBevelGradientReal(use[1], &pixPainter, r, horiz, false, bevApp, WIDGET_PROGRESSBAR);
+                    drawBevelGradientReal(cols[1], &pixPainter, r, horiz, false, bevApp, WIDGET_PROGRESSBAR);
             }
         }
 
@@ -9378,7 +9377,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     if(r.width()>0 && r.height()>0)
     {
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
-            drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app);
+            drawProgressBevelGradient(p, r.adjusted(1, 1, -1, -1), option, horiz, app, custom);
         else
         {
             QRect br(r.adjusted(0, 0, 0,  WIDGET_MDI_WINDOW_TITLE==w ? 1 : 0));
@@ -10294,7 +10293,8 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
         rx.setWidth(3);
 
     int          length(vertical ? rx.height() : rx.width());
-    const QColor *use=option->state&State_Enabled || ECOLOR_BACKGROUND==opts.progressGrooveColor
+    // KTorrent's progressbars seem to have state==State_None
+    const QColor *use=option->state&State_Enabled || State_None==option->state || ECOLOR_BACKGROUND==opts.progressGrooveColor
                     ? itsHighlightCols : itsBackgroundCols;
 
     drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,

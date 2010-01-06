@@ -131,7 +131,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset, const QColor *cols, int startOffset,
                    int dark, ELine type) const;
     void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz,
-                                   EAppearance bevApp) const;
+                                   EAppearance bevApp, const QColor *cols) const;
     void drawBevelGradient(const QColor &base, QPainter *p, QRect const &r, const QPainterPath &path,
                            bool horiz, bool sel, EAppearance bevApp, EWidget w=WIDGET_OTHER, bool useCache=true) const;
     void drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &r, const QPainterPath &path,
