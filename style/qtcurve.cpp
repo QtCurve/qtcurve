@@ -11302,7 +11302,7 @@ QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
 
 void QtCurveStyle::widgetDestroyed(QObject *o)
 {
-    QWidget *w=static_cast<const QWidget *>(o);
+    QWidget *w=static_cast<QWidget *>(o);
     theNoEtchWidgets.remove(w);
     if(APP_KONTACT==theThemedApp)
     {

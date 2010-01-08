@@ -23,11 +23,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <pwd.h>
 #include <sys/types.h>
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <pwd.h>
+#endif
 
 #define QTC_MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
 
@@ -485,6 +488,9 @@ static const char * getHome()
 {
     static const char *home=NULL;
 
+#ifdef _WIN32
+    home = getenv("HOMEPATH");
+#else
     if(!home)
     {
         struct passwd *p=getpwuid(getuid());
@@ -502,7 +508,7 @@ static const char * getHome()
         if(!home)
             home="/tmp";
     }
-
+#endif
     return home;
 }
 
@@ -606,7 +612,12 @@ static const char *qtcConfDir()
            "sudo su" / "kcmshell style". The 1st would write to ~/.config, but
            if root has a XDG_ set then that would be used on the second :-(
         */
+#ifndef _WIN32
         char *env=0==getuid() ? NULL : getenv("XDG_CONFIG_HOME");
+#else
+        char *env=0;
+#endif
+
 #endif
 
         if(!env)

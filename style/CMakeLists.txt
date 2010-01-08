@@ -19,7 +19,7 @@ if (NOT QTC_QT_ONLY)
 endif (NOT QTC_QT_ONLY)
 
 target_link_libraries(qtcurve ${QTC_KDE_LIBS} ${QTC_KFILEDIALOG_LIBS} ${QT_QTGUI_LIBRARY}
-                              ${QT_QTDBUS_LIBRARY} ${QT_QTCORE_LIBRARY} ${X11_X11_LIB})
+                              ${QT_QTDBUS_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTSVG_LIBRARY} ${X11_X11_LIB})
 
 
 if (NOT QTC_QT_ONLY)

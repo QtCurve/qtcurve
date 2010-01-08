@@ -7,6 +7,7 @@
    still redraw errors on the first/last item. This is all OO.o's fault, but
    these changes improve the situation a little.
 5. Fix kwin compilation with KDE<4.3
+6. Apply visual studio patch from Benjamin Sonnemann
 
 1.0.0
 -----

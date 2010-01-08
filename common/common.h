@@ -29,6 +29,22 @@
 #include <math.h>
 #include "config.h"
 
+#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <sys/stat.h>
+#include <float.h>
+#include <direct.h>
+
+static int isnan(double x)
+{
+    return _isnan(x);
+}
+
+static int lstat(const char* fileName, struct stat* s)
+{
+    return stat(fileName, s);
+}
+#endif
+
 /*
     The following #define disables the rounding when scrollbar type==none.
 #define QTC_SIMPLE_SCROLLBARS
