@@ -1227,7 +1227,7 @@ void QtCurveStyle::polish(QApplication *app)
     if(APP_OPENOFFICE==theThemedApp)
     {
         if(APPEARANCE_FADE==opts.menuitemAppearance)
-            opts.menuitemAppearance=APPEARANCE_GRADIENT;
+            opts.menuitemAppearance=APPEARANCE_FLAT;
         opts.borderMenuitems=false;
     }
 
