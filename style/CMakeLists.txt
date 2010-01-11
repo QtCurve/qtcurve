@@ -7,7 +7,7 @@ include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BIN
 #kde4_add_plugin(qtcurve ${qtcurve_SRCS} )
 qt4_automoc(${qtcurve_SRCS})
 qt4_wrap_cpp(qtcurve_MOC_SRCS ${qtcurve_MOC_HDRS})
-add_library(qtcurve SHARED ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
+add_library(qtcurve MODULE ${qtcurve_SRCS} ${qtcurve_MOC_SRCS})
 set_target_properties(qtcurve PROPERTIES PREFIX "")
 
 if (NOT QTC_QT_ONLY)
