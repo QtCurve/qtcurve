@@ -1,6 +1,7 @@
 1.0.2
 -----
 1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
+2. For older mozilla apps, if menuitem style is set to fade, then use flat.
 
 1.0.1
 -----
