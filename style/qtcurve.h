@@ -189,6 +189,9 @@ class QtCurveStyle : public QWindowsStyle
     const QColor * backgroundColors(const QColor &col) const;
     const QColor * backgroundColors(const QStyleOption *option) const
         { return backgroundColors(option->palette.background().color()); }
+    const QColor * highlightColors(const QColor &col) const;
+    const QColor * highlightColors(const QStyleOption *option) const
+        { return highlightColors(option->palette.highlight().color()); }
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
     void setMenuColors(const QColor &bgnd);
@@ -253,6 +256,7 @@ class QtCurveStyle : public QWindowsStyle
     mutable QColor                     itsMdiTextColor;
     mutable QColor                     itsColoredButtonCols[TOTAL_SHADES+1];
     mutable QColor                     itsColoredBackgroundCols[TOTAL_SHADES+1];
+    mutable QColor                     itsColoredHighlightCols[TOTAL_SHADES+1];
     mutable QCache<QtcKey, QPixmap>    itsPixmapCache;
     mutable bool                       itsActive;
     mutable const QWidget              *itsSbWidget;

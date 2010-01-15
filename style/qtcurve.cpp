@@ -10302,7 +10302,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     int          length(vertical ? rx.height() : rx.width());
     // KTorrent's progressbars seem to have state==State_None
     const QColor *use=option->state&State_Enabled || State_None==option->state || ECOLOR_BACKGROUND==opts.progressGrooveColor
-                    ? itsHighlightCols : itsBackgroundCols;
+                    ? highlightColors(option) : itsBackgroundCols;
 
     drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,
                    WIDGET_PROGRESSBAR);
@@ -10905,6 +10905,17 @@ const QColor * QtCurveStyle::backgroundColors(const QColor &col) const
     }
 
     return itsBackgroundCols;
+}
+
+const QColor * QtCurveStyle::highlightColors(const QColor &col) const
+{
+    if(col.alpha()!=0 && col!=itsHighlightCols[ORIGINAL_SHADE])
+    {
+        shadeColors(col, itsColoredHighlightCols);
+        return itsColoredHighlightCols;
+    }
+
+    return itsHighlightCols;
 }
 
 const QColor * QtCurveStyle::borderColors(const QStyleOption *option, const QColor *use) const
