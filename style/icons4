@@ -79,6 +79,7 @@ gtk-remove actions/edit-delete.png
 gtk-revert-to-saved actions/document-revert.png
 gtk-save actions/document-save.png
 gtk-save-as actions/document-save-as.png
+gtk-select-all actions/edit-select-all.png
 gtk-select-color actions/color-picker.png
 gtk-select-font apps/preferences-desktop-font.png
 gtk-sort-ascending actions/view-sort-ascending.png
