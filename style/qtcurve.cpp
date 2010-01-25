@@ -5267,9 +5267,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if (selected && enabled)
                     drawMenuItem(painter,
+#if QT_VERSION < 0x040600
                                  comboMenu && opts.gtkComboMenus
                                     ? r
                                     : r.adjusted(0, 0, -1, 0),
+#else
+                                 r,
+#endif
                                  option, false, ROUNDED_ALL,
                                  opts.useHighlightForMenu ? itsHighlightCols : itsBackgroundCols);
 

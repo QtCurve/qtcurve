@@ -7,6 +7,7 @@
 5. Elide progressbar text if there is not enough space.
 6. Replace some dynamic_cast's with qobject_cast's - fixes a reported crash in
    Gambatte (thanks to Andreas Pakulat)
+7. Fix menuitems with Qt4.6 - these were drawn 1 pixel to thin.
 
 1.0.1
 -----
