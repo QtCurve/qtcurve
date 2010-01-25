@@ -5,6 +5,8 @@
 3. Respect highlight colour setting when drawing progressbars.
 4. Fix background of KOffice's dock widget titlebars.
 5. Elide progressbar text if there is not enough space.
+6. Replace some dynamic_cast's with qobject_cast's - fixes a reported crash in
+   Gambatte (thanks to Andreas Pakulat)
 
 1.0.1
 -----

@@ -3905,10 +3905,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 else
                 {
                     //Figuring out in what beast we are painting...
-                    bool view((widget && ((dynamic_cast<const QAbstractScrollArea*>(widget)) ||
+                    bool view((widget && ((qobject_cast<const QAbstractScrollArea*>(widget)) ||
                                         widget->inherits("Q3ScrollView"))) ||
                                          (widget && widget->parent() &&
-                                            ((dynamic_cast<const QAbstractScrollArea*>(widget->parent())) ||
+                                            ((qobject_cast<const QAbstractScrollArea*>(widget->parent())) ||
                                               widget->parent()->inherits("Q3ScrollView"))));
                     painter->save();
                     QColor c(view && state&State_Selected
@@ -4288,8 +4288,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                 : palette.color(cg, QPalette::Highlight));
                 bool   square(opts.squareLvSelection && widget &&
                               !widget->inherits("KFilePlacesView") &&
-                              (dynamic_cast<const QTreeView *>(widget) ||
-                                (dynamic_cast<const QListView *>(widget) &&
+                              (qobject_cast<const QTreeView *>(widget) ||
+                                (qobject_cast<const QListView *>(widget) &&
                                 QListView::IconMode!=((const QListView *)widget)->viewMode())));
 
                 if (hover && !hasCustomBackground)
