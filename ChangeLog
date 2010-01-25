@@ -3,6 +3,8 @@
 1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
 2. For OpenOffice.org, if menuitem style is set to fade, then use flat.
 3. Respect highlight colour setting when drawing progressbars.
+4. Fix background of KOffice's dock widget titlebars.
+5. Elide progressbar text if there is not enough space.
 
 1.0.1
 -----

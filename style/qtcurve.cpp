@@ -1507,6 +1507,10 @@ void QtCurveStyle::polish(QWidget *widget)
             pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
             widget->setPalette(pal);
         }
+        QFont font(widget->font());
+
+        font.setBold(true);
+        widget->setFont(font);
         widget->installEventFilter(this);
     }
     else if (widget->inherits("Q3Header"))
@@ -2801,7 +2805,17 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             // Tell the calling app that we can handle certain custom widgets...
             if(hint>=SH_CustomBase && widget)
                 if("CE_CapacityBar"==widget->objectName())
+                {
+                    if (!widget->property("qtc-set-bold").isValid())
+                    {
+                        QWidget *w=(QWidget *)widget;
+                        QFont font(w->font());
+                        font.setBold(true);
+                        w->setFont(font);
+                        w->setProperty("qtc-set-bold", true);
+                    }
                     return CE_QtC_KCapacityBar;
+                }
 #endif
             return QTC_BASE_STYLE::styleHint(hint, option, widget, returnData);
    }
@@ -4305,8 +4319,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                         pixPainter.setRenderHint(QPainter::Antialiasing, true);
                         drawBevelGradient(color, &pixPainter, border,
-                                          buildPath(QRectF(border.x(), border.y(), border.width(), border.height()),
-                                                    WIDGET_OTHER, ROUNDED_ALL, radius), true,
+                                          buildPath(QRectF(border), WIDGET_OTHER, ROUNDED_ALL, radius), true,
                                           false, opts.selectionAppearance, WIDGET_SELECTION, false);
 //                         pixPainter.setBrush(Qt::NoBrush);
 //                         pixPainter.setPen(color);
@@ -4501,8 +4514,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
 
                         drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.splitterHighlight)),
-                                          painter, r, buildPath(QRectF(r.x(), r.y(), r.width(), r.height()),
-                                                                WIDGET_OTHER, ROUNDED_ALL, radius),
+                                          painter, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, radius),
                                           !(state&State_Horizontal), false, opts.selectionAppearance, WIDGET_SELECTION, false);
                         painter->restore();
                     }
@@ -4644,6 +4656,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     QRect fillRect(r);
                     if(widget && widget->inherits("KoDockWidgetTitleBar"))
                         fillRect.adjust(-r.x(), -r.y(), 0, 0);
+
                     painter->save();
 
                     QColor col((opts.dwtSettings&QTC_DWT_COLOR_AS_PER_TITLEBAR)
@@ -4663,8 +4676,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
                         painter->setRenderHint(QPainter::Antialiasing, true);
                         drawBevelGradient(col, painter, fillRect,
-                                          buildPath(QRectF(r.x(), r.y(), r.width(), r.height()),
-                                                    WIDGET_OTHER, round, radius), !verticalTitleBar,
+                                          buildPath(QRectF(fillRect), WIDGET_OTHER, round, radius), !verticalTitleBar,
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE, false);
                     }
 
@@ -5059,11 +5071,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->save();
 
                 QRect leftRect;
-                QFont font;
-
-                font.setBold(true);
-                painter->setFont(font);
-                painter->setPen(palette.text().color());
+//                 QFont font;
+// 
+//                 font.setBold(true);
+//                 painter->setFont(font);
+//                 painter->setPen(palette.text().color());
 
 #if QT_VERSION >= 0x040300
                 if (vertical)
@@ -5114,12 +5126,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         painter->setPen(palette.text().color());
                 }
 
-                painter->drawText(r, bar->text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
+                QString text = bar->fontMetrics.elidedText(bar->text, Qt::ElideRight, r.width());
+                painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 if (!leftRect.isNull())
                 {
                     painter->setPen(flip ? palette.text().color() : palette.highlightedText().color());
                     painter->setClipRect(leftRect, Qt::IntersectClip);
-                    painter->drawText(r, bar->text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
+                    painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 }
 
                 painter->restore();
@@ -6578,9 +6591,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                             drawBevelGradient(shade(palette.background().color(), QTC_TO_FACTOR(opts.crHighlight)),
                                               painter, highlightRect,
-                                              buildPath(QRectF(highlightRect.x(), highlightRect.y(),
-                                                               highlightRect.width(), highlightRect.height()),
-                                                        WIDGET_OTHER, ROUNDED_ALL, radius), true,
+                                              buildPath(QRectF(highlightRect), WIDGET_OTHER, ROUNDED_ALL, radius), true,
                                               false, opts.selectionAppearance, WIDGET_SELECTION, false);
                             painter->restore();
                         }
@@ -9516,7 +9527,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 }
 
                 QRectF          gr(horiz ? QRectF(ra.x()+mod, ra.y(), ra.width()-(mod*2)-1, size-1)
-                                        : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
+                                         : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
                 QLinearGradient g(gr.topLeft(), horiz ? gr.bottomLeft() : gr.topRight());
                 QColor          white(Qt::white);
                 bool            mo(option->state&State_MouseOver && opts.highlightFactor);
