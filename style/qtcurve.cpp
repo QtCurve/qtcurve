@@ -8044,11 +8044,12 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                     newSize = QSize(scrollBarExtent, scrollBarExtent * numButtons(opts.scrollbarType) + scrollBarSliderMinimum);
             }
             break;
+        case CT_LineEdit:
+            if (const QStyleOptionFrame *f = qstyleoption_cast<const QStyleOptionFrame *>(option))
+                newSize = size+QSize(2*f->lineWidth, 2*f->lineWidth);
+            break;
         case CT_SpinBox:
-            //newSize.setHeight(sizeFromContents(CT_LineEdit, option, size, widget).height());
-            if(opts.unifySpin)
-                newSize.rheight() --;
-            else
+            if(!opts.unifySpin)
                 newSize.rheight() -= ((1 - newSize.rheight()) & 1);
             break;
         case CT_ToolButton:
