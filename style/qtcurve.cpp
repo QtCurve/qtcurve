@@ -1597,8 +1597,8 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->parentWidget()->parentWidget() &&
             widget->parentWidget()->parentWidget()->parentWidget() &&
             qobject_cast<QSplitter *>(widget->parentWidget()) &&
-            widget->parentWidget()->parentWidget()->inherits("KFileWidget") &&
-            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog"))
+            widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
+            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
         ((QDockWidget *)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
     else if(opts.fixParentlessDialogs)
         if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
@@ -1981,8 +1981,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
             widget->parentWidget()->parentWidget() &&
             widget->parentWidget()->parentWidget()->parentWidget() &&
             qobject_cast<QSplitter *>(widget->parentWidget()) &&
-            widget->parentWidget()->parentWidget()->inherits("KFileWidget") &&
-            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog"))
+            widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
+            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
     {
         delete ((QDockWidget *)widget)->titleBarWidget();
         ((QDockWidget *)widget)->setTitleBarWidget(0L);

@@ -12,6 +12,7 @@
  9. If using a background gradient, or cannot deternine a widget's parent's
     background colour - usr a 10% alpha white as the etch colour.
 10. Fix cropping issues with KIntNumInput in QFormLayout in Qt4.6
+11. Remove dock widget title from all KFileWidget's, not just those in KFileDialog.
 
 1.0.1
 -----
