@@ -9680,7 +9680,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
         if(WIDGET_SLIDER_TROUGH==w && opts.thinSbarGroove && widget && qobject_cast<const QScrollBar *>(widget))
         {
             QColor col(Qt::white);
-            col.setAlphaF(0.25);
+            col.setAlphaF(0.1); // 0.25);
             p->setPen(col);
         }
         else
@@ -11331,7 +11331,7 @@ QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
     }
 
     QColor col(Qt::white);
-    col.setAlphaF(IS_FLAT(opts.bgndAppearance) ? 0.25 : 0.4);
+    col.setAlphaF(0.1); // IS_FLAT(opts.bgndAppearance) ? 0.25 : 0.4);
 
     return col;
 }
