@@ -1722,12 +1722,11 @@ void QtCurveStyle::polish(QWidget *widget)
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
 static QFontMetrics styledFontMetrics(const QStyleOption *option, const QWidget *widget)
 {
-    if (option) {
-        return option->fontMetrics;
-    } else if (widget) {
-        return widget->fontMetrics();
-    }
-    return qApp->fontMetrics();
+    return option
+            ? option->fontMetrics
+            : widget
+                ? widget->fontMetrics()
+                : qApp->fontMetrics();
 }
 
 static int fontHeight(const QStyleOption *option, const QWidget *widget)
@@ -1784,12 +1783,14 @@ void QtCurveStyle::polishFormLayout(QFormLayout *layout)
             continue;
 
         int fieldHeight = fieldItem->sizeHint().height();
+#if QT_VERSION < 0x040600
         // work around KIntNumInput::sizeHint() bug
         if (fieldItem->widget() && fieldItem->widget()->inherits("KIntNumInput"))
         {
             fieldHeight -= 2;
             fieldItem->widget()->setMaximumHeight(fieldHeight);
         }
+#endif
         /* for large fields, we don't center */
         if (fieldHeight <= 2 * fontHeight(0, label) + addedHeight)
         {
@@ -1802,8 +1803,12 @@ void QtCurveStyle::polishFormLayout(QFormLayout *layout)
             label->setMinimumHeight(labelHeight);
         else
         {
+#if QT_VERSION >= 0x040602
+            label->setMinimumHeight((labelHeight * 4 + 6) / 7);
+#else
             // QFormLayout determines label size as height * 5 / 4, so revert that
             label->setMinimumHeight((labelHeight * 4 + 4) / 5);
+#endif
         }
     }
 }
@@ -2546,7 +2551,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             else
                 return 2;
         case PM_SpinBoxFrameWidth:
-            return QTC_DO_EFFECT ? 3 : 2;
+            return QTC_DO_EFFECT && opts.etchEntry ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
             return QTC_DO_EFFECT
@@ -8390,13 +8395,14 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                             return QRect(x, y+bs.height(), bs.width(), bs.height()+extra);
                         }
                     case SC_SpinBoxEditField:
+                    {
+                        int pad=opts.round>ROUND_FULL ? 2 : 0;
+
                         if (QAbstractSpinBox::NoButtons==spinbox->buttonSymbols)
-                            return QRect(fw, fw, spinbox->rect.width() - 2*fw, spinbox->rect.height() - 2*fw);
+                            return QRect(fw, fw, (x-fw*2)-pad, r.height()-2*fw);
                         else
-                        {
-                            int pad=opts.round>ROUND_FULL ? 2 : 0;
                             return QRect(fw+(reverse ? bs.width() : 0), fw, (x-fw*2)-pad, r.height()-2*fw);
-                        }
+                    }
                     case SC_SpinBoxFrame:
                     default:
                         return visualRect(spinbox->direction, spinbox->rect, spinbox->rect);

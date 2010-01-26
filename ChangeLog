@@ -1,16 +1,17 @@
 1.0.2
 -----
-1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
-2. For OpenOffice.org, if menuitem style is set to fade, then use flat.
-3. Respect highlight colour setting when drawing progressbars.
-4. Fix background of KOffice's dock widget titlebars.
-5. Elide progressbar text if there is not enough space.
-6. Replace some dynamic_cast's with qobject_cast's - fixes a reported crash in
-   Gambatte/ (thanks to Andreas Pakulat)
-7. Fix menuitems with Qt4.6 - these were drawn 1 pixel to thin.
-8. Fix plasma calendar's week spinwidet mouse-over under KDE SC4.4
-9. If using a background gradient, or cannot deternine a widget's parent's
-   background colour - usr a 10% alpha white as the etch colour.
+ 1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
+ 2. For OpenOffice.org, if menuitem style is set to fade, then use flat.
+ 3. Respect highlight colour setting when drawing progressbars.
+ 4. Fix background of KOffice's dock widget titlebars.
+ 5. Elide progressbar text if there is not enough space.
+ 6. Replace some dynamic_cast's with qobject_cast's - fixes a reported crash in
+    Gambatte/ (thanks to Andreas Pakulat)
+ 7. Fix menuitems with Qt4.6 - these were drawn 1 pixel to thin.
+ 8. Fix plasma calendar's week spinwidet mouse-over under KDE SC4.4
+ 9. If using a background gradient, or cannot deternine a widget's parent's
+    background colour - usr a 10% alpha white as the etch colour.
+10. Fix cropping issues with KIntNumInput in QFormLayout in Qt4.6
 
 1.0.1
 -----
