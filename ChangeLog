@@ -3,6 +3,8 @@
 1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
 2. For older mozilla apps, if menuitem style is set to fade, then use flat.
 3. Map edit-select-all.png to gtk-select-all
+4. Fix check, radio, expander, and splitter background highlighting - forgot
+   to convert configured value to a percentage!
 
 1.0.1
 -----

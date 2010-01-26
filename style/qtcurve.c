@@ -2771,7 +2771,7 @@ debugDisplayWidget(widget, 3);
     {
         if(GTK_STATE_PRELIGHT==state && opts.splitterHighlight)
         {
-            GdkColor col=shadeColor(&style->bg[state], opts.splitterHighlight);
+            GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.splitterHighlight));
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col,
                               width>height);
         }
@@ -2780,7 +2780,7 @@ debugDisplayWidget(widget, 3);
     {
         if(GTK_STATE_PRELIGHT==state && opts.crHighlight && width>(QTC_CHECK_SIZE*2))
         {
-            GdkColor col=shadeColor(&style->bg[state], opts.crHighlight);
+            GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.crHighlight));
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
         }
     }
@@ -2788,7 +2788,7 @@ debugDisplayWidget(widget, 3);
     {
         if(GTK_STATE_PRELIGHT==state && opts.expanderHighlight)
         {
-            GdkColor col=shadeColor(&style->bg[state], opts.expanderHighlight);
+            GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.expanderHighlight));
             drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
         }
     }
