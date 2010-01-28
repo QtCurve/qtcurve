@@ -5196,6 +5196,11 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                       reverse(Qt::RightToLeft==menuItem->direction);
                 int   checkcol(qMax(menuItem->maxIconWidth, 20)),
                       stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
+
+#if QT_VERSION < 0x040600
+                if(!(comboMenu && opts.gtkComboMenus)
+                  r.adjust(0, 0, -1, 0);
+#endif
                 QRect rx(r);
 
                 if(APP_OPENOFFICE==theThemedApp)
@@ -5271,15 +5276,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                 if (selected && enabled)
-                    drawMenuItem(painter,
-#if QT_VERSION < 0x040600
-                                 comboMenu && opts.gtkComboMenus
-                                    ? r
-                                    : r.adjusted(0, 0, -1, 0),
-#else
-                                 r,
-#endif
-                                 option, false, ROUNDED_ALL,
+                    drawMenuItem(painter, r, option, false, ROUNDED_ALL,
                                  opts.useHighlightForMenu ? itsHighlightCols : itsBackgroundCols);
 
                 if(comboMenu)
