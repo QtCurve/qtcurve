@@ -5198,7 +5198,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                       stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
 
 #if QT_VERSION < 0x040600
-                if(!(comboMenu && opts.gtkComboMenus)
+                if(!(comboMenu && opts.gtkComboMenus))
                   r.adjust(0, 0, -1, 0);
 #endif
                 QRect rx(r);
