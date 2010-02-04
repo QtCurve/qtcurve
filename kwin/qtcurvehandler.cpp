@@ -214,6 +214,10 @@ bool QtCurveHandler::supports(Ability ability) const
         case AbilityColorTitleFore:
         case AbilityColorFrame:
             return true;
+#if KDE_IS_VERSION(4, 3, 0)
+        case AbilityUsesAlphaChannel:
+            return !Handler()->outerBorder();
+#endif
         default:
             return false;
     };

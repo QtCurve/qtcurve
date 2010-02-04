@@ -383,9 +383,8 @@ typedef enum
 } QtCMetrics;
 
 #define QtC_StateKWin         ((QStyle::StateFlag)0x10000000)
-#define QtC_StateKWinShaded   ((QStyle::StateFlag)0x20000000)
-#define QtC_StateKWinNotFull  ((QStyle::StateFlag)0x40000000)
-#define QtC_StateKWinNoBorder ((QStyle::StateFlag)0x80000000)
+#define QtC_StateKWinNotFull  ((QStyle::StateFlag)0x20000000)
+#define QtC_StateKWinNoBorder ((QStyle::StateFlag)0x40000000)
 
 #define CLOSE_COLOR              QColor(191, 82, 82)
 #define QTC_DARK_WINDOW_TEXT(A)  ((A).red()<230 || (A).green()<230 || (A).blue()<230)

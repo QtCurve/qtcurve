@@ -176,12 +176,9 @@ void QtCurveClient::activeChange()
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
-#ifdef QTC_DRAW_INTO_PIXMAPS
     bool                 compositing=KWindowSystem::compositingActive();
-#endif
     QPainter             painter(widget());
-    QRect                r(widget()->rect()),
-                         rx(r);
+    QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
     bool                 active(isActive()),
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
@@ -204,16 +201,34 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
 
-//     if(!isShade())
-//     {
-//         painter.setClipRegion(e->region());
-//         painter.fillRect(r, windowCol); // Makes things look nicer for kcmshell preview...
-//     }
     if(isMaximized())
-         painter.setClipRegion(e->region());
+        painter.setClipRegion(e->region());
     else
+#if KDE_IS_VERSION(4, 3, 0)
+        if(!compositing || isPreview())
+#endif
         painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+#if KDE_IS_VERSION(4, 3, 0)
+    double       radius((round>ROUND_SLIGHT ? 6.0 : 2.0) - (outerBorder ? 0.5 : 0.0)),
+                 dr(radius * 2);
+    QRectF       rf(r.x(), r.y()+5, r.width(), r.height() - 6);
+    QPainterPath path;
+
+    path.moveTo(rf.right(), rf.top() + radius);
+    path.arcTo(rf.right() - dr, rf.top(), dr, dr, 0.0, 90.0);
+    path.lineTo(rf.left() + radius, rf.top());
+    path.arcTo(rf.left(), rf.top(), dr, dr, 90.0, 90.0);
+    path.lineTo(rf.left(), rf.bottom() - radius);
+    path.arcTo(rf.left(), rf.bottom() - dr, dr, dr, 180.0, 90.0);
+    path.lineTo(rf.right() - radius, rf.bottom());
+    path.arcTo(rf.right() - dr, rf.bottom() - dr, dr, dr,  270.0, 90.0);
+    painter.fillPath(path, colorTitleOnly ? windowCol : col);
+#else
     painter.fillRect(r, colorTitleOnly ? windowCol : col);
+#endif
 
     opt.init(widget());
 
@@ -227,8 +242,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(!roundBottom)
         opt.state|=QtC_StateKWinNotFull;
-    if(isShade())
-        opt.state|=QtC_StateKWinShaded;
 
     if(outerBorder)
     {
@@ -238,6 +251,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
             QPixmap pix(32, 32);
             QPainter p2(&pix);
+            p2.setRenderHint(QPainter::Antialiasing, true);
             opt.rect=QRect(0, 0, pix.width(), pix.height());
             p2.fillRect(opt.rect, colorTitleOnly ? windowCol : col);
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &p2, widget());
@@ -255,35 +269,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else
         opt.state|=QtC_StateKWinNoBorder;
 
-// Commented out as leads to a 1 pixel window coloured line down the side of konsole windows...
-//     if(round>=ROUND_FULL && !colorTitleOnly && col!=windowCol && roundBottom)
-//     {
-//         QColor cornerCol(col);
-//         painter.setPen(windowCol);
-//         painter.drawRect(rx.x()+borderSize-1, rx.y()+borderSize-1,
-//                          rx.x()+rx.width()-((borderSize*2)-1), rx.y()+rx.height()-((borderSize*2)-1));
-//         painter.setPen(cornerCol);
-//         painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize));
-//         painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-borderSize);
-//         cornerCol.setAlphaF(0.5);
-//         painter.setPen(cornerCol);
-//         painter.drawPoint(rx.x()+borderSize, rx.y()+rx.height()-(borderSize));
-//         painter.drawPoint(rx.x()+borderSize-1, rx.y()+rx.height()-(borderSize+1));
-//         painter.drawPoint(rx.x()+rx.width()-borderSize-1, rx.y()+rx.height()-borderSize);
-//         painter.drawPoint(rx.x()+rx.width()-borderSize, rx.y()+rx.height()-(borderSize+1));
-//     }
-
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
-//     if(KDecoration::options()->color(KDecoration::ColorTitleBar, true)!=windowCol ||
-//        KDecoration::options()->color(KDecoration::ColorTitleBar, false)!=windowCol)
-//        opt.titleBarState|=QtC_StateKWinDrawLine;
+
 #ifdef QTC_DRAW_INTO_PIXMAPS
     if(!compositing || itsIsPreview)
     {
         QPixmap  tPix(32, titleBarHeight);
         QPainter tPainter(&tPix);
+        tPainter.setRenderHint(QPainter::Antialiasing, true);
         opt.rect=QRect(0, 0, tPix.width(), tPix.height());
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &tPainter, widget());
         tPainter.end();
@@ -353,10 +348,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 {
                     iconX=((textRect.width()-textWidth)/2.0)+0.5+textWidth+iconSize;
                     textRect.setX(textRect.x()-(iconSize+constPad));
-//                     iconX=((textRect.width()-textWidth)/2.0)+0.5+(textWidth-constPad);
-//                     textRect.setX(iconX-(textWidth-iconSize));
-//                     textRect.setWidth(textWidth-iconSize);
-//                     alignment=Qt::AlignVCenter|Qt::AlignRight;
                 }
                 else
                 {
@@ -420,9 +411,7 @@ void QtCurveClient::updateWindowShape()
 }
 
 QRegion QtCurveClient::getMask(int round, int w, int h) const
-{  
-//     if(isShade())
-//         round=ROUND_SLIGHT;
+{
     switch(round)
     {
         case ROUND_NONE:
@@ -437,8 +426,36 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
         }
         default: // ROUND_FULL
         {
+            bool    roundBottom=!isShade() && Handler()->roundBottom();
+
+#if KDE_IS_VERSION(4, 3, 0)
+            QRegion mask(4, 0, w-8, h);
+
+            if(roundBottom)
+            {
+                mask += QRegion(0, 4, 1, h-8);
+                mask += QRegion(1, 2, 1, h-4);
+                mask += QRegion(2, 1, 1, h-2);
+                mask += QRegion(3, 1, 1, h-2);
+                mask += QRegion(w-1, 4, 1, h-8);
+                mask += QRegion(w-2, 2, 1, h-4);
+                mask += QRegion(w-3, 1, 1, h-2);
+                mask += QRegion(w-4, 1, 1, h-2);
+            }
+            else
+            {
+                mask += QRegion(0, 4, 1, h-4);
+                mask += QRegion(1, 2, 1, h-1);
+                mask += QRegion(2, 1, 1, h);
+                mask += QRegion(3, 1, 1, h);
+                mask += QRegion(w-1, 4, 1, h-4);
+                mask += QRegion(w-2, 2, 1, h-1);
+                mask += QRegion(w-3, 1, 1, h-0);
+                mask += QRegion(w-4, 1, 1, h-0);
+            }
+            return mask;
+#else
             QRegion mask(5, 0, w-10, h);
-            bool    roundBottom=isShade() || Handler()->roundBottom();
 
             if(roundBottom)
             {
@@ -462,8 +479,8 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
                 mask += QRegion(w-3, 2, 1, h-1);
                 mask += QRegion(w-5, 1, 2, h);
             }
-
             return mask;
+#endif
         }
     }
 

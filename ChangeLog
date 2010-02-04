@@ -1,3 +1,7 @@
+1.0.3
+-----
+1. Under KDE SC>=4.3, use alpha belnding for window borders.
+
 1.0.2
 -----
  1. Apply cygwin patches from Yaakov S - use MODULE istead of SHARED.
@@ -9,8 +13,8 @@
     Gambatte (thanks to Andreas Pakulat)
  7. Fix menuitems with Qt4.6 - these were drawn 1 pixel to thin.
  8. Fix plasma calendar's week spinwidet mouse-over under KDE SC4.4
- 9. If using a background gradient, or cannot deternine a widget's parent's
-    background colour - usr a 10% alpha white as the etch colour.
+ 9. If using a background gradient, or cannot determine a widget's parent's
+    background colour - use a 10% alpha white as the etch colour.
 10. Fix cropping issues with KIntNumInput in QFormLayout in Qt4.6
 11. Remove dock widget title from all KFileWidget's, not just those in KFileDialog.
 

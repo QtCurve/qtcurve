@@ -2706,24 +2706,26 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             {
                 QRect r(option->rect);
 
-                mask->region = r;
-                mask->region -= QRect(r.left(), r.top(), 2, 1);
-                mask->region -= QRect(r.right() - 1, r.top(), 2, 1);
-                mask->region -= QRect(r.left(), r.top() + 1, 1, 1);
-                mask->region -= QRect(r.right(), r.top() + 1, 1, 1);
-
-                const QStyleOptionTitleBar *titleBar = qstyleoption_cast<const QStyleOptionTitleBar *>(option);
-                if (titleBar && (titleBar->titleBarState&Qt::WindowMinimized))
+                switch(opts.round)
                 {
-                    mask->region -= QRect(r.left(), r.bottom(), 2, 1);
-                    mask->region -= QRect(r.right() - 1, r.bottom(), 2, 1);
-                    mask->region -= QRect(r.left(), r.bottom() - 1, 1, 1);
-                    mask->region -= QRect(r.right(), r.bottom() - 1, 1, 1);
-                }
-                else
-                {
-                    mask->region -= QRect(r.bottomLeft(), QSize(1, 1));
-                    mask->region -= QRect(r.bottomRight(), QSize(1, 1));
+                    case ROUND_NONE:
+                        mask->region=r;
+                        break;
+                    case ROUND_SLIGHT:
+                        mask->region=QRegion(r.x()+1, r.y(), r.width()-2, r.height());
+                        mask->region += QRegion(r.x()+0, r.y()+1, 1, r.height()-2);
+                        mask->region += QRegion(r.x()+r.width()-1, r.y()+1, 1, r.height()-2);
+                        break;
+                    default: // ROUND_FULL
+                        mask->region=QRegion(r.x()+4, r.y(), r.width()-8, r.height());
+                        mask->region += QRegion(r.x()+0, r.y()+4, 1, r.height()-4);
+                        mask->region += QRegion(r.x()+1, r.y()+2, 1, r.height()-1);
+                        mask->region += QRegion(r.x()+2, r.y()+1, 1, r.height());
+                        mask->region += QRegion(r.x()+3, r.y()+1, 1, r.height());
+                        mask->region += QRegion(r.x()+r.width()-1, r.y()+4, 1, r.height()-4);
+                        mask->region += QRegion(r.x()+r.width()-2, r.y()+2, 1, r.height()-1);
+                        mask->region += QRegion(r.x()+r.width()-3, r.y()+1, 1, r.height()-0);
+                        mask->region += QRegion(r.x()+r.width()-4, r.y()+1, 1, r.height()-0);
                 }
             }
             return 1;
@@ -4109,57 +4111,28 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_FrameWindow:
         {
-            ERound oldRound=opts.round;
-            if(state&QtC_StateKWinNotFull && state&QtC_StateKWin)
-                opts.round=ROUND_NONE;
-            else if(state&QtC_StateKWinShaded && state&QtC_StateKWin && opts.round>ROUND_SLIGHT)
-                opts.round=ROUND_SLIGHT;
-
             const QColor *borderCols(opts.colorTitlebarOnly
                                         ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
                                         : theThemedApp==APP_KWIN
                                             ? buttonColors(option)
                                             : getMdiColors(option, state&State_Active));
-            QStyleOption opt(*option);
-            bool         roundKWinFull(QTC_FULLLY_ROUNDED &&
-                                       (APP_KWIN==theThemedApp || state&QtC_StateKWin));
 
-            opt.state=State_Horizontal|State_Enabled|State_Raised;
-
-            if(APP_KWIN!=theThemedApp && roundKWinFull) // Set clipping for preview in kcmshell...
+            painter->save();
+            painter->setPen(borderCols[QT_STD_BORDER]);
+            if(opts.round<ROUND_SLIGHT || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
-                int     x(r.x()), y(r.y()), w(r.width()), h(r.height());
-                QRegion mask(x+5, y+0, w-10, h);
-
-                mask += QRegion(x+0, y+5, 1, h-10);
-                mask += QRegion(x+1, y+3, 1, h-6);
-                mask += QRegion(x+2, y+2, 1, h-4);
-                mask += QRegion(x+3, y+1, 2, h-2);
-
-                mask += QRegion(x+w-1, y+5, 1, h-10);
-                mask += QRegion(x+w-2, y+3, 1, h-6);
-                mask += QRegion(x+w-3, y+2, 1, h-4);
-                mask += QRegion(x+w-5, y+1, 2, h-2);
-                painter->setClipRegion(mask);
+                painter->setRenderHint(QPainter::Antialiasing, false);
+                drawRect(painter, r);
             }
-
-            drawBorder(painter, r, &opt, ROUNDED_BOTTOM, borderCols, WIDGET_MDI_WINDOW, opts.titlebarBorder ? BORDER_RAISED : BORDER_FLAT);
-            opts.round=oldRound;
-
-            if(roundKWinFull)
-            {     
-                QColor col(opts.colorTitlebarOnly
-                            ? backgroundColors(option)[QT_STD_BORDER]
-                            : buttonColors(option)[QT_STD_BORDER]);
-
-                painter->setPen(col);
-                painter->drawPoint(r.x()+2, r.y()+r.height()-3);
-                painter->drawPoint(r.x()+r.width()-3, r.y()+r.height()-3);
-                painter->drawLine(r.x()+1, r.y()+r.height()-5, r.x()+1, r.y()+r.height()-4);
-                painter->drawLine(r.x()+3, r.y()+r.height()-2, r.x()+4, r.y()+r.height()-2);
-                painter->drawLine(r.x()+r.width()-2, r.y()+r.height()-5, r.x()+r.width()-2, r.y()+r.height()-4);
-                painter->drawLine(r.x()+r.width()-4, r.y()+r.height()-2, r.x()+r.width()-5, r.y()+r.height()-2);
+            else
+            {
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL,
+                                            opts.round>ROUND_SLIGHT && state&QtC_StateKWin
+                                                ? 5.5
+                                                : 1.5));
             }
+            painter->restore();
             break;
         }
         case PE_FrameTabWidget:
@@ -7285,10 +7258,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             if (const QStyleOptionTitleBar *titleBar = qstyleoption_cast<const QStyleOptionTitleBar *>(option))
             {
                 painter->save();
-
-                ERound oldRound=opts.round;
-                if(state&QtC_StateKWinShaded && state&QtC_StateKWin && opts.round>ROUND_SLIGHT)
-                    opts.round=ROUND_SLIGHT;
             
                 bool         active(state&State_Active),
                              kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin),
@@ -7314,50 +7283,42 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                              shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                 QStyleOption opt(*option);
 
+
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
 
-                if(state&QtC_StateKWinNoBorder)
-                    drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, true, false,
-                                      widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active),
-                                      WIDGET_MDI_WINDOW);
-                else
+#if KDE_IS_VERSION(4, 3, 0)
+                QPainterPath path(opts.round<ROUND_SLIGHT
+                                    ? QPainterPath()
+                                    : buildPath(QRectF(r), WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
+                                                (opts.round>ROUND_SLIGHT /*&& kwin*/
+                                                    ? 6.0
+                                                    : 2.0)));
+#else
+                QPainterPath path;
+#endif
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, path, true, false,
+                                    widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active),
+                                    WIDGET_MDI_WINDOW, false);
+                                      
+                if(!(state&QtC_StateKWinNoBorder))
                 {
-                    drawLightBevel(painter, r, &opt, widget,
-                                   titleBar->titleBarState&State_Raised
-                                        ? ROUNDED_NONE
-                                        : titleBar->titleBarState&State_Enabled
-                                            ? ROUNDED_ALL
-                                            : ROUNDED_TOP,
-                                    titleCols[ORIGINAL_SHADE], titleCols, true,
-                                    titleBar->titleBarState&Qt::WindowMinimized ? WIDGET_MDI_WINDOW : WIDGET_MDI_WINDOW_TITLE);
+                    
+                    painter->setPen(btnCols[QT_STD_BORDER]);
+                    painter->drawPath(buildPath(r, WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
+                                                opts.round<ROUND_SLIGHT
+                                                    ? 0
+                                                    : opts.round>ROUND_SLIGHT /*&& kwin*/
+                                                        ? 5.5
+                                                        : 1.5));
 
                     if(opts.titlebarBorder)
                     {
                         painter->setPen(btnCols[0]);
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
-
-                    if(roundKWinFull)
-                    {
-                        painter->setPen(btnCols[QT_STD_BORDER]);
-
-                        painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
-                        painter->drawPoint(r.x()+2, r.y()+2);
-                        painter->drawLine(r.x()+3, r.y()+1, r.x()+4, r.y()+1);
-                        painter->drawLine(r.x()+r.width()-2, r.y()+4, r.x()+r.width()-2, r.y()+3);
-                        painter->drawPoint(r.x()+r.width()-3, r.y()+2);
-                        painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
-
-                        if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
-                        {
-                            painter->setPen(btnCols[0]);
-                            painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
-                            painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
-                            //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
-                            painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
-                        }
-                    }
                     
+                    painter->setRenderHint(QPainter::Antialiasing, false);
                     if(opts.titlebarBlend && (!kwin || !(state&QtC_StateKWinNoBorder)))
                     {
                         static const int constFadeLen=8;
@@ -7372,6 +7333,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->drawLine(r.x()+r.width()-1, start.y(), r.x()+r.width()-1, end.y());
                     }
                 }
+                else
+                    painter->setRenderHint(QPainter::Antialiasing, false);
 
                 bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && !titleBar->icon.isNull();
                 int     iconSize=showIcon ? pixelMetric(QStyle::PM_SmallIconSize) : 0,
@@ -7530,7 +7493,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                     else
                         drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, shadow, btnCols, bgndCols);
-                opts.round=oldRound;
+
                 painter->restore();
             }
             break;
@@ -9909,8 +9872,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
     bool         enabled(state&State_Enabled),
                  entry(WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews)),
                  hasFocus(enabled && entry && state&State_HasFocus),
-                 hasMouseOver(enabled && WIDGET_ENTRY==w && state&State_MouseOver && QTC_ENTRY_MO),
-                 window(WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w);
+                 hasMouseOver(enabled && WIDGET_ENTRY==w && state&State_MouseOver && QTC_ENTRY_MO);
     const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
                         ? itsMouseOverCols
                         : enabled && hasFocus && itsFocusCols && entry
@@ -9928,71 +9890,58 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
                                                 ? QT_SLIDER_MO_BORDER
                                                 : borderVal]);
 
-//     if(!window)
-        p->setRenderHint(QPainter::Antialiasing, true);
-
+    p->setRenderHint(QPainter::Antialiasing, true);
     p->setBrush(Qt::NoBrush);
 
-    if(!window || opts.titlebarBorder)
+    if(WIDGET_TAB_BOT==w || WIDGET_TAB_TOP==w)
+        cols=itsBackgroundCols;
+
+    switch(borderProfile)
     {
-        if(WIDGET_TAB_BOT==w || WIDGET_TAB_TOP==w)
-            cols=itsBackgroundCols;
-
-        switch(borderProfile)
+        case BORDER_FLAT:
+            break;
+        case BORDER_RAISED:
+        case BORDER_SUNKEN:
+        case BORDER_LIGHT:
         {
-            case BORDER_FLAT:
-                break;
-            case BORDER_RAISED:
-            case BORDER_SUNKEN:
-            case BORDER_LIGHT:
+            int          dark=QT_FRAME_DARK_SHADOW;
+            QColor       tl(cols[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile ? 0 : dark]),
+                         br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
+            QPainterPath topPath,
+                         botPath;
+
+            if( ((hasMouseOver || hasFocus) && WIDGET_ENTRY==w) ||
+                (hasFocus && WIDGET_SCROLLVIEW==w))
             {
-                EAppearance  app(widgetApp(w, &opts));
-                int          dark=window ? ORIGINAL_SHADE : QT_FRAME_DARK_SHADOW;
-
-                if(APPEARANCE_FLAT==app && window)
-                    app=APPEARANCE_RAISED;
-
-                QColor       tl(cols[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile ? 0 : dark]),
-                             br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
-                QPainterPath topPath,
-                             botPath;
-
-                if( ((hasMouseOver || hasFocus) && WIDGET_ENTRY==w) ||
-                    (hasFocus && WIDGET_SCROLLVIEW==w))
-                {
-                    tl.setAlphaF(QTC_ENTRY_INNER_ALPHA);
-                    br.setAlphaF(QTC_ENTRY_INNER_ALPHA);
-                }
-                else if(doBlend && !window)
-                {
-                    tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
-                    br.setAlphaF(BORDER_SUNKEN ? 0.0 : QTC_BORDER_BLEND_ALPHA);
-                }
-
-    //             if(window)
-    //                 tl.setAlphaF(0.5);
-
-                QRect inner(r.adjusted(1, 1, -1, -1));
-
-                buildSplitPath(inner, w, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL),
-                               topPath, botPath);
-
-                p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
-                          (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
-                                ? tl
-                                : option->palette.background().color());
-                p->drawPath(topPath);
-                if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
-                    p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
-                                ? checkColour(option, QPalette::Window)
-                                : WIDGET_ENTRY==w && !hasFocus
-                                    ? checkColour(option, QPalette::Base)
-                                    : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                      WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w || (window && opts.titlebarBorder))
-                                        ? br
-                                        : checkColour(option, QPalette::Window));
-                p->drawPath(botPath);
+                tl.setAlphaF(QTC_ENTRY_INNER_ALPHA);
+                br.setAlphaF(QTC_ENTRY_INNER_ALPHA);
             }
+            else if(doBlend)
+            {
+                tl.setAlphaF(QTC_BORDER_BLEND_ALPHA);
+                br.setAlphaF(BORDER_SUNKEN ? 0.0 : QTC_BORDER_BLEND_ALPHA);
+            }
+
+            QRect inner(r.adjusted(1, 1, -1, -1));
+
+            buildSplitPath(inner, w, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL),
+                            topPath, botPath);
+
+            p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
+                        (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
+                            ? tl
+                            : option->palette.background().color());
+            p->drawPath(topPath);
+            if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
+                p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
+                            ? checkColour(option, QPalette::Window)
+                            : WIDGET_ENTRY==w && !hasFocus
+                                ? checkColour(option, QPalette::Base)
+                                : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                    WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                    ? br
+                                    : checkColour(option, QPalette::Window));
+            p->drawPath(botPath);
         }
     }
 
@@ -10019,32 +9968,7 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
     }
 
-//     if(!window)
-        p->setRenderHint(QPainter::Antialiasing, false);
-
-    if(QTC_FULLLY_ROUNDED && window)
-    {
-        if(WIDGET_MDI_WINDOW==w)
-        {
-            p->drawPoint(r.x(), r.y()+r.height()-2);
-            p->drawPoint(r.x()+1, r.y()+r.height()-1);
-            p->drawPoint(r.x()+r.width()-2, r.y()+r.height()-1);
-            p->drawPoint(r.x()+r.width()-1, r.y()+r.height()-2);
-//             p->setPen(cols[ORIGINAL_SHADE]);
-//             p->drawPoint(r.x()+1, r.y()+r.height()-2);
-        }
-
-        if(WIDGET_MDI_WINDOW_TITLE==w)
-        {
-            p->drawPoint(r.x()+2, r.y());
-            p->drawPoint(r.x(), r.y()+2);
-            p->drawPoint(r.x()+r.width()-1, r.y()+2);
-            p->drawPoint(r.x()+r.width()-3, r.y());
-//             p->setPen(cols[0]);
-//             p->drawPoint(r.x()+1, r.y()+2);
-//             p->drawPoint(r.x()+2, r.y()+1);
-        }
-    }
+    p->setRenderHint(QPainter::Antialiasing, false);
 }
 
 void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
