@@ -5,8 +5,8 @@
 3. Map edit-select-all.png to gtk-select-all
 4. Fix check, radio, expander, and splitter background highlighting - forgot
    to convert configured value to a percentage!
-5. If using a background gradient, or cannot deternine a widget's parent's
-   background colour - usr a 10% alpha white as the etch colour.
+5. If using a background gradient, or cannot determine a widget's parent's
+   background colour - use a 10% alpha white as the etch colour.
 
 1.0.1
 -----
