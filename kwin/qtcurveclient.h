@@ -60,7 +60,6 @@ class QtCurveClient : public KCommonDecoration
     QRegion                   getMask(int round, int w, int h) const;
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
-    bool isPreview() const   { return itsIsPreview; }
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
 
     private:
@@ -85,7 +84,6 @@ class QtCurveClient : public KCommonDecoration
     QRect           itsCaptionRect;
     QString         itsOldCaption;
     QFont           itsTitleFont;
-    bool            itsIsPreview;
 };
 
 }

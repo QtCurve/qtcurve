@@ -53,8 +53,7 @@ namespace KWinQtCurve
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory)
              : KCommonDecoration(bridge, factory),
                itsResizeGrip(0L),
-               itsTitleFont(QFont()),
-               itsIsPreview(!QApplication::applicationName().startsWith("kwin"))
+               itsTitleFont(QFont())
 {
 }
 
@@ -201,34 +200,43 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
 
+    painter.setClipRegion(e->region());
+
     if(isMaximized())
-        painter.setClipRegion(e->region());
+        painter.setClipRect(r, Qt::IntersectClip);
     else
 #if KDE_IS_VERSION(4, 3, 0)
         if(!compositing || isPreview())
 #endif
-        painter.setClipRegion(e->region().intersected(getMask(round, r.width(), r.height())));
+        painter.setClipRegion(getMask(round, r.width(), r.height()), Qt::IntersectClip);
 
+    painter.fillRect(r, compositing ? Qt::transparent : (colorTitleOnly ? windowCol : col));
     painter.setRenderHint(QPainter::Antialiasing, true);
-
+    if(compositing)
+    {
 #if KDE_IS_VERSION(4, 3, 0)
-    double       radius((round>ROUND_SLIGHT ? 6.0 : 2.0) - (outerBorder ? 0.5 : 0.0)),
-                 dr(radius * 2);
-    QRectF       rf(r.x(), r.y()+5, r.width(), r.height() - 6);
-    QPainterPath path;
+        if(roundBottom)
+        {
+            double       radius((round>ROUND_SLIGHT ? 6.0 : 2.0) - (outerBorder ? 1.0 : 0.0)),
+                         dr(radius * 2);
+            QRect        fr(outerBorder ? r.adjusted(1, 1, -1, -1) : r);
+            QRectF       rf(fr.x()-0.5, fr.y()+5.5, fr.width()+0.5, fr.height() - 5.5);
+            QPainterPath path;
 
-    path.moveTo(rf.right(), rf.top() + radius);
-    path.arcTo(rf.right() - dr, rf.top(), dr, dr, 0.0, 90.0);
-    path.lineTo(rf.left() + radius, rf.top());
-    path.arcTo(rf.left(), rf.top(), dr, dr, 90.0, 90.0);
-    path.lineTo(rf.left(), rf.bottom() - radius);
-    path.arcTo(rf.left(), rf.bottom() - dr, dr, dr, 180.0, 90.0);
-    path.lineTo(rf.right() - radius, rf.bottom());
-    path.arcTo(rf.right() - dr, rf.bottom() - dr, dr, dr,  270.0, 90.0);
-    painter.fillPath(path, colorTitleOnly ? windowCol : col);
-#else
-    painter.fillRect(r, colorTitleOnly ? windowCol : col);
+            path.moveTo(rf.right(), rf.top() + radius);
+            path.arcTo(rf.right() - dr, rf.top(), dr, dr, 0.0, 90.0);
+            path.lineTo(rf.left() + radius, rf.top());
+            path.arcTo(rf.left(), rf.top(), dr, dr, 90.0, 90.0);
+            path.lineTo(rf.left(), rf.bottom() - radius);
+            path.arcTo(rf.left(), rf.bottom() - dr, dr, dr, 180.0, 90.0);
+            path.lineTo(rf.right() - radius, rf.bottom());
+            path.arcTo(rf.right() - dr, rf.bottom() - dr, dr, dr,  270.0, 90.0);
+            painter.fillPath(path, colorTitleOnly ? windowCol : col);
+        }
+        else
 #endif
+            painter.fillRect(r.adjusted(0, 5, 0, 0), colorTitleOnly ? windowCol : col);
+    }
 
     opt.init(widget());
 
@@ -243,10 +251,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(!roundBottom)
         opt.state|=QtC_StateKWinNotFull;
 
+    if(compositing && !isPreview())
+        opt.state|=QtC_StateKWinCompositing;
+
     if(outerBorder)
     {
 #ifdef QTC_DRAW_INTO_PIXMAPS
-        if(!compositing || itsIsPreview)
+        if(!compositing || isPreview())
         {
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
             QPixmap pix(32, 32);
@@ -274,7 +285,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
 #ifdef QTC_DRAW_INTO_PIXMAPS
-    if(!compositing || itsIsPreview)
+    if(!compositing || isPreview())
     {
         QPixmap  tPix(32, titleBarHeight);
         QPainter tPainter(&tPix);
@@ -428,59 +439,64 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
         {
             bool    roundBottom=!isShade() && Handler()->roundBottom();
 
-#if KDE_IS_VERSION(4, 3, 0)
-            QRegion mask(4, 0, w-8, h);
+// #if KDE_IS_VERSION(4, 3, 0)
+//             if(!isPreview() && KWindowSystem::compositingActive())
+//             {
+//                 QRegion mask(4, 0, w-8, h);
+// 
+//                 if(roundBottom)
+//                 {
+//                     mask += QRegion(0, 4, 1, h-8);
+//                     mask += QRegion(1, 2, 1, h-4);
+//                     mask += QRegion(2, 1, 1, h-2);
+//                     mask += QRegion(3, 1, 1, h-2);
+//                     mask += QRegion(w-1, 4, 1, h-8);
+//                     mask += QRegion(w-2, 2, 1, h-4);
+//                     mask += QRegion(w-3, 1, 1, h-2);
+//                     mask += QRegion(w-4, 1, 1, h-2);
+//                 }
+//                 else
+//                 {
+//                     mask += QRegion(0, 4, 1, h-4);
+//                     mask += QRegion(1, 2, 1, h-1);
+//                     mask += QRegion(2, 1, 1, h);
+//                     mask += QRegion(3, 1, 1, h);
+//                     mask += QRegion(w-1, 4, 1, h-4);
+//                     mask += QRegion(w-2, 2, 1, h-1);
+//                     mask += QRegion(w-3, 1, 1, h-0);
+//                     mask += QRegion(w-4, 1, 1, h-0);
+//                 }
+//                 return mask;
+//             }
+//             else
+// #endif
+            {
+                QRegion mask(5, 0, w-10, h);
 
-            if(roundBottom)
-            {
-                mask += QRegion(0, 4, 1, h-8);
-                mask += QRegion(1, 2, 1, h-4);
-                mask += QRegion(2, 1, 1, h-2);
-                mask += QRegion(3, 1, 1, h-2);
-                mask += QRegion(w-1, 4, 1, h-8);
-                mask += QRegion(w-2, 2, 1, h-4);
-                mask += QRegion(w-3, 1, 1, h-2);
-                mask += QRegion(w-4, 1, 1, h-2);
+                if(roundBottom)
+                {
+                    mask += QRegion(0, 5, 1, h-10);
+                    mask += QRegion(1, 3, 1, h-6);
+                    mask += QRegion(2, 2, 1, h-4);
+                    mask += QRegion(3, 1, 2, h-2);
+                    mask += QRegion(w-1, 5, 1, h-10);
+                    mask += QRegion(w-2, 3, 1, h-6);
+                    mask += QRegion(w-3, 2, 1, h-4);
+                    mask += QRegion(w-5, 1, 2, h-2);
+                }
+                else
+                {
+                    mask += QRegion(0, 5, 1, h-5);
+                    mask += QRegion(1, 3, 1, h-2);
+                    mask += QRegion(2, 2, 1, h-1);
+                    mask += QRegion(3, 1, 2, h);
+                    mask += QRegion(w-1, 5, 1, h-5);
+                    mask += QRegion(w-2, 3, 1, h-2);
+                    mask += QRegion(w-3, 2, 1, h-1);
+                    mask += QRegion(w-5, 1, 2, h);
+                }
+                return mask;
             }
-            else
-            {
-                mask += QRegion(0, 4, 1, h-4);
-                mask += QRegion(1, 2, 1, h-1);
-                mask += QRegion(2, 1, 1, h);
-                mask += QRegion(3, 1, 1, h);
-                mask += QRegion(w-1, 4, 1, h-4);
-                mask += QRegion(w-2, 2, 1, h-1);
-                mask += QRegion(w-3, 1, 1, h-0);
-                mask += QRegion(w-4, 1, 1, h-0);
-            }
-            return mask;
-#else
-            QRegion mask(5, 0, w-10, h);
-
-            if(roundBottom)
-            {
-                mask += QRegion(0, 5, 1, h-10);
-                mask += QRegion(1, 3, 1, h-6);
-                mask += QRegion(2, 2, 1, h-4);
-                mask += QRegion(3, 1, 2, h-2);
-                mask += QRegion(w-1, 5, 1, h-10);
-                mask += QRegion(w-2, 3, 1, h-6);
-                mask += QRegion(w-3, 2, 1, h-4);
-                mask += QRegion(w-5, 1, 2, h-2);
-            }
-            else
-            {
-                mask += QRegion(0, 5, 1, h-5);
-                mask += QRegion(1, 3, 1, h-2);
-                mask += QRegion(2, 2, 1, h-1);
-                mask += QRegion(3, 1, 2, h);
-                mask += QRegion(w-1, 5, 1, h-5);
-                mask += QRegion(w-2, 3, 1, h-2);
-                mask += QRegion(w-3, 2, 1, h-1);
-                mask += QRegion(w-5, 1, 2, h);
-            }
-            return mask;
-#endif
         }
     }
 
@@ -529,7 +545,7 @@ void QtCurveClient::reset(unsigned long changed)
     // Set note in init() above
     if(0==changed)
         widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
-    else  if (changed&(SettingColors|SettingFont|SettingBorder))
+    if (changed&(SettingColors|SettingFont|SettingBorder))
     {
         // Reset button backgrounds...
         for(int i=0; i<constNumButtonStates; ++i)

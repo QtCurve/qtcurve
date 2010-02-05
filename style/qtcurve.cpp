@@ -4118,19 +4118,47 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                             : getMdiColors(option, state&State_Active));
 
             painter->save();
-            painter->setPen(borderCols[QT_STD_BORDER]);
-            if(opts.round<ROUND_SLIGHT || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
+            
+            if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
+                painter->setPen(borderCols[0]);
+                drawRect(painter, r.adjusted(1, 1, 0, 0));
+                painter->setPen(borderCols[QT_STD_BORDER]);
                 drawRect(painter, r);
             }
             else
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
+                if(opts.titlebarBorder)
+                {
+                    painter->setPen(borderCols[0]);
+                    painter->drawPath(buildPath(r.adjusted(1, 1, 0, 0), WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
+                                                opts.round>ROUND_SLIGHT && state&QtC_StateKWin
+                                                    ? 5.0
+                                                    : 1.0));
+                }
+                painter->setPen(borderCols[QT_STD_BORDER]);
                 painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL,
                                             opts.round>ROUND_SLIGHT && state&QtC_StateKWin
-                                                ? 5.5
-                                                : 1.5));
+                                                ? 6.0
+                                                : 2.0));
+
+                if(QTC_FULLLY_ROUNDED && !(state&QtC_StateKWinCompositing))
+                {
+                    QColor col(opts.colorTitlebarOnly
+                                ? backgroundColors(option)[QT_STD_BORDER]
+                                : buttonColors(option)[QT_STD_BORDER]);
+
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                    painter->setPen(col);
+                    painter->drawPoint(r.x()+2, r.y()+r.height()-3);
+                    painter->drawPoint(r.x()+r.width()-3, r.y()+r.height()-3);
+                    painter->drawLine(r.x()+1, r.y()+r.height()-5, r.x()+1, r.y()+r.height()-4);
+                    painter->drawLine(r.x()+3, r.y()+r.height()-2, r.x()+4, r.y()+r.height()-2);
+                    painter->drawLine(r.x()+r.width()-2, r.y()+r.height()-5, r.x()+r.width()-2, r.y()+r.height()-4);
+                    painter->drawLine(r.x()+r.width()-4, r.y()+r.height()-2, r.x()+r.width()-5, r.y()+r.height()-2);
+                }
             }
             painter->restore();
             break;
@@ -7289,10 +7317,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #if KDE_IS_VERSION(4, 3, 0)
                 QPainterPath path(opts.round<ROUND_SLIGHT
                                     ? QPainterPath()
-                                    : buildPath(QRectF(r), WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
+                                    : buildPath(QRectF(state&QtC_StateKWinNoBorder ? r : r.adjusted(1, 1, -1, 0)),
+                                                WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
                                                 (opts.round>ROUND_SLIGHT /*&& kwin*/
                                                     ? 6.0
-                                                    : 2.0)));
+                                                    : 2.0)-(state&QtC_StateKWinNoBorder ? 0.0 : 1.0)));
 #else
                 QPainterPath path;
 #endif
@@ -7303,22 +7332,57 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                       
                 if(!(state&QtC_StateKWinNoBorder))
                 {
-                    
+                    if(opts.titlebarBorder)
+                    {
+                        painter->setPen(btnCols[0]);
+                        painter->drawPath(buildPath(r.adjusted(1, 1, 0, 0), WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
+                                                    opts.round<ROUND_SLIGHT
+                                                        ? 0
+                                                        : opts.round>ROUND_SLIGHT /*&& kwin*/
+                                                            ? 5.0
+                                                            : 1.0));
+                    }
+
                     painter->setPen(btnCols[QT_STD_BORDER]);
                     painter->drawPath(buildPath(r, WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
                                                 opts.round<ROUND_SLIGHT
                                                     ? 0
                                                     : opts.round>ROUND_SLIGHT /*&& kwin*/
-                                                        ? 5.5
-                                                        : 1.5));
+                                                        ? 6.0
+                                                        : 2.0));
+
+                    painter->setRenderHint(QPainter::Antialiasing, false);
 
                     if(opts.titlebarBorder)
                     {
                         painter->setPen(btnCols[0]);
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
-                    
-                    painter->setRenderHint(QPainter::Antialiasing, false);
+
+                    if(QTC_FULLLY_ROUNDED)
+                    {
+                        if(!(state&QtC_StateKWinCompositing))
+                        {
+                            painter->setPen(btnCols[QT_STD_BORDER]);
+
+                            painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
+                            painter->drawPoint(r.x()+2, r.y()+2);
+                            painter->drawLine(r.x()+3, r.y()+1, r.x()+4, r.y()+1);
+                            painter->drawLine(r.x()+r.width()-2, r.y()+4, r.x()+r.width()-2, r.y()+3);
+                            painter->drawPoint(r.x()+r.width()-3, r.y()+2);
+                            painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
+                        }
+
+                        if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
+                        {
+                            painter->setPen(btnCols[0]);
+                            painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
+                            painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
+                            //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
+                            painter->drawLine(r.x()+r.width()-4, r.y()+2, r.x()+r.width()-5, r.y()+2);
+                        }
+                    }
+
                     if(opts.titlebarBlend && (!kwin || !(state&QtC_StateKWinNoBorder)))
                     {
                         static const int constFadeLen=8;
