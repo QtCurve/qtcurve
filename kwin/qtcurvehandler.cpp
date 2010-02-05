@@ -81,6 +81,9 @@ namespace KWinQtCurve
 QtCurveHandler::QtCurveHandler()
               : itsTitleBarPad(0)
               , itsStyle(NULL)
+#if KDE_IS_VERSION(4, 3, 0)
+              , itsCustomShadows(false)
+#endif
 {
     setStyle();
     reset(0);
@@ -216,7 +219,9 @@ bool QtCurveHandler::supports(Ability ability) const
             return true;
 #if KDE_IS_VERSION(4, 3, 0)
         case AbilityUsesAlphaChannel:
-            return !Handler()->outerBorder();
+            return true; // !Handler()->outerBorder(); ???
+        case AbilityProvidesShadow:
+            return itsCustomShadows;
 #endif
         default:
             return false;
@@ -249,7 +254,10 @@ bool QtCurveHandler::readConfig()
          oldRoundBottom=itsRoundBottom,
          oldOuterBorder=itsOuterBorder;
     int  oldTitleBarPad=itsTitleBarPad;
-    
+#if KDE_IS_VERSION(4, 3, 0)
+    bool oldCustomShadows(itsCustomShadows);
+#endif
+
     itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
     itsRoundBottom = config.readEntry("RoundBottom", true);
@@ -259,11 +267,19 @@ bool QtCurveHandler::readConfig()
     itsTitleBarPad = config.readEntry("TitleBarPad", 0);
 
     itsTitleHeight+=2*itsTitleBarPad;
+#if KDE_IS_VERSION(4, 3, 0)
+    itsCustomShadows = config.readEntry("CustomShadows", false);
+    if(itsCustomShadows)
+        itsOuterBorder=false;
+#endif
 
     return oldMenuClose!=itsMenuClose ||
            oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom ||
            oldOuterBorder!=itsOuterBorder ||
+#if KDE_IS_VERSION(4, 3, 0)
+           oldCustomShadows!=itsCustomShadows ||
+#endif
            oldTitleBarPad!=itsTitleBarPad;
 }
 

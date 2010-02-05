@@ -35,6 +35,10 @@
 #include <kdecorationfactory.h>
 #include "config.h"
 
+#if KDE_IS_VERSION(4, 3, 0)
+#include "qtcurveshadowcache.h"
+#endif
+
 class QStyle;
 
 namespace KWinQtCurve
@@ -60,7 +64,11 @@ enum ButtonIcon
 };
 
 class QtCurveHandler : public QObject,
+#if KDE_IS_VERSION(4, 3, 0)
+                       public KDecorationFactoryUnstable
+#else
                        public KDecorationFactory
+#endif
 {
     Q_OBJECT
 
@@ -74,20 +82,24 @@ class QtCurveHandler : public QObject,
     virtual KDecoration * createDecoration( KDecorationBridge* );
     virtual bool supports( Ability ability ) const;
 
-    const QBitmap & buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow);
-    int             titleHeight() const     { return itsTitleHeight; }
-    int             titleHeightTool() const { return itsTitleHeightTool; }
-    const QFont &   titleFont()             { return itsTitleFont; }
-    const QFont &   titleFontTool()         { return itsTitleFontTool; }
-    int             borderSize() const      { return itsBorderSize; }
-    bool            coloredShadow() const   { return itsColoredShadow; }
-    bool            menuClose() const       { return itsMenuClose; }
-    bool            showResizeGrip() const  { return itsShowResizeGrip; }
-    bool            roundBottom() const     { return itsRoundBottom && itsBorderSize>1; }
-    bool            outerBorder() const     { return itsOuterBorder; }
-    QStyle *        wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
-    int             borderEdgeSize() const;
-    int             titleBarPad() const     { return itsTitleBarPad; }
+    const QBitmap &       buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow);
+    int                   titleHeight() const     { return itsTitleHeight; }
+    int                   titleHeightTool() const { return itsTitleHeightTool; }
+    const QFont &         titleFont()             { return itsTitleFont; }
+    const QFont &         titleFontTool()         { return itsTitleFontTool; }
+    int                   borderSize() const      { return itsBorderSize; }
+    bool                  coloredShadow() const   { return itsColoredShadow; }
+    bool                  menuClose() const       { return itsMenuClose; }
+    bool                  showResizeGrip() const  { return itsShowResizeGrip; }
+    bool                  roundBottom() const     { return itsRoundBottom && itsBorderSize>1; }
+    bool                  outerBorder() const     { return itsOuterBorder; }
+    QStyle *              wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
+    int                   borderEdgeSize() const;
+    int                   titleBarPad() const     { return itsTitleBarPad; }
+#if KDE_IS_VERSION(4, 3, 0)
+    bool                 customShadows() const    { return itsCustomShadows; }
+    QtCurveShadowCache & shadowCache()            { return itsShadowCache; }
+#endif
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
 
@@ -111,6 +123,10 @@ class QtCurveHandler : public QObject,
             itsTitleFontTool;
     QStyle  *itsStyle;
     QBitmap itsBitmaps[2][NumButtonIcons];
+#if KDE_IS_VERSION(4, 3, 0)
+    bool               itsCustomShadows;
+    QtCurveShadowCache itsShadowCache;
+#endif
 };
 
 QtCurveHandler * Handler();

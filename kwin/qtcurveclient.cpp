@@ -46,6 +46,9 @@
 #include "qtcurvesizegrip.h"
 #define QTC_KWIN
 #include "common.h"
+#if KDE_IS_VERSION(4, 3, 0)
+#include "tileset.h"
+#endif
 
 namespace KWinQtCurve
 {
@@ -107,6 +110,14 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
             return 0;
         case LM_ButtonMarginTop:
             return 0;
+#if KDE_IS_VERSION(4, 3, 0)
+        case LM_OuterPaddingLeft:
+        case LM_OuterPaddingRight:
+        case LM_OuterPaddingTop:
+        case LM_OuterPaddingBottom:
+            if(Handler()->customShadows())
+                return Handler()->shadowCache().shadowSize();
+#endif
         default:
             return KCommonDecoration::layoutMetric(lm, respectWindowState, btn);
     }
@@ -133,7 +144,7 @@ KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
 
 void QtCurveClient::init()
 {
-    itsTitleFont = isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
+    itsTitleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
     KCommonDecoration::init();
     // If WA_PaintOnScreen is set to false when not compositnig then get redraw errors
@@ -193,7 +204,30 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
                          titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+(isMaximized() ? border : 0)),
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-    int                  rectX, rectY, rectX2, rectY2;
+    int                  rectX, rectY, rectX2, rectY2, shadowSize(0);
+
+#if KDE_IS_VERSION(4, 3, 0)
+    if(Handler()->customShadows() && compositing)
+    {
+        TileSet *tileSet( 0 );
+//         if( configuration().useOxygenShadows() && glowIsAnimated() && !isForcedActive() )
+//       {
+// 
+//         int frame = ;
+//         tileSet = shadowCache().tileSet( this, frame );=
+//       }
+//       else
+          tileSet = Handler()->shadowCache().tileSet( this );
+
+        if(!isMaximized())
+            tileSet->render(r.adjusted(4, 4, -4, -4), &painter, TileSet::Ring);
+        else if(isShade())
+            tileSet->render(r.adjusted(0, 4, 0, -4), &painter, TileSet::Bottom);
+
+        shadowSize=Handler()->shadowCache().shadowSize();
+        r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
+    }
+#endif
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
@@ -301,7 +335,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
 
-    itsCaptionRect = captionRect(); // also update itsCaptionRect!
+    itsCaptionRect=captionRect(); // also update itsCaptionRect!
     bool     showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,
                                                                                     0L, 0L);
     int     iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0,
@@ -387,7 +421,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 }
             }
 
-        painter.setClipRect(itsCaptionRect.adjusted(-2, 0, 2, 0));
+#if KDE_IS_VERSION(4, 3, 0)
+        if(shadowSize>0)
+            textRect.adjust(0, shadowSize, 0, shadowSize);
+#endif
+        painter.setClipRect(itsCaptionRect.adjusted(-2, shadowSize, 2, shadowSize));
+
         QColor color(KDecoration::options()->color(KDecoration::ColorFont, active));
 
         if(EFFECT_NONE!=effect)
@@ -407,7 +446,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     }
 
     if(showIcon && iconX>=0)
-        painter.drawPixmap(iconX, itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2)+1, menuIcon);
+        painter.drawPixmap(iconX, shadowSize+itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2)+1, menuIcon);
 
     painter.end();
 }
@@ -524,7 +563,7 @@ void QtCurveClient::updateCaption()
 {
     QRect oldCaptionRect(itsCaptionRect);
 
-    itsCaptionRect = QtCurveClient::captionRect();
+    itsCaptionRect=QtCurveClient::captionRect();
 
     if (oldCaptionRect.isValid() && itsCaptionRect.isValid())
         widget()->update(oldCaptionRect|itsCaptionRect);
@@ -539,7 +578,7 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 
     return KCommonDecoration::eventFilter(o, e);
 }
-    
+
 void QtCurveClient::reset(unsigned long changed)
 {
     // Set note in init() above
@@ -570,7 +609,7 @@ void QtCurveClient::reset(unsigned long changed)
     else if (changed&SettingFont)
     {
         // font has changed -- update title height and font
-        itsTitleFont = isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
+        itsTitleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
         updateLayout();
         widget()->update();
