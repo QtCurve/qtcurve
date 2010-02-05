@@ -31,6 +31,7 @@
 #include <kcommondecoration.h>
 #include <QtGui/QPixmap>
 #include <QtGui/QColor>
+#include "qtcurvehandler.h"
 #include "config.h"
 
 namespace KWinQtCurve
@@ -38,11 +39,16 @@ namespace KWinQtCurve
 
 class QtCurveSizeGrip;
 
-class QtCurveClient : public KCommonDecoration
+class QtCurveClient :
+#if KDE_IS_VERSION(4, 3, 0)
+                       public KCommonDecorationUnstable
+#else
+                       public KCommonDecoration
+#endif    
 {
     public:
 
-    QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory);
+    QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory);
     virtual ~QtCurveClient();
 
     QString                   visibleName() const;

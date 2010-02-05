@@ -40,7 +40,6 @@
 #include <KDE/KWindowSystem>
 #endif
 #include <qdesktopwidget.h>
-#include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
 #include "qtcurvesizegrip.h"
@@ -50,11 +49,21 @@
 #include "tileset.h"
 #endif
 
+#if KDE_IS_VERSION(4, 3, 0)
+    #define QTC_COMPOSITING compositingActive()
+#else
+    #define QTC_COMPOSITING KWindowSystem::compositingActive()
+#endif
+
 namespace KWinQtCurve
 {
 
-QtCurveClient::QtCurveClient(KDecorationBridge *bridge, KDecorationFactory *factory)
+QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
+#if KDE_IS_VERSION(4, 3, 0)
+             : KCommonDecorationUnstable(bridge, factory),
+#else
              : KCommonDecoration(bridge, factory),
+#endif    
                itsResizeGrip(0L),
                itsTitleFont(QFont())
 {
@@ -151,9 +160,10 @@ void QtCurveClient::init()
     // ...if set to true when compositing, then sometimes only part of the titlebar is updated!
     // ...hence in reset() we need to alter this setting
     // ... :-(
-    widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
+    widget()->setAttribute(Qt::WA_PaintOnScreen, !QTC_COMPOSITING);
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, true);
+    widget()->setAttribute(Qt::WA_NoSystemBackground);
 
     if(Handler()->showResizeGrip())
         createSizeGrip();
@@ -186,7 +196,7 @@ void QtCurveClient::activeChange()
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
-    bool                 compositing=KWindowSystem::compositingActive();
+    bool                 compositing=QTC_COMPOSITING;
     QPainter             painter(widget());
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
@@ -204,7 +214,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
                          titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+(isMaximized() ? border : 0)),
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-    int                  rectX, rectY, rectX2, rectY2, shadowSize(0);
+    int                  rectX, rectY, rectX2, rectY2;
+
+    painter.setClipRegion(e->region());
 
 #if KDE_IS_VERSION(4, 3, 0)
     if(Handler()->customShadows() && compositing)
@@ -224,7 +236,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         else if(isShade())
             tileSet->render(r.adjusted(0, 4, 0, -4), &painter, TileSet::Bottom);
 
-        shadowSize=Handler()->shadowCache().shadowSize();
+        int shadowSize=Handler()->shadowCache().shadowSize();
         r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
     }
 #endif
@@ -233,8 +245,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
-
-    painter.setClipRegion(e->region());
 
     if(isMaximized())
         painter.setClipRect(r, Qt::IntersectClip);
@@ -421,11 +431,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 }
             }
 
-#if KDE_IS_VERSION(4, 3, 0)
-        if(shadowSize>0)
-            textRect.adjust(0, shadowSize, 0, shadowSize);
-#endif
-        painter.setClipRect(itsCaptionRect.adjusted(-2, shadowSize, 2, shadowSize));
+        painter.setClipRect(itsCaptionRect.adjusted(-2, 0, 2, 0));
 
         QColor color(KDecoration::options()->color(KDecoration::ColorFont, active));
 
@@ -446,7 +452,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     }
 
     if(showIcon && iconX>=0)
-        painter.drawPixmap(iconX, shadowSize+itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2)+1, menuIcon);
+        painter.drawPixmap(iconX, itsCaptionRect.y()+((itsCaptionRect.height()-iconSize)/2)+1, menuIcon);
 
     painter.end();
 }
@@ -479,7 +485,7 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
             bool    roundBottom=!isShade() && Handler()->roundBottom();
 
 // #if KDE_IS_VERSION(4, 3, 0)
-//             if(!isPreview() && KWindowSystem::compositingActive())
+//             if(!isPreview() && QTC_COMPOSITING)
 //             {
 //                 QRegion mask(4, 0, w-8, h);
 // 
@@ -555,7 +561,13 @@ QRect QtCurveClient::captionRect() const
                            titleEdgeLeft - layoutMetric(LM_TitleEdgeRight) -
                            buttonsLeftWidth() - buttonsRightWidth() -
                            marginLeft - marginRight);
-
+#if KDE_IS_VERSION(4, 3, 0)
+    if(Handler()->customShadows() && QTC_COMPOSITING)
+    {
+        int shadowSize=Handler()->shadowCache().shadowSize();
+        return QRect(titleLeft, r.top()+titleEdgeTop+shadowSize, titleWidth, titleHeight);
+    }
+#endif
     return QRect(titleLeft, r.top()+titleEdgeTop, titleWidth, titleHeight);
 }
 
@@ -583,7 +595,14 @@ void QtCurveClient::reset(unsigned long changed)
 {
     // Set note in init() above
     if(0==changed)
-        widget()->setAttribute(Qt::WA_PaintOnScreen, !KWindowSystem::compositingActive());
+        widget()->setAttribute(Qt::WA_PaintOnScreen, !QTC_COMPOSITING);
+#if KDE_IS_VERSION(4, 3, 85)
+    if(changed & SettingCompositing)
+    {
+        updateWindowShape();
+        widget()->update();
+    }
+#endif
     if (changed&(SettingColors|SettingFont|SettingBorder))
     {
         // Reset button backgrounds...
