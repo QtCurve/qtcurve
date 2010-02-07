@@ -97,8 +97,8 @@ class QtCurveHandler : public QObject,
     int                   borderEdgeSize() const;
     int                   titleBarPad() const     { return itsTitleBarPad; }
 #if KDE_IS_VERSION(4, 3, 0)
-    bool                 customShadows() const    { return itsCustomShadows; }
-    QtCurveShadowCache & shadowCache()            { return itsShadowCache; }
+    bool                  customShadows() const    { return itsCustomShadows; }
+    QtCurveShadowCache &  shadowCache()            { return itsShadowCache; }
 #endif
 
     QList<QtCurveHandler::BorderSize>  borderSizes() const;

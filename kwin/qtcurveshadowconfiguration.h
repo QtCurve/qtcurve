@@ -21,32 +21,48 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <KConfigGroup>
 #include <QtGui/QPalette>
+
+class KConfig;
 
 namespace KWinQtCurve
 {
 
 class QtCurveShadowConfiguration
 {
-
     public:
 
+    enum ColorType
+    {
+        CT_FOCUS,
+        CT_HOVER,
+        CT_ACTIVE_TITLEBAR,
+        CT_INACTIVE_TITLEBAR,
+        CT_GRAY,
+        CT_CUSTOM
+    };
+    
     QtCurveShadowConfiguration(QPalette::ColorGroup);
 
     virtual ~QtCurveShadowConfiguration() { }
 
+    void                 defaults();
+    void                 load(KConfig *cfg);
+    void                 save(KConfig *cfg);
+
     QPalette::ColorGroup colorGroup() const             { return itsColorGroup; }
-    qreal                shadowSize() const             { return itShadowSize; }
-    void                 setShadowSize(qreal v)         { itShadowSize = v; }
-    qreal                horizontalOffset() const       { return itsHorizontalOffset; }
-    void                 setHorizontalOffset(qreal v)   { itsHorizontalOffset = v; }
-    qreal                verticalOffset() const         { return itsVerticalOffset; }
-    void                 setVerticalOffset(qreal v)     { itsVerticalOffset = v; }
+    int                  shadowSize() const             { return itShadowSize; }
+    void                 setShadowSize(int v)           { itShadowSize = v; }
+    int                  horizontalOffset() const       { return itsHorizontalOffset; }
+    void                 setHorizontalOffset(int v)     { itsHorizontalOffset = v; }
+    int                  verticalOffset() const         { return itsVerticalOffset; }
+    void                 setVerticalOffset(int v)       { itsVerticalOffset = v; }
     QColor               innerColor() const             { return itsInnerColor; }
     void                 setInnerColor(const QColor &c) { itsInnerColor=c; }
     QColor               outerColor() const             { return itsOuterColor ; }
     void                 setOuterColor(const QColor &c) { itsOuterColor=c; }
+    ColorType            colorType() const              { return itsColorType; }
+    void                 setColorType(ColorType ct);
 
     bool operator == (const QtCurveShadowConfiguration& other) const
     {
@@ -61,9 +77,10 @@ class QtCurveShadowConfiguration
     private:
 
     QPalette::ColorGroup itsColorGroup;
-    qreal                itShadowSize,
+    int                  itShadowSize,
                          itsHorizontalOffset,
                          itsVerticalOffset;
+    ColorType            itsColorType;
     QColor               itsInnerColor,
                          itsOuterColor;
 };

@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include "ui_qtcurvekwinconfigwidget.h"
+#include "../kwin/qtcurveshadowconfiguration.h"
 
 class KConfig;
 
@@ -57,11 +58,23 @@ class QtCurveKWinConfig : public QObject
     void load(const KConfigGroup &config);
     void save(KConfigGroup &config);
     void defaults();
+    void activeShadowColorChanged();
+    void inactiveShadowColorChanged();
+    
+    private:
+    
+#if KDE_IS_VERSION(4, 3, 0)
+    void setShadows();
+#endif
 
     private:
 
-    KConfig                 *itsConfig;
-    QtCurveKWinConfigWidget *itsWidget;
+    KConfig                                *itsConfig;
+    QtCurveKWinConfigWidget                *itsWidget;
+#if KDE_IS_VERSION(4, 3, 0)
+    KWinQtCurve::QtCurveShadowConfiguration itsActiveShadows,
+                                            itsInactiveShadows;
+#endif
 };
 
 #endif // KNIFTYCONFIG_H

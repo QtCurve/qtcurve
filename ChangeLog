@@ -1,6 +1,8 @@
 1.0.3
 -----
 1. Under KDE SC>=4.3, use alpha blending for window borders.
+2. Implement coloured shadows - code taken from Oxygen window decoration
+   (but slightly modified)
 
 1.0.2
 -----

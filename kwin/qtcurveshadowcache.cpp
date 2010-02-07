@@ -201,8 +201,8 @@ static QColor calcLightColor(const QColor &color)
     // offsets are scaled with the shadow size
     // so that the ratio Top-shadow/Bottom-shadow is kept constant
     // when shadow size is changed
-    qreal hoffset = shadowConfiguration.horizontalOffset()*shadowSize/fixedSize;
-    qreal voffset = shadowConfiguration.verticalOffset()*shadowSize/fixedSize;
+    qreal hoffset = (((qreal)shadowConfiguration.horizontalOffset())/100.0)*shadowSize/fixedSize;
+    qreal voffset = (((qreal)shadowConfiguration.verticalOffset())/100.0)*shadowSize/fixedSize;
 
     // some gradients rendering are different at bottom corners if client has no border
 //     bool hasBorder( key.hasBorder || key.isShade );

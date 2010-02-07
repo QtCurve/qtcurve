@@ -22,6 +22,9 @@
 #if KDE_IS_VERSION(4, 3, 0)
 
 #include <KColorScheme>
+#include <KGlobalSettings>
+#include <KConfig>
+#include <KConfigGroup>
 #include "qtcurveshadowconfiguration.h"
 
 namespace KWinQtCurve
@@ -30,20 +33,107 @@ namespace KWinQtCurve
 QtCurveShadowConfiguration::QtCurveShadowConfiguration(QPalette::ColorGroup colorGroup)
                           : itsColorGroup(colorGroup)
 {
-    if(QPalette::Active==colorGroup)
+    defaults();
+}
+
+void QtCurveShadowConfiguration::defaults()
+{
+    itsHorizontalOffset = 0;
+    itsVerticalOffset = 5;
+        
+    if(QPalette::Active==itsColorGroup)
     {
         itShadowSize = 29;
-        itsHorizontalOffset = 0;
-        itsVerticalOffset = 0.05;
-        itsInnerColor = itsOuterColor = KColorScheme(QPalette::Active).decoration(KColorScheme::FocusColor).color();
+        setColorType(CT_FOCUS);
     }
     else
     {
         itShadowSize = 25;
-        itsHorizontalOffset = 0;
-        itsVerticalOffset = 0.05;
-        itsInnerColor = itsOuterColor = QColor("#393835");
+        setColorType(CT_GRAY);
     }
+}
+
+void QtCurveShadowConfiguration::setColorType(ColorType ct)
+{
+    itsColorType=ct;
+    
+    switch(itsColorType)
+    {
+        default:
+        case CT_FOCUS:
+            itsInnerColor = itsOuterColor = KColorScheme(itsColorGroup).decoration(KColorScheme::FocusColor).color();
+            break;
+        case CT_HOVER:
+            itsInnerColor = itsOuterColor = KColorScheme(itsColorGroup).decoration(KColorScheme::HoverColor).color();
+            break;
+        case CT_ACTIVE_TITLEBAR:
+            itsInnerColor = itsOuterColor = KGlobalSettings::activeTitleColor();
+            break;
+        case CT_INACTIVE_TITLEBAR:
+            itsInnerColor = itsOuterColor = KGlobalSettings::inactiveTitleColor();
+            break;
+        case CT_GRAY:
+            itsInnerColor = itsOuterColor = QColor("#393835");
+            break;
+    }
+}
+
+#define CFG_GROUP (QPalette::Active==itsColorGroup ? "ActiveShadows" : "InactiveShadows")
+#define CFG_SIZE         "Size"
+#define CFG_HORIZ_OFFSET "HOffset"
+#define CFG_VERT_OFFSET  "VOffset"
+#define CFG_COLOR_TYPE   "ColorType"
+#define CFG_INNER_COL    "InnerColor"
+#define CFG_OUTER_COL    "OuterColor"
+
+void QtCurveShadowConfiguration::load(KConfig *cfg)
+{
+    KConfigGroup configGroup(cfg, CFG_GROUP);
+    itShadowSize=configGroup.readEntry(CFG_SIZE, itShadowSize);
+    itsHorizontalOffset=configGroup.readEntry(CFG_HORIZ_OFFSET, itsHorizontalOffset);
+    itsVerticalOffset=configGroup.readEntry(CFG_VERT_OFFSET, itsVerticalOffset);
+    itsColorType=(ColorType)configGroup.readEntry(CFG_COLOR_TYPE, (int)itsColorType);
+    if(CT_CUSTOM==itsColorType)
+    {
+        itsInnerColor=configGroup.readEntry(CFG_INNER_COL, itsInnerColor);
+        itsOuterColor=configGroup.readEntry(CFG_OUTER_COL, itsOuterColor);
+    }
+}
+
+void QtCurveShadowConfiguration::save(KConfig *cfg)
+{
+    KConfigGroup               configGroup(cfg, CFG_GROUP);
+    QtCurveShadowConfiguration def(itsColorGroup);
+    
+    if(itShadowSize==def.itShadowSize)
+        configGroup.deleteEntry(CFG_SIZE);
+    else
+        configGroup.writeEntry(CFG_SIZE, itShadowSize);
+
+    if(itsHorizontalOffset==def.itsHorizontalOffset)
+        configGroup.deleteEntry(CFG_HORIZ_OFFSET);
+    else
+        configGroup.writeEntry(CFG_HORIZ_OFFSET, itsHorizontalOffset);
+
+    if(itsVerticalOffset==def.itsVerticalOffset)
+        configGroup.deleteEntry(CFG_VERT_OFFSET);
+    else
+        configGroup.writeEntry(CFG_VERT_OFFSET, itsVerticalOffset);
+
+    if(itsColorType==def.itsColorType)
+        configGroup.deleteEntry(CFG_COLOR_TYPE);
+    else
+        configGroup.writeEntry(CFG_COLOR_TYPE, (int)itsColorType);
+    
+    if(CT_CUSTOM!=itsColorType || itsInnerColor==def.itsInnerColor)
+        configGroup.deleteEntry(CFG_INNER_COL);
+    else
+        configGroup.writeEntry(CFG_INNER_COL, itsInnerColor);
+
+    if(CT_CUSTOM!=itsColorType || itsOuterColor==def.itsOuterColor)
+        configGroup.deleteEntry(CFG_OUTER_COL);
+    else
+        configGroup.writeEntry(CFG_OUTER_COL, itsOuterColor);
 }
 
 }

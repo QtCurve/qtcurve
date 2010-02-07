@@ -269,8 +269,22 @@ bool QtCurveHandler::readConfig()
     itsTitleHeight+=2*itsTitleBarPad;
 #if KDE_IS_VERSION(4, 3, 0)
     itsCustomShadows = config.readEntry("CustomShadows", false);
+    
+    QtCurveShadowConfiguration actShadow(QPalette::Active),
+                               inactShadow(QPalette::Inactive);
+
     if(itsCustomShadows)
         itsOuterBorder=false;
+    
+    bool shadowChanged=itsCustomShadows &&
+                       (itsShadowCache.shadowConfigurationChanged(actShadow) ||
+                        itsShadowCache.shadowConfigurationChanged(inactShadow));                
+
+    if(itsCustomShadows)
+    {
+        itsShadowCache.setShadowConfiguration(actShadow);
+        itsShadowCache.setShadowConfiguration(inactShadow);
+    }
 #endif
 
     return oldMenuClose!=itsMenuClose ||
@@ -279,6 +293,7 @@ bool QtCurveHandler::readConfig()
            oldOuterBorder!=itsOuterBorder ||
 #if KDE_IS_VERSION(4, 3, 0)
            oldCustomShadows!=itsCustomShadows ||
+           shadowChanged ||
 #endif
            oldTitleBarPad!=itsTitleBarPad;
 }
