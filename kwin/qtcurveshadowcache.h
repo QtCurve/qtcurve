@@ -144,6 +144,12 @@ namespace KWinQtCurve
     //! simple pixmap
     QPixmap simpleShadowPixmap( const QColor&, const Key&, bool active ) const;
 
+    void reset()
+    {
+        shadowCache_.clear();
+        animatedShadowCache_.clear();
+    }
+    
     protected:
 
 //     QtCurveHelper& helper( void ) const

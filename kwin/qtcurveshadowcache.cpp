@@ -97,8 +97,7 @@ static QColor calcLightColor(const QColor &color)
     QtCurveShadowConfiguration& local = (other.colorGroup() == QPalette::Active ) ? activeShadowConfiguration_:inactiveShadowConfiguration_;
     local = other;
 
-    shadowCache_.clear();
-    animatedShadowCache_.clear();
+    reset();
   }
 
   //_______________________________________________________

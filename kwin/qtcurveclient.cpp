@@ -156,11 +156,6 @@ void QtCurveClient::init()
     itsTitleFont=isToolWindow() ? Handler()->titleFontTool() : Handler()->titleFont();
 
     KCommonDecoration::init();
-    // If WA_PaintOnScreen is set to false when not compositnig then get redraw errors
-    // ...if set to true when compositing, then sometimes only part of the titlebar is updated!
-    // ...hence in reset() we need to alter this setting
-    // ... :-(
-    widget()->setAttribute(Qt::WA_PaintOnScreen, !QTC_COMPOSITING);
     widget()->setAutoFillBackground(false);
     widget()->setAttribute(Qt::WA_OpaquePaintEvent, true);
     widget()->setAttribute(Qt::WA_NoSystemBackground);
@@ -219,23 +214,25 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     painter.setClipRegion(e->region());
 
 #if KDE_IS_VERSION(4, 3, 0)
-    if(Handler()->customShadows() && compositing)
+    if(Handler()->customShadows())
     {
-        TileSet *tileSet( 0 );
-//         if( configuration().useOxygenShadows() && glowIsAnimated() && !isForcedActive() )
-//       {
-//
-//         int frame = ;
-//         tileSet = shadowCache().tileSet(this, frame);=
-//       }
-//       else
-          tileSet = Handler()->shadowCache().tileSet(this);
+        if(compositing)
+        {
+            TileSet *tileSet( 0 );
+    //         if( configuration().useOxygenShadows() && glowIsAnimated() && !isForcedActive() )
+    //       {
+    //
+    //         int frame = ;
+    //         tileSet = shadowCache().tileSet(this, frame);=
+    //       }
+    //       else
+            tileSet = Handler()->shadowCache().tileSet(this);
 
-        if(!isMaximized())
-            tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);
-        else if(isShade())
-            tileSet->render(r.adjusted(0, 5, 0, -5), &painter, TileSet::Bottom);
-
+            if(!isMaximized())
+                tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);
+            else if(isShade())
+                tileSet->render(r.adjusted(0, 5, 0, -5), &painter, TileSet::Bottom);
+        }
         shadowSize=Handler()->shadowCache().shadowSize();
         r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
     }
@@ -467,7 +464,7 @@ void QtCurveClient::updateWindowShape()
         clearMask();
     else
     {
-        QRect r(Handler()->customShadows() && QTC_COMPOSITING
+        QRect r(Handler()->customShadows()
                     ? widget()->rect().adjusted(layoutMetric(LM_OuterPaddingLeft), layoutMetric(LM_OuterPaddingTop),
                                                -layoutMetric(LM_OuterPaddingRight), 0) // -layoutMetric(LM_OuterPaddingBottom))
                     : widget()->rect());
@@ -545,7 +542,7 @@ QRegion QtCurveClient::getMask(int round, const QRect &r) const
                 }
                 else
                 {
-                    mask += QRegion(x, 5, y+1, h-5);
+                    mask += QRegion(x, y+5, 1, h-5);
                     mask += QRegion(x+1, y+3, 1, h-2);
                     mask += QRegion(x+2, y+2, 1, h-1);
                     mask += QRegion(x+3, y+1, 2, h);
@@ -576,7 +573,7 @@ QRect QtCurveClient::captionRect() const
                            buttonsLeftWidth() - buttonsRightWidth() -
                            marginLeft - marginRight);
 #if KDE_IS_VERSION(4, 3, 0)
-    if(Handler()->customShadows() && QTC_COMPOSITING)
+    if(Handler()->customShadows())
     {
         int shadowSize=Handler()->shadowCache().shadowSize();
         return QRect(titleLeft+shadowSize, r.top()+titleEdgeTop+shadowSize, titleWidth-(shadowSize*2), titleHeight);
@@ -607,9 +604,6 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 
 void QtCurveClient::reset(unsigned long changed)
 {
-    // Set note in init() above
-    if(0==changed)
-        widget()->setAttribute(Qt::WA_PaintOnScreen, !QTC_COMPOSITING);
 #if KDE_IS_VERSION(4, 3, 85)
     if(changed & SettingCompositing)
     {
