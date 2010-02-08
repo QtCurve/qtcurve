@@ -87,13 +87,20 @@ void QtCurveShadowConfiguration::setColorType(ColorType ct)
 
 void QtCurveShadowConfiguration::load(KConfig *cfg)
 {
-    KConfigGroup configGroup(cfg, CFG_GROUP);
+    KConfigGroup               configGroup(cfg, CFG_GROUP);
+    QtCurveShadowConfiguration def(itsColorGroup);
     itShadowSize=configGroup.readEntry(CFG_SIZE, itShadowSize);
     itsHorizontalOffset=configGroup.readEntry(CFG_HORIZ_OFFSET, itsHorizontalOffset);
     itsVerticalOffset=configGroup.readEntry(CFG_VERT_OFFSET, itsVerticalOffset);
     itsColorType=(ColorType)configGroup.readEntry(CFG_COLOR_TYPE, (int)itsColorType);
     if(CT_CUSTOM==itsColorType)
         itsColor=configGroup.readEntry(CFG_COLOR, itsColor);
+    if(itShadowSize<MIN_SIZE || itShadowSize>MAX_SIZE)
+        itShadowSize=def.shadowSize();
+    if(itsHorizontalOffset<MIN_OFFSET || itsHorizontalOffset>MAX_OFFSET)
+        itsHorizontalOffset=def.horizontalOffset();
+    if(itsVerticalOffset<MIN_OFFSET || itsVerticalOffset>MAX_OFFSET)
+        itsVerticalOffset=def.verticalOffset();
 }
 
 void QtCurveShadowConfiguration::save(KConfig *cfg)

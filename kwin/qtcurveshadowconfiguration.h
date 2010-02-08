@@ -41,6 +41,14 @@ class QtCurveShadowConfiguration
         CT_GRAY,
         CT_CUSTOM
     };
+
+    enum Constants
+    {
+        MIN_SIZE   = 10,
+        MAX_SIZE   = 50,
+        MIN_OFFSET = 0,
+        MAX_OFFSET = 20
+    };
     
     QtCurveShadowConfiguration(QPalette::ColorGroup);
 

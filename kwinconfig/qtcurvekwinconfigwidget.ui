@@ -152,7 +152,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Vertical offset:</string>
+             <string>Horizontal offset:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -160,19 +160,32 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="KIntSpinBox" name="activeShadowOffset"/>
+           <widget class="KIntSpinBox" name="activeShadowHOffset"/>
           </item>
-          <item row="2" column="0">
+         <item row="2" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Vertical offset:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="KIntSpinBox" name="activeShadowVOffset"/>
+          </item>
+          <item row="3" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
              <string>Color:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QComboBox" name="activeShadowColorType"/>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="KColorButton" name="activeShadowColor"/>
           </item>
          </layout>
@@ -203,7 +216,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_11">
             <property name="text">
-             <string>Vertical offset:</string>
+             <string>Horizontal offset:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -211,19 +224,32 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="KIntSpinBox" name="inactiveShadowOffset"/>
+           <widget class="KIntSpinBox" name="inactiveShadowHOffset"/>
           </item>
           <item row="2" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Vertical offset:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="KIntSpinBox" name="inactiveShadowVOffset"/>
+          </item>
+          <item row="3" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Color:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QComboBox" name="inactiveShadowColorType"/>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="KColorButton" name="inactiveShadowColor"/>
           </item>
          </layout>
@@ -258,11 +284,13 @@
   <tabstop>titleBarPad</tabstop>
   <tabstop>useShadows</tabstop>
   <tabstop>activeShadowSize</tabstop>
-  <tabstop>activeShadowOffset</tabstop>
+  <tabstop>activeShadowHOffset</tabstop>
+  <tabstop>activeShadowVOffset</tabstop>
   <tabstop>activeShadowColorType</tabstop>
   <tabstop>activeShadowColor</tabstop>
   <tabstop>inactiveShadowSize</tabstop>
-  <tabstop>inactiveShadowOffset</tabstop>
+  <tabstop>inactiveShadowHOffset</tabstop>
+  <tabstop>inactiveShadowVOffset</tabstop>
   <tabstop>inactiveShadowColorType</tabstop>
   <tabstop>inactiveShadowColor</tabstop>
  </tabstops>

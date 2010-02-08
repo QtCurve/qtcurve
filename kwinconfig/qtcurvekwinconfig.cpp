@@ -69,16 +69,30 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
     insertColorEntries(itsWidget->inactiveShadowColorType);
     connect(itsWidget->useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->activeShadowOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(itsWidget->activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(itsWidget->activeShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
     connect(itsWidget->activeShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(activeShadowColorTypeChanged()));
     connect(itsWidget->activeShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
     connect(itsWidget->inactiveShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->inactiveShadowOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(itsWidget->inactiveShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(itsWidget->inactiveShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
     connect(itsWidget->inactiveShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(inactiveShadowColorTypeChanged()));
     connect(itsWidget->inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
     activeShadowColorTypeChanged();
     inactiveShadowColorTypeChanged();
     setShadows();
+    itsWidget->activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
+                                          KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
+    itsWidget->inactiveShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
+                                            KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
+    itsWidget->activeShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                             KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+    itsWidget->inactiveShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                               KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+    itsWidget->activeShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                             KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+    itsWidget->inactiveShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                               KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
 #else
     itsWidget->shadowTab->setVisible(false);
 #endif
@@ -125,12 +139,14 @@ void QtCurveKWinConfig::save(KConfigGroup &)
     if(itsWidget->useShadows->isChecked())
     {
         itsActiveShadows.setShadowSize(itsWidget->activeShadowSize->value());
-        itsActiveShadows.setVerticalOffset(itsWidget->activeShadowOffset->value());
+        itsActiveShadows.setHorizontalOffset(itsWidget->activeShadowHOffset->value());
+        itsActiveShadows.setVerticalOffset(itsWidget->activeShadowVOffset->value());
         itsActiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)itsWidget->activeShadowColorType->currentIndex());
         if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==itsWidget->activeShadowColorType->currentIndex())
             itsActiveShadows.setColor(itsWidget->activeShadowColor->color());
         itsInactiveShadows.setShadowSize(itsWidget->inactiveShadowSize->value());
-        itsInactiveShadows.setVerticalOffset(itsWidget->inactiveShadowOffset->value());
+        itsInactiveShadows.setHorizontalOffset(itsWidget->inactiveShadowHOffset->value());
+        itsInactiveShadows.setVerticalOffset(itsWidget->inactiveShadowVOffset->value());
         itsInactiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)itsWidget->inactiveShadowColorType->currentIndex());
         if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==itsWidget->inactiveShadowColorType->currentIndex())
             itsInactiveShadows.setColor(itsWidget->inactiveShadowColor->color());
@@ -183,11 +199,13 @@ void QtCurveKWinConfig::inactiveShadowColorTypeChanged()
 void QtCurveKWinConfig::setShadows()
 {
     itsWidget->activeShadowSize->setValue(itsActiveShadows.shadowSize());
-    itsWidget->activeShadowOffset->setValue(itsActiveShadows.verticalOffset());
+    itsWidget->activeShadowHOffset->setValue(itsActiveShadows.horizontalOffset());
+    itsWidget->activeShadowVOffset->setValue(itsActiveShadows.verticalOffset());
     itsWidget->activeShadowColor->setColor(itsActiveShadows.color());
     itsWidget->activeShadowColorType->setCurrentIndex(itsActiveShadows.colorType());
     itsWidget->inactiveShadowSize->setValue(itsInactiveShadows.shadowSize());
-    itsWidget->inactiveShadowOffset->setValue(itsInactiveShadows.verticalOffset());
+    itsWidget->inactiveShadowHOffset->setValue(itsInactiveShadows.horizontalOffset());
+    itsWidget->inactiveShadowVOffset->setValue(itsInactiveShadows.verticalOffset());
     itsWidget->inactiveShadowColor->setColor(itsInactiveShadows.color());
     itsWidget->inactiveShadowColorType->setCurrentIndex(itsInactiveShadows.colorType());
 }
