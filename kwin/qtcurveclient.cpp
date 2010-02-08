@@ -214,7 +214,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
                          titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+(isMaximized() ? border : 0)),
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
-    int                  rectX, rectY, rectX2, rectY2;
+    int                  rectX, rectY, rectX2, rectY2, shadowSize(0);
 
     painter.setClipRegion(e->region());
 
@@ -236,7 +236,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         else if(isShade())
             tileSet->render(r.adjusted(0, 5, 0, -5), &painter, TileSet::Bottom);
 
-        int shadowSize=Handler()->shadowCache().shadowSize();
+        shadowSize=Handler()->shadowCache().shadowSize();
         r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
     }
 #endif
@@ -347,7 +347,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
 
     itsCaptionRect=captionRect(); // also update itsCaptionRect!
-    bool     showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,
+    bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,
                                                                                     0L, 0L);
     int     iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0,
             iconX=itsCaptionRect.x();
@@ -390,11 +390,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             {
                 alignment=Qt::AlignVCenter|Qt::AlignLeft;
                 textRect=itsCaptionRect;
+                hAlign=Qt::AlignLeft;
             }
             else if(itsCaptionRect.right()<((textRect.width()+textWidth)>>1))
             {
                 alignment=Qt::AlignVCenter|Qt::AlignRight;
                 textRect=itsCaptionRect;
+                hAlign=Qt::AlignRight;
             }
 
         if(showIcon)
@@ -407,7 +409,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 }
                 else
                 {
-                    iconX=((textRect.width()-textWidth)/2.0)+0.5;
+                    iconX=(((textRect.width()-textWidth)/2.0)+0.5)+
+                            (shadowSize ? (Qt::AlignHCenter==hAlign ? shadowSize : itsCaptionRect.x()) : 0);
                     textRect.setX(iconX+iconSize+constPad);
                     alignment=Qt::AlignVCenter|Qt::AlignLeft;
                 }
@@ -576,7 +579,7 @@ QRect QtCurveClient::captionRect() const
     if(Handler()->customShadows() && QTC_COMPOSITING)
     {
         int shadowSize=Handler()->shadowCache().shadowSize();
-        return QRect(titleLeft, r.top()+titleEdgeTop+shadowSize, titleWidth, titleHeight);
+        return QRect(titleLeft+shadowSize, r.top()+titleEdgeTop+shadowSize, titleWidth-(shadowSize*2), titleHeight);
     }
 #endif
     return QRect(titleLeft, r.top()+titleEdgeTop, titleWidth, titleHeight);
