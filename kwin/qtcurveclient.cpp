@@ -224,7 +224,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         TileSet *tileSet( 0 );
 //         if( configuration().useOxygenShadows() && glowIsAnimated() && !isForcedActive() )
 //       {
-// 
+//
 //         int frame = ;
 //         tileSet = shadowCache().tileSet( this, frame );=
 //       }
@@ -232,9 +232,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
           tileSet = Handler()->shadowCache().tileSet( this );
 
         if(!isMaximized())
-            tileSet->render(r.adjusted(4, 4, -4, -4), &painter, TileSet::Ring);
+            tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);
         else if(isShade())
-            tileSet->render(r.adjusted(0, 4, 0, -4), &painter, TileSet::Bottom);
+            tileSet->render(r.adjusted(0, 5, 0, -5), &painter, TileSet::Bottom);
 
         int shadowSize=Handler()->shadowCache().shadowSize();
         r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
@@ -488,7 +488,7 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
 //             if(!isPreview() && QTC_COMPOSITING)
 //             {
 //                 QRegion mask(4, 0, w-8, h);
-// 
+//
 //                 if(roundBottom)
 //                 {
 //                     mask += QRegion(0, 4, 1, h-8);
