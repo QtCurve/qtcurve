@@ -2717,15 +2717,15 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
                         mask->region += QRegion(r.x()+r.width()-1, r.y()+1, 1, r.height()-2);
                         break;
                     default: // ROUND_FULL
-                        mask->region=QRegion(r.x()+4, r.y(), r.width()-8, r.height());
-                        mask->region += QRegion(r.x()+0, r.y()+4, 1, r.height()-4);
-                        mask->region += QRegion(r.x()+1, r.y()+2, 1, r.height()-1);
-                        mask->region += QRegion(r.x()+2, r.y()+1, 1, r.height());
-                        mask->region += QRegion(r.x()+3, r.y()+1, 1, r.height());
-                        mask->region += QRegion(r.x()+r.width()-1, r.y()+4, 1, r.height()-4);
-                        mask->region += QRegion(r.x()+r.width()-2, r.y()+2, 1, r.height()-1);
-                        mask->region += QRegion(r.x()+r.width()-3, r.y()+1, 1, r.height()-0);
-                        mask->region += QRegion(r.x()+r.width()-4, r.y()+1, 1, r.height()-0);
+                        mask->region=QRegion(r.x()+5, r.y(), r.width()-10, r.height());
+                        mask->region += QRegion(r.x()+0, r.y()+5, 1, r.height()-5);
+                        mask->region += QRegion(r.x()+1, r.y()+3, 1, r.height()-2);
+                        mask->region += QRegion(r.x()+2, r.y()+2, 1, r.height()-1);
+                        mask->region += QRegion(r.x()+3, r.y()+1, 2, r.height());
+                        mask->region += QRegion(r.x()+r.width()-1, r.y()+4, 1, r.height()-5);
+                        mask->region += QRegion(r.x()+r.width()-2, r.y()+3, 1, r.height()-2);
+                        mask->region += QRegion(r.x()+r.width()-3, r.y()+2, 1, r.height()-1);
+                        mask->region += QRegion(r.x()+r.width()-5, r.y()+1, 2, r.height()-0);
                 }
             }
             return 1;
@@ -7325,16 +7325,19 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #else
                 QPainterPath path;
 #endif
+                if(!kwin)
+                    painter->fillRect(r, titleCols[QT_STD_BORDER]);
+
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, path, true, false,
                                     widgetApp(WIDGET_MDI_WINDOW, &opts, option->state&State_Active),
                                     WIDGET_MDI_WINDOW, false);
-                                      
+
                 if(!(state&QtC_StateKWinNoBorder))
                 {
                     if(opts.titlebarBorder)
                     {
-                        painter->setPen(btnCols[0]);
+                        painter->setPen(titleCols[0]);
                         painter->drawPath(buildPath(r.adjusted(1, 1, 0, 0), WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
                                                     opts.round<ROUND_SLIGHT
                                                         ? 0
@@ -7343,7 +7346,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                                             : 1.0));
                     }
 
-                    painter->setPen(btnCols[QT_STD_BORDER]);
+                    painter->setPen(titleCols[QT_STD_BORDER]);
                     painter->drawPath(buildPath(r, WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
                                                 opts.round<ROUND_SLIGHT
                                                     ? 0
@@ -7355,7 +7358,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(opts.titlebarBorder)
                     {
-                        painter->setPen(btnCols[0]);
+                        painter->setPen(titleCols[0]);
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
 
@@ -7363,7 +7366,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         if(!(state&QtC_StateKWinCompositing))
                         {
-                            painter->setPen(btnCols[QT_STD_BORDER]);
+                            painter->setPen(titleCols[QT_STD_BORDER]);
 
                             painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
                             painter->drawPoint(r.x()+2, r.y()+2);
@@ -7375,7 +7378,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                         if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
                         {
-                            painter->setPen(btnCols[0]);
+                            painter->setPen(titleCols[0]);
                             painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
                             painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
                             //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
@@ -7390,7 +7393,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         end(start.x(), start.y()+constFadeLen);
                         QLinearGradient grad(start, end);
 
-                        grad.setColorAt(0, btnCols[QT_STD_BORDER]);
+                        grad.setColorAt(0, titleCols[QT_STD_BORDER]);
                         grad.setColorAt(1, itsBackgroundCols[QT_STD_BORDER]);
                         painter->setPen(QPen(QBrush(grad), 1));
                         painter->drawLine(r.x(), start.y(), r.x(), end.y());
