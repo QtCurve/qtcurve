@@ -277,9 +277,6 @@ bool QtCurveHandler::readConfig()
         QtCurveShadowConfiguration actShadow(QPalette::Active),
                                    inactShadow(QPalette::Inactive);
 
-        if(itsCustomShadows)
-            itsOuterBorder=false;
-
         actShadow.load(&configFile);
         inactShadow.load(&configFile);
 
