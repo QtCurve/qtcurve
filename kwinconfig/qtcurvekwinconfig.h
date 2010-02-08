@@ -58,8 +58,8 @@ class QtCurveKWinConfig : public QObject
     void load(const KConfigGroup &config);
     void save(KConfigGroup &config);
     void defaults();
-    void activeShadowColorChanged();
-    void inactiveShadowColorChanged();
+    void activeShadowColorTypeChanged();
+    void inactiveShadowColorTypeChanged();
     
     private:
     

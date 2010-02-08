@@ -170,33 +170,10 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="activeShadowColor"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Custom inner color:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
+           <widget class="QComboBox" name="activeShadowColorType"/>
           </item>
           <item row="3" column="1">
-           <widget class="KColorButton" name="activeShadowInnerColor"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Custom outer color:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="KColorButton" name="activeShadowOuterColor"/>
+           <widget class="KColorButton" name="activeShadowColor"/>
           </item>
          </layout>
         </widget>
@@ -244,33 +221,10 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="inactiveShadowColor"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Custom inner color:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
+           <widget class="QComboBox" name="inactiveShadowColorType"/>
           </item>
           <item row="3" column="1">
-           <widget class="KColorButton" name="inactiveShadowInnerColor"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Custom outer color:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="KColorButton" name="inactiveShadowOuterColor"/>
+           <widget class="KColorButton" name="inactiveShadowColor"/>
           </item>
          </layout>
         </widget>
@@ -305,14 +259,12 @@
   <tabstop>useShadows</tabstop>
   <tabstop>activeShadowSize</tabstop>
   <tabstop>activeShadowOffset</tabstop>
+  <tabstop>activeShadowColorType</tabstop>
   <tabstop>activeShadowColor</tabstop>
-  <tabstop>activeShadowInnerColor</tabstop>
-  <tabstop>activeShadowOuterColor</tabstop>
   <tabstop>inactiveShadowSize</tabstop>
   <tabstop>inactiveShadowOffset</tabstop>
+  <tabstop>inactiveShadowColorType</tabstop>
   <tabstop>inactiveShadowColor</tabstop>
-  <tabstop>inactiveShadowInnerColor</tabstop>
-  <tabstop>inactiveShadowOuterColor</tabstop>
  </tabstops>
  <resources/>
  <connections>

@@ -50,19 +50,22 @@ class QtCurveShadowConfiguration
     void                 load(KConfig *cfg);
     void                 save(KConfig *cfg);
 
-    QPalette::ColorGroup colorGroup() const             { return itsColorGroup; }
-    int                  shadowSize() const             { return itShadowSize; }
-    void                 setShadowSize(int v)           { itShadowSize = v; }
-    int                  horizontalOffset() const       { return itsHorizontalOffset; }
-    void                 setHorizontalOffset(int v)     { itsHorizontalOffset = v; }
-    int                  verticalOffset() const         { return itsVerticalOffset; }
-    void                 setVerticalOffset(int v)       { itsVerticalOffset = v; }
-    QColor               innerColor() const             { return itsInnerColor; }
-    void                 setInnerColor(const QColor &c) { itsInnerColor=c; }
-    QColor               outerColor() const             { return itsOuterColor ; }
-    void                 setOuterColor(const QColor &c) { itsOuterColor=c; }
-    ColorType            colorType() const              { return itsColorType; }
+    QPalette::ColorGroup colorGroup() const         { return itsColorGroup; }
+    int                  shadowSize() const         { return itShadowSize; }
+    void                 setShadowSize(int v)       { itShadowSize = v; }
+    int                  horizontalOffset() const   { return itsHorizontalOffset; }
+    void                 setHorizontalOffset(int v) { itsHorizontalOffset = v; }
+    int                  verticalOffset() const     { return itsVerticalOffset; }
+    void                 setVerticalOffset(int v)   { itsVerticalOffset = v; }
+    void                 setColor(const QColor &c)  { itsColor=c; }
+    const QColor &       color() const              { return itsColor; }
+    ColorType            colorType() const          { return itsColorType; }
     void                 setColorType(ColorType ct);
+
+    // Keep compatible with Oxygen Shadow Cache code...
+    const QColor &       innerColor() const         { return itsColor; }
+    const QColor &       midColor() const           { return itsColor; }
+    const QColor &       outerColor() const         { return itsColor; }
 
     bool operator == (const QtCurveShadowConfiguration& other) const
     {
@@ -70,8 +73,7 @@ class QtCurveShadowConfiguration
                 itShadowSize == other.itShadowSize &&
                 itsHorizontalOffset == other.itsHorizontalOffset &&
                 itsVerticalOffset == other.itsVerticalOffset &&
-                itsInnerColor == other.itsInnerColor &&
-                itsOuterColor == other.itsOuterColor;
+                itsColor == other.itsColor;
     }
 
     private:
@@ -81,8 +83,7 @@ class QtCurveShadowConfiguration
                          itsHorizontalOffset,
                          itsVerticalOffset;
     ColorType            itsColorType;
-    QColor               itsInnerColor,
-                         itsOuterColor;
+    QColor               itsColor;
 };
 
 }

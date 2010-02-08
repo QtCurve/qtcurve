@@ -61,19 +61,19 @@ void QtCurveShadowConfiguration::setColorType(ColorType ct)
     {
         default:
         case CT_FOCUS:
-            itsInnerColor = itsOuterColor = KColorScheme(itsColorGroup).decoration(KColorScheme::FocusColor).color();
+            itsColor = KColorScheme(itsColorGroup).decoration(KColorScheme::FocusColor).color();
             break;
         case CT_HOVER:
-            itsInnerColor = itsOuterColor = KColorScheme(itsColorGroup).decoration(KColorScheme::HoverColor).color();
+            itsColor = KColorScheme(itsColorGroup).decoration(KColorScheme::HoverColor).color();
             break;
         case CT_ACTIVE_TITLEBAR:
-            itsInnerColor = itsOuterColor = KGlobalSettings::activeTitleColor();
+            itsColor = KGlobalSettings::activeTitleColor();
             break;
         case CT_INACTIVE_TITLEBAR:
-            itsInnerColor = itsOuterColor = KGlobalSettings::inactiveTitleColor();
+            itsColor = KGlobalSettings::inactiveTitleColor();
             break;
         case CT_GRAY:
-            itsInnerColor = itsOuterColor = QColor("#393835");
+            itsColor = QColor("#393835");
             break;
     }
 }
@@ -83,8 +83,7 @@ void QtCurveShadowConfiguration::setColorType(ColorType ct)
 #define CFG_HORIZ_OFFSET "HOffset"
 #define CFG_VERT_OFFSET  "VOffset"
 #define CFG_COLOR_TYPE   "ColorType"
-#define CFG_INNER_COL    "InnerColor"
-#define CFG_OUTER_COL    "OuterColor"
+#define CFG_COLOR        "Color"
 
 void QtCurveShadowConfiguration::load(KConfig *cfg)
 {
@@ -94,10 +93,7 @@ void QtCurveShadowConfiguration::load(KConfig *cfg)
     itsVerticalOffset=configGroup.readEntry(CFG_VERT_OFFSET, itsVerticalOffset);
     itsColorType=(ColorType)configGroup.readEntry(CFG_COLOR_TYPE, (int)itsColorType);
     if(CT_CUSTOM==itsColorType)
-    {
-        itsInnerColor=configGroup.readEntry(CFG_INNER_COL, itsInnerColor);
-        itsOuterColor=configGroup.readEntry(CFG_OUTER_COL, itsOuterColor);
-    }
+        itsColor=configGroup.readEntry(CFG_COLOR, itsColor);
 }
 
 void QtCurveShadowConfiguration::save(KConfig *cfg)
@@ -125,15 +121,10 @@ void QtCurveShadowConfiguration::save(KConfig *cfg)
     else
         configGroup.writeEntry(CFG_COLOR_TYPE, (int)itsColorType);
     
-    if(CT_CUSTOM!=itsColorType || itsInnerColor==def.itsInnerColor)
-        configGroup.deleteEntry(CFG_INNER_COL);
+    if(CT_CUSTOM!=itsColorType || itsColor==def.itsColor)
+        configGroup.deleteEntry(CFG_COLOR);
     else
-        configGroup.writeEntry(CFG_INNER_COL, itsInnerColor);
-
-    if(CT_CUSTOM!=itsColorType || itsOuterColor==def.itsOuterColor)
-        configGroup.deleteEntry(CFG_OUTER_COL);
-    else
-        configGroup.writeEntry(CFG_OUTER_COL, itsOuterColor);
+        configGroup.writeEntry(CFG_COLOR, itsColor);
 }
 
 }
