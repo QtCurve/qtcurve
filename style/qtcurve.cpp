@@ -4122,8 +4122,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
-                painter->setPen(borderCols[0]);
-                drawRect(painter, r.adjusted(1, 1, 0, 0));
+                if(opts.titlebarBorder)
+                {
+                    painter->setPen(borderCols[0]);
+                    drawRect(painter, r.adjusted(1, 1, 0, 0));
+                }
                 painter->setPen(borderCols[QT_STD_BORDER]);
                 drawRect(painter, r);
             }
@@ -7398,6 +7401,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->setPen(QPen(QBrush(grad), 1));
                         painter->drawLine(r.x(), start.y(), r.x(), end.y());
                         painter->drawLine(r.x()+r.width()-1, start.y(), r.x()+r.width()-1, end.y());
+
+                        if(opts.titlebarBorder)
+                        {
+                            grad.setColorAt(0, titleCols[0]);
+                            grad.setColorAt(1, itsBackgroundCols[0]);
+                            painter->setPen(QPen(QBrush(grad), 1));
+                            painter->drawLine(r.x()+1, start.y(), r.x()+1, end.y());
+                        }
                     }
                 }
                 else
