@@ -254,7 +254,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
 
-    painter.fillRect(r, compositing ? Qt::transparent : (colorTitleOnly ? windowCol : col));
+    if(!compositing)
+        painter.fillRect(r, colorTitleOnly ? windowCol : col);
     painter.setRenderHint(QPainter::Antialiasing, true);
     if(compositing)
     {
@@ -465,7 +466,7 @@ void QtCurveClient::updateWindowShape()
     {
         QRect r(Handler()->customShadows() && QTC_COMPOSITING
                     ? widget()->rect().adjusted(layoutMetric(LM_OuterPaddingLeft), layoutMetric(LM_OuterPaddingTop),
-                                               -layoutMetric(LM_OuterPaddingRight), -layoutMetric( LM_OuterPaddingBottom))
+                                               -layoutMetric(LM_OuterPaddingRight), 0) // -layoutMetric(LM_OuterPaddingBottom))
                     : widget()->rect());
 
         setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL), r));
