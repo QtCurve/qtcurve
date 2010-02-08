@@ -226,10 +226,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 //       {
 //
 //         int frame = ;
-//         tileSet = shadowCache().tileSet( this, frame );=
+//         tileSet = shadowCache().tileSet(this, frame);=
 //       }
 //       else
-          tileSet = Handler()->shadowCache().tileSet( this );
+          tileSet = Handler()->shadowCache().tileSet(this);
 
         if(!isMaximized())
             tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);
@@ -250,9 +250,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.setClipRect(r, Qt::IntersectClip);
     else
 #if KDE_IS_VERSION(4, 3, 0)
-        if(!compositing || isPreview())
+        if(!compositing && !isPreview())
 #endif
-        painter.setClipRegion(getMask(round, r.width(), r.height()), Qt::IntersectClip);
+        painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
 
     painter.fillRect(r, compositing ? Qt::transparent : (colorTitleOnly ? windowCol : col));
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -301,7 +301,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(outerBorder)
     {
 #ifdef QTC_DRAW_INTO_PIXMAPS
-        if(!compositing || isPreview())
+        if(!compositing && !isPreview())
         {
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
             QPixmap pix(32, 32);
@@ -329,7 +329,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
 #ifdef QTC_DRAW_INTO_PIXMAPS
-    if(!compositing || isPreview())
+    if(!compositing && !isPreview())
     {
         QPixmap  tPix(32, titleBarHeight);
         QPainter tPainter(&tPix);
@@ -462,21 +462,31 @@ void QtCurveClient::updateWindowShape()
     if(isMaximized())
         clearMask();
     else
-        setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
-                        widget()->width(), widget()->height()));
+    {
+        QRect r(Handler()->customShadows() && QTC_COMPOSITING
+                    ? widget()->rect().adjusted(layoutMetric(LM_OuterPaddingLeft), layoutMetric(LM_OuterPaddingTop),
+                                               -layoutMetric(LM_OuterPaddingRight), -layoutMetric( LM_OuterPaddingBottom))
+                    : widget()->rect());
+
+        setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL), r));
+    }
 }
 
-QRegion QtCurveClient::getMask(int round, int w, int h) const
+QRegion QtCurveClient::getMask(int round, const QRect &r) const
 {
+    int x, y, w, h;
+
+    r.getRect(&x, &y, &w, &h);
+
     switch(round)
     {
         case ROUND_NONE:
-            return  QRegion(0, 0, w, h);
+            return  QRegion(x, y, w, h);
         case ROUND_SLIGHT:
         {
-            QRegion mask(1, 0, w-2, h);
-            mask += QRegion(0, 1, 1, h-2);
-            mask += QRegion(w-1, 1, 1, h-2);
+            QRegion mask(x+1, y, w-2, h);
+            mask += QRegion(x, y+1, 1, h-2);
+            mask += QRegion(x+w-1, y+1, 1, h-2);
 
             return mask;
         }
@@ -487,58 +497,58 @@ QRegion QtCurveClient::getMask(int round, int w, int h) const
 // #if KDE_IS_VERSION(4, 3, 0)
 //             if(!isPreview() && QTC_COMPOSITING)
 //             {
-//                 QRegion mask(4, 0, w-8, h);
+//                 QRegion mask(x+4, y, w-8, h);
 //
 //                 if(roundBottom)
 //                 {
-//                     mask += QRegion(0, 4, 1, h-8);
-//                     mask += QRegion(1, 2, 1, h-4);
-//                     mask += QRegion(2, 1, 1, h-2);
-//                     mask += QRegion(3, 1, 1, h-2);
-//                     mask += QRegion(w-1, 4, 1, h-8);
-//                     mask += QRegion(w-2, 2, 1, h-4);
-//                     mask += QRegion(w-3, 1, 1, h-2);
-//                     mask += QRegion(w-4, 1, 1, h-2);
+//                     mask += QRegion(x, y+4, 1, h-8);
+//                     mask += QRegion(x+1, y+2, 1, h-4);
+//                     mask += QRegion(x+2, y+1, 1, h-2);
+//                     mask += QRegion(x+3, y+1, 1, h-2);
+//                     mask += QRegion(x+w-1, y+4, 1, h-8);
+//                     mask += QRegion(x+w-2, y+2, 1, h-4);
+//                     mask += QRegion(x+w-3, y+1, 1, h-2);
+//                     mask += QRegion(x+w-4, y+1, 1, h-2);
 //                 }
 //                 else
 //                 {
-//                     mask += QRegion(0, 4, 1, h-4);
-//                     mask += QRegion(1, 2, 1, h-1);
-//                     mask += QRegion(2, 1, 1, h);
-//                     mask += QRegion(3, 1, 1, h);
-//                     mask += QRegion(w-1, 4, 1, h-4);
-//                     mask += QRegion(w-2, 2, 1, h-1);
-//                     mask += QRegion(w-3, 1, 1, h-0);
-//                     mask += QRegion(w-4, 1, 1, h-0);
+//                     mask += QRegion(x, y+4, 1, h-4);
+//                     mask += QRegion(x+1, y+2, 1, h-1);
+//                     mask += QRegion(x+2, y+1, 1, h);
+//                     mask += QRegion(x+3, y+1, 1, h);
+//                     mask += QRegion(x+w-1, y+4, 1, h-4);
+//                     mask += QRegion(x+w-2, y+2, 1, h-1);
+//                     mask += QRegion(x+w-3, y+1, 1, h-0);
+//                     mask += QRegion(x+w-4, y+1, 1, h-0);
 //                 }
 //                 return mask;
 //             }
 //             else
 // #endif
             {
-                QRegion mask(5, 0, w-10, h);
+                QRegion mask(x+5, y, w-10, h);
 
                 if(roundBottom)
                 {
-                    mask += QRegion(0, 5, 1, h-10);
-                    mask += QRegion(1, 3, 1, h-6);
-                    mask += QRegion(2, 2, 1, h-4);
-                    mask += QRegion(3, 1, 2, h-2);
-                    mask += QRegion(w-1, 5, 1, h-10);
-                    mask += QRegion(w-2, 3, 1, h-6);
-                    mask += QRegion(w-3, 2, 1, h-4);
-                    mask += QRegion(w-5, 1, 2, h-2);
+                    mask += QRegion(x, y+5, 1, h-10);
+                    mask += QRegion(x+1, y+3, 1, h-6);
+                    mask += QRegion(x+2, y+2, 1, h-4);
+                    mask += QRegion(x+3, y+1, 2, h-2);
+                    mask += QRegion(x+w-1, y+5, 1, h-10);
+                    mask += QRegion(x+w-2, y+3, 1, h-6);
+                    mask += QRegion(x+w-3, y+2, 1, h-4);
+                    mask += QRegion(x+w-5, y+1, 2, h-2);
                 }
                 else
                 {
-                    mask += QRegion(0, 5, 1, h-5);
-                    mask += QRegion(1, 3, 1, h-2);
-                    mask += QRegion(2, 2, 1, h-1);
-                    mask += QRegion(3, 1, 2, h);
-                    mask += QRegion(w-1, 5, 1, h-5);
-                    mask += QRegion(w-2, 3, 1, h-2);
-                    mask += QRegion(w-3, 2, 1, h-1);
-                    mask += QRegion(w-5, 1, 2, h);
+                    mask += QRegion(x, 5, y+1, h-5);
+                    mask += QRegion(x+1, y+3, 1, h-2);
+                    mask += QRegion(x+2, y+2, 1, h-1);
+                    mask += QRegion(x+3, y+1, 2, h);
+                    mask += QRegion(x+w-1, y+5, 1, h-5);
+                    mask += QRegion(x+w-2, y+3, 1, h-2);
+                    mask += QRegion(x+w-3, y+2, 1, h-1);
+                    mask += QRegion(x+w-5, y+1, 2, h);
                 }
                 return mask;
             }

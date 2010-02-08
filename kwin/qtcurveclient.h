@@ -63,7 +63,7 @@ class QtCurveClient :
     void                      reset(unsigned long changed);
     void                      paintEvent(QPaintEvent *e);
     void                      updateWindowShape();
-    QRegion                   getMask(int round, int w, int h) const;
+    QRegion                   getMask(int round, const QRect &r) const;
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
