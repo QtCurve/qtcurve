@@ -283,9 +283,9 @@ bool QtCurveHandler::readConfig()
         actShadow.load(&configFile);
         inactShadow.load(&configFile);
 
-        bool shadowChanged=itsCustomShadows &&
-                            (itsShadowCache.shadowConfigurationChanged(actShadow) ||
-                             itsShadowCache.shadowConfigurationChanged(inactShadow));                
+        shadowChanged=itsCustomShadows &&
+                       (itsShadowCache.shadowConfigurationChanged(actShadow) ||
+                        itsShadowCache.shadowConfigurationChanged(inactShadow));
 
         itsShadowCache.setShadowConfiguration(actShadow);
         itsShadowCache.setShadowConfiguration(inactShadow);
