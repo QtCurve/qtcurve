@@ -855,6 +855,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarAlignment, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarEffect, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarIcon, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(boldProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(coloredTbarMo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(borderSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2129,6 +2132,9 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.fadeLines=fadeLines->isChecked();
     opts.menuIcons=menuIcons->isChecked();
     opts.stdBtnSizes=stdBtnSizes->isChecked();
+    opts.boldProgress=boldProgress->isChecked();
+    opts.coloredTbarMo=coloredTbarMo->isChecked();
+    opts.borderSelection=borderSelection->isChecked();
     opts.forceAlternateLvCols=forceAlternateLvCols->isChecked();
     opts.squareLvSelection=squareLvSelection->isChecked();
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
@@ -2293,6 +2299,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     fadeLines->setChecked(opts.fadeLines);
     menuIcons->setChecked(opts.menuIcons);
     stdBtnSizes->setChecked(opts.stdBtnSizes);
+    boldProgress->setChecked(opts.boldProgress);
+    boldProgress_false->setChecked(!opts.boldProgress);
+    coloredTbarMo->setChecked(opts.coloredTbarMo);
+    coloredTbarMo_false->setChecked(!opts.coloredTbarMo);
+    borderSelection->setChecked(opts.borderSelection);
     forceAlternateLvCols->setChecked(opts.forceAlternateLvCols);
     squareLvSelection->setChecked(opts.squareLvSelection);
     titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
@@ -2507,6 +2518,9 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          fadeLines->isChecked()!=opts.fadeLines ||
          menuIcons->isChecked()!=opts.menuIcons ||
          stdBtnSizes->isChecked()!=opts.stdBtnSizes ||
+         boldProgress->isChecked()!=opts.boldProgress ||
+         coloredTbarMo->isChecked()!=opts.coloredTbarMo ||
+         borderSelection->isChecked()!=opts.borderSelection ||
          forceAlternateLvCols->isChecked()!=opts.forceAlternateLvCols ||
          squareLvSelection->isChecked()!=opts.squareLvSelection ||
          titlebarAlignment->currentIndex()!=opts.titlebarAlignment ||
