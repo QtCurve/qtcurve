@@ -2405,15 +2405,16 @@ static gboolean qtInit()
                     static const char *constGrpBoxBoldSuffix="widget_class \"*Frame.GtkLabel\" style \""QTC_RC_SETTING"BFnt\" "
                                                              "widget_class \"*Statusbar.*Frame.GtkLabel\" style \""QTC_RC_SETTING"Fnt\"";
                     tmpStr=(char *)realloc(tmpStr, strlen(constStdPrefix)+strlen(qtSettings.fonts[FONT_GENERAL])+strlen(constStdSuffix)+
-                                                   strlen(constBoldPrefix)+strlen(qtSettings.fonts[FONT_BOLD])+strlen(constBoldSuffix)+
+                                                   strlen(constBoldPrefix)+strlen(qtSettings.fonts[FONT_BOLD])+
+                                                   (opts.boldProgress ? strlen(constBoldSuffix) : strlen(constStdSuffix))+
                                                    strlen(constGrpBoxBoldSuffix)+1);
 
                     sprintf(tmpStr, "%s%s%s%s%s%s%s",
                                     constStdPrefix, qtSettings.fonts[FONT_GENERAL], constStdSuffix,
-                                    constBoldPrefix, qtSettings.fonts[FONT_BOLD], constBoldSuffix,
+                                    constBoldPrefix, qtSettings.fonts[FONT_BOLD], opts.boldProgress ? constBoldSuffix : constStdSuffix,
                                     constGrpBoxBoldSuffix);
                 }
-                else
+                else if(opts.boldProgress)
                 {
                     tmpStr=(char *)realloc(tmpStr, strlen(constBoldPrefix)+strlen(qtSettings.fonts[FONT_BOLD])+strlen(constBoldSuffix)+1);
                     sprintf(tmpStr, "%s%s%s", constBoldPrefix, qtSettings.fonts[FONT_BOLD], constBoldSuffix);
