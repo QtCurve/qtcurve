@@ -3537,12 +3537,7 @@ debugDisplayWidget(widget, 3);
                                                 : combo || optionmenu
                                                     ? WIDGET_COMBO
                                                     : tbar_button
-                                                        ?
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
-                                                            WIDGET_UNCOLOURED_MO_BUTTON
-#else
-                                                            WIDGET_TOOLBAR_BUTTON
-#endif
+                                                        ? (opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON)
                                                         : togglebutton
                                                             ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
                                                             : checkbox
@@ -3556,12 +3551,10 @@ debugDisplayWidget(widget, 3);
                                                                             : WIDGET_OTHER;
                 int xo=x, yo=y, wo=width, ho=height, stepper=QTC_STEPPER_NONE;
 
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
                 /* Try and guess if this button is a toolbar button... */
-                if(WIDGET_STD_BUTTON==widgetType && isMozillaWidget(widget) && GTK_IS_BUTTON(widget) && DETAIL("button") &&
-                   ((width>22 && width<50 && height>30) || height>32))
+                if(!opts.coloredTbarMo && WIDGET_STD_BUTTON==widgetType && isMozillaWidget(widget) &&
+                    GTK_IS_BUTTON(widget) && DETAIL("button") && ((width>22 && width<50 && height>30) || height>32))
                     widgetType=WIDGET_UNCOLOURED_MO_BUTTON;
-#endif
 
                 if(ROUND_MAX==opts.round &&
                     ( (WIDGET_TOGGLE_BUTTON==widgetType && height>(QTC_CHECK_SIZE+8) && width<(height+10)) ||
