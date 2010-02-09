@@ -25,6 +25,7 @@
 #include <KGlobalSettings>
 #include <KConfig>
 #include <KConfigGroup>
+#include <QApplication>
 #include "qtcurveshadowconfiguration.h"
 
 namespace KWinQtCurve
@@ -66,11 +67,13 @@ void QtCurveShadowConfiguration::setColorType(ColorType ct)
         case CT_HOVER:
             itsColor = KColorScheme(itsColorGroup).decoration(KColorScheme::HoverColor).color();
             break;
-        case CT_ACTIVE_TITLEBAR:
-            itsColor = KGlobalSettings::activeTitleColor();
+        case CT_SELECTION:
+            itsColor = QApplication::palette().color(itsColorGroup, QPalette::Highlight);
             break;
-        case CT_INACTIVE_TITLEBAR:
-            itsColor = KGlobalSettings::inactiveTitleColor();
+        case CT_TITLEBAR:
+            itsColor = QPalette::Active==itsColorGroup
+                        ? KGlobalSettings::activeTitleColor()
+                        : KGlobalSettings::inactiveTitleColor();
             break;
         case CT_GRAY:
             itsColor = QColor("#393835");

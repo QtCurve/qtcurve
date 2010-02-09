@@ -36,8 +36,8 @@ class QtCurveShadowConfiguration
     {
         CT_FOCUS,
         CT_HOVER,
-        CT_ACTIVE_TITLEBAR,
-        CT_INACTIVE_TITLEBAR,
+        CT_SELECTION,
+        CT_TITLEBAR,
         CT_GRAY,
         CT_CUSTOM
     };

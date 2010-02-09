@@ -36,8 +36,8 @@ static void insertColorEntries(QComboBox *combo)
 {
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_FOCUS, i18n("Focus"));
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_HOVER, i18n("Hover"));
-    combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_ACTIVE_TITLEBAR, i18n("Active Titlebar"));
-    combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_INACTIVE_TITLEBAR, i18n("Inactive Titlebar"));
+    combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_SELECTION, i18n("Selection Background"));
+    combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_TITLEBAR, i18n("Titlebar"));
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_GRAY, i18n("Gray"));
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM, i18n("Custom:"));
 }
