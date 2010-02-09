@@ -130,7 +130,7 @@ class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
         aboutData = new KAboutData("qtcurve", 0, ki18n("QtCurve"), VERSION,
                                    ki18n("Unified widet style."),
                                    KAboutData::License_GPL,
-                                   ki18n("(C) Craig Drummond, 2003-2009"),
+                                   ki18n("(C) Craig Drummond, 2003-2010"),
                                    KLocalizedString());
         aboutData->setProgramIconName("preferences-desktop-theme");
         componentData = new KComponentData(aboutData);
@@ -636,7 +636,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
                gradPreview(NULL)
 {
     setupUi(this);
-    titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2009");
+    titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2010");
     insertShadeEntries(shadeSliders, SW_SLIDER);
     insertShadeEntries(shadeMenubars, SW_MENUBAR);
     insertShadeEntries(shadeCheckRadio, SW_CHECK_RADIO);
