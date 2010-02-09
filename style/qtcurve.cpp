@@ -9431,9 +9431,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                                      WIDGET_SPIN!=w && WIDGET_COMBO_BUTTON!=w && WIDGET_SB_BUTTON!=w &&
                                      (WIDGET_SB_SLIDER!=w || !opts.colorSliderMouseOver) &&
                                      !(option->state&QTC_STATE_KWIN_BUTTON) &&
-#ifdef QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
-                                     !(option->state&QTC_STATE_TBAR_BUTTON) &&
-#endif
+                                     (opts.coloredTbarMo || !(option->state&QTC_STATE_TBAR_BUTTON)) &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
                                      WIDGET_PROGRESSBAR!=w &&
                                      (/*option->state&QTC_TOGGLE_BUTTON ||*/ !sunken)),

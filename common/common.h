@@ -58,10 +58,6 @@ static int lstat(const char* fileName, struct stat* s)
 #define QTC_INCREASE_SB_SLIDER
 
 /*
-    Control whether toolbar, window decoration, and dock window, buttons should have coloured mouse-over
-*/
-#define QTC_DONT_COLOUR_MOUSEOVER_TBAR_BUTTONS
-/*
     Control shading used for glass variants.
     0 => As used in 0.51.1 +
     1 => As used in 0.51
@@ -957,7 +953,8 @@ typedef struct
                      squareLvSelection,
                      invertBotTab,
                      menubarHiding,
-                     boldProgress;
+                     boldProgress,
+                     coloredTbarMo;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
