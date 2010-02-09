@@ -1172,7 +1172,7 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Progressbars"), i++);
     new CStackItem(stackList, i18n("Default Button"),i++);
     new CStackItem(stackList, i18n("Mouse-over"), i++);
-    new CStackItem(stackList, i18n("Listviews"), i++);
+    new CStackItem(stackList, i18n("Item Views"), i++);
     new CStackItem(stackList, i18n("Scrollviews"), i++);
     new CStackItem(stackList, i18n("Tabs"), i++);
     new CStackItem(stackList, i18n("Checks and Radios"), i++);
