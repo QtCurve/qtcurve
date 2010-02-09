@@ -956,7 +956,8 @@ typedef struct
                      forceAlternateLvCols,
                      squareLvSelection,
                      invertBotTab,
-                     menubarHiding;
+                     menubarHiding,
+                     boldProgress;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,

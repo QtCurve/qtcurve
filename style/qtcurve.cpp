@@ -1507,10 +1507,14 @@ void QtCurveStyle::polish(QWidget *widget)
             pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
             widget->setPalette(pal);
         }
-        QFont font(widget->font());
 
-        font.setBold(true);
-        widget->setFont(font);
+        if(opts.boldProgress)
+        {
+            QFont font(widget->font());
+
+            font.setBold(true);
+            widget->setFont(font);
+        }
         widget->installEventFilter(this);
     }
     else if (widget->inherits("Q3Header"))
@@ -2813,7 +2817,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             if(hint>=SH_CustomBase && widget)
                 if("CE_CapacityBar"==widget->objectName())
                 {
-                    if (!widget->property("qtc-set-bold").isValid())
+                    if (opts.boldProgress && !widget->property("qtc-set-bold").isValid())
                     {
                         QWidget *w=(QWidget *)widget;
                         QFont font(w->font());

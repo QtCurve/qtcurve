@@ -1472,6 +1472,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(squareLvSelection)
             QTC_CFG_READ_BOOL(invertBotTab)
             QTC_CFG_READ_BOOL(menubarHiding)
+            QTC_CFG_READ_BOOL(boldProgress)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(stdBtnSizes)
             QTC_CFG_READ_BOOL(titlebarBorder)
@@ -2135,6 +2136,7 @@ static void defaultSettings(Options *opts)
     opts->squareLvSelection=false;
     opts->invertBotTab=true;
     opts->menubarHiding=false;
+    opts->boldProgress=true;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarBorder=true;
@@ -2801,6 +2803,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareLvSelection)
         CFG_WRITE_ENTRY(invertBotTab)
         CFG_WRITE_ENTRY(menubarHiding)
+        CFG_WRITE_ENTRY(boldProgress)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)

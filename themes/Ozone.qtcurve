@@ -14,3 +14,4 @@ borderInactiveTab=true
 highlightScrollViews=true
 lvLines=old
 glowProgress=middle
+boldProgress=false
