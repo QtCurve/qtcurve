@@ -38,6 +38,7 @@ namespace KWinQtCurve
 {
 
 class QtCurveSizeGrip;
+class QtCurveButton;
 
 class QtCurveClient :
 #if KDE_IS_VERSION(4, 3, 0)
@@ -62,6 +63,9 @@ class QtCurveClient :
     void                      activeChange();
     void                      reset(unsigned long changed);
     void                      paintEvent(QPaintEvent *e);
+    void                      paintTitle(QPainter *painter, const QRect &capRect, const QRect &alignFullRect,
+                                         const QString &cap, const QPixmap &pix, int shadowSize=0,
+                                         bool isTab=false, bool activeTab=false);
     void                      updateWindowShape();
     QRegion                   getMask(int round, const QRect &r) const;
     void                      updateCaption();
@@ -69,6 +73,18 @@ class QtCurveClient :
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
 
     private:
+
+#if KDE_IS_VERSION(4, 3, 85)
+    bool                      mouseSingleClickEvent(QMouseEvent *e);
+    bool                      mouseMoveEvent(QMouseEvent *e);
+    bool                      mouseButtonPressEvent(QMouseEvent *e);
+    bool                      mouseButtonReleaseEvent(QMouseEvent *e);
+    bool                      dragMoveEvent(QDragMoveEvent *e);
+    bool                      dragLeaveEvent(QDragLeaveEvent *e);
+    bool                      dragEnterEvent(QDragEnterEvent *e);
+    bool                      dropEvent(QDropEvent *e);
+    int                       itemClicked(const QPoint &point, bool between = false);
+#endif
 
     QRect                     captionRect() const;
     void                      createSizeGrip();
@@ -90,6 +106,15 @@ class QtCurveClient :
     QRect           itsCaptionRect;
     QString         itsOldCaption;
     QFont           itsTitleFont;
+
+#if KDE_IS_VERSION(4, 3, 85)
+    QList<QtCurveButton *> itsCloseButtons;
+    bool                   itsClickInProgress,
+                           itsDragInrogress;
+    Qt::MouseButton        itsMouseButton;
+    QPoint                 itsClickPoint;
+    int                    itsTargetTab;
+#endif
 };
 
 }

@@ -223,6 +223,10 @@ bool QtCurveHandler::supports(Ability ability) const
         case AbilityProvidesShadow:
             return itsCustomShadows;
 #endif
+#if KDE_IS_VERSION(4, 3, 85)
+        case AbilityClientGrouping:
+            return true;
+#endif
         default:
             return false;
     };

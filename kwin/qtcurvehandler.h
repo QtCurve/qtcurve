@@ -47,6 +47,9 @@ namespace KWinQtCurve
 enum ButtonIcon
 {
     CloseIcon = 0,
+#if KDE_IS_VERSION(4, 3, 85)
+    CloseTabIcon,
+#endif
     MaxIcon,
     MaxRestoreIcon,
     MinIcon,

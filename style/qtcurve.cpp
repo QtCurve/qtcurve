@@ -7328,7 +7328,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 QPainterPath path(opts.round<ROUND_SLIGHT
                                     ? QPainterPath()
                                     : buildPath(QRectF(state&QtC_StateKWinNoBorder ? r : r.adjusted(1, 1, -1, 0)),
-                                                WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
+                                                (state&QtC_StateKWin && state&QtC_StateKWinTabDrag)
+                                                    ? WIDGET_OTHER :  WIDGET_MDI_WINDOW_TITLE, ROUNDED_ALL,
                                                 (opts.round>ROUND_SLIGHT /*&& kwin*/
                                                     ? 6.0
                                                     : 2.0)-(state&QtC_StateKWinNoBorder ? 0.0 : 1.0)));
