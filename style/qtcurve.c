@@ -2598,29 +2598,59 @@ static void dialogMapEvent(GtkWidget *widget, gpointer user_data)
     }
 }
 
-static void drawSelectionReal(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                              int x, int y, int width, int height, int round, gboolean isSelection,
-                              double alpha, GdkColor *col, gboolean horiz)
+static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
+                                  int x, int y, int width, int height, int round, gboolean isLvSelection,
+                                  double alpha, GdkColor *col, gboolean horiz)
 {
-    if((!isSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
+    if((!isLvSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
     {
-        cairo_new_path(cr);
         cairo_save(cr);
+        cairo_new_path(cr);
         createPath(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION), round);
         cairo_clip(cr);
     }
     drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height, col,
                            horiz, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
-    if((!isSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
+    if((!isLvSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
         cairo_restore(cr);
 }
 
 static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          int x, int y, int width, int height, int round, gboolean isSelection)
+                          int x, int y, int width, int height, int round, gboolean isLvSelection)
 {
-    drawSelectionReal(cr, style, state, area, widget, x, y, width, height, round, isSelection,
-                      GTK_STATE_PRELIGHT==state ? 0.20 : 1.0,
-                      &style->base[widget && GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE], TRUE);
+    double   alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
+    GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
+
+    drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, round, isLvSelection, alpha, col, TRUE);
+
+    if(opts.borderSelection && (!isLvSelection || !opts.squareLvSelection))
+    {
+        double   xd=x+0.5,
+                 yd=y+0.5,
+                 alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
+        int      xo=x, widtho=width;
+    
+        if(isLvSelection && !opts.squareLvSelection && ROUNDED_ALL!=round)
+        {
+            if(!(round&ROUNDED_LEFT))
+            {
+                x-=1;
+                xd-=1;
+                width+=1;
+            }
+            if(!(round&ROUNDED_RIGHT))
+                width+=1;
+        }
+
+        cairo_save(cr);
+        cairo_new_path(cr);
+        cairo_rectangle(cr, xo, y, widtho, height);
+        cairo_clip(cr);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*col), alpha);
+        createPath(cr, xd, yd, width-1, height-1, getRadius(&opts, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
+        cairo_stroke(cr);
+        cairo_restore(cr);
+    }
 }
 
 static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state,
@@ -2775,7 +2805,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_PRELIGHT==state && opts.splitterHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.splitterHighlight));
-            drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col,
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col,
                               width>height);
         }
     }
@@ -2784,7 +2814,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_PRELIGHT==state && opts.crHighlight && width>(QTC_CHECK_SIZE*2))
         {
             GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.crHighlight));
-            drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
         }
     }
     else if(detail && 0==strcmp(detail, "expander"))
@@ -2792,7 +2822,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_PRELIGHT==state && opts.expanderHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.expanderHighlight));
-            drawSelectionReal(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
         }
     }
     else if(DETAIL("tooltip"))
