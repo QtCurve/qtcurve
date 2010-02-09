@@ -4334,9 +4334,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         drawBevelGradient(color, &pixPainter, border,
                                           buildPath(QRectF(border), WIDGET_OTHER, ROUNDED_ALL, radius), true,
                                           false, opts.selectionAppearance, WIDGET_SELECTION, false);
-//                         pixPainter.setBrush(Qt::NoBrush);
-//                         pixPainter.setPen(color);
-//                         pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
+                        if(opts.borderSelection)
+                        {
+                            pixPainter.setBrush(Qt::NoBrush);
+                            pixPainter.setPen(color);
+                            pixPainter.drawPath(buildPath(border, WIDGET_SELECTION, ROUNDED_ALL, radius));
+                        }
                         pixPainter.end();
                         if(itsUsePixmapCache)
                             QPixmapCache::insert(key, pix);

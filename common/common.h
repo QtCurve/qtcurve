@@ -954,7 +954,8 @@ typedef struct
                      invertBotTab,
                      menubarHiding,
                      boldProgress,
-                     coloredTbarMo;
+                     coloredTbarMo,
+                     borderSelection;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,

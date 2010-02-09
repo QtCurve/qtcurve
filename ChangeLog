@@ -2,8 +2,9 @@
 -----
 1. Add option to not embolden progressbar text.
 2. Add option to allow coloured mouse over for toolbar buttons.
-3. Under KDE SC>=4.3, use alpha blending for window borders.
-4. Implement coloured shadows - code taken from Oxygen window decoration
+3. Add option to border selection.
+4. Under KDE SC>=4.3, use alpha blending for window borders.
+5. Implement coloured shadows - code taken from Oxygen window decoration
    (but slightly modified)
 
 1.0.2
