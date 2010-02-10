@@ -48,6 +48,7 @@
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
 #endif
+#include <stdio.h>
 
 #if KDE_IS_VERSION(4, 3, 0)
     #define QTC_COMPOSITING compositingActive()
@@ -712,6 +713,7 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
 bool QtCurveClient::mouseButtonPressEvent(QMouseEvent *e)
 {
     itsClickPoint = widget()->mapToParent(e->pos());
+
     int item = itemClicked(itsClickPoint);
 
     if(OperationsOp==buttonToWindowOperation(e->button()))
@@ -864,13 +866,13 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between)
     QRect                  frame = widget()->frameGeometry();
     QList<ClientGroupItem> list = clientGroupItems();
     int                    tabs = list.count(),
-                           titleX = titleRect().x(),
+                           shadowSize = Handler()->customShadows() ? Handler()->shadowCache().shadowSize() : 0,
+                           titleX = titleRect().x()-shadowSize,
                            frameY = 0, // frame.y(),
-                           titleWidth = titleRect().width(),
+                           titleWidth = titleRect().width()+(2*shadowSize),
                            titleHeight = layoutMetric(LM_TitleEdgeTop) +
                                          layoutMetric(LM_TitleHeight) +
-                                         layoutMetric(LM_TitleEdgeBottom) +
-                                         (Handler()->customShadows() ? Handler()->shadowCache().shadowSize() : 0),
+                                         layoutMetric(LM_TitleEdgeBottom) + shadowSize,
                            tabWidth = titleWidth/tabs;
 
     if(between) // We are inserting a new tab between two existing ones
