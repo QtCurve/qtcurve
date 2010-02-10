@@ -158,7 +158,7 @@ class QtCurveStyle : public QWindowsStyle
     void drawBackground(QWidget *widget, bool isWindow=true) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
-    void buildSplitPath(const QRect &r, EWidget w, int round, double radius, QPainterPath &tl, QPainterPath &br) const;
+    void buildSplitPath(const QRect &r, int round, double radius, QPainterPath &tl, QPainterPath &br) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
