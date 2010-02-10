@@ -7646,6 +7646,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(needsBaseBgnd)
                     painter->fillRect(r, palette.brush(QPalette::Base));
+                else if(opts.thinSbarGroove && APP_ARORA==theThemedApp && widget && widget->inherits("WebView"))
+                    painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
 
                 if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                     drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,

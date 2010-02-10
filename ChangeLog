@@ -7,6 +7,8 @@
 5. Implement coloured shadows - code taken from Oxygen window decoration
    (but slightly modified)
 6. Add support for window grouping with KDE SC >= 4.4.
+7. In Arora, if using thin scrollbar grooves, fill background of scrolbars
+   in 'WebView' with standard background colour.
 
 1.0.2
 -----
