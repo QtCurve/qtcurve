@@ -778,7 +778,7 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
 
         bool  showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);
         int   iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0;
-        QRect r(0, 0, geom.size().width()-(QTC_TAB_CLOSE_ICON_SIZE+constTitlePad), geom.size().height());
+        QRect r(0, 0, geom.size().width()-(tabList.count() ? (QTC_TAB_CLOSE_ICON_SIZE+constTitlePad) : 0), geom.size().height());
 
         painter.save();
         painter.setRenderHint(QPainter::Antialiasing, true);
