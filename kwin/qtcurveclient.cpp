@@ -48,7 +48,6 @@
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
 #endif
-#include <stdio.h>
 
 #if KDE_IS_VERSION(4, 3, 0)
     #define QTC_COMPOSITING compositingActive()
@@ -455,19 +454,14 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
                                     ? fm.boundingRect(str).width()+(showIcon ? pix.width()+constTitlePad : 0) : 0;
         EEffect       effect((EEffect)(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
 
-        if(alignFull)
-            if(capRect.left()>((textRect.width()-textWidth)>>1))
-            {
-                alignment=Qt::AlignVCenter|Qt::AlignLeft;
-                textRect=capRect;
-                hAlign=Qt::AlignLeft;
-            }
-            else if(capRect.right()<((textRect.width()+textWidth)>>1))
-            {
-                alignment=Qt::AlignVCenter|Qt::AlignRight;
-                textRect=capRect;
-                hAlign=Qt::AlignRight;
-            }
+        if(alignFull &&
+            ( ( (capRect.left()+shadowSize)>((textRect.width()-textWidth)>>1) ) ||
+              (  capRect.right()<((textRect.width()+textWidth)>>1) ) ) )
+        {
+            alignment=Qt::AlignVCenter|Qt::AlignHCenter;
+            textRect=capRect;
+            hAlign=Qt::AlignLeft;
+        }
 
         if(showIcon)
             if(alignment&Qt::AlignHCenter)

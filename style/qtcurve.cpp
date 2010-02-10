@@ -7456,17 +7456,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     int           textWidth=alignFull || (showIcon && alignment&Qt::AlignHCenter)
                                                 ? fm.boundingRect(str).width()+(showIcon ? iconSize+constPad : 0) : 0;
 
-                    if(alignFull)
-                        if(captionRect.left()>((textRect.width()-textWidth)>>1))
-                        {
-                            alignment=Qt::AlignVCenter|Qt::AlignLeft;
-                            textRect=captionRect;
-                        }
-                        else if(captionRect.right()<((textRect.width()+textWidth)>>1))
-                        {
-                            alignment=Qt::AlignVCenter|Qt::AlignRight;
-                            textRect=captionRect;
-                        }
+                    if(alignFull &&
+                        ( (captionRect.left()>((textRect.width()-textWidth)>>1)) ||
+                          (captionRect.right()<((textRect.width()+textWidth)>>1)) ) )
+                    {
+                        alignment=Qt::AlignVCenter|Qt::AlignRight;
+                        textRect=captionRect;
+                    }
 
                     if(showIcon)
                         if(alignment&Qt::AlignHCenter)
