@@ -152,7 +152,12 @@ void QtCurveButton::drawButton(QPainter *painter)
     QPixmap  buffer(width(), height());
     buffer.fill(Qt::transparent);
     QPainter bP(&buffer);
-    
+#if KDE_IS_VERSION(4, 3, 85)
+    bool     isTabClose(ItemCloseButton==type());
+
+    if(isTabClose && drawFrame && !(sunken || itsHover))
+        drawFrame=false;
+#endif
 //     if(CloseButton==type())
 //         buttonColor=midColor(QColor(180,64,32), buttonColor);
 
@@ -262,7 +267,7 @@ void QtCurveButton::drawButton(QPainter *painter)
 
         if( (CloseButton==type()
 #if KDE_IS_VERSION(4, 3, 85)
-              || ItemCloseButton==type()
+              || isTabClose
 #endif
              ) && itsHover && !(flags&QTC_TITLEBAR_BUTTON_COLOR) && !customCol)
             col=CLOSE_COLOR;

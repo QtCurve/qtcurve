@@ -392,6 +392,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     {
         QRect allTabGeom = titleRect().adjusted(-1, -titleEdgeTop, 1, 0),
               tabGeom    = allTabGeom;
+        int   activeTab  = visibleClientGroupItem();
 
         tabGeom.setWidth(tabGeom.width() / tabCount + 1); // Split titlebar evenly
         for(int i = 0; i < tabCount; ++i)
@@ -402,8 +403,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
             int iconSize(QTC_TAB_CLOSE_ICON_SIZE);
 
-            paintTitle(&painter, tabGeom.adjusted(0, 0, -(iconSize+constTitlePad), 0), QRect(), tabList[i].title(),
-                       showIcon ? tabList[i].icon().pixmap(iconSize) : QPixmap(),  0, true, visibleClientGroupItem()==i);
+            paintSeparator(&painter, tabGeom);
+            paintTitle(&painter, tabGeom.adjusted(showIcon ? 1 : 0, 0, -(iconSize+constTitlePad), 0), QRect(), tabList[i].title(),
+                       showIcon ? tabList[i].icon().pixmap(iconSize) : QPixmap(),  0, true, activeTab==i);
 
             if(i >= itsCloseButtons.size())
                 itsCloseButtons.append(new QtCurveButton(ItemCloseButton, this));
@@ -414,7 +416,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             itsCloseButtons[i]->installEventFilter(this);
             itsCloseButtons[i]->show();
 
+            QRect br(tabGeom);
+
             tabGeom.translate(tabGeom.width() - 1, 0);
+            if(i==tabCount-1)
+                paintSeparator(&painter, tabGeom);
+
+            if(i!=activeTab)
+            {
+                QColor gray(Qt::black);
+                gray.setAlphaF(0.075);
+                painter.fillRect(br.adjusted(0==i || activeTab==i-1 ? 1 : 0, 0, 0, 0), gray);
+            }
         }
     }
     else
@@ -504,6 +517,9 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
 
         QColor color(KDecoration::options()->color(KDecoration::ColorFont, isActive()));
 
+        if(isTab && !isActiveTab)
+            textRect.adjust(0, 1, 0, 1);
+
         if((!isTab || isActiveTab) && EFFECT_NONE!=effect)
         {
             QColor shadow(WINDOW_SHADOW_COLOR(effect));
@@ -516,15 +532,45 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
         }
 
         if(isTab && !isActiveTab)
-            color.setAlphaF(0.25);
+            color.setAlphaF(0.45);
         painter->setPen(color);
         painter->drawText(textRect, alignment, str);
 //         painter->setClipping(false);
     }
 
     if(showIcon && iconX>=0)
-        painter->drawPixmap(iconX, capRect.y()+((capRect.height()-pix.height())/2)+1, pix);
+        painter->drawPixmap(iconX, capRect.y()+((capRect.height()-pix.height())/2)+1+(isTab && !isActiveTab ? 1 : 0), pix);
 }
+
+#if KDE_IS_VERSION(4, 3, 85)
+static void drawFadedLine(QPainter *painter, const QRect &r, const QColor &col)
+{
+    bool            aa(painter->testRenderHint(QPainter::Antialiasing));
+    QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),
+                    end(r.x()+(aa ? 0.5 : 0.0),
+                        r.y()+(r.height()-1)+(aa ? 0.5 : 0.0));
+    QLinearGradient grad(start, end);
+    QColor          c(col),
+                    outer(Qt::white),
+                    blank(Qt::white);
+
+    c.setAlphaF(0.3);
+    blank.setAlphaF(0.0);
+    grad.setColorAt(0, blank);
+    grad.setColorAt(0.4, c);
+    grad.setColorAt(0.6, c);
+    grad.setColorAt(1, blank);
+    painter->setPen(QPen(QBrush(grad), 1));
+    painter->drawLine(start, end);
+}
+
+void QtCurveClient::paintSeparator(QPainter *painter, const QRect &r)
+{
+    drawFadedLine(painter, r, Qt::white);
+    drawFadedLine(painter, r.adjusted(1, 0, 1, 0), Qt::black);
+    drawFadedLine(painter, r.adjusted(2, 0, 2, 0), Qt::white);
+}
+#endif
 
 void QtCurveClient::updateWindowShape()
 {
