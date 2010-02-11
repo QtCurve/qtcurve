@@ -1,16 +1,18 @@
 1.1.0
 -----
-1. Add option to not embolden progressbar text.
-2. Add option to allow coloured mouse over for toolbar buttons.
-3. Add option to border selection.
-4. Under KDE SC >= 4.3, use alpha blending for window borders.
-5. Implement coloured shadows - code taken from Oxygen window decoration
-   (but slightly modified)
-6. Add support for window grouping with KDE SC >= 4.4.
-7. In Arora, if using thin scrollbar grooves, fill background of scrolbars
-   in 'WebView' with standard background colour.
-8. When drawing focus, attempt to determine if this is in a KpageListView.
-9. Increase tabbar tab size so as to allow more space around icons.
+ 1. Add option to not embolden progressbar text.
+ 2. Add option to allow coloured mouse over for toolbar buttons.
+ 3. Add option to border selection.
+ 4. Under KDE SC >= 4.3, use alpha blending for window borders.
+ 5. Implement coloured shadows - code taken from Oxygen window decoration
+    (but slightly modified)
+ 6. Add support for window grouping with KDE SC >= 4.4.
+ 7. In Arora, if using thin scrollbar grooves, fill background of scrolbars
+    in 'WebView' with standard background colour.
+ 8. When drawing focus, attempt to determine if this is in a KpageListView.
+ 9. Increase tabbar tab size so as to allow more space around icons.
+10. Fix clipping issues when drawing combos with a coloured area under arrow
+    (sometimes arrows would not be redrawn).
 
 1.0.2
 -----

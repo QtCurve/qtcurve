@@ -7936,7 +7936,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         if(!sunken)
                             frameOpt.state|=State_Raised;
                         painter->save();
-                        painter->setClipRect(btn);
+                        painter->setClipRect(btn, Qt::IntersectClip);
                         drawLightBevel(painter, opts.comboSplitter
                                                     ? btn
                                                     : btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
