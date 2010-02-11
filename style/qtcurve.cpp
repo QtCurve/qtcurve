@@ -1688,6 +1688,9 @@ void QtCurveStyle::polish(QWidget *widget)
     //bool onToolBar(widget && widget->parent() && 0L!=getToolBar(widget->parentWidget(), true));
     bool parentIsToolbar(widget && widget->parent() && (qobject_cast<QToolBar *>(widget->parent()) || widget->parent()->inherits("Q3ToolBar")));
 
+    if(parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
+        widget->setFont(QApplication::font());
+
     if (qobject_cast<QMenuBar *>(widget) ||
         widget->inherits("Q3ToolBar") ||
         qobject_cast<QToolBar *>(widget) ||
