@@ -10,6 +10,7 @@
 7. In Arora, if using thin scrollbar grooves, fill background of scrolbars
    in 'WebView' with standard background colour.
 8. When drawing focus, attempt to determine if this is in a KpageListView.
+9. Increase tabbar tab size so as to allow more space around icons.
 
 1.0.2
 -----

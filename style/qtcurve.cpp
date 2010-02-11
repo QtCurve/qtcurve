@@ -8034,6 +8034,9 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
     switch (type)
     {
+        case CT_TabBarTab:
+            newSize+=QSize(1, 1);
+            break;
         case CT_Splitter:
         {
             int sw=pixelMetric(PM_SplitterWidth, 0L, 0L);
@@ -8269,8 +8272,8 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                 rect=tabV2.rect;
                 if (verticalTabs)
                     rect.setRect(0, 0, rect.height(), rect.width());
-                int verticalShift = pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget);
-                int horizontalShift = pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget);
+                int verticalShift = pixelMetric(QStyle::PM_TabBarTabShiftVertical, tab, widget),
+                    horizontalShift = pixelMetric(QStyle::PM_TabBarTabShiftHorizontal, tab, widget);
                 if (tabV2.shape == QTabBar::RoundedSouth || tabV2.shape == QTabBar::TriangularSouth)
                     verticalShift = -verticalShift;
                 rect.adjust(0, 0, horizontalShift, verticalShift);
