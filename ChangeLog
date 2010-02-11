@@ -9,6 +9,7 @@
 6. Add support for window grouping with KDE SC >= 4.4.
 7. In Arora, if using thin scrollbar grooves, fill background of scrolbars
    in 'WebView' with standard background colour.
+8. When drawing focus, attempt to determine if this is in a KpageListView.
 
 1.0.2
 -----

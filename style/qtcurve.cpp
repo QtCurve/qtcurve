@@ -3916,11 +3916,25 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 else
                 {
                     //Figuring out in what beast we are painting...
-                    bool view((widget && ((qobject_cast<const QAbstractScrollArea*>(widget)) ||
+                    bool view(state&State_Item ||
+                              ((widget && ((qobject_cast<const QAbstractScrollArea*>(widget)) ||
                                         widget->inherits("Q3ScrollView"))) ||
                                          (widget && widget->parent() &&
                                             ((qobject_cast<const QAbstractScrollArea*>(widget->parent())) ||
-                                              widget->parent()->inherits("Q3ScrollView"))));
+                                              widget->parent()->inherits("Q3ScrollView")))) );
+
+                    if(!view && !widget && painter->device())
+                    {
+                        // Try to determine if we are in a KPageView...
+                        QWidget *wid=dynamic_cast<QWidget *>(painter->device());
+
+                        if(wid && wid->parentWidget() && wid->parentWidget()->inherits("KDEPrivate::KPageListView"))
+                        {
+                            r.adjust(2, 2, -2, -2);
+                            view=true;
+                        }
+                    }
+                    
                     painter->save();
                     QColor c(view && state&State_Selected
                                   ? palette.highlightedText().color()
