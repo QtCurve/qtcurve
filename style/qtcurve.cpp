@@ -3027,6 +3027,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             // disable painting of PE_PanelScrollAreaCorner
             // the default implementation fills the rect with the window background color
             // which does not work for windows that have gradients.
+            //
+            // ...but need to for WebView!!!
+            if(!QTC_CUSTOM_BGND || (widget && widget->inherits("WebView")))
+                painter->fillRect(r, palette.brush(QPalette::Window));
             break;
         case PE_IndicatorBranch:
         {
