@@ -859,7 +859,7 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
 
 bool QtCurveClient::dragEnterEvent(QDragEnterEvent *e)
 {
-    if(e->source() != 0 && e->source()->objectName()=="decoration widget")
+    if(e->mimeData()->hasFormat(clientGroupItemDragMimeType()))
     {
         itsDragInrogress = true;
         e->acceptProposedAction();
