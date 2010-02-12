@@ -430,7 +430,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             if(i!=activeTab)
             {
                 QColor gray(Qt::black);
-                gray.setAlphaF(0.075);
+                gray.setAlphaF(0.1);
                 painter.fillRect(br.adjusted(0==i ? 1 : 0, 0, 0, 0), gray);
             }
 
