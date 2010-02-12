@@ -14,6 +14,7 @@
 10. Fix clipping issues when drawing combos with a coloured area under arrow
     (sometimes arrows would not be redrawn).
 11. Use standard application font for combos and line-edits that are in toolbars.
+12. Use KIcon("dialog-close") as tab-close icon.
 
 1.0.2
 -----

@@ -70,6 +70,9 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #include <KDE/KTitleWidget>
 #include <KDE/KTabBar>
 #include <KDE/KFileDialog>
+#if QT_VERSION >= 0x040500
+#include <KDE/KIcon>
+#endif
 #if KDE_IS_VERSION(4, 3, 0)
 #include <KDE/KFileWidget>
 #else
@@ -2446,6 +2449,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ToolBarExtensionExtent:
             return 15;
 #ifndef QTC_QT_ONLY
+#if QT_VERSION >= 0x040500
+        case PM_TabCloseIndicatorWidth:
+        case PM_TabCloseIndicatorHeight:
+#endif
         case PM_SmallIconSize:
         case PM_ButtonIconSize:
             return KIconLoader::global()->currentSize(KIconLoader::Small);
@@ -3023,6 +3030,24 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
     switch (element)
     {
+#if (QT_VERSION >= 0x040500) && !defined QTC_QT_ONLY
+        case PE_IndicatorTabClose:
+        {
+            int         size(pixelMetric(QStyle::PM_SmallIconSize));
+            QIcon::Mode mode(state&State_Enabled
+                                ? state& State_Raised
+                                    ? QIcon::Active
+                                    : QIcon::Normal
+                                : QIcon::Disabled);
+                                
+            if (!(state&State_Raised) && !(state&State_Sunken) && !(state&QStyle::State_Selected))
+                mode = QIcon::Disabled;
+
+            drawItemPixmap(painter, r, Qt::AlignCenter, KIcon("dialog-close").pixmap(size, mode, state&State_Sunken
+                                                                                        ? QIcon::On : QIcon::Off));
+            break;
+        }
+#endif
         case PE_PanelScrollAreaCorner:
             // disable painting of PE_PanelScrollAreaCorner
             // the default implementation fills the rect with the window background color
