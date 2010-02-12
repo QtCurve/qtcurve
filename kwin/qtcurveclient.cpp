@@ -49,6 +49,10 @@
 #include "tileset.h"
 #endif
 
+#if KDE_IS_VERSION(4, 3, 85)
+#include <KDE/KIconLoader>
+#endif
+
 #if KDE_IS_VERSION(4, 3, 0)
     #define QTC_COMPOSITING compositingActive()
 #else
@@ -105,8 +109,9 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
              , itsTitleFont(QFont())
 #if KDE_IS_VERSION(4, 3, 85)
              , itsClickInProgress(false)
-             , itsDragInrogress(false)
+             , itsDragInProgress(false)
              , itsMouseButton(Qt::NoButton)
+             , itsTargetTab(-1)
 #endif
 {
 }
@@ -427,6 +432,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 QColor gray(Qt::black);
                 gray.setAlphaF(0.075);
                 painter.fillRect(br.adjusted(0==i ? 1 : 0, 0, 0, 0), gray);
+            }
+
+            if(itsDragInProgress && itsTargetTab>-1 &&
+                (i==itsTargetTab || ((i==tabCount-1) && itsTargetTab==tabCount)))
+            {
+                QPixmap arrow(SmallIcon("arrow-down"));
+                painter.drawPixmap(br.x()+(itsTargetTab==tabCount ? tabGeom.width() : 0)-(arrow.width()/2), br.y()+2, arrow);
             }
         }
     }
@@ -794,7 +806,7 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
        (c - itsClickPoint).manhattanLength() >= 4)
     {
         itsClickInProgress = false;
-        itsDragInrogress = true;
+        itsDragInProgress = true;
     
         QDrag     *drag      = new QDrag(widget());
         QMimeData *groupData = new QMimeData();
@@ -845,7 +857,7 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
         drag->setHotSpot(QPoint(c.x() - geom.x(), -1));
 
         drag->exec(Qt::MoveAction);
-        itsDragInrogress = false;
+        itsDragInProgress = false;
         if(drag->target()==0 && tabList.count() > 1)
         { // Remove window from group and move to where the cursor is located
             QPoint pos = QCursor::pos();
@@ -861,9 +873,9 @@ bool QtCurveClient::dragEnterEvent(QDragEnterEvent *e)
 {
     if(e->mimeData()->hasFormat(clientGroupItemDragMimeType()))
     {
-        itsDragInrogress = true;
+        itsDragInProgress = true;
         e->acceptProposedAction();
-        itsTargetTab = itemClicked(widget()->mapToParent(e->pos()));
+        itsTargetTab = itemClicked(widget()->mapToParent(e->pos()), true, true);
         widget()->update();
         return true;
     }
@@ -875,37 +887,49 @@ bool QtCurveClient::dropEvent(QDropEvent *e)
     QPoint point    = widget()->mapToParent(e->pos());
     int    tabClick = itemClicked(point);
 
-    itsDragInrogress = false;
+    itsDragInProgress = false;
     if(tabClick >= 0)
     {
         const QMimeData *groupData = e->mimeData();
         if(groupData->hasFormat(clientGroupItemDragMimeType()))
         {
             if(widget()==e->source())
-                moveItemInClientGroup(itemClicked(itsClickPoint), itemClicked(point, true));
+                moveItemInClientGroup(itemClicked(itsClickPoint), itemClicked(point, true, true));
             else
-                moveItemToClientGroup(QString(groupData->data(clientGroupItemDragMimeType())).toLong(), itemClicked(point, true));
+                moveItemToClientGroup(QString(groupData->data(clientGroupItemDragMimeType())).toLong(), itemClicked(point, true, true));
+            widget()->update();
             return true;
         }
     }
     return false;
 }
 
-bool QtCurveClient::dragMoveEvent(QDragMoveEvent*)
+bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
+{
+    if(e->mimeData()->hasFormat(clientGroupItemDragMimeType()))
+    {
+        e->acceptProposedAction();
+        int tt = itemClicked(widget()->mapToParent(e->pos()), true, true);
+        if(itsTargetTab!=tt)
+        {
+            itsTargetTab=tt;
+            widget()->update();
+        }
+        return true;
+    }
+    return false;
+}
+
+bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent *)
 {
     return false;
 }
 
-bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent*)
-{
-    return false;
-}
-
-int QtCurveClient::itemClicked(const QPoint &point, bool between)
+int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
 {
     QRect                  frame = widget()->frameGeometry();
     QList<ClientGroupItem> list = clientGroupItems();
-    int                    tabs = list.count(),
+    int                    tabs = list.count()+(drag ? 1 : 0),
                            shadowSize = Handler()->customShadows() ? Handler()->shadowCache().shadowSize() : 0,
                            titleX = titleRect().x()-shadowSize,
                            frameY = 0, // frame.y(),
@@ -918,7 +942,7 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between)
     if(between) // We are inserting a new tab between two existing ones
         titleX -= tabWidth / 2;
 
-    int rem = titleWidth%tabs,
+    int rem  = titleWidth%tabs,
         tabX = titleX;
 
     for(int i = 0; i < tabs; ++i)

@@ -86,7 +86,7 @@ class QtCurveClient :
     bool                      dragLeaveEvent(QDragLeaveEvent *e);
     bool                      dragEnterEvent(QDragEnterEvent *e);
     bool                      dropEvent(QDropEvent *e);
-    int                       itemClicked(const QPoint &point, bool between = false);
+    int                       itemClicked(const QPoint &point, bool between=false, bool drag=false);
 #endif
 
     QRect                     captionRect() const;
@@ -113,7 +113,7 @@ class QtCurveClient :
 #if KDE_IS_VERSION(4, 3, 85)
     QList<QtCurveButton *> itsCloseButtons;
     bool                   itsClickInProgress,
-                           itsDragInrogress;
+                           itsDragInProgress;
     Qt::MouseButton        itsMouseButton;
     QPoint                 itsClickPoint;
     int                    itsTargetTab;
