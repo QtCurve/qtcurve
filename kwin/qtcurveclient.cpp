@@ -403,7 +403,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
             int iconSize(QTC_TAB_CLOSE_ICON_SIZE);
 
-            paintSeparator(&painter, tabGeom);
+            if(0==i)
+                paintSeparator(&painter, tabGeom);
             paintTitle(&painter, tabGeom.adjusted(showIcon ? 1 : 0, 0, -(iconSize+constTitlePad), 0), QRect(), tabList[i].title(),
                        showIcon ? tabList[i].icon().pixmap(iconSize) : QPixmap(),  0, true, activeTab==i);
 
@@ -419,14 +420,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             QRect br(tabGeom);
 
             tabGeom.translate(tabGeom.width() - 1, 0);
-            if(i==tabCount-1)
-                paintSeparator(&painter, tabGeom);
+            paintSeparator(&painter, tabGeom.adjusted(-1, 0, -1, 0));
 
             if(i!=activeTab)
             {
                 QColor gray(Qt::black);
                 gray.setAlphaF(0.075);
-                painter.fillRect(br.adjusted(0==i || activeTab==i-1 ? 1 : 0, 0, 0, 0), gray);
+                painter.fillRect(br.adjusted(0==i ? 1 : 0, 0, 0, 0), gray);
             }
         }
     }
