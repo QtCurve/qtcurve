@@ -405,6 +405,38 @@ int static toHint(int sc)
     }
 }
 
+static const char *constBoldProperty="qtc-set-bold";
+
+static void setBold(QWidget *widget)
+{
+    QVariant prop(widget->property(constBoldProperty));
+    if(!prop.isValid() || !prop.toBool())
+    {
+        QFont font(widget->font());
+        
+        if(!font.bold())
+        {
+            font.setBold(true);
+            widget->setFont(font);
+            widget->setProperty(constBoldProperty, true);
+        }
+    }
+}
+
+static void unSetBold(QWidget *widget)
+{
+    QVariant prop(widget->property(constBoldProperty));
+
+    if(prop.isValid() && prop.toBool())
+    {
+        QFont font(widget->font());
+        
+        font.setBold(false);
+        widget->setFont(font);
+        widget->setProperty(constBoldProperty, false);
+    }
+}
+
 static QWidget * getActiveWindow(QWidget *widget)
 {
     QWidget *activeWindow=QApplication::activeWindow();
@@ -1512,12 +1544,7 @@ void QtCurveStyle::polish(QWidget *widget)
         }
 
         if(opts.boldProgress)
-        {
-            QFont font(widget->font());
-
-            font.setBold(true);
-            widget->setFont(font);
-        }
+            setBold(widget);
         widget->installEventFilter(this);
     }
     else if (widget->inherits("Q3Header"))
@@ -1932,6 +1959,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
     else if (qobject_cast<QProgressBar *>(widget))
     {
         widget->removeEventFilter(this);
+        if(opts.boldProgress)
+            unSetBold(widget);
         itsProgressBars.remove((QProgressBar *)widget);
     }
     else if (widget->inherits("Q3Header"))
@@ -1999,6 +2028,9 @@ void QtCurveStyle::unpolish(QWidget *widget)
     }
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
+    else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
+        unSetBold(widget);
+
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
         {
@@ -2827,14 +2859,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             if(hint>=SH_CustomBase && widget)
                 if("CE_CapacityBar"==widget->objectName())
                 {
-                    if (opts.boldProgress && !widget->property("qtc-set-bold").isValid())
-                    {
-                        QWidget *w=(QWidget *)widget;
-                        QFont font(w->font());
-                        font.setBold(true);
-                        w->setFont(font);
-                        w->setProperty("qtc-set-bold", true);
-                    }
+                    if (opts.boldProgress)
+                        setBold((QWidget *)widget);
                     return CE_QtC_KCapacityBar;
                 }
 #endif
