@@ -920,6 +920,7 @@ bool QtCurveClient::dropEvent(QDropEvent *e)
     return false;
 }
 
+
 bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
 {
     if(e->mimeData()->hasFormat(clientGroupItemDragMimeType()))
@@ -945,11 +946,11 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
 {
     QRect                  frame = widget()->frameGeometry();
     QList<ClientGroupItem> list = clientGroupItems();
-    int                    tabs = list.count()+(drag ? 1 : 0),
+    int                    tabs = list.count(),
                            shadowSize = Handler()->customShadows() ? Handler()->shadowCache().shadowSize() : 0,
                            titleX = titleRect().x()-shadowSize,
                            frameY = 0, // frame.y(),
-                           titleWidth = titleRect().width()+(2*shadowSize),
+                           titleWidth = titleRect().width()/*+(2*shadowSize)*/,
                            titleHeight = layoutMetric(LM_TitleEdgeTop) +
                                          layoutMetric(LM_TitleHeight) +
                                          layoutMetric(LM_TitleEdgeBottom) + shadowSize,
@@ -958,10 +959,10 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
     if(between) // We are inserting a new tab between two existing ones
         titleX -= tabWidth / 2;
 
-    int rem  = titleWidth%tabs,
+    int rem  = titleWidth%(tabs+(drag ? 1 : 0)),
         tabX = titleX;
 
-    for(int i = 0; i < tabs; ++i)
+    for(int i = 0; i < tabs+(drag ? 1 : 0); ++i)
     {
         QRect tabRect(tabX, frameY, i<rem?tabWidth+1:tabWidth, titleHeight);
 
@@ -969,6 +970,7 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
             return i;
         tabX += tabRect.width();
     }
+
     return -1;
 }
 #endif
