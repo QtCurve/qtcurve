@@ -778,6 +778,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(tabMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(tabMoChanged()));
     connect(stdSidebarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(toolbarTabs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(centerTabText, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(popupBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -2083,6 +2084,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.tabMouseOver=(ETabMo)tabMouseOver->currentIndex();
     opts.stdSidebarButtons=stdSidebarButtons->isChecked();
     opts.toolbarTabs=toolbarTabs->isChecked();
+    opts.centerTabText=centerTabText->isChecked();
     opts.borderMenuitems=borderMenuitems->isChecked();
     opts.popupBorder=popupBorder->isChecked();
     opts.progressAppearance=(EAppearance)progressAppearance->currentIndex();
@@ -2276,6 +2278,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     stdSidebarButtons->setChecked(opts.stdSidebarButtons);
     toolbarTabs->setChecked(opts.toolbarTabs);
     toolbarTabs_false->setChecked(!opts.toolbarTabs);
+    centerTabText->setChecked(opts.centerTabText);
+    centerTabText_false->setChecked(!opts.centerTabText);
     borderMenuitems->setChecked(opts.borderMenuitems);
     popupBorder->setChecked(opts.popupBorder);
     progressAppearance->setCurrentIndex(opts.progressAppearance);
@@ -2481,6 +2485,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          tabMouseOver->currentIndex()!=opts.tabMouseOver ||
          stdSidebarButtons->isChecked()!=opts.stdSidebarButtons ||
          toolbarTabs->isChecked()!=opts.toolbarTabs ||
+         centerTabText->isChecked()!=opts.centerTabText ||
          borderMenuitems->isChecked()!=opts.borderMenuitems ||
          popupBorder->isChecked()!=opts.popupBorder ||
          defBtnIndicator->currentIndex()!=(int)opts.defBtnIndicator ||

@@ -15,6 +15,8 @@
     (sometimes arrows would not be redrawn).
 11. Use standard application font for combos and line-edits that are in toolbars.
 12. Use KIcon("dialog-close") as tab-close icon.
+13. Dont round frame of KPassivePopup - as used in rekonq's tab previews.
+14. Add option to align tab text in the centre.
 
 1.0.2
 -----

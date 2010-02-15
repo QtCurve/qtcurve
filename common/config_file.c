@@ -1500,6 +1500,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_EFFECT(titlebarEffect)
             QTC_CFG_READ_BOOL(gtkComboMenus)
             QTC_CFG_READ_BOOL(colorTitlebarOnly)
+            QTC_CFG_READ_BOOL(centerTabText)
 /*
 #else
             QTC_CFG_READ_BOOL(setDialogButtonOrder)
@@ -2168,6 +2169,7 @@ static void defaultSettings(Options *opts)
     opts->customMenuStripeColor.setRgb(0, 0, 0);
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
+    opts->centerTabText=false;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
@@ -2863,6 +2865,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
+        CFG_WRITE_ENTRY(centerTabText)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         QTC_WRITE_STRING_LIST_ENTRY(noBgndGradientApps)
         QTC_WRITE_STRING_LIST_ENTRY(noBgndImageApps)

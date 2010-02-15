@@ -5802,7 +5802,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     painter->setTransform(m, true);
                 }
 
-                int alignment(Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic);
+                int alignment(Qt::AlignVCenter | Qt::TextShowMnemonic | (opts.centerTabText ? Qt::AlignHCenter : Qt::AlignLeft));
 
                 if (!styleHint(SH_UnderlineShortcut, option, widget))
                     alignment |= Qt::TextHideMnemonic;

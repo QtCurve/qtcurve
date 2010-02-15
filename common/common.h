@@ -1026,6 +1026,7 @@ typedef struct
 #if defined __cplusplus
     EAlign           titlebarAlignment;
     EEffect          titlebarEffect;
+    bool             centerTabText;
 #endif
     double           customShades[NUM_STD_SHADES];
 #ifdef __cplusplus
