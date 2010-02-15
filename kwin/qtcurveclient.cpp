@@ -470,7 +470,7 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
                                const QString &cap, const QPixmap &pix, int shadowSize, bool isTab, bool isActiveTab)
 {
     int  iconX=capRect.x();
-    bool showIcon=!pix.isNull();
+    bool showIcon=!pix.isNull() && capRect.width()>pix.width();
 
     if(!cap.isEmpty())
     {
