@@ -939,6 +939,8 @@ bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
 
 bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent *)
 {
+    itsDragInProgress = false;
+    widget()->update();
     return false;
 }
 
