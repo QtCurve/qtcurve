@@ -25,7 +25,7 @@
  */
 #define QTC_DRAW_INTO_PIXMAPS
 
-#include <klocale.h>
+#include <KDE/KLocale>
 #include <QBitmap>
 #include <QDateTime>
 #include <QFontMetrics>
@@ -36,6 +36,7 @@
 #include <QPixmap>
 #include <QStyleOptionTitleBar>
 #include <QStyle>
+#include <KDE/KColorUtils>
 #ifdef QTC_DRAW_INTO_PIXMAPS
 #include <KDE/KWindowSystem>
 #endif
@@ -98,7 +99,16 @@ static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false)
     return path;
 }
 #endif
-            
+
+static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
+{
+    QColor col(foreground);
+
+    col.setAlpha(255);
+
+    return KColorUtils::mix(background, foreground, alpha);
+}
+
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
 #if KDE_IS_VERSION(4, 3, 0)
              : KCommonDecorationUnstable(bridge, factory)
@@ -527,25 +537,31 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
 
 //         painter->setClipRect(capRect.adjusted(-2, 0, 2, 0));
 
-        QColor color(KDecoration::options()->color(KDecoration::ColorFont, isActive()));
+        QColor color(KDecoration::options()->color(KDecoration::ColorFont, isActive())),
+               bgnd(KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
 
         if(isTab && !isActiveTab)
             textRect.adjust(0, 1, 0, 1);
 
         if((!isTab || isActiveTab) && EFFECT_NONE!=effect)
         {
-            QColor shadow(WINDOW_SHADOW_COLOR(effect));
-            shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
-            painter->setPen(shadow);
+//             QColor shadow(WINDOW_SHADOW_COLOR(effect));
+//             shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
+//             painter->setPen(shadow);
+            painter->setPen(blendColors(WINDOW_SHADOW_COLOR(effect), bgnd, WINDOW_TEXT_SHADOW_ALPHA(effect)));
             painter->drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
 
             if (!isActive() && QTC_DARK_WINDOW_TEXT(color))
-                color.setAlpha((color.alpha() * 180) >> 8);
+            {
+                //color.setAlpha((color.alpha() * 180) >> 8);
+                color=blendColors(color, bgnd, ((255 * 180) >> 8)/256.0);
+            }
         }
 
-        if(isTab && !isActiveTab)
-            color.setAlphaF(0.45);
-        painter->setPen(color);
+//         if(isTab && !isActiveTab)
+//             color.setAlphaF(0.45);
+//         painter->setPen(color);
+        painter->setPen(isTab && !isActiveTab ? blendColors(color, bgnd, 0.45) : color);
         painter->drawText(textRect, alignment, str);
 //         painter->setClipping(false);
     }
