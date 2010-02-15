@@ -70,6 +70,8 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #include <KDE/KTitleWidget>
 #include <KDE/KTabBar>
 #include <KDE/KFileDialog>
+#include <KDE/KPassivePopup>
+
 #if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
 #endif
@@ -3458,11 +3460,20 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                         drawBorder(painter, r, &opt,
                                    opts.round &&
-                                    ( (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
+                                    (
+#ifdef QTC_QT_ONLY
+                                      (widget && widget->inherits("KPassivePopup")) ||
+#else
+                                      (widget && qobject_cast<const KPassivePopup *>(widget)) ||
+#endif
+                                      (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
                                        0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
+                                       
                                       (APP_KRUNNER==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
                                        0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")) ||
-                                      kwinTab)
+                                       
+                                      kwinTab
+                                    )
                                    ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
                                    sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
                                                           ? BORDER_SUNKEN
