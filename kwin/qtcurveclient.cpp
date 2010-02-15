@@ -420,7 +420,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
             if(0==i)
                 paintSeparator(&painter, tabGeom);
-            paintTitle(&painter, tabGeom.adjusted(showIcon ? 1 : 0, 0, -(iconSize+constTitlePad), 0), QRect(), tabList[i].title(),
+            paintTitle(&painter, tabGeom.adjusted(showIcon ? constTitlePad : 0, 0,
+                                                  -(iconSize+(showIcon ? constTitlePad : 0)), 0), QRect(), tabList[i].title(),
                        showIcon ? tabList[i].icon().pixmap(iconSize) : QPixmap(),  0, true, activeTab==i);
 
             if(i >= itsCloseButtons.size())
