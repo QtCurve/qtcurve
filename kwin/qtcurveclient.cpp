@@ -802,7 +802,7 @@ bool QtCurveClient::mouseButtonPressEvent(QMouseEvent *e)
 
 bool QtCurveClient::mouseButtonReleaseEvent(QMouseEvent *e)
 {
-    int item = itemClicked(e->pos());
+    int item = itemClicked(widget()->mapToParent(e->pos()));
 
     if(itsClickInProgress && item >= 0)
     {
@@ -953,7 +953,7 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
                            shadowSize = Handler()->customShadows() ? Handler()->shadowCache().shadowSize() : 0,
                            titleX = titleRect().x()-shadowSize,
                            frameY = 0, // frame.y(),
-                           titleWidth = titleRect().width()/*+(2*shadowSize)*/,
+                           titleWidth = titleRect().width(),
                            titleHeight = layoutMetric(LM_TitleEdgeTop) +
                                          layoutMetric(LM_TitleHeight) +
                                          layoutMetric(LM_TitleEdgeBottom) + shadowSize,
