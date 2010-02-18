@@ -68,6 +68,9 @@ static const int constTitlePad=4;
 #if KDE_IS_VERSION(4, 3, 85)
 #define QTC_TAB_CLOSE_ICON_SIZE tabCloseIconSize(layoutMetric(LM_TitleHeight))
 
+static const int constInvalidTab=-1;
+static const int constAddToEmpty=-2;
+
 static inline int tabCloseIconSize(int titleHeight)
 {
     int size=titleHeight*0.8;
@@ -121,7 +124,7 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
              , itsClickInProgress(false)
              , itsDragInProgress(false)
              , itsMouseButton(Qt::NoButton)
-             , itsTargetTab(-1)
+             , itsTargetTab(constInvalidTab)
 #endif
 {
 }
@@ -445,7 +448,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 painter.fillRect(br.adjusted(0==i ? 1 : 0, 0, 0, 0), gray);
             }
 
-            if(itsDragInProgress && itsTargetTab>-1 &&
+            if(itsDragInProgress && itsTargetTab>constInvalidTab &&
                 (i==itsTargetTab || ((i==tabCount-1) && itsTargetTab==tabCount)))
             {
                 QPixmap arrow(SmallIcon("arrow-down"));
@@ -462,6 +465,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                                    itsCaptionRect.height()),
                    caption(), showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
 #if KDE_IS_VERSION(4, 3, 85)
+
+        if(constAddToEmpty==itsTargetTab)
+        {
+            QPixmap arrow(SmallIcon("list-add"));
+            painter.drawPixmap(itsCaptionRect.x(),
+                               itsCaptionRect.y()+((itsCaptionRect.height()-arrow.height())/2),
+                               arrow);
+        }
     }
 #endif
     painter.end();
@@ -892,7 +903,10 @@ bool QtCurveClient::dragEnterEvent(QDragEnterEvent *e)
     {
         itsDragInProgress = true;
         e->acceptProposedAction();
-        itsTargetTab = itemClicked(widget()->mapToParent(e->pos()), true, true);
+        if(1==clientGroupItems().count() && widget()!=e->source())
+            itsTargetTab = constAddToEmpty;
+        else
+            itsTargetTab = itemClicked(widget()->mapToParent(e->pos()), true, true);
         widget()->update();
         return true;
     }
@@ -914,25 +928,27 @@ bool QtCurveClient::dropEvent(QDropEvent *e)
                 moveItemInClientGroup(itemClicked(itsClickPoint), itemClicked(point, true, true));
             else
                 moveItemToClientGroup(QString(groupData->data(clientGroupItemDragMimeType())).toLong(), itemClicked(point, true, true));
+            itsTargetTab=constInvalidTab;
             widget()->update();
             return true;
         }
     }
-    else if(-1!=itsTargetTab)
+    else if(constInvalidTab!=itsTargetTab)
     {
-        itsTargetTab=-1;
+        itsTargetTab=constInvalidTab;
         widget()->update();
     }
     return false;
 }
-
 
 bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
 {
     if(e->mimeData()->hasFormat(clientGroupItemDragMimeType()))
     {
         e->acceptProposedAction();
-        int tt = itemClicked(widget()->mapToParent(e->pos()), true, true);
+        int tt = 1==clientGroupItems().count() && widget()!=e->source()
+                    ? constAddToEmpty
+                    : itemClicked(widget()->mapToParent(e->pos()), true, true);
         if(itsTargetTab!=tt)
         {
             itsTargetTab=tt;
@@ -946,7 +962,7 @@ bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
 bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent *)
 {
     itsDragInProgress = false;
-    itsTargetTab = -1;
+    itsTargetTab = constInvalidTab;
     widget()->update();
     return false;
 }
@@ -986,7 +1002,7 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
         tabX += tabRect.width();
     }
 
-    return -1;
+    return constInvalidTab;
 }
 #endif
 
