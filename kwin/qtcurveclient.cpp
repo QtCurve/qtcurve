@@ -902,7 +902,7 @@ bool QtCurveClient::dragEnterEvent(QDragEnterEvent *e)
 bool QtCurveClient::dropEvent(QDropEvent *e)
 {
     QPoint point    = widget()->mapToParent(e->pos());
-    int    tabClick = itemClicked(point);
+    int    tabClick = itemClicked(point, true, true);
 
     itsDragInProgress = false;
     if(tabClick >= 0)
@@ -953,17 +953,23 @@ bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent *)
 
 int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
 {
-    QRect                  frame = widget()->frameGeometry();
+    QRect                  title = titleRect();
     QList<ClientGroupItem> list = clientGroupItems();
     int                    tabs = list.count(),
                            shadowSize = Handler()->customShadows() ? Handler()->shadowCache().shadowSize() : 0,
-                           titleX = titleRect().x()-shadowSize,
-                           frameY = 0, // frame.y(),
-                           titleWidth = titleRect().width(),
+                           titleX = title.x()-shadowSize,
+                           frameY = 0,
+                           titleWidth = title.width(),
                            titleHeight = layoutMetric(LM_TitleEdgeTop) +
                                          layoutMetric(LM_TitleHeight) +
                                          layoutMetric(LM_TitleEdgeBottom) + shadowSize,
                            tabWidth = titleWidth/tabs;
+
+    if(drag)
+        if(point.x() <= title.left())
+            return 0;
+        else if(point.x() >= titleRect().right())
+            return tabs;
 
     if(between) // We are inserting a new tab between two existing ones
         titleX -= tabWidth / 2;
