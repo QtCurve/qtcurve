@@ -918,6 +918,11 @@ bool QtCurveClient::dropEvent(QDropEvent *e)
             return true;
         }
     }
+    else if(-1!=itsTargetTab)
+    {
+        itsTargetTab=-1;
+        widget()->update();
+    }
     return false;
 }
 
@@ -941,6 +946,7 @@ bool QtCurveClient::dragMoveEvent(QDragMoveEvent *e)
 bool QtCurveClient::dragLeaveEvent(QDragLeaveEvent *)
 {
     itsDragInProgress = false;
+    itsTargetTab = -1;
     widget()->update();
     return false;
 }
