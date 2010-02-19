@@ -19,6 +19,8 @@
 14. Add option to align tab text in the centre.
 15. Dont fade tabbar base on KDevelop's tabbbar that is in the menubar - KDevelop
     itself is doing fading.
+16. If not using standard buttons for sidebar buttons, make KDevelop's appear
+    more kate-like.
 
 1.0.2
 -----

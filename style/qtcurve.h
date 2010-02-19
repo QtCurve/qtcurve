@@ -210,6 +210,7 @@ class QtCurveStyle : public QWindowsStyle
     QColor         shade(const QColor &a, float k) const;
     void           shade(const color &ca, color *cb, double k) const;
     QColor         getLowerEtchCol(const QWidget *widget) const;
+    QPalette::ColorRole getTextRole(const QWidget *w, const QPainter *p, QPalette::ColorRole def) const;
 
     private Q_SLOTS:
 

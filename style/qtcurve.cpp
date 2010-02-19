@@ -891,17 +891,20 @@ static void parseWindowLine(const QString &line, QList<int> &data)
         }
 }
 
-static const QPushButton * getButton(const QWidget *w, const QPainter *p)
+static const QAbstractButton * getButton(const QWidget *w, const QPainter *p)
 {
     const QWidget *widget=w ? w : (p && p->device() ? dynamic_cast<const QWidget *>(p->device()) : 0L);
-    return widget ? ::qobject_cast<const QPushButton *>(widget) : 0L;
+    return widget ? ::qobject_cast<const QAbstractButton *>(widget) : 0L;
 }
 
-inline bool isMultiTabBarTab(const QPushButton *button)
+inline bool isMultiTabBarTab(const QAbstractButton *button)
 {
-    return button && button->isFlat() && button->inherits("KMultiTabBarTab");
+    return button && ( (::qobject_cast<const QPushButton *>(button) && ((QPushButton *)button)->isFlat() &&
+                            button->inherits("KMultiTabBarTab")) ||
+                       (APP_KDEVELOP==theThemedApp && ::qobject_cast<const QToolButton *>(button) &&
+                            button->inherits("Sublime::IdealToolButton")) );
 }
-
+    
 #ifdef QTC_STYLE_SUPPORT
 QtCurveStyle::QtCurveStyle(const QString &name)
 #else
@@ -1772,6 +1775,12 @@ void QtCurveStyle::polish(QWidget *widget)
         ((QFrame *)widget)->setLineWidth(0);
         ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
     }
+
+    if(APP_KDEVELOP==theThemedApp && !opts.stdSidebarButtons && widget->inherits("Sublime::IdealButtonBarWidget") && widget->layout())
+    {
+        widget->layout()->setSpacing(0);
+        widget->layout()->setMargin(0);
+    }
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
@@ -2587,7 +2596,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ButtonShiftHorizontal:
             // return Qt::RightToLeft==QApplication::layoutDirection() ? -1 : 1;
         case PM_ButtonShiftVertical:
-            return 1;
+            return APP_KDEVELOP==theThemedApp && !opts.stdSidebarButtons && widget && isMultiTabBarTab(getButton(widget, 0L)) ? 0 : 1;
         case PM_ButtonDefaultIndicator:
             return 0;
         case PM_DefaultFrameWidth:
@@ -6516,7 +6525,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         alignment |= Qt::TextHideMnemonic;
 
                     r.translate(shiftX, shiftY);
-                    drawItemText(painter, r, alignment, tb->palette, state&State_Enabled, tb->text, QPalette::ButtonText);
+                    drawItemText(painter, r, alignment, tb->palette, state&State_Enabled, tb->text,
+                                 getTextRole(widget, painter, QPalette::ButtonText));
                 }
                 else
                 {
@@ -6591,7 +6601,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         tr.translate(shiftX, shiftY);
                         drawItemText(painter, QStyle::visualRect(option->direction, r, tr), alignment, tb->palette,
-                                     tb->state & State_Enabled, tb->text, QPalette::ButtonText);
+                                     tb->state & State_Enabled, tb->text, getTextRole(widget, painter, QPalette::ButtonText));
                     }
                     else
                     {
@@ -8099,14 +8109,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
                                 QPalette::ColorRole textRole) const
 {
-    if(QPalette::ButtonText==textRole && !opts.stdSidebarButtons)
-    {
-        const QPushButton *button=getButton(0L, painter);
-
-        if(button && isMultiTabBarTab(button) && button->isChecked())
-            textRole=QPalette::HighlightedText;
-    }
-    QTC_BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+    QTC_BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, getTextRole(0L, painter, textRole));
 }
 
 #if 0 // Not sure about this...
@@ -11431,6 +11434,18 @@ QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
     col.setAlphaF(0.1); // IS_FLAT(opts.bgndAppearance) ? 0.25 : 0.4);
 
     return col;
+}
+
+QPalette::ColorRole QtCurveStyle::getTextRole(const QWidget *w, const QPainter *p, QPalette::ColorRole def) const
+{
+    if(QPalette::ButtonText==def && !opts.stdSidebarButtons)
+    {
+        const QAbstractButton *button=getButton(w, p);
+
+        if(button && isMultiTabBarTab(button) && button->isChecked())
+            return QPalette::HighlightedText;
+    }
+    return def;
 }
 
 void QtCurveStyle::widgetDestroyed(QObject *o)
