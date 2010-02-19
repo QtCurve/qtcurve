@@ -1242,7 +1242,7 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_KMIX;
         else if("Designer"==QCoreApplication::applicationName())
             theThemedApp=APP_QTDESIGNER;
-        else if("kdevelop"==appName)
+        else if("kdevelop"==appName || "kdevelop.bin"==appName)
             theThemedApp=APP_KDEVELOP;
         else if("soffice.bin"==appName)
             theThemedApp=APP_OPENOFFICE;
@@ -3554,14 +3554,21 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 //                     painter->setPen(use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER]);
 //                     painter->drawLine(bottomLine);
 
+                    bool fadeState=true, fadeEnd=true;
+
+                    // Dont fade start/end of tabbar in KDevelop's menubar
+                    if(APP_KDEVELOP==theThemedApp && widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
+                        qobject_cast<const QTabBar *>(widget) && qobject_cast<const QMenuBar *>(widget->parentWidget()->parentWidget()))
+                        fadeState=fadeEnd=false;
+
                     drawFadedLine(painter, QRect(topLine.p1(), topLine.p2()),
                                   QTabBar::RoundedSouth==tbb->shape && APPEARANCE_FLAT==opts.appearance
                                     ? palette.background().color()
                                     : use[QTabBar::RoundedNorth==tbb->shape ? QT_STD_BORDER
                                                                             : (opts.borderTab ? 0 : QT_FRAME_DARK_SHADOW)], 
-                                  true, true, horiz, fadeSizeStart, fadeSizeEnd);
+                                  fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
                     drawFadedLine(painter, QRect(bottomLine.p1(), bottomLine.p2()), use[QTabBar::RoundedNorth==tbb->shape ? 0 : QT_STD_BORDER],
-                                  true, true, horiz, fadeSizeStart, fadeSizeEnd);
+                                  fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
                     painter->restore();
                 }
             break;
