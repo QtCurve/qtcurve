@@ -439,6 +439,22 @@ static void unSetBold(QWidget *widget)
     }
 }
 
+static int getFrameRound(const QWidget *widget)
+{
+    const QWidget *window=widget ? widget->window() : 0L;
+
+    if(window)
+    {
+        QRect widgetRect(widget->rect()),
+              windowRect(window->rect());
+
+        if(widgetRect==windowRect)
+            return ROUNDED_NONE;
+    }
+
+    return ROUNDED_ALL;
+}
+
 static QWidget * getActiveWindow(QWidget *widget)
 {
     QWidget *activeWindow=QApplication::activeWindow();
@@ -3459,22 +3475,23 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         }
 
                         drawBorder(painter, r, &opt,
-                                   opts.round &&
-                                    (
-#ifdef QTC_QT_ONLY
-                                      (widget && widget->inherits("KPassivePopup")) ||
-#else
-                                      (widget && qobject_cast<const KPassivePopup *>(widget)) ||
-#endif
-                                      (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
-                                       0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
-                                       
-                                      (APP_KRUNNER==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
-                                       0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")) ||
-                                       
-                                      kwinTab
-                                    )
-                                   ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
+                                   opts.round ?  getFrameRound(widget) : ROUND_NONE, backgroundColors(option),
+//                                    opts.round &&
+//                                     (
+// #ifdef QTC_QT_ONLY
+//                                       (widget && widget->inherits("KPassivePopup")) ||
+// #else
+//                                       (widget && qobject_cast<const KPassivePopup *>(widget)) ||
+// #endif
+//                                       (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
+//                                        0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
+//                                        
+//                                       (APP_KRUNNER==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
+//                                        0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")) ||
+//                                        
+//                                       kwinTab
+//                                     )
+//                                    ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
                                    sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
                                                           ? BORDER_SUNKEN
                                                             : state&State_Raised
