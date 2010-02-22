@@ -2118,10 +2118,12 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
 {
     bool useWindow=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
                                (IMG_FILE!=opts.bgndImage.type || 
-                                (opts.bgndImage.height==opts.bgndImage.height &&
-                                 opts.bgndImage.width==opts.bgndImage.width &&
+                                (opts.bgndImage.height==opts.menuBgndImage.height &&
+                                 opts.bgndImage.width==opts.menuBgndImage.width &&
                                  opts.bgndImage.file==opts.menuBgndImage.file)));
     QtCImage *img=useWindow ? &opts.bgndImage : &opts.menuBgndImage;
+    int      imgWidth=IMG_FILE==img->type ? img->width : QTC_RINGS_WIDTH(img->type),
+             imgHeight=IMG_FILE==img->type ? img->height : QTC_RINGS_HEIGHT(img->type);
 
     switch(img->type)
     {
@@ -2143,7 +2145,7 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
             if(!crImg)
             {
                 cairo_t *ci;
-                crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, QTC_RINGS_WIDTH+1, QTC_RINGS_HEIGHT+1);
+                crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
                 ci=cairo_create(crImg);
                 drawBgndRing(ci, 0, 0, 200, 140, isWindow);
 
@@ -2163,8 +2165,56 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
                     menuBgndImage=crImg;
             }
 
-            cairo_set_source_surface(cr, crImg, width-QTC_RINGS_WIDTH, y+1);
+            cairo_set_source_surface(cr, crImg, width-imgWidth, y+1);
             cairo_paint(cr);
+            break;
+        }
+        case IMG_SQUARE_RINGS:
+        {
+            cairo_surface_t *crImg=useWindow ? bgndImage : menuBgndImage;
+
+            if(!crImg)
+            {
+                cairo_t *ci;
+                double  halfWidth=QTC_RINGS_SQUARE_LINE_WIDTH/2.0;
+                crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
+                ci=cairo_create(crImg);
+
+                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_ALPHA);
+                cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
+                createPath(ci, halfWidth+0.5, halfWidth+0.5, QTC_RINGS_SQUARE_SMALL_SIZE, QTC_RINGS_SQUARE_SMALL_SIZE,
+                               QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+                cairo_stroke(ci);
+
+                cairo_new_path(ci);
+                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_ALPHA);
+                cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
+                createPath(ci, halfWidth+0.5+((imgWidth-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
+                               halfWidth+0.5+((imgHeight-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
+                               QTC_RINGS_SQUARE_LARGE_SIZE, QTC_RINGS_SQUARE_LARGE_SIZE,
+                               QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+                cairo_stroke(ci);
+
+                cairo_new_path(ci);
+                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_ALPHA);
+                cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
+                createPath(ci, halfWidth+0.5+(imgWidth-(QTC_RINGS_SQUARE_SMALL_SIZE+QTC_RINGS_SQUARE_LINE_WIDTH)),
+                               halfWidth+0.5+(imgHeight-(QTC_RINGS_SQUARE_SMALL_SIZE+QTC_RINGS_SQUARE_LINE_WIDTH)),
+                               QTC_RINGS_SQUARE_SMALL_SIZE, QTC_RINGS_SQUARE_SMALL_SIZE,
+                               QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+                cairo_stroke(ci);
+
+                cairo_destroy(ci);
+
+                if(useWindow)
+                    bgndImage=crImg;
+                else
+                    menuBgndImage=crImg;
+            }
+
+            cairo_set_source_surface(cr, crImg, width-imgWidth, y+1);
+            cairo_paint(cr);
+            break;
         }
     }
 }
