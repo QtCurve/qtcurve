@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2010-02-19 21:12+0000\n"
+"POT-Creation-Date: 2010-02-22 22:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -110,7 +110,7 @@ msgstr ""
 msgid "Darken"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:432 config/qtcurveconfig.cpp:1616
+#: config/qtcurveconfig.cpp:432 config/qtcurveconfig.cpp:1617
 msgid "Custom gradient %1"
 msgstr ""
 
@@ -463,255 +463,259 @@ msgstr ""
 msgid "Plain rings"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:624
-msgid "No glow"
+#: config/qtcurveconfig.cpp:619
+msgid "Square rings"
 msgstr ""
 
 #: config/qtcurveconfig.cpp:625
-msgid "Add glow at the start"
+msgid "No glow"
 msgstr ""
 
 #: config/qtcurveconfig.cpp:626
-msgid "Add glow in the middle"
+msgid "Add glow at the start"
 msgstr ""
 
 #: config/qtcurveconfig.cpp:627
+msgid "Add glow in the middle"
+msgstr ""
+
+#: config/qtcurveconfig.cpp:628
 msgid "Add glow at the end"
 msgstr ""
 
 #. i18n: file: config/qtcurveconfigbase.ui:792
 #. i18n: ectx: property (suffix), widget (KIntNumInput, sliderWidth)
-#: config/qtcurveconfig.cpp:715 po/rc.cpp:280 rc.cpp:280
+#: config/qtcurveconfig.cpp:716 po/rc.cpp:280 rc.cpp:280
 msgid " pixels"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1166
+#: config/qtcurveconfig.cpp:1167
 msgid "Presets and Preview"
 msgstr ""
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:21
 #. i18n: ectx: attribute (title), widget (QWidget, generalTab)
-#: config/qtcurveconfig.cpp:1167 po/rc.cpp:1311 rc.cpp:1311
+#: config/qtcurveconfig.cpp:1168 po/rc.cpp:1311 rc.cpp:1311
 msgid "General"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1168
+#: config/qtcurveconfig.cpp:1169
 msgid "Group Boxes"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1169
+#: config/qtcurveconfig.cpp:1170
 msgid "Combos"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1170
+#: config/qtcurveconfig.cpp:1171
 msgid "Spin Buttons"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1171
+#: config/qtcurveconfig.cpp:1172
 msgid "Splitters"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1172
+#: config/qtcurveconfig.cpp:1173
 msgid "Sliders and Scrollbars"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1173
+#: config/qtcurveconfig.cpp:1174
 msgid "Progressbars"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1174
+#: config/qtcurveconfig.cpp:1175
 msgid "Default Button"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1175
+#: config/qtcurveconfig.cpp:1176
 msgid "Mouse-over"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1176
+#: config/qtcurveconfig.cpp:1177
 msgid "Item Views"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1177
+#: config/qtcurveconfig.cpp:1178
 msgid "Scrollviews"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1178
+#: config/qtcurveconfig.cpp:1179
 msgid "Tabs"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1179
+#: config/qtcurveconfig.cpp:1180
 msgid "Checks and Radios"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1180
+#: config/qtcurveconfig.cpp:1181
 msgid "Windows"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1181
+#: config/qtcurveconfig.cpp:1182
 msgid "Window buttons"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1182
+#: config/qtcurveconfig.cpp:1183
 msgid "Window button colors"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1183
+#: config/qtcurveconfig.cpp:1184
 msgid "Menubars"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1184
+#: config/qtcurveconfig.cpp:1185
 msgid "Popup menus"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1185
+#: config/qtcurveconfig.cpp:1186
 msgid "Toolbars"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1186
+#: config/qtcurveconfig.cpp:1187
 msgid "Dock windows"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1187
+#: config/qtcurveconfig.cpp:1188
 msgid "Advanced Settings"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1188
+#: config/qtcurveconfig.cpp:1189
 msgid "Applications"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1189
+#: config/qtcurveconfig.cpp:1190
 msgid "Legacy"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1190
+#: config/qtcurveconfig.cpp:1191
 msgid "Custom Gradients"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1191
+#: config/qtcurveconfig.cpp:1192
 msgid "Custom Shades"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1208
+#: config/qtcurveconfig.cpp:1209
 msgid "Save"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1209
+#: config/qtcurveconfig.cpp:1210
 msgid "Delete"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1210
+#: config/qtcurveconfig.cpp:1211
 msgid "Import..."
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1211
+#: config/qtcurveconfig.cpp:1212
 msgid "Export..."
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1215
+#: config/qtcurveconfig.cpp:1216
 msgid "(Current)"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1216
+#: config/qtcurveconfig.cpp:1217
 msgid "(Default)"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1485
+#: config/qtcurveconfig.cpp:1486
 msgid ""
 "Export your current KDE4 color palette, and font, so that they can be used "
 "by KDE3 applications?"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1531
+#: config/qtcurveconfig.cpp:1532
 msgid ""
 "Export your current KDE4 color palette, and font, so that they can be used "
 "by pure-Qt3 applications?"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1629
+#: config/qtcurveconfig.cpp:1630
 msgid "Add"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1630
+#: config/qtcurveconfig.cpp:1631
 msgid "Remove"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1631
+#: config/qtcurveconfig.cpp:1632
 msgid "Update"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1769
+#: config/qtcurveconfig.cpp:1770
 msgid "Save Preset"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1769
+#: config/qtcurveconfig.cpp:1770
 msgid "Please enter a name for the preset:"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1771
+#: config/qtcurveconfig.cpp:1772
 msgid "New preset"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1774 config/qtcurveconfig.cpp:1842
-#: config/qtcurveconfig.cpp:1856 config/qtcurveconfig.cpp:1869
+#: config/qtcurveconfig.cpp:1775 config/qtcurveconfig.cpp:1843
+#: config/qtcurveconfig.cpp:1857 config/qtcurveconfig.cpp:1870
 msgid "%1 New"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1777
+#: config/qtcurveconfig.cpp:1778
 msgid "Sorry, failed to save preset"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1840
+#: config/qtcurveconfig.cpp:1841
 msgid ""
 "<p>You cannot use the name \"%1\".</p><p>Please enter a different name:<p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1854
+#: config/qtcurveconfig.cpp:1855
 msgid ""
 "<p>A system defined preset named\"%1\" aleady exists.</p><p>Please enter a "
 "new name:<p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1861
+#: config/qtcurveconfig.cpp:1862
 msgid ""
 "<p>A preset named \"%1\" aleady exists.</p><p>Do you wish to overwrite this?"
 "<p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1868
+#: config/qtcurveconfig.cpp:1869
 msgid "<p>Please enter a new name:<p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1886
+#: config/qtcurveconfig.cpp:1887
 msgid "<p>Are you sure you wish to delete:</p><p><b>%1</b></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1894
+#: config/qtcurveconfig.cpp:1895
 msgid "<p>Sorry, failed to remove the preset file:</p><p><i>%1</i></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1901 config/qtcurveconfig.cpp:1949
+#: config/qtcurveconfig.cpp:1902 config/qtcurveconfig.cpp:1950
 msgid "*"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1911
+#: config/qtcurveconfig.cpp:1912
 msgid "<p>Sorry, failed to load file.</p><p><i>Empty preset name?</i></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1913
+#: config/qtcurveconfig.cpp:1914
 msgid ""
 "<p>Sorry, failed to load file.</p><p><i>Cannot have a preset named \"%1\"</"
 "i></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1917
+#: config/qtcurveconfig.cpp:1918
 msgid "Import Preset"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1925
+#: config/qtcurveconfig.cpp:1926
 msgid "Sorry, failed to load file."
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1932
+#: config/qtcurveconfig.cpp:1933
 msgid ""
 "<p>In which format would you like to export the QtCurve settings?"
 "<ul><li><i>QtCurve settings file</i> - a file to be imported via this config "
@@ -719,19 +723,19 @@ msgid ""
 "from the KDE style panel.</li></ul></p>"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1937
+#: config/qtcurveconfig.cpp:1938
 msgid "Export Settings"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1938
+#: config/qtcurveconfig.cpp:1939
 msgid "QtCurve Settings File"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1938
+#: config/qtcurveconfig.cpp:1939
 msgid "Standalone Theme"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:1965
+#: config/qtcurveconfig.cpp:1966
 msgid ""
 "Could not write to file:\n"
 "%1"
