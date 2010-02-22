@@ -3,23 +3,24 @@
  1. Add option to not embolden progressbar text.
  2. Add option to allow coloured mouse over for toolbar buttons.
  3. Add option to border selection.
- 4. Under KDE SC >= 4.3, use alpha blending for window borders.
- 5. Implement coloured shadows - code taken from Oxygen window decoration
+ 4. Add option to draw square rings on background.
+ 5. Under KDE SC >= 4.3, use alpha blending for window borders.
+ 6. Implement coloured shadows - code taken from Oxygen window decoration
     (but slightly modified)
- 6. Add support for window grouping with KDE SC >= 4.4.
- 7. In Arora, if using thin scrollbar grooves, fill background of scrolbars
+ 7. Add support for window grouping with KDE SC >= 4.4.
+ 8. In Arora, if using thin scrollbar grooves, fill background of scrolbars
     in 'WebView' with standard background colour.
- 8. When drawing focus, attempt to determine if this is in a KpageListView.
- 9. Increase tabbar tab size so as to allow more space around icons.
-10. Fix clipping issues when drawing combos with a coloured area under arrow
+ 9. When drawing focus, attempt to determine if this is in a KpageListView.
+10. Increase tabbar tab size so as to allow more space around icons.
+11. Fix clipping issues when drawing combos with a coloured area under arrow
     (sometimes arrows would not be redrawn).
-11. Use standard application font for combos and line-edits that are in toolbars.
-12. Use KIcon("dialog-close") as tab-close icon.
-13. When drawing frames - if frame size = window size, then dont round.
-14. Add option to align tab text in the centre.
-15. Dont fade tabbar base on KDevelop's tabbbar that is in the menubar - KDevelop
+12. Use standard application font for combos and line-edits that are in toolbars.
+13. Use KIcon("dialog-close") as tab-close icon.
+14. When drawing frames - if frame size = window size, then dont round.
+15. Add option to align tab text in the centre.
+16. Dont fade tabbar base on KDevelop's tabbbar that is in the menubar - KDevelop
     itself is doing fading.
-16. If not using standard buttons for sidebar buttons, make KDevelop's appear
+17. If not using standard buttons for sidebar buttons, make KDevelop's appear
     more kate-like.
 
 1.0.2

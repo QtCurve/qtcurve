@@ -616,6 +616,7 @@ static void insertImageEntries(QComboBox *combo)
     combo->insertItem(IMG_NONE, i18n("No background image"));
     combo->insertItem(IMG_BORDERED_RINGS, i18n("Bordered rings"));
     combo->insertItem(IMG_PLAIN_RINGS, i18n("Plain rings"));
+    combo->insertItem(IMG_SQUARE_RINGS, i18n("Square rings"));
     //combo->insertItem(IMG_FILE, i18n("File:"));
 }
 

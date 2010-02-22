@@ -461,6 +461,8 @@ static EImageType toImageType(const char *str, EImageType def)
             return IMG_PLAIN_RINGS;
         if(0==memcmp(str, "rings", 5))
             return IMG_BORDERED_RINGS;
+        if(0==memcmp(str, "squarerings", 11))
+            return IMG_SQUARE_RINGS;
         if(0==memcmp(str, "file", 4))
             return IMG_FILE;
     }
@@ -2593,6 +2595,8 @@ static const char * toStr(EImageType lv)
             return "plainrings";
         case IMG_BORDERED_RINGS:
             return "rings";
+        case IMG_SQUARE_RINGS:
+            return "squarerings";
         case IMG_FILE:
             return "file";
     }

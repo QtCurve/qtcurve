@@ -351,10 +351,16 @@ typedef gchar ** Strings;
 #define QTC_ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
 
-#define QTC_RINGS_INNER_ALPHA(T) qtcRingAlpha[IMG_PLAIN_RINGS==T ? 0 : 1] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
+#define QTC_RINGS_INNER_ALPHA(T) qtcRingAlpha[IMG_PLAIN_RINGS==T] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
 #define QTC_RINGS_OUTER_ALPHA    qtcRingAlpha[2] //0.5
-#define QTC_RINGS_WIDTH          450
-#define QTC_RINGS_HEIGHT         360
+#define QTC_RINGS_WIDTH(T)       (IMG_SQUARE_RINGS==T ? 260 : 450)
+#define QTC_RINGS_HEIGHT(T)      (IMG_SQUARE_RINGS==T ? 220 : 360)
+
+#define QTC_RINGS_SQUARE_ALPHA      (QTC_RINGS_OUTER_ALPHA*0.6)
+#define QTC_RINGS_SQUARE_LINE_WIDTH 20.0
+#define QTC_RINGS_SQUARE_RADIUS     18.0
+#define QTC_RINGS_SQUARE_LARGE_SIZE 120.0
+#define QTC_RINGS_SQUARE_SMALL_SIZE 100.0
 
 #define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
 
@@ -449,6 +455,7 @@ typedef enum
     IMG_NONE,
     IMG_BORDERED_RINGS,
     IMG_PLAIN_RINGS,
+    IMG_SQUARE_RINGS,
     IMG_FILE
 } EImageType;
 
