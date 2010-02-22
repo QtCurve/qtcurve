@@ -8381,15 +8381,27 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                 }
 
                 // left widget
-                if (tabV2.leftButtonSize.isNull())
-                    rect.setLeft(rect.left()+constTabPad);
-                else if(tabV2.leftButtonSize.width()>0)
-                    rect.setLeft(rect.left() + constTabPad + 2 +
-                                (verticalTabs ? tabV2.leftButtonSize.height() : tabV2.leftButtonSize.width()));
-                else if(tabV2.icon.isNull())
-                    rect.setLeft(rect.left()+constTabPad);
+                if(opts.centerTabText)
+                {
+                    if (!tabV2.leftButtonSize.isEmpty())  // left widget
+                        rect.setLeft(rect.left() + constTabPad +
+                                     (verticalTabs ? tabV2.leftButtonSize.height() : tabV2.leftButtonSize.width()));
+                    if (!tabV2.rightButtonSize.isEmpty()) // right widget
+                        rect.setRight(rect.right() - constTabPad -
+                                     (verticalTabs ? tabV2.rightButtonSize.height() : tabV2.rightButtonSize.width()));
+                }
                 else
-                    rect.setLeft(rect.left() + 2);
+                {
+                    if (tabV2.leftButtonSize.isNull())
+                        rect.setLeft(rect.left()+constTabPad);
+                    else if(tabV2.leftButtonSize.width()>0)
+                        rect.setLeft(rect.left() + constTabPad + 2 +
+                                    (verticalTabs ? tabV2.leftButtonSize.height() : tabV2.leftButtonSize.width()));
+                    else if(tabV2.icon.isNull())
+                        rect.setLeft(rect.left()+constTabPad);
+                    else
+                        rect.setLeft(rect.left() + 2);
+                }
 
                 // icon
                 if (!tabV2.icon.isNull())
@@ -8404,7 +8416,8 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                                                             (tabV2.state & State_Enabled) ? QIcon::Normal
                                                             : QIcon::Disabled);
                     int offset = 4;
-                    if (tabV2.leftButtonSize.isNull())
+                    
+                    if (!opts.centerTabText && tabV2.leftButtonSize.isNull())
                         offset += 2;
 
                     QRect iconRect = QRect(rect.left() + offset, rect.center().y() - tabIconSize.height() / 2,
@@ -8415,9 +8428,10 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                 }
 
                 // right widget
-                if (!tabV2.rightButtonSize.isNull() && tabV2.rightButtonSize.width()>0)
+                if (!opts.centerTabText && !tabV2.rightButtonSize.isNull() && tabV2.rightButtonSize.width()>0)
                     rect.setRight(rect.right() - constTabPad - 2 -
                                   (verticalTabs ? tabV2.rightButtonSize.height() : tabV2.rightButtonSize.width()));
+
 
                 if (!verticalTabs)
                     rect = visualRect(option->direction, option->rect, rect);
