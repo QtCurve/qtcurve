@@ -1,6 +1,7 @@
 1.1.1
 -----
 1. Alter alpha settings of square rings.
+2. Fix progressbar glow sometimes disappearing with Firefox.
 
 1.1.0
 -----

@@ -2531,7 +2531,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         if(opts.glowProgress && (horiz ? width : height)>3)
         {
-            cairo_pattern_t *pat=cairo_pattern_create_linear(x+1, y+1, horiz ? x+width-4 : 0, horiz ? 0 : y+height-4);
+            cairo_pattern_t *pat=cairo_pattern_create_linear(x+1, y+1, horiz ? x+width-4 : x+1, horiz ? y+1 : y+height-4);
             gboolean        inverted=FALSE;
             
             if(GLOW_MIDDLE!=opts.glowProgress && widget && GTK_IS_PROGRESS_BAR(widget))
