@@ -1,6 +1,7 @@
 1.1.1
 -----
-1. Fix Qt only compile.
+1. Alter alpha settings of square rings.
+2. Fix Qt only compile.
 
 1.1.0
 -----

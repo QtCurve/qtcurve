@@ -9967,19 +9967,21 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
                 QColor   col(Qt::white);
                 double   halfWidth=QTC_RINGS_SQUARE_LINE_WIDTH/2.0;
 
-                col.setAlphaF(QTC_RINGS_SQUARE_ALPHA);
+                col.setAlphaF(QTC_RINGS_SQUARE_SMALL_ALPHA);
                 pixPainter.setRenderHint(QPainter::Antialiasing);
                 pixPainter.setPen(QPen(col, QTC_RINGS_SQUARE_LINE_WIDTH, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
                 pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5, halfWidth+0.5,
                                                      QTC_RINGS_SQUARE_SMALL_SIZE, QTC_RINGS_SQUARE_SMALL_SIZE),
                                               WIDGET_OTHER, ROUNDED_ALL, QTC_RINGS_SQUARE_RADIUS));
-                pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5+((imgWidth-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
-                                                     halfWidth+0.5+((imgHeight-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
-                                                     QTC_RINGS_SQUARE_LARGE_SIZE, QTC_RINGS_SQUARE_LARGE_SIZE),
-                                              WIDGET_OTHER, ROUNDED_ALL, QTC_RINGS_SQUARE_RADIUS));
                 pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5+(imgWidth-(QTC_RINGS_SQUARE_SMALL_SIZE+QTC_RINGS_SQUARE_LINE_WIDTH)),
                                                      halfWidth+0.5+(imgHeight-(QTC_RINGS_SQUARE_SMALL_SIZE+QTC_RINGS_SQUARE_LINE_WIDTH)),
                                                      QTC_RINGS_SQUARE_SMALL_SIZE, QTC_RINGS_SQUARE_SMALL_SIZE),
+                                              WIDGET_OTHER, ROUNDED_ALL, QTC_RINGS_SQUARE_RADIUS));
+                col.setAlphaF(QTC_RINGS_SQUARE_LARGE_ALPHA);
+                pixPainter.setPen(QPen(col, QTC_RINGS_SQUARE_LINE_WIDTH, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+                pixPainter.drawPath(buildPath(QRectF(halfWidth+0.5+((imgWidth-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
+                                                     halfWidth+0.5+((imgHeight-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
+                                                     QTC_RINGS_SQUARE_LARGE_SIZE, QTC_RINGS_SQUARE_LARGE_SIZE),
                                               WIDGET_OTHER, ROUNDED_ALL, QTC_RINGS_SQUARE_RADIUS));
                 pixPainter.end();
             }
