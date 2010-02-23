@@ -1,3 +1,7 @@
+1.1.1
+-----
+1. Fix Qt only compile.
+
 1.1.0
 -----
  1. Add option to not embolden progressbar text.
