@@ -587,6 +587,19 @@ static QColor checkColour(const QStyleOption *option, QPalette::ColorRole role)
     return col;
 }
 
+static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
+{
+    QColor col(foreground);
+
+    col.setAlpha(255);
+
+#if defined QTC_QT_ONLY
+    return ColorUtils_mix(&background, &foreground, alpha);
+#else
+    return KColorUtils::mix(background, foreground, alpha);
+#endif
+}
+
 // from windows style
 static const int windowsItemFrame    =  2; // menu item frame width
 static const int windowsItemHMargin  =  3; // menu item hor text margin
@@ -3231,15 +3244,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                              (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
                 r.adjust(1, 1, 1, 1);
             if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
-            {
-#if defined QTC_QT_ONLY
-                QColor bgnd=palette.background().color();
-                col=ColorUtils_mix(&bgnd, &col, col.alphaF());
-#else
-                col=KColorUtils::mix(palette.background().color(), col, col.alphaF());
-#endif
-                col.setAlpha(255);
-            }
+                col=blendColors(col, palette.background().color(), col.alphaF());
+
             drawArrow(painter, r, element, col, false);
             break;
         }
@@ -7627,12 +7633,17 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(EFFECT_NONE!=opts.titlebarEffect)
                     {
-                        shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
-                        painter->setPen(shadow);
+                        //shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
+                        //painter->setPen(shadow);
+                        painter->setPen(blendColors(WINDOW_SHADOW_COLOR(opts.titlebarEffect), titleCols[ORIGINAL_SHADE],
+                                                    WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect)));
                         painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
 
                         if (!active && QTC_DARK_WINDOW_TEXT(textColor))
-                            textColor.setAlpha((textColor.alpha() * 180) >> 8);
+                        {
+                            //textColor.setAlpha((textColor.alpha() * 180) >> 8);
+                            textColor=blendColors(textColor, titleCols[ORIGINAL_SHADE], ((255 * 180) >> 8)/256.0);
+                        }
                     }
                     painter->setPen(textColor);
                     painter->drawText(textRect, str, textOpt);
@@ -10276,26 +10287,12 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
 
         if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
     //         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
-        {
-#if defined QTC_QT_ONLY
-            QColor sh=ColorUtils_mix(&bgnd, &shadow, shadow.alphaF());
-#else
-            QColor sh=KColorUtils::mix(bgnd, shadow, shadow.alphaF());
-#endif
-
-            sh.setAlpha(255);
-            drawIcon(painter, sh, r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
-        }
+            drawIcon(painter, blendColors(shadow, bgnd, shadow.alphaF()), r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
 
         QColor col(color);
 
-#if defined QTC_QT_ONLY
         if(faded)
-            col=ColorUtils_mix(&bgnd, &col, HOVER_BUTTON_ALPHA(col));
-#else
-        if(faded)
-            col=KColorUtils::mix(bgnd, col, HOVER_BUTTON_ALPHA(col));
-#endif
+            col=blendColors(col, bgnd, HOVER_BUTTON_ALPHA(col));
 
         drawIcon(painter, col, r, sunken, icon, stdSize);
     }
