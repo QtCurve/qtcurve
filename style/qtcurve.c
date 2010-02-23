@@ -2180,27 +2180,27 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
                 crImg=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, imgWidth+1, imgHeight+1);
                 ci=cairo_create(crImg);
 
-                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_ALPHA);
+                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_SMALL_ALPHA);
                 cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
                 createPath(ci, halfWidth+0.5, halfWidth+0.5, QTC_RINGS_SQUARE_SMALL_SIZE, QTC_RINGS_SQUARE_SMALL_SIZE,
                                QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
                 cairo_stroke(ci);
 
                 cairo_new_path(ci);
-                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_ALPHA);
-                cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
-                createPath(ci, halfWidth+0.5+((imgWidth-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
-                               halfWidth+0.5+((imgHeight-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
-                               QTC_RINGS_SQUARE_LARGE_SIZE, QTC_RINGS_SQUARE_LARGE_SIZE,
-                               QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
-                cairo_stroke(ci);
-
-                cairo_new_path(ci);
-                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_ALPHA);
+                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_SMALL_ALPHA);
                 cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
                 createPath(ci, halfWidth+0.5+(imgWidth-(QTC_RINGS_SQUARE_SMALL_SIZE+QTC_RINGS_SQUARE_LINE_WIDTH)),
                                halfWidth+0.5+(imgHeight-(QTC_RINGS_SQUARE_SMALL_SIZE+QTC_RINGS_SQUARE_LINE_WIDTH)),
                                QTC_RINGS_SQUARE_SMALL_SIZE, QTC_RINGS_SQUARE_SMALL_SIZE,
+                               QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
+                cairo_stroke(ci);
+
+                cairo_new_path(ci);
+                cairo_set_source_rgba(ci, 1.0, 1.0, 1.0, QTC_RINGS_SQUARE_LARGE_ALPHA);
+                cairo_set_line_width(ci, QTC_RINGS_SQUARE_LINE_WIDTH);
+                createPath(ci, halfWidth+0.5+((imgWidth-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
+                               halfWidth+0.5+((imgHeight-QTC_RINGS_SQUARE_LARGE_SIZE-QTC_RINGS_SQUARE_LINE_WIDTH)/2.0),
+                               QTC_RINGS_SQUARE_LARGE_SIZE, QTC_RINGS_SQUARE_LARGE_SIZE,
                                QTC_RINGS_SQUARE_RADIUS, ROUNDED_ALL);
                 cairo_stroke(ci);
 
