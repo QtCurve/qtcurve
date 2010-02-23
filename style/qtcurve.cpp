@@ -2812,7 +2812,7 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
                         mask->region += QRegion(r.x()+1, r.y()+3, 1, r.height()-2);
                         mask->region += QRegion(r.x()+2, r.y()+2, 1, r.height()-1);
                         mask->region += QRegion(r.x()+3, r.y()+1, 2, r.height());
-                        mask->region += QRegion(r.x()+r.width()-1, r.y()+4, 1, r.height()-5);
+                        mask->region += QRegion(r.x()+r.width()-1, r.y()+5, 1, r.height()-5);
                         mask->region += QRegion(r.x()+r.width()-2, r.y()+3, 1, r.height()-2);
                         mask->region += QRegion(r.x()+r.width()-3, r.y()+2, 1, r.height()-1);
                         mask->region += QRegion(r.x()+r.width()-5, r.y()+1, 2, r.height()-0);

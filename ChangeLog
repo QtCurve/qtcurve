@@ -3,6 +3,7 @@
 1. Alter alpha settings of square rings.
 2. Fix Qt only compile.
 3. Fix painting of MDI titlebar texts.
+4. Fix right border of MDI windows when rounded.
 
 1.1.0
 -----
