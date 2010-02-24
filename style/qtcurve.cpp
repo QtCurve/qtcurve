@@ -9590,6 +9590,9 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     if(doEtch)
         r.adjust(1, 1, -1, -1);
 
+    if(WIDGET_TROUGH==w && !opts.borderSbarGroove)
+        doBorder=false;
+
     p->setRenderHint(QPainter::Antialiasing, true);
     
     if(r.width()>0 && r.height()>0)
@@ -9599,7 +9602,9 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         else
         {
             drawBevelGradient(fill, p, r,
-                              buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)),
+                              doBorder
+                                ? buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))
+                                : buildPath(QRectF(r), w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)),
                               horiz, sunken, app, w, useCache);
 
             if(!sunken)

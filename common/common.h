@@ -942,6 +942,7 @@ typedef struct
                      colorSliderMouseOver,
                      thinSbarGroove,
                      flatSbarButtons,
+                     borderSbarGroove,
                      popupBorder,
                      unifySpinBtns,
                      unifyCombo,

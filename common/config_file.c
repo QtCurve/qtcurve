@@ -1461,6 +1461,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(etchEntry)
             QTC_CFG_READ_INT_BOOL(splitterHighlight, opts->highlightFactor)
             QTC_CFG_READ_BOOL(flatSbarButtons)
+            QTC_CFG_READ_BOOL(borderSbarGroove)
             QTC_CFG_READ_BOOL(popupBorder)
             QTC_CFG_READ_BOOL(unifySpinBtns)
             QTC_CFG_READ_BOOL(unifySpin)
@@ -2128,6 +2129,7 @@ static void defaultSettings(Options *opts)
     opts->highlightScrollViews=false;
     opts->etchEntry=false;
     opts->flatSbarButtons=true;
+    opts->borderSbarGroove=true;
     opts->popupBorder=true;
     opts->unifySpinBtns=false;
     opts->unifySpin=true;
@@ -2800,6 +2802,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(splitterHighlight)
         CFG_WRITE_ENTRY_NUM(expanderHighlight)
         CFG_WRITE_ENTRY(flatSbarButtons)
+        CFG_WRITE_ENTRY(borderSbarGroove)
         CFG_WRITE_ENTRY(popupBorder)
         CFG_WRITE_ENTRY(unifySpinBtns)
         CFG_WRITE_ENTRY(unifySpin)
