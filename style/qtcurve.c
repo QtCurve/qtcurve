@@ -1584,6 +1584,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
     double      xd=x+0.5, yd=y+0.5;
 
+    if(WIDGET_TROUGH==widget && !opts.borderSbarGroove && flags&DF_DO_BORDER)
+        flags-=DF_DO_BORDER;
+
     if(WIDGET_COMBO_BUTTON==widget && doEtch)
         if(ROUNDED_RIGHT==round)
             x--, xd-=1, width++;
@@ -1595,7 +1598,16 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     if(width>0 && height>0)
     {
-        clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
+        if(!(flags&DF_DO_BORDER))
+        {
+            cairo_new_path(cr);
+            cairo_save(cr);
+            createPath(cr, x, y, width, height, getRadius(&opts, width, height, widget, RADIUS_EXTERNAL), round);
+            cairo_clip(cr);
+        }
+        else
+            clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
+
         drawBevelGradient(cr, style, area, region, x, y, width, height, base, horiz,
                           sunken && !IS_TROUGH(widget), app, widget);
 
