@@ -7453,7 +7453,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
 #ifdef QTC_QT_ONLY
                 QPainterPath path;
-#elif KDE_IS_VERSION(4, 3, 0)
+#else
+#if KDE_IS_VERSION(4, 3, 0)
                 QPainterPath path(opts.round<ROUND_SLIGHT
                                     ? QPainterPath()
                                     : buildPath(QRectF(state&QtC_StateKWinNoBorder ? r : r.adjusted(1, 1, -1, 0)),
@@ -7464,6 +7465,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                                     : 2.0)-(state&QtC_StateKWinNoBorder ? 0.0 : 1.0)));
 #else
                 QPainterPath path;
+#endif
 #endif
                 if(!kwin)
                     painter->fillRect(r, titleCols[QT_STD_BORDER]);
