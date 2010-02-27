@@ -1,6 +1,7 @@
 1.1.2
 -----
 1. Really fix Qt only compile.
+2. Increase default shadow sizes.
 
 1.1.1
 -----

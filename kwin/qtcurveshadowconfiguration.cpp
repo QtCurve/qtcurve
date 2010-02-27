@@ -44,12 +44,12 @@ void QtCurveShadowConfiguration::defaults()
         
     if(QPalette::Active==itsColorGroup)
     {
-        itShadowSize = 29;
+        itShadowSize = 35;
         setColorType(CT_FOCUS);
     }
     else
     {
-        itShadowSize = 25;
+        itShadowSize = 30;
         setColorType(CT_GRAY);
     }
 }
