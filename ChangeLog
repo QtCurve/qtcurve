@@ -2,6 +2,7 @@
 -----
 1. Really fix Qt only compile.
 2. Increase default shadow sizes.
+3. Fix kwin decoration compile under KDE SC < 4.3.
 
 1.1.1
 -----

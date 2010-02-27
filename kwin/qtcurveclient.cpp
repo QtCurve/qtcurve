@@ -618,10 +618,14 @@ void QtCurveClient::updateWindowShape()
         clearMask();
     else
     {
-        QRect r(Handler()->customShadows()
+        QRect r(
+#if KDE_IS_VERSION(4, 3, 0)
+                Handler()->customShadows()
                     ? widget()->rect().adjusted(layoutMetric(LM_OuterPaddingLeft), layoutMetric(LM_OuterPaddingTop),
                                                -layoutMetric(LM_OuterPaddingRight), 0) // -layoutMetric(LM_OuterPaddingBottom))
-                    : widget()->rect());
+                    : 
+#endif
+                      widget()->rect());
 
         setMask(getMask(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL), r));
     }
