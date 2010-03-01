@@ -1,7 +1,8 @@
 1.2.0
 -----
 1. Improve appearance of button style check and radio buttons.
-2. Fix calculation of alpha values for square rings.
+2. Add option to control whether scrollbar groove has a border or not.
+3. Fix calculation of alpha values for square rings.
 
 1.1.1
 -----
