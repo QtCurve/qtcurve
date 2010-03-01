@@ -821,6 +821,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(highlightScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(etchEntry, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(flatSbarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(borderSbarGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2109,6 +2110,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.squareScrollViews=squareScrollViews->isChecked();
     opts.etchEntry=etchEntry->isChecked();
     opts.flatSbarButtons=flatSbarButtons->isChecked();
+    opts.borderSbarGroove=borderSbarGroove->isChecked();
     opts.thinSbarGroove=thinSbarGroove->isChecked();
     opts.colorSliderMouseOver=colorSliderMouseOver->isChecked();
     opts.titlebarBorder=titlebarBorder->isChecked();
@@ -2321,6 +2323,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     squareScrollViews->setChecked(opts.squareScrollViews);
     etchEntry->setChecked(opts.etchEntry);
     flatSbarButtons->setChecked(opts.flatSbarButtons);
+    borderSbarGroove->setChecked(opts.borderSbarGroove);
     thinSbarGroove->setChecked(opts.thinSbarGroove);
     colorSliderMouseOver->setChecked(opts.colorSliderMouseOver);
     titlebarBorder->setChecked(opts.titlebarBorder);
@@ -2539,6 +2542,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          squareScrollViews->isChecked()!=opts.squareScrollViews ||
          etchEntry->isChecked()!=opts.etchEntry ||
          flatSbarButtons->isChecked()!=opts.flatSbarButtons ||
+         borderSbarGroove->isChecked()!=opts.borderSbarGroove ||
          thinSbarGroove->isChecked()!=opts.thinSbarGroove ||
          colorSliderMouseOver->isChecked()!=opts.colorSliderMouseOver ||
          titlebarBorder->isChecked()!=opts.titlebarBorder ||

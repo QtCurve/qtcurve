@@ -1,8 +1,9 @@
 1.2.0
 -----
 1. Improve appearance of button style check and radio buttons.
-2. Really fix Qt only compile.
-3. Increase default shadow sizes.
+2. Add option to control whether scrollbar groove has a border or not.
+3. Really fix Qt only compile.
+4. Increase default shadow sizes.
 
 1.1.1
 -----

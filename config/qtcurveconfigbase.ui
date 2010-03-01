@@ -723,14 +723,21 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="9" column="1">
+        <widget class="QCheckBox" name="borderSbarGroove">
+         <property name="text">
+          <string>Bordered</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
         <widget class="QLabel" name="label_14">
          <property name="text">
           <string>Scrollbar buttons:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QComboBox" name="scrollbarType">
          <property name="whatsThis">
           <string>&lt;p&gt;This controls the position, and number, of buttons on a scrollbar.
@@ -738,7 +745,7 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QCheckBox" name="flatSbarButtons">
          <property name="whatsThis">
           <string>If enabled, then scrollbar buttons are not drawn and only the arrows will appear.</string>
@@ -748,42 +755,42 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_32">
          <property name="text">
           <string>Background:</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QComboBox" name="sbarBgndAppearance">
          <property name="whatsThis">
           <string>Configures the background gradient to be used with 'Flat' scrollbar buttons.</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_15">
          <property name="text">
           <string>Slider thumbs:</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="13" column="1">
         <widget class="QComboBox" name="sliderThumbs">
          <property name="whatsThis">
           <string>Defines what markings should be placed in the center of scrollbar sliders (and plain style sliders).</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_15a">
          <property name="text">
           <string>Slider width:</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="14" column="1">
         <widget class="KIntNumInput" name="sliderWidth">
          <property name="whatsThis">
           <string>Controls the width of scrollbar sliders, and plain style sliders.</string>
@@ -3375,6 +3382,7 @@
   <tabstop>sliderFill</tabstop>
   <tabstop>grooveAppearance</tabstop>
   <tabstop>thinSbarGroove</tabstop>
+  <tabstop>borderSbarGroove</tabstop>
   <tabstop>scrollbarType</tabstop>
   <tabstop>flatSbarButtons</tabstop>
   <tabstop>sbarBgndAppearance</tabstop>
