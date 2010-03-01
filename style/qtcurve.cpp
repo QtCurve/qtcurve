@@ -1177,7 +1177,7 @@ QtCurveStyle::QtCurveStyle()
        IMG_SQUARE_RINGS==opts.bgndImage.type ||
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
-        calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
+        calcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
 #if !defined QTC_QT_ONLY
     // Ensure the link to libkio is not stripped, by placing a call to a kio function.
@@ -1357,7 +1357,7 @@ void QtCurveStyle::polish(QPalette &palette)
            IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
            IMG_SQUARE_RINGS==opts.menuBgndImage.type)
         {
-            calcRingAlphas(&opts, &itsBackgroundCols[ORIGINAL_SHADE]);
+            calcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
             if(itsUsePixmapCache)
                 QPixmapCache::clear();
         }
