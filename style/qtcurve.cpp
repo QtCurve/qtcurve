@@ -3799,6 +3799,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(menu)
                     opt.state&=~State_MouseOver;
                 opt.state&=~State_On;
+                opt.state|=State_Raised;
                 opt.rect=rect;
                 drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
                                use, true, WIDGET_CHECKBOX);
@@ -3916,6 +3917,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(menu)
                     opt.state&=~State_MouseOver;
                 opt.state&=~State_On;
+                opt.state|=State_Raised;
                 opt.rect=rect;
                 if(doEtch)
                     x++, y++;
