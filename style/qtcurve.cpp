@@ -7636,7 +7636,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(EFFECT_NONE!=opts.titlebarEffect)
                     {
-                        //shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
+                        shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect));
                         //painter->setPen(shadow);
                         painter->setPen(blendColors(WINDOW_SHADOW_COLOR(opts.titlebarEffect), titleCols[ORIGINAL_SHADE],
                                                     WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect)));
