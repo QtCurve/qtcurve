@@ -2772,8 +2772,10 @@ static gboolean qtInit()
                                     "class \"*GtkWidget\" style \""QTC_RC_SETTING"Spl\"");
 
             if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
-               IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type)
-                calcRingAlphas(&opts, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
+               IMG_SQUARE_RINGS==opts.bgndImage.type ||
+               IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
+               IMG_SQUARE_RINGS==opts.menuBgndImage.type)
+                calcRingAlphas(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
 
             if(tmpStr)
                 free(tmpStr);
