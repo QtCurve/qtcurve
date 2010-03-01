@@ -1777,7 +1777,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 
 static double qtcRingAlpha[3]={0.125, 0.125, 0.5};
 
-static void calcRingAlphas(Options *opts, const color *bgnd)
+static void calcRingAlphas(const color *bgnd)
 {
 #ifdef __cplusplus
     double r=bgnd->red()/255.0,
