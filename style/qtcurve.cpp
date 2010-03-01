@@ -589,10 +589,6 @@ static QColor checkColour(const QStyleOption *option, QPalette::ColorRole role)
 
 static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
 {
-    QColor col(foreground);
-
-    col.setAlpha(255);
-
 #if defined QTC_QT_ONLY
     return ColorUtils_mix(&background, &foreground, alpha);
 #else

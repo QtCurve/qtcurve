@@ -105,10 +105,6 @@ static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false)
 
 static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
 {
-    QColor col(foreground);
-
-    col.setAlpha(255);
-
     return KColorUtils::mix(background, foreground, alpha);
 }
 
