@@ -1,8 +1,8 @@
-1.1.2
+1.2.0
 -----
-1. Really fix Qt only compile.
-2. Increase default shadow sizes.
-3. Fix kwin decoration compile under KDE SC < 4.3.
+1. Improve appearance of button style check and radio buttons.
+2. Really fix Qt only compile.
+3. Increase default shadow sizes.
 
 1.1.1
 -----

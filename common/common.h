@@ -264,21 +264,27 @@ typedef gchar ** Strings;
 #define NUM_SPLITTER_DASHES 21
 
 #ifdef __cplusplus
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || \
+                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                           WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || \
                           WIDGET_TOOLBAR_BUTTON==(w) )
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
+                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || IS_SLIDER((w)) || \
+                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                         WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w))
 #else
-#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_CHECKBOX==(w) || \
-                          WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
+#define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || \
+                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
+                          WIDGET_RADIO_BUTTON==(w) || WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
                           WIDGET_TOOLBAR_BUTTON==(w))
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
+                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_COMBO==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
                         WIDGET_TOOLBAR_BUTTON==(w))
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
+                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                         WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w))
 #endif
 
@@ -515,6 +521,7 @@ typedef enum
     WIDGET_SB_BGND,
     WIDGET_TROUGH,
     WIDGET_CHECKBOX,
+    WIDGET_RADIO_BUTTON,
     WIDGET_COMBO,
     WIDGET_COMBO_BUTTON,
     WIDGET_MENU_ITEM,
@@ -1639,9 +1646,15 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
         r=ROUND_SLIGHT;
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if(WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+    if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
+       WIDGET_RADIO_BUTTON==widget)
        return ROUND_MAX;
 #endif
+#ifndef __cplusplus
+    if(WIDGET_RADIO_BUTTON==widget)
+       return ROUND_MAX;
+#endif
+
     switch(r)
     {
         case ROUND_MAX:
@@ -1671,7 +1684,12 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
         r=ROUND_SLIGHT;
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if(WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+    if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
+       WIDGET_RADIO_BUTTON==widget) 
+        return (w>h ? h : w)/2.0;
+#endif
+#ifndef __cplusplus
+    if(WIDGET_RADIO_BUTTON==widget)
         return (w>h ? h : w)/2.0;
 #endif
 

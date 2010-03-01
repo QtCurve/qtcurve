@@ -3783,90 +3783,94 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
-            bool          menu(state&QTC_STATE_MENU),
-                          sunken(!menu && (state&State_Sunken)),
-                          mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                          doEtch(PE_IndicatorMenuCheckMark!=element && !menu
-                                 && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
-                                 && QTC_DO_EFFECT),
-                          glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
-            QRect         rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
-            const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
-                         *btn(checkRadioColors(option)),
-                         *use(bc ? bc : btn);
-            const QColor &bgnd(opts.crButton
-                                ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
-                                : state&State_Enabled && !sunken
-                                    ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
-                                        ? use[QTC_CR_MO_FILL]
-                                        : palette.base().color()
-                                    : palette.background().color());
-            EWidget      wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-            EAppearance  app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
-            bool         drawSunken=opts.crButton ? sunken : false,
-                         lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                         draw3dFull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(drawSunken, app),
-                         draw3d=draw3dFull || (!lightBorder && QTC_DRAW_3D_BORDER(drawSunken, app)),
-                         drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d),
-                         drawDark=drawLight && draw3dFull && !lightBorder;
+            bool  menu(state&QTC_STATE_MENU);
+            QRect rect(r);
 
             painter->save();
-            if(IS_FLAT(opts.appearance))
-                painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
-            else
-                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true,
-                                  drawSunken, MODIFY_AGUA(app), WIDGET_TROUGH);
 
-            if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
+            if(opts.crButton)
             {
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setPen(use[QTC_CR_MO_FILL]);
-                drawAaRect(painter, rect.adjusted(1, 1, -1, -1));
-//                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
-                painter->setRenderHint(QPainter::Antialiasing, false);
+                const QColor *use(checkRadioColors(option));
+                QStyleOption opt(*option);
+                bool         doEtch(QTC_DO_EFFECT);
+
+                rect=QRect(r.x(), r.y(), QTC_CHECK_SIZE+(doEtch ? 2 : 0), QTC_CHECK_SIZE+(doEtch ? 2 : 0));
+
+                if(menu)
+                    opt.state&=~State_MouseOver;
+                opt.state&=~State_On;
+                opt.rect=rect;
+                drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
+                               use, true, WIDGET_CHECKBOX);
             }
-            else if(!opts.crButton || drawLight)
+            else
             {
-                painter->setPen(drawLight ? btn[QTC_LIGHT_BORDER(app)]
-                                          : midColor(state&State_Enabled ? palette.base().color()
-                                                                         : palette.background().color(), use[3]));
-                if(lightBorder)
-                    drawRect(painter, rect.adjusted(1, 1, -1, -1));
+                bool         sunken(!menu && (state&State_Sunken)),
+                             mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                             doEtch(PE_IndicatorMenuCheckMark!=element && !menu
+                                    && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
+                                    && QTC_DO_EFFECT),
+                             glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
+                const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
+                             *btn(checkRadioColors(option)),
+                             *use(bc ? bc : btn);
+                const QColor &bgnd(state&State_Enabled && !sunken
+                                        ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
+                                            ? use[QTC_CR_MO_FILL]
+                                            : palette.base().color()
+                                        : palette.background().color());
+                bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED),
+                             draw3dFull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(false, APPEARANCE_INVERTED),
+                             draw3d=draw3dFull || (!lightBorder && QTC_DRAW_3D_BORDER(false, APPEARANCE_INVERTED));
+
+                rect=QRect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+
+                if(IS_FLAT(opts.appearance))
+                    painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
+                else
+                    drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
+
+                if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
+                {
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->setPen(use[QTC_CR_MO_FILL]);
+                    drawAaRect(painter, rect.adjusted(1, 1, -1, -1));
+    //                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                }
                 else
                 {
-                    painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
-                    painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
-
-                    if(drawDark)
+                    painter->setPen(midColor(state&State_Enabled ? palette.base().color()
+                                                                 : palette.background().color(), use[3]));
+                    if(lightBorder)
+                        drawRect(painter, rect.adjusted(1, 1, -1, -1));
+                    else
                     {
-                        painter->setPen(btn[2]);
-                        painter->drawLine(rect.x()+rect.width()-2, rect.y()+1,
-                                          rect.x()+rect.width()-2, rect.y()+rect.height()-2);
-                        painter->drawLine(rect.x()+1, rect.y()+rect.height()-2,
-                                          rect.x()+rect.width()-2, rect.y()+rect.height()-2);
+                        painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
+                        painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
                     }
                 }
+
+                if(doEtch)
+                    if(glow)
+                        drawGlow(painter, r, WIDGET_CHECKBOX);
+                    else
+                        drawEtch(painter, r, widget, WIDGET_CHECKBOX,
+                                opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
+
+                drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
             }
-
-            if(doEtch)
-                if(glow)
-                    drawGlow(painter, r, WIDGET_CHECKBOX);
-                else
-                    drawEtch(painter, r, widget, WIDGET_CHECKBOX,
-                             opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
-
-            drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
 
             if(state&State_On)
             {
                 QPixmap *pix(getPixmap(checkRadioCol(option), PIX_CHECK, 1.0));
 
-                painter->drawPixmap(r.center().x()-(pix->width()/2), r.center().y()-(pix->height()/2),
+                painter->drawPixmap(rect.center().x()-(pix->width()/2), rect.center().y()-(pix->height()/2),
                                     *pix);
             }
             else if (state&State_NoChange)    // tri-state
             {
-                int x(r.center().x()), y(r.center().y());
+                int x(rect.center().x()), y(rect.center().y());
 
                 painter->setPen(checkRadioCol(option));
                 painter->drawLine(x-3, y, x+3, y);
@@ -3897,98 +3901,97 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(QTC_RADIO_SIZE);
         case PE_IndicatorRadioButton:
         {
-            bool        menu(state&QTC_STATE_MENU),
-                        sunken(!menu && (state&State_Sunken)),
-                        mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                        doEtch(!menu
-                               && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
-                               && QTC_DO_EFFECT),
-                        glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
-                        coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
-            QRect       rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
-            int         x(rect.x()), y(rect.y());
-            QPolygon    clipRegion;
-            EWidget     wid=opts.crButton ? WIDGET_STD_BUTTON : WIDGET_TROUGH;
-            EAppearance app=opts.crButton ? opts.appearance : APPEARANCE_INVERTED;
-            bool        drawSunken=opts.crButton ? sunken : false,
-                        lightBorder=QTC_DRAW_LIGHT_BORDER(drawSunken, wid, app),
-                        draw3d=!lightBorder &&
-                               (QTC_DRAW_3D_BORDER(drawSunken, app) || QTC_DRAW_3D_FULL_BORDER(drawSunken, app)),
-                        drawLight=opts.crButton && !drawSunken && (lightBorder || draw3d),
-                        doneShadow=false;
-
-            clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
-                                     x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
-
-            const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
-                         *btn(checkRadioColors(option)),
-                         *use(bc ? bc : btn);
-            const QColor &bgnd(opts.crButton
-                                ? menu ? btn[ORIGINAL_SHADE] : getFill(option, btn, true)
-                                : state&State_Enabled && !sunken
-                                    ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
-                                        ? use[QTC_CR_MO_FILL]
-                                        : palette.base().color()
-                                    : palette.background().color());
+            bool menu(state&QTC_STATE_MENU);
+            int  x(r.x()), y(r.y());                
 
             painter->save();
 
-            if(doEtch && !glow && opts.crButton && !drawSunken && EFFECT_SHADOW==opts.buttonEffect)
+            if(opts.crButton)
             {
-                QColor col(Qt::black);
+                const QColor *use(checkRadioColors(option));
+                QStyleOption opt(*option);
+                bool         doEtch(QTC_DO_EFFECT);
+                QRect        rect(r.x(), r.y(), QTC_RADIO_SIZE+(doEtch ? 2 : 0), QTC_RADIO_SIZE+(doEtch ? 2 : 0));
 
-                col.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-                doneShadow=true;
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setBrush(Qt::NoBrush);
-                painter->setPen(col);
-                painter->drawArc(QRectF(r.x()+1.5, r.y()+1.5, QTC_RADIO_SIZE, QTC_RADIO_SIZE), 0, 360*16);
-                painter->setRenderHint(QPainter::Antialiasing, false);
+                if(menu)
+                    opt.state&=~State_MouseOver;
+                opt.state&=~State_On;
+                opt.rect=rect;
+                if(doEtch)
+                    x++, y++;
+                drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
+                               use, true, WIDGET_RADIO_BUTTON);
             }
-
-            painter->setClipRegion(QRegion(clipRegion));
-            if(IS_FLAT(opts.appearance))
-                painter->fillRect(rect, bgnd);
             else
-                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, drawSunken, MODIFY_AGUA(app), wid);
-            if(coloredMo)
             {
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setBrush(Qt::NoBrush);
-                painter->setPen(use[QTC_CR_MO_FILL]);
-                painter->drawArc(QRectF(x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2), 0, 360*16);
-                painter->drawArc(QRectF(x+2, y+2, QTC_RADIO_SIZE-4, QTC_RADIO_SIZE-4), 0, 360*16);
-//                 painter->drawArc(QRectF(x+3, y+3, QTC_RADIO_SIZE-6, QTC_RADIO_SIZE-6), 0, 360*16);
-                painter->setRenderHint(QPainter::Antialiasing, false);
+                bool         sunken(!menu && (state&State_Sunken)),
+                             doEtch(!menu
+                                    && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
+                                    && QTC_DO_EFFECT),
+                             mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                             glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
+                             coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
+                QPolygon     clipRegion;
+                bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED),
+                             doneShadow=false;
+                QRect        rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+                const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
+                             *btn(checkRadioColors(option)),
+                             *use(bc ? bc : btn);
+
+                if(doEtch)
+                    x++, y++;
+
+                clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
+                                         x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
+
+                const QColor &bgnd(state&State_Enabled && !sunken
+                                        ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
+                                            ? use[QTC_CR_MO_FILL]
+                                            : palette.base().color()
+                                        : palette.background().color());
+
+                painter->setClipRegion(QRegion(clipRegion));
+                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
+                if(coloredMo)
+                {
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->setBrush(Qt::NoBrush);
+                    painter->setPen(use[QTC_CR_MO_FILL]);
+                    painter->drawArc(QRectF(x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2), 0, 360*16);
+                    painter->drawArc(QRectF(x+2, y+2, QTC_RADIO_SIZE-4, QTC_RADIO_SIZE-4), 0, 360*16);
+    //                 painter->drawArc(QRectF(x+3, y+3, QTC_RADIO_SIZE-6, QTC_RADIO_SIZE-6), 0, 360*16);
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                }
+
+                painter->setClipping(false);
+
+                if(!doneShadow && doEtch && (glow || EFFECT_ETCH==opts.buttonEffect || sunken))
+                {
+                    QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
+
+                    if(!glow)
+                        topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->setBrush(Qt::NoBrush);
+                    painter->setPen(topCol);
+                    painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
+                    if(!glow)
+                        painter->setPen(getLowerEtchCol(widget));
+                    painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                }
+
+                painter->drawPixmap(x, y, *getPixmap(use[QT_BORDER(state&State_Enabled)], PIX_RADIO_BORDER, 0.8));
+
+                if(!coloredMo)
+                    painter->drawPixmap(x, y, *getPixmap(btn[state&State_MouseOver ? 3 : 4],
+                                                        lightBorder ? PIX_RADIO_INNER : PIX_RADIO_LIGHT));
             }
-
-            painter->setClipping(false);
-
-            if(!doneShadow && doEtch && (glow || EFFECT_ETCH==opts.buttonEffect || sunken))
-            {
-                QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
-
-                if(!glow)
-                    topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setBrush(Qt::NoBrush);
-                painter->setPen(topCol);
-                painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
-                if(!glow)
-                    painter->setPen(getLowerEtchCol(widget));
-                painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
-                painter->setRenderHint(QPainter::Antialiasing, false);
-            }
-
-            painter->drawPixmap(x, y, *getPixmap(use[QT_BORDER(state&State_Enabled)], PIX_RADIO_BORDER, 0.8));
-
             if(state&State_On)
                 painter->drawPixmap(x, y, *getPixmap(checkRadioCol(option), PIX_RADIO_ON, 1.0));
-            if(!coloredMo && (!opts.crButton || drawLight))
-                painter->drawPixmap(x, y, *getPixmap(btn[drawLight ? QTC_LIGHT_BORDER(app)
-                                                                   : (state&State_MouseOver ? 3 : 4)],
-                                                     lightBorder ? PIX_RADIO_INNER : PIX_RADIO_LIGHT));
+
             painter->restore();
             break;
         }
@@ -9471,7 +9474,8 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
         int    endSize=0,
                middleSize=8;
         bool   horiz(isHoriz(option, w)),
-               circular(WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND));
+               circular( (WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
+                         WIDGET_RADIO_BUTTON==w );
         double radius=0;
         ERound realRound=getWidgetRound(&opts, r.width(), r.height(), w);
 
@@ -9673,7 +9677,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         }
 
         if(APPEARANCE_AGUA==app && !sunken)
-            if(WIDGET_MDI_WINDOW_BUTTON==w)
+            if(WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_RADIO_BUTTON==w)
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
                 double //botSize=(ra.height()*0.4),
@@ -9681,7 +9685,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                        topSize=(ra.height()*0.4),
 //                        topRad=topSize/2.0,
                        //botWidthAdjust=4.5,
-                       topWidthAdjust=4.75;
+                       topWidthAdjust=WIDGET_RADIO_BUTTON==w ? 4 : 4.75;
 
                 QRectF          //botGradRect(ra.x()+botWidthAdjust, ra.y()+(ra.height()-botSize),
                                 //            ra.width()-(botWidthAdjust*2)-1, botSize-1),
@@ -10012,7 +10016,7 @@ QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, doub
 {
     QPainterPath path;
 
-    if(WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)
+    if(WIDGET_RADIO_BUTTON==w || (WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
     {
         path.addEllipse(r);
         return path;
@@ -11061,7 +11065,7 @@ const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
 
 const QColor * QtCurveStyle::checkRadioColors(const QStyleOption *option) const
 {
-    return opts.crColor && option  && option->state&State_Enabled && (option->state&State_On || option->state&State_NoChange)
+    return opts.crColor && option && option->state&State_Enabled && (option->state&State_On || option->state&State_NoChange)
         ? itsCheckRadioSelCols
         : buttonColors(option);
 }
