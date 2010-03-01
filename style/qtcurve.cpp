@@ -9606,7 +9606,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
             drawBevelGradient(fill, p, r,
                               doBorder
                                 ? buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))
-                                : buildPath(QRectF(r), w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)),
+                                : buildPath(QRectF(r), w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)),
                               horiz, sunken, app, w, useCache);
 
             if(!sunken)
