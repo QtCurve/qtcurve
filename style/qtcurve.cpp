@@ -3816,9 +3816,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                             ? use[QTC_CR_MO_FILL]
                                             : palette.base().color()
                                         : palette.background().color());
-                bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED),
-                             draw3dFull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(false, APPEARANCE_INVERTED),
-                             draw3d=draw3dFull || (!lightBorder && QTC_DRAW_3D_BORDER(false, APPEARANCE_INVERTED));
+                bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
 
                 rect=QRect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
 
@@ -7426,10 +7424,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 painter->save();
             
                 bool         active(state&State_Active),
-                             kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin),
-                             roundKWinFull(QTC_FULLLY_ROUNDED &&
-                                            ((APP_KWIN==theThemedApp && !(titleBar->titleBarState&State_Raised)) ||
-                                              titleBar->titleBarState&QtC_StateKWin));
+                             kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin);
                 const QColor *bgndCols(kwin ? buttonColors(option) : getMdiColors(titleBar, active)),
                              *btnCols(kwin || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_STD_COLOR
                                         ? buttonColors(option)
