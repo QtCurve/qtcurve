@@ -106,8 +106,11 @@
            </item>
            <item>
             <widget class="QSlider" name="Slider1">
+             <property name="maximum">
+              <number>100</number>
+             </property>
              <property name="value">
-              <number>30</number>
+              <number>70</number>
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -266,9 +269,20 @@
               <attribute name="headerMinimumSectionSize">
                <number>32</number>
               </attribute>
+              <attribute name="headerDefaultSectionSize">
+               <number>80</number>
+              </attribute>
+              <attribute name="headerMinimumSectionSize">
+               <number>32</number>
+              </attribute>
               <column>
                <property name="text">
                 <string>Column 1</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Column 2</string>
                </property>
               </column>
               <item>
@@ -326,5 +340,22 @@ Come to wash my sins away...</string>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>Slider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ProgressBar1</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>50</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
