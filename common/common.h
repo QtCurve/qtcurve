@@ -496,11 +496,13 @@ typedef enum
     PIX_RADIO_LIGHT,
     PIX_RADIO_ON,
     PIX_CHECK,
+#ifdef __cplusplus
+#ifdef defined QT_VERSION && (QT_VERSION < 0x040000)
     PIX_SLIDER,
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
     PIX_SLIDER_LIGHT_V,
-#if defined __cplusplus
+#endif
     PIX_DOT
 #else
     PIX_BLANK
