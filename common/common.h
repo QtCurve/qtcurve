@@ -1591,9 +1591,17 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 #define QTC_FULL_INNER_RADIUS    1.5
 #define QTC_FULL_OUTER_RADIUS    2.5
 #define QTC_FULL_ETCH_RADIUS     3.5
+
+#if defined QT_VERSION && (QT_VERSION < 0x040600)
 #define QTC_SLIGHT_INNER_RADIUS  0.5
 #define QTC_SLIGHT_OUTER_RADIUS  1.5
 #define QTC_SLIGHT_ETCH_RADIUS   2.5
+#else
+#define QTC_SLIGHT_INNER_RADIUS  0.75
+#define QTC_SLIGHT_OUTER_RADIUS  1.75
+#define QTC_SLIGHT_ETCH_RADIUS   2.75
+#endif
+
 #else
 #define QTC_EXTRA_INNER_RADIUS   4
 #define QTC_EXTRA_OUTER_RADIUS   5
