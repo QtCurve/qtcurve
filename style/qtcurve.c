@@ -1144,9 +1144,6 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
 
     switch(key->pix)
     {
-        case PIX_RADIO_ON:
-            res=gdk_pixbuf_new_from_inline(-1, opts.smallRadio ? radio_on_small : radio_on, TRUE, NULL);
-            break;
         case PIX_CHECK:
             res=gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :check_on, TRUE, NULL);
             break;
@@ -5283,10 +5280,13 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         if(on)
         {
-            GdkPixbuf *pix=getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_RADIO_ON, 1.0);
+            GdkColor *col=getCheckRadioCol(style, ind_state, mnu);
+            double   radius=opts.smallRadio ? 2.5 : 3.5,
+                     offset=(QTC_RADIO_SIZE/2.0)-radius;
 
-            gdk_cairo_set_source_pixbuf(cr, pix, x, y);
-            cairo_paint(cr);
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(*col));
+            cairo_arc(cr, x+offset+radius, y+offset+radius, radius, 0, 2*M_PI);
+            cairo_fill(cr);
         }
         else if(tri)
         {
