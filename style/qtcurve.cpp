@@ -1783,7 +1783,8 @@ void QtCurveStyle::polish(QWidget *widget)
                 polishLayout(layout);
     }
 
-    if(APP_K3B==theThemedApp && widget->inherits("K3b::ThemedHeader") && qobject_cast<QFrame *>(widget))
+    if( (APP_K3B==theThemedApp && widget->inherits("K3b::ThemedHeader") && qobject_cast<QFrame *>(widget)) ||
+        widget->inherits("KColorPatch"))
     {
         ((QFrame *)widget)->setLineWidth(0);
         ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);

@@ -1,17 +1,18 @@
 1.2.0
 -----
-1. Draw etch effect on radios if using a button effect, and not using button-like
-   check/radios.
-2. If drawing square scrollviews, use a dark/light borders.
-3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
-   groove.
-4. Improve appearance of button style check and radio buttons.
-5. Add option to control whether scrollbar groove has a border or not.
-6. Dont use pixmaps to draw rounded slider, or radio button borders.
-7. Really fix Qt only compile.
-8. Increase default shadow sizes.
-9. If using gtk style combos and bordering menu items, increase frame width by
-   1 pixel.
+ 1. Draw etch effect on radios if using a button effect, and not using button-like
+    check/radios.
+ 2. If drawing square non-gtk style scrollviews, use a dark/light borders.
+ 3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
+    groove.
+ 4. Improve appearance of button style check and radio buttons.
+ 5. Add option to control whether scrollbar groove has a border or not.
+ 6. Dont use pixmaps to draw rounded slider, or radio button borders.
+ 7. Really fix Qt only compile.
+ 8. Increase default shadow sizes.
+ 9. If using gtk style combos and bordering menu items, increase frame width by
+    1 pixel.
+10. Remove border from preview colour square in KDE colour selection dialog.
 
 1.1.1
 -----
