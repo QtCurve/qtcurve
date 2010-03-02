@@ -3927,7 +3927,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                              mo(!sunken && state&State_MouseOver && state&State_Enabled),
                              glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
                              coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
-                QPolygon     clipRegion;
                 bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED),
                              doneShadow=false;
                 QRect        rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
@@ -3938,30 +3937,24 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(doEtch)
                     x++, y++;
 
-                clipRegion.setPoints(8,  x+1,  y+8,   x+1,  y+4,   x+4, y+1,    x+8, y+1,
-                                         x+12, y+4,   x+12, y+8,   x+8, y+12,   x+4, y+12);
-
                 const QColor &bgnd(state&State_Enabled && !sunken
                                         ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
                                             ? use[QTC_CR_MO_FILL]
                                             : palette.base().color()
                                         : palette.background().color());
+                QPainterPath path;
 
-                painter->setClipRegion(QRegion(clipRegion));
-                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
+                path.addEllipse(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5));
+                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), path, true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
+                painter->setRenderHint(QPainter::Antialiasing, true);
                 if(coloredMo)
                 {
-                    painter->setRenderHint(QPainter::Antialiasing, true);
                     painter->setBrush(Qt::NoBrush);
                     painter->setPen(use[QTC_CR_MO_FILL]);
                     painter->drawArc(QRectF(x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2), 0, 360*16);
                     painter->drawArc(QRectF(x+2, y+2, QTC_RADIO_SIZE-4, QTC_RADIO_SIZE-4), 0, 360*16);
-    //                 painter->drawArc(QRectF(x+3, y+3, QTC_RADIO_SIZE-6, QTC_RADIO_SIZE-6), 0, 360*16);
-                    painter->setRenderHint(QPainter::Antialiasing, false);
                 }
 
-                painter->setClipping(false);
-                painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
                 if(!doneShadow && doEtch && (glow || EFFECT_NONE!=opts.buttonEffect || sunken))
                 {
