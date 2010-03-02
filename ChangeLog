@@ -2,7 +2,7 @@
 -----
 1. Improve appearance of button style check and radio buttons.
 2. Add option to control whether scrollbar groove has a border or not.
-3. Dont use pixmaps to draw rounded slider.
+3. Dont use pixmaps to draw rounded slider, or radio button borders.
 4. Fix calculation of alpha values for square rings.
 5. Fix progressbar glow central position.
 

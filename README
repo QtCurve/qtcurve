@@ -89,9 +89,6 @@ pixmaps.h
 
 To regenerate this, run the following:
 
-    gdk-pixbuf-csource --raw --name radio_frame radio_frame.png > pixmaps.h
-    gdk-pixbuf-csource --raw --name radio_inner radio_inner.png >> pixmaps.h
-    gdk-pixbuf-csource --raw --name radio_light radio_light.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name radio_on radio_on.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name radio_on_small radio_on_small.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name check_on check_on.png >> pixmaps.h

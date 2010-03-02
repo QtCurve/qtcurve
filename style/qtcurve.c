@@ -1144,15 +1144,6 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
 
     switch(key->pix)
     {
-        case PIX_RADIO_BORDER:
-            res=gdk_pixbuf_new_from_inline(-1, radio_frame, TRUE, NULL);
-            break;
-        case PIX_RADIO_INNER:
-            res=gdk_pixbuf_new_from_inline(-1, radio_inner, TRUE, NULL);
-            break;
-        case PIX_RADIO_LIGHT:
-            res=gdk_pixbuf_new_from_inline(-1, radio_light, TRUE, NULL);
-            break;
         case PIX_RADIO_ON:
             res=gdk_pixbuf_new_from_inline(-1, opts.smallRadio ? radio_on_small : radio_on, TRUE, NULL);
             break;
@@ -5215,25 +5206,23 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
 
             {
-                gboolean  coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver;
+                gboolean  coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
+                          doneShadow=false;
                 int       bgnd=0;
 
                 GdkPoint  clip[8]= {{x,    y+8},     {x,    y+4},     {x+4, y},      {x+8, y},
                                     { x+12, y+4},     {x+12, y+8},     {x+8, y+12},   {x+4, y+12} };
 
                 GdkRegion *region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
-
-
-                { /* C-scoping */
-                GdkColor *colors=coloredMouseOver
+                GdkColor  *colors=coloredMouseOver
                             ? qtcPalette.mouseover
-                            : btn_colors;
-                GdkColor *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
+                            : btn_colors,
+                          *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
                                     ? &style->bg[GTK_STATE_NORMAL]
                                     : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                         ? &colors[QTC_CR_MO_FILL]
                                         : &style->base[GTK_STATE_NORMAL];
-                gboolean doneShadow=false;
+                double    radius=(QTC_RADIO_SIZE+1)/2.0;
 
                 bgnd=getFill(state, set/*, TRUE*/);
 
@@ -5274,25 +5263,19 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                     cairo_stroke(cr);
                 }
 
+                cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[coloredMouseOver ? 4 : QT_BORDER(GTK_STATE_INSENSITIVE!=state)]));
+                radius=(QTC_RADIO_SIZE-0.5)/2.0;
+                cairo_arc(cr, x+0.25+radius, y+0.25+radius, radius, 0, 2*M_PI);
+                cairo_stroke(cr);
+                if(!coloredMouseOver)
                 {
-                    GdkPixbuf *border=getPixbuf(&colors[coloredMouseOver ? 4 : QT_BORDER(GTK_STATE_INSENSITIVE!=state)], PIX_RADIO_BORDER,
-                                                    0.8);
-
-                    gdk_cairo_set_source_pixbuf(cr, border, x, y);
-                    cairo_paint(cr);
-
-                    /*if(!on)*/
-                    if(!coloredMouseOver)
-                    {
-                        GdkPixbuf *light=getPixbuf(&btn_colors[coloredMouseOver ? 3 : 4],
-                                                   lightBorder ? PIX_RADIO_INNER : PIX_RADIO_LIGHT, 1.0);
-
-                        gdk_cairo_set_source_pixbuf(cr, light, x, y);
-                        cairo_paint(cr);
-                    }
+                    radius=(QTC_RADIO_SIZE-1)/2.0;
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(btn_colors[coloredMouseOver ? 3 : 4]));
+                    cairo_arc(cr, x+0.75+radius, y+0.75+radius, radius,
+                              lightBorder ? 0 : 0.75*M_PI,
+                              lightBorder ? 2*M_PI : 1.75*M_PI);
+                    cairo_stroke(cr);
                 }
-
-                } /* C-scoping */
             }
         }
 
