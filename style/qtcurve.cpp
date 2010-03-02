@@ -2621,7 +2621,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 
             if (opts.squareScrollViews && widget &&
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget)))
-                return opts.gtkScrollViews ? 1 : 2;
+                return opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove ? 1 : 2;
 
             if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
                 qobject_cast<const QMenu *>(widget))
@@ -3401,26 +3401,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     {
                         if(squareSv)
                         {
-                            QColor col(backgroundColors(option)[QT_STD_BORDER]);
+                            const QColor *use=backgroundColors(option);
 
                             if(APP_ARORA==theThemedApp)
                                 painter->fillRect(r, palette.brush(QPalette::Base));
-                            painter->setPen(col);
-
-                            // Flat style...
-                            //drawRect(painter, r);
-                            // 3d style...
-                            painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-                            painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-                            col.setAlphaF(QT_LOWER_BORDER_ALPHA);
-                            painter->setPen(col);
-
-                            // Again. more intel 2.9 xorg driver issues :-(
-                            painter->save();
-                            painter->setRenderHint(QPainter::Antialiasing, true);
-                            drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
-                            drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-                            painter->restore();
+                            painter->setPen(use[QT_STD_BORDER]);
+                            painter->drawLine(r.bottomLeft(), r.topLeft());
+                            painter->drawLine(r.topLeft(), r.topRight());
+                            painter->setPen(use[QT_STD_BORDER_BR]);
+                            painter->drawLine(r.topRight(), r.bottomRight());
+                            painter->drawLine(r.bottomRight(), r.bottomLeft());
                         }
                         else
                         {
