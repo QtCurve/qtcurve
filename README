@@ -95,6 +95,4 @@ To regenerate this, run the following:
     gdk-pixbuf-csource --raw --name radio_on radio_on.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name radio_on_small radio_on_small.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name check_on check_on.png >> pixmaps.h
-    gdk-pixbuf-csource --raw --name slider slider.png >> pixmaps.h
-    gdk-pixbuf-csource --raw --name slider_light slider_light.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name check_x_on check_x_on.png >> pixmaps.h

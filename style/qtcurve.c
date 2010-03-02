@@ -1159,28 +1159,6 @@ static GdkPixbuf * pixbufCacheValueNew(QtCPixKey *key)
         case PIX_CHECK:
             res=gdk_pixbuf_new_from_inline(-1, opts.xCheck ? check_x_on :check_on, TRUE, NULL);
             break;
-        case PIX_SLIDER:
-            res=gdk_pixbuf_new_from_inline(-1, slider, TRUE, NULL);
-            break;
-        case PIX_SLIDER_LIGHT:
-            res=gdk_pixbuf_new_from_inline(-1, slider_light, TRUE, NULL);
-            break;
-        case PIX_SLIDER_V:
-        {
-            GdkPixbuf *orig=gdk_pixbuf_new_from_inline(-1, slider, TRUE, NULL);
-            res=gdk_pixbuf_rotate_simple(orig, GDK_PIXBUF_ROTATE_CLOCKWISE);
-            gdk_pixbuf_unref(orig);
-            break;
-        }
-        case PIX_SLIDER_LIGHT_V:
-        {
-            GdkPixbuf *orig=gdk_pixbuf_new_from_inline(-1, slider_light, TRUE, NULL),
-                      *rotated=gdk_pixbuf_rotate_simple(orig, GDK_PIXBUF_ROTATE_CLOCKWISE);
-            res=gdk_pixbuf_flip(rotated, true);
-            gdk_pixbuf_unref(orig);
-            gdk_pixbuf_unref(rotated);
-            break;
-        }
         case PIX_BLANK:
             return gdk_pixbuf_new_from_inline(-1, blank16x16, TRUE, NULL);
     }
@@ -1568,7 +1546,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 doColouredMouseOver=opts.coloredMouseOver && qtcPalette.mouseover &&
                                   WIDGET_SPIN!=widget && WIDGET_SPIN_DOWN!=widget && WIDGET_SPIN_UP!=widget &&
                                   WIDGET_COMBO_BUTTON!=widget && WIDGET_SB_BUTTON!=widget &&
-                                  (WIDGET_SB_SLIDER!=widget || !opts.colorSliderMouseOver) &&
+                                  (!QTC_SLIDER(widget) || !opts.colorSliderMouseOver) &&
                                   WIDGET_UNCOLOURED_MO_BUTTON!=widget &&
                                   GTK_STATE_PRELIGHT==state &&
                                   (IS_TOGGLE_BUTTON(widget) || !sunken),
@@ -1613,7 +1591,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         if(plastikMouseOver)
         {
-            if(WIDGET_SB_SLIDER==widget)
+            if(QTC_SLIDER(widget))
             {
                 int len=QTC_SB_SLIDER_MO_LEN(horiz ? width : height),
                     so=lightBorder ? QTC_SLIDER_MO_BORDER : 1,
@@ -1639,8 +1617,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
             {
                 int      mh=height;
                 GdkColor *col=&qtcPalette.mouseover[QTC_MO_PLASTIK_DARK(widget)];
-                bool     horizontal=(horiz && !(WIDGET_SB_BUTTON==widget || WIDGET_SB_SLIDER==widget))||
-                                    (!horiz && (WIDGET_SB_BUTTON==widget || WIDGET_SB_SLIDER==widget)),
+                bool     horizontal=(horiz && !(WIDGET_SB_BUTTON==widget || QTC_SLIDER(widget)))||
+                                    (!horiz && (WIDGET_SB_BUTTON==widget || QTC_SLIDER(widget))),
                          thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN_UP==widget || WIDGET_SPIN_DOWN==widget ||
                               ((horiz ? height : width)<16);
 
@@ -1775,10 +1753,10 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(plastikMouseOver && !sunken)
     {
         bool         thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN==widget || ((horiz ? height : width)<16),
-                     horizontal=WIDGET_SB_SLIDER==widget ? !horiz
-                                                    : (horiz && WIDGET_SB_BUTTON!=widget) ||
-                                                        (!horiz && WIDGET_SB_BUTTON==widget);
-        int          len=WIDGET_SB_SLIDER==widget ? QTC_SB_SLIDER_MO_LEN(horiz ? width : height) : (thin ? 1 : 2);
+                     horizontal=QTC_SLIDER(widget) ? !horiz
+                                                   : (horiz && WIDGET_SB_BUTTON!=widget) ||
+                                                      (!horiz && WIDGET_SB_BUTTON==widget);
+        int          len=QTC_SLIDER(widget) ? QTC_SB_SLIDER_MO_LEN(horiz ? width : height) : (thin ? 1 : 2);
         GdkRectangle rect;
         if(horizontal)
             rect.x=x, rect.y=y+len, rect.width=width, rect.height=height-(len*2);
@@ -1848,12 +1826,12 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
         /* Yuck! this is a mess!!!! */
 // Copied from KDE4 version...
         if(!sunken && GTK_STATE_INSENSITIVE!=state &&
-            ( ( ( (doEtch && WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget) || WIDGET_SB_SLIDER==widget || WIDGET_COMBO==widget || WIDGET_MENU_BUTTON==widget ) &&
+            ( ( ( (doEtch && WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget) || QTC_SLIDER(widget) || WIDGET_COMBO==widget || WIDGET_MENU_BUTTON==widget ) &&
                  (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && GTK_STATE_PRELIGHT==state) ||
                (doEtch && WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
 
 // Previous Gtk2...        
-//         if(!sunken && (doEtch || WIDGET_SB_SLIDER==widget) &&
+//         if(!sunken && (doEtch || QTC_SLIDER(widget)) &&
 //             ( (WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
 //                 MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
 //               (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
@@ -3326,7 +3304,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                               0==strcmp(detail, "stepper")),
              pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
              qtc_paned=!pbar && IS_QTC_PANED,
-             slider=!qtc_paned && (DETAIL("slider") || DETAIL("qtc-slider")),
+             qtcSlider=!qtc_paned && DETAIL("qtc-slider"),
+             slider=qtcSlider || (!qtc_paned && DETAIL("slider")),
              hscale=!slider && DETAIL("hscale"),
              vscale=!hscale && DETAIL("vscale"),
              menubar=!vscale && DETAIL("menubar"),
@@ -3651,7 +3630,8 @@ debugDisplayWidget(widget, 3);
                 EWidget  widgetType=isComboBoxButton(widget)
                                     ? WIDGET_COMBO_BUTTON
                                     : slider
-                                        ? WIDGET_SB_SLIDER
+                                        ? (qtcSlider && (SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
+                                            ? WIDGET_SLIDER : WIDGET_SB_SLIDER)
                                         : hscale||vscale
                                         ? WIDGET_SLIDER
                                             : lvh
@@ -6250,8 +6230,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     FN_CHECK
     sanitizeSize(window, &width, &height);
 
-    if(scrollbar || !(SLIDER_TRIANGULAR==opts.sliderStyle ||
-       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED)))
+    if(scrollbar || SLIDER_TRIANGULAR!=opts.sliderStyle)
     {
         if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType && !isMozilla())
         {
@@ -6270,7 +6249,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
     
         drawBox(style, window, state, shadow_type, area, widget,
-                !scrollbar && SLIDER_PLAIN==opts.sliderStyle ? "qtc-slider" : "slider", x, y, width, height, FALSE);
+                !scrollbar ? "qtc-slider" : "slider", x, y, width, height, FALSE);
 
        /* Orientation is always vertical with Mozilla, why? Anyway this hack should be OK - as we only draw
           dashes when slider is larger than 'min' pixels... */
@@ -6328,10 +6307,11 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         GdkRegion    *region=NULL;
         GdkPoint     clip[8];
         GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
-        gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver ||
-                                       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) &&
-                                       (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders));
+        gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
         int          borderVal=qtcPalette.mouseover==borderCols ? QT_SLIDER_MO_BORDER : QT_BORDER(GTK_STATE_INSENSITIVE==state);
+        double       xd=x+0.5,
+                     yd=y+0.5,
+                     radius=2.5;
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)
         {
@@ -6413,62 +6393,40 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         gdk_region_destroy(region);
 
-        if(SLIDER_TRIANGULAR==opts.sliderStyle)
+        cairo_new_path(cr);
+        cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
+        switch(direction)
         {
-            double xd=x+0.5,
-                   yd=y+0.5,
-                   radius=2.5;
-
-            cairo_new_path(cr);
-            cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
-            switch(direction)
-            {
-                case GTK_ARROW_UP:
-                default:
-                case GTK_ARROW_DOWN:
-                    cairo_move_to(cr, xd+radius, yd);
-                    cairo_arc(cr, xd+10-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
-                    cairo_line_to(cr, xd+10, yd+9);
-                    cairo_line_to(cr, xd+5, yd+14);
-                    cairo_line_to(cr, xd, yd+9);
-                    cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
-                    cairo_stroke(cr);
-                    if(drawLight)
-                    {
-                        drawVLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 7);
-                        drawHLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 6);
-                    }
-                    break;
-                case GTK_ARROW_RIGHT:
-                case GTK_ARROW_LEFT:
-                    cairo_move_to(cr, xd, yd+10-radius);
-                    cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
-                    cairo_line_to(cr, xd+9, yd);
-                    cairo_line_to(cr, xd+14, yd+5);
-                    cairo_line_to(cr, xd+9, yd+10);
-                    cairo_arc(cr, xd+radius, yd+10-radius, radius, M_PI * 0.5, M_PI);
-                    cairo_stroke(cr);
-                    if(drawLight)
-                    {
-                        drawHLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 7);
-                        drawVLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 6);
-                    }
-            }
-        }
-        else
-        {
-            GdkPixbuf *border=getPixbuf(&borderCols[borderVal], horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8);
-
-            gdk_cairo_set_source_pixbuf(cr, border, x, y);
-            cairo_paint(cr);
-
-            if(drawLight)
-            {
-                GdkPixbuf *light=getPixbuf(&colors[0], horiz ? PIX_SLIDER_LIGHT : PIX_SLIDER_LIGHT_V, 1.0);
-
-                gdk_cairo_set_source_pixbuf(cr, light, x, y);
-                cairo_paint(cr);
-            }
+            case GTK_ARROW_UP:
+            default:
+            case GTK_ARROW_DOWN:
+                cairo_move_to(cr, xd+radius, yd);
+                cairo_arc(cr, xd+10-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
+                cairo_line_to(cr, xd+10, yd+9);
+                cairo_line_to(cr, xd+5, yd+14);
+                cairo_line_to(cr, xd, yd+9);
+                cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
+                cairo_stroke(cr);
+                if(drawLight)
+                {
+                    drawVLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 7);
+                    drawHLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 6);
+                }
+                break;
+            case GTK_ARROW_RIGHT:
+            case GTK_ARROW_LEFT:
+                cairo_move_to(cr, xd, yd+10-radius);
+                cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
+                cairo_line_to(cr, xd+9, yd);
+                cairo_line_to(cr, xd+14, yd+5);
+                cairo_line_to(cr, xd+9, yd+10);
+                cairo_arc(cr, xd+radius, yd+10-radius, radius, M_PI * 0.5, M_PI);
+                cairo_stroke(cr);
+                if(drawLight)
+                {
+                    drawHLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+2, yd+1, 7);
+                    drawVLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 6);
+                }
         }
     }
 
