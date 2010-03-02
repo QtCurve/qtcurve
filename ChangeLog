@@ -2,11 +2,14 @@
 -----
 1. Draw etch effect on radios if using a button effect, and not using button-like
    check/radios.
-2. Improve appearance of button style check and radio buttons.
-3. Add option to control whether scrollbar groove has a border or not.
-4. Dont use pixmaps to draw rounded slider, or radio button borders.
-5. Fix calculation of alpha values for square rings.
-6. Fix progressbar glow central position.
+2. If drawing square scrollviews, use a dark/light borders.
+3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
+   groove.
+4. Improve appearance of button style check and radio buttons.
+5. Add option to control whether scrollbar groove has a border or not.
+6. Dont use pixmaps to draw rounded slider, or radio button borders.
+7. Fix calculation of alpha values for square rings.
+8. Fix progressbar glow central position.
 
 1.1.1
 -----

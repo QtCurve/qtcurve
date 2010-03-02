@@ -2582,7 +2582,7 @@ static gboolean qtInit()
 
             /* Scrolled windows */
             if(opts.squareScrollViews)
-                thickness=opts.gtkScrollViews ? 1 : 2;
+                thickness=opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove ? 1 : 2;
             else if(opts.etchEntry)
                 thickness=3;
 
