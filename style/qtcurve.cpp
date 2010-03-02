@@ -3963,7 +3963,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->setClipping(false);
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setBrush(Qt::NoBrush);
-                if(!doneShadow && doEtch && (glow || EFFECT_ETCH==opts.buttonEffect || sunken))
+                if(!doneShadow && doEtch && (glow || EFFECT_NONE!=opts.buttonEffect || sunken))
                 {
                     QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
 

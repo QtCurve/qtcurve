@@ -1,11 +1,13 @@
 1.2.0
 -----
-1. Improve appearance of button style check and radio buttons.
-2. Add option to control whether scrollbar groove has a border or not.
-3. Dont use pixmaps to draw rounded slider, or radio button borders.
-4. Really fix Qt only compile.
-5. Increase default shadow sizes.
-6. If using gtk style combos and bordering menu items, increase frame width by
+1. Draw etch effect on radios if using a button effect, and not using button-like
+   check/radios.
+2. Improve appearance of button style check and radio buttons.
+3. Add option to control whether scrollbar groove has a border or not.
+4. Dont use pixmaps to draw rounded slider, or radio button borders.
+5. Really fix Qt only compile.
+6. Increase default shadow sizes.
+7. If using gtk style combos and bordering menu items, increase frame width by
    1 pixel.
 
 1.1.1
