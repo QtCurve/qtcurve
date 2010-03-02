@@ -4774,7 +4774,9 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
                         createTLPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
                         cairo_stroke(cr);
-                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER_BR]));
+                        if(!opts.gtkScrollViews)
+                            cairo_set_source_rgba(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), QT_LOWER_BORDER_ALPHA);
+                            //cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER_BR]));
                         createBRPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
                         cairo_stroke(cr);
                         doBorder=false;
