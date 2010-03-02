@@ -3972,25 +3972,32 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
 
                     painter->setPen(topCol);
-                    painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
+                    painter->drawArc(QRectF(x-0.5, y-0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
                     if(!glow)
                         painter->setPen(getLowerEtchCol(widget));
-                    painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
+                    painter->drawArc(QRectF(x-0.5, y-0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
                 }
 
                 painter->setPen(use[QT_BORDER(state&State_Enabled)]);
-                painter->drawArc(QRectF(r.x()+1.25, r.y()+1.25, QTC_RADIO_SIZE-0.5, QTC_RADIO_SIZE-0.5), 0, 360*16);
+                painter->drawArc(QRectF(x+0.25, y+0.25, QTC_RADIO_SIZE-0.5, QTC_RADIO_SIZE-0.5), 0, 360*16);
                 if(!coloredMo)
                 {
                     painter->setPen(btn[state&State_MouseOver ? 3 : 4]);
-                    painter->drawArc(QRectF(r.x()+1.75, r.y()+1.75, QTC_RADIO_SIZE-1.5, QTC_RADIO_SIZE-1.5),
+                    painter->drawArc(QRectF(x+0.75, y+0.75, QTC_RADIO_SIZE-1.5, QTC_RADIO_SIZE-1.5),
                                      lightBorder ? 0 : 45*16,
                                      lightBorder ? 360*16 : 180*16);
                 }
-                painter->setRenderHint(QPainter::Antialiasing, false);
             }
             if(state&State_On)
-                painter->drawPixmap(x, y, *getPixmap(checkRadioCol(option), PIX_RADIO_ON, 1.0));
+            {
+                QPainterPath path;
+                double       radius=opts.smallRadio ? 2.75 : 3.75,
+                             offset=(QTC_RADIO_SIZE/2.0)-radius;
+
+                path.addEllipse(QRectF(x+offset, y+offset, radius*2.0, radius*2.0));
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->fillPath(path, checkRadioCol(option));
+            }
 
             painter->restore();
             break;
@@ -11292,12 +11299,6 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
 
             switch(p)
             {
-                case PIX_RADIO_ON:
-                    if(opts.smallRadio)
-                        img.loadFromData(radio_on_small_png_data, radio_on_small_png_len);
-                    else
-                        img.loadFromData(radio_on_png_data, radio_on_png_len);
-                    break;
                 case PIX_CHECK:
                     if(opts.xCheck)
                         img.loadFromData(check_x_on_png_data, check_x_on_png_len);

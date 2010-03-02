@@ -7,7 +7,7 @@
     groove.
  4. Improve appearance of button style check and radio buttons.
  5. Add option to control whether scrollbar groove has a border or not.
- 6. Dont use pixmaps to draw rounded slider, or radio button borders.
+ 6. Dont use pixmaps to draw rounded slider, or radio buttons.
  7. Really fix Qt only compile.
  8. Increase default shadow sizes.
  9. If using gtk style combos and bordering menu items, increase frame width by
