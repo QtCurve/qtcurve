@@ -3406,11 +3406,28 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             if(APP_ARORA==theThemedApp)
                                 painter->fillRect(r, palette.brush(QPalette::Base));
                             painter->setPen(use[QT_STD_BORDER]);
+
                             painter->drawLine(r.bottomLeft(), r.topLeft());
                             painter->drawLine(r.topLeft(), r.topRight());
-                            painter->setPen(use[QT_STD_BORDER_BR]);
-                            painter->drawLine(r.topRight(), r.bottomRight());
-                            painter->drawLine(r.bottomRight(), r.bottomLeft());
+
+                            if(!opts.gtkScrollViews)
+                            {
+                                QColor col(use[QT_STD_BORDER]);
+                                col.setAlphaF(QT_LOWER_BORDER_ALPHA);
+                                painter->setPen(col);
+
+                                // Again. more intel 2.9 xorg driver issues :-(
+                                painter->save();
+                                painter->setRenderHint(QPainter::Antialiasing, true);
+                                drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
+                                drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                                painter->restore();
+                            }
+                            else
+                            {
+                                painter->drawLine(r.topRight(), r.bottomRight());
+                                painter->drawLine(r.bottomRight(), r.bottomLeft());
+                            }
                         }
                         else
                         {
