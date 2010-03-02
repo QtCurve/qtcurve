@@ -2614,7 +2614,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 0;
         case PM_DefaultFrameWidth:
             if ((!opts.popupBorder || opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
-                return opts.gtkComboMenus ? 1 : 0;
+                return opts.gtkComboMenus ? (opts.borderMenuitems ? 2 : 1) : 0;
 
             if ((!opts.gtkScrollViews || opts.squareScrollViews) && isKateView(widget))
                 return opts.squareScrollViews ? 1 : 0;
