@@ -288,6 +288,8 @@ typedef gchar ** Strings;
                         WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w))
 #endif
 
+#define QTC_SLIDER(w) (WIDGET_SB_SLIDER==(w) || WIDGET_SLIDER==(w))
+
 #define MODIFY_AGUA_X(A, X) (APPEARANCE_AGUA==(A) ?  (X) : (A))
 #define MODIFY_AGUA(A)      MODIFY_AGUA_X((A), APPEARANCE_AGUA_MOD)
 #define AGUA_MAX 32.0
@@ -1663,6 +1665,11 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
        return ROUND_MAX;
 #endif
 
+#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    if(WIDGET_SLIDER==widget && (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle))
+        return ROUND_MAX;
+#endif
+
     switch(r)
     {
         case ROUND_MAX:
@@ -1698,6 +1705,11 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 #endif
 #ifndef __cplusplus
     if(WIDGET_RADIO_BUTTON==widget)
+        return (w>h ? h : w)/2.0;
+#endif
+
+#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    if(WIDGET_SLIDER==widget && (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle))
         return (w>h ? h : w)/2.0;
 #endif
 

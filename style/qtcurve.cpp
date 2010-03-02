@@ -9479,7 +9479,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                 case ROUND_SLIGHT:
                 case ROUND_NONE:
                 case ROUND_FULL:
-                    endSize=WIDGET_SB_SLIDER==w && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 9 : 5;
+                    endSize=QTC_SLIDER(w) && MO_PLASTIK==opts.coloredMouseOver && option->state&State_MouseOver ? 9 : 5;
                     break;
                 case ROUND_EXTRA:
                     endSize=7;
@@ -9487,7 +9487,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                 case ROUND_MAX:
                 {
                     radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
-                    endSize=WIDGET_SB_SLIDER==w
+                    endSize=QTC_SLIDER(w)
                                 ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
                                 : (int)(radius+2.5);
                     middleSize=(QTC_MIN_ROUND_MAX_WIDTH-(endSize*2))+4;
@@ -9568,7 +9568,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
                                      WIDGET_SPIN!=w && WIDGET_COMBO_BUTTON!=w && WIDGET_SB_BUTTON!=w &&
-                                     (WIDGET_SB_SLIDER!=w || !opts.colorSliderMouseOver) &&
+                                     (!QTC_SLIDER(w) || !opts.colorSliderMouseOver) &&
                                      !(option->state&QTC_STATE_KWIN_BUTTON) &&
                                      (opts.coloredTbarMo || !(option->state&QTC_STATE_TBAR_BUTTON)) &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
@@ -9612,7 +9612,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                     p->save();
                     p->setClipPath(buildPath(r.adjusted(0, 0, 0, -1), w, round,
                                              getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)));
-                    if(WIDGET_SB_SLIDER==w)
+                    if(QTC_SLIDER(w))
                     {
                         int len(QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())+1),
                             so(lightBorder ? QTC_SLIDER_MO_BORDER : 1),
@@ -9754,8 +9754,8 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     if(plastikMouseOver && !sunken)
     {
         bool thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16)),
-             horizontal(WIDGET_SB_SLIDER==w ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
-        int  len(WIDGET_SB_SLIDER==w ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height()) : (thin ? 1 : 2));
+             horizontal(QTC_SLIDER(w) ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
+        int  len(QTC_SLIDER(w) ? QTC_SB_SLIDER_MO_LEN(horiz ? r.width() : r.height()) : (thin ? 1 : 2));
 
         p->save();
         if(horizontal)
@@ -9812,7 +9812,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
 
         r.adjust(-1, -1, 1, 1);
         if(!sunken && option->state&State_Enabled &&
-            ( ( ( (doEtch && WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || WIDGET_SB_SLIDER==w || WIDGET_COMBO==w || WIDGET_MENU_BUTTON==w ) &&
+            ( ( ( (doEtch && WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || QTC_SLIDER(w) || WIDGET_COMBO==w || WIDGET_MENU_BUTTON==w ) &&
                  (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && option->state&State_MouseOver) ||
                (doEtch && WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(p, r, option, round,
@@ -10613,7 +10613,9 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
                    || SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons
 #endif
                     ? ROUNDED_ALL : ROUNDED_NONE,
-                   getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders), use, true, WIDGET_SB_SLIDER);
+                   getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders), use, true,
+                   slider && (SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
+                        ? WIDGET_SLIDER : WIDGET_SB_SLIDER);
 
     if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)))
     {
@@ -10652,8 +10654,7 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 {
     bool horiz(SLIDER_TRIANGULAR==opts.sliderStyle ? r.height()>r.width() : r.width()>r.height());
 
-    if(SLIDER_TRIANGULAR==opts.sliderStyle ||
-       ((SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle) && QTC_FULLLY_ROUNDED))
+    if(SLIDER_TRIANGULAR==opts.sliderStyle)
     {
         QStyleOption opt(*option);
 
@@ -10671,43 +10672,33 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
                                     ? itsMouseOverCols : use);
         const QColor     &fill(getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders));
         int              x(r.x()),
-                         y(r.y()),
-                         xo(horiz ? 8 : 0),
-                         yo(horiz ? 0 : 8);
+                         y(r.y());
         PrimitiveElement direction(horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight);
         QPolygon         clipRegion;
-        bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver) ||
-                                   (SLIDER_ROUND==opts.sliderStyle &&
-                                   (SHADE_BLEND_SELECTED==opts.shadeSliders || SHADE_SELECTED==opts.shadeSliders)));
+        bool             drawLight(MO_PLASTIK!=opts.coloredMouseOver || !(opt.state&State_MouseOver));
         int              size(SLIDER_TRIANGULAR==opts.sliderStyle ? 15 : 13),
                          borderVal(itsMouseOverCols==border ? QT_SLIDER_MO_BORDER : QT_BORDER(opt.state&State_Enabled));
 
-        if(SLIDER_TRIANGULAR==opts.sliderStyle)
-        {
-            if(option->tickPosition & QSlider::TicksBelow)
-                direction=horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight;
-            else if(option->tickPosition & QSlider::TicksAbove)
-                direction=horiz ? PE_IndicatorArrowUp : PE_IndicatorArrowLeft;
+        if(option->tickPosition & QSlider::TicksBelow)
+            direction=horiz ? PE_IndicatorArrowDown : PE_IndicatorArrowRight;
+        else if(option->tickPosition & QSlider::TicksAbove)
+            direction=horiz ? PE_IndicatorArrowUp : PE_IndicatorArrowLeft;
 
-            switch(direction)
-            {
-                default:
-                case PE_IndicatorArrowDown:
-                    clipRegion.setPoints(7,   x, y+2,    x+2, y,   x+8, y,    x+10, y+2,   x+10, y+9,   x+5, y+14,    x, y+9);
-                    break;
-                case PE_IndicatorArrowUp:
-                    clipRegion.setPoints(7,   x, y+12,   x+2, y+14,   x+8, y+14,   x+10, y+12,   x+10, y+5,   x+5, y,    x, y+5);
-                    break;
-                case PE_IndicatorArrowLeft:
-                    clipRegion.setPoints(7,   x+12, y,   x+14, y+2,   x+14, y+8,   x+12, y+10,   x+5, y+10,    x, y+5,    x+5, y );
-                    break;
-                case PE_IndicatorArrowRight:
-                    clipRegion.setPoints(7,   x+2, y,    x, y+2,   x, y+8,    x+2, y+10,   x+9, y+10,   x+14, y+5,    x+9, y);
-            }
+        switch(direction)
+        {
+            default:
+            case PE_IndicatorArrowDown:
+                clipRegion.setPoints(7,   x, y+2,    x+2, y,   x+8, y,    x+10, y+2,   x+10, y+9,   x+5, y+14,    x, y+9);
+                break;
+            case PE_IndicatorArrowUp:
+                clipRegion.setPoints(7,   x, y+12,   x+2, y+14,   x+8, y+14,   x+10, y+12,   x+10, y+5,   x+5, y,    x, y+5);
+                break;
+            case PE_IndicatorArrowLeft:
+                clipRegion.setPoints(7,   x+12, y,   x+14, y+2,   x+14, y+8,   x+12, y+10,   x+5, y+10,    x, y+5,    x+5, y );
+                break;
+            case PE_IndicatorArrowRight:
+                clipRegion.setPoints(7,   x+2, y,    x, y+2,   x, y+8,    x+2, y+10,   x+9, y+10,   x+14, y+5,    x+9, y);
         }
-        else
-            clipRegion.setPoints(8, x,       y+8+yo,  x,       y+4,     x+4,    y,        x+8+xo, y,
-                                 x+12+xo, y+4,     x+12+xo, y+8+yo,  x+8+xo, y+12+yo,  x+4,    y+12+yo);
 
         p->save();
         p->setClipRegion(QRegion(clipRegion)); // , QPainter::CoordPainter);
@@ -10761,96 +10752,86 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
 
         p->setClipping(false);
 
-        if(SLIDER_TRIANGULAR==opts.sliderStyle)
-        {
-            QPainterPath path;
-            double       xd(r.x()+0.5),
-                         yd(r.y()+0.5),
-                         radius(2.5),
-                         diameter(radius*2);
+        QPainterPath path;
+        double       xd(r.x()+0.5),
+                     yd(r.y()+0.5),
+                     radius(2.5),
+                     diameter(radius*2);
 
-            p->setPen(border[borderVal]);
-            switch(direction)
-            {
-                default:
-                case PE_IndicatorArrowDown:
-                    path.moveTo(xd+10-radius, yd);
-                    path.arcTo(xd, yd, diameter, diameter, 90, 90);
-                    path.lineTo(xd, yd+9);
-                    path.lineTo(xd+5, yd+14);
-                    path.lineTo(xd+10, yd+9);
-                    path.arcTo(xd+10-diameter, yd, diameter, diameter, 0, 90);
-                    p->setRenderHint(QPainter::Antialiasing, true);
-                    p->drawPath(path);
-                    p->setRenderHint(QPainter::Antialiasing, false);
-                    if(drawLight)
-                    {
-                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
-                        p->drawLine(r.x()+1, r.y()+2, r.x()+1, r.y()+8);
-                        p->drawLine(r.x()+2, r.y()+1, r.x()+7, r.y()+1);
-                    }
-                    break;
-                case PE_IndicatorArrowUp:
-                    path.moveTo(xd, yd+5);
-                    path.arcTo(xd, yd+14-diameter, diameter, diameter, 180, 90);
-                    path.arcTo(xd+10-diameter, yd+14-diameter, diameter, diameter, 270, 90);
-                    path.lineTo(xd+10, yd+5);
-                    path.lineTo(xd+5, yd);
-                    path.lineTo(xd, yd+5);
-                    p->setRenderHint(QPainter::Antialiasing, true);
-                    p->drawPath(path);
-                    p->setRenderHint(QPainter::Antialiasing, false);
-                    if(drawLight)
-                    {
-                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
-                        p->drawLine(r.x()+5, r.y()+1, r.x()+1, r.y()+5);
-                        p->drawLine(r.x()+1, r.y()+5, r.x()+1, r.y()+11);
-                    }
-                    break;
-                case PE_IndicatorArrowLeft:
-                    path.moveTo(xd+5, yd+10);
-                    path.arcTo(xd+14-diameter, yd+10-diameter, diameter, diameter, 270, 90);
-                    path.arcTo(xd+14-diameter, yd, diameter, diameter, 0, 90);
-                    path.lineTo(xd+5, yd);
-                    path.lineTo(xd, yd+5);
-                    path.lineTo(xd+5, yd+10);
-                    p->setRenderHint(QPainter::Antialiasing, true);
-                    p->drawPath(path);
-                    p->setRenderHint(QPainter::Antialiasing, false);
-                    if(drawLight)
-                    {
-                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
-                        p->drawLine(r.x()+1, r.y()+5, r.x()+5, r.y()+1);
-                        p->drawLine(r.x()+5, r.y()+1, r.x()+11, r.y()+1);
-                    }
-                    break;
-                case PE_IndicatorArrowRight:
-                    path.moveTo(xd+9, yd);
-                    path.arcTo(xd, yd, diameter, diameter, 90, 90);
-                    path.arcTo(xd, yd+diameter, diameter, diameter, 180, 90);
-                    path.lineTo(xd+9, yd+10);
-                    path.lineTo(xd+14, yd+5);
-                    path.lineTo(xd+9, yd);
-                    p->setRenderHint(QPainter::Antialiasing, true);
-                    p->drawPath(path);
-                    p->setRenderHint(QPainter::Antialiasing, false);
-                    if(drawLight)
-                    {
-                        p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
-                        p->drawLine(r.x()+2, r.y()+1, r.x()+7, r.y()+1);
-                        p->drawLine(r.x()+1, r.y()+2, r.x()+1, r.y()+8);
-                    }
-                    break;
-            }
-        }
-        else
+        p->setPen(border[borderVal]);
+        switch(direction)
         {
-            p->drawPixmap(x, y,
-                          *getPixmap(border[borderVal], horiz ? PIX_SLIDER : PIX_SLIDER_V, 0.8));
-
-            if(drawLight)
-                p->drawPixmap(x, y, *getPixmap(use[0], horiz ? PIX_SLIDER_LIGHT : PIX_SLIDER_LIGHT_V));
+            default:
+            case PE_IndicatorArrowDown:
+                path.moveTo(xd+10-radius, yd);
+                path.arcTo(xd, yd, diameter, diameter, 90, 90);
+                path.lineTo(xd, yd+9);
+                path.lineTo(xd+5, yd+14);
+                path.lineTo(xd+10, yd+9);
+                path.arcTo(xd+10-diameter, yd, diameter, diameter, 0, 90);
+                p->setRenderHint(QPainter::Antialiasing, true);
+                p->drawPath(path);
+                p->setRenderHint(QPainter::Antialiasing, false);
+                if(drawLight)
+                {
+                    p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                    p->drawLine(r.x()+1, r.y()+2, r.x()+1, r.y()+8);
+                    p->drawLine(r.x()+2, r.y()+1, r.x()+7, r.y()+1);
+                }
+                break;
+            case PE_IndicatorArrowUp:
+                path.moveTo(xd, yd+5);
+                path.arcTo(xd, yd+14-diameter, diameter, diameter, 180, 90);
+                path.arcTo(xd+10-diameter, yd+14-diameter, diameter, diameter, 270, 90);
+                path.lineTo(xd+10, yd+5);
+                path.lineTo(xd+5, yd);
+                path.lineTo(xd, yd+5);
+                p->setRenderHint(QPainter::Antialiasing, true);
+                p->drawPath(path);
+                p->setRenderHint(QPainter::Antialiasing, false);
+                if(drawLight)
+                {
+                    p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                    p->drawLine(r.x()+5, r.y()+1, r.x()+1, r.y()+5);
+                    p->drawLine(r.x()+1, r.y()+5, r.x()+1, r.y()+11);
+                }
+                break;
+            case PE_IndicatorArrowLeft:
+                path.moveTo(xd+5, yd+10);
+                path.arcTo(xd+14-diameter, yd+10-diameter, diameter, diameter, 270, 90);
+                path.arcTo(xd+14-diameter, yd, diameter, diameter, 0, 90);
+                path.lineTo(xd+5, yd);
+                path.lineTo(xd, yd+5);
+                path.lineTo(xd+5, yd+10);
+                p->setRenderHint(QPainter::Antialiasing, true);
+                p->drawPath(path);
+                p->setRenderHint(QPainter::Antialiasing, false);
+                if(drawLight)
+                {
+                    p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                    p->drawLine(r.x()+1, r.y()+5, r.x()+5, r.y()+1);
+                    p->drawLine(r.x()+5, r.y()+1, r.x()+11, r.y()+1);
+                }
+                break;
+            case PE_IndicatorArrowRight:
+                path.moveTo(xd+9, yd);
+                path.arcTo(xd, yd, diameter, diameter, 90, 90);
+                path.arcTo(xd, yd+diameter, diameter, diameter, 180, 90);
+                path.lineTo(xd+9, yd+10);
+                path.lineTo(xd+14, yd+5);
+                path.lineTo(xd+9, yd);
+                p->setRenderHint(QPainter::Antialiasing, true);
+                p->drawPath(path);
+                p->setRenderHint(QPainter::Antialiasing, false);
+                if(drawLight)
+                {
+                    p->setPen(use[APPEARANCE_DULL_GLASS==opts.sliderAppearance ? 1 : 0]);
+                    p->drawLine(r.x()+2, r.y()+1, r.x()+7, r.y()+1);
+                    p->drawLine(r.x()+1, r.y()+2, r.x()+1, r.y()+8);
+                }
+                break;
         }
+
         p->restore();
     }
     else
@@ -11340,19 +11321,6 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
                     else
                         img.loadFromData(check_on_png_data, check_on_png_len);
                     break;
-                case PIX_SLIDER:
-                    img.loadFromData(slider_png_data, slider_png_len);
-                    break;
-                case PIX_SLIDER_LIGHT:
-                    img.loadFromData(slider_light_png_data, slider_light_png_len);
-                    break;
-                case PIX_SLIDER_V:
-                    img.loadFromData(slider_png_data, slider_png_len);
-                    img=rotateImage(img);
-                    break;
-                case PIX_SLIDER_LIGHT_V:
-                    img.loadFromData(slider_light_png_data, slider_light_png_len);
-                    img=rotateImage(img).mirrored(true, false);
                 default:
                     break;
             }

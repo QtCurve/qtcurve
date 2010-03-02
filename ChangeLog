@@ -2,9 +2,10 @@
 -----
 1. Improve appearance of button style check and radio buttons.
 2. Add option to control whether scrollbar groove has a border or not.
-3. Really fix Qt only compile.
-4. Increase default shadow sizes.
-5. If using gtk style combos and bordering menu items, increase frame width by
+3. Dont use pixmaps to draw rounded slider.
+4. Really fix Qt only compile.
+5. Increase default shadow sizes.
+6. If using gtk style combos and bordering menu items, increase frame width by
    1 pixel.
 
 1.1.1
