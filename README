@@ -76,6 +76,6 @@ pixmaps.h
 
 To regenerate this, run the following:
 
-    qembed radio_frame.png radio_inner.png radio_light.png radio_on.png radio_on_small.png check_on.png check_x_on.png dot.png > pixmaps.h
+    qembed radio_on.png radio_on_small.png check_on.png check_x_on.png dot.png > pixmaps.h
 
 'qembed' is part of Qt3 dev packages. pixmaps.h needs to be edited and the QCString parts removed.

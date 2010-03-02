@@ -3961,7 +3961,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
 
                 painter->setClipping(false);
-
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setBrush(Qt::NoBrush);
                 if(!doneShadow && doEtch && (glow || EFFECT_ETCH==opts.buttonEffect || sunken))
                 {
                     QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
@@ -3969,21 +3970,23 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(!glow)
                         topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
 
-                    painter->setRenderHint(QPainter::Antialiasing, true);
-                    painter->setBrush(Qt::NoBrush);
                     painter->setPen(topCol);
                     painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
                     if(!glow)
                         painter->setPen(getLowerEtchCol(widget));
                     painter->drawArc(QRectF(r.x()+0.5, r.y()+0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
-                    painter->setRenderHint(QPainter::Antialiasing, false);
                 }
 
-                painter->drawPixmap(x, y, *getPixmap(use[QT_BORDER(state&State_Enabled)], PIX_RADIO_BORDER, 0.8));
-
+                painter->setPen(use[QT_BORDER(state&State_Enabled)]);
+                painter->drawArc(QRectF(r.x()+1.25, r.y()+1.25, QTC_RADIO_SIZE-0.5, QTC_RADIO_SIZE-0.5), 0, 360*16);
                 if(!coloredMo)
-                    painter->drawPixmap(x, y, *getPixmap(btn[state&State_MouseOver ? 3 : 4],
-                                                        lightBorder ? PIX_RADIO_INNER : PIX_RADIO_LIGHT));
+                {
+                    painter->setPen(btn[state&State_MouseOver ? 3 : 4]);
+                    painter->drawArc(QRectF(r.x()+1.75, r.y()+1.75, QTC_RADIO_SIZE-1.5, QTC_RADIO_SIZE-1.5),
+                                     lightBorder ? 0 : 45*16,
+                                     lightBorder ? 360*16 : 180*16);
+                }
+                painter->setRenderHint(QPainter::Antialiasing, false);
             }
             if(state&State_On)
                 painter->drawPixmap(x, y, *getPixmap(checkRadioCol(option), PIX_RADIO_ON, 1.0));
@@ -11247,18 +11250,6 @@ const QColor & QtCurveStyle::getFill(const QStyleOption *option, const QColor *u
                                : use[darker ? 2 : ORIGINAL_SHADE];
 }
 
-static QImage rotateImage(const QImage &img, double angle=90.0)
-{
-    QMatrix matrix;
-    matrix.translate(img.width()/2, img.height()/2);
-    matrix.rotate(angle);
-
-    QRect newRect(matrix.mapRect(QRect(0, 0, img.width(), img.height())));
-
-    return img.transformed(QMatrix(matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(),
-                                   matrix.dx() - newRect.left(), matrix.dy() - newRect.top()));
-}
-
 QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) const
 {
     QtcKey  key(createKey(col, p));
@@ -11300,15 +11291,6 @@ QPixmap * QtCurveStyle::getPixmap(const QColor col, EPixmap p, double shade) con
 
             switch(p)
             {
-                case PIX_RADIO_BORDER:
-                    img.loadFromData(radio_frame_png_data, radio_frame_png_len);
-                    break;
-                case PIX_RADIO_INNER:
-                    img.loadFromData(radio_inner_png_data, radio_inner_png_len);
-                    break;
-                case PIX_RADIO_LIGHT:
-                    img.loadFromData(radio_light_png_data, radio_light_png_len);
-                    break;
                 case PIX_RADIO_ON:
                     if(opts.smallRadio)
                         img.loadFromData(radio_on_small_png_data, radio_on_small_png_len);
