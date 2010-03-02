@@ -5107,8 +5107,7 @@ debugDisplayWidget(widget, 3);
                     drawGlow(cr, area, NULL, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2, ROUNDED_ALL, WIDGET_CHECKBOX);
                 else
                     drawEtch(cr, area, NULL, widget, x-1, y-1, QTC_CHECK_SIZE+2, QTC_CHECK_SIZE+2,
-                            opts.crButton && !mnu && EFFECT_SHADOW==opts.buttonEffect ? GTK_STATE_ACTIVE!=state : false,
-                            ROUNDED_ALL, WIDGET_CHECKBOX);
+                            false, ROUNDED_ALL, WIDGET_CHECKBOX);
             }
 
             drawBorder(cr, style, state, area, NULL, x, y, QTC_CHECK_SIZE, QTC_CHECK_SIZE,
@@ -5229,13 +5228,11 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 GdkColor *colors=coloredMouseOver
                             ? qtcPalette.mouseover
                             : btn_colors;
-                GdkColor *bgndCol=opts.crButton
-                                    ? &btn_colors[mnu ? ORIGINAL_SHADE : getFill(state, false)]
-                                    : GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
-                                        ? &style->bg[GTK_STATE_NORMAL]
-                                        : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
-                                            ? &colors[QTC_CR_MO_FILL]
-                                            : &style->base[GTK_STATE_NORMAL];
+                GdkColor *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
+                                    ? &style->bg[GTK_STATE_NORMAL]
+                                    : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
+                                        ? &colors[QTC_CR_MO_FILL]
+                                        : &style->base[GTK_STATE_NORMAL];
                 gboolean doneShadow=false;
 
                 bgnd=getFill(state, set/*, TRUE*/);
@@ -5266,7 +5263,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                     else
                         cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_RADIO_TOP_ALPHA);
 
-                    if(!opts.crButton || EFFECT_SHADOW!=opts.buttonEffect || glow)
+                    if(EFFECT_SHADOW!=opts.buttonEffect || glow)
                     {
                         cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
                         cairo_stroke(cr);
