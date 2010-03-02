@@ -3793,7 +3793,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 rect=QRect(r.x(), r.y(), QTC_CHECK_SIZE+(doEtch ? 2 : 0), QTC_CHECK_SIZE+(doEtch ? 2 : 0));
 
                 if(menu)
-                    opt.state&=~State_MouseOver;
+                    opt.state&=~(State_MouseOver|State_Sunken);
                 opt.state&=~State_On;
                 opt.state|=State_Raised;
                 opt.rect=rect;
@@ -3911,7 +3911,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QRect        rect(r.x(), r.y(), QTC_RADIO_SIZE+(doEtch ? 2 : 0), QTC_RADIO_SIZE+(doEtch ? 2 : 0));
 
                 if(menu)
-                    opt.state&=~State_MouseOver;
+                    opt.state&=~(State_MouseOver|State_Sunken);
                 opt.state&=~State_On;
                 opt.state|=State_Raised;
                 opt.rect=rect;
