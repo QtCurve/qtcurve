@@ -5252,7 +5252,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                     else
                         cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_RADIO_TOP_ALPHA);
 
-                    if(EFFECT_SHADOW!=opts.buttonEffect || glow)
+                    if(EFFECT_NONE!=opts.buttonEffect || glow)
                     {
                         cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
                         cairo_stroke(cr);
