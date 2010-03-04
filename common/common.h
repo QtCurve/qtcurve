@@ -956,6 +956,7 @@ typedef struct
                      thinSbarGroove,
                      flatSbarButtons,
                      borderSbarGroove,
+                     borderProgress,
                      popupBorder,
                      unifySpinBtns,
                      unifyCombo,

@@ -1465,6 +1465,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_INT(crSize)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(borderSbarGroove)
+            QTC_CFG_READ_BOOL(borderProgress)
             QTC_CFG_READ_BOOL(popupBorder)
             QTC_CFG_READ_BOOL(unifySpinBtns)
             QTC_CFG_READ_BOOL(unifySpin)
@@ -1957,6 +1958,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             opts->tabAppearance=MODIFY_AGUA(opts->tabAppearance);
             opts->activeTabAppearance=MODIFY_AGUA(opts->activeTabAppearance);
             opts->menuitemAppearance=MODIFY_AGUA(opts->menuitemAppearance);
+
+            if(!opts->borderProgress && (!opts->fillProgress || !opts->squareProgress))
+                opts->borderProgress=true;
+
 #ifdef __cplusplus
             opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
             opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
@@ -2143,6 +2148,7 @@ static void defaultSettings(Options *opts)
     opts->etchEntry=false;
     opts->flatSbarButtons=true;
     opts->borderSbarGroove=true;
+    opts->borderProgress=true;
     opts->popupBorder=true;
     opts->unifySpinBtns=false;
     opts->unifySpin=true;
@@ -2819,6 +2825,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(crSize)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(borderSbarGroove)
+        CFG_WRITE_ENTRY(borderProgress)
         CFG_WRITE_ENTRY(popupBorder)
         CFG_WRITE_ENTRY(unifySpinBtns)
         CFG_WRITE_ENTRY(unifySpin)

@@ -46,3 +46,5 @@ squareEntry=true
 titlebarEffect=etch
 titlebarBlend=false
 crSize=15
+borderProgress=false
+progressGrooveAppearance=agua
