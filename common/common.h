@@ -977,7 +977,9 @@ typedef struct
                      menubarHiding,
                      boldProgress,
                      coloredTbarMo,
-                     borderSelection;
+                     borderSelection,
+                     squareProgress,
+                     squareEntry;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
@@ -1655,6 +1657,10 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
 {
     ERound r=opts->round;
 
+    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && opts->squareProgress) ||
+        (WIDGET_ENTRY==widget && opts->squareEntry) )
+        return ROUND_NONE;
+
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
 
@@ -1700,6 +1706,10 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
+
+    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && opts->squareProgress) ||
+        (WIDGET_ENTRY==widget && opts->squareEntry) )
+        return 0.0;
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||

@@ -5,14 +5,15 @@
  2. If drawing square non-gtk style scrollviews, use a dark/light borders.
  3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
     groove.
- 4. Improve appearance of button style check and radio buttons.
- 5. Add option to control whether scrollbar groove has a border or not.
- 6. Dont use pixmaps to draw rounded slider, or radio buttons.
- 7. Really fix Qt only compile.
- 8. Increase default shadow sizes.
- 9. If using gtk style combos and bordering menu items, increase frame width by
+ 4. Add options to draw square progress and entry fields when rounding.
+ 5. Improve appearance of button style check and radio buttons.
+ 6. Add option to control whether scrollbar groove has a border or not.
+ 7. Dont use pixmaps to draw rounded slider, or radio buttons.
+ 8. Really fix Qt only compile.
+ 9. Increase default shadow sizes.
+10. If using gtk style combos and bordering menu items, increase frame width by
     1 pixel.
-10. Remove border from preview colour square in KDE colour selection dialog.
+11. Remove border from preview colour square in KDE colour selection dialog.
 
 1.1.1
 -----

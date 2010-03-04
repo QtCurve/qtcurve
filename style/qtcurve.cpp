@@ -10026,7 +10026,7 @@ QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, doub
         return path;
     }
 
-    if(ROUND_NONE==opts.round)
+    if(ROUND_NONE==opts.round || (radius<0.01))
         round=ROUNDED_NONE;
 
     double       diameter(radius*2);
@@ -10390,7 +10390,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
     }
 
     if(doEtch && opts.etchEntry)
-        drawEtch(p, rx, widget, WIDGET_ENTRY, false);
+        drawEtch(p, rx, widget, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, false);
 
     drawBorder(p, r, option, round, 0L, w, BORDER_SUNKEN);
 }

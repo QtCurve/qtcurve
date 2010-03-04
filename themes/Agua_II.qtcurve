@@ -41,3 +41,5 @@ sbarBgndAppearance=gradient
 thinSbarGroove=false
 borderSbarGroove=false
 grooveAppearance=darkinverted
+squareProgress=true
+squareEntry=true
