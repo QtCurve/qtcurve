@@ -3421,7 +3421,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                 painter->save();
                                 painter->setRenderHint(QPainter::Antialiasing, true);
                                 drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
-                                drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                                drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-2, r.y()+r.height()-1);
                                 painter->restore();
                             }
                             else
