@@ -628,6 +628,22 @@ static void insertGlowEntries(QComboBox *combo)
     combo->insertItem(GLOW_END, i18n("Add glow at the end"));
 }
 
+static void insertCrSizeEntries(QComboBox *combo)
+{
+    combo->insertItem(0, i18n("Small (%1 pixels)", QTC_CR_SMALL_SIZE));
+    combo->insertItem(1, i18n("Large (%1 pixels)", QTC_CR_LARGE_SIZE));
+}
+
+static void setCrSize(QComboBox *combo, int size)
+{
+    combo->setCurrentIndex(QTC_CR_SMALL_SIZE==size ? 0 : 1);
+}
+
+static int getCrSize(QComboBox *combo)
+{
+    return 0==combo->currentIndex() ? QTC_CR_SMALL_SIZE : QTC_CR_LARGE_SIZE;
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                widgetStyle(NULL),
@@ -692,6 +708,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertImageEntries(bgndImage);
     insertImageEntries(menuBgndImage);
     insertGlowEntries(glowProgress);
+    insertCrSizeEntries(crSize);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -754,7 +771,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menubarHiding, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
-    connect(fillProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(glowProgress, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -770,6 +786,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(crHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(expanderHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(crButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(crSize, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(colorSelTab, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(roundAllTabs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderTab, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -821,8 +838,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(highlightScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(etchEntry, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(flatSbarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(borderSbarGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(borderSbarGroove, SIGNAL(toggled(bool)), SLOT(borderSbarGrooveChanged()));
+    connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(thinSbarGrooveChanged()));
     connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -861,6 +878,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(boldProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(coloredTbarMo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(borderProgress, SIGNAL(toggled(bool)), SLOT(borderProgressChanged()));
+    connect(squareProgress, SIGNAL(toggled(bool)), SLOT(squareProgressChanged()));
+    connect(fillProgress, SIGNAL(toggled(bool)), SLOT(fillProgressChanged()));
+    connect(squareEntry, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1161,7 +1182,40 @@ void QtCurveConfig::titlebarBlendChanged()
         colorTitlebarOnly->setChecked(true);
     updateChanged();
 }
-    
+
+void QtCurveConfig::thinSbarGrooveChanged()
+{
+    if(thinSbarGroove->isChecked())
+        borderSbarGroove->setChecked(false);
+}
+
+void QtCurveConfig::borderSbarGrooveChanged()
+{
+    if(borderSbarGroove->isChecked())
+        thinSbarGroove->setChecked(false);
+}
+
+void QtCurveConfig::borderProgressChanged()
+{
+    if(!borderProgress->isChecked())
+    {
+        squareProgress->setChecked(true);
+        fillProgress->setChecked(true);
+    }
+}
+
+void QtCurveConfig::squareProgressChanged()
+{
+    if(!fillProgress->isChecked() || !squareProgress->isChecked())
+        borderProgress->setChecked(true);
+}
+
+void QtCurveConfig::fillProgressChanged()
+{
+    if(!fillProgress->isChecked() || !squareProgress->isChecked())
+        borderProgress->setChecked(true);
+}
+
 void QtCurveConfig::setupStack()
 {
     int i=0;
@@ -2146,6 +2200,10 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.titlebarEffect=(EEffect)titlebarEffect->currentIndex();
     opts.titlebarIcon=(ETitleBarIcon)titlebarIcon->currentIndex();
     opts.dwtSettings=getDwtSettingsFlags();
+    opts.crSize=getCrSize(crSize);
+    opts.squareEntry=squareEntry->isChecked();
+    opts.squareProgress=squareProgress->isChecked();
+    opts.borderProgress=borderProgress->isChecked();
 
     if(customShading->isChecked())
     {
@@ -2354,6 +2412,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customGradient=opts.customGradient;
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
 
+    setCrSize(crSize, opts.crSize);
+    squareEntry->setChecked(opts.squareEntry);
+    squareProgress->setChecked(opts.squareProgress);
+    borderProgress->setChecked(opts.borderProgress);
+    
     if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
     {
         titlebarButtons_colorClose->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE));
@@ -2535,6 +2598,10 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          titlebarAlignment->currentIndex()!=opts.titlebarAlignment ||
          titlebarEffect->currentIndex()!=opts.titlebarEffect ||
          titlebarIcon->currentIndex()!=opts.titlebarIcon ||
+         getCrSize(crSize)!=opts.crSize ||
+         squareEntry->isChecked()!=opts.squareEntry ||
+         squareProgress->isChecked()!=opts.squareProgress ||
+         borderProgress->isChecked()!=opts.borderProgress ||
 
          shading->currentIndex()!=(int)opts.shading ||
          gtkScrollViews->isChecked()!=opts.gtkScrollViews ||

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>755</width>
-    <height>509</height>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -269,21 +269,21 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
           <string>Button effect:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QComboBox" name="buttonEffect">
          <property name="whatsThis">
           <string>Control what effect should be applied to buttons, combo boxes, etc.</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QCheckBox" name="thinnerBtns">
          <property name="whatsThis">
           <string>Make buttons, and other widgets, slightly thinner.</string>
@@ -293,7 +293,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="etchEntry">
          <property name="whatsThis">
           <string>When the 'Button effect' is set to etched or shadowed, then this option controls whether line-edits and scrollviews (such as listviews and treeviews) should have an etched look.</string>
@@ -303,21 +303,21 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QLabel" name="label_25">
          <property name="text">
           <string>Focus rectangle:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QComboBox" name="focus">
          <property name="whatsThis">
           <string>Controls how QtCurve indicates that a widget has keyboard focus.</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="0" colspan="2">
+       <item row="11" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string/>
@@ -384,6 +384,16 @@
          <property name="whatsThis">
           <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
             &lt;ul&gt;&lt;li&gt;No background image - No image&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QCheckBox" name="squareEntry">
+         <property name="whatsThis">
+          <string>Controls whether text entry fields should respect the general round setting, or always be square.</string>
+         </property>
+         <property name="text">
+          <string>Square entries.</string>
          </property>
         </widget>
        </item>
@@ -807,6 +817,9 @@
      </widget>
      <widget class="QWidget" name="page_4">
       <layout class="QFormLayout" name="formLayout_5">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_16">
          <property name="text">
@@ -857,7 +870,7 @@
           <string>Enable this option to remove the 1 pixel border around the filled element.</string>
          </property>
          <property name="text">
-          <string>No border</string>
+          <string>Fill groove</string>
          </property>
         </widget>
        </item>
@@ -882,7 +895,23 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="7" column="1">
+        <widget class="QCheckBox" name="borderProgress">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>Eanble this option to have a border around the progress bar groove and contents.</string>
+         </property>
+         <property name="text">
+          <string>Bordered</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
         <widget class="QLabel" name="label_85">
          <property name="text">
           <string>Text:</string>
@@ -898,7 +927,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="9" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_12">
          <property name="spacing">
           <number>0</number>
@@ -924,6 +953,16 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="8" column="1">
+        <widget class="QCheckBox" name="squareProgress">
+         <property name="whatsThis">
+          <string>Controls whether progress bars should respect the general round setting, or always be square.</string>
+         </property>
+         <property name="text">
+          <string>Always draw square - regardless of the general round setting.</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -1596,6 +1635,9 @@
      </widget>
      <widget class="QWidget" name="page_9">
       <layout class="QFormLayout" name="formLayout_10">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_22">
          <property name="text">
@@ -1626,7 +1668,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_53">
          <property name="text">
           <string>Checkmarks:</string>
@@ -1639,7 +1681,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QFrame" name="frame_3">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -1683,7 +1725,7 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="label_71">
          <property name="text">
           <string>Radio 'dot':</string>
@@ -1696,7 +1738,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QFrame" name="frame_7">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -1737,14 +1779,14 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_54">
          <property name="text">
           <string>Background mouse-over highlight:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="KIntNumInput" name="crHighlight">
          <property name="whatsThis">
           <string>Defines by how much the theme should brighen (or darken) the background of the text associated with a checkbox, or radio button, when the mouse hovers over it.</string>
@@ -1754,14 +1796,14 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_70">
          <property name="text">
           <string>Emblem:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="crButton">
          <property name="whatsThis">
           <string>Controls whether the background of the checkbox, or radio button, should appear sunken like or button like.</string>
@@ -1771,13 +1813,27 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QCheckBox" name="crColor">
          <property name="whatsThis">
           <string>Controls whether the background of a selected checkbox, or radio button, should be tinted with the 'highlight' color.</string>
          </property>
          <property name="text">
           <string>Color when selected</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_87">
+         <property name="text">
+          <string>Size:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="crSize">
+         <property name="whatsThis">
+          <string>Configures the size of checkboxes and radio buttons.</string>
          </property>
         </widget>
        </item>
@@ -3415,6 +3471,7 @@
   <tabstop>bgndImage</tabstop>
   <tabstop>sunkenAppearance</tabstop>
   <tabstop>round</tabstop>
+  <tabstop>squareEntry</tabstop>
   <tabstop>buttonEffect</tabstop>
   <tabstop>thinnerBtns</tabstop>
   <tabstop>etchEntry</tabstop>
@@ -3457,6 +3514,8 @@
   <tabstop>fillProgress</tabstop>
   <tabstop>progressGrooveAppearance</tabstop>
   <tabstop>progressGrooveColor</tabstop>
+  <tabstop>borderProgress</tabstop>
+  <tabstop>squareProgress</tabstop>
   <tabstop>boldProgress_false</tabstop>
   <tabstop>boldProgress</tabstop>
   <tabstop>defBtnIndicator</tabstop>
@@ -3494,6 +3553,7 @@
   <tabstop>centerTabText</tabstop>
   <tabstop>shadeCheckRadio</tabstop>
   <tabstop>customCheckRadioColor</tabstop>
+  <tabstop>crSize</tabstop>
   <tabstop>xCheck_false</tabstop>
   <tabstop>xCheck</tabstop>
   <tabstop>smallRadio_false</tabstop>
