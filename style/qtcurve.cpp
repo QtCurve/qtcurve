@@ -10210,8 +10210,6 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
         if(enabled)
             p->setPen(col);
         p->drawPath(botPath);
-        if(enabled)
-            p->setPen(border);
     }
     else
     {
