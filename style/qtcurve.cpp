@@ -4544,7 +4544,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     mod.rect.adjust(0, m, 0, -m);
                 }
                 drawControl(CE_ProgressBarGroove, &mod, painter, widget);
-                if(QTC_DO_EFFECT)
+                if(QTC_DO_EFFECT && opts.borderProgress)
                     mod.rect.adjust(1, 1, -1, -1);
                 drawControl(CE_ProgressBarContents, &mod, painter, widget);
                 drawControl(CE_ProgressBarLabel, &mod, painter, widget);
