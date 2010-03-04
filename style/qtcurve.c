@@ -1541,9 +1541,10 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 plastikMouseOver=doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver,
                 colouredMouseOver=doColouredMouseOver &&
                                   (MO_COLORED==opts.coloredMouseOver || MO_COLORED_THICK==opts.coloredMouseOver),
-                lightBorder=QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
-                draw3dfull=!lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app),
-                draw3d=draw3dfull || (!lightBorder && QTC_DRAW_3D_BORDER(sunken, app)),
+                flatWidget=WIDGET_PROGRESSBAR==widget && !opts.borderProgress,
+                lightBorder=!flatWidget && QTC_DRAW_LIGHT_BORDER(sunken, widget, app),
+                draw3dfull=!flatWidget && !lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app),
+                draw3d=!flatWidget && (draw3dfull || (!lightBorder && QTC_DRAW_3D_BORDER(sunken, app))),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && QTC_DO_EFFECT,
                 horiz=!(flags&DF_VERT);
