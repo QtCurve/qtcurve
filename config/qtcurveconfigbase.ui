@@ -887,6 +887,15 @@
          <property name="text">
           <string>Text:</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
+         </property>
+         <property name="indent">
+          <number>-1</number>
+         </property>
         </widget>
        </item>
        <item row="7" column="1">
@@ -1261,6 +1270,12 @@
          <property name="text">
           <string>Round tabs:</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="6" column="1">
@@ -1315,6 +1330,12 @@
          <property name="text">
           <string>Border:</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="7" column="1">
@@ -1365,6 +1386,12 @@
         <widget class="QLabel" name="label_62">
          <property name="text">
           <string>Inactive tab inner border:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -1417,6 +1444,12 @@
          <property name="text">
           <string>Shade of bottom tabs:</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="9" column="1">
@@ -1462,6 +1495,12 @@
          <property name="text">
           <string>Tabs within toolbars:</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="10" column="1">
@@ -1506,6 +1545,12 @@
         <widget class="QLabel" name="label_86">
          <property name="text">
           <string>Text:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -1586,6 +1631,12 @@
          <property name="text">
           <string>Checkmarks:</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="2" column="1">
@@ -1636,6 +1687,12 @@
         <widget class="QLabel" name="label_71">
          <property name="text">
           <string>Radio 'dot':</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -2598,6 +2655,12 @@
         <widget class="QLabel" name="label_84">
          <property name="text">
           <string>Colored mouse-over:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="margin">
+          <number>1</number>
          </property>
         </widget>
        </item>
