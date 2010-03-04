@@ -2539,7 +2539,10 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         if(opts.glowProgress && (horiz ? width : height)>3)
         {
-            cairo_pattern_t *pat=cairo_pattern_create_linear(x+1, y+1, horiz ? x+1+width-2 : x+1, horiz ? y+1 : y+1+height-2);
+            int             offset=opts.borderProgress ? 1 : 0;
+            cairo_pattern_t *pat=cairo_pattern_create_linear(x+offset, y+offset,
+                                                             horiz ? x+width-offset : x+offset,
+                                                             horiz ? y+offset : y+height-offset);
             gboolean        inverted=FALSE;
             
             if(GLOW_MIDDLE!=opts.glowProgress && widget && GTK_IS_PROGRESS_BAR(widget))
@@ -2565,7 +2568,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
             cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0,
                                               (inverted ? GLOW_START : GLOW_END)==opts.glowProgress ? QTC_GLOW_PROG_ALPHA : 0.0);
             cairo_set_source(cr, pat);
-            cairo_rectangle(cr, x+1, y+1, width-2, height-2);
+            cairo_rectangle(cr, x+offset, y+offset, width-(2*offset), height-(2*offset));
             cairo_fill(cr);
             cairo_pattern_destroy(pat);
         }
