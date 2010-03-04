@@ -10501,7 +10501,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
 
     if(opts.glowProgress && (vertical ? rx.height() : rx.width())>3)
     {
-        QRect           ri(rx.adjusted(1, 1, -1, -1));
+        QRect           ri(opts.borderProgress ? rx.adjusted(1, 1, -1, -1) : rx);
         QLinearGradient grad(0, 0, vertical ? 0 : 1, vertical ? 1 : 0);
         QColor          glow(Qt::white),
                         blank(Qt::white);
