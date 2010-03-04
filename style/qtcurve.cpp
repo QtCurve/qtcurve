@@ -9572,11 +9572,12 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
     QRect        r(rOrig);
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
-                 flatMdi(WIDGET_MDI_WINDOW_BUTTON==w &&
-                         (opts.round==ROUND_MAX || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)),
-                 lightBorder(!flatMdi && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
-                 draw3dfull(!flatMdi && !lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app)),
-                 draw3d(!flatMdi && (draw3dfull || (
+                 flatWidget( (WIDGET_MDI_WINDOW_BUTTON==w &&
+                              (opts.round==ROUND_MAX || opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
+                              (WIDGET_PROGRESSBAR==w && !opts.borderProgress)),
+                 lightBorder(!flatWidget && QTC_DRAW_LIGHT_BORDER(sunken, w, app)),
+                 draw3dfull(!flatWidget && !lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app)),
+                 draw3d(!flatWidget && (draw3dfull || (
                             !lightBorder && QTC_DRAW_3D_BORDER(sunken, app)))),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
