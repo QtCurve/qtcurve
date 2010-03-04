@@ -127,8 +127,8 @@ class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
     CStylePreview(QWidget *parent = 0)
         : KXmlGuiWindow(parent)
     {
-        aboutData = new KAboutData("qtcurve", 0, ki18n("QtCurve"), VERSION,
-                                   ki18n("Unified widet style."),
+        aboutData = new KAboutData("QtCurve", 0, ki18n("QtCurve"), VERSION,
+                                   ki18n("Unified widget style."),
                                    KAboutData::License_GPL,
                                    ki18n("(C) Craig Drummond, 2003-2010"),
                                    KLocalizedString());

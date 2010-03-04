@@ -9,3 +9,4 @@ kde4_add_ui_files(kstyle_qtcurve_config_PART_SRCS qtcurveconfigbase.ui styleprev
 kde4_add_plugin(kstyle_qtcurve_config ${kstyle_qtcurve_config_PART_SRCS})
 target_link_libraries(kstyle_qtcurve_config ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KDECORE_LIBS} ${QT_QTGUI_LIBRARY})
 install(TARGETS kstyle_qtcurve_config DESTINATION ${PLUGIN_INSTALL_DIR} )
+install(FILES QtCurveui.rc DESTINATION ${DATA_INSTALL_DIR}/QtCurve )
