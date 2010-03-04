@@ -6,12 +6,13 @@
  3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
     groove.
  4. Add options to draw square progress and entry fields when rounding.
- 5. Improve appearance of button style check and radio buttons.
- 6. Add option to control whether scrollbar groove has a border or not.
- 7. Dont use pixmaps to draw rounded slider, or radio buttons.
- 8. Add option to increase size of check/radios - default is now 15pixels.
- 9. Fix calculation of alpha values for square rings.
-10. Fix progressbar glow central position.
+ 5. Add option to control whether progressbars have a border or not.
+ 6. Improve appearance of button style check and radio buttons.
+ 7. Add option to control whether scrollbar groove has a border or not.
+ 8. Dont use pixmaps to draw rounded slider, or radio buttons.
+ 9. Add option to increase size of check/radios - default is now 15pixels.
+10. Fix calculation of alpha values for square rings.
+11. Fix progressbar glow central position.
 
 1.1.1
 -----

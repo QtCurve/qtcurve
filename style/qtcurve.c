@@ -2522,7 +2522,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         x++, y++, width-=2, height-=2;
 
-        if(opts.round>ROUND_SLIGHT && (horiz ? width : height)<4)
+        if(opts.borderProgress && opts.round>ROUND_SLIGHT && (horiz ? width : height)<4)
             clipPath(cr, x, y, width, height, wid, RADIUS_EXTERNAL, ROUNDED_ALL);
 
         if((horiz ? width : height)>1)
@@ -2535,7 +2535,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
             drawLightBevel(cr, style, new_state, NULL, region, x, y,
                         width, height, &itemCols[1],
                         qtcPalette.highlight, round, wid, BORDER_FLAT,
-                        (opts.fillProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+                        (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
         if(opts.glowProgress && (horiz ? width : height)>3)
         {
@@ -2570,10 +2570,10 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
             cairo_pattern_destroy(pat);
         }
 
-        if(width>2 && height>2)
+        if(width>2 && height>2 && opts.borderProgress)
             realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
                             itemCols, round, BORDER_FLAT, wid, 0, QT_PBAR_BORDER);
-        if(!opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4)
+        if(!opts.fillProgress && QTC_ROUNDED && ROUNDED_ALL!=round && width>4 && height>4 && opts.borderProgress)
         {
             /*if(!isMozilla())
             {
@@ -4157,7 +4157,7 @@ debugDisplayWidget(widget, 3);
                 && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
                 drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
-            if(doEtch)
+            if(doEtch && opts.borderProgress)
                 x++, y++, width-=2, height-=2;
 
             /*clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);*/
@@ -4165,15 +4165,16 @@ debugDisplayWidget(widget, 3);
                               horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
             /*unsetCairoClipping(cr);*/
 
-            if(doEtch)
+            if(doEtch && opts.borderProgress)
                  drawEtch(cr, area, NULL, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
 
-            drawBorder(cr, widget && widget->parent ? widget->parent->style : style,
-                       state, area, NULL, x, y, width, height,
-                       NULL, ROUNDED_ALL,
-                       IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
-                            ? BORDER_SUNKEN : BORDER_FLAT,
-                       WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
+            if(opts.borderProgress)
+                drawBorder(cr, widget && widget->parent ? widget->parent->style : style,
+                           state, area, NULL, x, y, width, height,
+                           NULL, ROUNDED_ALL,
+                           IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
+                                ? BORDER_SUNKEN : BORDER_FLAT,
+                           WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
         }
         else /* Scrollbars... */
         {
