@@ -7646,7 +7646,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         //painter->setPen(shadow);
                         painter->setPen(blendColors(WINDOW_SHADOW_COLOR(opts.titlebarEffect), titleCols[ORIGINAL_SHADE],
                                                     WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect)));
-                        painter->drawText(textRect.adjusted(1, 1, 1, 1), str, textOpt);
+                        painter->drawText(EFFECT_SHADOW==opts.titlebarEffect
+                                            ? textRect.adjusted(1, 1, 1, 1)
+                                            : textRect.adjusted(0, 1, 0, 1),
+                                          str, textOpt);
 
                         if (!active && QTC_DARK_WINDOW_TEXT(textColor))
                         {
@@ -10300,7 +10303,11 @@ void QtCurveStyle::drawMdiIcon(QPainter *painter, const QColor &color, const QCo
 
         if(!sunken && !faded && EFFECT_NONE!=opts.titlebarEffect)
     //         // && hover && !(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_HOVER_SYMBOL) && !customCol)
-            drawIcon(painter, blendColors(shadow, bgnd, shadow.alphaF()), r.adjusted(1, 1, 1, 1), sunken, icon, stdSize);
+            drawIcon(painter, blendColors(shadow, bgnd, shadow.alphaF()),
+                     EFFECT_SHADOW==opts.titlebarEffect
+                                            ? r.adjusted(1, 1, 1, 1)
+                                            : r.adjusted(0, 1, 0, 1),
+                     sunken, icon, stdSize);
 
         QColor col(color);
 
