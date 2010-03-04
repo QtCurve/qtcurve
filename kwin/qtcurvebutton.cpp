@@ -262,7 +262,7 @@ void QtCurveButton::drawButton(QPainter *painter)
 
             shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
             bP.setPen(shadow);
-            bP.drawPixmap(dX+1, dY+1, icon);
+            bP.drawPixmap(EFFECT_SHADOW==effect ? dX+1 : dX, dY+1, icon);
         }
 
         if( (CloseButton==type()

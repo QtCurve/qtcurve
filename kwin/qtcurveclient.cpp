@@ -557,7 +557,10 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
 //             shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
 //             painter->setPen(shadow);
             painter->setPen(blendColors(WINDOW_SHADOW_COLOR(effect), bgnd, WINDOW_TEXT_SHADOW_ALPHA(effect)));
-            painter->drawText(textRect.adjusted(1, 1, 1, 1), alignment, str);
+            painter->drawText(EFFECT_SHADOW==effect
+                                ? textRect.adjusted(1, 1, 1, 1)
+                                : textRect.adjusted(0, 1, 0, 1), 
+                              alignment, str);
 
             if (!isActive() && QTC_DARK_WINDOW_TEXT(color))
             {
