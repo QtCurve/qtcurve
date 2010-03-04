@@ -6292,9 +6292,6 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         GtkArrowType direction=horiz ? GTK_ARROW_DOWN : GTK_ARROW_RIGHT;
         gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
         int          borderVal=qtcPalette.mouseover==borderCols ? QT_SLIDER_MO_BORDER : QT_BORDER(GTK_STATE_INSENSITIVE==state);
-        double       xd=x+0.5,
-                     yd=y+0.5,
-                     radius=2.5;
 
         if(SLIDER_TRIANGULAR==opts.sliderStyle)
         {
@@ -6376,6 +6373,11 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         gdk_region_destroy(region);
 
+        { /* C-Scope */
+        double xd=x+0.5,
+               yd=y+0.5,
+               radius=2.5;
+                     
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
         switch(direction)
@@ -6411,6 +6413,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                     drawVLine(cr, QTC_CAIRO_COL(colors[light]), 1.0, xd+1, yd+2, 6);
                 }
         }
+        } /* C-Scope */
     }
 
     QTC_CAIRO_END
