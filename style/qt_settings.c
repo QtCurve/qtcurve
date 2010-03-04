@@ -2777,6 +2777,16 @@ static gboolean qtInit()
                IMG_SQUARE_RINGS==opts.menuBgndImage.type)
                 calcRingAlphas(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
 
+            if(opts.crSize!=QTC_CR_LARGE_SIZE)
+            {
+                static const char *constStrFormat="style \""QTC_RC_SETTING"CRSize\" "
+                                                  "{ GtkCheckButton::indicator_size = %d }"
+                                                  " class \"*\" style \""QTC_RC_SETTING"CRSize\" ";
+                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
+                sprintf(tmpStr, constStrFormat, opts.crSize);
+                gtk_rc_parse_string(tmpStr);
+            }
+
             if(tmpStr)
                 free(tmpStr);
         }

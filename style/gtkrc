@@ -25,7 +25,7 @@ style "qtcurve-default"
   GtkScale::slider_length = 21
   GtkScale::slider_width = 13
   GtkScrollbar::min_slider_length = 16
-  GtkCheckButton::indicator_size = 13
+  GtkCheckButton::indicator_size = 15
   GtkMenuBar::internal-padding = 0
   GtkToolbar::internal-padding = 2
   GtkNotebook::tab-overlap = 2
