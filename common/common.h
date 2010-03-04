@@ -116,9 +116,6 @@ typedef gchar ** Strings;
 #define QTC_THEME_PREFIX "qtc_"
 #define QTC_THEME_SUFFIX ".themerc"
 
-
-#define QTC_CHECK_SIZE   13
-#define QTC_RADIO_SIZE   13
 #define QTC_LV_SIZE      7
 
 #define LARGE_ARR_WIDTH  7
@@ -312,6 +309,9 @@ typedef gchar ** Strings;
 
 #define PROGRESS_ANIMATION 100
 #define MIN_SLIDER_SIZE(A) (LINE_DOTS==(A) ? 24 : 20)
+
+#define QTC_CR_SMALL_SIZE 13
+#define QTC_CR_LARGE_SIZE 15
 
 #define QTC_TAB_APP(A)   (APPEARANCE_BEVELLED==(A) || APPEARANCE_SPLIT_GRADIENT==(A) ? APPEARANCE_GRADIENT : (A))
 #define QTC_NORM_TAB_APP QTC_TAB_APP(opts.tabAppearance)
@@ -897,7 +897,8 @@ typedef struct
                      expanderHighlight,
 #endif
                      crHighlight,
-                     splitterHighlight;
+                     splitterHighlight,
+                     crSize;
     ERound           round;
     bool             embolden,
                      highlightTab,

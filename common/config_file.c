@@ -1264,6 +1264,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 
             /* Check if the config file expects old default values... */
+            if(version<QTC_MAKE_VERSION(1, 2))
+                def->crSize=QTC_CR_SMALL_SIZE;
             if(version<QTC_MAKE_VERSION(1, 0))
             {
                 def->roundAllTabs=false;
@@ -1460,6 +1462,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(etchEntry)
             QTC_CFG_READ_INT_BOOL(splitterHighlight, opts->highlightFactor)
+            QTC_CFG_READ_INT(crSize)
             QTC_CFG_READ_BOOL(flatSbarButtons)
             QTC_CFG_READ_BOOL(borderSbarGroove)
             QTC_CFG_READ_BOOL(popupBorder)
@@ -1893,6 +1896,13 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->animatedProgress && !opts->stripedProgress)
                 opts->animatedProgress=false;
 
+#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined QTC_CONFIG_DIALOG
+            opts->crSize=QTC_CR_SMALL_SIZE;
+#endif
+            /* For now, only 2 sizes... */
+            if(opts->crSize!=QTC_CR_SMALL_SIZE && opts->crSize!=QTC_CR_LARGE_SIZE)
+                opts->crSize=QTC_CR_SMALL_SIZE;
+
 /*
 ??
             if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
@@ -2041,6 +2051,7 @@ static void defaultSettings(Options *opts)
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
     opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
     opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
+    opts->crSize=QTC_CR_LARGE_SIZE;
     opts->menuDelay=DEFAULT_MENU_DELAY;
     opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
     opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
@@ -2805,6 +2816,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(etchEntry)
         CFG_WRITE_ENTRY_NUM(splitterHighlight)
         CFG_WRITE_ENTRY_NUM(expanderHighlight)
+        CFG_WRITE_ENTRY_NUM(crSize)
         CFG_WRITE_ENTRY(flatSbarButtons)
         CFG_WRITE_ENTRY(borderSbarGroove)
         CFG_WRITE_ENTRY(popupBorder)

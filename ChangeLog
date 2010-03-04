@@ -9,11 +9,12 @@
  5. Improve appearance of button style check and radio buttons.
  6. Add option to control whether scrollbar groove has a border or not.
  7. Dont use pixmaps to draw rounded slider, or radio buttons.
- 8. Really fix Qt only compile.
- 9. Increase default shadow sizes.
-10. If using gtk style combos and bordering menu items, increase frame width by
+ 8. Add option to increase size of check/radios - default is now 15pixels.
+ 9. Really fix Qt only compile.
+10. Increase default shadow sizes.
+11. If using gtk style combos and bordering menu items, increase frame width by
     1 pixel.
-11. Remove border from preview colour square in KDE colour selection dialog.
+12. Remove border from preview colour square in KDE colour selection dialog.
 
 1.1.1
 -----

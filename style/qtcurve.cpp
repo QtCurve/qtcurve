@@ -2642,11 +2642,11 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
             return QTC_DO_EFFECT
-                        ? QTC_CHECK_SIZE+2 : QTC_CHECK_SIZE;
+                        ? opts.crSize+2 : opts.crSize;
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
             return QTC_DO_EFFECT
-                        ? QTC_RADIO_SIZE+2 : QTC_RADIO_SIZE;
+                        ? opts.crSize+2 : opts.crSize;
         case PM_TabBarTabOverlap:
             return TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1;
         case PM_ProgressBarChunkWidth:
@@ -3780,10 +3780,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     painter->fillRect(0, 0, x + marg + w + 4, item.height, palette.brush(QPalette::Highlight));
             }
 
-            r.setX(r.x()+((r.width()-QTC_CHECK_SIZE)/2)-1);
-            r.setY(r.y()+((r.height()-QTC_CHECK_SIZE)/2)-1);
-            r.setWidth(QTC_CHECK_SIZE);
-            r.setHeight(QTC_CHECK_SIZE);
+            r.setX(r.x()+((r.width()-opts.crSize)/2)-1);
+            r.setY(r.y()+((r.height()-opts.crSize)/2)-1);
+            r.setWidth(opts.crSize);
+            r.setHeight(opts.crSize);
         case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
@@ -3798,7 +3798,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QStyleOption opt(*option);
                 bool         doEtch(QTC_DO_EFFECT);
 
-                rect=QRect(r.x(), r.y(), QTC_CHECK_SIZE+(doEtch ? 2 : 0), QTC_CHECK_SIZE+(doEtch ? 2 : 0));
+                rect=QRect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
                 if(menu)
                     opt.state&=~(State_MouseOver|State_Sunken);
@@ -3813,7 +3813,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool         sunken(!menu && (state&State_Sunken)),
                              mo(!sunken && state&State_MouseOver && state&State_Enabled),
                              doEtch(PE_IndicatorMenuCheckMark!=element && !menu
-                                    && r.width()>=QTC_CHECK_SIZE+2 && r.height()>=QTC_CHECK_SIZE+2
+                                    && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
                                     && QTC_DO_EFFECT),
                              glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
                 const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
@@ -3898,10 +3898,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     painter->fillRect(0, 0, x + marg + w + 4, item.height, palette.brush(QPalette::Highlight));
             }
 
-            r.setX(r.x()+((r.width()-QTC_RADIO_SIZE)/2)-1);
-            r.setY(r.y()+((r.height()-QTC_RADIO_SIZE)/2)-1);
-            r.setWidth(QTC_RADIO_SIZE);
-            r.setHeight(QTC_RADIO_SIZE);
+            r.setX(r.x()+((r.width()-opts.crSize)/2)-1);
+            r.setY(r.y()+((r.height()-opts.crSize)/2)-1);
+            r.setWidth(opts.crSize);
+            r.setHeight(opts.crSize);
         case PE_IndicatorRadioButton:
         {
             bool menu(state&QTC_STATE_MENU);
@@ -3914,7 +3914,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 const QColor *use(checkRadioColors(option));
                 QStyleOption opt(*option);
                 bool         doEtch(QTC_DO_EFFECT);
-                QRect        rect(r.x(), r.y(), QTC_RADIO_SIZE+(doEtch ? 2 : 0), QTC_RADIO_SIZE+(doEtch ? 2 : 0));
+                QRect        rect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
                 if(menu)
                     opt.state&=~(State_MouseOver|State_Sunken);
@@ -3930,7 +3930,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 bool         sunken(!menu && (state&State_Sunken)),
                              doEtch(!menu
-                                    && r.width()>=QTC_RADIO_SIZE+2 && r.height()>=QTC_RADIO_SIZE+2
+                                    && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
                                     && QTC_DO_EFFECT),
                              mo(!sunken && state&State_MouseOver && state&State_Enabled),
                              glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
@@ -3959,8 +3959,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 {
                     painter->setBrush(Qt::NoBrush);
                     painter->setPen(use[QTC_CR_MO_FILL]);
-                    painter->drawArc(QRectF(x+1, y+1, QTC_RADIO_SIZE-2, QTC_RADIO_SIZE-2), 0, 360*16);
-                    painter->drawArc(QRectF(x+2, y+2, QTC_RADIO_SIZE-4, QTC_RADIO_SIZE-4), 0, 360*16);
+                    painter->drawArc(QRectF(x+1, y+1, opts.crSize-2, opts.crSize-2), 0, 360*16);
+                    painter->drawArc(QRectF(x+2, y+2, opts.crSize-4, opts.crSize-4), 0, 360*16);
                 }
 
                 painter->setBrush(Qt::NoBrush);
@@ -3972,18 +3972,18 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
 
                     painter->setPen(topCol);
-                    painter->drawArc(QRectF(x-0.5, y-0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 45*16, 180*16);
+                    painter->drawArc(QRectF(x-0.5, y-0.5, opts.crSize+1, opts.crSize+1), 45*16, 180*16);
                     if(!glow)
                         painter->setPen(getLowerEtchCol(widget));
-                    painter->drawArc(QRectF(x-0.5, y-0.5, QTC_RADIO_SIZE+1, QTC_RADIO_SIZE+1), 225*16, 180*16);
+                    painter->drawArc(QRectF(x-0.5, y-0.5, opts.crSize+1, opts.crSize+1), 225*16, 180*16);
                 }
 
                 painter->setPen(use[QT_BORDER(state&State_Enabled)]);
-                painter->drawArc(QRectF(x+0.25, y+0.25, QTC_RADIO_SIZE-0.5, QTC_RADIO_SIZE-0.5), 0, 360*16);
+                painter->drawArc(QRectF(x+0.25, y+0.25, opts.crSize-0.5, opts.crSize-0.5), 0, 360*16);
                 if(!coloredMo)
                 {
                     painter->setPen(btn[state&State_MouseOver ? 3 : 4]);
-                    painter->drawArc(QRectF(x+0.75, y+0.75, QTC_RADIO_SIZE-1.5, QTC_RADIO_SIZE-1.5),
+                    painter->drawArc(QRectF(x+0.75, y+0.75, opts.crSize-1.5, opts.crSize-1.5),
                                      lightBorder ? 0 : 45*16,
                                      lightBorder ? 360*16 : 180*16);
                 }
@@ -3992,7 +3992,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 QPainterPath path;
                 double       radius=opts.smallRadio ? 2.75 : 3.75,
-                             offset=(QTC_RADIO_SIZE/2.0)-radius;
+                             offset=(opts.crSize/2.0)-radius;
 
                 path.addEllipse(QRectF(x+offset, y+offset, radius*2.0, radius*2.0));
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -5436,7 +5436,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
                 {
                     // Check
-                    QRect checkRect(r.left() + 3, r.center().y() - 6, QTC_CHECK_SIZE, QTC_CHECK_SIZE);
+                    QRect checkRect(r.left() + 3, r.center().y() - 6, opts.crSize, opts.crSize);
                     checkRect = visualRect(menuItem->direction, menuItem->rect, checkRect);
                     if (checkable)
                     {
@@ -6718,7 +6718,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
         case CE_RadioButton:
         case CE_CheckBox:
-            if (opts.crHighlight && (r.width()>QTC_CHECK_SIZE*2))
+            if (opts.crHighlight && (r.width()>opts.crSize*2))
                 if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton *>(option))
                 {
                     QStyleOptionButton copy(*button);
