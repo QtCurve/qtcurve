@@ -907,7 +907,7 @@
           <string>Eanble this option to have a border around the progress bar groove and contents.</string>
          </property>
          <property name="text">
-          <string>Bordered</string>
+          <string>Border all sides</string>
          </property>
         </widget>
        </item>

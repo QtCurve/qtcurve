@@ -5079,7 +5079,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             break;
         case CE_ProgressBarGroove:
         {
-            bool   doEtch(QTC_DO_EFFECT && opts.borderProgress),
+            bool   doEtch(QTC_DO_EFFECT && !opts.borderProgress),
                    horiz(true);
             QColor col;
 
@@ -5113,6 +5113,20 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
             if(doEtch)
                 drawEtch(painter, r.adjusted(-1, -1, 1, 1), widget, WIDGET_PBAR_TROUGH);
+            else if(!opts.borderProgress)
+            {
+                painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
+                if(horiz)
+                {
+                    painter->drawLine(r.topLeft(), r.topRight());
+                    painter->drawLine(r.bottomLeft(), r.bottomRight());
+                }
+                else
+                {
+                    painter->drawLine(r.topLeft(), r.bottomLeft());
+                    painter->drawLine(r.topRight(), r.bottomRight());
+                }
+            }
 
             if(opts.borderProgress)
                 drawBorder(painter, r, option, ROUNDED_ALL, backgroundColors(option), WIDGET_PBAR_TROUGH,
@@ -10534,6 +10548,20 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
                 p->drawPoint(rx.x()+rx.width()-1, rx.y());
             if(!(round&CORNER_BR) || !drawFull)
                 p->drawPoint(rx.x()+rx.width()-1, rx.y()+rx.height()-1);
+        }
+    }
+    else
+    {
+        p->setPen(use[QT_PBAR_BORDER]);
+        if(!vertical)
+        {
+            p->drawLine(rx.topLeft(), rx.topRight());
+            p->drawLine(rx.bottomLeft(), rx.bottomRight());
+        }
+        else
+        {
+            p->drawLine(rx.topLeft(), rx.bottomLeft());
+            p->drawLine(rx.topRight(), rx.bottomRight());
         }
     }
 }
