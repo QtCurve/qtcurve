@@ -5079,7 +5079,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             break;
         case CE_ProgressBarGroove:
         {
-            bool   doEtch(QTC_DO_EFFECT && !opts.borderProgress),
+            bool   doEtch(QTC_DO_EFFECT && opts.borderProgress),
                    horiz(true);
             QColor col;
 
