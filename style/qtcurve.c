@@ -2601,6 +2601,18 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 cairo_rectangle(cr, x, y+height-1, 1, 1);
             cairo_fill(cr);
         }
+        
+        if(!opts.borderProgress)
+            if(horiz)
+            {
+                drawHLine(cr, QTC_CAIRO_COL(itemCols[QT_PBAR_BORDER]), 1.0, x, y, width);
+                drawHLine(cr, QTC_CAIRO_COL(itemCols[QT_PBAR_BORDER]), 1.0, x, y+height-1, width);
+            }
+            else
+            {
+                drawVLine(cr, QTC_CAIRO_COL(itemCols[QT_PBAR_BORDER]), 1.0, x, y, height);
+                drawVLine(cr, QTC_CAIRO_COL(itemCols[QT_PBAR_BORDER]), 1.0, x+width-1, y, height);
+            }
     }
 
     if(region)
@@ -4179,6 +4191,17 @@ debugDisplayWidget(widget, 3);
                            IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
                                 ? BORDER_SUNKEN : BORDER_FLAT,
                            WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
+            else if(!opts.borderProgress)
+                if(horiz)
+                {
+                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x, y, width);
+                    drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x, y+height-1, width);
+                }
+                else
+                {
+                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x, y, height);
+                    drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), 1.0, x+width-1, y, height);
+                }
         }
         else /* Scrollbars... */
         {

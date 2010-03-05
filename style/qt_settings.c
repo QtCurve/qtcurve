@@ -2601,7 +2601,7 @@ static gboolean qtInit()
                                                     "{ xthickness = %d ythickness = %d } "
                                                       "widget_class \"*GtkProgressBar\" style \""QTC_RC_SETTING"Pbar\"";
                 int pthickness=opts.fillProgress
-                                ? doEffect
+                                ? doEffect && opts.borderProgress
                                     ? 1
                                     : 0
                                 : doEffect

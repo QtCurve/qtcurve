@@ -6,7 +6,8 @@
  3. If drawing square scrollviews, set frame width to 1 if using thin scrollbar
     groove.
  4. Add options to draw square progress and entry fields when rounding.
- 5. Add option to control whether progressbars have a border or not.
+ 5. Add option to control whether progressbars have a border on all sides, or just
+    top/bottom.
  6. Improve appearance of button style check and radio buttons.
  7. Add option to control whether scrollbar groove has a border or not.
  8. Dont use pixmaps to draw rounded slider, or radio buttons.
