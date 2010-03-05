@@ -14,6 +14,7 @@
  9. Add option to increase size of check/radios - default is now 15pixels.
 10. Fix calculation of alpha values for square rings.
 11. Fix progressbar glow central position.
+12. Draw more frames.
 
 1.1.1
 -----

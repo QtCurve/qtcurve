@@ -4775,7 +4775,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
        debugDisplayWidget(widget, 3);
     #endif
 
-        if(!statusBar && (frame || scrolledWindow || viewport || drawSquare)) // && QTC_ROUNDED)
+        if(!statusBar && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && QTC_ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
@@ -4812,13 +4812,13 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                         x++, y++, width-=2, height-=2;
                     }
                 }
-                if(viewport || drawSquare)
+                if(viewport/* || drawSquare*/)
                 {
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-                    if(drawSquare)
-                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
-                    else
+//                     if(drawSquare)
+//                         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]));
+//                     else
                         cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]));
                     cairo_stroke(cr);
                 }
@@ -4862,14 +4862,16 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                     break;
                 case GTK_SHADOW_IN:
                 case GTK_SHADOW_OUT:
-                    if(frame || !QTC_ROUNDED)
+                    //if(drawSquare || frame || !QTC_ROUNDED)
                     {
-                        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[c2]), 1.0, x, y, width-1);
-                        drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[c2]), 1.0, x, y, height-1);
+                        double c2Alpha=GTK_SHADOW_IN==shadow_type ? 1.0 : QT_LOWER_BORDER_ALPHA,
+                               c1Alpha=GTK_SHADOW_OUT==shadow_type ? 1.0 : QT_LOWER_BORDER_ALPHA;
+                        drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), c2Alpha, x, y, width);
+                        drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), c2Alpha, x, y, height);
                         if(APPEARANCE_FLAT!=opts.appearance)
                         {
-                            drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[c1]), 1.0, x, y+height-1, width-1);
-                            drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[c1]), 1.0, x+width-1, y, height-1);
+                            drawHLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), c1Alpha, x, y+height-1, width);
+                            drawVLine(cr, QTC_CAIRO_COL(qtcPalette.background[QT_STD_BORDER]), c1Alpha, x+width-1, y, height);
                         }
                     }
                     break;
