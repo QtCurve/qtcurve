@@ -5009,8 +5009,8 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
              doEtch=QTC_DO_EFFECT;
     GdkColor new_colors[TOTAL_SHADES+1],
              *btn_colors;
-    int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL,
-             checkSpace=doEtch && /*!list && */!mnu ? opts.crSize+2 : opts.crSize;
+    int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL;
+             //checkSpace=doEtch && /*!list && */!mnu ? opts.crSize+2 : opts.crSize;
 
     QTC_CAIRO_BEGIN
 
@@ -5045,6 +5045,9 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
 printf("Draw check %d %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height, mnu, detail ? detail : "NULL");
 debugDisplayWidget(widget, 3);
 #endif
+
+    if(QTC_CR_SMALL_SIZE!=opts.crSize)
+        y--;
 
     if(mnu && GTK_APP_OPEN_OFFICE==qtSettings.app)
         x+=2, y-=2;
@@ -5188,6 +5191,9 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         GdkColor  new_colors[TOTAL_SHADES+1],
                   *btn_colors;
 
+        if(QTC_CR_SMALL_SIZE!=opts.crSize)
+            y--;
+    
         if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
             btn_colors=qtcPalette.selectedcr;
         else if(QT_CUSTOM_COLOR_BUTTON(style))
@@ -5238,11 +5244,6 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                 gboolean  coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
                           doneShadow=false;
                 int       bgnd=0;
-
-                GdkPoint  clip[8]= {{x,    y+8},     {x,    y+4},     {x+4, y},      {x+8, y},
-                                    { x+12, y+4},     {x+12, y+8},     {x+8, y+12},   {x+4, y+12} };
-
-                GdkRegion *region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
                 GdkColor  *colors=coloredMouseOver
                             ? qtcPalette.mouseover
                             : btn_colors,
@@ -5255,10 +5256,10 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
                 bgnd=getFill(state, set/*, TRUE*/);
 
-                drawBevelGradient(cr, style, NULL, region, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
+                clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
+                drawBevelGradient(cr, style, NULL, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
                                   TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
-
-                gdk_region_destroy(region);
+                cairo_restore(cr);
 
                 if(!mnu && coloredMouseOver && !glow)
                 {
