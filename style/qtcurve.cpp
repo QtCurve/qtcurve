@@ -350,6 +350,7 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 #define WINDOWTITLE_SPACER    0x10000000
 #define QTC_STATE_REVERSE     (QStyle::StateFlag)0x10000000
 #define QTC_STATE_MENU        (QStyle::StateFlag)0x20000000
+#define QTC_STATE_VIEW        (QStyle::StateFlag)0x40000000
 #define QTC_STATE_KWIN_BUTTON (QStyle::StateFlag)0x40000000
 #define QTC_STATE_TBAR_BUTTON (QStyle::StateFlag)0x80000000
 #define QTC_STATE_DWT_BUTTON  (QStyle::StateFlag)0x20000000
@@ -3220,7 +3221,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             QStyleOption opt(*option);
 
             opt.state &= ~State_MouseOver;
-            opt.state |= QTC_STATE_MENU;
+            opt.state |= QTC_STATE_VIEW;
             drawPrimitive(PE_IndicatorCheckBox, &opt, painter, widget);
             break;
         }
@@ -3787,8 +3788,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorMenuCheckMark:
         case PE_IndicatorCheckBox:
         {
-            bool  menu(state&QTC_STATE_MENU);
-            QRect rect(r);
+            bool  menu(state&QTC_STATE_MENU),
+                  view(state&QTC_STATE_VIEW),
+                  doEtch(QTC_DO_EFFECT && 
+                          (opts.crButton ||(PE_IndicatorMenuCheckMark!=element && !menu &&
+                                            r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2)));
+            QRect rect(r.x(), r.y()+(view ? -1 : 0), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
             painter->save();
 
@@ -3796,9 +3801,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 const QColor *use(checkRadioColors(option));
                 QStyleOption opt(*option);
-                bool         doEtch(QTC_DO_EFFECT);
-
-                rect=QRect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
                 if(QTC_CR_SMALL_SIZE!=opts.crSize)
                     if(menu)
@@ -3818,9 +3820,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 bool         sunken(!menu && (state&State_Sunken)),
                              mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                             doEtch(PE_IndicatorMenuCheckMark!=element && !menu
-                                    && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
-                                    && QTC_DO_EFFECT),
                              glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
                 const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
                              *btn(checkRadioColors(option)),
@@ -3832,7 +3831,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         : palette.background().color());
                 bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
 
-                rect=QRect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+                rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
 
                 if(QTC_CR_SMALL_SIZE!=opts.crSize)
                     if(menu)
@@ -3866,7 +3865,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     }
                 }
 
-                if(doEtch)
+                if(doEtch && !view)
                     if(glow)
                         drawGlow(painter, r, WIDGET_CHECKBOX);
                     else
