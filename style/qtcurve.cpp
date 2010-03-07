@@ -2622,7 +2622,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 
             if (opts.squareScrollViews && widget &&
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget)))
-                return opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove ? 1 : 2;
+                return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
             if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
                 qobject_cast<const QMenu *>(widget))
@@ -3400,37 +3400,37 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     if(sv && (opts.etchEntry || squareSv))
                     {
-                        if(squareSv)
-                        {
-                            const QColor *use=backgroundColors(option);
-
-                            if(APP_ARORA==theThemedApp)
-                                painter->fillRect(r, palette.brush(QPalette::Base));
-                            painter->setPen(use[QT_STD_BORDER]);
-
-                            painter->drawLine(r.bottomLeft(), r.topLeft());
-                            painter->drawLine(r.topLeft(), r.topRight());
-
-                            if(!opts.gtkScrollViews)
-                            {
-                                QColor col(use[QT_STD_BORDER]);
-                                col.setAlphaF(QT_LOWER_BORDER_ALPHA);
-                                painter->setPen(col);
-
-                                // Again. more intel 2.9 xorg driver issues :-(
-                                painter->save();
-                                painter->setRenderHint(QPainter::Antialiasing, true);
-                                drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
-                                drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-2, r.y()+r.height()-1);
-                                painter->restore();
-                            }
-                            else
-                            {
-                                painter->drawLine(r.topRight(), r.bottomRight());
-                                painter->drawLine(r.bottomRight(), r.bottomLeft());
-                            }
-                        }
-                        else
+//                         if(squareSv)
+//                         {
+//                             const QColor *use=backgroundColors(option);
+// 
+//                             if(APP_ARORA==theThemedApp)
+//                                 painter->fillRect(r, palette.brush(QPalette::Base));
+//                             painter->setPen(use[QT_STD_BORDER]);
+// 
+//                             painter->drawLine(r.bottomLeft(), r.topLeft());
+//                             painter->drawLine(r.topLeft(), r.topRight());
+// 
+//                             if(!opts.gtkScrollViews)
+//                             {
+//                                 QColor col(use[QT_STD_BORDER]);
+//                                 col.setAlphaF(QT_LOWER_BORDER_ALPHA);
+//                                 painter->setPen(col);
+// 
+//                                 // Again. more intel 2.9 xorg driver issues :-(
+//                                 painter->save();
+//                                 painter->setRenderHint(QPainter::Antialiasing, true);
+//                                 drawAaLine(painter, r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-1);
+//                                 drawAaLine(painter, r.x()+1, r.y()+r.height()-1, r.x()+r.width()-2, r.y()+r.height()-1);
+//                                 painter->restore();
+//                             }
+//                             else
+//                             {
+//                                 painter->drawLine(r.topRight(), r.bottomRight());
+//                                 painter->drawLine(r.bottomRight(), r.bottomLeft());
+//                             }
+//                         }
+//                         else
                         {
                             // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
                             // but is when painted. So check here if it should not be etched.
@@ -3454,11 +3454,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             {
                                 QStyleOptionFrame opt(*fo);
                                 opt.state&=~State_HasFocus;
-                                drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false,
+                                drawEntryField(painter, r, widget, &opt, squareSv ? ROUNDED_NONE : ROUNDED_ALL, false,
                                             doEtch && !noEtchW, WIDGET_SCROLLVIEW);
                             }
                             else
-                                drawEntryField(painter, r, widget, option, ROUNDED_ALL, false,
+                                drawEntryField(painter, r, widget, option, squareSv ? ROUNDED_NONE : ROUNDED_ALL, false,
                                             doEtch && !noEtchW, WIDGET_SCROLLVIEW);
                         }
                     }

@@ -8,16 +8,17 @@
  4. Add options to draw square progress and entry fields when rounding.
  5. Add option to control whether progressbars have a border on all sides, or just
     top/bottom.
- 6. Improve appearance of button style check and radio buttons.
- 7. Add option to control whether scrollbar groove has a border or not.
- 8. Dont use pixmaps to draw rounded slider, or radio buttons.
- 9. Add option to increase size of check/radios - default is now 15pixels.
-10. Really fix Qt only compile.
-11. Increase default shadow sizes.
-12. If using gtk style combos and bordering menu items, increase frame width by
+ 6. Allow to draw focus highlight for square scrollviews.
+ 7. Improve appearance of button style check and radio buttons.
+ 8. Add option to control whether scrollbar groove has a border or not.
+ 9. Dont use pixmaps to draw rounded slider, or radio buttons.
+10. Add option to increase size of check/radios - default is now 15pixels.
+11. Really fix Qt only compile.
+12. Increase default shadow sizes.
+13. If using gtk style combos and bordering menu items, increase frame width by
     1 pixel.
-13. Remove border from preview colour square in KDE colour selection dialog.
-14. Only offset vertical position of etch text.
+14. Remove border from preview colour square in KDE colour selection dialog.
+15. Only offset vertical position of etch text.
 
 1.1.1
 -----
