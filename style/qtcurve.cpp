@@ -3800,6 +3800,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 rect=QRect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
+                if(QTC_CR_SMALL_SIZE!=opts.crSize)
+                    if(menu)
+                        rect.adjust(0, -1, 0, -1);
+                    else
+                        rect.adjust(0, 1, 0, 1);
+
                 if(menu)
                     opt.state&=~(State_MouseOver|State_Sunken);
                 opt.state&=~State_On;
@@ -3827,6 +3833,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
 
                 rect=QRect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+
+                if(QTC_CR_SMALL_SIZE!=opts.crSize)
+                    if(menu)
+                        rect.adjust(0, -1, 0, -1);
+                    else
+                        rect.adjust(0, 1, 0, 1);
 
                 if(IS_FLAT(opts.appearance))
                     painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
@@ -3916,6 +3928,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool         doEtch(QTC_DO_EFFECT);
                 QRect        rect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
+                if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
+                    rect.adjust(0, -1, 0, -1), y++;
+                    
                 if(menu)
                     opt.state&=~(State_MouseOver|State_Sunken);
                 opt.state&=~State_On;
