@@ -4154,6 +4154,7 @@ debugDisplayWidget(widget, 3);
         {
             gboolean doEtch=!list && QTC_DO_EFFECT;
             GdkColor *col=&style->base[state];
+            int      offset=opts.borderProgress ? 1 : 0;
 
             switch(opts.progressGrooveColor)
             {
@@ -4177,7 +4178,7 @@ debugDisplayWidget(widget, 3);
                 x++, y++, width-=2, height-=2;
 
             /*clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);*/
-            drawBevelGradient(cr, style, area, NULL, x+1, y+1, width-2, height-2, col,
+            drawBevelGradient(cr, style, area, NULL, x+offset, y+offset, width-(2*offset), height-(2*offset), col,
                               horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
             /*unsetCairoClipping(cr);*/
 
