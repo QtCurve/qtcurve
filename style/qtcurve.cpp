@@ -5456,7 +5456,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
                     }
 
-                    if(APP_OPENOFFICE==theThemedApp)
+                    if(APP_OPENOFFICE==theThemedApp && !widget)
                     {
                         painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                         painter->drawLine(rx.topLeft(), rx.bottomLeft());
@@ -5626,7 +5626,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 : palette.text().color());
                 }
                 
-                if(APP_OPENOFFICE==theThemedApp)
+                if(APP_OPENOFFICE==theThemedApp && !widget)
                 {
                     painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                     painter->drawLine(rx.topLeft(), rx.bottomLeft());

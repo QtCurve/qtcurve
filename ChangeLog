@@ -27,6 +27,7 @@
      - reduce padding within frames
      - dont etch entries or scrollviews
      - fix spin buttons appearing disabled
+     - only apply menu fix to oo.o menus, not file selector menus
 
 1.1.1
 -----
