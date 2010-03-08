@@ -50,3 +50,7 @@ crSize=15
 borderProgress=false
 progressGrooveAppearance=agua
 progressGrooveColor=background
+unifyCombo=false
+unifySpin=false
+unifySpinBtns=true
+
