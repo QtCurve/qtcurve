@@ -3937,6 +3937,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 opt.rect=rect;
                 if(doEtch)
                     x++, y++;
+                if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
+                    y-=2;
+
                 drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
                                use, true, WIDGET_RADIO_BUTTON);
             }
