@@ -1296,7 +1296,7 @@ void QtCurveStyle::polish(QApplication *app)
     {
         if(APPEARANCE_FADE==opts.menuitemAppearance)
             opts.menuitemAppearance=APPEARANCE_FLAT;
-        opts.borderMenuitems=false;
+        opts.borderMenuitems=opts.etchEntry=opts.sunkenScrollViews=false;
     }
 
 #ifndef QTC_QT_ONLY
@@ -2555,7 +2555,11 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_HeaderMargin:
             return 3;
         case PM_DefaultChildMargin:
-            return 6;
+            return APP_OPENOFFICE==theThemedApp
+                    ? /*opts.round>=ROUND_FULL && !opts.squareScrollViews
+                        ?*/ 2
+                        /*: 1*/
+                    : 6;
         case PM_DefaultTopLevelMargin:
             return 9;
         case PM_LayoutHorizontalSpacing:
@@ -3357,6 +3361,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_Frame:
         {
+            // Dont draw OO.o status bar frames...
+            if(APP_OPENOFFICE==theThemedApp && r.height()<22)
+                break;
+
 #ifdef QTC_QT_ONLY
             if(widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
                 break;
@@ -3393,13 +3401,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
                 else
                 {
-                    bool sv(::qobject_cast<const QAbstractScrollArea *>(widget) ||
+                    bool sv((!widget && APP_OPENOFFICE==theThemedApp) ||
+                            ::qobject_cast<const QAbstractScrollArea *>(widget) ||
                             (widget && widget->inherits("Q3ScrollView")) ||
                             (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
                         squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow()))),
                         inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
 
-                    if(sv && (opts.etchEntry || squareSv))
+                    if(sv && (opts.etchEntry || squareSv || APP_OPENOFFICE==theThemedApp))
                     {
 //                         if(squareSv)
 //                         {
@@ -3715,7 +3724,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
-                if (lineEdit->lineWidth>0 &&
+                if ((lineEdit->lineWidth>0 || APP_OPENOFFICE==theThemedApp) &&
                     !(widget &&
                      (qobject_cast<const QComboBox *>(widget->parentWidget()) ||
                       qobject_cast<const QAbstractSpinBox *>(widget->parentWidget()))))
@@ -3761,7 +3770,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         }
                     }
                     painter->save();
-                    drawEntryField(painter, r, widget, &opt, ROUNDED_ALL, false, QTC_DO_EFFECT);
+                    drawEntryField(painter, APP_OPENOFFICE!=theThemedApp ? r : r.adjusted(1, 2, -1, -2), widget, &opt, ROUNDED_ALL,
+                                   APP_OPENOFFICE==theThemedApp, APP_OPENOFFICE!=theThemedApp && QTC_DO_EFFECT);
                     painter->restore();
                 }
             }
@@ -4291,7 +4301,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                             : getMdiColors(option, state&State_Active));
 
             painter->save();
-            
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
@@ -6974,19 +6983,22 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 State mflags(bflags);
 
-#if QT_VERSION >= 0x040500
-                if (state&State_Sunken && !(toolbutton->activeSubControls&SC_ToolButton))
-                    bflags&=~State_Sunken;
-#else
-                // Try to detect if this is Qt 4.5...
-                if(qtVersion()>=VER_45)
+                if(APP_OPENOFFICE!=theThemedApp)
                 {
+#if QT_VERSION >= 0x040500
                     if (state&State_Sunken && !(toolbutton->activeSubControls&SC_ToolButton))
                         bflags&=~State_Sunken;
-                }
-                else if (toolbutton->activeSubControls&SC_ToolButtonMenu && state&State_Enabled)
-                    mflags |= State_Sunken;
+#else
+                    // Try to detect if this is Qt 4.5...
+                    if(qtVersion()>=VER_45)
+                    {
+                        if (state&State_Sunken && !(toolbutton->activeSubControls&SC_ToolButton))
+                            bflags&=~State_Sunken;
+                    }
+                    else if (toolbutton->activeSubControls&SC_ToolButtonMenu && state&State_Enabled)
+                        mflags |= State_Sunken;
 #endif
+                }
 
                 bool         drawMenu=mflags & (State_Sunken | State_On | State_Raised);
                 QStyleOption tool(0);
@@ -7332,7 +7344,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     up.setHeight(up.height()+1);
                     opt.rect=up;
                     opt.direction=option->direction;
-                    opt.state=(enabled && spinBox->stepEnabled&QAbstractSpinBox::StepUpEnabled ? State_Enabled : State_None)|
+                    opt.state=(enabled && (spinBox->stepEnabled&QAbstractSpinBox::StepUpEnabled ||
+                                           QAbstractSpinBox::StepNone==spinBox->stepEnabled && APP_OPENOFFICE==theThemedApp)
+                                    ? State_Enabled : State_None)|
                               (upIsActive && sunken ? State_Sunken : State_Raised)|
                               (upIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;;
 
@@ -7345,7 +7359,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QStyleOption opt(*option);
 
                     opt.rect=down;
-                    opt.state=(enabled && spinBox->stepEnabled&QAbstractSpinBox::StepDownEnabled ? State_Enabled : State_None)|
+                    opt.state=(enabled && (spinBox->stepEnabled&QAbstractSpinBox::StepUpEnabled ||
+                                           QAbstractSpinBox::StepNone==spinBox->stepEnabled && APP_OPENOFFICE==theThemedApp)
+                                    ? State_Enabled : State_None)|
                               (downIsActive && sunken ? State_Sunken : State_Raised)|
                               (downIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;
                     opt.direction=option->direction;
@@ -8024,6 +8040,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                            state&State_Enabled && state&State_HasFocus),
                              doEffect(QTC_DO_EFFECT && (!comboBox->editable || opts.etchEntry));
 
+                if(APP_OPENOFFICE==theThemedApp)
+                    frame.adjust(0, 0, 0, -2), arrow.adjust(0, 0, 0, -2), field.adjust(0, 0, 0, -2);
+
 //                 painter->fillRect(r, Qt::transparent);
                 if(doEffect)
                 {
@@ -8076,6 +8095,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             field=r;
                             if(doEffect)
                                 field.adjust(1, 1, -1, -1);
+                            if(APP_OPENOFFICE==theThemedApp)
+                                field.adjust(0, 0, 0, -2);
                         }
                         //field.adjust(-1,-1, 0, 1);
 //                         painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
@@ -8676,7 +8697,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     uint valueRange = scrollBar->maximum - scrollBar->minimum;
                     sliderLength = (scrollBar->pageStep * sliderMaxLength) / (valueRange + scrollBar->pageStep);
 
-                    if (sliderLength < sliderMinLength || valueRange > INT_MAX / 2)
+                    if (sliderLength < sliderMinLength || (APP_OPENOFFICE!=theThemedApp && valueRange > INT_MAX / 2))
                         sliderLength = sliderMinLength;
                     if (sliderLength > sliderMaxLength)
                         sliderLength = sliderMaxLength;
