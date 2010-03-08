@@ -3497,7 +3497,7 @@ debugDisplayWidget(widget, 3);
                            btn_colors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
                            DF_DO_CORNERS|DF_DO_BORDER|
                            (sunken ? DF_SUNKEN : 0), widget);
-            drawFadedLine(cr, x+2, y+(height>>1), width-(offset+3), 1, &btn_colors[QT_STD_BORDER], area,
+            drawFadedLine(cr, x+2, y+(height>>1), width-(offset+4), 1, &btn_colors[QT_STD_BORDER], area,
                           NULL, TRUE, TRUE, TRUE);
         }
 
