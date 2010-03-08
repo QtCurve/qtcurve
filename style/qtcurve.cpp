@@ -3792,7 +3792,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                   view(state&QTC_STATE_VIEW),
                   doEtch(QTC_DO_EFFECT && 
                           (opts.crButton ||(PE_IndicatorMenuCheckMark!=element && !menu &&
-                                            r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2)));
+                                            r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2))),
+                  selectedOOMenu(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, 15, 15) &&
+                                ((State_Sunken|State_Enabled)==state ||
+                                 (State_Sunken|State_Enabled|State_Selected)==state));
             QRect rect(r.x(), r.y()+(view ? -1 : 0), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
             painter->save();
@@ -3802,13 +3805,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 const QColor *use(checkRadioColors(option));
                 QStyleOption opt(*option);
 
+                if(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, opts.crSize, opts.crSize))
+                    rect.adjust(-1, -2, -1, -2);
+            
                 if(QTC_CR_SMALL_SIZE!=opts.crSize)
                     if(menu)
                         rect.adjust(0, -1, 0, -1);
                     else
                         rect.adjust(0, 1, 0, 1);
 
-                if(menu)
+                if(menu || selectedOOMenu)
                     opt.state&=~(State_MouseOver|State_Sunken);
                 opt.state&=~State_On;
                 opt.state|=State_Raised;
@@ -3818,7 +3824,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             else
             {
-                bool         sunken(!menu && (state&State_Sunken)),
+                bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
                              mo(!sunken && state&State_MouseOver && state&State_Enabled),
                              glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
                 const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
@@ -3832,6 +3838,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
 
                 rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
+
+                if(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, opts.crSize, opts.crSize))
+                    rect.adjust(0, -1, 0, -1);
 
                 if(QTC_CR_SMALL_SIZE!=opts.crSize)
                     if(menu)
@@ -3875,7 +3884,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
             }
 
-            if(state&State_On)
+            if(state&State_On || selectedOOMenu)
             {
                 QPixmap *pix(getPixmap(checkRadioCol(option), PIX_CHECK, 1.0));
 
@@ -3915,11 +3924,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(opts.crSize);
         case PE_IndicatorRadioButton:
         {
-            bool menu(state&QTC_STATE_MENU);
+            bool menu(state&QTC_STATE_MENU),
+                 selectedOOMenu(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, 15, 15) &&
+                                ((State_Sunken|State_Enabled)==state ||
+                                 (State_Sunken|State_Enabled|State_Selected)==state));
             int  x(r.x()), y(r.y());                
 
             painter->save();
-
+    
             if(opts.crButton)
             {
                 const QColor *use(checkRadioColors(option));
@@ -3929,12 +3941,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
                     rect.adjust(0, -1, 0, -1), y++;
-                    
-                if(menu)
+
+                if(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, opts.crSize, opts.crSize))
+                    rect.adjust(-1, -1, -1, -1), --x, --y;
+                
+                if(menu || selectedOOMenu)
                     opt.state&=~(State_MouseOver|State_Sunken);
                 opt.state&=~State_On;
                 opt.state|=State_Raised;
                 opt.rect=rect;
+
                 if(doEtch)
                     x++, y++;
                 if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
@@ -3945,7 +3961,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             else
             {
-                bool         sunken(!menu && (state&State_Sunken)),
+                bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
                              doEtch(!menu
                                     && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
                                     && QTC_DO_EFFECT),
@@ -4005,7 +4021,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                      lightBorder ? 360*16 : 180*16);
                 }
             }
-            if(state&State_On)
+            if(state&State_On || selectedOOMenu)
             {
                 QPainterPath path;
                 double       radius=opts.smallRadio ? 2.75 : 3.75,

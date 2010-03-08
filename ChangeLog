@@ -19,6 +19,7 @@
     1 pixel.
 14. Remove border from preview colour square in KDE colour selection dialog.
 15. Only offset vertical position of etch text.
+16. Attempt to improve look of check/radios in OpenOffice.org menus.
 
 1.1.1
 -----
