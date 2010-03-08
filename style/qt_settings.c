@@ -2777,6 +2777,9 @@ static gboolean qtInit()
                IMG_SQUARE_RINGS==opts.menuBgndImage.type)
                 calcRingAlphas(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
 
+            if(isMozilla())
+                opts.crSize=QTC_CR_SMALL_SIZE;
+
             if(opts.crSize!=QTC_CR_LARGE_SIZE)
             {
                 static const char *constStrFormat="style \""QTC_RC_SETTING"CRSize\" "

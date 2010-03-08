@@ -12,6 +12,7 @@
  7. Add option to control whether scrollbar groove has a border or not.
  8. Dont use pixmaps to draw rounded slider, or radio buttons.
  9. Add option to increase size of check/radios - default is now 15pixels.
+    (For Mozilla apps, the old 13pixel size will be used).
 10. Fix calculation of alpha values for square rings.
 11. Fix progressbar glow central position.
 12. Draw more frames.
