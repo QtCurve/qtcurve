@@ -7359,7 +7359,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     QStyleOption opt(*option);
 
                     opt.rect=down;
-                    opt.state=(enabled && (spinBox->stepEnabled&QAbstractSpinBox::StepUpEnabled ||
+                    opt.state=(enabled && (spinBox->stepEnabled&QAbstractSpinBox::StepDownEnabled ||
                                            QAbstractSpinBox::StepNone==spinBox->stepEnabled && APP_OPENOFFICE==theThemedApp)
                                     ? State_Enabled : State_None)|
                               (downIsActive && sunken ? State_Sunken : State_Raised)|
