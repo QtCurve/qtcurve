@@ -4474,14 +4474,22 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
             if(state&State_Selected || hover)
             {
+                if(!widget)
+                {
+                    widget=dynamic_cast<const QWidget *>(painter->device());
+                    if(widget)
+                        widget=widget->parentWidget();
+                }
+
                 QColor color(hasCustomBackground && hasSolidBackground
                                 ? v4Opt->backgroundBrush.color()
                                 : palette.color(cg, QPalette::Highlight));
-                bool   square(opts.squareLvSelection && widget &&
-                              !widget->inherits("KFilePlacesView") &&
-                              (qobject_cast<const QTreeView *>(widget) ||
-                                (qobject_cast<const QListView *>(widget) &&
-                                QListView::IconMode!=((const QListView *)widget)->viewMode())));
+                bool   square(opts.squareLvSelection && 
+                              (/*(!widget && r.height()<=40 && r.width()>=48) || */
+                               (widget && !widget->inherits("KFilePlacesView") &&
+                                (qobject_cast<const QTreeView *>(widget) ||
+                                  (qobject_cast<const QListView *>(widget) &&
+                                  QListView::IconMode!=((const QListView *)widget)->viewMode())))));
 
                 if (hover && !hasCustomBackground)
                 {
