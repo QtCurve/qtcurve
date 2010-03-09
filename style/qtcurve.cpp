@@ -384,6 +384,11 @@ static enum
 
 static QString appName;
 
+static inline bool isOOWidget(const QWidget *widget)
+{
+    return APP_OPENOFFICE==theThemedApp && !widget;
+}
+
 int static toHint(int sc)
 {
     switch(sc)
@@ -2555,7 +2560,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_HeaderMargin:
             return 3;
         case PM_DefaultChildMargin:
-            return APP_OPENOFFICE==theThemedApp
+            return isOOWidget(widget)
                     ? /*opts.round>=ROUND_FULL && !opts.squareScrollViews
                         ?*/ 2
                         /*: 1*/
@@ -3362,7 +3367,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_Frame:
         {
             // Dont draw OO.o status bar frames...
-            if(APP_OPENOFFICE==theThemedApp && r.height()<22)
+            if(isOOWidget(widget) && r.height()<22)
                 break;
 
 #ifdef QTC_QT_ONLY
@@ -3401,14 +3406,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
                 else
                 {
-                    bool sv((!widget && APP_OPENOFFICE==theThemedApp) ||
+                    bool sv(isOOWidget(widget) ||
                             ::qobject_cast<const QAbstractScrollArea *>(widget) ||
                             (widget && widget->inherits("Q3ScrollView")) ||
                             (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
                         squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow()))),
                         inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
 
-                    if(sv && (opts.etchEntry || squareSv || APP_OPENOFFICE==theThemedApp))
+                    if(sv && (opts.etchEntry || squareSv || isOOWidget(widget)))
                     {
 //                         if(squareSv)
 //                         {
@@ -3724,7 +3729,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_FrameLineEdit:
             if (const QStyleOptionFrame *lineEdit = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
-                if ((lineEdit->lineWidth>0 || APP_OPENOFFICE==theThemedApp) &&
+                if ((lineEdit->lineWidth>0 || isOOWidget(widget)) &&
                     !(widget &&
                      (qobject_cast<const QComboBox *>(widget->parentWidget()) ||
                       qobject_cast<const QAbstractSpinBox *>(widget->parentWidget()))))
@@ -3770,8 +3775,9 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         }
                     }
                     painter->save();
-                    drawEntryField(painter, APP_OPENOFFICE!=theThemedApp ? r : r.adjusted(1, 2, -1, -2), widget, &opt, ROUNDED_ALL,
-                                   APP_OPENOFFICE==theThemedApp, APP_OPENOFFICE!=theThemedApp && QTC_DO_EFFECT);
+                    bool isOO(isOOWidget(widget));
+                    drawEntryField(painter, isOO ? r.adjusted(1, 2, -1, -2) : r, widget, &opt, ROUNDED_ALL,
+                                   isOO, !isOO && QTC_DO_EFFECT);
                     painter->restore();
                 }
             }
@@ -3803,7 +3809,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                   doEtch(QTC_DO_EFFECT && 
                           (opts.crButton ||(PE_IndicatorMenuCheckMark!=element && !menu &&
                                             r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2))),
-                  selectedOOMenu(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, 15, 15) &&
+                  isOO(isOOWidget(widget)),
+                  selectedOOMenu(isOO && r==QRect(0, 0, 15, 15) &&
                                 ((State_Sunken|State_Enabled)==state ||
                                  (State_Sunken|State_Enabled|State_Selected)==state));
             QRect rect(r.x(), r.y()+(view ? -1 : 0), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
@@ -3815,7 +3822,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 const QColor *use(checkRadioColors(option));
                 QStyleOption opt(*option);
 
-                if(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, opts.crSize, opts.crSize))
+                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
                     rect.adjust(-1, -2, -1, -2);
             
                 if(QTC_CR_SMALL_SIZE!=opts.crSize)
@@ -3849,7 +3856,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
 
-                if(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, opts.crSize, opts.crSize))
+                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
                     rect.adjust(0, -1, 0, -1);
 
                 if(QTC_CR_SMALL_SIZE!=opts.crSize)
@@ -3935,7 +3942,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorRadioButton:
         {
             bool menu(state&QTC_STATE_MENU),
-                 selectedOOMenu(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, 15, 15) &&
+                 isOO(isOOWidget(widget)),
+                 selectedOOMenu(isOO && r==QRect(0, 0, 15, 15) &&
                                 ((State_Sunken|State_Enabled)==state ||
                                  (State_Sunken|State_Enabled|State_Selected)==state));
             int  x(r.x()), y(r.y());                
@@ -3952,7 +3960,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
                     rect.adjust(0, -1, 0, -1), y++;
 
-                if(APP_OPENOFFICE==theThemedApp && r==QRect(0, 0, opts.crSize, opts.crSize))
+                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
                     rect.adjust(-1, -1, -1, -1), --x, --y;
                 
                 if(menu || selectedOOMenu)
@@ -5403,7 +5411,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
                 bool  comboMenu(qobject_cast<const QComboBox*>(widget)),
-                      reverse(Qt::RightToLeft==menuItem->direction);
+                      reverse(Qt::RightToLeft==menuItem->direction),
+                      isOO(isOOWidget(widget));
                 int   checkcol(qMax(menuItem->maxIconWidth, 20)),
                       stripeWidth(qMax(checkcol, constMenuPixmapWidth)-2);
 
@@ -5413,7 +5422,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
                 QRect rx(r);
 
-                if(APP_OPENOFFICE==theThemedApp)
+                if(isOO)
                     if(opts.borderMenuitems)
                         r.adjust(2, 0, -2, 0);
                     else if(APPEARANCE_FADE==opts.menuitemAppearance)
@@ -5464,7 +5473,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         drawFadedLine(painter, miRect, itsBackgroundCols[QTC_MENU_SEP_SHADE], true, true, true);
                     }
 
-                    if(APP_OPENOFFICE==theThemedApp && !widget)
+                    if(isOO)
                     {
                         painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                         painter->drawLine(rx.topLeft(), rx.bottomLeft());
@@ -5634,7 +5643,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                 : palette.text().color());
                 }
                 
-                if(APP_OPENOFFICE==theThemedApp && !widget)
+                if(isOO)
                 {
                     painter->setPen(itsBackgroundCols[QT_STD_BORDER]);
                     painter->drawLine(rx.topLeft(), rx.bottomLeft());
@@ -6991,7 +7000,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 State mflags(bflags);
 
-                if(APP_OPENOFFICE!=theThemedApp)
+                if(!isOOWidget(widget))
                 {
 #if QT_VERSION >= 0x040500
                     if (state&State_Sunken && !(toolbutton->activeSubControls&SC_ToolButton))
@@ -7345,6 +7354,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     }
                 }
 
+                bool isOO(isOOWidget(widget));
+
                 if(up.isValid())
                 {
                     QStyleOption opt(*option);
@@ -7353,7 +7364,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     opt.rect=up;
                     opt.direction=option->direction;
                     opt.state=(enabled && (spinBox->stepEnabled&QAbstractSpinBox::StepUpEnabled ||
-                                           QAbstractSpinBox::StepNone==spinBox->stepEnabled && APP_OPENOFFICE==theThemedApp)
+                                           QAbstractSpinBox::StepNone==spinBox->stepEnabled && isOO)
                                     ? State_Enabled : State_None)|
                               (upIsActive && sunken ? State_Sunken : State_Raised)|
                               (upIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;;
@@ -7368,7 +7379,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     opt.rect=down;
                     opt.state=(enabled && (spinBox->stepEnabled&QAbstractSpinBox::StepDownEnabled ||
-                                           QAbstractSpinBox::StepNone==spinBox->stepEnabled && APP_OPENOFFICE==theThemedApp)
+                                           QAbstractSpinBox::StepNone==spinBox->stepEnabled && isOO)
                                     ? State_Enabled : State_None)|
                               (downIsActive && sunken ? State_Sunken : State_Raised)|
                               (downIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;
@@ -8046,9 +8057,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                              glowOverFocus(state&State_MouseOver && QTC_FULL_FOCUS &&
                                            MO_GLOW==opts.coloredMouseOver && QTC_DO_EFFECT && !sunken && !comboBox->editable &&
                                            state&State_Enabled && state&State_HasFocus),
-                             doEffect(QTC_DO_EFFECT && (!comboBox->editable || opts.etchEntry));
+                             doEffect(QTC_DO_EFFECT && (!comboBox->editable || opts.etchEntry)),
+                             isOO(isOOWidget(widget));
 
-                if(APP_OPENOFFICE==theThemedApp)
+                if(isOO)
                     frame.adjust(0, 0, 0, -2), arrow.adjust(0, 0, 0, -2), field.adjust(0, 0, 0, -2);
 
 //                 painter->fillRect(r, Qt::transparent);
@@ -8103,7 +8115,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             field=r;
                             if(doEffect)
                                 field.adjust(1, 1, -1, -1);
-                            if(APP_OPENOFFICE==theThemedApp)
+                            if(isOO)
                                 field.adjust(0, 0, 0, -2);
                         }
                         //field.adjust(-1,-1, 0, 1);
@@ -8705,7 +8717,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     uint valueRange = scrollBar->maximum - scrollBar->minimum;
                     sliderLength = (scrollBar->pageStep * sliderMaxLength) / (valueRange + scrollBar->pageStep);
 
-                    if (sliderLength < sliderMinLength || (APP_OPENOFFICE!=theThemedApp && valueRange > INT_MAX / 2))
+                    if (sliderLength < sliderMinLength || (!isOOWidget(widget) && valueRange > INT_MAX / 2))
                         sliderLength = sliderMinLength;
                     if (sliderLength > sliderMaxLength)
                         sliderLength = sliderMaxLength;
