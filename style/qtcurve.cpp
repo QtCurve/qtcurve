@@ -3782,9 +3782,25 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         }
                     }
                     painter->save();
-                    bool isOO(isOOWidget(widget));
-                    drawEntryField(painter, isOO ? r.adjusted(1, 2, -1, -2) : r, widget, &opt, ROUNDED_ALL,
-                                   isOO, !isOO && QTC_DO_EFFECT);
+                    bool  isOO(isOOWidget(widget));
+                    QRect rect(r);
+                    int   round(ROUNDED_ALL);
+
+                    if(isOO)
+                    {
+                        // This (hopefull) checks is we're OO.o 3.2 - in which case no adjustment is required...
+                        QImage *img=dynamic_cast<QImage *>(painter->device());
+
+                        if(!img || img->rect()!=r) // OO.o 3.1?
+                            rect.adjust(1, 2, -1, -2);
+                        else
+                        {
+                            round=ROUNDED_NONE;
+                            rect.adjust(1, 1, -1, -1);
+                        }
+                    }
+
+                    drawEntryField(painter, rect, widget, &opt, round, isOO, !isOO && QTC_DO_EFFECT);
                     painter->restore();
                 }
             }
@@ -3817,96 +3833,101 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                           (opts.crButton ||(PE_IndicatorMenuCheckMark!=element && !menu &&
                                             r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2))),
                   isOO(isOOWidget(widget)),
-                  selectedOOMenu(isOO && r==QRect(0, 0, 15, 15) &&
+                  selectedOOMenu(isOO && (r==QRect(0, 0, 15, 15) || r==QRect(0, 0, 14, 15)) &&  // OO.o 3.2 =14x15?
                                 ((State_Sunken|State_Enabled)==state ||
                                  (State_Sunken|State_Enabled|State_Selected)==state));
             QRect rect(r.x(), r.y()+(view ? -1 : 0), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
             painter->save();
 
-            if(opts.crButton)
-            {
-                const QColor *use(checkRadioColors(option));
-                QStyleOption opt(*option);
+            // For OO.o 3.2 need to fill widget background!
+            if(isOO)
+                painter->fillRect(r, palette.brush(QPalette::Window));
 
-                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
-                    rect.adjust(-1, -2, -1, -2);
-            
-                if(QTC_CR_SMALL_SIZE!=opts.crSize)
-                    if(menu)
-                        rect.adjust(0, -1, 0, -1);
-                    else
-                        rect.adjust(0, 1, 0, 1);
-
-                if(menu || selectedOOMenu)
-                    opt.state&=~(State_MouseOver|State_Sunken);
-                opt.state&=~State_On;
-                opt.state|=State_Raised;
-                opt.rect=rect;
-                drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
-                               use, true, WIDGET_CHECKBOX);
-            }
-            else
-            {
-                bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
-                             mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                             glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
-                const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
-                             *btn(checkRadioColors(option)),
-                             *use(bc ? bc : btn);
-                const QColor &bgnd(state&State_Enabled && !sunken
-                                        ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
-                                            ? use[QTC_CR_MO_FILL]
-                                            : palette.base().color()
-                                        : palette.background().color());
-                bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
-
-                rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
-
-                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
-                    rect.adjust(0, -1, 0, -1);
-
-                if(QTC_CR_SMALL_SIZE!=opts.crSize)
-                    if(menu)
-                        rect.adjust(0, -1, 0, -1);
-                    else
-                        rect.adjust(0, 1, 0, 1);
-
-                if(IS_FLAT(opts.appearance))
-                    painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
-                else
-                    drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
-
-                if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
+            if(!selectedOOMenu)
+                if(opts.crButton)
                 {
-                    painter->setRenderHint(QPainter::Antialiasing, true);
-                    painter->setPen(use[QTC_CR_MO_FILL]);
-                    drawAaRect(painter, rect.adjusted(1, 1, -1, -1));
-    //                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
-                    painter->setRenderHint(QPainter::Antialiasing, false);
+                    const QColor *use(checkRadioColors(option));
+                    QStyleOption opt(*option);
+
+                    if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
+                        rect.adjust(-1, -2, -1, -2);
+
+                    if(QTC_CR_SMALL_SIZE!=opts.crSize)
+                        if(menu)
+                            rect.adjust(0, -1, 0, -1);
+                        else
+                            rect.adjust(0, 1, 0, 1);
+
+                    if(menu || selectedOOMenu)
+                        opt.state&=~(State_MouseOver|State_Sunken);
+                    opt.state&=~State_On;
+                    opt.state|=State_Raised;
+                    opt.rect=rect;
+                    drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
+                                use, true, WIDGET_CHECKBOX);
                 }
                 else
                 {
-                    painter->setPen(midColor(state&State_Enabled ? palette.base().color()
-                                                                 : palette.background().color(), use[3]));
-                    if(lightBorder)
-                        drawRect(painter, rect.adjusted(1, 1, -1, -1));
+                    bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
+                                 mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                                 glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo);
+                    const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
+                                 *btn(checkRadioColors(option)),
+                                 *use(bc ? bc : btn);
+                    const QColor &bgnd(state&State_Enabled && !sunken
+                                            ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
+                                                ? use[QTC_CR_MO_FILL]
+                                                : palette.base().color()
+                                            : palette.background().color());
+                    bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
+
+                    rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
+
+                    if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
+                        rect.adjust(0, -1, 0, -1);
+
+                    if(QTC_CR_SMALL_SIZE!=opts.crSize)
+                        if(menu)
+                            rect.adjust(0, -1, 0, -1);
+                        else
+                            rect.adjust(0, 1, 0, 1);
+
+                    if(IS_FLAT(opts.appearance))
+                        painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
+                    else
+                        drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
+
+                    if(MO_NONE!=opts.coloredMouseOver && !glow && mo)
+                    {
+                        painter->setRenderHint(QPainter::Antialiasing, true);
+                        painter->setPen(use[QTC_CR_MO_FILL]);
+                        drawAaRect(painter, rect.adjusted(1, 1, -1, -1));
+        //                 drawAaRect(painter, rect.adjusted(2, 2, -2, -2));
+                        painter->setRenderHint(QPainter::Antialiasing, false);
+                    }
                     else
                     {
-                        painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
-                        painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
+                        painter->setPen(midColor(state&State_Enabled ? palette.base().color()
+                                                                    : palette.background().color(), use[3]));
+                        if(lightBorder)
+                            drawRect(painter, rect.adjusted(1, 1, -1, -1));
+                        else
+                        {
+                            painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
+                            painter->drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
+                        }
                     }
+
+                    if(doEtch && !view)
+                        if(glow)
+                            drawGlow(painter, r, WIDGET_CHECKBOX);
+                        else
+                            drawEtch(painter, r, widget, WIDGET_CHECKBOX,
+                                    opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
+
+                    drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
                 }
-
-                if(doEtch && !view)
-                    if(glow)
-                        drawGlow(painter, r, WIDGET_CHECKBOX);
-                    else
-                        drawEtch(painter, r, widget, WIDGET_CHECKBOX,
-                                opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
-
-                drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
-            }
 
             if(state&State_On || selectedOOMenu)
             {
@@ -3950,102 +3971,107 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         {
             bool menu(state&QTC_STATE_MENU),
                  isOO(isOOWidget(widget)),
-                 selectedOOMenu(isOO && r==QRect(0, 0, 15, 15) &&
+                 selectedOOMenu(isOO && (r==QRect(0, 0, 15, 15) || r==QRect(0, 0, 14, 15)) &&  // OO.o 3.2 =14x15?
                                 ((State_Sunken|State_Enabled)==state ||
                                  (State_Sunken|State_Enabled|State_Selected)==state));
             int  x(r.x()), y(r.y());                
 
             painter->save();
-    
-            if(opts.crButton)
-            {
-                const QColor *use(checkRadioColors(option));
-                QStyleOption opt(*option);
-                bool         doEtch(QTC_DO_EFFECT);
-                QRect        rect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
 
-                if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
-                    rect.adjust(0, -1, 0, -1), y++;
+            // For OO.o 3.2 need to fill widget background!
+            if(isOO)
+                painter->fillRect(r, palette.brush(QPalette::Window));
 
-                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
-                    rect.adjust(-1, -1, -1, -1), --x, --y;
-                
-                if(menu || selectedOOMenu)
-                    opt.state&=~(State_MouseOver|State_Sunken);
-                opt.state&=~State_On;
-                opt.state|=State_Raised;
-                opt.rect=rect;
-
-                if(doEtch)
-                    x++, y++;
-                if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
-                    y-=2;
-
-                drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
-                               use, true, WIDGET_RADIO_BUTTON);
-            }
-            else
-            {
-                bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
-                             doEtch(!menu
-                                    && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
-                                    && QTC_DO_EFFECT),
-                             mo(!sunken && state&State_MouseOver && state&State_Enabled),
-                             glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
-                             coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
-                bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED),
-                             doneShadow=false;
-                QRect        rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
-                const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
-                             *btn(checkRadioColors(option)),
-                             *use(bc ? bc : btn);
-
-                if(doEtch)
-                    x++, y++;
-
-                const QColor &bgnd(state&State_Enabled && !sunken
-                                        ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
-                                            ? use[QTC_CR_MO_FILL]
-                                            : palette.base().color()
-                                        : palette.background().color());
-                QPainterPath path;
-
-                path.addEllipse(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5));
-                drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), path, true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                if(coloredMo)
+            if(!selectedOOMenu)
+                if(opts.crButton)
                 {
+                    const QColor *use(checkRadioColors(option));
+                    QStyleOption opt(*option);
+                    bool         doEtch(QTC_DO_EFFECT);
+                    QRect        rect(r.x(), r.y(), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
+
+                    if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
+                        rect.adjust(0, -1, 0, -1), y++;
+
+                    if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
+                        rect.adjust(-1, -1, -1, -1), --x, --y;
+
+                    if(menu || selectedOOMenu)
+                        opt.state&=~(State_MouseOver|State_Sunken);
+                    opt.state&=~State_On;
+                    opt.state|=State_Raised;
+                    opt.rect=rect;
+
+                    if(doEtch)
+                        x++, y++;
+                    if(QTC_CR_SMALL_SIZE!=opts.crSize && menu)
+                        y-=2;
+
+                    drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
+                                use, true, WIDGET_RADIO_BUTTON);
+                }
+                else
+                {
+                    bool         sunken(!menu && !selectedOOMenu && (state&State_Sunken)),
+                                 doEtch(!menu
+                                        && r.width()>=opts.crSize+2 && r.height()>=opts.crSize+2
+                                        && QTC_DO_EFFECT),
+                                 mo(!sunken && state&State_MouseOver && state&State_Enabled),
+                                 glow(doEtch && MO_GLOW==opts.coloredMouseOver && mo),
+                                 coloredMo(MO_NONE!=opts.coloredMouseOver && !glow && mo && !sunken);
+                    bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED),
+                                 doneShadow=false;
+                    QRect        rect(doEtch ? r.adjusted(1, 1, -1, -1) : r);
+                    const QColor *bc(sunken ? 0L : borderColors(option, 0L)),
+                                 *btn(checkRadioColors(option)),
+                                 *use(bc ? bc : btn);
+
+                    if(doEtch)
+                        x++, y++;
+
+                    const QColor &bgnd(state&State_Enabled && !sunken
+                                            ? MO_NONE==opts.coloredMouseOver && !opts.crHighlight && mo
+                                                ? use[QTC_CR_MO_FILL]
+                                                : palette.base().color()
+                                            : palette.background().color());
+                    QPainterPath path;
+
+                    path.addEllipse(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5));
+                    drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), path, true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    if(coloredMo)
+                    {
+                        painter->setBrush(Qt::NoBrush);
+                        painter->setPen(use[QTC_CR_MO_FILL]);
+                        painter->drawArc(QRectF(x+1, y+1, opts.crSize-2, opts.crSize-2), 0, 360*16);
+                        painter->drawArc(QRectF(x+2, y+2, opts.crSize-4, opts.crSize-4), 0, 360*16);
+                    }
+
                     painter->setBrush(Qt::NoBrush);
-                    painter->setPen(use[QTC_CR_MO_FILL]);
-                    painter->drawArc(QRectF(x+1, y+1, opts.crSize-2, opts.crSize-2), 0, 360*16);
-                    painter->drawArc(QRectF(x+2, y+2, opts.crSize-4, opts.crSize-4), 0, 360*16);
+                    if(!doneShadow && doEtch && (glow || EFFECT_NONE!=opts.buttonEffect || sunken))
+                    {
+                        QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
+
+                        if(!glow)
+                            topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
+
+                        painter->setPen(topCol);
+                        painter->drawArc(QRectF(x-0.5, y-0.5, opts.crSize+1, opts.crSize+1), 45*16, 180*16);
+                        if(!glow)
+                            painter->setPen(getLowerEtchCol(widget));
+                        painter->drawArc(QRectF(x-0.5, y-0.5, opts.crSize+1, opts.crSize+1), 225*16, 180*16);
+                    }
+
+                    painter->setPen(use[QT_BORDER(state&State_Enabled)]);
+                    painter->drawArc(QRectF(x+0.25, y+0.25, opts.crSize-0.5, opts.crSize-0.5), 0, 360*16);
+                    if(!coloredMo)
+                    {
+                        painter->setPen(btn[state&State_MouseOver ? 3 : 4]);
+                        painter->drawArc(QRectF(x+0.75, y+0.75, opts.crSize-1.5, opts.crSize-1.5),
+                                        lightBorder ? 0 : 45*16,
+                                        lightBorder ? 360*16 : 180*16);
+                    }
                 }
-
-                painter->setBrush(Qt::NoBrush);
-                if(!doneShadow && doEtch && (glow || EFFECT_NONE!=opts.buttonEffect || sunken))
-                {
-                    QColor topCol(glow ? itsMouseOverCols[QTC_GLOW_MO] : Qt::black);
-
-                    if(!glow)
-                        topCol.setAlphaF(QTC_ETCH_RADIO_TOP_ALPHA);
-
-                    painter->setPen(topCol);
-                    painter->drawArc(QRectF(x-0.5, y-0.5, opts.crSize+1, opts.crSize+1), 45*16, 180*16);
-                    if(!glow)
-                        painter->setPen(getLowerEtchCol(widget));
-                    painter->drawArc(QRectF(x-0.5, y-0.5, opts.crSize+1, opts.crSize+1), 225*16, 180*16);
-                }
-
-                painter->setPen(use[QT_BORDER(state&State_Enabled)]);
-                painter->drawArc(QRectF(x+0.25, y+0.25, opts.crSize-0.5, opts.crSize-0.5), 0, 360*16);
-                if(!coloredMo)
-                {
-                    painter->setPen(btn[state&State_MouseOver ? 3 : 4]);
-                    painter->drawArc(QRectF(x+0.75, y+0.75, opts.crSize-1.5, opts.crSize-1.5),
-                                     lightBorder ? 0 : 45*16,
-                                     lightBorder ? 360*16 : 180*16);
-                }
-            }
             if(state&State_On || selectedOOMenu)
             {
                 QPainterPath path;
@@ -5666,6 +5692,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
         case CE_PushButton:
             if(const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
+                // For OO.o 3.2 need to fill widget background!
+                if(isOOWidget(widget))
+                    painter->fillRect(r, palette.brush(QPalette::Window));
                 drawControl(CE_PushButtonBevel, btn, painter, widget);
 
                 QStyleOptionButton subopt(*btn);
@@ -6851,6 +6880,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
     switch (control)
     {
         case CC_ToolButton:
+            // For OO.o 3.2 need to fill widget background!
+            if(isOOWidget(widget))
+                painter->fillRect(r, palette.brush(QPalette::Window));
             if (const QStyleOptionToolButton *toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option))
             {
                 int widthAdjust(0),
@@ -7315,8 +7347,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                       mouseOver(state&State_MouseOver),
                       upIsActive(SC_SpinBoxUp==spinBox->activeSubControls),
                       downIsActive(SC_SpinBoxDown==spinBox->activeSubControls),
-                      doEtch(QTC_DO_EFFECT && opts.etchEntry);
+                      doEtch(QTC_DO_EFFECT && opts.etchEntry),
+                      isOO(isOOWidget(widget));
 
+                if(!doFrame && isOO && !opts.unifySpin)
+                {
+                    doFrame=true;
+                    frame=all;
+                }
+                
                 if(up.isValid())
                     if(reverse)
                         frame.adjust(up.width(), 0, 0, 0);
@@ -7327,7 +7366,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     drawEtch(painter, all, widget, WIDGET_SPIN);
                     down.adjust(reverse ? 1 : 0, 0, reverse ? 0 : -1, -1);
-                        up.adjust(reverse ? 1 : 0, 1, reverse ? 0 : -1, 0);
+                    up.adjust(reverse ? 1 : 0, 1, reverse ? 0 : -1, 0);
                     frame.adjust(reverse ? 0 : 1, 1, reverse ? -1 : 0, -1);
                     all.adjust(1, 1, -1, -1);
                 }
@@ -7360,8 +7399,6 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawFadedLine(painter, down.adjusted(2, 0, -2, 0), use[QT_BORDER(state&State_Enabled)], true, true, true);
                     }
                 }
-
-                bool isOO(isOOWidget(widget));
 
                 if(up.isValid())
                 {
@@ -7833,6 +7870,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                    sbRect(scrollbar->rect);
                 QStyleOptionSlider opt(*scrollbar);
 
+                // For OO.o 3.2 need to fill widget background!
+                if(isOOWidget(widget))
+                    painter->fillRect(r, palette.brush(QPalette::Window));
+                
                 if(reverse && horiz)
                 {
                     bool tmp(atMin);
@@ -8065,10 +8106,21 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                            MO_GLOW==opts.coloredMouseOver && QTC_DO_EFFECT && !sunken && !comboBox->editable &&
                                            state&State_Enabled && state&State_HasFocus),
                              doEffect(QTC_DO_EFFECT && (!comboBox->editable || opts.etchEntry)),
-                             isOO(isOOWidget(widget));
+                             isOO(isOOWidget(widget)),
+                             isOO31(isOO);
 
                 if(isOO)
-                    frame.adjust(0, 0, 0, -2), arrow.adjust(0, 0, 0, -2), field.adjust(0, 0, 0, -2);
+                {
+                    // This (hopefull) checks is we're OO.o 3.2 - in which case no adjustment is required...
+                    QImage *img=dynamic_cast<QImage *>(painter->device());
+
+                    isOO31=!img || img->rect()!=r;
+                
+                    if(isOO31)
+                        frame.adjust(0, 0, 0, -2), arrow.adjust(0, 0, 0, -2), field.adjust(0, 0, 0, -2);
+                    else
+                        arrow.adjust(1, 0, 0, 0);
+                }
 
 //                 painter->fillRect(r, Qt::transparent);
                 if(doEffect)
@@ -8122,7 +8174,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             field=r;
                             if(doEffect)
                                 field.adjust(1, 1, -1, -1);
-                            if(isOO)
+                            if(isOO31)
                                 field.adjust(0, 0, 0, -2);
                         }
                         //field.adjust(-1,-1, 0, 1);

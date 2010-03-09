@@ -20,7 +20,7 @@
 14. Remove border from preview colour square in KDE colour selection dialog.
 15. Only offset vertical position of etch text.
 16. OpenOffice.org improvements:
-     - draw check/radios menus as selected, and not sunken
+     - only draw check/dot of check/radios in menus
      - draw frames (general, line edits, scrollviews)
      - fix pressed behaviour of toolbar buttons
      - fix drawing of full width scrollbar
@@ -28,6 +28,7 @@
      - dont etch entries or scrollviews
      - fix spin buttons appearing disabled
      - only apply menu fix to oo.o menus, not file selector menus
+     - use square entry fields
 17. Set Qt toolbar font to KDE setting - but not for lineedits and comboboxes.
 
 1.1.1
