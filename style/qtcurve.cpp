@@ -1756,7 +1756,14 @@ void QtCurveStyle::polish(QWidget *widget)
         }
 
     //bool onToolBar(widget && widget->parent() && 0L!=getToolBar(widget->parentWidget(), true));
-    bool parentIsToolbar(widget && widget->parent() && (qobject_cast<QToolBar *>(widget->parent()) || widget->parent()->inherits("Q3ToolBar")));
+    bool    parentIsToolbar(false);
+    QWidget *wid=widget ? widget->parentWidget() : 0L;
+
+    while(wid && !parentIsToolbar)
+    {
+        parentIsToolbar=qobject_cast<QToolBar *>(wid) || wid->inherits("Q3ToolBar");
+        wid=wid->parentWidget();
+    }
 
     if(parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
         widget->setFont(QApplication::font());
@@ -11625,8 +11632,7 @@ void QtCurveStyle::applyKdeSettings(bool pal)
         QApplication::setFont(mnu, "QMenuBar");
         QApplication::setFont(mnu, "QMenu");
         QApplication::setFont(mnu, "KPopupTitle");
-// Don't set toolbar font - messes things up with Arora...
-//         QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
+        QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
     }
 }
 #endif

@@ -28,6 +28,7 @@
      - dont etch entries or scrollviews
      - fix spin buttons appearing disabled
      - only apply menu fix to oo.o menus, not file selector menus
+17. Set Qt toolbar font to KDE setting - but not for lineedits and comboboxes.
 
 1.1.1
 -----
