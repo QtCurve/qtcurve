@@ -3131,7 +3131,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             // which does not work for windows that have gradients.
             //
             // ...but need to for WebView!!!
-            if(!QTC_CUSTOM_BGND || (widget && widget->inherits("WebView")))
+            if(!opts.gtkScrollViews || !QTC_CUSTOM_BGND || (widget && widget->inherits("WebView")))
                 painter->fillRect(r, palette.brush(QPalette::Window));
             break;
         case PE_IndicatorBranch:
