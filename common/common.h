@@ -1756,7 +1756,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                 case ROUND_MAX:
                     if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
-                        double r=(w>h ? h : w)/2.0;
+                        double r=((w>h ? h : w)-(WIDGET_SLIDER==widget ? 1 : 0))/2.0;
                         return r>QTC_MAX_RADIUS_INTERNAL ? QTC_MAX_RADIUS_INTERNAL : r;
                     }
                     if(w>(QTC_MIN_ROUND_MAX_WIDTH-2) && h>(QTC_MIN_ROUND_MAX_HEIGHT-2) && QTC_IS_MAX_ROUND_WIDGET(widget))
@@ -1781,7 +1781,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                 case ROUND_MAX:
                     if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
-                        double r=(w>h ? h : w)/2.0;
+                        double r=((w>h ? h : w)-(WIDGET_SLIDER==widget ? 1 : 0))/2.0;
                         return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
                     }
                     if(w>QTC_MIN_ROUND_MAX_WIDTH && h>QTC_MIN_ROUND_MAX_HEIGHT && QTC_IS_MAX_ROUND_WIDGET(widget))
@@ -1807,7 +1807,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
                 case ROUND_MAX:
                     if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
-                        double r=(w>h ? h : w)/2.0;
+                        double r=((w>h ? h : w)-(WIDGET_SLIDER==widget ? 1 : 0))/2.0;
                         return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
                     }
                     if(w>(QTC_MIN_ROUND_MAX_WIDTH+2) && h>(QTC_MIN_ROUND_MAX_HEIGHT+2) && QTC_IS_MAX_ROUND_WIDGET(widget))
