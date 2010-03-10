@@ -8163,7 +8163,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     //if(opts.coloredMouseOver && frameOpt.state&State_MouseOver && comboBox->editable && !sunken)
                     //    frame.adjust(reverse ? 0 : 1, 0, reverse ? 1 : 0, 0);
-
+                        
                     drawLightBevel(painter, frame, &frameOpt, widget,
                                    comboBox->editable ? (reverse ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL,
                                    getFill(&frameOpt, cols, false,
@@ -8213,6 +8213,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 {
                     bool mouseOver=comboBox->editable && !(comboBox->activeSubControls&SC_ComboBoxArrow)
                                     ? false : (state&State_MouseOver ? true : false);
+
+                    if(!comboBox->editable && isOO && !isOO31)
+                        arrow.adjust(reverse ? 0 : 1, 0, reverse ? -1 : 0, 0);
 
                     if(!comboBox->editable && (SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
                     {
