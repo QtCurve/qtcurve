@@ -3837,7 +3837,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                   selectedOOMenu(isOO && (r==QRect(0, 0, 15, 15) || r==QRect(0, 0, 14, 15)) &&  // OO.o 3.2 =14x15?
                                 ((State_Sunken|State_Enabled)==state ||
                                  (State_Sunken|State_Enabled|State_Selected)==state));
-            QRect rect(r.x(), r.y()+(view ? -1 : 0), opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0));
+            int   crSize(opts.crSize+(doEtch ? 2 : 0));
+            QRect rect(r.x(), r.y()+(view ? -1 : 0), crSize, crSize);
 
             painter->save();
 
@@ -3851,19 +3852,20 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     rect.adjust(-1, -1, -1, -1);
             }
             else
+            {
+                if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
+                    rect.adjust(0, -1, 0, -1);
+
+                if(QTC_CR_SMALL_SIZE!=opts.crSize)
+                    if(menu)
+                        rect.adjust(0, -1, 0, -1);
+                    else if(r.height()>crSize)   // Can only adjust position if there is space!
+                        rect.adjust(0, 1, 0, 1); // ...when used in a listview, usually there is no space.
+
                 if(opts.crButton)
                 {
                     const QColor *use(checkRadioColors(option));
                     QStyleOption opt(*option);
-
-                    if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
-                        rect.adjust(-1, -2, -1, -2);
-
-                    if(QTC_CR_SMALL_SIZE!=opts.crSize)
-                        if(menu)
-                            rect.adjust(0, -1, 0, -1);
-                        else
-                            rect.adjust(0, 1, 0, 1);
 
                     if(menu || selectedOOMenu)
                         opt.state&=~(State_MouseOver|State_Sunken);
@@ -3889,15 +3891,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     bool         lightBorder=QTC_DRAW_LIGHT_BORDER(false, WIDGET_TROUGH, APPEARANCE_INVERTED);
 
                     rect=QRect(doEtch ? rect.adjusted(1, 1, -1, -1) : rect);
-
-                    if(isOO && r==QRect(0, 0, opts.crSize, opts.crSize))
-                        rect.adjust(0, -1, 0, -1);
-
-                    if(QTC_CR_SMALL_SIZE!=opts.crSize)
-                        if(menu)
-                            rect.adjust(0, -1, 0, -1);
-                        else
-                            rect.adjust(0, 1, 0, 1);
 
                     if(IS_FLAT(opts.appearance))
                         painter->fillRect(rect.adjusted(1, 1, -1, -1), bgnd);
@@ -3934,6 +3927,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     drawBorder(painter, rect, option, ROUNDED_ALL, use, WIDGET_CHECKBOX);
                 }
+            }
 
             if(state&State_On || selectedOOMenu)
             {
