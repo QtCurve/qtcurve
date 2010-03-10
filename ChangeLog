@@ -21,7 +21,8 @@
 15. Remove border from preview colour square in KDE colour selection dialog.
 16. Only offset vertical position of etch text.
 17. OpenOffice.org improvements:
-     - only draw check/dot of check/radios in menus
+     - only draw check of checkboxes in menus
+     - draw check for radios in menus
      - draw frames (general, line edits, scrollviews)
      - fix pressed behaviour of toolbar buttons
      - fix drawing of full width scrollbar

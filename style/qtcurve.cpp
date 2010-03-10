@@ -3968,20 +3968,20 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             r.setHeight(opts.crSize);
         case PE_IndicatorRadioButton:
         {
-            bool menu(state&QTC_STATE_MENU),
-                 isOO(isOOWidget(widget)),
+            bool isOO(isOOWidget(widget)),
                  selectedOOMenu(isOO && (r==QRect(0, 0, 15, 15) || r==QRect(0, 0, 14, 15)) &&  // OO.o 3.2 =14x15?
                                 ((State_Sunken|State_Enabled)==state ||
                                  (State_Sunken|State_Enabled|State_Selected)==state));
-            int  x(r.x()), y(r.y());                
+                                 
+            if(selectedOOMenu)
+                drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
+            else
+            {
+                bool menu(state&QTC_STATE_MENU);
+                int  x(r.x()), y(r.y());                
 
-            painter->save();
+                painter->save();
 
-            // For OO.o 3.2 need to fill widget background!
-            if(isOO)
-                painter->fillRect(r, palette.brush(QPalette::Window));
-
-            if(!selectedOOMenu)
                 if(opts.crButton)
                 {
                     const QColor *use(checkRadioColors(option));
@@ -4071,18 +4071,19 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         lightBorder ? 360*16 : 180*16);
                     }
                 }
-            if(state&State_On || selectedOOMenu)
-            {
-                QPainterPath path;
-                double       radius=opts.smallRadio ? 2.75 : 3.75,
-                             offset=(opts.crSize/2.0)-radius;
+                if(state&State_On || selectedOOMenu)
+                {
+                    QPainterPath path;
+                    double       radius=opts.smallRadio ? 2.75 : 3.75,
+                                offset=(opts.crSize/2.0)-radius;
 
-                path.addEllipse(QRectF(x+offset, y+offset, radius*2.0, radius*2.0));
-                painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->fillPath(path, checkRadioCol(option));
+                    path.addEllipse(QRectF(x+offset, y+offset, radius*2.0, radius*2.0));
+                    painter->setRenderHint(QPainter::Antialiasing, true);
+                    painter->fillPath(path, checkRadioCol(option));
+                }
+
+                painter->restore();
             }
-
-            painter->restore();
             break;
         }
         case PE_IndicatorToolBarHandle:
