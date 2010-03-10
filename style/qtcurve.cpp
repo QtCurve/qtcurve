@@ -3845,7 +3845,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(isOO)
                 painter->fillRect(r, palette.brush(QPalette::Window));
 
-            if(!selectedOOMenu)
+            if(selectedOOMenu)
+            {
+                if(r==QRect(0, 0, 14, 15)) // OO.o 3.2 =14x15?
+                    rect.adjust(-1, -1, -1, -1);
+            }
+            else
                 if(opts.crButton)
                 {
                     const QColor *use(checkRadioColors(option));
@@ -3866,7 +3871,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     opt.state|=State_Raised;
                     opt.rect=rect;
                     drawLightBevel(painter, rect, &opt, widget, ROUNDED_ALL, getFill(&opt, use, true, false),
-                                use, true, WIDGET_CHECKBOX);
+                                   use, true, WIDGET_CHECKBOX);
                 }
                 else
                 {
@@ -3934,8 +3939,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 QPixmap *pix(getPixmap(checkRadioCol(option), PIX_CHECK, 1.0));
 
-                painter->drawPixmap(rect.center().x()-(pix->width()/2), rect.center().y()-(pix->height()/2),
-                                    *pix);
+                painter->drawPixmap(rect.center().x()-(pix->width()/2), rect.center().y()-(pix->height()/2), *pix);
             }
             else if (state&State_NoChange)    // tri-state
             {
