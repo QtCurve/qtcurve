@@ -2678,15 +2678,15 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ScrollBarSliderMin:
             return opts.sliderWidth+1;
         case PM_SliderThickness:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 19 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6));
+            return (SLIDER_TRIANGULAR==opts.sliderStyle ? 19 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6)))+QTC_SLIDER_GLOW;
         case PM_SliderControlThickness:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2));
+            return (SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)))+QTC_SLIDER_GLOW;
          case PM_SliderTickmarkOffset:
              return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
-                int size(SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)));
+                int size((SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)))+QTC_SLIDER_GLOW);
 
                 if (slider->tickPosition & QSlider::TicksBelow)
                     ++size;
@@ -2696,7 +2696,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             }
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
         case PM_SliderLength:
-            return SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? -2 : 6));
+            return (SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? -2 : 6)))+QTC_SLIDER_GLOW;
         case PM_ScrollBarExtent:
             return opts.sliderWidth;
         case PM_MaximumDragDistance:
@@ -10021,7 +10021,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
     p->setRenderHint(QPainter::Antialiasing, true);
     p->setPen(col);
 
-    if(!raised)
+    if(!raised && WIDGET_SLIDER!=w)
     {
         p->drawPath(tl);
         if(WIDGET_SLIDER_TROUGH==w && opts.thinSbarGroove && widget && qobject_cast<const QScrollBar *>(widget))
@@ -10799,8 +10799,7 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
 #endif
                     ? ROUNDED_ALL : ROUNDED_NONE,
                    getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders), use, true,
-                   slider && (SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
-                        ? WIDGET_SLIDER : WIDGET_SB_SLIDER);
+                   slider ? WIDGET_SLIDER : WIDGET_SB_SLIDER);
 
     if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)))
     {

@@ -268,6 +268,7 @@ typedef gchar ** Strings;
                           WIDGET_TOOLBAR_BUTTON==(w) )
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
                         WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
+                        (WIDGET_SLIDER==(w) && MO_GLOW==opts.coloredMouseOver) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || IS_SLIDER((w)) || \
                         WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
@@ -279,6 +280,7 @@ typedef gchar ** Strings;
                           WIDGET_TOOLBAR_BUTTON==(w))
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
                         WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
+                        (WIDGET_SLIDER==(w) && MO_GLOW==opts.coloredMouseOver) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_COMBO==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
                         WIDGET_TOOLBAR_BUTTON==(w))
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
@@ -341,6 +343,7 @@ typedef gchar ** Strings;
 #define QTC_FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define QTC_DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
+#define QTC_SLIDER_GLOW        (QTC_DO_EFFECT && MO_GLOW==opts.coloredMouseOver && SLIDER_TRIANGULAR!=opts.sliderStyle ? 2 : 0)
 #else
 #define QTC_DO_EFFECT          (QTC_FULLLY_ROUNDED && EFFECT_NONE!=opts.buttonEffect)
 #endif
@@ -1649,7 +1652,7 @@ typedef enum
 
 #define QTC_CAN_EXTRA_ROUND(MOD) \
             (QTC_IS_EXTRA_ROUND_WIDGET(widget) && \
-            (WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget || \
+            (IS_SLIDER(widget) || WIDGET_TROUGH==widget || \
             ( ( (w>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+MOD)) || (WIDGET_NO_ETCH_BTN==widget || WIDGET_MENU_BUTTON==widget) ) &&\
                                              (h>(QTC_MIN_ROUND_EXTRA_SIZE(widget)+MOD)))))
 #define QTC_CAN_FULL_ROUND(MOD) (w>(QTC_MIN_ROUND_FULL_SIZE+MOD) && h>(QTC_MIN_ROUND_FULL_SIZE+MOD))
@@ -1684,7 +1687,7 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
     switch(r)
     {
         case ROUND_MAX:
-            if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget ||
+            if(IS_SLIDER(widget) || WIDGET_TROUGH==widget ||
                (w>(QTC_MIN_ROUND_MAX_WIDTH+2) && h>(QTC_MIN_ROUND_MAX_HEIGHT+2) && QTC_IS_MAX_ROUND_WIDGET(widget)))
                 return ROUND_MAX;
         case ROUND_EXTRA:
@@ -1751,7 +1754,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                    if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
                         double r=(w>h ? h : w)/2.0;
                         return r>QTC_MAX_RADIUS_INTERNAL ? QTC_MAX_RADIUS_INTERNAL : r;
@@ -1776,7 +1779,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                    if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
                         double r=(w>h ? h : w)/2.0;
                         return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
@@ -1802,7 +1805,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
             switch(r)
             {
                 case ROUND_MAX:
-                    if(WIDGET_SB_SLIDER==widget || WIDGET_TROUGH==widget)
+                    if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
                     {
                         double r=(w>h ? h : w)/2.0;
                         return r>QTC_MAX_RADIUS_EXTERNAL ? QTC_MAX_RADIUS_EXTERNAL : r;
