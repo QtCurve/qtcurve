@@ -1501,7 +1501,7 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
     setCairoClipping(cr, a, region);
 
     cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_TOP_ALPHA);
-    if(!raised)
+    if(!raised && WIDGET_SLIDER!=wid)
     {
         createTLPath(cr, xd, yd, w-1, h-1, radius, round);
         cairo_stroke(cr);
@@ -3634,8 +3634,7 @@ debugDisplayWidget(widget, 3);
                 EWidget  widgetType=isComboBoxButton(widget)
                                     ? WIDGET_COMBO_BUTTON
                                     : slider
-                                        ? (qtcSlider && (SLIDER_ROUND==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
-                                            ? WIDGET_SLIDER : WIDGET_SB_SLIDER)
+                                        ? qtcSlider ? WIDGET_SLIDER : WIDGET_SB_SLIDER
                                         : hscale||vscale
                                         ? WIDGET_SLIDER
                                             : lvh
