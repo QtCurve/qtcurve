@@ -3796,6 +3796,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                         else
                         {
                             round=ROUNDED_NONE;
+                            painter->fillRect(r, palette.brush(QPalette::Window));
                             rect.adjust(1, 1, -1, -1);
                         }
                     }
@@ -7355,7 +7356,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     doFrame=true;
                     frame=all;
                 }
-                
+
+                if(isOO)
+                    painter->fillRect(r, palette.brush(QPalette::Window));
+
                 if(up.isValid())
                     if(reverse)
                         frame.adjust(up.width(), 0, 0, 0);
