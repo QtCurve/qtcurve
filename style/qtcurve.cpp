@@ -8208,11 +8208,11 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     bool mouseOver=comboBox->editable && !(comboBox->activeSubControls&SC_ComboBoxArrow)
                                     ? false : (state&State_MouseOver ? true : false);
 
-                    if(!comboBox->editable && isOO && !isOO31)
-                        arrow.adjust(reverse ? 0 : 1, 0, reverse ? -1 : 0, 0);
-
                     if(!comboBox->editable && (SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
                     {
+                        if(!comboBox->editable && isOO && !isOO31)
+                            arrow.adjust(reverse ? 0 : 1, 0, reverse ? -1 : 0, 0);
+
                         QStyleOption frameOpt(*option);
                         QRect        btn(arrow.x(), frame.y(), arrow.width()+1, frame.height());
                         const QColor *cols=SHADE_DARKEN==opts.comboBtn || !(state&State_Enabled) ? use : itsComboBtnCols;
