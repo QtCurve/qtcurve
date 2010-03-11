@@ -2689,8 +2689,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                         : SLIDER_TRIANGULAR==opts.sliderStyle
                             ? 11
                             : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)))+QTC_SLIDER_GLOW;
-         case PM_SliderTickmarkOffset:
-             return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
+        case PM_SliderTickmarkOffset:
+            return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
@@ -9857,7 +9857,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                        topSize=(ra.height()*0.4),
 //                        topRad=topSize/2.0,
                        //botWidthAdjust=4.5,
-                       topWidthAdjust=WIDGET_RADIO_BUTTON==w ? 4 : 4.75;
+                       topWidthAdjust=WIDGET_RADIO_BUTTON==w || WIDGET_SLIDER==w ? 4 : 4.75;
 
                 QRectF          //botGradRect(ra.x()+botWidthAdjust, ra.y()+(ra.height()-botSize),
                                 //            ra.width()-(botWidthAdjust*2)-1, botSize-1),
