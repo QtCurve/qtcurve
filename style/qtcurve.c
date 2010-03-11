@@ -1524,6 +1524,22 @@ static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, in
     cairo_clip(cr);
 }
 
+static void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
+{
+    int endx=horizontal ? 10 :0,
+        endy=horizontal ? 0 : 10;
+
+    cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x+endx, y+endy);
+
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0, 0.15);
+    cairo_pattern_set_extend(pat, CAIRO_EXTEND_REFLECT);
+    cairo_set_source(cr, pat);
+    cairo_rectangle(cr, x, y, w, h);
+    cairo_fill(cr);
+    cairo_pattern_destroy(pat);
+}
+
 static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                            GdkRectangle *area, GdkRegion *region, gint x, gint y, gint width,
                            gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
@@ -1836,6 +1852,16 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
             drawBorder(cr, style, state, area, region, x, y, width, height,
                        colouredMouseOver && MO_COLORED_THICK==opts.coloredMouseOver ? qtcPalette.mouseover : borderCols,
                        round, borderProfile, widget, flags);
+    }
+
+    if(WIDGET_SB_SLIDER==widget && opts.stripedSbar)
+    {
+        cairo_save(cr);
+        cairo_new_path(cr);
+        createPath(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SB_SLIDER, RADIUS_INTERNAL), round);
+        cairo_clip(cr);
+        addStripes(cr, x, y, width, height, horiz);
+        cairo_restore(cr);
     }
 }
 
@@ -2426,7 +2452,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(opts.fillProgress)
         x--, y--, width+=2, height+=2;
 
-    if(STRIPE_NONE!=opts.stripedProgress)
+    if(STRIPE_NONE!=opts.stripedProgress && STRIPE_FADE!=opts.stripedProgress)
     {
         GdkRectangle              rect={x, y, width-2, height-2};
         GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
@@ -2536,10 +2562,13 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                         (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
         if(opts.stripedProgress && width>4 && height>4)
-            drawLightBevel(cr, style, new_state, NULL, region, x, y,
-                        width, height, &itemCols[1],
-                        qtcPalette.highlight, round, wid, BORDER_FLAT,
-                        (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+            if(STRIPE_FADE==opts.stripedProgress)
+                addStripes(cr, x, y, width, height, horiz);
+            else
+                drawLightBevel(cr, style, new_state, NULL, region, x, y,
+                               width, height, &itemCols[1],
+                               qtcPalette.highlight, round, wid, BORDER_FLAT,
+                               (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
         if(opts.glowProgress && (horiz ? width : height)>3)
         {
