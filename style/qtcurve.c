@@ -7168,23 +7168,55 @@ static void generateColors()
     qtcPalette.selectedcr=NULL;
 
     if(opts.crColor)
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
-            qtcPalette.selectedcr=qtcPalette.slider;
-        else if(IND_COLORED==opts.defBtnIndicator)
-            qtcPalette.selectedcr=qtcPalette.defbtn;
-        else if(SHADE_BLEND_SELECTED==opts.comboBtn)
-            qtcPalette.selectedcr=qtcPalette.combobtn;
-        else if(SHADE_BLEND_SELECTED==opts.sortedLv && opts.lvButton)
-            qtcPalette.selectedcr=qtcPalette.sortedlv;
-        else
+    {
+        case SHADE_DARKEN:
         {
-            GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                                  &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
+            GdkColor color;
 
             qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
-            shadeColors(&mid, qtcPalette.selectedcr);
+            shade(&opts, &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE], &color, LV_HEADER_DARK_FACTOR);
+            shadeColors(&color, qtcPalette.selectedcr);
+            break;
         }
+        default:
+        case SHADE_NONE:
+            qtcPalette.selectedcr=qtcPalette.button;
+            break;
+        case SHADE_SELECTED:
+            qtcPalette.selectedcr=qtcPalette.highlight;
+            break;
+        case SHADE_CUSTOM:
+            if(SHADE_CUSTOM==opts.shadeSliders && QTC_EQUAL_COLOR(opts.customSlidersColor, opts.customCrBgndColor))
+                qtcPalette.selectedcr=qtcPalette.slider;
+            else if(SHADE_CUSTOM==opts.comboBtn && QTC_EQUAL_COLOR(opts.customComboBtnColor, opts.customCrBgndColor))
+                qtcPalette.selectedcr=qtcPalette.combobtn;
+            else if(SHADE_CUSTOM==opts.sortedLv && QTC_EQUAL_COLOR(opts.customComboBtnColor, opts.customSortedLvColor))
+                qtcPalette.selectedcr=qtcPalette.sortedlv;
+            else
+            {
+                qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&opts.customCrBgndColor, qtcPalette.selectedcr);
+            }
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                qtcPalette.selectedcr=qtcPalette.slider;
+            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+                qtcPalette.selectedcr=qtcPalette.combobtn;
+            else if(SHADE_BLEND_SELECTED==opts.sortedLv)
+                qtcPalette.selectedcr=qtcPalette.sortedlv;
+            else
+            {
+                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                      &qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE]);
 
+                qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&mid, qtcPalette.selectedcr);
+            }
+        default:
+            break;
+    }
+        
     qtcPalette.sidebar=NULL;
     if(!opts.stdSidebarButtons)
         if(SHADE_BLEND_SELECTED==opts.shadeSliders)
