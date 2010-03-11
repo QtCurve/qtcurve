@@ -6326,34 +6326,27 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean     drawLight=MO_PLASTIK!=opts.coloredMouseOver || !coloredMouseOver;
         int          borderVal=qtcPalette.mouseover==borderCols ? QT_SLIDER_MO_BORDER : QT_BORDER(GTK_STATE_INSENSITIVE==state);
 
-        if(SLIDER_TRIANGULAR==opts.sliderStyle)
-        {
-            switch(direction)
-            {
-                case GTK_ARROW_UP:
-                default:
-                case GTK_ARROW_DOWN:
-                    y+=2;
-                    {
-                        GdkPoint pts[]={{x, y+2}, {x+2, y}, {x+8, y}, {x+10, y+2}, {x+10, y+9}, {x+5, y+14}, {x, y+9}};
-                        region=gdk_region_polygon(pts, 7, GDK_EVEN_ODD_RULE);
-                    }
-                    break;
-                case GTK_ARROW_RIGHT:
-                case GTK_ARROW_LEFT:
-                    x+=2;
-                    {
-                        GdkPoint pts[]={{x+2, y}, {x, y+2}, {x, y+8}, {x+2, y+10}, {x+9, y+10}, {x+14, y+5}, {x+9, y}};
-                        region=gdk_region_polygon(pts, 7, GDK_EVEN_ODD_RULE);
-                    }
-            }
-        }
-        else
-        {
-            GdkPoint  clip[8]= {{x,       y+8+yo},  {x,       y+4},     {x+4,    y},        {x+8+xo, y},
-                               { x+12+xo, y+4},     {x+12+xo, y+8+yo},  {x+8+xo, y+12+yo},  {x+4, y+12+yo} };
+        if(MO_GLOW==opts.coloredMouseOver && QTC_DO_EFFECT)
+            x++, y++, xo++, yo++;
 
-            region=gdk_region_polygon(clip, 8, GDK_EVEN_ODD_RULE);
+        switch(direction)
+        {
+            case GTK_ARROW_UP:
+            default:
+            case GTK_ARROW_DOWN:
+                y+=2;
+                {
+                    GdkPoint pts[]={{x, y+2}, {x+2, y}, {x+8, y}, {x+10, y+2}, {x+10, y+9}, {x+5, y+14}, {x, y+9}};
+                    region=gdk_region_polygon(pts, 7, GDK_EVEN_ODD_RULE);
+                }
+                break;
+            case GTK_ARROW_RIGHT:
+            case GTK_ARROW_LEFT:
+                x+=2;
+                {
+                    GdkPoint pts[]={{x+2, y}, {x, y+2}, {x, y+8}, {x+2, y+10}, {x+9, y+10}, {x+14, y+5}, {x+9, y}};
+                    region=gdk_region_polygon(pts, 7, GDK_EVEN_ODD_RULE);
+                }
         }
 
         if(IS_FLAT(opts.sliderAppearance))
@@ -6407,17 +6400,35 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         gdk_region_destroy(region);
 
         { /* C-Scope */
-        double xd=x+0.5,
-               yd=y+0.5,
-               radius=2.5;
-                     
+        double   xd=x+0.5,
+                 yd=y+0.5,
+                 radius=2.5,
+                 xdg=xd-1,
+                 ydg=yd-1,
+                 radiusg=radius+1;
+        gboolean glowMo=MO_GLOW==opts.coloredMouseOver && coloredMouseOver && QTC_DO_EFFECT;
+    
         cairo_new_path(cr);
-        cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
+        if(glowMo)
+            cairo_set_source_rgba(cr, QTC_CAIRO_COL(borderCols[QTC_GLOW_MO]), QTC_GLOW_ALPHA(FALSE));
+        else
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
         switch(direction)
         {
             case GTK_ARROW_UP:
             default:
             case GTK_ARROW_DOWN:
+                if(glowMo)
+                {
+                    cairo_move_to(cr, xdg+radiusg, ydg);
+                    cairo_arc(cr, xdg+12-radiusg, ydg+radiusg, radiusg, M_PI * 1.5, M_PI * 2);
+                    cairo_line_to(cr, xdg+12, ydg+10.5);
+                    cairo_line_to(cr, xdg+6, ydg+16.5);
+                    cairo_line_to(cr, xdg, ydg+10.5);
+                    cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
+                    cairo_stroke(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
+                }
                 cairo_move_to(cr, xd+radius, yd);
                 cairo_arc(cr, xd+10-radius, yd+radius, radius, M_PI * 1.5, M_PI * 2);
                 cairo_line_to(cr, xd+10, yd+9);
@@ -6433,6 +6444,17 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                 break;
             case GTK_ARROW_RIGHT:
             case GTK_ARROW_LEFT:
+                if(glowMo)
+                {
+                    cairo_move_to(cr, xdg, ydg+12-radiusg);
+                    cairo_arc(cr, xdg+radiusg, ydg+radiusg, radiusg, M_PI, M_PI * 1.5);
+                    cairo_line_to(cr, xdg+10.5, ydg);
+                    cairo_line_to(cr, xdg+16.5, ydg+6);
+                    cairo_line_to(cr, xdg+10.5, ydg+12);
+                    cairo_arc(cr, xdg+radiusg, ydg+12-radiusg, radiusg, M_PI * 0.5, M_PI);
+                    cairo_stroke(cr);
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(borderCols[borderVal]));
+                }
                 cairo_move_to(cr, xd, yd+10-radius);
                 cairo_arc(cr, xd+radius, yd+radius, radius, M_PI, M_PI * 1.5);
                 cairo_line_to(cr, xd+9, yd);
