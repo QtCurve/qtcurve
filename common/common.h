@@ -345,7 +345,7 @@ typedef gchar ** Strings;
 #define QTC_FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define QTC_DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
-#define QTC_SLIDER_GLOW        (QTC_DO_EFFECT && MO_GLOW==opts.coloredMouseOver && SLIDER_TRIANGULAR!=opts.sliderStyle ? 2 : 0)
+#define QTC_SLIDER_GLOW        (QTC_DO_EFFECT && MO_GLOW==opts.coloredMouseOver /*&& SLIDER_TRIANGULAR!=opts.sliderStyle*/ ? 2 : 0)
 #else
 #define QTC_DO_EFFECT          (QTC_FULLLY_ROUNDED && EFFECT_NONE!=opts.buttonEffect)
 #endif
