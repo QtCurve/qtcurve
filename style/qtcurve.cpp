@@ -2694,7 +2694,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_SliderSpaceAvailable:
             if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
             {
-                int size((SLIDER_TRIANGULAR==opts.sliderStyle ? 17 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)))+QTC_SLIDER_GLOW);
+                int size(pixelMetric(PM_SliderControlThickness, slider, widget));
 
                 if (slider->tickPosition & QSlider::TicksBelow)
                     ++size;
@@ -9016,12 +9016,12 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                 }
                 else
                 {
-                    int  tickOffset(slider->tickPosition&QSlider::TicksAbove ||
+                    bool horizontal(Qt::Horizontal==slider->orientation);
+                    int  thickness(pixelMetric(PM_SliderControlThickness, slider, widget)),
+                         tickOffset(slider->tickPosition&QSlider::TicksAbove ||
                                     slider->tickPosition&QSlider::TicksBelow
                                         ? pixelMetric(PM_SliderTickmarkOffset, slider, widget)
-                                        : pixelMetric(PM_SliderTickmarkOffset, slider, widget)/2),
-                         thickness(pixelMetric(PM_SliderControlThickness, slider, widget));
-                    bool horizontal(Qt::Horizontal==slider->orientation);
+                                        : ((horizontal ? r.height() : r.width()) - thickness)/2);
 
                     switch (subControl)
                     {
