@@ -2743,16 +2743,20 @@ static gboolean qtInit()
 
             {
                 gboolean customSliderW=DEFAULT_SLIDER_WIDTH!=opts.sliderWidth;
-                int      length=(SLIDER_TRIANGULAR==opts.sliderStyle
-                                ? 11
-                                : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                    ? (customSliderW ? QTC_SLIDER_SIZE +6 : 13)
-                                    : (customSliderW ? QTC_SLIDER_SIZE -2 : 21) ) + QTC_SLIDER_GLOW,
-                         width = (SLIDER_TRIANGULAR==opts.sliderStyle
-                                ? 18
-                                : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                    ? (customSliderW ? QTC_SLIDER_SIZE -2 : 21)
-                                    : (customSliderW ? QTC_SLIDER_SIZE +6 : 13) ) + QTC_SLIDER_GLOW;
+                int      length=(SLIDER_CIRCULAR==opts.sliderStyle
+                                    ? QTC_CIRCULAR_SLIDER_SIZE
+                                    : SLIDER_TRIANGULAR==opts.sliderStyle
+                                        ? 11
+                                        : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
+                                            ? (customSliderW ? QTC_SLIDER_SIZE +6 : 13)
+                                            : (customSliderW ? QTC_SLIDER_SIZE -2 : 21) ) + QTC_SLIDER_GLOW,
+                         width = (SLIDER_CIRCULAR==opts.sliderStyle
+                                    ? QTC_CIRCULAR_SLIDER_SIZE
+                                    : SLIDER_TRIANGULAR==opts.sliderStyle
+                                        ? 18
+                                        : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
+                                            ? (customSliderW ? QTC_SLIDER_SIZE -2 : 21)
+                                            : (customSliderW ? QTC_SLIDER_SIZE +6 : 13) ) + QTC_SLIDER_GLOW;
 
                 static const char *constStrFormat="style \""QTC_RC_SETTING"Sldr\" "
                                                   "{GtkScale::slider_length = %d GtkScale::slider_width = %d} "

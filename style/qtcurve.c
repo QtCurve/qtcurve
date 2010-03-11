@@ -1551,6 +1551,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
     double      xd=x+0.5, yd=y+0.5;
 
+    if(QTC_CIRCULAR_SLIDER(widget))
+        horiz=true;
+
     if(WIDGET_TROUGH==widget && !opts.borderSbarGroove && flags&DF_DO_BORDER)
         flags-=DF_DO_BORDER;
 
@@ -1659,7 +1662,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
             gboolean mo=GTK_STATE_PRELIGHT==state && opts.highlightFactor;
             int      xa=x, ya=y, wa=width, ha=height;
 
-            if(WIDGET_RADIO_BUTTON==widget)
+            if(WIDGET_RADIO_BUTTON==widget || QTC_CIRCULAR_SLIDER(widget))
             {
                 double          topSize=(ha*0.4),
                                 topWidthAdjust=3.5,
