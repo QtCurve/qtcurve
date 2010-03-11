@@ -1058,6 +1058,9 @@ QtCurveStyle::QtCurveStyle()
         case IND_GLOW:
             itsDefBtnCols=itsFocusCols;
             break;
+        case IND_SELECTED:
+            itsDefBtnCols=itsHighlightCols;
+            break;
         case IND_TINT:
             itsDefBtnCols=new QColor [TOTAL_SHADES+1];
             shadeColors(tint(itsButtonCols[ORIGINAL_SHADE],
@@ -1229,7 +1232,7 @@ QtCurveStyle::~QtCurveStyle()
         delete [] itsActiveMdiColors;
     if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
         delete [] itsMdiColors;
-    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols)
+    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols && itsDefBtnCols!=itsHighlightCols)
         delete [] itsDefBtnCols;
     if(itsSliderCols && itsSliderCols!=itsHighlightCols)
         delete [] itsSliderCols;
@@ -4260,7 +4263,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(isOnListView)
                 opt.state|=State_Horizontal|State_Raised;
 
-            if(isDefault && state&State_Enabled && IND_TINT==opts.defBtnIndicator)
+            if(isDefault && state&State_Enabled && (IND_TINT==opts.defBtnIndicator || IND_SELECTED==opts.defBtnIndicator))
                 use=itsDefBtnCols;
             else if(state&QTC_STATE_DWT_BUTTON && widget && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR &&
                     coloredMdiButtons(state&State_Active, state&State_MouseOver) &&
