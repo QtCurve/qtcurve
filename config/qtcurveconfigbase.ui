@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>755</width>
-    <height>522</height>
+    <width>760</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -661,7 +661,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QCheckBox" name="colorSliderMouseOver">
          <property name="whatsThis">
           <string>Controls whether the coloration happens all the time, or only when the mouse hovers over the slider.</string>
@@ -671,28 +671,28 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_13">
          <property name="text">
           <string>Style:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="sliderStyle">
          <property name="whatsThis">
           <string>Controls the appearance of standard sliders - i.e. not scrollbar sliders. 'Triangular' is very similar to plastik's sliders.</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_50">
          <property name="text">
           <string>Used slider groove:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="fillSlider">
          <property name="whatsThis">
           <string>Indicates whether the used part of a slider's groove should be filled or not. (Does not affect scrollbar sliders).</string>
@@ -702,28 +702,28 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QComboBox" name="sliderFill">
          <property name="whatsThis">
           <string>Controls the gradient setting used for the used part of a standard sliders' groove.</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_30">
          <property name="text">
           <string>Groove appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QComboBox" name="grooveAppearance">
          <property name="whatsThis">
           <string>Controls the gradient setting used for both scrollbar sliders, and other sliders.</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="thinSbarGroove">
          <property name="whatsThis">
           <string>Controls whether scrollbar slider grooves should be the same thickness as the slider, or be thinner (and more like the groove of a standard slider).</string>
@@ -733,21 +733,21 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QCheckBox" name="borderSbarGroove">
          <property name="text">
           <string>Bordered</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="11" column="0">
         <widget class="QLabel" name="label_14">
          <property name="text">
           <string>Scrollbar buttons:</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QComboBox" name="scrollbarType">
          <property name="whatsThis">
           <string>&lt;p&gt;This controls the position, and number, of buttons on a scrollbar.
@@ -755,7 +755,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QCheckBox" name="flatSbarButtons">
          <property name="whatsThis">
           <string>If enabled, then scrollbar buttons are not drawn and only the arrows will appear.</string>
@@ -765,42 +765,42 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_32">
          <property name="text">
           <string>Background:</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="13" column="1">
         <widget class="QComboBox" name="sbarBgndAppearance">
          <property name="whatsThis">
           <string>Configures the background gradient to be used with 'Flat' scrollbar buttons.</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_15">
          <property name="text">
           <string>Slider thumbs:</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="14" column="1">
         <widget class="QComboBox" name="sliderThumbs">
          <property name="whatsThis">
           <string>Defines what markings should be placed in the center of scrollbar sliders (and plain style sliders).</string>
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="15" column="0">
         <widget class="QLabel" name="label_15a">
          <property name="text">
           <string>Slider width:</string>
          </property>
         </widget>
        </item>
-       <item row="14" column="1">
+       <item row="15" column="1">
         <widget class="KIntNumInput" name="sliderWidth">
          <property name="whatsThis">
           <string>Controls the width of scrollbar sliders, and plain style sliders.</string>
@@ -810,6 +810,16 @@
          </property>
          <property name="prefix">
           <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="stripedSbar">
+         <property name="whatsThis">
+          <string>If enabled, a fading stripe will be added.</string>
+         </property>
+         <property name="text">
+          <string>Striped</string>
          </property>
         </widget>
        </item>
@@ -3496,6 +3506,7 @@
   <tabstop>sliderAppearance</tabstop>
   <tabstop>shadeSliders</tabstop>
   <tabstop>customSlidersColor</tabstop>
+  <tabstop>stripedSbar</tabstop>
   <tabstop>colorSliderMouseOver</tabstop>
   <tabstop>sliderStyle</tabstop>
   <tabstop>fillSlider</tabstop>

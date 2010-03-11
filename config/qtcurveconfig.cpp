@@ -770,6 +770,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(splitters, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(fillSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(stripedSbar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menubarHiding, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
@@ -2114,6 +2115,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.customMenuSelTextColor=customMenuSelTextColor->color();
     opts.customMenuTextColor=customMenuTextColor->isChecked();
     opts.fillSlider=fillSlider->isChecked();
+    opts.stripedSbar=stripedSbar->isChecked();
     opts.sliderStyle=(ESliderStyle)sliderStyle->currentIndex();
     opts.roundMbTopOnly=roundMbTopOnly->isChecked();
     opts.menubarHiding=menubarHiding->isChecked();
@@ -2307,6 +2309,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     animatedProgress->setEnabled(STRIPE_NONE!=stripedProgress->currentIndex());
 
     fillSlider->setChecked(opts.fillSlider);
+    stripedSbar->setChecked(opts.stripedSbar);
     sliderStyle->setCurrentIndex(opts.sliderStyle);
     roundMbTopOnly->setChecked(opts.roundMbTopOnly);
     menubarHiding->setChecked(opts.menubarHiding);
@@ -2528,6 +2531,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          menuBgndGrad->currentIndex()!=opts.menuBgndGrad ||
          embolden->isChecked()!=opts.embolden ||
          fillSlider->isChecked()!=opts.fillSlider ||
+         stripedSbar->isChecked()!=opts.stripedSbar ||
          sliderStyle->currentIndex()!=opts.sliderStyle ||
          roundMbTopOnly->isChecked()!=opts.roundMbTopOnly ||
          menubarHiding->isChecked()!=opts.menubarHiding ||
