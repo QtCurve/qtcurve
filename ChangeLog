@@ -8,18 +8,19 @@
  4. Add options to draw square progress and entry fields when rounding.
  5. Add option to control whether progressbars have a border on all sides, or just
     top/bottom.
- 6. Add circular slider style.
- 7. Add glow to mouse over of slider handles (not scrollbars).
- 8. Add option to draw stripes on scrollbar sliders.
- 9. Add a 'faded' style porgressbar stripe option.
-10. Improve appearance of button style check and radio buttons.
-11. Add option to control whether scrollbar groove has a border or not.
-12. Dont use pixmaps to draw rounded slider, or radio buttons.
-13. Add option to increase size of check/radios - default is now 15pixels.
+ 6. Add option to colour default buttons using highlight colour.
+ 7. Add circular slider style.
+ 8. Add glow to mouse over of slider handles (not scrollbars).
+ 9. Add option to draw stripes on scrollbar sliders.
+10. Add a 'faded' style porgressbar stripe option.
+11. Improve appearance of button style check and radio buttons.
+12. Add option to control whether scrollbar groove has a border or not.
+13. Dont use pixmaps to draw rounded slider, or radio buttons.
+14. Add option to increase size of check/radios - default is now 15pixels.
     (For Mozilla apps, the old 13pixel size will be used).
-14. Fix calculation of alpha values for square rings.
-15. Fix progressbar glow central position.
-16. Draw more frames.
+15. Fix calculation of alpha values for square rings.
+16. Fix progressbar glow central position.
+17. Draw more frames.
 
 1.1.1
 -----

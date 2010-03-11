@@ -3888,7 +3888,7 @@ debugDisplayWidget(widget, 3);
                 }
                 else
                 {
-                    GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator)
+                    GdkColor *cols=defBtn && (IND_TINT==opts.defBtnIndicator || IND_COLORED==opts.defBtnIndicator || IND_SELECTED==opts.defBtnIndicator)
                                     ? qtcPalette.defbtn
                                     : WIDGET_COMBO_BUTTON==widgetType && qtcPalette.combobtn && GTK_STATE_INSENSITIVE!=state
                                         ? qtcPalette.combobtn
@@ -7103,6 +7103,9 @@ static void generateColors()
             shadeColors(&col, qtcPalette.defbtn);
             break;
         }
+        case IND_SELECTED:
+            qtcPalette.defbtn=qtcPalette.highlight;
+            break;
         default:
             break;
         case IND_COLORED:
