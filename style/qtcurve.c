@@ -7167,7 +7167,7 @@ static void generateColors()
 
     qtcPalette.selectedcr=NULL;
 
-    if(opts.crColor)
+    switch(opts.crColor)
     {
         case SHADE_DARKEN:
         {
@@ -7180,7 +7180,7 @@ static void generateColors()
         }
         default:
         case SHADE_NONE:
-            qtcPalette.selectedcr=qtcPalette.button;
+            qtcPalette.selectedcr=qtcPalette.button[PAL_ACTIVE];
             break;
         case SHADE_SELECTED:
             qtcPalette.selectedcr=qtcPalette.highlight;
@@ -7213,8 +7213,6 @@ static void generateColors()
                 qtcPalette.selectedcr=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
                 shadeColors(&mid, qtcPalette.selectedcr);
             }
-        default:
-            break;
     }
         
     qtcPalette.sidebar=NULL;
