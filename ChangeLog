@@ -9,22 +9,23 @@
  5. Add option to control whether progressbars have a border on all sides, or just
     top/bottom.
  6. Add option to colour default buttons using highlight colour.
- 7. Add circular slider style.
- 8. Add glow to mouse over of slider handles (not scrollbars).
- 9. Add option to draw stripes on scrollbar sliders.
-10. Add a 'faded' style porgressbar stripe option.
-11. Allow to draw focus highlight for square scrollviews.
-12. Improve appearance of button style check and radio buttons.
-13. Add option to control whether scrollbar groove has a border or not.
-14. Dont use pixmaps to draw rounded slider, or radio buttons.
-15. Add option to increase size of check/radios - default is now 15pixels.
-16. Really fix Qt only compile.
-17. Increase default shadow sizes.
-18. If using gtk style combos and bordering menu items, increase frame width by
+ 7. Expand selected check/radio colour option so as to be able to specift colour.
+ 8. Add circular slider style.
+ 9. Add glow to mouse over of slider handles (not scrollbars).
+10. Add option to draw stripes on scrollbar sliders.
+11. Add a 'faded' style porgressbar stripe option.
+12. Allow to draw focus highlight for square scrollviews.
+13. Improve appearance of button style check and radio buttons.
+14. Add option to control whether scrollbar groove has a border or not.
+15. Dont use pixmaps to draw rounded slider, or radio buttons.
+16. Add option to increase size of check/radios - default is now 15pixels.
+17. Really fix Qt only compile.
+18. Increase default shadow sizes.
+19. If using gtk style combos and bordering menu items, increase frame width by
     1 pixel.
-19. Remove border from preview colour square in KDE colour selection dialog.
-20. Only offset vertical position of etch text.
-21. OpenOffice.org improvements:
+20. Remove border from preview colour square in KDE colour selection dialog.
+21. Only offset vertical position of etch text.
+22. OpenOffice.org improvements:
      - only draw check of checkboxes in menus
      - draw check for radios in menus
      - draw frames (general, line edits, scrollviews)
@@ -35,7 +36,7 @@
      - fix spin buttons appearing disabled
      - only apply menu fix to oo.o menus, not file selector menus
      - use square entry fields
-22. Set Qt toolbar font to KDE setting - but not for lineedits and comboboxes.
+23. Set Qt toolbar font to KDE setting - but not for lineedits and comboboxes.
 
 1.1.1
 -----

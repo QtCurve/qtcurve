@@ -952,7 +952,6 @@ typedef struct
                      framelessGroupBoxes,
                      groupBoxLine,
                      crButton,
-                     crColor,
                      smallRadio,
                      fillProgress,
                      comboSplitter,
@@ -1043,7 +1042,8 @@ typedef struct
                      menuStripe,
                      shadeCheckRadio,
                      comboBtn,
-                     sortedLv;
+                     sortedLv,
+                     crColor;
     EColor           progressGrooveColor;
     EEffect          buttonEffect;
     EScrollbar       scrollbarType;
@@ -1055,7 +1055,8 @@ typedef struct
                      customMenuStripeColor,
                      customCheckRadioColor,
                      customComboBtnColor,
-                     customSortedLvColor;
+                     customSortedLvColor,
+                     customCrBgndColor;
     EShading         shading;
 #if defined __cplusplus
     EAlign           titlebarAlignment;

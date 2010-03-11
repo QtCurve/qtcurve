@@ -1823,16 +1823,6 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
-        <widget class="QCheckBox" name="crColor">
-         <property name="whatsThis">
-          <string>Controls whether the background of a selected checkbox, or radio button, should be tinted with the 'highlight' color.</string>
-         </property>
-         <property name="text">
-          <string>Color when selected</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_87">
          <property name="text">
@@ -1844,6 +1834,27 @@
         <widget class="QComboBox" name="crSize">
          <property name="whatsThis">
           <string>Configures the size of checkboxes and radio buttons.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QComboBox" name="crColor">
+         <property name="whatsThis">
+          <string>Sets the color of selected checkboxes and radio buttons when these are set to 'button like'.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="KColorButton" name="customCrBgndColor">
+         <property name="whatsThis">
+          <string>Sets the custom color.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_88">
+         <property name="text">
+          <string>Selected emblem:</string>
          </property>
         </widget>
        </item>
@@ -3572,6 +3583,7 @@
   <tabstop>crHighlight</tabstop>
   <tabstop>crButton</tabstop>
   <tabstop>crColor</tabstop>
+  <tabstop>customCrBgndColor</tabstop>
   <tabstop>titlebarAppearance</tabstop>
   <tabstop>inactiveTitlebarAppearance</tabstop>
   <tabstop>titlebarAlignment</tabstop>
@@ -3677,12 +3689,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>261</x>
-     <y>58</y>
+     <x>357</x>
+     <y>410</y>
     </hint>
     <hint type="destinationlabel">
-     <x>261</x>
-     <y>58</y>
+     <x>360</x>
+     <y>325</y>
     </hint>
    </hints>
   </connection>
@@ -3693,8 +3705,8 @@
    <slot>exportKDE3()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>344</x>
-     <y>43</y>
+     <x>266</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>662</x>
@@ -3709,12 +3721,44 @@
    <slot>exportQt()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>440</x>
-     <y>76</y>
+     <x>266</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>532</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>crButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>crColor</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>crButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>customCrBgndColor</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>473</x>
+     <y>261</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>425</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>

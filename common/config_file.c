@@ -1395,6 +1395,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_SHADE(shadeMenubars, true, false, &opts->customMenubarsColor)
             QTC_CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor)
             QTC_CFG_READ_SHADE(sortedLv, true, false, &opts->customSortedLvColor)
+            QTC_CFG_READ_SHADE(crColor,  true, false, &opts->customCrBgndColor)
             QTC_CFG_READ_APPEARANCE(menubarAppearance, false)
             QTC_CFG_READ_APPEARANCE(menuitemAppearance, true)
             QTC_CFG_READ_APPEARANCE(toolbarAppearance, false)
@@ -1460,7 +1461,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(colorMenubarMouseOver)
             QTC_CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
             QTC_CFG_READ_BOOL(crButton)
-            QTC_CFG_READ_BOOL(crColor)
             QTC_CFG_READ_BOOL(smallRadio)
             QTC_CFG_READ_BOOL(fillProgress)
             QTC_CFG_READ_BOOL(comboSplitter)
@@ -2150,7 +2150,7 @@ static void defaultSettings(Options *opts)
     opts->groupBoxLine=true;
     opts->colorMenubarMouseOver=true;
     opts->crButton=true;
-    opts->crColor=false;
+    opts->crColor=SHADE_NONE;
     opts->smallRadio=true;
     opts->fillProgress=true;
     opts->comboSplitter=false;
@@ -2831,7 +2831,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(colorMenubarMouseOver)
         CFG_WRITE_ENTRY_NUM(crHighlight)
         CFG_WRITE_ENTRY(crButton)
-        CFG_WRITE_ENTRY(crColor)
+        CFG_WRITE_SHADE_ENTRY(crColor, customCrBgndColor)
         CFG_WRITE_ENTRY(smallRadio)
         CFG_WRITE_ENTRY(fillProgress)
         CFG_WRITE_ENTRY(comboSplitter)

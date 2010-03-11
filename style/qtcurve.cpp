@@ -1153,21 +1153,51 @@ QtCurveStyle::QtCurveStyle()
                         itsSortedLvColors);
     }
 
-    if(opts.crColor)
-        if(SHADE_BLEND_SELECTED==opts.shadeSliders)
-            itsCheckRadioSelCols=itsSliderCols;
-        else if(IND_COLORED==opts.defBtnIndicator)
-            itsCheckRadioSelCols=itsDefBtnCols;
-        else if(SHADE_BLEND_SELECTED==opts.comboBtn)
-            itsCheckRadioSelCols=itsComboBtnCols;
-        else if(SHADE_BLEND_SELECTED==opts.sortedLv && opts.lvButton)
-            itsCheckRadioSelCols=itsSortedLvColors;
-        else
-        {
-            itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
-            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                                 itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
-        }
+    switch(opts.crColor)
+    {
+        default:
+        case SHADE_NONE:
+            itsCheckRadioSelCols=itsButtonCols;
+            break;
+        case SHADE_DARKEN:
+            if(!itsCheckRadioSelCols)
+                itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
+            shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
+            break;
+        case SHADE_SELECTED:
+            itsCheckRadioSelCols=itsHighlightCols;
+            break;
+        case SHADE_CUSTOM:
+            if(SHADE_CUSTOM==opts.shadeSliders && opts.customSlidersColor==opts.customCrBgndColor)
+                itsCheckRadioSelCols=itsSliderCols;
+            else if(SHADE_CUSTOM==opts.comboBtn && opts.customComboBtnColor==opts.customCrBgndColor)
+                itsCheckRadioSelCols=itsComboBtnCols;
+            else if(SHADE_CUSTOM==opts.sortedLv && opts.customComboBtnColor==opts.customSortedLvColor)
+                itsCheckRadioSelCols=itsSortedLvColors;
+            else
+            {
+                if(!itsCheckRadioSelCols)
+                    itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
+                shadeColors(opts.customCrBgndColor, itsCheckRadioSelCols);
+            }
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                itsCheckRadioSelCols=itsSliderCols;
+            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+                itsCheckRadioSelCols=itsComboBtnCols;
+            else if(SHADE_BLEND_SELECTED==opts.sortedLv)
+                itsCheckRadioSelCols=itsSortedLvColors;
+            else
+            {
+                if(!itsCheckRadioSelCols)
+                    itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
+                shadeColors(SHADE_BLEND_SELECTED==opts.sortedLv
+                                ? midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE])
+                                : opts.customSortedLvColor,
+                            itsCheckRadioSelCols);
+            }
+    }
 
     setMenuColors(QApplication::palette().color(QPalette::Active, QPalette::Background));
 
@@ -1242,7 +1272,8 @@ QtCurveStyle::~QtCurveStyle()
        itsSortedLvColors!=itsComboBtnCols)
         delete [] itsSortedLvColors;
     if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
-       itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors)
+       itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors && 
+       itsCheckRadioSelCols!=itsButtonCols && itsCheckRadioSelCols!=itsHighlightCols)
         delete [] itsCheckRadioSelCols;
     if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
@@ -1366,14 +1397,15 @@ void QtCurveStyle::polish(QPalette &palette)
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
                      (newButton || newHighlight)),
-         newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsHighlightCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
+         newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsDefBtnCols!=itsSortedLvColors && itsSliderCols!=itsSortedLvColors &&
                                              itsComboBtnCols!=itsSortedLvColors) ||
                                              SHADE_DARKEN==opts.sortedLv) &&
                      (newContrast || (opts.lvButton ? newButton : newGray))),
-         newCheckRadioSelCols((newButton || newGray) &&
-                              itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols &&
-                              itsCheckRadioSelCols!=itsSliderCols &&
-                              itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors);
+         newCheckRadioSelCols(itsCheckRadioSelCols && ( (SHADE_BLEND_SELECTED==opts.crColor && itsDefBtnCols!=itsCheckRadioSelCols &&
+                                                         itsSliderCols!=itsCheckRadioSelCols && itsComboBtnCols!=itsCheckRadioSelCols &&
+                                                         itsSortedLvColors!=itsCheckRadioSelCols) ||
+                                             SHADE_DARKEN==opts.crColor) &&
+                     (newContrast || newButton));
 
     if(newGray)
     {
@@ -1404,8 +1436,7 @@ void QtCurveStyle::polish(QPalette &palette)
 
 // printf("%d %d %d %d %d %d %d %d %d\n", newContrast, newHighlight, newGray, newButton, newSlider, newDefBtn, newComboBtn, newSortedLv, newCheckRadioSelCols);
     if(newSlider)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                    itsButtonCols[ORIGINAL_SHADE]), itsSliderCols);
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsSliderCols);
 
     if(newDefBtn)
         if(IND_TINT==opts.defBtnIndicator)
@@ -1416,8 +1447,7 @@ void QtCurveStyle::polish(QPalette &palette)
                         itsButtonCols[ORIGINAL_SHADE]), itsDefBtnCols);
 
     if(newComboBtn)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                    itsButtonCols[ORIGINAL_SHADE]), itsComboBtnCols);
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsComboBtnCols);
 
     if(newSortedLv)
         if(SHADE_BLEND_SELECTED==opts.sortedLv)
@@ -1438,8 +1468,7 @@ void QtCurveStyle::polish(QPalette &palette)
     switch(opts.shadeCheckRadio)
     {
         default:
-            itsCheckRadioCol=palette.color(QPalette::Active, opts.crButton
-                                                                 ? QPalette::ButtonText : QPalette::Text);
+            itsCheckRadioCol=palette.color(QPalette::Active, opts.crButton ? QPalette::ButtonText : QPalette::Text);
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
@@ -1450,8 +1479,10 @@ void QtCurveStyle::polish(QPalette &palette)
     }
 
     if(newCheckRadioSelCols)
-        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
-                             itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
+        if(SHADE_BLEND_SELECTED==opts.crColor)
+            shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
+        else
+            shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
 
     palette.setColor(QPalette::Active, QPalette::Light, itsBackgroundCols[0]);
     palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);

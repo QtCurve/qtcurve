@@ -394,7 +394,8 @@ enum ShadeWidget
     SW_CHECK_RADIO,
     SW_MENU_STRIPE,
     SW_COMBO,
-    SW_LV_HEADER
+    SW_LV_HEADER,
+    SW_CR_BGND
 };
 
 static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
@@ -411,6 +412,7 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
         case SW_CHECK_RADIO:
             combo->insertItem(SHADE_NONE, i18n("Text"));
             break;
+        case SW_CR_BGND:
         case SW_LV_HEADER:
         case SW_MENU_STRIPE:
             combo->insertItem(SHADE_NONE, i18n("None"));
@@ -663,6 +665,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertShadeEntries(menuStripe, SW_MENU_STRIPE);
     insertShadeEntries(comboBtn, SW_COMBO);
     insertShadeEntries(sortedLv, SW_LV_HEADER);
+    insertShadeEntries(crColor, SW_CR_BGND);
     insertAppearanceEntries(appearance);
     insertAppearanceEntries(menubarAppearance);
     insertAppearanceEntries(toolbarAppearance);
@@ -859,7 +862,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(dwtEffectAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtRoundTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(xbar, SIGNAL(toggled(bool)), SLOT(xbarChanged()));
-    connect(crColor, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(crColor, SIGNAL(currentIndexChanged(int)), SLOT(crColorChanged()));
+    connect(customCrBgndColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(smallRadio, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(splitterHighlight, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(gtkComboMenus, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1076,6 +1080,12 @@ void QtCurveConfig::comboBtnChanged()
 void QtCurveConfig::sortedLvChanged()
 {
     customSortedLvColor->setEnabled(SHADE_CUSTOM==sortedLv->currentIndex());
+    updateChanged();
+}
+
+void QtCurveConfig::crColorChanged()
+{
+    customCrBgndColor->setEnabled(SHADE_CUSTOM==crColor->currentIndex());
     updateChanged();
 }
 
@@ -2180,7 +2190,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menuBgndImage.type=(EImageType)menuBgndImage->currentIndex();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
     opts.xbar=xbar->isChecked();
-    opts.crColor=crColor->isChecked();
+    opts.crColor=(EShade)crColor->currentIndex();
+    opts.customCrBgndColor=customCrBgndColor->color();
     opts.smallRadio=smallRadio->isChecked();
     opts.splitterHighlight=splitterHighlight->value();
     opts.gtkComboMenus=gtkComboMenus->isChecked();
@@ -2405,7 +2416,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     dwtEffectAsPerTitleBar->setChecked(opts.dwtSettings&QTC_DWT_EFFECT_AS_PER_TITLEBAR);
     dwtRoundTopOnly->setChecked(opts.dwtSettings&QTC_DWT_ROUND_TOP_ONLY);
     xbar->setChecked(opts.xbar);
-    crColor->setChecked(opts.crColor);
+    crColor->setCurrentIndex(opts.crColor);
+    customCrBgndColor->setColor(opts.customCrBgndColor);
     smallRadio->setChecked(opts.smallRadio);
     smallRadio_false->setChecked(!opts.smallRadio);
     splitterHighlight->setValue(opts.splitterHighlight);
@@ -2627,7 +2639,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          menuBgndImage->currentIndex()!=opts.menuBgndImage.type ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
          xbar->isChecked()!=opts.xbar ||
-         crColor->isChecked()!=opts.crColor ||
+         crColor->currentIndex()!=opts.crColor ||
          smallRadio->isChecked()!=opts.smallRadio ||
          splitterHighlight->value()!=opts.splitterHighlight ||
          gtkComboMenus->isChecked()!=opts.gtkComboMenus ||
@@ -2661,6 +2673,8 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
                customComboBtnColor->color()!=opts.customComboBtnColor) ||
          (SHADE_CUSTOM==opts.sortedLv &&
                customSortedLvColor->color()!=opts.customSortedLvColor) ||
+         (SHADE_CUSTOM==opts.crColor &&
+               customCrBgndColor->color()!=opts.customCrBgndColor) ||
 
          customGradient!=opts.customGradient ||
 
