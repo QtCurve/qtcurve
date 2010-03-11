@@ -301,6 +301,8 @@ static EStripe toStripe(const char *str, EStripe def)
             return STRIPE_NONE;
         if(0==memcmp(str, "diagonal", 8))
             return STRIPE_DIAGONAL;
+        if(0==memcmp(str, "fade", 4))
+            return STRIPE_FADE;
     }
 
     return def;
@@ -1486,6 +1488,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(borderSelection)
             QTC_CFG_READ_BOOL(squareProgress)
             QTC_CFG_READ_BOOL(squareEntry)
+            QTC_CFG_READ_BOOL(stripedSbar)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(stdBtnSizes)
             QTC_CFG_READ_BOOL(titlebarBorder)
@@ -1903,6 +1906,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             opts->crSize=QTC_CR_SMALL_SIZE;
             if(SLIDER_CIRCULAR==opts->sliderStyle)
                 opts->sliderStyle=SLIDER_ROUND;
+            if(STRIPE_FADE==opts->stripedProgress)
+                opts->stripedProgress=STRIPE_PLAIN;
 #endif
             /* For now, only 2 sizes... */
             if(opts->crSize!=QTC_CR_SMALL_SIZE && opts->crSize!=QTC_CR_LARGE_SIZE)
@@ -2171,6 +2176,7 @@ static void defaultSettings(Options *opts)
     opts->borderSelection=false;
     opts->squareProgress=false;
     opts->squareEntry=false;
+    opts->stripedSbar=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarBorder=true;
@@ -2472,6 +2478,8 @@ static const char *toStr(EStripe s)
             return "none";
         case STRIPE_DIAGONAL:
             return "diagonal";
+        case STRIPE_FADE:
+            return "fade";
     }
 }
 
@@ -2850,6 +2858,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(borderSelection)
         CFG_WRITE_ENTRY(squareProgress)
         CFG_WRITE_ENTRY(squareEntry)
+        CFG_WRITE_ENTRY(stripedSbar)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)

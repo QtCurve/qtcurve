@@ -29,7 +29,7 @@ sortedLv=selected
 squareLvSelection=true
 squareScrollViews=true
 stdBtnSizes=true
-stripedProgress=plain
+stripedProgress=fade
 sunkenAppearance=inverted
 titlebarBorder=false
 titlebarButtonAppearance=agua
@@ -54,3 +54,5 @@ unifyCombo=false
 unifySpin=false
 unifySpinBtns=true
 tabBgnd=-2
+stripedSbar=true
+

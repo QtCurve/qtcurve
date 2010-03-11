@@ -723,7 +723,8 @@ typedef enum
 {
     STRIPE_NONE,
     STRIPE_PLAIN,
-    STRIPE_DIAGONAL
+    STRIPE_DIAGONAL,
+    STRIPE_FADE
 } EStripe;
 
 typedef enum
@@ -987,7 +988,8 @@ typedef struct
                      coloredTbarMo,
                      borderSelection,
                      squareProgress,
-                     squareEntry;
+                     squareEntry,
+                     stripedSbar;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,

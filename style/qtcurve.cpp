@@ -602,6 +602,28 @@ static QColor blendColors(const QColor &foreground, const QColor &background, do
 #endif
 }
 
+static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect, bool horizontal)
+{
+    QPoint          end(offset + (horizontal ? QPoint(10, 0) : QPoint(0, 10)));
+    QColor          col(Qt::white);
+    QLinearGradient patternGradient(rect.topLeft(), rect.topLeft()+periodEnd);
+
+    col.setAlphaF(0.0);
+    patternGradient.setColorAt(0.0, col);
+    col.setAlphaF(0.15);
+    patternGradient.setColorAt(1.0, col);
+    patternGradient.setSpread(QGradient::ReflectSpread);
+    if(path.isEmpty())
+        p->fillRect(rect, patternGradient);
+    else
+    {
+        p->save();
+        p->setRenderHint(QPainter::Antialiasing, true);
+        p->fillPath(path, patternGradient);
+        p->restore();
+    }
+}
+
 // from windows style
 static const int windowsItemFrame    =  2; // menu item frame width
 static const int windowsItemHMargin  =  3; // menu item hor text margin
@@ -9504,6 +9526,8 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
     p->setClipRect(origRect, Qt::IntersectClip);
     p->drawTiledPixmap(fillRect, *pix);
     p->restore();
+    if(STRIPE_FADE==opts.stripedProgress && fillRect.width()>4 && fillRect.height()>4)
+        addStripes(p, QPainterPath(), fillRect, !vertical);
 
     if(!inCache)
         delete pix;
@@ -9725,6 +9749,14 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                                        pix.copy(0, endSize, pix.width(), middle));
                 p->drawPixmap(r.x(), r.y(), pix.copy(0, 0, pix.width(), endSize));
                 p->drawPixmap(r.x(), r.y()+r.height()-endSize, pix.copy(0, pix.height()-endSize, pix.width(), endSize));
+            }
+
+            if(WIDGET_SB_SLIDER==w && opts.stripedSbar)
+            {
+                QRect rx(r.adjusted(1, 1, -1, -1));
+                addStripes(p, buildPath(rx, WIDGET_SB_SLIDER, realRound, getRadius(&opts, rx.width()-1, rx.height()-1, WIDGET_SB_SLIDER,
+                                                                                   RADIUS_INTERNAL)),
+                           rx, horiz);
             }
         }
     }
