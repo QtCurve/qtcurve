@@ -543,6 +543,7 @@ static void insertSliderStyleEntries(QComboBox *combo)
     combo->insertItem(SLIDER_PLAIN_ROTATED, i18n("Plain - rotated"));
     combo->insertItem(SLIDER_ROUND_ROTATED, i18n("Round - rotated"));
     combo->insertItem(SLIDER_TRIANGULAR, i18n("Triangular"));
+    combo->insertItem(SLIDER_CIRCULAR, i18n("Circular"));
 }
 
 static void insertEColorEntries(QComboBox *combo)

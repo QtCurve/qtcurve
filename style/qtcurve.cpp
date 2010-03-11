@@ -2678,9 +2678,17 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case PM_ScrollBarSliderMin:
             return opts.sliderWidth+1;
         case PM_SliderThickness:
-            return (SLIDER_TRIANGULAR==opts.sliderStyle ? 19 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6)))+QTC_SLIDER_GLOW;
+            return (SLIDER_CIRCULAR==opts.sliderStyle
+                        ? QTC_CIRCULAR_SLIDER_SIZE+6
+                        : SLIDER_TRIANGULAR==opts.sliderStyle
+                            ? 19
+                            : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 11 : 6)))+QTC_SLIDER_GLOW;
         case PM_SliderControlThickness:
-            return (SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)))+QTC_SLIDER_GLOW;
+            return (SLIDER_CIRCULAR==opts.sliderStyle
+                        ? QTC_CIRCULAR_SLIDER_SIZE
+                        : SLIDER_TRIANGULAR==opts.sliderStyle
+                            ? 11
+                            : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? 6 : -2)))+QTC_SLIDER_GLOW;
          case PM_SliderTickmarkOffset:
              return SLIDER_TRIANGULAR==opts.sliderStyle ? 5 : 4;
         case PM_SliderSpaceAvailable:
@@ -2696,7 +2704,11 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             }
             return QTC_BASE_STYLE::pixelMetric(metric, option, widget);
         case PM_SliderLength:
-            return (SLIDER_TRIANGULAR==opts.sliderStyle ? 11 : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? -2 : 6)))+QTC_SLIDER_GLOW;
+            return (SLIDER_CIRCULAR==opts.sliderStyle
+                        ? QTC_CIRCULAR_SLIDER_SIZE
+                        : SLIDER_TRIANGULAR==opts.sliderStyle
+                            ? 11
+                            : (QTC_SLIDER_SIZE+(QTC_ROTATED_SLIDER ? -2 : 6)))+QTC_SLIDER_GLOW;
         case PM_ScrollBarExtent:
             return opts.sliderWidth;
         case PM_MaximumDragDistance:
@@ -9632,9 +9644,9 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
 
         int    endSize=0,
                middleSize=8;
-        bool   horiz(isHoriz(option, w)),
+        bool   horiz(QTC_CIRCULAR_SLIDER(w) || isHoriz(option, w)),
                circular( (WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
-                         WIDGET_RADIO_BUTTON==w );
+                         WIDGET_RADIO_BUTTON==w  || QTC_CIRCULAR_SLIDER(w));
         double radius=0;
         ERound realRound=getWidgetRound(&opts, r.width(), r.height(), w);
 
@@ -9747,7 +9759,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                                         MO_COLORED_THICK==opts.coloredMouseOver ||
                                               (MO_GLOW==opts.coloredMouseOver && !QTC_DO_EFFECT))),
                  doEtch(doBorder && ETCH_WIDGET(w) && QTC_DO_EFFECT),
-                 horiz(isHoriz(option, w));
+                 horiz(QTC_CIRCULAR_SLIDER(w) || isHoriz(option, w));
     const QColor *cols(custom ? custom : itsBackgroundCols),
                  *border(colouredMouseOver ? borderColors(option, cols) : cols);
 
@@ -9837,7 +9849,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
         }
 
         if(APPEARANCE_AGUA==app && !sunken)
-            if(WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_RADIO_BUTTON==w)
+            if(WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_RADIO_BUTTON==w || QTC_CIRCULAR_SLIDER(w))
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
                 double //botSize=(ra.height()*0.4),
@@ -10176,7 +10188,8 @@ QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, doub
 {
     QPainterPath path;
 
-    if(WIDGET_RADIO_BUTTON==w || (WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND))
+    if(WIDGET_RADIO_BUTTON==w || (WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND) ||
+       QTC_CIRCULAR_SLIDER(w))
     {
         path.addEllipse(r);
         return path;

@@ -170,6 +170,7 @@ typedef gchar ** Strings;
 
 #define QTC_THIN_SBAR_MOD  ((opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? 3 : opts.sliderWidth>DEFAULT_SLIDER_WIDTH ? (opts.sliderWidth-9)/2 : 4)+(EFFECT_NONE==opts.buttonEffect ? 1 : 0))
 #define QTC_SLIDER_SIZE (opts.sliderWidth<DEFAULT_SLIDER_WIDTH ? DEFAULT_SLIDER_WIDTH-2 : opts.sliderWidth)
+#define QTC_CIRCULAR_SLIDER_SIZE 15
 #define QTC_GLOW_MO        1 /*ORIGINAL_SHADE*/
 #define QTC_GLOW_DEFBTN    1
 #define QTC_GLOW_ALPHA(DEF) ((DEF) ? 0.5 : 0.65)
@@ -289,6 +290,7 @@ typedef gchar ** Strings;
 #endif
 
 #define QTC_SLIDER(w) (WIDGET_SB_SLIDER==(w) || WIDGET_SLIDER==(w))
+#define QTC_CIRCULAR_SLIDER(w) (WIDGET_SLIDER==(w) && SLIDER_CIRCULAR==opts.sliderStyle)
 
 #define MODIFY_AGUA_X(A, X) (APPEARANCE_AGUA==(A) ?  (X) : (A))
 #define MODIFY_AGUA(A)      MODIFY_AGUA_X((A), APPEARANCE_AGUA_MOD)
@@ -321,7 +323,7 @@ typedef gchar ** Strings;
 
 #define QTC_SLIDER_MO_SHADE  (SHADE_SELECTED==opts.shadeSliders ? 1 : (SHADE_BLEND_SELECTED==opts.shadeSliders ? 0 : ORIGINAL_SHADE))
 #define QTC_SLIDER_MO_BORDER (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 2 : 1)
-#define QTC_SLIDER_MO_LEN (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
+#define QTC_SLIDER_MO_LEN    (SLIDER_TRIANGULAR==opts.sliderStyle ? 2 : (SHADE_SELECTED==opts.shadeSliders || SHADE_BLEND_SELECTED==opts.shadeSliders ? 4 : 3))
 #define QTC_SB_SLIDER_MO_LEN(A) ((A)<22 && !QTC_FULLLY_ROUNDED \
                                     ? 2 \
                                     : ((A)<32 || (SHADE_SELECTED!=opts.shadeSliders && SHADE_BLEND_SELECTED!=opts.shadeSliders) \
@@ -731,6 +733,7 @@ typedef enum
     SLIDER_PLAIN_ROTATED,
     SLIDER_ROUND_ROTATED,
     SLIDER_TRIANGULAR,
+    SLIDER_CIRCULAR
 } ESliderStyle;
 
 #define QTC_ROTATED_SLIDER (SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle)
@@ -1680,7 +1683,8 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
 #endif
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if(WIDGET_SLIDER==widget && (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle))
+    if(WIDGET_SLIDER==widget &&
+       (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
         return ROUND_MAX;
 #endif
 
@@ -1727,7 +1731,8 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 #endif
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if(WIDGET_SLIDER==widget && (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle))
+    if(WIDGET_SLIDER==widget &&
+       (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
         return (w>h ? h : w)/2.0;
 #endif
 

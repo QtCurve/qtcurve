@@ -1,4 +1,4 @@
-/*
+ /*
   QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@googlemail.com
 
   ----
@@ -320,6 +320,8 @@ static ESliderStyle toSlider(const char *str, ESliderStyle def)
             return SLIDER_PLAIN_ROTATED;
         if(0==memcmp(str, "triangular", 10))
             return SLIDER_TRIANGULAR;
+        if(0==memcmp(str, "circular", 8))
+            return SLIDER_CIRCULAR;
     }
 
     return def;
@@ -1899,6 +1901,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
 #if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined QTC_CONFIG_DIALOG
             opts->crSize=QTC_CR_SMALL_SIZE;
+            if(SLIDER_CIRCULAR==opts->sliderStyle)
+                opts->sliderStyle=SLIDER_ROUND;
 #endif
             /* For now, only 2 sizes... */
             if(opts->crSize!=QTC_CR_SMALL_SIZE && opts->crSize!=QTC_CR_LARGE_SIZE)
@@ -2483,6 +2487,8 @@ static const char *toStr(ESliderStyle s)
             return "r-round";
         case SLIDER_PLAIN_ROTATED:
             return "r-plain";
+        case SLIDER_CIRCULAR:
+            return "circular";
         default:
         case SLIDER_ROUND:
             return "round";
