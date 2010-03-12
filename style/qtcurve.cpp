@@ -1880,7 +1880,6 @@ static int fontHeight(const QStyleOption *option, const QWidget *widget)
     return styledFontMetrics(option, widget).height();
 }
 
-
 // Taken from skulpture 0.2.3
 void QtCurveStyle::polishFormLayout(QFormLayout *layout)
 {
@@ -1994,7 +1993,6 @@ void QtCurveStyle::polishLayout(QLayout *layout)
     for (int i = 0; i < layout->count(); ++i)
         if (QLayout *l = layout->itemAt(i)->layout())
             polishLayout(l);
-
 }
 #endif
 
@@ -2207,10 +2205,7 @@ static bool updateMenuBarEvent(QMouseEvent *event, QMenuBar *menu)
 
     struct HackedMenu : public QMenuBar
     {
-        void send(QMouseEvent *ev)
-        {
-            event(ev);
-        }
+        void send(QMouseEvent *ev) { event(ev); }
     };
 
     if(((HackEvent *)event)->adjust())
@@ -2655,9 +2650,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             // Bangarang (media player) has a 4 pixel high menubar at the top - when it doesn't actually have a menubar!
             // Seems to be because of the return 2 below (which was previously always returned unless XBar support and
             // size was 0). So, if we are askes for these metrics for a widet whose size<6, then return 0.
-            return widget && widget->size().height() < 6
-                    ? 0
-                    : 2;
+            return widget && widget->size().height() < 6 ? 0 : 2;
         case PM_MenuHMargin:
         case PM_MenuVMargin:
             return 0;
@@ -2702,10 +2695,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 
             if(QTC_DO_EFFECT && opts.etchEntry &&
                 (!widget || // !isFormWidget(widget) &&
-                ::qobject_cast<const QLineEdit *>(widget) ||
-                ::qobject_cast<const QAbstractScrollArea*>(widget) ||
-                widget->inherits("Q3ScrollView") /*||
-                     isKontactPreviewPane(widget)*/))
+                ::qobject_cast<const QLineEdit *>(widget) || ::qobject_cast<const QAbstractScrollArea*>(widget) ||
+                widget->inherits("Q3ScrollView") /*|| isKontactPreviewPane(widget)*/))
                 return 3;
             else
                 return 2;
@@ -2713,12 +2704,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return QTC_DO_EFFECT && opts.etchEntry ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
-            return QTC_DO_EFFECT
-                        ? opts.crSize+2 : opts.crSize;
+            return QTC_DO_EFFECT ? opts.crSize+2 : opts.crSize;
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
-            return QTC_DO_EFFECT
-                        ? opts.crSize+2 : opts.crSize;
+            return QTC_DO_EFFECT ? opts.crSize+2 : opts.crSize;
         case PM_TabBarTabOverlap:
             return TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1;
         case PM_ProgressBarChunkWidth:
@@ -3072,11 +3061,9 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
             return KIcon("application-x-zerosize");
 //         case SP_FileLinkIcon:
         case SP_FileDialogStart:
-            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                    ? "go-edn" : "go-first");
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-edn" : "go-first");
         case SP_FileDialogEnd:
-            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                    ? "go-first" : "go-end");
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-first" : "go-end");
         case SP_FileDialogToParent:
             return KIcon("go-up");
         case SP_FileDialogNewFolder:
@@ -3090,8 +3077,7 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_FileDialogListView:
             return KIcon("view-list-icons");
         case SP_FileDialogBack:
-            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                    ? "go-next" : "go-previous");
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-next" : "go-previous");
         case SP_DialogOkButton:
             return KIcon("dialog-ok");
         case SP_DialogCancelButton:
@@ -3123,12 +3109,9 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
         case SP_ArrowRight:
             return KIcon("arrow-right");
         case SP_ArrowBack:
-            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                    ? "go-next" : "go-previous");
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-next" : "go-previous");
         case SP_ArrowForward:
-            return KIcon(Qt::RightToLeft==QApplication::layoutDirection()
-                                                    ? "go-previous"
-                                                    : "go-next");
+            return KIcon(Qt::RightToLeft==QApplication::layoutDirection() ? "go-previous" : "go-next");
         case SP_DirHomeIcon:
             return KIcon("user-home");
 //         case SP_CommandLink:
