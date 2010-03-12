@@ -537,7 +537,7 @@ static void insertStripeEntries(QComboBox *combo)
     combo->insertItem(STRIPE_NONE, i18n("Plain"));
     combo->insertItem(STRIPE_PLAIN, i18n("Striped"));
     combo->insertItem(STRIPE_DIAGONAL, i18n("Diagonal stripes"));
-    combo->insertItem(STRIPE_FADE, i18n("Fading"));
+    combo->insertItem(STRIPE_FADE, i18n("Faded stripes"));
 }
 
 static void insertSliderStyleEntries(QComboBox *combo)
