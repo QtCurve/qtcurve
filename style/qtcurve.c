@@ -3355,6 +3355,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
              hscrollbar=!vscrollbar && DETAIL("hscrollbar"),
              spinUp=!hscrollbar && DETAIL("spinbutton_up"),
              spinDown=!spinUp && DETAIL("spinbutton_down"),
+             menuScroll=detail && NULL!=strstr(detail, "menu_scroll_arrow_"),
              rev=reverseLayout(widget) || (widget && reverseLayout(widget->parent)),
              activeWindow=TRUE;
     GdkColor new_cols[TOTAL_SHADES+1],
@@ -4684,7 +4685,7 @@ debugDisplayWidget(widget, 3);
         }
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                   NULL, ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, QT_STD_BORDER);
+                   NULL, menuScroll ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, QT_STD_BORDER);
     }
 
     QTC_CAIRO_END
