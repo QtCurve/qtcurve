@@ -2693,7 +2693,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 return opts.squareScrollViews ? 1 : 0;
 
             if (opts.squareScrollViews && widget &&
-                (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget)))
+                (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
                 return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
             if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
