@@ -10423,9 +10423,9 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 
         col.setAlphaF(QT_LOWER_BORDER_ALPHA);
         buildSplitPath(r, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL), topPath, botPath);
-        p->setPen(enabled ? border : col);
+        p->setPen(/*enabled ? */border/* : col*/);
         p->drawPath(topPath);
-        if(enabled)
+//         if(enabled)
             p->setPen(col);
         p->drawPath(botPath);
     }
