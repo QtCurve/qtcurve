@@ -1442,7 +1442,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
        (WIDGET_FRAME==widget || ((WIDGET_ENTRY==widget || WIDGET_SCROLLVIEW==widget) &&
                                  !opts.etchEntry && !hasFocus && !hasMouseOver)))
     {
-        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), enabled ? 1.0 : QT_LOWER_BORDER_ALPHA);
+        cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), /*enabled ? */1.0/* : QT_LOWER_BORDER_ALPHA*/);
         createTLPath(cr, xd, yd, width, height, radius, round);
         cairo_stroke(cr);
         cairo_set_source_rgba(cr, QTC_CAIRO_COL(*border_col), QT_LOWER_BORDER_ALPHA);
