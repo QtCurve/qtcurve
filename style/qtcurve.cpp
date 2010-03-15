@@ -8236,9 +8236,10 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         // 2 for frame width
                         if(!opts.unifyCombo)
                         {
-                            int pad=/*opts.round>ROUND_FULL ? */2/* : 0*/;
-
-                            field.adjust(-(2+pad),-2, (2+pad), 2);
+//                             int pad=/*opts.round>ROUND_FULL ? */2/* : 0*/;
+// 
+//                             field.adjust(-(2+pad),-2, (2+pad), 2);
+                            field.adjust(reverse ? -6 : -2, -2, reverse ? 2 : 6, 2);
                         }
                         drawEntryField(painter, field, widget, option, opts.unifyCombo ? ROUNDED_ALL : reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
@@ -8752,7 +8753,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                             r.adjust(1, 0, 0, 0);
                         break;
                     case SC_ComboBoxEditField:
-                        r.setRect(x + (ed && opts.unifyCombo ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
+                        r.setRect(x + (ed /*&& opts.unifyCombo*/ ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
                         if(doEtch)
                             r.adjust(1, 1, -1, -1);
                         if(ed)
