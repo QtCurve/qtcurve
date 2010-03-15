@@ -12,6 +12,7 @@ defBtnIndicator=tint
 fixParentlessDialogs=true
 glowProgress=true
 gtkComboMenus=true
+gtkScrollViews=false
 highlightFactor=7
 lvAppearance=agua
 menuitemAppearance=harsh
