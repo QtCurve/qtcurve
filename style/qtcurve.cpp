@@ -9794,7 +9794,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                  draw3dfull(!flatWidget && !lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app)),
                  draw3d(!flatWidget && (draw3dfull || (
                             !lightBorder && QTC_DRAW_3D_BORDER(sunken, app)))),
-                 drawShine(!flatWidget && QTC_DRAW_SHINE(sunken, app)),
+                 drawShine(QTC_DRAW_SHINE(sunken, app)),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
                                      WIDGET_SPIN!=w && WIDGET_COMBO_BUTTON!=w && WIDGET_SB_BUTTON!=w &&
