@@ -309,6 +309,9 @@ typedef gchar ** Strings;
 #define QTC_DRAW_3D_BORDER(SUNKEN, APP) \
     (!(SUNKEN) && GB_3D==getGradient((APP), &opts)->border)
 
+#define QTC_DRAW_SHINE(SUNKEN, APP) \
+    (!(SUNKEN) && GB_SHINE==getGradient((APP), &opts)->border)
+
 #define QTC_LIGHT_BORDER(APP) (APPEARANCE_DULL_GLASS==(APP) ? 1 : 0)
 
 #define PROGRESS_ANIMATION 100
@@ -826,7 +829,8 @@ typedef enum
     GB_NONE,
     GB_LIGHT,
     GB_3D,
-    GB_3D_FULL
+    GB_3D_FULL,
+    GB_SHINE
 } EGradientBorder;
 
 typedef enum
@@ -1572,7 +1576,7 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
         setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_FLAT], GB_3D_FULL,2,0.0,1.0,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_FLAT], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
         setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_FLAT], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
-        setupGradient(&stdGradients[APPEARANCE_AGUA-APPEARANCE_FLAT], GB_NONE, 2,0.0,0.6,1.0,1.1);
+        setupGradient(&stdGradients[APPEARANCE_AGUA-APPEARANCE_FLAT], GB_SHINE, 2,0.0,0.6,1.0,1.1);
         setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.04,1.0,0.98);
         setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.1,1.0,0.94);
         setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.3,1.0,0.925);

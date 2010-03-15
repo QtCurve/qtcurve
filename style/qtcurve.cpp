@@ -9793,6 +9793,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                  draw3dfull(!flatWidget && !lightBorder && QTC_DRAW_3D_FULL_BORDER(sunken, app)),
                  draw3d(!flatWidget && (draw3dfull || (
                             !lightBorder && QTC_DRAW_3D_BORDER(sunken, app)))),
+                 drawShine(!flatWidget && QTC_DRAW_SHINE(sunken, app)),
                  doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
                                      WIDGET_SPIN!=w && WIDGET_COMBO_BUTTON!=w && WIDGET_SB_BUTTON!=w &&
@@ -9897,7 +9898,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 }
         }
 
-        if(APPEARANCE_AGUA==app && !sunken)
+        if(drawShine)
             if(WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_RADIO_BUTTON==w || QTC_CIRCULAR_SLIDER(w))
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
@@ -9931,6 +9932,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
             else
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
+                bool   button(IS_SLIDER(w) || WIDGET_BUTTON(w));
                 double size=(QTC_MIN((horiz ? ra.height() : ra.width())/2.0, 16)),
                        rad=size/2.0;
                 int    mod=4;
@@ -9994,7 +9996,7 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
 
     if(!colouredMouseOver && lightBorder)
     {
-        p->setPen(cols[APPEARANCE_DULL_GLASS==app ? 1 : 0]);
+        p->setPen(cols[QTC_LIGHT_BORDER(app)]);
         p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || (draw3d && option->state&State_Raised))

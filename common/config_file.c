@@ -418,7 +418,8 @@ static EGradientBorder toGradientBorder(const char *str)
             return GB_3D_FULL;
         if(0==memcmp(str, "3d", 2) || 0==memcmp(str, "false", 5))
             return GB_3D;
-
+        if(0==memcmp(str, "shine", 5))
+            return GB_SHINE;
     }
     return GB_3D;
 }
@@ -2563,6 +2564,8 @@ static const char *toStr(EGradientBorder g)
             return "light";
         case GB_3D_FULL:
             return "3dfull";
+        case GB_SHINE:
+            return "shine";
         default:
         case GB_3D:
             return "3d";
