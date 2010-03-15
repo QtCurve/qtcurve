@@ -3142,6 +3142,7 @@
 &lt;li&gt;&lt;i&gt;Light border&lt;/i&gt; - A 'light' line is drawn around all edges.&lt;/li&gt;
 &lt;li&gt;&lt;i&gt;3D border (light only)&lt;/i&gt; - A 'light' line is drawn around the top and left edges.&lt;/li&gt;
 &lt;li&gt;&lt;i&gt;3D border (light only)&lt;/i&gt; - A 'light' line is drawn around the top and left edges, and a darker one around the bottom and right edges.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;Shine&lt;/i&gt; - A shaine is added the top (or left) when this gradient is drawn on buttons or scrollbars.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;i&gt;Note: This setting is not used when drawing the preview below.&lt;/i&gt;&lt;/p&gt;
 
