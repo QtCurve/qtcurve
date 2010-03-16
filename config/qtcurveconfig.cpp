@@ -309,7 +309,6 @@ void CGradientPreview::paintEvent(QPaintEvent *)
 {
     QRect    r(rect());
     QPainter p(this);
-    p.fillRect(r, palette().background());
 
     if(!style)
         style=QStyleFactory::create("qtcurve");
