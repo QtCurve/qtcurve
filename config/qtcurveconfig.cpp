@@ -323,6 +323,7 @@ void CGradientPreview::paintEvent(QPaintEvent *)
         styleOpt.opts.appearance=APPEARANCE_CUSTOM1;
         styleOpt.opts.customGradient[APPEARANCE_CUSTOM1]=grad;
         styleOpt.palette.setColor(QPalette::Button, color);
+        styleOpt.state|=QStyle::State_Raised;
         style->drawControl((QStyle::ControlElement)QtCurveStyle::CE_QtC_Preview, &styleOpt, &p, this);
     }
     p.end();
