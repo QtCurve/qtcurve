@@ -146,6 +146,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void exportKDE3();
     void exportQt();
     void updatePreview();
+    void copyGradient(QAction *act);
 
     private:
 

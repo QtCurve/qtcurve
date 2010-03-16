@@ -39,6 +39,8 @@
      - use square entry fields
 24. Set Qt toolbar font to KDE setting - but not for lineedits and comboboxes.
 25. Fix text position in non-unified editable combos.
+26. In settings dialog, add the ability to copy gradient settings to new
+    custom gradient.
 
 1.1.1
 -----

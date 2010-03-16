@@ -1487,66 +1487,6 @@ static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, 
     }
     va_end(ap);
 }
-#endif
-
-#if defined QTC_COMMON_FUNCTIONS && !defined QTC_CONFIG_DIALOG
-
-#ifdef __cplusplus
-static EAppearance widgetApp(EWidget w, const Options *opts, bool active=true)
-#else
-static EAppearance widgetApp(EWidget w, const Options *opts)
-#endif
-{
-    switch(w)
-    {
-        case WIDGET_SB_BGND:
-            return opts->sbarBgndAppearance;
-        case WIDGET_LISTVIEW_HEADER:
-            return opts->lvAppearance;
-        case WIDGET_SB_BUTTON:
-        case WIDGET_SLIDER:
-        case WIDGET_SB_SLIDER:
-            return opts->sliderAppearance;
-        case WIDGET_FILLED_SLIDER_TROUGH:
-            return opts->sliderFill;
-        case WIDGET_TAB_TOP:
-        case WIDGET_TAB_BOT:
-            return opts->tabAppearance;
-        case WIDGET_MENU_ITEM:
-            return opts->menuitemAppearance;
-        case WIDGET_PROGRESSBAR:
-#ifndef __cplusplus
-        case WIDGET_ENTRY_PROGRESSBAR:
-#endif
-            return opts->progressAppearance;
-        case WIDGET_PBAR_TROUGH:
-            return opts->progressGrooveAppearance;
-        case WIDGET_SELECTION:
-            return opts->selectionAppearance;
-#ifdef __cplusplus
-        case WIDGET_DOCK_WIDGET_TITLE:
-            return opts->dwtAppearance;
-        case WIDGET_MDI_WINDOW:
-        case WIDGET_MDI_WINDOW_TITLE:
-            return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
-        case WIDGET_MDI_WINDOW_BUTTON:
-            return opts->titlebarButtonAppearance;
-#endif
-        case WIDGET_TROUGH:
-        case WIDGET_SLIDER_TROUGH:
-            return opts->grooveAppearance;
-#ifndef __cplusplus     
-        case WIDGET_SPIN_UP:
-        case WIDGET_SPIN_DOWN:
-#endif
-        case WIDGET_SPIN:
-            return MODIFY_AGUA(opts->appearance);
-        default:
-            break;
-    }
-
-    return opts->appearance;
-};
 
 static const Gradient * getGradient(EAppearance app, const Options *opts)
 {
@@ -1595,6 +1535,67 @@ static const Gradient * getGradient(EAppearance app, const Options *opts)
 
     return 0L; /* Will never happen! */
 }
+
+#endif
+
+#if defined QTC_COMMON_FUNCTIONS && !defined QTC_CONFIG_DIALOG
+
+#ifdef __cplusplus
+static EAppearance widgetApp(EWidget w, const Options *opts, bool active=true)
+#else
+static EAppearance widgetApp(EWidget w, const Options *opts)
+#endif
+{
+    switch(w)
+    {
+        case WIDGET_SB_BGND:
+            return opts->sbarBgndAppearance;
+        case WIDGET_LISTVIEW_HEADER:
+            return opts->lvAppearance;
+        case WIDGET_SB_BUTTON:
+        case WIDGET_SLIDER:
+        case WIDGET_SB_SLIDER:
+            return opts->sliderAppearance;
+        case WIDGET_FILLED_SLIDER_TROUGH:
+            return opts->sliderFill;
+        case WIDGET_TAB_TOP:
+        case WIDGET_TAB_BOT:
+            return opts->tabAppearance;
+        case WIDGET_MENU_ITEM:
+            return opts->menuitemAppearance;
+        case WIDGET_PROGRESSBAR:
+#ifndef __cplusplus
+        case WIDGET_ENTRY_PROGRESSBAR:
+#endif
+            return opts->progressAppearance;
+        case WIDGET_PBAR_TROUGH:
+            return opts->progressGrooveAppearance;
+        case WIDGET_SELECTION:
+            return opts->selectionAppearance;
+#ifdef __cplusplus
+        case WIDGET_DOCK_WIDGET_TITLE:
+            return opts->dwtAppearance;
+        case WIDGET_MDI_WINDOW:
+        case WIDGET_MDI_WINDOW_TITLE:
+            return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
+        case WIDGET_MDI_WINDOW_BUTTON:
+            return opts->titlebarButtonAppearance;
+#endif
+        case WIDGET_TROUGH:
+        case WIDGET_SLIDER_TROUGH:
+            return opts->grooveAppearance;
+#ifndef __cplusplus
+        case WIDGET_SPIN_UP:
+        case WIDGET_SPIN_DOWN:
+#endif
+        case WIDGET_SPIN:
+            return MODIFY_AGUA(opts->appearance);
+        default:
+            break;
+    }
+
+    return opts->appearance;
+};
 
 #define QTC_MIN_ROUND_FULL_SIZE     8
 #ifdef __cplusplus

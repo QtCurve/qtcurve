@@ -43,6 +43,7 @@
 #include <QCloseEvent>
 #include <QRegExp>
 #include <QRegExpValidator>
+#include <QMenu>
 #include <KGuiItem>
 #include <KInputDialog>
 #include <KDE/KLocale>
@@ -1426,8 +1427,6 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
 
 void QtCurveConfig::addGradStop()
 {
-    bool added(false);
-
     GradientCont::iterator cg=customGradient.find((EAppearance)gradCombo->currentIndex());
 
     if(cg==customGradient.end())
@@ -1437,7 +1436,6 @@ void QtCurveConfig::addGradStop()
         cust.border=(EGradientBorder)gradBorder->currentIndex();
         cust.stops.insert(GradientStop(stopPosition->value()/100.0, stopValue->value()/100.0));
         customGradient[(EAppearance)gradCombo->currentIndex()]=cust;
-        added=true;
         gradChanged(gradCombo->currentIndex());
         emit changed(true);
     }
@@ -1684,12 +1682,52 @@ void QtCurveConfig::updatePreview()
     }
 }
 
+static const char * constGradValProp="qtc-grad-val";
+
+void QtCurveConfig::copyGradient(QAction *act)
+{
+    int            val=act->property(constGradValProp).toInt();
+    const Gradient *copy=NULL;
+
+    if(val>=APPEARANCE_CUSTOM1 && val <(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
+    {
+        // Custom gradient!
+        if(val!=gradCombo->currentIndex())
+        {
+            GradientCont::const_iterator grad(customGradient.find((EAppearance)val));
+
+            if(grad!=customGradient.end())
+                copy=&((*grad).second);
+        }
+    }
+    else
+        copy=getGradient((EAppearance)val, &previewStyle);
+
+    if(copy)
+    {
+        customGradient[(EAppearance)gradCombo->currentIndex()]=*copy;
+        gradChanged(gradCombo->currentIndex());
+        emit changed(true);
+    }
+}
+
 void QtCurveConfig::setupGradientsTab()
 {
+    QMenu *menu=new QMenu(copyGradientButton);
+
+    for(int i=0; i<appearance->count(); ++i)
+        menu->addAction(appearance->itemText(i))->setProperty(constGradValProp, i);
+    
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
         gradCombo->insertItem(i-APPEARANCE_CUSTOM1, i18n("Custom gradient %1", (i-APPEARANCE_CUSTOM1)+1));
 
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
+
+    copyGradientButton->setIcon(KIcon("edit-copy"));
+    copyGradientButton->setToolTip(i18n("Copy settings from another gradient"));
+    copyGradientButton->setMenu(menu);
+    copyGradientButton->setPopupMode(QToolButton::InstantPopup);
+    connect(menu, SIGNAL(triggered(QAction *)), SLOT(copyGradient(QAction *)));
 
     gradPreview=new CGradientPreview(this, previewWidgetContainer);
     QBoxLayout *layout=new QBoxLayout(QBoxLayout::TopToBottom, previewWidgetContainer);
