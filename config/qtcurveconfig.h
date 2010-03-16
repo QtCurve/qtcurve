@@ -44,11 +44,12 @@ class CGradientPreview : public QWidget
     public:
 
     CGradientPreview(QtCurveConfig *c, QWidget *p);
+    ~CGradientPreview();
 
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
     void paintEvent(QPaintEvent *);
-    void setGrad(const GradientStopCont &s);
+    void setGrad(const Gradient &g);
 
     public Q_SLOTS:
 
@@ -56,9 +57,10 @@ class CGradientPreview : public QWidget
 
     private:
 
-    QtCurveConfig    *cfg;
-    QColor           color;
-    GradientStopCont stops;
+    QtCurveConfig *cfg;
+    QColor        color;
+    Gradient      grad;
+    QStyle        *style;
 };
 
 struct Preset
@@ -137,6 +139,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void fillProgressChanged();
     void changeStack();
     void gradChanged(int i);
+    void borderChanged(int i);
     void editItem(QTreeWidgetItem *i, int col);
     void itemChanged(QTreeWidgetItem *i, int col);
     void addGradStop();
@@ -148,7 +151,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void updatePreview();
     void copyGradient(QAction *act);
 
-    private:
+    public:
 
     bool savePreset(const QString &name);
     QString getPresetName(const QString &cap, QString label, QString def, QString name=QString());

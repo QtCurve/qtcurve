@@ -905,9 +905,7 @@ typedef struct
                      sliderWidth,
                      tabBgnd,
                      colorSelTab,
-#if !defined __cplusplus || defined QTC_CONFIG_DIALOG
                      expanderHighlight,
-#endif
                      crHighlight,
                      splitterHighlight,
                      crSize;
@@ -938,16 +936,12 @@ typedef struct
                      setDialogButtonOrder,
 */
 #endif
-#if !defined __cplusplus || defined QTC_CONFIG_DIALOG
                      mapKdeIcons,
-#endif
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
                      fadeLines,
 #endif
-#if !defined __cplusplus || (defined QTC_CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
                      reorderGtkButtons,
-#endif
                      borderMenuitems,
                      colorMenubarMouseOver,
                      darkerBorders,

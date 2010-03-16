@@ -73,7 +73,15 @@ class QtCurveStyle : public QWindowsStyle
 
     enum CustomElements
     {
-        CE_QtC_KCapacityBar = CE_CustomBase+0xFFFF00
+        CE_QtC_KCapacityBar = CE_CustomBase+0xFFFF00,
+        CE_QtC_Preview
+    };
+
+    class PreviewOption : public QStyleOption
+    {
+        public:
+
+        Options opts;
     };
 
     enum Icon

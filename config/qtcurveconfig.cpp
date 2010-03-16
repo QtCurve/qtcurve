@@ -65,6 +65,7 @@
 #include <KDE/KToolBar>
 #include <unistd.h>
 #include "config.h"
+#include "../style/qtcurve.h"
 #define CONFIG_READ
 #define CONFIG_WRITE
 #include "config_file.c"
@@ -282,9 +283,16 @@ class CStackItem : public QTreeWidgetItem
 
 CGradientPreview::CGradientPreview(QtCurveConfig *c, QWidget *p)
                 : QWidget(p),
-                  cfg(c)
+                  cfg(c),
+                  style(0L)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    setProperty("qtc-widget-name", "qtc-preview");
+}
+
+CGradientPreview::~CGradientPreview()
+{
+    delete style;
 }
 
 QSize CGradientPreview::sizeHint() const
@@ -301,32 +309,29 @@ void CGradientPreview::paintEvent(QPaintEvent *)
 {
     QRect    r(rect());
     QPainter p(this);
+    p.fillRect(r, palette().background());
 
-    if(stops.size())
+    if(!style)
+        style=QStyleFactory::create("qtcurve");
+
+    if(style)
     {
-        QLinearGradient                  grad(r.topLeft(), r.bottomLeft());
-        GradientStopCont                 st(stops.fix());
-        GradientStopCont::const_iterator it(st.begin()),
-                                         end(st.end());
+        QtCurveStyle::PreviewOption styleOpt;
 
-        for(; it!=end; ++it)
-        {
-            QColor col;
-            Options opts;
-            opts.shading=cfg->currentShading();
-            shade(&opts, color, &col, (*it).val);
-            grad.setColorAt((*it).pos, col);
-        }
-        p.fillRect(r, QBrush(grad));
+        styleOpt.init(this);
+
+        cfg->setOptions(styleOpt.opts);
+        styleOpt.opts.appearance=APPEARANCE_CUSTOM1;
+        styleOpt.opts.customGradient[APPEARANCE_CUSTOM1]=grad;
+        styleOpt.palette.setColor(QPalette::Button, color);
+        style->drawControl((QStyle::ControlElement)QtCurveStyle::CE_QtC_Preview, &styleOpt, &p, this);
     }
-    else
-        p.fillRect(r, color);
     p.end();
 }
 
-void CGradientPreview::setGrad(const GradientStopCont &s)
+void CGradientPreview::setGrad(const Gradient &g)
 {
-    stops=s;
+    grad=g;
     repaint();
 }
 
@@ -1359,7 +1364,7 @@ void QtCurveConfig::gradChanged(int i)
 
     if(it!=customGradient.end())
     {
-        gradPreview->setGrad((*it).second.stops);
+        gradPreview->setGrad((*it).second);
         gradBorder->setCurrentIndex((*it).second.border);
 
         GradientStopCont::const_iterator git((*it).second.stops.begin()),
@@ -1379,11 +1384,22 @@ void QtCurveConfig::gradChanged(int i)
     }
     else
     {
-        gradPreview->setGrad(GradientStopCont());
+        gradPreview->setGrad(Gradient());
         gradBorder->setCurrentIndex(GB_3D);
     }
 
     gradBorder->setEnabled(QTC_NUM_CUSTOM_GRAD!=i);
+}
+
+void QtCurveConfig::borderChanged(int i)
+{
+    GradientCont::iterator it=customGradient.find((EAppearance)gradCombo->currentIndex());
+    if(it!=customGradient.end())
+    {
+        (*it).second.border=(EGradientBorder)i;
+        gradPreview->setGrad((*it).second);
+        emit changed(true);
+    }
 }
 
 static double prev=0.0;
@@ -1418,7 +1434,7 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
         {
             (*it).second.stops.erase(GradientStop(col ? other : prev, col ? prev : other));
             (*it).second.stops.insert(GradientStop(col ? other : val, col ? val : other));
-            gradPreview->setGrad((*it).second.stops);
+            gradPreview->setGrad((*it).second);
             i->setText(col, QString().setNum(val*100.0));
             emit changed(true);
         }
@@ -1460,7 +1476,7 @@ void QtCurveConfig::addGradStop()
         (*cg).second.stops.insert(GradientStop(pos, val));
         if((*cg).second.stops.size()!=b4)
         {
-            gradPreview->setGrad((*cg).second.stops);
+            gradPreview->setGrad((*cg).second);
 
             QStringList details;
 
@@ -1495,7 +1511,7 @@ void QtCurveConfig::removeGradStop()
                    val=cur->text(1).toDouble(&ok)/100.0;
 
             (*it).second.stops.erase(GradientStop(pos, val));
-            gradPreview->setGrad((*it).second.stops);
+            gradPreview->setGrad((*it).second);
             emit changed(true);
 
             delete cur;
@@ -1525,7 +1541,7 @@ void QtCurveConfig::updateGradStop()
 
             i->setText(0, QString().setNum(stopPosition->value()));
             i->setText(1, QString().setNum(stopValue->value()));
-            gradPreview->setGrad((*cg).second.stops);
+            gradPreview->setGrad((*cg).second);
             emit changed(true);
         }
     }
@@ -1747,6 +1763,7 @@ void QtCurveConfig::setupGradientsTab()
     removeButton->setEnabled(false);
     updateButton->setEnabled(false);
     connect(gradCombo, SIGNAL(currentIndexChanged(int)), SLOT(gradChanged(int)));
+    connect(gradBorder, SIGNAL(currentIndexChanged(int)), SLOT(borderChanged(int)));
     connect(previewColor, SIGNAL(changed(const QColor &)), gradPreview, SLOT(setColor(const QColor &)));
     connect(gradStops, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT(editItem(QTreeWidgetItem *, int)));
     connect(gradStops, SIGNAL(itemChanged(QTreeWidgetItem *, int)), SLOT(itemChanged(QTreeWidgetItem *, int)));

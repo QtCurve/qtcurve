@@ -4672,6 +4672,21 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
     switch(element)
     {
+        case CE_QtC_Preview:
+            if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option))
+            {
+                if(widget && "qtc-preview"==widget->property("qtc-widget-name").toString())
+                {
+                    Options      old=opts;
+                    const QColor *use(buttonColors(option));
+                    opts=preview->opts;
+
+                    drawLightBevelReal(painter, r, option, widget, ROUNDED_ALL, getFill(option, use, false, false), use,
+                                       true, WIDGET_STD_BUTTON, false, opts.round);
+                    opts=old;
+                }
+            }
+            break;
         case CE_QtC_KCapacityBar:
             if (const QStyleOptionProgressBar *bar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
