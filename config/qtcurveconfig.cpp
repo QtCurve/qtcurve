@@ -286,7 +286,7 @@ CGradientPreview::CGradientPreview(QtCurveConfig *c, QWidget *p)
                   cfg(c),
                   style(0L)
 {
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+//     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     setProperty("qtc-widget-name", "qtc-preview");
 }
 
@@ -297,7 +297,7 @@ CGradientPreview::~CGradientPreview()
 
 QSize CGradientPreview::sizeHint() const
 {
-    return QSize(64, 64);
+    return QSize(64, 24);
 }
 
 QSize CGradientPreview::minimumSizeHint() const
