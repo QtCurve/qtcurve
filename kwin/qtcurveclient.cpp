@@ -516,8 +516,16 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
                 }
                 else
                 {
+//                     iconX=(((textRect.width()-textWidth)/2.0)+0.5)+
+//                             (shadowSize ? (Qt::AlignHCenter==hAlign ? shadowSize : capRect.x()) : 0)+
+//                             (isTab ? capRect.x() : 0);
+
+                    int adjustment=textRect==capRect ? capRect.x() : 0;
+
                     iconX=(((textRect.width()-textWidth)/2.0)+0.5)+
-                            (shadowSize ? (Qt::AlignHCenter==hAlign ? shadowSize : capRect.x()) : 0)+
+                            (shadowSize
+                                ? (Qt::AlignHCenter==hAlign ? shadowSize : capRect.x())
+                                : (isTab ? 0 : adjustment))+
                             (isTab ? capRect.x() : 0);
                     textRect.setX(iconX+pix.width()+constTitlePad);
                     alignment=Qt::AlignVCenter|Qt::AlignLeft;
