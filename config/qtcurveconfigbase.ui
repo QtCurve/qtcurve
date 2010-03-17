@@ -3181,6 +3181,9 @@
               </property>
               <item>
                <layout class="QFormLayout" name="formLayout_12">
+                <property name="fieldGrowthPolicy">
+                 <enum>QFormLayout::ExpandingFieldsGrow</enum>
+                </property>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_5">
                   <property name="text">
@@ -3188,8 +3191,21 @@
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>Value:</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="0" column="1">
                  <widget class="KIntNumInput" name="stopPosition">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="whatsThis">
                    <string>Set the position of the gradient value. 0% means the top of horizontal gradients, and the left for vertical gradients.</string>
                   </property>
@@ -3201,15 +3217,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_6">
-                  <property name="text">
-                   <string>Value:</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="1" column="1">
                  <widget class="KIntNumInput" name="stopValue">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="whatsThis">
                    <string>Sets the strength of the gradient at the defined position. 110% would lighten a color by 10%, 90% would darken it by 10%, and 100% would be the original color.</string>
                   </property>
@@ -3279,6 +3294,13 @@
                </widget>
               </item>
              </layout>
+             <zorder>label_3</zorder>
+             <zorder></zorder>
+             <zorder>stopValue</zorder>
+             <zorder>stopPosition</zorder>
+             <zorder></zorder>
+             <zorder>label_6</zorder>
+             <zorder>label_5</zorder>
             </widget>
            </item>
           </layout>
