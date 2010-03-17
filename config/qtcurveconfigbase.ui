@@ -265,7 +265,7 @@
        <item row="5" column="1">
         <widget class="QComboBox" name="round">
          <property name="whatsThis">
-          <string>Set how 'rounded' widget can be. The 'max' round setting only applies to buttons.</string>
+          <string>Set how 'rounded' widgets can be. The 'max' round setting only applies to buttons.</string>
          </property>
         </widget>
        </item>
@@ -329,7 +329,7 @@
           <item>
            <widget class="QCheckBox" name="drawStatusBarFrames">
             <property name="whatsThis">
-             <string>Control whether QtCurve should draw frames around items in statusbars.</string>
+             <string>Controls whether QtCurve should draw frames around items in statusbars.</string>
             </property>
             <property name="text">
              <string>Draw statusbar frames</string>
@@ -383,7 +383,7 @@
         <widget class="QComboBox" name="bgndImage">
          <property name="whatsThis">
           <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
-            &lt;ul&gt;&lt;li&gt;No background image - No image&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+            &lt;ul&gt;&lt;li&gt;No background image - No image.&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders.&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;Square rings - 3 simple rounded sqaures.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -592,7 +592,7 @@
        <item row="1" column="1">
         <widget class="QComboBox" name="splitters">
          <property name="whatsThis">
-          <string>Sets the makring used to indicate that the widget is a splitter.</string>
+          <string>Sets the marking used to indicate that the widget is a splitter.</string>
          </property>
         </widget>
        </item>
@@ -606,7 +606,7 @@
        <item row="2" column="1">
         <widget class="KIntNumInput" name="splitterHighlight">
          <property name="whatsThis">
-          <string>Defines by how much the theme should brighen (or darken) the color of background of the splitter when the mosue hovers over.</string>
+          <string>Defines by how much the theme should brighen (or darken) the background of the splitter when the mouse hovers over.</string>
          </property>
          <property name="suffix">
           <string>%</string>
@@ -641,7 +641,7 @@
        <item row="1" column="1">
         <widget class="QComboBox" name="shadeSliders">
          <property name="whatsThis">
-          <string>Controls the  color setting of both scrollbar sliders and other sliders.</string>
+          <string>Controls the color setting of both scrollbar sliders and other sliders.</string>
          </property>
         </widget>
        </item>
@@ -1023,7 +1023,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="textLabel1_8">
          <property name="whatsThis">
-          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
+          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them.</string>
          </property>
          <property name="text">
           <string>Highlight by:</string>
@@ -1057,7 +1057,7 @@
        <item row="0" column="1">
         <widget class="QComboBox" name="lvAppearance">
          <property name="whatsThis">
-          <string>Defines the gradient to ge used in the header of listviews and treeviews.</string>
+          <string>Defines the gradient to be used in the header of listviews and treeviews.</string>
          </property>
         </widget>
        </item>
@@ -1126,9 +1126,6 @@
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="textLabel1_8_2_4">
-         <property name="whatsThis">
-          <string>This controls the % that widgets will be highlighted by when the mouse hovers over them</string>
-         </property>
          <property name="text">
           <string>Selection appearance (KDE4 &amp; Gtk2):</string>
          </property>
@@ -2575,7 +2572,7 @@
         <widget class="QComboBox" name="menuBgndImage">
          <property name="whatsThis">
           <string>&lt;p&gt;This adds a background image to menus.
-            &lt;ul&gt;&lt;li&gt;No background image - No image&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+            &lt;ul&gt;&lt;li&gt;No background image - No image.&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders.&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;Square rings - 3 simple rounded sqaures.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -2871,7 +2868,7 @@
        <item row="1" column="1">
         <widget class="QCheckBox" name="reorderGtkButtons">
          <property name="whatsThis">
-          <string>&lt;p&gt;If this is enabled and 'Use Gtk button order' is not, QtCurve will attempt to manually set hte order of buttonsiin Gtk dialogs.&lt;/p&gt;&lt;p&gt;&lt;b&gt;NOTE&lt;b&gt; This is experimental, and may produce unexpected results!&lt;/p&gt;</string>
+          <string>&lt;p&gt;If this is enabled and 'Use Gtk button order' is not, QtCurve will attempt to manually set the order of buttons in Gtk dialogs.&lt;/p&gt;&lt;p&gt;&lt;b&gt;NOTE&lt;b&gt; This is experimental, and may produce unexpected results!&lt;/p&gt;</string>
          </property>
          <property name="text">
           <string>Manually re-order Gtk buttons</string>
