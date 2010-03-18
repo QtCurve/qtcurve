@@ -64,7 +64,7 @@
          <item row="2" column="1">
           <widget class="QCheckBox" name="outerBorder">
            <property name="text">
-            <string>Draw dark outer border.</string>
+            <string>Draw dark outer border</string>
            </property>
           </widget>
          </item>
