@@ -23,6 +23,9 @@
 17. Fix calculation of alpha values for square rings.
 18. Fix progressbar glow central position.
 19. Draw more frames.
+20. Fix image/gradient background issues with wxWidgets applications. 
+    (Use gtk_widget_translate_coordinates to translate widgets coordinates
+     relative to window.)
 
 1.1.1
 -----

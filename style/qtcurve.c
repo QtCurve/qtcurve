@@ -2275,16 +2275,10 @@ printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
 debugDisplayWidget(widget, 20);
 #endif
         while(window && !GTK_IS_WINDOW(window))
-        {
-            if(!GTK_WIDGET_NO_WINDOW(window))
-            {
-                if(0==xpos)
-                    xpos+=widget->allocation.x;
-                if(0==ypos)
-                    ypos+=widget->allocation.y;
-            }
             window=window->parent;
-        }
+
+        if(window && window!=widget)
+            gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
@@ -4382,8 +4376,7 @@ debugDisplayWidget(widget, 3);
                                             ? width<height
                                             : width>height,
                                 FALSE, MODIFY_AGUA(app), WIDGET_OTHER);
-            else if(!QTC_CUSTOM_BGND || !(widget &&
-                                                      drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+            else if(!QTC_CUSTOM_BGND || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
             {
                 if(menubar)
                 {
