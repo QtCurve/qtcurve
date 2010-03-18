@@ -140,7 +140,7 @@ bool QtCurveClient::decorationBehaviour(DecorationBehaviour behaviour) const
     switch (behaviour)
     {
         case DB_MenuClose:
-            return Handler()->menuClose();
+            return true;
         case DB_WindowMask:
             return false;
         default:

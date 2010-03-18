@@ -24,58 +24,41 @@
        <item>
         <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Closing:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="menuClose">
-           <property name="whatsThis">
-            <string>Check this option if you want windows to be closed when you double click the menu button, similar to Microsoft Windows.</string>
-           </property>
-           <property name="text">
-            <string>Close windows by double clicking the menu button</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Borders:</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="0" column="1">
           <widget class="QCheckBox" name="resizeGrip">
            <property name="text">
             <string>Show resize grip</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="2" column="1">
           <widget class="QCheckBox" name="roundBottom">
            <property name="text">
             <string>Round bottom corners (style must be rounded, and borders not tiny)</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="1" column="1">
           <widget class="QCheckBox" name="outerBorder">
            <property name="text">
             <string>Draw dark outer border</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Titlebar padding:</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="3" column="1">
           <widget class="KIntSpinBox" name="titleBarPad">
            <property name="suffix">
             <string>px</string>
@@ -277,7 +260,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>menuClose</tabstop>
   <tabstop>resizeGrip</tabstop>
   <tabstop>roundBottom</tabstop>
   <tabstop>outerBorder</tabstop>

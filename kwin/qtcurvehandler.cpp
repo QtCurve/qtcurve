@@ -253,8 +253,7 @@ bool QtCurveHandler::readConfig()
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;
 
-    bool oldMenuClose=itsMenuClose,
-         oldShowResizeGrip=itsShowResizeGrip,
+    bool oldShowResizeGrip=itsShowResizeGrip,
          oldRoundBottom=itsRoundBottom,
          oldOuterBorder=itsOuterBorder;
     int  oldTitleBarPad=itsTitleBarPad;
@@ -262,7 +261,6 @@ bool QtCurveHandler::readConfig()
     bool oldCustomShadows(itsCustomShadows);
 #endif
 
-    itsMenuClose = config.readEntry("CloseOnMenuDoubleClick", true);
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
     itsRoundBottom = config.readEntry("RoundBottom", true);
     itsOuterBorder = config.hasKey("NoBorder")
@@ -270,6 +268,8 @@ bool QtCurveHandler::readConfig()
                         : config.readEntry("OuterBorder", true);
     itsTitleBarPad = config.readEntry("TitleBarPad", 0);
 
+    if(itsTitleBarPad<0 || itsTitleBarPad>10)
+        itsTitleBarPad=0;
     itsTitleHeight+=2*itsTitleBarPad;
 #if KDE_IS_VERSION(4, 3, 0)
     bool shadowChanged(false);
@@ -293,8 +293,7 @@ bool QtCurveHandler::readConfig()
     }
 #endif
 
-    return oldMenuClose!=itsMenuClose ||
-           oldShowResizeGrip!=itsShowResizeGrip ||
+    return oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom ||
            oldOuterBorder!=itsOuterBorder ||
 #if KDE_IS_VERSION(4, 3, 0)

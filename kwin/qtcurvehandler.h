@@ -92,7 +92,6 @@ class QtCurveHandler : public QObject,
     const QFont &         titleFontTool()         { return itsTitleFontTool; }
     int                   borderSize() const      { return itsBorderSize; }
     bool                  coloredShadow() const   { return itsColoredShadow; }
-    bool                  menuClose() const       { return itsMenuClose; }
     bool                  showResizeGrip() const  { return itsShowResizeGrip; }
     bool                  roundBottom() const     { return itsRoundBottom && itsBorderSize>1; }
     bool                  outerBorder() const     { return itsOuterBorder; }
@@ -113,7 +112,6 @@ class QtCurveHandler : public QObject,
     private:
 
     bool    itsColoredShadow,
-            itsMenuClose,
             itsShowResizeGrip,
             itsRoundBottom,
             itsOuterBorder;
