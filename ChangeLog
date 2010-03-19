@@ -45,7 +45,7 @@
 25. Fix text position in non-unified editable combos.
 26. In settings dialog, add the ability to copy gradient settings to new
     custom gradient.
-27. In settings dialog, draw borders, etc, around preview.
+27. In settings dialog, draw borders, etc, around gradient preview.
 
 1.1.1
 -----
