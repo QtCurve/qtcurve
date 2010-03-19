@@ -1281,7 +1281,7 @@ static void createTLPath(cairo_t *cr, double xd, double yd, double width, double
     gboolean rounded=radius>0.0;
 
     if (rounded && round&CORNER_BL)
-        cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.8, M_PI);
+        cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.75, M_PI);
     else
         cairo_move_to(cr, xd, yd+height);
 
@@ -1291,7 +1291,7 @@ static void createTLPath(cairo_t *cr, double xd, double yd, double width, double
         cairo_line_to(cr, xd, yd);
 
     if (rounded && round&CORNER_TR)
-        cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.5, M_PI * 1.7);
+        cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.5, M_PI * 1.75);
     else
         cairo_line_to(cr, xd+width, yd);
 }
@@ -1302,7 +1302,7 @@ static void createBRPath(cairo_t *cr, double xd, double yd, double width, double
     gboolean rounded=radius>0.0;
 
     if (rounded && round&CORNER_TR)
-        cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.7, 0);
+        cairo_arc(cr, xd+width-radius, yd+radius, radius, M_PI * 1.75, 0);
     else
         cairo_move_to(cr, xd+width, yd);
 
@@ -1312,7 +1312,7 @@ static void createBRPath(cairo_t *cr, double xd, double yd, double width, double
         cairo_line_to(cr, xd+width, yd+height);
 
     if (rounded && round&CORNER_BL)
-        cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.5, M_PI * 0.8);
+        cairo_arc(cr, xd+radius, yd+height-radius, radius, M_PI * 0.5, M_PI * 0.75);
     else
         cairo_line_to(cr, xd, yd+height);
 }
