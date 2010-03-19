@@ -1,3 +1,8 @@
+1.2.1
+-----
+1. Hack around Firefox check/radio focus issues. (Not 100% - GMail still has errors, but
+   does with most themes!)
+
 1.2.0
 -----
  1. Draw etch effect on radios if using a button effect, and not using button-like
