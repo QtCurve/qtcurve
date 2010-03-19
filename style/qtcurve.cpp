@@ -10029,14 +10029,12 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                        innerTlPath, innerBrPath);
 
         p->setPen(border[colouredMouseOver ? QTC_MO_STD_LIGHT(w, sunken) : (sunken ? dark : 0)]);
+        p->drawPath(innerTlPath);
         if(colouredMouseOver || bevelledButton || draw3dfull)
         {
-            p->drawPath(innerTlPath);
             p->setPen(border[colouredMouseOver ? QTC_MO_STD_DARK(w) : (sunken ? 0 : dark)]);
             p->drawPath(innerBrPath);
         }
-        else
-            p->drawPath(innerTlPath);
     }
     if(plastikMouseOver && !sunken)
         p->restore();
@@ -10316,8 +10314,8 @@ void QtCurveStyle::buildSplitPath(const QRect &r, int round, double radius, QPai
 
     if (rounded && round&CORNER_TR)
     {
-        tl.arcMoveTo(xd+width-diameter, yd, diameter, diameter, 36);
-        tl.arcTo(xd+width-diameter, yd, diameter, diameter, 36, 36);
+        tl.arcMoveTo(xd+width-diameter, yd, diameter, diameter, 45);
+        tl.arcTo(xd+width-diameter, yd, diameter, diameter, 45, 45);
         if(width>diameter)
             tl.lineTo(xd+width-diameter, yd);
     }
@@ -10331,9 +10329,9 @@ void QtCurveStyle::buildSplitPath(const QRect &r, int round, double radius, QPai
 
     if (rounded && round&CORNER_BL)
     {
-        tl.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 36);
-        br.arcMoveTo(xd, yd+height-diameter, diameter, diameter, 180+36);
-        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+36, 54);
+        tl.arcTo(xd, yd+height-diameter, diameter, diameter, 180, 45);
+        br.arcMoveTo(xd, yd+height-diameter, diameter, diameter, 180+45);
+        br.arcTo(xd, yd+height-diameter, diameter, diameter, 180+45, 45);
     }
     else
     {
@@ -10347,7 +10345,7 @@ void QtCurveStyle::buildSplitPath(const QRect &r, int round, double radius, QPai
         br.lineTo(xd+width, yd+height);
 
     if (rounded && round&CORNER_TR)
-        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 54);
+        br.arcTo(xd+width-diameter, yd, diameter, diameter, 0, 45);
     else
         br.lineTo(xd+width, yd);
 }
