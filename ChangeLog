@@ -9,7 +9,7 @@
  5. Add option to control whether progressbars have a border on all sides, or just
     top/bottom.
  6. Add option to colour default buttons using highlight colour.
- 7. Expand selected check/radio colour option so as to be able to specift colour.
+ 7. Expand selected check/radio colour option so as to be able to specify colour.
  8. Add circular slider style.
  9. Add glow to mouse over of slider handles (not scrollbars).
 10. Add option to draw stripes on scrollbar sliders.
@@ -816,7 +816,7 @@
  6. Optional diagonal progressbar sripes.
  7. Use alternating dark/light for dashed toolbar handles.
  8. New 'split' style gradient.
- 9. Option to specift slider style: plain, round (only when appearance=round),
+ 9. Option to specify slider style: plain, round (only when appearance=round),
     and triangular (plastik-ish)
 10. Modify default style: flat splitter lines, flat slider thumbs, no
     toolbar separators, triangular slider, diagonal progressbar stripes.
