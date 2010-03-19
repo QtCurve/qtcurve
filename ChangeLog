@@ -1,3 +1,7 @@
+1.2.1
+-----
+1. Set decoration (hover/focus) colours for preview.
+
 1.2.0
 -----
  1. Draw etch effect on radios if using a button effect, and not using button-like

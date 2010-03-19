@@ -1242,6 +1242,10 @@ QtCurveStyle::QtCurveStyle()
     // link process.
     if(itsPos.x()>65534)
         (void)KFileDialog::getSaveFileName();
+
+    // We need to set the decoration colours for the preview now...
+    if(!rcFile.isEmpty())
+        setDecorationColors();
 #endif
 }
 
