@@ -59,6 +59,9 @@ or copy to <kde install prefix>/share/apps/kstyle/themes/ (usually
 
 When KDE's style panel is restarted, your new theme should appear in the list.
 
+NOTE: As of QtCurve 1.0.0 style support has been disabled by default, and you will
+need to explicitly enable it via QTC_STYLE_SUPPORT
+
 
 Creating Distribution Packages
 ------------------------------
