@@ -6711,7 +6711,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
-            if(isMozilla() && 18==width && 18==height)
+            if(isMozilla() && width==height && width>13)
                 y++, x++, width--, height--;
             else if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])  // Gimps buttons in its toolbox are
             {
