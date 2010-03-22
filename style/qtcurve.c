@@ -2274,11 +2274,28 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
 printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
 debugDisplayWidget(widget, 20);
 #endif
-        while(window && !GTK_IS_WINDOW(window))
-            window=window->parent;
+        if(GTK_IS_TOOLBAR(widget))
+        {
+            while(window && !GTK_IS_WINDOW(window))
+            {
+                if(!GTK_WIDGET_NO_WINDOW(window))
+                {
+                    if(0==xpos)
+                        xpos+=widget->allocation.x;
+                    if(0==ypos)
+                        ypos+=widget->allocation.y;
+                }
+                window=window->parent;
+            }
+        }
+        else
+        {
+            while(window && !GTK_IS_WINDOW(window))
+                window=window->parent;
 
-        if(window && window!=widget)
-            gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
+            if(window && window!=widget)
+                gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
+        }
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
