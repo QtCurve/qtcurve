@@ -5394,13 +5394,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #endif
 
                 painter->save();
-
-                QRect leftRect;
-//                 QFont font;
-// 
-//                 font.setBold(true);
-//                 painter->setFont(font);
-//                 painter->setPen(palette.text().color());
+                painter->setRenderHint(QPainter::Antialiasing, true);
 
 #if QT_VERSION >= 0x040300
                 if (vertical)
@@ -5426,6 +5420,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 int    progressIndicatorPos=(int)vc6Workaround;
                 bool   flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || ((Qt::LeftToRight==bar->direction) && inverted))) ||
                             (vertical && ((!inverted && !bottomToTop) || (inverted && bottomToTop))));
+                QRect  leftRect,
+                       rightRect;
 
                 if (flip)
                 {
@@ -5435,6 +5431,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     {
                         painter->setPen(palette.base().color());
                         leftRect = QRect(r.left(), r.top(), indicatorPos, r.height());
+                        rightRect = QRect(r.left()+indicatorPos, r.top(), r.width()-indicatorPos, r.height());
                     }
                     else if (indicatorPos > r.width())
                         painter->setPen(palette.text().color());
@@ -5444,7 +5441,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 else
                 {
                     if (progressIndicatorPos >= 0 && progressIndicatorPos <= r.width())
+                    {
                         leftRect = QRect(r.left(), r.top(), progressIndicatorPos, r.height());
+                        rightRect = QRect(r.left()+progressIndicatorPos, r.top(), r.width()-progressIndicatorPos, r.height());
+                    }
                     else if (progressIndicatorPos > r.width())
                         painter->setPen(palette.highlightedText().color());
                     else
@@ -5452,9 +5452,15 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
 
                 QString text = bar->fontMetrics.elidedText(bar->text, Qt::ElideRight, r.width());
+                if (!leftRect.isNull())
+                {
+                    painter->save();
+                    painter->setClipRect(rightRect, Qt::IntersectClip);
+                }
                 painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 if (!leftRect.isNull())
                 {
+                    painter->restore();
                     painter->setPen(flip ? palette.text().color() : palette.highlightedText().color());
                     painter->setClipRect(leftRect, Qt::IntersectClip);
                     painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
