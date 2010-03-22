@@ -2356,15 +2356,24 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 static_cast<QMenuBar *>(object)->setHidden(true);
             break;
         case QEvent::Paint:
-        {
             if((!IS_FLAT(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu*>(object))
                 drawBackground((QWidget*)object, false);
+            else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
+            {
+                // paint focus rect
+                QLabel                *lbl = (QLabel *)object;
+                QPainter              painter(lbl);
+                QStyleOptionFocusRect opts;
+
+                opts.palette = lbl->palette();
+                opts.rect    = QRect(0, 0, lbl->width(), lbl->height());
+                drawPrimitive(PE_FrameFocusRect, &opts, &painter, lbl);
+            }
             else
             {
                 QFrame *frame = qobject_cast<QFrame*>(object);
 
                 if (frame)
-                {
                     if(QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                     {
                         QPainter painter(frame);
@@ -2377,21 +2386,8 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                     }
                     else
                         return false;
-                }
-                else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
-                {
-                    // paint focus rect
-                    QLabel                *lbl = (QLabel *)object;
-                    QPainter              painter(lbl);
-                    QStyleOptionFocusRect opts;
-
-                    opts.palette = lbl->palette();
-                    opts.rect    = QRect(0, 0, lbl->width(), lbl->height());
-                    drawPrimitive(PE_FrameFocusRect, &opts, &painter, lbl);
-                }
             }
             break;
-        }
         case QEvent::MouseButtonPress:
             if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && dynamic_cast<QMouseEvent*>(event))
             {
