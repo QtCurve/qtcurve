@@ -1358,7 +1358,7 @@
           <item>
            <widget class="QRadioButton" name="roundAllTabs">
             <property name="whatsThis">
-             <string>If enabled, all tabs are rounded - and there will be a 2 pixel gap between each tab.</string>
+             <string>If enabled, all tabs are rounded - there will be a 2 pixel gap between each tab if 'glow' is selected as the general colored mouse over style.</string>
             </property>
             <property name="text">
              <string>All</string>
