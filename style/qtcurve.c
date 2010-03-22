@@ -2274,21 +2274,8 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
 printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
 debugDisplayWidget(widget, 20);
 #endif
-        if(GTK_IS_TOOLBAR(widget))
-        {
-            while(window && !GTK_IS_WINDOW(window))
-            {
-                if(!GTK_WIDGET_NO_WINDOW(window))
-                {
-                    if(0==xpos)
-                        xpos+=widget->allocation.x;
-                    if(0==ypos)
-                        ypos+=widget->allocation.y;
-                }
-                window=window->parent;
-            }
-        }
-        else
+
+        if(0==y)
         {
             while(window && !GTK_IS_WINDOW(window))
                 window=window->parent;
