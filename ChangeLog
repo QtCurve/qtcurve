@@ -1,7 +1,6 @@
 1.2.1
 -----
-1. Hack around Firefox check/radio focus issues. (Not 100% - GMail still has errors, but
-   does with most themes!)
+1. Better check/radio positioning.
 
 1.2.0
 -----

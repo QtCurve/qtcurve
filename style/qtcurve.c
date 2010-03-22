@@ -5036,8 +5036,8 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
              doEtch=QTC_DO_EFFECT;
     GdkColor new_colors[TOTAL_SHADES+1],
              *btn_colors;
-    int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL;
-             //checkSpace=doEtch && /*!list && */!mnu ? opts.crSize+2 : opts.crSize;
+    int      ind_state=(list || ( !mnu && GTK_STATE_INSENSITIVE==state ) ) ? state : GTK_STATE_NORMAL,
+             checkSpace=doEtch ? opts.crSize+2 : opts.crSize;
 
     QTC_CAIRO_BEGIN
 
@@ -5051,46 +5051,24 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else
         btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
 
-//     x+=(width-checkSpace)>>1;
-//     y+=(height-checkSpace)>>1;
-// 
-//     if(doEtch)
-//         x++, y++;
-// 
-    if(mnu)
-    {
-        y++;
-        if(GTK_APP_OPEN_OFFICE==qtSettings.app)
-            y+=2;
-//         if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
-//             x+=2;
-//         else
-//             x-=2;
-    }
+    x+=(width-checkSpace)>>1;
+    y+=(height-checkSpace)>>1;
 
 #ifdef QTC_DEBUG
 printf("Draw check %d %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height, mnu, detail ? detail : "NULL");
 debugDisplayWidget(widget, 3);
 #endif
 
-    if(QTC_CR_SMALL_SIZE!=opts.crSize)
-        y--;
-
-    if(mnu && GTK_APP_OPEN_OFFICE==qtSettings.app)
-        x+=2, y-=2;
-    else if(mnu && GTK_APP_MOZILLA==qtSettings.app)
-        y-=4;
-
     if(mnu && GTK_STATE_PRELIGHT==state)
         state=GTK_STATE_NORMAL;
+
+    if(mnu && isMozilla())
+        x-=2;
 
     if(!mnu || qtSettings.qt4)
     {
         if(opts.crButton)
         {
-            if(mnu)
-                y++;
-
             drawLightBevel(cr, style, state, area, NULL, x, y,
                            opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0), &btn_colors[getFill(state, false)],
                            btn_colors, ROUNDED_ALL, WIDGET_CHECKBOX, BORDER_FLAT,
@@ -5107,17 +5085,12 @@ debugDisplayWidget(widget, 3);
                         draw3d=draw3dFull || (!lightBorder && QTC_DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED));
             GdkColor    *colors=coloredMouseOver
                             ? qtcPalette.mouseover
-                            : btn_colors;
-            GdkColor    *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
+                            : btn_colors,
+                        *bgndCol=/*!isList(widget) && */GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
                                     ? &style->bg[GTK_STATE_NORMAL]
                                     : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
                                         ? &btn_colors[QTC_CR_MO_FILL]
                                         : &style->base[GTK_STATE_NORMAL];
-
-            if(mnu)
-                y++, width=opts.crSize, height=opts.crSize;
-            /*else if(list)
-                y++, width=opts.crSize, height=opts.crSize;*/
 
             drawBevelGradient(cr, style, area, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
                               TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
@@ -5214,12 +5187,13 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
                   tri=GTK_SHADOW_ETCHED_IN==shadow_type,
                   set=on||tri,
                   doEtch=QTC_DO_EFFECT;
-        int       ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL;
+        int       ind_state=GTK_STATE_INSENSITIVE==state ? state : GTK_STATE_NORMAL,
+                  optSpace=doEtch ? opts.crSize+2 : opts.crSize;
         GdkColor  new_colors[TOTAL_SHADES+1],
                   *btn_colors;
 
-        if(QTC_CR_SMALL_SIZE!=opts.crSize)
-            y--;
+        x+=((width-optSpace)>>1);
+        y+=((height-optSpace)>>1);
     
         if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
             btn_colors=qtcPalette.selectedcr;
@@ -5231,12 +5205,6 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         else
             btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
 
-        if(mnu)
-            if(GTK_APP_MOZILLA==qtSettings.app)
-                y-=2;
-            else
-                y+=2;
-                
         if(opts.crButton)
         {
             drawLightBevel(cr, style, state, area, NULL, x, y,
@@ -5251,88 +5219,71 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             bool     glow=doEtch && GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver;
             gboolean lightBorder=QTC_DRAW_LIGHT_BORDER(FALSE, WIDGET_TROUGH, APPEARANCE_INVERTED),
                      draw3d=!lightBorder &&
-                            (QTC_DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED) || QTC_DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED));
+                            (QTC_DRAW_3D_BORDER(FALSE, APPEARANCE_INVERTED) || QTC_DRAW_3D_FULL_BORDER(FALSE, APPEARANCE_INVERTED)),
+                     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
+                     doneShadow=false;
+            int      bgnd=0;
+            GdkColor *colors=coloredMouseOver
+                        ? qtcPalette.mouseover
+                        : btn_colors,
+                     *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
+                        ? &style->bg[GTK_STATE_NORMAL]
+                        : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
+                            ? &colors[QTC_CR_MO_FILL]
+                            : &style->base[GTK_STATE_NORMAL];
+            double   radius=(opts.crSize+1)/2.0;
 
-    //         x+=((width-opts.crSize)>>1)+1;  /* +1 solves clipping on prnting dialog */
-    //         y+=((height-opts.crSize)>>1)+1;
-    //
-    //         if(doEtch)
-    //             x++, y++;
-    //
-    //         /* For some reason, radios dont look aligned properly - most noticeable with menuStripe set */
-    //         if(GTK_APP_MOZILLA!=qtSettings.app)
-    //             x-=3;
+            bgnd=getFill(state, set/*, TRUE*/);
 
-    //         if(mnu)
-    //             y++;
+            clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
+            drawBevelGradient(cr, style, NULL, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
+                                TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
+            cairo_restore(cr);
 
-
+            if(!mnu && coloredMouseOver && !glow)
             {
-                gboolean  coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver,
-                          doneShadow=false;
-                int       bgnd=0;
-                GdkColor  *colors=coloredMouseOver
-                            ? qtcPalette.mouseover
-                            : btn_colors,
-                          *bgndCol=GTK_STATE_INSENSITIVE==state || GTK_STATE_ACTIVE==state
-                                    ? &style->bg[GTK_STATE_NORMAL]
-                                    : !mnu && GTK_STATE_PRELIGHT==state && !coloredMouseOver && !opts.crHighlight
-                                        ? &colors[QTC_CR_MO_FILL]
-                                        : &style->base[GTK_STATE_NORMAL];
-                double    radius=(opts.crSize+1)/2.0;
+                double radius=(opts.crSize-2)/2.0;
 
-                bgnd=getFill(state, set/*, TRUE*/);
-
-                clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
-                drawBevelGradient(cr, style, NULL, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
-                                  TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
-                cairo_restore(cr);
-
-                if(!mnu && coloredMouseOver && !glow)
-                {
-                    double radius=(opts.crSize-2)/2.0;
-
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[QTC_CR_MO_FILL]));
-                    cairo_arc(cr, x+radius + 1, y+radius + 1, radius, 0, 2*M_PI);
-                    cairo_stroke(cr);
-                    radius--;
-                    cairo_arc(cr, x+radius + 2, y+radius + 2, radius, 0, 2*M_PI);
-                    cairo_stroke(cr);
-                }
-
-                if(!doneShadow && doEtch && !mnu && (!list || glow))
-                {
-                    double   radius=(opts.crSize+1)/2.0;
-
-                    if(glow)
-                        cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QTC_GLOW_MO]));
-                    else
-                        cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_RADIO_TOP_ALPHA);
-
-                    if(EFFECT_NONE!=opts.buttonEffect || glow)
-                    {
-                        cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
-                        cairo_stroke(cr);
-                        if(!glow)
-                            setLowerEtchCol(cr, widget);
-                    }
-                    cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 1.75*M_PI, 0.75*M_PI);
-                    cairo_stroke(cr);
-                }
-
-                cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[coloredMouseOver ? 4 : QT_BORDER(GTK_STATE_INSENSITIVE!=state)]));
-                radius=(opts.crSize-0.5)/2.0;
-                cairo_arc(cr, x+0.25+radius, y+0.25+radius, radius, 0, 2*M_PI);
+                cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[QTC_CR_MO_FILL]));
+                cairo_arc(cr, x+radius + 1, y+radius + 1, radius, 0, 2*M_PI);
                 cairo_stroke(cr);
-                if(!coloredMouseOver)
+                radius--;
+                cairo_arc(cr, x+radius + 2, y+radius + 2, radius, 0, 2*M_PI);
+                cairo_stroke(cr);
+            }
+
+            if(!doneShadow && doEtch && !mnu && (!list || glow))
+            {
+                double   radius=(opts.crSize+1)/2.0;
+
+                if(glow)
+                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(qtcPalette.mouseover[QTC_GLOW_MO]));
+                else
+                    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, QTC_ETCH_RADIO_TOP_ALPHA);
+
+                if(EFFECT_NONE!=opts.buttonEffect || glow)
                 {
-                    radius=(opts.crSize-1)/2.0;
-                    cairo_set_source_rgb(cr, QTC_CAIRO_COL(btn_colors[coloredMouseOver ? 3 : 4]));
-                    cairo_arc(cr, x+0.75+radius, y+0.75+radius, radius,
-                              lightBorder ? 0 : 0.75*M_PI,
-                              lightBorder ? 2*M_PI : 1.75*M_PI);
+                    cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 0.75*M_PI, 1.75*M_PI);
                     cairo_stroke(cr);
+                    if(!glow)
+                        setLowerEtchCol(cr, widget);
                 }
+                cairo_arc(cr, x+radius - 0.5, y+radius - 0.5, radius, 1.75*M_PI, 0.75*M_PI);
+                cairo_stroke(cr);
+            }
+
+            cairo_set_source_rgb(cr, QTC_CAIRO_COL(colors[coloredMouseOver ? 4 : QT_BORDER(GTK_STATE_INSENSITIVE!=state)]));
+            radius=(opts.crSize-0.5)/2.0;
+            cairo_arc(cr, x+0.25+radius, y+0.25+radius, radius, 0, 2*M_PI);
+            cairo_stroke(cr);
+            if(!coloredMouseOver)
+            {
+                radius=(opts.crSize-1)/2.0;
+                cairo_set_source_rgb(cr, QTC_CAIRO_COL(btn_colors[coloredMouseOver ? 3 : 4]));
+                cairo_arc(cr, x+0.75+radius, y+0.75+radius, radius,
+                            lightBorder ? 0 : 0.75*M_PI,
+                            lightBorder ? 2*M_PI : 1.75*M_PI);
+                cairo_stroke(cr);
             }
         }
 
@@ -6711,9 +6662,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
-            if(isMozilla() && width==height && width>13)
-                y++, x++, width--, height--;
-            else if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])  // Gimps buttons in its toolbox are
+            if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])  // Gimps buttons in its toolbox are
             {
                 if(FOCUS_LINE==opts.focus)
                     height--;
