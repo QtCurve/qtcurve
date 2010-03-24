@@ -88,7 +88,7 @@ static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false)
     double       radius((fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0)),
                  dr(radius * 2);
     QRect        fr(inner ? r.adjusted(1, 1, -1, -1) : r);
-    QRectF       rf(fr.x()-0.5, fr.y()+5.5, fr.width()+0.5, fr.height() - 5.5);
+    QRectF       rf(fr.x(), fr.y()+6, fr.width(), fr.height() - 6);
     QPainterPath path;
 
     path.moveTo(rf.right(), rf.top() + radius);
