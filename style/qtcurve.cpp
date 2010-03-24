@@ -445,22 +445,6 @@ static void unSetBold(QWidget *widget)
     }
 }
 
-static int getFrameRound(const QWidget *widget)
-{
-    const QWidget *window=widget ? widget->window() : 0L;
-
-    if(window)
-    {
-        QRect widgetRect(widget->rect()),
-              windowRect(window->rect());
-
-        if(widgetRect==windowRect)
-            return ROUNDED_NONE;
-    }
-
-    return ROUNDED_ALL;
-}
-
 static QWidget * getActiveWindow(QWidget *widget)
 {
     QWidget *activeWindow=QApplication::activeWindow();
@@ -11771,6 +11755,25 @@ QPalette::ColorRole QtCurveStyle::getTextRole(const QWidget *w, const QPainter *
             return QPalette::HighlightedText;
     }
     return def;
+}
+
+int QtCurveStyle::getFrameRound(const QWidget *widget) const
+{
+    const QWidget *window=widget ? widget->window() : 0L;
+
+    if(window)
+    {
+        QRect widgetRect(widget->rect()),
+              windowRect(window->rect());
+
+        if(widgetRect==windowRect)
+            return ROUNDED_NONE;
+    }
+
+    if(opts.squareEntry && widget && qobject_cast<const QLabel *>(widget))
+        return ROUNDED_NONE;
+
+    return ROUNDED_ALL;
 }
 
 void QtCurveStyle::widgetDestroyed(QObject *o)
