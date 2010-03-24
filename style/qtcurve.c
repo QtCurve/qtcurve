@@ -2853,16 +2853,23 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if (opts.menubarHiding && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) && !isGimpDockable(widget) &&
-        !isMenuOrToolTipWindow)
+    if ((opts.menubarHiding || opts.statusbarHiding) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) &&
+        !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
         qtcWindowSetup(widget);
-        if(qtcMenuBarHidden(qtSettings.appName))
+        if(opts.menubarHiding && qtcMenuBarHidden(qtSettings.appName))
         {
             GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
 
             if(menuBar)
                 gtk_widget_hide(menuBar);
+        }
+        if(opts.statusbarHiding && qtcStatusBarHidden(qtSettings.appName))
+        {
+            GtkWidget *statusBar=qtcWindowGetStatusBar(widget, 0);
+
+            if(statusBar)
+                gtk_widget_hide(statusBar);
         }
     }
 

@@ -1,9 +1,10 @@
 1.2.1
 -----
-1. Better check/radio positioning.
-2. Fix background painting with some toolbars.
-3. Draw window frames square.
-4. Fix rounding of check/radio/splitter/expander highlight.
+1. Add option to hide status bars via Ctrl-Alt-S
+2. Better check/radio positioning.
+3. Fix background painting with some toolbars.
+4. Draw window frames square.
+5. Fix rounding of check/radio/splitter/expander highlight.
 
 1.2.0
 -----

@@ -2265,6 +2265,7 @@ static gboolean qtInit()
             {
                 opts.shadeMenubars=SHADE_NONE;
                 opts.menubarHiding=false;
+                opts.statusbarHiding=false;
             }
 
             /* Tear off menu items dont seem to draw they're background, and the default background
