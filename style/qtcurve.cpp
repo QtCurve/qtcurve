@@ -2752,9 +2752,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return QTC_DO_EFFECT && opts.etchEntry ? 3 : 2;
         case PM_IndicatorWidth:
         case PM_IndicatorHeight:
-            return QTC_DO_EFFECT ? opts.crSize+2 : opts.crSize;
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
+        case PM_CheckListControllerSize:
+        case PM_CheckListButtonSize:
             return QTC_DO_EFFECT ? opts.crSize+2 : opts.crSize;
         case PM_TabBarTabOverlap:
             return TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1;
@@ -2873,6 +2874,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
 {
     switch (hint)
     {
+        case SH_ComboBox_ListMouseTracking:
+            return true;
         case SH_WizardStyle:
             return QWizard::ClassicStyle;
         case SH_RubberBand_Mask:
@@ -2941,8 +2944,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return 1;
         case SH_TitleBar_AutoRaise:
             return 1;
-//        case SH_ItemView_ArrowKeysNavigateIntoChildren:
-//            return false;
+        case SH_ItemView_ArrowKeysNavigateIntoChildren:
+            return true;
 //         case SH_ItemView_ChangeHighlightOnFocus: // gray out selected items when losing focus.
 //             return true;
         case SH_ItemView_ShowDecorationSelected:
@@ -5884,7 +5887,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if (QIcon::Normal==mode && button->state&State_HasFocus)
                         mode = QIcon::Active;
 
-                    QIcon::State state(button->state&State_On ? QIcon::On : QIcon::Off);
+                    QIcon::State state((button->state&State_On) || (button->state&State_Sunken) ? QIcon::On : QIcon::Off);
                     QPixmap      pixmap(getIconPixmap(button->icon, button->iconSize, mode, state));
                     int          labelWidth(pixmap.width()),
                                  labelHeight(pixmap.height()),
@@ -5908,7 +5911,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     if (button->state & (State_On|State_Sunken))
                         iconRect.translate(pixelMetric(PM_ButtonShiftHorizontal, option, widget),
-                                        pixelMetric(PM_ButtonShiftVertical, option, widget));
+                                           pixelMetric(PM_ButtonShiftVertical, option, widget));
                     painter->drawPixmap(iconRect, pixmap);
                 }
                 else
