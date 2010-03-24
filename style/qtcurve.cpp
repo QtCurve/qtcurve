@@ -1340,9 +1340,9 @@ void QtCurveStyle::polish(QApplication *app)
             theThemedApp=APP_OPENOFFICE;
 
     if(opts.menubarHiding)
-        itsSaveMenuBarStatus=opts.menubarApps.contains(appName);
+        itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);
     if(opts.statusbarHiding)
-        itsSaveStatusBarStatus=opts.statusbarApps.contains(appName);
+        itsSaveStatusBarStatus=opts.statusbarApps.contains("kde") || opts.statusbarApps.contains(appName);
 
     if(!IS_FLAT(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
         opts.bgndAppearance=APPEARANCE_FLAT;

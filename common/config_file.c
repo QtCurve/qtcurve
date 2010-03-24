@@ -2222,7 +2222,7 @@ static void defaultSettings(Options *opts)
     opts->xbar=false;
     opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer";
-    opts->statusbarApps=opts->menubarApps;
+    opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";

@@ -3063,7 +3063,7 @@
        <item row="4" column="1">
         <widget class="KLineEdit" name="menubarApps">
          <property name="whatsThis">
-          <string>Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the menubar is hidden or not.</string>
+          <string>&lt;p&gt;Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the menubar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The menubar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -3077,7 +3077,7 @@
        <item row="6" column="1">
         <widget class="KLineEdit" name="noDlgFixApps">
          <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
+          <string>&lt;p&gt;Comma seperated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -3091,7 +3091,7 @@
        <item row="5" column="1">
         <widget class="KLineEdit" name="statusbarApps">
          <property name="whatsThis">
-          <string>Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the statusbar is hidden or not.</string>
+          <string>&lt;p&gt;Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the statusbar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The statusbar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
