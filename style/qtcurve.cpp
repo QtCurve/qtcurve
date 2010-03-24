@@ -4398,22 +4398,21 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(opts.titlebarBorder)
                 {
                     painter->setPen(borderCols[0]);
-                    drawRect(painter, r.adjusted(1, 1, 0, 0));
+                    painter->drawLine(r.x()+1, r.y(), r.x()+1, r.y()+r.height()-1);
                 }
                 painter->setPen(borderCols[QT_STD_BORDER]);
                 drawRect(painter, r);
             }
             else
             {
-                painter->setRenderHint(QPainter::Antialiasing, true);
                 if(opts.titlebarBorder)
                 {
+                    painter->setRenderHint(QPainter::Antialiasing, false);
                     painter->setPen(borderCols[0]);
-                    painter->drawPath(buildPath(r.adjusted(1, 1, 0, 0), WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
-                                                opts.round>ROUND_SLIGHT && state&QtC_StateKWin
-                                                    ? 5.0
-                                                    : 1.0));
+                    painter->drawLine(r.x()+1, r.y(),
+                                      r.x()+1, r.y()+r.height()-(1+(opts.round>ROUND_SLIGHT && state&QtC_StateKWin ? 3 : 1)));
                 }
+                painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(borderCols[QT_STD_BORDER]);
                 painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL,
                                             opts.round>ROUND_SLIGHT && state&QtC_StateKWin
@@ -7686,12 +7685,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(opts.titlebarBorder)
                     {
                         painter->setPen(titleCols[0]);
+                        painter->save();
+                        painter->setClipRect(r.adjusted(0, 0, -1, -1));
                         painter->drawPath(buildPath(r.adjusted(1, 1, 0, 1), WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
                                                     opts.round<ROUND_SLIGHT
                                                         ? 0
                                                         : opts.round>ROUND_SLIGHT /*&& kwin*/
                                                             ? 5.0
                                                             : 1.0));
+                        painter->restore();
                     }
 
                     painter->setPen(titleCols[QT_STD_BORDER]);

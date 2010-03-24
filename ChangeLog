@@ -3,6 +3,7 @@
 1. Set decoration (hover/focus) colours for preview.
 2. Fix unreadable text when using progressbar glow and anti-aliased fonts.
 3. Better event filter code for qwidget buddy focus painting.
+4. Fix issues with light border in window decoration.
 
 1.2.0
 -----
