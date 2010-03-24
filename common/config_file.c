@@ -1207,33 +1207,47 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #ifdef __cplusplus
     if(file.isEmpty())
     {
-        const char *cfgDir=qtcConfDir();
+        const char *env=getenv("QTCURVE_CONFIG_FILE");
 
-        if(cfgDir)
+        if(NULL!=env)
+            return readConfig(env, opts, defOpts);
+        else
         {
-            QString filename(QFile::decodeName(cfgDir)+QTC_FILE);
+            const char *cfgDir=qtcConfDir();
 
-            if(!QFile::exists(filename))
-                filename=QFile::decodeName(cfgDir)+"../"QTC_OLD_FILE;
-            return readConfig(filename, opts, defOpts);
+            if(cfgDir)
+            {
+                QString filename(QFile::decodeName(cfgDir)+QTC_FILE);
+
+                if(!QFile::exists(filename))
+                    filename=QFile::decodeName(cfgDir)+"../"QTC_OLD_FILE;
+                return readConfig(filename, opts, defOpts);
+            }
         }
     }
 #else
     if(!file)
     {
-        const char *cfgDir=qtcConfDir();
+        const char *env=getenv("QTCURVE_CONFIG_FILE");
 
-        if(cfgDir)
+        if(NULL!=env)
+            return readConfig(env, opts, defOpts);
+        else
         {
-            char *filename=(char *)malloc(strlen(cfgDir)+strlen(QTC_OLD_FILE)+4);
-            bool rv=false;
+            const char *cfgDir=qtcConfDir();
 
-            sprintf(filename, "%s"QTC_FILE, cfgDir);
-            if(!qtcFileExists(filename))
-                sprintf(filename, "%s../"QTC_OLD_FILE, cfgDir);
-            rv=readConfig(filename, opts, defOpts);
-            free(filename);
-            return rv;
+            if(cfgDir)
+            {
+                char *filename=(char *)malloc(strlen(cfgDir)+strlen(QTC_OLD_FILE)+4);
+                bool rv=false;
+
+                sprintf(filename, "%s"QTC_FILE, cfgDir);
+                if(!qtcFileExists(filename))
+                    sprintf(filename, "%s../"QTC_OLD_FILE, cfgDir);
+                rv=readConfig(filename, opts, defOpts);
+                free(filename);
+                return rv;
+            }
         }
     }
 #endif
