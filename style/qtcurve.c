@@ -2915,7 +2915,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_PRELIGHT==state && opts.splitterHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.splitterHighlight));
-            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col,
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, &col,
                               width>height);
         }
     }
@@ -2924,7 +2924,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_PRELIGHT==state && opts.crHighlight && width>(opts.crSize*2))
         {
             GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.crHighlight));
-            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, &col, TRUE);
         }
     }
     else if(detail && 0==strcmp(detail, "expander"))
@@ -2932,7 +2932,7 @@ debugDisplayWidget(widget, 3);
         if(GTK_STATE_PRELIGHT==state && opts.expanderHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], QTC_TO_FACTOR(opts.expanderHighlight));
-            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, TRUE, 1.0, &col, TRUE);
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, &col, TRUE);
         }
     }
     else if(DETAIL("tooltip"))
