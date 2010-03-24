@@ -73,10 +73,17 @@ When KDE's style panel is restarted, your new theme should appear in the list.
 NOTE: As of QtCurve 1.0.0 style support has been disabled by default, and you will
 need to explicitly enable it via QTC_STYLE_SUPPORT
 
+Testing
+-------
+As of v1.2.1, QtCurve can be forced to read its settings from an alternate config
+file via the QTCURVE_CONFIG_FILE environment variable. This is only really useful
+for testing alternate config settings without changing the users current settings.
+Usage:
+
+    QTCURVE_CONFIG_FILE=~/testfile gimp
 
 Creating Distribution Packages
 ------------------------------
-
 CMake (as of v2.4.x) does not support building rpm or deb packages, and a simple
 checkinstall will not work. CMake 2.6 should support rpm and deb packages, but until
 then I have supplied a simple shell script to build a package with checkinstall.
