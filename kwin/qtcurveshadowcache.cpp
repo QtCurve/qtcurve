@@ -81,7 +81,7 @@ static QColor calcLightColor(const QColor &color)
     inactiveShadowConfiguration_( QtCurveShadowConfiguration( QPalette::Inactive ) )
   {
     shadowCache_.setMaxCost( 1<<6 );
-    animatedShadowCache_.setMaxCost( maxIndex_<<6 );
+//     animatedShadowCache_.setMaxCost( maxIndex_<<6 );
   }
 
   //_______________________________________________________
@@ -119,54 +119,54 @@ static QColor calcLightColor(const QColor &color)
 
   }
 
-  //_______________________________________________________
-  TileSet* QtCurveShadowCache::tileSet( const QtCurveClient* client, int index )
-  {
-
-    assert( index <= maxIndex_ );
-
-    // construct key
-    Key key( client );
-    key.index = index;
-
-    // check if tileset already in cache
-    int hash( key.hash() );
-    if( animatedShadowCache_.contains(hash) ) return animatedShadowCache_.object(hash);
-
-    // create shadow and tileset otherwise
-    qreal size( shadowSize() );
-    qreal opacity( qreal(index)/qreal(maxIndex_) );
-
-    QPixmap shadow( size*2, size*2 );
-    shadow.fill( Qt::transparent );
-    QPainter p( &shadow );
-    p.setRenderHint( QPainter::Antialiasing );
-
-    QPixmap inactiveShadow( shadowPixmap( client, false ) );
-    {
-      QPainter pp( &inactiveShadow );
-      pp.setRenderHint( QPainter::Antialiasing );
-      pp.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-      pp.fillRect( inactiveShadow.rect(), QColor( 0, 0, 0, 255*(1.0-opacity ) ) );
-    }
-
-    QPixmap activeShadow( shadowPixmap( client, true ) );
-    {
-      QPainter pp( &activeShadow );
-      pp.setRenderHint( QPainter::Antialiasing );
-      pp.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-      pp.fillRect( activeShadow.rect(), QColor( 0, 0, 0, 255*( opacity ) ) );
-    }
-
-    p.drawPixmap( QPointF(0,0), inactiveShadow );
-    p.drawPixmap( QPointF(0,0), activeShadow );
-    p.end();
-
-    TileSet* tileSet = new TileSet(shadow, size, size, 1, 1);
-    animatedShadowCache_.insert( hash, tileSet );
-    return tileSet;
-
-  }
+//   //_______________________________________________________
+//   TileSet* QtCurveShadowCache::tileSet( const QtCurveClient* client, int index )
+//   {
+// 
+//     assert( index <= maxIndex_ );
+// 
+//     // construct key
+//     Key key( client );
+//     key.index = index;
+// 
+//     // check if tileset already in cache
+//     int hash( key.hash() );
+//     if( animatedShadowCache_.contains(hash) ) return animatedShadowCache_.object(hash);
+// 
+//     // create shadow and tileset otherwise
+//     qreal size( shadowSize() );
+//     qreal opacity( qreal(index)/qreal(maxIndex_) );
+// 
+//     QPixmap shadow( size*2, size*2 );
+//     shadow.fill( Qt::transparent );
+//     QPainter p( &shadow );
+//     p.setRenderHint( QPainter::Antialiasing );
+// 
+//     QPixmap inactiveShadow( shadowPixmap( client, false ) );
+//     {
+//       QPainter pp( &inactiveShadow );
+//       pp.setRenderHint( QPainter::Antialiasing );
+//       pp.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+//       pp.fillRect( inactiveShadow.rect(), QColor( 0, 0, 0, 255*(1.0-opacity ) ) );
+//     }
+// 
+//     QPixmap activeShadow( shadowPixmap( client, true ) );
+//     {
+//       QPainter pp( &activeShadow );
+//       pp.setRenderHint( QPainter::Antialiasing );
+//       pp.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+//       pp.fillRect( activeShadow.rect(), QColor( 0, 0, 0, 255*( opacity ) ) );
+//     }
+// 
+//     p.drawPixmap( QPointF(0,0), inactiveShadow );
+//     p.drawPixmap( QPointF(0,0), activeShadow );
+//     p.end();
+// 
+//     TileSet* tileSet = new TileSet(shadow, size, size, 1, 1);
+//     animatedShadowCache_.insert( hash, tileSet );
+//     return tileSet;
+// 
+//   }
 
   //_________________________________________________________________
   QPixmap QtCurveShadowCache::shadowPixmap(const QtCurveClient* client, bool active ) const

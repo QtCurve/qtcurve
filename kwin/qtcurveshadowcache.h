@@ -59,7 +59,7 @@ namespace KWinQtCurve
     void invalidateCaches( void )
     {
       shadowCache_.clear();
-      animatedShadowCache_.clear();
+//       animatedShadowCache_.clear();
     }
 
     //! returns true if provided shadow configuration changes with respect to stored
@@ -90,7 +90,7 @@ namespace KWinQtCurve
     TileSet* tileSet( const QtCurveClient* );
 
     //! get shadow matching client and animation index
-    TileSet* tileSet( const QtCurveClient*, int );
+//     TileSet* tileSet( const QtCurveClient*, int );
 
     //! Key class to be used into QCache
     /*! class is entirely inline for optimization */
@@ -147,7 +147,7 @@ namespace KWinQtCurve
     void reset()
     {
         shadowCache_.clear();
-        animatedShadowCache_.clear();
+//         animatedShadowCache_.clear();
     }
     
     protected:
@@ -178,7 +178,7 @@ namespace KWinQtCurve
     TileSetCache shadowCache_;
 
     //! animated shadow cache
-    TileSetCache animatedShadowCache_;
+//     TileSetCache animatedShadowCache_;
 
   };
 
