@@ -982,6 +982,7 @@ typedef struct
                      squareLvSelection,
                      invertBotTab,
                      menubarHiding,
+                     statusbarHiding,
                      boldProgress,
                      coloredTbarMo,
                      borderSelection,
@@ -1078,6 +1079,7 @@ typedef struct
                      noMenuStripeApps;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     Strings          menubarApps,
+                     statusbarApps,
                      useQtFileDialogApps;
 #endif
 

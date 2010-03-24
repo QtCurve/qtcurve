@@ -257,6 +257,7 @@ class QtCurveStyle : public QWindowsStyle
                                        itsLighterPopupMenuBgndCol,
                                        itsCheckRadioCol;
     bool                               itsSaveMenuBarStatus,
+                                       itsSaveStatusBarStatus,
                                        itsUsePixmapCache,
                                        itsIsPreview;
     mutable QColor                     *itsSidebarButtonsCols;

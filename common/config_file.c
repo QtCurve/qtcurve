@@ -668,21 +668,28 @@ static const char *qtcConfDir()
 
 #if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined QTC_CONFIG_DIALOG
 
-#define QTC_MENU_FILE_PREFIX "menubar-"
+#define QTC_MENU_FILE_PREFIX   "menubar-"
+#define QTC_STATUS_FILE_PREFIX "statusbar-"
+
+#define qtcMenuBarHidden(A)         qtcBarHidden((A), QTC_MENU_FILE_PREFIX)
+#define qtcSetMenuBarHidden(A, H)   qtcSetBarHidden((A), (H), QTC_MENU_FILE_PREFIX)
+#define qtcStatusBarHidden(A)       qtcBarHidden((A), QTC_STATUS_FILE_PREFIX)
+#define qtcSetStatusBarHidden(A, H) qtcSetBarHidden((A), (H), QTC_STATUS_FILE_PREFIX)
 
 #ifdef __cplusplus
-static bool qtcMenuBarHidden(const QString &app)
+static bool qtcBarHidden(const QString &app, const char *prefix)
 {
-    return QFile::exists(QFile::decodeName(qtcConfDir())+QTC_MENU_FILE_PREFIX+app);
+    return QFile::exists(QFile::decodeName(qtcConfDir())+prefix+app);
 }
 
-static void qtcSetMenuBarHidden(const QString &app, bool hidden)
+static void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix)
 {
     if(!hidden)
-        QFile::remove(QFile::decodeName(qtcConfDir())+QTC_MENU_FILE_PREFIX+app);
+        QFile::remove(QFile::decodeName(qtcConfDir())+prefix+app);
     else
-        QFile(QFile::decodeName(qtcConfDir())+QTC_MENU_FILE_PREFIX+app).open(QIODevice::WriteOnly);
+        QFile(QFile::decodeName(qtcConfDir())+prefix+app).open(QIODevice::WriteOnly);
 }
+
 #else
 static bool qtcFileExists(const char *name)
 {
@@ -691,31 +698,31 @@ static bool qtcFileExists(const char *name)
     return 0==lstat(name, &info) && S_ISREG(info.st_mode);
 }
 
-static char * qtcGetMenuBarFileName(const char *app)
+static char * qtcGetBarFileName(const char *app, const char *prefix)
 {
     char *filename=NULL;
 
     if(!filename)
     {
-        filename=(char *)malloc(strlen(qtcConfDir())+strlen(QTC_MENU_FILE_PREFIX)+strlen(app)+1);
-        sprintf(filename, "%s"QTC_MENU_FILE_PREFIX"%s", qtcConfDir(), app);
+        filename=(char *)malloc(strlen(qtcConfDir())+strlen(prefix)+strlen(app)+1);
+        sprintf(filename, "%s%s%s", qtcConfDir(), prefix, app);
     }
 
     return filename;
 }
 
-static bool qtcMenuBarHidden(const char *app)
+static bool qtcBarHidden(const char *app, const char *prefix)
 {
-    return qtcFileExists(qtcGetMenuBarFileName(app));
+    return qtcFileExists(qtcGetBarFileName(app, prefix));
 }
 
-static void qtcSetMenuBarHidden(const char *app, bool hidden)
+static void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
 {
     if(!hidden)
-        unlink(qtcGetMenuBarFileName(app));
+        unlink(qtcGetBarFileName(app, prefix));
     else
     {
-        FILE *f=fopen(qtcGetMenuBarFileName(app), "w");
+        FILE *f=fopen(qtcGetBarFileName(app, prefix), "w");
 
         if(f)
             fclose(f);
@@ -1486,6 +1493,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(squareLvSelection)
             QTC_CFG_READ_BOOL(invertBotTab)
             QTC_CFG_READ_BOOL(menubarHiding)
+            QTC_CFG_READ_BOOL(statusbarHiding)
             QTC_CFG_READ_BOOL(boldProgress)
             QTC_CFG_READ_BOOL(coloredTbarMo)
             QTC_CFG_READ_BOOL(borderSelection)
@@ -1565,6 +1573,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             QTC_READ_STRING_LIST(menubarApps)
+            QTC_READ_STRING_LIST(statusbarApps)
             QTC_READ_STRING_LIST(useQtFileDialogApps)
 #endif
 
@@ -2174,6 +2183,7 @@ static void defaultSettings(Options *opts)
     opts->squareLvSelection=false;
     opts->invertBotTab=true;
     opts->menubarHiding=false;
+    opts->statusbarHiding=false;
     opts->boldProgress=true;
     opts->coloredTbarMo=false;
     opts->borderSelection=false;
@@ -2212,6 +2222,7 @@ static void defaultSettings(Options *opts)
     opts->xbar=false;
     opts->dwtSettings=QTC_DWT_BUTTONS_AS_PER_TITLEBAR|QTC_DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer";
+    opts->statusbarApps=opts->menubarApps;
     opts->useQtFileDialogApps << "googleearth-bin";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
@@ -2860,6 +2871,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareLvSelection)
         CFG_WRITE_ENTRY(invertBotTab)
         CFG_WRITE_ENTRY(menubarHiding)
+        CFG_WRITE_ENTRY(statusbarHiding)
         CFG_WRITE_ENTRY(boldProgress)
         CFG_WRITE_ENTRY(coloredTbarMo)
         CFG_WRITE_ENTRY(borderSelection)
@@ -2926,6 +2938,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         QTC_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
         QTC_WRITE_STRING_LIST_ENTRY(noMenuStripeApps)
         QTC_WRITE_STRING_LIST_ENTRY(menubarApps)
+        QTC_WRITE_STRING_LIST_ENTRY(statusbarApps)
         QTC_WRITE_STRING_LIST_ENTRY(useQtFileDialogApps)
 #endif
 

@@ -489,6 +489,19 @@ static const QWidget * getToolBar(const QWidget *w/*, bool checkQ3*/)
             : 0L;
 }
 
+static QStatusBar * getStatusBar(QWidget *w)
+{
+    if(w)
+    {
+        QList<QStatusBar *> sb = w->findChildren<QStatusBar *>();
+
+        if(sb.count())
+            return sb.first();
+    }
+
+    return 0L;
+}
+
 //
 // OK, Etching looks cr*p on plasma widgets, and khtml...
 // CPD:TODO WebKit?
@@ -1328,6 +1341,8 @@ void QtCurveStyle::polish(QApplication *app)
 
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains(appName);
+    if(opts.statusbarHiding)
+        itsSaveStatusBarStatus=opts.statusbarApps.contains(appName);
 
     if(!IS_FLAT(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
         opts.bgndAppearance=APPEARANCE_FLAT;
@@ -1556,13 +1571,27 @@ void QtCurveStyle::polish(QWidget *widget)
         }
     }
 
-    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
         widget->installEventFilter(this);
         if(itsSaveMenuBarStatus)
-            static_cast<QMainWindow *>(widget)->menuBar()->installEventFilter(this);
+            static_cast<QMainWindow *>(widget)->menuWidget()->installEventFilter(this);
         if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
-            static_cast<QMainWindow *>(widget)->menuBar()->setHidden(true);
+            static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
+    }
+
+    if(opts.statusbarHiding && qobject_cast<QMainWindow *>(widget))
+    {
+        QStatusBar *sb=getStatusBar(widget);
+
+        if(sb)
+        {
+            widget->installEventFilter(this);
+            if(itsSaveStatusBarStatus)
+                sb->installEventFilter(this);
+            if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
+                sb->setHidden(true);
+        }
     }
 
     // Enable hover effects in all itemviews
@@ -2017,11 +2046,23 @@ void QtCurveStyle::unpolish(QWidget *widget)
         }
     }
 
-    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuBar())
+    if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
         widget->removeEventFilter(this);
         if(itsSaveMenuBarStatus)
-            static_cast<QMainWindow *>(widget)->menuBar()->removeEventFilter(this);
+            static_cast<QMainWindow *>(widget)->menuWidget()->removeEventFilter(this);
+    }
+
+    if(opts.statusbarHiding && qobject_cast<QMainWindow *>(widget))
+    {
+        QStatusBar *sb=getStatusBar(widget);
+
+        if(sb)
+        {
+            widget->removeEventFilter(this);
+            if(itsSaveStatusBarStatus)
+                sb->removeEventFilter(this);
+        }
     }
 
     if(qobject_cast<QPushButton *>(widget) ||
@@ -2317,27 +2358,50 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
     switch(event->type())
     {
         case QEvent::ShortcutOverride:
-            if(opts.menubarHiding && qobject_cast<QMainWindow *>(object))
+            if((opts.menubarHiding || opts.statusbarHiding) && qobject_cast<QMainWindow *>(object))
             {
                 QMainWindow *window=static_cast<QMainWindow *>(object);
 
-                if(window->isVisible() && window->menuBar())
+                if(window->isVisible())
                 {
-                    QKeyEvent *k=static_cast<QKeyEvent *>(event);
-
-                    if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
+                    if(opts.menubarHiding && window->menuWidget())
                     {
-                        if(itsSaveMenuBarStatus)
-                            qtcSetMenuBarHidden(appName, window->menuBar()->isVisible());
-                        window->menuBar()->setHidden(window->menuBar()->isVisible());
+                        QKeyEvent *k=static_cast<QKeyEvent *>(event);
+
+                        if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
+                        {
+                            if(itsSaveMenuBarStatus)
+                                qtcSetMenuBarHidden(appName, window->menuWidget()->isVisible());
+                            window->menuWidget()->setHidden(window->menuWidget()->isVisible());
+                        }
+                    }
+                    if(opts.statusbarHiding)
+                    {
+                        QKeyEvent *k=static_cast<QKeyEvent *>(event);
+
+                        if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_S==k->key())
+                        {
+                            QStatusBar *sb=getStatusBar(window);
+
+                            if(sb)
+                            {
+                                if(itsSaveStatusBarStatus)
+                                    qtcSetStatusBarHidden(appName, sb->isVisible());
+                                sb->setHidden(sb->isVisible());
+                            }
+                        }
                     }
                 }
+                
             }
             break;
         case QEvent::ShowToParent:
             if(opts.menubarHiding && itsSaveMenuBarStatus && qobject_cast<QMenuBar *>(object) &&
                qtcMenuBarHidden(appName))
                 static_cast<QMenuBar *>(object)->setHidden(true);
+            if(opts.statusbarHiding && itsSaveStatusBarStatus && qobject_cast<QStatusBar *>(object) &&
+               qtcStatusBarHidden(appName))
+                static_cast<QStatusBar *>(object)->setHidden(true);
             break;
         case QEvent::Paint:
             if((!IS_FLAT(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu*>(object))

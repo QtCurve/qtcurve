@@ -327,16 +327,6 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="drawStatusBarFrames">
-            <property name="whatsThis">
-             <string>Controls whether QtCurve should draw frames around items in statusbars.</string>
-            </property>
-            <property name="text">
-             <string>Draw statusbar frames</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QCheckBox" name="vArrows">
             <property name="whatsThis">
              <string>QtCurve supports 2 arrows types; plain (i.e. triangular) and the more modern looking 'V' style arrows.</string>
@@ -2761,6 +2751,44 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_27">
+      <layout class="QFormLayout" name="formLayout_21">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_90">
+         <property name="text">
+          <string>Frames around items:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="drawStatusBarFrames">
+         <property name="whatsThis">
+          <string>Controls whether QtCurve should draw frames around items in statusbars.</string>
+         </property>
+         <property name="text">
+          <string>Visible</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_91">
+         <property name="text">
+          <string>Hiding:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="statusbarHiding">
+         <property name="whatsThis">
+          <string>If enabled, statusbars may be hidden (and re-shown), by using the 'Ctrl-Alt-S' key combination.</string>
+         </property>
+         <property name="text">
+          <string>Use Ctrl-Alt-S (experimental)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_11">
       <layout class="QFormLayout" name="formLayout_18">
        <item row="0" column="0">
@@ -2966,6 +2994,9 @@
      </widget>
      <widget class="QWidget" name="page_26">
       <layout class="QFormLayout" name="formLayout_20">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_81">
          <property name="text">
@@ -3036,17 +3067,31 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_83x">
          <property name="text">
           <string>Don't apply parent-less dialog fix:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="KLineEdit" name="noDlgFixApps">
          <property name="whatsThis">
           <string>&lt;p&gt;Comma seperated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_89">
+         <property name="text">
+          <string>Save statusbar visibility:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="KLineEdit" name="statusbarApps">
+         <property name="whatsThis">
+          <string>Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the statusbar is hidden or not.</string>
          </property>
         </widget>
        </item>
@@ -3296,11 +3341,7 @@
              </layout>
              <zorder>label_3</zorder>
              <zorder></zorder>
-             <zorder>stopValue</zorder>
-             <zorder>stopPosition</zorder>
              <zorder></zorder>
-             <zorder>label_6</zorder>
-             <zorder>label_5</zorder>
             </widget>
            </item>
           </layout>
@@ -3530,7 +3571,6 @@
   <tabstop>thinnerBtns</tabstop>
   <tabstop>etchEntry</tabstop>
   <tabstop>focus</tabstop>
-  <tabstop>drawStatusBarFrames</tabstop>
   <tabstop>vArrows</tabstop>
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
@@ -3674,6 +3714,8 @@
   <tabstop>toolbarBorders</tabstop>
   <tabstop>coloredTbarMo_false</tabstop>
   <tabstop>coloredTbarMo</tabstop>
+  <tabstop>drawStatusBarFrames</tabstop>
+  <tabstop>statusbarHiding</tabstop>
   <tabstop>dwtAppearance</tabstop>
   <tabstop>dwtRoundTopOnly</tabstop>
   <tabstop>dwtBtnAsPerTitleBar</tabstop>
@@ -3693,6 +3735,7 @@
   <tabstop>noMenuStripeApps</tabstop>
   <tabstop>useQtFileDialogApps</tabstop>
   <tabstop>menubarApps</tabstop>
+  <tabstop>statusbarApps</tabstop>
   <tabstop>noDlgFixApps</tabstop>
   <tabstop>exportKde3Button</tabstop>
   <tabstop>exportQt3Button</tabstop>

@@ -785,6 +785,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menubarHiding, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
+    connect(statusbarHiding, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(glowProgress, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -922,6 +923,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(noBgndImageApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(useQtFileDialogApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(menubarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(statusbarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
@@ -1263,6 +1265,7 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Menubars"), i++);
     new CStackItem(stackList, i18n("Popup menus"), i++);
     new CStackItem(stackList, i18n("Toolbars"), i++);
+    new CStackItem(stackList, i18n("Statusbars"), i++);
     new CStackItem(stackList, i18n("Dock windows"), i++);
     new CStackItem(stackList, i18n("Advanced Settings"), i++);
     new CStackItem(stackList, i18n("Applications"), i++);
@@ -2189,6 +2192,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sliderStyle=(ESliderStyle)sliderStyle->currentIndex();
     opts.roundMbTopOnly=roundMbTopOnly->isChecked();
     opts.menubarHiding=menubarHiding->isChecked();
+    opts.statusbarHiding=statusbarHiding->isChecked();
     opts.fillProgress=fillProgress->isChecked();
     opts.glowProgress=(EGlow)glowProgress->currentIndex();
     opts.darkerBorders=darkerBorders->isChecked();
@@ -2308,6 +2312,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.noBgndImageApps=toSet(noBgndImageApps->text());
     opts.useQtFileDialogApps=toSet(useQtFileDialogApps->text());
     opts.menubarApps=toSet(menubarApps->text());
+    opts.statusbarApps=toSet(statusbarApps->text());
     opts.noDlgFixApps=toSet(noDlgFixApps->text());
     opts.noMenuStripeApps=toSet(noMenuStripeApps->text());
 }
@@ -2385,6 +2390,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sliderStyle->setCurrentIndex(opts.sliderStyle);
     roundMbTopOnly->setChecked(opts.roundMbTopOnly);
     menubarHiding->setChecked(opts.menubarHiding);
+    statusbarHiding->setChecked(opts.statusbarHiding);
     fillProgress->setChecked(opts.fillProgress);
     glowProgress->setCurrentIndex(opts.glowProgress);
     darkerBorders->setChecked(opts.darkerBorders);
@@ -2539,6 +2545,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     noBgndImageApps->setText(toString(opts.noBgndImageApps));
     useQtFileDialogApps->setText(toString(opts.useQtFileDialogApps));
     menubarApps->setText(toString(opts.menubarApps));
+    statusbarApps->setText(toString(opts.statusbarApps));
     noDlgFixApps->setText(toString(opts.noDlgFixApps));
     noMenuStripeApps->setText(toString(opts.noMenuStripeApps));
 }
@@ -2608,6 +2615,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          sliderStyle->currentIndex()!=opts.sliderStyle ||
          roundMbTopOnly->isChecked()!=opts.roundMbTopOnly ||
          menubarHiding->isChecked()!=opts.menubarHiding ||
+         statusbarHiding->isChecked()!=opts.statusbarHiding ||
          fillProgress->isChecked()!=opts.fillProgress ||
          glowProgress->currentIndex()!=opts.glowProgress ||
          darkerBorders->isChecked()!=opts.darkerBorders ||
@@ -2742,6 +2750,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          toSet(noBgndImageApps->text())!=opts.noBgndImageApps ||
          toSet(useQtFileDialogApps->text())!=opts.useQtFileDialogApps ||
          toSet(menubarApps->text())!=opts.menubarApps ||
+         toSet(statusbarApps->text())!=opts.statusbarApps ||
          toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||
          toSet(noMenuStripeApps->text())!=opts.noMenuStripeApps ||
 
