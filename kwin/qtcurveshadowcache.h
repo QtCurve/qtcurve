@@ -43,23 +43,18 @@ class QtCurveHelper;
 namespace KWinQtCurve
 {
 
-  class QtCurveClient;
-  class QtCurveShadowCache
-  {
+class QtCurveClient;
+
+class QtCurveShadowCache
+{
     public:
 
-    //! constructor
-    QtCurveShadowCache( int maxIndex=256 );
+    QtCurveShadowCache();
+    virtual ~QtCurveShadowCache() { }
 
-    //! destructor
-    virtual ~QtCurveShadowCache( void )
-    {}
-
-    //! invalidate caches
-    void invalidateCaches( void )
+    void invalidateCaches()
     {
-      shadowCache_.clear();
-//       animatedShadowCache_.clear();
+        shadowCache_.clear();
     }
 
     //! returns true if provided shadow configuration changes with respect to stored
@@ -67,121 +62,62 @@ namespace KWinQtCurve
     use QtCurveShadowConfiguration::colorRole() to decide whether it should be stored
     as active or inactive
     */
-    bool shadowConfigurationChanged( const QtCurveShadowConfiguration& ) const;
+    bool shadowConfigurationChanged(const QtCurveShadowConfiguration &other) const;
 
     //! set shadowConfiguration
     /*!
     use QtCurveShadowConfiguration::colorRole() to decide whether it should be stored
     as active or inactive
     */
-    void setShadowConfiguration( const QtCurveShadowConfiguration& );
+    void setShadowConfiguration(const QtCurveShadowConfiguration &other);
 
     //! shadow size
-    qreal shadowSize( void ) const
+    qreal shadowSize() const
     {
-        qreal size( qMax( activeShadowConfiguration_.shadowSize(), inactiveShadowConfiguration_.shadowSize() ) );
+        qreal size(qMax(activeShadowConfiguration_.shadowSize(), inactiveShadowConfiguration_.shadowSize()));
 
-        // even if shadows are disabled,
-        // you need a minimum size to allow corner rendering
-        return qMax( size, qreal(5.0) );
+        // even if shadows are disabled, you need a minimum size to allow corner rendering
+        return qMax(size, qreal(5.0));
     }
 
-    //! get shadow matching client
-    TileSet* tileSet( const QtCurveClient* );
-
-    //! get shadow matching client and animation index
-//     TileSet* tileSet( const QtCurveClient*, int );
+    TileSet * tileSet(const QtCurveClient *client, bool roundAllCorners);
 
     //! Key class to be used into QCache
     /*! class is entirely inline for optimization */
     class Key
     {
+        public:
 
-      public:
+        explicit Key() : active(false), isShade(false) {}
+        Key(const QtCurveClient *client);
+        Key(int hash) : active((hash>>1)&1), isShade((hash)&1) {}
 
-      //! explicit constructor
-      explicit Key( void ):
-        index(0),
-        active(false),
-        isShade(false)
-      {}
+        int hash() const { return (active <<1)|(isShade); }
 
-      //! constructor from client
-      Key( const QtCurveClient* );
-
-      //! constructor from int
-      Key( int hash ):
-        index( hash>>5 ),
-        active( (hash>>4)&1 ),
-        isShade( (hash>>2)&1 )
-      {}
-
-      //! hash function
-      int hash( void ) const
-      {
-
-        // note this can be optimized because not all of the flag configurations are actually relevant
-        // allocate 3 empty bits for flags
-        return
-          ( index << 5 ) |
-          ( active << 4 ) |
-          (isShade<<2);
-
-      }
-
-      int index;
-      bool active;
-      bool isShade;
+        bool active,
+             isShade;
     };
 
     //! complex pixmap (when needed)
-    QPixmap shadowPixmap( const QtCurveClient*, bool active ) const;
+    QPixmap shadowPixmap(const QtCurveClient *client, bool active, bool roundAllCorners) const;
 
     //! simple pixmap
-    QPixmap simpleShadowPixmap( const QColor& color, const Key& key ) const
-    { return simpleShadowPixmap( color, key, key.active ); }
+    QPixmap simpleShadowPixmap(const QColor &color, bool active, bool roundAllCorners) const;
 
-    //! simple pixmap
-    QPixmap simpleShadowPixmap( const QColor&, const Key&, bool active ) const;
-
-    void reset()
-    {
-        shadowCache_.clear();
-//         animatedShadowCache_.clear();
-    }
-    
-    protected:
-
-//     QtCurveHelper& helper( void ) const
-//     { return helper_; }
+    void reset() { shadowCache_.clear(); }
 
     private:
 
     //! draw gradient into rect
     /*! a separate method is used in order to properly account for corners */
-    void renderGradient( QPainter&, const QRectF&, const QRadialGradient&/*, bool hasBorder = true*/ ) const;
+    void renderGradient(QPainter &p, const QRectF &rect, const QRadialGradient &rg) const;
 
-    //! max index
-    /*! it is used to set caches max cost, and calculate animation opacity */
-    int maxIndex_;
-
-    //! shadow configuration
-    QtCurveShadowConfiguration activeShadowConfiguration_;
-
-    //! shadow configuration
-    QtCurveShadowConfiguration inactiveShadowConfiguration_;
-
-    //! cache
     typedef QCache<int, TileSet> TileSetCache;
 
-    //! shadow cache
-    TileSetCache shadowCache_;
-
-    //! animated shadow cache
-//     TileSetCache animatedShadowCache_;
-
-  };
-
+    QtCurveShadowConfiguration activeShadowConfiguration_,
+                               inactiveShadowConfiguration_;
+    TileSetCache               shadowCache_;
+};
 }
 
 #endif

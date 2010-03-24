@@ -260,8 +260,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                                         NULL, NULL)),
                          roundBottom(Handler()->roundBottom()),
                          outerBorder(Handler()->outerBorder());
-    const int            borderSize(Handler()->borderSize()),
-                         border(Handler()->borderEdgeSize()),
+    const int            border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
                          titleEdgeBottom(layoutMetric(LM_TitleEdgeBottom)),
@@ -278,15 +277,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     {
         if(compositing)
         {
-            TileSet *tileSet(0);
-    //         if(configuration().useOxygenShadows() && glowIsAnimated() && !isForcedActive())
-    //       {
-    //
-    //         int frame = ;
-    //         tileSet = shadowCache().tileSet(this, frame);=
-    //       }
-    //       else
-            tileSet = Handler()->shadowCache().tileSet(this);
+            TileSet *tileSet=Handler()->shadowCache().tileSet(this, roundBottom);
 
             if(!isMaximized())
                 tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);

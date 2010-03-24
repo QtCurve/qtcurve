@@ -6,6 +6,7 @@
 4. Fix issues with light border in window decoration.
 5. Fix blurred left edges of windows when not drawing border and rounding
    bottom.
+6. Fix custom shadows when window is fully rounded.
 
 1.2.0
 -----

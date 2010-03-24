@@ -290,6 +290,9 @@ bool QtCurveHandler::readConfig()
 
         itsShadowCache.setShadowConfiguration(actShadow);
         itsShadowCache.setShadowConfiguration(inactShadow);
+
+        if(shadowChanged || itsRoundBottom!=oldRoundBottom)
+            itsShadowCache.reset();
     }
 #endif
 
