@@ -75,11 +75,11 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
 #endif
-#if KDE_IS_VERSION(4, 3, 0)
-#include <KDE/KFileWidget>
-#else
-#include <kfilewidget.h>
-#endif
+// #if KDE_IS_VERSION(4, 3, 0)
+// #include <KDE/KFileWidget>
+// #else
+// #include <kfilewidget.h>
+// #endif
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 static int theInstanceCount=0;
@@ -8454,23 +8454,25 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 
             if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
             {
-                bool dialogButton=
+                if(!opts.stdBtnSizes)
+                {
+                    bool dialogButton=
                             // Cant rely on AutoDefaultButton - as VirtualBox does not set this!!!
                             // btn->features&QStyleOptionButton::AutoDefaultButton &&
                             widget && widget->parentWidget() &&
                             (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) ||
-#ifdef QTC_QT_ONLY
+// #ifdef QTC_QT_ONLY
                                 widget->parentWidget()->inherits("KFileWidget")
-#else
-                                ::qobject_cast<const KFileWidget *>(widget->parentWidget())
-#endif
+// #else
+//                                 ::qobject_cast<const KFileWidget *>(widget->parentWidget())
+// #endif
                             );
-
-                if(!opts.stdBtnSizes && dialogButton)
-                {
-                    int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
-                    if(size.height()<iconHeight+2)
-                        newSize.setHeight(iconHeight+2);
+                    if(dialogButton)
+                    {
+                        int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
+                        if(size.height()<iconHeight+2)
+                            newSize.setHeight(iconHeight+2);
+                    }
                 }
 
                 int margin = (pixelMetric(PM_ButtonMargin, btn, widget)+
