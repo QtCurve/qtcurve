@@ -384,6 +384,16 @@ static inline bool isOOWidget(const QWidget *widget)
     return APP_OPENOFFICE==theThemedApp && !widget;
 }
 
+static bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
+{
+    QColor text(pal.text().color()),
+           hl(pal.highlightedText().color());
+ 
+    return (text.red()<50) && (text.green()<50) && (text.blue()<50) && 
+           (hl.red()>127) && (hl.green()>127) && (hl.blue()>127) &&
+           TOO_DARK(highlight);
+}
+
 int static toHint(int sc)
 {
     switch(sc)
@@ -948,6 +958,7 @@ QtCurveStyle::QtCurveStyle()
               itsComboBtnCols(0L),
               itsCheckRadioSelCols(0L),
               itsSortedLvColors(0L),
+              itsOOMenuCols(0L),
               itsSaveMenuBarStatus(false),
               itsUsePixmapCache(false),
               itsIsPreview(false),
@@ -1279,6 +1290,8 @@ QtCurveStyle::~QtCurveStyle()
     if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
             delete [] itsTitleBarButtonsCols[i];
+    if(itsOOMenuCols)
+        delete itsOOMenuCols;
 }
 
 static QString getFile(const QString &f)
@@ -1360,6 +1373,13 @@ void QtCurveStyle::polish(QApplication *app)
         if(APPEARANCE_FADE==opts.menuitemAppearance)
             opts.menuitemAppearance=APPEARANCE_FLAT;
         opts.borderMenuitems=opts.etchEntry=opts.sunkenScrollViews=false;
+
+        if(opts.useHighlightForMenu && blendOOMenuHighlight(QApplication::palette(), itsHighlightCols[ORIGINAL_SHADE]))
+        {
+            itsOOMenuCols=new QColor [TOTAL_SHADES+1];
+            shadeColors(tint(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
+                             itsHighlightCols[ORIGINAL_SHADE], 0.6), itsOOMenuCols);
+        }
     }
 
 #ifndef QTC_QT_ONLY
@@ -1486,6 +1506,20 @@ void QtCurveStyle::polish(QPalette &palette)
             shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
         else
             shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
+
+    if(APP_OPENOFFICE==theThemedApp && opts.useHighlightForMenu && (newGray || newHighlight))
+        if(blendOOMenuHighlight(palette, itsHighlightCols[ORIGINAL_SHADE]))
+        {
+            if(!itsOOMenuCols)
+                itsOOMenuCols=new QColor [TOTAL_SHADES+1];
+            shadeColors(tint(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
+                             itsHighlightCols[ORIGINAL_SHADE], 0.6), itsOOMenuCols);
+        }
+        else if(itsOOMenuCols)
+        {
+            delete itsOOMenuCols;
+            itsOOMenuCols=0L;
+        }
 
     palette.setColor(QPalette::Active, QPalette::Light, itsBackgroundCols[0]);
     palette.setColor(QPalette::Active, QPalette::Dark, itsBackgroundCols[QT_STD_BORDER]);
@@ -5547,9 +5581,10 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
-                    drawMenuItem(painter, r, option, true, down && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
-                                 opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down)
-                                    ? itsHighlightCols : itsBackgroundCols);
+                    drawMenuItem(painter, r, option, true, (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly
+                                                                ? ROUNDED_TOP : ROUNDED_ALL,
+                                 opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down || APP_OPENOFFICE==theThemedApp)
+                                            ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : itsBackgroundCols);
 
                 if (!pix.isNull())
                     drawItemPixmap(painter, mbi->rect, alignment, pix);
@@ -5665,7 +5700,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 if (selected && enabled)
                     drawMenuItem(painter, r, option, false, ROUNDED_ALL,
-                                 opts.useHighlightForMenu ? itsHighlightCols : itsBackgroundCols);
+                                 opts.useHighlightForMenu
+                                            ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : itsBackgroundCols);
 
                 if(comboMenu)
                 {
@@ -5752,7 +5788,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                 painter->setPen(dis
                                     ? palette.text().color()
-                                    : selected && opts.useHighlightForMenu
+                                    : selected && opts.useHighlightForMenu && !itsOOMenuCols
                                         ? palette.highlightedText().color()
                                         : palette.foreground().color());
 
@@ -5807,7 +5843,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                                              QRect(xpos, menuItem->rect.top() + menuItem->rect.height() / 2 - dim / 2, dim, dim)));
 
                     drawArrow(painter, vSubMenuRect, arrow,
-                              opts.useHighlightForMenu && state&State_Selected
+                              opts.useHighlightForMenu && state&State_Selected && !itsOOMenuCols
                                 ? palette.highlightedText().color()
                                 : palette.text().color());
                 }
@@ -10766,7 +10802,7 @@ void QtCurveStyle::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *
 
 void QtCurveStyle::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const
 {
-    int fill=opts.useHighlightForMenu && (!mbi || itsHighlightCols==cols) ? ORIGINAL_SHADE : 4,
+    int fill=opts.useHighlightForMenu && (!mbi || itsHighlightCols==cols || APP_OPENOFFICE==theThemedApp) ? ORIGINAL_SHADE : 4,
         border=opts.borderMenuitems ? 0 : fill;
 
     if(itsHighlightCols!=cols && mbi && !(option->state&(State_On|State_Sunken)) &&
