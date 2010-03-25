@@ -2280,14 +2280,12 @@ printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
 debugDisplayWidget(widget, 20);
 #endif
 
-        if(0==y)
-        {
+
             while(window && !GTK_IS_WINDOW(window))
                 window=window->parent;
 
-            if(window && window!=widget)
-                gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
-        }
+        if(0==y && window && window!=widget)
+            gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
