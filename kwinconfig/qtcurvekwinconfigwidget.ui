@@ -51,14 +51,21 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="borderlessMax">
+           <property name="text">
+            <string>Remove from maximised windows</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Titlebar padding:</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="KIntSpinBox" name="titleBarPad">
            <property name="suffix">
             <string>px</string>
@@ -263,6 +270,7 @@
   <tabstop>resizeGrip</tabstop>
   <tabstop>roundBottom</tabstop>
   <tabstop>outerBorder</tabstop>
+  <tabstop>borderlessMax</tabstop>
   <tabstop>titleBarPad</tabstop>
   <tabstop>useShadows</tabstop>
   <tabstop>activeShadowSize</tabstop>

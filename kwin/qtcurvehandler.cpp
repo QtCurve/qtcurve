@@ -255,7 +255,8 @@ bool QtCurveHandler::readConfig()
 
     bool oldShowResizeGrip=itsShowResizeGrip,
          oldRoundBottom=itsRoundBottom,
-         oldOuterBorder=itsOuterBorder;
+         oldOuterBorder=itsOuterBorder,
+         oldBorderlessMax=itsBorderlessMax;
     int  oldTitleBarPad=itsTitleBarPad;
 #if KDE_IS_VERSION(4, 3, 0)
     bool oldCustomShadows(itsCustomShadows);
@@ -267,6 +268,7 @@ bool QtCurveHandler::readConfig()
                         ? !config.readEntry("NoBorder", false)
                         : config.readEntry("OuterBorder", true);
     itsTitleBarPad = config.readEntry("TitleBarPad", 0);
+    itsBorderlessMax = config.readEntry("BorderlessMax", false);
 
     if(itsTitleBarPad<0 || itsTitleBarPad>10)
         itsTitleBarPad=0;
@@ -299,6 +301,7 @@ bool QtCurveHandler::readConfig()
     return oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom ||
            oldOuterBorder!=itsOuterBorder ||
+           oldBorderlessMax!=itsBorderlessMax ||
 #if KDE_IS_VERSION(4, 3, 0)
            oldCustomShadows!=itsCustomShadows ||
            shadowChanged ||

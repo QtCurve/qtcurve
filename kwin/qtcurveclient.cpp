@@ -160,7 +160,7 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
         case LM_TitleEdgeTop:
             return respectWindowState && isMaximized() ? 0 : Handler()->borderEdgeSize();
         case LM_TitleEdgeBottom:
-            return /*respectWindowState && isMaximized() ? 1 : */ Handler()->borderEdgeSize();
+            return respectWindowState && isMaximized() && Handler()->borderlessMax() ? 0 :  Handler()->borderEdgeSize();
         case LM_TitleEdgeLeft:
         case LM_TitleEdgeRight:
             return respectWindowState && isMaximized() ? 0 : Handler()->borderEdgeSize();
@@ -170,7 +170,11 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
         case LM_ButtonWidth:
         case LM_ButtonHeight:
         case LM_TitleHeight:
-            return respectWindowState && isToolWindow() ? Handler()->titleHeightTool() : Handler()->titleHeight();
+            return respectWindowState && isMaximized() && Handler()->borderlessMax()
+                        ? 0
+                        : respectWindowState && isToolWindow()
+                            ? Handler()->titleHeightTool()
+                            : Handler()->titleHeight();
         case LM_ButtonSpacing:
             return 0;
         case LM_ButtonMarginTop:

@@ -98,6 +98,7 @@ class QtCurveHandler : public QObject,
     QStyle *              wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
     int                   borderEdgeSize() const;
     int                   titleBarPad() const     { return itsTitleBarPad; }
+    bool                  borderlessMax() const   { return itsBorderlessMax; }
 #if KDE_IS_VERSION(4, 3, 0)
     bool                  customShadows() const    { return itsCustomShadows; }
     QtCurveShadowCache &  shadowCache()            { return itsShadowCache; }
@@ -114,7 +115,8 @@ class QtCurveHandler : public QObject,
     bool    itsColoredShadow,
             itsShowResizeGrip,
             itsRoundBottom,
-            itsOuterBorder;
+            itsOuterBorder,
+            itsBorderlessMax;
     int     itsBorderSize,
             itsTitleHeight,
             itsTitleHeightTool,

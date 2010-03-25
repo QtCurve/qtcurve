@@ -62,6 +62,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
     connect(itsWidget->resizeGrip, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->outerBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
     itsWidget->titleBarPad->setRange(0, 10);
 #if KDE_IS_VERSION(4, 3, 0)
@@ -113,6 +114,7 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
     itsWidget->outerBorder->setChecked(configGroup.hasKey("NoBorder")
                                         ? !configGroup.readEntry("NoBorder", false)
                                         : configGroup.readEntry("OuterBorder", true));
+    itsWidget->borderlessMax->setChecked(configGroup.readEntry("BorderlessMax", false));
     itsWidget->titleBarPad->setValue(configGroup.readEntry("TitleBarPad", 0));
     
 #if KDE_IS_VERSION(4, 3, 0)
@@ -130,6 +132,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
     configGroup.writeEntry("ShowResizeGrip", itsWidget->resizeGrip->isChecked());
     configGroup.writeEntry("RoundBottom", itsWidget->roundBottom->isChecked());
     configGroup.writeEntry("OuterBorder", itsWidget->outerBorder->isChecked());
+    configGroup.writeEntry("BorderlessMax", itsWidget->borderlessMax->isChecked());
     configGroup.writeEntry("TitleBarPad", itsWidget->titleBarPad->value());
     configGroup.deleteEntry("NoBorder");
 #if KDE_IS_VERSION(4, 3, 0)
@@ -165,6 +168,7 @@ void QtCurveKWinConfig::defaults()
     itsWidget->resizeGrip->setChecked(false);
     itsWidget->roundBottom->setChecked(true);
     itsWidget->outerBorder->setChecked(true);
+    itsWidget->borderlessMax->setChecked(false);
     itsWidget->titleBarPad->setValue(0);
 #if KDE_IS_VERSION(4, 3, 0)
     itsWidget->useShadows->setChecked(false);
