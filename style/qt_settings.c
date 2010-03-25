@@ -2798,6 +2798,10 @@ static gboolean qtInit()
                 gtk_rc_parse_string(tmpStr);
             }
 
+            if(TB_NONE==opts.toolbarBorders)
+                gtk_rc_parse_string("style \""QTC_RC_SETTING"TbB\" { xthickness = 0 ythickness = 0 GtkToolbar::internal-padding = 0 }"
+                                    " widget_class \"*<GtkToolbar>\" style  \""QTC_RC_SETTING"TbB\"");
+            
             if(tmpStr)
                 free(tmpStr);
         }

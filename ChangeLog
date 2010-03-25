@@ -5,6 +5,7 @@
 3. Fix background painting with some toolbars.
 4. Draw window frames square.
 5. Fix rounding of check/radio/splitter/expander highlight.
+6. Set toolbar frame width to 0 if not drawing borders.
 
 1.2.0
 -----
