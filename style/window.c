@@ -99,12 +99,14 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
     if(GDK_CONTROL_MASK&event->state && GDK_MOD1_MASK&event->state && !event->is_modifier &&
        0==(event->state&0xFF00)) // Ensure only ctrl/alt/shift/capsLock are pressed...
     {
+        gboolean toggled=FALSE;
         if(opts.menubarHiding && (GDK_m==event->keyval || GDK_M==event->keyval))
         {
             GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
 
             if(menuBar)
             {
+                toggled=TRUE;
                 qtcSetMenuBarHidden(qtSettings.appName, GTK_WIDGET_VISIBLE(menuBar));
                 if(GTK_WIDGET_VISIBLE(menuBar))
                     gtk_widget_hide(menuBar);
@@ -119,6 +121,7 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
 
             if(statusBar)
             {
+                toggled=TRUE;
                 qtcSetStatusBarHidden(qtSettings.appName, GTK_WIDGET_VISIBLE(statusBar));
                 if(GTK_WIDGET_VISIBLE(statusBar))
                     gtk_widget_hide(statusBar);
@@ -126,6 +129,9 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
                     gtk_widget_show(statusBar);
             }
         }
+
+        if(toggled)
+            gtk_widget_queue_draw(widget);
     }
     return FALSE;
 }
