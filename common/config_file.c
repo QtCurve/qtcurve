@@ -523,7 +523,7 @@ static const char * getHome()
 
 #ifdef __cplusplus
 
-#ifdef QTC_QT_ONLY
+#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
 #if QT_VERSION < 0x040000
 #include <qdir.h>
 #include <qfile.h>
@@ -566,9 +566,10 @@ bool makeDir(const QString& dir, int mode)
             if (lstat(baseEncoded, &st) == 0)
                 (void)unlink(baseEncoded); // try removing
 
-            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0) {
+            if (mkdir(baseEncoded, static_cast<mode_t>(mode)) != 0)
+            {
 #if QT_VERSION >= 0x040000
-                baseEncoded.prepend( "trying to create local folder " );
+                baseEncoded.prepend("trying to create local folder ");
                 perror(baseEncoded.constData());
 #else
                 perror("trying to create QtCurve config folder ");
@@ -650,7 +651,7 @@ static const char *qtcConfDir()
         if(0!=lstat(cfgDir, &info))
         {
 #ifdef __cplusplus
-#ifdef QTC_QT_ONLY
+#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
             makeDir(cfgDir, 0755);
 #else
             KStandardDirs::makeDir(cfgDir, 0755);
