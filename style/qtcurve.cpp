@@ -75,11 +75,6 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
 #endif
-// #if KDE_IS_VERSION(4, 3, 0)
-// #include <KDE/KFileWidget>
-// #else
-// #include <kfilewidget.h>
-// #endif
 
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
 static int theInstanceCount=0;
@@ -8470,13 +8465,8 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                             // Cant rely on AutoDefaultButton - as VirtualBox does not set this!!!
                             // btn->features&QStyleOptionButton::AutoDefaultButton &&
                             widget && widget->parentWidget() &&
-                            (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) ||
-// #ifdef QTC_QT_ONLY
-                                widget->parentWidget()->inherits("KFileWidget")
-// #else
-//                                 ::qobject_cast<const KFileWidget *>(widget->parentWidget())
-// #endif
-                            );
+                            (::qobject_cast<const QDialogButtonBox *>(widget->parentWidget()) || widget->parentWidget()->inherits("KFileWidget"));
+
                     if(dialogButton)
                     {
                         int iconHeight=btn->icon.isNull() ? btn->iconSize.height() : 16;
