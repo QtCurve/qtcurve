@@ -12,6 +12,7 @@
  9. Derive from QCommonStyle, and not QWindowsStyle.
     (Deriving from QWindowsStyle seems to cause a crash in konqueror)
 10. Remove linkage to libkfile
+11. Set toolbar frame width to 0 if not drawing borders.
 
 1.2.0
 -----

@@ -2704,6 +2704,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 0;
         case PM_ToolBarItemSpacing:
             return 1;
+        case PM_ToolBarFrameWidth:
+            return TB_NONE==opts.toolbarBorders ? 0 : 1;
         case PM_FocusFrameVMargin:
         case PM_FocusFrameHMargin:
             return 2;
