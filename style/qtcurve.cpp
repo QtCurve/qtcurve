@@ -615,14 +615,19 @@ static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect,
     }
 }
 
-// from windows style
-static const int windowsItemFrame    =  2; // menu item frame width
-static const int windowsItemHMargin  =  3; // menu item hor text margin
-static const int windowsItemVMargin  =  2; // menu item ver text margin
-static const int windowsRightBorder  = 15; // right border on windows
-static const int windowsArrowHMargin =  6; // arrow horizontal margin
-static const int constProgressBarFps = 20;
-static const int constTabPad         = 6;
+enum WindowsStyleConsts
+{
+    windowsItemFrame      =  2, // menu item frame width
+    windowsSepHeight      =  9, // separator item height
+    windowsItemHMargin    =  3, // menu item hor text margin
+    windowsItemVMargin    =  2, // menu item ver text margin
+    windowsRightBorder    = 15, // right border on windows
+    windowsCheckMarkWidth = 12, // checkmarks width on windows
+    windowsArrowHMargin   =  6  // arrow horizontal margin
+};
+
+static const int constProgressBarFps   = 20;
+static const int constTabPad           =  6;
 
 static const QLatin1String constDwtClose("qt_dockwidget_closebutton");
 static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
@@ -8612,6 +8617,47 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
         case CT_MenuItem:
             if (const QStyleOptionMenuItem *mi = qstyleoption_cast<const QStyleOptionMenuItem *>(option))
             {
+                // Taken from QWindowStyle...
+                int w = size.width();
+
+                if (QStyleOptionMenuItem::Separator==mi->menuItemType)
+                    newSize = QSize(10, windowsSepHeight);
+                else if (mi->icon.isNull())
+                {
+                    newSize.setHeight(newSize.height() - 2);
+                    w -= 6;
+                }
+
+                if (QStyleOptionMenuItem::Separator!=mi->menuItemType && !mi->icon.isNull())
+                {
+                    int iconExtent = pixelMetric(PM_SmallIconSize, option, widget);
+                    newSize.setHeight(qMax(newSize.height(),
+                                  mi->icon.actualSize(QSize(iconExtent, iconExtent)).height()
+                                  + 2 * windowsItemFrame));
+                }
+                int maxpmw = mi->maxIconWidth,
+                    tabSpacing = 20;
+                    
+                if (mi->text.contains(QLatin1Char('\t')))
+                    w += tabSpacing;
+                else if (mi->menuItemType == QStyleOptionMenuItem::SubMenu)
+                    w += 2 * windowsArrowHMargin;
+                else if (mi->menuItemType == QStyleOptionMenuItem::DefaultItem)
+                {
+                    // adjust the font and add the difference in size.
+                    // it would be better if the font could be adjusted in the initStyleOption qmenu func!!
+                    QFontMetrics fm(mi->font);
+                    QFont fontBold = mi->font;
+                    fontBold.setBold(true);
+                    QFontMetrics fmBold(fontBold);
+                    w += fmBold.width(mi->text) - fm.width(mi->text);
+                }
+
+                int checkcol = qMax<int>(maxpmw, windowsCheckMarkWidth); // Windows always shows a check column
+                w += checkcol + windowsRightBorder + 10;
+                newSize.setWidth(w);
+                // ....
+                
                 int h(newSize.height()-8); // Fix mainly for Qt4.4
 
                 if (QStyleOptionMenuItem::Separator==mi->menuItemType && mi->text.isEmpty())
