@@ -7,7 +7,8 @@
 5. Fix rounding of check/radio/splitter/expander highlight.
 6. Set toolbar frame width to 0 if not drawing borders.
 7. When toggling menubar, or statusbar, queue a redraw of the window.
-8. Decrease size of swt toolbars.
+8. Decrease size of SWT toolbars.
+9. Disable background image and gradient for SWT apps.
 
 1.2.0
 -----
