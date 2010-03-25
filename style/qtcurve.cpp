@@ -2631,11 +2631,21 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
     {
         case PM_MdiSubWindowFrameWidth:
             return 3;
+        case PM_DockWidgetTitleMargin:
+            return 2;
+        case PM_DockWidgetTitleBarButtonMargin:
+            return 4;
         case PM_DockWidgetFrameWidth:
             return 2;
         case PM_ToolBarExtensionExtent:
             return 15;
-#ifndef QTC_QT_ONLY
+#ifdef QTC_QT_ONLY
+        case PM_SmallIconSize:
+            return 16;
+        case PM_IconViewIconSize:
+        case PM_LargeIconSize:
+            return 32;
+#else
 #if QT_VERSION >= 0x040500
         case PM_TabCloseIndicatorWidth:
         case PM_TabCloseIndicatorHeight:
@@ -2645,6 +2655,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return KIconLoader::global()->currentSize(KIconLoader::Small);
         case PM_ToolBarIconSize:
             return KIconLoader::global()->currentSize(KIconLoader::Toolbar);
+        case PM_IconViewIconSize:
         case PM_LargeIconSize:
             return KIconLoader::global()->currentSize(KIconLoader::Dialog);
         case PM_MessageBoxIconSize:
@@ -2817,6 +2828,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return qMax(widget ? widget->fontMetrics().lineSpacing()
                                : option ? option->fontMetrics.lineSpacing()
                                         : 0, 24);
+        case PM_MenuBarPanelWidth:
+            return 0;
         case QtC_Round:
             return (int)opts.round;
         case QtC_TitleBarColorTopOnly:
@@ -2878,7 +2891,26 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
     switch (hint)
     {
         case SH_ComboBox_ListMouseTracking:
+        case SH_PrintDialog_RightAlignButtons:
+        case SH_ItemView_ArrowKeysNavigateIntoChildren:
+        case SH_ToolBox_SelectedPageTitleBold:
+        case SH_ScrollBar_MiddleClickAbsolutePosition:
+        case SH_SpinControls_DisableOnBounds:
+        case SH_Slider_SnapToValue:
+        case SH_FontDialog_SelectAssociatedText:
+        case SH_Menu_MouseTracking:
+        case SH_UnderlineShortcut:
             return true;
+        case SH_MessageBox_CenterButtons:
+        case SH_ProgressDialog_CenterCancelButton:
+        case SH_DitherDisabledText:
+        case SH_EtchDisabledText:
+        case SH_Menu_AllowActiveAndDisabled:
+        case SH_ItemView_ShowDecorationSelected: // Controls whether the highlighting of listview/treeview items highlights whole line.
+        case SH_MenuBar_AltKeyNavigation:
+            return false;
+        case SH_ItemView_ChangeHighlightOnFocus: // gray out selected items when losing focus.
+            return false;
         case SH_WizardStyle:
             return QWizard::ClassicStyle;
         case SH_RubberBand_Mask:
@@ -2897,24 +2929,12 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             return opts.menuDelay;
         case SH_ToolButton_PopupDelay:
             return 250;
-        case SH_Menu_AllowActiveAndDisabled:
-            return false;
         case SH_ComboBox_PopupFrameStyle:
             return opts.popupBorder ? QFrame::StyledPanel|QFrame::Plain : QFrame::NoFrame;
         case SH_TabBar_Alignment:
             return Qt::AlignLeft;
         case SH_Header_ArrowAlignment:
             return Qt::AlignLeft;
-        case SH_MessageBox_CenterButtons:
-            return false;
-        case SH_ProgressDialog_CenterCancelButton:
-            return false;
-        case SH_PrintDialog_RightAlignButtons:
-            return true;
-        case SH_DitherDisabledText:
-            return false;
-        case SH_EtchDisabledText:
-            return false;
         case SH_WindowFrame_Mask:
             if (QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
             {
@@ -2944,18 +2964,8 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
             }
             return 1;
         case SH_TitleBar_NoBorder:
-            return 1;
         case SH_TitleBar_AutoRaise:
             return 1;
-        case SH_ItemView_ArrowKeysNavigateIntoChildren:
-            return true;
-//         case SH_ItemView_ChangeHighlightOnFocus: // gray out selected items when losing focus.
-//             return true;
-        case SH_ItemView_ShowDecorationSelected:
-            return false; // Controls whether the highlighting of listview/treeview items highlights whole line.
-        case SH_ToolBox_SelectedPageTitleBold:
-        case SH_ScrollBar_MiddleClickAbsolutePosition:
-            return true;
         case SH_MainWindow_SpaceBelowMenuBar:
             if(opts.xbar)
                 if (const QMenuBar *menubar = qobject_cast<const QMenuBar*>(widget))
@@ -2966,8 +2976,6 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
                     }
 
             return 0;
-        case SH_SpinControls_DisableOnBounds:
-            return true;
         case SH_DialogButtonLayout:
             return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
         case SH_MessageBox_TextInteractionFlags:
@@ -3019,8 +3027,6 @@ int QtCurveStyle::styleHint(StyleHint hint, const QStyleOption *option, const QW
         case SH_ItemView_ActivateItemOnSingleClick:
             return KGlobalSettings::singleClick();
 #endif
-        case SH_MenuBar_AltKeyNavigation:
-            return false;
         default:
 #if !defined QTC_QT_ONLY
             // Tell the calling app that we can handle certain custom widgets...
@@ -3782,6 +3788,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->restore();
             break;
         }
+        case PE_FrameButtonTool:
         case PE_PanelButtonTool:
             if(isMultiTabBarTab(getButton(widget, painter)))
             {
@@ -4279,6 +4286,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
             }
             break;
+        case PE_FrameButtonBevel:
         case PE_PanelButtonBevel:
         case PE_PanelButtonCommand:
         {
@@ -4709,6 +4717,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
 #endif
+        // TODO: This is the only part left from QWindosStyle - but I dont think its actually used!
+        // case PE_IndicatorProgressChunk:
         default:
             QTC_BASE_STYLE::drawPrimitive(element, option, painter, widget);
             break;
@@ -8664,6 +8674,25 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
     QRect rect;
     switch (element)
     {
+        case SE_SliderFocusRect:
+        case SE_ToolBoxTabContents:
+            return visualRect(option->direction, option->rect, option->rect);
+        case SE_DockWidgetTitleBarText:
+        {
+            const QStyleOptionDockWidgetV2 *v2= qstyleoption_cast<const QStyleOptionDockWidgetV2*>(option);
+            bool                           verticalTitleBar = v2 ? v2->verticalTitleBar : false;
+            int                            m = pixelMetric(PM_DockWidgetTitleMargin, option, widget);
+
+            rect = QTC_BASE_STYLE::subElementRect(element, option, widget);
+
+            if (verticalTitleBar)
+                rect.adjust(0, 0, 0, -m);
+            else if (Qt::LeftToRight==option->direction )
+                rect.adjust(m, 0, 0, 0);
+            else
+                rect.adjust(0, 0, -m, 0);
+            return rect;
+        }
 #if QT_VERSION >= 0x040500
         case SE_TabBarTabLeftButton:
             return QTC_BASE_STYLE::subElementRect(element, option, widget).translated(-2, -1);

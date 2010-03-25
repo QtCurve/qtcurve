@@ -9,6 +9,8 @@
    bottom.
 7. Fix custom shadows when window is fully rounded.
 8. If using squared entry fields, draw frames around lables square.
+9. Derive from QCommonStyle, and not QWindowsStyle.
+   (Deriving from QWindowsStyle seems to cause a crash in konqueror)
 
 1.2.0
 -----

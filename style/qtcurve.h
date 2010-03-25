@@ -46,8 +46,8 @@ typedef qulonglong QtcKey;
 // #include <kstyle.h>
 // #define QTC_BASE_STYLE KStyle
 // #else
-#include <QWindowsStyle>
-#define QTC_BASE_STYLE QWindowsStyle
+#include <QCommonStyle>
+#define QTC_BASE_STYLE QCommonStyle
 // #endif
 
 class QStyleOptionSlider;
@@ -55,7 +55,7 @@ class QLabel;
 class QMenuBar;
 class QScrollBar;
 
-class QtCurveStyle : public QWindowsStyle
+class QtCurveStyle : public QCommonStyle
 {
     Q_OBJECT
     Q_CLASSINFO("X-KDE-CustomElements", "true")
