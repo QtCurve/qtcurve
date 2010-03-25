@@ -1698,11 +1698,11 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->setMouseTracking(true);
         widget->installEventFilter(this);
     }
-    else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
-    {
-        widget->installEventFilter(this);
-        widget->setAttribute(Qt::WA_Hover, true);
-    }
+//     else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
+//     {
+//         widget->installEventFilter(this);
+//         widget->setAttribute(Qt::WA_Hover, true);
+//     }
     else if(qobject_cast<QMenuBar *>(widget))
     {
         if (opts.xbar &&
@@ -2141,8 +2141,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->setMouseTracking(false);
         widget->removeEventFilter(this);
     }
-    else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
-        widget->removeEventFilter(this);
+//     else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
+//         widget->removeEventFilter(this);
     else if(qobject_cast<QMenuBar *>(widget))
     {
         if(opts.xbar)
@@ -2595,11 +2595,11 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             }
             break;
         }
-        case QEvent::FocusIn:
-        case QEvent::FocusOut:
-            if(opts.highlightScrollViews && object->isWidgetType() && object->inherits("Q3ScrollView"))
-                ((QWidget *)object)->repaint();
-            break;
+//         case QEvent::FocusIn:
+//         case QEvent::FocusOut:
+//             if(opts.highlightScrollViews && object->isWidgetType() && object->inherits("Q3ScrollView"))
+//                 ((QWidget *)object)->repaint();
+//             break;
         case QEvent::WindowActivate:
             if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars && qobject_cast<QMenuBar *>(object))
             {
