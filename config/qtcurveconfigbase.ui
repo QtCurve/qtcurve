@@ -3007,7 +3007,7 @@
        <item row="0" column="1">
         <widget class="KLineEdit" name="noBgndGradientApps">
          <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background gradient setting. &lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
+          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background gradient setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -3021,7 +3021,7 @@
        <item row="1" column="1">
         <widget class="KLineEdit" name="noBgndImageApps">
          <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background image setting. &lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
+          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background image setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -3035,7 +3035,7 @@
        <item row="2" column="1">
         <widget class="KLineEdit" name="noMenuStripeApps">
          <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu stripe setting. &lt;/p&gt;&lt;p&gt;(Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.)&lt;/p&gt;</string>
+          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu stripe setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
