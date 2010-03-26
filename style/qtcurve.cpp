@@ -1378,7 +1378,7 @@ void QtCurveStyle::polish(QApplication *app)
         {
             itsOOMenuCols=new QColor [TOTAL_SHADES+1];
             shadeColors(tint(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
-                             itsHighlightCols[ORIGINAL_SHADE], 0.6), itsOOMenuCols);
+                             itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
         }
     }
 
@@ -1513,7 +1513,7 @@ void QtCurveStyle::polish(QPalette &palette)
             if(!itsOOMenuCols)
                 itsOOMenuCols=new QColor [TOTAL_SHADES+1];
             shadeColors(tint(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
-                             itsHighlightCols[ORIGINAL_SHADE], 0.6), itsOOMenuCols);
+                             itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
         }
         else if(itsOOMenuCols)
         {
