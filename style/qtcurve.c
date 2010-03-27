@@ -61,6 +61,7 @@ static Options opts;
 #include "widgetmap.c"
 #include "window.c"
 #include "entry.c"
+#include "wmmove.c"
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -4380,6 +4381,9 @@ debugDisplayWidget(widget, 3);
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
 
+//             if(menubar)
+                qtcWMMoveSetup(widget);
+
             /* Toolbars and menus */
             if(GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app))
                 drawBevelGradient(cr, style, area, NULL, x, y, width,
@@ -4813,7 +4817,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
     #ifdef QTC_DEBUG
         printf("Draw shadow %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height,
                detail ? detail : "NULL");
-       debugDisplayWidget(widget, 3);
+        debugDisplayWidget(widget, 3);
     #endif
 
         if(!statusBar && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && QTC_ROUNDED)
