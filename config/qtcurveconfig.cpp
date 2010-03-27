@@ -857,6 +857,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(thinSbarGrooveChanged()));
     connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(windowDrag, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -2246,6 +2247,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.thinSbarGroove=thinSbarGroove->isChecked();
     opts.colorSliderMouseOver=colorSliderMouseOver->isChecked();
     opts.titlebarBorder=titlebarBorder->isChecked();
+    opts.windowDrag=windowDrag->isChecked();
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
@@ -2468,6 +2470,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     thinSbarGroove->setChecked(opts.thinSbarGroove);
     colorSliderMouseOver->setChecked(opts.colorSliderMouseOver);
     titlebarBorder->setChecked(opts.titlebarBorder);
+    windowDrag->setChecked(opts.windowDrag);
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
@@ -2700,6 +2703,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          thinSbarGroove->isChecked()!=opts.thinSbarGroove ||
          colorSliderMouseOver->isChecked()!=opts.colorSliderMouseOver ||
          titlebarBorder->isChecked()!=opts.titlebarBorder ||
+         windowDrag->isChecked()!=opts.windowDrag ||
          sbarBgndAppearance->currentIndex()!=opts.sbarBgndAppearance ||
          sliderFill->currentIndex()!=opts.sliderFill ||
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||

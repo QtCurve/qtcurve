@@ -239,6 +239,9 @@ class QtCurveStyle : public QCommonStyle
     void           setDecorationColors();
     void           applyKdeSettings(bool pal);
 #endif
+#ifdef Q_WS_X11
+    bool           isWindowDragWidget(QObject *o);
+#endif
 
     private:
 
@@ -284,6 +287,10 @@ class QtCurveStyle : public QCommonStyle
     // Required for Q3Header hover...
     QPoint                             itsPos;
     QWidget                            *itsHoverWidget;
+#ifdef Q_WS_X11
+    QWidget                            *itsDragWidget;
+    bool                               itsDragWidgetHadMouseTracking;
+#endif
 #if QT_VERSION < 0x040500
     mutable Version                    itsQtVersion;
 #endif

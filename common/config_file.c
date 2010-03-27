@@ -1515,6 +1515,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(squareProgress)
             QTC_CFG_READ_BOOL(squareEntry)
             QTC_CFG_READ_BOOL(stripedSbar)
+            QTC_CFG_READ_BOOL(windowDrag)
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(stdBtnSizes)
             QTC_CFG_READ_BOOL(titlebarBorder)
@@ -2205,6 +2206,7 @@ static void defaultSettings(Options *opts)
     opts->squareProgress=false;
     opts->squareEntry=false;
     opts->stripedSbar=false;
+    opts->windowDrag=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarBorder=true;
@@ -2893,6 +2895,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(squareProgress)
         CFG_WRITE_ENTRY(squareEntry)
         CFG_WRITE_ENTRY(stripedSbar)
+        CFG_WRITE_ENTRY(windowDrag)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)

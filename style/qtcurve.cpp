@@ -32,6 +32,10 @@
 #define QTC_MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
 
 #include "macmenu.h"
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "fixx11h.h"
+#include <QX11Info>
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define QTC_FIX_DISABLED_ICONS
@@ -644,6 +648,31 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #define QTC_SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
+#ifdef Q_WS_X11
+static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+
+static void triggerWMMove(const QWidget *w, const QPoint &p)
+{
+    //...Taken from bespin...
+    // stolen... errr "adapted!" from QSizeGrip
+    QX11Info info;
+    XEvent xev;
+    xev.xclient.type = ClientMessage;
+    xev.xclient.message_type = constNetMoveResize;
+    xev.xclient.display = QX11Info::display();
+    xev.xclient.window = w->window()->winId();
+    xev.xclient.format = 32;
+    xev.xclient.data.l[0] = p.x();
+    xev.xclient.data.l[1] = p.y();
+    xev.xclient.data.l[2] = 8; // NET::Move
+    xev.xclient.data.l[3] = Button1;
+    xev.xclient.data.l[4] = 0;
+    XUngrabPointer(QX11Info::display(), QX11Info::appTime());
+    XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
+               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+}
+#endif
+
 #ifdef QTC_STYLE_SUPPORT
 static bool useQt3Settings()
 {
@@ -972,6 +1001,10 @@ QtCurveStyle::QtCurveStyle()
               itsAnimateStep(0),
               itsPos(-1, -1),
               itsHoverWidget(0L)
+#ifdef Q_WS_X11
+              , itsDragWidget(0L)
+              , itsDragWidgetHadMouseTracking(false)
+#endif
 #if QT_VERSION < 0x040500
               , itsQtVersion(VER_UNKNOWN)
 #endif
@@ -1564,6 +1597,11 @@ void QtCurveStyle::polish(QWidget *widget)
     if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
         widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
 
+#ifdef Q_WS_X11
+    if(isWindowDragWidget(widget))
+        widget->installEventFilter(this);
+#endif
+
     if(EFFECT_NONE!=opts.buttonEffect && isNoEtchWidget(widget))
     {
         theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
@@ -2058,6 +2096,11 @@ void QtCurveStyle::unpolish(QWidget *widget)
         disconnect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 
+#ifdef Q_WS_X11
+    if(isWindowDragWidget(widget))
+        widget->removeEventFilter(this);
+#endif
+
     if(QTC_CUSTOM_BGND)
     {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
@@ -2474,34 +2517,59 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             }
             break;
         case QEvent::MouseButtonPress:
-            if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && dynamic_cast<QMouseEvent*>(event))
-            {
-                QLabel      *lbl = (QLabel *)object;
-                QMouseEvent *mev = (QMouseEvent *)event;
-
-                if (lbl->rect().contains(mev->pos()))
+            if(dynamic_cast<QMouseEvent*>(event))
+                if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy())
                 {
-                    itsClickedLabel=lbl;
-                    lbl->repaint();
+                    QLabel      *lbl = (QLabel *)object;
+                    QMouseEvent *mev = (QMouseEvent *)event;
+
+                    if (lbl->rect().contains(mev->pos()))
+                    {
+                        itsClickedLabel=lbl;
+                        lbl->repaint();
+                    }
                 }
-            }
+#ifdef Q_WS_X11
+                else if(isWindowDragWidget(object))
+                {
+                    QMouseEvent *mev = (QMouseEvent *)event;
+
+                    if(Qt::NoModifier==mev->modifiers() && Qt::LeftButton==mev->button())
+                    {
+                        QWidget *wid = static_cast<QWidget*>(object);
+                        itsDragWidget=wid;
+                        itsDragWidgetHadMouseTracking=itsDragWidget->hasMouseTracking();
+                        itsDragWidget->setMouseTracking(true);
+                        return false;
+                    }
+                }
+#endif
             break;
         case QEvent::MouseButtonRelease:
-            if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && dynamic_cast<QMouseEvent*>(event))
-            {
-                QLabel      *lbl = (QLabel *)object;
-                QMouseEvent *mev = (QMouseEvent *)event;
-
-                if(itsClickedLabel)
+            if(dynamic_cast<QMouseEvent*>(event))
+                if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy())
                 {
-                    itsClickedLabel=0;
-                    lbl->update();
-                }
+                    QLabel      *lbl = (QLabel *)object;
+                    QMouseEvent *mev = (QMouseEvent *)event;
 
-                // set focus to the buddy...
-                if (lbl->rect().contains(mev->pos()))
-                    ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
-            }
+                    if(itsClickedLabel)
+                    {
+                        itsClickedLabel=0;
+                        lbl->update();
+                    }
+
+                    // set focus to the buddy...
+                    if (lbl->rect().contains(mev->pos()))
+                        ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
+                }
+#ifdef Q_WS_X11
+                else if(itsDragWidget)
+                {
+                    itsDragWidget->setMouseTracking(itsDragWidgetHadMouseTracking);
+                    itsDragWidget = 0L;
+                    return false;
+                }
+#endif
             break;
         case QEvent::StyleChange:
         case QEvent::Show:
@@ -2585,7 +2653,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
             break;
         case QEvent::MouseMove:  // Only occurs for widgets with mouse tracking enabled
         {
-            QMouseEvent *me = static_cast<QMouseEvent*>(event);
+            QMouseEvent *me = dynamic_cast<QMouseEvent*>(event);
 
             if(me && itsHoverWidget && object->isWidgetType() && object->inherits("Q3Header"))
             {
@@ -2593,6 +2661,18 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                     itsHoverWidget->repaint();
                 itsPos=me->pos();
             }
+#ifdef Q_WS_X11
+            else if(itsDragWidget)
+            {
+                itsDragWidget->setMouseTracking(itsDragWidgetHadMouseTracking);
+                bool move=isWindowDragWidget(object);
+
+                if(move)
+                    triggerWMMove(itsDragWidget, ((QMouseEvent *)event)->globalPos());
+                itsDragWidget = 0L;
+                return move;
+            }
+#endif
             break;
         }
         case QEvent::FocusIn:
@@ -12042,3 +12122,23 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
     }
 #endif
 }
+
+#ifdef Q_WS_X11
+bool QtCurveStyle::isWindowDragWidget(QObject *o)
+{
+   return  opts.windowDrag &&
+           (//qobject_cast<QDialog*>(o) ||
+           (qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction())
+            //|| qobject_cast<QGroupBox*>(o)
+            //|| (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled())
+//             || qobject_cast<QToolBar*>(o)
+            //|| qobject_cast<QDockWidget*>(o)
+
+//            || ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget))
+//            || ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget))
+
+//            || o->inherits("QStatusBar")
+//            || (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar"))
+           );
+}
+#endif

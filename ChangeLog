@@ -1,24 +1,25 @@
 1.2.1
 -----
  1. Add option to hide status bars via Ctrl-Alt-S
- 2. Set decoration (hover/focus) colours for preview.
- 3. Fix unreadable text when using progressbar glow and anti-aliased fonts.
- 4. Better event filter code for qwidget buddy focus painting.
- 5. Fix issues with light border in window decoration.
- 6. Fix blurred left edges of windows when not drawing border and rounding
+ 2. Add option to drag windows by menubar.
+ 3. Set decoration (hover/focus) colours for preview.
+ 4. Fix unreadable text when using progressbar glow and anti-aliased fonts.
+ 5. Better event filter code for qwidget buddy focus painting.
+ 6. Fix issues with light border in window decoration.
+ 7. Fix blurred left edges of windows when not drawing border and rounding
     bottom.
- 7. Fix custom shadows when window is fully rounded.
- 8. If using squared entry fields, draw frames around lables square.
- 9. Derive from QCommonStyle, and not QWindowsStyle.
+ 8. Fix custom shadows when window is fully rounded.
+ 9. If using squared entry fields, draw frames around lables square.
+10. Derive from QCommonStyle, and not QWindowsStyle.
     (Deriving from QWindowsStyle seems to cause a crash in konqueror)
-10. Remove linkage to libkfile
-11. Set toolbar frame width to 0 if not drawing borders.
-12. Added option to remove all borders from maximised windows.
-13. Fix rounding top of menubar items in OO.o if this option is enabled.
-14. If using highlight as menu item colour, then for oo.o if text r/g/b<50
+11. Remove linkage to libkfile
+12. Set toolbar frame width to 0 if not drawing borders.
+13. Added option to remove all borders from maximised windows.
+14. Fix rounding top of menubar items in OO.o if this option is enabled.
+15. If using highlight as menu item colour, then for oo.o if text r/g/b<50
     and highlightedText r/g/b<127 - then blend highlight colour with menu
     colour.
-15. Fix konqueror crash due to highlighting of Q3ScrollViews.
+16. Fix konqueror crash due to highlighting of Q3ScrollViews.
 
 1.2.0
 -----

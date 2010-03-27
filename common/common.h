@@ -988,7 +988,8 @@ typedef struct
                      borderSelection,
                      squareProgress,
                      squareEntry,
-                     stripedSbar;
+                     stripedSbar,
+                     windowDrag;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,

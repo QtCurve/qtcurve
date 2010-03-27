@@ -1963,6 +1963,20 @@
          </property>
         </widget>
        </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_92">
+         <property name="text">
+          <string>Extend grab area into menubar:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QCheckBox" name="windowDrag">
+         <property name="text">
+          <string>Enabled</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_19">
@@ -3665,6 +3679,7 @@
   <tabstop>colorTitlebarOnly</tabstop>
   <tabstop>titlebarBlend</tabstop>
   <tabstop>titlebarBorder</tabstop>
+  <tabstop>windowDrag</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>titlebarButtons_noFrame</tabstop>
   <tabstop>titlebarButtons_round</tabstop>
