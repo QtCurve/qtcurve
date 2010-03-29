@@ -10,8 +10,7 @@
  8. When toggling menubar, or statusbar, queue a redraw of the window.
  9. Decrease size of SWT toolbars.
 10. Disable background image and gradient for SWT apps.
-11. Revert change made in v0.61 where QtCurve's colours could not be overridden,
-    as this breaks applications such as gwave.
+11. Only disallow QtCurve's colours to be overridden if run as root.
 
 1.2.0
 -----
