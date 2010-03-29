@@ -97,6 +97,11 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 #else
     itsWidget->shadowTab->setVisible(false);
 #endif
+#if KDE_IS_VERSION(4, 3, 85)
+    connect(itsWidget->grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+#else
+    itsWidget->grouping->setVisible(false);
+#endif
 }
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
@@ -122,6 +127,9 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
     itsActiveShadows.load(itsConfig);
     itsInactiveShadows.load(itsConfig);
     setShadows();
+#endif
+#if KDE_IS_VERSION(4, 3, 85)
+    itsWidget->grouping->setChecked(configGroup.readEntry("Grouping", true));
 #endif
 }
 
@@ -160,6 +168,9 @@ void QtCurveKWinConfig::save(KConfigGroup &)
     itsActiveShadows.save(itsConfig);
     itsInactiveShadows.save(itsConfig);
 #endif
+#if KDE_IS_VERSION(4, 3, 85)
+    configGroup.writeEntry("Grouping", itsWidget->grouping->isChecked());
+#endif
     itsConfig->sync();
 }
 
@@ -175,6 +186,9 @@ void QtCurveKWinConfig::defaults()
     itsActiveShadows.defaults();
     itsInactiveShadows.defaults();
     setShadows();
+#endif
+#if KDE_IS_VERSION(4, 3, 85)
+    itsWidget->grouping->setChecked(true);
 #endif
 }
 

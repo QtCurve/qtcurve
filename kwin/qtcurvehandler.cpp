@@ -225,7 +225,7 @@ bool QtCurveHandler::supports(Ability ability) const
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
         case AbilityClientGrouping:
-            return true;
+            return itsGrouping;
 #endif
         default:
             return false;
@@ -260,6 +260,9 @@ bool QtCurveHandler::readConfig()
     int  oldTitleBarPad=itsTitleBarPad;
 #if KDE_IS_VERSION(4, 3, 0)
     bool oldCustomShadows(itsCustomShadows);
+#endif
+#if KDE_IS_VERSION(4, 3, 85)
+    bool oldGrouping=itsGrouping;
 #endif
 
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
@@ -297,6 +300,9 @@ bool QtCurveHandler::readConfig()
             itsShadowCache.reset();
     }
 #endif
+#if KDE_IS_VERSION(4, 3, 85)
+    itsGrouping = config.readEntry("Grouping", true);
+#endif
 
     return oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom ||
@@ -305,6 +311,9 @@ bool QtCurveHandler::readConfig()
 #if KDE_IS_VERSION(4, 3, 0)
            oldCustomShadows!=itsCustomShadows ||
            shadowChanged ||
+#endif
+#if KDE_IS_VERSION(4, 3, 85)
+           oldGrouping!=itsGrouping ||
 #endif
            oldTitleBarPad!=itsTitleBarPad;
 }

@@ -20,6 +20,7 @@
     and highlightedText r/g/b<127 - then blend highlight colour with menu
     colour.
 16. Fix konqueror crash due to highlighting of Q3ScrollViews.
+17. Add option to turn of kwin window grouping.
 
 1.2.0
 -----

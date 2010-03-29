@@ -760,39 +760,41 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
         Handler()->setStyle();
 
 #if KDE_IS_VERSION(4, 3, 85)
-    if(QtCurveButton *btn = dynamic_cast<QtCurveButton *>(o))
+    if(Handler()->grouping())
     {
-        if(QEvent::MouseButtonPress==e->type())
-            return true; // No-op
-        else if(QEvent::MouseButtonRelease==e->type())
+        if(QtCurveButton *btn = dynamic_cast<QtCurveButton *>(o))
         {
-            const QMouseEvent *me = static_cast<QMouseEvent *>(e);
-            if(Qt::LeftButton==me->button() && btn->rect().contains(me->pos()))
-                closeClientGroupItem(itsCloseButtons.indexOf(btn));
-            return true;
+            if(QEvent::MouseButtonPress==e->type())
+                return true; // No-op
+            else if(QEvent::MouseButtonRelease==e->type())
+            {
+                const QMouseEvent *me = static_cast<QMouseEvent *>(e);
+                if(Qt::LeftButton==me->button() && btn->rect().contains(me->pos()))
+                    closeClientGroupItem(itsCloseButtons.indexOf(btn));
+                return true;
+            }
         }
+
+        bool state = false;
+        if(QEvent::MouseButtonPress==e->type())
+            state = mouseButtonPressEvent(static_cast<QMouseEvent *>(e));
+        else if(QEvent::MouseButtonRelease==e->type() && widget()==o)
+            state = mouseButtonReleaseEvent(static_cast<QMouseEvent *>(e));
+        else if(QEvent::MouseMove==e->type())
+            state = mouseMoveEvent(static_cast<QMouseEvent *>(e));
+        else if(QEvent::DragEnter==e->type() && widget()==o)
+            state = dragEnterEvent(static_cast<QDragEnterEvent *>(e));
+        else if(QEvent::DragMove==e->type() && widget()==o)
+            state = dragMoveEvent(static_cast<QDragMoveEvent *>(e));
+        else if(QEvent::DragLeave==e->type() && widget()==o)
+            state = dragLeaveEvent(static_cast<QDragLeaveEvent *>(e));
+        else if(QEvent::Drop==e->type() && widget()==o)
+            state = dropEvent(static_cast<QDropEvent *>(e));
+
+        return state || KCommonDecorationUnstable::eventFilter(o, e);
     }
-
-    bool state = false;
-    if(QEvent::MouseButtonPress==e->type())
-        state = mouseButtonPressEvent(static_cast<QMouseEvent *>(e));
-    else if(QEvent::MouseButtonRelease==e->type() && widget()==o)
-        state = mouseButtonReleaseEvent(static_cast<QMouseEvent *>(e));
-    else if(QEvent::MouseMove==e->type())
-        state = mouseMoveEvent(static_cast<QMouseEvent *>(e));
-    else if(QEvent::DragEnter==e->type() && widget()==o)
-        state = dragEnterEvent(static_cast<QDragEnterEvent *>(e));
-    else if(QEvent::DragMove==e->type() && widget()==o)
-        state = dragMoveEvent(static_cast<QDragMoveEvent *>(e));
-    else if(QEvent::DragLeave==e->type() && widget()==o)
-        state = dragLeaveEvent(static_cast<QDragLeaveEvent *>(e));
-    else if(QEvent::Drop==e->type() && widget()==o)
-        state = dropEvent(static_cast<QDropEvent *>(e));
-
-    return state || KCommonDecorationUnstable::eventFilter(o, e);
-#else
-    return KCommonDecoration::eventFilter(o, e);
 #endif
+    return KCommonDecoration::eventFilter(o, e);
 }
 
 #if KDE_IS_VERSION(4, 3, 85)

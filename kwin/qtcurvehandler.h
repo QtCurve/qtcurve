@@ -103,7 +103,9 @@ class QtCurveHandler : public QObject,
     bool                  customShadows() const    { return itsCustomShadows; }
     QtCurveShadowCache &  shadowCache()            { return itsShadowCache; }
 #endif
-
+#if KDE_IS_VERSION(4, 3, 85)
+    bool                  grouping() const         { return itsGrouping; }
+#endif
     QList<QtCurveHandler::BorderSize>  borderSizes() const;
 
     private:
@@ -129,6 +131,9 @@ class QtCurveHandler : public QObject,
 #if KDE_IS_VERSION(4, 3, 0)
     bool               itsCustomShadows;
     QtCurveShadowCache itsShadowCache;
+#endif
+#if KDE_IS_VERSION(4, 3, 85)
+    bool    itsGrouping;
 #endif
 };
 
