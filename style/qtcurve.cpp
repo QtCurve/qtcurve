@@ -361,10 +361,6 @@ static const int constMenuPixmapWidth=22;
 
 static enum
 {
-    APP_SKIP_TASKBAR,
-    APP_KPRINTER,
-    APP_KDIALOG,
-    APP_KDIALOGD,
     APP_PLASMA,
     APP_KRUNNER,
     APP_KWIN,
@@ -373,7 +369,6 @@ static enum
     APP_KONQUEROR,
     APP_KONTACT,
     APP_ARORA,
-    APP_KMIX,
     APP_QTDESIGNER,
     APP_KDEVELOP,
     APP_K3B,
@@ -1343,47 +1338,30 @@ void QtCurveStyle::polish(QApplication *app)
 {
     appName=getFile(app->argv()[0]);
 
-    if(opts.fixParentlessDialogs)
-    {
-        if ("kdefilepicker"==appName)
-            theThemedApp=APP_SKIP_TASKBAR;
-        else if ("kprinter"==appName)
-            theThemedApp=APP_KPRINTER;
-        else if ("kdialog"==appName)
-            theThemedApp=APP_KDIALOG;
-        else if ("kdialogd"==appName)
-            theThemedApp=APP_KDIALOGD;
-    }
-    else
-        theThemedApp=APP_OTHER;
-
-    if(APP_OTHER==theThemedApp)
-        if("kwin"==appName)
-            theThemedApp=APP_KWIN;
-        else if("systemsettings"==appName)
-            theThemedApp=APP_SYSTEMSETTINGS;
-        else if("plasma"==appName || appName.startsWith("plasma-"))
-            theThemedApp=APP_PLASMA;
-        else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
-            theThemedApp=APP_KRUNNER;
-        else if("konqueror"==appName)
-            theThemedApp=APP_KONQUEROR;
-        else if("kontact"==appName)
-            theThemedApp=APP_KONTACT;
-        else if("k3b"==appName)
-            theThemedApp=APP_K3B;
-        else if("skype"==appName)
-            theThemedApp=APP_SKYPE;
-        else if("arora"==appName)
-            theThemedApp=APP_ARORA;
-        else if("kmix"==appName)
-            theThemedApp=APP_KMIX;
-        else if("Designer"==QCoreApplication::applicationName())
-            theThemedApp=APP_QTDESIGNER;
-        else if("kdevelop"==appName || "kdevelop.bin"==appName)
-            theThemedApp=APP_KDEVELOP;
-        else if("soffice.bin"==appName)
-            theThemedApp=APP_OPENOFFICE;
+    if("kwin"==appName)
+        theThemedApp=APP_KWIN;
+    else if("systemsettings"==appName)
+        theThemedApp=APP_SYSTEMSETTINGS;
+    else if("plasma"==appName || appName.startsWith("plasma-"))
+        theThemedApp=APP_PLASMA;
+    else if("krunner"==appName || "krunner_lock"==appName || "kscreenlocker"==appName)
+        theThemedApp=APP_KRUNNER;
+    else if("konqueror"==appName)
+        theThemedApp=APP_KONQUEROR;
+    else if("kontact"==appName)
+        theThemedApp=APP_KONTACT;
+    else if("k3b"==appName)
+        theThemedApp=APP_K3B;
+    else if("skype"==appName)
+        theThemedApp=APP_SKYPE;
+    else if("arora"==appName)
+        theThemedApp=APP_ARORA;
+    else if("Designer"==QCoreApplication::applicationName())
+        theThemedApp=APP_QTDESIGNER;
+    else if("kdevelop"==appName || "kdevelop.bin"==appName)
+        theThemedApp=APP_KDEVELOP;
+    else if("soffice.bin"==appName)
+        theThemedApp=APP_OPENOFFICE;
 
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);
@@ -1821,35 +1799,18 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
             widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
         ((QDockWidget *)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
-    else if(opts.fixParentlessDialogs)
-        if(APP_KPRINTER==theThemedApp || APP_KDIALOG==theThemedApp || APP_KDIALOGD==theThemedApp)
-        {
-            QString cap(widget->windowTitle());
-            int     index=-1;
+    else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
+           (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
+    {
+        QWidget *activeWindow=getActiveWindow(widget);
 
-            // Remove horrible "Open - KDialog" titles...
-            if( cap.length() &&
-                ( (APP_KPRINTER==theThemedApp && (-1!=(index=cap.indexOf(" - KPrinter"))) &&
-                    (index+11)==(int)cap.length()) ||
-                  (APP_KDIALOG==theThemedApp && (-1!=(index=cap.indexOf(" - KDialog"))) &&
-                    (index+10)==(int)cap.length()) ||
-                  (APP_KDIALOGD==theThemedApp && (-1!=(index=cap.indexOf(" - KDialog Daemon"))) &&
-                    (index+17)==(int)cap.length())) )
-                widget->QWidget::setWindowTitle(cap.left(index));
-             //widget->installEventFilter(this);
-        }
-        else if(qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
-                (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
+        if(activeWindow)
         {
-            QWidget *activeWindow=getActiveWindow(widget);
-
-            if(activeWindow)
-            {
-                itsReparentedDialogs[widget]=widget->parentWidget();
-                widget->setParent(activeWindow, widget->windowFlags());
-            }
-            widget->installEventFilter(this);
+            itsReparentedDialogs[widget]=widget->parentWidget();
+            widget->setParent(activeWindow, widget->windowFlags());
         }
+        widget->installEventFilter(this);
+    }
 
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
@@ -3750,22 +3711,6 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                         drawBorder(painter, r, &opt,
                                    opts.round ?  getFrameRound(widget) : ROUND_NONE, backgroundColors(option),
-//                                    opts.round &&
-//                                     (
-// #ifdef QTC_QT_ONLY
-//                                       (widget && widget->inherits("KPassivePopup")) ||
-// #else
-//                                       (widget && qobject_cast<const KPassivePopup *>(widget)) ||
-// #endif
-//                                       (APP_KMIX==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
-//                                        0==strcmp(widget->parentWidget()->metaObject()->className(), "ViewDockAreaPopup")) ||
-//                                        
-//                                       (APP_KRUNNER==theThemedApp &&  widget && widget->parentWidget() && qobject_cast<const QFrame *>(widget) &&
-//                                        0==strcmp(widget->parentWidget()->metaObject()->className(), "PasswordDlg")) ||
-//                                        
-//                                       kwinTab
-//                                     )
-//                                    ? ROUND_NONE : ROUNDED_ALL, backgroundColors(option),
                                    sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
                                                           ? BORDER_SUNKEN
                                                             : state&State_Raised
