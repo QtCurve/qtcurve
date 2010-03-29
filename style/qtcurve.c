@@ -7272,15 +7272,18 @@ static guint qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
 
 static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 {
+#if 0
+    GtkRcStyle copy;
     bool       destIsQtc=QTCURVE_IS_RC_STYLE(dest),
                srcIsQtc=!src->name || src->name==strstr(src->name, QTC_RC_SETTING) ||
-                        (getAppName() && src->name==strstr(src->name, getAppName())),
-               isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg");
-    GtkRcStyle copy;
+                        (getAppName() && src->name==strstr(src->name, getAppName()));
+#endif
+    bool       isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg");
 
     if(isQtCNoteBook)
         shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &src->bg[GTK_STATE_NORMAL], QTC_TO_FACTOR(opts.tabBgnd));
 
+#if 0
     if(destIsQtc && !srcIsQtc && !isQtCNoteBook)
     {
         memcpy(copy.color_flags, dest->color_flags, sizeof(GtkRcFlags)*5);
@@ -7289,9 +7292,11 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
         memcpy(copy.text, dest->text, sizeof(GdkColor)*5);
         memcpy(copy.base, dest->base, sizeof(GdkColor)*5);
     }
+#endif
 
     parent_rc_class->merge(dest, src);
 
+#if 0
     if(destIsQtc && !srcIsQtc && !isQtCNoteBook)
     {
         memcpy(dest->color_flags, copy.color_flags, sizeof(GtkRcFlags)*5);
@@ -7300,6 +7305,7 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
         memcpy(dest->text, copy.text, sizeof(GdkColor)*5);
         memcpy(dest->base, copy.base, sizeof(GdkColor)*5);
     }
+#endif
 }
 
 /* Create an empty style suitable to this RC style */
