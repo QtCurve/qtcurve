@@ -32,21 +32,27 @@ static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
 static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event, int adjust)
 {
     GtkAllocation alloc;
+    int           nx=0,
+                  ny=0;
 
     alloc.x-=adjust;
     alloc.y-=adjust;
     alloc.width+=adjust;
     alloc.height+=adjust;
 
+    // Need to get absolute co-ordinates...
     gtk_widget_get_allocation(widget, &alloc);
+    gdk_window_get_origin(widget->window, &nx, &ny);
+    alloc.x+=nx;
+    alloc.y+=ny;
 
-    return alloc.x<=event->x && alloc.y<=event->y &&
-           (alloc.x+alloc.width)>event->x &&(alloc.y+alloc.height)>event->y;
+    return alloc.x<=event->x_root && alloc.y<=event->y_root &&
+           (alloc.x+alloc.width)>event->x_root &&(alloc.y+alloc.height)>event->y_root;
 }
 
-static gboolean pointerOnItem(GtkWidget *widget, GdkEventButton *event)
+static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
 {
-    bool onItem=FALSE;
+    bool use=TRUE;
     if(QTC_GE_IS_MENU_SHELL(widget))
     {
         GdkModifierType pointer_mask;
@@ -56,17 +62,22 @@ static gboolean pointerOnItem(GtkWidget *widget, GdkEventButton *event)
             GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
                   *child;
               
-            for(child = g_list_first(children); child /*&& !onItem*/; child = g_list_next(child))
+            for(child = g_list_first(children); child /*&& use*/; child = g_list_next(child))
             {
+                // Can only use this 'press' event if
+                //  1. There is no active menu being displayed - as the 'press' will be to cancel the menu
+                //  2. The click is not where a menu item is
                 if((child->data) && QTC_GE_IS_WIDGET(child->data) &&
-                    withinWidget(GTK_WIDGET(child->data), event,
+                    ((GTK_STATE_NORMAL!=GTK_WIDGET_STATE(GTK_WIDGET(child->data)) &&
+                      GTK_STATE_INSENSITIVE!=GTK_WIDGET_STATE(GTK_WIDGET(child->data))) ||
+                     withinWidget(GTK_WIDGET(child->data), event,
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
                                  constMenuAdjust
 #else
                                  0
 #endif
-                                 ) )
-                    onItem=TRUE;
+                                 ) ) )
+                    use=FALSE;
             }
          
             if(children)   
@@ -74,14 +85,14 @@ static gboolean pointerOnItem(GtkWidget *widget, GdkEventButton *event)
         }
     }
     
-    return onItem;
+    return use;
 }
 
 static gboolean qtcIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
 {
     return opts.windowDrag &&
            (!event || withinWidget(widget, event, 0)) &&
-           ((QTC_GE_IS_MENU_BAR(widget) && (!event || !pointerOnItem(widget, event)))
+           ((QTC_GE_IS_MENU_BAR(widget) && (!event || useEvent(widget, event)))
 //             || QTC_GE_IS_TOOL_BAR(widget)
 //             || QTC_GE_IS_STATUS_BAR(widget)
 //             || (QTC_GE_IS_LABEL(widget) && isOnStatusBar(widget, 0))
