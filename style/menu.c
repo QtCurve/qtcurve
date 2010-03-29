@@ -21,6 +21,8 @@ static gboolean objectIsA(const GObject * object, const gchar * type_name)
 #define QTC_EXTEND_MENUBAR_ITEM_HACK
 
 #ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
+static const int constMenuAdjust=2;
+
 static gboolean menuIsSelectable(GtkWidget *menu)
 {
     return !((!GTK_BIN(menu)->child && G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
