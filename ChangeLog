@@ -14,7 +14,9 @@
     or GtkRcStyle. Also, in the case of root, disallow 'ToolTip' and 'default'
     styles - as if app is run via kdesu/kdesudo, these could potentially be the
     user's colours. This should stop other theme's / user's colours from interfering.
-
+12. If using KDE4/Qt4 colour settings, only force the colours for buttons that are
+    disabled. This fixes the coloured text on GWave's buttons.
+    
 1.2.0
 -----
  1. Draw etch effect on radios if using a button effect, and not using button-like

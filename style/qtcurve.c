@@ -5421,7 +5421,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(isOnListViewHeader(widget, 0))
             y--;
 
-        if(but && (qtSettings.qt4 || GTK_STATE_INSENSITIVE!=state))
+        if(but && ((qtSettings.qt4 && GTK_STATE_INSENSITIVE==state) || (!qtSettings.qt4  && GTK_STATE_INSENSITIVE!=state)))
         {
             use_text=TRUE;
             swap_gc=TRUE;
