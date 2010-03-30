@@ -61,6 +61,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     connect(itsWidget->resizeGrip, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->drawBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->outerBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
@@ -116,6 +117,7 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
 
     itsWidget->resizeGrip->setChecked(configGroup.readEntry("ShowResizeGrip", false));
     itsWidget->roundBottom->setChecked(configGroup.readEntry("RoundBottom", true));
+    itsWidget->drawBottom->setChecked(configGroup.readEntry("DrawBottom", false));
     itsWidget->outerBorder->setChecked(configGroup.hasKey("NoBorder")
                                         ? !configGroup.readEntry("NoBorder", false)
                                         : configGroup.readEntry("OuterBorder", true));
@@ -139,6 +141,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 
     configGroup.writeEntry("ShowResizeGrip", itsWidget->resizeGrip->isChecked());
     configGroup.writeEntry("RoundBottom", itsWidget->roundBottom->isChecked());
+    configGroup.writeEntry("DrawBottom", itsWidget->drawBottom->isChecked());
     configGroup.writeEntry("OuterBorder", itsWidget->outerBorder->isChecked());
     configGroup.writeEntry("BorderlessMax", itsWidget->borderlessMax->isChecked());
     configGroup.writeEntry("TitleBarPad", itsWidget->titleBarPad->value());
@@ -178,6 +181,7 @@ void QtCurveKWinConfig::defaults()
 {
     itsWidget->resizeGrip->setChecked(false);
     itsWidget->roundBottom->setChecked(true);
+    itsWidget->drawBottom->setChecked(false);
     itsWidget->outerBorder->setChecked(true);
     itsWidget->borderlessMax->setChecked(false);
     itsWidget->titleBarPad->setValue(0);

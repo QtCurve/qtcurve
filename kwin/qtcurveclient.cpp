@@ -156,7 +156,7 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
         case LM_BorderLeft:
         case LM_BorderRight:
         case LM_BorderBottom:
-            return respectWindowState && isMaximized() ? 0 : Handler()->borderSize();
+            return respectWindowState && isMaximized() ? 0 : Handler()->borderSize(LM_BorderBottom==lm);
         case LM_TitleEdgeTop:
             return respectWindowState && isMaximized() ? 0 : Handler()->borderEdgeSize();
         case LM_TitleEdgeBottom:

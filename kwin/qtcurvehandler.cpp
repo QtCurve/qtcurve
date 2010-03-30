@@ -255,6 +255,7 @@ bool QtCurveHandler::readConfig()
 
     bool oldShowResizeGrip=itsShowResizeGrip,
          oldRoundBottom=itsRoundBottom,
+         oldDrawBottom=itsDrawBottom,
          oldOuterBorder=itsOuterBorder,
          oldBorderlessMax=itsBorderlessMax;
     int  oldTitleBarPad=itsTitleBarPad;
@@ -267,6 +268,14 @@ bool QtCurveHandler::readConfig()
 
     itsShowResizeGrip = config.readEntry("ShowResizeGrip", false);
     itsRoundBottom = config.readEntry("RoundBottom", true);
+    itsDrawBottom = config.readEntry("DrawBottom", false);
+
+    if(itsDrawBottom && BorderTiny!=KDecoration::options()->preferredBorderSize(this))
+        itsDrawBottom=false;
+
+    if(itsRoundBottom && BorderTiny==KDecoration::options()->preferredBorderSize(this) && !itsDrawBottom)
+        itsRoundBottom=false;
+
     itsOuterBorder = config.hasKey("NoBorder")
                         ? !config.readEntry("NoBorder", false)
                         : config.readEntry("OuterBorder", true);
@@ -306,6 +315,7 @@ bool QtCurveHandler::readConfig()
 
     return oldShowResizeGrip!=itsShowResizeGrip ||
            oldRoundBottom!=itsRoundBottom ||
+           oldDrawBottom!=itsDrawBottom ||
            oldOuterBorder!=itsOuterBorder ||
            oldBorderlessMax!=itsBorderlessMax ||
 #if KDE_IS_VERSION(4, 3, 0)

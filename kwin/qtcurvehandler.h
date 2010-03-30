@@ -90,10 +90,11 @@ class QtCurveHandler : public QObject,
     int                   titleHeightTool() const { return itsTitleHeightTool; }
     const QFont &         titleFont()             { return itsTitleFont; }
     const QFont &         titleFontTool()         { return itsTitleFontTool; }
-    int                   borderSize() const      { return itsBorderSize; }
+    int                   borderSize(bool bot=false) const { return bot && itsDrawBottom && itsBorderSize<=1
+                                                                ? itsBorderSize+4 : itsBorderSize; }
     bool                  coloredShadow() const   { return itsColoredShadow; }
     bool                  showResizeGrip() const  { return itsShowResizeGrip; }
-    bool                  roundBottom() const     { return itsRoundBottom && itsBorderSize>1; }
+    bool                  roundBottom() const     { return itsRoundBottom && (itsBorderSize>1 || itsDrawBottom); }
     bool                  outerBorder() const     { return itsOuterBorder; }
     QStyle *              wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
     int                   borderEdgeSize() const;
@@ -117,9 +118,11 @@ class QtCurveHandler : public QObject,
     bool    itsColoredShadow,
             itsShowResizeGrip,
             itsRoundBottom,
+            itsDrawBottom,
             itsOuterBorder,
             itsBorderlessMax;
     int     itsBorderSize,
+            itsBotBorderSize,
             itsTitleHeight,
             itsTitleHeightTool,
             itsTimeStamp,
