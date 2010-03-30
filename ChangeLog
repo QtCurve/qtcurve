@@ -22,6 +22,9 @@
 16. Fix konqueror crash due to highlighting of Q3ScrollViews.
 17. Add option to turn of kwin window grouping.
 18. Add kwin option to draw bottom border on windows when border size set to tiny.
+19. Only show kwin resize grip if not drawng the bottom border - otherwise it just
+    looks odd.
+20. Use 'kde' to disable parent-less dialog fix for all KDE applications.
 
 1.2.0
 -----

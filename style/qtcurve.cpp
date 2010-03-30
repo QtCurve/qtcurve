@@ -1376,7 +1376,7 @@ void QtCurveStyle::polish(QApplication *app)
         opts.menuStripe=SHADE_NONE;
 
     // Plasma and Kate do not like the 'Fix parentless dialogs' option...
-    if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName)))
+    if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
 
     if(APP_OPENOFFICE==theThemedApp)
