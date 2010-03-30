@@ -276,6 +276,9 @@ bool QtCurveHandler::readConfig()
     if(itsRoundBottom && BorderTiny==KDecoration::options()->preferredBorderSize(this) && !itsDrawBottom)
         itsRoundBottom=false;
 
+    if(itsShowResizeGrip && (BorderTiny!=KDecoration::options()->preferredBorderSize(this) || itsDrawBottom))
+        itsShowResizeGrip=false;
+
     itsOuterBorder = config.hasKey("NoBorder")
                         ? !config.readEntry("NoBorder", false)
                         : config.readEntry("OuterBorder", true);

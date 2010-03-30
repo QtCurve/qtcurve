@@ -33,7 +33,7 @@
          <item row="0" column="1">
           <widget class="QCheckBox" name="resizeGrip">
            <property name="text">
-            <string>Show resize grip</string>
+            <string>Show resize grip (when no bottom border is drawn)</string>
            </property>
           </widget>
          </item>
