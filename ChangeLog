@@ -10,7 +10,10 @@
  8. When toggling menubar, or statusbar, queue a redraw of the window.
  9. Decrease size of SWT toolbars.
 10. Disable background image and gradient for SWT apps.
-11. Only disallow QtCurve's colours to be overridden if run as root.
+11. Only allow QtCurve's colours to be overridden if they come from QtCurveRcStyle
+    or GtkRcStyle. Also, in the case of root, disallow 'ToolTip' and 'default'
+    styles - as if app is run via kdesu/kdesudo, these could potentially be the
+    user's colours. This should stop other theme's / user's colours from interfering.
 
 1.2.0
 -----

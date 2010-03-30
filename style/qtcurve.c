@@ -7273,17 +7273,26 @@ static guint qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
 static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 {
 
-    GtkRcStyle copy;
-    bool       destIsQtc=QTCURVE_IS_RC_STYLE(dest),
-               srcIsQtc=!src->name || src->name==strstr(src->name, QTC_RC_SETTING) ||
-                        (getAppName() && src->name==strstr(src->name, getAppName())),
-               isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg"),
-               dontChageColors=0==getuid() && destIsQtc && !srcIsQtc && !isQtCNoteBook;
+    GtkRcStyle  copy;
+    const gchar *typeName=src ? g_type_name(G_TYPE_FROM_INSTANCE(src)) : NULL;
+    bool        destIsQtc=QTCURVE_IS_RC_STYLE(dest),
+                srcIsQtc=!src->name || src->name==strstr(src->name, QTC_RC_SETTING) ||
+                         (getAppName() && src->name==strstr(src->name, getAppName())),
+                isQtCNoteBook=0!=opts.tabBgnd && src->name && 0==strcmp(src->name, "qtcurve-notebook_bg"),
+                dontChangeColors=destIsQtc && !srcIsQtc && !isQtCNoteBook &&
+                                 // Only allow GtkRcStyle and QtCurveRcStyle to change colours
+                                 // ...this should catch most cases whre another themes gtkrc is in the
+                                 // GTK2_RC_FILES path
+                                ( (typeName && strcmp(typeName, "GtkRcStyle") && strcmp(typeName, "QtCurveRcStyle")) ||
+                                 // If run as root (probably via kdesu/kdesudo) then dont allow KDE settings to take
+                                 // effect - as these are sometimes from the user's settings, not roots!
+                                  (0==getuid() && src && src->name && (0==strcmp(src->name, "ToolTip") ||
+                                                                      0==strcmp(src->name, "default"))));
 
     if(isQtCNoteBook)
         shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &src->bg[GTK_STATE_NORMAL], QTC_TO_FACTOR(opts.tabBgnd));
 
-    if(dontChageColors)
+    if(dontChangeColors)
     {
         memcpy(copy.color_flags, dest->color_flags, sizeof(GtkRcFlags)*5);
         memcpy(copy.fg, dest->fg, sizeof(GdkColor)*5);
@@ -7294,7 +7303,7 @@ static void qtcurve_rc_style_merge(GtkRcStyle *dest, GtkRcStyle *src)
 
     parent_rc_class->merge(dest, src);
 
-    if(dontChageColors)
+    if(dontChangeColors)
     {
         memcpy(dest->color_flags, copy.color_flags, sizeof(GtkRcFlags)*5);
         memcpy(dest->fg, copy.fg, sizeof(GdkColor)*5);
