@@ -2281,9 +2281,8 @@ printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height);
 debugDisplayWidget(widget, 20);
 #endif
 
-
-            while(window && !GTK_IS_WINDOW(window))
-                window=window->parent;
+        while(window && !GTK_IS_WINDOW(window))
+            window=window->parent;
 
         if(0==y && window && window!=widget)
             gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
