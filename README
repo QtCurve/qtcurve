@@ -82,6 +82,9 @@ Usage:
 
     QTCURVE_CONFIG_FILE=~/testfile gimp
 
+If 'QTCURVE_DEBUG' is set before an application is run, QtCurve will output the
+applications name and the current icon path.
+
 Creating Distribution Packages
 ------------------------------
 CMake (as of v2.4.x) does not support building rpm or deb packages, and a simple

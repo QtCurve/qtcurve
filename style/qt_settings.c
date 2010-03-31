@@ -177,7 +177,8 @@ struct QtData
                     shadeSortedList;
     EGtkApp         app;
     gboolean        qt4,
-                    inactiveChangeSelectionColor;
+                    inactiveChangeSelectionColor,
+                    debug;
 #ifdef QTC_FIX_FIREFOX_LOCATION_BAR
     gboolean        isBrowser;
     int             fontSize;
@@ -1549,6 +1550,9 @@ static char * getIconPath()
         path[plen - 1] = '\0';
     }
 
+    if(qtSettings.debug && path)
+        printf("%s\n", path);
+
     return path;
 }
 
@@ -2025,6 +2029,7 @@ static gboolean qtInit()
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
+            qtSettings.debug=getenv("QTCURVE_DEBUG");
             opts.contrast=QTC_DEFAULT_CONTRAST;
 
             lastRead=now;
@@ -2175,6 +2180,9 @@ static gboolean qtInit()
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }
+
+            if(qtSettings.debug)
+                printf("Name: \"%s\"\n", qtSettings.appName ? qtSettings.appName : "<unknown>");
 
             /* Eclipse sets a application name, so if this is set then we're not a Swing java app */
             if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
