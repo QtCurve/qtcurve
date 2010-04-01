@@ -25,6 +25,8 @@
 19. Only show kwin resize grip if not drawng the bottom border - otherwise it just
     looks odd.
 20. Use 'kde' to disable parent-less dialog fix for all KDE applications.
+21. Fix shading of menubars and when using flat menubar appearance and background
+    image/gradient.
 
 1.2.0
 -----
