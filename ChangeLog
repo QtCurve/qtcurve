@@ -18,6 +18,7 @@
     disabled. This fixes the coloured text on GWave's buttons.
 13. Fix shading of menubars and when using flat menubar appearance and background
     image/gradient.
+14. Fix slider groove not always being painted when using background gradient/rings.
 
 1.2.0
 -----

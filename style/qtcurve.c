@@ -4122,17 +4122,17 @@ debugDisplayWidget(widget, 3);
             if(horiz && rev)
                 inverted=!inverted;
 
-            if((!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")) &&
-                IS_FLAT(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
-            {
-                gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
-                                                   GTK_STATE_INSENSITIVE==state
-                                                        ? GTK_STATE_INSENSITIVE
-                                                        : GTK_STATE_NORMAL,
-                                                   area, x, y, width, height);
-                if(widget && IMG_NONE!=opts.bgndImage.type)
-                    drawWindowBgnd(cr, style, area, widget, x, y, width, height);
-            }
+//             if((!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")) &&
+//                 IS_FLAT(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+//             {
+//                 gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
+//                                                    GTK_STATE_INSENSITIVE==state
+//                                                         ? GTK_STATE_INSENSITIVE
+//                                                         : GTK_STATE_NORMAL,
+//                                                    area, x, y, width, height);
+//                 if(widget && IMG_NONE!=opts.bgndImage.type)
+//                     drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+//             }
 
             if(horiz)
             {
