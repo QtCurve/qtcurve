@@ -16,7 +16,9 @@
     user's colours. This should stop other theme's / user's colours from interfering.
 12. If using KDE4/Qt4 colour settings, only force the colours for buttons that are
     disabled. This fixes the coloured text on GWave's buttons.
-    
+13. Fix shading of menubars and when using flat menubar appearance and background
+    image/gradient.
+
 1.2.0
 -----
  1. Draw etch effect on radios if using a button effect, and not using button-like

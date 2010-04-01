@@ -4393,7 +4393,8 @@ debugDisplayWidget(widget, 3);
                                             ? width<height
                                             : width>height,
                                 FALSE, MODIFY_AGUA(app), WIDGET_OTHER);
-            else if(!QTC_CUSTOM_BGND || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+            else if((menubar && SHADE_NONE!=opts.shadeMenubars) || !QTC_CUSTOM_BGND ||
+                    !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
             {
                 if(menubar)
                 {
