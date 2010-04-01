@@ -4775,7 +4775,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
             }
 #endif
             if((opts.unifySpin && isSpin) || (combo && opts.unifyCombo))
-                width+=2;
+                width+=(combo ? 4 : 2);
 
             // If we're a combo entry, and not prelight, check to see if the button is
             // prelighted, if so so are we!

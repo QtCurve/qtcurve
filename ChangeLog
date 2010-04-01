@@ -19,6 +19,7 @@
 13. Fix shading of menubars and when using flat menubar appearance and background
     image/gradient.
 14. Fix slider groove not always being painted when using background gradient/rings.
+15. Fix drawing glitches with unified comboentries on mouse over.
 
 1.2.0
 -----
