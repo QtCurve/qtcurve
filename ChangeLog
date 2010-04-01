@@ -27,6 +27,7 @@
 20. Use 'kde' to disable parent-less dialog fix for all KDE applications.
 21. Fix shading of menubars and when using flat menubar appearance and background
     image/gradient.
+22. Don't do mouse over of disalbed sliders.
 
 1.2.0
 -----

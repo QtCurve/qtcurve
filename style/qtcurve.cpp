@@ -11110,17 +11110,17 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
 
 void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlider *option) const
 {
-    bool horiz(SLIDER_TRIANGULAR==opts.sliderStyle ? r.height()>r.width() : r.width()>r.height());
+    bool         horiz(SLIDER_TRIANGULAR==opts.sliderStyle ? r.height()>r.width() : r.width()>r.height());
+    QStyleOption opt(*option);
 
+    if(!(option->activeSubControls&SC_SliderHandle) || !(opt.state&State_Enabled))
+        opt.state&=~State_MouseOver;
+        
     if(SLIDER_TRIANGULAR==opts.sliderStyle)
     {
-        QStyleOption opt(*option);
-
         if(r.width()>r.height())
             opt.state|=State_Horizontal;
         opt.state&=~(State_Sunken|State_On);
-        if(!(option->activeSubControls&SC_SliderHandle) || !(opt.state&State_Enabled))
-            opt.state&=~State_MouseOver;
 
         opt.state|=State_Raised;
 
@@ -11355,15 +11355,6 @@ void QtCurveStyle::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOpt
     }
     else
     {
-//         QRect sr(r);
-//
-//         if(horiz)
-//             sr.adjust(0, 1, 0, 0);
-//         else
-//             sr.adjust(1, 0, 0, 0);
-
-        QStyleOption opt(*option);
-
         if(QTC_ROTATED_SLIDER)
             opt.state^=State_Horizontal;
 
