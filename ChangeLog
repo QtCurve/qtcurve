@@ -28,6 +28,7 @@
 21. Fix shading of menubars and when using flat menubar appearance and background
     image/gradient.
 22. Don't do mouse over of disalbed sliders.
+23. When casting QPainter device, check the QPaintDevice devType() against QInternal
 
 1.2.0
 -----

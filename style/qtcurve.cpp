@@ -958,9 +958,19 @@ static void parseWindowLine(const QString &line, QList<int> &data)
         }
 }
 
+static const QWidget * getWidget(const QPainter *p)
+{
+    return p && p->device() && QInternal::Widget==p->device()->devType() ? dynamic_cast<const QWidget *>(p->device()) : 0L;
+}
+
+static const QImage * getImage(const QPainter *p)
+{
+    return p && p->device() && QInternal::Image==p->device()->devType() ? dynamic_cast<const QImage *>(p->device()) : 0L;
+}
+
 static const QAbstractButton * getButton(const QWidget *w, const QPainter *p)
 {
-    const QWidget *widget=w ? w : (p && p->device() ? dynamic_cast<const QWidget *>(p->device()) : 0L);
+    const QWidget *widget=w ? w : getWidget(p);
     return widget ? ::qobject_cast<const QAbstractButton *>(widget) : 0L;
 }
 
@@ -3964,7 +3974,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     if(isOO)
                     {
                         // This (hopefull) checks is we're OO.o 3.2 - in which case no adjustment is required...
-                        QImage *img=dynamic_cast<QImage *>(painter->device());
+                        const QImage *img=getImage(painter);
 
                         if(!img || img->rect()!=r) // OO.o 3.1?
                             rect.adjust(1, 2, -1, -2);
@@ -4304,10 +4314,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                             ((qobject_cast<const QAbstractScrollArea*>(widget->parent())) ||
                                               widget->parent()->inherits("Q3ScrollView")))) );
 
-                    if(!view && !widget && painter->device())
+                    if(!view && !widget)
                     {
                         // Try to determine if we are in a KPageView...
-                        QWidget *wid=dynamic_cast<QWidget *>(painter->device());
+                        const QWidget *wid=getWidget(painter);
 
                         if(wid && wid->parentWidget() && wid->parentWidget()->inherits("KDEPrivate::KPageListView"))
                         {
@@ -4692,7 +4702,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 if(!widget)
                 {
-                    widget=dynamic_cast<const QWidget *>(painter->device());
+                    widget=getWidget(painter);
                     if(widget)
                         widget=widget->parentWidget();
                 }
@@ -8318,7 +8328,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(isOO)
                 {
                     // This (hopefull) checks is we're OO.o 3.2 - in which case no adjustment is required...
-                    QImage *img=dynamic_cast<QImage *>(painter->device());
+                    const QImage *img=getImage(painter);
 
                     isOO31=!img || img->rect()!=r;
                 
@@ -8500,7 +8510,7 @@ void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags,
 #if 0 // Not sure about this...
 void QtCurveStyle::drawItemPixmap(QPainter *painter, const QRect &rect, int alignment, const QPixmap &pixmap) const
 {
-    QWidget *widget=dynamic_cast<QWidget *>(painter->device());
+    QWidget *widget=getWidget(painter);
 
     if(widget && widget->parentWidget() && widget->inherits("QDockWidgetTitleButton") && !widget->parentWidget()->underMouse())
         return;
