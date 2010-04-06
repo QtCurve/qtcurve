@@ -958,14 +958,37 @@ static void parseWindowLine(const QString &line, QList<int> &data)
         }
 }
 
+static const QPaintDevice * getDevice(const QPainter *p, int type)
+{
+    if(p)
+        if (type==p->device()->devType())
+            return p->device();
+        else
+        {
+            QPaintDevice *dev = QPainter::redirected(p->device());
+            if (dev && type==dev->devType())
+                return dev;
+        }
+    return 0L;
+}
+
 static const QWidget * getWidget(const QPainter *p)
 {
-    return p && p->device() && QInternal::Widget==p->device()->devType() ? dynamic_cast<const QWidget *>(p->device()) : 0L;
+    if(p)
+        if (QInternal::Widget==p->device()->devType())
+            return static_cast<const QWidget *>(p->device());
+        else
+        {
+            QPaintDevice *dev = QPainter::redirected(p->device());
+            if (dev && QInternal::Widget==dev->devType())
+                return static_cast<const QWidget *>(dev) ;
+        }
+    return 0L;
 }
 
 static const QImage * getImage(const QPainter *p)
 {
-    return p && p->device() && QInternal::Image==p->device()->devType() ? dynamic_cast<const QImage *>(p->device()) : 0L;
+    return p && p->device() && QInternal::Image==p->device()->devType() ? static_cast<const QImage *>(p->device()) : 0L;
 }
 
 static const QAbstractButton * getButton(const QWidget *w, const QPainter *p)
@@ -5367,7 +5390,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     else
                         r.setRight(r.right() - pixw - 2);
                 }
-                drawItemText(painter, r, header->textAlignment, palette, state&State_Enabled, header->text, QPalette::ButtonText);
+                drawItemTextWithRole(painter, r, header->textAlignment, palette, state&State_Enabled, header->text, QPalette::ButtonText);
             }
             break;
         case CE_ProgressBarGroove:
@@ -5702,8 +5725,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                         font.setBold(true);
                         painter->setFont(font);
-                        drawItemText(painter, r, Qt::AlignHCenter | Qt::AlignVCenter,
-                                     palette, state&State_Enabled, menuItem->text, QPalette::Text);
+                        drawItemTextWithRole(painter, r, Qt::AlignHCenter | Qt::AlignVCenter,
+                                             palette, state&State_Enabled, menuItem->text, QPalette::Text);
                     }
                     else
                     {
@@ -6051,8 +6074,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 int num(opts.embolden && button->features&QStyleOptionButton::DefaultButton ? 2 : 1);
 
                 for(int i=0; i<num; ++i)
-                    drawItemText(painter, r.adjusted(i, 0, i, 0), tf, button->palette, (button->state&State_Enabled),
-                                button->text, QPalette::ButtonText);
+                    drawItemTextWithRole(painter, r.adjusted(i, 0, i, 0), tf, button->palette, (button->state&State_Enabled),
+                                         button->text, QPalette::ButtonText);
             }
             break;
         case CE_ComboBoxLabel:
@@ -6097,8 +6120,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     editRect.adjust(1, -margin, -1, margin);
                     painter->setClipRect(editRect);
 
-                    drawItemText(painter, editRect, Qt::AlignLeft|Qt::AlignVCenter, palette,
-                                 state&State_Enabled, comboBox->currentText, QPalette::ButtonText);
+                    drawItemTextWithRole(painter, editRect, Qt::AlignLeft|Qt::AlignVCenter, palette,
+                                         state&State_Enabled, comboBox->currentText, QPalette::ButtonText);
                 }
                 painter->restore();
             }
@@ -6229,9 +6252,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 #if QT_VERSION < 0x040500
                     r.adjust(constTabPad, 0, -constTabPad, 0);
 #endif
-                    drawItemText(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text,
-                                 !opts.stdSidebarButtons && toolbarTab && state&State_Selected
-                                    ? QPalette::HighlightedText : QPalette::WindowText);
+                    drawItemTextWithRole(painter, r, alignment, tab->palette, tab->state&State_Enabled, tab->text,
+                                         !opts.stdSidebarButtons && toolbarTab && state&State_Selected
+                                            ? QPalette::HighlightedText : QPalette::WindowText);
                 }
 
                 if (verticalTabs)
@@ -6863,8 +6886,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         alignment |= Qt::TextHideMnemonic;
 
                     r.translate(shiftX, shiftY);
-                    drawItemText(painter, r, alignment, tb->palette, state&State_Enabled, tb->text,
-                                 getTextRole(widget, painter, QPalette::ButtonText));
+                    drawItemTextWithRole(painter, r, alignment, tb->palette, state&State_Enabled, tb->text,
+                                         getTextRole(widget, painter, QPalette::ButtonText));
                 }
                 else
                 {
@@ -6938,8 +6961,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                             alignment |= Qt::AlignLeft | Qt::AlignVCenter;
                         }
                         tr.translate(shiftX, shiftY);
-                        drawItemText(painter, QStyle::visualRect(option->direction, r, tr), alignment, tb->palette,
-                                     tb->state & State_Enabled, tb->text, getTextRole(widget, painter, QPalette::ButtonText));
+                        drawItemTextWithRole(painter, QStyle::visualRect(option->direction, r, tr), alignment, tb->palette,
+                                             tb->state & State_Enabled, tb->text, getTextRole(widget, painter, QPalette::ButtonText));
                     }
                     else
                     {
@@ -6979,8 +7002,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         textRect.setLeft(textRect.left() + btn->iconSize.width() + 4);
                 }
                 if (!btn->text.isEmpty())
-                    drawItemText(painter, textRect, alignment | Qt::TextShowMnemonic,
-                                 palette, state&State_Enabled, btn->text, QPalette::WindowText);
+                    drawItemTextWithRole(painter, textRect, alignment | Qt::TextShowMnemonic,
+                                         palette, state&State_Enabled, btn->text, QPalette::WindowText);
             }
             break;
         case CE_ToolBoxTabLabel:
@@ -7021,7 +7044,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 int alignment = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic;
                 if (!styleHint(QStyle::SH_UnderlineShortcut, tb, widget))
                     alignment |= Qt::TextHideMnemonic;
-                drawItemText(painter, tr, alignment, tb->palette, enabled, txt, QPalette::ButtonText);
+                drawItemTextWithRole(painter, tr, alignment, tb->palette, enabled, txt, QPalette::ButtonText);
 
                 if (!txt.isEmpty() && state&State_HasFocus)
                 {
@@ -7215,8 +7238,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                         font.setBold(true);
                         painter->setFont(font);
-                        drawItemText(painter, r, Qt::AlignHCenter | Qt::AlignVCenter,
-                                     palette, state&State_Enabled, toolbutton->text, QPalette::Text);
+                        drawItemTextWithRole(painter, r, Qt::AlignHCenter | Qt::AlignVCenter,
+                                             palette, state&State_Enabled, toolbutton->text, QPalette::Text);
                         painter->restore();
                         break;
                     }
@@ -8499,6 +8522,13 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
             QTC_BASE_STYLE::drawComplexControl(control, option, painter, widget);
             break;
     }
+}
+
+// Use 'drawItemTextWithRole' when already know which role to use.
+void QtCurveStyle::drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled,
+                                        const QString &text, QPalette::ColorRole textRole) const
+{
+    QTC_BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
 void QtCurveStyle::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,

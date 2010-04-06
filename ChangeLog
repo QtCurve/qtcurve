@@ -29,6 +29,7 @@
     image/gradient.
 22. Don't do mouse over of disalbed sliders.
 23. When casting QPainter device, check the QPaintDevice devType() against QInternal
+    - and use static_cast, and not dynamic_cast. (Fixes crash with tagainijisho)
 
 1.2.0
 -----

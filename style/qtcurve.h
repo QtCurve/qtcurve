@@ -122,6 +122,8 @@ class QtCurveStyle : public QCommonStyle
     void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     void drawControl(ControlElement control, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
+    void drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
+                              QPalette::ColorRole textRole) const;
     void drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
                       QPalette::ColorRole textRole = QPalette::NoRole) const;
     QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const;
