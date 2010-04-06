@@ -958,20 +958,6 @@ static void parseWindowLine(const QString &line, QList<int> &data)
         }
 }
 
-static const QPaintDevice * getDevice(const QPainter *p, int type)
-{
-    if(p)
-        if (type==p->device()->devType())
-            return p->device();
-        else
-        {
-            QPaintDevice *dev = QPainter::redirected(p->device());
-            if (dev && type==dev->devType())
-                return dev;
-        }
-    return 0L;
-}
-
 static const QWidget * getWidget(const QPainter *p)
 {
     if(p)
