@@ -264,11 +264,11 @@ typedef gchar ** Strings;
 
 #ifdef __cplusplus
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || \
-                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
+                          WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || WIDGET_DIAL==(w) || \
                           WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || \
                           WIDGET_TOOLBAR_BUTTON==(w) )
 #define ETCH_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_SLIDER_TROUGH==(w) || \
-                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
+                        WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || WIDGET_DIAL==(w) || \
                         (WIDGET_SLIDER==(w) && MO_GLOW==opts.coloredMouseOver) || \
                         WIDGET_FILLED_SLIDER_TROUGH==(w) || WIDGET_MDI_WINDOW_BUTTON==(w) || WIDGET_TOOLBAR_BUTTON==(w))
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || IS_SLIDER((w)) || \
@@ -552,6 +552,7 @@ typedef enum
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
     WIDGET_DOCK_WIDGET_TITLE,
+    WIDGET_DIAL,
 #endif
     WIDGET_SPIN,
     WIDGET_ENTRY,
@@ -1577,6 +1578,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
             return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
         case WIDGET_MDI_WINDOW_BUTTON:
             return opts->titlebarButtonAppearance;
+        case WIDGET_DIAL:
+            return IS_FLAT(opts->appearance) ? APPEARANCE_RAISED : APPEARANCE_SOFT_GRADIENT;
 #endif
         case WIDGET_TROUGH:
         case WIDGET_SLIDER_TROUGH:
@@ -1680,7 +1683,7 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
-       WIDGET_RADIO_BUTTON==widget)
+       WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget)
        return ROUND_MAX;
 #endif
 #ifndef __cplusplus
@@ -1728,7 +1731,7 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
     if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
-       WIDGET_RADIO_BUTTON==widget) 
+       WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget) 
         return (w>h ? h : w)/2.0;
 #endif
 #ifndef __cplusplus

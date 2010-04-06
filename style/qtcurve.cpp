@@ -1710,6 +1710,7 @@ void QtCurveStyle::polish(QWidget *widget)
         qobject_cast<QAbstractScrollArea *>(widget) ||
         qobject_cast<QTextEdit *>(widget) ||
         qobject_cast<QLineEdit *>(widget) ||
+        qobject_cast<QDial *>(widget) ||
 //        qobject_cast<QDockWidget *>(widget) ||
         widget->inherits("QWorkspaceTitleBar") ||
         widget->inherits("QDockSeparator") ||
@@ -2152,6 +2153,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
        qobject_cast<QAbstractScrollArea *>(widget) ||
        qobject_cast<QTextEdit *>(widget) ||
        qobject_cast<QLineEdit *>(widget) ||
+       qobject_cast<QDial *>(widget) ||
 //       qobject_cast<QDockWidget *>(widget) ||
        widget->inherits("QWorkspaceTitleBar") ||
        widget->inherits("QDockSeparator") ||
@@ -7052,7 +7054,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     opt.rect = tr;
                     opt.palette = palette;
                     opt.state = QStyle::State_None;
-                    drawPrimitive(QStyle::PE_FrameFocusRect, &opt, painter, widget);
+                    drawPrimitive(PE_FrameFocusRect, &opt, painter, widget);
                 }
             }
             break;
@@ -7112,6 +7114,89 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
     switch (control)
     {
+        case CC_Dial:
+            if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option))
+            {
+                r.adjust(1, 1, -1, -1);
+
+                QStyleOptionComplex opt(*option);
+                bool                mo(state&State_Enabled && state&State_MouseOver);
+                QRect               outer(r);
+                int                 sliderWidth = qMin(2*r.width()/5, QTC_CIRCULAR_SLIDER_SIZE);
+#ifdef DIAL_DOT_ON_RING
+                int                 halfWidth=sliderWidth/2;
+#endif
+
+                opt.state|=State_Horizontal;
+
+                // Outer circle...
+                if (outer.width() > outer.height())
+                {
+                    outer.setLeft(outer.x()+(outer.width()-outer.height())/2);
+                    outer.setWidth(outer.height());
+                }
+                else
+                {
+                    outer.setTop(outer.y()+(outer.height()-outer.width())/2);
+                    outer.setHeight(outer.width());
+                }
+
+                opt.state&=~State_MouseOver;
+#ifdef DIAL_DOT_ON_RING
+                opt.rect=outer.adjusted(halfWidth, halfWidth, -halfWidth, -halfWidth);
+#else
+                opt.rect=outer;
+#endif
+                drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
+                               getFill(&opt, itsBackgroundCols), itsBackgroundCols,
+                               true, WIDGET_DIAL);
+
+                // Inner 'dot'
+                if(mo)
+                    opt.state|=State_MouseOver;
+
+                // angle calculation from qcommonstyle.cpp (c) Trolltech 1992-2007, ASA.
+                qreal               angle(0);
+                if(slider->maximum == slider->minimum)
+                    angle = M_PI / 2;
+                else
+                {
+                    const qreal fraction(qreal(slider->sliderValue - slider->minimum)/
+                                         qreal(slider->maximum - slider->minimum));
+                    if(slider->dialWrapping)
+                        angle = 1.5*M_PI - fraction*2*M_PI;
+                    else
+                        angle = (M_PI*8 - fraction*10*M_PI)/6;
+                }
+
+                QPoint center = r.center();
+#ifdef DIAL_DOT_ON_RING
+                const qreal radius=0.5*(r.width() - sliderWidth);
+#else
+                const qreal radius=0.5*(r.width() - 2*sliderWidth);
+#endif
+                center += QPoint(radius*cos(angle), -radius*sin(angle));
+
+                opt.rect=QRect(0, 0, sliderWidth, sliderWidth );
+                opt.rect.moveCenter(center);
+
+                const QColor *use(buttonColors(option));
+
+                drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
+                               getFill(&opt, use), use, true, WIDGET_RADIO_BUTTON);
+
+                // Draw value...
+                drawItemTextWithRole(painter, outer, Qt::AlignCenter, palette, state&State_Enabled,
+                                     QString::number(slider->sliderValue), QPalette::ButtonText);
+
+                if(state&State_HasFocus)
+                {
+                    QStyleOptionFocusRect fr;
+                    fr.rect = outer.adjusted(-1, -1, 1, 1);
+                    drawPrimitive(PE_FrameFocusRect, &fr, painter, widget);
+                }
+            }
+            break;
         case CC_ToolButton:
             // For OO.o 3.2 need to fill widget background!
             if(isOOWidget(widget))
@@ -9938,7 +10023,7 @@ void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOptio
                middleSize=8;
         bool   horiz(QTC_CIRCULAR_SLIDER(w) || isHoriz(option, w)),
                circular( (WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND)) ||
-                         WIDGET_RADIO_BUTTON==w  || QTC_CIRCULAR_SLIDER(w));
+                         WIDGET_RADIO_BUTTON==w || WIDGET_DIAL==w || QTC_CIRCULAR_SLIDER(w));
         double radius=0;
         ERound realRound=getWidgetRound(&opts, r.width(), r.height(), w);
 
@@ -10488,7 +10573,8 @@ QPainterPath QtCurveStyle::buildPath(const QRectF &r, EWidget w, int round, doub
 {
     QPainterPath path;
 
-    if(WIDGET_RADIO_BUTTON==w || (WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND) ||
+    if(WIDGET_RADIO_BUTTON==w || WIDGET_DIAL==w ||
+       (WIDGET_MDI_WINDOW_BUTTON==w && opts.titlebarButtons&QTC_TITLEBAR_BUTTON_ROUND) ||
        QTC_CIRCULAR_SLIDER(w))
     {
         path.addEllipse(r);

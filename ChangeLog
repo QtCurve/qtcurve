@@ -30,6 +30,7 @@
 22. Don't do mouse over of disalbed sliders.
 23. When casting QPainter device, check the QPaintDevice devType() against QInternal
     - and use static_cast, and not dynamic_cast. (Fixes crash with tagainijisho)
+24. Theme QDial
 
 1.2.0
 -----
