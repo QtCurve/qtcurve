@@ -7108,7 +7108,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 QStyleOptionComplex opt(*option);
                 bool                mo(state&State_Enabled && state&State_MouseOver);
                 QRect               outer(r);
-                int                 sliderWidth = qMin(2*r.width()/5, QTC_CIRCULAR_SLIDER_SIZE);
+                int                 sliderWidth = /*qMin(2*r.width()/5, */QTC_CIRCULAR_SLIDER_SIZE/*)*/;
 #ifdef DIAL_DOT_ON_RING
                 int                 halfWidth=sliderWidth/2;
 #endif
@@ -7172,8 +7172,16 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                getFill(&opt, use), use, true, WIDGET_RADIO_BUTTON);
 
                 // Draw value...
-                drawItemTextWithRole(painter, outer, Qt::AlignCenter, palette, state&State_Enabled,
+#ifdef DIAL_DOT_ON_RING
+                drawItemTextWithRole(painter, outer.adjusted(sliderWidth, sliderWidth, -sliderWidth, -sliderWidth),
+                                     Qt::AlignCenter, palette, state&State_Enabled,
                                      QString::number(slider->sliderValue), QPalette::ButtonText);
+#else
+                int adjust=2*sliderWidth;
+                drawItemTextWithRole(painter, outer.adjusted(adjust, adjust, -adjust, -adjust),
+                                     Qt::AlignCenter, palette, state&State_Enabled,
+                                     QString::number(slider->sliderValue), QPalette::ButtonText);
+#endif
 
                 if(state&State_HasFocus)
                 {
