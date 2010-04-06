@@ -11463,11 +11463,12 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
 
 void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
 {
-    if(!QTC_CUSTOM_BGND || !IS_FLAT(menu ? opts.menubarAppearance : opts.toolbarAppearance) || (menu && SHADE_NONE!=opts.shadeMenubars))
+    EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
+    if(!QTC_CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
         drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? itsMenubarCols[ORIGINAL_SHADE]
                             : option->palette.background().color(),
-                          p, r, horiz, false, menu ? opts.menubarAppearance : opts.toolbarAppearance);
+                          p, r, horiz, false, MODIFY_AGUA(app));
 }
 
 void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOption *option, bool tb,
