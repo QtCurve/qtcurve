@@ -197,7 +197,7 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
     return def;
 }
 
-static EShade toShade(const char *str, bool allowDarken, EShade def, bool menuShade, color *col)
+static EShade toShade(const char *str, bool allowMenu, EShade def, bool menuShade, color *col)
 {
     if(str)
     {
@@ -206,8 +206,10 @@ static EShade toShade(const char *str, bool allowDarken, EShade def, bool menuSh
             return SHADE_BLEND_SELECTED;
         if(0==memcmp(str, "origselected", 12))
             return SHADE_SELECTED;
-        if(allowDarken && (0==memcmp(str, "darken", 6) || (menuShade && 0==memcmp(str, "true", 4))))
+        if(allowMenu && (0==memcmp(str, "darken", 6) || (menuShade && 0==memcmp(str, "true", 4))))
             return SHADE_DARKEN;
+        if(allowMenu && 0==memcmp(str, "wborder", 7))
+            return SHADE_WINDOW_BORDER;
         if(0==memcmp(str, "custom", 6))
             return SHADE_CUSTOM;
         if('#'==str[0] && col)
@@ -1969,6 +1971,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(!opts->framelessGroupBoxes)
                 opts->groupBoxLine=false;
+
+            if(SHADE_WINDOW_BORDER==opts->shadeMenubars)
+                opts->shadeMenubarOnlyWhenActive=true;
 #endif
 #ifndef __cplusplus
             if(!defOpts)
@@ -2429,6 +2434,8 @@ static QString toStr(EShade exp, const QColor &col)
             return "origselected";
         case SHADE_DARKEN:
             return "darken";
+        case SHADE_WINDOW_BORDER:
+            return "wborder";
     }
 }
 

@@ -668,7 +668,15 @@ static void triggerWMMove(const QWidget *w, const QPoint &p)
 }
 #endif
 
-#ifdef QTC_STYLE_SUPPORT
+#if defined QTC_QT_ONLY
+static void setRgb(QColor *col, const QStringList &rgb)
+{
+    if(3==rgb.size())
+        *col=QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
+}
+#endif
+
+#if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
 static bool useQt3Settings()
 {
     static const char *full = getenv("KDE_FULL_SESSION");
@@ -699,7 +707,9 @@ static QString kdeHome()
 //     return KGlobal::dirs()->localkdedir();
 // #endif
 }
+#endif
 
+#ifdef QTC_STYLE_SUPPORT
 static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
 {
     QDir d(dir+sub);
@@ -1753,9 +1763,21 @@ void QtCurveStyle::polish(QWidget *widget)
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->installEventFilter(this);
 
-        if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
-           SHADE_SELECTED==opts.shadeMenubars ||
-           (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
+        if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
+        {
+            QPalette pal(widget->palette());
+            QStyleOption opt;
+
+            opt.init(widget);
+            getMdiColors(&opt, false);
+
+            pal.setBrush(QPalette::Active, QPalette::Foreground, itsActiveMdiTextColor);
+            pal.setBrush(QPalette::Inactive, QPalette::Foreground, itsMdiTextColor);
+            widget->setPalette(pal);
+        }
+        else if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
+                SHADE_SELECTED==opts.shadeMenubars ||
+                (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
         {
             QPalette pal(widget->palette());
 
@@ -2181,9 +2203,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->removeEventFilter(this);
 
-        if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
-           SHADE_SELECTED==opts.shadeMenubars ||
-           (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
+        if(SHADE_WINDOW_BORDER==opts.shadeMenubars || opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
+           SHADE_SELECTED==opts.shadeMenubars || (SHADE_CUSTOM==opts.shadeMenubars &&TOO_DARK(itsMenubarCols[ORIGINAL_SHADE])))
             widget->setPalette(QApplication::palette());
     }
     else if(qobject_cast<QLabel*>(widget))
@@ -6123,10 +6144,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
                     (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
                 {
-                    const QColor *use=itsActive
-                                        ? itsMenubarCols
-                                        : backgroundColors(option);
-
+                    const QColor *use=menuColors(option, itsActive);
                     bool         dark(TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders);
 
                     if(TB_DARK_ALL==opts.toolbarBorders || TB_LIGHT_ALL==opts.toolbarBorders)
@@ -11545,8 +11563,8 @@ void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, cons
 {
     EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if(!QTC_CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
-        drawBevelGradient(menu && itsActive && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
-                            ? itsMenubarCols[ORIGINAL_SHADE]
+        drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
+                            ? menuColors(option, itsActive)[ORIGINAL_SHADE]
                             : option->palette.background().color(),
                           p, r, horiz, false, MODIFY_AGUA(app));
 }
@@ -11753,7 +11771,19 @@ void QtCurveStyle::setMenuColors(const QColor &bgnd)
             break;
         case SHADE_DARKEN:
             shadeColors(shade(bgnd, MENUBAR_DARK_FACTOR), itsMenubarCols);
+            break;
+        case SHADE_WINDOW_BORDER:
+            break;
     }
+}
+
+const QColor * QtCurveStyle::menuColors(const QStyleOption *option, bool active) const
+{
+    return SHADE_WINDOW_BORDER==opts.shadeMenubars
+            ? getMdiColors(option, active)
+            : SHADE_NONE==opts.shadeMenubars || (opts.shadeMenubarOnlyWhenActive && !active)
+                ? backgroundColors(option)
+                : itsMenubarCols;
 }
 
 bool QtCurveStyle::coloredMdiButtons(bool active, bool mouseOver) const
@@ -11773,7 +11803,56 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
         itsActiveMdiTextColor=option->palette.highlightedText().color();
         itsMdiTextColor=option->palette.text().color();
 
-#if !defined QTC_QT_ONLY
+#if defined QTC_QT_ONLY
+        QFile f(kdeHome()+"/share/config/kdeglobals");
+
+        if(f.open(QIODevice::ReadOnly))
+        {
+            QTextStream in(&f);
+            bool        inPal(false);
+
+            while (!in.atEnd())
+            {
+                QString line(in.readLine());
+
+                if(inPal)
+                {
+                    if(!itsActiveMdiColors && 0==line.indexOf("activeBackground="))
+                    {
+                        QColor col;
+
+                        setRgb(&col, line.mid(17).split(","));
+
+                        if(col!=itsHighlightCols[ORIGINAL_SHADE])
+                        {
+                            itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
+                            shadeColors(col, itsActiveMdiColors);
+                        }
+                    }
+                    else if(!itsMdiColors && 0==line.indexOf("inactiveBackground="))
+                    {
+                        QColor col;
+
+                        setRgb(&col, line.mid(19).split(","));
+                        if(col!=itsButtonCols[ORIGINAL_SHADE])
+                        {
+                            itsMdiColors=new QColor [TOTAL_SHADES+1];
+                            shadeColors(col, itsMdiColors);
+                        }
+                    }
+                    else if(0==line.indexOf("activeForeground="))
+                        setRgb(&itsActiveMdiTextColor, line.mid(17).split(","));
+                    else if(0==line.indexOf("inactiveForeground="))
+                        setRgb(&itsMdiTextColor, line.mid(19).split(","));
+                    else if (-1!=line.indexOf('['))
+                        break;
+                }
+                else if(0==line.indexOf("[WM]"))
+                    inPal=true;
+            }
+            f.close();
+        }
+#else
         QColor col=KGlobalSettings::activeTitleColor();
 
         if(col!=itsHighlightCols[ORIGINAL_SHADE])

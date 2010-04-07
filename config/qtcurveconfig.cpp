@@ -432,6 +432,8 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
         combo->insertItem(SHADE_BLEND_SELECTED, i18n("Blended selected background"));
         combo->insertItem(SHADE_DARKEN, SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken"));
     }
+    if(SW_MENUBAR==sw)
+        combo->insertItem(SHADE_WINDOW_BORDER, i18n("Titlebar border"));
 }
 
 static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=true, bool fade=false)
@@ -1058,6 +1060,10 @@ void QtCurveConfig::shadeSlidersChanged()
 void QtCurveConfig::shadeMenubarsChanged()
 {
     customMenubarsColor->setEnabled(SHADE_CUSTOM==shadeMenubars->currentIndex());
+    customMenuNormTextColor->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex());
+    customMenuSelTextColor->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex());
+    customMenuTextColor->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex());
+    shadeMenubarOnlyWhenActive->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex());
     updateChanged();
 }
 
@@ -1069,8 +1075,8 @@ void QtCurveConfig::shadeCheckRadioChanged()
 
 void QtCurveConfig::customMenuTextColorChanged()
 {
-    customMenuNormTextColor->setEnabled(customMenuTextColor->isChecked());
-    customMenuSelTextColor->setEnabled(customMenuTextColor->isChecked());
+    customMenuNormTextColor->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex() && customMenuTextColor->isChecked());
+    customMenuSelTextColor->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex() && customMenuTextColor->isChecked());
     updateChanged();
 }
 

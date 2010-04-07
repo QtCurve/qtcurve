@@ -1,3 +1,7 @@
+1.3.0
+-----
+1. Add option to use kwin titlebar colours as menubar shade.
+
 1.2.1
 -----
  1. Add option to hide status bars via Ctrl-Alt-S

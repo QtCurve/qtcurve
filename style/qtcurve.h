@@ -205,6 +205,7 @@ class QtCurveStyle : public QCommonStyle
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
     void setMenuColors(const QColor &bgnd);
+    const QColor * menuColors(const QStyleOption *option, bool active) const;
     bool           coloredMdiButtons(bool active, bool mouseOver) const;
     const QColor * getMdiColors(const QStyleOption *option, bool active) const;
     void           readMdiPositions() const;

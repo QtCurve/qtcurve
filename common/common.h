@@ -687,7 +687,8 @@ typedef enum
     SHADE_CUSTOM,
     SHADE_SELECTED,
     SHADE_BLEND_SELECTED,
-    SHADE_DARKEN
+    SHADE_DARKEN,
+    SHADE_WINDOW_BORDER
 } EShade;
 
 typedef enum
