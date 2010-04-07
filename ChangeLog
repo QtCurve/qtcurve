@@ -1,40 +1,37 @@
 1.3.0
 -----
-1. Add option to use kwin titlebar colours as menubar shade.
-
-1.2.1
------
- 1. Add option to hide status bars via Ctrl-Alt-S
- 2. Add option to drag windows by menubar.
- 3. Set decoration (hover/focus) colours for preview.
- 4. Fix unreadable text when using progressbar glow and anti-aliased fonts.
- 5. Better event filter code for qwidget buddy focus painting.
- 6. Fix issues with light border in window decoration.
- 7. Fix blurred left edges of windows when not drawing border and rounding
+ 1. Add option to use kwin titlebar colours as menubar shade.
+ 2. Add option to hide status bars via Ctrl-Alt-S
+ 3. Add option to drag windows by menubar.
+ 4. Set decoration (hover/focus) colours for preview.
+ 5. Fix unreadable text when using progressbar glow and anti-aliased fonts.
+ 6. Better event filter code for qwidget buddy focus painting.
+ 7. Fix issues with light border in window decoration.
+ 8. Fix blurred left edges of windows when not drawing border and rounding
     bottom.
- 8. Fix custom shadows when window is fully rounded.
- 9. If using squared entry fields, draw frames around lables square.
-10. Derive from QCommonStyle, and not QWindowsStyle.
+ 9. Fix custom shadows when window is fully rounded.
+10. If using squared entry fields, draw frames around lables square.
+11. Derive from QCommonStyle, and not QWindowsStyle.
     (Deriving from QWindowsStyle seems to cause a crash in konqueror)
-11. Remove linkage to libkfile
-12. Set toolbar frame width to 0 if not drawing borders.
-13. Add option to remove all borders from maximised windows.
-14. Fix rounding top of menubar items in OO.o if this option is enabled.
-15. If using highlight as menu item colour, then for oo.o if text r/g/b<50
+12. Remove linkage to libkfile
+13. Set toolbar frame width to 0 if not drawing borders.
+14. Add option to remove all borders from maximised windows.
+15. Fix rounding top of menubar items in OO.o if this option is enabled.
+16. If using highlight as menu item colour, then for oo.o if text r/g/b<50
     and highlightedText r/g/b<127 - then blend highlight colour with menu
     colour.
-16. Fix konqueror crash due to highlighting of Q3ScrollViews.
-17. Add option to turn of kwin window grouping.
-18. Add kwin option to draw bottom border on windows when border size set to tiny.
-19. Only show kwin resize grip if not drawng the bottom border - otherwise it just
+17. Fix konqueror crash due to highlighting of Q3ScrollViews.
+18. Add option to turn of kwin window grouping.
+19. Add kwin option to draw bottom border on windows when border size set to tiny.
+20. Only show kwin resize grip if not drawng the bottom border - otherwise it just
     looks odd.
-20. Use 'kde' to disable parent-less dialog fix for all KDE applications.
-21. Fix shading of menubars and when using flat menubar appearance and background
+21. Use 'kde' to disable parent-less dialog fix for all KDE applications.
+22. Fix shading of menubars and when using flat menubar appearance and background
     image/gradient.
-22. Don't do mouse over of disalbed sliders.
-23. When casting QPainter device, check the QPaintDevice devType() against QInternal
+23. Don't do mouse over of disalbed sliders.
+24. When casting QPainter device, check the QPaintDevice devType() against QInternal
     - and use static_cast, and not dynamic_cast. (Fixes crash with tagainijisho)
-24. Theme QDial
+25. Theme QDial
 
 1.2.0
 -----
