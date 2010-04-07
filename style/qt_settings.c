@@ -115,9 +115,11 @@ enum QtColorRoles
 
     COLOR_FOCUS,    /* KDE4 */
     COLOR_HOVER,    /* KDE4 */
-    
-    COLOR_NONE,
-    COLOR_NUMCOLORS=COLOR_NONE  /* NONE does not count! */
+    COLOR_WINDOW_BORDER,
+    COLOR_WINDOW_BORDER_TEXT,
+
+    COLOR_NUMCOLORS,
+    COLOR_NUMCOLORS_STD = COLOR_NUMCOLORS-2 /* Remove Window border colors */
 };
 
 typedef enum
@@ -273,11 +275,13 @@ enum
     SECT_KDE4_EFFECT_DISABLED =0x002000,
     SECT_KDE4_EFFECT_INACTIVE =0x004000,
 
+    SECT_KDE4_COL_WM          =0x008000,
+
     SECT_QT
 };
 
 #define ALL_KDE4_PAL_SETTINGS (SECT_KDE4_COL_BUTTON|SECT_KDE4_COL_SEL|SECT_KDE4_COL_TOOLTIP|SECT_KDE4_COL_VIEW| \
-                               SECT_KDE4_COL_WINDOW|SECT_KDE4_EFFECT_DISABLED|SECT_KDE4_EFFECT_INACTIVE)
+                               SECT_KDE4_COL_WINDOW|SECT_KDE4_EFFECT_DISABLED|SECT_KDE4_EFFECT_INACTIVE|SECT_KDE4_COL_WM)
 /*
   Qt uses the following predefined weights: 
     Light    = 25,
@@ -817,6 +821,10 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
         qtSettings.colors[PAL_ACTIVE][COLOR_LV]=setGdkColor(248, 247, 246);
         qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]=setGdkColor(233, 232, 232);
         qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT]=setGdkColor(20, 19, 18);
+        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER]=qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
+        qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW];
+        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]=qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
+        qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT];
 
         if(kde4)
         {
@@ -862,6 +870,8 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
                     section=SECT_GENERAL;
                 else if(kde4 && 0==strncmp_i(line, "[KDE]", 5))
                     section=SECT_KDE;
+                else if(kde4 && 0==strncmp_i(line, "[WM]", 4))
+                    section=SECT_KDE4_COL_WM;
                 else
                 {
                     section=SECT_NONE;
@@ -939,6 +949,18 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
             {
                 qtSettings.colors[PAL_ACTIVE][COLOR_LV]=readColor(line);
                 found|=RD_LIST_COLOR;
+            }
+            else if(kde4 && SECT_KDE4_COL_WM==section && rd&RD_KDE4_PAL && !(found&RD_KDE4_PAL))
+            {
+                colorsFound|=section;
+                if(0==strncmp_i(line, "activeBackground=", 17))
+                    qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER]=readColor(line);
+                else if(0==strncmp_i(line, "activeForeground=", 17))
+                    qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]=readColor(line);
+                else if(0==strncmp_i(line, "inactiveBackground=", 19))
+                    qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]=readColor(line);
+                else if(0==strncmp_i(line, "inactiveForeground=", 19))
+                    qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT]=readColor(line);
             }
             else if(kde4 && section>=SECT_KDE4_COL_BUTTON && section<=SECT_KDE4_COL_WINDOW &&
                     rd&RD_KDE4_PAL && !(found&RD_KDE4_PAL))
@@ -1097,11 +1119,11 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
         for(eff=0; eff<2; ++eff)
         {
             int p=0==eff ? PAL_DISABLED : PAL_INACTIVE;
-            memcpy(qtSettings.colors[p], qtSettings.colors[PAL_ACTIVE], sizeof(GdkColor) * COLOR_NUMCOLORS);
+            memcpy(qtSettings.colors[p], qtSettings.colors[PAL_ACTIVE], sizeof(GdkColor) * COLOR_NUMCOLORS_STD);
             if(effects[eff].enabled)
             {
                 int col;
-                for(col=0; col<COLOR_NUMCOLORS; ++col)
+                for(col=0; col<COLOR_NUMCOLORS_STD; ++col)
                 {
                     switch(effects[eff].intensity.effect)
                     {

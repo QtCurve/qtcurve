@@ -45,6 +45,8 @@ static struct
              *selectedcr,
              *sortedlv,
              *sidebar,
+             *wborder[2],
+             mdi_text[2],
              menubar[TOTAL_SHADES+1],
              highlight[TOTAL_SHADES+1],
              focus[TOTAL_SHADES+1],
@@ -221,6 +223,15 @@ static void drawVLine(cairo_t *cr, double r, double g, double b, double a, int x
     cairo_move_to(cr, x+0.5, y);
     cairo_line_to(cr, x+0.5, y+h);
     cairo_stroke(cr);
+}
+
+static GdkColor * menuColors(gboolean active)
+{
+    return SHADE_WINDOW_BORDER==opts.shadeMenubars
+            ? qtcPalette.wborder[active ? 1 : 0]
+            : SHADE_NONE==opts.shadeMenubars || (opts.shadeMenubarOnlyWhenActive && !active)
+                ? qtcPalette.background
+                : qtcPalette.menubar;
 }
 
 static EBorder shadowToBorder(GtkShadowType shadow)
@@ -4375,8 +4386,8 @@ debugDisplayWidget(widget, 3);
     {
         //if(GTK_SHADOW_NONE!=shadow_type)
         {
-            GdkColor    *col=activeWindow && menubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
-                                ? &qtcPalette.menubar[ORIGINAL_SHADE]
+            GdkColor    *col=menubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
+                                ? &menuColors(activeWindow)[ORIGINAL_SHADE]
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
 
@@ -5435,9 +5446,17 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else if(isMenuItem)
         {
-            if(mb && activeWindow)
+            if(mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars))
             {
-                if(opts.customMenuTextColor && qtcurveStyle->menutext_gc[0])
+                if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
+                {
+                    for(i=0; i<QTC_NUM_GCS; ++i)
+                        prevGcs[i]=style->text_gc[i];
+                    swap_gc=TRUE;
+                    style->text_gc[GTK_STATE_NORMAL]=qtcurveStyle->menutext_gc[activeWindow ? 1 : 0];
+                    use_text=TRUE;
+                }
+                else if(opts.customMenuTextColor && qtcurveStyle->menutext_gc[0])
                 {
                     for(i=0; i<QTC_NUM_GCS; ++i)
                         prevGcs[i]=style->text_gc[i];
@@ -6866,7 +6885,13 @@ static void styleRealize(GtkStyle *style)
     qtcurveStyle->button_text_gc[PAL_DISABLED]=qtSettings.qt4
                             ? realizeColors(style, &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT])
                             : style->text_gc[GTK_STATE_INSENSITIVE];
-    if(opts.customMenuTextColor)
+
+    if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
+    {
+        qtcurveStyle->menutext_gc[0]=realizeColors(style, &qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT]);
+        qtcurveStyle->menutext_gc[1]=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]);
+    }
+    else if(opts.customMenuTextColor)
     {
         qtcurveStyle->menutext_gc[0]=realizeColors(style, &opts.customMenuNormTextColor);
         qtcurveStyle->menutext_gc[1]=realizeColors(style, &opts.customMenuSelTextColor);
@@ -6891,7 +6916,7 @@ static void styleUnrealize(GtkStyle *style)
     gtk_gc_release(qtcurveStyle->button_text_gc[PAL_ACTIVE]);
     if(qtSettings.qt4)
         gtk_gc_release(qtcurveStyle->button_text_gc[PAL_DISABLED]);
-    if(opts.customMenuTextColor)
+    if(opts.customMenuTextColor || SHADE_WINDOW_BORDER==opts.shadeMenubars)
     {
         gtk_gc_release(qtcurveStyle->menutext_gc[0]);
         gtk_gc_release(qtcurveStyle->menutext_gc[1]);
@@ -6924,6 +6949,12 @@ static void generateColors()
 
     switch(opts.shadeMenubars)
     {
+        case SHADE_WINDOW_BORDER:
+            qtcPalette.wborder[0]=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            qtcPalette.wborder[1]=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+            shadeColors(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER], qtcPalette.wborder[0]);
+            shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER], qtcPalette.wborder[1]);
+            break;
         case SHADE_NONE:
             memcpy(qtcPalette.menubar, qtcPalette.background, sizeof(GdkColor)*(TOTAL_SHADES+1));
             break;
