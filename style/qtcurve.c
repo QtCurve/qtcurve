@@ -5075,7 +5075,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
         btn_colors=qtcPalette.selectedcr;
-    else if(QT_CUSTOM_COLOR_BUTTON(style))
+    else if(!mnu && QT_CUSTOM_COLOR_BUTTON(style))
     {
         shadeColors(&(style->bg[state]), new_colors);
         btn_colors=new_colors;
@@ -5229,7 +5229,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
     
         if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
             btn_colors=qtcPalette.selectedcr;
-        else if(QT_CUSTOM_COLOR_BUTTON(style))
+        else if(!mnu && QT_CUSTOM_COLOR_BUTTON(style))
         {
             shadeColors(&(style->bg[state]), new_colors);
             btn_colors=new_colors;
