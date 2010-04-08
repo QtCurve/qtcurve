@@ -5124,6 +5124,9 @@ debugDisplayWidget(widget, 3);
                                         ? &btn_colors[QTC_CR_MO_FILL]
                                         : &style->base[GTK_STATE_NORMAL];
 
+            if(doEtch)
+                x++, y++;
+
             drawBevelGradient(cr, style, area, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
                               TRUE, FALSE, APPEARANCE_INVERTED, WIDGET_TROUGH);
 
@@ -5266,6 +5269,9 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             double   radius=(opts.crSize+1)/2.0;
 
             bgnd=getFill(state, set/*, TRUE*/);
+
+            if(doEtch)
+                x++, y++;
 
             clipPath(cr, x, y, opts.crSize, opts.crSize, WIDGET_RADIO_BUTTON, RADIUS_EXTERNAL, ROUNDED_ALL);
             drawBevelGradient(cr, style, NULL, NULL, x+1, y+1, opts.crSize-2, opts.crSize-2, bgndCol,
