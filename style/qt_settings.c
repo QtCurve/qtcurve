@@ -2199,9 +2199,6 @@ static gboolean qtInit()
                                               FALSE;
 #endif
 
-#ifndef QTC_MODIFY_MOZILLA
-                    if(add_menu_colors)
-#endif
                     if(firefox)
                     {
                         processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
