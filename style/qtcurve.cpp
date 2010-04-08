@@ -1021,17 +1021,19 @@ QtCurveStyle::QtCurveStyle()
               itsPixmapCache(150000),
               itsActive(true),
               itsSbWidget(0L),
+              itsClickedLabel(0L),
               itsProgressBarAnimateTimer(0),
               itsAnimateStep(0),
               itsPos(-1, -1),
-              itsHoverWidget(0L)
+              itsHoverWidget(0L),
 #ifdef Q_WS_X11
-              , itsDragWidget(0L)
-              , itsDragWidgetHadMouseTracking(false)
+              itsDragWidget(0L),
+              itsDragWidgetHadMouseTracking(false),
 #endif
 #if QT_VERSION < 0x040500
-              , itsQtVersion(VER_UNKNOWN)
+              itsQtVersion(VER_UNKNOWN),
 #endif
+              itsSViewSBar(0L)
 {
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
