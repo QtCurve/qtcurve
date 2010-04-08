@@ -21,6 +21,7 @@
     image/gradient.
 15. Fix slider groove not always being painted when using background gradient/rings.
 16. Fix drawing glitches with unified comboentries on mouse over.
+17. Improve firefox menubar text colouring.
 
 1.2.0
 -----

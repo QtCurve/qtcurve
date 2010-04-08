@@ -1652,19 +1652,26 @@ static char * getAppName()
 #define USER_CHROME_CSS  USER_CHROME_DIR"/"USER_CHROME_FILE
 #define MAX_DEFAULT_NAME 16+strlen(CSS_DEFAULT)+strlen(USER_CHROME_CSS)
 
-#define QTC_GUARD_STR "Added by QtCurve -- do not remove"
-#define MENU_TEXT_STR "menubar > menu { color: HighlightText !important; } menubar > menu[_moz-menuactive=\"true\"] "\
+#define QTC_GUARD_STR      "Added by QtCurve -- do not remove"
+#define QTC_MENU_GUARD_STR "MenuColors, "QTC_GUARD_STR
+
+#define OLD_MENU_TEXT_STR "menubar > menu { color: HighlightText !important; } menubar > menu[_moz-menuactive=\"true\"] "\
                       "{ background-color : HighlightText !important; color: HighlightText !important; } "\
                       "/* "QTC_GUARD_STR" */\n"
-
+#define MENU_TEXT_STR_FORMAT "menubar > menu { color: #%02x%02x%02x !important; } " \
+                             "menubar > menu[_moz-menuactive=\"true\"][open=\"false\"] { color: #%02x%02x%02x !important; } "\
+                             "menubar > menu[_moz-menuactive=\"true\"][open=\"true\"] { color: #%02x%02x%02x !important; } "\
+                             "/* "QTC_MENU_GUARD_STR" */\n"
 #define CSS_FILE_STR     "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve.css\"); /* "QTC_GUARD_STR" */\n"
 #define BTN_CSS_FILE_STR "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve-KDEButtonOrder.css\"); /* "QTC_GUARD_STR" */\n"
 
 static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_menu_colors)
 {
     FILE        *f=fopen(file, "r");
-    char        *contents=NULL;
-    gboolean    remove_menu_colors=FALSE;
+    char        *contents=NULL,
+                *menu_text_str=NULL;
+    gboolean    remove_menu_colors=FALSE,
+                remove_old_menu_colors=FALSE;
 #ifdef QTC_MODIFY_MOZILLA
     gboolean    remove_btn_css=FALSE,
                 add_css=TRUE;
@@ -1673,12 +1680,39 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
     size_t      file_size=0,
                 new_size=0;
 
+    if(add_menu_colors)
+    {
+        GdkColor *std, *active;
+        if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
+            std=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+        else if(opts.customMenuTextColor)
+            std=&opts.customMenuNormTextColor;
+        else if(SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars || 
+                (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
+            std=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
+        else
+            std=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT];
+  
+        if(opts.customMenuTextColor)
+            active=&opts.customMenuSelTextColor;
+        else if(opts.useHighlightForMenu)
+            active=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
+        else
+            active=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT];
+
+        menu_text_str=(char *)malloc(strlen(MENU_TEXT_STR_FORMAT)+1);
+        sprintf(menu_text_str, MENU_TEXT_STR_FORMAT,
+                toQtColor(std->red), toQtColor(std->green), toQtColor(std->blue),
+                toQtColor(std->red), toQtColor(std->green), toQtColor(std->blue),
+                toQtColor(active->red), toQtColor(active->green), toQtColor(active->blue));
+    }
+
     if(f)
     {
         if(0==fstat(fileno(f), &st))
         {
             file_size = st.st_size;
-            new_size=file_size+strlen(MENU_TEXT_STR)+strlen(CSS_FILE_STR)+3;
+            new_size=file_size+strlen(MENU_TEXT_STR_FORMAT)+strlen(CSS_FILE_STR)+3;
             contents=(char *)malloc(new_size);
 
             if(contents)
@@ -1697,24 +1731,25 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
                         if (add_btn_css)
                             add_btn_css=FALSE;
                         else
-                        {
-                            remove_btn_css=TRUE;
-                            write_line=FALSE;
-                        }
+                            remove_btn_css=TRUE, write_line=FALSE;
                     }
                     else if(0==strcmp(line, CSS_FILE_STR))
                         add_css=FALSE;
                     else
 #endif
-                        if(0==strcmp(line, MENU_TEXT_STR))
+                    if(0==strcmp(line, OLD_MENU_TEXT_STR))
+                        write_line=FALSE, remove_old_menu_colors=TRUE;
+                    else if(NULL!=strstr(line, QTC_MENU_GUARD_STR))
                     {
                         if (add_menu_colors)
-                            add_menu_colors=FALSE;
-                        else
                         {
-                            remove_menu_colors=TRUE;
-                            write_line=FALSE;
+                            if(0==strcmp(menu_text_str, line))
+                                add_menu_colors=FALSE;
+                            else
+                                write_line=FALSE;
                         }
+                        else
+                            remove_menu_colors=TRUE, write_line=FALSE;
                     }
                     if(write_line)
                         strcat(contents, line);
@@ -1735,7 +1770,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
     {
         if(!contents)
         {
-            new_size=strlen(MENU_TEXT_STR)+strlen(BTN_CSS_FILE_STR)+strlen(CSS_FILE_STR)+4;
+            new_size=strlen(MENU_TEXT_STR_FORMAT)+strlen(BTN_CSS_FILE_STR)+strlen(CSS_FILE_STR)+4;
 
             contents=(char *)malloc(new_size);
             if(contents)
@@ -1778,15 +1813,15 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
 
                 if(len && contents[len-1]!='\n')
                     strcat(contents, "\n");
-                strcat(contents, MENU_TEXT_STR);
+                strcat(contents, menu_text_str);
             }
         }
     }
 
 #ifdef QTC_MODIFY_MOZILLA
-    if(contents && (add_btn_css || remove_btn_css || add_menu_colors || remove_menu_colors))
+    if(contents && (add_btn_css || remove_btn_css || add_menu_colors || remove_menu_colors || remove_old_menu_colors))
 #else
-    if(contents && (add_menu_colors || remove_menu_colors))
+    if(contents && (add_menu_colors || remove_menu_colors || remove_old_menu_colors))
 #endif
     {
         f=fopen(file, "w");
@@ -1798,6 +1833,9 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         }
         free(contents);
     }
+    
+    if(menu_text_str)
+        free(menu_text_str);
 }
 
 static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, char *app, gboolean under_moz)
@@ -2151,7 +2189,8 @@ static gboolean qtInit()
                                         ? &opts.customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
                     gboolean add_menu_colors=SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
-                                             SHADE_WINDOW_BORDER==opts.shadeMenubars || 
+                                             SHADE_WINDOW_BORDER==opts.shadeMenubars ||
+                                             opts.customMenuTextColor || !opts.useHighlightForMenu ||
                                              (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) ),
                              add_btn_css=
 #ifdef QTC_MODIFY_MOZILLA
