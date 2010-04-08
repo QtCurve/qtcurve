@@ -2151,6 +2151,7 @@ static gboolean qtInit()
                                         ? &opts.customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
                     gboolean add_menu_colors=SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
+                                             SHADE_WINDOW_BORDER==opts.shadeMenubars || 
                                              (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) ),
                              add_btn_css=
 #ifdef QTC_MODIFY_MOZILLA
