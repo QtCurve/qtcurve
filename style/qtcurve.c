@@ -5102,7 +5102,7 @@ debugDisplayWidget(widget, 3);
         if(opts.crButton)
         {
             drawLightBevel(cr, style, state, area, NULL, x, y,
-                           opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0), &btn_colors[getFill(state, false)],
+                           checkSpace, checkSpace, &btn_colors[getFill(state, false)],
                            btn_colors, ROUNDED_ALL, WIDGET_CHECKBOX, BORDER_FLAT,
                            DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), widget);
             if(doEtch)
@@ -5240,7 +5240,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(opts.crButton)
         {
             drawLightBevel(cr, style, state, area, NULL, x, y,
-                           opts.crSize+(doEtch ? 2 : 0), opts.crSize+(doEtch ? 2 : 0), &btn_colors[getFill(state, false)],
+                           optSpace, optSpace, &btn_colors[getFill(state, false)],
                            btn_colors, ROUNDED_ALL, WIDGET_RADIO_BUTTON, BORDER_FLAT,
                            DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), widget);
             if(doEtch)
