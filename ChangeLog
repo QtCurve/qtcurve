@@ -32,6 +32,7 @@
 24. When casting QPainter device, check the QPaintDevice devType() against QInternal
     - and use static_cast, and not dynamic_cast. (Fixes crash with tagainijisho)
 25. Theme QDial
+26. Fix some unitialised variables - caught via valgrind.
 
 1.2.0
 -----

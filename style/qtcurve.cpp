@@ -1052,7 +1052,6 @@ QtCurveStyle::QtCurveStyle()
 
         itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
-    setupKde4();
 #if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
     setFileDialogs();
 #endif
@@ -1099,6 +1098,9 @@ QtCurveStyle::QtCurveStyle()
     // Set defaults for Hover and Focus, these will be changed when KDE4 palette is applied...
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsFocusCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
+#if !defined QTC_QT_ONLY
+    setupKde4();
+#endif
 
     switch(opts.shadeSliders)
     {
