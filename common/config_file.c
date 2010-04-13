@@ -531,7 +531,7 @@ static const char * getHome()
 #include <qfile.h>
 #endif
 // Take from KStandardDirs::makeDir
-bool makeDir(const QString& dir, int mode)
+static bool makeDir(const QString& dir, int mode)
 {
     // we want an absolute path
     if (QDir::isRelativePath(dir))
