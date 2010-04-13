@@ -4335,10 +4335,24 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 if(FOCUS_STANDARD==opts.focus)
                 {
-                    QStyleOptionFocusRect opt(*focusFrame);
-
-                    opt.rect=r2;
-                    QTC_BASE_STYLE::drawPrimitive(element, &opt, painter, widget);
+                    // Taken from QWindowsStyle...
+                    painter->save();
+                    painter->setBackgroundMode(Qt::TransparentMode);
+                    QColor bgCol(focusFrame->backgroundColor);
+                    if (!bgCol.isValid())
+                        bgCol = painter->background().color();
+                    // Create an "XOR" color.
+                    QColor patternCol((bgCol.red() ^ 0xff) & 0xff,
+                                      (bgCol.green() ^ 0xff) & 0xff,
+                                      (bgCol.blue() ^ 0xff) & 0xff);
+                    painter->setBrush(QBrush(patternCol, Qt::Dense4Pattern));
+                    painter->setBrushOrigin(r.topLeft());
+                    painter->setPen(Qt::NoPen);
+                    painter->drawRect(r.left(), r.top(), r.width(), 1);    // Top
+                    painter->drawRect(r.left(), r.bottom(), r.width(), 1); // Bottom
+                    painter->drawRect(r.left(), r.top(), 1, r.height());   // Left
+                    painter->drawRect(r.right(), r.top(), 1, r.height());  // Right
+                    painter->restore();
                 }
                 else
                 {
