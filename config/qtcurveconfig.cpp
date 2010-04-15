@@ -1260,13 +1260,15 @@ void QtCurveConfig::bgndAppearanceChanged()
 {
     if(APPEARANCE_STRIPED==bgndAppearance->currentIndex())
         bgndGrad->setCurrentIndex(GT_HORIZ);
+    bgndGrad->setEnabled(APPEARANCE_STRIPED!=bgndAppearance->currentIndex());
     updateChanged();
 }
     
 void QtCurveConfig::menuBgndAppearanceChanged()
 {
-    if(APPEARANCE_STRIPED==bgndAppearance->currentIndex())
-        bgndGrad->setCurrentIndex(GT_HORIZ);
+    if(APPEARANCE_STRIPED==menuBgndAppearance->currentIndex())
+        menuBgndGrad->setCurrentIndex(GT_HORIZ);
+    menuBgndGrad->setEnabled(APPEARANCE_STRIPED!=menuBgndAppearance->currentIndex());
     updateChanged();
 }
 
