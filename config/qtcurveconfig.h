@@ -137,6 +137,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void borderProgressChanged();
     void squareProgressChanged();
     void fillProgressChanged();
+    void bgndAppearanceChanged();
+    void menuBgndAppearanceChanged();
     void changeStack();
     void gradChanged(int i);
     void borderChanged(int i);

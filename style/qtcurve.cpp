@@ -1401,7 +1401,7 @@ void QtCurveStyle::polish(QApplication *app)
     if(opts.statusbarHiding)
         itsSaveStatusBarStatus=opts.statusbarApps.contains("kde") || opts.statusbarApps.contains(appName);
 
-    if(!IS_FLAT(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
+    if(!IS_FLAT_BGND(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
         opts.bgndAppearance=APPEARANCE_FLAT;
     if(IMG_NONE!=opts.bgndImage.type && opts.noBgndImageApps.contains(appName))
         opts.bgndImage.type=IMG_NONE;
@@ -1897,7 +1897,7 @@ void QtCurveStyle::polish(QWidget *widget)
         }
 
     if(qobject_cast<QMenu *>(widget))
-        if(!IS_FLAT(opts.menuBgndAppearance))
+        if(!IS_FLAT_BGND(opts.menuBgndAppearance))
             widget->installEventFilter(this);
         else if(USE_LIGHTER_POPUP_MENU)
         {
@@ -2289,7 +2289,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
             }
         }
 
-    if((!IS_FLAT(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu *>(widget))
+    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu *>(widget))
         widget->removeEventFilter(this);
 
     if (qobject_cast<QMenuBar *>(widget) ||
@@ -2491,7 +2491,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 static_cast<QStatusBar *>(object)->setHidden(true);
             break;
         case QEvent::Paint:
-            if((!IS_FLAT(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu*>(object))
+            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu*>(object))
                 drawBackground((QWidget*)object, false);
             else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
             {
@@ -2877,7 +2877,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
                 return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
-            if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
+            if ((USE_LIGHTER_POPUP_MENU || !IS_FLAT_BGND(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
                 qobject_cast<const QMenu *>(widget))
                 return 1;
 
@@ -3746,7 +3746,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
 
-                        if(opts.round && IS_FLAT(opts.bgndAppearance) &&
+                        if(opts.round && IS_FLAT_BGND(opts.bgndAppearance) &&
                            widget && widget->parentWidget() && !inQAbstractItemView/* &&
                            widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/)
                         {
@@ -3865,7 +3865,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             painter->setPen(use[QT_STD_BORDER]);
             drawRect(painter, r);
 
-            if(!USE_LIGHTER_POPUP_MENU && IS_FLAT(opts.menuBgndAppearance))
+            if(!USE_LIGHTER_POPUP_MENU && IS_FLAT_BGND(opts.menuBgndAppearance))
             /*
             {
                 painter->setPen(itsLighterPopupMenuBgndCol);
@@ -4997,7 +4997,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             bool         horiz(state&State_Horizontal || (r.height()>6 && r.height()>r.width()));
 
             painter->save();
-            if(/*IS_FLAT(opts.bgndAppearance) || */state&State_MouseOver && state&State_Enabled)
+            if(/*IS_FLAT_BGND(opts.bgndAppearance) || */state&State_MouseOver && state&State_Enabled)
             {
                 QColor color(palette.color(QPalette::Active, QPalette::Window));
 
@@ -10495,7 +10495,7 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    if(!IS_FLAT(app))
+    if(!IS_FLAT_BGND(app))
     {
         static const int constPixmapWidth  = 16;
         static const int constPixmapHeight = 256;
@@ -10504,23 +10504,45 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
         EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
         QSize     scaledSize(GT_HORIZ==grad ? constPixmapWidth : window->rect().width(),
                              GT_HORIZ==grad ? window->rect().height() : constPixmapWidth);
-        QPixmap pix;
+        bool      striped(APPEARANCE_STRIPED==app);
+        QPixmap   pix;
 
         key.sprintf("qtc-bgnd-%x-%d-%d", col.rgba(), grad, app);
         if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
         {
-            pix=QPixmap(QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight,
-                              GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
+            pix=QPixmap(striped
+                            ? QSize(64, 64)
+                            : QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight,
+                                    GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
             QPainter pixPainter(&pix);
 
-            drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
-                                  GT_HORIZ==grad, false, app, WIDGET_OTHER);
+            if(striped)
+            {
+                QColor col2(shade(col, QTC_BGND_STRIPE_SHADE));
+
+                pixPainter.fillRect(pix.rect(), col);
+                pixPainter.setPen(QColor((3*col.red()+col2.red())/4,
+                                         (3*col.green()+col2.green())/4,
+                                         (3*col.blue()+col2.blue())/4));
+
+                for(int i=1; i<pix.height(); i+=4)
+                {
+                    pixPainter.drawLine(0, i, pix.width()-1, i);
+                    pixPainter.drawLine(0, i+2, pix.width()-1, i+2);
+                }
+                pixPainter.setPen(col2);
+                for(int i=2; i<pix.height()-1; i+=4)
+                    pixPainter.drawLine(0, i, pix.width()-1, i);
+            }
+            else
+                drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
+                                      GT_HORIZ==grad, false, app, WIDGET_OTHER);
             if(itsUsePixmapCache)
                 QPixmapCache::insert(key, pix);
         }
 
         p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
-                          scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+                          striped || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
 
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
@@ -12131,7 +12153,7 @@ void QtCurveStyle::shade(const color &ca, color *cb, double k) const
 
 QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
 {
-    if(IS_FLAT(opts.bgndAppearance))
+    if(IS_FLAT_BGND(opts.bgndAppearance))
     {
         bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
 // CPD: Don't really want to check here for every widget, when (so far) on problem seems to be in
@@ -12152,7 +12174,7 @@ QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
     }
 
     QColor col(Qt::white);
-    col.setAlphaF(0.1); // IS_FLAT(opts.bgndAppearance) ? 0.25 : 0.4);
+    col.setAlphaF(0.1); // IS_FLAT_BGND(opts.bgndAppearance) ? 0.25 : 0.4);
 
     return col;
 }

@@ -436,7 +436,7 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
         combo->insertItem(SHADE_WINDOW_BORDER, i18n("Titlebar border"));
 }
 
-static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=true, bool fade=false)
+static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=true, bool fade=false, bool striped=false)
 {
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD); ++i)
         combo->insertItem(i, i18n("Custom gradient %1", (i-APPEARANCE_CUSTOM1)+1));
@@ -459,6 +459,8 @@ static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=
             combo->insertItem(APPEARANCE_BEVELLED, i18n("Bevelled"));
             if(fade)
                 combo->insertItem(APPEARANCE_FADE, i18n("Fade out (popup menuitems)"));
+            else if(striped)
+                combo->insertItem(APPEARANCE_STRIPED, i18n("Striped"));
         }
     }
 }
@@ -687,7 +689,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(grooveAppearance);
     insertAppearanceEntries(sunkenAppearance);
     insertAppearanceEntries(menuitemAppearance, true, true, true);
-    insertAppearanceEntries(menuBgndAppearance);
+    insertAppearanceEntries(menuBgndAppearance, true, true, false, true);
     insertAppearanceEntries(titlebarAppearance, true, false);
     insertAppearanceEntries(inactiveTitlebarAppearance, true, false);
     insertAppearanceEntries(titlebarButtonAppearance);
@@ -695,7 +697,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(menuStripeAppearance, true, false);
     insertAppearanceEntries(sbarBgndAppearance);
     insertAppearanceEntries(sliderFill);
-    insertAppearanceEntries(bgndAppearance);
+    insertAppearanceEntries(bgndAppearance, true, true, false, true);
     insertAppearanceEntries(dwtAppearance);
     insertLineEntries(handles, true, true);
     insertLineEntries(sliderThumbs, true, false);
@@ -822,7 +824,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sunkenAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(progressGrooveColor, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(menuitemAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(menuBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(menuBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(menuBgndAppearanceChanged()));
     connect(titlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(inactiveTitlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarButtonAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -862,7 +864,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(windowDrag, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(bgndAppearanceChanged()));
     connect(bgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(menuBgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1220,12 +1222,14 @@ void QtCurveConfig::thinSbarGrooveChanged()
 {
     if(thinSbarGroove->isChecked())
         borderSbarGroove->setChecked(false);
+    updateChanged();
 }
 
 void QtCurveConfig::borderSbarGrooveChanged()
 {
     if(borderSbarGroove->isChecked())
         thinSbarGroove->setChecked(false);
+    updateChanged();
 }
 
 void QtCurveConfig::borderProgressChanged()
@@ -1235,18 +1239,35 @@ void QtCurveConfig::borderProgressChanged()
         squareProgress->setChecked(true);
         fillProgress->setChecked(true);
     }
+    updateChanged();
 }
 
 void QtCurveConfig::squareProgressChanged()
 {
     if(!fillProgress->isChecked() || !squareProgress->isChecked())
         borderProgress->setChecked(true);
+    updateChanged();
 }
 
 void QtCurveConfig::fillProgressChanged()
 {
     if(!fillProgress->isChecked() || !squareProgress->isChecked())
         borderProgress->setChecked(true);
+    updateChanged();
+}
+
+void QtCurveConfig::bgndAppearanceChanged()
+{
+    if(APPEARANCE_STRIPED==bgndAppearance->currentIndex())
+        bgndGrad->setCurrentIndex(GT_HORIZ);
+    updateChanged();
+}
+    
+void QtCurveConfig::menuBgndAppearanceChanged()
+{
+    if(APPEARANCE_STRIPED==bgndAppearance->currentIndex())
+        bgndGrad->setCurrentIndex(GT_HORIZ);
+    updateChanged();
 }
 
 void QtCurveConfig::setupStack()

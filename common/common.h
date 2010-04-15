@@ -191,6 +191,8 @@ typedef gchar ** Strings;
 #define QTC_MENU_STRIPE_SHADE (USE_LIGHTER_POPUP_MENU ? ORIGINAL_SHADE : 2)
 #define QTC_MENU_SEP_SHADE    (USE_LIGHTER_POPUP_MENU ? 4 : 3)
 
+#define QTC_BGND_STRIPE_SHADE 0.95
+
 #define QTC_SHADE(c, s) \
     (c>10 || c<0 || s>=NUM_STD_SHADES || s<0 \
         ? 1.0 \
@@ -211,6 +213,7 @@ typedef gchar ** Strings;
 #define IS_GLASS(A) (APPEARANCE_DULL_GLASS==(A) || APPEARANCE_SHINY_GLASS==(A))
 #define IS_CUSTOM(A) ((A)>=APPEARANCE_CUSTOM1 && (A)<(APPEARANCE_CUSTOM1+QTC_NUM_CUSTOM_GRAD))
 #define IS_FLAT(A)  (APPEARANCE_FLAT==(A) || APPEARANCE_RAISED==(A) || APPEARANCE_FADE==(A))
+#define IS_FLAT_BGND(A)  (APPEARANCE_FLAT==(A) || APPEARANCE_RAISED==(A))
 
 #ifdef __cplusplus
 #define MENUBAR_DARK_LIMIT 160
@@ -380,7 +383,7 @@ typedef gchar ** Strings;
 #define QTC_RINGS_SQUARE_LARGE_SIZE  120.0
 #define QTC_RINGS_SQUARE_SMALL_SIZE  100.0
 
-#define QTC_CUSTOM_BGND (!(IS_FLAT(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
+#define QTC_CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
 
 #define QTC_GLOW_PROG_ALPHA 0.55
 
@@ -606,6 +609,7 @@ typedef enum
     APPEARANCE_SPLIT_GRADIENT,
     APPEARANCE_BEVELLED,
         APPEARANCE_FADE, /* Only for poupmenu items! */
+        APPEARANCE_STRIPED = APPEARANCE_FADE, /* Only for windows  and menus */
         APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
         APPEARANCE_AGUA_MOD,
         APPEARANCE_LV_AGUA,
