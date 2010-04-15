@@ -1010,7 +1010,7 @@ static gboolean eqRect(GdkRectangle *a, GdkRectangle *b)
 
 static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
-    if(IS_FLAT(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
+    if(IS_FLAT_BGND(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
     {
         GdkColor *parentBg=getParentBgCol(widget);
 
@@ -2167,11 +2167,11 @@ static void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolea
     }
 }
 
-static cairo_surface_t *bgndImage=NULL;
-static cairo_surface_t *menuBgndImage=NULL;
-
 static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
 {
+    static cairo_surface_t *bgndImage=NULL;
+    static cairo_surface_t *menuBgndImage=NULL;
+
     bool useWindow=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
                                (IMG_FILE!=opts.bgndImage.type || 
                                 (opts.bgndImage.height==opts.menuBgndImage.height &&
@@ -2275,6 +2275,61 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
     }
 }
 
+#define STRIPE_OUTER(A, B, PART) (B.PART=((3*A.PART+B.PART)/4))
+static void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y, gint w, gint h, GdkColor *col,
+                            gboolean isWindow)
+{
+    GdkColor col2;
+
+    shade(&opts, col, &col2, QTC_BGND_STRIPE_SHADE);
+
+    cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x, y+4);
+    cairo_pattern_add_color_stop_rgb(pat, 0.0, QTC_CAIRO_COL(*col));
+    cairo_pattern_add_color_stop_rgb(pat, 0.25-0.0001, QTC_CAIRO_COL(*col));
+    cairo_pattern_add_color_stop_rgb(pat, 0.5, QTC_CAIRO_COL(col2));
+    cairo_pattern_add_color_stop_rgb(pat, 0.75-0.0001, QTC_CAIRO_COL(col2));
+    col2.red=(3*col->red+col2.red)/4;
+    col2.green=(3*col->green+col2.green)/4;
+    col2.blue=(3*col->blue+col2.blue)/4;
+    cairo_pattern_add_color_stop_rgb(pat, 0.25, QTC_CAIRO_COL(col2));
+    cairo_pattern_add_color_stop_rgb(pat, 0.5-0.0001, QTC_CAIRO_COL(col2));
+    cairo_pattern_add_color_stop_rgb(pat, 0.75, QTC_CAIRO_COL(col2));
+    cairo_pattern_add_color_stop_rgb(pat, 1.0, QTC_CAIRO_COL(col2));
+
+    cairo_pattern_set_extend(pat, CAIRO_EXTEND_REPEAT);
+    cairo_set_source(cr, pat);
+    cairo_rectangle(cr, x, y, w, h);
+    cairo_fill(cr);
+    cairo_pattern_destroy(pat);
+/*
+    TODO: Use image? Would this speed up drawing???
+    static cairo_surface_t *bgndStripedImage=NULL;
+    static GdkColor        bgndStripedImageColor;
+    static cairo_surface_t *menuBgndStripedImage=NULL;
+    static GdkColor        menuBgndStripedImageColor;
+
+    bool            useWindow=isWindow || (bgndStripedImage && *col==bgndStripedImageColor));
+    GdkColor        *imgCol=useWindow ? &bgndStripedImageColor : &menuBgndStripedImageColor;
+    cairo_surface_t **img=useWindow ? &bgndStripedImage : &menuBgndStripedImage;
+
+    if(!(*img) || *imgCol!=*col)
+    {
+        static const inst constSize=64;
+
+        GdkColor col2;
+        cairo_t  *ci;
+
+        shade(&opts, col, &col2, QTC_BGND_STRIPE_SHADE);
+
+        if(!(*img)
+            *img=cairo_image_surface_create(CAIRO_FORMAT_ARGB32, constSize, constSize);
+        ci=cairo_create(crImg);
+    }
+    cairo_set_source_surface(cr, *img, width-imgWidth, y+1);
+    cairo_paint(cr);
+*/
+}
+
 static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
                                gint x, gint y, gint width, gint height)
 {
@@ -2305,13 +2360,15 @@ debugDisplayWidget(widget, 20);
             clip.x=x, clip.y=-ypos, clip.width=width, clip.height=window->allocation.height;
             setCairoClipping(cr, &clip, NULL);
                     
-            if(IS_FLAT(opts.bgndAppearance))
+            if(IS_FLAT_BGND(opts.bgndAppearance))
             {
                 GdkColor *parent_col=getParentBgCol(widget);
 
                 if(parent_col)
                     drawAreaColor(cr, area, NULL, parent_col , x, -ypos, width, window->allocation.height);
             }
+            else if(APPEARANCE_STRIPED==opts.bgndAppearance)
+                drawStripedBgnd(cr, style, area,  x, -ypos, width, window->allocation.height, &style->bg[GTK_STATE_NORMAL], TRUE);
             else
             {
                 if(GT_HORIZ==opts.bgndGrad)
@@ -2351,7 +2408,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         qtcEntrySetup(widget);
 
     if((doEtch || ROUND_NONE!=opts.round) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-        if(!IS_FLAT(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height))
+        if(!IS_FLAT_BGND(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height))
             ;
         else
         {
@@ -3002,7 +3059,7 @@ debugDisplayWidget(widget, 3);
 #endif
 
     sanitizeSize(window, &width, &height);
-    if(IS_FLAT(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
     {
         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
                                            area, x, y, width, height);
@@ -3508,7 +3565,7 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("spinbutton"))
     {
-        if(IS_FLAT(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+        if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
         {
             gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
                                                GTK_STATE_INSENSITIVE==state
@@ -3896,7 +3953,7 @@ debugDisplayWidget(widget, 3);
                    /* if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && widget->parent && widget->parent->parent &&
                        GTK_IS_SCROLLED_WINDOW(widget->parent) && GTK_IS_NOTEBOOK(widget->parent->parent))
                         drawAreaModColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], QTC_TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
-                    else*/ if(IS_FLAT(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
+                    else*/ if(IS_FLAT_BGND(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
                                                               widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
                     {
                         if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
@@ -4134,7 +4191,7 @@ debugDisplayWidget(widget, 3);
                 inverted=!inverted;
 
 //             if((!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")) &&
-//                 IS_FLAT(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+//                 IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
 //             {
 //                 gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget),
 //                                                    GTK_STATE_INSENSITIVE==state
@@ -4221,7 +4278,7 @@ debugDisplayWidget(widget, 3);
                     col=&qtcPalette.background[2];
             }
 
-            if(!list && (IS_FLAT(opts.bgndAppearance) || !(widget &&
+            if(!list && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget &&
                                                            drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
                 && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
                 drawAreaColor(cr, area, NULL, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
@@ -4592,9 +4649,14 @@ debugDisplayWidget(widget, 3);
     {
         gboolean comboMenu=isComboMenu(widget);
 
-        if(!comboMenu && !IS_FLAT(opts.menuBgndAppearance))
-            drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                              &qtcPalette.menu, GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance, WIDGET_OTHER);
+        if(!comboMenu && !IS_FLAT_BGND(opts.menuBgndAppearance))
+        {
+            if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
+                drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu, FALSE);
+            else
+                drawBevelGradient(cr, style, area, NULL, x, y, width, height,
+                                  &qtcPalette.menu, GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance, WIDGET_OTHER);
+        }
         else if(USE_LIGHTER_POPUP_MENU)
             drawAreaColor(cr, area, NULL, &qtcPalette.menu, x, y, width, height);
 
@@ -4677,7 +4739,7 @@ debugDisplayWidget(widget, 3);
                           &qtcPalette.background[ORIGINAL_SHADE],
                           'h'==detail[0], FALSE, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
-//        if(IS_FLAT(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x, y, width, height))
+//        if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x, y, width, height))
 //        {
 //             drawAreaColor(cr, area, NULL, &style->bg[state], x, y, width, height);
 //             if(widget && IMG_NONE!=opts.bgndImage.type)
@@ -4700,7 +4762,7 @@ debugDisplayWidget(widget, 3);
     else
     {
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
-        if(IS_FLAT(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x+1, y+1, width-2, height-2))
+        if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x+1, y+1, width-2, height-2))
         {
             drawAreaColor(cr, area, NULL, &style->bg[state], x+1, y+1, width-2, height-2);
             if(widget && IMG_NONE!=opts.bgndImage.type)
@@ -6818,7 +6880,7 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
     int size=SIZE_GRIP_SIZE-2;
 
     /* Clear background */
-    if(IS_FLAT(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
     {
         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
         if(widget && IMG_NONE!=opts.bgndImage.type)
