@@ -7953,6 +7953,34 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(!kwin)
                     painter->fillRect(r, titleCols[QT_STD_BORDER]);
 
+                if(APPEARANCE_STRIPED==opts.bgndAppearance && opts.titlebarBlend)
+                {
+                    QColor col2(shade(itsBackgroundCols[ORIGINAL_SHADE], QTC_BGND_STRIPE_SHADE));
+
+                    if(!path.isEmpty())
+                    {
+                        painter->save();
+                        painter->setRenderHint(QPainter::Antialiasing, false);
+                        painter->setClipPath(path, Qt::IntersectClip);
+                    }
+                    else
+                        painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
+                    painter->setPen(QColor((3*itsBackgroundCols[ORIGINAL_SHADE].red()+col2.red())/4,
+                                           (3*itsBackgroundCols[ORIGINAL_SHADE].green()+col2.green())/4,
+                                           (3*itsBackgroundCols[ORIGINAL_SHADE].blue()+col2.blue())/4));
+
+                    for(int i=r.y()+r.height()-1; i>r.y()+8; i-=4)
+                    {
+                        painter->drawLine(r.x(), i, r.x()+r.width()-1, i);
+                        painter->drawLine(r.x(), i+2, r.x()+r.width()-1, i+2);
+                    }
+                    painter->setPen(col2);
+                    for(int i=r.y()+r.height()-2; i>r.y()+8; i-=4)
+                        painter->drawLine(r.x(), i, r.x()+r.width()-1, i);
+                    if(!path.isEmpty())
+                        painter->restore();
+                }
+                
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, path, true, false,
                                     widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active),
@@ -10009,7 +10037,11 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         if(/*sel && */(topTab || botTab || dwt || titleBar) && i==numStops-1)
         {
             if(titleBar)
+            {
                 col=itsBackgroundCols[ORIGINAL_SHADE];
+                if(APPEARANCE_STRIPED==opts.bgndAppearance)
+                    col.setAlphaF(0.0);
+            }
             else
             {
                 col=base;
