@@ -606,7 +606,7 @@ static QColor blendColors(const QColor &foreground, const QColor &background, do
 static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect, bool horizontal)
 {
     QColor          col(Qt::white);
-    QLinearGradient patternGradient(rect.topLeft(), rect.topLeft()+(horizontal ? QPoint(10, 0) : QPoint(0, 10)));
+    QLinearGradient patternGradient(rect.topLeft(), rect.topLeft()+(horizontal ? QPoint(STRIPE_WIDTH, 0) : QPoint(0, STRIPE_WIDTH)));
 
     col.setAlphaF(0.0);
     patternGradient.setColorAt(0.0, col);
