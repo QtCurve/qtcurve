@@ -4644,7 +4644,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                     if(tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
                     {
-                        if(QTC_CUSTOM_BGND && 0==opts.tabBgnd)
+                        if(!reverse && QTC_CUSTOM_BGND && 0==opts.tabBgnd) // Does not work for reverse :-(
                         {
                             QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
 
