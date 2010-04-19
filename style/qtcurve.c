@@ -1543,8 +1543,8 @@ static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, in
 
 static void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
 {
-    int endx=horizontal ? 10 :0,
-        endy=horizontal ? 0 : 10;
+    int endx=horizontal ? STRIPE_WIDTH :0,
+        endy=horizontal ? 0 : STRIPE_WIDTH;
 
     cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x+endx, y+endy);
 
@@ -2515,31 +2515,31 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                          GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height,
                          gboolean rev, gboolean isEntryProg)
 {
-    GdkRegion *region=NULL;
-    gboolean  horiz=isHorizontalProgressbar(widget);
-    int       wid=isEntryProg ? WIDGET_ENTRY_PROGRESSBAR : WIDGET_PROGRESSBAR;
+    GdkRegion                 *region=NULL;
+    GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
+                                    ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
+                                    : GTK_PROGRESS_LEFT_TO_RIGHT;
+    gboolean                  horiz=isHorizontalProgressbar(widget),
+                              revProg=GTK_PROGRESS_LEFT_TO_RIGHT!=orientation;
+    int                       wid=isEntryProg ? WIDGET_ENTRY_PROGRESSBAR : WIDGET_PROGRESSBAR,
+                              animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH;
 
     if(opts.fillProgress)
         x--, y--, width+=2, height+=2;
 
+    if(STRIPE_NONE!=opts.stripedProgress && opts.animatedProgress && (isEntryProg || QTC_IS_PROGRESS_BAR(widget)))
+    {
+        if(isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
+            qtc_animation_progressbar_add((gpointer)widget, isEntryProg);
+
+        animShift+=(revProg ? -1 : 1)*
+                    (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
+    }
+
     if(STRIPE_NONE!=opts.stripedProgress && STRIPE_FADE!=opts.stripedProgress)
     {
-        GdkRectangle              rect={x, y, width-2, height-2};
-        GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
-                                    ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
-                                    : GTK_PROGRESS_LEFT_TO_RIGHT;
-        gboolean                  revProg=GTK_PROGRESS_LEFT_TO_RIGHT!=orientation;
-        int                       animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH,
-                                  stripeOffset;
-
-        if(opts.animatedProgress && (isEntryProg || QTC_IS_PROGRESS_BAR(widget)))
-        {
-            if(isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
-                qtc_animation_progressbar_add((gpointer)widget, isEntryProg);
-
-            animShift+=(revProg ? -1 : 1)*
-                        (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
-        }
+        GdkRectangle rect={x, y, width-2, height-2};
+        int          stripeOffset;
 
         constrainRect(&rect, area);
         region=gdk_region_rectangle(&rect);
@@ -2582,9 +2582,9 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                     for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
                     {
                         GdkPoint  a[4]={ {x+stripeOffset+animShift,                               y},
-                                            {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
-                                            {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
-                                            {(x+stripeOffset+animShift)-height,                      y+height-1}};
+                                         {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
+                                         {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
+                                         {(x+stripeOffset+animShift)-height,                      y+height-1}};
                         GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
 
                         gdk_region_xor(region, inner_region);
@@ -2633,7 +2633,12 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         if(opts.stripedProgress && width>4 && height>4)
             if(STRIPE_FADE==opts.stripedProgress)
-                addStripes(cr, x, y, width, height, horiz);
+            {
+                int posMod=opts.animatedProgress ? STRIPE_WIDTH-animShift : 0,
+                    sizeMod=opts.animatedProgress ? (STRIPE_WIDTH*2) : 0;
+                addStripes(cr, x-(horiz ? posMod : 0), y-(horiz ? 0 : posMod),
+                                 width+(horiz ? sizeMod : 0), height+(horiz ? 0 : sizeMod), horiz);
+            }
             else
                 drawLightBevel(cr, style, new_state, NULL, region, x, y,
                                width, height, &itemCols[1],
