@@ -7963,7 +7963,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->setRenderHint(QPainter::Antialiasing, false);
                         painter->setClipPath(path, Qt::IntersectClip);
                     }
-                    else
+                    if(path.isEmpty() || !kwin)
                         painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
                     painter->setPen(QColor((3*itsBackgroundCols[ORIGINAL_SHADE].red()+col2.red())/4,
                                            (3*itsBackgroundCols[ORIGINAL_SHADE].green()+col2.green())/4,
