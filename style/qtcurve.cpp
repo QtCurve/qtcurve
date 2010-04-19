@@ -9935,9 +9935,9 @@ void QtCurveStyle::drawProgressBevelGradient(QPainter *p, const QRect &origRect,
     p->save();
     p->setClipRect(origRect, Qt::IntersectClip);
     p->drawTiledPixmap(fillRect, *pix);
-    p->restore();
     if(STRIPE_FADE==opts.stripedProgress && fillRect.width()>4 && fillRect.height()>4)
         addStripes(p, QPainterPath(), fillRect, !vertical);
+    p->restore();
 
     if(!inCache)
         delete pix;
