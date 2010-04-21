@@ -27,15 +27,15 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
 
 #ifdef __cplusplus
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-#define QTC_FLOAT_COLOR(VAL, COL) (VAL).COL##F()
-#define QTC_TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
+#define FLOAT_COLOR(VAL, COL) (VAL).COL##F()
+#define TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
 #else
-#define QTC_FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
-#define QTC_TO_COLOR(R, G, B) QColor(limit(R*255.0), limit(G*255.0), limit(B*255.0))
+#define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
+#define TO_COLOR(R, G, B) QColor(limit(R*255.0), limit(G*255.0), limit(B*255.0))
 #endif
 #else
 #define inline
-#define QTC_FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL*1.0)/65535.0))
+#define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL*1.0)/65535.0))
 static GdkColor qtcGdkColor(double r, double g, double b)
 {
     GdkColor col;
@@ -47,7 +47,7 @@ static GdkColor qtcGdkColor(double r, double g, double b)
     return col;
 }
 
-#define QTC_TO_COLOR(R, G, B) qtcGdkColor(R, G, B)
+#define TO_COLOR(R, G, B) qtcGdkColor(R, G, B)
 #endif
 
 static inline double ColorUtils_normalize(double a)
@@ -102,17 +102,17 @@ typedef struct
 static ColorUtils_HCY ColorUtils_HCY_fromColor(const color *color)
 {
     ColorUtils_HCY hcy;
-    double r = ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, red));
-    double g = ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, green));
-    double b = ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, blue));
+    double r = ColorUtils_HCY_gamma(FLOAT_COLOR(*color, red));
+    double g = ColorUtils_HCY_gamma(FLOAT_COLOR(*color, green));
+    double b = ColorUtils_HCY_gamma(FLOAT_COLOR(*color, blue));
 //     a = color.alphaF();
 
     // luma component
     hcy.y = ColorUtils_HCY_lumag(r, g, b);
 
     // hue component
-    double p = QTC_MAX(QTC_MAX(r, g), b);
-    double n = QTC_MIN(QTC_MIN(r, g), b);
+    double p = MAX(MAX(r, g), b);
+    double n = MIN(MIN(r, g), b);
     double d = 6.0 * (p - n);
     if (n == p)
         hcy.h = 0.0;
@@ -127,7 +127,7 @@ static ColorUtils_HCY ColorUtils_HCY_fromColor(const color *color)
     if (0.0 == hcy.y || 1.0 == hcy.y)
         hcy.c = 0.0;
     else
-        hcy.c = QTC_MAX( (hcy.y - n) / hcy.y, (p - hcy.y) / (1 - hcy.y) );
+        hcy.c = MAX( (hcy.y - n) / hcy.y, (p - hcy.y) / (1 - hcy.y) );
     return hcy;
 }
 
@@ -180,25 +180,25 @@ static color ColorUtils_HCY_toColor(ColorUtils_HCY *hcy)
 
     // return RGB channels in appropriate order
     if (_hs < 1.0)
-        return QTC_TO_COLOR(ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tn));
+        return TO_COLOR(ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tn));
     else if (_hs < 2.0)
-        return QTC_TO_COLOR(ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(tn));
+        return TO_COLOR(ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(tn));
     else if (_hs < 3.0)
-        return QTC_TO_COLOR(ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(to));
+        return TO_COLOR(ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(to));
     else if (_hs < 4.0)
-        return QTC_TO_COLOR(ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tp));
+        return TO_COLOR(ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tp));
     else if (_hs < 5.0)
-        return QTC_TO_COLOR(ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(tp));
+        return TO_COLOR(ColorUtils_HCY_igamma(to), ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(tp));
     else
-        return QTC_TO_COLOR(ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(to));
+        return TO_COLOR(ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(to));
 }
 
 // #ifndef __cplusplus
 static inline double ColorUtils_HCY_luma(const color *color)
 {
-    return ColorUtils_HCY_lumag(ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, red)),
-                                ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, green)),
-                                ColorUtils_HCY_gamma(QTC_FLOAT_COLOR(*color, blue)));
+    return ColorUtils_HCY_lumag(ColorUtils_HCY_gamma(FLOAT_COLOR(*color, red)),
+                                ColorUtils_HCY_gamma(FLOAT_COLOR(*color, green)),
+                                ColorUtils_HCY_gamma(FLOAT_COLOR(*color, blue)));
 }
 
 static inline double ColorUtils_mixQreal(double a, double b, double bias)
@@ -286,12 +286,12 @@ static color ColorUtils_mix(const color *c1, const color *c2, double bias)
     if (isnan(bias)) return *c1;
 
     {
-    double r = ColorUtils_mixQreal(QTC_FLOAT_COLOR(*c1, red),   QTC_FLOAT_COLOR(*c2, red),    bias);
-    double g = ColorUtils_mixQreal(QTC_FLOAT_COLOR(*c1, green), QTC_FLOAT_COLOR(*c2, green), bias);
-    double b = ColorUtils_mixQreal(QTC_FLOAT_COLOR(*c1, blue),  QTC_FLOAT_COLOR(*c2, blue),  bias);
-    /*double a = ColorUtils_mixQreal(QTC_FLOAT_COLOR(*c1, alpha),   QTC_FLOAT_COLOR(*c2, alpha),   bias);*/
+    double r = ColorUtils_mixQreal(FLOAT_COLOR(*c1, red),   FLOAT_COLOR(*c2, red),    bias);
+    double g = ColorUtils_mixQreal(FLOAT_COLOR(*c1, green), FLOAT_COLOR(*c2, green), bias);
+    double b = ColorUtils_mixQreal(FLOAT_COLOR(*c1, blue),  FLOAT_COLOR(*c2, blue),  bias);
+    /*double a = ColorUtils_mixQreal(FLOAT_COLOR(*c1, alpha),   FLOAT_COLOR(*c2, alpha),   bias);*/
 
-    return QTC_TO_COLOR(r, g, b);
+    return TO_COLOR(r, g, b);
     }
 }
 

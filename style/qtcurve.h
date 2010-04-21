@@ -44,10 +44,10 @@ typedef qulonglong QtcKey;
 
 // #ifdef QTC_KSTYLE
 // #include <kstyle.h>
-// #define QTC_BASE_STYLE KStyle
+// #define BASE_STYLE KStyle
 // #else
 #include <QCommonStyle>
-#define QTC_BASE_STYLE QCommonStyle
+#define BASE_STYLE QCommonStyle
 // #endif
 
 class QStyleOptionSlider;
@@ -96,7 +96,7 @@ class QtCurveStyle : public QCommonStyle
         ICN_RIGHT
     };
 
-#ifdef QTC_STYLE_SUPPORT
+#ifdef STYLE_SUPPORT
     QtCurveStyle(const QString &name=QString());
 #else
     QtCurveStyle();
@@ -112,7 +112,7 @@ class QtCurveStyle : public QCommonStyle
     void polishLayout(QLayout *layout);
 #endif
 
-    void unpolish(QApplication *app) { QTC_BASE_STYLE::unpolish(app); }
+    void unpolish(QApplication *app) { BASE_STYLE::unpolish(app); }
     void unpolish(QWidget *widget);
     bool eventFilter(QObject *object, QEvent *event);
     void timerEvent(QTimerEvent *event);
@@ -137,7 +137,7 @@ class QtCurveStyle : public QCommonStyle
     void drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const;
     void drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) const;
     void drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz,
-                       double fadeSizeStart=QTC_FADE_SIZE, double fadeSizeEnd=QTC_FADE_SIZE) const;
+                       double fadeSizeStart=FADE_SIZE, double fadeSizeEnd=FADE_SIZE) const;
     void drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset, const QColor *cols, int startOffset,
                    int dark, ELine type) const;
     void drawProgressBevelGradient(QPainter *p, const QRect &origRect, const QStyleOption *option, bool horiz,
@@ -170,7 +170,7 @@ class QtCurveStyle : public QCommonStyle
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
     void buildSplitPath(const QRect &r, int round, double radius, QPainterPath &tl, QPainterPath &br) const;
     void drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom=0,
-                    EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=QT_STD_BORDER) const;
+                    EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
                         ETitleBarButtons btn, const QColor &iconColor, const QColor &shadow, const QColor *btnCols, const QColor *bgndCols) const;
     void drawDwtControl(QPainter *p, const QFlags<State> &state, const QRect &rect, ETitleBarButtons btn, Icon icon,

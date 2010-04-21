@@ -22,7 +22,7 @@
 */
 
 #include <kdialog.h>
-#define QTC_CONFIG_DIALOG
+#define CONFIG_DIALOG
 #include "common.h"
 
 class KUrlRequester;

@@ -23,7 +23,7 @@
   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
   Boston, MA 02110-1301, USA.
  */
-#define QTC_DRAW_INTO_PIXMAPS
+#define DRAW_INTO_PIXMAPS
 
 #include <KDE/KLocale>
 #include <QBitmap>
@@ -37,14 +37,13 @@
 #include <QStyleOptionTitleBar>
 #include <QStyle>
 #include <KDE/KColorUtils>
-#ifdef QTC_DRAW_INTO_PIXMAPS
+#ifdef DRAW_INTO_PIXMAPS
 #include <KDE/KWindowSystem>
 #endif
 #include <qdesktopwidget.h>
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
 #include "qtcurvesizegrip.h"
-#define QTC_KWIN
 #include "common.h"
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
@@ -55,9 +54,9 @@
 #endif
 
 #if KDE_IS_VERSION(4, 3, 0)
-    #define QTC_COMPOSITING compositingActive()
+    #define COMPOSITING_ENABLED compositingActive()
 #else
-    #define QTC_COMPOSITING KWindowSystem::compositingActive()
+    #define COMPOSITING_ENABLED KWindowSystem::compositingActive()
 #endif
 
 namespace KWinQtCurve
@@ -66,7 +65,7 @@ namespace KWinQtCurve
 static const int constTitlePad=4;
 
 #if KDE_IS_VERSION(4, 3, 85)
-#define QTC_TAB_CLOSE_ICON_SIZE tabCloseIconSize(layoutMetric(LM_TitleHeight))
+#define TAB_CLOSE_ICON_SIZE tabCloseIconSize(layoutMetric(LM_TitleHeight))
 
 static const int constInvalidTab=-1;
 static const int constAddToEmpty=-2;
@@ -255,7 +254,7 @@ void QtCurveClient::activeChange()
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
-    bool                 compositing=QTC_COMPOSITING;
+    bool                 compositing=COMPOSITING_ENABLED;
     QPainter             painter(widget());
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
@@ -337,7 +336,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(outerBorder)
     {
-#ifdef QTC_DRAW_INTO_PIXMAPS
+#ifdef DRAW_INTO_PIXMAPS
         if(!compositing && !isPreview())
         {
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
@@ -365,7 +364,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
-#ifdef QTC_DRAW_INTO_PIXMAPS
+#ifdef DRAW_INTO_PIXMAPS
     if(!compositing && !isPreview())
     {
         QPixmap  tPix(32, titleBarHeight);
@@ -410,7 +409,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             if(i==tabCount - 1)
                 tabGeom.setWidth(allTabGeom.width() - tabGeom.width() * i + i - 1);
 
-            int iconSize(QTC_TAB_CLOSE_ICON_SIZE);
+            int iconSize(TAB_CLOSE_ICON_SIZE);
 
             if(0==i)
                 paintSeparator(&painter, tabGeom);
@@ -565,7 +564,7 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
                                 : textRect.adjusted(0, 1, 0, 1), 
                               alignment, str);
 
-            if (!isActive() && QTC_DARK_WINDOW_TEXT(color))
+            if (!isActive() && DARK_WINDOW_TEXT(color))
             {
                 //color.setAlpha((color.alpha() * 180) >> 8);
                 color=blendColors(color, bgnd, ((255 * 180) >> 8)/256.0);
@@ -656,7 +655,7 @@ QRegion QtCurveClient::getMask(int round, const QRect &r) const
             bool    roundBottom=!isShade() && Handler()->roundBottom();
 
 // #if KDE_IS_VERSION(4, 3, 0)
-//             if(!isPreview() && QTC_COMPOSITING)
+//             if(!isPreview() && COMPOSITING_ENABLED)
 //             {
 //                 QRegion mask(x+4, y, w-8, h);
 //
@@ -868,7 +867,7 @@ bool QtCurveClient::mouseMoveEvent(QMouseEvent *e)
 
         bool  showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);
         int   iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0;
-        QRect r(0, 0, geom.size().width()-(tabList.count() ? (QTC_TAB_CLOSE_ICON_SIZE+constTitlePad) : 0), geom.size().height());
+        QRect r(0, 0, geom.size().width()-(tabList.count() ? (TAB_CLOSE_ICON_SIZE+constTitlePad) : 0), geom.size().height());
 
         painter.save();
         painter.setRenderHint(QPainter::Antialiasing, true);
