@@ -3,6 +3,8 @@
 1. Add striped window and menu background options.
 2. Added options to not square frames and tab frames.
 3. Fix 'bleed' of progress stripes when using animated faded stripes.
+4. Dont etch window button icons unless not drawing the frame - doesn't look
+   good otherwise.
 
 1.3.1
 -----

@@ -145,6 +145,7 @@ void QtCurveButton::drawButton(QPainter *painter)
              sunken(isDown()),
              drawFrame(!(flags&TITLEBAR_BUTTON_NO_FRAME) &&
                        (itsHover || sunken || !(flags&TITLEBAR_BUTTON_HOVER_FRAME))),
+             drewFrame(false),
              iconForMenu(TITLEBAR_ICON_MENU_BUTTON==
                             Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon, 0L, 0L));
     QColor   buttonColor(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
@@ -211,6 +212,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(flags&TITLEBAR_BUTTON_COLOR && !(flags&TITLEBAR_BUTTON_COLOR_SYMBOL))
             opt.version=versionHack;
         Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
+        drewFrame=true;
     }
 
     if (MenuButton==type() && iconForMenu)
@@ -238,6 +240,9 @@ void QtCurveButton::drawButton(QPainter *painter)
         int           dX(r.x()+(r.width()-icon.width())/2),
                       dY(r.y()+(r.height()-icon.height())/2);
         EEffect       effect((EEffect)(style()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
+
+        if(EFFECT_ETCH==effect && drewFrame)
+            effect=EFFECT_SHADOW;
 
         if(flags&TITLEBAR_BUTTON_COLOR && flags&TITLEBAR_BUTTON_COLOR_SYMBOL &&
            (itsHover || !(flags&TITLEBAR_BUTTON_HOVER_SYMBOL)))
