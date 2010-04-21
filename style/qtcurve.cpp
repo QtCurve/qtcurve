@@ -2804,7 +2804,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 3;
         case PM_DefaultChildMargin:
             return isOOWidget(widget)
-                    ? /*opts.round>=ROUND_FULL && !opts.squareScrollViews
+                    ? /*opts.round>=ROUND_FULL && !(opts.square&SQUARE_SCROLLVIEW)
                         ?*/ 2
                         /*: 1*/
                     : 6;
@@ -2870,10 +2870,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if ((!opts.popupBorder || opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
                 return opts.gtkComboMenus ? (opts.borderMenuitems ? 2 : 1) : 0;
 
-            if ((!opts.gtkScrollViews || opts.squareScrollViews) && isKateView(widget))
-                return opts.squareScrollViews ? 1 : 0;
+            if ((!opts.gtkScrollViews || (opts.square&SQUARE_SCROLLVIEW)) && isKateView(widget))
+                return (opts.square&SQUARE_SCROLLVIEW) ? 1 : 0;
 
-            if (opts.squareScrollViews && widget &&
+            if ((opts.square&SQUARE_SCROLLVIEW) && widget &&
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
                 return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
@@ -3652,8 +3652,8 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     bool sv(isOOWidget(widget) ||
                             ::qobject_cast<const QAbstractScrollArea *>(widget) ||
                             (widget && widget->inherits("Q3ScrollView")) ||
-                            (opts.squareScrollViews && (isKateView(widget) || isKontactPreviewPane(widget)))),
-                        squareSv(sv && (opts.squareScrollViews || (widget && widget->isWindow()))),
+                            ((opts.square&SQUARE_SCROLLVIEW) && (isKateView(widget) || isKontactPreviewPane(widget)))),
+                        squareSv(sv && ((opts.square&SQUARE_SCROLLVIEW) || (widget && widget->isWindow()))),
                         inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
 
                     if(sv && (opts.etchEntry || squareSv || isOOWidget(widget)))
@@ -4626,7 +4626,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         }
         case PE_FrameTabWidget:
         {
-            int round(ROUNDED_ALL);
+            int round(opts.square&SQUARE_TAB_FRAME ? ROUNDED_NONE : ROUNDED_ALL);
 
             painter->save();
 
@@ -4670,7 +4670,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             painter->setClipRegion(QRegion(r).subtract(tabRect), Qt::IntersectClip);
                         }
 
-                        if(0==tw->currentIndex())
+                        if(!(opts.square&SQUARE_TAB_FRAME) && 0==tw->currentIndex())
                         {
                             bool reverse(Qt::RightToLeft==twf->direction);
 
@@ -4760,7 +4760,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 QColor color(hasCustomBackground && hasSolidBackground
                                 ? v4Opt->backgroundBrush.color()
                                 : palette.color(cg, QPalette::Highlight));
-                bool   square(opts.squareLvSelection && 
+                bool   square((opts.square&SQUARE_LISTVIEW_SELECTION) &&
                               (/*(!widget && r.height()<=40 && r.width()>=48) || */
                                (widget && !widget->inherits("KFilePlacesView") &&
                                 (qobject_cast<const QTreeView *>(widget) ||
@@ -6443,7 +6443,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.left()-1),
+                            int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME) ? 2 : 1) : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right()+1);
                             painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.bottom()-1, r, r2.bottom()-1);
@@ -6516,7 +6516,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.left()-1),
+                            int l(fixLeft ? r2.left()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME)? 2 : 1) : r2.left()-1),
                                 r(fixRight ? r2.right()-2 : r2.right());
                             painter->setPen(use[QT_STD_BORDER]);
                             painter->drawLine(l, r2.top()+1, r, r2.top()+1);
@@ -6581,7 +6581,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.top()-1),
+                            int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME)? 2 : 1) : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
                             painter->setPen(use[QT_STD_BORDER]);
@@ -6647,7 +6647,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         }
                         else
                         {
-                            int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT ? 2 : 1) : r2.top()-1),
+                            int t(firstTab ? r2.top()+(opts.round>ROUND_SLIGHT && !(opts.square&SQUARE_TAB_FRAME)? 2 : 1) : r2.top()-1),
                                 b(/*lastTab ? r2.bottom()-2 : */ r2.bottom()+1);
 
                             painter->setPen(use[QT_STD_BORDER]);
@@ -12225,6 +12225,9 @@ QPalette::ColorRole QtCurveStyle::getTextRole(const QWidget *w, const QPainter *
 
 int QtCurveStyle::getFrameRound(const QWidget *widget) const
 {
+    if(opts.square&SQUARE_FRAME)
+        return ROUNDED_NONE;
+        
     const QWidget *window=widget ? widget->window() : 0L;
 
     if(window)
@@ -12236,7 +12239,7 @@ int QtCurveStyle::getFrameRound(const QWidget *widget) const
             return ROUNDED_NONE;
     }
 
-    if(opts.squareEntry && widget && qobject_cast<const QLabel *>(widget))
+    if((opts.square&SQUARE_ENTRY) && widget && qobject_cast<const QLabel *>(widget))
         return ROUNDED_NONE;
 
     return ROUNDED_ALL;

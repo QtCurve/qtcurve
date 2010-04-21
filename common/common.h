@@ -497,6 +497,17 @@ typedef struct
 
 typedef enum
 {
+    SQUARE_NONE               = 0x0,
+    SQUARE_ENTRY              = 0x01,
+    SQUARE_PROGRESS           = 0x02,
+    SQUARE_SCROLLVIEW         = 0x04,
+    SQUARE_LISTVIEW_SELECTION = 0x08,
+    SQUARE_FRAME              = 0x10,
+    SQUARE_TAB_FRAME          = 0x20
+} ESquare;
+
+typedef enum
+{
     EFFECT_NONE,
     EFFECT_ETCH,
     EFFECT_SHADOW
@@ -960,7 +971,6 @@ typedef struct
                      smallRadio,
                      fillProgress,
                      comboSplitter,
-                     squareScrollViews,
                      highlightScrollViews,
                      sunkenScrollViews,
                      etchEntry,
@@ -986,21 +996,19 @@ typedef struct
                      xbar,
 #endif
                      forceAlternateLvCols,
-                     squareLvSelection,
                      invertBotTab,
                      menubarHiding,
                      statusbarHiding,
                      boldProgress,
                      coloredTbarMo,
                      borderSelection,
-                     squareProgress,
-                     squareEntry,
                      stripedSbar,
                      windowDrag;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
+    int              square;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     int              dwtSettings;
 #endif
@@ -1680,8 +1688,8 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
 {
     ERound r=opts->round;
 
-    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && opts->squareProgress) ||
-        (WIDGET_ENTRY==widget && opts->squareEntry) )
+    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && (opts->square&SQUARE_PROGRESS)) ||
+        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) )
         return ROUND_NONE;
 
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
@@ -1731,8 +1739,8 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
         r=ROUND_SLIGHT;
 
-    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && opts->squareProgress) ||
-        (WIDGET_ENTRY==widget && opts->squareEntry) )
+    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && (opts->square&SQUARE_PROGRESS)) ||
+        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) )
         return 0.0;
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))

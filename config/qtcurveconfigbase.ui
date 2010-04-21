@@ -200,6 +200,9 @@
      </widget>
      <widget class="QWidget" name="page">
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
@@ -241,6 +244,14 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="bgndImage">
+         <property name="whatsThis">
+          <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
+            &lt;ul&gt;&lt;li&gt;No background image - No image.&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders.&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;Square rings - 3 simple rounded sqaures.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_29">
          <property name="text">
@@ -256,34 +267,20 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Roundedness:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QComboBox" name="round">
-         <property name="whatsThis">
-          <string>Set how 'rounded' widgets can be. The 'max' round setting only applies to buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
           <string>Button effect:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="buttonEffect">
          <property name="whatsThis">
           <string>Control what effect should be applied to buttons, combo boxes, etc.</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="thinnerBtns">
          <property name="whatsThis">
           <string>Make buttons, and other widgets, slightly thinner.</string>
@@ -293,7 +290,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="7" column="1">
         <widget class="QCheckBox" name="etchEntry">
          <property name="whatsThis">
           <string>When the 'Button effect' is set to etched or shadowed, then this option controls whether line-edits and scrollviews (such as listviews and treeviews) should have an etched look.</string>
@@ -303,21 +300,21 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_25">
          <property name="text">
           <string>Focus rectangle:</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="8" column="1">
         <widget class="QComboBox" name="focus">
          <property name="whatsThis">
           <string>Controls how QtCurve indicates that a widget has keyboard focus.</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="2">
+       <item row="9" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string/>
@@ -369,21 +366,88 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="bgndImage">
-         <property name="whatsThis">
-          <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
-            &lt;ul&gt;&lt;li&gt;No background image - No image.&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders.&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;Square rings - 3 simple rounded sqaures.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_28">
+      <layout class="QFormLayout" name="formLayout_22">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>General setting:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="0" column="1">
+        <widget class="QComboBox" name="round">
+         <property name="whatsThis">
+          <string>Set how 'rounded' widgets can be. The 'max' round setting only applies to buttons.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_93">
+         <property name="text">
+          <string>Do not round:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
         <widget class="QCheckBox" name="squareEntry">
          <property name="whatsThis">
           <string>Controls whether text entry fields should respect the general round setting, or always be square.</string>
          </property>
          <property name="text">
-          <string>Square entries.</string>
+          <string>Entry fields</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="squareProgress">
+         <property name="whatsThis">
+          <string>Controls whether progress bars should respect the general round setting, or always be square.</string>
+         </property>
+         <property name="text">
+          <string>Progressbars</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="squareScrollViews">
+         <property name="whatsThis">
+          <string>Controls whether the frame of a scrollview should respect the general round setting, or always be square.</string>
+         </property>
+         <property name="text">
+          <string>Scrollable windows</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="squareLvSelection">
+         <property name="whatsThis">
+          <string>If enabled, then selected items in listviews and treeviews will be drawn with square edges, regardless of the general round setting.</string>
+         </property>
+         <property name="text">
+          <string>Listview selections</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QCheckBox" name="squareTabFrame">
+         <property name="whatsThis">
+          <string>Controls whether the frames of tab widgets should respect the general round setting, or always be square.</string>
+         </property>
+         <property name="text">
+          <string>Tab widget frames</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QCheckBox" name="squareFrame">
+         <property name="whatsThis">
+          <string>Controls whether general frames should respect the general round setting, or always be square.</string>
+         </property>
+         <property name="text">
+          <string>General frames</string>
          </property>
         </widget>
        </item>
@@ -911,7 +975,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_85">
          <property name="text">
           <string>Text:</string>
@@ -927,7 +991,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="8" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_12">
          <property name="spacing">
           <number>0</number>
@@ -953,16 +1017,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="8" column="1">
-        <widget class="QCheckBox" name="squareProgress">
-         <property name="whatsThis">
-          <string>Controls whether progress bars should respect the general round setting, or always be square.</string>
-         </property>
-         <property name="text">
-          <string>Always draw square - regardless of the general round setting.</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -1037,6 +1091,9 @@
      </widget>
      <widget class="QWidget" name="page_7">
       <layout class="QFormLayout" name="formLayout_8">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_19">
          <property name="text">
@@ -1132,16 +1189,6 @@
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QCheckBox" name="squareLvSelection">
-         <property name="whatsThis">
-          <string>If enabled, then selected items in listviews and treeviews will be drawn with square edges, regardless of the general round setting.</string>
-         </property>
-         <property name="text">
-          <string>Square</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
         <widget class="QCheckBox" name="borderSelection">
          <property name="whatsThis">
           <string>If enabled, then selected items in listviews and treeviews will be drawn with bordered edges - but only if they are set to be rounded as well.</string>
@@ -1151,14 +1198,14 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_48">
          <property name="text">
           <string>Lines between items:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="7" column="1">
         <widget class="QComboBox" name="lvLines">
          <property name="whatsThis">
           <string>Controls the style of lines drawn between items in a treeview.</string>
@@ -1186,16 +1233,6 @@
          </property>
          <property name="text">
           <string>Highlight on focus (KDE)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="squareScrollViews">
-         <property name="whatsThis">
-          <string>Controls whether the frame of a scrollview should respect the general round setting, or always be square.</string>
-         </property>
-         <property name="text">
-          <string>Always draw with a square frame - regardless of the general round setting.</string>
          </property>
         </widget>
        </item>
@@ -3582,8 +3619,6 @@
   <tabstop>bgndGrad</tabstop>
   <tabstop>bgndImage</tabstop>
   <tabstop>sunkenAppearance</tabstop>
-  <tabstop>round</tabstop>
-  <tabstop>squareEntry</tabstop>
   <tabstop>buttonEffect</tabstop>
   <tabstop>thinnerBtns</tabstop>
   <tabstop>etchEntry</tabstop>
@@ -3592,6 +3627,13 @@
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
   <tabstop>fadeLines</tabstop>
+  <tabstop>round</tabstop>
+  <tabstop>squareEntry</tabstop>
+  <tabstop>squareProgress</tabstop>
+  <tabstop>squareScrollViews</tabstop>
+  <tabstop>squareLvSelection</tabstop>
+  <tabstop>squareTabFrame</tabstop>
+  <tabstop>squareFrame</tabstop>
   <tabstop>framelessGroupBoxes</tabstop>
   <tabstop>groupBoxLine</tabstop>
   <tabstop>comboBtn</tabstop>
@@ -3627,7 +3669,6 @@
   <tabstop>progressGrooveAppearance</tabstop>
   <tabstop>progressGrooveColor</tabstop>
   <tabstop>borderProgress</tabstop>
-  <tabstop>squareProgress</tabstop>
   <tabstop>boldProgress_false</tabstop>
   <tabstop>boldProgress</tabstop>
   <tabstop>defBtnIndicator</tabstop>
@@ -3639,12 +3680,10 @@
   <tabstop>sortedLv</tabstop>
   <tabstop>customSortedLvColor</tabstop>
   <tabstop>selectionAppearance</tabstop>
-  <tabstop>squareLvSelection</tabstop>
   <tabstop>borderSelection</tabstop>
   <tabstop>lvLines</tabstop>
   <tabstop>gtkScrollViews</tabstop>
   <tabstop>highlightScrollViews</tabstop>
-  <tabstop>squareScrollViews</tabstop>
   <tabstop>activeTabAppearance</tabstop>
   <tabstop>highlightTab</tabstop>
   <tabstop>colorSelTab</tabstop>

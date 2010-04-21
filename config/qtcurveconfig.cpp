@@ -1277,6 +1277,7 @@ void QtCurveConfig::setupStack()
     int i=0;
     CStackItem *first=new CStackItem(stackList, i18n("Presets and Preview"), i++);
     new CStackItem(stackList, i18n("General"), i++);
+    new CStackItem(stackList, i18n("Rounding"), i++);
     new CStackItem(stackList, i18n("Group Boxes"), i++);
     new CStackItem(stackList, i18n("Combos"), i++);
     new CStackItem(stackList, i18n("Spin Buttons"), i++);
@@ -2269,7 +2270,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.shading=(EShading)shading->currentIndex();
     opts.gtkScrollViews=gtkScrollViews->isChecked();
     opts.highlightScrollViews=highlightScrollViews->isChecked();
-    opts.squareScrollViews=squareScrollViews->isChecked();
     opts.etchEntry=etchEntry->isChecked();
     opts.flatSbarButtons=flatSbarButtons->isChecked();
     opts.borderSbarGroove=borderSbarGroove->isChecked();
@@ -2305,14 +2305,13 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.coloredTbarMo=coloredTbarMo->isChecked();
     opts.borderSelection=borderSelection->isChecked();
     opts.forceAlternateLvCols=forceAlternateLvCols->isChecked();
-    opts.squareLvSelection=squareLvSelection->isChecked();
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
     opts.titlebarEffect=(EEffect)titlebarEffect->currentIndex();
     opts.titlebarIcon=(ETitleBarIcon)titlebarIcon->currentIndex();
     opts.dwtSettings=getDwtSettingsFlags();
     opts.crSize=getCrSize(crSize);
-    opts.squareEntry=squareEntry->isChecked();
-    opts.squareProgress=squareProgress->isChecked();
+    opts.square=getSquareFlags();
+
     opts.borderProgress=borderProgress->isChecked();
 
     if(customShading->isChecked())
@@ -2484,7 +2483,6 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     coloredTbarMo_false->setChecked(!opts.coloredTbarMo);
     borderSelection->setChecked(opts.borderSelection);
     forceAlternateLvCols->setChecked(opts.forceAlternateLvCols);
-    squareLvSelection->setChecked(opts.squareLvSelection);
     titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
     titlebarEffect->setCurrentIndex(opts.titlebarEffect);
     titlebarIcon->setCurrentIndex(opts.titlebarIcon);
@@ -2492,7 +2490,6 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     shading->setCurrentIndex(opts.shading);
     gtkScrollViews->setChecked(opts.gtkScrollViews);
     highlightScrollViews->setChecked(opts.highlightScrollViews);
-    squareScrollViews->setChecked(opts.squareScrollViews);
     etchEntry->setChecked(opts.etchEntry);
     flatSbarButtons->setChecked(opts.flatSbarButtons);
     borderSbarGroove->setChecked(opts.borderSbarGroove);
@@ -2527,12 +2524,17 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     framelessGroupBoxes->setChecked(opts.framelessGroupBoxes);
     customGradient=opts.customGradient;
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
+    borderProgress->setChecked(opts.borderProgress);
 
     setCrSize(crSize, opts.crSize);
-    squareEntry->setChecked(opts.squareEntry);
-    squareProgress->setChecked(opts.squareProgress);
-    borderProgress->setChecked(opts.borderProgress);
-    
+
+    squareLvSelection->setChecked(opts.square&SQUARE_LISTVIEW_SELECTION);
+    squareScrollViews->setChecked(opts.square&SQUARE_SCROLLVIEW);
+    squareEntry->setChecked(opts.square&SQUARE_ENTRY);
+    squareProgress->setChecked(opts.square&SQUARE_PROGRESS);
+    squareFrame->setChecked(opts.square&SQUARE_FRAME);
+    squareTabFrame->setChecked(opts.square&SQUARE_TAB_FRAME);
+
     if(opts.titlebarButtons&QTC_TITLEBAR_BUTTON_COLOR)
     {
         titlebarButtons_colorClose->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE));
@@ -2599,6 +2601,25 @@ int QtCurveConfig::getDwtSettingsFlags()
     if(dwtRoundTopOnly->isChecked())
         dwt|=QTC_DWT_ROUND_TOP_ONLY;
     return dwt;
+}
+
+int QtCurveConfig::getSquareFlags()
+{
+    int square(0);
+
+    if(squareEntry->isChecked())
+        square|=SQUARE_ENTRY;
+    if(squareProgress->isChecked())
+        square|=SQUARE_PROGRESS;
+    if(squareScrollViews->isChecked())
+        square|=SQUARE_SCROLLVIEW;
+    if(squareLvSelection->isChecked())
+        square|=SQUARE_LISTVIEW_SELECTION;
+    if(squareFrame->isChecked())
+        square|=SQUARE_FRAME;
+    if(squareTabFrame->isChecked())
+        square|=SQUARE_TAB_FRAME;
+    return square;
 }
 
 bool QtCurveConfig::diffTitleBarButtonColors(const Options &opts)
@@ -2713,19 +2734,15 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          coloredTbarMo->isChecked()!=opts.coloredTbarMo ||
          borderSelection->isChecked()!=opts.borderSelection ||
          forceAlternateLvCols->isChecked()!=opts.forceAlternateLvCols ||
-         squareLvSelection->isChecked()!=opts.squareLvSelection ||
          titlebarAlignment->currentIndex()!=opts.titlebarAlignment ||
          titlebarEffect->currentIndex()!=opts.titlebarEffect ||
          titlebarIcon->currentIndex()!=opts.titlebarIcon ||
          getCrSize(crSize)!=opts.crSize ||
-         squareEntry->isChecked()!=opts.squareEntry ||
-         squareProgress->isChecked()!=opts.squareProgress ||
          borderProgress->isChecked()!=opts.borderProgress ||
 
          shading->currentIndex()!=(int)opts.shading ||
          gtkScrollViews->isChecked()!=opts.gtkScrollViews ||
          highlightScrollViews->isChecked()!=opts.highlightScrollViews ||
-         squareScrollViews->isChecked()!=opts.squareScrollViews ||
          etchEntry->isChecked()!=opts.etchEntry ||
          flatSbarButtons->isChecked()!=opts.flatSbarButtons ||
          borderSbarGroove->isChecked()!=opts.borderSbarGroove ||
@@ -2754,6 +2771,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          getTitleBarButtonFlags()!=opts.titlebarButtons ||
 
          getDwtSettingsFlags()!=opts.dwtSettings ||
+         getSquareFlags()!=opts.square ||
 
          diffTitleBarButtonColors(opts) ||
          

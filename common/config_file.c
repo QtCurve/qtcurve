@@ -1491,7 +1491,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(smallRadio)
             QTC_CFG_READ_BOOL(fillProgress)
             QTC_CFG_READ_BOOL(comboSplitter)
-            QTC_CFG_READ_BOOL(squareScrollViews)
             QTC_CFG_READ_BOOL(highlightScrollViews)
             QTC_CFG_READ_BOOL(etchEntry)
             QTC_CFG_READ_INT_BOOL(splitterHighlight, opts->highlightFactor)
@@ -1509,17 +1508,28 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             QTC_CFG_READ_BOOL(colorSliderMouseOver)
             QTC_CFG_READ_BOOL(menuIcons)
             QTC_CFG_READ_BOOL(forceAlternateLvCols)
-            QTC_CFG_READ_BOOL(squareLvSelection)
             QTC_CFG_READ_BOOL(invertBotTab)
             QTC_CFG_READ_BOOL(menubarHiding)
             QTC_CFG_READ_BOOL(statusbarHiding)
             QTC_CFG_READ_BOOL(boldProgress)
             QTC_CFG_READ_BOOL(coloredTbarMo)
             QTC_CFG_READ_BOOL(borderSelection)
-            QTC_CFG_READ_BOOL(squareProgress)
-            QTC_CFG_READ_BOOL(squareEntry)
             QTC_CFG_READ_BOOL(stripedSbar)
             QTC_CFG_READ_BOOL(windowDrag)
+
+            if(version<QTC_MAKE_VERSION(1, 4))
+            {
+                opts->square=
+                    (readBoolEntry(cfg, "squareLvSelection", def->square&SQUARE_LISTVIEW_SELECTION) ? SQUARE_LISTVIEW_SELECTION : SQUARE_NONE)+
+                    (readBoolEntry(cfg, "squareScrollViews", def->square&SQUARE_SCROLLVIEW) ? SQUARE_SCROLLVIEW : SQUARE_NONE)+
+                    (readBoolEntry(cfg, "squareProgress", def->square&SQUARE_PROGRESS) ? SQUARE_PROGRESS : SQUARE_NONE)+
+                    (readBoolEntry(cfg, "squareEntry", def->square&SQUARE_ENTRY)? SQUARE_ENTRY : SQUARE_NONE);
+            }
+            else
+            {
+                QTC_CFG_READ_INT(square)
+            }
+
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             QTC_CFG_READ_BOOL(stdBtnSizes)
             QTC_CFG_READ_BOOL(titlebarBorder)
@@ -2003,7 +2013,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             opts->activeTabAppearance=MODIFY_AGUA(opts->activeTabAppearance);
             opts->menuitemAppearance=MODIFY_AGUA(opts->menuitemAppearance);
 
-            if(!opts->borderProgress && (!opts->fillProgress || !opts->squareProgress))
+            if(!opts->borderProgress && (!opts->fillProgress || !(opts->square&SQUARE_PROGRESS)))
                 opts->borderProgress=true;
 
 #ifdef __cplusplus
@@ -2187,7 +2197,6 @@ static void defaultSettings(Options *opts)
     opts->smallRadio=true;
     opts->fillProgress=true;
     opts->comboSplitter=false;
-    opts->squareScrollViews=false;
     opts->highlightScrollViews=false;
     opts->etchEntry=false;
     opts->flatSbarButtons=true;
@@ -2203,15 +2212,13 @@ static void defaultSettings(Options *opts)
     opts->colorSliderMouseOver=false;
     opts->menuIcons=true;
     opts->forceAlternateLvCols=false;
-    opts->squareLvSelection=false;
     opts->invertBotTab=true;
     opts->menubarHiding=false;
     opts->statusbarHiding=false;
     opts->boldProgress=true;
     opts->coloredTbarMo=false;
     opts->borderSelection=false;
-    opts->squareProgress=false;
-    opts->squareEntry=false;
+    opts->square=SQUARE_NONE;
     opts->stripedSbar=false;
     opts->windowDrag=false;
 #if defined QTC_CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -2881,7 +2888,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(smallRadio)
         CFG_WRITE_ENTRY(fillProgress)
         CFG_WRITE_ENTRY(comboSplitter)
-        CFG_WRITE_ENTRY(squareScrollViews)
         CFG_WRITE_ENTRY(highlightScrollViews)
         CFG_WRITE_ENTRY(etchEntry)
         CFG_WRITE_ENTRY_NUM(splitterHighlight)
@@ -2900,15 +2906,13 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(colorSliderMouseOver)
         CFG_WRITE_ENTRY(menuIcons)
         CFG_WRITE_ENTRY(forceAlternateLvCols)
-        CFG_WRITE_ENTRY(squareLvSelection)
+        CFG_WRITE_ENTRY_NUM(square)
         CFG_WRITE_ENTRY(invertBotTab)
         CFG_WRITE_ENTRY(menubarHiding)
         CFG_WRITE_ENTRY(statusbarHiding)
         CFG_WRITE_ENTRY(boldProgress)
         CFG_WRITE_ENTRY(coloredTbarMo)
         CFG_WRITE_ENTRY(borderSelection)
-        CFG_WRITE_ENTRY(squareProgress)
-        CFG_WRITE_ENTRY(squareEntry)
         CFG_WRITE_ENTRY(stripedSbar)
         CFG_WRITE_ENTRY(windowDrag)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
