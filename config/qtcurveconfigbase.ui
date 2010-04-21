@@ -226,7 +226,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_47">
          <property name="text">
-          <string>Background (KDE4 &amp; Gtk2):</string>
+          <string>Background:</string>
          </property>
         </widget>
        </item>
@@ -359,7 +359,7 @@
              <string>Controls whether horizontal and vertical lines should be drawn with fading ends.</string>
             </property>
             <property name="text">
-             <string>Draw fading lines (KDE4 &amp;&amp; Gtk2)</string>
+             <string>Draw fading lines</string>
             </property>
            </widget>
           </item>
@@ -565,7 +565,7 @@
           <string>In Gtk, the list that is attached to a combo-box appears in the same style as a popup-menu. KDE4 has the ability to mimic this look.</string>
          </property>
          <property name="text">
-          <string>Gtk-style (KDE4)</string>
+          <string>Gtk-style</string>
          </property>
         </widget>
        </item>
@@ -1174,7 +1174,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="textLabel1_8_2_4">
          <property name="text">
-          <string>Selection appearance (KDE4 &amp; Gtk2):</string>
+          <string>Selection appearance:</string>
          </property>
          <property name="wordWrap">
           <bool>false</bool>

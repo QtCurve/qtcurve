@@ -505,8 +505,8 @@ static void insertRoundEntries(QComboBox *combo)
     combo->insertItem(ROUND_NONE, i18n("Square"));
     combo->insertItem(ROUND_SLIGHT, i18n("Slightly rounded"));
     combo->insertItem(ROUND_FULL, i18n("Fully rounded"));
-    combo->insertItem(ROUND_EXTRA, i18n("Extra rounded (KDE4 & Gtk2)"));
-    combo->insertItem(ROUND_MAX, i18n("Max rounded (KDE4 & Gtk2)"));
+    combo->insertItem(ROUND_EXTRA, i18n("Extra rounded"));
+    combo->insertItem(ROUND_MAX, i18n("Max rounded"));
 }
 
 static void insertMouseOverEntries(QComboBox *combo)
@@ -572,7 +572,7 @@ static void insertFocusEntries(QComboBox *combo)
     combo->insertItem(FOCUS_STANDARD, i18n("Standard (dotted)"));
     combo->insertItem(FOCUS_RECTANGLE, i18n("Highlight color"));
     combo->insertItem(FOCUS_FULL, i18n("Highlight color (full size)"));
-    combo->insertItem(FOCUS_FILLED, i18n("Highlight color, and fill (Gtk2 & KDE4 only)"));
+    combo->insertItem(FOCUS_FILLED, i18n("Highlight color, and fill"));
     combo->insertItem(FOCUS_LINE, i18n("Line drawn with highlight color"));
 }
 
