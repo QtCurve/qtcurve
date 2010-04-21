@@ -2646,7 +2646,7 @@ static gboolean qtInit()
                                     "class \"GtkScrolledWindow\" style \""QTC_RC_SETTING"SV\"");
 
             /* Scrolled windows */
-            if(opts.squareScrollViews)
+            if((opts.square&SQUARE_SCROLLVIEW))
                 thickness=opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove ? 1 : 2;
             else if(opts.etchEntry)
                 thickness=3;

@@ -2783,7 +2783,7 @@ static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType sta
                                   int x, int y, int width, int height, int round, gboolean isLvSelection,
                                   double alpha, GdkColor *col, gboolean horiz)
 {
-    if((!isLvSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
+    if((!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)) && ROUND_NONE!=opts.round)
     {
         cairo_save(cr);
         cairo_new_path(cr);
@@ -2792,7 +2792,7 @@ static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType sta
     }
     drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height, col,
                            horiz, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
-    if((!isLvSelection || !opts.squareLvSelection) && ROUND_NONE!=opts.round)
+    if((!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)) && ROUND_NONE!=opts.round)
         cairo_restore(cr);
 }
 
@@ -2804,14 +2804,14 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
 
     drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, round, isLvSelection, alpha, col, TRUE);
 
-    if(opts.borderSelection && (!isLvSelection || !opts.squareLvSelection))
+    if(opts.borderSelection && (!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)))
     {
         double   xd=x+0.5,
                  yd=y+0.5,
                  alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
         int      xo=x, widtho=width;
     
-        if(isLvSelection && !opts.squareLvSelection && ROUNDED_ALL!=round)
+        if(isLvSelection && !(opts.square&SQUARE_LISTVIEW_SELECTION) && ROUNDED_ALL!=round)
         {
             if(!(round&ROUNDED_LEFT))
             {
@@ -4775,7 +4775,7 @@ debugDisplayWidget(widget, 3);
         }
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, NULL, x, y, width, height,
-                   NULL, menuScroll ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, QT_STD_BORDER);
+                   NULL, menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, QT_STD_BORDER);
     }
 
     QTC_CAIRO_END
@@ -4888,7 +4888,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean frame=!detail || 0==strcmp(detail, "frame"),
                  scrolledWindow=DETAIL("scrolled_window"),
                  viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
-                 drawSquare=!viewport && !scrolledWindow && !detail && !widget,
+                 drawSquare=(frame & opts.square&SQUARE_FRAME) || (!viewport && !scrolledWindow && !detail && !widget),
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
                             ? frame : isStatusBarFrame(widget);
 
@@ -4915,7 +4915,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                 if(scrolledWindow)
                 {
                     /* See code in qt_settings.c as to isMozill part */
-                    if(opts.squareScrollViews || isMozillaWidget(widget))
+                    if((opts.square&SQUARE_SCROLLVIEW) || isMozillaWidget(widget))
                     {
                         /* Flat style...
                         drawBorder(cr, style, state, area, NULL, x, y, width, height,
@@ -5053,9 +5053,9 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
         
     if(GTK_SHADOW_NONE!=shadow_type)
     {
-        int round=ROUNDED_ALL;
+        int round=opts.square&SQUARE_TAB_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
 
-        if(gap_x<=0)
+        if(!(opts.square&SQUARE_TAB_FRAME) && gap_x<=0)
             switch(gap_side)
             {
                 case GTK_POS_TOP:
@@ -5825,7 +5825,7 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y, rightPos ? 1 : 0);
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y, 2);
             }
-            if(opts.round>ROUND_SLIGHT)
+            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
                 if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
                     drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
                 else
@@ -5851,7 +5851,7 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-1, rightPos ? 1 : 0);
                 drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y+height-1, 2);
             }
-            if(opts.round>ROUND_SLIGHT)
+            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
                 if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
                     drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
                 else
@@ -5873,7 +5873,7 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x, y+gap_x+gap_width-2, 1);
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+gap_x+gap_width-1, 2);
             }
-            if(opts.round>ROUND_SLIGHT)
+            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
                 if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
                     drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x, y+1, 2);
                 else
@@ -5898,7 +5898,7 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
                 drawVLine(cr, QTC_CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-1, 2);
                 drawVLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x+gap_width-1, 2);
             }
-            if(opts.round>ROUND_SLIGHT)
+            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
                 if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
                     drawHLine(cr, QTC_CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
                 else
