@@ -35,8 +35,8 @@
 #include <dirent.h>
 #include <errno.h>
 
-#define QTC_READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
-#define QTC_RC_SETTING "QtC__"
+#define READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
+#define RC_SETTING "QtC__"
 
 #define toQtColor(col) \
     ((col&0xFF00)>>8)
@@ -58,7 +58,7 @@ static GdkColor setGdkColor(int r, int g, int b)
 }
 
 /*
-#define QTC_DEBUG
+#define DEBUG
 */
 
 static int strncmp_i(const char *s1, const char *s2, int num)
@@ -142,7 +142,7 @@ enum QtPallete
     PAL_ACTIVE,
     PAL_DISABLED,
     PAL_INACTIVE
-#ifndef QTC_READ_INACTIVE_PAL
+#ifndef READ_INACTIVE_PAL
         = PAL_ACTIVE
 #endif
     ,
@@ -181,7 +181,7 @@ struct QtData
     gboolean        qt4,
                     inactiveChangeSelectionColor,
                     debug;
-#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+#ifdef FIX_FIREFOX_LOCATION_BAR
     gboolean        isBrowser;
     int             fontSize;
 #endif
@@ -202,7 +202,7 @@ struct QtData
 #define DEFAULT_KDE_DIS_PAL \
 "disabled=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#c7c7c7^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
 
-#ifdef QTC_READ_INACTIVE_PAL
+#ifdef READ_INACTIVE_PAL
 #define DEFAULT_KDE_INACT_PAL \
 "inactive=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
 #endif
@@ -394,8 +394,8 @@ static int getMozillaVersion(int pid)
                             break;
                         }
                     ver=major && minor
-                        ? QTC_MAKE_VERSION(strtol(major, NULL, 10), strtol(minor, NULL, 10))
-                        : QTC_MAKE_VERSION(dot[-1]-'0', 0);
+                        ? MAKE_VERSION(strtol(major, NULL, 10), strtol(minor, NULL, 10))
+                        : MAKE_VERSION(dot[-1]-'0', 0);
                 }
             }
         }
@@ -429,11 +429,11 @@ static char * getKdeHome()
             kdeHome=env;
         else
         {
-            static char kdeHomeStr[QTC_MAX_FILENAME_LEN+1];
+            static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN+1];
 
             const char *home=getHome();
 
-            if(home && strlen(home)<(QTC_MAX_FILENAME_LEN-5))
+            if(home && strlen(home)<(MAX_CONFIG_FILENAME_LEN-5))
             {
                 sprintf(kdeHomeStr, "%s/.kde", home);
                 kdeHome=kdeHomeStr;
@@ -446,13 +446,13 @@ static char * getKdeHome()
 
 static char * themeFileSub(const char *prefix, const char *name, char **tmpStr, const char *sub)
 {
-    *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(sub)+1+strlen(name)+strlen(QTC_THEME_SUFFIX)+1);
+    *tmpStr=realloc(*tmpStr, strlen(prefix)+1+strlen(sub)+1+strlen(name)+strlen(THEME_SUFFIX)+1);
 
     if(*tmpStr)
     {
         struct stat st;
 
-        sprintf(*tmpStr, "%s/%s/%s%s", prefix, sub, name, QTC_THEME_SUFFIX);
+        sprintf(*tmpStr, "%s/%s/%s%s", prefix, sub, name, THEME_SUFFIX);
 
         if(0==stat(*tmpStr, &st))
             return *tmpStr;
@@ -463,10 +463,10 @@ static char * themeFileSub(const char *prefix, const char *name, char **tmpStr, 
 
 static char * themeFile(const char *prefix, const char *name, char **tmpStr)
 {
-    char *f=themeFileSub(prefix, name, tmpStr, QTC_THEME_DIR);
+    char *f=themeFileSub(prefix, name, tmpStr, THEME_DIR);
 
     if(!f)
-        f=themeFileSub(prefix, name, tmpStr, QTC_THEME_DIR4);
+        f=themeFileSub(prefix, name, tmpStr, THEME_DIR4);
 
     return f;
 }
@@ -627,7 +627,7 @@ typedef struct
           italic,
           fixedW;
     float size;
-    char  family[QTC_MAX_INPUT_LINE_LEN+1];
+    char  family[MAX_CONFIG_INPUT_LINE_LEN+1];
 } QtFontDetails;
 
 static void initFont(QtFontDetails *f, gboolean setFamily)
@@ -646,11 +646,11 @@ static void parseFontLine(const char *line, QtFontDetails *font)
 {
     int           n=-1;
     char          *l,
-                  fontLine[QTC_MAX_INPUT_LINE_LEN+1];
+                  fontLine[MAX_CONFIG_INPUT_LINE_LEN+1];
     QtFontDetails rc;
 
     initFont(&rc, FALSE);
-    memcpy(fontLine, line, QTC_MAX_INPUT_LINE_LEN+1);
+    memcpy(fontLine, line, MAX_CONFIG_INPUT_LINE_LEN+1);
     l=strtok(fontLine, "=");
 
     while(l)
@@ -725,7 +725,7 @@ static void setFont(QtFontDetails *font, int f)
             italicStr(font->italic),
             (int)font->size);
 
-#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+#ifdef FIX_FIREFOX_LOCATION_BAR
     if(FONT_GENERAL==f)
         qtSettings.fontSize=(int)(font->size);
 #endif
@@ -750,7 +750,7 @@ static void setFont(QtFontDetails *font, int f)
 #endif
 }
 
-#define QTC_MIX(a, b, bias) (a + ((b - a) * bias))
+#define MIX(a, b, bias) (a + ((b - a) * bias))
 GdkColor mixColors(const GdkColor *c1, const GdkColor *c2, double bias)
 {
     if (bias <= 0.0 || isnan(bias)) return *c1;
@@ -765,9 +765,9 @@ GdkColor mixColors(const GdkColor *c1, const GdkColor *c2, double bias)
              b2=c2->blue/65535.0;
     GdkColor col;
 
-    col.red=(int)(65535.0*QTC_MIX(r1, r2, bias));
-    col.green=(int)(65535.0*QTC_MIX(g1, g2, bias));
-    col.blue=(int)(65535.0*QTC_MIX(b1, b2, bias));
+    col.red=(int)(65535.0*MIX(r1, r2, bias));
+    col.green=(int)(65535.0*MIX(g1, g2, bias));
+    col.blue=(int)(65535.0*MIX(b1, b2, bias));
 
     return col;
     }
@@ -779,7 +779,7 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
     int           found=0,
                   colorsFound=0,
                   i;
-    char          line[QTC_MAX_INPUT_LINE_LEN+1];
+    char          line[MAX_CONFIG_INPUT_LINE_LEN+1];
     FILE          *f=fopen(rc, "r");
     QtFontDetails fonts[FONT_NUM_STD];
 
@@ -841,7 +841,7 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
     {
         int section=SECT_NONE;
 
-        while(found!=rd && NULL!=fgets(line, QTC_MAX_INPUT_LINE_LEN, f))
+        while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
             if(line[0]=='[')
             {
                 if(0==strncmp_i(line, "[Icons]", 7))
@@ -1045,7 +1045,7 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
             {
                 opts.contrast=readInt(line, 9);
                 if(opts.contrast>10 || opts.contrast<0)
-                    opts.contrast=QTC_DEFAULT_CONTRAST;
+                    opts.contrast=DEFAULT_CONTRAST;
                 found|=RD_CONTRAST;
             }
 #ifdef QTC_STYLE_SUPPORT
@@ -1215,7 +1215,7 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
 {
     const char    *home=absolute ? NULL : getHome();
     int           found=0;
-    char          line[QTC_MAX_INPUT_LINE_LEN+1];
+    char          line[MAX_CONFIG_INPUT_LINE_LEN+1];
     QtFontDetails font;
 
     initFont(&font, TRUE);
@@ -1234,7 +1234,7 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
         {
             int section=SECT_NONE;
 
-            while(found!=rd && NULL!=fgets(line, QTC_MAX_INPUT_LINE_LEN, f))
+            while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
                 if(line[0]=='[')
                 {
                     if(0==strncmp_i(line, "[Palette]", 9))
@@ -1265,7 +1265,7 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
                     parseQtColors(line, PAL_DISABLED);
                     found|=RD_DIS_PALETTE;
                 }
-#ifdef QTC_READ_INACTIVE_PAL
+#ifdef READ_INACTIVE_PAL
                 else if(SECT_PALETTE==section && rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE) &&
                         0==strncmp_i(line, "inactive=", 9))
                 {
@@ -1298,15 +1298,15 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
 
     if(rd&RD_ACT_PALETTE && !(found&RD_ACT_PALETTE))
     {
-        strncpy(line, DEFAULT_KDE_ACT_PAL, QTC_MAX_INPUT_LINE_LEN);
-        line[QTC_MAX_INPUT_LINE_LEN]='\0';
+        strncpy(line, DEFAULT_KDE_ACT_PAL, MAX_CONFIG_INPUT_LINE_LEN);
+        line[MAX_CONFIG_INPUT_LINE_LEN]='\0';
         parseQtColors(line, PAL_ACTIVE);
     }
 
     if(rd&RD_DIS_PALETTE && !(found&RD_DIS_PALETTE))
     {
-        strncpy(line, DEFAULT_KDE_DIS_PAL, QTC_MAX_INPUT_LINE_LEN);
-        line[QTC_MAX_INPUT_LINE_LEN]='\0';
+        strncpy(line, DEFAULT_KDE_DIS_PAL, MAX_CONFIG_INPUT_LINE_LEN);
+        line[MAX_CONFIG_INPUT_LINE_LEN]='\0';
         parseQtColors(line, PAL_DISABLED);
     }
 
@@ -1324,11 +1324,11 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
             qtSettings.colors[PAL_DISABLED][COLOR_SELECTED];
     }
 */
-#ifdef QTC_READ_INACTIVE_PAL
+#ifdef READ_INACTIVE_PAL
     if(rd&RD_INACT_PALETTE && !(found&RD_INACT_PALETTE))
     {
-        strncpy(line, DEFAULT_KDE_INACT_PAL, QTC_MAX_INPUT_LINE_LEN);
-        line[QTC_MAX_INPUT_LINE_LEN]='\0';
+        strncpy(line, DEFAULT_KDE_INACT_PAL, MAX_CONFIG_INPUT_LINE_LEN);
+        line[MAX_CONFIG_INPUT_LINE_LEN]='\0';
         parseQtColors(line, PAL_INACTIVE);
     }
 
@@ -1357,11 +1357,11 @@ static int qt_refs=0;
 
 static const char * kdeGlobals()
 {
-    static char kg[QTC_MAX_FILENAME_LEN+1]={'\0'};
+    static char kg[MAX_CONFIG_FILENAME_LEN+1]={'\0'};
 
     char *kdehome=getKdeHome();
 
-    if(kdehome && strlen(kdehome)<(QTC_MAX_FILENAME_LEN-strlen(KDEGLOBALS_FILE)))
+    if(kdehome && strlen(kdehome)<(MAX_CONFIG_FILENAME_LEN-strlen(KDEGLOBALS_FILE)))
         sprintf(kg, "%s"KDEGLOBALS_FILE, kdehome);
 
     return kg;
@@ -1652,18 +1652,18 @@ static char * getAppName()
 #define USER_CHROME_CSS  USER_CHROME_DIR"/"USER_CHROME_FILE
 #define MAX_DEFAULT_NAME 16+strlen(CSS_DEFAULT)+strlen(USER_CHROME_CSS)
 
-#define QTC_GUARD_STR      "Added by QtCurve -- do not remove"
-#define QTC_MENU_GUARD_STR "MenuColors, "QTC_GUARD_STR
+#define GUARD_STR      "Added by QtCurve -- do not remove"
+#define MENU_GUARD_STR "MenuColors, "GUARD_STR
 
 #define OLD_MENU_TEXT_STR "menubar > menu { color: HighlightText !important; } menubar > menu[_moz-menuactive=\"true\"] "\
                       "{ background-color : HighlightText !important; color: HighlightText !important; } "\
-                      "/* "QTC_GUARD_STR" */\n"
+                      "/* "GUARD_STR" */\n"
 #define MENU_TEXT_STR_FORMAT "menubar > menu { color: #%02x%02x%02x !important; } " \
                              "menubar > menu[_moz-menuactive=\"true\"][open=\"false\"] { color: #%02x%02x%02x !important; } "\
                              "menubar > menu[_moz-menuactive=\"true\"][open=\"true\"] { color: #%02x%02x%02x !important; } "\
-                             "/* "QTC_MENU_GUARD_STR" */\n"
-#define CSS_FILE_STR     "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve.css\"); /* "QTC_GUARD_STR" */\n"
-#define BTN_CSS_FILE_STR "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve-KDEButtonOrder.css\"); /* "QTC_GUARD_STR" */\n"
+                             "/* "MENU_GUARD_STR" */\n"
+#define CSS_FILE_STR     "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve.css\"); /* "GUARD_STR" */\n"
+#define BTN_CSS_FILE_STR "@import url(\"file://"QTC_MOZILLA_DIR"/QtCurve-KDEButtonOrder.css\"); /* "GUARD_STR" */\n"
 
 static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_menu_colors)
 {
@@ -1739,7 +1739,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
 #endif
                     if(0==strcmp(line, OLD_MENU_TEXT_STR))
                         write_line=FALSE, remove_old_menu_colors=TRUE;
-                    else if(NULL!=strstr(line, QTC_MENU_GUARD_STR))
+                    else if(NULL!=strstr(line, MENU_GUARD_STR))
                     {
                         if (add_menu_colors)
                         {
@@ -2011,7 +2011,7 @@ static gboolean checkFileVersion(const char *fname, const char *versionStr, int 
             static const int constVLen=32;
 
             char line[constVLen+1];
-            int  numChars=QTC_MIN(constVLen, versionStrLen-1);
+            int  numChars=MIN(constVLen, versionStrLen-1);
 
             diff=NULL==fgets(line, numChars+1, f) || memcmp(versionStr, line, numChars);
         }
@@ -2090,7 +2090,7 @@ static gboolean qtInit()
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
             qtSettings.debug=getenv("QTCURVE_DEBUG");
-            opts.contrast=QTC_DEFAULT_CONTRAST;
+            opts.contrast=DEFAULT_CONTRAST;
 
             lastRead=now;
 
@@ -2140,9 +2140,9 @@ static gboolean qtInit()
             }
 
             /* Is the user using a non-default QtCurve style? */
-            if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, QTC_THEME_PREFIX))
+            if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, THEME_PREFIX))
             {
-#ifdef QTC_DEBUG
+#ifdef DEBUG
                 printf("Look for themerc file for %s\n", qtSettings.styleName);
 #endif
                 rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
@@ -2179,7 +2179,7 @@ static gboolean qtInit()
                          mozThunderbird=!thunderbird && !firefox && isMozApp(qtSettings.appName, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(qtSettings.appName, "seamonkey");
 
-#ifdef QTC_FIX_FIREFOX_LOCATION_BAR
+#ifdef FIX_FIREFOX_LOCATION_BAR
                 qtSettings.isBrowser=firefox;
 #endif
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
@@ -2194,15 +2194,15 @@ static gboolean qtInit()
                                              (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) ),
                              add_btn_css=
 #ifdef QTC_MODIFY_MOZILLA
-                                              mozVersion<QTC_MAKE_VERSION(3, 0) && !opts.gtkButtonOrder;
+                                              mozVersion<MAKE_VERSION(3, 0) && !opts.gtkButtonOrder;
 #else
                                               FALSE;
 #endif
 
                     if(firefox)
                     {
-                        processMozillaApp(mozVersion<QTC_MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
-                        if(mozVersion>=QTC_MAKE_VERSION(3, 5) && 0==strcmp(qtSettings.appName, "firefox-3.5"))
+                        processMozillaApp(mozVersion<MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
+                        if(mozVersion>=MAKE_VERSION(3, 5) && 0==strcmp(qtSettings.appName, "firefox-3.5"))
                             processMozillaApp(FALSE, add_menu_colors, "firefox-3.5", TRUE);
                     }
                     else if(thunderbird)
@@ -2216,10 +2216,10 @@ static gboolean qtInit()
                                     ? GTK_APP_NEW_MOZILLA :
 #endif
                                     GTK_APP_MOZILLA;
-                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>QTC_MAKE_VERSION(2, 0))
+                    if(GTK_APP_MOZILLA==qtSettings.app && mozVersion>MAKE_VERSION(2, 0))
                         qtSettings.app=GTK_APP_NEW_MOZILLA;
                     if(GTK_APP_NEW_MOZILLA!=qtSettings.app && APPEARANCE_FADE==opts.menuitemAppearance &&
-                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<QTC_MAKE_VERSION(2, 0))))
+                       (thunderbird || mozThunderbird || (seamonkey && mozVersion<MAKE_VERSION(2, 0))))
                         opts.menuitemAppearance=APPEARANCE_FLAT;
                 }
                 else if(0==strcmp(qtSettings.appName, "soffice.bin"))
@@ -2267,15 +2267,15 @@ static gboolean qtInit()
             {
                 /* KDE's "apply colors to non-KDE apps" messes up firefox, (and progress bar text) so need to fix this! */
                 /* ...and inactive highlight!!! */
-                static const char *format="style \""QTC_RC_SETTING"MTxt\""
+                static const char *format="style \""RC_SETTING"MTxt\""
                                           " {fg[ACTIVE]=\"#%02X%02X%02X\""
                                           " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
-                                          " style \""QTC_RC_SETTING"PTxt\""
+                                          " style \""RC_SETTING"PTxt\""
                                           " {fg[ACTIVE]=\"#%02X%02X%02X\""
                                           " fg[PRELIGHT]=\"#%02X%02X%02X\"}"
-                                          " class \"*MenuItem\" style \""QTC_RC_SETTING"MTxt\" "
-                                          " widget_class \"*.*MenuItem*\" style \""QTC_RC_SETTING"MTxt\" "
-                                          " widget_class \"*.*ProgressBar\" style \""QTC_RC_SETTING"PTxt\"";
+                                          " class \"*MenuItem\" style \""RC_SETTING"MTxt\" "
+                                          " widget_class \"*.*MenuItem*\" style \""RC_SETTING"MTxt\" "
+                                          " widget_class \"*.*ProgressBar\" style \""RC_SETTING"PTxt\"";
                 tmpStr=(char *)realloc(tmpStr, strlen(format));
 
                 if(tmpStr)
@@ -2302,10 +2302,10 @@ static gboolean qtInit()
 
             if(qtSettings.inactiveChangeSelectionColor)
             {
-                static const char *format="style \""QTC_RC_SETTING"HlFix\" "
+                static const char *format="style \""RC_SETTING"HlFix\" "
                                           "{base[ACTIVE]=\"#%02X%02X%02X\"}"
                                           //" text[ACTIVE]=\"#%02X%02X%02X\"}"
-                                          "class \"*\" style \""QTC_RC_SETTING"HlFix\"";
+                                          "class \"*\" style \""RC_SETTING"HlFix\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(format));
 
@@ -2336,16 +2336,16 @@ static gboolean qtInit()
                is drawn :-(  Fix/hack this by making that background the correct color */
             if(USE_LIGHTER_POPUP_MENU)
             {
-                static const char *format="style \""QTC_RC_SETTING"Mnu\" "
+                static const char *format="style \""RC_SETTING"Mnu\" "
                                           "{bg[NORMAL]=\"#%02X%02X%02X\"} "
-                                          "class \"GtkMenu\" style \""QTC_RC_SETTING"Mnu\"";
+                                          "class \"GtkMenu\" style \""RC_SETTING"Mnu\"";
                 tmpStr=(char *)realloc(tmpStr, strlen(format)+32);
 
                 if(tmpStr)
                 {
                     GdkColor col;
 
-                    shade(&opts, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, QTC_TO_FACTOR(opts.lighterPopupMenuBgnd));
+                    shade(&opts, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, TO_FACTOR(opts.lighterPopupMenuBgnd));
                     sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
                     gtk_rc_parse_string(tmpStr);
                 }
@@ -2419,26 +2419,26 @@ static gboolean qtInit()
                     g_object_set(settings, "gtk-font-name", qtSettings.fonts[FONT_GENERAL], NULL);
 
                 gtk_settings_set_long_property(settings, "gtk-toolbar-style", qtSettings.toolbarStyle, "KDE-Settings");
-#ifdef QTC_DEBUG
+#ifdef DEBUG
                 printf("gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
 #endif
                 if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
                 {
-#ifdef QTC_DEBUG
+#ifdef DEBUG
                     printf("gtk-button-images %d\n", qtSettings.buttonIcons);
 #endif
                     gtk_settings_set_long_property(settings, "gtk-button-images", qtSettings.buttonIcons, "KDE-Settings");
 #if 0
                     if(opts.drawStatusBarFrames)
-                        gtk_rc_parse_string("style \""QTC_RC_SETTING"StBar\""
+                        gtk_rc_parse_string("style \""RC_SETTING"StBar\""
                                             "{ GtkStatusbar::shadow-type = 1 }" /*GtkStatusbar::has-resize-grip = FALSE }" */
                                             "class \"GtkStatusbar\" style"
-                                            " \""QTC_RC_SETTING"StBar\"");
+                                            " \""RC_SETTING"StBar\"");
                     else
-                        gtk_rc_parse_string("style \""QTC_RC_SETTING"SBar\""
+                        gtk_rc_parse_string("style \""RC_SETTING"SBar\""
                                             "{ GtkStatusbar::shadow-type = 0 }" /*GtkStatusbar::has-resize-grip = FALSE }" */
                                             "class \"GtkStatusbar\" style"
-                                            " \""QTC_RC_SETTING"SBar\"");
+                                            " \""RC_SETTING"SBar\"");
 #endif
                 }
 
@@ -2449,8 +2449,8 @@ static gboolean qtInit()
 
             if(qtSettings.fonts[FONT_GENERAL])
             {
-                static const char *constFormat="style \""QTC_RC_SETTING"Fnt\" {font_name=\"%s\"} "
-                                               "widget_class \"*\" style \""QTC_RC_SETTING"Fnt\" ";
+                static const char *constFormat="style \""RC_SETTING"Fnt\" {font_name=\"%s\"} "
+                                               "widget_class \"*\" style \""RC_SETTING"Fnt\" ";
                 tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.fonts[FONT_GENERAL])+1);
 
                 sprintf(tmpStr, constFormat, qtSettings.fonts[FONT_GENERAL]);
@@ -2459,16 +2459,16 @@ static gboolean qtInit()
 
             if(qtSettings.fonts[FONT_BOLD] && qtSettings.fonts[FONT_GENERAL] && strcmp(qtSettings.fonts[FONT_BOLD], qtSettings.fonts[FONT_GENERAL]))
             {
-                static const char *constBoldPrefix="style \""QTC_RC_SETTING"BFnt\"{font_name=\"";
-                static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""QTC_RC_SETTING"BFnt\" "
-                                                   "widget_class \"*GtkProgress*\" style \""QTC_RC_SETTING"BFnt\" ";
+                static const char *constBoldPrefix="style \""RC_SETTING"BFnt\"{font_name=\"";
+                static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""RC_SETTING"BFnt\" "
+                                                   "widget_class \"*GtkProgress*\" style \""RC_SETTING"BFnt\" ";
 
                 if(opts.framelessGroupBoxes)
                 {
-                    static const char *constStdPrefix="style \""QTC_RC_SETTING"Fnt\"{font_name=\"";
+                    static const char *constStdPrefix="style \""RC_SETTING"Fnt\"{font_name=\"";
                     static const char *constStdSuffix="\"} ";
-                    static const char *constGrpBoxBoldSuffix="widget_class \"*Frame.GtkLabel\" style \""QTC_RC_SETTING"BFnt\" "
-                                                             "widget_class \"*Statusbar.*Frame.GtkLabel\" style \""QTC_RC_SETTING"Fnt\"";
+                    static const char *constGrpBoxBoldSuffix="widget_class \"*Frame.GtkLabel\" style \""RC_SETTING"BFnt\" "
+                                                             "widget_class \"*Statusbar.*Frame.GtkLabel\" style \""RC_SETTING"Fnt\"";
                     tmpStr=(char *)realloc(tmpStr, strlen(constStdPrefix)+strlen(qtSettings.fonts[FONT_GENERAL])+strlen(constStdSuffix)+
                                                    strlen(constBoldPrefix)+strlen(qtSettings.fonts[FONT_BOLD])+
                                                    (opts.boldProgress ? strlen(constBoldSuffix) : strlen(constStdSuffix))+
@@ -2490,8 +2490,8 @@ static gboolean qtInit()
 
             if(qtSettings.fonts[FONT_MENU] && qtSettings.fonts[FONT_GENERAL] && strcmp(qtSettings.fonts[FONT_MENU], qtSettings.fonts[FONT_GENERAL]))
             {
-                static const char *constFormat="style \""QTC_RC_SETTING"MFnt\" {font_name=\"%s\"} "
-                                               "widget_class \"*.*MenuItem.*\" style \""QTC_RC_SETTING"MFnt\" ";
+                static const char *constFormat="style \""RC_SETTING"MFnt\" {font_name=\"%s\"} "
+                                               "widget_class \"*.*MenuItem.*\" style \""RC_SETTING"MFnt\" ";
                 tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.fonts[FONT_MENU])+1);
 
                 sprintf(tmpStr, constFormat, qtSettings.fonts[FONT_MENU]);
@@ -2500,8 +2500,8 @@ static gboolean qtInit()
 
             if(qtSettings.fonts[FONT_TOOLBAR] && qtSettings.fonts[FONT_GENERAL] && strcmp(qtSettings.fonts[FONT_TOOLBAR], qtSettings.fonts[FONT_GENERAL]))
             {
-                static const char *constFormat="style \""QTC_RC_SETTING"TbFnt\" {font_name=\"%s\"} "
-                                               "widget_class \"*.*Toolbar.*\" style \""QTC_RC_SETTING"TbFnt\" ";
+                static const char *constFormat="style \""RC_SETTING"TbFnt\" {font_name=\"%s\"} "
+                                               "widget_class \"*.*Toolbar.*\" style \""RC_SETTING"TbFnt\" ";
                 tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.fonts[FONT_TOOLBAR])+1);
 
                 sprintf(tmpStr, constFormat, qtSettings.fonts[FONT_TOOLBAR]);
@@ -2509,8 +2509,8 @@ static gboolean qtInit()
             }
 
             if(opts.thinnerMenuItems)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Mi\" {xthickness = 1 ythickness = 2 } "
-                                    "class \"*MenuItem\" style \""QTC_RC_SETTING"Mi\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Mi\" {xthickness = 1 ythickness = 2 } "
+                                    "class \"*MenuItem\" style \""RC_SETTING"Mi\"");
 
             /* Set password character... */
 /*
@@ -2524,18 +2524,18 @@ static gboolean qtInit()
 */
             /* For some reason Firefox 3beta4 goes mad if GtkComboBoxEntry::appears-as-list = 1 !!!! */
             if(isMozilla())
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Mz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \""QTC_RC_SETTING"Mz\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \""RC_SETTING"Mz\"");
 
             if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
                 opts.scrollbarType=SCROLLBAR_WINDOWS;
             else
             {
-                static const char *constSbStrFormat="style \""QTC_RC_SETTING"SBt\" "
+                static const char *constSbStrFormat="style \""RC_SETTING"SBt\" "
                                                     "{ GtkScrollbar::has-backward-stepper=%d "
                                                       "GtkScrollbar::has-forward-stepper=%d "
                                                       "GtkScrollbar::has-secondary-backward-stepper=%d "
                                                       "GtkScrollbar::has-secondary-forward-stepper=%d } "
-                                                    "class \"*\" style \""QTC_RC_SETTING"SBt\"";
+                                                    "class \"*\" style \""RC_SETTING"SBt\"";
                 tmpStr=(char *)realloc(tmpStr, strlen(constSbStrFormat)+1);
 
                 if(GTK_APP_OPEN_OFFICE==qtSettings.app)
@@ -2571,10 +2571,10 @@ static gboolean qtInit()
 
             /* Set cursor colours... */
             { /* C-Scope */
-                static const char *constStrFormat="style \""QTC_RC_SETTING"Crsr\" "
+                static const char *constStrFormat="style \""RC_SETTING"Crsr\" "
                                                     "{ GtkWidget::cursor-color=\"#%02X%02X%02X\" "
                                                       "GtkWidget::secondary-cursor-color=\"#%02X%02X%02X\" } "
-                                                    "class \"*\" style \""QTC_RC_SETTING"Crsr\"";
+                                                    "class \"*\" style \""RC_SETTING"Crsr\"";
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
 
                 sprintf(tmpStr, constStrFormat, qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red>>8,
@@ -2595,10 +2595,10 @@ static gboolean qtInit()
 
             {
                 {
-                static const char *constStrFormat="style \""QTC_RC_SETTING"Etch2\" " \
+                static const char *constStrFormat="style \""RC_SETTING"Etch2\" " \
                                         "{ xthickness = 3 ythickness = %d} " \
-                                        "class \"*Button\" style \""QTC_RC_SETTING"Etch2\"" \
-                                        "class \"*GtkOptionMenu\" style \""QTC_RC_SETTING"Etch2\"";
+                                        "class \"*Button\" style \""RC_SETTING"Etch2\"" \
+                                        "class \"*GtkOptionMenu\" style \""RC_SETTING"Etch2\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+2);
                 sprintf(tmpStr, constStrFormat, opts.thinnerBtns || !doEffect ? 1 : 2);
@@ -2606,14 +2606,14 @@ static gboolean qtInit()
                 }
 
                 {
-                static const char *constStrFormat="style \""QTC_RC_SETTING"EtchE\" "
+                static const char *constStrFormat="style \""RC_SETTING"EtchE\" "
                                         "{ xthickness = %d ythickness = %d } "
-                                        "style \""QTC_RC_SETTING"EtchS\" "
+                                        "style \""RC_SETTING"EtchS\" "
                                         "{ xthickness = %d ythickness = %d } "
-                                        "widget_class \"*Toolbar*GtkSpinButton\" style \""QTC_RC_SETTING"EtchE\" "
-                                        "class \"*GtkEntry\" style  \""QTC_RC_SETTING"EtchE\" "
-                                        "widget_class \"*Toolbar*Entry\" style \""QTC_RC_SETTING"EtchE\" "
-                                        "class \"*GtkSpinButton\" style \""QTC_RC_SETTING"EtchS\" ";
+                                        "widget_class \"*Toolbar*GtkSpinButton\" style \""RC_SETTING"EtchE\" "
+                                        "class \"*GtkEntry\" style  \""RC_SETTING"EtchE\" "
+                                        "widget_class \"*Toolbar*Entry\" style \""RC_SETTING"EtchE\" "
+                                        "class \"*GtkSpinButton\" style \""RC_SETTING"EtchS\" ";
 
                 int thick=/*opts.etchEntry && doEffect ?*/ 4 /*: 3*/;
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
@@ -2623,10 +2623,10 @@ static gboolean qtInit()
 
                 if(isMozilla())
                 {
-                    static const char *constStrFormat="style \""QTC_RC_SETTING"EtchEM\" "
+                    static const char *constStrFormat="style \""RC_SETTING"EtchEM\" "
                         "{ xthickness = %d ythickness = %d } "
-                        "widget_class \"*GtkFixed*GtkSpinButton\" style \""QTC_RC_SETTING"EtchEM\" "
-                        "widget_class \"*GtkFixed*Entry\" style \""QTC_RC_SETTING"EtchEM\" ";
+                        "widget_class \"*GtkFixed*GtkSpinButton\" style \""RC_SETTING"EtchEM\" "
+                        "widget_class \"*GtkFixed*Entry\" style \""RC_SETTING"EtchEM\" ";
 
                     int thick=opts.etchEntry && doEffect ? 3 : 2;
                     tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+4);
@@ -2636,14 +2636,14 @@ static gboolean qtInit()
             }
 
             if(!opts.gtkScrollViews)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"SV\""
+                gtk_rc_parse_string("style \""RC_SETTING"SV\""
                                     " { GtkScrolledWindow::scrollbar-spacing = 0 "
                                       " GtkScrolledWindow::scrollbars-within-bevel = 1 } "
-                                    "class \"GtkScrolledWindow\" style \""QTC_RC_SETTING"SV\"");
+                                    "class \"GtkScrolledWindow\" style \""RC_SETTING"SV\"");
             else if(opts.etchEntry)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"SV\""
+                gtk_rc_parse_string("style \""RC_SETTING"SV\""
                                     " { GtkScrolledWindow::scrollbar-spacing = 2 } "
-                                    "class \"GtkScrolledWindow\" style \""QTC_RC_SETTING"SV\"");
+                                    "class \"GtkScrolledWindow\" style \""RC_SETTING"SV\"");
 
             /* Scrolled windows */
             if((opts.square&SQUARE_SCROLLVIEW))
@@ -2652,9 +2652,9 @@ static gboolean qtInit()
                 thickness=3;
 
             { /* C-Scope */
-                static const char *constStrFormat="style \""QTC_RC_SETTING"SVt\" "
+                static const char *constStrFormat="style \""RC_SETTING"SVt\" "
                                                     "{ xthickness = %d ythickness = %d } "
-                                                      "class \"*GtkScrolledWindow\" style \""QTC_RC_SETTING"SVt\"";
+                                                      "class \"*GtkScrolledWindow\" style \""RC_SETTING"SVt\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat, thickness, thickness);
@@ -2662,9 +2662,9 @@ static gboolean qtInit()
             } /* C-Scope */
 
             { /* C-Scope */
-                static const char *constStrFormat="style \""QTC_RC_SETTING"Pbar\" "
+                static const char *constStrFormat="style \""RC_SETTING"Pbar\" "
                                                     "{ xthickness = %d ythickness = %d } "
-                                                      "widget_class \"*GtkProgressBar\" style \""QTC_RC_SETTING"Pbar\"";
+                                                      "widget_class \"*GtkProgressBar\" style \""RC_SETTING"Pbar\"";
                 int pthickness=opts.fillProgress
                                 ? doEffect && opts.borderProgress
                                     ? 1
@@ -2680,10 +2680,10 @@ static gboolean qtInit()
             } /* C-Scope 'doEffect' */
 
             { /* C-Scope */
-                static const char *constStrFormat="style \""QTC_RC_SETTING"TT\" "
+                static const char *constStrFormat="style \""RC_SETTING"TT\" "
                                                     "{ xthickness = 4 ythickness = 4 bg[NORMAL] = \"#%02X%02X%02X\" fg[NORMAL] = \"#%02X%02X%02X\"} "
-                                                    "widget \"gtk-tooltips*\" style \""QTC_RC_SETTING"TT\" "
-                                                    "widget \"gtk-tooltip*\" style \""QTC_RC_SETTING"TT\"";
+                                                    "widget \"gtk-tooltips*\" style \""RC_SETTING"TT\" "
+                                                    "widget \"gtk-tooltip*\" style \""RC_SETTING"TT\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
@@ -2697,32 +2697,32 @@ static gboolean qtInit()
             } /* C-Scope */
 
             if( EFFECT_NONE==opts.buttonEffect)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Cmb\" { xthickness = 4 ythickness = 2 }"
-                                    "widget_class \"*.GtkCombo.GtkEntry\" style \""QTC_RC_SETTING"Cmb\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Cmb\" { xthickness = 4 ythickness = 2 }"
+                                    "widget_class \"*.GtkCombo.GtkEntry\" style \""RC_SETTING"Cmb\"");
 
             if(opts.round>=ROUND_FULL && EFFECT_NONE!=opts.buttonEffect)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Swt\" { xthickness = 3 ythickness = 2 }"
-                                    "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \""QTC_RC_SETTING"Swt\""
-                                    "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \""QTC_RC_SETTING"Swt\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Swt\" { xthickness = 3 ythickness = 2 }"
+                                    "widget_class \"*.SwtFixed.GtkCombo.GtkButton\" style \""RC_SETTING"Swt\""
+                                    "widget_class \"*.SwtFixed.GtkCombo.GtkEntry\" style \""RC_SETTING"Swt\"");
 
 
-            gtk_rc_parse_string("style \""QTC_RC_SETTING"MnuTb\" "
+            gtk_rc_parse_string("style \""RC_SETTING"MnuTb\" "
                                 "{ xthickness=1 ythickness=1"
                                 " GtkButton::focus-padding=0 GtkWidget::focus-line-width=0} "
-                                "class \"*GtkMenuToolButton\" style \""QTC_RC_SETTING"MnuTb\""
-                                "widget_class \"*.GtkMenuToolButton.*Box.GtkToggleButton\" style \""QTC_RC_SETTING"MnuTb\"");
+                                "class \"*GtkMenuToolButton\" style \""RC_SETTING"MnuTb\""
+                                "widget_class \"*.GtkMenuToolButton.*Box.GtkToggleButton\" style \""RC_SETTING"MnuTb\"");
 
             if(!opts.popupBorder)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
-                                    "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
+                gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
+                                    "class \"*GtkMenu\" style \""RC_SETTING"M\"");
             else if((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
-                                    "class \"*GtkMenu\" style \""QTC_RC_SETTING"M\"");
+                gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
+                                    "class \"*GtkMenu\" style \""RC_SETTING"M\"");
 
             { /* C-Scope */
-                static const char *constStrFormat="style \""QTC_RC_SETTING"Tree\" "
+                static const char *constStrFormat="style \""RC_SETTING"Tree\" "
                                                     "{ GtkTreeView::odd-row-color = \"#%02X%02X%02X\" GtkTreeView::even-row-color = \"#%02X%02X%02X\"} "
-                                                    "widget \"*GtkTreeView*\" style \""QTC_RC_SETTING"Tree\"";
+                                                    "widget \"*GtkTreeView*\" style \""RC_SETTING"Tree\"";
                 int alt=haveAlternareListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
@@ -2738,15 +2738,15 @@ static gboolean qtInit()
 
             if(!opts.useHighlightForMenu)
             {
-                static const char *constStrFormat="style \""QTC_RC_SETTING"Mnu\" "
+                static const char *constStrFormat="style \""RC_SETTING"Mnu\" "
                                                   "{ text[ACTIVE] = \"#%02X%02X%02X\" "
                                                   " text[SELECTED] = \"#%02X%02X%02X\" } "
-                                                  " class \"*MenuItem\" style \""QTC_RC_SETTING"Mnu\""
-                                                  " widget_class \"*MenuBar*MenuItem\" style \""QTC_RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkAccelMenuItem\" style \""QTC_RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkRadioMenuItem\" style \""QTC_RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkCheckMenuItem\" style \""QTC_RC_SETTING"Mnu\""
-                                                  " widget_class \"*.GtkImageMenuItem\" style \""QTC_RC_SETTING"Mnu\"";
+                                                  " class \"*MenuItem\" style \""RC_SETTING"Mnu\""
+                                                  " widget_class \"*MenuBar*MenuItem\" style \""RC_SETTING"Mnu\""
+                                                  " widget_class \"*.GtkAccelMenuItem\" style \""RC_SETTING"Mnu\""
+                                                  " widget_class \"*.GtkRadioMenuItem\" style \""RC_SETTING"Mnu\""
+                                                  " widget_class \"*.GtkCheckMenuItem\" style \""RC_SETTING"Mnu\""
+                                                  " widget_class \"*.GtkImageMenuItem\" style \""RC_SETTING"Mnu\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
@@ -2762,19 +2762,19 @@ static gboolean qtInit()
             /* Mozilla seems to assume that all scrolledviews are square :-(
                So, set the xthickness and ythickness to 1, and in qtcurve.c draw these as sqare */
             if(isMozilla())
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"SVm\""
+                gtk_rc_parse_string("style \""RC_SETTING"SVm\""
                                     " { xthickness=1 ythickness=1 } "
-                                    "widget_class \"GtkWindow.GtkFixed.GtkScrolledWindow\" style \""QTC_RC_SETTING"SVm\"");
+                                    "widget_class \"GtkWindow.GtkFixed.GtkScrolledWindow\" style \""RC_SETTING"SVm\"");
             
             if(TAB_MO_GLOW==opts.tabMouseOver)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Tab\" { GtkNotebook::tab-overlap = 0 } class \"*GtkNotebook\" style \""QTC_RC_SETTING"Tab\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Tab\" { GtkNotebook::tab-overlap = 0 } class \"*GtkNotebook\" style \""RC_SETTING"Tab\"");
 
             if(!opts.useHighlightForMenu && GTK_APP_OPEN_OFFICE==qtSettings.app)
             {
-                static const char *constStrFormat="style \""QTC_RC_SETTING"OOMnu\" "
+                static const char *constStrFormat="style \""RC_SETTING"OOMnu\" "
                                                   "{ bg[SELECTED] = \"#%02X%02X%02X\" } "
-                                                  " class \"*Menu*\" style \""QTC_RC_SETTING"OOMnu\" "
-                                                  " widget_class \"*Menu*\" style \""QTC_RC_SETTING"OOMnu\" ";
+                                                  " class \"*Menu*\" style \""RC_SETTING"OOMnu\" "
+                                                  " widget_class \"*Menu*\" style \""RC_SETTING"OOMnu\" ";
 
 
                 shadeColors(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], qtcPalette.background);
@@ -2796,10 +2796,10 @@ static gboolean qtInit()
 
             if(DEFAULT_SLIDER_WIDTH!=opts.sliderWidth)
             {
-                static const char *constStrFormat="style \""QTC_RC_SETTING"SbarW\" "
+                static const char *constStrFormat="style \""RC_SETTING"SbarW\" "
                                                   "{ GtkRange::slider_width = %d GtkRange::stepper_size = %d "
                                                   "  GtkScrollbar::min_slider_length = %d } "
-                                                  " class \"*\" style \""QTC_RC_SETTING"SbarW\" ";
+                                                  " class \"*\" style \""RC_SETTING"SbarW\" ";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
                 sprintf(tmpStr, constStrFormat, opts.sliderWidth, opts.sliderWidth, opts.sliderWidth+1);
@@ -2809,23 +2809,23 @@ static gboolean qtInit()
             {
                 gboolean customSliderW=DEFAULT_SLIDER_WIDTH!=opts.sliderWidth;
                 int      length=(SLIDER_CIRCULAR==opts.sliderStyle
-                                    ? QTC_CIRCULAR_SLIDER_SIZE
+                                    ? CIRCULAR_SLIDER_SIZE
                                     : SLIDER_TRIANGULAR==opts.sliderStyle
                                         ? 11
                                         : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                            ? (customSliderW ? QTC_SLIDER_SIZE +6 : 13)
-                                            : (customSliderW ? QTC_SLIDER_SIZE -2 : 21) ) + QTC_SLIDER_GLOW,
+                                            ? (customSliderW ? SLIDER_SIZE +6 : 13)
+                                            : (customSliderW ? SLIDER_SIZE -2 : 21) ) + SLIDER_GLOW,
                          width = (SLIDER_CIRCULAR==opts.sliderStyle
-                                    ? QTC_CIRCULAR_SLIDER_SIZE
+                                    ? CIRCULAR_SLIDER_SIZE
                                     : SLIDER_TRIANGULAR==opts.sliderStyle
                                         ? 18
                                         : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                            ? (customSliderW ? QTC_SLIDER_SIZE -2 : 21)
-                                            : (customSliderW ? QTC_SLIDER_SIZE +6 : 13) ) + QTC_SLIDER_GLOW;
+                                            ? (customSliderW ? SLIDER_SIZE -2 : 21)
+                                            : (customSliderW ? SLIDER_SIZE +6 : 13) ) + SLIDER_GLOW;
 
-                static const char *constStrFormat="style \""QTC_RC_SETTING"Sldr\" "
+                static const char *constStrFormat="style \""RC_SETTING"Sldr\" "
                                                   "{GtkScale::slider_length = %d GtkScale::slider_width = %d} "
-                                                  "class \"*\" style \""QTC_RC_SETTING"Sldr\"";
+                                                  "class \"*\" style \""RC_SETTING"Sldr\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+8);
                 sprintf(tmpStr, constStrFormat, length, width);
@@ -2833,15 +2833,15 @@ static gboolean qtInit()
             }
 
             if(opts.lvLines)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"LvL\" { GtkTreeView::tree-line-pattern=\"\\111\\111\" } "
-                                    "class \"*GtkWidget\" style \""QTC_RC_SETTING"LvL\"");
+                gtk_rc_parse_string("style \""RC_SETTING"LvL\" { GtkTreeView::tree-line-pattern=\"\\111\\111\" } "
+                                    "class \"*GtkWidget\" style \""RC_SETTING"LvL\"");
 
             if(!opts.menuIcons)
                 gtk_rc_parse_string("gtk-menu-images = 0");
             
             if(LINE_1DOT==opts.splitters)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"Spl\" { GtkPaned::handle_size=7 GtkPaned::handle_width = 7 } "
-                                    "class \"*GtkWidget\" style \""QTC_RC_SETTING"Spl\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Spl\" { GtkPaned::handle_size=7 GtkPaned::handle_width = 7 } "
+                                    "class \"*GtkWidget\" style \""RC_SETTING"Spl\"");
 
             if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
                IMG_SQUARE_RINGS==opts.bgndImage.type ||
@@ -2850,21 +2850,21 @@ static gboolean qtInit()
                 calcRingAlphas(&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]);
 
             if(isMozilla())
-                opts.crSize=QTC_CR_SMALL_SIZE;
+                opts.crSize=CR_SMALL_SIZE;
 
-            if(opts.crSize!=QTC_CR_LARGE_SIZE)
+            if(opts.crSize!=CR_LARGE_SIZE)
             {
-                static const char *constStrFormat="style \""QTC_RC_SETTING"CRSize\" "
+                static const char *constStrFormat="style \""RC_SETTING"CRSize\" "
                                                   "{ GtkCheckButton::indicator_size = %d }"
-                                                  " class \"*\" style \""QTC_RC_SETTING"CRSize\" ";
+                                                  " class \"*\" style \""RC_SETTING"CRSize\" ";
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
                 sprintf(tmpStr, constStrFormat, opts.crSize);
                 gtk_rc_parse_string(tmpStr);
             }
 
             if(TB_NONE==opts.toolbarBorders)
-                gtk_rc_parse_string("style \""QTC_RC_SETTING"TbB\" { xthickness = 0 ythickness = 0 GtkToolbar::internal-padding = 0 }"
-                                    " widget_class \"*<GtkToolbar>\" style  \""QTC_RC_SETTING"TbB\"");
+                gtk_rc_parse_string("style \""RC_SETTING"TbB\" { xthickness = 0 ythickness = 0 GtkToolbar::internal-padding = 0 }"
+                                    " widget_class \"*<GtkToolbar>\" style  \""RC_SETTING"TbB\"");
             
             if(tmpStr)
                 free(tmpStr);

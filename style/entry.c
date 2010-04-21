@@ -1,4 +1,4 @@
-#define QTC_GE_IS_ENTRY(object) ((object) && objectIsA((GObject*)(object), "GtkEntry"))
+#define GE_IS_ENTRY(object) ((object) && objectIsA((GObject*)(object), "GtkEntry"))
 
 static GtkWidget *lastMoEntry=NULL;
 
@@ -6,7 +6,7 @@ static void qtcEntryCleanup(GtkWidget *widget)
 {
     if(lastMoEntry==widget)
         lastMoEntry=NULL;
-    if (QTC_GE_IS_ENTRY(widget))
+    if (GE_IS_ENTRY(widget))
     {
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID"));
@@ -36,7 +36,7 @@ static gboolean qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, gpointer use
 
 static gboolean qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-    if (QTC_GE_IS_ENTRY(widget))
+    if (GE_IS_ENTRY(widget))
     {
         lastMoEntry=widget;
         gtk_widget_queue_draw(widget);
@@ -47,7 +47,7 @@ static gboolean qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpoint
 
 static gboolean qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-    if (QTC_GE_IS_ENTRY(widget))
+    if (GE_IS_ENTRY(widget))
     {
         lastMoEntry=NULL;
         gtk_widget_queue_draw(widget);
@@ -58,7 +58,7 @@ static gboolean qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpoint
 
 static void qtcEntrySetup(GtkWidget *widget)
 {
-    if (QTC_GE_IS_ENTRY(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET"))
+    if (GE_IS_ENTRY(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET"))
     {
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID",

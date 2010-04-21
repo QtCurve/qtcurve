@@ -1,7 +1,7 @@
 static GHashTable *widgetMapHashTable[2] = {NULL, NULL};
 
-#define QTC_MAP_ID_X(ID_STR) "QTC_WIDGET_MAP_HACK_HACK_SET"ID_STR
-#define QTC_MAP_ID(ID) (ID ? QTC_MAP_ID_X("1") : QTC_MAP_ID_X("0"))
+#define MAP_ID_X(ID_STR) "QTC_WIDGET_MAP_HACK_HACK_SET"ID_STR
+#define MAP_ID(ID) (ID ? MAP_ID_X("1") : MAP_ID_X("0"))
 
 static GtkWidget * lookupWidgetMapHash(void *hash, void *value, int map)
 {
@@ -32,13 +32,13 @@ static void removeFromWidgetMapHash(void *hash)
 
 static GtkWidget * getMappedWidget(GtkWidget *widget, int map)
 {
-    return widget && g_object_get_data(G_OBJECT(widget), QTC_MAP_ID(map))
+    return widget && g_object_get_data(G_OBJECT(widget), MAP_ID(map))
             ? lookupWidgetMapHash(widget, NULL, map) : NULL;
 }
 
 static void qtcWidgetMapCleanup(GtkWidget *widget)
 {
-    if(g_object_get_data(G_OBJECT(widget), QTC_MAP_ID(0)) || g_object_get_data(G_OBJECT(widget), QTC_MAP_ID(1)))
+    if(g_object_get_data(G_OBJECT(widget), MAP_ID(0)) || g_object_get_data(G_OBJECT(widget), MAP_ID(1)))
     {
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_DESTROY_ID"));
@@ -46,8 +46,8 @@ static void qtcWidgetMapCleanup(GtkWidget *widget)
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_UNREALIZE_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID"));
-        g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(0));
-        g_object_steal_data(G_OBJECT(widget), QTC_MAP_ID(1));
+        g_object_steal_data(G_OBJECT(widget), MAP_ID(0));
+        g_object_steal_data(G_OBJECT(widget), MAP_ID(1));
         removeFromWidgetMapHash(widget);
     }
 }
@@ -66,9 +66,9 @@ static gboolean qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, gpointer
 
 static void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
 {
-    if (from && to && !g_object_get_data(G_OBJECT(from), QTC_MAP_ID(map)))
+    if (from && to && !g_object_get_data(G_OBJECT(from), MAP_ID(map)))
     {
-        g_object_set_data(G_OBJECT(from), QTC_MAP_ID(map), (gpointer)1);
+        g_object_set_data(G_OBJECT(from), MAP_ID(map), (gpointer)1);
         g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_DESTROY_ID",
                           (gpointer)g_signal_connect(G_OBJECT(from), "destroy-event",
                                                      (GtkSignalFunc)qtcWidgetMapDestroy, NULL));

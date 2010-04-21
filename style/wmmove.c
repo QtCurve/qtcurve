@@ -2,9 +2,9 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 
-// #define QTC_GE_IS_TOOL_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkToolbar"))
-// #define QTC_GE_IS_STATUS_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkStatusbar"))
-// #define QTC_GE_IS_LABEL(object) ((object) && objectIsA((GObject*)(object), "GtkLabel"))
+// #define GE_IS_TOOL_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkToolbar"))
+// #define GE_IS_STATUS_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkStatusbar"))
+// #define GE_IS_LABEL(object) ((object) && objectIsA((GObject*)(object), "GtkLabel"))
 
 static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
 {
@@ -53,11 +53,11 @@ static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event, int adjus
 static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
 {
     bool use=TRUE;
-    if(QTC_GE_IS_MENU_SHELL(widget))
+    if(GE_IS_MENU_SHELL(widget))
     {
         GdkModifierType pointer_mask;
 
-        if(QTC_GE_IS_CONTAINER(widget))
+        if(GE_IS_CONTAINER(widget))
         {
             GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
                   *child;
@@ -67,11 +67,11 @@ static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
                 // Can only use this 'press' event if
                 //  1. There is no active menu being displayed - as the 'press' will be to cancel the menu
                 //  2. The click is not where a menu item is
-                if((child->data) && QTC_GE_IS_WIDGET(child->data) &&
+                if((child->data) && GE_IS_WIDGET(child->data) &&
                     ((GTK_STATE_NORMAL!=GTK_WIDGET_STATE(GTK_WIDGET(child->data)) &&
                       GTK_STATE_INSENSITIVE!=GTK_WIDGET_STATE(GTK_WIDGET(child->data))) ||
                      withinWidget(GTK_WIDGET(child->data), event,
-#ifdef QTC_EXTEND_MENUBAR_ITEM_HACK
+#ifdef EXTEND_MENUBAR_ITEM_HACK
                                  constMenuAdjust
 #else
                                  0
@@ -92,10 +92,10 @@ static gboolean qtcIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
 {
     return opts.windowDrag &&
            (!event || withinWidget(widget, event, 0)) &&
-           ((QTC_GE_IS_MENU_BAR(widget) && (!event || useEvent(widget, event)))
-//             || QTC_GE_IS_TOOL_BAR(widget)
-//             || QTC_GE_IS_STATUS_BAR(widget)
-//             || (QTC_GE_IS_LABEL(widget) && isOnStatusBar(widget, 0))
+           ((GE_IS_MENU_BAR(widget) && (!event || useEvent(widget, event)))
+//             || GE_IS_TOOL_BAR(widget)
+//             || GE_IS_STATUS_BAR(widget)
+//             || (GE_IS_LABEL(widget) && isOnStatusBar(widget, 0))
             );
 }
 

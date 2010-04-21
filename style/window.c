@@ -4,7 +4,7 @@ static void qtcWindowCleanup(GtkWidget *widget)
 {
     if (widget)
     {
-        if(QTC_CUSTOM_BGND)
+        if(CUSTOM_BGND)
             g_signal_handler_disconnect(G_OBJECT(widget),
                                         (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_SIZE_REQUEST_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
@@ -33,12 +33,12 @@ static gboolean qtcWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer us
 static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     // Need to invalidate the whole of the window on a resize, as gradient needs to be redone.
-    if(widget && QTC_CUSTOM_BGND)
+    if(widget && CUSTOM_BGND)
     {
         GdkRectangle rect;
 
         if(IS_FLAT(opts.bgndAppearance))
-            rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=opts.bgndImage.pix ? opts.bgndImage.height : QTC_RINGS_HEIGHT(opts.bgndImage.type);
+            rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=opts.bgndImage.pix ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type);
         else
             rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=widget->allocation.height;
         gdk_window_invalidate_rect(widget->window, &rect, FALSE);
@@ -141,7 +141,7 @@ static void qtcWindowSetup(GtkWidget *widget)
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET"))
     {
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET", (gpointer)1);
-        if(QTC_CUSTOM_BGND)
+        if(CUSTOM_BGND)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_SIZE_REQUEST_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "size-request",
                                                         (GtkSignalFunc)qtcWindowSizeRequest, NULL));
