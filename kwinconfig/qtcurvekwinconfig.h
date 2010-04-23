@@ -30,6 +30,7 @@
 #include <QObject>
 #include "ui_qtcurvekwinconfigwidget.h"
 #include "../kwin/qtcurveshadowconfiguration.h"
+#include "../kwin/qtcurveconfig.h"
 
 class KConfig;
 
@@ -46,7 +47,7 @@ class QtCurveKWinConfig : public QObject
 
     public:
 
-    QtCurveKWinConfig(KConfig* config, QWidget* parent);
+    QtCurveKWinConfig(KConfig *config, QWidget *parent);
     ~QtCurveKWinConfig();
 
     Q_SIGNALS:
@@ -60,12 +61,15 @@ class QtCurveKWinConfig : public QObject
     void defaults();
     void activeShadowColorTypeChanged();
     void inactiveShadowColorTypeChanged();
+    void sizeChanged();
     
     private:
     
 #if KDE_IS_VERSION(4, 3, 0)
     void setShadows();
 #endif
+    void setWidgets(const KWinQtCurve::QtCurveConfig &cfg);
+    void setWidgetStates();
 
     private:
 

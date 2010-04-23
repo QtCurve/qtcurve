@@ -27,69 +27,65 @@
        <item>
         <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
+          <widget class="QLabel" name="label_4x">
+           <property name="text">
+            <string>Border size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="KComboBox" name="borderSize" />
+         </item>
+         <item row="1" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Borders:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="resizeGrip">
-           <property name="text">
-            <string>Show resize grip (when no bottom border is drawn)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
+         <item row="1" column="1">
           <widget class="QCheckBox" name="roundBottom">
            <property name="text">
             <string>Round bottom corners (style must be rounded)</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="drawBottom">
-           <property name="text">
-            <string>Draw bottom even when border size set to Tiny</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QCheckBox" name="outerBorder">
            <property name="text">
             <string>Draw dark outer border</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="3" column="1">
           <widget class="QCheckBox" name="borderlessMax">
            <property name="text">
             <string>Remove from maximised windows</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="label_2x">
            <property name="text">
             <string>Window grouping:</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="4" column="1">
           <widget class="QCheckBox" name="grouping">
            <property name="text">
             <string>Enabled</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Titlebar padding:</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="5" column="1">
           <widget class="KIntSpinBox" name="titleBarPad">
            <property name="suffix">
             <string>px</string>
@@ -197,7 +193,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QComboBox" name="activeShadowColorType"/>
+           <widget class="KComboBox" name="activeShadowColorType"/>
           </item>
           <item row="4" column="1">
            <widget class="KColorButton" name="activeShadowColor"/>
@@ -261,7 +257,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QComboBox" name="inactiveShadowColorType"/>
+           <widget class="KComboBox" name="inactiveShadowColorType"/>
           </item>
           <item row="4" column="1">
            <widget class="KColorButton" name="inactiveShadowColor"/>
@@ -278,6 +274,11 @@
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
+  <customwidget>
+   <class>KComboBox</class>
+   <extends>QComboBox</extends>
+   <header>kcombobox.h</header>
+  </customwidget>
   <customwidget>
    <class>KIntSpinBox</class>
    <extends>QSpinBox</extends>
