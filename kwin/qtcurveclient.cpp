@@ -501,6 +501,7 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
         }
 
         if(showIcon)
+        {
             if(alignment&Qt::AlignHCenter)
             {
                 if(reverse)
@@ -544,6 +545,7 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
                         iconX=textRect.x();
                 }
             }
+        }
 
 //         painter->setClipRect(capRect.adjusted(-2, 0, 2, 0));
 
@@ -989,10 +991,12 @@ int QtCurveClient::itemClicked(const QPoint &point, bool between, bool drag)
                            tabWidth = titleWidth/tabs;
 
     if(drag)
+    {
         if(point.x() <= title.left())
             return 0;
         else if(point.x() >= titleRect().right())
             return tabs;
+    }
 
     if(between) // We are inserting a new tab between two existing ones
         titleX -= tabWidth / 2;
@@ -1030,6 +1034,7 @@ void QtCurveClient::reset(unsigned long changed)
     }
     
     if (changed&SettingBorder)
+    {
         if (maximizeMode()==MaximizeFull)
         {
             if (!options()->moveResizeMaximizedWindows() && itsResizeGrip)
@@ -1037,6 +1042,7 @@ void QtCurveClient::reset(unsigned long changed)
         }
         else if (itsResizeGrip)
                 itsResizeGrip->show();
+    }
 
     if (changed&SettingColors)
     {

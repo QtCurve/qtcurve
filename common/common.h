@@ -1114,6 +1114,7 @@ typedef struct
 #define MAX(a, b) ((b) < (a) ? (a) : (b))
 #endif
 
+#ifndef CONFIG_DIALOG
 
 /* Taken from rgb->hsl routines taken from KColor
     Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
@@ -1427,6 +1428,7 @@ static void shade(const Options *opts, const color *ca, color *cb, double k)
     cb->pixel = ca->pixel;
 #endif
 }
+#endif
 
 #if (!defined CONFIG_DIALOG)
 static unsigned char checkBounds(int num)

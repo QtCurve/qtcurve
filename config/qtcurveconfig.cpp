@@ -212,7 +212,7 @@ class CharSelectDialog : public KDialog
         layout->setMargin(0);
         layout->setSpacing(KDialog::spacingHint());
 
-        itsSelector=new KCharSelect(page);
+        itsSelector=new KCharSelect(page, NULL);
         itsSelector->setCurrentChar(QChar(v));
         layout->addWidget(itsSelector);
     }
@@ -359,7 +359,7 @@ static QString kdeHome(bool kde3)
     {
         FILE *fpipe;
 
-        if (fpipe = (FILE*)popen(kde3 ? "kde-config --localprefix" : "kde4-config --localprefix", "r"))
+        if ((fpipe = (FILE*)popen(kde3 ? "kde-config --localprefix" : "kde4-config --localprefix", "r")))
         {
             char line[1024];
 
@@ -1498,6 +1498,7 @@ void QtCurveConfig::addGradStop()
 
         for(; it!=end; ++it)
             if(equal(pos, (*it).pos))
+            {
                 if(equal(val, (*it).val))
                     return;
                 else
@@ -1505,6 +1506,7 @@ void QtCurveConfig::addGradStop()
                     (*cg).second.stops.erase(it);
                     break;
                 }
+            }
 
         unsigned int b4=(*cg).second.stops.size();
         (*cg).second.stops.insert(GradientStop(pos, val));
@@ -2048,6 +2050,7 @@ void QtCurveConfig::deletePreset()
 {
     if(KMessageBox::Yes==KMessageBox::warningYesNo(this, i18n("<p>Are you sure you wish to delete:</p><p><b>%1</b></p>",
                                                               presetsCombo->currentText())))
+    {
         if(QFile::remove(presets[presetsCombo->currentText()].fileName))
         {
             presets.remove(presetsCombo->currentText());
@@ -2056,6 +2059,7 @@ void QtCurveConfig::deletePreset()
         else
             KMessageBox::error(this, i18n("<p>Sorry, failed to remove the preset file:</p><p><i>%1</i></p>",
                                           presets[presetsCombo->currentText()].fileName));
+    }
 }
     
 void QtCurveConfig::importPreset()

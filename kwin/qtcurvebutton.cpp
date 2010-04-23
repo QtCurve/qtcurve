@@ -193,6 +193,7 @@ void QtCurveButton::drawButton(QPainter *painter)
                 break;
             case ShadeButton:
                 versionHack=TBAR_VERSION_HACK+TITLEBAR_SHADE;
+            default:
                 break;
         }
             

@@ -1136,10 +1136,12 @@ static void checkAppearance(EAppearance *ap, Options *opts)
 #else
         if(!opts->customGradient[*ap-APPEARANCE_CUSTOM1])
 #endif
+        {
             if(ap==&opts->appearance)
                 *ap=APPEARANCE_FLAT;
             else
                 *ap=opts->appearance;
+        }
     }
 }
 
