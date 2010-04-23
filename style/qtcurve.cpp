@@ -370,6 +370,7 @@ static enum
     APP_KONTACT,
     APP_ARORA,
     APP_QTDESIGNER,
+    APP_QTCREATOR,
     APP_KDEVELOP,
     APP_K3B,
     APP_OPENOFFICE,
@@ -504,6 +505,40 @@ static QStatusBar * getStatusBar(QWidget *w)
     }
 
     return 0L;
+}
+
+static QToolBar * getToolBarChild(QWidget *w)
+{
+    const QObjectList children = w->children();
+
+    foreach (QObject* child, children)
+    {
+        if (child->isWidgetType())
+        {
+            if(qobject_cast<QToolBar *>(child))
+                return static_cast<QToolBar *>(child);
+            QToolBar *tb=getToolBarChild((QWidget *) child);
+            if(tb)
+                return tb;
+        }
+    }
+
+    return 0L;
+}
+
+static void setStyleRecursive(QWidget *w, QStyle *s)
+{
+    w->setStyle(s);
+    if(qobject_cast<QToolButton *>(w))
+        w->setMinimumSize(1, 26);
+
+    const QObjectList children = w->children();
+
+    foreach (QObject *child, children)
+    {
+        if (child->isWidgetType())
+            setStyleRecursive((QWidget *) child, s);
+    }
 }
 
 //
@@ -1391,6 +1426,8 @@ void QtCurveStyle::polish(QApplication *app)
         theThemedApp=APP_ARORA;
     else if("Designer"==QCoreApplication::applicationName())
         theThemedApp=APP_QTDESIGNER;
+    else if("QtCreator"==QCoreApplication::applicationName())
+        theThemedApp=APP_QTCREATOR;
     else if("kdevelop"==appName || "kdevelop.bin"==appName)
         theThemedApp=APP_KDEVELOP;
     else if("soffice.bin"==appName)
@@ -1917,6 +1954,29 @@ void QtCurveStyle::polish(QWidget *widget)
     {
         parentIsToolbar=qobject_cast<QToolBar *>(wid) || wid->inherits("Q3ToolBar");
         wid=wid->parentWidget();
+    }
+
+    if(APP_QTCREATOR==theThemedApp && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget()) // &&
+       //(!static_cast<QMainWindow *>(widget)->menuWidget()->style() ||
+       //  static_cast<QMainWindow *>(widget)->menuWidget()->style()->inherits("QtCurveStyle")))
+        static_cast<QMainWindow *>(widget)->menuWidget()->setStyle(this);
+
+    if(APP_QTCREATOR==theThemedApp && qobject_cast<QDialog *>(widget) &&
+#ifdef QTC_QT_ONLY
+        widget->inherits("KFileDialog")
+#else
+        qobject_cast<KFileDialog *>(widget)
+#endif
+        )
+    {
+        QToolBar *tb=getToolBarChild(widget);
+
+        if(tb)
+        {
+            tb->setIconSize(QSize(22, 22));
+            tb->setMinimumSize(QSize(36, 36));
+            setStyleRecursive(tb, this);
+        }
     }
 
     if(parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
