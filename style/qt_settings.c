@@ -2089,7 +2089,7 @@ static gboolean qtInit()
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
-            qtSettings.debug=getenv("QTCURVE_DEBUG");
+            qtSettings.debug=NULL!=getenv("QTCURVE_DEBUG");
             opts.contrast=DEFAULT_CONTRAST;
 
             lastRead=now;
