@@ -225,6 +225,10 @@ void QtCurveClient::init()
 
     if(Handler()->showResizeGrip())
         createSizeGrip();
+    if (isPreview())
+        itsCaption =  isActive() ? i18n("Active Window") : i18n("Inactive Window");
+    else
+        captionChange();
 }
 
 void QtCurveClient::maximizeChange()
@@ -250,6 +254,17 @@ void QtCurveClient::activeChange()
         itsResizeGrip->update();
     }
     KCommonDecoration::activeChange();
+}
+
+void QtCurveClient::captionChange()
+{
+    itsCaption=caption();
+    if(-1!=itsCaption.indexOf(i18n(" [modified]")))
+    {
+        itsCaption=itsCaption.remove(i18n(" [modified]"));
+        itsCaption="*"+itsCaption;
+    }
+    widget()->update();
 }
 
 void QtCurveClient::paintEvent(QPaintEvent *e)
@@ -453,7 +468,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         paintTitle(&painter, itsCaptionRect, QRect(rectX+titleEdgeLeft, itsCaptionRect.y(),
                                                    rectX2-titleEdgeRight-(rectX+titleEdgeLeft),
                                                    itsCaptionRect.height()),
-                   caption(), showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
+                   itsCaption, showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
 #if KDE_IS_VERSION(4, 3, 85)
 
         if(constAddToEmpty==itsTargetTab)

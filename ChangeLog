@@ -8,6 +8,7 @@
 5. Re-organised window decoration config items and module.
 6. Get QtCreator to use QtCurve style for menubar, and for the toolbar in KFileDialog
    (KFileDialog is not 100%, but still looks better...)
+7. Change 'abc [modified] - App' window titles to '*abc - App'
 
 1.3.1
 -----

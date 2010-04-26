@@ -61,6 +61,7 @@ class QtCurveClient :
     void                      maximizeChange();
     void                      shadeChange();
     void                      activeChange();
+    void                      captionChange();
     void                      reset(unsigned long changed);
     void                      paintEvent(QPaintEvent *e);
     void                      paintTitle(QPainter *painter, const QRect &capRect, const QRect &alignFullRect,
@@ -107,7 +108,7 @@ class QtCurveClient :
     QtCurveSizeGrip *itsResizeGrip;
     ButtonBgnd      itsButtonBackground[constNumButtonStates];
     QRect           itsCaptionRect;
-    QString         itsOldCaption;
+    QString         itsCaption;
     QFont           itsTitleFont;
 
 #if KDE_IS_VERSION(4, 3, 85)
