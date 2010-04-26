@@ -526,18 +526,18 @@ static QToolBar * getToolBarChild(QWidget *w)
     return 0L;
 }
 
-static void setStyleRecursive(QWidget *w, QStyle *s)
+static void setStyleRecursive(QWidget *w, QStyle *s, int minSize)
 {
     w->setStyle(s);
     if(qobject_cast<QToolButton *>(w))
-        w->setMinimumSize(1, 26);
+        w->setMinimumSize(1, minSize);
 
     const QObjectList children = w->children();
 
     foreach (QObject *child, children)
     {
         if (child->isWidgetType())
-            setStyleRecursive((QWidget *) child, s);
+            setStyleRecursive((QWidget *) child, s, minSize);
     }
 }
 
@@ -1987,9 +1987,11 @@ void QtCurveStyle::polish(QWidget *widget)
 
         if(tb)
         {
-            tb->setIconSize(QSize(22, 22));
-            tb->setMinimumSize(QSize(36, 36));
-            setStyleRecursive(tb, this);
+            int size = pixelMetric(PM_ToolBarIconSize);
+            tb->setIconSize(QSize(size, size));
+            tb->setMinimumSize(QSize(size+14, size+14));
+            setStyleRecursive(tb, this, size+4);
+            //widget->setProperty("_q_custom_style_disabled", true);
         }
     }
 
@@ -2846,6 +2848,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
 #ifdef QTC_QT_ONLY
         case PM_SmallIconSize:
             return 16;
+        case PM_ToolBarIconSize:
+            return 22;
         case PM_IconViewIconSize:
         case PM_LargeIconSize:
             return 32;
