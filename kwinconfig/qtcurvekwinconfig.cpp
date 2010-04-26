@@ -220,15 +220,13 @@ void QtCurveKWinConfig::sizeChanged()
 
 void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
 {
-    KWinQtCurve::QtCurveConfig def;
-
     itsWidget->borderSize->setCurrentIndex(cfg.borderSize());
     itsWidget->roundBottom->setChecked(cfg.roundBottom());
     itsWidget->outerBorder->setChecked(cfg.outerBorder());
     itsWidget->borderlessMax->setChecked(cfg.borderlessMax());
     itsWidget->titleBarPad->setValue(cfg.titleBarPad());
 #if KDE_IS_VERSION(4, 3, 0)
-    itsWidget->useShadows->setChecked(def.customShadows());
+    itsWidget->useShadows->setChecked(cfg.customShadows());
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
     itsWidget->grouping->setChecked(cfg.grouping());
