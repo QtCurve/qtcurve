@@ -37,6 +37,7 @@
 #include <QStyleOptionTitleBar>
 #include <QStyle>
 #include <KDE/KColorUtils>
+#include <KDE/KWindowInfo>
 #ifdef DRAW_INTO_PIXMAPS
 #include <KDE/KWindowSystem>
 #endif
@@ -48,6 +49,11 @@
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
 #endif
+
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "../style/fixx11h.h"
+#include <QX11Info>
 
 #if KDE_IS_VERSION(4, 3, 85)
 #include <KDE/KIconLoader>
@@ -267,6 +273,8 @@ void QtCurveClient::captionChange()
     widget()->update();
 }
 
+static const Atom constQtcMenuSize = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
     bool                 compositing=COMPOSITING_ENABLED;
@@ -379,10 +387,33 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
+    unsigned short menuBarHeight=0;
+    
+    if(!isPreview() && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL))
+    {
+        /*
+        unsigned char  *data;
+        int            dummy;
+        unsigned long  dummy2;
+        if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
+                                        &dummy2, &dummy, &dummy2, &dummy2, &data))
+        {
+            unsigned short val=*((unsigned short*)data);
+
+            if(val<512)
+                menuBarHeight=val;
+            XFree(data);
+        }
+        else
+            *data = NULL; // superflous?!?
+        opt.rect.adjust(0, 0, 0, menuBarHeight);
+        */
+    }
+
 #ifdef DRAW_INTO_PIXMAPS
     if(!compositing && !isPreview())
     {
-        QPixmap  tPix(32, titleBarHeight);
+        QPixmap  tPix(32, titleBarHeight+menuBarHeight);
         QPainter tPainter(&tPix);
         tPainter.setRenderHint(QPainter::Antialiasing, true);
         opt.rect=QRect(0, 0, tPix.width(), tPix.height());

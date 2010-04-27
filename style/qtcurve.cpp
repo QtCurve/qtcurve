@@ -680,6 +680,33 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #ifdef Q_WS_X11
 static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+static const Atom constQtcMenuSize   = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+
+static void emitMenuSize(QWidget *w, unsigned short size)
+{
+    if(w)
+    {
+        static const char * constMenuSizeProperty="qtcMenuSize";
+        QVariant       prop(w->property(constMenuSizeProperty));
+        unsigned short oldSize=0;
+
+        if(prop.isValid())
+        {
+            bool ok;
+            oldSize=prop.toUInt(&ok);
+            if(!ok)
+                oldSize=0;
+        }
+
+        if(oldSize!=size)
+        {
+            if(w)
+                w->setProperty(constMenuSizeProperty, size);
+            XChangeProperty(QX11Info::display(), w->window()->winId(),
+                            constQtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
+        }
+    }
+}
 
 static void triggerWMMove(const QWidget *w, const QPoint &p)
 {
@@ -1709,7 +1736,13 @@ void QtCurveStyle::polish(QWidget *widget)
         if(itsSaveMenuBarStatus)
             static_cast<QMainWindow *>(widget)->menuWidget()->installEventFilter(this);
         if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
+        {
             static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
+#ifdef Q_WS_X11
+            if(BLEND_TITLEBAR)
+                emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
+#endif
+        }
     }
 
     if(opts.statusbarHiding && qobject_cast<QMainWindow *>(widget))
@@ -1808,6 +1841,10 @@ void QtCurveStyle::polish(QWidget *widget)
             (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
+#ifdef Q_WS_X11
+        if(BLEND_TITLEBAR)
+            emitMenuSize((QWidget *)widget, widget->rect().height());
+#endif
         if(CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::NoRole);
 
@@ -2520,6 +2557,17 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
     switch(event->type())
     {
+#ifdef Q_WS_X11
+        case QEvent::Resize:
+            if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
+            {
+                QResizeEvent *re = static_cast<QResizeEvent *>(event);
+
+                if (re->size().height() != re->oldSize().height())
+                    emitMenuSize((QMenuBar *)object, re->size().height());
+            }
+            break;
+#endif
         case QEvent::ShortcutOverride:
             if((opts.menubarHiding || opts.statusbarHiding) && qobject_cast<QMainWindow *>(object))
             {
@@ -2533,9 +2581,11 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
                         if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
                         {
+                            QWidget *menubar=window->menuWidget();
                             if(itsSaveMenuBarStatus)
-                                qtcSetMenuBarHidden(appName, window->menuWidget()->isVisible());
-                            window->menuWidget()->setHidden(window->menuWidget()->isVisible());
+                                qtcSetMenuBarHidden(appName, menubar->isVisible());
+
+                            window->menuWidget()->setHidden(menubar->isVisible());
                         }
                     }
                     if(opts.statusbarHiding)
@@ -2555,7 +2605,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                         }
                     }
                 }
-                
             }
             break;
         case QEvent::ShowToParent:
@@ -2680,11 +2729,22 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 //                 // This catches the case where the frame is created, and then its style set...
 //                     frame->setFrameShape(QFrame::StyledPanel);
 //             }
+            else if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
+            {
+                QMenuBar *mb=(QMenuBar *)object;
+                emitMenuSize((QMenuBar *)mb, mb->size().height());
+            }
             break;
         }
         case QEvent::Destroy:
         case QEvent::Hide:
         {
+            if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
+            {
+                QMenuBar *mb=(QMenuBar *)object;
+                emitMenuSize((QMenuBar *)mb, 0);
+            }
+
             if(itsHoverWidget && object==itsHoverWidget)
             {
                 itsPos.setX(-1);
@@ -3069,6 +3129,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return opts.titlebarBorder;
         case QtC_TitleBarEffect:
             return opts.titlebarEffect;
+        case QtC_BlendMenuAndTitleBar:
+            return BLEND_TITLEBAR;
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
@@ -3860,7 +3922,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 painter->save();
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, r, option);
+                    drawMenuOrToolBarBackground(painter, r, option, true, true, widget);
                 if(TB_NONE!=opts.toolbarBorders)
                 {
                     const QColor *use=itsActive
@@ -5758,7 +5820,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
+                    drawMenuOrToolBarBackground(painter, mbi->menuRect, option, widget);
 
                 if(active)
                     drawMenuItem(painter, r, option, true, (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly
@@ -6252,7 +6314,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, r, option);
+                    drawMenuOrToolBarBackground(painter, r, option, true, true, widget);
                 if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
                     (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
                 {
@@ -11748,14 +11810,31 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
     }
 }
 
-void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
+void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz, const QWidget *widget) const
 {
     EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
+    {
+        QRect rx(r);
+        if(BLEND_TITLEBAR)
+        {
+            const QWidget *w=widget ? widget : getWidget(p);
+            
+            if(w && (w=w->topLevelWidget()->window()))
+            {
+                int titlebarHeight=w->geometry().y()-w->frameGeometry().y();
+                rx.adjust(0, -titlebarHeight, 0, 0);
+//                printf("Adjust:%d  %d %s  %d %d    %d %d\n", titlebarHeight, w->frameGeometry().height(), w->metaObject()->className(),
+//                       w->isWindow(), !(w->windowType() == Qt::Popup), w->geometry().y(), w->frameGeometry().y());
+
+            }
+        }
+
         drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? menuColors(option, itsActive)[ORIGINAL_SHADE]
                             : option->palette.background().color(),
-                          p, r, horiz, false, MODIFY_AGUA(app));
+                          p, rx, horiz, false, MODIFY_AGUA(app));
+    }
 }
 
 void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOption *option, bool tb,

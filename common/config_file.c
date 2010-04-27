@@ -1313,8 +1313,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                 def->dwtSettings=0;
 #endif
-                def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
 #endif
+                def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
             }
             if(version<MAKE_VERSION(0, 67))
                 def->doubleGtkComboArrow=false;
@@ -1348,10 +1348,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
             if(version<MAKE_VERSION(0, 62))
             {
-#ifdef __cplusplus
                 def->titlebarAppearance=APPEARANCE_GRADIENT;
                 def->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
-#endif
                 def->round=ROUND_FULL;
                 def->appearance=APPEARANCE_DULL_GLASS;
                 def->sliderAppearance=APPEARANCE_DULL_GLASS;
@@ -1518,6 +1516,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(borderSelection)
             CFG_READ_BOOL(stripedSbar)
             CFG_READ_BOOL(windowDrag)
+            CFG_READ_BOOL(xxx)
 
             if(version<MAKE_VERSION(1, 4))
             {
@@ -1531,11 +1530,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             {
                 CFG_READ_INT(square)
             }
-
+            
+            CFG_READ_BOOL(titlebarBlend)
+            CFG_READ_BOOL(titlebarBorder)
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(stdBtnSizes)
-            CFG_READ_BOOL(titlebarBorder)
-            CFG_READ_BOOL(titlebarBlend)
             CFG_READ_INT(titlebarButtons)
             CFG_READ_TB_ICON(titlebarIcon)
 #endif
@@ -1552,11 +1551,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(doubleGtkComboArrow)
             CFG_READ_BOOL(stdSidebarButtons)
             CFG_READ_BOOL(toolbarTabs)
+            CFG_READ_BOOL(colorTitlebarOnly)
 #ifdef __cplusplus
             CFG_READ_ALIGN(titlebarAlignment)
             CFG_READ_EFFECT(titlebarEffect)
             CFG_READ_BOOL(gtkComboMenus)
-            CFG_READ_BOOL(colorTitlebarOnly)
             CFG_READ_BOOL(centerTabText)
 /*
 #else
@@ -1573,25 +1572,24 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(reorderGtkButtons)
 #endif
-#ifdef __cplusplus
             CFG_READ_APPEARANCE(titlebarAppearance, false, false)
             CFG_READ_APPEARANCE(inactiveTitlebarAppearance, false, false)
-            CFG_READ_APPEARANCE(titlebarButtonAppearance, false, false)
 
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_FLAT;
-
+            if(opts->titlebarBlend && !opts->colorTitlebarOnly)
+                opts->titlebarBlend=false;
             if(APPEARANCE_BEVELLED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
+#ifdef __cplusplus
+            CFG_READ_APPEARANCE(titlebarButtonAppearance, false, false)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             if(opts->xbar && opts->menubarHiding)
                 opts->xbar=false;
-            if(opts->titlebarBlend && !opts->colorTitlebarOnly)
-                opts->titlebarBlend=false;
 #endif
 #endif
             CFG_READ_SHADING(shading)
@@ -1856,9 +1854,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkAppearance(&opts->activeTabAppearance, opts);
             checkAppearance(&opts->sliderAppearance, opts);
             checkAppearance(&opts->selectionAppearance, opts);
-#ifdef __cplusplus
             checkAppearance(&opts->titlebarAppearance, opts);
             checkAppearance(&opts->inactiveTitlebarAppearance, opts);
+#ifdef __cplusplus
             checkAppearance(&opts->titlebarButtonAppearance, opts);
             checkAppearance(&opts->selectionAppearance, opts);
             checkAppearance(&opts->dwtAppearance, opts);
@@ -2018,9 +2016,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(!opts->borderProgress && (!opts->fillProgress || !(opts->square&SQUARE_PROGRESS)))
                 opts->borderProgress=true;
 
-#ifdef __cplusplus
             opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
             opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
+#ifdef __cplusplus
 
 #if defined QT_VERSION && QT_VERSION >= 0x040000
             if(!(opts->titlebarButtons&TITLEBAR_BUTTON_ROUND))
@@ -2096,6 +2094,10 @@ static void defaultSettings(Options *opts)
 
     for(i=0; i<NUM_CUSTOM_GRAD; ++i)
         opts->customGradient[i]=0L;
+    opts->customGradient[APPEARANCE_CUSTOM1]=malloc(sizeof(Gradient));
+    opts->customGradient[APPEARANCE_CUSTOM2]=malloc(sizeof(Gradient));
+    setupGradient(opts->customGradient[APPEARANCE_CUSTOM1], GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
+    setupGradient(opts->customGradient[APPEARANCE_CUSTOM2], GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
 #else
     // Setup titlebar gradients...
     setupGradient(&(opts->customGradient[APPEARANCE_CUSTOM1]), GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
@@ -2223,10 +2225,12 @@ static void defaultSettings(Options *opts)
     opts->square=SQUARE_NONE;
     opts->stripedSbar=false;
     opts->windowDrag=false;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    opts->stdBtnSizes=false;
+    opts->xxx=false;
     opts->titlebarBorder=true;
     opts->titlebarBlend=false;
+    opts->colorTitlebarOnly=false;
+#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
     opts->titlebarIcon=TITLEBAR_ICON_NEXT_TO_TITLE;
 #endif
@@ -2240,7 +2244,6 @@ static void defaultSettings(Options *opts)
     opts->toolbarTabs=false;
 #ifdef __cplusplus
     opts->gtkComboMenus=false;
-    opts->colorTitlebarOnly=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);
     opts->customSlidersColor.setRgb(0, 0, 0);
     opts->customMenuNormTextColor.setRgb(0, 0, 0);
@@ -2281,9 +2284,9 @@ static void defaultSettings(Options *opts)
     opts->mapKdeIcons=true;
     opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
 #endif
-#ifdef __cplusplus
     opts->titlebarAppearance=APPEARANCE_CUSTOM1;
     opts->inactiveTitlebarAppearance=APPEARANCE_CUSTOM1;
+#ifdef __cplusplus
     opts->titlebarButtonAppearance=APPEARANCE_GRADIENT;
 #endif
     /* Read system config file... */
@@ -2921,10 +2924,10 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
 #endif
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-        CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY(titlebarBorder)
         CFG_WRITE_ENTRY(titlebarBlend);
+#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+        CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
         CFG_WRITE_ENTRY(titlebarIcon)
 

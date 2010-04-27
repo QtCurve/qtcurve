@@ -177,6 +177,12 @@ typedef gchar ** Strings;
 #define DEF_BNT_TINT      0.4
 #define ENTRY_INNER_ALPHA 0.4
 
+#define MENU_SIZE_ATOM     "_QTCURVE_MENUBAR_SIZE_"
+#define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
+                           !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag && opts.xxx)
+
+#define TITLEBAR_SIZE_ATOM "_QTCURVE_TITLEBAR_SIZE_"
+
 #define STD_BORDER         5
 #define STD_BORDER_BR      2
 #define PBAR_BORDER        4
@@ -403,7 +409,8 @@ typedef enum
     QtC_TitleBarIcon,
     QtC_TitleBarIconColor,
     QtC_TitleBarBorder,
-    QtC_TitleBarEffect
+    QtC_TitleBarEffect,
+    QtC_BlendMenuAndTitleBar
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
@@ -948,7 +955,6 @@ typedef struct
                      toolbarTabs,
 #ifdef __cplusplus
                      gtkComboMenus,
-                     colorTitlebarOnly,
 /*
 #else
                      setDialogButtonOrder,
@@ -989,9 +995,10 @@ typedef struct
                      menuIcons,
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                      stdBtnSizes,
+#endif
+                     colorTitlebarOnly,
                      titlebarBorder,
                      titlebarBlend,
-#endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      xbar,
 #endif
@@ -1003,7 +1010,8 @@ typedef struct
                      coloredTbarMo,
                      borderSelection,
                      stripedSbar,
-                     windowDrag;
+                     windowDrag,
+                     xxx;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
@@ -1038,9 +1046,9 @@ typedef struct
                      tabAppearance,
                      activeTabAppearance,
                      sliderAppearance,
-#ifdef __cplusplus
                      titlebarAppearance,
                      inactiveTitlebarAppearance,
+#ifdef __cplusplus
                      titlebarButtonAppearance,
                      dwtAppearance,
 #endif
