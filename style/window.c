@@ -1,4 +1,17 @@
 #include <gdk/gdkkeysyms.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gdk/gdkx.h>
+
+static int qtcCalculateTitleBarSize(GtkWidget *w)
+{
+    GdkRectangle rect;
+    int          x, 
+                 y;
+    gdk_window_get_frame_extents(w->window, &rect);
+    gdk_window_get_origin(w->window, &x, &y);
+    return y-rect.y;
+}
 
 static void qtcWindowCleanup(GtkWidget *widget)
 {
@@ -109,9 +122,15 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
                 toggled=TRUE;
                 qtcSetMenuBarHidden(qtSettings.appName, GTK_WIDGET_VISIBLE(menuBar));
                 if(GTK_WIDGET_VISIBLE(menuBar))
+                {
+                    qtcEmitMenuSize(menuBar, 0);
                     gtk_widget_hide(menuBar);
+                }
                 else
+                {
+                    qtcEmitMenuSize(menuBar, menuBar->allocation.height);
                     gtk_widget_show(menuBar);
+                }
             }
         }
 

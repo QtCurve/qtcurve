@@ -4452,14 +4452,20 @@ debugDisplayWidget(widget, 3);
                                 ? &menuColors(activeWindow)[ORIGINAL_SHADE]
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
+            int         menuBarAdjust=0;
 
 //             if(menubar)
                 qtcWMMoveSetup(widget);
 
+            if(menubar && widget && BLEND_TITLEBAR)
+            {
+                menuBarAdjust=qtcCalculateTitleBarSize(widget);
+                qtcEmitMenuSize(widget, widget->allocation.height);
+            }
+
             /* Toolbars and menus */
             if(GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app))
-                drawBevelGradient(cr, style, area, NULL, x, y, width,
-                                height, col,
+                drawBevelGradient(cr, style, area, NULL, x, y-menuBarAdjust, width, height+menuBarAdjust, col,
                                 menubar
                                     ? TRUE
                                     : DETAIL("handlebox")

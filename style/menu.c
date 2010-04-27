@@ -5,6 +5,31 @@
 #define GE_IS_CONTAINER(object)((object)  && objectIsA((GObject*)(object), "GtkContainer"))
 #define GE_IS_WIDGET(object)((object)  && objectIsA((GObject*)(object), "GtkWidget"))
 
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gdk/gdkx.h>
+
+static void qtcEmitMenuSize(GtkWidget *w, unsigned int size)
+{
+    if(w)
+    {
+        unsigned int oldSize=(unsigned int)g_object_get_data(G_OBJECT(w), MENU_SIZE_ATOM);
+
+        if(oldSize!=size)
+        {
+            Atom      qtcMenuSize = XInternAtom(gdk_x11_get_default_xdisplay(), MENU_SIZE_ATOM, False);
+            GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+
+            if(0xFFFF==size)
+                size=0;
+            g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM, (gpointer)size);
+            unsigned short ssize=size;
+            XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                            qtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&ssize, 1);
+        }
+    }
+}
+
 static gboolean objectIsA(const GObject * object, const gchar * type_name)
 {
     if((object))
