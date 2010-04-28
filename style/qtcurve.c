@@ -271,16 +271,11 @@ static gboolean useButtonColor(const gchar *detail)
                        0==strcmp(detail, QTC_PANED) );
 }
 
-#define COL_EQ(A, B)(abs(A-B)<(3<<8))
-
 #define QT_CUSTOM_COLOR_BUTTON(style) \
     (style && \
     !(COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].red,(style->bg[GTK_STATE_NORMAL].red)) && \
       COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].green,(style->bg[GTK_STATE_NORMAL].green)) && \
       COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].blue,(style->bg[GTK_STATE_NORMAL].blue))))
-
-#define EQUAL_COLOR(A, B) \
-   (COL_EQ(A.red, B.red) && COL_EQ(A.green, B.green) && COL_EQ(A.blue, B.blue))
 
 static void shadeColors(GdkColor *base, GdkColor *vals)
 {

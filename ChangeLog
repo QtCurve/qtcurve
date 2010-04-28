@@ -8,7 +8,10 @@
         not blending titlebar gradient AND
         using window titlebar colour for menubar AND
         extending window drag into menubar
-5. When shading menubars only when active, or using window border colours as menubar
+5. If using window border colours as menubar colours, and the active and inactive
+   titlebar colours are the same, then always use the active titlebar text colour
+   for the menubar.
+6. When shading menubars only when active, or using window border colours as menubar
    colours, track the active window using a X11 event sent from the QtCurve kwin
    decoration.
 

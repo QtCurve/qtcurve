@@ -38,6 +38,11 @@
 #define READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
 #define RC_SETTING "QtC__"
 
+#define COL_EQ(A, B)(abs(A-B)<(3<<8))
+
+#define EQUAL_COLOR(A, B) \
+   (COL_EQ(A.red, B.red) && COL_EQ(A.green, B.green) && COL_EQ(A.blue, B.blue))
+   
 #define toQtColor(col) \
     ((col&0xFF00)>>8)
 /*    ((int)((((double)col)/256.0)+0.5))*/
@@ -2868,6 +2873,10 @@ static gboolean qtInit()
             
             if(tmpStr)
                 free(tmpStr);
+
+            if(opts.shadeMenubarOnlyWhenActive && SHADE_WINDOW_BORDER==opts.shadeMenubars &&
+               EQUAL_COLOR(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER], qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]))
+                opts.shadeMenubarOnlyWhenActive=false;
         }
         return TRUE;
     }
