@@ -93,6 +93,7 @@ class QtCurveClient :
     QRect                     captionRect() const;
     void                      createSizeGrip();
     void                      deleteSizeGrip();
+    void                      informApp();
 
     private:
 

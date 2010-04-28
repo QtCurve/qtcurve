@@ -54,6 +54,7 @@
 #include <X11/Xatom.h>
 #include "../style/fixx11h.h"
 #include <QX11Info>
+#include <stdio.h>
 
 #if KDE_IS_VERSION(4, 3, 85)
 #include <KDE/KIconLoader>
@@ -259,6 +260,8 @@ void QtCurveClient::activeChange()
         itsResizeGrip->activeChange();
         itsResizeGrip->update();
     }
+
+    informApp();
     KCommonDecoration::activeChange();
 }
 
@@ -1128,6 +1131,24 @@ void QtCurveClient::deleteSizeGrip()
     {
         delete itsResizeGrip;
         itsResizeGrip=0L;
+    }
+}
+
+void QtCurveClient::informApp()
+{
+    if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
+    {
+        static const Atom constQtcActiveWindow = XInternAtom(QX11Info::display(), ACTIVE_WINDOW_ATOM, False);
+
+        QX11Info info;
+        XEvent xev;
+        xev.xclient.type = ClientMessage;
+        xev.xclient.message_type = constQtcActiveWindow;
+        xev.xclient.display = QX11Info::display();
+        xev.xclient.window = windowId();
+        xev.xclient.format = 32;
+        xev.xclient.data.l[0] = isActive() ? 1 : 0;
+        XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
     }
 }
 

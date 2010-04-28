@@ -3131,6 +3131,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return opts.titlebarEffect;
         case QtC_BlendMenuAndTitleBar:
             return BLEND_TITLEBAR;
+        case QtC_ShadeMenubarOnlyWhenActive:
+            return opts.shadeMenubarOnlyWhenActive;
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
