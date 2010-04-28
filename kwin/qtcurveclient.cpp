@@ -393,12 +393,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     
     if(!isPreview() && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL))
     {
-        /*
         unsigned char  *data;
         int            dummy;
-        unsigned long  dummy2;
+        unsigned long  num,
+                       dummy2;
+
         if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
-                                        &dummy2, &dummy, &dummy2, &dummy2, &data))
+                                        &dummy2, &dummy, &num, &dummy2, &data) && num>0)
         {
             unsigned short val=*((unsigned short*)data);
 
@@ -406,10 +407,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 menuBarHeight=val;
             XFree(data);
         }
-        else
-            *data = NULL; // superflous?!?
+        //else
+        //    *data = NULL; // superflous?!?
         opt.rect.adjust(0, 0, 0, menuBarHeight);
-        */
     }
 
 #ifdef DRAW_INTO_PIXMAPS

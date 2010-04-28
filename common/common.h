@@ -179,9 +179,10 @@ typedef gchar ** Strings;
 
 #define MENU_SIZE_ATOM     "_QTCURVE_MENUBAR_SIZE_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
-                           !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag && opts.xxx)
+                           !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
 
 #define TITLEBAR_SIZE_ATOM "_QTCURVE_TITLEBAR_SIZE_"
+#define ACTIVE_WINDOW_ATOM "_QTCURVE_ACTIVE_WINDOW_"
 
 #define STD_BORDER         5
 #define STD_BORDER_BR      2
@@ -410,7 +411,8 @@ typedef enum
     QtC_TitleBarIconColor,
     QtC_TitleBarBorder,
     QtC_TitleBarEffect,
-    QtC_BlendMenuAndTitleBar
+    QtC_BlendMenuAndTitleBar,
+    QtC_ShadeMenubarOnlyWhenActive
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
@@ -1010,8 +1012,7 @@ typedef struct
                      coloredTbarMo,
                      borderSelection,
                      stripedSbar,
-                     windowDrag,
-                     xxx;
+                     windowDrag;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,

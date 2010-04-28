@@ -1516,7 +1516,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(borderSelection)
             CFG_READ_BOOL(stripedSbar)
             CFG_READ_BOOL(windowDrag)
-            CFG_READ_BOOL(xxx)
 
             if(version<MAKE_VERSION(1, 4))
             {
@@ -2225,7 +2224,6 @@ static void defaultSettings(Options *opts)
     opts->square=SQUARE_NONE;
     opts->stripedSbar=false;
     opts->windowDrag=false;
-    opts->xxx=false;
     opts->titlebarBorder=true;
     opts->titlebarBlend=false;
     opts->colorTitlebarOnly=false;
