@@ -1863,7 +1863,8 @@ void QtCurveStyle::polish(QWidget *widget)
             getMdiColors(&opt, false);
 
             pal.setBrush(QPalette::Active, QPalette::Foreground, itsActiveMdiTextColor);
-            pal.setBrush(QPalette::Inactive, QPalette::Foreground, itsMdiTextColor);
+            pal.setBrush(QPalette::Inactive, QPalette::Foreground,
+                         opts.shadeMenubarOnlyWhenActive ? itsMdiTextColor : itsActiveMdiTextColor);
             widget->setPalette(pal);
         }
         else if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
@@ -12190,6 +12191,10 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
             itsActiveMdiColors=(QColor *)itsHighlightCols;
         if(!itsMdiColors)
             itsMdiColors=(QColor *)itsBackgroundCols;
+
+        if(opts.shadeMenubarOnlyWhenActive && SHADE_WINDOW_BORDER==opts.shadeMenubars &&
+           itsActiveMdiColors[ORIGINAL_SHADE]==itsMdiColors[ORIGINAL_SHADE])
+            opts.shadeMenubarOnlyWhenActive=false;
     }
 
     return active ? itsActiveMdiColors : itsMdiColors;
