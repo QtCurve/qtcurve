@@ -3,7 +3,12 @@
 1. Add striped window and menu background options.
 2. Added options to not square frames and tab frames.
 3. Animate faded progressbars when animation enabled.
-4. When shading menubars only when active, or using window border colours as menubar
+4. Blend menubar and window titlebar gradients if:
+        menubar, titlebar, and inactive titlebar gradients match AND
+        not blending titlebar gradient AND
+        using window titlebar colour for menubar AND
+        extending window drag into menubar
+5. When shading menubars only when active, or using window border colours as menubar
    colours, track the active window using a X11 event sent from the QtCurve kwin
    decoration.
 
