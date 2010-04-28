@@ -3,14 +3,22 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 
+static GtkWidget *qtcCurrentActiveWindow=NULL;
+static int       qtcTitleBarHeight = 0;
+
 static int qtcCalculateTitleBarSize(GtkWidget *w)
 {
-    GdkRectangle rect;
-    int          x, 
+    if(!w || isMozilla())
+        return qtcTitleBarHeight;
+    else
+    {
+        GdkRectangle rect;
+        int          x, 
                  y;
-    gdk_window_get_frame_extents(w->window, &rect);
-    gdk_window_get_origin(w->window, &x, &y);
-    return y-rect.y;
+        gdk_window_get_frame_extents(w->window, &rect);
+        gdk_window_get_origin(w->window, &x, &y);
+        return y-rect.y;
+    }
 }
 
 static void qtcWindowCleanup(GtkWidget *widget)
@@ -40,12 +48,11 @@ static gboolean qtcWindowStyleSet(GtkWidget *widget, GtkStyle *previous_style, g
     return FALSE;
 }
 
-static GtkWidget *qtcCurrentActiveWindow=NULL;
-
 static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer user_data)
 {
     if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcActiveWindow))
     {
+        qtcTitleBarHeight=event->data.l[1];
         if(event->data.l[0])
             qtcCurrentActiveWindow=widget;
         else if(qtcCurrentActiveWindow==widget)
