@@ -57,6 +57,7 @@ static struct
 static Options opts;
 
 #include "qt_settings.c"
+#include "atoms.c"
 #include "animation.c"
 #include "menu.c"
 #include "tab.c"
@@ -2740,9 +2741,7 @@ static GtkWidget * getParentWindow(GtkWidget *widget)
         {
             GtkWidget *w=node->data;
 
-            if(w && GTK_IS_WIDGET(w) && w->window && w!=widget &&
-               gtk_window_has_toplevel_focus(GTK_WINDOW(w)) &&
-               gtk_window_is_active(GTK_WINDOW(w)))
+            if(w && GTK_IS_WIDGET(w) && w->window && w!=widget && qtcWindowIsActive(w))
             {
                 top=w;
                 break;
@@ -3498,7 +3497,7 @@ debugDisplayWidget(widget, 3);
                 g_object_set_data(G_OBJECT(topLevel), SHADE_ACTIVE_MB_HACK_SET, (gpointer)1);
                 g_signal_connect(G_OBJECT(topLevel), "event", G_CALLBACK(windowEvent), widget);
             }
-            activeWindow=gtk_window_has_toplevel_focus(GTK_WINDOW(topLevel));
+            activeWindow=qtcWindowIsActive(GTK_WIDGET(topLevel));
         }
     }
 
@@ -5488,12 +5487,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 #endif
             
         if(opts.shadeMenubarOnlyWhenActive)
-        {
-            GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
-
-            if(topLevel && GTK_IS_WINDOW(topLevel))
-                activeWindow=gtk_window_has_toplevel_focus(GTK_WINDOW(topLevel));
-        }
+            activeWindow=qtcWindowIsActive(gtk_widget_get_toplevel(widget));
 
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
@@ -7463,7 +7457,10 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     lastSlider.widget=NULL;
     if(qtInit())
+    {
         generateColors();
+        qtcCreateAtoms();
+    }
 #ifdef QTC_ADD_EVENT_FILTER____DISABLED
     qtcAddEventFilter();
 #endif

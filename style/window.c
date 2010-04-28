@@ -23,10 +23,13 @@ static void qtcWindowCleanup(GtkWidget *widget)
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_DESTROY_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID"));
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID"));               
         if(opts.menubarHiding || opts.statusbarHiding)
             g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID"));
+        if(opts.shadeMenubarOnlyWhenActive)
+            g_signal_handler_disconnect(G_OBJECT(widget),
+                                        (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_CLIENT_EVENT_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET");
     }
 }
@@ -37,10 +40,30 @@ static gboolean qtcWindowStyleSet(GtkWidget *widget, GtkStyle *previous_style, g
     return FALSE;
 }
 
+static GtkWidget *qtcCurrentActiveWindow=NULL;
+
+static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer user_data)
+{
+    if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcActiveWindow))
+    {
+        if(event->data.l[0])
+            qtcCurrentActiveWindow=widget;
+        else if(qtcCurrentActiveWindow==widget)
+            qtcCurrentActiveWindow=0L;
+        gtk_widget_queue_draw(widget);
+    }
+    return FALSE;
+}
+
 static gboolean qtcWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     qtcWindowCleanup(widget);
     return FALSE;
+}
+
+static gboolean qtcWindowIsActive(GtkWidget *widget)
+{
+    return widget && (gtk_window_is_active(GTK_WINDOW(widget)) || qtcCurrentActiveWindow==widget);
 }
 
 static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointer user_data)
@@ -174,5 +197,9 @@ static void qtcWindowSetup(GtkWidget *widget)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
                                                          (GtkSignalFunc)qtcWindowKeyRelease, NULL));
+        if(opts.shadeMenubarOnlyWhenActive)
+            g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_CLIENT_EVENT_ID",
+                              (gpointer)g_signal_connect(G_OBJECT(widget), "client-event",
+                                                         (GtkSignalFunc)qtcWindowClientEvent, NULL));
     }  
 }

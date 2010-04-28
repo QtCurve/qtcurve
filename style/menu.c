@@ -17,7 +17,6 @@ static void qtcEmitMenuSize(GtkWidget *w, unsigned int size)
 
         if(oldSize!=size)
         {
-            Atom      qtcMenuSize = XInternAtom(gdk_x11_get_default_xdisplay(), MENU_SIZE_ATOM, False);
             GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
 
             if(0xFFFF==size)
