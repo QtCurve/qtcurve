@@ -2927,12 +2927,20 @@ debugDisplayWidget(widget, 3);
         !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
         qtcWindowSetup(widget);
-        if(opts.menubarHiding && qtcMenuBarHidden(qtSettings.appName))
+
+        bool hiddenMenubar=opts.menubarHiding && qtcMenuBarHidden(qtSettings.appName);
+        
+        if(hiddenMenubar || BLEND_TITLEBAR)
         {
             GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
 
             if(menuBar)
-                gtk_widget_hide(menuBar);
+            {
+                if(hiddenMenubar)
+                    gtk_widget_hide(menuBar);
+                if(BLEND_TITLEBAR)
+                    qtcEmitMenuSize(menuBar, menuBar->allocation.height);
+            }
         }
         if(opts.statusbarHiding && qtcStatusBarHidden(qtSettings.appName))
         {
