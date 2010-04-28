@@ -285,6 +285,7 @@ class QtCurveStyle : public QCommonStyle
     mutable QMap<int, QColor *>        itsTitleBarButtonsCols;
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
     mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
+    mutable int                        itsTitlebarHeight;
 
     // Required for Q3Header hover...
     QPoint                             itsPos;
