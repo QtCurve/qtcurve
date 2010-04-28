@@ -54,7 +54,6 @@
 #include <X11/Xatom.h>
 #include "../style/fixx11h.h"
 #include <QX11Info>
-#include <stdio.h>
 
 #if KDE_IS_VERSION(4, 3, 85)
 #include <KDE/KIconLoader>
