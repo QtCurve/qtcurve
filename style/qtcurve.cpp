@@ -8091,8 +8091,24 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                             : itsMdiTextColor*/),
                              shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                 QStyleOption opt(*option);
+                QRect        tr(r);
 
+                if(!kwin && BLEND_TITLEBAR && widget && qobject_cast<const QMdiSubWindow *>(widget))
+                {
+                    const QWidget *w=NULL;
+                    if(qobject_cast<const QMainWindow *>(widget))
+                        w=widget;
+                    else if (static_cast<const QMdiSubWindow *>(widget)->widget())
+                        w=qobject_cast<const QMainWindow *>(static_cast<const QMdiSubWindow *>(widget)->widget());
+                    if(w)
+                    {
+                        const QMenuBar *menuBar=static_cast<const QMainWindow *>(w)->menuBar();
 
+                        if(menuBar)
+                            tr.adjust(0, 0, 0, menuBar->rect().height());
+                    }
+                }
+                
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
 
 #ifdef QTC_QT_ONLY
@@ -8101,7 +8117,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #if KDE_IS_VERSION(4, 3, 0)
                 QPainterPath path(opts.round<ROUND_SLIGHT
                                     ? QPainterPath()
-                                    : buildPath(QRectF(state&QtC_StateKWinNoBorder ? r : r.adjusted(1, 1, -1, 0)),
+                                    : buildPath(QRectF(state&QtC_StateKWinNoBorder ? tr : tr.adjusted(1, 1, -1, 0)),
                                                 WIDGET_MDI_WINDOW_TITLE, state&QtC_StateKWin && state&QtC_StateKWinTabDrag
                                                     ? ROUNDED_ALL : ROUNDED_TOP,
                                                 (opts.round>ROUND_SLIGHT /*&& kwin*/
@@ -8112,7 +8128,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 #endif
 #endif
                 if(!kwin)
-                    painter->fillRect(r, titleCols[STD_BORDER]);
+                    painter->fillRect(tr, titleCols[STD_BORDER]);
 
                 if(APPEARANCE_STRIPED==opts.bgndAppearance && opts.titlebarBlend)
                 {
@@ -8143,7 +8159,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 }
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, r, path, true, false,
+                drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false,
                                     widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active),
                                     WIDGET_MDI_WINDOW, false);
 
