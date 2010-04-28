@@ -94,6 +94,7 @@ class QtCurveClient :
     void                      createSizeGrip();
     void                      deleteSizeGrip();
     void                      informApp();
+    const QString &           windowClass();
 
     private:
 
@@ -109,7 +110,8 @@ class QtCurveClient :
     QtCurveSizeGrip *itsResizeGrip;
     ButtonBgnd      itsButtonBackground[constNumButtonStates];
     QRect           itsCaptionRect;
-    QString         itsCaption;
+    QString         itsCaption,
+                    itsWindowClass;
     QFont           itsTitleFont;
 
 #if KDE_IS_VERSION(4, 3, 85)

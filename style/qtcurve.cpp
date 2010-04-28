@@ -1088,6 +1088,7 @@ QtCurveStyle::QtCurveStyle()
               itsClickedLabel(0L),
               itsProgressBarAnimateTimer(0),
               itsAnimateStep(0),
+              itsTitlebarHeight(0),
               itsPos(-1, -1),
               itsHoverWidget(0L),
 #ifdef Q_WS_X11
@@ -11836,15 +11837,42 @@ void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, cons
         QRect rx(r);
         if(BLEND_TITLEBAR)
         {
-            const QWidget *w=widget ? widget : getWidget(p);
-            
-            if(w && (w=w->topLevelWidget()->window()))
+            if(APP_OPENOFFICE==theThemedApp)
             {
-                int titlebarHeight=w->geometry().y()-w->frameGeometry().y();
-                rx.adjust(0, -titlebarHeight, 0, 0);
-//                printf("Adjust:%d  %d %s  %d %d    %d %d\n", titlebarHeight, w->frameGeometry().height(), w->metaObject()->className(),
-//                       w->isWindow(), !(w->windowType() == Qt::Popup), w->geometry().y(), w->frameGeometry().y());
+#ifndef QTC_QT_ONLY
+                if(0==itsTitlebarHeight)
+                {
+                    KConfig            configFile("kwinqtcurverc");
+                    const KConfigGroup general(&configFile, "General");
+                    const KConfigGroup qtc(&configFile, "KWinQtCurve");
+                    QFontMetrics       fm(KGlobalSettings::windowTitleFont());
+                    int                titleHeightMin = general.readEntry("MinTitleHeight", 16),
+                                       titleBarPad = qtc.readEntry("TitleBarPad", 0);
 
+                    // The title should stretch with bigger font sizes!
+                    itsTitlebarHeight = qMax(titleHeightMin, fm.height() + 4); // 4 px for the shadow etc.
+                    // have an even title/button size so the button icons are fully centered...
+                    if (itsTitlebarHeight%2 == 0)
+                        itsTitlebarHeight++;
+                    itsTitlebarHeight+=2*titleBarPad;
+                }
+                rx.adjust(0, -itsTitlebarHeight, 0, 0);
+#else
+                // TODO!!!
+#endif
+            }
+            else
+            {
+                const QWidget *w=widget ? widget : getWidget(p);
+
+                if(w && (w=w->topLevelWidget()->window()))
+                {
+                    int titlebarHeight=w->geometry().y()-w->frameGeometry().y();
+                    rx.adjust(0, -titlebarHeight, 0, 0);
+    //                printf("Adjust:%d  %d %s  %d %d    %d %d\n", titlebarHeight, w->frameGeometry().height(), w->metaObject()->className(),
+    //                       w->isWindow(), !(w->windowType() == Qt::Popup), w->geometry().y(), w->frameGeometry().y());
+
+                }
             }
         }
 

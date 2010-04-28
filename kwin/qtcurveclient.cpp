@@ -393,22 +393,36 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     
     if(!isPreview() && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL))
     {
-        unsigned char  *data;
-        int            dummy;
-        unsigned long  num,
-                       dummy2;
-
-        if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
-                                        &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+        QString wc(windowClass());
+        if(wc==QLatin1String("Navigator Firefox"))
         {
-            unsigned short val=*((unsigned short*)data);
-
-            if(val<512)
-                menuBarHeight=val;
-            XFree(data);
+            // TODO: Calculate height???
+            menuBarHeight=23;
         }
-        //else
-        //    *data = NULL; // superflous?!?
+        else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")))
+        {
+            // TODO: Calculate height???
+            menuBarHeight=23;
+        }
+        else
+        {
+            unsigned char  *data;
+            int            dummy;
+            unsigned long  num,
+                        dummy2;
+
+            if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
+                                            &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+            {
+                unsigned short val=*((unsigned short*)data);
+
+                if(val<512)
+                    menuBarHeight=val;
+                XFree(data);
+            }
+            //else
+            //    *data = NULL; // superflous?!?
+        }
         opt.rect.adjust(0, 0, 0, menuBarHeight);
     }
 
@@ -1147,8 +1161,23 @@ void QtCurveClient::informApp()
         xev.xclient.window = windowId();
         xev.xclient.format = 32;
         xev.xclient.data.l[0] = isActive() ? 1 : 0;
+        xev.xclient.data.l[1] = isToolWindow()
+                                ? Handler()->titleHeightTool()
+                                : Handler()->titleHeight();
         XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
     }
+}
+
+const QString & QtCurveClient::windowClass()
+{
+    if(itsWindowClass.isEmpty())
+    {
+        KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+
+        itsWindowClass=info.windowClassName()+' '+info.windowClassClass();
+    }
+
+    return itsWindowClass;
 }
 
 }
