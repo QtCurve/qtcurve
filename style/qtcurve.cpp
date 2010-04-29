@@ -11836,7 +11836,7 @@ void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, cons
     if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
     {
         QRect rx(r);
-        if(BLEND_TITLEBAR)
+        if(menu && BLEND_TITLEBAR)
             rx.adjust(0, -qtcGetWindowBorderSize(), 0, 0);
 
         drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
