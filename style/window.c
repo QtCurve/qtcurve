@@ -36,8 +36,6 @@ static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, g
 {
     if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcActiveWindow))
     {
-        if(getWindowBorderSize(FALSE)!=event->data.l[1])
-            getWindowBorderSize(TRUE);
         if(event->data.l[0])
             qtcCurrentActiveWindow=widget;
         else if(qtcCurrentActiveWindow==widget)
