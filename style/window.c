@@ -132,17 +132,27 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
 
             if(menuBar)
             {
+                int size=0;
                 toggled=TRUE;
                 qtcSetMenuBarHidden(qtSettings.appName, GTK_WIDGET_VISIBLE(menuBar));
                 if(GTK_WIDGET_VISIBLE(menuBar))
-                {
-                    qtcEmitMenuSize(menuBar, 0);
                     gtk_widget_hide(menuBar);
-                }
                 else
                 {
-                    qtcEmitMenuSize(menuBar, menuBar->allocation.height);
+                    size=menuBar->allocation.height;
                     gtk_widget_show(menuBar);
+                }
+
+                {
+                    GtkWindow   *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(menuBar));
+                    unsigned int xid=GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window);
+                    char xidS[16], sizeS[16];
+                    char *argv[]={"qdbus", "org.kde.kwin", "/QtCurve", "refresh", xidS, sizeS, NULL};
+
+                    qtcEmitMenuSize(menuBar, size);
+                    sprintf(xidS, "%d", xid);
+                    sprintf(sizeS, "%d", size);
+                    g_spawn_async("/tmp", argv, NULL, (GSpawnFlags)0, NULL, NULL, NULL, NULL);
                 }
             }
         }
