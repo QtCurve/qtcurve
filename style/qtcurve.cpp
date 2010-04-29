@@ -1844,10 +1844,7 @@ void QtCurveStyle::polish(QWidget *widget)
 
 #ifdef Q_WS_X11
         if(BLEND_TITLEBAR)
-        {
             emitMenuSize((QWidget *)widget, widget->rect().height());
-            QTimer::singleShot(500, widget, SLOT(update()));
-        }
 #endif
         if(CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::NoRole);
@@ -3929,7 +3926,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             {
                 painter->save();
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, r, option, true, true, widget);
+                    drawMenuOrToolBarBackground(painter, r, option);
                 if(TB_NONE!=opts.toolbarBorders)
                 {
                     const QColor *use=itsActive
@@ -5827,7 +5824,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, mbi->menuRect, option, widget);
+                    drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
                     drawMenuItem(painter, r, option, true, (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly
@@ -6321,7 +6318,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, r, option, true, true, widget);
+                    drawMenuOrToolBarBackground(painter, r, option);
                 if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
                     (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
                 {
@@ -11833,52 +11830,14 @@ void QtCurveStyle::drawSliderGroove(QPainter *p, const QRect &groove, const QRec
     }
 }
 
-void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz, const QWidget *widget) const
+void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
 {
     EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
     {
         QRect rx(r);
         if(BLEND_TITLEBAR)
-        {
-            if(APP_OPENOFFICE==theThemedApp)
-            {
-#ifndef QTC_QT_ONLY
-                if(0==itsTitlebarHeight)
-                {
-                    KConfig            configFile("kwinqtcurverc");
-                    const KConfigGroup general(&configFile, "General");
-                    const KConfigGroup qtc(&configFile, "KWinQtCurve");
-                    QFontMetrics       fm(KGlobalSettings::windowTitleFont());
-                    int                titleHeightMin = general.readEntry("MinTitleHeight", 16),
-                                       titleBarPad = qtc.readEntry("TitleBarPad", 0);
-
-                    // The title should stretch with bigger font sizes!
-                    itsTitlebarHeight = qMax(titleHeightMin, fm.height() + 4); // 4 px for the shadow etc.
-                    // have an even title/button size so the button icons are fully centered...
-                    if (itsTitlebarHeight%2 == 0)
-                        itsTitlebarHeight++;
-                    itsTitlebarHeight+=2*titleBarPad;
-                }
-                rx.adjust(0, -itsTitlebarHeight, 0, 0);
-#else
-                // TODO!!!
-#endif
-            }
-            else
-            {
-                const QWidget *w=widget ? widget : getWidget(p);
-
-                if(w && (w=w->topLevelWidget()->window()))
-                {
-                    int titlebarHeight=w->geometry().y()-w->frameGeometry().y();
-                    rx.adjust(0, -titlebarHeight, 0, 0);
-    //                printf("Adjust:%d  %d %s  %d %d    %d %d\n", titlebarHeight, w->frameGeometry().height(), w->metaObject()->className(),
-    //                       w->isWindow(), !(w->windowType() == Qt::Popup), w->geometry().y(), w->frameGeometry().y());
-
-                }
-            }
-        }
+            rx.adjust(0, -qtcGetWindowBorderSize(), 0, 0);
 
         drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? menuColors(option, itsActive)[ORIGINAL_SHADE]

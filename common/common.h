@@ -115,6 +115,7 @@ typedef gchar ** Strings;
 #define THEME_DIR4   "/share/kde4/apps/kstyle/themes/"
 #define THEME_PREFIX "qtc_"
 #define THEME_SUFFIX ".themerc"
+#define BORDER_SIZE_FILE "windowBorderSizes"
 
 #define LV_SIZE      7
 

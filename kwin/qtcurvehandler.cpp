@@ -31,6 +31,8 @@
 #include <QStyleFactory>
 #include <QStyle>
 #include <QDir>
+#include <QFile>
+#include <QTextStream>
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
@@ -40,6 +42,7 @@
 #include <KColorUtils>
 #include <KColorScheme>
 #include <KGlobalSettings>
+#include <KSaveFile>
 #include <unistd.h>
 #include <sys/types.h>
 #include <kde_file.h>
@@ -257,6 +260,33 @@ bool QtCurveHandler::readConfig()
     itsConfig.load(&configFile);
 
     itsTitleHeight+=2*titleBarPad();
+
+    QFile in(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
+    int   oldSize(-1), oldToolSize(-1);
+
+    if(in.open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(&in);
+        oldSize=in.readLine().toInt();
+        oldToolSize=in.readLine().toInt();
+        in.close();
+    }
+
+    int borderEdge=borderEdgeSize();
+    if(oldSize!=(itsTitleHeight+borderEdge) || oldToolSize!=(itsTitleHeightTool+borderEdge))
+    {
+        KSaveFile sizeFile(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
+
+        if (sizeFile.open())
+        {
+            QTextStream stream(&sizeFile);
+            stream << itsTitleHeight+borderEdge << endl
+                << itsTitleHeightTool+borderEdge;
+            stream.flush();
+            sizeFile.finalize();
+            sizeFile.close();
+        }
+    }
 #if KDE_IS_VERSION(4, 3, 0)
     bool shadowChanged(false);
 

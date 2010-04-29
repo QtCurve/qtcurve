@@ -671,6 +671,59 @@ static const char *qtcConfDir()
     return cfgDir;
 }
 
+#ifdef __cplusplus
+static int qtcGetWindowBorderSize(bool force=false)
+{
+    static int size=-1;
+
+    if(-1==size || force)
+    {
+        QFile f(qtcConfDir()+QString(BORDER_SIZE_FILE));
+
+#if QT_VERSION >= 0x040000
+        if(f.open(QIODevice::ReadOnly))
+#else
+        if(f.open(IO_ReadOnly))
+#endif
+        {
+            QTextStream stream(&f);
+            QString     line;
+
+            size=stream.readLine().toInt();
+            f.close();
+        }
+    }
+
+    return size;
+}
+#else
+static int qtcGetWindowBorderSize(gboolean force)
+{
+    static int size=-1;
+
+    if(-1==size || force)
+    {
+        char *filename=(char *)malloc(strlen(qtcConfDir())+strlen(BORDER_SIZE_FILE)+1);
+        FILE *f=NULL;
+
+        sprintf(filename, "%s"BORDER_SIZE_FILE, qtcConfDir());
+        if((f=fopen(filename, "r")));
+        {
+            char *line=NULL;
+            size_t len;
+            getline(&line, &len, f);
+            size=atoi(line);
+            if(line)
+                free(line);
+            fclose(f);
+        }
+        free(filename);
+    }
+
+    return size;
+}
+#endif // __cplusplus
+
 #if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
 
 #define MENU_FILE_PREFIX   "menubar-"
@@ -695,7 +748,7 @@ static void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix)
         QFile(QFile::decodeName(qtcConfDir())+prefix+app).open(QIODevice::WriteOnly);
 }
 
-#else
+#else // __cplusplus
 static bool qtcFileExists(const char *name)
 {
     struct stat info;
@@ -733,11 +786,12 @@ static void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
             fclose(f);
     }
 }
-#endif
+
+#endif // __cplusplus
 
 #ifdef __cplusplus
 #include <QtSvg/QSvgRenderer>
-#endif
+#endif // __cplusplus
 
 static void loadBgndImage(QtCImage *img)
 {
@@ -759,15 +813,15 @@ static void loadBgndImage(QtCImage *img)
                 painter.end();
             }
         }
-#else
+#else // __cplusplus
         img->pix=0L;
         if(img->file)
             img->pix=gdk_pixbuf_new_from_file_at_scale(img->file, img->width, img->height, FALSE, NULL);
-#endif
+#endif // __cplusplus
     }
 }
 
-#endif
+#endif // (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
 
 #ifdef CONFIG_READ
 
