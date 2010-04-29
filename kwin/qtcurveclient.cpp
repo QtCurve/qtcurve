@@ -399,7 +399,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             // TODO: Calculate height???
             menuBarHeight=23;
         }
-        else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")))
+        else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
+                wc==QLatin1String("soffice.bin Soffice.bin"))
         {
             // TODO: Calculate height???
             menuBarHeight=23;
