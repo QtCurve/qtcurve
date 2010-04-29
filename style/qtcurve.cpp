@@ -1844,7 +1844,10 @@ void QtCurveStyle::polish(QWidget *widget)
 
 #ifdef Q_WS_X11
         if(BLEND_TITLEBAR)
+        {
             emitMenuSize((QWidget *)widget, widget->rect().height());
+            QTimer::singleShot(500, widget, SLOT(update()));
+        }
 #endif
         if(CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::NoRole);
