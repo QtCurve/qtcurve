@@ -680,33 +680,6 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 
 #ifdef Q_WS_X11
 static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
-static const Atom constQtcMenuSize   = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-
-static void emitMenuSize(QWidget *w, unsigned short size)
-{
-    if(w)
-    {
-        static const char * constMenuSizeProperty="qtcMenuSize";
-        QVariant       prop(w->property(constMenuSizeProperty));
-        unsigned short oldSize=0;
-
-        if(prop.isValid())
-        {
-            bool ok;
-            oldSize=prop.toUInt(&ok);
-            if(!ok)
-                oldSize=0;
-        }
-
-        if(oldSize!=size)
-        {
-            if(w)
-                w->setProperty(constMenuSizeProperty, size);
-            XChangeProperty(QX11Info::display(), w->window()->winId(),
-                            constQtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
-        }
-    }
-}
 
 static void triggerWMMove(const QWidget *w, const QPoint &p)
 {
@@ -1089,6 +1062,7 @@ QtCurveStyle::QtCurveStyle()
               itsProgressBarAnimateTimer(0),
               itsAnimateStep(0),
               itsTitlebarHeight(0),
+              itsDBus(0),
               itsPos(-1, -1),
               itsHoverWidget(0L),
 #ifdef Q_WS_X11
@@ -1420,6 +1394,8 @@ QtCurveStyle::~QtCurveStyle()
             delete [] itsTitleBarButtonsCols[i];
     if(itsOOMenuCols)
         delete itsOOMenuCols;
+    if(itsDBus)
+        delete itsDBus;
 }
 
 static QString getFile(const QString &f)
@@ -12561,4 +12537,35 @@ bool QtCurveStyle::isWindowDragWidget(QObject *o)
 //            || (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar"))
            );
 }
+
+static const Atom constQtcMenuSize   = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+
+void QtCurveStyle::emitMenuSize(QWidget *w, unsigned short size)
+{
+    if(w)
+    {
+        static const char * constMenuSizeProperty="qtcMenuSize";
+        QVariant       prop(w->property(constMenuSizeProperty));
+        unsigned short oldSize=0;
+
+        if(prop.isValid())
+        {
+            bool ok;
+            oldSize=prop.toUInt(&ok);
+            if(!ok)
+                oldSize=0;
+        }
+
+        if(oldSize!=size)
+        {
+            w->setProperty(constMenuSizeProperty, size);
+            XChangeProperty(QX11Info::display(), w->window()->winId(),
+                            constQtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
+            if(!itsDBus)
+                itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
+            itsDBus->call(QDBus::NoBlock, "refresh", (unsigned int)w->window()->winId(), (int)size);
+        }
+    }
+}
+
 #endif

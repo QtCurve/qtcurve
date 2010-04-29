@@ -33,10 +33,12 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
+#include <QApplication>
+#include <QDBusConnection>
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
-#include <QApplication>
+#include "qtcurvedbus.h"
 #include <KConfig>
 #include <KConfigGroup>
 #include <KColorUtils>
@@ -86,6 +88,9 @@ QtCurveHandler::QtCurveHandler()
 {
     setStyle();
     reset(0);
+
+    new QtCurveDBus(this);
+    QDBusConnection::sessionBus().registerObject("/QtCurve", this);
 }
 
 QtCurveHandler::~QtCurveHandler()
@@ -329,6 +334,16 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
     return itsBitmaps[toolWindow][typeIndex];
 }
 
+void QtCurveHandler::refresh(unsigned int xid, int size)
+{
+    QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
+                                          end(itsClients.end());
+
+    for(; it!=end; ++it)
+        if((*it)->windowId()==xid)
+            (*it)->menubarSize(size);
+}
+
 int QtCurveHandler::borderEdgeSize() const
 {
     return outerBorder()
@@ -359,3 +374,6 @@ extern "C"
         return KWinQtCurve::handler;
     }
 }
+
+#include "qtcurvedbus.moc"
+#include "qtcurvehandler.moc"

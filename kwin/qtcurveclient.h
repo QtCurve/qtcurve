@@ -75,6 +75,7 @@ class QtCurveClient :
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
+    void                      menubarSize(int size);
 
     private:
 
@@ -93,7 +94,7 @@ class QtCurveClient :
     QRect                     captionRect() const;
     void                      createSizeGrip();
     void                      deleteSizeGrip();
-    void                      informApp();
+    void                      informAppOfActiveChange();
     const QString &           windowClass();
 
     private:
@@ -113,6 +114,7 @@ class QtCurveClient :
     QString         itsCaption,
                     itsWindowClass;
     QFont           itsTitleFont;
+    int             itsMenuBarSize;
 
 #if KDE_IS_VERSION(4, 3, 85)
     QList<QtCurveButton *> itsCloseButtons;

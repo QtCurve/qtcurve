@@ -67,6 +67,8 @@ enum ButtonIcon
     NumButtonIcons
 };
 
+class QtCurveClient;
+
 class QtCurveHandler : public QObject,
 #if KDE_IS_VERSION(4, 3, 0)
                        public KDecorationFactoryUnstable
@@ -107,25 +109,29 @@ class QtCurveHandler : public QObject,
 #if KDE_IS_VERSION(4, 3, 85)
     bool                  grouping() const        { return itsConfig.grouping(); }
 #endif
-
+    void                  refresh(unsigned int xid, int size);
+    void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
+    void                  removeClient(QtCurveClient *c) { itsClients.removeAll(c); }
+    
     private:
 
     bool readConfig();
 
     private:
 
-    int           itsBorderSize,
-                  itsBotBorderSize,
-                  itsTitleHeight,
-                  itsTitleHeightTool,
-                  itsTimeStamp;
-    QFont         itsTitleFont,
-                  itsTitleFontTool;
-    QStyle        *itsStyle;
-    QBitmap       itsBitmaps[2][NumButtonIcons];
-    QtCurveConfig itsConfig;
+    int                    itsBorderSize,
+                           itsBotBorderSize,
+                           itsTitleHeight,
+                           itsTitleHeightTool,
+                           itsTimeStamp;
+    QFont                  itsTitleFont,
+                           itsTitleFontTool;
+    QStyle                 *itsStyle;
+    QBitmap                itsBitmaps[2][NumButtonIcons];
+    QtCurveConfig          itsConfig;
+    QList<QtCurveClient *> itsClients;
 #if KDE_IS_VERSION(4, 3, 0)
-    QtCurveShadowCache itsShadowCache;
+    QtCurveShadowCache     itsShadowCache;
 #endif
 };
 

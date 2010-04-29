@@ -54,6 +54,7 @@ class QStyleOptionSlider;
 class QLabel;
 class QMenuBar;
 class QScrollBar;
+class QDBusInterface;
 
 class QtCurveStyle : public QCommonStyle
 {
@@ -243,6 +244,7 @@ class QtCurveStyle : public QCommonStyle
 #endif
 #ifdef Q_WS_X11
     bool           isWindowDragWidget(QObject *o);
+    void           emitMenuSize(QWidget *w, unsigned short size);
 #endif
 
     private:
@@ -286,6 +288,7 @@ class QtCurveStyle : public QCommonStyle
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
     mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
     mutable int                        itsTitlebarHeight;
+    QDBusInterface                     *itsDBus;
 
     // Required for Q3Header hover...
     QPoint                             itsPos;

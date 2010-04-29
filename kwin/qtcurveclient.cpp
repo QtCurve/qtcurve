@@ -121,6 +121,7 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
 #endif    
              , itsResizeGrip(0L)
              , itsTitleFont(QFont())
+             , itsMenuBarSize(-1)
 #if KDE_IS_VERSION(4, 3, 85)
              , itsClickInProgress(false)
              , itsDragInProgress(false)
@@ -128,10 +129,12 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
              , itsTargetTab(constInvalidTab)
 #endif
 {
+    Handler()->addClient(this);
 }
 
 QtCurveClient::~QtCurveClient()
 {
+    Handler()->removeClient(this);
     deleteSizeGrip();
 }
 
@@ -260,7 +263,7 @@ void QtCurveClient::activeChange()
         itsResizeGrip->update();
     }
 
-    informApp();
+    informAppOfActiveChange();
     KCommonDecoration::activeChange();
 }
 
@@ -388,49 +391,44 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.palette.setColor(QPalette::Button, col);
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
-
-    unsigned short menuBarHeight=0;
     
     if(!isPreview() && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL))
     {
-        QString wc(windowClass());
-        if(wc==QLatin1String("Navigator Firefox"))
+        if(-1==itsMenuBarSize)
         {
-            // TODO: Calculate height???
-            menuBarHeight=23;
-        }
-        else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
-                wc==QLatin1String("soffice.bin Soffice.bin"))
-        {
-            // TODO: Calculate height???
-            menuBarHeight=23;
-        }
-        else
-        {
-            unsigned char  *data;
-            int            dummy;
-            unsigned long  num,
-                        dummy2;
-
-            if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
-                                            &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+            QString wc(windowClass());
+            if(wc==QLatin1String("Navigator Firefox"))
+                itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
+            else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
+                    wc==QLatin1String("soffice.bin Soffice.bin"))
+                itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
+            else
             {
-                unsigned short val=*((unsigned short*)data);
+                unsigned char  *data;
+                int            dummy;
+                unsigned long  num,
+                            dummy2;
 
-                if(val<512)
-                    menuBarHeight=val;
-                XFree(data);
+                if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
+                                                &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+                {
+                    unsigned short val=*((unsigned short*)data);
+
+                    if(val<512)
+                        itsMenuBarSize=val;
+                    XFree(data);
+                }
+                //else
+                //    *data = NULL; // superflous?!?
             }
-            //else
-            //    *data = NULL; // superflous?!?
         }
-        opt.rect.adjust(0, 0, 0, menuBarHeight);
+        opt.rect.adjust(0, 0, 0, itsMenuBarSize);
     }
 
 #ifdef DRAW_INTO_PIXMAPS
     if(!compositing && !isPreview())
     {
-        QPixmap  tPix(32, titleBarHeight+menuBarHeight);
+        QPixmap  tPix(32, titleBarHeight+(itsMenuBarSize<0 ? 0 : itsMenuBarSize));
         QPainter tPainter(&tPix);
         tPainter.setRenderHint(QPainter::Antialiasing, true);
         opt.rect=QRect(0, 0, tPix.width(), tPix.height());
@@ -1148,7 +1146,7 @@ void QtCurveClient::deleteSizeGrip()
     }
 }
 
-void QtCurveClient::informApp()
+void QtCurveClient::informAppOfActiveChange()
 {
     if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
     {
@@ -1162,9 +1160,6 @@ void QtCurveClient::informApp()
         xev.xclient.window = windowId();
         xev.xclient.format = 32;
         xev.xclient.data.l[0] = isActive() ? 1 : 0;
-        xev.xclient.data.l[1] = isToolWindow()
-                                ? Handler()->titleHeightTool()
-                                : Handler()->titleHeight();
         XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
     }
 }
@@ -1179,6 +1174,12 @@ const QString & QtCurveClient::windowClass()
     }
 
     return itsWindowClass;
+}
+
+void QtCurveClient::menubarSize(int size)
+{
+    itsMenuBarSize=size;
+    KCommonDecoration::activeChange();
 }
 
 }
