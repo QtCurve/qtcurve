@@ -179,11 +179,9 @@ typedef gchar ** Strings;
 #define ENTRY_INNER_ALPHA 0.4
 
 #define MENU_SIZE_ATOM     "_QTCURVE_MENUBAR_SIZE_"
+#define ACTIVE_WINDOW_ATOM "_QTCURVE_ACTIVE_WINDOW_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                            !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
-
-#define TITLEBAR_SIZE_ATOM "_QTCURVE_TITLEBAR_SIZE_"
-#define ACTIVE_WINDOW_ATOM "_QTCURVE_ACTIVE_WINDOW_"
 
 #define STD_BORDER         5
 #define STD_BORDER_BR      2
