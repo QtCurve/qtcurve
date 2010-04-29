@@ -4459,10 +4459,11 @@ debugDisplayWidget(widget, 3);
 //             if(menubar)
                 qtcWMMoveSetup(widget);
 
-            if(menubar && widget && BLEND_TITLEBAR)
+            if(menubar && BLEND_TITLEBAR)
             {
-                menuBarAdjust=qtcCalculateTitleBarSize(widget);
-                qtcEmitMenuSize(widget, widget->allocation.height);
+                menuBarAdjust=qtcGetWindowBorderSize(FALSE);
+                if(widget)
+                    qtcEmitMenuSize(widget, widget->allocation.height);
             }
 
             /* Toolbars and menus */
