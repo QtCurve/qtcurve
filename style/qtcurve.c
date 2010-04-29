@@ -4463,7 +4463,7 @@ debugDisplayWidget(widget, 3);
             {
                 menuBarAdjust=qtcGetWindowBorderSize(FALSE);
                 if(widget)
-                    qtcEmitMenuSize(widget, widget->allocation.height);
+                    qtcEmitMenuSize(widget, height);
             }
 
             /* Toolbars and menus */
