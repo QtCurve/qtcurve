@@ -548,7 +548,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         itsCaptionRect=captionRect(); // also update itsCaptionRect!
         paintTitle(&painter, itsCaptionRect, QRect(rectX+titleEdgeLeft, itsCaptionRect.y(),
-                                                   rectX2-titleEdgeRight-(rectX+titleEdgeLeft),
+                                                   rectX2-(titleEdgeRight+rectX+titleEdgeLeft),
                                                    itsCaptionRect.height()),
                    itsCaption, showIcon ? icon().pixmap(iconSize) : QPixmap(), shadowSize);
 #if KDE_IS_VERSION(4, 3, 85)
@@ -588,13 +588,17 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
                                     ? fm.boundingRect(str).width()+(showIcon ? pix.width()+constTitlePad : 0) : 0;
         EEffect       effect((EEffect)(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
 
-        if(alignFull &&
-            ( ( (capRect.left()+shadowSize)>((textRect.width()-textWidth)>>1) ) ||
-              (  capRect.right()<((textRect.width()+textWidth)>>1) ) ) )
+        if(alignFull)
         {
-            alignment=Qt::AlignVCenter|Qt::AlignHCenter;
-            textRect=capRect;
-            hAlign=Qt::AlignLeft;
+            int halfWidth=(textWidth+(showIcon ? pix.width()+constTitlePad : 0))/2;
+
+            if(capRect.left()>(textRect.x()+(textRect.width()/2)-halfWidth) ||
+               capRect.right()<(textRect.x()+(textRect.width()/2)+halfWidth))
+            {
+                alignment=Qt::AlignVCenter|Qt::AlignHCenter;
+                textRect=capRect;
+                hAlign=Qt::AlignLeft;
+            }
         }
 
         if(showIcon)
