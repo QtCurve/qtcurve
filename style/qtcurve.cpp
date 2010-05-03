@@ -670,8 +670,9 @@ enum WindowsStyleConsts
     windowsArrowHMargin   =  6  // arrow horizontal margin
 };
 
-static const int constProgressBarFps   = 20;
-static const int constTabPad           =  6;
+static const int constWindowMargin   =  2;
+static const int constProgressBarFps = 20;
+static const int constTabPad         =  6;
 
 static const QLatin1String constDwtClose("qt_dockwidget_closebutton");
 static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
@@ -8222,6 +8223,24 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 else
                     painter->setRenderHint(QPainter::Antialiasing, false);
 
+                int   adjust(0);
+                QRect captionRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
+
+                if(!kwin && opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && opts.titlebarButtons&TITLEBAR_BUTTON_ROUND &&
+                    captionRect!=r)
+                {
+                    adjust=1;
+                    if(captionRect.left()>(r.left()+constWindowMargin))
+                        drawSunkenBevel(painter, QRect(r.left()+constWindowMargin+1, r.top()+constWindowMargin+1,
+                                                       captionRect.left()-(r.left()+(2*constWindowMargin)),
+                                                       r.height()-(1+(2*constWindowMargin))));
+
+                    if(captionRect.right()<(r.right()-constWindowMargin))
+                        drawSunkenBevel(painter, QRect(captionRect.right()+constWindowMargin, r.top()+constWindowMargin+1,
+                                                       r.right()-(captionRect.right()+(2*constWindowMargin)),
+                                                       r.height()-(1+(2*constWindowMargin))));
+                }
+
                 bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && !titleBar->icon.isNull();
                 int     iconSize=showIcon ? pixelMetric(QStyle::PM_SmallIconSize) : 0,
                         iconX=r.x();
@@ -8237,8 +8256,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     Qt::Alignment alignment((Qt::Alignment)pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
                     bool          alignFull(Qt::AlignHCenter==alignment),
                                   iconRight((!reverse && alignment&Qt::AlignRight) || (reverse && alignment&Qt::AlignLeft));
-                    QRect         captionRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget)),
-                                  textRect(alignFull
+                    QRect         textRect(alignFull
                                             ? QRect(r.x(), captionRect.y(), r.width(), captionRect.height())
                                             : captionRect);
 
@@ -8330,30 +8348,34 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if ((titleBar->subControls&SC_TitleBarMinButton) && (titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMinimized))
-                    drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, iconColor, btnCols, bgndCols, adjust);
 
                 if ((titleBar->subControls&SC_TitleBarMaxButton) && (titleBar->titleBarFlags&Qt::WindowMaximizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMaximized))
-                    drawMdiControl(painter, titleBar, SC_TitleBarMaxButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarMaxButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols, adjust);
 
                 if ((titleBar->subControls&SC_TitleBarCloseButton) && (titleBar->titleBarFlags&Qt::WindowSystemMenuHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarCloseButton, widget, TITLEBAR_CLOSE, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarCloseButton, widget, TITLEBAR_CLOSE, iconColor, btnCols, bgndCols,
+                                   adjust);
 
                 if ((titleBar->subControls&SC_TitleBarNormalButton) &&
                     (((titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     (titleBar->titleBarState&Qt::WindowMinimized)) ||
                     ((titleBar->titleBarFlags&Qt::WindowMaximizeButtonHint) &&
                     (titleBar->titleBarState&Qt::WindowMaximized))))
-                    drawMdiControl(painter, titleBar, SC_TitleBarNormalButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarNormalButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols, adjust);
 
                 if (titleBar->subControls&SC_TitleBarContextHelpButton && (titleBar->titleBarFlags&Qt::WindowContextHelpButtonHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarContextHelpButton, widget, TITLEBAR_HELP, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarContextHelpButton, widget, TITLEBAR_HELP, iconColor, btnCols, bgndCols,
+                                   adjust);
 
                 if (titleBar->subControls&SC_TitleBarShadeButton && (titleBar->titleBarFlags&Qt::WindowShadeButtonHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarShadeButton, widget, TITLEBAR_SHADE, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarShadeButton, widget, TITLEBAR_SHADE, iconColor, btnCols, bgndCols,
+                                   adjust);
 
                 if (titleBar->subControls&SC_TitleBarUnshadeButton && (titleBar->titleBarFlags&Qt::WindowShadeButtonHint))
-                    drawMdiControl(painter, titleBar, SC_TitleBarUnshadeButton, widget, TITLEBAR_SHADE, iconColor, btnCols, bgndCols);
+                    drawMdiControl(painter, titleBar, SC_TitleBarUnshadeButton, widget, TITLEBAR_SHADE, iconColor, btnCols, bgndCols,
+                                   adjust);
 
                 if ((titleBar->subControls&SC_TitleBarSysMenu) && (titleBar->titleBarFlags&Qt::WindowSystemMenuHint))
                 {
@@ -8385,7 +8407,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         }
                     }
                     else
-                        drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, btnCols, bgndCols);
+                        drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, btnCols, bgndCols, adjust);
                 }
 
                 painter->restore();
@@ -9705,8 +9727,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
 
             readMdiPositions();
 
-            const int windowMargin(2);
-            const int controlSize(tb->rect.height() - windowMargin *2);
+            const int controlSize(tb->rect.height() - constWindowMargin *2);
 
             QList<int>::ConstIterator it(itsMdiButtons[0].begin()),
                                       end(itsMdiButtons[0].end());
@@ -9758,19 +9779,19 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     }
                 }
 
-            totalLeft+=(windowMargin*(totalLeft ? 2 : 1));
-            totalRight+=(windowMargin*(totalRight ? 2 : 1));
+            totalLeft+=(constWindowMargin*(totalLeft ? 2 : 1));
+            totalRight+=(constWindowMargin*(totalRight ? 2 : 1));
 
             if(SC_TitleBarLabel==subControl)
                 r.adjust(totalLeft, 0, -totalRight, 0);
             else if(!found)
                 return QRect();
             else if(rhs)
-                r.setRect(r.right()-(pos+windowMargin),
-                          r.top()+windowMargin,
+                r.setRect(r.right()-(pos+constWindowMargin),
+                          r.top()+constWindowMargin,
                           controlSize, controlSize);
             else
-                r.setRect(r.left()+windowMargin+pos, r.top()+windowMargin,
+                r.setRect(r.left()+constWindowMargin+pos, r.top()+constWindowMargin,
                           controlSize, controlSize);
             if(0==(r.height()%2))
                 r.adjust(0, 0, 1, 1);
@@ -10236,6 +10257,23 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         p->fillRect(r, QBrush(g));
     else
         p->fillPath(path, QBrush(g));
+}
+
+void QtCurveStyle::drawSunkenBevel(QPainter *p, const QRect &r) const
+{
+    QPainterPath    path(buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, r.height()/2.0));
+    QLinearGradient g(r.topLeft(), r.bottomLeft());
+    QColor          black(Qt::black),
+                    white(Qt::white);
+
+    black.setAlphaF(0.25);
+    white.setAlphaF(0.25);
+    g.setColorAt(0, black);
+    g.setColorAt(1, white);
+    p->save();
+    p->setRenderHint(QPainter::Antialiasing, true);
+    p->fillPath(path, QBrush(g));
+    p->restore();
 }
 
 void QtCurveStyle::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option,
@@ -11030,12 +11068,15 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 }
 
 void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
-                                  ETitleBarButtons btn, const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols) const
+                                  ETitleBarButtons btn, const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols,
+                                  int adjust) const
 {
     QRect rect(subControlRect(CC_TitleBar, titleBar, sc, widget));
 
     if (rect.isValid())
     {
+        rect.adjust(adjust, adjust, -adjust, -adjust);
+
         bool sunken((titleBar->activeSubControls&sc) && (titleBar->state&State_Sunken)),
              hover((titleBar->activeSubControls&sc) && (titleBar->state&State_MouseOver)),
              colored=coloredMdiButtons(titleBar->state&State_Active, hover),

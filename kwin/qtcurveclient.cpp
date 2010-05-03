@@ -36,6 +36,8 @@
 #include <QPixmap>
 #include <QStyleOptionTitleBar>
 #include <QStyle>
+#include <QPainterPath>
+#include <QLinearGradient>
 #include <KDE/KColorUtils>
 #include <KDE/KWindowInfo>
 #ifdef DRAW_INTO_PIXMAPS
@@ -87,26 +89,46 @@ static inline int tabCloseIconSize(int titleHeight)
 
 #endif
 
+static QPainterPath createPath(const QRectF &r, double radius)
+{
+    double       dr(radius * 2);
+    QPainterPath path;
+
+    path.moveTo(r.right(), r.top() + radius);
+    path.arcTo(r.right() - dr, r.top(), dr, dr, 0.0, 90.0);
+    path.lineTo(r.left() + radius, r.top());
+    path.arcTo(r.left(), r.top(), dr, dr, 90.0, 90.0);
+    path.lineTo(r.left(), r.bottom() - radius);
+    path.arcTo(r.left(), r.bottom() - dr, dr, dr, 180.0, 90.0);
+    path.lineTo(r.right() - radius, r.bottom());
+    path.arcTo(r.right() - dr, r.bottom() - dr, dr, dr,  270.0, 90.0);
+    return path;
+}
+
 #if KDE_IS_VERSION(4, 3, 0)
 static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false)
 {
-    double       radius((fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0)),
-                 dr(radius * 2);
-    QRect        fr(inner ? r.adjusted(1, 1, -1, -1) : r);
-    QRectF       rf(fr.x(), fr.y()+6, fr.width(), fr.height() - 6);
-    QPainterPath path;
+    double radius((fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0));
+    QRect  fr(inner ? r.adjusted(1, 1, -1, -1) : r);
+    QRectF rf(fr.x(), fr.y()+6, fr.width(), fr.height() - 6);
 
-    path.moveTo(rf.right(), rf.top() + radius);
-    path.arcTo(rf.right() - dr, rf.top(), dr, dr, 0.0, 90.0);
-    path.lineTo(rf.left() + radius, rf.top());
-    path.arcTo(rf.left(), rf.top(), dr, dr, 90.0, 90.0);
-    path.lineTo(rf.left(), rf.bottom() - radius);
-    path.arcTo(rf.left(), rf.bottom() - dr, dr, dr, 180.0, 90.0);
-    path.lineTo(rf.right() - radius, rf.bottom());
-    path.arcTo(rf.right() - dr, rf.bottom() - dr, dr, dr,  270.0, 90.0);
-    return path;
+    return createPath(rf, radius);
 }
 #endif
+
+static void drawSunkenBevel(QPainter *p, const QRect &r)
+{
+    QPainterPath    path(createPath(QRectF(r), r.height()/2.0));
+    QLinearGradient g(r.topLeft(), r.bottomLeft());
+    QColor          black(Qt::black),
+                    white(Qt::white);
+
+    black.setAlphaF(0.25);
+    white.setAlphaF(0.25);
+    g.setColorAt(0, black);
+    g.setColorAt(1, white);
+    p->fillPath(path, QBrush(g));
+}
 
 static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
 {
@@ -298,7 +320,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleEdgeLeft(layoutMetric(LM_TitleEdgeLeft)),
                          titleEdgeRight(layoutMetric(LM_TitleEdgeRight)),
                          titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+(isMaximized() ? border : 0)),
-                         round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL);
+                         round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
+                         buttonFlags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, NULL, NULL);
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0);
 
     painter.setClipRegion(e->region());
@@ -442,6 +465,17 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
 
+    if(buttonFlags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && buttonFlags&TITLEBAR_BUTTON_ROUND)
+    {
+        int offset=2;
+        
+        if(buttonsLeftWidth()>(titleBarHeight-2*offset))
+            drawSunkenBevel(&painter, QRect(r.left()+offset, r.top()+offset, buttonsLeftWidth()-offset, titleBarHeight-2*offset));
+        if(buttonsRightWidth()>(titleBarHeight-2*offset))
+            drawSunkenBevel(&painter, QRect(r.right()-buttonsRightWidth(), r.top()+offset,
+                                            buttonsRightWidth(), titleBarHeight-2*offset));
+    }
+    
     bool showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);
     int  iconSize=showIcon ? Handler()->wStyle()->pixelMetric(QStyle::PM_SmallIconSize) : 0;
 
