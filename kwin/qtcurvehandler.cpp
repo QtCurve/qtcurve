@@ -113,14 +113,18 @@ void QtCurveHandler::setStyle()
         itsStyle=QStyleFactory::create("QtCurve");
 #endif
 
-    // Need to use or ouwn style instance, as want to update this when settings change...
+    // Need to use our own style instance, as want to update this when settings change...
     if(!itsStyle)
     {
         KConfig      kglobals("kdeglobals", KConfig::CascadeConfig);
         KConfigGroup general(&kglobals, "General");
         QString      styleName=general.readEntry("widgetStyle", QString()).toLower();
 
-        itsStyle=QStyleFactory::create(styleName.isEmpty() || styleName=="qtcurve" || !styleName.startsWith("qtc_")
+        itsStyle=QStyleFactory::create(styleName.isEmpty() || (styleName!="qtcurve"
+#ifdef QTC_STYLE_SUPPORT
+                                                                && !styleName.startsWith(THEME_PREFIX)
+#endif
+                                                               )
                                         ? QString("QtCurve") : styleName);
         itsTimeStamp=getTimeStamp(xdgConfigFolder()+"/qtcurve/stylerc");
     }
