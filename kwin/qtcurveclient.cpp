@@ -592,12 +592,17 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
         {
             int halfWidth=(textWidth+(showIcon ? pix.width()+constTitlePad : 0))/2;
 
-            if(capRect.left()>(textRect.x()+(textRect.width()/2)-halfWidth) ||
-               capRect.right()<(textRect.x()+(textRect.width()/2)+halfWidth))
+            if(capRect.left()>(textRect.x()+(textRect.width()/2)-halfWidth))
             {
-                alignment=Qt::AlignVCenter|Qt::AlignHCenter;
+                alignment=Qt::AlignVCenter|Qt::AlignLeft;
                 textRect=capRect;
                 hAlign=Qt::AlignLeft;
+            }
+            else if (capRect.right()<(textRect.x()+(textRect.width()/2)+halfWidth))
+            {
+                alignment=Qt::AlignVCenter|Qt::AlignRight;
+                textRect=capRect;
+                hAlign=Qt::AlignRight;
             }
         }
 
