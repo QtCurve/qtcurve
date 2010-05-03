@@ -123,8 +123,8 @@ static void drawSunkenBevel(QPainter *p, const QRect &r)
     QColor          black(Qt::black),
                     white(Qt::white);
 
-    black.setAlphaF(0.25);
-    white.setAlphaF(0.25);
+    black.setAlphaF(SUNKEN_BEVEL_DARK_ALPHA);
+    white.setAlphaF(SUNKEN_BEVEL_LIGHT_ALPHA);
     g.setColorAt(0, black);
     g.setColorAt(1, white);
     p->fillPath(path, QBrush(g));

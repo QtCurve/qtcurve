@@ -178,6 +178,9 @@ typedef gchar ** Strings;
 #define DEF_BNT_TINT      0.4
 #define ENTRY_INNER_ALPHA 0.4
 
+#define SUNKEN_BEVEL_DARK_ALPHA  0.25
+#define SUNKEN_BEVEL_LIGHT_ALPHA 0.40
+
 #define MENU_SIZE_ATOM     "_QTCURVE_MENUBAR_SIZE_"
 #define ACTIVE_WINDOW_ATOM "_QTCURVE_ACTIVE_WINDOW_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
