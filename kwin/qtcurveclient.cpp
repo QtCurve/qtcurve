@@ -474,7 +474,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             drawSunkenBevel(&painter, QRect(r.left()+offset+posAdjust, r.top()+offset,
                                             buttonsLeftWidth()-offset, titleBarHeight-2*offset));
         if(buttonsRightWidth()>(titleBarHeight-2*offset))
-            drawSunkenBevel(&painter, QRect(r.right()-buttonsRightWidth()+posAdjust, r.top()+offset,
+            drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust), r.top()+offset,
                                             buttonsRightWidth(), titleBarHeight-2*offset));
     }
     
