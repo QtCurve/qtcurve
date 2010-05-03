@@ -1366,7 +1366,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                            GdkColor *c_colors, int round,
                            EBorder borderProfile, EWidget widget, int flags, int borderVal)
 {
-    if(ROUND_NONE==opts.round)
+    if(ROUND_NONE==opts.round && WIDGET_RADIO_BUTTON!=widget)
         round=ROUNDED_NONE;
 
     {
