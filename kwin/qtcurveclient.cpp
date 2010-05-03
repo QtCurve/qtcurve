@@ -467,12 +467,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(buttonFlags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && buttonFlags&TITLEBAR_BUTTON_ROUND)
     {
-        int offset=2;
+        int offset=2,
+            posAdjust=isMaximized() ? 2 : 0;
         
         if(buttonsLeftWidth()>(titleBarHeight-2*offset))
-            drawSunkenBevel(&painter, QRect(r.left()+offset, r.top()+offset, buttonsLeftWidth()-offset, titleBarHeight-2*offset));
+            drawSunkenBevel(&painter, QRect(r.left()+offset+posAdjust, r.top()+offset,
+                                            buttonsLeftWidth()-offset, titleBarHeight-2*offset));
         if(buttonsRightWidth()>(titleBarHeight-2*offset))
-            drawSunkenBevel(&painter, QRect(r.right()-buttonsRightWidth(), r.top()+offset,
+            drawSunkenBevel(&painter, QRect(r.right()-buttonsRightWidth()+posAdjust, r.top()+offset,
                                             buttonsRightWidth(), titleBarHeight-2*offset));
     }
     
