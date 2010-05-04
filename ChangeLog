@@ -24,6 +24,7 @@
 12. Titlebar button modifications:
     - Dont support keep above/below buttons
     - Change shade/unshade to be an arrow with line above/below
+    - Add option to use arrows for the icons of min and max buttons.
 
 1.3.1
 -----

@@ -912,6 +912,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtons_hoverSymbol, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_hoverSymbolFull, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_sunkenBackground, SIGNAL(toggled(bool)), SLOT(titlebarButtonsSunkenBackgroundChanged()));
+    connect(titlebarButtons_arrowMinMax, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_colorOnMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_colorSymbolsOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_colorInactive, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2187,6 +2188,8 @@ int QtCurveConfig::getTitleBarButtonFlags()
         titlebarButtons+=TITLEBAR_BUTTON_COLOR_SYMBOL;
     if(titlebarButtons_sunkenBackground->isChecked())
         titlebarButtons+=TITLEBAR_BUTTON_SUNKEN_BACKGROUND;
+    if(titlebarButtons_arrowMinMax->isChecked())
+        titlebarButtons+=TITLEBAR_BUTTOM_ARROW_MIN_MAX;
     return titlebarButtons;
 }
 
@@ -2594,6 +2597,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtons_colorInactive->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_INACTIVE);
     titlebarButtons_colorSymbolsOnly->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL);
     titlebarButtons_sunkenBackground->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND);
+    titlebarButtons_arrowMinMax->setChecked(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX);
 
     populateShades(opts);
 

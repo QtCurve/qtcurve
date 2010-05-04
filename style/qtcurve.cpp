@@ -3628,7 +3628,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
                 col=blendColors(col, palette.background().color(), col.alphaF());
 
-            drawArrow(painter, r, element, col, false);
+            drawArrow(painter, r, element, col, false, state&QtC_StateKWin);
             break;
         }
         case PE_IndicatorSpinMinus:
@@ -7414,7 +7414,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                                                     widget->parentWidget()->parentWidget())==geom)
                                 btn=TITLEBAR_MAX, icon=ICN_RESTORE;
                             else
-                                btn=TITLEBAR_SHADE, icon=dw && dw->widget() && dw->widget()->isVisible() ? ICN_UP : ICN_DOWN;
+                                btn=TITLEBAR_SHADE, icon=dw && dw->widget() && dw->widget()->isVisible()
+                                        ? ICN_SHADE
+                                        : ICN_UNSHADE;
                         }
                         
                         QColor        shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
@@ -11190,13 +11192,23 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
     switch(icon)
     {
         case ICN_MIN:
-            drawRect(painter, QRect(br.left(), br.bottom()-1, br.width(), 2));
+            if(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+                drawArrow(painter, opts.vArrows ? br.adjusted(0, 1, 0, 1) : br, PE_IndicatorArrowDown, color, false);
+            else
+                drawRect(painter, QRect(br.left(), br.bottom()-1, br.width(), 2));
             break;
         case ICN_MAX:
-            drawRect(painter, br);
-            painter->drawLine(br.left() + 1, br.top() + 1,  br.right() - 1, br.top() + 1);
+            if(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+                drawArrow(painter, opts.vArrows ? br.adjusted(0, -1, 0, -1) : br, PE_IndicatorArrowUp, color, false);
+            else
+            {
+                drawRect(painter, br);
+                painter->drawLine(br.left() + 1, br.top() + 1,  br.right() - 1, br.top() + 1);
+            }
             break;
         case ICN_CLOSE:
+            if(stdSize && opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND)
+                br.adjust(1, 1, -1, -1);
             painter->save();
             painter->setClipRect(br);
             painter->setPen(QPen(color, 2));
@@ -11416,48 +11428,46 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     }
 }
 
-void QtCurveStyle::drawArrow(QPainter *p, const QRect &r, PrimitiveElement pe, QColor col, bool small) const
+static QPolygon rotate(const QPolygon &p, double angle)
+{
+    QMatrix matrix;
+    matrix.rotate(angle);
+    return matrix.map(p);
+}
+
+void QtCurveStyle::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor col, bool small, bool kwin) const
 {
     QPolygon     a;
     QPainterPath path;
+    QRect        r(rx);
+    int          m=!small && kwin ? ((r.height()-7)/2) : 0;
 
     if(small)
-        switch(pe)
-        {
-            case PE_IndicatorArrowUp:
-                a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,-2,  -2,0,   -2,1, 0,-1, 2,1);
-                break;
-            case PE_IndicatorArrowDown:
-                a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,2,  -2,0,   -2,-1, 0,1, 2,-1);
-                break;
-            case PE_IndicatorArrowRight:
-                a.setPoints(opts.vArrows ? 6 : 3,  0,-2,  2,0,  0,2,   -1,2, 1,0, -1,-2);
-                break;
-            case PE_IndicatorArrowLeft:
-                a.setPoints(opts.vArrows ? 6 : 3,  0,-2,  -2,0,  0,2,   1,2, -1,0, 1,-2);
-                break;
-            default:
-                return;
-        }
-    else // Large arrows...
-        switch(pe)
-        {
-            case PE_IndicatorArrowUp:
-                a.setPoints(opts.vArrows ? 8 : 3,  3,1,  0,-2,  -3,1,    -3,2,  -2,2, 0,0,  2,2, 3,2);
-                break;
-            case PE_IndicatorArrowDown:
-                a.setPoints(opts.vArrows ? 8 : 3,  3,-1,  0,2,  -3,-1,   -3,-2,  -2,-2, 0,0, 2,-2, 3,-2);
-                break;
-            case PE_IndicatorArrowRight:
-                a.setPoints(opts.vArrows ? 8 : 3,  -1,-3,  2,0,  -1,3,   -2,3, -2,2, 0,0, -2,-2, -2,-3);
-                break;
-            case PE_IndicatorArrowLeft:
-                a.setPoints(opts.vArrows ? 8 : 3,  1,-3,  -2,0,  1,3,    2,3, 2,2, 0,0, 2,-2, 2,-3);
-                break;
-            default:
-                return;
-        }
+        a.setPoints(opts.vArrows ? 6 : 3,  2,0,  0,-2,  -2,0,   -2,1, 0,-1, 2,1);
+    else
+        a.setPoints(opts.vArrows ? 8 : 3,  3+m,1+m,  0,-2,  -(3+m),1+m,    -(3+m),2+m,  -(2+m),2+m, 0,0,  2+m,2+m, 3+m,2+m);
 
+    switch(pe)
+    {
+        case PE_IndicatorArrowUp:
+            if(m)
+                r.adjust(0, -m, 0, -m);
+            break;
+        case PE_IndicatorArrowDown:
+            if(m)
+                r.adjust(0, m, 0, m);
+            a=rotate(a, 180);
+            break;
+        case PE_IndicatorArrowRight:
+            a=rotate(a, 90);
+            break;
+        case PE_IndicatorArrowLeft:
+            a=rotate(a, 270);
+            break;
+        default:
+            return;
+    }
+        
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
 
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX

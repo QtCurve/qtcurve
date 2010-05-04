@@ -337,19 +337,28 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             break;
         }
         case MaxIcon:
-        {
-            int lineWidth2 = 1; // frame
-            if (r.width() > 16)
-                lineWidth2 = 2;
-            else if (r.width() > 4)
-                lineWidth2 = 1;
+            if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+            {
+                QStyleOption opt;
 
-            drawObject(p, HorizontalLine, r.x(), r.top(), r.width(), lwTitleBar);
-            drawObject(p, HorizontalLine, r.x(), r.bottom()-(lineWidth2-1), r.width(), lineWidth2);
-            drawObject(p, VerticalLine, r.x(), r.top(), r.height(), lineWidth2);
-            drawObject(p, VerticalLine, r.right()-(lineWidth2-1), r.top(), r.height(), lineWidth2);
+                opt.rect=r;
+                opt.state=QStyle::State_Enabled|QtC_StateKWin;
+                style->drawPrimitive(QStyle::PE_IndicatorArrowUp, &opt, &p, 0L);
+            }
+            else
+            {
+                int lineWidth2 = 1; // frame
+                if (r.width() > 16)
+                    lineWidth2 = 2;
+                else if (r.width() > 4)
+                    lineWidth2 = 1;
+
+                drawObject(p, HorizontalLine, r.x(), r.top(), r.width(), lwTitleBar);
+                drawObject(p, HorizontalLine, r.x(), r.bottom()-(lineWidth2-1), r.width(), lineWidth2);
+                drawObject(p, VerticalLine, r.x(), r.top(), r.height(), lineWidth2);
+                drawObject(p, VerticalLine, r.right()-(lineWidth2-1), r.top(), r.height(), lineWidth2);
+            }
             break;
-        }
         case MaxRestoreIcon:
         {
             int lineWidth2 = 1; // frame
@@ -380,7 +389,16 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
         }
 
         case MinIcon:
-            drawObject(p, HorizontalLine, r.x(), r.bottom()-(lwTitleBar-1), r.width(), lwTitleBar);
+            if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+            {
+                QStyleOption opt;
+
+                opt.rect=r;
+                opt.state=QStyle::State_Enabled|QtC_StateKWin;
+                style->drawPrimitive(QStyle::PE_IndicatorArrowDown, &opt, &p, 0L);
+            }
+            else
+                drawObject(p, HorizontalLine, r.x(), r.bottom()-(lwTitleBar-1), r.width(), lwTitleBar);
             break;
         case HelpIcon:
         {
@@ -542,7 +560,8 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
 
             //opt.init(btn);
             opt.rect=r.adjusted(0, -(1+lwTitleBar), 0, 0);
-            opt.state=QStyle::State_Enabled;
+            opt.rect.adjust(2, 2, -2, -2);
+            opt.state=QStyle::State_Enabled|QtC_StateKWin;
 
             //opt.palette.setColor(QPalette::Button, Qt::red);
             style->drawPrimitive(ShadeIcon==icon ? QStyle::PE_IndicatorArrowDown
