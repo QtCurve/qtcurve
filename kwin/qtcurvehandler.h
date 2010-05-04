@@ -111,6 +111,7 @@ class QtCurveHandler : public QObject,
     bool                  grouping() const        { return itsConfig.grouping(); }
 #endif
     void                  refresh(unsigned int xid, int size);
+    void                  titlebarSizeChanged();
     void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
     void                  removeClient(QtCurveClient *c) { itsClients.removeAll(c); }
     

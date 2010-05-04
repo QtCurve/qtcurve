@@ -322,7 +322,10 @@ bool QtCurveHandler::readConfig()
 #endif
 
     if(itsDBus && (oldSize!=itsTitleHeight || oldToolSize!=itsTitleHeightTool))
-        itsDBus->emitTbSize();
+    {
+        itsDBus->emitTbSize(); // KDE4 apps...
+        titlebarSizeChanged(); // Gtk2 apps...
+    }
 
     return oldSize!=itsTitleHeight ||
            oldToolSize!=itsTitleHeightTool ||
@@ -343,6 +346,15 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
     if (itsBitmaps[toolWindow][typeIndex].size()!=QSize(w,h))
         itsBitmaps[toolWindow][typeIndex] = IconEngine::icon(type /*icon*/, qMin(w, h), wStyle());
     return itsBitmaps[toolWindow][typeIndex];
+}
+
+void QtCurveHandler::titlebarSizeChanged()
+{
+    QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
+                                          end(itsClients.end());
+
+    for(; it!=end; ++it)
+        (*it)->informAppOfTitlebarSizeChanged();
 }
 
 void QtCurveHandler::refresh(unsigned int xid, int size)

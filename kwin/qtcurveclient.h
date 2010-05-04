@@ -76,6 +76,7 @@ class QtCurveClient :
     bool                      eventFilter(QObject *o, QEvent *e);
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
     void                      menubarSize(int size);
+    void                      informAppOfTitlebarSizeChanged();
 
     private:
 

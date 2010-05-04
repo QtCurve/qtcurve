@@ -182,6 +182,7 @@ typedef gchar ** Strings;
 #define SUNKEN_BEVEL_LIGHT_ALPHA 0.40
 
 #define MENU_SIZE_ATOM     "_QTCURVE_MENUBAR_SIZE_"
+#define TITLEBAR_SIZE_ATOM "_QTCURVE_TITLEBAR_SIZE_"
 #define ACTIVE_WINDOW_ATOM "_QTCURVE_ACTIVE_WINDOW_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                            !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)

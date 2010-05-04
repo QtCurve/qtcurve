@@ -1191,16 +1191,31 @@ void QtCurveClient::deleteSizeGrip()
     }
 }
 
+void QtCurveClient::informAppOfTitlebarSizeChanged()
+{
+    static const Atom constQtCTitleBarSize = XInternAtom(QX11Info::display(), TITLEBAR_SIZE_ATOM, False);
+
+    QX11Info info;
+    XEvent xev;
+    xev.xclient.type = ClientMessage;
+    xev.xclient.message_type = constQtCTitleBarSize;
+    xev.xclient.display = QX11Info::display();
+    xev.xclient.window = windowId();
+    xev.xclient.format = 32;
+    xev.xclient.data.l[0] = 0;
+    XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
+}
+
 void QtCurveClient::informAppOfActiveChange()
 {
     if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
     {
-        static const Atom constQtcActiveWindow = XInternAtom(QX11Info::display(), ACTIVE_WINDOW_ATOM, False);
+        static const Atom constQtCActiveWindow = XInternAtom(QX11Info::display(), ACTIVE_WINDOW_ATOM, False);
 
         QX11Info info;
         XEvent xev;
         xev.xclient.type = ClientMessage;
-        xev.xclient.message_type = constQtcActiveWindow;
+        xev.xclient.message_type = constQtCActiveWindow;
         xev.xclient.display = QX11Info::display();
         xev.xclient.window = windowId();
         xev.xclient.format = 32;
