@@ -826,9 +826,9 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
         qtSettings.colors[PAL_ACTIVE][COLOR_LV]=setGdkColor(248, 247, 246);
         qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]=setGdkColor(233, 232, 232);
         qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT]=setGdkColor(20, 19, 18);
-        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER]=qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
+        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW];
         qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW];
-        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]=qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
+        qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT];
         qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT]=qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT];
 
         if(kde4)
