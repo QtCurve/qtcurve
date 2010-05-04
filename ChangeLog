@@ -8,24 +8,26 @@
          not blending titlebar gradient AND
          using window titlebar colour for menubar AND
          extending window drag into menubar
- 5. If using window border colours as menubar colours, and the active and inactive
+ 5. Default titlebar colours to window colours - matches KDE4 default.
+ 6. If using window border colours as menubar colours, and the active and inactive
     titlebar colours are the same, then always use the active titlebar text colour
     for the menubar.
- 6. When shading menubars only when active, or using window border colours as menubar
+ 7. When shading menubars only when active, or using window border colours as menubar
     colours, the kwin deocration will send an X11 event to the client window when
     the active window changes - this allws Gtk2 to keep track.
- 7. Dont etch window button icons unless not drawing the frame - doesn't look
+ 8. Dont etch window button icons unless not drawing the frame - doesn't look
     good otherwise.
- 8. Re-organised window decoration config items and module.
- 9. Get QtCreator to use QtCurve style for menubar, and for the toolbar in KFileDialog
+ 9. Re-organised window decoration config items and module.
+10. Get QtCreator to use QtCurve style for menubar, and for the toolbar in KFileDialog
     (KFileDialog is not 100%, but still looks better...)
-10. Change 'abc [modified] - App' window titles to '*abc - App'
-11. Add sunken background to window titlebar button options.
-12. Titlebar button modifications:
+11. Change 'abc [modified] - App' window titles to '*abc - App'
+12. Add sunken background to window titlebar button options.
+13. Titlebar button modifications:
     - Dont support keep above/below buttons
     - Change shade/unshade to be an arrow with line above/below
     - Add option to use arrows for the icons of min and max buttons.
     - Better icon for 'on all desktops'
+14. Default titlebar colours to window colours - matches KDE4 default.
 
 1.3.1
 -----

@@ -12134,10 +12134,10 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
 {
     if(!itsActiveMdiColors)
     {
-        itsActiveMdiTextColor=option->palette.highlightedText().color();
+#if defined QTC_QT_ONLY
+        itsActiveMdiTextColor=option->palette.text().color();
         itsMdiTextColor=option->palette.text().color();
 
-#if defined QTC_QT_ONLY
         QFile f(kdeHome()+"/share/config/kdeglobals");
 
         if(f.open(QIODevice::ReadOnly))
@@ -12189,14 +12189,14 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
 #else
         QColor col=KGlobalSettings::activeTitleColor();
 
-        if(col!=itsHighlightCols[ORIGINAL_SHADE])
+        if(col!=itsBackgroundCols[ORIGINAL_SHADE])
         {
             itsActiveMdiColors=new QColor [TOTAL_SHADES+1];
             shadeColors(col, itsActiveMdiColors);
         }
 
         col=KGlobalSettings::inactiveTitleColor();
-        if(col!=itsButtonCols[ORIGINAL_SHADE])
+        if(col!=itsBackgroundCols[ORIGINAL_SHADE])
         {
             itsMdiColors=new QColor [TOTAL_SHADES+1];
             shadeColors(col, itsMdiColors);
@@ -12207,7 +12207,7 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
 #endif
 
         if(!itsActiveMdiColors)
-            itsActiveMdiColors=(QColor *)itsHighlightCols;
+            itsActiveMdiColors=(QColor *)itsBackgroundCols;
         if(!itsMdiColors)
             itsMdiColors=(QColor *)itsBackgroundCols;
 
