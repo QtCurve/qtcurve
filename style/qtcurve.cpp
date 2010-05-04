@@ -11182,7 +11182,14 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
 
     painter->setPen(color);
 
-    QSize    iconSize(stdSize ? constIconSize : constSmallIconSize, stdSize ? constIconSize : (ICN_RESTORE==icon ? constSmallIconSize+1 : constSmallIconSize));
+    QSize    iconSize(stdSize
+                        ? constIconSize
+                        : constSmallIconSize,
+                      stdSize
+                        ? constIconSize
+                        : (ICN_RESTORE==icon && !(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+                            ? constSmallIconSize+1
+                            : constSmallIconSize));
     QRect    br(r.x()+((r.width()-iconSize.width())>>1),
                 r.y()+((r.height()-iconSize.height())>>1),
                 iconSize.width(), iconSize.height());
@@ -11217,13 +11224,24 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
             painter->restore();
             break;
         case ICN_RESTORE:
-            drawRect(painter, QRect(br.x(), br.y()+3, br.width()-2, br.height()-3));
-            painter->drawLine(br.x()+1, br.y()+4, br.x()+br.width()-4, br.y()+4);
-            painter->drawLine(br.x()+2, br.y(), br.x()+br.width()-1, br.y());
-            painter->drawLine(br.x()+2, br.y()+1, br.x()+br.width()-1, br.y()+1);
-            painter->drawLine(br.x()+br.width()-1, br.y()+2, br.x()+br.width()-1, br.y()+(stdSize ? 5 : 4));
-            painter->drawPoint(br.x()+br.width()-2, br.y()+(stdSize ? 5 : 4));
-            painter->drawPoint(br.x()+2, br.y()+2);
+            if(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+            {
+                painter->drawLine(br.x()+1, br.y(), br.x()+br.width()-2, br.y());
+                painter->drawLine(br.x()+1, br.y()+br.height()-1, br.x()+br.width()-2, br.y()+br.height()-1);
+                painter->drawLine(br.x(), br.y()+1, br.x(), br.y()+br.height()-2);
+                painter->drawLine(br.x()+br.width()-1, br.y()+1, br.x()+br.width()-1, br.y()+br.height()-2);
+                drawRect(painter, br.adjusted(1, 1, -1, -1));
+            }
+            else
+            {
+                drawRect(painter, QRect(br.x(), br.y()+3, br.width()-2, br.height()-3));
+                painter->drawLine(br.x()+1, br.y()+4, br.x()+br.width()-4, br.y()+4);
+                painter->drawLine(br.x()+2, br.y(), br.x()+br.width()-1, br.y());
+                painter->drawLine(br.x()+2, br.y()+1, br.x()+br.width()-1, br.y()+1);
+                painter->drawLine(br.x()+br.width()-1, br.y()+2, br.x()+br.width()-1, br.y()+(stdSize ? 5 : 4));
+                painter->drawPoint(br.x()+br.width()-2, br.y()+(stdSize ? 5 : 4));
+                painter->drawPoint(br.x()+2, br.y()+2);
+            }
             break;
         case ICN_UP:
             drawArrow(painter, br, PE_IndicatorArrowUp, color, false);

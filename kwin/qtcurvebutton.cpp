@@ -360,34 +360,41 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             }
             break;
         case MaxRestoreIcon:
-        {
-            int lineWidth2 = 1; // frame
-            if (r.width() > 16)
-                lineWidth2 = 2;
-            else if (r.width() > 4)
-                lineWidth2 = 1;
+            if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+            {
+                p.drawLine(r.x()+1, r.y(), r.x()+r.width()-2, r.y());
+                p.drawLine(r.x()+1, r.y()+r.height()-1, r.x()+r.width()-2, r.y()+r.height()-1);
+                p.drawLine(r.x(), r.y()+1, r.x(), r.y()+r.height()-2);
+                p.drawLine(r.x()+r.width()-1, r.y()+1, r.x()+r.width()-1, r.y()+r.height()-2);
+                p.drawRect(r.x()+1, r.y()+1, r.width()-3, r.height()-3);
+            }
+            else
+            {
+                int lineWidth2 = 1; // frame
+                if (r.width() > 16)
+                    lineWidth2 = 2;
+                else if (r.width() > 4)
+                    lineWidth2 = 1;
 
-            int margin1, margin2;
-            margin1 = margin2 = (lineWidth2*2)+1;
-            if (r.width() < 8)
-                margin1 = 1;
-            int margin1h=margin1-1, margin2h=margin2-1;
+                int margin1, margin2;
+                margin1 = margin2 = (lineWidth2*2)+1;
+                if (r.width() < 8)
+                    margin1 = 1;
+                int margin1h=margin1-1, margin2h=margin2-1;
 
-            // background window
-            drawObject(p, HorizontalLine, r.x()+margin1h, r.top(), r.width()-margin1, lwTitleBar);
-            drawObject(p, HorizontalLine, r.right()-margin2h, r.bottom()-(lineWidth2-1)-margin1, margin2h, lineWidth2);
-            drawObject(p, VerticalLine, r.x()+margin1h, r.top(), margin2, lineWidth2);
-            drawObject(p, VerticalLine, r.right()-(lineWidth2-1), r.top(), r.height()-margin1, lineWidth2);
+                // background window
+                drawObject(p, HorizontalLine, r.x()+margin1h, r.top(), r.width()-margin1, lwTitleBar);
+                drawObject(p, HorizontalLine, r.right()-margin2h, r.bottom()-(lineWidth2-1)-margin1, margin2h, lineWidth2);
+                drawObject(p, VerticalLine, r.x()+margin1h, r.top(), margin2, lineWidth2);
+                drawObject(p, VerticalLine, r.right()-(lineWidth2-1), r.top(), r.height()-margin1, lineWidth2);
 
-            // foreground window
-            drawObject(p, HorizontalLine, r.x(), r.top()+margin2, r.width()-margin2h, lwTitleBar);
-            drawObject(p, HorizontalLine, r.x(), r.bottom()-(lineWidth2-1), r.width()-margin2h, lineWidth2);
-            drawObject(p, VerticalLine, r.x(), r.top()+margin2, r.height(), lineWidth2);
-            drawObject(p, VerticalLine, r.right()-(lineWidth2-1)-margin2h, r.top()+margin2, r.height(), lineWidth2);
-
+                // foreground window
+                drawObject(p, HorizontalLine, r.x(), r.top()+margin2, r.width()-margin2h, lwTitleBar);
+                drawObject(p, HorizontalLine, r.x(), r.bottom()-(lineWidth2-1), r.width()-margin2h, lineWidth2);
+                drawObject(p, VerticalLine, r.x(), r.top()+margin2, r.height(), lineWidth2);
+                drawObject(p, VerticalLine, r.right()-(lineWidth2-1)-margin2h, r.top()+margin2, r.height(), lineWidth2);
+            }
             break;
-        }
-
         case MinIcon:
             if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
             {
@@ -462,50 +469,74 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             break;
         }
         case NotOnAllDesktopsIcon:
-        {
-            int lwMark = r.width()-lwTitleBar*2-2;
-            if (lwMark < 1)
-                lwMark = 3;
+//             if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+            {
+                r.adjust(1, 1, -1, -1);
 
-            drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark)/2, r.y()+(r.height()-lwMark)/2, lwMark, lwMark);
+                int lwMark = (r.width()-1)/2;
+                if (lwMark < 1)
+                    lwMark = 3;
 
-            // Fall through to OnAllDesktopsIcon intended!
-        }
+                drawObject(p, HorizontalLine, r.x(), r.y(), lwMark, lwMark);
+                drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark), r.y(), lwMark, lwMark);
+                drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark), r.y()+(r.height()-lwMark), lwMark, lwMark);
+                drawObject(p, HorizontalLine, r.x(), r.y()+(r.height()-lwMark), lwMark, lwMark);
+                break;
+            }
+//             else
+//             {
+//                 int lwMark = r.width()-lwTitleBar*2-2;
+//                 if (lwMark < 1)
+//                     lwMark = 3;
+// 
+//                 drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark)/2, r.y()+(r.height()-lwMark)/2, lwMark, lwMark);
+// 
+//                 // Fall through to OnAllDesktopsIcon intended!
+//             }
         case OnAllDesktopsIcon:
-        {
-            int lineWidth = 1;
-            if (r.width() > 16)
-                lineWidth = 3;
-            else if (r.width() > 4)
-                lineWidth = 2;
+//             if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
+            {
+                int lwMark = r.width()-lwTitleBar*2-2;
+                if (lwMark < 1)
+                    lwMark = 3;
 
-            int rounding=!style || ROUND_NONE==style->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL) ? 0 : 1;
-
-            drawObject(p, HorizontalLine, r.x()+rounding, r.top(), r.width()-(2*rounding), lineWidth);
-            drawObject(p, HorizontalLine, r.x()+rounding, r.bottom()-(lineWidth-1), r.width()-(2*rounding), lineWidth);
-            drawObject(p, VerticalLine, r.x(), r.top()+rounding, r.height()-(2*rounding), lineWidth);
-            drawObject(p, VerticalLine, r.right()-(lineWidth-1), r.top()+rounding, r.height()-(2*rounding), lineWidth);
-            
-#if 0
-            // <> style
-            int len=(r.width()/2)+1;
-
-            drawObject(p, DiagonalLine, r.x()+(r.width()/2), r.y(), len, lineWidth);
-            drawObject(p, DiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
-            drawObject(p, CrossDiagonalLine, r.x()+(r.width()/2), r.bottom(), len, lineWidth);
-            drawObject(p, CrossDiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
-#endif
-#if 0
-            // original plastik style
-            // horizontal bars
-            drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.y(), r.width()-2*lwTitleBar, lwTitleBar);
-            drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.bottom()-(lwTitleBar-1), r.width()-2*lwTitleBar, lwTitleBar);
-            // vertical bars
-            drawObject(p, VerticalLine, r.x(), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
-            drawObject(p, VerticalLine, r.right()-(lwTitleBar-1), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
-#endif
+                drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark)/2, r.y()+(r.height()-lwMark)/2, lwMark, lwMark);
+            }
+//             else
+//             {
+//                 int lineWidth = 1;
+//                 if (r.width() > 16)
+//                     lineWidth = 3;
+//                 else if (r.width() > 4)
+//                     lineWidth = 2;
+// 
+//                 int rounding=!style || ROUND_NONE==style->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL) ? 0 : 1;
+// 
+//                 drawObject(p, HorizontalLine, r.x()+rounding, r.top(), r.width()-(2*rounding), lineWidth);
+//                 drawObject(p, HorizontalLine, r.x()+rounding, r.bottom()-(lineWidth-1), r.width()-(2*rounding), lineWidth);
+//                 drawObject(p, VerticalLine, r.x(), r.top()+rounding, r.height()-(2*rounding), lineWidth);
+//                 drawObject(p, VerticalLine, r.right()-(lineWidth-1), r.top()+rounding, r.height()-(2*rounding), lineWidth);
+// 
+//     #if 0
+//                 // <> style
+//                 int len=(r.width()/2)+1;
+// 
+//                 drawObject(p, DiagonalLine, r.x()+(r.width()/2), r.y(), len, lineWidth);
+//                 drawObject(p, DiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
+//                 drawObject(p, CrossDiagonalLine, r.x()+(r.width()/2), r.bottom(), len, lineWidth);
+//                 drawObject(p, CrossDiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
+//     #endif
+//     #if 0
+//                 // original plastik style
+//                 // horizontal bars
+//                 drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.y(), r.width()-2*lwTitleBar, lwTitleBar);
+//                 drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.bottom()-(lwTitleBar-1), r.width()-2*lwTitleBar, lwTitleBar);
+//                 // vertical bars
+//                 drawObject(p, VerticalLine, r.x(), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
+//                 drawObject(p, VerticalLine, r.right()-(lwTitleBar-1), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
+//     #endif
+//             }
             break;
-        }
 //         case NoKeepAboveIcon:
 //         {
 //             int center = r.x()+r.width()/2;
