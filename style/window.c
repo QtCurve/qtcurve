@@ -19,7 +19,7 @@ static void qtcWindowCleanup(GtkWidget *widget)
         if(opts.menubarHiding || opts.statusbarHiding)
             g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID"));
-        if(opts.shadeMenubarOnlyWhenActive)
+        if(opts.shadeMenubarOnlyWhenActive || BLEND_TITLEBAR)
             g_signal_handler_disconnect(G_OBJECT(widget),
                                         (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_CLIENT_EVENT_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET");
@@ -32,6 +32,8 @@ static gboolean qtcWindowStyleSet(GtkWidget *widget, GtkStyle *previous_style, g
     return FALSE;
 }
 
+static GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level);
+
 static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer user_data)
 {
     if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcActiveWindow))
@@ -42,6 +44,16 @@ static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, g
             qtcCurrentActiveWindow=0L;
         gtk_widget_queue_draw(widget);
     }
+    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcTitleBarSize))
+    {
+        qtcGetWindowBorderSize(TRUE);
+
+        GtkWidget *menubar=qtcWindowGetMenuBar(widget, 0);
+
+        if(menubar)
+            gtk_widget_queue_draw(menubar);
+    }
+
     return FALSE;
 }
 
@@ -197,7 +209,7 @@ static void qtcWindowSetup(GtkWidget *widget)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
                                                          (GtkSignalFunc)qtcWindowKeyRelease, NULL));
-        if(opts.shadeMenubarOnlyWhenActive)
+        if(opts.shadeMenubarOnlyWhenActive || BLEND_TITLEBAR)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_CLIENT_EVENT_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "client-event",
                                                          (GtkSignalFunc)qtcWindowClientEvent, NULL));
