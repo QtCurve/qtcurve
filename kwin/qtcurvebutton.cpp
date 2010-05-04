@@ -82,12 +82,12 @@ void QtCurveButton::reset(unsigned long changed)
             case ShadeButton:
                 itsIconType = isChecked() ? UnShadeIcon : ShadeIcon;
                 break;
-            case AboveButton:
-                itsIconType = isChecked() ? NoKeepAboveIcon : KeepAboveIcon;
-                break;
-            case BelowButton:
-                itsIconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
-                break;
+//             case AboveButton:
+//                 itsIconType = isChecked() ? NoKeepAboveIcon : KeepAboveIcon;
+//                 break;
+//             case BelowButton:
+//                 itsIconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
+//                 break;
             case MenuButton:
                 itsIconType=MenuIcon;
                 break;
@@ -488,65 +488,67 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
 #endif
             break;
         }
-        case NoKeepAboveIcon:
-        {
-            int center = r.x()+r.width()/2;
-
-            // arrow
-            drawObject(p, CrossDiagonalLine, r.x(), center+2*lwArrow, center-r.x(), lwArrow);
-            drawObject(p, DiagonalLine, r.x()+center, r.y()+1+2*lwArrow, center-r.x(), lwArrow);
-            if (lwArrow>1)
-                drawObject(p, HorizontalLine, center-(lwArrow-2), r.y()+2*lwArrow, (lwArrow-2)*2, lwArrow);
-
-            // Fall through to KeepAboveIcon intended!
-        }
-        case KeepAboveIcon:
-        {
-            int center = r.x()+r.width()/2;
-
-            // arrow
-            drawObject(p, CrossDiagonalLine, r.x(), center, center-r.x(), lwArrow);
-            drawObject(p, DiagonalLine, r.x()+center, r.y()+1, center-r.x(), lwArrow);
-            if (lwArrow>1)
-                drawObject(p, HorizontalLine, center-(lwArrow-2), r.y(), (lwArrow-2)*2, lwArrow);
-            break;
-        }
-        case NoKeepBelowIcon:
-        {
-            int center = r.x()+r.width()/2;
-
-            // arrow
-            drawObject(p, DiagonalLine, r.x(), center-2*lwArrow, center-r.x(), lwArrow);
-            drawObject(p, CrossDiagonalLine, r.x()+center, r.bottom()-1-2*lwArrow, center-r.x(), lwArrow);
-            if (lwArrow>1)
-                drawObject(p, HorizontalLine, center-(lwArrow-2), r.bottom()-(lwArrow-1)-2*lwArrow, (lwArrow-2)*2, lwArrow);
-
-            // Fall through to KeepBelowIcon intended!
-        }
-        case KeepBelowIcon:
-        {
-            int center = r.x()+r.width()/2;
-
-            // arrow
-            drawObject(p, DiagonalLine, r.x(), center, center-r.x(), lwArrow);
-            drawObject(p, CrossDiagonalLine, r.x()+center, r.bottom()-1, center-r.x(), lwArrow);
-            if (lwArrow>1)
-                drawObject(p, HorizontalLine, center-(lwArrow-2), r.bottom()-(lwArrow-1), (lwArrow-2)*2, lwArrow);
-            break;
-        }
+//         case NoKeepAboveIcon:
+//         {
+//             int center = r.x()+r.width()/2;
+// 
+//             // arrow
+//             drawObject(p, CrossDiagonalLine, r.x(), center+2*lwArrow, center-r.x(), lwArrow);
+//             drawObject(p, DiagonalLine, r.x()+center, r.y()+1+2*lwArrow, center-r.x(), lwArrow);
+//             if (lwArrow>1)
+//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.y()+2*lwArrow, (lwArrow-2)*2, lwArrow);
+// 
+//             // Fall through to KeepAboveIcon intended!
+//         }
+//         case KeepAboveIcon:
+//         {
+//             int center = r.x()+r.width()/2;
+// 
+//             // arrow
+//             drawObject(p, CrossDiagonalLine, r.x(), center, center-r.x(), lwArrow);
+//             drawObject(p, DiagonalLine, r.x()+center, r.y()+1, center-r.x(), lwArrow);
+//             if (lwArrow>1)
+//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.y(), (lwArrow-2)*2, lwArrow);
+//             break;
+//         }
+//         case NoKeepBelowIcon:
+//         {
+//             int center = r.x()+r.width()/2;
+// 
+//             // arrow
+//             drawObject(p, DiagonalLine, r.x(), center-2*lwArrow, center-r.x(), lwArrow);
+//             drawObject(p, CrossDiagonalLine, r.x()+center, r.bottom()-1-2*lwArrow, center-r.x(), lwArrow);
+//             if (lwArrow>1)
+//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.bottom()-(lwArrow-1)-2*lwArrow, (lwArrow-2)*2, lwArrow);
+// 
+//             // Fall through to KeepBelowIcon intended!
+//         }
+//         case KeepBelowIcon:
+//         {
+//             int center = r.x()+r.width()/2;
+// 
+//             // arrow
+//             drawObject(p, DiagonalLine, r.x(), center, center-r.x(), lwArrow);
+//             drawObject(p, CrossDiagonalLine, r.x()+center, r.bottom()-1, center-r.x(), lwArrow);
+//             if (lwArrow>1)
+//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.bottom()-(lwArrow-1), (lwArrow-2)*2, lwArrow);
+//             break;
+//         }
         case UnShadeIcon:
+            r.adjust(0, -2, 0, 0);
         case ShadeIcon:
         {
             QStyleOption opt;
 
             //opt.init(btn);
-            opt.rect=r;
+            opt.rect=r.adjusted(0, -(1+lwTitleBar), 0, 0);
             opt.state=QStyle::State_Enabled;
 
             //opt.palette.setColor(QPalette::Button, Qt::red);
-            style->drawPrimitive(ShadeIcon==icon ? QStyle::PE_IndicatorArrowUp
-                                                 : QStyle::PE_IndicatorArrowDown,
+            style->drawPrimitive(ShadeIcon==icon ? QStyle::PE_IndicatorArrowDown
+                                                 : QStyle::PE_IndicatorArrowUp,
                                  &opt, &p, 0L);
+            drawObject(p, HorizontalLine, r.x()+1, r.bottom()-(lwTitleBar-1), r.width()-2, lwTitleBar);
             break;
         }
         case MenuIcon:

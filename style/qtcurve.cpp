@@ -277,12 +277,13 @@ static QtCurveStyle::Icon pix2Icon(QStyle::StandardPixmap pix)
         case QStyle::SP_TitleBarNormalButton:
             return QtCurveStyle::ICN_RESTORE;
         case QStyle::SP_TitleBarShadeButton:
-            return QtCurveStyle::ICN_UP;
+            return QtCurveStyle::ICN_SHADE;
         case QStyle::SP_ToolBarHorizontalExtensionButton:
             return QtCurveStyle::ICN_RIGHT;
         case QStyle::SP_ToolBarVerticalExtensionButton:
-        case QStyle::SP_TitleBarUnshadeButton:
             return QtCurveStyle::ICN_DOWN;
+        case QStyle::SP_TitleBarUnshadeButton:
+            return QtCurveStyle::ICN_UNSHADE;
         default:
         case QStyle::SP_DockWidgetCloseButton:
         case QStyle::SP_TitleBarCloseButton:
@@ -304,9 +305,9 @@ static QtCurveStyle::Icon subControlToIcon(QStyle::SubControl sc)
         case QStyle::SC_TitleBarNormalButton:
             return QtCurveStyle::ICN_RESTORE;
         case QStyle::SC_TitleBarShadeButton:
-            return QtCurveStyle::ICN_UP;
+            return QtCurveStyle::ICN_SHADE;
         case QStyle::SC_TitleBarUnshadeButton:
-            return QtCurveStyle::ICN_DOWN;
+            return QtCurveStyle::ICN_UNSHADE;
         case QStyle::SC_TitleBarSysMenu:
             return QtCurveStyle::ICN_MENU;
     }
@@ -11224,6 +11225,15 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
         case ICN_MENU:
             for(int i=1; i<=constIconSize; i+=3)
                 painter->drawLine(br.left() + 1, br.top() + i,  br.right() - 1, br.top() + i);
+            break;
+        case ICN_SHADE:
+        case ICN_UNSHADE:
+            br.adjust(0, -2, 0, 0);
+            drawRect(painter, QRect(br.left()+1, br.bottom()-1, br.width()-2, 2));
+            br.adjust(0, ICN_SHADE==icon ? -3 : -5, 0, 0);
+            drawArrow(painter, opts.vArrows ? br.adjusted(0, 1, 0, 1) : br,
+                      ICN_SHADE==icon ? PE_IndicatorArrowDown : PE_IndicatorArrowUp, color, false);
+            break;
         default:
             break;
     }

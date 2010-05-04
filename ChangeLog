@@ -21,6 +21,9 @@
     (KFileDialog is not 100%, but still looks better...)
 10. Change 'abc [modified] - App' window titles to '*abc - App'
 11. Add sunken background to window titlebar button options.
+12. Titlebar button modifications:
+    - Dont support keep above/below buttons
+    - Change shade/unshade to be an arrow with line above/below
 
 1.3.1
 -----

@@ -232,8 +232,8 @@ KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
         case MinButton:
         case MaxButton:
         case CloseButton:
-        case AboveButton:
-        case BelowButton:
+//         case AboveButton:
+//         case BelowButton:
         case ShadeButton:
             return new QtCurveButton(type, this);
         default:

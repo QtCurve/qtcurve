@@ -94,7 +94,9 @@ class QtCurveStyle : public QCommonStyle
         ICN_CLOSE,
         ICN_UP,
         ICN_DOWN,
-        ICN_RIGHT
+        ICN_RIGHT,
+        ICN_SHADE,
+        ICN_UNSHADE
     };
 
 #ifdef STYLE_SUPPORT
