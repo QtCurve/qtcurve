@@ -68,6 +68,7 @@ enum ButtonIcon
 };
 
 class QtCurveClient;
+class QtCurveDBus;
 
 class QtCurveHandler : public QObject,
 #if KDE_IS_VERSION(4, 3, 0)
@@ -130,6 +131,7 @@ class QtCurveHandler : public QObject,
     QBitmap                itsBitmaps[2][NumButtonIcons];
     QtCurveConfig          itsConfig;
     QList<QtCurveClient *> itsClients;
+    QtCurveDBus            *itsDBus;
 #if KDE_IS_VERSION(4, 3, 0)
     QtCurveShadowCache     itsShadowCache;
 #endif

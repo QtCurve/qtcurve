@@ -85,11 +85,12 @@ namespace KWinQtCurve
 
 QtCurveHandler::QtCurveHandler()
               : itsStyle(NULL)
+              , itsDBus(NULL)
 {
     setStyle();
     reset(0);
 
-    new QtCurveDBus(this);
+    itsDBus=new QtCurveDBus(this);
     QDBusConnection::sessionBus().registerObject("/QtCurve", this);
 }
 
@@ -250,7 +251,9 @@ bool QtCurveHandler::readConfig()
     KConfig            configFile("kwinqtcurverc");
     const KConfigGroup config(&configFile, "General");
     QFontMetrics       fm(itsTitleFont);  // active font = inactive font
-    int                titleHeightMin = config.readEntry("MinTitleHeight", 16);
+    int                titleHeightMin = config.readEntry("MinTitleHeight", 16),
+                       oldSize=itsTitleHeight,
+                       oldToolSize=itsTitleHeightTool;
 
     // The title should stretch with bigger font sizes!
     itsTitleHeight = qMax(titleHeightMin, fm.height() + 4); // 4 px for the shadow etc.
@@ -271,18 +274,18 @@ bool QtCurveHandler::readConfig()
     itsTitleHeight+=2*titleBarPad();
 
     QFile in(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
-    int   oldSize(-1), oldToolSize(-1);
+    int   prevSize(-1), prevToolSize(-1);
 
     if(in.open(QIODevice::ReadOnly))
     {
         QTextStream stream(&in);
-        oldSize=in.readLine().toInt();
-        oldToolSize=in.readLine().toInt();
+        prevSize=in.readLine().toInt();
+        prevToolSize=in.readLine().toInt();
         in.close();
     }
 
     int borderEdge=borderEdgeSize();
-    if(oldSize!=(itsTitleHeight+borderEdge) || oldToolSize!=(itsTitleHeightTool+borderEdge))
+    if(prevSize!=(itsTitleHeight+borderEdge) || prevToolSize!=(itsTitleHeightTool+borderEdge))
     {
         KSaveFile sizeFile(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
 
@@ -318,11 +321,15 @@ bool QtCurveHandler::readConfig()
     }
 #endif
 
-    return 
+    if(itsDBus && (oldSize!=itsTitleHeight || oldToolSize!=itsTitleHeightTool))
+        itsDBus->emitTbSize();
+
+    return oldSize!=itsTitleHeight ||
+           oldToolSize!=itsTitleHeightTool ||
 #if KDE_IS_VERSION(4, 3, 0)
            shadowChanged ||
 #endif
-            itsConfig!=oldConfig;
+           itsConfig!=oldConfig;
 }
 
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)

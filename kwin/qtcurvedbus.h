@@ -36,6 +36,12 @@ class QtCurveDBus : public QDBusAbstractAdaptor
 
     QtCurveDBus(QtCurveHandler *handler) : QDBusAbstractAdaptor(handler) { }
 
+    void emitTbSize() { emit titlebarSizeChanged(); }
+
+    Q_SIGNALS:
+
+    void titlebarSizeChanged();
+
     public Q_SLOTS:
 
     Q_NOREPLY void refresh(unsigned int xid, int size) { Handler()->refresh(xid, size); }

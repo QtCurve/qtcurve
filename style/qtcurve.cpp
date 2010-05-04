@@ -1097,6 +1097,8 @@ QtCurveStyle::QtCurveStyle()
 #endif
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
+    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                          "titlebarSizeChanged", this, SLOT(titlebarSizeChangedChange()));
 #endif
     // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
     // to a temporary filename. If this is set, we read the settings from there - and dont not use
@@ -12554,6 +12556,24 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
             KGlobal::config()->reparseConfiguration();
             applyKdeSettings(false);
             break;
+    }
+#endif
+}
+
+void QtCurveStyle::titlebarSizeChangedChange()
+{
+#if !defined QTC_QT_ONLY
+    int old=qtcGetWindowBorderSize();
+
+    if(old!=qtcGetWindowBorderSize(true))
+    {
+        QWidgetList                tlw=QApplication::topLevelWidgets();
+        QWidgetList::ConstIterator it(tlw.begin()),
+                                   end(tlw.end());
+
+        for(; it!=end; ++it)
+            if(qobject_cast<QMainWindow *>(*it) && static_cast<QMainWindow*>(*it)->menuBar())
+                static_cast<QMainWindow*>(*it)->menuBar()->update();
     }
 #endif
 }

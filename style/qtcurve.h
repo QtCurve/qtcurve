@@ -234,6 +234,7 @@ class QtCurveStyle : public QCommonStyle
                                                Qt::Orientation orientation, const QStyleOption *option,
                                                const QWidget *widget) const;
     void           kdeGlobalSettingsChange(int type, int);
+    void           titlebarSizeChangedChange();
 
     private:
 
