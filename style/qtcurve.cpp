@@ -12199,19 +12199,17 @@ void QtCurveStyle::readMdiPositions() const
 
         if(grp.readEntry("CustomButtonPositions", false))
         {
-            QString val=grp.readEntry("ButtonsOnLeft");
-            if(!val.isEmpty())
-            {
-                itsMdiButtons[0].clear();
-                parseWindowLine(val, itsMdiButtons[0]);
-            }
+            QString left=grp.readEntry("ButtonsOnLeft"),
+                    right=grp.readEntry("ButtonsOnRight");
+                    
+            if(!left.isEmpty() || !right.isEmpty())
+                itsMdiButtons[0].clear(), itsMdiButtons[1].clear();
 
-            val=grp.readEntry("ButtonsOnRight");
-            if(!val.isEmpty())
-            {
-                itsMdiButtons[1].clear();
-                parseWindowLine(val, itsMdiButtons[1]);
-            }
+            if(!left.isEmpty())
+                parseWindowLine(left, itsMdiButtons[0]);
+
+            if(!right.isEmpty())
+                parseWindowLine(right, itsMdiButtons[1]);
 
             // Designer uses shade buttons, not min/max - so if we dont have shade in our kwin config. then add this
             // button near the max button...
