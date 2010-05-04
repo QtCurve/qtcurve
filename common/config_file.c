@@ -694,7 +694,7 @@ static int qtcGetWindowBorderSize(bool force=false)
         }
     }
 
-    return size;
+    return size<12 ? 24 : size;
 }
 #else
 static int qtcGetWindowBorderSize(gboolean force)
@@ -720,7 +720,7 @@ static int qtcGetWindowBorderSize(gboolean force)
         free(filename);
     }
 
-    return size;
+    return size<12 ? 24 : size;
 }
 #endif // __cplusplus
 
