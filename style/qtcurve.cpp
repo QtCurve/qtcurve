@@ -2015,7 +2015,11 @@ void QtCurveStyle::polish(QWidget *widget)
     }
 
     if(parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
+    {
         widget->setFont(QApplication::font());
+        //if(qobject_cast<QLineEdit *>(widget) && widget->rect().height()==widget->parentWidget()->rect().height())
+        //    widget->setMaximumSize(32768, widget->rect().height()-4);
+    }
 
     if (qobject_cast<QMenuBar *>(widget) ||
         widget->inherits("Q3ToolBar") ||
