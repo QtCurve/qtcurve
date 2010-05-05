@@ -2867,9 +2867,12 @@ static gboolean qtInit()
                 gtk_rc_parse_string(tmpStr);
             }
 
+#if 0
+// Remove because, in KDE4 at least, if have two locked toolbars together then the last/first items are too close
             if(TB_NONE==opts.toolbarBorders)
                 gtk_rc_parse_string("style \""RC_SETTING"TbB\" { xthickness = 0 ythickness = 0 GtkToolbar::internal-padding = 0 }"
                                     " widget_class \"*<GtkToolbar>\" style  \""RC_SETTING"TbB\"");
+#endif
             
             if(tmpStr)
                 free(tmpStr);
