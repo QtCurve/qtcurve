@@ -584,7 +584,6 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
 //             break;
 //         }
         case UnShadeIcon:
-            r.adjust(0, -2, 0, 0);
         case ShadeIcon:
         {
             QStyleOption opt;
@@ -592,6 +591,8 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             //opt.init(btn);
             opt.rect=r.adjusted(0, -(1+lwTitleBar), 0, 0);
             opt.rect.adjust(2, 2, -2, -2);
+            if(UnShadeIcon==icon)
+                opt.rect.adjust(0, -1, 0, -1);
             opt.state=QStyle::State_Enabled|QtC_StateKWin;
 
             //opt.palette.setColor(QPalette::Button, Qt::red);
