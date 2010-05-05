@@ -34,7 +34,11 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="KComboBox" name="borderSize" />
+          <widget class="KComboBox" name="borderSize">
+           <property name="sizeAdjustPolicy">
+            <enum>QComboBox::AdjustToContents</enum>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_4">
@@ -193,7 +197,11 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="KComboBox" name="activeShadowColorType"/>
+           <widget class="KComboBox" name="activeShadowColorType">
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
+           </widget>
           </item>
           <item row="4" column="1">
            <widget class="KColorButton" name="activeShadowColor"/>
@@ -257,7 +265,11 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="KComboBox" name="inactiveShadowColorType"/>
+           <widget class="KComboBox" name="inactiveShadowColorType">
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
+           </widget>
           </item>
           <item row="4" column="1">
            <widget class="KColorButton" name="inactiveShadowColor"/>
@@ -275,14 +287,14 @@
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
-   <class>KComboBox</class>
-   <extends>QComboBox</extends>
-   <header>kcombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>KIntSpinBox</class>
    <extends>QSpinBox</extends>
    <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KComboBox</class>
+   <extends>QComboBox</extends>
+   <header>kcombobox.h</header>
   </customwidget>
   <customwidget>
    <class>KColorButton</class>
@@ -292,9 +304,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>resizeGrip</tabstop>
   <tabstop>roundBottom</tabstop>
-  <tabstop>drawBottom</tabstop>
   <tabstop>outerBorder</tabstop>
   <tabstop>borderlessMax</tabstop>
   <tabstop>grouping</tabstop>
