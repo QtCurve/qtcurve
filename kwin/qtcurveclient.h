@@ -96,7 +96,7 @@ class QtCurveClient :
     void                      createSizeGrip();
     void                      deleteSizeGrip();
     void                      informAppOfActiveChange();
-    const QString &           windowClass();
+    const QString &           windowClass(bool normalWindowsOnly=true);
 
     private:
 

@@ -51,6 +51,7 @@
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
 #endif
+#include <stdio.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -420,17 +421,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         if(-1==itsMenuBarSize)
         {
             QString wc(windowClass());
-            if(wc==QLatin1String("Navigator Firefox"))
+            if(wc==QLatin1String("Navigator Firefox") ||
+               wc==QLatin1String("Mail Thunderbird"))
                 itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
             else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
                     wc==QLatin1String("soffice.bin Soffice.bin"))
                 itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
             else
             {
-                unsigned char  *data;
-                int            dummy;
-                unsigned long  num,
-                            dummy2;
+                unsigned char *data;
+                int           dummy;
+                unsigned long num,
+                              dummy2;
 
                 if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
                                                 &dummy2, &dummy, &num, &dummy2, &data) && num>0)
@@ -445,7 +447,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 //    *data = NULL; // superflous?!?
             }
         }
-        opt.rect.adjust(0, 0, 0, itsMenuBarSize);
+        if(-1!=itsMenuBarSize)
+            opt.rect.adjust(0, 0, 0, itsMenuBarSize);
     }
 
 #ifdef DRAW_INTO_PIXMAPS
@@ -1224,13 +1227,16 @@ void QtCurveClient::informAppOfActiveChange()
     }
 }
 
-const QString & QtCurveClient::windowClass()
+const QString & QtCurveClient::windowClass(bool normalWindowsOnly)
 {
     if(itsWindowClass.isEmpty())
     {
-        KWindowInfo info(windowId(), 0, NET::WM2WindowClass);
+        KWindowInfo info(windowId(), normalWindowsOnly ? NET::WMWindowType : 0, NET::WM2WindowClass);
 
-        itsWindowClass=info.windowClassName()+' '+info.windowClassClass();
+        if(normalWindowsOnly && NET::Normal!=info.windowType(NET::AllTypesMask))
+            itsWindowClass="<>";
+        else
+            itsWindowClass=info.windowClassName()+' '+info.windowClassClass();
     }
 
     return itsWindowClass;
