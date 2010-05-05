@@ -40,6 +40,7 @@
 #include <QLinearGradient>
 #include <KDE/KColorUtils>
 #include <KDE/KWindowInfo>
+#include <KDE/KIconEffect>
 #ifdef DRAW_INTO_PIXMAPS
 #include <KDE/KWindowSystem>
 #endif
@@ -135,6 +136,12 @@ static QColor blendColors(const QColor &foreground, const QColor &background, do
 {
     return KColorUtils::mix(background, foreground, alpha);
 }
+
+// static inline bool isModified(const QString &title)
+// {
+//     return title.indexOf(i18n(" [modified] ")) > 3 ||
+//            (title.length()>3 && QChar('*')==title[0] && QChar(' ')==title[1]);
+// }
 
 QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
 #if KDE_IS_VERSION(4, 3, 0)
@@ -293,11 +300,6 @@ void QtCurveClient::activeChange()
 void QtCurveClient::captionChange()
 {
     itsCaption=caption();
-    if(-1!=itsCaption.indexOf(i18n(" [modified]")))
-    {
-        itsCaption=itsCaption.remove(i18n(" [modified]"));
-        itsCaption="*"+itsCaption;
-    }
     widget()->update();
 }
 
@@ -691,7 +693,16 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
     }
 
     if(showIcon && iconX>=0)
-        painter->drawPixmap(iconX, capRect.y()+((capRect.height()-pix.height())/2)+1+(isTab && !isActiveTab ? 1 : 0), pix);
+    {
+//         if(isModified(cap))
+//         {
+//             QPixmap mod=pix;
+//             KIconEffect::semiTransparent(mod);
+//             painter->drawPixmap(iconX, capRect.y()+((capRect.height()-pix.height())/2)+1+(isTab && !isActiveTab ? 1 : 0), mod);
+//         }
+//         else
+            painter->drawPixmap(iconX, capRect.y()+((capRect.height()-pix.height())/2)+1+(isTab && !isActiveTab ? 1 : 0), pix);
+    }
 }
 
 #if KDE_IS_VERSION(4, 3, 85)
