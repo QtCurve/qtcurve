@@ -105,4 +105,11 @@ endif (NOT QTC_QT_ONLY)
 
 add_subdirectory(style)
 
-
+if (QTC_KWIN_MAX_BUTTON_HACK)
+    message("\n**************************************************************\n"
+            "Warning: You have enabled the hack to force drawing of maximise\n"
+            "         buttons for windows that can be minimised. This is a 100%\n"
+            "         hack, that may not work or compile, and may even crash\n"
+            "         kwin.\n"
+            "**************************************************************\n")
+endif (QTC_KWIN_MAX_BUTTON_HACK)

@@ -27,12 +27,19 @@
 #ifndef QTCURVECLIENT_H
 #define QTCURVECLIENT_H
 
+#include "config.h"
+
 #include <kdeversion.h>
+#ifdef QTC_KWIN_MAX_BUTTON_HACK
+#define private public
+#endif
 #include <kcommondecoration.h>
+#ifdef QTC_KWIN_MAX_BUTTON_HACK
+#undef private
+#endif
 #include <QtGui/QPixmap>
 #include <QtGui/QColor>
 #include "qtcurvehandler.h"
-#include "config.h"
 
 namespace KWinQtCurve
 {

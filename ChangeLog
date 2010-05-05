@@ -28,6 +28,12 @@
     - Better icon for 'on all desktops'
 13. Always use a 1 pixel border for toolbars - as using a border of 0 can cause
     items of adjoining locked toolbars to be too close.
+14. Experimental hack to always display the 'maximise' button for windows that can be
+    minimised. Enable via cmake option: -DQTC_KWIN_MAX_BUTTON_HACK=true
+
+    WARNING: This is a 100% hack, and is not guaranteed to be stable or even
+             compile!
+
 
 1.3.1
 -----

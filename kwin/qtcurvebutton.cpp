@@ -209,11 +209,16 @@ void QtCurveButton::drawButton(QPainter *painter)
         opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised) |
                    (active ? QStyle::State_Active : QStyle::State_None) |
                    (itsHover ? QStyle::State_MouseOver : QStyle::State_None)|QStyle::State_Horizontal|QtC_StateKWin;
-        if(!(flags&TITLEBAR_BUTTON_STD_COLOR) ||
-           (flags&TITLEBAR_BUTTON_COLOR_MOUSE_OVER && !itsHover && !(flags&TITLEBAR_BUTTON_COLOR)))
+        if(!isEnabled())
             opt.palette.setColor(QPalette::Button, buttonColor);
-        if(flags&TITLEBAR_BUTTON_COLOR && !(flags&TITLEBAR_BUTTON_COLOR_SYMBOL))
-            opt.version=versionHack;
+        else
+        {
+            if(!(flags&TITLEBAR_BUTTON_STD_COLOR) ||
+                (flags&TITLEBAR_BUTTON_COLOR_MOUSE_OVER && !itsHover && !(flags&TITLEBAR_BUTTON_COLOR)))
+                opt.palette.setColor(QPalette::Button, buttonColor);
+            if(flags&TITLEBAR_BUTTON_COLOR && !(flags&TITLEBAR_BUTTON_COLOR_SYMBOL))
+                opt.version=versionHack;
+        }
         Handler()->wStyle()->drawPrimitive(QStyle::PE_PanelButtonCommand, &opt, &bP, 0L);
         drewFrame=true;
     }
@@ -234,7 +239,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         }
         bP.drawPixmap(dX, dY, menuIcon);
     }
-    else if(!(flags&TITLEBAR_BUTTON_HOVER_SYMBOL_FULL) || sunken || itsHover)
+    else if(isEnabled() && (!(flags&TITLEBAR_BUTTON_HOVER_SYMBOL_FULL) || sunken || itsHover))
     {
         const QBitmap &icon(Handler()->buttonBitmap(itsIconType, size(), decoration()->isToolWindow()));
         bool          customCol(false),

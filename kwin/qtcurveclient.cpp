@@ -230,8 +230,97 @@ int QtCurveClient::layoutMetric(LayoutMetric lm, bool respectWindowState,
     }
 }
 
+#ifdef QTC_KWIN_MAX_BUTTON_HACK
+static char typeToChar(ButtonType t)
+{
+    switch(t)
+    {
+        case MenuButton:
+            return 'M';
+        case OnAllDesktopsButton:
+            return 'S';
+        case HelpButton:
+            return 'H';
+        case MinButton:
+            return 'I';
+        case MaxButton:
+            return 'A';
+        case CloseButton:
+            return 'X';
+//         case AboveButton:
+//            return 'F';
+//         case BelowButton:
+//            return 'B';
+        case ShadeButton:
+            return 'L';
+        default:
+            return '?';
+    }
+}
+#endif
+
 KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
 {
+#ifdef QTC_KWIN_MAX_BUTTON_HACK
+    // If we're beng asked for a minimize button - then need to create a max button as well
+    // - otherwise position changes!
+    if(isMinimizable() && !isMaximizable())
+    {
+        QString left=options()->customButtonPositions() ? options()->titleButtonsLeft() : defaultButtonsLeft(),
+                right=options()->customButtonPositions() ? options()->titleButtonsRight() : defaultButtonsRight();
+        char    ch=typeToChar(type),
+                mc=typeToChar(MaxButton);
+        int     li=left.indexOf(ch),
+                ri=-1==li ? right.indexOf(ch) : -1,
+                lm=left.indexOf(mc),
+                rm=-1==lm ? right.indexOf(mc) : -1,
+                mod=0;
+        bool    create=false,
+                isLeft=false;
+
+        if((-1!=li && lm<li) || (-1!=ri && rm<ri))
+        {
+            isLeft=-1!=li;
+            const QString &str=isLeft ? left : right;
+            int           i=isLeft ? li : ri,
+                          m=isLeft ? lm : rm;
+
+            for(m=m+1; str[m]=='_' && m<i; ++m)
+                mod++;
+
+            create=m==i;
+        }
+
+        if(create)
+        {
+            KCommonDecorationButton *btn = createButton(MaxButton);
+            if (btn)
+            {
+                btn->setRealizeButtons(Qt::LeftButton|Qt::MidButton|Qt::RightButton);
+                const bool max = maximizeMode()==MaximizeFull;
+                btn->setTipText(max?i18n("Restore"):i18n("Maximize") );
+                btn->setEnabled(false);
+                // fix double deletion, see objDestroyed()
+                connect(btn, SIGNAL(destroyed(QObject*)), this, SLOT(objDestroyed(QObject*)));
+                KCommonDecoration::m_button[MaxButton] = btn;
+
+                btn->setSize(QSize(layoutMetric(LM_ButtonWidth, true, btn), layoutMetric(LM_ButtonHeight, true, btn)) );
+                btn->show();
+
+                ButtonContainer &cont=isLeft ? m_buttonsLeft : m_buttonsRight;
+                if(0==mod)
+                    cont.append(btn);
+                else
+                {
+                    int size=cont.size();
+                    cont[size-mod]=btn;
+                    cont.append(0);
+                }
+            }
+        }
+    }
+#endif
+
     switch (type)
     {
         case MenuButton:
