@@ -8,6 +8,9 @@ style "qtcurve-default"
   GtkWidget::interior_focus = 1
   GtkButton::child_displacement_x   = 1
   GtkButton::child_displacement_y   = 1
+  GtkMessageDialog::use-separator = 1
+  GtkDialog::content-area-border = 2
+  GtkDialog::action-area-border = 2
 
   GtkWidget::focus-line-width = 1
   GtkRange::trough_border = 0
@@ -46,6 +49,13 @@ style "qtcurve-default"
   engine "qtcurve" 
   {
   }
+}
+
+style "qtcurve-dlgsep" = "qtcurve-default"
+{
+  GtkSeparator::separator-height = 0
+  xthickness = 0
+  ythickness = 0
 }
 
 style "qtcurve-pathbutton" = "qtcurve-default"
@@ -265,6 +275,7 @@ class "*SeparatorMenuItem" style "qtcurve-separator"
 widget_class "*.GtkSeparatorMenuItem.*" style "qtcurve-separator"
 widget_class "*.GeditNotebook.GtkHBox.GtkButton" style "qtcurve-tabbutton"
 widget_class "*MenuBar*MenuItem" style "qtcurve-menubaritem"
+widget_class "*Dialog.*Separator" style "qtcurve-dlgsep"
 
 # Seems to fix issues with pidgin where some buttons have icons, and others not.
 # Messes other widgets up :-(
