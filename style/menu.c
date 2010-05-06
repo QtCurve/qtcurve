@@ -24,7 +24,7 @@ static void qtcEmitMenuSize(GtkWidget *w, unsigned int size)
             g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM, (gpointer)size);
             unsigned short ssize=size;
             XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
-                            qtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&ssize, 1);
+                            qtcMenuSizeAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&ssize, 1);
         }
     }
 }

@@ -2921,28 +2921,32 @@ debugDisplayWidget(widget, 3);
     if ((opts.menubarHiding || opts.statusbarHiding) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) &&
         !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
-        qtcWindowSetup(widget);
-
-        bool hiddenMenubar=opts.menubarHiding && qtcMenuBarHidden(qtSettings.appName);
-        
-        if(hiddenMenubar || BLEND_TITLEBAR)
+        if(qtcWindowSetup(widget))
         {
             GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
-
-            if(menuBar)
-            {
-                if(hiddenMenubar)
-                    gtk_widget_hide(menuBar);
-                if(BLEND_TITLEBAR)
-                    qtcEmitMenuSize(menuBar, menuBar->allocation.height);
-            }
-        }
-        if(opts.statusbarHiding && qtcStatusBarHidden(qtSettings.appName))
-        {
             GtkWidget *statusBar=qtcWindowGetStatusBar(widget, 0);
 
-            if(statusBar)
-                gtk_widget_hide(statusBar);
+            if(opts.menubarHiding && menuBar)
+            {
+                bool hiddenMenubar=qtcMenuBarHidden(qtSettings.appName);
+
+                if(hiddenMenubar)
+                    gtk_widget_hide(menuBar);
+
+                if(BLEND_TITLEBAR)
+                    qtcEmitMenuSize(menuBar, hiddenMenubar ? 0 : menuBar->allocation.height);
+                    
+                if(opts.menubarHiding&HIDE_KWIN)
+                    qtcWindowMenuBarDBus(widget, hiddenMenubar ? 0 : menuBar->allocation.height);
+            }
+            if(opts.statusbarHiding && statusBar)
+            {
+                gboolean hiddenStatusBar=qtcStatusBarHidden(qtSettings.appName);
+                if(hiddenStatusBar)
+                    gtk_widget_hide(statusBar);
+                if(opts.statusbarHiding&HIDE_KWIN)
+                    qtcWindowStatusBarDBus(widget, !hiddenStatusBar);
+            }
         }
     }
 

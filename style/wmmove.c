@@ -12,7 +12,7 @@ static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
     GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
 
     xev.xclient.type = ClientMessage;
-    xev.xclient.message_type = qtcNetMoveResize;
+    xev.xclient.message_type = qtcNetMoveResizeAtom;
     xev.xclient.display = gdk_x11_get_default_xdisplay();
     xev.xclient.window = GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window);
     xev.xclient.format = 32;
