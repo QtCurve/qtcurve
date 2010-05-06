@@ -1563,8 +1563,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(menuIcons)
             CFG_READ_BOOL(forceAlternateLvCols)
             CFG_READ_BOOL(invertBotTab)
-            CFG_READ_BOOL(menubarHiding)
-            CFG_READ_BOOL(statusbarHiding)
+            CFG_READ_INT_BOOL(menubarHiding, HIDE_KEYBOARD)
+            CFG_READ_INT_BOOL(statusbarHiding, HIDE_KEYBOARD)
             CFG_READ_BOOL(boldProgress)
             CFG_READ_BOOL(coloredTbarMo)
             CFG_READ_BOOL(borderSelection)
@@ -2270,8 +2270,8 @@ static void defaultSettings(Options *opts)
     opts->menuIcons=true;
     opts->forceAlternateLvCols=false;
     opts->invertBotTab=true;
-    opts->menubarHiding=false;
-    opts->statusbarHiding=false;
+    opts->menubarHiding=HIDE_NONE;
+    opts->statusbarHiding=HIDE_NONE;
     opts->boldProgress=true;
     opts->coloredTbarMo=false;
     opts->borderSelection=false;
@@ -2965,8 +2965,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(forceAlternateLvCols)
         CFG_WRITE_ENTRY_NUM(square)
         CFG_WRITE_ENTRY(invertBotTab)
-        CFG_WRITE_ENTRY(menubarHiding)
-        CFG_WRITE_ENTRY(statusbarHiding)
+        CFG_WRITE_ENTRY_NUM(menubarHiding)
+        CFG_WRITE_ENTRY_NUM(statusbarHiding)
         CFG_WRITE_ENTRY(boldProgress)
         CFG_WRITE_ENTRY(coloredTbarMo)
         CFG_WRITE_ENTRY(borderSelection)

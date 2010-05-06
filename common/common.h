@@ -181,9 +181,11 @@ typedef gchar ** Strings;
 #define SUNKEN_BEVEL_DARK_ALPHA  0.25
 #define SUNKEN_BEVEL_LIGHT_ALPHA 0.40
 
-#define MENU_SIZE_ATOM     "_QTCURVE_MENUBAR_SIZE_"
-#define TITLEBAR_SIZE_ATOM "_QTCURVE_TITLEBAR_SIZE_"
-#define ACTIVE_WINDOW_ATOM "_QTCURVE_ACTIVE_WINDOW_"
+#define MENU_SIZE_ATOM        "_QTCURVE_MENUBAR_SIZE_"
+#define TITLEBAR_SIZE_ATOM    "_QTCURVE_TITLEBAR_SIZE_"
+#define ACTIVE_WINDOW_ATOM    "_QTCURVE_ACTIVE_WINDOW_"
+#define TOGGLE_MENUBAR_ATOM   "_QTCURVE_TOGGLE_MENUBAR_"
+#define TOGGLE_STATUSBAR_ATOM "_QTCURVE_TOGGLE_STATUSBAR_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                            !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
 
@@ -415,7 +417,8 @@ typedef enum
     QtC_TitleBarBorder,
     QtC_TitleBarEffect,
     QtC_BlendMenuAndTitleBar,
-    QtC_ShadeMenubarOnlyWhenActive
+    QtC_ShadeMenubarOnlyWhenActive,
+    QtC_ToggleButtons
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
@@ -807,6 +810,13 @@ typedef enum
 
 #define FULL_FOCUS     (FOCUS_FULL==opts.focus  || FOCUS_FILLED==opts.focus)
 
+enum
+{
+    HIDE_NONE     = 0x00,
+    HIDE_KEYBOARD = 0x01,
+    HIDE_KWIN     = 0x02
+};
+
 #if defined __cplusplus
 typedef enum
 {
@@ -1011,8 +1021,6 @@ typedef struct
 #endif
                      forceAlternateLvCols,
                      invertBotTab,
-                     menubarHiding,
-                     statusbarHiding,
                      boldProgress,
                      coloredTbarMo,
                      borderSelection,
@@ -1022,6 +1030,8 @@ typedef struct
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
+    int              menubarHiding,
+                     statusbarHiding;
     int              square;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     int              dwtSettings;
