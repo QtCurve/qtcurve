@@ -393,6 +393,12 @@ static int toInt(const QString &str)
     return str.length()>1 ? str[0].unicode() : 0;
 }
 
+static int getHideFlags(const QCheckBox *kbd, const QCheckBox *kwin)
+{
+    return (kbd->isChecked() ? HIDE_KEYBOARD : HIDE_NONE)+
+           (kwin->isChecked() ? HIDE_KWIN : HIDE_NONE);
+}
+
 enum ShadeWidget
 {
     SW_MENUBAR,
@@ -788,8 +794,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(stripedSbar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(menubarHiding, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
-    connect(statusbarHiding, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(menubarHiding_keyboard, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
+    connect(menubarHiding_kwin, SIGNAL(toggled(bool)), SLOT(menubarHidingChanged()));
+    connect(statusbarHiding_keyboard, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(statusbarHiding_kwin, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(glowProgress, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(darkerBorders, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(comboSplitter, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1194,7 +1202,7 @@ void QtCurveConfig::sliderWidthChanged()
 
 void QtCurveConfig::menubarHidingChanged()
 {
-    if(menubarHiding->isChecked())
+    if(menubarHiding_keyboard->isChecked() || menubarHiding_kwin->isChecked())
         xbar->setChecked(false);
     updateChanged();
 }
@@ -1202,7 +1210,10 @@ void QtCurveConfig::menubarHidingChanged()
 void QtCurveConfig::xbarChanged()
 {
     if(xbar->isChecked())
-        menubarHiding->setChecked(false);
+    {
+        menubarHiding_keyboard->setChecked(false);
+        menubarHiding_kwin->setChecked(false);
+    }
     updateChanged();
 }
  
@@ -2246,8 +2257,8 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.stripedSbar=stripedSbar->isChecked();
     opts.sliderStyle=(ESliderStyle)sliderStyle->currentIndex();
     opts.roundMbTopOnly=roundMbTopOnly->isChecked();
-    opts.menubarHiding=menubarHiding->isChecked();
-    opts.statusbarHiding=statusbarHiding->isChecked();
+    opts.menubarHiding=getHideFlags(menubarHiding_keyboard, menubarHiding_kwin);
+    opts.statusbarHiding=getHideFlags(statusbarHiding_keyboard, statusbarHiding_kwin);
     opts.fillProgress=fillProgress->isChecked();
     opts.glowProgress=(EGlow)glowProgress->currentIndex();
     opts.darkerBorders=darkerBorders->isChecked();
@@ -2443,8 +2454,10 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     stripedSbar->setChecked(opts.stripedSbar);
     sliderStyle->setCurrentIndex(opts.sliderStyle);
     roundMbTopOnly->setChecked(opts.roundMbTopOnly);
-    menubarHiding->setChecked(opts.menubarHiding);
-    statusbarHiding->setChecked(opts.statusbarHiding);
+    menubarHiding_keyboard->setChecked(opts.menubarHiding&HIDE_KEYBOARD);
+    menubarHiding_kwin->setChecked(opts.menubarHiding&HIDE_KWIN);
+    statusbarHiding_keyboard->setChecked(opts.statusbarHiding&HIDE_KEYBOARD);
+    statusbarHiding_kwin->setChecked(opts.statusbarHiding&HIDE_KWIN);
     fillProgress->setChecked(opts.fillProgress);
     glowProgress->setCurrentIndex(opts.glowProgress);
     darkerBorders->setChecked(opts.darkerBorders);
@@ -2693,8 +2706,8 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          stripedSbar->isChecked()!=opts.stripedSbar ||
          sliderStyle->currentIndex()!=opts.sliderStyle ||
          roundMbTopOnly->isChecked()!=opts.roundMbTopOnly ||
-         menubarHiding->isChecked()!=opts.menubarHiding ||
-         statusbarHiding->isChecked()!=opts.statusbarHiding ||
+         getHideFlags(menubarHiding_keyboard, menubarHiding_kwin)!=opts.menubarHiding ||
+         getHideFlags(statusbarHiding_keyboard, statusbarHiding_kwin)!=opts.statusbarHiding ||
          fillProgress->isChecked()!=opts.fillProgress ||
          glowProgress->currentIndex()!=opts.glowProgress ||
          darkerBorders->isChecked()!=opts.darkerBorders ||

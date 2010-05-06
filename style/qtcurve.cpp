@@ -1098,8 +1098,6 @@ QtCurveStyle::QtCurveStyle()
 #endif
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                          "titlebarSizeChanged", this, SLOT(titlebarSizeChangedChange()));
 #endif
     // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
     // to a temporary filename. If this is set, we read the settings from there - and dont not use
@@ -1131,6 +1129,21 @@ QtCurveStyle::QtCurveStyle()
 
 #endif
     readConfig(rcFile, &opts);
+
+#ifdef Q_WS_X11
+    if(!qApp || QString(qApp->argv()[0])!="kwin")
+    {
+        QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                              "titlebarSizeChanged", this, SLOT(titlebarSizeChangedChange()));
+        if(opts.menubarHiding&HIDE_KWIN)
+            QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                                  "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+
+        if(opts.statusbarHiding&HIDE_KWIN)
+            QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                                  "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+    }
+#endif
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
     if(opts.contrast<0 || opts.contrast>10)
@@ -1720,7 +1733,7 @@ void QtCurveStyle::polish(QWidget *widget)
         {
             static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
 #ifdef Q_WS_X11
-            if(BLEND_TITLEBAR)
+            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN)
                 emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
 #endif
         }
@@ -1737,6 +1750,9 @@ void QtCurveStyle::polish(QWidget *widget)
                 sb->installEventFilter(this);
             if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
                 sb->setHidden(true);
+#ifdef Q_WS_X11
+            emitStatusBarState(sb);
+#endif
         }
     }
 
@@ -1823,7 +1839,7 @@ void QtCurveStyle::polish(QWidget *widget)
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
 #ifdef Q_WS_X11
-        if(BLEND_TITLEBAR)
+        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN)
             emitMenuSize((QWidget *)widget, widget->rect().height());
 #endif
         if(CUSTOM_BGND)
@@ -2561,34 +2577,19 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 
                 if(window->isVisible())
                 {
-                    if(opts.menubarHiding && window->menuWidget())
+                    if(opts.menubarHiding&HIDE_KEYBOARD && window->menuWidget())
                     {
                         QKeyEvent *k=static_cast<QKeyEvent *>(event);
 
                         if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M==k->key())
-                        {
-                            QWidget *menubar=window->menuWidget();
-                            if(itsSaveMenuBarStatus)
-                                qtcSetMenuBarHidden(appName, menubar->isVisible());
-
-                            window->menuWidget()->setHidden(menubar->isVisible());
-                        }
+                            toggleMenuBar(window);
                     }
-                    if(opts.statusbarHiding)
+                    if(opts.statusbarHiding&HIDE_KEYBOARD)
                     {
                         QKeyEvent *k=static_cast<QKeyEvent *>(event);
 
                         if(k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_S==k->key())
-                        {
-                            QStatusBar *sb=getStatusBar(window);
-
-                            if(sb)
-                            {
-                                if(itsSaveStatusBarStatus)
-                                    qtcSetStatusBarHidden(appName, sb->isVisible());
-                                sb->setHidden(sb->isVisible());
-                            }
-                        }
+                            toggleStatusBar(window);
                     }
                 }
             }
@@ -2715,22 +2716,25 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 //                 // This catches the case where the frame is created, and then its style set...
 //                     frame->setFrameShape(QFrame::StyledPanel);
 //             }
+#ifdef Q_WS_X11
             else if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, mb->size().height());
             }
+#endif
             break;
         }
         case QEvent::Destroy:
         case QEvent::Hide:
         {
+#ifdef Q_WS_X11
             if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, 0);
             }
-
+#endif
             if(itsHoverWidget && object==itsHoverWidget)
             {
                 itsPos.setX(-1);
@@ -3120,6 +3124,9 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return BLEND_TITLEBAR;
         case QtC_ShadeMenubarOnlyWhenActive:
             return opts.shadeMenubarOnlyWhenActive;
+        case QtC_ToggleButtons:
+            return (opts.menubarHiding&HIDE_KWIN   ? 0x1 : 0)+
+                   (opts.statusbarHiding&HIDE_KWIN ? 0x2 : 0);
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
@@ -12192,6 +12199,8 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
             f.close();
         }
 #else
+        Q_UNUSED(option)
+
         QColor col=KGlobalSettings::activeTitleColor();
 
         if(col!=itsBackgroundCols[ORIGINAL_SHADE])
@@ -12621,6 +12630,56 @@ void QtCurveStyle::titlebarSizeChangedChange()
 #endif
 }
 
+static QMainWindow * getWindow(unsigned int xid)
+{
+    QWidgetList                tlw=QApplication::topLevelWidgets();
+    QWidgetList::ConstIterator it(tlw.begin()),
+                               end(tlw.end());
+
+    for(; it!=end; ++it)
+        if(qobject_cast<QMainWindow *>(*it) && (*it)->winId()==xid)
+            return static_cast<QMainWindow*>(*it);
+    return 0L;
+}
+
+void QtCurveStyle::toggleMenuBar(unsigned int xid)
+{
+    QMainWindow *win=getWindow(xid);
+    if(win)
+        toggleMenuBar(win);
+}
+
+void QtCurveStyle::toggleStatusBar(unsigned int xid)
+{
+    QMainWindow *win=getWindow(xid);
+    if(win)
+        toggleStatusBar(win);
+}
+    
+void QtCurveStyle::toggleMenuBar(QMainWindow *window)
+{
+    QWidget *menubar=window->menuWidget();
+    if(itsSaveMenuBarStatus)
+        qtcSetMenuBarHidden(appName, menubar->isVisible());
+
+    window->menuWidget()->setHidden(menubar->isVisible());
+}
+
+void QtCurveStyle::toggleStatusBar(QMainWindow *window)
+{
+    QStatusBar *sb=getStatusBar(window);
+
+    if(sb)
+    {
+        if(itsSaveStatusBarStatus)
+            qtcSetStatusBarHidden(appName, sb->isVisible());
+        sb->setHidden(sb->isVisible());
+#ifdef Q_WS_X11
+        emitStatusBarState(sb);
+#endif
+    }
+}
+                        
 #ifdef Q_WS_X11
 bool QtCurveStyle::isWindowDragWidget(QObject *o)
 {
@@ -12665,8 +12724,18 @@ void QtCurveStyle::emitMenuSize(QWidget *w, unsigned short size)
                             constQtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
             if(!itsDBus)
                 itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
-            itsDBus->call(QDBus::NoBlock, "refresh", (unsigned int)w->window()->winId(), (int)size);
+            itsDBus->call(QDBus::NoBlock, "menuBarSize", (unsigned int)w->window()->winId(), (int)size);
         }
+    }
+}
+
+void QtCurveStyle::emitStatusBarState(QStatusBar *sb)
+{
+    if(opts.statusbarHiding&HIDE_KWIN)
+    {
+        if(!itsDBus)
+            itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
+        itsDBus->call(QDBus::NoBlock, "statusBarState", (unsigned int)sb->window()->winId(), sb->isVisible());
     }
 }
 

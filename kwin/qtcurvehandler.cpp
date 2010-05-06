@@ -84,7 +84,9 @@ namespace KWinQtCurve
 {
 
 QtCurveHandler::QtCurveHandler()
-              : itsStyle(NULL)
+              : itsLastMenuXid(0)
+              , itsLastStatusXid(0)
+              , itsStyle(NULL)
               , itsDBus(NULL)
 {
     setStyle();
@@ -357,16 +359,44 @@ void QtCurveHandler::titlebarSizeChanged()
         (*it)->informAppOfTitlebarSizeChanged();
 }
 
-void QtCurveHandler::refresh(unsigned int xid, int size)
+void QtCurveHandler::menuBarSize(unsigned int xid, int size)
 {
     QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
                                           end(itsClients.end());
 
     for(; it!=end; ++it)
         if((*it)->windowId()==xid)
-            (*it)->menubarSize(size);
+        {
+            (*it)->menuBarSize(size);
+            break;
+        }
+    itsLastMenuXid=xid;
 }
 
+void QtCurveHandler::statusBarState(unsigned int xid, bool state)
+{
+    QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
+                                          end(itsClients.end());
+
+    for(; it!=end; ++it)
+        if((*it)->windowId()==xid)
+        {
+            (*it)->statusBarState(state);
+            break;
+        }
+    itsLastStatusXid=xid;
+}
+
+void QtCurveHandler::emitToggleMenuBar(int xid)
+{
+    itsDBus->emitMbToggle(xid);
+}
+
+void QtCurveHandler::emitToggleStatusBar(int xid)
+{
+    itsDBus->emitSbToggle(xid);
+}
+    
 int QtCurveHandler::borderEdgeSize() const
 {
     return outerBorder()

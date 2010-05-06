@@ -34,6 +34,7 @@
     WARNING: This is a 100% hack, and is not guaranteed to be stable or even
              compile!
 
+15. Add option to provide titlebar buttons to hide menubar and statusbars.
 
 1.3.1
 -----

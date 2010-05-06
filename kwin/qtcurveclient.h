@@ -46,6 +46,7 @@ namespace KWinQtCurve
 
 class QtCurveSizeGrip;
 class QtCurveButton;
+class QtCurveToggleButton;
 
 class QtCurveClient :
 #if KDE_IS_VERSION(4, 3, 0)
@@ -54,6 +55,8 @@ class QtCurveClient :
                        public KCommonDecoration
 #endif    
 {
+    Q_OBJECT
+
     public:
 
     QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory);
@@ -82,8 +85,16 @@ class QtCurveClient :
     void                      updateCaption();
     bool                      eventFilter(QObject *o, QEvent *e);
     bool isMaximized() const { return maximizeMode()==MaximizeFull && !options()->moveResizeMaximizedWindows();  }
-    void                      menubarSize(int size);
+    void                      menuBarSize(int size);
+    void                      statusBarState(bool state);
+    QtCurveToggleButton *     createToggleButton(bool menubar);
     void                      informAppOfTitlebarSizeChanged();
+    void                      sendToggleToApp(bool menubar);
+
+    public Q_SLOTS:
+
+    void                      toggleMenuBar();
+    void                      toggleStatusBar();
 
     private:
 
@@ -116,14 +127,16 @@ class QtCurveClient :
 
     static const int constNumButtonStates=2;
 
-    QtCurveSizeGrip *itsResizeGrip;
-    ButtonBgnd      itsButtonBackground[constNumButtonStates];
-    QRect           itsCaptionRect;
-    QString         itsCaption,
-                    itsWindowClass;
-    QFont           itsTitleFont;
-    int             itsMenuBarSize;
-
+    QtCurveSizeGrip        *itsResizeGrip;
+    ButtonBgnd             itsButtonBackground[constNumButtonStates];
+    QRect                  itsCaptionRect;
+    QString                itsCaption,
+                           itsWindowClass;
+    QFont                  itsTitleFont;
+    int                    itsMenuBarSize;
+    QtCurveToggleButton    *itsToggleMenuBarButton,
+                           *itsToggleStatusBarButton;
+//     bool                   itsHover;
 #if KDE_IS_VERSION(4, 3, 85)
     QList<QtCurveButton *> itsCloseButtons;
     bool                   itsClickInProgress,

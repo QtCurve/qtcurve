@@ -110,11 +110,16 @@ class QtCurveHandler : public QObject,
 #if KDE_IS_VERSION(4, 3, 85)
     bool                  grouping() const        { return itsConfig.grouping(); }
 #endif
-    void                  refresh(unsigned int xid, int size);
+    void                  menuBarSize(unsigned int xid, int size);
+    void                  statusBarState(unsigned int xid, bool state);
+    void                  emitToggleMenuBar(int xid);
+    void                  emitToggleStatusBar(int xid);
     void                  titlebarSizeChanged();
     void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
     void                  removeClient(QtCurveClient *c) { itsClients.removeAll(c); }
-    
+    bool                  wasLastMenu(int id)            { return id==itsLastMenuXid; }
+    bool                  wasLastStatus(int id)          { return id==itsLastStatusXid; }
+
     private:
 
     bool readConfig();
@@ -125,7 +130,9 @@ class QtCurveHandler : public QObject,
                            itsBotBorderSize,
                            itsTitleHeight,
                            itsTitleHeightTool,
-                           itsTimeStamp;
+                           itsTimeStamp,
+                           itsLastMenuXid,
+                           itsLastStatusXid;
     QFont                  itsTitleFont,
                            itsTitleFontTool;
     QStyle                 *itsStyle;

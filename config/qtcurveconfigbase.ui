@@ -2517,7 +2517,7 @@
         </widget>
        </item>
        <item row="12" column="1">
-        <widget class="QCheckBox" name="menubarHiding">
+        <widget class="QCheckBox" name="menubarHiding_keyboard">
          <property name="whatsThis">
           <string>If enabled, menubars may be hidden (and re-shown), by using the 'Ctrl-Alt-M' key combination.</string>
          </property>
@@ -2527,6 +2527,16 @@
         </widget>
        </item>
        <item row="13" column="1">
+        <widget class="QCheckBox" name="menubarHiding_kwin">
+         <property name="whatsThis">
+          <string>If enabled, menubars may be hidden (and re-shown), by using a special button in the QtCurve kwin decoration.</string>
+         </property>
+         <property name="text">
+          <string>Window titlebar button (experimental)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
         <widget class="QCheckBox" name="xbar">
          <property name="whatsThis">
           <string>If enabled, the theme will support embedding the menubar of KDE4 applications in Bespin's XBar.</string>
@@ -2536,7 +2546,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_72">
          <property name="text">
           <string>XBar support:</string>
@@ -2852,12 +2862,22 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QCheckBox" name="statusbarHiding">
+        <widget class="QCheckBox" name="statusbarHiding_keyboard">
          <property name="whatsThis">
           <string>If enabled, statusbars may be hidden (and re-shown), by using the 'Ctrl-Alt-S' key combination.</string>
          </property>
          <property name="text">
           <string>Use Ctrl-Alt-S (experimental)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="statusbarHiding_kwin">
+         <property name="whatsThis">
+          <string>If enabled, statusbars may be hidden (and re-shown), by using a special button in the QtCurve kwin decoration.</string>
+         </property>
+         <property name="text">
+          <string>Window titlebar button (experimental)</string>
          </property>
         </widget>
        </item>
@@ -3775,7 +3795,8 @@
   <tabstop>menubarMouseOver</tabstop>
   <tabstop>colorMenubarMouseOver</tabstop>
   <tabstop>roundMbTopOnly</tabstop>
-  <tabstop>menubarHiding</tabstop>
+  <tabstop>menubarHiding_keyboard</tabstop>
+  <tabstop>menubarHiding_kwin</tabstop>
   <tabstop>xbar</tabstop>
   <tabstop>borderMenuitems</tabstop>
   <tabstop>useHighlightForMenu</tabstop>
@@ -3794,7 +3815,8 @@
   <tabstop>coloredTbarMo_false</tabstop>
   <tabstop>coloredTbarMo</tabstop>
   <tabstop>drawStatusBarFrames</tabstop>
-  <tabstop>statusbarHiding</tabstop>
+  <tabstop>statusbarHiding_keyboard</tabstop>
+  <tabstop>statusbarHiding_kwin</tabstop>
   <tabstop>dwtAppearance</tabstop>
   <tabstop>dwtRoundTopOnly</tabstop>
   <tabstop>dwtBtnAsPerTitleBar</tabstop>

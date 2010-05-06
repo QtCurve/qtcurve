@@ -55,6 +55,8 @@ class QLabel;
 class QMenuBar;
 class QScrollBar;
 class QDBusInterface;
+class QMainWindow;
+class QStatusBar;
 
 class QtCurveStyle : public QCommonStyle
 {
@@ -237,8 +239,13 @@ class QtCurveStyle : public QCommonStyle
                                                const QWidget *widget) const;
     void           kdeGlobalSettingsChange(int type, int);
     void           titlebarSizeChangedChange();
+    void           toggleMenuBar(unsigned int xid);
+    void           toggleStatusBar(unsigned int xid);
 
     private:
+
+    void           toggleMenuBar(QMainWindow *window);
+    void           toggleStatusBar(QMainWindow *window);
 
 #if !defined QTC_QT_ONLY
     void           setupKde4();
@@ -250,6 +257,7 @@ class QtCurveStyle : public QCommonStyle
 #ifdef Q_WS_X11
     bool           isWindowDragWidget(QObject *o);
     void           emitMenuSize(QWidget *w, unsigned short size);
+    void           emitStatusBarState(QStatusBar *sb);
 #endif
 
     private:

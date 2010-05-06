@@ -47,12 +47,12 @@
 #include <qdesktopwidget.h>
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
+#include "qtcurvetogglebutton.h"
 #include "qtcurvesizegrip.h"
 #include "common.h"
 #if KDE_IS_VERSION(4, 3, 0)
 #include "tileset.h"
 #endif
-#include <stdio.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -152,6 +152,9 @@ QtCurveClient::QtCurveClient(KDecorationBridge *bridge, QtCurveHandler *factory)
              , itsResizeGrip(0L)
              , itsTitleFont(QFont())
              , itsMenuBarSize(-1)
+             , itsToggleMenuBarButton(0L)
+             , itsToggleStatusBarButton(0L)
+//              , itsHover(false)
 #if KDE_IS_VERSION(4, 3, 85)
              , itsClickInProgress(false)
              , itsDragInProgress(false)
@@ -656,6 +659,54 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         }
     }
 #endif
+
+    bool hideToggleButtons(true);
+
+    if(!itsToggleMenuBarButton && Handler()->wasLastMenu(windowId()))
+        itsToggleMenuBarButton=createToggleButton(true);
+    if(!itsToggleStatusBarButton && Handler()->wasLastStatus(windowId()))
+        itsToggleStatusBarButton=createToggleButton(false);
+        
+//     if(itsHover)
+    {
+        if(1==tabCount && active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
+        {
+            if( (buttonsLeftWidth()+buttonsRightWidth()+constTitlePad+
+                (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +
+                (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)) < r.width())
+            {
+                int   offset=2,
+                      posAdjust=isMaximized() ? 2 : 0;
+                QRect cr(r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
+                                    (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
+                                    (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)),
+                         r.top()+offset,
+                         (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
+                         (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0),
+                         titleBarHeight-2*offset);
+
+                if(itsToggleMenuBarButton)
+                {
+                    itsToggleMenuBarButton->move(cr.x(), r.y()+3);
+                    itsToggleMenuBarButton->show();
+                }
+                if(itsToggleStatusBarButton)
+                {
+                    itsToggleStatusBarButton->move(cr.x()+(itsToggleMenuBarButton ? itsToggleMenuBarButton->width()+2 : 0), r.y()+3);
+                    itsToggleStatusBarButton->show();
+                }
+                hideToggleButtons=false;
+            }
+        }
+    }
+    if(hideToggleButtons)
+    {
+        if(itsToggleMenuBarButton)
+            itsToggleMenuBarButton->hide();
+        if(itsToggleStatusBarButton)
+            itsToggleStatusBarButton->hide();
+    }
+    
     painter.end();
 }
 
@@ -969,6 +1020,24 @@ bool QtCurveClient::eventFilter(QObject *o, QEvent *e)
     if(QEvent::StyleChange==e->type())
         Handler()->setStyle();
 
+//     if(widget()==o)
+//     {
+//         if(itsToggleMenuBarButton || itsToggleStatusBarButton)
+//             switch(e->type())
+//             {
+//                 case QEvent::Enter:
+//                     itsHover=true;
+//                     widget()->update();
+//                     break;
+//                 case QEvent::Leave:
+//                     itsHover=false;
+//                     widget()->update();
+//                 default:
+//                     break;
+//             }
+//         return true;
+//     }
+    
 #if KDE_IS_VERSION(4, 3, 85)
     if(Handler()->grouping())
     {
@@ -1327,6 +1396,29 @@ void QtCurveClient::informAppOfActiveChange()
     }
 }
 
+void QtCurveClient::sendToggleToApp(bool menubar)
+{
+    //if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL))
+    {
+        static const Atom constQtCToggleMenuBar   = XInternAtom(QX11Info::display(), TOGGLE_MENUBAR_ATOM, False);
+        static const Atom constQtCToggleStatusBar = XInternAtom(QX11Info::display(), TOGGLE_STATUSBAR_ATOM, False);
+
+        QX11Info info;
+        XEvent xev;
+        xev.xclient.type = ClientMessage;
+        xev.xclient.message_type = menubar ? constQtCToggleMenuBar : constQtCToggleStatusBar;
+        xev.xclient.display = QX11Info::display();
+        xev.xclient.window = windowId();
+        xev.xclient.format = 32;
+        xev.xclient.data.l[0]=0;
+        XSendEvent(QX11Info::display(), windowId(), False, NoEventMask, &xev);
+        if(menubar)
+            Handler()->emitToggleMenuBar(windowId());
+        else
+            Handler()->emitToggleStatusBar(windowId());
+    }
+}
+
 const QString & QtCurveClient::windowClass(bool normalWindowsOnly)
 {
     if(itsWindowClass.isEmpty())
@@ -1342,10 +1434,52 @@ const QString & QtCurveClient::windowClass(bool normalWindowsOnly)
     return itsWindowClass;
 }
 
-void QtCurveClient::menubarSize(int size)
+void QtCurveClient::menuBarSize(int size)
 {
     itsMenuBarSize=size;
+    if(!itsToggleMenuBarButton)
+        itsToggleMenuBarButton=createToggleButton(true);
+    //if(itsToggleMenuBarButton)
+    //    itsToggleMenuBarButton->setChecked(itsMenuBarSize>0);
     KCommonDecoration::activeChange();
+}
+
+void QtCurveClient::statusBarState(bool state)
+{
+    Q_UNUSED(state)
+    if(!itsToggleStatusBarButton)
+        itsToggleStatusBarButton=createToggleButton(false);
+    //if(itsToggleStatusBarButton)
+    //    itsToggleStatusBarButton->setChecked(state);
+    KCommonDecoration::activeChange();
+}
+
+void QtCurveClient::toggleMenuBar()
+{
+    sendToggleToApp(true);
+}
+
+void QtCurveClient::toggleStatusBar()
+{
+    sendToggleToApp(false);
+}
+    
+QtCurveToggleButton * QtCurveClient::createToggleButton(bool menubar)
+{
+    if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL) & (menubar ? 0x01 : 0x02))
+    {
+        QtCurveToggleButton *button = new QtCurveToggleButton(menubar, this);
+        int                 size    = layoutMetric(LM_TitleHeight)-6;
+
+        button->setFixedSize(size, size);
+        //button->setCheckable(true);
+        //button->setChecked(false);
+        connect(button, SIGNAL(clicked()), menubar ? SLOT(toggleMenuBar()) : SLOT(toggleStatusBar()));
+//         widget()->setAttribute(Qt::WA_Hover, true);
+//         widget()->installEventFilter(this);
+        return button;
+    }
+    return NULL;
 }
 
 }
