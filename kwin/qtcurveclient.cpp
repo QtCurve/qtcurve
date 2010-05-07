@@ -675,15 +675,19 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +
                 (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)) < r.width())
             {
-                int   offset=2,
-                      posAdjust=isMaximized() ? 2 : 0;
-                QRect cr(r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
-                                    (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
-                                    (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)),
-                         r.top()+offset,
-                         (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
-                         (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0),
-                         titleBarHeight-2*offset);
+                QString left=options()->customButtonPositions() ? options()->titleButtonsLeft() : defaultButtonsLeft(),
+                        right=options()->customButtonPositions() ? options()->titleButtonsRight() : defaultButtonsRight();
+                int     offset=2,
+                        posAdjust=isMaximized() ? 2 : 0;
+                QRect   cr(left.length()<right.length()
+                            ? r.left()+buttonsLeftWidth()+posAdjust+constTitlePad+2
+                            : r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
+                                        (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
+                                        (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)),
+                           r.top()+offset,
+                           (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
+                           (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0),
+                           titleBarHeight-2*offset);
 
                 if(itsToggleMenuBarButton)
                 {
