@@ -2818,15 +2818,15 @@ static gboolean qtInit()
                                     : SLIDER_TRIANGULAR==opts.sliderStyle
                                         ? 11
                                         : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                            ? (customSliderW ? SLIDER_SIZE +6 : 13)
-                                            : (customSliderW ? SLIDER_SIZE -2 : 21) ) + SLIDER_GLOW,
+                                            ? (customSliderW ? SLIDER_SIZE -2 : 13)
+                                            : (customSliderW ? SLIDER_SIZE +6 : 21) ) + SLIDER_GLOW,
                          width = (SLIDER_CIRCULAR==opts.sliderStyle
                                     ? CIRCULAR_SLIDER_SIZE
                                     : SLIDER_TRIANGULAR==opts.sliderStyle
                                         ? 18
                                         : SLIDER_PLAIN_ROTATED==opts.sliderStyle || SLIDER_ROUND_ROTATED==opts.sliderStyle
-                                            ? (customSliderW ? SLIDER_SIZE -2 : 21)
-                                            : (customSliderW ? SLIDER_SIZE +6 : 13) ) + SLIDER_GLOW;
+                                            ? (customSliderW ? SLIDER_SIZE +6 : 21)
+                                            : (customSliderW ? SLIDER_SIZE -2 : 13) ) + SLIDER_GLOW;
 
                 static const char *constStrFormat="style \""RC_SETTING"Sldr\" "
                                                   "{GtkScale::slider_length = %d GtkScale::slider_width = %d} "

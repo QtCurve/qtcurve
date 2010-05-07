@@ -20,6 +20,7 @@
     items of adjoining locked toolbars to be too close.
 10. Add separator to messafge dialog boxes - matches KDE.
 11. Add option to act upon titlebar buttons to hide menubar and statusbars.
+12. Fix plain/round sliders being rotated when using a custom slider width.
 
 1.3.0
 -----
