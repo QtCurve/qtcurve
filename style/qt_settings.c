@@ -2333,8 +2333,8 @@ static gboolean qtInit()
             if(GTK_APP_VMPLAYER==qtSettings.app)
             {
                 opts.shadeMenubars=SHADE_NONE;
-                opts.menubarHiding=false;
-                opts.statusbarHiding=false;
+                opts.menubarHiding=HIDE_NONE;
+                opts.statusbarHiding=HIDE_NONE;
             }
 
             /* Tear off menu items dont seem to draw they're background, and the default background
