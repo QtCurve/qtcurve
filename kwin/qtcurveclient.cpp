@@ -675,11 +675,19 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +
                 (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)) < r.width())
             {
-                QString left=options()->customButtonPositions() ? options()->titleButtonsLeft() : defaultButtonsLeft(),
-                        right=options()->customButtonPositions() ? options()->titleButtonsRight() : defaultButtonsRight();
+                int  align(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
+                bool onLeft(align&Qt::AlignRight);
+
+                if(align&Qt::AlignHCenter)
+                {
+                    QString left=options()->customButtonPositions() ? options()->titleButtonsLeft() : defaultButtonsLeft(),
+                            right=options()->customButtonPositions() ? options()->titleButtonsRight() : defaultButtonsRight();
+                    onLeft=left.length()<right.length();
+                }
+
                 int     offset=2,
                         posAdjust=isMaximized() ? 2 : 0;
-                QRect   cr(left.length()<right.length()
+                QRect   cr(onLeft
                             ? r.left()+buttonsLeftWidth()+posAdjust+constTitlePad+2
                             : r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
                                         (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
