@@ -495,17 +495,9 @@ static const QWidget * getToolBar(const QWidget *w/*, bool checkQ3*/)
             : 0L;
 }
 
-static QStatusBar * getStatusBar(QWidget *w)
+static inline QList<QStatusBar *> getStatusBars(QWidget *w)
 {
-    if(w)
-    {
-        QList<QStatusBar *> sb = w->findChildren<QStatusBar *>();
-
-        if(sb.count())
-            return sb.first();
-    }
-
-    return 0L;
+    return w ? w->findChildren<QStatusBar *>() : QList<QStatusBar *>();
 }
 
 static QToolBar * getToolBarChild(QWidget *w)
@@ -1741,17 +1733,22 @@ void QtCurveStyle::polish(QWidget *widget)
 
     if(opts.statusbarHiding && qobject_cast<QMainWindow *>(widget))
     {
-        QStatusBar *sb=getStatusBar(widget);
+        QList<QStatusBar *> sb=getStatusBars(widget);
 
-        if(sb)
+        if(sb.count())
         {
             widget->installEventFilter(this);
-            if(itsSaveStatusBarStatus)
-                sb->installEventFilter(this);
-            if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
-                sb->setHidden(true);
+            QList<QStatusBar *>::ConstIterator it(sb.begin()),
+                                               end(sb.end());
+            for(; it!=end; ++it)
+            {
+                if(itsSaveStatusBarStatus)
+                    (*it)->installEventFilter(this);
+                if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
+                    (*it)->setHidden(true);
+            }
 #ifdef Q_WS_X11
-            emitStatusBarState(sb);
+            emitStatusBarState(sb.first());
 #endif
         }
     }
@@ -2257,13 +2254,18 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
     if(opts.statusbarHiding && qobject_cast<QMainWindow *>(widget))
     {
-        QStatusBar *sb=getStatusBar(widget);
+        QList<QStatusBar *> sb=getStatusBars(widget);
 
-        if(sb)
+        if(sb.count())
         {
             widget->removeEventFilter(this);
             if(itsSaveStatusBarStatus)
-                sb->removeEventFilter(this);
+            {
+                QList<QStatusBar *>::ConstIterator it(sb.begin()),
+                                                   end(sb.end());
+                for(; it!=end; ++it)
+                    (*it)->removeEventFilter(this);
+            }
         }
     }
 
@@ -12667,15 +12669,20 @@ void QtCurveStyle::toggleMenuBar(QMainWindow *window)
 
 void QtCurveStyle::toggleStatusBar(QMainWindow *window)
 {
-    QStatusBar *sb=getStatusBar(window);
+    QList<QStatusBar *> sb=getStatusBars(window);
 
-    if(sb)
+    if(sb.count())
     {
         if(itsSaveStatusBarStatus)
-            qtcSetStatusBarHidden(appName, sb->isVisible());
-        sb->setHidden(sb->isVisible());
+            qtcSetStatusBarHidden(appName, sb.first()->isVisible());
+
+        QList<QStatusBar *>::ConstIterator it(sb.begin()),
+                                           end(sb.end());
+        for(; it!=end; ++it)
+            (*it)->setHidden((*it)->isVisible());
+
 #ifdef Q_WS_X11
-        emitStatusBarState(sb);
+        emitStatusBarState(sb.first());
 #endif
     }
 }
