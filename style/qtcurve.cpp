@@ -1478,6 +1478,7 @@ void QtCurveStyle::polish(QApplication *app)
             shadeColors(tint(USE_LIGHTER_POPUP_MENU ? itsLighterPopupMenuBgndCol : itsBackgroundCols[ORIGINAL_SHADE],
                              itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
         }
+        opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
     }
 
 #ifndef QTC_QT_ONLY
