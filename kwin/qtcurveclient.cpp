@@ -519,6 +519,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                wc==QLatin1String("Mail Thunderbird"))
                 itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
             else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
+                    wc.startsWith(QLatin1String("VCLSalFrame OpenOffice.org")) ||
                     wc==QLatin1String("soffice.bin Soffice.bin"))
                 itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
             else
