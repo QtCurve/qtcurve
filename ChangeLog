@@ -36,6 +36,9 @@
 
 15. Add option to provide titlebar buttons to hide menubar and statusbars.
 16. When hiding statusbar, hide *all* statusbars in a window (e.g. kate).
+17. If window is a KXmlGuiWindow, and it contains the standard hide menubar and
+    hide statatus bar actions, then use these to hide/show the menu/status bars.
+    (Only when compiled against KDE)
 
 1.3.1
 -----

@@ -75,6 +75,9 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #include <KDE/KTabBar>
 #include <KDE/KFileDialog>
 #include <KDE/KPassivePopup>
+#include <KDE/KXmlGuiWindow>
+#include <KDE/KStandardAction>
+#include <KDE/KActionCollection>
 
 #if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
@@ -12661,30 +12664,67 @@ void QtCurveStyle::toggleStatusBar(unsigned int xid)
     
 void QtCurveStyle::toggleMenuBar(QMainWindow *window)
 {
-    QWidget *menubar=window->menuWidget();
-    if(itsSaveMenuBarStatus)
-        qtcSetMenuBarHidden(appName, menubar->isVisible());
+    bool triggeredAction(false);
 
-    window->menuWidget()->setHidden(menubar->isVisible());
+#ifndef QTC_QT_ONLY
+    if(qobject_cast<KXmlGuiWindow *>(window))
+    {
+        KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
+        QAction           *act=collection ? collection->action(KStandardAction::name(KStandardAction::ShowMenubar)) : 0L;
+        if(act)
+        {
+            act->trigger();
+            triggeredAction=true;
+        }
+    }
+#endif
+    if(!triggeredAction)
+    {
+        QWidget *menubar=window->menuWidget();
+        if(itsSaveMenuBarStatus)
+            qtcSetMenuBarHidden(appName, menubar->isVisible());
+    
+        window->menuWidget()->setHidden(menubar->isVisible());
+    }
 }
 
 void QtCurveStyle::toggleStatusBar(QMainWindow *window)
 {
-    QList<QStatusBar *> sb=getStatusBars(window);
+    bool triggeredAction(false);
 
-    if(sb.count())
+#ifndef QTC_QT_ONLY
+    if(qobject_cast<KXmlGuiWindow *>(window))
     {
-        if(itsSaveStatusBarStatus)
-            qtcSetStatusBarHidden(appName, sb.first()->isVisible());
+        KActionCollection *collection=static_cast<KXmlGuiWindow *>(window)->actionCollection();
+        QAction           *act=collection ? collection->action(KStandardAction::name(KStandardAction::ShowStatusbar)) : 0L;
+        if(act)
+        {
+            act->trigger();
+            triggeredAction=true;
+#ifdef Q_WS_X11
+            //emitStatusBarState(true); // TODO: ???
+#endif
+        }
+    }
+#endif
+    if(!triggeredAction)
+    {
+        QList<QStatusBar *> sb=getStatusBars(window);
 
-        QList<QStatusBar *>::ConstIterator it(sb.begin()),
-                                           end(sb.end());
-        for(; it!=end; ++it)
-            (*it)->setHidden((*it)->isVisible());
+        if(sb.count())
+        {
+            if(itsSaveStatusBarStatus)
+                qtcSetStatusBarHidden(appName, sb.first()->isVisible());
+
+            QList<QStatusBar *>::ConstIterator it(sb.begin()),
+                                            end(sb.end());
+            for(; it!=end; ++it)
+                (*it)->setHidden((*it)->isVisible());
 
 #ifdef Q_WS_X11
-        emitStatusBarState(sb.first());
+            emitStatusBarState(sb.first());
 #endif
+        }
     }
 }
                         
