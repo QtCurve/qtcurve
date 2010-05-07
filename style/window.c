@@ -149,8 +149,10 @@ static void qtcWindowMenuBarDBus(GtkWidget *widget, int size)
     GtkWindow    *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
     unsigned int xid=GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window);
 
-    char         cmd[96];
-    sprintf(cmd, "qdbus org.kde.kwin /QtCurve menuBarSize %u %d", xid, size);
+    char         cmd[160];
+    //sprintf(cmd, "qdbus org.kde.kwin /QtCurve menuBarSize %u %d", xid, size);
+    sprintf(cmd, "dbus-send --type=method_call --session --dest=org.kde.kwin /QtCurve org.kde.QtCurve.menuBarSize uint32:%u int32:%d",
+            xid, size);
     system(cmd);
     /*
     char         xidS[16],
@@ -168,8 +170,10 @@ static void qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state)
     GtkWindow    *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
     unsigned int xid=GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window);
 
-    char         cmd[72];
-    sprintf(cmd, "qdbus org.kde.kwin /QtCurve statusBarState %u %s", xid, state ? "true" : "false");
+    char         cmd[160];
+    //sprintf(cmd, "qdbus org.kde.kwin /QtCurve statusBarState %u %s", xid, state ? "true" : "false");
+    sprintf(cmd, "dbus-send --type=method_call --session --dest=org.kde.kwin /QtCurve org.kde.QtCurve.statusBarState uint32:%u boolean:%s",
+            xid, state ? "true" : "false");
     system(cmd);
     /*
     char         xidS[16],
