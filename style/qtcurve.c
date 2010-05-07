@@ -2918,17 +2918,17 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if ((opts.menubarHiding || opts.statusbarHiding) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) &&
+    if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) &&
         !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
         if(qtcWindowSetup(widget))
         {
             GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
-            GtkWidget *statusBar=qtcWindowGetStatusBar(widget, 0);
+            GtkWidget *statusBar=opts.statusbarHiding ? qtcWindowGetStatusBar(widget, 0) : NULL;
 
-            if(opts.menubarHiding && menuBar)
+            if(menuBar)
             {
-                bool hiddenMenubar=qtcMenuBarHidden(qtSettings.appName);
+                bool hiddenMenubar=opts.menubarHiding ? qtcMenuBarHidden(qtSettings.appName) : FALSE;
 
                 if(hiddenMenubar)
                     gtk_widget_hide(menuBar);
@@ -4467,7 +4467,10 @@ debugDisplayWidget(widget, 3);
             {
                 menuBarAdjust=qtcGetWindowBorderSize(FALSE);
                 if(widget)
-                    qtcEmitMenuSize(widget, height);
+                {
+                    if(qtcEmitMenuSize(widget, height) && opts.menubarHiding)
+                        qtcWindowMenuBarDBus(widget, height);
+                }
             }
 
             /* Toolbars and menus */

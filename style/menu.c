@@ -9,7 +9,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 
-static void qtcEmitMenuSize(GtkWidget *w, unsigned int size)
+static gboolean qtcEmitMenuSize(GtkWidget *w, unsigned int size)
 {
     if(w)
     {
@@ -25,8 +25,11 @@ static void qtcEmitMenuSize(GtkWidget *w, unsigned int size)
             unsigned short ssize=size;
             XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
                             qtcMenuSizeAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&ssize, 1);
+            return TRUE;
         }
     }
+
+    return FALSE;
 }
 
 static gboolean objectIsA(const GObject * object, const gchar * type_name)
