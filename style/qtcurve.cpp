@@ -676,10 +676,10 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef Q_WS_X11
-static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
-
 static void triggerWMMove(const QWidget *w, const QPoint &p)
 {
+    static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+
     //...Taken from bespin...
     // stolen... errr "adapted!" from QSizeGrip
     QX11Info info;
@@ -697,6 +697,25 @@ static void triggerWMMove(const QWidget *w, const QPoint &p)
     XUngrabPointer(QX11Info::display(), QX11Info::appTime());
     XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
                SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+}
+
+void setSbProp(QWidget *w)
+{
+    if(w)
+    {
+        static const char * constStatusBarProperty="qtcStatusBar";
+        QVariant            prop(w->property(constStatusBarProperty));
+
+        if(!prop.isValid() || !prop.toBool())
+        {
+            static const Atom constQtCStatusBar = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
+
+            unsigned short s=1;
+            w->setProperty(constStatusBarProperty, true);
+            XChangeProperty(QX11Info::display(), w->window()->winId(), constQtCStatusBar, XA_CARDINAL, 16, PropModeReplace,
+                            (unsigned char *)&s, 1);
+        }
+    }
 }
 #endif
 
@@ -1752,6 +1771,7 @@ void QtCurveStyle::polish(QWidget *widget)
                     (*it)->setHidden(true);
             }
 #ifdef Q_WS_X11
+            setSbProp(widget);
             emitStatusBarState(sb.first());
 #endif
         }
@@ -12747,8 +12767,6 @@ bool QtCurveStyle::isWindowDragWidget(QObject *o)
            );
 }
 
-static const Atom constQtcMenuSize   = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-
 void QtCurveStyle::emitMenuSize(QWidget *w, unsigned short size)
 {
     if(w)
@@ -12767,9 +12785,11 @@ void QtCurveStyle::emitMenuSize(QWidget *w, unsigned short size)
 
         if(oldSize!=size)
         {
+            static const Atom constQtCMenuSize = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+
             w->setProperty(constMenuSizeProperty, size);
             XChangeProperty(QX11Info::display(), w->window()->winId(),
-                            constQtcMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
+                            constQtCMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
             if(!itsDBus)
                 itsDBus=new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
             itsDBus->call(QDBus::NoBlock, "menuBarSize", (unsigned int)w->window()->winId(), (int)size);

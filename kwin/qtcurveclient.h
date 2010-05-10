@@ -115,6 +115,7 @@ class QtCurveClient :
     void                      deleteSizeGrip();
     void                      informAppOfActiveChange();
     const QString &           windowClass(bool normalWindowsOnly=true);
+    int                       getProperty(bool menubar=true);
 
     private:
 

@@ -395,8 +395,6 @@ void QtCurveClient::captionChange()
     widget()->update();
 }
 
-static const Atom constQtcMenuSize = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-
 void QtCurveClient::paintEvent(QPaintEvent *e)
 {
     bool                 compositing=COMPOSITING_ENABLED;
@@ -524,22 +522,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                 itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
             else
             {
-                unsigned char *data;
-                int           dummy;
-                unsigned long num,
-                              dummy2;
-
-                if (Success==XGetWindowProperty(QX11Info::display(), windowId(), constQtcMenuSize, 0L, 1, False, XA_CARDINAL,
-                                                &dummy2, &dummy, &num, &dummy2, &data) && num>0)
-                {
-                    unsigned short val=*((unsigned short*)data);
-
-                    if(val<512)
-                        itsMenuBarSize=val;
-                    XFree(data);
-                }
-                //else
-                //    *data = NULL; // superflous?!?
+                int val=getProperty();
+                if(val>-1)
+                    itsMenuBarSize=val;
             }
         }
         if(-1!=itsMenuBarSize)
@@ -662,53 +647,57 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
 
     bool hideToggleButtons(true);
+    int  toggleButtons(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL));
 
-    if(!itsToggleMenuBarButton && Handler()->wasLastMenu(windowId()))
-        itsToggleMenuBarButton=createToggleButton(true);
-    if(!itsToggleStatusBarButton && Handler()->wasLastStatus(windowId()))
-        itsToggleStatusBarButton=createToggleButton(false);
-        
-//     if(itsHover)
+    if(toggleButtons)
     {
-        if(1==tabCount && active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
+        if(!itsToggleMenuBarButton && toggleButtons&0x01 && (Handler()->wasLastMenu(windowId()) || getProperty()>-1))
+            itsToggleMenuBarButton=createToggleButton(true);
+        if(!itsToggleStatusBarButton && toggleButtons&0x02 && (Handler()->wasLastStatus(windowId()) || getProperty(false)>-1))
+            itsToggleStatusBarButton=createToggleButton(false);
+
+    //     if(itsHover)
         {
-            if( (buttonsLeftWidth()+buttonsRightWidth()+constTitlePad+
-                (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +
-                (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)) < r.width())
+            if(1==tabCount && active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
             {
-                int  align(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
-                bool onLeft(align&Qt::AlignRight);
-
-                if(align&Qt::AlignHCenter)
+                if( (buttonsLeftWidth()+buttonsRightWidth()+constTitlePad+
+                    (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +
+                    (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)) < r.width())
                 {
-                    QString left=options()->customButtonPositions() ? options()->titleButtonsLeft() : defaultButtonsLeft(),
-                            right=options()->customButtonPositions() ? options()->titleButtonsRight() : defaultButtonsRight();
-                    onLeft=left.length()<right.length();
-                }
+                    int  align(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
+                    bool onLeft(align&Qt::AlignRight);
 
-                int     offset=2,
-                        posAdjust=isMaximized() ? 2 : 0;
-                QRect   cr(onLeft
-                            ? r.left()+buttonsLeftWidth()+posAdjust+constTitlePad+2
-                            : r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
-                                        (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
-                                        (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)),
-                           r.top()+offset,
-                           (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
-                           (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0),
-                           titleBarHeight-2*offset);
+                    if(align&Qt::AlignHCenter)
+                    {
+                        QString left=options()->customButtonPositions() ? options()->titleButtonsLeft() : defaultButtonsLeft(),
+                                right=options()->customButtonPositions() ? options()->titleButtonsRight() : defaultButtonsRight();
+                        onLeft=left.length()<right.length();
+                    }
 
-                if(itsToggleMenuBarButton)
-                {
-                    itsToggleMenuBarButton->move(cr.x(), r.y()+3);
-                    itsToggleMenuBarButton->show();
+                    int     offset=2,
+                            posAdjust=isMaximized() ? 2 : 0;
+                    QRect   cr(onLeft
+                                ? r.left()+buttonsLeftWidth()+posAdjust+constTitlePad+2
+                                : r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
+                                            (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
+                                            (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0)),
+                            r.top()+offset,
+                            (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0)+
+                            (itsToggleStatusBarButton ? itsToggleStatusBarButton->width() : 0),
+                            titleBarHeight-2*offset);
+
+                    if(itsToggleMenuBarButton)
+                    {
+                        itsToggleMenuBarButton->move(cr.x(), r.y()+3);
+                        itsToggleMenuBarButton->show();
+                    }
+                    if(itsToggleStatusBarButton)
+                    {
+                        itsToggleStatusBarButton->move(cr.x()+(itsToggleMenuBarButton ? itsToggleMenuBarButton->width()+2 : 0), r.y()+3);
+                        itsToggleStatusBarButton->show();
+                    }
+                    hideToggleButtons=false;
                 }
-                if(itsToggleStatusBarButton)
-                {
-                    itsToggleStatusBarButton->move(cr.x()+(itsToggleMenuBarButton ? itsToggleMenuBarButton->width()+2 : 0), r.y()+3);
-                    itsToggleStatusBarButton->show();
-                }
-                hideToggleButtons=false;
             }
         }
     }
@@ -1450,20 +1439,26 @@ const QString & QtCurveClient::windowClass(bool normalWindowsOnly)
 void QtCurveClient::menuBarSize(int size)
 {
     itsMenuBarSize=size;
-    if(!itsToggleMenuBarButton)
-        itsToggleMenuBarButton=createToggleButton(true);
-    //if(itsToggleMenuBarButton)
-    //    itsToggleMenuBarButton->setChecked(itsMenuBarSize>0);
+    if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL) &0x01)
+    {
+        if(!itsToggleMenuBarButton)
+            itsToggleMenuBarButton=createToggleButton(true);
+        //if(itsToggleMenuBarButton)
+        //    itsToggleMenuBarButton->setChecked(itsMenuBarSize>0);
+    }
     KCommonDecoration::activeChange();
 }
 
 void QtCurveClient::statusBarState(bool state)
 {
     Q_UNUSED(state)
-    if(!itsToggleStatusBarButton)
-        itsToggleStatusBarButton=createToggleButton(false);
-    //if(itsToggleStatusBarButton)
-    //    itsToggleStatusBarButton->setChecked(state);
+    if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL) &0x02)
+    {
+        if(!itsToggleStatusBarButton)
+            itsToggleStatusBarButton=createToggleButton(false);
+        //if(itsToggleStatusBarButton)
+        //    itsToggleStatusBarButton->setChecked(state);
+    }
     KCommonDecoration::activeChange();
 }
 
@@ -1479,20 +1474,41 @@ void QtCurveClient::toggleStatusBar()
     
 QtCurveToggleButton * QtCurveClient::createToggleButton(bool menubar)
 {
-    if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ToggleButtons, NULL, NULL) & (menubar ? 0x01 : 0x02))
-    {
-        QtCurveToggleButton *button = new QtCurveToggleButton(menubar, this);
-        int                 size    = layoutMetric(LM_TitleHeight)-6;
+    QtCurveToggleButton *button = new QtCurveToggleButton(menubar, this);
+    int                 size    = layoutMetric(LM_TitleHeight)-6;
 
-        button->setFixedSize(size, size);
-        //button->setCheckable(true);
-        //button->setChecked(false);
-        connect(button, SIGNAL(clicked()), menubar ? SLOT(toggleMenuBar()) : SLOT(toggleStatusBar()));
-//         widget()->setAttribute(Qt::WA_Hover, true);
-//         widget()->installEventFilter(this);
-        return button;
+    button->setFixedSize(size, size);
+    //button->setCheckable(true);
+    //button->setChecked(false);
+    connect(button, SIGNAL(clicked()), menubar ? SLOT(toggleMenuBar()) : SLOT(toggleStatusBar()));
+//     widget()->setAttribute(Qt::WA_Hover, true);
+//     widget()->installEventFilter(this);
+    return button;
+}
+
+int QtCurveClient::getProperty(bool menubar)
+{
+    static const Atom constQtcMenuSize  = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+    static const Atom constQtcStatusBar = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
+
+    unsigned char *data;
+    int           dummy;
+    unsigned long num,
+                  dummy2;
+    int           rv(-1);
+
+    if (Success==XGetWindowProperty(QX11Info::display(), windowId(), menubar ? constQtcMenuSize : constQtcStatusBar, 0L, 1, False,
+                                    XA_CARDINAL, &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+    {
+        unsigned short val=*((unsigned short*)data);
+
+        if(val<512)
+            rv=val;
+        XFree(data);
     }
-    return NULL;
+    //else
+    //    *data = NULL; // superflous?!?
+    return rv;
 }
 
 }
