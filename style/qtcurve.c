@@ -2933,7 +2933,7 @@ debugDisplayWidget(widget, 3);
                 if(hiddenMenubar)
                     gtk_widget_hide(menuBar);
 
-                if(BLEND_TITLEBAR)
+                if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN)
                     qtcEmitMenuSize(menuBar, hiddenMenubar ? 0 : menuBar->allocation.height);
                     
                 if(opts.menubarHiding&HIDE_KWIN)
@@ -2945,7 +2945,10 @@ debugDisplayWidget(widget, 3);
                 if(hiddenStatusBar)
                     gtk_widget_hide(statusBar);
                 if(opts.statusbarHiding&HIDE_KWIN)
+                {
                     qtcWindowStatusBarDBus(widget, !hiddenStatusBar);
+                    qtcWindowSetStatusBarProp(widget);
+                }
             }
         }
     }

@@ -5,10 +5,6 @@
 #define GE_IS_CONTAINER(object)((object)  && objectIsA((GObject*)(object), "GtkContainer"))
 #define GE_IS_WIDGET(object)((object)  && objectIsA((GObject*)(object), "GtkWidget"))
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <gdk/gdkx.h>
-
 static gboolean qtcEmitMenuSize(GtkWidget *w, unsigned int size)
 {
     if(w)

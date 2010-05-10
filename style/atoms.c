@@ -9,6 +9,7 @@ static Atom qtcActiveWindowAtom;
 static Atom qtcTitleBarSizeAtom;
 static Atom qtcToggleMenuBarAtom;
 static Atom qtcToggleStatusBarAtom;
+static Atom qtcStatusBarAtom;
 
 static void qtcCreateAtoms()
 {
@@ -20,4 +21,5 @@ static void qtcCreateAtoms()
     qtcTitleBarSizeAtom=XInternAtom(dpy, TITLEBAR_SIZE_ATOM, False);
     qtcToggleMenuBarAtom=XInternAtom(dpy, TOGGLE_MENUBAR_ATOM, False);
     qtcToggleStatusBarAtom=XInternAtom(dpy, TOGGLE_STATUSBAR_ATOM, False);
+    qtcStatusBarAtom=XInternAtom(dpy, STATUSBAR_ATOM, False);
 }

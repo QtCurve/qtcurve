@@ -212,6 +212,22 @@ static gboolean qtcWindowToggleMenuBar(GtkWidget *widget)
 
 static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level);
 
+static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
+{
+    if(w &&!g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM))
+    {
+        GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+
+        unsigned short setting=1;
+        g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
+        XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                        qtcStatusBarAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
 {
     GtkWidget *statusBar=qtcWindowGetStatusBar(widget, 0);
