@@ -27,12 +27,6 @@ The following options may be supplied to cmake:
         Support QtCurve style files. These are stored as
         <kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc
 
-    -DQTC_KWIN_MAX_BUTTON_HACK=true
-        Force kwin decoration to always display the maximise button (disabled) for
-        windows that can be minimised.
-        *WARNING* This is a 100% hack, and is not guaranteed to be stable or even
-        compile!
-
 XBar/MacMenu
 ------------
 The XBar support was copied directly from Bespin. The relevant files are named macmenu*

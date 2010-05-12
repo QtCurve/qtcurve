@@ -28,15 +28,9 @@
     - Better icon for 'on all desktops'
 13. Always use a 1 pixel border for toolbars - as using a border of 0 can cause
     items of adjoining locked toolbars to be too close.
-14. Experimental hack to always display the 'maximise' button for windows that can be
-    minimised. Enable via cmake option: -DQTC_KWIN_MAX_BUTTON_HACK=true
-
-    WARNING: This is a 100% hack, and is not guaranteed to be stable or even
-             compile!
-
-15. Add option to provide titlebar buttons to hide menubar and statusbars.
-16. When hiding statusbar, hide *all* statusbars in a window (e.g. kate).
-17. If window is a KXmlGuiWindow, and it contains the standard hide menubar and
+14. Add option to provide titlebar buttons to hide menubar and statusbars.
+15. When hiding statusbar, hide *all* statusbars in a window (e.g. kate).
+16. If window is a KXmlGuiWindow, and it contains the standard hide menubar and
     hide statatus bar actions, then use these to hide/show the menu/status bars.
     (Only when compiled against KDE)
 
