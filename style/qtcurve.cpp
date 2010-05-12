@@ -11296,12 +11296,17 @@ void QtCurveStyle::drawIcon(QPainter *painter, const QColor &color, const QRect 
             break;
         case ICN_SHADE:
         case ICN_UNSHADE:
+        {
+            bool isDwt=opts.dwtSettings&DWT_BUTTONS_AS_PER_TITLEBAR;
             br.adjust(0, -2, 0, 0);
-            drawRect(painter, QRect(br.left()+1, br.bottom()-1, br.width()-2, 2));
+            drawRect(painter, isDwt
+                                ? QRect(br.left(), br.bottom(), br.width(), 2)
+                                : QRect(br.left()+1, br.bottom()-1, br.width()-2, 2));
             br.adjust(0, ICN_SHADE==icon ? -3 : -5, 0, 0);
             drawArrow(painter, opts.vArrows ? br.adjusted(0, 1, 0, 1) : br,
                       ICN_SHADE==icon ? PE_IndicatorArrowDown : PE_IndicatorArrowUp, color, false);
             break;
+        }
         default:
             break;
     }
