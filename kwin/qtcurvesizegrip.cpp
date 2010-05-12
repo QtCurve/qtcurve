@@ -43,7 +43,7 @@ namespace KWinQtCurve
 {
 static inline bool similar(const QColor &a, const QColor &b)
 {
-    static const int constDiff=3;
+    static const int constDiff=18;
 
     return abs(a.red()-b.red())<constDiff &&
            abs(a.green()-b.green())<constDiff &&
@@ -146,7 +146,7 @@ static inline bool similar(const QColor &a, const QColor &b)
     //QColor dark( client().helper().calcDarkColor( base.darker(150) ) );
 
     if(similar(base, client().widget()->palette().color(backgroundRole())))
-        base = base.value() > 100 ? base.dark(130) : base.light(120);
+        base = base.value() > 100 ? base.dark(120) : base.light(120);
 
     // create and configure painter
     QPainter painter(this);
