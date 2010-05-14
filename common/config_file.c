@@ -707,7 +707,7 @@ static int qtcGetWindowBorderSize(gboolean force)
         FILE *f=NULL;
 
         sprintf(filename, "%s"BORDER_SIZE_FILE, qtcConfDir());
-        if((f=fopen(filename, "r")));
+        if((f=fopen(filename, "r")))
         {
             char *line=NULL;
             size_t len;
