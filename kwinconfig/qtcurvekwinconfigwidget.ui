@@ -159,7 +159,7 @@
           <number>100</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="suffix">
           <string>%</string>
@@ -185,7 +185,7 @@
           <number>100</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="suffix">
           <string>%</string>
