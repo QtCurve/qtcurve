@@ -556,8 +556,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(buttonFlags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && buttonFlags&TITLEBAR_BUTTON_ROUND)
     {
-        int offset=2,
-            posAdjust=isMaximized() ? 2 : 0;
+        int offset=2+(outerBorder ? 1 :0),
+            posAdjust=isMaximized() || outerBorder ? 2 : 0;
         
         if(buttonsLeftWidth()>(titleBarHeight-2*offset))
             drawSunkenBevel(&painter, QRect(r.left()+offset+posAdjust, r.top()+offset,
@@ -694,12 +694,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
                     if(itsToggleMenuBarButton)
                     {
-                        itsToggleMenuBarButton->move(cr.x(), r.y()+3);
+                        itsToggleMenuBarButton->move(cr.x(), r.y()+3+(outerBorder ? 2 : 0));
                         itsToggleMenuBarButton->show();
                     }
                     if(itsToggleStatusBarButton)
                     {
-                        itsToggleStatusBarButton->move(cr.x()+(itsToggleMenuBarButton ? itsToggleMenuBarButton->width()+2 : 0), r.y()+3);
+                        itsToggleStatusBarButton->move(cr.x()+(itsToggleMenuBarButton ? itsToggleMenuBarButton->width()+2 : 0),
+                                                       r.y()+3+(outerBorder ? 2 : 0));
                         itsToggleStatusBarButton->show();
                     }
                     hideToggleButtons=false;
