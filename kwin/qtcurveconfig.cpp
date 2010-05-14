@@ -39,6 +39,7 @@ void QtCurveConfig::defaults()
     itsGrouping=true;
     itsTitleBarPad=0;
     itsActiveOpacity=itsInactiveOpacity=100;
+    itsOpaqueBorder=true;
 }
 
 #define READ_ENTRY(ENTRY) \
@@ -76,6 +77,7 @@ void QtCurveConfig::load(const KConfig *cfg)
     READ_ENTRY(TitleBarPad)
     READ_ENTRY(ActiveOpacity)
     READ_ENTRY(InactiveOpacity)
+    READ_ENTRY(OpaqueBorder)
 
     if(itsTitleBarPad<0 || itsTitleBarPad>10)
         itsTitleBarPad=0;
@@ -114,6 +116,7 @@ void QtCurveConfig::save(KConfig *cfg)
     WRITE_ENTRY(TitleBarPad)
     WRITE_ENTRY(ActiveOpacity)
     WRITE_ENTRY(InactiveOpacity)
+    WRITE_ENTRY(OpaqueBorder)
 }
 
 }

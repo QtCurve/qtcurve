@@ -57,6 +57,7 @@ class QtCurveConfig
     bool grouping() const          { return itsGrouping; }
     int  titleBarPad() const       { return itsTitleBarPad; }
     int  opacity(bool a) const     { return a ? itsActiveOpacity : itsInactiveOpacity; }
+    bool opaqueBorder() const      { return itsOpaqueBorder; }
     void setBorderSize(Size v)     { itsBorderSize=v; }
     void setRoundBottom(bool v)    { itsRoundBottom=v; }
     void setOuterBorder(bool v)    { itsOuterBorder=v; }
@@ -65,6 +66,7 @@ class QtCurveConfig
     void setGrouping(bool v)       { itsGrouping=v; }
     void setTitleBarPad(int v)     { itsTitleBarPad=v; }
     void setOpacity(int v, bool a) { a ? itsActiveOpacity=v : itsInactiveOpacity=v; }
+    void setOpaqueBorder(bool v)   { itsOpaqueBorder=v; }
 
     bool operator==(const QtCurveConfig &o) const
     {
@@ -76,7 +78,8 @@ class QtCurveConfig
                itsGrouping==o.itsGrouping &&
                itsTitleBarPad==o.itsTitleBarPad &&
                itsActiveOpacity==o.itsActiveOpacity &&
-               itsInactiveOpacity==o.itsInactiveOpacity;
+               itsInactiveOpacity==o.itsInactiveOpacity &&
+               itsOpaqueBorder==o.itsOpaqueBorder;
     }
 
     bool operator!=(const QtCurveConfig &o) const { return !(*this==o); }
@@ -90,7 +93,8 @@ class QtCurveConfig
          itsOuterBorder,
          itsBorderlessMax,
          itsCustomShadows,
-         itsGrouping;
+         itsGrouping,
+         itsOpaqueBorder;
     int  itsTitleBarPad;
 };
 

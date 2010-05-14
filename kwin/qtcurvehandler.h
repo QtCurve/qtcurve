@@ -90,25 +90,27 @@ class QtCurveHandler : public QObject,
     virtual bool supports(Ability ability) const;
 
     const QBitmap &       buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow);
-    int                   titleHeight() const     { return itsTitleHeight; }
-    int                   titleHeightTool() const { return itsTitleHeightTool; }
-    const QFont &         titleFont()             { return itsTitleFont; }
-    const QFont &         titleFontTool()         { return itsTitleFontTool; }
+    int                   titleHeight() const        { return itsTitleHeight; }
+    int                   titleHeightTool() const    { return itsTitleHeightTool; }
+    const QFont &         titleFont()                { return itsTitleFont; }
+    const QFont &         titleFontTool()               { return itsTitleFontTool; }
     int                   borderSize(bool bot=false) const { return bot && QtCurveConfig::BORDER_NO_SIDES==itsConfig.borderSize()
                                                                 ? itsBorderSize+5 : itsBorderSize; }
-    bool                  showResizeGrip() const  { return QtCurveConfig::BORDER_NONE==itsConfig.borderSize(); }
-    bool                  roundBottom() const     { return itsConfig.roundBottom() && itsConfig.borderSize()>QtCurveConfig::BORDER_NONE; }
-    bool                  outerBorder() const     { return itsConfig.outerBorder(); }
-    QStyle *              wStyle() const          { return itsStyle ? itsStyle : QApplication::style(); }
+    bool                  showResizeGrip() const     { return QtCurveConfig::BORDER_NONE==itsConfig.borderSize(); }
+    bool                  roundBottom() const        { return itsConfig.roundBottom() && itsConfig.borderSize()>QtCurveConfig::BORDER_NONE; }
+    bool                  outerBorder() const        { return itsConfig.outerBorder(); }
+    QStyle *              wStyle() const             { return itsStyle ? itsStyle : QApplication::style(); }
     int                   borderEdgeSize() const;
-    int                   titleBarPad() const     { return itsConfig.titleBarPad(); }
-    bool                  borderlessMax() const   { return itsConfig.borderlessMax(); }
+    int                   titleBarPad() const        { return itsConfig.titleBarPad(); }
+    bool                  borderlessMax() const      { return itsConfig.borderlessMax(); }
+    int                   opacity(bool active) const { return itsConfig.opacity(active); }
+    bool                  opaqueBorder() const       { return itsConfig.opaqueBorder(); }
 #if KDE_IS_VERSION(4, 3, 0)
-    bool                  customShadows() const   { return itsConfig.customShadows(); }
-    QtCurveShadowCache &  shadowCache()           { return itsShadowCache; }
+    bool                  customShadows() const      { return itsConfig.customShadows(); }
+    QtCurveShadowCache &  shadowCache()              { return itsShadowCache; }
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
-    bool                  grouping() const        { return itsConfig.grouping(); }
+    bool                  grouping() const           { return itsConfig.grouping(); }
 #endif
     void                  menuBarSize(unsigned int xid, int size);
     void                  statusBarState(unsigned int xid, bool state);

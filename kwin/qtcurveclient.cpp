@@ -91,30 +91,42 @@ static inline int tabCloseIconSize(int titleHeight)
 
 #endif
 
-static QPainterPath createPath(const QRectF &r, double radius)
+static QPainterPath createPath(const QRectF &r, double radius, bool botOnly=false)
 {
     double       dr(radius * 2);
     QPainterPath path;
 
-    path.moveTo(r.right(), r.top() + radius);
-    path.arcTo(r.right() - dr, r.top(), dr, dr, 0.0, 90.0);
-    path.lineTo(r.left() + radius, r.top());
-    path.arcTo(r.left(), r.top(), dr, dr, 90.0, 90.0);
+    if(botOnly)
+    {
+        path.moveTo(r.right(), r.top());
+        path.lineTo(r.left(), r.top());
+    }
+    else
+    {
+        path.moveTo(r.right(), r.top() + radius);
+        path.arcTo(r.right() - dr, r.top(), dr, dr, 0.0, 90.0);
+        path.lineTo(r.left() + radius, r.top());
+        path.arcTo(r.left(), r.top(), dr, dr, 90.0, 90.0);
+    }
     path.lineTo(r.left(), r.bottom() - radius);
     path.arcTo(r.left(), r.bottom() - dr, dr, dr, 180.0, 90.0);
     path.lineTo(r.right() - radius, r.bottom());
     path.arcTo(r.right() - dr, r.bottom() - dr, dr, dr,  270.0, 90.0);
+    if(botOnly)
+        path.lineTo(r.right(), r.top());
+
     return path;
 }
 
 #if KDE_IS_VERSION(4, 3, 0)
-static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false)
+static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false, bool botOnly=false)
 {
     double radius((fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0));
+    int    adjust(botOnly ? 0 : 6);
     QRect  fr(inner ? r.adjusted(1, 1, -1, -1) : r);
-    QRectF rf(fr.x(), fr.y()+6, fr.width(), fr.height() - 6);
+    QRectF rf(fr.x(), fr.y()+adjust, fr.width(), fr.height() - adjust);
 
-    return createPath(rf, radius);
+    return createPath(rf, radius, botOnly);
 }
 #endif
 
@@ -415,7 +427,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          titleBarHeight(titleHeight+titleEdgeTop+titleEdgeBottom+(isMaximized() ? border : 0)),
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
                          buttonFlags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, NULL, NULL);
-    int                  rectX, rectY, rectX2, rectY2, shadowSize(0);
+    int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
+                         opacity(compositing ? Handler()->opacity(active) : 1.0);
 
     painter.setClipRegion(e->region());
 
@@ -426,12 +439,20 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         {
             TileSet *tileSet=Handler()->shadowCache().tileSet(this, roundBottom);
 
+            shadowSize=Handler()->shadowCache().shadowSize();
+            if(opacity<100)
+            {
+                painter.save();
+                painter.setClipRegion(QRegion(r).subtract(getMask(round, r.adjusted(shadowSize, shadowSize, -shadowSize, -shadowSize))), Qt::IntersectClip);
+            }
+            
             if(!isMaximized())
                 tileSet->render(r.adjusted(5, 5, -5, -5), &painter, TileSet::Ring);
             else if(isShade())
                 tileSet->render(r.adjusted(0, 5, 0, -5), &painter, TileSet::Bottom);
+            if(opacity<100)
+                painter.restore();
         }
-        shadowSize=Handler()->shadowCache().shadowSize();
         r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
     }
 #endif
@@ -439,12 +460,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
-           windowCol(widget()->palette().color(QPalette::Window));
+           windowCol(widget()->palette().color(QPalette::Window)),
+           fillCol(colorTitleOnly ? windowCol : col);
 
-    if(Handler()->opacity(active)<100)
+    if(opacity<100)
     {
-        col.setAlphaF(Handler()->opacity(active)/100.0);
-        windowCol.setAlphaF(Handler()->opacity(active)/100.0);
+        double alpha=opacity/100.0;
+        col.setAlphaF(alpha);
+        windowCol.setAlphaF(alpha);
+        if(!Handler()->opaqueBorder())
+            fillCol.setAlphaF(alpha);
     }
 
     if(isMaximized())
@@ -454,18 +479,19 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         if(!compositing && !isPreview())
 #endif
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
-
+    
     if(!compositing)
-        painter.fillRect(r, colorTitleOnly ? windowCol : col);
+        painter.fillRect(r, fillCol);
     painter.setRenderHint(QPainter::Antialiasing, true);
     if(compositing)
     {
 #if KDE_IS_VERSION(4, 3, 0)
         if(roundBottom)
-            painter.fillPath(createPath(r, round>ROUND_SLIGHT, outerBorder), colorTitleOnly ? windowCol : col);
+            painter.fillPath(createPath(r.adjusted(0, titleBarHeight-1, 0, 0), round>ROUND_SLIGHT, outerBorder, true),
+                                        fillCol);
         else
 #endif
-            painter.fillRect(r.adjusted(0, 5, 0, 0), colorTitleOnly ? windowCol : col);
+            painter.fillRect(r.adjusted(0, titleBarHeight, 0, 0), fillCol);
     }
 
     opt.init(widget());
@@ -485,7 +511,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         opt.state|=QtC_StateKWinCompositing;
 
     if(outerBorder)
-    {
+    {        
+        if(opacity<100)
+        {
+            painter.save();
+            painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
+        }
 #ifdef DRAW_INTO_PIXMAPS
         if(!compositing && !isPreview())
         {
@@ -494,7 +525,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             QPainter p2(&pix);
             p2.setRenderHint(QPainter::Antialiasing, true);
             opt.rect=QRect(0, 0, pix.width(), pix.height());
-            p2.fillRect(opt.rect, colorTitleOnly ? windowCol : col);
+            p2.fillRect(opt.rect, fillCol);
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &p2, widget());
             p2.end();
             painter.drawTiledPixmap(r.x(), r.y()+10, 2, r.height()-18, pix.copy(0, 8, 2, 16));
@@ -506,6 +537,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         else
 #endif
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
+        if(opacity<100)
+            painter.restore();
     }
     else
         opt.state|=QtC_StateKWinNoBorder;
@@ -972,14 +1005,14 @@ QRegion QtCurveClient::getMask(int round, const QRect &r) const
                 }
                 else
                 {
-                    mask += QRegion(x, y+5, 1, h-5);
-                    mask += QRegion(x+1, y+3, 1, h-2);
-                    mask += QRegion(x+2, y+2, 1, h-1);
-                    mask += QRegion(x+3, y+1, 2, h);
-                    mask += QRegion(x+w-1, y+5, 1, h-5);
-                    mask += QRegion(x+w-2, y+3, 1, h-2);
-                    mask += QRegion(x+w-3, y+2, 1, h-1);
-                    mask += QRegion(x+w-5, y+1, 2, h);
+                    mask += QRegion(x, y+5, 1, h-6);
+                    mask += QRegion(x+1, y+3, 1, h-3);
+                    mask += QRegion(x+2, y+2, 1, h-2);
+                    mask += QRegion(x+3, y+1, 2, h-1);
+                    mask += QRegion(x+w-1, y+5, 1, h-6);
+                    mask += QRegion(x+w-2, y+3, 1, h-3);
+                    mask += QRegion(x+w-3, y+2, 1, h-2);
+                    mask += QRegion(x+w-5, y+1, 2, h-1);
                 }
                 return mask;
             }

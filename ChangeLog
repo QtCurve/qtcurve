@@ -33,6 +33,7 @@
 16. If window is a KXmlGuiWindow, and it contains the standard hide menubar and
     hide statatus bar actions, then use these to hide/show the menu/status bars.
     (Only when compiled against KDE)
+17. Add translucency support to kwin theme.
 
 1.3.1
 -----

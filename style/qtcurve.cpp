@@ -4752,6 +4752,11 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                                         : theThemedApp==APP_KWIN
                                             ? buttonColors(option)
                                             : getMdiColors(option, state&State_Active));
+            QColor       light(borderCols[0]),
+                         dark(borderCols[STD_BORDER]);
+
+            light.setAlphaF(1.0);
+            dark.setAlphaF(1.0);
 
             painter->save();
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
@@ -4759,10 +4764,10 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 painter->setRenderHint(QPainter::Antialiasing, false);
                 if(opts.titlebarBorder)
                 {
-                    painter->setPen(borderCols[0]);
+                    painter->setPen(light);
                     painter->drawLine(r.x()+1, r.y(), r.x()+1, r.y()+r.height()-1);
                 }
-                painter->setPen(borderCols[STD_BORDER]);
+                painter->setPen(dark);
                 drawRect(painter, r);
             }
             else
@@ -4770,12 +4775,12 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 if(opts.titlebarBorder)
                 {
                     painter->setRenderHint(QPainter::Antialiasing, false);
-                    painter->setPen(borderCols[0]);
+                    painter->setPen(light);
                     painter->drawLine(r.x()+1, r.y(),
                                       r.x()+1, r.y()+r.height()-(1+(opts.round>ROUND_SLIGHT && state&QtC_StateKWin ? 3 : 1)));
                 }
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setPen(borderCols[STD_BORDER]);
+                painter->setPen(dark);
                 painter->drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL,
                                             opts.round>ROUND_SLIGHT && state&QtC_StateKWin
                                                 ? 6.0
@@ -8187,9 +8192,18 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(!(state&QtC_StateKWinNoBorder))
                 {
+                    QColor light(titleCols[0]),
+                           dark(titleCols[STD_BORDER]);
+
+                    if(kwin)
+                    {
+                        light.setAlphaF(1.0);
+                        dark.setAlphaF(1.0);
+                    }
+                    
                     if(opts.titlebarBorder)
                     {
-                        painter->setPen(titleCols[0]);
+                        painter->setPen(light);
                         painter->save();
                         painter->setClipRect(r.adjusted(0, 0, -1, -1));
                         painter->drawPath(buildPath(r.adjusted(1, 1, 0, 1), WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
@@ -8201,7 +8215,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->restore();
                     }
 
-                    painter->setPen(titleCols[STD_BORDER]);
+                    painter->setPen(dark);
                     painter->drawPath(buildPath(r, WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
                                                 opts.round<ROUND_SLIGHT
                                                     ? 0
@@ -8213,7 +8227,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     if(opts.titlebarBorder)
                     {
-                        painter->setPen(titleCols[0]);
+                        painter->setPen(light);
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
 
@@ -8221,7 +8235,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     {
                         if(!(state&QtC_StateKWinCompositing))
                         {
-                            painter->setPen(titleCols[STD_BORDER]);
+                            painter->setPen(dark);
 
                             painter->drawLine(r.x()+1, r.y()+4, r.x()+1, r.y()+3);
                             painter->drawPoint(r.x()+2, r.y()+2);
@@ -8233,7 +8247,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                         if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
                         {
-                            painter->setPen(titleCols[0]);
+                            painter->setPen(light);
                             painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
                             painter->drawLine(r.x()+3, r.y()+2, r.x()+4, r.y()+2);
                             //painter->drawLine(r.x()+r.width()-3, r.y()+4, r.x()+r.width()-3, r.y()+3);
@@ -8248,7 +8262,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                         end(start.x(), start.y()+constFadeLen);
                         QLinearGradient grad(start, end);
 
-                        grad.setColorAt(0, titleCols[STD_BORDER]);
+                        grad.setColorAt(0, dark);
                         grad.setColorAt(1, itsBackgroundCols[STD_BORDER]);
                         painter->setPen(QPen(QBrush(grad), 1));
                         painter->drawLine(r.x(), start.y(), r.x(), end.y());
@@ -8256,7 +8270,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                         if(opts.titlebarBorder)
                         {
-                            grad.setColorAt(0, titleCols[0]);
+                            grad.setColorAt(0, light);
                             grad.setColorAt(1, itsBackgroundCols[0]);
                             painter->setPen(QPen(QBrush(grad), 1));
                             painter->drawLine(r.x()+1, start.y(), r.x()+1, end.y());
