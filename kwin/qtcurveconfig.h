@@ -49,20 +49,22 @@ class QtCurveConfig
     void load(const KConfig *cfg);
     void save(KConfig *cfg);
 
-    Size borderSize() const       { return (Size)itsBorderSize; }
-    bool roundBottom() const      { return itsRoundBottom; }
-    bool outerBorder() const      { return itsOuterBorder; }
-    bool borderlessMax() const    { return itsBorderlessMax; }
-    bool customShadows() const    { return itsCustomShadows; }
-    bool grouping() const         { return itsGrouping; }
-    int  titleBarPad() const      { return itsTitleBarPad; }
-    void setBorderSize(Size v)    { itsBorderSize=v; }
-    void setRoundBottom(bool v)   { itsRoundBottom=v; }
-    void setOuterBorder(bool v)   { itsOuterBorder=v; }
-    void setBorderlessMax(bool v) { itsBorderlessMax=v; }
-    void setCustomShadows(bool v) { itsCustomShadows=v; }
-    void setGrouping(bool v)      { itsGrouping=v; }
-    void setTitleBarPad(int v)    { itsTitleBarPad=v; }
+    Size borderSize() const        { return (Size)itsBorderSize; }
+    bool roundBottom() const       { return itsRoundBottom; }
+    bool outerBorder() const       { return itsOuterBorder; }
+    bool borderlessMax() const     { return itsBorderlessMax; }
+    bool customShadows() const     { return itsCustomShadows; }
+    bool grouping() const          { return itsGrouping; }
+    int  titleBarPad() const       { return itsTitleBarPad; }
+    int  opacity(bool a) const     { return a ? itsActiveOpacity : itsInactiveOpacity; }
+    void setBorderSize(Size v)     { itsBorderSize=v; }
+    void setRoundBottom(bool v)    { itsRoundBottom=v; }
+    void setOuterBorder(bool v)    { itsOuterBorder=v; }
+    void setBorderlessMax(bool v)  { itsBorderlessMax=v; }
+    void setCustomShadows(bool v)  { itsCustomShadows=v; }
+    void setGrouping(bool v)       { itsGrouping=v; }
+    void setTitleBarPad(int v)     { itsTitleBarPad=v; }
+    void setOpacity(int v, bool a) { a ? itsActiveOpacity=v : itsInactiveOpacity=v; }
 
     bool operator==(const QtCurveConfig &o) const
     {
@@ -72,14 +74,18 @@ class QtCurveConfig
                itsBorderlessMax==o.itsBorderlessMax &&
                itsCustomShadows==o.itsCustomShadows &&
                itsGrouping==o.itsGrouping &&
-               itsTitleBarPad==o.itsTitleBarPad;
+               itsTitleBarPad==o.itsTitleBarPad &&
+               itsActiveOpacity==o.itsActiveOpacity &&
+               itsInactiveOpacity==o.itsInactiveOpacity;
     }
 
     bool operator!=(const QtCurveConfig &o) const { return !(*this==o); }
 
     private:
 
-    int  itsBorderSize;
+    int  itsBorderSize,
+         itsActiveOpacity,
+         itsInactiveOpacity;
     bool itsRoundBottom,
          itsOuterBorder,
          itsBorderlessMax,

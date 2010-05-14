@@ -38,7 +38,11 @@ void QtCurveConfig::defaults()
     itsCustomShadows=false;
     itsGrouping=true;
     itsTitleBarPad=0;
+    itsActiveOpacity=itsInactiveOpacity=100;
 }
+
+#define READ_ENTRY(ENTRY) \
+    its##ENTRY=group.readEntry(#ENTRY, def.its##ENTRY);
 
 void QtCurveConfig::load(const KConfig *cfg)
 {
@@ -66,21 +70,28 @@ void QtCurveConfig::load(const KConfig *cfg)
 
     if(itsBorderSize<BORDER_NONE || itsBorderSize>BORDER_OVERSIZED)
         itsBorderSize=BORDER_NORMAL;
-    itsBorderlessMax=group.readEntry("BorderlessMax", def.borderlessMax());
-    itsCustomShadows=group.readEntry("CustomShadows", def.customShadows());
-    itsGrouping=group.readEntry("Grouping", def.grouping());
-    itsTitleBarPad=group.readEntry("TitleBarPad", def.titleBarPad());
+    READ_ENTRY(BorderlessMax)
+    READ_ENTRY(CustomShadows)
+    READ_ENTRY(Grouping)
+    READ_ENTRY(TitleBarPad)
+    READ_ENTRY(ActiveOpacity)
+    READ_ENTRY(InactiveOpacity)
+
     if(itsTitleBarPad<0 || itsTitleBarPad>10)
         itsTitleBarPad=0;
     if(BORDER_NONE==itsBorderSize)
         itsRoundBottom=false;
     else
-        itsRoundBottom=group.readEntry("RoundBottom", def.roundBottom());
+        READ_ENTRY(RoundBottom)
 
     if(itsBorderSize<BORDER_TINY)
         itsOuterBorder=false;
     else
-        itsOuterBorder=group.readEntry("OuterBorder", def.outerBorder());
+        READ_ENTRY(OuterBorder)
+    if(itsActiveOpacity<0 || itsActiveOpacity>100)
+        itsActiveOpacity=100;
+    if(itsInactiveOpacity<0 || itsInactiveOpacity>100)
+        itsInactiveOpacity=100;
 }
 
 #define WRITE_ENTRY(ENTRY) \
@@ -101,6 +112,8 @@ void QtCurveConfig::save(KConfig *cfg)
     WRITE_ENTRY(CustomShadows)
     WRITE_ENTRY(Grouping)
     WRITE_ENTRY(TitleBarPad)
+    WRITE_ENTRY(ActiveOpacity)
+    WRITE_ENTRY(InactiveOpacity)
 }
 
 }

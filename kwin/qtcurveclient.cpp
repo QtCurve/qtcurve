@@ -441,6 +441,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
            windowCol(widget()->palette().color(QPalette::Window));
 
+    if(Handler()->opacity(active)<100)
+    {
+        col.setAlphaF(Handler()->opacity(active)/100.0);
+        windowCol.setAlphaF(Handler()->opacity(active)/100.0);
+    }
+
     if(isMaximized())
         painter.setClipRect(r, Qt::IntersectClip);
     else
