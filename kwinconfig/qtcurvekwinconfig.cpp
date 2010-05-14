@@ -118,8 +118,12 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
     connect(itsWidget->grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(itsWidget->inactiveOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(itsWidget->opaqueBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
 #else
     itsWidget->grouping->setVisible(false);
+    itsWidget->opacityTab->setVisible(false);
 #endif
 }
 
@@ -179,6 +183,9 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
     config.setGrouping(itsWidget->grouping->isChecked());
+    config.setOpacity(itsWidget->activeOpacity->value(), true);
+    config.setOpacity(itsWidget->inactiveOpacity->value(), false);
+    config.setOpaqueBorder(itsWidget->opaqueBorder->isChecked());
 #endif
     config.save(itsConfig);
     itsConfig->sync();
@@ -230,6 +237,9 @@ void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
 #endif
 #if KDE_IS_VERSION(4, 3, 85)
     itsWidget->grouping->setChecked(cfg.grouping());
+    itsWidget->activeOpacity->setValue(cfg.opacity(true));
+    itsWidget->inactiveOpacity->setValue(cfg.opacity(false));
+    itsWidget->opaqueBorder->setChecked(cfg.opaqueBorder());
 #endif
     setWidgetStates();
 }

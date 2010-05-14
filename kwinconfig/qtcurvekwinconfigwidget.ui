@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>277</height>
+    <width>492</width>
+    <height>270</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -16,6 +16,12 @@
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>270</height>
+      </size>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -124,6 +130,79 @@
          </property>
          <property name="wordWrap">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="opacityTab">
+      <attribute name="title">
+       <string>Opacity</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Active windows:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="KIntNumInput" name="activeOpacity">
+         <property name="value">
+          <number>100</number>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="singleStep">
+          <number>10</number>
+         </property>
+         <property name="suffix">
+          <string>%</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Inactive windows:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="KIntNumInput" name="inactiveOpacity">
+         <property name="value">
+          <number>100</number>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="singleStep">
+          <number>10</number>
+         </property>
+         <property name="suffix">
+          <string>%</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Side and bottom borders:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="opaqueBorder">
+         <property name="text">
+          <string>Ignore opacity settings</string>
          </property>
         </widget>
        </item>
@@ -301,14 +380,23 @@
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
   </customwidget>
+  <customwidget>
+   <class>KIntNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
+  <tabstop>borderSize</tabstop>
   <tabstop>roundBottom</tabstop>
   <tabstop>outerBorder</tabstop>
   <tabstop>borderlessMax</tabstop>
   <tabstop>grouping</tabstop>
   <tabstop>titleBarPad</tabstop>
+  <tabstop>activeOpacity</tabstop>
+  <tabstop>inactiveOpacity</tabstop>
+  <tabstop>opaqueBorder</tabstop>
   <tabstop>useShadows</tabstop>
   <tabstop>activeShadowSize</tabstop>
   <tabstop>activeShadowHOffset</tabstop>
