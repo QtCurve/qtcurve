@@ -107,7 +107,10 @@ void QtCurveConfig::save(KConfig *cfg)
     KConfigGroup  group(cfg, GROUP);
     QtCurveConfig def;
 
-    WRITE_ENTRY(BorderSize)
+    //WRITE_ENTRY(BorderSize)
+    // Hace to write BorderSize, because if not found we read the kwin setting - to be
+    // compatible with QtCurve<1.4
+    group.writeEntry("BorderSize", itsBorderSize);
     WRITE_ENTRY(RoundBottom)
     WRITE_ENTRY(OuterBorder)
     WRITE_ENTRY(BorderlessMax)
