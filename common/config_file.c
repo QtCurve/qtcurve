@@ -40,6 +40,23 @@
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
 #define VERSION_KEY               "version"
 
+#ifdef __cplusplus
+
+#if QT_VERSION >= 0x040000
+#include <QMap>
+#include <QFile>
+#include <QTextStream>
+#define TO_LATIN1(A) A.toLatin1().constData()
+#else
+#define TO_LATIN1(A) A.latin1()
+
+#include <qmap.h>
+#include <qfile.h>
+#include <qtextstream.h>
+#endif
+
+#endif // __cplusplus
+
 #ifdef CONFIG_READ
 static int c2h(char ch)
 {
@@ -838,19 +855,6 @@ static void checkColor(EShade *s, color *c)
 }
 
 #ifdef __cplusplus
-
-#if QT_VERSION >= 0x040000
-#include <QMap>
-#include <QFile>
-#include <QTextStream>
-#define TO_LATIN1(A) A.toLatin1().constData()
-#else
-#define TO_LATIN1(A) A.latin1()
-
-#include <qmap.h>
-#include <qfile.h>
-#include <qtextstream.h>
-#endif
 
 class QtCConfig
 {

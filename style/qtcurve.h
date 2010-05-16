@@ -101,7 +101,7 @@ class QtCurveStyle : public QCommonStyle
         ICN_UNSHADE
     };
 
-#ifdef STYLE_SUPPORT
+#ifdef QTC_STYLE_SUPPORT
     QtCurveStyle(const QString &name=QString());
 #else
     QtCurveStyle();

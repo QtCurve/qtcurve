@@ -1,3 +1,7 @@
+1.4.1
+-----
+1. Fix compilation when -DQTC_STYLE_SUPPORT=true
+
 1.4.0
 -----
  1. Add striped window and menu background options.
