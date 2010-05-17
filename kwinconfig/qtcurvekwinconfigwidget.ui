@@ -19,7 +19,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>270</height>
+       <height>296</height>
       </size>
      </property>
      <property name="currentIndex">
@@ -68,34 +68,41 @@
           </widget>
          </item>
          <item row="3" column="1">
+          <widget class="QCheckBox" name="innerBorder">
+           <property name="text">
+            <string>Draw dark inner border</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
           <widget class="QCheckBox" name="borderlessMax">
            <property name="text">
             <string>Remove from maximised windows</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label_2x">
            <property name="text">
             <string>Window grouping:</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QCheckBox" name="grouping">
            <property name="text">
             <string>Enabled</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Titlebar padding:</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="KIntSpinBox" name="titleBarPad">
            <property name="suffix">
             <string>px</string>
@@ -391,6 +398,7 @@
   <tabstop>borderSize</tabstop>
   <tabstop>roundBottom</tabstop>
   <tabstop>outerBorder</tabstop>
+  <tabstop>innerBorder</tabstop>
   <tabstop>borderlessMax</tabstop>
   <tabstop>grouping</tabstop>
   <tabstop>titleBarPad</tabstop>

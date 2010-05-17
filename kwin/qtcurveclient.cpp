@@ -511,7 +511,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         opt.state|=QtC_StateKWinCompositing;
 
     if(outerBorder)
-    {        
+    {
         if(opacity<100)
         {
             painter.save();
@@ -539,6 +539,21 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
         if(opacity<100)
             painter.restore();
+
+        if(Handler()->innerBorder())
+        {
+            QStyleOptionFrame frameOpt;
+            int side(layoutMetric(LM_BorderLeft)),
+                bot(layoutMetric(LM_BorderBottom));
+                
+
+            frameOpt.palette=opt.palette;
+            frameOpt.rect=widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot))
+                                          .adjusted(-1, -1, 1, 1);
+            frameOpt.state=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
+            frameOpt.lineWidth=frameOpt.midLineWidth=1;
+            Handler()->wStyle()->drawPrimitive(QStyle::PE_Frame, &frameOpt, &painter, widget());
+        }
     }
     else
         opt.state|=QtC_StateKWinNoBorder;

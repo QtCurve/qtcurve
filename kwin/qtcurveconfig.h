@@ -52,6 +52,7 @@ class QtCurveConfig
     Size borderSize() const        { return (Size)itsBorderSize; }
     bool roundBottom() const       { return itsRoundBottom; }
     bool outerBorder() const       { return itsOuterBorder; }
+    bool innerBorder() const       { return itsInnerBorder; }
     bool borderlessMax() const     { return itsBorderlessMax; }
     bool customShadows() const     { return itsCustomShadows; }
     bool grouping() const          { return itsGrouping; }
@@ -61,6 +62,7 @@ class QtCurveConfig
     void setBorderSize(Size v)     { itsBorderSize=v; }
     void setRoundBottom(bool v)    { itsRoundBottom=v; }
     void setOuterBorder(bool v)    { itsOuterBorder=v; }
+    void setInnerBorder(bool v)    { itsInnerBorder=v; }
     void setBorderlessMax(bool v)  { itsBorderlessMax=v; }
     void setCustomShadows(bool v)  { itsCustomShadows=v; }
     void setGrouping(bool v)       { itsGrouping=v; }
@@ -73,6 +75,7 @@ class QtCurveConfig
         return itsBorderSize==o.itsBorderSize &&
                itsRoundBottom==o.itsRoundBottom &&
                itsOuterBorder==o.itsOuterBorder &&
+               itsInnerBorder==o.itsInnerBorder &&
                itsBorderlessMax==o.itsBorderlessMax &&
                itsCustomShadows==o.itsCustomShadows &&
                itsGrouping==o.itsGrouping &&
@@ -91,6 +94,7 @@ class QtCurveConfig
          itsInactiveOpacity;
     bool itsRoundBottom,
          itsOuterBorder,
+         itsInnerBorder,
          itsBorderlessMax,
          itsCustomShadows,
          itsGrouping,

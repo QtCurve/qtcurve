@@ -183,6 +183,8 @@ bool QtCurveHandler::reset(unsigned long changed)
 
     if(!outerBorder() && (itsBorderSize==1 || itsBorderSize>4))
         itsBorderSize--;
+    else if(outerBorder() && innerBorder() && itsConfig.borderSize()<=QtCurveConfig::BORDER_NORMAL)
+        itsBorderSize+=2;
 
     for (int t=0; t < 2; ++t)
         for (int i=0; i < NumButtonIcons; i++)

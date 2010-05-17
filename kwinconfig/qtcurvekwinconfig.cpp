@@ -82,7 +82,8 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     connect(itsWidget->borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
     connect(itsWidget->roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(itsWidget->outerBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(itsWidget->outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
+    connect(itsWidget->innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
     connect(itsWidget->borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(itsWidget->titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
     itsWidget->titleBarPad->setRange(0, 10);
@@ -153,6 +154,7 @@ void QtCurveKWinConfig::save(KConfigGroup &)
     config.setBorderSize((KWinQtCurve::QtCurveConfig::Size)itsWidget->borderSize->currentIndex());
     config.setRoundBottom(itsWidget->roundBottom->isChecked());
     config.setOuterBorder(itsWidget->outerBorder->isChecked());
+    config.setInnerBorder(itsWidget->innerBorder->isChecked());
     config.setBorderlessMax(itsWidget->borderlessMax->isChecked());
     config.setTitleBarPad(itsWidget->titleBarPad->value());
 
@@ -201,6 +203,20 @@ void QtCurveKWinConfig::defaults()
 #endif
 }
 
+void QtCurveKWinConfig::outerBorderChanged()
+{
+    if(!itsWidget->outerBorder->isChecked())
+        itsWidget->innerBorder->setChecked(false);
+    emit changed();
+}
+
+void QtCurveKWinConfig::innerBorderChanged()
+{
+    if(itsWidget->innerBorder->isChecked())
+        itsWidget->outerBorder->setChecked(true);
+    emit changed();
+}
+
 void QtCurveKWinConfig::activeShadowColorTypeChanged()
 {
 #if KDE_IS_VERSION(4, 3, 0)
@@ -230,6 +246,7 @@ void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
     itsWidget->borderSize->setCurrentIndex(cfg.borderSize());
     itsWidget->roundBottom->setChecked(cfg.roundBottom());
     itsWidget->outerBorder->setChecked(cfg.outerBorder());
+    itsWidget->innerBorder->setChecked(cfg.innerBorder());
     itsWidget->borderlessMax->setChecked(cfg.borderlessMax());
     itsWidget->titleBarPad->setValue(cfg.titleBarPad());
 #if KDE_IS_VERSION(4, 3, 0)
@@ -257,10 +274,15 @@ void QtCurveKWinConfig::setWidgetStates()
     if(itsWidget->borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
     {
         itsWidget->outerBorder->setEnabled(false);
+        itsWidget->innerBorder->setEnabled(false);
         itsWidget->outerBorder->setChecked(false);
+        itsWidget->innerBorder->setChecked(false);
     }
     else
+    {
         itsWidget->outerBorder->setEnabled(true);
+        itsWidget->innerBorder->setEnabled(true);
+    }
 }
 
 #if KDE_IS_VERSION(4, 3, 0)

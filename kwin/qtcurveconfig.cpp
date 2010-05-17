@@ -34,6 +34,7 @@ void QtCurveConfig::defaults()
     itsBorderSize=BORDER_NORMAL;
     itsRoundBottom=true;
     itsOuterBorder=false;
+    itsInnerBorder=false;
     itsBorderlessMax=false;
     itsCustomShadows=false;
     itsGrouping=true;
@@ -87,9 +88,13 @@ void QtCurveConfig::load(const KConfig *cfg)
         READ_ENTRY(RoundBottom)
 
     if(itsBorderSize<BORDER_TINY)
-        itsOuterBorder=false;
+        itsOuterBorder=itsInnerBorder=false;
     else
         READ_ENTRY(OuterBorder)
+    if(itsOuterBorder)
+        READ_ENTRY(InnerBorder)
+    else
+        itsInnerBorder=false;
     if(itsActiveOpacity<0 || itsActiveOpacity>100)
         itsActiveOpacity=100;
     if(itsInactiveOpacity<0 || itsInactiveOpacity>100)
@@ -113,6 +118,7 @@ void QtCurveConfig::save(KConfig *cfg)
     group.writeEntry("BorderSize", itsBorderSize);
     WRITE_ENTRY(RoundBottom)
     WRITE_ENTRY(OuterBorder)
+    WRITE_ENTRY(InnerBorder)
     WRITE_ENTRY(BorderlessMax)
     WRITE_ENTRY(CustomShadows)
     WRITE_ENTRY(Grouping)

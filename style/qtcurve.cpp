@@ -3817,6 +3817,22 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                     drawRect(painter, r);
                     painter->restore();
                 }
+                else if((QtC_StateKWin==state || (QtC_StateKWin|State_Active)==state) && fo && 1==fo->lineWidth && 1==fo->midLineWidth)
+                {
+                    const QColor *borderCols(opts.colorTitlebarOnly
+                                                ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
+                                                : theThemedApp==APP_KWIN
+                                                    ? buttonColors(option)
+                                                    : getMdiColors(option, state&State_Active));
+                    QColor        dark(borderCols[STD_BORDER]);
+
+                    dark.setAlphaF(1.0);
+                    painter->save();
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                    painter->setPen(dark);
+                    drawRect(painter, r);
+                    painter->restore();
+                }
                 else
                 {
                     bool sv(isOOWidget(widget) ||
