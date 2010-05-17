@@ -697,7 +697,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     //     if(itsHover)
         {
-            if(1==tabCount && active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
+            if(
+#if KDE_IS_VERSION(4, 3, 85)
+                1==tabCount &&
+#endif
+                active && (itsToggleMenuBarButton||itsToggleStatusBarButton))
             {
                 if( (buttonsLeftWidth()+buttonsRightWidth()+constTitlePad+
                     (itsToggleMenuBarButton ? itsToggleMenuBarButton->width() : 0) +

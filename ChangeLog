@@ -2,6 +2,7 @@
 -----
 1. Fix compilation when -DQTC_STYLE_SUPPORT=true
 2. Re-add support for keep above/below kwin buttons.
+3. Fix compilation with KDE SC4.3
 
 1.4.0
 -----
