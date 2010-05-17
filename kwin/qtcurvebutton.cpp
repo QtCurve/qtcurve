@@ -82,12 +82,12 @@ void QtCurveButton::reset(unsigned long changed)
             case ShadeButton:
                 itsIconType = isChecked() ? UnShadeIcon : ShadeIcon;
                 break;
-//             case AboveButton:
-//                 itsIconType = isChecked() ? NoKeepAboveIcon : KeepAboveIcon;
-//                 break;
-//             case BelowButton:
-//                 itsIconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
-//                 break;
+            case AboveButton:
+                itsIconType = isChecked() ? NoKeepAboveIcon : KeepAboveIcon;
+                break;
+            case BelowButton:
+                itsIconType = isChecked() ? NoKeepBelowIcon : KeepBelowIcon;
+                break;
             case MenuButton:
                 itsIconType=MenuIcon;
                 break;
@@ -474,120 +474,73 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
             break;
         }
         case NotOnAllDesktopsIcon:
-//             if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
-            {
-                r.adjust(1, 1, -1, -1);
+        {
+            r.adjust(1, 1, -1, -1);
 
-                int lwMark = (r.width()-1)/2;
-                if (lwMark < 1)
-                    lwMark = 3;
+            int lwMark = (r.width()-1)/2;
+            if (lwMark < 1)
+                lwMark = 3;
 
-                drawObject(p, HorizontalLine, r.x(), r.y(), lwMark, lwMark);
-                drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark), r.y(), lwMark, lwMark);
-                drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark), r.y()+(r.height()-lwMark), lwMark, lwMark);
-                drawObject(p, HorizontalLine, r.x(), r.y()+(r.height()-lwMark), lwMark, lwMark);
-                break;
-            }
-//             else
-//             {
-//                 int lwMark = r.width()-lwTitleBar*2-2;
-//                 if (lwMark < 1)
-//                     lwMark = 3;
-// 
-//                 drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark)/2, r.y()+(r.height()-lwMark)/2, lwMark, lwMark);
-// 
-//                 // Fall through to OnAllDesktopsIcon intended!
-//             }
-        case OnAllDesktopsIcon:
-//             if(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTOM_ARROW_MIN_MAX)
-            {
-                int lwMark = r.width()-lwTitleBar*2-2;
-                if (lwMark < 1)
-                    lwMark = 3;
-
-                drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark)/2, r.y()+(r.height()-lwMark)/2, lwMark, lwMark);
-            }
-//             else
-//             {
-//                 int lineWidth = 1;
-//                 if (r.width() > 16)
-//                     lineWidth = 3;
-//                 else if (r.width() > 4)
-//                     lineWidth = 2;
-// 
-//                 int rounding=!style || ROUND_NONE==style->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL) ? 0 : 1;
-// 
-//                 drawObject(p, HorizontalLine, r.x()+rounding, r.top(), r.width()-(2*rounding), lineWidth);
-//                 drawObject(p, HorizontalLine, r.x()+rounding, r.bottom()-(lineWidth-1), r.width()-(2*rounding), lineWidth);
-//                 drawObject(p, VerticalLine, r.x(), r.top()+rounding, r.height()-(2*rounding), lineWidth);
-//                 drawObject(p, VerticalLine, r.right()-(lineWidth-1), r.top()+rounding, r.height()-(2*rounding), lineWidth);
-// 
-//     #if 0
-//                 // <> style
-//                 int len=(r.width()/2)+1;
-// 
-//                 drawObject(p, DiagonalLine, r.x()+(r.width()/2), r.y(), len, lineWidth);
-//                 drawObject(p, DiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
-//                 drawObject(p, CrossDiagonalLine, r.x()+(r.width()/2), r.bottom(), len, lineWidth);
-//                 drawObject(p, CrossDiagonalLine, r.x(), r.y()+(r.height()/2), len, lineWidth);
-//     #endif
-//     #if 0
-//                 // original plastik style
-//                 // horizontal bars
-//                 drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.y(), r.width()-2*lwTitleBar, lwTitleBar);
-//                 drawObject(p, HorizontalLine, r.x()+lwTitleBar, r.bottom()-(lwTitleBar-1), r.width()-2*lwTitleBar, lwTitleBar);
-//                 // vertical bars
-//                 drawObject(p, VerticalLine, r.x(), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
-//                 drawObject(p, VerticalLine, r.right()-(lwTitleBar-1), r.y()+lwTitleBar, r.height()-2*lwTitleBar, lwTitleBar);
-//     #endif
-//             }
+            drawObject(p, HorizontalLine, r.x(), r.y(), lwMark, lwMark);
+            drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark), r.y(), lwMark, lwMark);
+            drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark), r.y()+(r.height()-lwMark), lwMark, lwMark);
+            drawObject(p, HorizontalLine, r.x(), r.y()+(r.height()-lwMark), lwMark, lwMark);
             break;
-//         case NoKeepAboveIcon:
-//         {
-//             int center = r.x()+r.width()/2;
-// 
-//             // arrow
-//             drawObject(p, CrossDiagonalLine, r.x(), center+2*lwArrow, center-r.x(), lwArrow);
-//             drawObject(p, DiagonalLine, r.x()+center, r.y()+1+2*lwArrow, center-r.x(), lwArrow);
-//             if (lwArrow>1)
-//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.y()+2*lwArrow, (lwArrow-2)*2, lwArrow);
-// 
-//             // Fall through to KeepAboveIcon intended!
-//         }
-//         case KeepAboveIcon:
-//         {
-//             int center = r.x()+r.width()/2;
-// 
-//             // arrow
-//             drawObject(p, CrossDiagonalLine, r.x(), center, center-r.x(), lwArrow);
-//             drawObject(p, DiagonalLine, r.x()+center, r.y()+1, center-r.x(), lwArrow);
-//             if (lwArrow>1)
-//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.y(), (lwArrow-2)*2, lwArrow);
-//             break;
-//         }
-//         case NoKeepBelowIcon:
-//         {
-//             int center = r.x()+r.width()/2;
-// 
-//             // arrow
-//             drawObject(p, DiagonalLine, r.x(), center-2*lwArrow, center-r.x(), lwArrow);
-//             drawObject(p, CrossDiagonalLine, r.x()+center, r.bottom()-1-2*lwArrow, center-r.x(), lwArrow);
-//             if (lwArrow>1)
-//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.bottom()-(lwArrow-1)-2*lwArrow, (lwArrow-2)*2, lwArrow);
-// 
-//             // Fall through to KeepBelowIcon intended!
-//         }
-//         case KeepBelowIcon:
-//         {
-//             int center = r.x()+r.width()/2;
-// 
-//             // arrow
-//             drawObject(p, DiagonalLine, r.x(), center, center-r.x(), lwArrow);
-//             drawObject(p, CrossDiagonalLine, r.x()+center, r.bottom()-1, center-r.x(), lwArrow);
-//             if (lwArrow>1)
-//                 drawObject(p, HorizontalLine, center-(lwArrow-2), r.bottom()-(lwArrow-1), (lwArrow-2)*2, lwArrow);
-//             break;
-//         }
+        }
+        case OnAllDesktopsIcon:
+        {
+            int lwMark = r.width()-lwTitleBar*2-2;
+            if (lwMark < 1)
+                lwMark = 3;
+
+            drawObject(p, HorizontalLine, r.x()+(r.width()-lwMark)/2, r.y()+(r.height()-lwMark)/2, lwMark, lwMark);
+            break;
+        }
+        case NoKeepAboveIcon:
+        case KeepAboveIcon:
+        {
+            QStyleOption opt;
+
+            opt.rect=r.adjusted(0, -(1+lwTitleBar), 0, 0);
+            opt.rect.adjust(2, 2, -2, -2);
+            opt.state=QStyle::State_Enabled|QtC_StateKWin;
+
+            opt.rect.adjust(0, -1, 0, -1);
+            if(NoKeepAboveIcon==icon)
+            {
+                int w=r.width()/3;
+                if(0==w%2)
+                    w++;
+                drawObject(p, HorizontalLine, r.x()+(r.width()-w)/2, r.y()+1, w, 2);
+            }
+            else
+                style->drawPrimitive(QStyle::PE_IndicatorArrowUp, &opt, &p, 0L);
+            opt.rect.adjust(0, 4, 0, 4);
+            style->drawPrimitive(QStyle::PE_IndicatorArrowUp, &opt, &p, 0L);
+            break;
+        }
+        case NoKeepBelowIcon:
+        case KeepBelowIcon:
+        {
+            QStyleOption opt;
+
+            opt.rect=r.adjusted(0, -(1+lwTitleBar), 0, 0);
+            opt.rect.adjust(2, 2, -2, -2);
+            opt.state=QStyle::State_Enabled|QtC_StateKWin;
+            opt.rect.adjust(0, -1, 0, -1);
+            style->drawPrimitive(QStyle::PE_IndicatorArrowDown, &opt, &p, 0L);
+            opt.rect.adjust(0, 4, 0, 4);
+            if(NoKeepBelowIcon==icon)
+            {
+                int w=r.width()/3;
+                if(0==w%2)
+                    w++;
+                drawObject(p, HorizontalLine, r.x()+(r.width()-w)/2, r.y()+r.height()-3, w, 2);
+            }
+            else
+                style->drawPrimitive(QStyle::PE_IndicatorArrowDown, &opt, &p, 0L);
+            break;
+        }
         case UnShadeIcon:
         case ShadeIcon:
         {

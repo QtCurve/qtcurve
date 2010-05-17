@@ -262,10 +262,10 @@ static char typeToChar(ButtonType t)
             return 'A';
         case CloseButton:
             return 'X';
-//         case AboveButton:
-//            return 'F';
-//         case BelowButton:
-//            return 'B';
+        case AboveButton:
+           return 'F';
+        case BelowButton:
+           return 'B';
         case ShadeButton:
             return 'L';
         default:
@@ -344,8 +344,8 @@ KCommonDecorationButton *QtCurveClient::createButton(ButtonType type)
         case MinButton:
         case MaxButton:
         case CloseButton:
-//         case AboveButton:
-//         case BelowButton:
+        case AboveButton:
+        case BelowButton:
         case ShadeButton:
             return new QtCurveButton(type, this);
         default:
