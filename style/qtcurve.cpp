@@ -8355,6 +8355,9 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         textRect=captionRect;
                     }
 
+                    if(alignment&Qt::AlignLeft && constWindowMargin==textRect.x())
+                        textRect.adjust(showIcon ? 4 : 6, 0, 0, 0);
+
                     if(showIcon)
                     {
                         if(alignment&Qt::AlignHCenter)
