@@ -428,18 +428,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
                          buttonFlags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, NULL, NULL);
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
-                         opacity(compositing ? Handler()->opacity(active) : 1.0);
+                         opacity(compositing ? Handler()->opacity(active) : 100);
 
     painter.setClipRegion(e->region());
 
 #if KDE_IS_VERSION(4, 3, 0)
     if(Handler()->customShadows())
     {
+        shadowSize=Handler()->shadowCache().shadowSize();
+
         if(compositing)
         {
             TileSet *tileSet=Handler()->shadowCache().tileSet(this, roundBottom);
-
-            shadowSize=Handler()->shadowCache().shadowSize();
             if(opacity<100)
             {
                 painter.save();

@@ -4,6 +4,7 @@
 2. Re-add support for keep above/below kwin buttons.
 3. Fix compilation with KDE SC4.3
 4. Add option to draw dark inner border in kwin decoration.
+5. Fix garbled window decoration when not compositing.
 
 1.4.0
 -----
