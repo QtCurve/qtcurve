@@ -7,6 +7,7 @@
 5. Fix garbled window decoration when not compositing.
 6. For MDI window titles, if left-aligning ensure text is at least 6 pixels
    from edge.
+7. Fix(?) compilation on non-X11 platforms - only link to, and use, QtDBus on unix.
 
 1.4.0
 -----

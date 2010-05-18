@@ -1,5 +1,10 @@
-set(qtcurve_SRCS qtcurve.cpp macmenu.cpp)
-set(qtcurve_MOC_HDRS qtcurve.h macmenu.h macmenu-dbus.h)
+if (Q_WS_X11)
+    set(qtcurve_SRCS qtcurve.cpp macmenu.cpp)
+    set(qtcurve_MOC_HDRS qtcurve.h macmenu.h macmenu-dbus.h)
+else (Q_WS_X11)
+    set(qtcurve_SRCS qtcurve.cpp)
+    set(qtcurve_MOC_HDRS qtcurve.h)
+endif (Q_WS_X11)
 
 add_definitions(-DQT_PLUGIN)
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR} ${QT_INCLUDE_DIR}
@@ -18,8 +23,13 @@ if (NOT QTC_QT_ONLY)
     endif (NOT QTC_DISABLE_KDEFILEDIALOG_CALLS)
 endif (NOT QTC_QT_ONLY)
 
-target_link_libraries(qtcurve ${QTC_KDE_LIBS} ${QTC_KFILEDIALOG_LIBS} ${QT_QTGUI_LIBRARY}
-                              ${QT_QTDBUS_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTSVG_LIBRARY} ${X11_X11_LIB})
+if (Q_WS_X11)
+    target_link_libraries(qtcurve ${QTC_KDE_LIBS} ${QTC_KFILEDIALOG_LIBS} ${QT_QTGUI_LIBRARY}
+                                ${QT_QTDBUS_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTSVG_LIBRARY} ${X11_X11_LIB})
+else (Q_WS_X11)
+    target_link_libraries(qtcurve ${QTC_KDE_LIBS} ${QTC_KFILEDIALOG_LIBS} ${QT_QTGUI_LIBRARY}
+                                  ${QT_QTCORE_LIBRARY} ${QT_QTSVG_LIBRARY})
+endif (Q_WS_X11)
 
 
 if (NOT QTC_QT_ONLY)
