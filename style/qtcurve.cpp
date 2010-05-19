@@ -363,7 +363,9 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 #define STATE_DWT_BUTTON  (QStyle::StateFlag)0x20000000
 // #define NO_BGND_BUTTON    (QStyle::StateFlag)0x80000000
 
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
+#endif
 
 static const int constMenuPixmapWidth=22;
 
@@ -1082,10 +1084,10 @@ QtCurveStyle::QtCurveStyle()
               itsProgressBarAnimateTimer(0),
               itsAnimateStep(0),
               itsTitlebarHeight(0),
-              itsDBus(0),
               itsPos(-1, -1),
               itsHoverWidget(0L),
 #ifdef Q_WS_X11
+              itsDBus(0),
               itsDragWidget(0L),
               itsDragWidgetHadMouseTracking(false),
 #endif
@@ -1431,8 +1433,10 @@ QtCurveStyle::~QtCurveStyle()
             delete [] itsTitleBarButtonsCols[i];
     if(itsOOMenuCols)
         delete itsOOMenuCols;
+#ifdef Q_WS_X11
     if(itsDBus)
         delete itsDBus;
+#endif
 }
 
 static QString getFile(const QString &f)
@@ -12521,7 +12525,7 @@ const QColor & QtCurveStyle::checkRadioCol(const QStyleOption *opt) const
                 : opt->palette.text().color();
 }
 
-QColor QtCurveStyle::shade(const QColor &a, float k) const
+QColor QtCurveStyle::shade(const QColor &a, double k) const
 {
     QColor mod;
 

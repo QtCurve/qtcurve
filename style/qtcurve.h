@@ -224,7 +224,7 @@ class QtCurveStyle : public QCommonStyle
     Version        qtVersion() const;
 #endif
     const QColor & checkRadioCol(const QStyleOption *opt) const;
-    QColor         shade(const QColor &a, float k) const;
+    QColor         shade(const QColor &a, double k) const;
     void           shade(const color &ca, color *cb, double k) const;
     QColor         getLowerEtchCol(const QWidget *widget) const;
     QPalette::ColorRole getTextRole(const QWidget *w, const QPainter *p, QPalette::ColorRole def) const;
@@ -301,12 +301,12 @@ class QtCurveStyle : public QCommonStyle
     mutable QMap<QWidget *, QWidget *> itsReparentedDialogs;
     mutable QList<int>                 itsMdiButtons[2]; // 0=left, 1=right
     mutable int                        itsTitlebarHeight;
-    QDBusInterface                     *itsDBus;
 
     // Required for Q3Header hover...
     QPoint                             itsPos;
     QWidget                            *itsHoverWidget;
 #ifdef Q_WS_X11
+    QDBusInterface                     *itsDBus;
     QWidget                            *itsDragWidget;
     bool                               itsDragWidgetHadMouseTracking;
 #endif

@@ -1,3 +1,7 @@
+1.4.2
+-----
+1. Remove some warnings when building on windows.
+
 1.4.1
 -----
 1. Fix compilation when -DQTC_STYLE_SUPPORT=true

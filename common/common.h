@@ -245,7 +245,7 @@ typedef gchar ** Strings;
 #define MIN_HIGHLIGHT_FACTOR                     -50
 #define MENUBAR_DARK_FACTOR        TO_FACTOR(-3)
 #define INACTIVE_HIGHLIGHT_FACTOR  TO_FACTOR(20)
-#define LV_HEADER_DARK_FACTOR     TO_FACTOR(-10)
+#define LV_HEADER_DARK_FACTOR      TO_FACTOR(-10)
 #define DEF_POPUPMENU_LIGHT_FACTOR                 2
 #define MIN_LIGHTER_POPUP_MENU                  -100
 #define MAX_LIGHTER_POPUP_MENU                   100
@@ -385,7 +385,7 @@ typedef gchar ** Strings;
 #define ETCH_RADIO_BOTTOM_ALPHA  1.0
 // #endif
 
-#define RINGS_INNER_ALPHA(T) qtcRingAlpha[IMG_PLAIN_RINGS==T] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
+#define RINGS_INNER_ALPHA(T) qtcRingAlpha[IMG_PLAIN_RINGS==(T) ? 1 : 0] //(IMG_PLAIN_RINGS==opts.bgndImage.type ? 0.25 :  0.125)
 #define RINGS_OUTER_ALPHA    qtcRingAlpha[2] //0.5
 #define RINGS_WIDTH(T)       (IMG_SQUARE_RINGS==T ? 260 : 450)
 #define RINGS_HEIGHT(T)      (IMG_SQUARE_RINGS==T ? 220 : 360)
