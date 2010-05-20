@@ -27,6 +27,16 @@ The following options may be supplied to cmake:
         Support QtCurve style files. These are stored as
         <kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc
 
+Windows
+-------
+It has been reported that building via cmake on windows can have problems. To ease this,
+QtCurve includes a qmake folder containg files to build only the style via qmake.
+
+To build with qmake:
+1. cd qmake
+2. qmake
+3. make
+
 XBar/MacMenu
 ------------
 The XBar support was copied directly from Bespin. The relevant files are named macmenu*

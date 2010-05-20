@@ -1415,24 +1415,24 @@ QtCurveStyle::~QtCurveStyle()
         delete [] itsActiveMdiColors;
     if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
         delete [] itsMdiColors;
-    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols && itsDefBtnCols!=itsHighlightCols)
-        delete [] itsDefBtnCols;
-    if(itsSliderCols && itsSliderCols!=itsHighlightCols)
-        delete [] itsSliderCols;
-    if(itsComboBtnCols && itsComboBtnCols!=itsHighlightCols && itsComboBtnCols!=itsSliderCols)
-        delete [] itsComboBtnCols;
-    if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
-       itsSortedLvColors!=itsComboBtnCols)
-        delete [] itsSortedLvColors;
     if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
        itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors && 
        itsCheckRadioSelCols!=itsButtonCols && itsCheckRadioSelCols!=itsHighlightCols)
         delete [] itsCheckRadioSelCols;
+    if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
+       itsSortedLvColors!=itsComboBtnCols)
+        delete [] itsSortedLvColors;
+    if(itsComboBtnCols && itsComboBtnCols!=itsHighlightCols && itsComboBtnCols!=itsSliderCols)
+        delete [] itsComboBtnCols;
+    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols && itsDefBtnCols!=itsHighlightCols)
+        delete [] itsDefBtnCols;
+    if(itsSliderCols && itsSliderCols!=itsHighlightCols)
+        delete [] itsSliderCols;
     if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
             delete [] itsTitleBarButtonsCols[i];
     if(itsOOMenuCols)
-        delete itsOOMenuCols;
+        delete [] itsOOMenuCols;
 #ifdef Q_WS_X11
     if(itsDBus)
         delete itsDBus;
@@ -1655,7 +1655,7 @@ void QtCurveStyle::polish(QPalette &palette)
         }
         else if(itsOOMenuCols)
         {
-            delete itsOOMenuCols;
+            delete [] itsOOMenuCols;
             itsOOMenuCols=0L;
         }
     }
@@ -3358,6 +3358,18 @@ QPalette QtCurveStyle::standardPalette() const
 #endif
 }
 
+#if defined QTC_QT_ONLY
+#include "dialogpixmaps.h"
+
+static QIcon load(const unsigned int len, const unsigned char *data)
+{
+    QImage img;
+    img.loadFromData(data, len);
+
+    return QIcon(QPixmap::fromImage(img));
+}
+#endif
+
 QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
 {
     switch(pix)
@@ -3394,7 +3406,58 @@ QIcon QtCurveStyle::standardIconImplementation(StandardPixmap pix, const QStyleO
             drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix), true);
             return QIcon(pm);
         }
-#if !defined QTC_QT_ONLY
+#if defined QTC_QT_ONLY
+        case SP_MessageBoxQuestion:
+        case SP_MessageBoxInformation:
+        {
+            static QIcon icn(load(dialog_information_png_len, dialog_information_png_data));
+            return icn;
+        }
+        case SP_MessageBoxWarning:
+        {
+            static QIcon icn(load(dialog_warning_png_len, dialog_warning_png_data));
+            return icn;
+        }
+        case SP_MessageBoxCritical:
+        {
+            static QIcon icn(load(dialog_error_png_len, dialog_error_png_data));
+            return icn;
+        }
+/*
+        case SP_DialogYesButton:
+        case SP_DialogOkButton:
+        {
+            static QIcon icn(load(dialog_ok_png_len, dialog_ok_png_data));
+            return icn;
+        }
+        case SP_DialogNoButton:
+        case SP_DialogCancelButton:
+        {
+            static QIcon icn(load(dialog_cancel_png_len, dialog_cancel_png_data));
+            return icn;
+        }
+        case SP_DialogHelpButton:
+        {
+            static QIcon icn(load(help_contents_png_len, help_contents_png_data));
+            return icn;
+        }
+        case SP_DialogCloseButton:
+        {
+            static QIcon icn(load(dialog_close_png_len, dialog_close_png_data));
+            return icn;
+        }
+        case SP_DialogApplyButton:
+        {
+            static QIcon icn(load(dialog_ok_apply_png_len, dialog_ok_apply_png_data));
+            return icn;
+        }
+        case SP_DialogResetButton:
+        {
+            static QIcon icn(load(document_revert_png_len, document_revert_png_data));
+            return icn;
+        }
+*/
+#else
         case SP_MessageBoxInformation:
             return KIcon("dialog-information");
         case SP_MessageBoxWarning:
