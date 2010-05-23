@@ -138,11 +138,15 @@ void QtCurveButton::paintEvent(QPaintEvent *ev)
 
 void QtCurveButton::drawButton(QPainter *painter)
 {
+    int  flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L);
+    bool active(itsClient->isActive());
+
+    if(!active && !itsHover && flags&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW)
+        return;
+
     QRect    r(0, 0, width(), height());
-    int      flags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L),
-             versionHack=0;
-    bool     active(itsClient->isActive()),
-             sunken(isDown()),
+    int      versionHack=0;
+    bool     sunken(isDown()),
              drawFrame(!(flags&TITLEBAR_BUTTON_NO_FRAME) &&
                        (itsHover || sunken || !(flags&TITLEBAR_BUTTON_HOVER_FRAME))),
              drewFrame(false),

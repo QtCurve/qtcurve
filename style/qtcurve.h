@@ -179,7 +179,7 @@ class QtCurveStyle : public QCommonStyle
                     EWidget w=WIDGET_OTHER, EBorder borderProfile=BORDER_FLAT, bool doBlend=true, int borderVal=STD_BORDER) const;
     void drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
                         ETitleBarButtons btn, const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols,
-                        int adjust) const;
+                        int adjust, bool activeWindow) const;
     void drawDwtControl(QPainter *p, const QFlags<State> &state, const QRect &rect, ETitleBarButtons btn, Icon icon,
                         const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols) const;
     bool drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;

@@ -3,6 +3,7 @@
 1. Remove some warnings when building on windows.
 2. Provide a qmake project to aid building on windows - thanks to Hugues Delorme
 3. When compiled as Qt-only, embed oxygen PNGs for message box icons.
+4. Add option to hide titlebar buttons on inactive windows.
 
 1.4.1
 -----

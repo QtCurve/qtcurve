@@ -933,6 +933,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtons_colorMenu, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_colorShade, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_colorAllDesktops, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_hideOnInactiveWindow, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 
     connect(noBgndGradientApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noBgndImageApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
@@ -2201,6 +2202,8 @@ int QtCurveConfig::getTitleBarButtonFlags()
         titlebarButtons+=TITLEBAR_BUTTON_SUNKEN_BACKGROUND;
     if(titlebarButtons_arrowMinMax->isChecked())
         titlebarButtons+=TITLEBAR_BUTTOM_ARROW_MIN_MAX;
+    if(titlebarButtons_hideOnInactiveWindow->isChecked())
+        titlebarButtons+=TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW;
     return titlebarButtons;
 }
 
@@ -2611,6 +2614,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtons_colorSymbolsOnly->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL);
     titlebarButtons_sunkenBackground->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND);
     titlebarButtons_arrowMinMax->setChecked(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX);
+    titlebarButtons_hideOnInactiveWindow->setChecked(opts.titlebarButtons&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW);
 
     populateShades(opts);
 

@@ -8500,66 +8500,76 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if ((titleBar->subControls&SC_TitleBarMinButton) && (titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMinimized))
-                    drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, iconColor, btnCols, bgndCols, adjust);
+                    drawMdiControl(painter, titleBar, SC_TitleBarMinButton, widget, TITLEBAR_MIN, iconColor, btnCols, bgndCols,
+                                   adjust, active);
 
                 if ((titleBar->subControls&SC_TitleBarMaxButton) && (titleBar->titleBarFlags&Qt::WindowMaximizeButtonHint) &&
                     !(titleBar->titleBarState&Qt::WindowMaximized))
-                    drawMdiControl(painter, titleBar, SC_TitleBarMaxButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols, adjust);
+                    drawMdiControl(painter, titleBar, SC_TitleBarMaxButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols,
+                                   adjust, active);
 
                 if ((titleBar->subControls&SC_TitleBarCloseButton) && (titleBar->titleBarFlags&Qt::WindowSystemMenuHint))
                     drawMdiControl(painter, titleBar, SC_TitleBarCloseButton, widget, TITLEBAR_CLOSE, iconColor, btnCols, bgndCols,
-                                   adjust);
+                                   adjust, active);
 
                 if ((titleBar->subControls&SC_TitleBarNormalButton) &&
                     (((titleBar->titleBarFlags&Qt::WindowMinimizeButtonHint) &&
                     (titleBar->titleBarState&Qt::WindowMinimized)) ||
                     ((titleBar->titleBarFlags&Qt::WindowMaximizeButtonHint) &&
                     (titleBar->titleBarState&Qt::WindowMaximized))))
-                    drawMdiControl(painter, titleBar, SC_TitleBarNormalButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols, adjust);
+                    drawMdiControl(painter, titleBar, SC_TitleBarNormalButton, widget, TITLEBAR_MAX, iconColor, btnCols, bgndCols,
+                                   adjust, active);
 
                 if (titleBar->subControls&SC_TitleBarContextHelpButton && (titleBar->titleBarFlags&Qt::WindowContextHelpButtonHint))
                     drawMdiControl(painter, titleBar, SC_TitleBarContextHelpButton, widget, TITLEBAR_HELP, iconColor, btnCols, bgndCols,
-                                   adjust);
+                                   adjust, active);
 
                 if (titleBar->subControls&SC_TitleBarShadeButton && (titleBar->titleBarFlags&Qt::WindowShadeButtonHint))
                     drawMdiControl(painter, titleBar, SC_TitleBarShadeButton, widget, TITLEBAR_SHADE, iconColor, btnCols, bgndCols,
-                                   adjust);
+                                   adjust, active);
 
                 if (titleBar->subControls&SC_TitleBarUnshadeButton && (titleBar->titleBarFlags&Qt::WindowShadeButtonHint))
                     drawMdiControl(painter, titleBar, SC_TitleBarUnshadeButton, widget, TITLEBAR_SHADE, iconColor, btnCols, bgndCols,
-                                   adjust);
+                                   adjust, active);
 
                 if ((titleBar->subControls&SC_TitleBarSysMenu) && (titleBar->titleBarFlags&Qt::WindowSystemMenuHint))
                 {
                     if(TITLEBAR_ICON_MENU_BUTTON==opts.titlebarIcon)
                     {
-                        QRect rect = subControlRect(CC_TitleBar, titleBar, SC_TitleBarSysMenu, widget);
-                        if (rect.isValid())
+                        bool hover((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_MouseOver));
+
+                        if(active || hover || !(opts.titlebarButtons&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW))
                         {
-                            bool sunken((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_Sunken)),
-                                 hover((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_MouseOver));
-                            int  offset(sunken ? 1 : 0);
-
-                            if(!(opts.titlebarButtons&TITLEBAR_BUTTON_ROUND))
-                                drawMdiButton(painter, rect, hover, sunken,
-                                              coloredMdiButtons(state&State_Active, hover) ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
-
-                            if (!titleBar->icon.isNull())
-                                titleBar->icon.paint(painter, rect.adjusted(offset, offset, offset, offset));
-                            else
+                            QRect rect = subControlRect(CC_TitleBar, titleBar, SC_TitleBarSysMenu, widget);
+                            if (rect.isValid())
                             {
-                                QStyleOption tool(0);
+                                bool sunken((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_Sunken));
+                                int  offset(sunken ? 1 : 0);
 
-                                tool.palette = palette;
-                                tool.rect = rect;
-                                painter->save();
-                                drawItemPixmap(painter, rect.adjusted(offset, offset, offset, offset), Qt::AlignCenter, standardIcon(SP_TitleBarMenuButton, &tool, widget).pixmap(16, 16));
-                                painter->restore();
+                                if(!(opts.titlebarButtons&TITLEBAR_BUTTON_ROUND))
+                                    drawMdiButton(painter, rect, hover, sunken,
+                                                  coloredMdiButtons(state&State_Active, hover)
+                                                    ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
+
+                                if (!titleBar->icon.isNull())
+                                    titleBar->icon.paint(painter, rect.adjusted(offset, offset, offset, offset));
+                                else
+                                {
+                                    QStyleOption tool(0);
+
+                                    tool.palette = palette;
+                                    tool.rect = rect;
+                                    painter->save();
+                                    drawItemPixmap(painter, rect.adjusted(offset, offset, offset, offset), Qt::AlignCenter,
+                                                   standardIcon(SP_TitleBarMenuButton, &tool, widget).pixmap(16, 16));
+                                    painter->restore();
+                                }
                             }
                         }
                     }
                     else
-                        drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, btnCols, bgndCols, adjust);
+                        drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, btnCols, bgndCols,
+                                       adjust, active);
                 }
 
                 painter->restore();
@@ -11221,8 +11231,13 @@ void QtCurveStyle::drawBorder(QPainter *p, const QRect &r, const QStyleOption *o
 
 void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
                                   ETitleBarButtons btn, const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols,
-                                  int adjust) const
+                                  int adjust, bool activeWindow) const
 {
+    bool hover((titleBar->activeSubControls&sc) && (titleBar->state&State_MouseOver));
+
+    if(!activeWindow && !hover && opts.titlebarButtons&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW)
+        return;
+     
     QRect rect(subControlRect(CC_TitleBar, titleBar, sc, widget));
 
     if (rect.isValid())
@@ -11230,7 +11245,6 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
         rect.adjust(adjust, adjust, -adjust, -adjust);
 
         bool sunken((titleBar->activeSubControls&sc) && (titleBar->state&State_Sunken)),
-             hover((titleBar->activeSubControls&sc) && (titleBar->state&State_MouseOver)),
              colored=coloredMdiButtons(titleBar->state&State_Active, hover),
              useBtnCols(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR &&
                          (hover ||
