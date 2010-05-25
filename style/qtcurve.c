@@ -5177,7 +5177,8 @@ printf("Draw check %d %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, 
 debugDisplayWidget(widget, 3);
 #endif
 
-    if(mnu && GTK_STATE_PRELIGHT==state)
+    if((mnu && GTK_STATE_PRELIGHT==state) ||
+       (list && GTK_STATE_ACTIVE==state))
         state=GTK_STATE_NORMAL;
 
     if(mnu && isMozilla())
@@ -5297,7 +5298,8 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     CAIRO_BEGIN
 
-    if(mnu && GTK_STATE_PRELIGHT==state)
+    if((mnu && GTK_STATE_PRELIGHT==state) ||
+       (list && GTK_STATE_ACTIVE==state))
         state=GTK_STATE_NORMAL;
 
     if(!qtSettings.qt4 && mnu)

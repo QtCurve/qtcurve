@@ -1,3 +1,8 @@
+1.4.1
+-----
+1. When drawing button-like checks and radios, do not drawn sunken if they are in
+   a list/tree view.
+
 1.4.0
 -----
  1. Add striped window and menu background options.
