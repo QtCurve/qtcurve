@@ -57,7 +57,9 @@ static struct
 static Options opts;
 
 #include "qt_settings.c"
-#include "atoms.c"
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gdk/gdkx.h>
 #include "animation.c"
 #include "menu.c"
 #include "tab.c"
@@ -7478,10 +7480,7 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     lastSlider.widget=NULL;
     if(qtInit())
-    {
         generateColors();
-        qtcCreateAtoms();
-    }
 #ifdef QTC_ADD_EVENT_FILTER____DISABLED
     qtcAddEventFilter();
 #endif

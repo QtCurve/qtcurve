@@ -38,7 +38,8 @@ static gboolean    qtcWindowToggleStatusBar(GtkWidget *widget);
 
 static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer user_data)
 {
-    if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcActiveWindowAtom))
+    if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(gdk_x11_get_xatom_by_name_for_display(
+                                                                        gtk_widget_get_display(widget), ACTIVE_WINDOW_ATOM)))
     {
         if(event->data.l[0])
             qtcCurrentActiveWindow=widget;
@@ -46,7 +47,8 @@ static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, g
             qtcCurrentActiveWindow=0L;
         gtk_widget_queue_draw(widget);
     }
-    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcTitleBarSizeAtom))
+    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(gdk_x11_get_xatom_by_name_for_display(
+                                                                             gtk_widget_get_display(widget), TITLEBAR_SIZE_ATOM)))
     {
         qtcGetWindowBorderSize(TRUE);
 
@@ -55,12 +57,14 @@ static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, g
         if(menubar)
             gtk_widget_queue_draw(menubar);
     }
-    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcToggleMenuBarAtom))
+    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(gdk_x11_get_xatom_by_name_for_display(
+                                                                             gtk_widget_get_display(widget), TOGGLE_MENUBAR_ATOM)))
     {
         if(opts.menubarHiding&HIDE_KWIN && qtcWindowToggleMenuBar(widget))
             gtk_widget_queue_draw(widget);
     }
-    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(qtcToggleStatusBarAtom))
+    else if(gdk_x11_atom_to_xatom(event->message_type)==GDK_ATOM_TO_POINTER(gdk_x11_get_xatom_by_name_for_display(
+                                                                             gtk_widget_get_display(widget), TOGGLE_STATUSBAR_ATOM)))
     {
         if(opts.statusbarHiding&HIDE_KWIN && qtcWindowToggleStatusBar(widget))
             gtk_widget_queue_draw(widget);
@@ -216,12 +220,14 @@ static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
 {
     if(w &&!g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM))
     {
-        GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
-
+        GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+        GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+    
         unsigned short setting=1;
         g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
-        XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
-                        qtcStatusBarAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                        gdk_x11_get_xatom_by_name_for_display(display, STATUSBAR_ATOM),
+                        XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
         return TRUE;
     }
 

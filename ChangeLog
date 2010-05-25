@@ -2,6 +2,7 @@
 -----
 1. When drawing button-like checks and radios, do not drawn sunken if they are in
    a list/tree view.
+2. Fix segfault on some systems due to gdk_x11_get_default_xdisplay usage.
 
 1.4.0
 -----

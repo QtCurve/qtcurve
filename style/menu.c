@@ -13,14 +13,16 @@ static gboolean qtcEmitMenuSize(GtkWidget *w, unsigned int size)
 
         if(oldSize!=size)
         {
-            GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+            GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+            GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
 
             if(0xFFFF==size)
                 size=0;
             g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM, (gpointer)size);
             unsigned short ssize=size;
-            XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
-                            qtcMenuSizeAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&ssize, 1);
+            XChangeProperty(gdk_x11_display_get_xdisplay(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                            gdk_x11_get_xatom_by_name_for_display(display, MENU_SIZE_ATOM),
+                            XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&ssize, 1);
             return TRUE;
         }
     }
