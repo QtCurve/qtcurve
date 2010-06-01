@@ -1,3 +1,7 @@
+1.4.3
+-----
+1. Fix crash (mainly on Arch linux) when apps (e.g. dolphin) exit.
+
 1.4.2
 -----
 1. Remove some warnings when building on windows.

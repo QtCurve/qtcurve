@@ -1411,7 +1411,7 @@ QtCurveStyle::~QtCurveStyle()
        itsSidebarButtonsCols!=itsSliderCols &&
        itsSidebarButtonsCols!=itsDefBtnCols)
         delete [] itsSidebarButtonsCols;
-    if(itsActiveMdiColors && itsActiveMdiColors!=itsHighlightCols)
+    if(itsActiveMdiColors && itsActiveMdiColors!=itsHighlightCols && itsActiveMdiColors!=itsBackgroundCols)
         delete [] itsActiveMdiColors;
     if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
         delete [] itsMdiColors;
