@@ -2313,7 +2313,7 @@ static void defaultSettings(Options *opts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
-    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer";
+    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
 #endif
