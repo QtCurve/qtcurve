@@ -1797,6 +1797,7 @@ void QtCurveStyle::polish(QWidget *widget)
            viewport->autoFillBackground() && // Dolphins Folders panel
            //255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
            !widget->inherits("KFilePlacesView") &&
+           !widget->inherits("QComboBoxListView") &&
            (qobject_cast<QTreeView *>(widget) ||
             (qobject_cast<QListView *>(widget) && QListView::IconMode!=((QListView *)widget)->viewMode())))
             itemView->setAlternatingRowColors(true);

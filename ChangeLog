@@ -2,6 +2,7 @@
 -----
 1. Fix crash (mainly on Arch linux) when apps (e.g. dolphin) exit.
 2. Add VirtualBox to list of apps that need menubar state to be saved.
+3. Dont force alternate colours for combo-box pop-up menus.
 
 1.4.2
 -----
