@@ -45,6 +45,7 @@ static struct
              *selectedcr,
              *sortedlv,
              *sidebar,
+             *progress,
              *wborder[2],
              mdi_text[2],
              menubar[TOTAL_SHADES+1],
@@ -2614,7 +2615,11 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     {
         gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
-        GdkColor *itemCols=grayItem ? qtcPalette.background : qtcPalette.highlight;
+        GdkColor *itemCols=grayItem
+                            ? qtcPalette.background
+                            : qtcPalette.progress
+                                ? qtcPalette.progress
+                                : qtcPalette.highlight;
         int      round=opts.fillProgress || isEntryProg ? ROUNDED_ALL : progressbarRound(widget, rev),
                  new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
         int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
@@ -7282,7 +7287,7 @@ static void generateColors()
                 qtcPalette.selectedcr=qtcPalette.slider;
             else if(SHADE_CUSTOM==opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customCrBgndColor))
                 qtcPalette.selectedcr=qtcPalette.combobtn;
-            else if(SHADE_CUSTOM==opts.sortedLv && EQUAL_COLOR(opts.customComboBtnColor, opts.customSortedLvColor))
+            else if(SHADE_CUSTOM==opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customCrBgndColor))
                 qtcPalette.selectedcr=qtcPalette.sortedlv;
             else
             {
@@ -7321,6 +7326,48 @@ static void generateColors()
             qtcPalette.sidebar=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
             shadeColors(&mid, qtcPalette.sidebar);
         }
+
+    qtcPalette.progress=NULL;
+    switch(opts.progressColor)
+    {
+        case SHADE_NONE:
+            qtcPalette.progress=qtcPalette.background;
+        default:
+            /* Not set! */
+            break;
+        case SHADE_CUSTOM:
+            if(SHADE_CUSTOM==opts.shadeSliders && EQUAL_COLOR(opts.customSlidersColor, opts.customProgressColor))
+                qtcPalette.progress=qtcPalette.slider;
+            else if(SHADE_CUSTOM==opts.comboBtn && EQUAL_COLOR(opts.customComboBtnColor, opts.customProgressColor))
+                qtcPalette.progress=qtcPalette.combobtn;
+            else if(SHADE_CUSTOM==opts.sortedLv && EQUAL_COLOR(opts.customSortedLvColor, opts.customProgressColor))
+                qtcPalette.progress=qtcPalette.sortedlv;
+            else if(SHADE_CUSTOM==opts.crColor && EQUAL_COLOR(opts.customCrBgndColor, opts.customProgressColor))
+                qtcPalette.progress=qtcPalette.selectedcr;
+            else
+            {
+                qtcPalette.progress=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&opts.customProgressColor, qtcPalette.progress);
+            }
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                qtcPalette.progress=qtcPalette.slider;
+            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+                qtcPalette.progress=qtcPalette.combobtn;
+            else if(SHADE_BLEND_SELECTED==opts.sortedLv)
+                qtcPalette.progress=qtcPalette.sortedlv;
+            else if(SHADE_BLEND_SELECTED==opts.crColor)
+                qtcPalette.progress=qtcPalette.selectedcr;
+            else
+            {
+                GdkColor mid=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
+                                      &qtcPalette.background[ORIGINAL_SHADE]);
+
+                qtcPalette.progress=(GdkColor *)malloc(sizeof(GdkColor)*(TOTAL_SHADES+1));
+                shadeColors(&mid, qtcPalette.progress);
+            }
+    }
 }
 
 static void qtcurve_style_init_from_rc(GtkStyle *style, GtkRcStyle *rc_style)
