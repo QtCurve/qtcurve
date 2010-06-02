@@ -1481,6 +1481,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_SHADE(shadeCheckRadio, false, false, &opts->customCheckRadioColor)
             CFG_READ_SHADE(sortedLv, true, false, &opts->customSortedLvColor)
             CFG_READ_SHADE(crColor,  true, false, &opts->customCrBgndColor)
+            CFG_READ_SHADE(progressColor, false, false, &opts->customProgressColor)
             CFG_READ_APPEARANCE(menubarAppearance, false, false)
             CFG_READ_APPEARANCE(menuitemAppearance, true, false)
             CFG_READ_APPEARANCE(toolbarAppearance, false, false)
@@ -2258,6 +2259,7 @@ static void defaultSettings(Options *opts)
     opts->colorMenubarMouseOver=true;
     opts->crButton=true;
     opts->crColor=SHADE_NONE;
+    opts->progressColor=SHADE_SELECTED;
     opts->smallRadio=true;
     opts->fillProgress=true;
     opts->comboSplitter=false;
@@ -2310,6 +2312,7 @@ static void defaultSettings(Options *opts)
     opts->customCheckRadioColor.setRgb(0, 0, 0);
     opts->customComboBtnColor.setRgb(0, 0, 0);
     opts->customMenuStripeColor.setRgb(0, 0, 0);
+    opts->customProgressColor.setRgb(0, 0, 0);
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
@@ -2337,6 +2340,7 @@ static void defaultSettings(Options *opts)
     opts->customCheckRadioColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
     opts->customComboBtnColor.red=opts->customCheckRadioColor.green=opts->customCheckRadioColor.blue=0;
     opts->customMenuStripeColor.red=opts->customMenuStripeColor.green=opts->customMenuStripeColor.blue=0;
+    opts->customProgressColor.red=opts->customProgressColor.green=opts->customProgressColor.blue=0;
 #endif
 
 #if !defined __cplusplus || defined CONFIG_DIALOG
@@ -2949,6 +2953,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(crHighlight)
         CFG_WRITE_ENTRY(crButton)
         CFG_WRITE_SHADE_ENTRY(crColor, customCrBgndColor)
+        CFG_WRITE_SHADE_ENTRY(progressColor, customProgressColor)
         CFG_WRITE_ENTRY(smallRadio)
         CFG_WRITE_ENTRY(fillProgress)
         CFG_WRITE_ENTRY(comboSplitter)

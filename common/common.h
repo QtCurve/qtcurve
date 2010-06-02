@@ -1088,7 +1088,8 @@ typedef struct
                      shadeCheckRadio,
                      comboBtn,
                      sortedLv,
-                     crColor;
+                     crColor,
+                     progressColor;
     EColor           progressGrooveColor;
     EEffect          buttonEffect;
     EScrollbar       scrollbarType;
@@ -1101,7 +1102,8 @@ typedef struct
                      customCheckRadioColor,
                      customComboBtnColor,
                      customSortedLvColor,
-                     customCrBgndColor;
+                     customCrBgndColor,
+                     customProgressColor;
     EShading         shading;
 #if defined __cplusplus
     EAlign           titlebarAlignment;

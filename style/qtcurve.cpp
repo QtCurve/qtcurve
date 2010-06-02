@@ -1071,6 +1071,7 @@ QtCurveStyle::QtCurveStyle()
               itsCheckRadioSelCols(0L),
               itsSortedLvColors(0L),
               itsOOMenuCols(0L),
+              itsProgressCols(0L),
               itsSaveMenuBarStatus(false),
               itsUsePixmapCache(false),
               itsIsPreview(false),
@@ -1321,7 +1322,7 @@ QtCurveStyle::QtCurveStyle()
                 itsCheckRadioSelCols=itsSliderCols;
             else if(SHADE_CUSTOM==opts.comboBtn && opts.customComboBtnColor==opts.customCrBgndColor)
                 itsCheckRadioSelCols=itsComboBtnCols;
-            else if(SHADE_CUSTOM==opts.sortedLv && opts.customComboBtnColor==opts.customSortedLvColor)
+            else if(SHADE_CUSTOM==opts.sortedLv && opts.customSortedLvColor==opts.customCrBgndColor)
                 itsCheckRadioSelCols=itsSortedLvColors;
             else
             {
@@ -1341,10 +1342,46 @@ QtCurveStyle::QtCurveStyle()
             {
                 if(!itsCheckRadioSelCols)
                     itsCheckRadioSelCols=new QColor [TOTAL_SHADES+1];
-                shadeColors(SHADE_BLEND_SELECTED==opts.sortedLv
-                                ? midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE])
-                                : opts.customSortedLvColor,
-                            itsCheckRadioSelCols);
+                shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsButtonCols[ORIGINAL_SHADE]), itsCheckRadioSelCols);
+            }
+    }
+
+    switch(opts.progressColor)
+    {
+        case SHADE_NONE:
+            itsProgressCols=itsBackgroundCols;
+            break;
+        default:
+            // Not set!
+            break;
+        case SHADE_CUSTOM:
+            if(SHADE_CUSTOM==opts.shadeSliders && opts.customSlidersColor==opts.customProgressColor)
+                itsProgressCols=itsSliderCols;
+            else if(SHADE_CUSTOM==opts.comboBtn && opts.customComboBtnColor==opts.customProgressColor)
+                itsProgressCols=itsComboBtnCols;
+            else if(SHADE_CUSTOM==opts.sortedLv && opts.customSortedLvColor==opts.customProgressColor)
+                itsProgressCols=itsSortedLvColors;
+            else if(SHADE_CUSTOM==opts.crColor && opts.customCrBgndColor==opts.customProgressColor)
+                itsProgressCols=itsCheckRadioSelCols;
+            else
+            {
+                if(!itsProgressCols)
+                    itsProgressCols=new QColor [TOTAL_SHADES+1];
+                shadeColors(opts.customProgressColor, itsProgressCols);
+            }
+            break;
+        case SHADE_BLEND_SELECTED:
+            if(SHADE_BLEND_SELECTED==opts.shadeSliders)
+                itsProgressCols=itsSliderCols;
+            else if(SHADE_BLEND_SELECTED==opts.comboBtn)
+                itsProgressCols=itsComboBtnCols;
+            else if(SHADE_BLEND_SELECTED==opts.sortedLv)
+                itsProgressCols=itsSortedLvColors;
+            else
+            {
+                if(!itsProgressCols)
+                    itsProgressCols=new QColor [TOTAL_SHADES+1];
+                shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsBackgroundCols[ORIGINAL_SHADE]), itsProgressCols);
             }
     }
 
@@ -1415,6 +1452,9 @@ QtCurveStyle::~QtCurveStyle()
         delete [] itsActiveMdiColors;
     if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
         delete [] itsMdiColors;
+    if(itsProgressCols && itsProgressCols!=itsHighlightCols && itsProgressCols!=itsBackgroundCols &&
+       itsProgressCols!=itsSliderCols && itsProgressCols!=itsComboBtnCols && itsProgressCols!=itsCheckRadioSelCols &&  itsProgressCols!=itsSortedLvColors)
+        delete [] itsProgressCols;
     if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
        itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors && 
        itsCheckRadioSelCols!=itsButtonCols && itsCheckRadioSelCols!=itsHighlightCols)
@@ -1559,7 +1599,10 @@ void QtCurveStyle::polish(QPalette &palette)
                                                          itsSliderCols!=itsCheckRadioSelCols && itsComboBtnCols!=itsCheckRadioSelCols &&
                                                          itsSortedLvColors!=itsCheckRadioSelCols) ||
                                              SHADE_DARKEN==opts.crColor) &&
-                     (newContrast || newButton));
+                     (newContrast || newButton)),
+         newProgressCols(itsProgressCols && SHADE_BLEND_SELECTED==opts.progressColor &&
+                         itsSliderCols!=itsProgressCols && itsComboBtnCols!=itsProgressCols &&
+                         itsSortedLvColors!=itsProgressCols && itsCheckRadioSelCols!=itsProgressCols && (newContrast || newButton));
 
     if(newGray)
     {
@@ -1644,6 +1687,9 @@ void QtCurveStyle::polish(QPalette &palette)
             shadeColors(shade(itsButtonCols[ORIGINAL_SHADE], LV_HEADER_DARK_FACTOR), itsCheckRadioSelCols);
     }
 
+    if(newProgressCols)
+        shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsBackgroundCols[ORIGINAL_SHADE]), itsProgressCols);
+    
     if(APP_OPENOFFICE==theThemedApp && opts.useHighlightForMenu && (newGray || newHighlight))
     {
         if(blendOOMenuHighlight(palette, itsHighlightCols[ORIGINAL_SHADE]))
@@ -11565,7 +11611,10 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     int          length(vertical ? rx.height() : rx.width());
     // KTorrent's progressbars seem to have state==State_None
     const QColor *use=option->state&State_Enabled || State_None==option->state || ECOLOR_BACKGROUND==opts.progressGrooveColor
-                    ? highlightColors(option) : itsBackgroundCols;
+                    ? itsProgressCols
+                        ? itsProgressCols
+                        : highlightColors(option)
+                    : itsBackgroundCols;
 
     drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,
                    WIDGET_PROGRESSBAR);

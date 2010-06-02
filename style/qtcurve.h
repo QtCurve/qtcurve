@@ -275,6 +275,7 @@ class QtCurveStyle : public QCommonStyle
                                        *itsCheckRadioSelCols,
                                        *itsSortedLvColors,
                                        *itsOOMenuCols,
+                                       *itsProgressCols,
                                        itsButtonCols[TOTAL_SHADES+1],
                                        itsLighterPopupMenuBgndCol,
                                        itsCheckRadioCol;
