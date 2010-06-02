@@ -407,7 +407,8 @@ enum ShadeWidget
     SW_MENU_STRIPE,
     SW_COMBO,
     SW_LV_HEADER,
-    SW_CR_BGND
+    SW_CR_BGND,
+    SW_PROGRESS
 };
 
 static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
@@ -415,6 +416,7 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
     switch(sw)
     {
         case SW_MENUBAR:
+        case SW_PROGRESS:
             combo->insertItem(SHADE_NONE, i18n("Background"));
             break;
         case SW_COMBO:
@@ -436,7 +438,8 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
     if(SW_CHECK_RADIO!=sw) // For check/radio, we dont blend, and dont allow darken
     {
         combo->insertItem(SHADE_BLEND_SELECTED, i18n("Blended selected background"));
-        combo->insertItem(SHADE_DARKEN, SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken"));
+        if(SW_PROGRESS!=sw)
+            combo->insertItem(SHADE_DARKEN, SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken"));
     }
     if(SW_MENUBAR==sw)
         combo->insertItem(SHADE_WINDOW_BORDER, i18n("Titlebar border"));
@@ -683,6 +686,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertShadeEntries(comboBtn, SW_COMBO);
     insertShadeEntries(sortedLv, SW_LV_HEADER);
     insertShadeEntries(crColor, SW_CR_BGND);
+    insertShadeEntries(progressColor, SW_PROGRESS);
     insertAppearanceEntries(appearance);
     insertAppearanceEntries(menubarAppearance);
     insertAppearanceEntries(toolbarAppearance);
@@ -825,8 +829,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(toolbarTabs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(centerTabText, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(shadePopupMenu, SIGNAL(toggled(bool)), SLOT(shadePopupMenuChanged()));
     connect(popupBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(progressColor, SIGNAL(currentIndexChanged(int)), SLOT(progressColorChanged()));
+    connect(customProgressColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(progressGrooveAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(grooveAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sunkenAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -861,7 +868,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(scrollbarType, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(shading, SIGNAL(currentIndexChanged(int)), SLOT(shadingChanged()));
     connect(gtkScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(squareScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(highlightScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(etchEntry, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(flatSbarButtons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -878,6 +884,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dwtIconColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtFontAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtTextAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtEffectAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -900,7 +907,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(menuIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(stdBtnSizes, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(forceAlternateLvCols, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(squareLvSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarAlignment, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarEffect, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarIcon, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -908,12 +914,18 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(coloredTbarMo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderProgress, SIGNAL(toggled(bool)), SLOT(borderProgressChanged()));
-    connect(squareProgress, SIGNAL(toggled(bool)), SLOT(squareProgressChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(fillProgressChanged()));
     connect(squareEntry, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-
+    connect(squareProgress, SIGNAL(toggled(bool)), SLOT(squareProgressChanged()));
+    connect(squareLvSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squareScrollViews, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squareFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squareTabFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squareSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squareScrollbarSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(titlebarButtons_customIcon, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_noFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_round, SIGNAL(toggled(bool)), SLOT(titlebarButtonsRoundChanged()));
     connect(titlebarButtons_hoverFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -933,6 +945,24 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtons_colorMenu, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_colorShade, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_colorAllDesktops, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorCloseIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorMinIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorMaxIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorKeepAboveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorKeepBelowIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorHelpIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorMenuIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorShadeIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorAllDesktopsIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorCloseInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorMinInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorMaxInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorKeepAboveInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorKeepBelowInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorHelpInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorMenuInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorShadeInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
+    connect(titlebarButtons_colorAllDesktopsInactiveIcon, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(titlebarButtons_hideOnInactiveWindow, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 
     connect(noBgndGradientApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
@@ -1097,6 +1127,17 @@ void QtCurveConfig::menuStripeChanged()
 {
     customMenuStripeColor->setEnabled(SHADE_CUSTOM==menuStripe->currentIndex());
     menuStripeAppearance->setEnabled(SHADE_NONE!=menuStripe->currentIndex());
+    updateChanged();
+}
+
+void QtCurveConfig::shadePopupMenuChanged()
+{
+    lighterPopupMenuBgnd->setEnabled(!shadePopupMenu->isChecked());
+}
+
+void QtCurveConfig::progressColorChanged()
+{
+    customProgressColor->setEnabled(SHADE_CUSTOM==progressColor->currentIndex());
     updateChanged();
 }
 
@@ -2182,6 +2223,8 @@ int QtCurveConfig::getTitleBarButtonFlags()
         titlebarButtons+=TITLEBAR_BUTTON_STD_COLOR;
     if(titlebarButtons_custom->isChecked())
         titlebarButtons+=TITLEBAR_BUTTON_COLOR;
+    if(titlebarButtons_customIcon->isChecked())
+        titlebarButtons+=TITLEBAR_BUTTON_ICON_COLOR;
     if(titlebarButtons_noFrame->isChecked())
         titlebarButtons+=TITLEBAR_BUTTON_NO_FRAME;
     if(titlebarButtons_round->isChecked())
@@ -2289,8 +2332,11 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.toolbarTabs=toolbarTabs->isChecked();
     opts.centerTabText=centerTabText->isChecked();
     opts.borderMenuitems=borderMenuitems->isChecked();
+    opts.shadePopupMenu=shadePopupMenu->isChecked();
     opts.popupBorder=popupBorder->isChecked();
     opts.progressAppearance=(EAppearance)progressAppearance->currentIndex();
+    opts.progressColor=(EShade)progressColor->currentIndex();
+    opts.customProgressColor=customProgressColor->color();
     opts.progressGrooveAppearance=(EAppearance)progressGrooveAppearance->currentIndex();
     opts.grooveAppearance=(EAppearance)grooveAppearance->currentIndex();
     opts.sunkenAppearance=(EAppearance)sunkenAppearance->currentIndex();
@@ -2373,11 +2419,30 @@ void QtCurveConfig::setOptions(Options &opts)
         opts.titlebarButtonColors[TITLEBAR_MENU]=titlebarButtons_colorMenu->color();
         opts.titlebarButtonColors[TITLEBAR_SHADE]=titlebarButtons_colorShade->color();
         opts.titlebarButtonColors[TITLEBAR_ALL_DESKTOPS]=titlebarButtons_colorAllDesktops->color();
-        /*
+
         if(opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
         {
+            int offset=NUM_TITLEBAR_BUTTONS;
+            opts.titlebarButtonColors[TITLEBAR_CLOSE+offset]=titlebarButtons_colorCloseIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_MIN+offset]=titlebarButtons_colorMinIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_MAX+offset]=titlebarButtons_colorMaxIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_KEEP_ABOVE+offset]=titlebarButtons_colorKeepAboveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_KEEP_BELOW+offset]=titlebarButtons_colorKeepBelowIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_HELP+offset]=titlebarButtons_colorHelpIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_MENU+offset]=titlebarButtons_colorMenuIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_SHADE+offset]=titlebarButtons_colorShadeIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_ALL_DESKTOPS+offset]=titlebarButtons_colorAllDesktopsIcon->color();
+            offset+=NUM_TITLEBAR_BUTTONS;
+            opts.titlebarButtonColors[TITLEBAR_CLOSE+offset]=titlebarButtons_colorCloseInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_MIN+offset]=titlebarButtons_colorMinInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_MAX+offset]=titlebarButtons_colorMaxInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_KEEP_ABOVE+offset]=titlebarButtons_colorKeepAboveInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_KEEP_BELOW+offset]=titlebarButtons_colorKeepBelowInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_HELP+offset]=titlebarButtons_colorHelpInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_MENU+offset]=titlebarButtons_colorMenuInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_SHADE+offset]=titlebarButtons_colorShadeInactiveIcon->color();
+            opts.titlebarButtonColors[TITLEBAR_ALL_DESKTOPS+offset]=titlebarButtons_colorAllDesktopsInactiveIcon->color();
         }
-        */
     }
 
     opts.noBgndGradientApps=toSet(noBgndGradientApps->text());
@@ -2389,9 +2454,9 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.noMenuStripeApps=toSet(noMenuStripeApps->text());
 }
 
-static QColor getColor(const TBCols &cols, int btn, const QColor &def=Qt::black)
+static QColor getColor(const TBCols &cols, int btn, int offset=0, const QColor &def=Qt::black)
 {
-    TBCols::const_iterator it=cols.find(btn);
+    TBCols::const_iterator it=cols.find(btn+(NUM_TITLEBAR_BUTTONS*offset));
 
     return cols.end()==it ? def : (*it).second;
 }
@@ -2499,8 +2564,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     centerTabText->setChecked(opts.centerTabText);
     centerTabText_false->setChecked(!opts.centerTabText);
     borderMenuitems->setChecked(opts.borderMenuitems);
+    shadePopupMenu->setChecked(opts.shadePopupMenu);
     popupBorder->setChecked(opts.popupBorder);
     progressAppearance->setCurrentIndex(opts.progressAppearance);
+    progressColor->setCurrentIndex(opts.progressColor);
+    customProgressColor->setColor(opts.customProgressColor);
     progressGrooveAppearance->setCurrentIndex(opts.progressGrooveAppearance);
     grooveAppearance->setCurrentIndex(opts.grooveAppearance);
     sunkenAppearance->setCurrentIndex(opts.sunkenAppearance);
@@ -2550,6 +2618,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&DWT_BUTTONS_AS_PER_TITLEBAR);
     dwtColAsPerTitleBar->setChecked(opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR);
+    dwtIconColAsPerTitleBar->setChecked(opts.dwtSettings&DWT_ICON_COLOR_AS_PER_TITLEBAR);
     dwtFontAsPerTitleBar->setChecked(opts.dwtSettings&DWT_FONT_AS_PER_TITLEBAR);
     dwtTextAsPerTitleBar->setChecked(opts.dwtSettings&DWT_TEXT_ALIGN_AS_PER_TITLEBAR);
     dwtEffectAsPerTitleBar->setChecked(opts.dwtSettings&DWT_EFFECT_AS_PER_TITLEBAR);
@@ -2578,6 +2647,8 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     squareProgress->setChecked(opts.square&SQUARE_PROGRESS);
     squareFrame->setChecked(opts.square&SQUARE_FRAME);
     squareTabFrame->setChecked(opts.square&SQUARE_TAB_FRAME);
+    squareSlider->setChecked(opts.square&SQUARE_SLIDER);
+    squareScrollbarSlider->setChecked(opts.square&SQUARE_SB_SLIDER);
 
     if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
     {
@@ -2606,8 +2677,56 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
         titlebarButtons_colorAllDesktops->setColor(col);
     }
 
+    if(opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
+    {
+        titlebarButtons_colorCloseIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE, 1));
+        titlebarButtons_colorMinIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_MIN, 1));
+        titlebarButtons_colorMaxIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_MAX, 1));
+        titlebarButtons_colorKeepAboveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_ABOVE, 1));
+        titlebarButtons_colorKeepBelowIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_BELOW, 1));
+        titlebarButtons_colorHelpIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_HELP, 1));
+        titlebarButtons_colorMenuIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_MENU, 1));
+        titlebarButtons_colorShadeIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_SHADE, 1));
+        titlebarButtons_colorAllDesktopsIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_ALL_DESKTOPS, 1));
+
+        titlebarButtons_colorCloseInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE, 2));
+        titlebarButtons_colorMinInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_MIN, 2));
+        titlebarButtons_colorMaxInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_MAX, 2));
+        titlebarButtons_colorKeepAboveInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_ABOVE, 2));
+        titlebarButtons_colorKeepBelowInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_BELOW, 2));
+        titlebarButtons_colorHelpInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_HELP, 2));
+        titlebarButtons_colorMenuInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_MENU, 2));
+        titlebarButtons_colorShadeInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_SHADE, 2));
+        titlebarButtons_colorAllDesktopsInactiveIcon->setColor(getColor(opts.titlebarButtonColors, TITLEBAR_ALL_DESKTOPS, 2));
+    }
+    else
+    {
+        QColor col=KGlobalSettings::activeTextColor();
+        titlebarButtons_colorCloseIcon->setColor(col);
+        titlebarButtons_colorMinIcon->setColor(col);
+        titlebarButtons_colorMaxIcon->setColor(col);
+        titlebarButtons_colorKeepAboveIcon->setColor(col);
+        titlebarButtons_colorKeepBelowIcon->setColor(col);
+        titlebarButtons_colorHelpIcon->setColor(col);
+        titlebarButtons_colorMenuIcon->setColor(col);
+        titlebarButtons_colorShadeIcon->setColor(col);
+        titlebarButtons_colorAllDesktopsIcon->setColor(col);
+
+        col=KGlobalSettings::inactiveTextColor();
+        titlebarButtons_colorCloseInactiveIcon->setColor(col);
+        titlebarButtons_colorMinInactiveIcon->setColor(col);
+        titlebarButtons_colorMaxInactiveIcon->setColor(col);
+        titlebarButtons_colorKeepAboveInactiveIcon->setColor(col);
+        titlebarButtons_colorKeepBelowInactiveIcon->setColor(col);
+        titlebarButtons_colorHelpInactiveIcon->setColor(col);
+        titlebarButtons_colorMenuInactiveIcon->setColor(col);
+        titlebarButtons_colorShadeInactiveIcon->setColor(col);
+        titlebarButtons_colorAllDesktopsInactiveIcon->setColor(col);
+    }
+    
     titlebarButtons_button->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR);
     titlebarButtons_custom->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR);
+    titlebarButtons_customIcon->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR);
     titlebarButtons_noFrame->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_NO_FRAME);
     titlebarButtons_round->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_ROUND);
     titlebarButtons_hoverFrame->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_HOVER_FRAME);
@@ -2639,6 +2758,8 @@ int QtCurveConfig::getDwtSettingsFlags()
         dwt|=DWT_BUTTONS_AS_PER_TITLEBAR;
     if(dwtColAsPerTitleBar->isChecked())
         dwt|=DWT_COLOR_AS_PER_TITLEBAR;
+    if(dwtIconColAsPerTitleBar->isChecked())
+        dwt|=DWT_ICON_COLOR_AS_PER_TITLEBAR;
     if(dwtFontAsPerTitleBar->isChecked())
         dwt|=DWT_FONT_AS_PER_TITLEBAR;
     if(dwtTextAsPerTitleBar->isChecked())
@@ -2666,21 +2787,44 @@ int QtCurveConfig::getSquareFlags()
         square|=SQUARE_FRAME;
     if(squareTabFrame->isChecked())
         square|=SQUARE_TAB_FRAME;
+    if(squareSlider->isChecked())
+        square|=SQUARE_SLIDER;
+    if(squareScrollbarSlider->isChecked())
+        square|=SQUARE_SB_SLIDER;
     return square;
 }
 
 bool QtCurveConfig::diffTitleBarButtonColors(const Options &opts)
 {
-    return titlebarButtons_custom->isChecked() &&
-           ( titlebarButtons_colorClose->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE) ||
-             titlebarButtons_colorMin->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MIN) ||
-             titlebarButtons_colorMax->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MAX) ||
-             titlebarButtons_colorKeepAbove->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_ABOVE) ||
-             titlebarButtons_colorKeepBelow->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_BELOW) ||
-             titlebarButtons_colorHelp->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_HELP) ||
-             titlebarButtons_colorMenu->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MENU) ||
-             titlebarButtons_colorShade->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_SHADE) ||
-             titlebarButtons_colorAllDesktops->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_ALL_DESKTOPS));
+    return (titlebarButtons_custom->isChecked() &&
+            ( titlebarButtons_colorClose->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE) ||
+              titlebarButtons_colorMin->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MIN) ||
+              titlebarButtons_colorMax->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MAX) ||
+              titlebarButtons_colorKeepAbove->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_ABOVE) ||
+              titlebarButtons_colorKeepBelow->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_BELOW) ||
+              titlebarButtons_colorHelp->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_HELP) ||
+              titlebarButtons_colorMenu->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MENU) ||
+              titlebarButtons_colorShade->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_SHADE) ||
+              titlebarButtons_colorAllDesktops->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_ALL_DESKTOPS))) ||
+            (titlebarButtons_customIcon->isChecked() &&
+            ( titlebarButtons_colorCloseIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE, 1) ||
+              titlebarButtons_colorMinIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MIN, 1) ||
+              titlebarButtons_colorMaxIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MAX, 1) ||
+              titlebarButtons_colorKeepAboveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_ABOVE, 1) ||
+              titlebarButtons_colorKeepBelowIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_BELOW, 1) ||
+              titlebarButtons_colorHelpIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_HELP, 1) ||
+              titlebarButtons_colorMenuIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MENU, 1) ||
+              titlebarButtons_colorShadeIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_SHADE, 1) ||
+              titlebarButtons_colorAllDesktopsIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_ALL_DESKTOPS, 1) ||
+              titlebarButtons_colorCloseInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_CLOSE, 2) ||
+              titlebarButtons_colorMinInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MIN, 2) ||
+              titlebarButtons_colorMaxInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MAX, 2) ||
+              titlebarButtons_colorKeepAboveInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_ABOVE, 2) ||
+              titlebarButtons_colorKeepBelowInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_KEEP_BELOW, 2) ||
+              titlebarButtons_colorHelpInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_HELP, 2) ||
+              titlebarButtons_colorMenuInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_MENU, 2) ||
+              titlebarButtons_colorShadeInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_SHADE, 2) ||
+              titlebarButtons_colorAllDesktopsInactiveIcon->color()!=getColor(opts.titlebarButtonColors, TITLEBAR_ALL_DESKTOPS, 2)));
 }
 
 bool QtCurveConfig::settingsChanged(const Options &opts)
@@ -2741,6 +2885,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          toolbarTabs->isChecked()!=opts.toolbarTabs ||
          centerTabText->isChecked()!=opts.centerTabText ||
          borderMenuitems->isChecked()!=opts.borderMenuitems ||
+         shadePopupMenu->isChecked()!=opts.shadePopupMenu ||
          popupBorder->isChecked()!=opts.popupBorder ||
          defBtnIndicator->currentIndex()!=(int)opts.defBtnIndicator ||
          sliderThumbs->currentIndex()!=(int)opts.sliderThumbs ||
@@ -2757,6 +2902,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          tabAppearance->currentIndex()!=opts.tabAppearance ||
          activeTabAppearance->currentIndex()!=opts.activeTabAppearance ||
          progressAppearance->currentIndex()!=opts.progressAppearance ||
+         progressColor->currentIndex()!=opts.progressColor ||
          progressGrooveAppearance->currentIndex()!=opts.progressGrooveAppearance ||
          grooveAppearance->currentIndex()!=opts.grooveAppearance ||
          sunkenAppearance->currentIndex()!=opts.sunkenAppearance ||
@@ -2841,6 +2987,8 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
                customSortedLvColor->color()!=opts.customSortedLvColor) ||
          (SHADE_CUSTOM==opts.crColor &&
                customCrBgndColor->color()!=opts.customCrBgndColor) ||
+         (SHADE_CUSTOM==opts.progressColor &&
+               customProgressColor->color()!=opts.customProgressColor) ||
 
          customGradient!=opts.customGradient ||
 

@@ -1,9 +1,11 @@
 1.5.0
 -----
 1. Add option to set progressbar colour.
-2. Add option to use menubar colours for popup menus.
-3. Fixed background of Gtk2 style combo menus.
-4. Add option to specify colour of titlebar button icons.
+2. Add options to have squared sliders and/or scrollbar sliders even when
+   general setting set to round.
+3. Add option to use menubar colours for popup menus.
+4. Fixed background of Gtk2 style combo menus.
+5. Add option to specify colour of titlebar button icons.
 
 1.4.3
 -----

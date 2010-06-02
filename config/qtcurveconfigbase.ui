@@ -451,6 +451,20 @@
          </property>
         </widget>
        </item>
+       <item row="7" column="1">
+        <widget class="QCheckBox" name="squareSlider">
+         <property name="text">
+          <string>Sliders</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QCheckBox" name="squareScrollbarSlider">
+         <property name="text">
+          <string>Scrollbar sliders</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_18">
@@ -898,14 +912,14 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="3" column="1">
         <widget class="QComboBox" name="stripedProgress">
          <property name="whatsThis">
           <string>Defines the stripe type to be used for the progress part of a progressbar.</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="4" column="1">
         <widget class="QCheckBox" name="animatedProgress">
          <property name="whatsThis">
           <string>Determines if the sripes on progressbars should be aninmated, or not.</string>
@@ -915,14 +929,14 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="glowProgress">
          <property name="whatsThis">
           <string>Add a white 'glow' to progressbars.</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="fillProgress">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -938,28 +952,28 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_24">
          <property name="text">
           <string>Groove:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="7" column="1">
         <widget class="QComboBox" name="progressGrooveAppearance">
          <property name="whatsThis">
           <string>Defines the gradient to be used for the groove part of a progressbar.</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="8" column="1">
         <widget class="QComboBox" name="progressGrooveColor">
          <property name="whatsThis">
           <string>Defines the color to be used for the groove part of a progressbar.</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="borderProgress">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -975,7 +989,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="10" column="0">
         <widget class="QLabel" name="label_85">
          <property name="text">
           <string>Text:</string>
@@ -991,7 +1005,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="10" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_12">
          <property name="spacing">
           <number>0</number>
@@ -1017,6 +1031,12 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="progressColor"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="KColorButton" name="customProgressColor"/>
        </item>
       </layout>
      </widget>
@@ -2091,11 +2111,11 @@
           <string>If enabled, the titlebar buttons will be drawn using the cusom colors defined in the next page.</string>
          </property>
          <property name="text">
-          <string>Use custom colors</string>
+          <string>Use custom background colors</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorOnMouseOver">
          <property name="whatsThis">
           <string>If enabled, the colors will only be used when the button is under the mouse.</string>
@@ -2105,7 +2125,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QCheckBox" name="titlebarButtons_sunkenBackground">
          <property name="whatsThis">
           <string>If enabled, a sunken background is drawn behind the buttons.</string>
@@ -2115,7 +2135,7 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QCheckBox" name="titlebarButtons_arrowMinMax">
          <property name="whatsThis">
           <string>If enabled, arrows are drawn as the icons for min and max buttons.</string>
@@ -2125,7 +2145,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QCheckBox" name="titlebarButtons_hideOnInactiveWindow">
          <property name="whatsThis">
           <string>If enabled, buttons on inactive windows are only drawn when the mouse hovers over them.</string>
@@ -2135,14 +2155,14 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_57">
          <property name="text">
           <string>Custom colors:</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="13" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorSymbolsOnly">
          <property name="whatsThis">
           <string>If enabled, custom colors will be applied to the symbols, otherwise they will be applied to the button background.</string>
@@ -2152,7 +2172,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="14" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorInactive">
          <property name="whatsThis">
           <string>If enabled, custom colors will be applied to active and inactive windows, otherwise they will only be applied to active windows.</string>
@@ -2172,189 +2192,454 @@
          </property>
         </widget>
        </item>
+       <item row="8" column="1">
+        <widget class="QCheckBox" name="titlebarButtons_customIcon">
+         <property name="text">
+          <string>Use custom icon colors</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_20">
-      <layout class="QFormLayout" name="formLayout_11">
+      <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_34">
-         <property name="text">
-          <string>Close:</string>
-         </property>
-        </widget>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_94">
+           <property name="text">
+            <string>Background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_95">
+           <property name="text">
+            <string>Active Icon</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLabel" name="label_96">
+           <property name="text">
+            <string>InactiveIcon</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorClose">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Close' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorMin">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Minimise' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorMax">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Maximise', and 'Restore, buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorHelp">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Help' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorMenu">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Menu' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorShade">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Shade', and 'Un-Shade', buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorAllDesktops">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'On All Desktop' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorKeepAbove">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Keep Above' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="KColorButton" name="titlebarButtons_colorKeepBelow">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>Sets the custom color for 'Keep Below' buttons.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_34">
+           <property name="text">
+            <string>Close:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_35">
+           <property name="text">
+            <string>Minimise:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_36">
+           <property name="text">
+            <string>Maximise:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_37">
+           <property name="text">
+            <string>Help:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_38">
+           <property name="text">
+            <string>Menu:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_39">
+           <property name="text">
+            <string>Shade:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_40">
+           <property name="text">
+            <string>All Desktops:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_41">
+           <property name="text">
+            <string>Keep Above:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_42">
+           <property name="text">
+            <string>Keep Below:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorCloseIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorMinIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorMaxIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorHelpIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorMenuIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorShadeIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorAllDesktopsIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorKeepAboveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="2">
+          <widget class="KColorButton" name="titlebarButtons_colorKeepBelowIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorCloseInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorMinInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorMaxInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorHelpInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorMenuInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorShadeInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorAllDesktopsInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorKeepAboveInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="3">
+          <widget class="KColorButton" name="titlebarButtons_colorKeepBelowInactiveIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="0" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorClose">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Close' buttons.</string>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>239</width>
+           <height>20</height>
+          </size>
          </property>
-        </widget>
+        </spacer>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_35">
-         <property name="text">
-          <string>Minimise:</string>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorMin">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>188</height>
+          </size>
          </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Minimise' buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_36">
-         <property name="text">
-          <string>Maximise:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorMax">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Maximise', and 'Restore, buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_37">
-         <property name="text">
-          <string>Help:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorHelp">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Help' buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_38">
-         <property name="text">
-          <string>Menu:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorMenu">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Menu' buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_39">
-         <property name="text">
-          <string>Shade:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorShade">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Shade', and 'Un-Shade', buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_40">
-         <property name="text">
-          <string>All Desktops:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorAllDesktops">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'On All Desktop' buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_41">
-         <property name="text">
-          <string>Keep Above:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorKeepAbove">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Keep Above' buttons.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_42">
-         <property name="text">
-          <string>Keep Below:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="KColorButton" name="titlebarButtons_colorKeepBelow">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis">
-          <string>Sets the custom color for 'Keep Below' buttons.</string>
-         </property>
-        </widget>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -2737,6 +3022,20 @@
          </property>
         </widget>
        </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_97">
+         <property name="text">
+          <string>Use menubar colour settings:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <widget class="QCheckBox" name="shadePopupMenu">
+         <property name="text">
+          <string>Enabled</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_22">
@@ -2942,11 +3241,11 @@
           <string>If enabled, the background of dock window titlebars will have use the color settings of standard windows, otherwise they will use the standard background color.</string>
          </property>
          <property name="text">
-          <string>Colors</string>
+          <string>Background colors</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QCheckBox" name="dwtFontAsPerTitleBar">
          <property name="whatsThis">
           <string>If enabled, the font of dock window titlebars will have use the font settings of standard windows, otherwise they will use the standard font.</string>
@@ -2956,7 +3255,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="dwtTextAsPerTitleBar">
          <property name="whatsThis">
           <string>If enabled, the text of dock window titlebars will have use the text alignment settings of standard windows, otherwise they will be left aligned.</string>
@@ -2966,13 +3265,20 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QCheckBox" name="dwtEffectAsPerTitleBar">
          <property name="whatsThis">
           <string>If enabled, the text of dock window titlebars will have use the text effect settings of standard windows, otherwise they will be drawn with no effect.</string>
          </property>
          <property name="text">
           <string>Text effect</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="dwtIconColAsPerTitleBar">
+         <property name="text">
+          <string>Icon colors</string>
          </property>
         </widget>
        </item>
@@ -3684,6 +3990,8 @@
   <tabstop>squareLvSelection</tabstop>
   <tabstop>squareTabFrame</tabstop>
   <tabstop>squareFrame</tabstop>
+  <tabstop>squareSlider</tabstop>
+  <tabstop>squareScrollbarSlider</tabstop>
   <tabstop>framelessGroupBoxes</tabstop>
   <tabstop>groupBoxLine</tabstop>
   <tabstop>comboBtn</tabstop>
@@ -3712,6 +4020,8 @@
   <tabstop>sbarBgndAppearance</tabstop>
   <tabstop>sliderThumbs</tabstop>
   <tabstop>progressAppearance</tabstop>
+  <tabstop>progressColor</tabstop>
+  <tabstop>customProgressColor</tabstop>
   <tabstop>stripedProgress</tabstop>
   <tabstop>animatedProgress</tabstop>
   <tabstop>glowProgress</tabstop>
@@ -3780,6 +4090,7 @@
   <tabstop>titlebarButtons_hoverSymbolFull</tabstop>
   <tabstop>titlebarButtons_button</tabstop>
   <tabstop>titlebarButtons_custom</tabstop>
+  <tabstop>titlebarButtons_customIcon</tabstop>
   <tabstop>titlebarButtons_colorOnMouseOver</tabstop>
   <tabstop>titlebarButtons_sunkenBackground</tabstop>
   <tabstop>titlebarButtons_arrowMinMax</tabstop>
@@ -3795,6 +4106,24 @@
   <tabstop>titlebarButtons_colorAllDesktops</tabstop>
   <tabstop>titlebarButtons_colorKeepAbove</tabstop>
   <tabstop>titlebarButtons_colorKeepBelow</tabstop>
+  <tabstop>titlebarButtons_colorCloseIcon</tabstop>
+  <tabstop>titlebarButtons_colorMinIcon</tabstop>
+  <tabstop>titlebarButtons_colorMaxIcon</tabstop>
+  <tabstop>titlebarButtons_colorHelpIcon</tabstop>
+  <tabstop>titlebarButtons_colorMenuIcon</tabstop>
+  <tabstop>titlebarButtons_colorShadeIcon</tabstop>
+  <tabstop>titlebarButtons_colorAllDesktopsIcon</tabstop>
+  <tabstop>titlebarButtons_colorKeepAboveIcon</tabstop>
+  <tabstop>titlebarButtons_colorKeepBelowIcon</tabstop>
+  <tabstop>titlebarButtons_colorCloseInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorMinInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorMaxInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorHelpInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorMenuInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorShadeInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorAllDesktopsInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorKeepAboveInactiveIcon</tabstop>
+  <tabstop>titlebarButtons_colorKeepBelowInactiveIcon</tabstop>
   <tabstop>menubarAppearance</tabstop>
   <tabstop>shadeMenubars</tabstop>
   <tabstop>customMenubarsColor</tabstop>
@@ -3810,6 +4139,7 @@
   <tabstop>menubarHiding_kwin</tabstop>
   <tabstop>xbar</tabstop>
   <tabstop>borderMenuitems</tabstop>
+  <tabstop>shadePopupMenu</tabstop>
   <tabstop>useHighlightForMenu</tabstop>
   <tabstop>thinnerMenuItems</tabstop>
   <tabstop>menuBgndAppearance</tabstop>
@@ -3832,6 +4162,7 @@
   <tabstop>dwtRoundTopOnly</tabstop>
   <tabstop>dwtBtnAsPerTitleBar</tabstop>
   <tabstop>dwtColAsPerTitleBar</tabstop>
+  <tabstop>dwtIconColAsPerTitleBar</tabstop>
   <tabstop>dwtFontAsPerTitleBar</tabstop>
   <tabstop>dwtTextAsPerTitleBar</tabstop>
   <tabstop>dwtEffectAsPerTitleBar</tabstop>
