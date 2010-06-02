@@ -200,6 +200,7 @@ class QtCurveStyle : public QCommonStyle
     void colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int round) const;
     void shadeColors(const QColor &base, QColor *vals) const;
     const QColor * buttonColors(const QStyleOption *option) const;
+    QColor         titlebarIconColor(const QStyleOption *option) const;
     const QColor * checkRadioColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;

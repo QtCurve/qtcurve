@@ -1368,7 +1368,7 @@ QtCurveStyle::QtCurveStyle()
             itsCheckRadioCol=opts.customCheckRadioColor;
     }
 
-    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR && NUM_TITLEBAR_BUTTONS==opts.titlebarButtonColors.size())
+    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR && opts.titlebarButtonColors.size()>=NUM_TITLEBAR_BUTTONS)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
         {
             QColor *cols=new QColor [TOTAL_SHADES+1];
@@ -3154,7 +3154,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case QtC_TitleBarIcon:
             return opts.titlebarIcon;
         case QtC_TitleBarIconColor:
-            return buttonColors(option)[ORIGINAL_SHADE].rgb();
+            return titlebarIconColor(option).rgb();
         case QtC_TitleBarBorder:
             return opts.titlebarBorder;
         case QtC_TitleBarEffect:
@@ -11247,16 +11247,20 @@ void QtCurveStyle::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *title
         rect.adjust(adjust, adjust, -adjust, -adjust);
 
         bool sunken((titleBar->activeSubControls&sc) && (titleBar->state&State_Sunken)),
-             colored=coloredMdiButtons(titleBar->state&State_Active, hover),
+             colored(coloredMdiButtons(titleBar->state&State_Active, hover)),
              useBtnCols(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR &&
                          (hover ||
                           !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_MOUSE_OVER) ||
                           opts.titlebarButtons&TITLEBAR_BUTTON_COLOR));
         const QColor *buttonColors=colored && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL)
                                     ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols);
-        const QColor &icnColor=colored && opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL
-                        ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
-                        : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
+        const QColor &icnColor=opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR
+                                ? opts.titlebarButtonColors[btn+(NUM_TITLEBAR_BUTTONS*(titleBar->state&State_Active ? 1 : 2))]
+                                : colored && opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL
+                                    ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
+                                    : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) && (hover || sunken)
+                                        ? CLOSE_COLOR
+                                        : iconColor);
 
         bool drewFrame=drawMdiButton(p, rect, hover, sunken, buttonColors);
         drawMdiIcon(p, icnColor, (drewFrame ? buttonColors : bgndCols)[ORIGINAL_SHADE],
@@ -11269,16 +11273,20 @@ void QtCurveStyle::drawDwtControl(QPainter *p, const QFlags<State> &state, const
 {
     bool    sunken(state&State_Sunken),
             hover(state&State_MouseOver),
-            colored=coloredMdiButtons(state&State_Active, hover),
+            colored(coloredMdiButtons(state&State_Active, hover)),
             useBtnCols(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR &&
                         (hover ||
                         !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_MOUSE_OVER) ||
                         opts.titlebarButtons&TITLEBAR_BUTTON_COLOR));
     const QColor *buttonColors=colored && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL)
                                 ? itsTitleBarButtonsCols[btn] : (useBtnCols ? btnCols : bgndCols);
-    const QColor &icnColor=colored && opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL
-                    ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
-                    : (TITLEBAR_CLOSE==btn && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) && (hover || sunken) ? CLOSE_COLOR : iconColor);
+    const QColor &icnColor=opts.dwtSettings&DWT_ICON_COLOR_AS_PER_TITLEBAR && opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR
+                            ? opts.titlebarButtonColors[btn+(NUM_TITLEBAR_BUTTONS/**(titleBar->state&State_Active ? 1 : 2)*/)]
+                            : colored && opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL
+                                ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
+                                : (TITLEBAR_CLOSE==btn && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) && (hover || sunken)
+                                    ? CLOSE_COLOR
+                                    : iconColor);
 
     bool drewFrame=drawMdiButton(p, rect, hover, sunken, buttonColors);
     drawMdiIcon(p, icnColor, (drewFrame ? buttonColors : bgndCols)[ORIGINAL_SHADE], rect, hover, sunken, icon, false, drewFrame);
@@ -12178,11 +12186,6 @@ void QtCurveStyle::shadeColors(const QColor &base, QColor *vals) const
 
 const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
 {
-    if(option && option->version>=TBAR_VERSION_HACK &&
-       option->version<TBAR_VERSION_HACK+NUM_TITLEBAR_BUTTONS &&
-       coloredMdiButtons(option->state&State_Active, option->state&(State_MouseOver|State_Sunken)))
-        return itsTitleBarButtonsCols[option->version-TBAR_VERSION_HACK];
-
     if(option && option->palette.button()!=itsButtonCols[ORIGINAL_SHADE])
     {
         shadeColors(option->palette.button().color(), itsColoredButtonCols);
@@ -12190,6 +12193,20 @@ const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
     }
 
     return itsButtonCols;
+}
+
+QColor QtCurveStyle::titlebarIconColor(const QStyleOption *option) const
+{
+    if(option && option->version>=TBAR_VERSION_HACK)
+    {
+        if(opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR && option->version<TBAR_VERSION_HACK+(NUM_TITLEBAR_BUTTONS*3))
+            return opts.titlebarButtonColors[option->version-TBAR_VERSION_HACK];
+        if(option->version<TBAR_VERSION_HACK+NUM_TITLEBAR_BUTTONS &&
+           coloredMdiButtons(option->state&State_Active, option->state&(State_MouseOver|State_Sunken)))
+            return itsTitleBarButtonsCols[option->version-TBAR_VERSION_HACK][ORIGINAL_SHADE];
+    }
+
+    return buttonColors(option)[ORIGINAL_SHADE];
 }
 
 const QColor * QtCurveStyle::checkRadioColors(const QStyleOption *option) const

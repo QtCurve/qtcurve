@@ -445,7 +445,8 @@ typedef enum
     DWT_FONT_AS_PER_TITLEBAR       = 0x0004,
     DWT_TEXT_ALIGN_AS_PER_TITLEBAR = 0x0008,
     DWT_EFFECT_AS_PER_TITLEBAR     = 0x0010,
-    DWT_ROUND_TOP_ONLY             = 0x0020
+    DWT_ROUND_TOP_ONLY             = 0x0020,
+    DWT_ICON_COLOR_AS_PER_TITLEBAR = 0x0040
 } EDwtSettingsFlags;
 
 typedef enum
@@ -463,6 +464,7 @@ typedef enum
     TITLEBAR_BUTTON_SUNKEN_BACKGROUND       = 0x0400,
     TITLEBAR_BUTTOM_ARROW_MIN_MAX           = 0x0800,
     TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW = 0x1000,
+    TITLEBAR_BUTTON_ICON_COLOR              = 0x2000
 } ETitleBarButtonFlags;
 
 typedef enum
@@ -488,7 +490,7 @@ typedef enum
 
 #define TBAR_VERSION_HACK 65535
 
-typedef std::map<ETitleBarButtons, QColor> TBCols;
+typedef std::map<int, QColor> TBCols;
 #endif
 
 typedef enum

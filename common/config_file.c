@@ -1666,29 +1666,32 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
 #ifdef __cplusplus
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-            if(opts->titlebarButtons&TITLEBAR_BUTTON_COLOR)
+            if(opts->titlebarButtons&TITLEBAR_BUTTON_COLOR || opts->titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
             {
 #if (defined QT_VERSION && (QT_VERSION >= 0x040000))
                 QStringList cols(readStringEntry(cfg, "titlebarButtonColors").split(',', QString::SkipEmptyParts));
 #else
                 QStringList cols(QStringList::split(',', readStringEntry(cfg, "titlebarButtonColors")));
 #endif
-                if(NUM_TITLEBAR_BUTTONS==cols.count())
+                if(cols.count() && 0==(cols.count()%NUM_TITLEBAR_BUTTONS) && cols.count()<=(NUM_TITLEBAR_BUTTONS*3))
                 {
                     QStringList::ConstIterator it(cols.begin()),
                                                end(cols.end());
-                    TBCols                     cols;
 
                     for(int i=0; it!=end; ++it, ++i)
                     {
                         QColor col;
                         setRgb(&col, TO_LATIN1((*it)));
-                        cols[(ETitleBarButtons)i]=col;
+                        opts->titlebarButtonColors[i]=col;
                     }
-                    opts->titlebarButtonColors=cols;
+                    if(cols.count()<(NUM_TITLEBAR_BUTTONS+1))
+                        opts->titlebarButtons&=~TITLEBAR_BUTTON_ICON_COLOR;
                 }
                 else
+                {
                     opts->titlebarButtons&=~TITLEBAR_BUTTON_COLOR;
+                    opts->titlebarButtons&=~TITLEBAR_BUTTON_ICON_COLOR;
+                }
             }
 #endif
 
@@ -2987,7 +2990,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
         CFG_WRITE_ENTRY(titlebarIcon)
 
-        if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR && NUM_TITLEBAR_BUTTONS==opts.titlebarButtonColors.size())
+        if((opts.titlebarButtons&TITLEBAR_BUTTON_COLOR || opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR) &&
+            opts.titlebarButtonColors.size() && 0==(opts.titlebarButtonColors.size()%NUM_TITLEBAR_BUTTONS))
         {
             QString     val;
 #if QT_VERSION >= 0x040000
@@ -2995,7 +2999,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #else
             QTextStream str(&val, IO_WriteOnly);
 #endif
-            for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
+            for(unsigned int i=0; i<opts.titlebarButtonColors.size(); ++i)
             {
                 TBCols::const_iterator c(opts.titlebarButtonColors.find((ETitleBarButtons)i));
 

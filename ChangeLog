@@ -1,3 +1,7 @@
+1.5.0
+-----
+1. Add option to specify colour of titlebar button icons.
+
 1.4.3
 -----
 1. Fix crash (mainly on Arch linux) when apps (e.g. dolphin) exit.

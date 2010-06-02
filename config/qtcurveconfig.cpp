@@ -2361,7 +2361,8 @@ void QtCurveConfig::setOptions(Options &opts)
         opts.customShades[0]=0;
 
     opts.titlebarButtons=getTitleBarButtonFlags();
-    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
+    opts.titlebarButtonColors.clear();
+    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR || opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
     {
         opts.titlebarButtonColors[TITLEBAR_CLOSE]=titlebarButtons_colorClose->color();
         opts.titlebarButtonColors[TITLEBAR_MIN]=titlebarButtons_colorMin->color();
@@ -2372,9 +2373,12 @@ void QtCurveConfig::setOptions(Options &opts)
         opts.titlebarButtonColors[TITLEBAR_MENU]=titlebarButtons_colorMenu->color();
         opts.titlebarButtonColors[TITLEBAR_SHADE]=titlebarButtons_colorShade->color();
         opts.titlebarButtonColors[TITLEBAR_ALL_DESKTOPS]=titlebarButtons_colorAllDesktops->color();
+        /*
+        if(opts.titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
+        {
+        }
+        */
     }
-    else
-        opts.titlebarButtonColors.clear();
 
     opts.noBgndGradientApps=toSet(noBgndGradientApps->text());
     opts.noBgndImageApps=toSet(noBgndImageApps->text());
@@ -2385,11 +2389,11 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.noMenuStripeApps=toSet(noMenuStripeApps->text());
 }
 
-static QColor getColor(const TBCols &cols, ETitleBarButtons btn)
+static QColor getColor(const TBCols &cols, int btn, const QColor &def=Qt::black)
 {
     TBCols::const_iterator it=cols.find(btn);
 
-    return cols.end()==it ? Qt::black : (*it).second;
+    return cols.end()==it ? def : (*it).second;
 }
 
 void QtCurveConfig::setWidgetOptions(const Options &opts)

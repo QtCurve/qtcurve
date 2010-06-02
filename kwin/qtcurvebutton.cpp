@@ -200,7 +200,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             default:
                 break;
         }
-            
+
     if (drawFrame && (!(flags&TITLEBAR_BUTTON_ROUND) || MenuButton!=type() || !iconForMenu))
     {
         QStyleOption opt;
@@ -256,17 +256,27 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(EFFECT_ETCH==effect && drewFrame)
             effect=EFFECT_SHADOW;
 
-        if(flags&TITLEBAR_BUTTON_COLOR && flags&TITLEBAR_BUTTON_COLOR_SYMBOL &&
-           (itsHover || !(flags&TITLEBAR_BUTTON_HOVER_SYMBOL)))
+        if(itsHover || !(flags&TITLEBAR_BUTTON_HOVER_SYMBOL))
         {
-            QStyleOption opt;
+            bool userDefined=flags&TITLEBAR_BUTTON_ICON_COLOR;
+            
+            if(userDefined || (flags&TITLEBAR_BUTTON_COLOR && flags&TITLEBAR_BUTTON_COLOR_SYMBOL))
+            {
+                QStyleOption opt;
 
-            opt.init(this);
-            opt.version=versionHack;
-            col=QColor(QRgb(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIconColor, &opt, 0L)));
-            customCol=true;
+                opt.init(this);
+                opt.version=versionHack;
+                if(userDefined)
+                {
+                    versionHack+=NUM_TITLEBAR_BUTTONS;
+                    if(!active)
+                        versionHack+=NUM_TITLEBAR_BUTTONS;
+                }
+                col=QColor(QRgb(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIconColor, &opt, 0L)));
+                customCol=true;
+            }
         }
-
+    
         if(sunken)
         {
             dY++;
