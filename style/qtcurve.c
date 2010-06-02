@@ -51,7 +51,7 @@ static struct
              menubar[TOTAL_SHADES+1],
              highlight[TOTAL_SHADES+1],
              focus[TOTAL_SHADES+1],
-             menu,
+             menu[TOTAL_SHADES+1],
              *check_radio;
 } qtcPalette;
 
@@ -3422,10 +3422,22 @@ debugDisplayWidget(widget, 3);
             x-=2;
 
         {
+        gboolean isMenuItem=IS_MENU_ITEM(widget);
         GdkColor *col=isSpinButton || sbar
                         ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE][COLOR_BUTTON_TEXT]
-                        : &style->text[IS_MENU_ITEM(widget) && GTK_STATE_PRELIGHT==state
+                        : &style->text[isMenuItem && GTK_STATE_PRELIGHT==state
                                         ? GTK_STATE_SELECTED : ARROW_STATE(state)];
+        if(isMenuItem && GTK_STATE_PRELIGHT!=state && opts.shadePopupMenu)
+        {
+            if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
+                col=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+            else if(opts.customMenuTextColor)
+                col=&opts.customMenuNormTextColor;
+            else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars || 
+                        (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
+                col=&style->text[GTK_STATE_SELECTED];
+        }
+
         drawArrow(window, style, MO_ARROW(isMenuItem, col), area, arrow_type, x, y, smallArrows, TRUE);
         }
     }
@@ -4644,8 +4656,8 @@ debugDisplayWidget(widget, 3);
                                   itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_MENU_ITEM, 0, fillVal);
 
                 {
-                    GdkColor        *left=reverse ? &qtcPalette.menu : &itemCols[fillVal],
-                                    *right=reverse ? &itemCols[fillVal] : &qtcPalette.menu;
+                    GdkColor        *left=reverse ? &qtcPalette.menu[ORIGINAL_SHADE] : &itemCols[fillVal],
+                                    *right=reverse ? &itemCols[fillVal] : &qtcPalette.menu[ORIGINAL_SHADE];
                     cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
 
                     cairo_pattern_add_color_stop_rgb(pt, 0, CAIRO_COL(*left));
@@ -4688,13 +4700,14 @@ debugDisplayWidget(widget, 3);
         if(!comboMenu && !IS_FLAT_BGND(opts.menuBgndAppearance))
         {
             if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
-                drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu, FALSE);
+                drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE);
             else
                 drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                                  &qtcPalette.menu, GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance, WIDGET_OTHER);
+                                  &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance,
+                                  WIDGET_OTHER);
         }
-        else if(USE_LIGHTER_POPUP_MENU)
-            drawAreaColor(cr, area, NULL, &qtcPalette.menu, x, y, width, height);
+        else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
+            drawAreaColor(cr, area, NULL, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height);
 
         if(!comboMenu && IMG_NONE!=opts.menuBgndImage.type)
             drawBgndRings(cr, y, width, FALSE);
@@ -4746,16 +4759,20 @@ debugDisplayWidget(widget, 3);
 
         if(opts.popupBorder)
         {
+            GdkColor *cols=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
+                            ? qtcPalette.menu
+                            : qtcPalette.background;
+
             cairo_new_path(cr);
-            cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
+            cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
             cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_stroke(cr);
-            if(!USE_LIGHTER_POPUP_MENU)
+            if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu)
             {
-                drawHLine(cr, CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+1, width-2);
-                drawVLine(cr, CAIRO_COL(qtcPalette.background[0]), 1.0, x+1, y+1, height-2);
-                drawHLine(cr, CAIRO_COL(qtcPalette.background[FRAME_DARK_SHADOW]), 1.0, x+1, y+height-2, width-2);
-                drawVLine(cr, CAIRO_COL(qtcPalette.background[FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
+                drawHLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, width-2);
+                drawVLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, height-2);
+                drawHLine(cr, CAIRO_COL(cols[FRAME_DARK_SHADOW]), 1.0, x+1, y+height-2, width-2);
+                drawVLine(cr, CAIRO_COL(cols[FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
             }
         }
     }
@@ -4785,12 +4802,21 @@ debugDisplayWidget(widget, 3);
     else if(DETAIL("hseparator"))
     {
         gboolean isMenuItem=widget && GTK_IS_MENU_ITEM(widget);
+        GdkColor *cols=qtcPalette.background;
+        int      offset=opts.menuStripe && (isMozilla() || isMenuItem) ? 20 : 0;
 
-        int offset=opts.menuStripe && (isMozilla() || isMenuItem) ? 20 : 0;
         if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
             offset+=2;
+
+        if(isMenuItem && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
+            cols=SHADE_WINDOW_BORDER==opts.shadeMenubars
+                    ? qtcPalette.wborder[0]
+                    : qtcPalette.menu
+                        ? qtcPalette.menu
+                        : qtcPalette.background;
+
         drawFadedLine(cr, x+1+offset, y+(height>>1), width-(1+offset), 1,
-                      &qtcPalette.background[isMenuItem ? MENU_SEP_SHADE : STD_BORDER], area, NULL,
+                      &cols[isMenuItem ? MENU_SEP_SHADE : STD_BORDER], area, NULL,
                       TRUE, TRUE, TRUE);
     }
     else if(DETAIL("vseparator"))
@@ -5547,7 +5573,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else if(isMenuItem)
         {
-            if(mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars))
+            if(opts.shadePopupMenu || (mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
             {
                 if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
                 {
@@ -6672,13 +6698,24 @@ debugDisplayWidget(widget, 3);
     }
     else if(DETAIL("menuitem") || (widget && DETAIL("hseparator") && IS_MENU_ITEM(widget)))
     {
-        int offset=opts.menuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
+        int       offset=opts.menuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
+        GdkColor *cols=qtcPalette.background;
+
+        if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
+            offset+=2;
+
+        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
+            cols=SHADE_WINDOW_BORDER==opts.shadeMenubars
+                    ? qtcPalette.wborder[0]
+                    : qtcPalette.menu
+                        ? qtcPalette.menu
+                        : qtcPalette.background;
 
         if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
             offset+=2;
 
         //drawHLine(cr, CAIRO_COL(qtcPalette.background[MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));
-        drawFadedLine(cr, offset+(x1<x2 ? x1 : x2), y+1, abs(x2-x1)-offset, 1, &qtcPalette.background[MENU_SEP_SHADE],
+        drawFadedLine(cr, offset+(x1<x2 ? x1 : x2), y+1, abs(x2-x1)-offset, 1, &cols[MENU_SEP_SHADE],
                       area, NULL, true, true, true);
     }
     else
@@ -7237,8 +7274,37 @@ static void generateColors()
             qtcPalette.check_radio=&opts.customCheckRadioColor;
     }
 
-    shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &qtcPalette.menu, TO_FACTOR(opts.lighterPopupMenuBgnd));
-    
+    if(opts.shadePopupMenu)
+        memcpy(qtcPalette.menu,
+               SHADE_WINDOW_BORDER==opts.shadeMenubars
+                ? qtcPalette.wborder[0]
+                : qtcPalette.menubar, sizeof(GdkColor)*(TOTAL_SHADES+1));
+    else
+    {
+        GdkColor color;
+        shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
+        shadeColors(&color, qtcPalette.menu);
+    }
+
+    /* Tear off menu items dont seem to draw they're background, and the default background
+        is drawn :-(  Fix/hack this by making that background the correct color */
+    if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
+    {
+        static const char *format="style \""RC_SETTING"Mnu\" "
+                                    "{bg[NORMAL]=\"#%02X%02X%02X\"} "
+                                    "class \"GtkMenu\" style \""RC_SETTING"Mnu\"";
+        char *str=(char *)malloc(strlen(format)+32);
+
+        if(str)
+        {
+            GdkColor *col=&qtcPalette.menu[ORIGINAL_SHADE];
+
+            sprintf(str, format, toQtColor(col->red), toQtColor(col->green), toQtColor(col->blue));
+            gtk_rc_parse_string(str);
+            free(str);
+        }
+    }
+            
     switch(opts.menuStripe)
     {
         default:
@@ -7246,16 +7312,16 @@ static void generateColors()
             opts.customMenuStripeColor=qtcPalette.background[ORIGINAL_SHADE];
             break;
         case SHADE_DARKEN:
-            opts.customMenuStripeColor=USE_LIGHTER_POPUP_MENU
-                ? qtcPalette.menu
+            opts.customMenuStripeColor=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
+                ? qtcPalette.menu[ORIGINAL_SHADE]
                 : qtcPalette.background[MENU_STRIPE_SHADE];
             break;
         case SHADE_CUSTOM:
             break;
         case SHADE_BLEND_SELECTED:
             opts.customMenuStripeColor=midColor(&qtcPalette.highlight[ORIGINAL_SHADE],
-                                                opts.lighterPopupMenuBgnd<0
-                                                    ? &qtcPalette.menu
+                                                opts.lighterPopupMenuBgnd || opts.shadePopupMenu
+                                                    ? &qtcPalette.menu[ORIGINAL_SHADE]
                                                     : &qtcPalette.background[ORIGINAL_SHADE]);
             break;
         case SHADE_SELECTED:

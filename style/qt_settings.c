@@ -2337,25 +2337,6 @@ static gboolean qtInit()
                 opts.statusbarHiding=HIDE_NONE;
             }
 
-            /* Tear off menu items dont seem to draw they're background, and the default background
-               is drawn :-(  Fix/hack this by making that background the correct color */
-            if(USE_LIGHTER_POPUP_MENU)
-            {
-                static const char *format="style \""RC_SETTING"Mnu\" "
-                                          "{bg[NORMAL]=\"#%02X%02X%02X\"} "
-                                          "class \"GtkMenu\" style \""RC_SETTING"Mnu\"";
-                tmpStr=(char *)realloc(tmpStr, strlen(format)+32);
-
-                if(tmpStr)
-                {
-                    GdkColor col;
-
-                    shade(&opts, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW], &col, TO_FACTOR(opts.lighterPopupMenuBgnd));
-                    sprintf(tmpStr, format, toQtColor(col.red), toQtColor(col.green), toQtColor(col.blue));
-                    gtk_rc_parse_string(tmpStr);
-                }
-            }
-
             if(opts.mapKdeIcons && qtSettings.icons)
             {
                 static const char *constFormat="gtk-icon-theme-name=\"%s\" gtk-fallback-icon-theme=\"hicolor\"";
@@ -2720,7 +2701,7 @@ static gboolean qtInit()
             if(!opts.popupBorder)
                 gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
                                     "class \"*GtkMenu\" style \""RC_SETTING"M\"");
-            else if((USE_LIGHTER_POPUP_MENU || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems)
+            else if((USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems)
                 gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \""RC_SETTING"M\"");
 
