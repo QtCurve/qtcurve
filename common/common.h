@@ -1031,7 +1031,8 @@ typedef struct
                      coloredTbarMo,
                      borderSelection,
                      stripedSbar,
-                     windowDrag;
+                     windowDrag,
+                     shadePopupMenu;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,

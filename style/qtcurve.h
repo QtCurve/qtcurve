@@ -201,6 +201,8 @@ class QtCurveStyle : public QCommonStyle
     void shadeColors(const QColor &base, QColor *vals) const;
     const QColor * buttonColors(const QStyleOption *option) const;
     QColor         titlebarIconColor(const QStyleOption *option) const;
+    const QColor * popupMenuCols(const QStyleOption *option) const;
+    QColor         popupMenuCol(int shade=ORIGINAL_SHADE) const;
     const QColor * checkRadioColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;
@@ -211,14 +213,15 @@ class QtCurveStyle : public QCommonStyle
         { return highlightColors(option->palette.highlight().color()); }
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
-    void setMenuColors(const QColor &bgnd);
+    void           setMenuColors(const QColor &bgnd);
+   void            setMenuTextColors(QWidget *widget, bool isMenuBar) const;
     const QColor * menuColors(const QStyleOption *option, bool active) const;
     bool           coloredMdiButtons(bool active, bool mouseOver) const;
     const QColor * getMdiColors(const QStyleOption *option, bool active) const;
     void           readMdiPositions() const;
     const QColor & getFill(const QStyleOption *option, const QColor *use, bool cr=false, bool darker=false) const;
     const QColor & getTabFill(bool current, bool highlight, const QColor *use) const;
-    const QColor & menuStripeCol() const;
+    QColor         menuStripeCol() const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     int            konqMenuBarSize(const QMenuBar *menu) const;
 #if QT_VERSION < 0x040500

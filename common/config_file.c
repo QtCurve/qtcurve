@@ -1575,6 +1575,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(borderSelection)
             CFG_READ_BOOL(stripedSbar)
             CFG_READ_BOOL(windowDrag)
+            CFG_READ_BOOL(shadePopupMenu)
 
             if(version<MAKE_VERSION(1, 4))
             {
@@ -2079,6 +2080,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
             opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
+
+            if(opts->shadePopupMenu && SHADE_NONE==opts->shadeMenubars)
+                opts->shadePopupMenu=false;
+
+            if(opts->shadePopupMenu)
+                opts->lighterPopupMenuBgnd=0;
 #ifdef __cplusplus
 
 #if defined QT_VERSION && QT_VERSION >= 0x040000
@@ -2287,6 +2294,7 @@ static void defaultSettings(Options *opts)
     opts->square=SQUARE_NONE;
     opts->stripedSbar=false;
     opts->windowDrag=false;
+    opts->shadePopupMenu=false;
     opts->titlebarBorder=true;
     opts->titlebarBlend=false;
     opts->colorTitlebarOnly=false;
@@ -2984,6 +2992,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(borderSelection)
         CFG_WRITE_ENTRY(stripedSbar)
         CFG_WRITE_ENTRY(windowDrag)
+        CFG_WRITE_ENTRY(shadePopupMenu)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
