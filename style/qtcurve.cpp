@@ -12209,6 +12209,11 @@ void QtCurveStyle::shadeColors(const QColor &base, QColor *vals) const
 
 const QColor * QtCurveStyle::buttonColors(const QStyleOption *option) const
 {
+   if(option && option->version>=TBAR_VERSION_HACK &&
+       option->version<TBAR_VERSION_HACK+NUM_TITLEBAR_BUTTONS &&
+       coloredMdiButtons(option->state&State_Active, option->state&(State_MouseOver|State_Sunken)))
+        return itsTitleBarButtonsCols[option->version-TBAR_VERSION_HACK];
+
     if(option && option->palette.button()!=itsButtonCols[ORIGINAL_SHADE])
     {
         shadeColors(option->palette.button().color(), itsColoredButtonCols);
