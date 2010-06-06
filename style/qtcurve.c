@@ -5573,7 +5573,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else if(isMenuItem)
         {
-            if(opts.shadePopupMenu || (mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
+            if(/*opts.shadePopupMenu || */(mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
             {
                 if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
                 {
@@ -5595,7 +5595,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                     style->text_gc[GTK_STATE_INSENSITIVE]=qtcurveStyle->menutext_gc[0];
                     use_text=TRUE;
                 }
-                else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars || 
+                else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
                          (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
                     selectedText=TRUE;
             }
@@ -7282,7 +7282,10 @@ static void generateColors()
     else
     {
         GdkColor color;
-        shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
+        if(opts.lighterPopupMenuBgnd)
+            shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
+        else
+            color=qtcPalette.background[ORIGINAL_SHADE];
         shadeColors(&color, qtcPalette.menu);
     }
 
@@ -7290,16 +7293,31 @@ static void generateColors()
         is drawn :-(  Fix/hack this by making that background the correct color */
     if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
     {
-        static const char *format="style \""RC_SETTING"Mnu\" "
-                                    "{bg[NORMAL]=\"#%02X%02X%02X\"} "
-                                    "class \"GtkMenu\" style \""RC_SETTING"Mnu\"";
-        char *str=(char *)malloc(strlen(format)+32);
+        static const char *format="style \""RC_SETTING"Mnu\" { "
+                                    "bg[NORMAL]=\"#%02X%02X%02X\" "
+                                    "fg[NORMAL]=\"#%02X%02X%02X\" "
+                                    "text[INSENSITIVE]=\"#%02X%02X%02X\" "
+                                    "} class \"GtkMenu\" style \""RC_SETTING"Mnu\" "
+                                    "widget_class \"*Menu.*Label\" style \""RC_SETTING"Mnu\"";
+        char *str=(char *)malloc(strlen(format)+18+1);
 
         if(str)
         {
             GdkColor *col=&qtcPalette.menu[ORIGINAL_SHADE];
-
-            sprintf(str, format, toQtColor(col->red), toQtColor(col->green), toQtColor(col->blue));
+            GdkColor text=opts.shadePopupMenu
+                            ? SHADE_WINDOW_BORDER==opts.shadeMenubars
+                                ? qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]
+                                : opts.customMenuTextColor
+                                    ? opts.customMenuNormTextColor
+                                    : SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
+                                    (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE]))
+                                    ? qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED]
+                                    : qtSettings.colors[PAL_ACTIVE][COLOR_TEXT]
+                            : qtSettings.colors[PAL_ACTIVE][COLOR_TEXT],
+                     mid=opts.shadePopupMenu ? midColor(col, &text) : qtSettings.colors[PAL_DISABLED][COLOR_TEXT];
+            sprintf(str, format, toQtColor(col->red), toQtColor(col->green), toQtColor(col->blue),
+                                 toQtColor(text.red), toQtColor(text.green), toQtColor(text.blue),
+                                 toQtColor(mid.red), toQtColor(mid.green), toQtColor(mid.blue));
             gtk_rc_parse_string(str);
             free(str);
         }
