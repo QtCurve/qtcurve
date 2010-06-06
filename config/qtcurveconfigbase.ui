@@ -2003,14 +2003,24 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="7" column="1">
+        <widget class="QCheckBox" name="titlebarMenuColor">
+         <property name="whatsThis">
+          <string>If enabled, the the configured menubar color will be used for windows that have menubars.</string>
+         </property>
+         <property name="text">
+          <string>Use menubar color</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
         <widget class="QLabel" name="label_55">
          <property name="text">
           <string>Add a light border:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QCheckBox" name="titlebarBorder">
          <property name="whatsThis">
           <string>If enabled, a 1 pixel light border is added to the top and left of the window.</string>
@@ -2020,14 +2030,14 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_92">
          <property name="text">
           <string>Extend grab area into menubar:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="windowDrag">
          <property name="whatsThis">
           <string>If enabled, you will be able to drag windows by using the unused part of the menubar.</string>
@@ -4080,6 +4090,7 @@
   <tabstop>titlebarIcon</tabstop>
   <tabstop>colorTitlebarOnly</tabstop>
   <tabstop>titlebarBlend</tabstop>
+  <tabstop>titlebarMenuColor</tabstop>
   <tabstop>titlebarBorder</tabstop>
   <tabstop>windowDrag</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>

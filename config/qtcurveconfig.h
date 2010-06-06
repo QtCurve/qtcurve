@@ -134,6 +134,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void xbarChanged();
     void colorTitlebarOnlyChanged();
     void titlebarBlendChanged();
+    void titlebarMenuColorChanged();
     void thinSbarGrooveChanged();
     void borderSbarGrooveChanged();
     void borderProgressChanged();

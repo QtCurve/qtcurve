@@ -417,7 +417,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
                                         NULL, NULL)),
                          roundBottom(Handler()->roundBottom()),
-                         outerBorder(Handler()->outerBorder());
+                         outerBorder(Handler()->outerBorder()),
+                         preview(isPreview()),
+                         blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
+                         menuColor(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarUseMenuColor, NULL, NULL));
     const int            border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -463,6 +466,28 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
            windowCol(widget()->palette().color(QPalette::Window)),
            fillCol(colorTitleOnly ? windowCol : col);
 
+    if(!preview && (blend||menuColor) && -1==itsMenuBarSize)
+    {
+        QString wc(windowClass());
+        if(wc==QLatin1String("Navigator Firefox") ||
+            wc==QLatin1String("Mail Thunderbird"))
+            itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
+        else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
+                wc.startsWith(QLatin1String("VCLSalFrame OpenOffice.org")) ||
+                wc==QLatin1String("soffice.bin Soffice.bin"))
+            itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
+        else
+        {
+            int val=getProperty();
+            if(val>-1)
+                itsMenuBarSize=val;
+        }
+    }
+
+    if(menuColor && itsMenuBarSize>0 &&
+       (active || !Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_ShadeMenubarOnlyWhenActive, NULL, NULL)))
+        col=QColor(QRgb(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_MenubarColor, NULL, NULL)));
+
     if(opacity<100)
     {
         double alpha=opacity/100.0;
@@ -476,7 +501,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.setClipRect(r, Qt::IntersectClip);
     else
 #if KDE_IS_VERSION(4, 3, 0)
-        if(!compositing && !isPreview())
+        if(!compositing && !preview)
 #endif
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
     
@@ -507,7 +532,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(!roundBottom)
         opt.state|=QtC_StateKWinNotFull;
 
-    if(compositing && !isPreview())
+    if(compositing && !preview)
         opt.state|=QtC_StateKWinCompositing;
 
     if(outerBorder)
@@ -518,7 +543,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
         }
 #ifdef DRAW_INTO_PIXMAPS
-        if(!compositing && !isPreview())
+        if(!compositing && !preview)
         {
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
             QPixmap pix(32, 32);
@@ -562,33 +587,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
     
-    if(!isPreview() && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL))
-    {
-        if(-1==itsMenuBarSize)
-        {
-            QString wc(windowClass());
-            if(wc==QLatin1String("Navigator Firefox") ||
-               wc==QLatin1String("Mail Thunderbird"))
-                itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
-            else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
-                    wc.startsWith(QLatin1String("VCLSalFrame OpenOffice.org")) ||
-                    wc==QLatin1String("soffice.bin Soffice.bin"))
-                itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
-            else
-            {
-                int val=getProperty();
-                if(val>-1)
-                    itsMenuBarSize=val;
-            }
-        }
-        if(-1!=itsMenuBarSize)
-            opt.rect.adjust(0, 0, 0, itsMenuBarSize);
-    }
+    if(!preview && blend && -1!=itsMenuBarSize)
+        opt.rect.adjust(0, 0, 0, itsMenuBarSize);
 
 #ifdef DRAW_INTO_PIXMAPS
-    if(!compositing && !isPreview())
+    if(!compositing && !preview)
     {
-        QPixmap  tPix(32, titleBarHeight+(itsMenuBarSize<0 ? 0 : itsMenuBarSize));
+        QPixmap  tPix(32, titleBarHeight+(!blend || itsMenuBarSize<0 ? 0 : itsMenuBarSize));
         QPainter tPainter(&tPix);
         tPainter.setRenderHint(QPainter::Antialiasing, true);
         opt.rect=QRect(0, 0, tPix.width(), tPix.height());

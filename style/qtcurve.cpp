@@ -1802,7 +1802,7 @@ void QtCurveStyle::polish(QWidget *widget)
         {
             static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
 #ifdef Q_WS_X11
-            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN)
+            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.titlebarMenuColor)
                 emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
 #endif
         }
@@ -1915,7 +1915,7 @@ void QtCurveStyle::polish(QWidget *widget)
             (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
-        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN)
+        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.titlebarMenuColor)
             emitMenuSize((QWidget *)widget, widget->rect().height());
 #endif
         if(CUSTOM_BGND)
@@ -2619,7 +2619,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
     {
 #ifdef Q_WS_X11
         case QEvent::Resize:
-            if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
+            if((BLEND_TITLEBAR || opts.titlebarMenuColor) && qobject_cast<QMenuBar *>(object))
             {
                 QResizeEvent *re = static_cast<QResizeEvent *>(event);
 
@@ -2775,7 +2775,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 //                     frame->setFrameShape(QFrame::StyledPanel);
 //             }
 #ifdef Q_WS_X11
-            else if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
+            else if((BLEND_TITLEBAR || opts.titlebarMenuColor) && qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, mb->size().height());
@@ -2787,7 +2787,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         case QEvent::Hide:
         {
 #ifdef Q_WS_X11
-            if(BLEND_TITLEBAR && qobject_cast<QMenuBar *>(object))
+            if((BLEND_TITLEBAR || opts.titlebarMenuColor) && qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, 0);
@@ -3185,6 +3185,10 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case QtC_ToggleButtons:
             return (opts.menubarHiding&HIDE_KWIN   ? 0x1 : 0)+
                    (opts.statusbarHiding&HIDE_KWIN ? 0x2 : 0);
+        case QtC_TitleBarUseMenuColor:
+            return opts.titlebarMenuColor;
+        case QtC_MenubarColor:
+            return itsMenubarCols[ORIGINAL_SHADE].rgb();
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab

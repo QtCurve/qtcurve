@@ -1614,6 +1614,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #ifdef __cplusplus
             CFG_READ_ALIGN(titlebarAlignment)
             CFG_READ_EFFECT(titlebarEffect)
+            CFG_READ_BOOL(titlebarMenuColor)
             CFG_READ_BOOL(gtkComboMenus)
             CFG_READ_BOOL(centerTabText)
 /*
@@ -2094,6 +2095,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
             opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
 #endif
+            if(opts->titlebarMenuColor && (opts->titlebarBlend || SHADE_WINDOW_BORDER==opts->shadeMenubars))
+                opts->titlebarMenuColor=false;
+
             if(APPEARANCE_FLAT==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_RAISED;
 
@@ -2297,6 +2301,7 @@ static void defaultSettings(Options *opts)
     opts->shadePopupMenu=false;
     opts->titlebarBorder=true;
     opts->titlebarBlend=false;
+    opts->titlebarMenuColor=false;
     opts->colorTitlebarOnly=false;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
@@ -2997,6 +3002,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
 #endif
+        CFG_WRITE_ENTRY(titlebarMenuColor)
         CFG_WRITE_ENTRY(titlebarBorder)
         CFG_WRITE_ENTRY(titlebarBlend);
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))

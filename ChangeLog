@@ -6,6 +6,9 @@
 3. Add option to use menubar colours for popup menus.
 4. Fixed background of Gtk2 style combo menus.
 5. Add option to specify colour of titlebar button icons.
+6. Add option to use menubar colour for titlebar when a window has a menubar visible.
+   (Only valid when not blending titlebars and not using window border colours for
+   menubars)
 
 1.4.3
 -----

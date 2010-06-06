@@ -419,7 +419,9 @@ typedef enum
     QtC_TitleBarEffect,
     QtC_BlendMenuAndTitleBar,
     QtC_ShadeMenubarOnlyWhenActive,
-    QtC_ToggleButtons
+    QtC_ToggleButtons,
+    QtC_TitleBarUseMenuColor,
+    QtC_MenubarColor
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
@@ -1020,6 +1022,7 @@ typedef struct
                      stdBtnSizes,
 #endif
                      colorTitlebarOnly,
+                     titlebarMenuColor,
                      titlebarBorder,
                      titlebarBlend,
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
