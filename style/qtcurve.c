@@ -2927,8 +2927,8 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) &&
-        !isGimpDockable(widget) && !isMenuOrToolTipWindow)
+    if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR || opts.titlebarMenuColor) &&
+        widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) && !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
         if(qtcWindowSetup(widget))
         {
@@ -2942,7 +2942,7 @@ debugDisplayWidget(widget, 3);
                 if(hiddenMenubar)
                     gtk_widget_hide(menuBar);
 
-                if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN)
+                if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.titlebarMenuColor)
                     qtcEmitMenuSize(menuBar, hiddenMenubar ? 0 : menuBar->allocation.height);
                     
                 if(opts.menubarHiding&HIDE_KWIN)
@@ -4495,7 +4495,7 @@ debugDisplayWidget(widget, 3);
                 menuBarAdjust=qtcGetWindowBorderSize(FALSE);
                 if(widget)
                 {
-                    if(qtcEmitMenuSize(widget, height) && opts.menubarHiding)
+                    if(qtcEmitMenuSize(widget, height) && (opts.menubarHiding || opts.titlebarMenuColor))
                         qtcWindowMenuBarDBus(widget, height);
                 }
             }
