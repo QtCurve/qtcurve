@@ -12358,6 +12358,12 @@ void QtCurveStyle::setMenuTextColors(QWidget *widget, bool isMenuBar) const
                             opts.shadeMenubarOnlyWhenActive ? itsMdiTextColor : itsActiveMdiTextColor);
             pal.setBrush(QPalette::Inactive, QPalette::Text, pal.brush(QPalette::Inactive, QPalette::Foreground));
         }
+        else if(opts.shadePopupMenu)
+        {
+            pal.setBrush(QPalette::Disabled, QPalette::Foreground, midColor(itsActiveMdiTextColor, popupMenuCol()));
+            pal.setBrush(QPalette::Disabled, QPalette::Text, pal.brush(QPalette::Disabled, QPalette::Foreground));
+        }
+            
         widget->setPalette(pal);
     }
     else if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
@@ -12378,7 +12384,12 @@ void QtCurveStyle::setMenuTextColors(QWidget *widget, bool isMenuBar) const
                                                 : pal.highlightedText().color());
             pal.setBrush(QPalette::Inactive, QPalette::Text, pal.brush(QPalette::Inactive, QPalette::Foreground));
         }
-
+        else if(!isMenuBar && opts.shadePopupMenu)
+        {
+            pal.setBrush(QPalette::Disabled, QPalette::Foreground,
+                         midColor(pal.brush(QPalette::Active, QPalette::Foreground).color(), popupMenuCol()));
+            pal.setBrush(QPalette::Disabled, QPalette::Text, pal.brush(QPalette::Disabled, QPalette::Foreground));
+        }
         widget->setPalette(pal);
     }
 }
