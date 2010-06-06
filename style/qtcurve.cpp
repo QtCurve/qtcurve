@@ -2456,13 +2456,11 @@ void QtCurveStyle::unpolish(QWidget *widget)
 
             if(opts.gtkComboMenus && widget->parentWidget() && (p=widget->parentWidget()->parentWidget()) &&
                qobject_cast<QComboBox *>(p) && !((QComboBox *)(p))->isEditable())
-            {
-                QPalette pal(widget->palette());
-
-                pal.setBrush(QPalette::Active, QPalette::Base, QApplication::palette().brush(QPalette::Base));
-                widget->setPalette(pal);
-            }
+                widget->setPalette(QApplication::palette());
         }
+
+    if(qobject_cast<QMenu *>(widget) && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
+        widget->setPalette(QApplication::palette());
 
     if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu *>(widget))
         widget->removeEventFilter(this);
