@@ -3127,7 +3127,7 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             if ((!opts.gtkScrollViews || (opts.square&SQUARE_SCROLLVIEW)) && isKateView(widget))
                 return (opts.square&SQUARE_SCROLLVIEW) ? 1 : 0;
 
-            if ((opts.square&SQUARE_SCROLLVIEW) && widget &&
+            if ((opts.square&SQUARE_SCROLLVIEW) && widget && !opts.etchEntry &&
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
                 return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
