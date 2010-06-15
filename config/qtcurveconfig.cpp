@@ -670,6 +670,14 @@ static int getCrSize(QComboBox *combo)
     return 0==combo->currentIndex() ? CR_SMALL_SIZE : CR_LARGE_SIZE;
 }
 
+static void insertDragEntries(QComboBox *combo)
+{
+    combo->insertItem(WM_DRAG_NONE, i18n("Titlebar only"));
+    combo->insertItem(WM_DRAG_MENUBAR, i18n("Titlebar and menubar"));
+    combo->insertItem(WM_DRAG_MENU_AND_TOOLBAR, i18n("Titlebar, menubar, and toolbars"));
+    combo->insertItem(WM_DRAG_ALL, i18n("All empty areas"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                widgetStyle(NULL),
@@ -737,6 +745,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertImageEntries(menuBgndImage);
     insertGlowEntries(glowProgress);
     insertCrSizeEntries(crSize);
+
+    insertDragEntries(windowDrag);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -882,7 +892,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(thinSbarGrooveChanged()));
     connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(windowDrag, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(windowDrag, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(bgndAppearanceChanged()));
@@ -2418,7 +2428,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.thinSbarGroove=thinSbarGroove->isChecked();
     opts.colorSliderMouseOver=colorSliderMouseOver->isChecked();
     opts.titlebarBorder=titlebarBorder->isChecked();
-    opts.windowDrag=windowDrag->isChecked();
+    opts.windowDrag=windowDrag->currentIndex();
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
@@ -2670,7 +2680,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     thinSbarGroove->setChecked(opts.thinSbarGroove);
     colorSliderMouseOver->setChecked(opts.colorSliderMouseOver);
     titlebarBorder->setChecked(opts.titlebarBorder);
-    windowDrag->setChecked(opts.windowDrag);
+    windowDrag->setCurrentIndex(opts.windowDrag);
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
@@ -3008,7 +3018,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          thinSbarGroove->isChecked()!=opts.thinSbarGroove ||
          colorSliderMouseOver->isChecked()!=opts.colorSliderMouseOver ||
          titlebarBorder->isChecked()!=opts.titlebarBorder ||
-         windowDrag->isChecked()!=opts.windowDrag ||
+         windowDrag->currentIndex()!=opts.windowDrag ||
          sbarBgndAppearance->currentIndex()!=opts.sbarBgndAppearance ||
          sliderFill->currentIndex()!=opts.sliderFill ||
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||
