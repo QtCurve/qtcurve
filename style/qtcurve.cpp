@@ -1080,7 +1080,8 @@ static const QAbstractButton * getButton(const QWidget *w, const QPainter *p)
 
 inline bool isMultiTabBarTab(const QAbstractButton *button)
 {
-    return button && ( (::qobject_cast<const QPushButton *>(button) && ((QPushButton *)button)->isFlat() &&
+    // Check for isFlat fails in KDE SC4.5
+    return button && ( (::qobject_cast<const QPushButton *>(button) && // ((QPushButton *)button)->isFlat() &&
                             button->inherits("KMultiTabBarTab")) ||
                        (APP_KDEVELOP==theThemedApp && ::qobject_cast<const QToolButton *>(button) &&
                             button->inherits("Sublime::IdealToolButton")) );
