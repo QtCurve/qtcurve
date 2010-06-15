@@ -16,6 +16,8 @@
 10. Fix KDE SC4.5 sidebar buttons when set to now draw as standard buttons.
 11. Display kwin options in style config dialog, and import/export these when
     importing/exporting QtCurve themes.
+12. If drawing a spin widget with no edit field (as happens in KOffice's progress/spin
+    widget), then dont draw the background behind the spin arrows.
 
 1.4.3
 -----

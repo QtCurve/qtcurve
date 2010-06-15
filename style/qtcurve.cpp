@@ -8057,7 +8057,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                       upIsActive(SC_SpinBoxUp==spinBox->activeSubControls),
                       downIsActive(SC_SpinBoxDown==spinBox->activeSubControls),
                       doEtch(DO_EFFECT && opts.etchEntry),
-                      isOO(isOOWidget(widget));
+                      isOO(isOOWidget(widget)),
+                      oldUnify=opts.unifySpin; // See Krita note below...
 
                 if(!doFrame && isOO && !opts.unifySpin)
                 {
@@ -8085,34 +8086,40 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     all.adjust(1, 1, -1, -1);
                 }
 
-                if(opts.unifySpin)
-                    drawEntryField(painter, all, widget, option, ROUNDED_ALL, true, false);
+                // Krita/KOffice uses a progressbar with spin buttons at the end
+                // ...when drawn, the frame part is not set - so in this case dont draw the background
+                // behind the buttons!
+                if(!doFrame)
+                    opts.unifySpin=true; // So, set this to true to fake the above scenario!
                 else
-                {
-                    if(opts.unifySpinBtns)
+                    if(opts.unifySpin)
+                        drawEntryField(painter, all, widget, option, ROUNDED_ALL, true, false);
+                    else
                     {
-                        QRect btns=up.united(down);
-                        const QColor *use(buttonColors(option));
-                        QStyleOption opt(*option);
-
-                        opt.state&=~(State_Sunken|State_MouseOver);
-                        opt.state|=State_Horizontal;
-
-                        drawLightBevel(painter, btns, &opt, widget, reverse ?  ROUNDED_LEFT : ROUNDED_RIGHT,
-                                    getFill(&opt, use), use, true, WIDGET_SPIN);
-
-                        if(state&State_MouseOver && state&State_Enabled && !(state&State_Sunken))
+                        if(opts.unifySpinBtns)
                         {
-                            opt.state|=State_MouseOver;
-                            painter->save();
-                            painter->setClipRect(upIsActive ? up : down);
+                            QRect btns=up.united(down);
+                            const QColor *use(buttonColors(option));
+                            QStyleOption opt(*option);
+
+                            opt.state&=~(State_Sunken|State_MouseOver);
+                            opt.state|=State_Horizontal;
+
                             drawLightBevel(painter, btns, &opt, widget, reverse ?  ROUNDED_LEFT : ROUNDED_RIGHT,
                                         getFill(&opt, use), use, true, WIDGET_SPIN);
-                            painter->restore();
+
+                            if(state&State_MouseOver && state&State_Enabled && !(state&State_Sunken))
+                            {
+                                opt.state|=State_MouseOver;
+                                painter->save();
+                                painter->setClipRect(upIsActive ? up : down);
+                                drawLightBevel(painter, btns, &opt, widget, reverse ?  ROUNDED_LEFT : ROUNDED_RIGHT,
+                                            getFill(&opt, use), use, true, WIDGET_SPIN);
+                                painter->restore();
+                            }
+                            drawFadedLine(painter, down.adjusted(2, 0, -2, 0), use[BORDER_VAL(state&State_Enabled)], true, true, true);
                         }
-                        drawFadedLine(painter, down.adjusted(2, 0, -2, 0), use[BORDER_VAL(state&State_Enabled)], true, true, true);
                     }
-                }
 
                 if(up.isValid())
                 {
@@ -8125,7 +8132,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                                            (QAbstractSpinBox::StepNone==spinBox->stepEnabled && isOO))
                                     ? State_Enabled : State_None)|
                               (upIsActive && sunken ? State_Sunken : State_Raised)|
-                              (upIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;;
+                              (upIsActive && !sunken && mouseOver ? State_MouseOver : State_None)|State_Horizontal;
 
                     drawPrimitive(QAbstractSpinBox::PlusMinus==spinBox->buttonSymbols ? PE_IndicatorSpinPlus : PE_IndicatorSpinUp,
                                   &opt, painter, widget);
@@ -8154,6 +8161,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         frame.setWidth(frame.width()+1);
                     drawEntryField(painter, frame, widget, option, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                 }
+                opts.unifySpin=oldUnify;
             }
             break;
         case CC_Slider:
