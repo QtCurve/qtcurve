@@ -1600,6 +1600,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             CFG_READ_BOOL(xbar)
             CFG_READ_INT(dwtSettings)
+            CFG_READ_INT(bgndOpacity)
+            CFG_READ_INT(menuBgndOpacity)
 #endif
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             CFG_READ_APPEARANCE(menuStripeAppearance, false, false)
@@ -2109,7 +2111,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->colorSliderMouseOver &&
                (SHADE_NONE==opts->shadeSliders || SHADE_DARKEN==opts->shadeSliders))
                 opts->colorSliderMouseOver=false;
-#endif
+#endif /* ndef CONFIG_DIALOG */
 
             if(LINE_1DOT==opts->toolbarSeparators)
                 opts->toolbarSeparators=LINE_DOTS;
@@ -2330,6 +2332,7 @@ static void defaultSettings(Options *opts)
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    opts->bgndOpacity=opts->menuBgndOpacity=100;
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
@@ -3001,6 +3004,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
+        CFG_WRITE_ENTRY_NUM(bgndOpacity)
+        CFG_WRITE_ENTRY_NUM(menuBgndOpacity)
 #endif
         CFG_WRITE_ENTRY(titlebarMenuColor)
         CFG_WRITE_ENTRY(titlebarBorder)

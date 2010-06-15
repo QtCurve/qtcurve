@@ -684,7 +684,9 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #ifdef Q_WS_X11
 static void triggerWMMove(const QWidget *w, const QPoint &p)
 {
-    static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+    Display *dpy = QX11Info::display();
+
+    static const Atom constNetMoveResize = XInternAtom(dpy, "_NET_WM_MOVERESIZE", False);
 
     //...Taken from bespin...
     // stolen... errr "adapted!" from QSizeGrip
@@ -692,7 +694,7 @@ static void triggerWMMove(const QWidget *w, const QPoint &p)
     XEvent xev;
     xev.xclient.type = ClientMessage;
     xev.xclient.message_type = constNetMoveResize;
-    xev.xclient.display = QX11Info::display();
+    xev.xclient.display = dpy;
     xev.xclient.window = w->window()->winId();
     xev.xclient.format = 32;
     xev.xclient.data.l[0] = p.x();
@@ -700,9 +702,33 @@ static void triggerWMMove(const QWidget *w, const QPoint &p)
     xev.xclient.data.l[2] = 8; // NET::Move
     xev.xclient.data.l[3] = Button1;
     xev.xclient.data.l[4] = 0;
-    XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-    XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
+    XUngrabPointer(dpy, QX11Info::appTime());
+    XSendEvent(dpy, QX11Info::appRootWindow(info.screen()), False,
                SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+}
+
+static void enableBlurBehind(QWidget *w, bool enable=true)
+{
+    Display *dpy = QX11Info::display();
+
+    static const Atom atom = XInternAtom(dpy, "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
+
+    if (enable)
+        XChangeProperty(dpy, w->window()->winId(), atom, XA_CARDINAL, 32, PropModeReplace, 0, 0);
+    else
+        XDeleteProperty(dpy, w->window()->winId(), atom);
+}
+
+static bool compositingActive()
+{
+    Display *dpy = QX11Info::display();
+    char    string[100];
+
+    sprintf(string, "_NET_WM_CM_S%d", DefaultScreen(dpy));
+
+    Atom atom = XInternAtom(dpy, string, False);
+
+    return XGetSelectionOwner(QX11Info::display(), atom) != None;
 }
 
 void setSbProp(QWidget *w)
@@ -1166,6 +1192,9 @@ QtCurveStyle::QtCurveStyle()
             QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
                                                   "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
     }
+
+    if((100!=opts.bgndOpacity || 100!=opts.menuBgndOpacity) && !compositingActive())
+        opts.bgndOpacity=opts.menuBgndOpacity=100;
 #endif
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
@@ -1766,6 +1795,17 @@ void QtCurveStyle::polish(QWidget *widget)
             case Qt::Dialog:
                 widget->installEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground);
+                if(100!=opts.bgndOpacity && widget->isWindow() && !widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) &&
+                   !widget->testAttribute(Qt::WA_TranslucentBackground))
+                {
+                    widget->setAttribute(Qt::WA_TranslucentBackground);
+                    // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
+                    // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+                    widget->move(10000,10000);
+#ifdef Q_WS_X11
+                    enableBlurBehind(widget, true);
+#endif
+                }
                 break;
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
             case Qt::Tool: // this we exclude as it is used for dragging of icons etc
@@ -2033,9 +2073,18 @@ void QtCurveStyle::polish(QWidget *widget)
 
     if(qobject_cast<QMenu *>(widget))
     {
-        if(!IS_FLAT_BGND(opts.menuBgndAppearance))
+        if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity)
+        {
             widget->installEventFilter(this);
-        else if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
+            if(100!=opts.bgndOpacity && !widget->testAttribute(Qt::WA_TranslucentBackground))
+            {
+                widget->setAttribute(Qt::WA_TranslucentBackground);
+#ifdef Q_WS_X11
+                enableBlurBehind(widget, true);
+#endif
+            }
+        }
+        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
         {
             QPalette pal(widget->palette());
 
@@ -2284,6 +2333,10 @@ void QtCurveStyle::unpolish(QWidget *widget)
             case Qt::Dialog:
                 widget->removeEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground, false);
+#ifdef Q_WS_X11
+                if(100!=opts.bgndOpacity)
+                    enableBlurBehind(widget, false);
+#endif
                 break;
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
             case Qt::Tool: // this we exclude as it is used for dragging of icons etc
@@ -2459,11 +2512,16 @@ void QtCurveStyle::unpolish(QWidget *widget)
                 widget->setPalette(QApplication::palette());
         }
 
-    if(qobject_cast<QMenu *>(widget) && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
-        widget->setPalette(QApplication::palette());
-
-    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu *>(widget))
+    if(qobject_cast<QMenu *>(widget))
+    {
         widget->removeEventFilter(this);
+        if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
+            widget->setPalette(QApplication::palette());
+#ifdef Q_WS_X11
+        if(100!=opts.menuBgndOpacity)
+            enableBlurBehind(widget, false);
+#endif
+    }
 
     if (qobject_cast<QMenuBar *>(widget) ||
         widget->inherits("Q3ToolBar") ||
@@ -2611,7 +2669,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         QWidget *widget=qobject_cast<QWidget *>(object);
 
         if(widget && (widget->isWindow() || (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))) && widget->isVisible() &&
-           widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground))
+           widget->testAttribute(Qt::WA_StyledBackground) && (opts.bgndOpacity!=100 || !widget->testAttribute(Qt::WA_NoSystemBackground)))
             drawBackground(widget);
     }
 
@@ -2661,7 +2719,8 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 static_cast<QStatusBar *>(object)->setHidden(true);
             break;
         case QEvent::Paint:
-            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type) && qobject_cast<QMenu*>(object))
+            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity) &&
+                qobject_cast<QMenu*>(object))
                 drawBackground((QWidget*)object, false);
             else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
             {
@@ -4032,7 +4091,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
 
-                        if(opts.round && IS_FLAT_BGND(opts.bgndAppearance) &&
+                        if(opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100==opts.bgndOpacity &&
                            widget && widget->parentWidget() && !inQAbstractItemView/* &&
                            widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/)
                         {
@@ -10916,6 +10975,7 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
     EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
+    int           opacity = isWindow ? opts.bgndOpacity : opts.menuBgndOpacity;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
@@ -10931,6 +10991,9 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
         bool      striped(APPEARANCE_STRIPED==app);
         QPixmap   pix;
 
+        if(100!=opacity)
+            col.setAlphaF(opacity/100.0);
+
         key.sprintf("qtc-bgnd-%x-%d-%d", col.rgba(), grad, app);
         if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
         {
@@ -10938,16 +11001,29 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
                             ? QSize(64, 64)
                             : QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight,
                                     GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
+
+            if(100!=opacity)
+                pix.fill(Qt::transparent);
+
             QPainter pixPainter(&pix);
 
             if(striped)
             {
                 QColor col2(shade(col, BGND_STRIPE_SHADE));
 
-                pixPainter.fillRect(pix.rect(), col);
+                if(100!=opacity)
+                {
+                    col2.setAlphaF(opacity/100.0);
+                    pixPainter.setPen(col);
+                    for(int i=0; i<pix.height(); i+=4)
+                        pixPainter.drawLine(0, i, pix.width()-1, i);
+                }
+                else
+                    pixPainter.fillRect(pix.rect(), col);
                 pixPainter.setPen(QColor((3*col.red()+col2.red())/4,
                                          (3*col.green()+col2.green())/4,
-                                         (3*col.blue()+col2.blue())/4));
+                                         (3*col.blue()+col2.blue())/4,
+                                         100!=opacity ? col2.alpha() : 255));
 
                 for(int i=1; i<pix.height(); i+=4)
                 {
@@ -10967,6 +11043,13 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
 
         p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
                           striped || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+    }
+    else if(100!=opacity)
+    {
+        QColor col(isWindow ? window->palette().window().color() : popupMenuCol());
+
+        col.setAlphaF(opacity/100.0);
+        p.fillRect(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()), col);
     }
 
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&

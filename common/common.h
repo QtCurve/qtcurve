@@ -107,6 +107,7 @@ typedef gchar ** Strings;
 #endif
 
 #define SETTINGS_GROUP        "Settings"
+#define KWIN_GROUP            "KWin"
 /*#define DESCR_GROUP  "Description"*/
 
 /* qtc_<theme name>.themerc support */
@@ -397,7 +398,11 @@ typedef gchar ** Strings;
 #define RINGS_SQUARE_LARGE_SIZE  120.0
 #define RINGS_SQUARE_SMALL_SIZE  100.0
 
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+#define CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type || 100!=opts.bgndOpacity)
+#else
 #define CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
+#endif
 
 #define GLOW_PROG_ALPHA 0.55
 
@@ -1044,7 +1049,9 @@ typedef struct
                      statusbarHiding;
     int              square;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    int              dwtSettings;
+    int              dwtSettings,
+                     bgndOpacity,
+                     menuBgndOpacity;
 #endif
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
