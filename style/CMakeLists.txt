@@ -1,9 +1,9 @@
 if (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp macmenu.cpp)
-    set(qtcurve_MOC_HDRS qtcurve.h macmenu.h macmenu-dbus.h)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp)
+    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h macmenu.h macmenu-dbus.h)
 else (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp)
-    set(qtcurve_MOC_HDRS qtcurve.h)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp)
+    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h)
 endif (Q_WS_X11)
 
 add_definitions(-DQT_PLUGIN)
