@@ -8091,7 +8091,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 // Krita/KOffice uses a progressbar with spin buttons at the end
                 // ...when drawn, the frame part is not set - so in this case dont draw the background
                 // behind the buttons!
-                if(!doFrame)
+                if(!isOO && !doFrame)
                     opts.unifySpin=true; // So, set this to true to fake the above scenario!
                 else
                     if(opts.unifySpin)
