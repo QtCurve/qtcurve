@@ -19,6 +19,7 @@
     importing/exporting QtCurve themes.
 13. If drawing a spin widget with no edit field (as happens in KOffice's progress/spin
     widget), then dont draw the background behind the spin arrows.
+14. Fix right margin of tab labels.
 
 1.4.3
 -----
