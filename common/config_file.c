@@ -1636,7 +1636,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(coloredTbarMo)
             CFG_READ_BOOL(borderSelection)
             CFG_READ_BOOL(stripedSbar)
-            CFG_READ_BOOL(windowDrag)
+            CFG_READ_INT_BOOL(windowDrag, WM_DRAG_MENUBAR)
             CFG_READ_BOOL(shadePopupMenu)
 
             if(version<MAKE_VERSION(1, 4))
@@ -2316,7 +2316,7 @@ static void defaultSettings(Options *opts)
     opts->borderSelection=false;
     opts->square=SQUARE_NONE;
     opts->stripedSbar=false;
-    opts->windowDrag=false;
+    opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
     opts->titlebarBorder=true;
     opts->titlebarBlend=false;

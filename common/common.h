@@ -545,6 +545,14 @@ typedef enum
 
 typedef enum
 {
+    WM_DRAG_NONE             = 0,
+    WM_DRAG_MENUBAR          = 1,
+    WM_DRAG_MENU_AND_TOOLBAR = 2,
+    WM_DRAG_ALL              = 3
+} EWmDrag;
+
+typedef enum
+{
     EFFECT_NONE,
     EFFECT_ETCH,
     EFFECT_SHADOW
@@ -1047,15 +1055,15 @@ typedef struct
                      coloredTbarMo,
                      borderSelection,
                      stripedSbar,
-                     windowDrag,
                      shadePopupMenu;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
     int              menubarHiding,
-                     statusbarHiding;
-    int              square;
+                     statusbarHiding,
+                     square,
+                     windowDrag;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     int              dwtSettings,
                      bgndOpacity,

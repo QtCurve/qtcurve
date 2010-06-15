@@ -24,6 +24,7 @@
 #endif
 #define COMMON_FUNCTIONS
 #include "qtcurve.h"
+#include "windowmanager.h"
 #include "pixmaps.h"
 #define CONFIG_READ
 #include "config_file.c"
@@ -682,31 +683,6 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef Q_WS_X11
-static void triggerWMMove(const QWidget *w, const QPoint &p)
-{
-    Display *dpy = QX11Info::display();
-
-    static const Atom constNetMoveResize = XInternAtom(dpy, "_NET_WM_MOVERESIZE", False);
-
-    //...Taken from bespin...
-    // stolen... errr "adapted!" from QSizeGrip
-    QX11Info info;
-    XEvent xev;
-    xev.xclient.type = ClientMessage;
-    xev.xclient.message_type = constNetMoveResize;
-    xev.xclient.display = dpy;
-    xev.xclient.window = w->window()->winId();
-    xev.xclient.format = 32;
-    xev.xclient.data.l[0] = p.x();
-    xev.xclient.data.l[1] = p.y();
-    xev.xclient.data.l[2] = 8; // NET::Move
-    xev.xclient.data.l[3] = Button1;
-    xev.xclient.data.l[4] = 0;
-    XUngrabPointer(dpy, QX11Info::appTime());
-    XSendEvent(dpy, QX11Info::appRootWindow(info.screen()), False,
-               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-}
-
 static void enableBlurBehind(QWidget *w, bool enable=true)
 {
     Display *dpy = QX11Info::display();
@@ -1086,7 +1062,9 @@ inline bool isMultiTabBarTab(const QAbstractButton *button)
                        (APP_KDEVELOP==theThemedApp && ::qobject_cast<const QToolButton *>(button) &&
                             button->inherits("Sublime::IdealToolButton")) );
 }
-    
+
+Options QtCurveStyle::opts;
+
 #ifdef QTC_STYLE_SUPPORT
 QtCurveStyle::QtCurveStyle(const QString &name)
 #else
@@ -1116,13 +1094,12 @@ QtCurveStyle::QtCurveStyle()
               itsHoverWidget(0L),
 #ifdef Q_WS_X11
               itsDBus(0),
-              itsDragWidget(0L),
-              itsDragWidgetHadMouseTracking(false),
 #endif
 #if QT_VERSION < 0x040500
               itsQtVersion(VER_UNKNOWN),
 #endif
-              itsSViewSBar(0L)
+              itsSViewSBar(0L),
+              itsWindowManager(new QtCurve::WindowManager(this))
 {
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
@@ -1212,6 +1189,8 @@ QtCurveStyle::QtCurveStyle()
 #if !defined QTC_QT_ONLY
     setupKde4();
 #endif
+
+    itsWindowManager->initialize();
 
     switch(opts.shadeSliders)
     {
@@ -1771,22 +1750,22 @@ void QtCurveStyle::polish(QPalette &palette)
 
 void QtCurveStyle::polish(QWidget *widget)
 {
+    if(!widget)
+        return;
+
     bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
     // 'Fix' konqueror's large menubar...
     if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
         widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
 
-#ifdef Q_WS_X11
-    if(isWindowDragWidget(widget))
-        widget->installEventFilter(this);
-#endif
-
     if(EFFECT_NONE!=opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget))
     {
         theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
+
+    itsWindowManager->registerWidget(widget);
 
     if(CUSTOM_BGND)
     {
@@ -2316,16 +2295,16 @@ void QtCurveStyle::polishLayout(QLayout *layout)
 
 void QtCurveStyle::unpolish(QWidget *widget)
 {
+    if(!widget)
+        return;
+
     if(EFFECT_NONE!=opts.buttonEffect && theNoEtchWidgets.contains(widget))
     {
         theNoEtchWidgets.remove(static_cast<const QWidget *>(widget));
         disconnect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 
-#ifdef Q_WS_X11
-    if(isWindowDragWidget(widget))
-        widget->removeEventFilter(this);
-#endif
+    itsWindowManager->unregisterWidget(widget);
 
     if(CUSTOM_BGND)
     {
@@ -2770,21 +2749,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                         lbl->repaint();
                     }
                 }
-#ifdef Q_WS_X11
-                else if(isWindowDragWidget(object))
-                {
-                    QMouseEvent *mev = (QMouseEvent *)event;
-
-                    if(Qt::NoModifier==mev->modifiers() && Qt::LeftButton==mev->button())
-                    {
-                        QWidget *wid = static_cast<QWidget*>(object);
-                        itsDragWidget=wid;
-                        itsDragWidgetHadMouseTracking=itsDragWidget->hasMouseTracking();
-                        itsDragWidget->setMouseTracking(true);
-                        return false;
-                    }
-                }
-#endif
             }
             break;
         case QEvent::MouseButtonRelease:
@@ -2805,14 +2769,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                     if (lbl->rect().contains(mev->pos()))
                         ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
                 }
-#ifdef Q_WS_X11
-                else if(itsDragWidget)
-                {
-                    itsDragWidget->setMouseTracking(itsDragWidgetHadMouseTracking);
-                    itsDragWidget = 0L;
-                    return false;
-                }
-#endif
             }
             break;
         case QEvent::StyleChange:
@@ -2919,18 +2875,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                     itsHoverWidget->repaint();
                 itsPos=me->pos();
             }
-#ifdef Q_WS_X11
-            else if(itsDragWidget)
-            {
-                itsDragWidget->setMouseTracking(itsDragWidgetHadMouseTracking);
-                bool move=isWindowDragWidget(object);
-
-                if(move)
-                    triggerWMMove(itsDragWidget, ((QMouseEvent *)event)->globalPos());
-                itsDragWidget = 0L;
-                return move;
-            }
-#endif
             break;
         }
         case QEvent::FocusIn:
@@ -12994,6 +12938,8 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
             break;
     }
 #endif
+
+    itsWindowManager->initialize();
 }
 
 void QtCurveStyle::titlebarSizeChangedChange()
@@ -13113,24 +13059,6 @@ void QtCurveStyle::toggleStatusBar(QMainWindow *window)
 }
                         
 #ifdef Q_WS_X11
-bool QtCurveStyle::isWindowDragWidget(QObject *o)
-{
-   return  opts.windowDrag &&
-           (//qobject_cast<QDialog*>(o) ||
-           (qobject_cast<QMenuBar*>(o) && !static_cast<QMenuBar*>(o)->activeAction())
-            //|| qobject_cast<QGroupBox*>(o)
-            //|| (o->inherits("QToolButton") && !static_cast<QWidget*>(o)->isEnabled())
-//             || qobject_cast<QToolBar*>(o)
-            //|| qobject_cast<QDockWidget*>(o)
-
-//            || ((*appType == Hacks::SMPlayer) && o->inherits(SMPlayerVideoWidget))
-//            || ((*appType == Hacks::Dragon) && o->inherits(DragonVideoWidget))
-
-//            || o->inherits("QStatusBar")
-//            || (o->inherits("QLabel") && o->parent() && o->parent()->inherits("QStatusBar"))
-           );
-}
-
 void QtCurveStyle::emitMenuSize(QWidget *w, unsigned short size)
 {
     if(w)

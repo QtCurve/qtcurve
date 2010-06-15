@@ -22,6 +22,7 @@
 14. Fix right margin of tab labels.
 15. Fix scrollview frame when squared and etched.
 16. Fix QDial 'handle' position.
+17. Replace custom window-drag code with that of Oxygen.
 
 1.4.3
 -----

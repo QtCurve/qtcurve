@@ -58,6 +58,11 @@ class QDBusInterface;
 class QMainWindow;
 class QStatusBar;
 
+namespace QtCurve
+{
+    class WindowManager;
+}
+
 class QtCurveStyle : public QCommonStyle
 {
     Q_OBJECT
@@ -107,6 +112,8 @@ class QtCurveStyle : public QCommonStyle
     QtCurveStyle();
 #endif
     ~QtCurveStyle();
+
+    static Options & options() { return opts; }
 
     void polish(QApplication *app);
     void polish(QPalette &palette);
@@ -266,7 +273,7 @@ class QtCurveStyle : public QCommonStyle
 
     private:
 
-    mutable Options                    opts;
+    static Options                     opts;
     QColor                             itsHighlightCols[TOTAL_SHADES+1],
                                        itsBackgroundCols[TOTAL_SHADES+1],
                                        itsMenubarCols[TOTAL_SHADES+1],
@@ -312,8 +319,6 @@ class QtCurveStyle : public QCommonStyle
     QWidget                            *itsHoverWidget;
 #ifdef Q_WS_X11
     QDBusInterface                     *itsDBus;
-    QWidget                            *itsDragWidget;
-    bool                               itsDragWidgetHadMouseTracking;
 #endif
 #if QT_VERSION < 0x040500
     mutable Version                    itsQtVersion;
@@ -323,6 +328,7 @@ class QtCurveStyle : public QCommonStyle
 #if !defined QTC_QT_ONLY
     KComponentData                     itsComponentData;
 #endif
+    QtCurve::WindowManager             *itsWindowManager;
 };
 
 #endif
