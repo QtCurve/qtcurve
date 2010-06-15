@@ -1063,8 +1063,6 @@ inline bool isMultiTabBarTab(const QAbstractButton *button)
                             button->inherits("Sublime::IdealToolButton")) );
 }
 
-Options QtCurveStyle::opts;
-
 #ifdef QTC_STYLE_SUPPORT
 QtCurveStyle::QtCurveStyle(const QString &name)
 #else
@@ -1190,7 +1188,7 @@ QtCurveStyle::QtCurveStyle()
     setupKde4();
 #endif
 
-    itsWindowManager->initialize();
+    itsWindowManager->initialize(opts.windowDrag);
 
     switch(opts.shadeSliders)
     {
@@ -12939,7 +12937,7 @@ void QtCurveStyle::kdeGlobalSettingsChange(int type, int)
     }
 #endif
 
-    itsWindowManager->initialize();
+    itsWindowManager->initialize(opts.windowDrag);
 }
 
 void QtCurveStyle::titlebarSizeChangedChange()

@@ -113,7 +113,7 @@ class QtCurveStyle : public QCommonStyle
 #endif
     ~QtCurveStyle();
 
-    static Options & options() { return opts; }
+    Options & options() { return opts; }
 
     void polish(QApplication *app);
     void polish(QPalette &palette);
@@ -273,7 +273,7 @@ class QtCurveStyle : public QCommonStyle
 
     private:
 
-    static Options                     opts;
+    mutable Options                    opts;
     QColor                             itsHighlightCols[TOTAL_SHADES+1],
                                        itsBackgroundCols[TOTAL_SHADES+1],
                                        itsMenubarCols[TOTAL_SHADES+1],
