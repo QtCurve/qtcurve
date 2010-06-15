@@ -859,9 +859,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(inactiveTitlebarAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(titlebarButtonAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(colorTitlebarOnlyChanged()));
-    connect(titlebarBlend, SIGNAL(toggled(bool)), SLOT(titlebarBlendChanged()));
-    connect(titlebarMenuColor, SIGNAL(toggled(bool)), SLOT(titlebarMenuColorChanged()));
+    connect(windowBorder_colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(windowBorder_colorTitlebarOnlyChanged()));
+    connect(windowBorder_blend, SIGNAL(toggled(bool)), SLOT(windowBorder_blendChanged()));
+    connect(windowBorder_menuColor, SIGNAL(toggled(bool)), SLOT(windowBorder_menuColorChanged()));
     connect(selectionAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(shadeCheckRadio, SIGNAL(currentIndexChanged(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -891,7 +891,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(borderSbarGroove, SIGNAL(toggled(bool)), SLOT(borderSbarGrooveChanged()));
     connect(thinSbarGroove, SIGNAL(toggled(bool)), SLOT(thinSbarGrooveChanged()));
     connect(colorSliderMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(titlebarBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(windowBorder_addLightBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(windowDrag, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1132,7 +1132,7 @@ void QtCurveConfig::shadeMenubarsChanged()
     customMenuTextColor->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex());
     shadeMenubarOnlyWhenActive->setEnabled(SHADE_WINDOW_BORDER!=shadeMenubars->currentIndex());
     if(SHADE_WINDOW_BORDER==shadeMenubars->currentIndex())
-        titlebarMenuColor->setChecked(false);
+        windowBorder_menuColor->setChecked(false);
     updateChanged();
 }
 
@@ -1285,28 +1285,28 @@ void QtCurveConfig::xbarChanged()
     updateChanged();
 }
  
-void QtCurveConfig::colorTitlebarOnlyChanged()
+void QtCurveConfig::windowBorder_colorTitlebarOnlyChanged()
 {
-    if(!colorTitlebarOnly->isChecked())
-        titlebarBlend->setChecked(false);
+    if(!windowBorder_colorTitlebarOnly->isChecked())
+        windowBorder_blend->setChecked(false);
     updateChanged();
 }
 
-void QtCurveConfig::titlebarBlendChanged()
+void QtCurveConfig::windowBorder_blendChanged()
 {
-    if(titlebarBlend->isChecked())
+    if(windowBorder_blend->isChecked())
     {
-        colorTitlebarOnly->setChecked(true);
-        titlebarMenuColor->setChecked(false);
+        windowBorder_colorTitlebarOnly->setChecked(true);
+        windowBorder_menuColor->setChecked(false);
     }
     updateChanged();
 }
 
-void QtCurveConfig::titlebarMenuColorChanged()
+void QtCurveConfig::windowBorder_menuColorChanged()
 {
-    if(titlebarMenuColor->isChecked())
+    if(windowBorder_menuColor->isChecked())
     {
-        colorTitlebarOnly->setChecked(false);
+        windowBorder_colorTitlebarOnly->setChecked(false);
         if(SHADE_WINDOW_BORDER==shadeMenubars->currentIndex())
             shadeMenubars->setCurrentIndex(SHADE_NONE);
     }
@@ -2413,9 +2413,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.titlebarAppearance=(EAppearance)titlebarAppearance->currentIndex();
     opts.inactiveTitlebarAppearance=(EAppearance)inactiveTitlebarAppearance->currentIndex();
     opts.titlebarButtonAppearance=(EAppearance)titlebarButtonAppearance->currentIndex();
-    opts.colorTitlebarOnly=colorTitlebarOnly->isChecked();
-    opts.titlebarBlend=titlebarBlend->isChecked();
-    opts.titlebarMenuColor=titlebarMenuColor->isChecked();
+    opts.windowBorder=getWindowBorderFlags();
     opts.selectionAppearance=(EAppearance)selectionAppearance->currentIndex();
     opts.shadeCheckRadio=(EShade)shadeCheckRadio->currentIndex();
     opts.customCheckRadioColor=customCheckRadioColor->color();
@@ -2427,7 +2425,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.borderSbarGroove=borderSbarGroove->isChecked();
     opts.thinSbarGroove=thinSbarGroove->isChecked();
     opts.colorSliderMouseOver=colorSliderMouseOver->isChecked();
-    opts.titlebarBorder=titlebarBorder->isChecked();
     opts.windowDrag=windowDrag->currentIndex();
     opts.sbarBgndAppearance=(EAppearance)sbarBgndAppearance->currentIndex();
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
@@ -2649,9 +2646,9 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarAppearance->setCurrentIndex(opts.titlebarAppearance);
     inactiveTitlebarAppearance->setCurrentIndex(opts.inactiveTitlebarAppearance);
     titlebarButtonAppearance->setCurrentIndex(opts.titlebarButtonAppearance);
-    colorTitlebarOnly->setChecked(opts.colorTitlebarOnly);
-    titlebarBlend->setChecked(opts.titlebarBlend);
-    titlebarMenuColor->setChecked(opts.titlebarMenuColor);
+    windowBorder_colorTitlebarOnly->setChecked(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY);
+    windowBorder_blend->setChecked(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR);
+    windowBorder_menuColor->setChecked(opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR);
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
@@ -2679,7 +2676,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     borderSbarGroove->setChecked(opts.borderSbarGroove);
     thinSbarGroove->setChecked(opts.thinSbarGroove);
     colorSliderMouseOver->setChecked(opts.colorSliderMouseOver);
-    titlebarBorder->setChecked(opts.titlebarBorder);
+    windowBorder_addLightBorder->setChecked(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER);
     windowDrag->setCurrentIndex(opts.windowDrag);
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
@@ -2869,6 +2866,21 @@ int QtCurveConfig::getSquareFlags()
     return square;
 }
 
+int QtCurveConfig::getWindowBorderFlags()
+{
+    int flags(0);
+
+    if(windowBorder_colorTitlebarOnly->isChecked())
+        flags|=WINDOW_BORDER_COLOR_TITLEBAR_ONLY;
+    if(windowBorder_menuColor->isChecked())
+        flags|=WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR;
+    if(windowBorder_addLightBorder->isChecked())
+        flags|=WINDOW_BORDER_ADD_LIGHT_BORDER;
+    if(windowBorder_blend->isChecked())
+        flags|=WINDOW_BORDER_BLEND_TITLEBAR;
+    return flags;
+}
+
 bool QtCurveConfig::diffTitleBarButtonColors(const Options &opts)
 {
     return (titlebarButtons_custom->isChecked() &&
@@ -2987,9 +2999,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          titlebarAppearance->currentIndex()!=opts.titlebarAppearance ||
          inactiveTitlebarAppearance->currentIndex()!=opts.inactiveTitlebarAppearance ||
          titlebarButtonAppearance->currentIndex()!=opts.titlebarButtonAppearance ||
-         colorTitlebarOnly->isChecked()!=opts.colorTitlebarOnly ||
-         titlebarBlend->isChecked()!=opts.titlebarBlend ||
-         titlebarMenuColor->isChecked()!=opts.titlebarMenuColor ||
          selectionAppearance->currentIndex()!=opts.selectionAppearance ||
          toolbarSeparators->currentIndex()!=opts.toolbarSeparators ||
          splitters->currentIndex()!=opts.splitters ||
@@ -3017,7 +3026,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          borderSbarGroove->isChecked()!=opts.borderSbarGroove ||
          thinSbarGroove->isChecked()!=opts.thinSbarGroove ||
          colorSliderMouseOver->isChecked()!=opts.colorSliderMouseOver ||
-         titlebarBorder->isChecked()!=opts.titlebarBorder ||
+         getWindowBorderFlags()!=opts.windowBorder ||
          windowDrag->currentIndex()!=opts.windowDrag ||
          sbarBgndAppearance->currentIndex()!=opts.sbarBgndAppearance ||
          sliderFill->currentIndex()!=opts.sliderFill ||

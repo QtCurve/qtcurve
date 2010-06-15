@@ -196,7 +196,7 @@ enum
 #define TOGGLE_MENUBAR_ATOM   "_QTCURVE_TOGGLE_MENUBAR_"
 #define TOGGLE_STATUSBAR_ATOM "_QTCURVE_TOGGLE_STATUSBAR_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
-                           !opts.titlebarBlend && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
+                           !(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR) && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
 
 #define STD_BORDER         5
 #define STD_BORDER_BR      2
@@ -422,18 +422,16 @@ typedef enum
 {
     QtC_Round = QStyle::PM_CustomBase,
     QtC_TitleBarButtonAppearance,
-    QtC_TitleBarColorTopOnly,
     QtC_TitleAlignment,
     QtC_TitleBarButtons,
     QtC_TitleBarIcon,
     QtC_TitleBarIconColor,
-    QtC_TitleBarBorder,
     QtC_TitleBarEffect,
     QtC_BlendMenuAndTitleBar,
     QtC_ShadeMenubarOnlyWhenActive,
     QtC_ToggleButtons,
-    QtC_TitleBarUseMenuColor,
-    QtC_MenubarColor
+    QtC_MenubarColor,
+    QtC_WindowBorder
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
@@ -506,6 +504,14 @@ typedef enum
 
 typedef std::map<int, QColor> TBCols;
 #endif
+
+typedef enum
+{
+    WINDOW_BORDER_COLOR_TITLEBAR_ONLY            = 0x01, // colorTitlebarOnly
+    WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR = 0x02, // titlebarMenuColor
+    WINDOW_BORDER_ADD_LIGHT_BORDER               = 0x04, // titlebarBorder
+    WINDOW_BORDER_BLEND_TITLEBAR                 = 0x08  // titlebarBlend
+} EWindowBorder;
 
 typedef enum
 {
@@ -1042,10 +1048,6 @@ typedef struct
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
                      stdBtnSizes,
 #endif
-                     colorTitlebarOnly,
-                     titlebarMenuColor,
-                     titlebarBorder,
-                     titlebarBlend,
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      xbar,
 #endif
@@ -1063,7 +1065,8 @@ typedef struct
     int              menubarHiding,
                      statusbarHiding,
                      square,
-                     windowDrag;
+                     windowDrag,
+                     windowBorder;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     int              dwtSettings,
                      bgndOpacity,

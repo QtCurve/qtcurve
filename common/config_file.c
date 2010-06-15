@@ -1418,6 +1418,30 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 
             /* Check if the config file expects old default values... */
+            if(version<MAKE_VERSION(1, 5))
+            {
+                opts->windowBorder=
+                    (readBoolEntry(cfg, "colorTitlebarOnly", def->windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY)
+                                                                ? WINDOW_BORDER_COLOR_TITLEBAR_ONLY : 0)+
+                    (readBoolEntry(cfg, "titlebarBorder", def->windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
+                                                                ? WINDOW_BORDER_ADD_LIGHT_BORDER : 0)+
+                    (readBoolEntry(cfg, "titlebarBlend", def->windowBorder&WINDOW_BORDER_BLEND_TITLEBAR)
+                                                                ? WINDOW_BORDER_BLEND_TITLEBAR : 0);
+            }
+            else
+                CFG_READ_INT(windowBorder);
+
+            if(version<MAKE_VERSION(1, 4))
+            {
+                opts->square=
+                    (readBoolEntry(cfg, "squareLvSelection", def->square&SQUARE_LISTVIEW_SELECTION) ? SQUARE_LISTVIEW_SELECTION : SQUARE_NONE)+
+                    (readBoolEntry(cfg, "squareScrollViews", def->square&SQUARE_SCROLLVIEW) ? SQUARE_SCROLLVIEW : SQUARE_NONE)+
+                    (readBoolEntry(cfg, "squareProgress", def->square&SQUARE_PROGRESS) ? SQUARE_PROGRESS : SQUARE_NONE)+
+                    (readBoolEntry(cfg, "squareEntry", def->square&SQUARE_ENTRY)? SQUARE_ENTRY : SQUARE_NONE);
+            }
+            else
+                CFG_READ_INT(square)
+
             if(version<MAKE_VERSION(1, 2))
                 def->crSize=CR_SMALL_SIZE;
             if(version<MAKE_VERSION(1, 0))
@@ -1638,22 +1662,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(stripedSbar)
             CFG_READ_INT_BOOL(windowDrag, WM_DRAG_MENUBAR)
             CFG_READ_BOOL(shadePopupMenu)
-
-            if(version<MAKE_VERSION(1, 4))
-            {
-                opts->square=
-                    (readBoolEntry(cfg, "squareLvSelection", def->square&SQUARE_LISTVIEW_SELECTION) ? SQUARE_LISTVIEW_SELECTION : SQUARE_NONE)+
-                    (readBoolEntry(cfg, "squareScrollViews", def->square&SQUARE_SCROLLVIEW) ? SQUARE_SCROLLVIEW : SQUARE_NONE)+
-                    (readBoolEntry(cfg, "squareProgress", def->square&SQUARE_PROGRESS) ? SQUARE_PROGRESS : SQUARE_NONE)+
-                    (readBoolEntry(cfg, "squareEntry", def->square&SQUARE_ENTRY)? SQUARE_ENTRY : SQUARE_NONE);
-            }
-            else
-            {
-                CFG_READ_INT(square)
-            }
             
-            CFG_READ_BOOL(titlebarBlend)
-            CFG_READ_BOOL(titlebarBorder)
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(stdBtnSizes)
             CFG_READ_INT(titlebarButtons)
@@ -1675,11 +1684,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(doubleGtkComboArrow)
             CFG_READ_BOOL(stdSidebarButtons)
             CFG_READ_BOOL(toolbarTabs)
-            CFG_READ_BOOL(colorTitlebarOnly)
 #ifdef __cplusplus
             CFG_READ_ALIGN(titlebarAlignment)
             CFG_READ_EFFECT(titlebarEffect)
-            CFG_READ_BOOL(titlebarMenuColor)
             CFG_READ_BOOL(gtkComboMenus)
             CFG_READ_BOOL(centerTabText)
 /*
@@ -1704,8 +1711,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_FLAT;
-            if(opts->titlebarBlend && !opts->colorTitlebarOnly)
-                opts->titlebarBlend=false;
+            if((opts->windowBorder&WINDOW_BORDER_BLEND_TITLEBAR) && !(opts->windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY))
+                opts->windowBorder-=WINDOW_BORDER_BLEND_TITLEBAR;
             if(APPEARANCE_BEVELLED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
             else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
@@ -2113,8 +2120,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
             opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
 #endif
-            if(opts->titlebarMenuColor && (opts->titlebarBlend || SHADE_WINDOW_BORDER==opts->shadeMenubars))
-                opts->titlebarMenuColor=false;
+            if(opts->windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR &&
+              (opts->windowBorder&WINDOW_BORDER_BLEND_TITLEBAR || SHADE_WINDOW_BORDER==opts->shadeMenubars))
+                opts->windowBorder-=WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR;
 
             if(APPEARANCE_FLAT==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_RAISED;
@@ -2318,10 +2326,7 @@ static void defaultSettings(Options *opts)
     opts->stripedSbar=false;
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
-    opts->titlebarBorder=true;
-    opts->titlebarBlend=false;
-    opts->titlebarMenuColor=false;
-    opts->colorTitlebarOnly=false;
+    opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
@@ -3017,8 +3022,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(coloredTbarMo)
         CFG_WRITE_ENTRY(borderSelection)
         CFG_WRITE_ENTRY(stripedSbar)
-        CFG_WRITE_ENTRY(windowDrag)
+        CFG_WRITE_ENTRY_NUM(windowDrag)
         CFG_WRITE_ENTRY(shadePopupMenu)
+        CFG_WRITE_ENTRY_NUM(windowBorder)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
@@ -3026,9 +3032,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(menuBgndOpacity)
         CFG_WRITE_ENTRY(dlgOpacity)
 #endif
-        CFG_WRITE_ENTRY(titlebarMenuColor)
-        CFG_WRITE_ENTRY(titlebarBorder)
-        CFG_WRITE_ENTRY(titlebarBlend);
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
@@ -3069,7 +3072,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
         CFG_WRITE_ENTRY(doubleGtkComboArrow)
-        CFG_WRITE_ENTRY(colorTitlebarOnly)
         CFG_WRITE_ENTRY(gtkButtonOrder)
 #if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(reorderGtkButtons)
@@ -3152,6 +3154,16 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         }
         else
             CFG.deleteEntry("customShades");
+
+        // Removed from 1.5 onwards...
+        CFG.deleteEntry("colorTitlebarOnly");
+        CFG.deleteEntry("titlebarBorder");
+        CFG.deleteEntry("titlebarBlend");
+        // Removed from 1.4 onwards..
+        CFG.deleteEntry("squareLvSelection");
+        CFG.deleteEntry("squareScrollViews");
+        CFG.deleteEntry("squareProgress");
+        CFG.deleteEntry("squareEntry");
 
         cfg->sync();
         return true;

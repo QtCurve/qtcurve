@@ -403,8 +403,8 @@ int QtCurveHandler::borderEdgeSize() const
 {
     return outerBorder()
                 ? (itsConfig.borderSize()>QtCurveConfig::BORDER_NO_SIDES &&
-                    wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL)<ROUND_FULL)
-                    ? wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarBorder, NULL, NULL)
+                    wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, 0L, 0L)<ROUND_FULL)
+                    ? wStyle()->pixelMetric((QStyle::PixelMetric)QtC_WindowBorder, 0L, 0L)&WINDOW_BORDER_ADD_LIGHT_BORDER
                         ? 2
                         : 1
                     : 3

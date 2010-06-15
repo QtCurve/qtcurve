@@ -22,6 +22,9 @@
  */
 
 #include <QtGui/QPalette>
+#ifdef midColor
+#undef midColor
+#endif
 
 class KConfig;
 

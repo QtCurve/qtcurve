@@ -27,7 +27,6 @@ namespace KWinQtCurve
 {
 
 #define GROUP "General"
-#define NEW_GROUP "KWinQtCurve"
 
 void QtCurveConfig::defaults()
 {
@@ -46,9 +45,9 @@ void QtCurveConfig::defaults()
 #define READ_ENTRY(ENTRY) \
     its##ENTRY=group.readEntry(#ENTRY, def.its##ENTRY);
 
-void QtCurveConfig::load(const KConfig *cfg)
+void QtCurveConfig::load(const KConfig *cfg, const char *grp)
 {
-    KConfigGroup  group(cfg, GROUP);
+    KConfigGroup  group(cfg, grp ? grp : GROUP);
     QtCurveConfig def;
 
     if(group.hasKey("BorderSize"))
@@ -107,13 +106,13 @@ void QtCurveConfig::load(const KConfig *cfg)
     else \
         group.writeEntry(#ENTRY, its##ENTRY);
 
-void QtCurveConfig::save(KConfig *cfg)
+void QtCurveConfig::save(KConfig *cfg, const char *grp)
 {
-    KConfigGroup  group(cfg, GROUP);
+    KConfigGroup  group(cfg, grp ? grp : GROUP);
     QtCurveConfig def;
 
     //WRITE_ENTRY(BorderSize)
-    // Hace to write BorderSize, because if not found we read the kwin setting - to be
+    // Have to write BorderSize, because if not found we read the kwin setting - to be
     // compatible with QtCurve<1.4
     group.writeEntry("BorderSize", itsBorderSize);
     WRITE_ENTRY(RoundBottom)

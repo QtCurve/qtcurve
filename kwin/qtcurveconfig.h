@@ -46,8 +46,8 @@ class QtCurveConfig
     QtCurveConfig()               { defaults(); }
 
     void defaults();
-    void load(const KConfig *cfg);
-    void save(KConfig *cfg);
+    void load(const KConfig *cfg, const char *grp=0L);
+    void save(KConfig *cfg, const char *grp=0L);
 
     Size borderSize() const        { return (Size)itsBorderSize; }
     bool roundBottom() const       { return itsRoundBottom; }

@@ -1821,7 +1821,7 @@ void QtCurveStyle::polish(QWidget *widget)
         {
             static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
 #ifdef Q_WS_X11
-            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.titlebarMenuColor)
+            if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
                 emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
 #endif
         }
@@ -1934,7 +1934,7 @@ void QtCurveStyle::polish(QWidget *widget)
             (!((APP_QTDESIGNER==theThemedApp || APP_KDEVELOP==theThemedApp) && widget->inherits("QDesignerMenuBar"))))
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
-        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.titlebarMenuColor)
+        if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
             emitMenuSize((QWidget *)widget, widget->rect().height());
 #endif
         if(CUSTOM_BGND)
@@ -2656,7 +2656,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
     {
 #ifdef Q_WS_X11
         case QEvent::Resize:
-            if((BLEND_TITLEBAR || opts.titlebarMenuColor) && qobject_cast<QMenuBar *>(object))
+            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) && qobject_cast<QMenuBar *>(object))
             {
                 QResizeEvent *re = static_cast<QResizeEvent *>(event);
 
@@ -2790,7 +2790,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
 //                     frame->setFrameShape(QFrame::StyledPanel);
 //             }
 #ifdef Q_WS_X11
-            else if((BLEND_TITLEBAR || opts.titlebarMenuColor) && qobject_cast<QMenuBar *>(object))
+            else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) && qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, mb->size().height());
@@ -2802,7 +2802,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         case QEvent::Hide:
         {
 #ifdef Q_WS_X11
-            if((BLEND_TITLEBAR || opts.titlebarMenuColor) && qobject_cast<QMenuBar *>(object))
+            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) && qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, 0);
@@ -3154,8 +3154,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return 0;
         case QtC_Round:
             return (int)opts.round;
-        case QtC_TitleBarColorTopOnly:
-            return opts.colorTitlebarOnly;
+        case QtC_WindowBorder:
+            return opts.windowBorder;
         case QtC_TitleBarButtonAppearance:
             return (int)opts.titlebarButtonAppearance;
         case QtC_TitleAlignment:
@@ -3177,8 +3177,6 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return opts.titlebarIcon;
         case QtC_TitleBarIconColor:
             return titlebarIconColor(option).rgb();
-        case QtC_TitleBarBorder:
-            return opts.titlebarBorder;
         case QtC_TitleBarEffect:
             return opts.titlebarEffect;
         case QtC_BlendMenuAndTitleBar:
@@ -3188,8 +3186,6 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
         case QtC_ToggleButtons:
             return (opts.menubarHiding&HIDE_KWIN   ? 0x1 : 0)+
                    (opts.statusbarHiding&HIDE_KWIN ? 0x2 : 0);
-        case QtC_TitleBarUseMenuColor:
-            return opts.titlebarMenuColor;
         case QtC_MenubarColor:
             return itsMenubarCols[ORIGINAL_SHADE].rgb();
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
@@ -3922,7 +3918,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                 }
                 else if((QtC_StateKWin==state || (QtC_StateKWin|State_Active)==state) && fo && 1==fo->lineWidth && 1==fo->midLineWidth)
                 {
-                    const QColor *borderCols(opts.colorTitlebarOnly
+                    const QColor *borderCols(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
                                                 ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
                                                 : theThemedApp==APP_KWIN
                                                     ? buttonColors(option)
@@ -4867,7 +4863,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         case PE_FrameWindow:
         {
-            const QColor *borderCols(opts.colorTitlebarOnly
+            const QColor *borderCols(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
                                         ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
                                         : theThemedApp==APP_KWIN
                                             ? buttonColors(option)
@@ -4882,7 +4878,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
-                if(opts.titlebarBorder)
+                if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
                 {
                     painter->setPen(light);
                     painter->drawLine(r.x()+1, r.y(), r.x()+1, r.y()+r.height()-1);
@@ -4892,7 +4888,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             }
             else
             {
-                if(opts.titlebarBorder)
+                if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
                 {
                     painter->setRenderHint(QPainter::Antialiasing, false);
                     painter->setPen(light);
@@ -4908,7 +4904,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
 
                 if(FULLLY_ROUNDED && !(state&QtC_StateKWinCompositing))
                 {
-                    QColor col(opts.colorTitlebarOnly
+                    QColor col(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
                                 ? backgroundColors(option)[STD_BORDER]
                                 : buttonColors(option)[STD_BORDER]);
 
@@ -8284,7 +8280,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 if(!kwin)
                     painter->fillRect(tr, titleCols[STD_BORDER]);
 
-                if(APPEARANCE_STRIPED==opts.bgndAppearance && opts.titlebarBlend)
+                if(APPEARANCE_STRIPED==opts.bgndAppearance && opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR)
                 {
                     QColor col2(shade(itsBackgroundCols[ORIGINAL_SHADE], BGND_STRIPE_SHADE));
 
@@ -8328,7 +8324,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         dark.setAlphaF(1.0);
                     }
                     
-                    if(opts.titlebarBorder)
+                    if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
                     {
                         painter->setPen(light);
                         painter->save();
@@ -8352,7 +8348,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                     painter->setRenderHint(QPainter::Antialiasing, false);
 
-                    if(opts.titlebarBorder)
+                    if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
                     {
                         painter->setPen(light);
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
@@ -8372,7 +8368,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
                         }
 
-                        if(opts.titlebarBorder && (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
+                        if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER &&
+                            (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
                         {
                             painter->setPen(light);
                             painter->drawLine(r.x()+2, r.y()+4, r.x()+2, r.y()+3);
@@ -8382,7 +8379,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         }
                     }
 
-                    if(opts.titlebarBlend && (!kwin || !(state&QtC_StateKWinNoBorder)))
+                    if(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR && (!kwin || !(state&QtC_StateKWinNoBorder)))
                     {
                         static const int constFadeLen=8;
                         QPoint          start(0, r.y()+r.height()-(1+constFadeLen)),
@@ -8395,7 +8392,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->drawLine(r.x(), start.y(), r.x(), end.y());
                         painter->drawLine(r.x()+r.width()-1, start.y(), r.x()+r.width()-1, end.y());
 
-                        if(opts.titlebarBorder)
+                        if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
                         {
                             grad.setColorAt(0, light);
                             grad.setColorAt(1, itsBackgroundCols[0]);
@@ -10409,8 +10406,9 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
     bool                             topTab(WIDGET_TAB_TOP==w),
                                      botTab(WIDGET_TAB_BOT==w),
                                      dwt(CUSTOM_BGND && WIDGET_DOCK_WIDGET_TITLE==w),
-                                     titleBar(opts.titlebarBlend && (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
-                                                                    (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
+                                     titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
+                                                    (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
+                                                     (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
                                                                      WIDGET_DOCK_WIDGET_TITLE==w && !dwt)));
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());

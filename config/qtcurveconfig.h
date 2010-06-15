@@ -133,9 +133,9 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void sliderWidthChanged();
     void menubarHidingChanged();
     void xbarChanged();
-    void colorTitlebarOnlyChanged();
-    void titlebarBlendChanged();
-    void titlebarMenuColorChanged();
+    void windowBorder_colorTitlebarOnlyChanged();
+    void windowBorder_blendChanged();
+    void windowBorder_menuColorChanged();
     void thinSbarGrooveChanged();
     void borderSbarGrooveChanged();
     void borderProgressChanged();
@@ -177,6 +177,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void setWidgetOptions(const Options &opts);
     int  getDwtSettingsFlags();
     int  getSquareFlags();
+    int  getWindowBorderFlags();
     bool diffTitleBarButtonColors(const Options &opts);
     bool settingsChanged(const Options &opts);
     bool settingsChanged() { return settingsChanged(presets[currentText].opts); }

@@ -2015,7 +2015,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QCheckBox" name="colorTitlebarOnly">
+        <widget class="QCheckBox" name="windowBorder_colorTitlebarOnly">
          <property name="whatsThis">
           <string>If enabled, only the titlebar, and not the border, of windows will be colored.</string>
          </property>
@@ -2025,7 +2025,7 @@
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QCheckBox" name="titlebarBlend">
+        <widget class="QCheckBox" name="windowBorder_blend">
          <property name="whatsThis">
           <string>If enabled, the background color will be used as the last part of the titlebar gradient.</string>
          </property>
@@ -2035,7 +2035,7 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QCheckBox" name="titlebarMenuColor">
+        <widget class="QCheckBox" name="windowBorder_menuColor">
          <property name="whatsThis">
           <string>If enabled, the the configured menubar color will be used for windows that have menubars.</string>
          </property>
@@ -2052,7 +2052,7 @@
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="QCheckBox" name="titlebarBorder">
+        <widget class="QCheckBox" name="windowBorder_addLightBorder">
          <property name="whatsThis">
           <string>If enabled, a 1 pixel light border is added to the top and left of the window.</string>
          </property>
@@ -4139,10 +4139,10 @@
   <tabstop>titlebarAlignment</tabstop>
   <tabstop>titlebarEffect</tabstop>
   <tabstop>titlebarIcon</tabstop>
-  <tabstop>colorTitlebarOnly</tabstop>
-  <tabstop>titlebarBlend</tabstop>
-  <tabstop>titlebarMenuColor</tabstop>
-  <tabstop>titlebarBorder</tabstop>
+  <tabstop>windowBorder_colorTitlebarOnly</tabstop>
+  <tabstop>windowBorder_blend</tabstop>
+  <tabstop>windowBorder_menuColor</tabstop>
+  <tabstop>windowBorder_addLightBorder</tabstop>
   <tabstop>windowDrag</tabstop>
   <tabstop>titlebarButtonAppearance</tabstop>
   <tabstop>titlebarButtons_noFrame</tabstop>

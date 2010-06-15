@@ -413,14 +413,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QPainter             painter(widget());
     QRect                r(widget()->rect());
     QStyleOptionTitleBar opt;
+    int                  windowBorder(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_WindowBorder, 0L, 0L));
     bool                 active(isActive()),
-                         colorTitleOnly(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarColorTopOnly,
-                                        NULL, NULL)),
+                         colorTitleOnly(windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY),
                          roundBottom(Handler()->roundBottom()),
                          outerBorder(Handler()->outerBorder()),
                          preview(isPreview()),
                          blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
-                         menuColor(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarUseMenuColor, NULL, NULL));
+                         menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR);
     const int            border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
