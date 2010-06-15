@@ -1011,7 +1011,9 @@ static gboolean eqRect(GdkRectangle *a, GdkRectangle *b)
 
 static void setLowerEtchCol(cairo_t *cr, GtkWidget *widget)
 {
-    if(IS_FLAT_BGND(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
+    if(USE_CUSTOM_ALPHAS(opts))
+        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, opts.customAlphas[ALPHA_ETCH_LIGHT]);
+    else if(IS_FLAT_BGND(opts.bgndAppearance) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
     {
         GdkColor *parentBg=getParentBgCol(widget);
 
@@ -1518,13 +1520,13 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
         
     setCairoClipping(cr, a, region);
 
-    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, ETCH_TOP_ALPHA);
+    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[ALPHA_ETCH_DARK] : ETCH_TOP_ALPHA);
     if(!raised && WIDGET_SLIDER!=wid)
     {
         createTLPath(cr, xd, yd, w-1, h-1, radius, round);
         cairo_stroke(cr);
         if(WIDGET_SLIDER_TROUGH==wid && opts.thinSbarGroove && widget && GTK_IS_SCROLLBAR(widget))
-            cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.1); // 0.25);
+            cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[ALPHA_ETCH_LIGHT] : ETCH_BOTTOM_ALPHA);
         else
             setLowerEtchCol(cr, widget);
     }

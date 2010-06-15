@@ -4,6 +4,7 @@
 2. Add options to have squared sliders and/or scrollbar sliders even when
    general setting set to round.
 3. Add option to use menubar colours for popup menus.
+4. Add option to set alpha values used to draw etch/shadow effect.
 
 1.4.1
 -----
