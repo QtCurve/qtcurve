@@ -1782,7 +1782,7 @@ void QtCurveStyle::polish(QWidget *widget)
         widget->installEventFilter(this);
 #endif
 
-    if(EFFECT_NONE!=opts.buttonEffect && isNoEtchWidget(widget))
+    if(EFFECT_NONE!=opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget))
     {
         theNoEtchWidgets.insert(static_cast<const QWidget *>(widget));
         connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
@@ -4040,15 +4040,16 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
                             // For some reason, in KPackageKit, the KTextBrower when polished is not in the scrollview,
                             // but is when painted. So check here if it should not be etched.
                             // Also, see not in getLowerEtchCol()
-                            if(DO_EFFECT && widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget) &&
-                            inQAbstractItemView)
+                            if(DO_EFFECT && !USE_CUSTOM_ALPHAS(opts) && widget && widget->parentWidget() &&
+                                !theNoEtchWidgets.contains(widget) && inQAbstractItemView)
                                 theNoEtchWidgets.insert(widget);
 
                             // If we are set to have sunken scrollviews, then the frame width is set to 3.
                             // ...but it we are a scrollview within a scrollview, then we dont draw sunken, therefore
                             // need to draw inner border...
                             bool doEtch=DO_EFFECT && opts.etchEntry,
-                                noEtchW=doEtch && theNoEtchWidgets.contains(widget);
+                                 noEtchW=doEtch && !USE_CUSTOM_ALPHAS(opts) && theNoEtchWidgets.contains(widget);
+
                             if(doEtch && noEtchW)
                             {
                                 painter->setPen(palette.brush(QPalette::Base).color());
@@ -10938,7 +10939,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
 
     buildSplitPath(r, ROUNDED_ALL, getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
 
-    col.setAlphaF(ETCH_TOP_ALPHA);
+    col.setAlphaF(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[ALPHA_ETCH_DARK] : ETCH_TOP_ALPHA);
     p->setBrush(Qt::NoBrush);
     p->setRenderHint(QPainter::Antialiasing, true);
     p->setPen(col);
@@ -10949,7 +10950,7 @@ void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget, 
         if(WIDGET_SLIDER_TROUGH==w && opts.thinSbarGroove && widget && qobject_cast<const QScrollBar *>(widget))
         {
             QColor col(Qt::white);
-            col.setAlphaF(0.1); // 0.25);
+            col.setAlphaF(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[ALPHA_ETCH_LIGHT] : ETCH_BOTTOM_ALPHA); // 0.25);
             p->setPen(col);
         }
         else
@@ -12839,6 +12840,13 @@ void QtCurveStyle::shade(const color &ca, color *cb, double k) const
 
 QColor QtCurveStyle::getLowerEtchCol(const QWidget *widget) const
 {
+    if(USE_CUSTOM_ALPHAS(opts))
+    {
+        QColor col(Qt::white);
+        col.setAlphaF(opts.customAlphas[ALPHA_ETCH_LIGHT]);
+        return col;
+    }
+    
     if(IS_FLAT_BGND(opts.bgndAppearance))
     {
         bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);

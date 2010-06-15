@@ -128,6 +128,13 @@ typedef gchar ** Strings;
 #define NUM_STD_SHADES   6
 #define NUM_EXTRA_SHADES 3
 
+enum
+{
+    ALPHA_ETCH_LIGHT = 0,
+    ALPHA_ETCH_DARK,
+    NUM_STD_ALPHAS
+};
+
 #define TOTAL_SHADES     NUM_STD_SHADES+NUM_EXTRA_SHADES
 #define ORIGINAL_SHADE   TOTAL_SHADES
 
@@ -377,7 +384,7 @@ typedef gchar ** Strings;
 #define FOCUS_ALPHA              0.08
 #define BORDER_BLEND_ALPHA       0.7
 #define ETCH_TOP_ALPHA           0.055
-#define ETCH_BOTTOM_ALPHA        0.80
+#define ETCH_BOTTOM_ALPHA        0.1
 // #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 // #define ETCH_RADIO_TOP_ALPHA     0.055
 // #define ETCH_RADIO_BOTTOM_ALPHA  0.80
@@ -943,6 +950,7 @@ Gradient
 ;
 
 #define USE_CUSTOM_SHADES(A) ((A).customShades[0]>0.00001)
+#define USE_CUSTOM_ALPHAS(A) ((A).customAlphas[0]>0.00001)
 
 #ifdef __cplusplus
 typedef std::map<EAppearance, Gradient> GradientCont;
@@ -1122,7 +1130,8 @@ typedef struct
     EEffect          titlebarEffect;
     bool             centerTabText;
 #endif
-    double           customShades[NUM_STD_SHADES];
+    double           customShades[NUM_STD_SHADES],
+                     customAlphas[NUM_STD_ALPHAS];
 #ifdef __cplusplus
     GradientCont     customGradient;
 #else

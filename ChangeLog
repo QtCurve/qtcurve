@@ -4,19 +4,20 @@
  2. Add options to have squared sliders and/or scrollbar sliders even when
     general setting set to round.
  3. Add option to use menubar colours for popup menus.
- 4. Fixed background of Gtk2 style combo menus.
- 5. Add option to specify colour of titlebar button icons.
- 6. Add option to use menubar colour for titlebar when a window has a menubar visible.
+ 4. Add option to set alpha values used to draw etch/shadow effect.
+ 5. Fixed background of Gtk2 style combo menus.
+ 6. Add option to specify colour of titlebar button icons.
+ 7. Add option to use menubar colour for titlebar when a window has a menubar visible.
     (Only valid when not blending titlebars and not using window border colours for
     menubars)
- 7. 'Fix' toolbar handles in OpenOffice.org
- 8. Add options to set opacity for window and poup-menu backgrounds.The KDE SC4.5
+ 8. 'Fix' toolbar handles in OpenOffice.org
+ 9. Add options to set opacity for window and poup-menu backgrounds.The KDE SC4.5
     blur-behind hint is set when the opacity!=100
- 9. Don't alter agua 'shine' for mouse-overed disabled widgets.
-10. Fix KDE SC4.5 sidebar buttons when set to not draw as standard buttons.
-11. Display kwin options in style config dialog, and import/export these when
+10. Don't alter agua 'shine' for mouse-overed disabled widgets.
+11. Fix KDE SC4.5 sidebar buttons when set to not draw as standard buttons.
+12. Display kwin options in style config dialog, and import/export these when
     importing/exporting QtCurve themes.
-12. If drawing a spin widget with no edit field (as happens in KOffice's progress/spin
+13. If drawing a spin widget with no edit field (as happens in KOffice's progress/spin
     widget), then dont draw the background behind the spin arrows.
 
 1.4.3

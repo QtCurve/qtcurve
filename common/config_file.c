@@ -933,6 +933,28 @@ static bool readBoolEntry(QtCConfig &cfg, const QString &key, bool def)
     return val.isEmpty() ? def : (val=="true" ? true : false);
 }
 
+static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int count)
+{
+#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
+    QStringList strings(readStringEntry(cfg, key).split(',', QString::SkipEmptyParts));
+#else
+    QStringList strings(QStringList::split(',', readStringEntry(cfg, key)));
+#endif
+    bool ok(count==strings.size());
+
+    if(ok)
+    {
+        QStringList::ConstIterator it(strings.begin());
+        int                        i;
+
+        for(i=0; i<count && ok; ++i, ++it)
+            list[i]=(*it).toDouble(&ok);
+    }
+
+    if(!ok && strings.size())
+        list[0]=0;
+}
+            
 #define CFG_READ_COLOR(ENTRY) \
     { \
         QString sVal(cfg.readEntry(#ENTRY)); \
@@ -1061,6 +1083,44 @@ static gboolean readBoolEntry(GHashTable *cfg, char *key, gboolean def)
     return str ? (0==memcmp(str, "true", 4) ? true : false) : def;
 }
 
+static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
+{
+    char *str=readStringEntry(cfg, key);
+
+    if(str)
+    {
+        int  j,
+             comma=0;
+        bool ok=true;
+
+        for(j=0; str[j]; ++j)
+            if(','==str[j])
+                comma++;
+
+        ok=(count-1)==comma;
+        if(ok)
+        {
+            for(j=0; j<comma+1 && str && ok; ++j)
+            {
+                char *c=strchr(str, ',');
+
+                if(c || (str && count-1==comma))
+                {
+                    if(c)
+                        *c='\0';
+                    list[j]=g_ascii_strtod(str, NULL);
+                    str=c+1;
+                }
+                else
+                    ok=false;
+            }
+        }
+
+        if(!ok)
+            list[0]=0;
+    }
+}
+            
 #define TO_LATIN1(A) A
 
 #define CFG_READ_COLOR(ENTRY) \
@@ -1234,6 +1294,7 @@ static void copyOpts(Options *src, Options *dest)
         memcpy(dest, src, sizeof(Options));
         src->noBgndGradientApps=src->noBgndImageApps=src->noDlgFixApps=src->noMenuStripeApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
+        memcpy(dest->customAlphas, src->customAlphas, sizeof(double)*NUM_STD_ALPHAS);
         copyGradients(src, dest);
     }
 }
@@ -1447,6 +1508,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts!=def)
             {
                 opts->customShades[0]=0;
+                opts->customAlphas[0]=0;
                 if(USE_CUSTOM_SHADES(*def))
                     memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
             }
@@ -1669,7 +1731,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_STRING_LIST(statusbarApps)
             CFG_READ_STRING_LIST(useQtFileDialogApps)
 #endif
-
+            readDoubleList(cfg, "customShades", opts->customShades, NUM_STD_SHADES);
+            readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
+            
 #ifdef __cplusplus
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             if(opts->titlebarButtons&TITLEBAR_BUTTON_COLOR || opts->titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)
@@ -1700,24 +1764,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 }
             }
 #endif
-
-#if (defined QT_VERSION && (QT_VERSION >= 0x040000))
-            QStringList shades(readStringEntry(cfg, "customShades").split(',', QString::SkipEmptyParts));
-#else
-            QStringList shades(QStringList::split(',', readStringEntry(cfg, "customShades")));
-#endif
-            bool ok(NUM_STD_SHADES==shades.size());
-
-            if(ok)
-            {
-                QStringList::ConstIterator it(shades.begin());
-
-                for(i=0; i<NUM_STD_SHADES && ok; ++i, ++it)
-                    opts->customShades[i]=(*it).toDouble(&ok);
-            }
-
-            if(!ok && shades.size())
-                opts->customShades[0]=0;
 
             for(i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
             {
@@ -1765,44 +1811,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 }
             }
 #else
-            {
-            char *str=readStringEntry(cfg, "customShades");
-
-            if(str)
-            {
-                int  j,
-                     comma=0;
-                bool ok=true;
-
-                for(j=0; str[j]; ++j)
-                    if(','==str[j])
-                        comma++;
-
-                ok=(NUM_STD_SHADES-1)==comma;
-                if(ok)
-                {
-
-                    for(j=0; j<comma+1 && str && ok; ++j)
-                    {
-                        char *c=strchr(str, ',');
-
-                        if(c || (str && NUM_STD_SHADES-1==comma))
-                        {
-                            if(c)
-                                *c='\0';
-                            opts->customShades[j]=g_ascii_strtod(str, NULL);
-                            str=c+1;
-                        }
-                        else
-                            ok=false;
-                    }
-                }
-
-                if(!ok)
-                    opts->customShades[0]=0;
-            }
-            }
-
             for(i=0; i<NUM_CUSTOM_GRAD; ++i)
             {
                 char gradKey[18];
@@ -2191,6 +2199,7 @@ static void defaultSettings(Options *opts)
     opts->customShades[3]=0.78;
     opts->customShades[4]=0.84;
     opts->customShades[5]=0.75;
+    opts->customAlphas[0]=0;
     opts->contrast=7;
     opts->passwordChar=0x25CF;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
