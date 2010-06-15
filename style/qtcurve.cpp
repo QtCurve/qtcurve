@@ -7551,15 +7551,15 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         angle = (M_PI*8 - fraction*10*M_PI)/6;
                 }
 
-                QPoint center = r.center();
+                QPoint center = outer.center();
 #ifdef DIAL_DOT_ON_RING
-                const qreal radius=0.5*(r.width() - sliderWidth);
+                const qreal radius=0.5*(outer.width() - sliderWidth);
 #else
-                const qreal radius=0.5*(r.width() - 2*sliderWidth);
+                const qreal radius=0.5*(outer.width() - 2*sliderWidth);
 #endif
                 center += QPoint(radius*cos(angle), -radius*sin(angle));
 
-                opt.rect=QRect(0, 0, sliderWidth, sliderWidth );
+                opt.rect=QRect(outer.x(), outer.y(), sliderWidth, sliderWidth);
                 opt.rect.moveCenter(center);
 
                 const QColor *use(buttonColors(option));

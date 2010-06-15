@@ -21,6 +21,7 @@
     widget), then dont draw the background behind the spin arrows.
 14. Fix right margin of tab labels.
 15. Fix scrollview frame when squared and etched.
+16. Fix QDial 'handle' position.
 
 1.4.3
 -----
