@@ -69,6 +69,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
     insertColorEntries(activeShadowColorType);
     insertColorEntries(inactiveShadowColorType);
 
+    load(0L);
     connect(borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
     connect(roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
