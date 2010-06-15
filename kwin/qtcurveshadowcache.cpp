@@ -151,6 +151,26 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
 //       {
         {
             // inner (shark) gradient
+#ifdef NEW_SHADOWS
+            const qreal gradientSize = qMin( shadowSize,(shadowSize+fixedSize)/2 );
+            const qreal hoffset = shadowConfiguration.horizontalOffset()*gradientSize/fixedSize;
+            const qreal voffset = shadowConfiguration.verticalOffset()*gradientSize/fixedSize;
+
+            QRadialGradient rg = QRadialGradient( size+12.0*hoffset, size+12.0*voffset, gradientSize );
+            rg.setColorAt(1, Qt::transparent );
+
+            // gaussian shadow is used
+            int nPoints( (10*gradientSize)/fixedSize );
+            Gaussian f( 0.85, 0.17 );
+            QColor c = shadowConfiguration.innerColor();
+            for( int i = 0; i < nPoints; i++ )
+            {
+                qreal x = qreal(i)/nPoints;
+                c.setAlphaF( f(x) );
+                rg.setColorAt( x, c );
+
+            }
+#else
             int             nPoints = 7;
             qreal           x[7] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4 };
             int             values[7] = {203, 200, 175, 105, 45, 2, 0 };
@@ -162,6 +182,7 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
                 c.setAlpha(values[i]);
                 rg.setColorAt(x[i], c);
             }
+#endif
 
             p.setBrush(rg);
             if(roundAllCorners)
@@ -172,6 +193,26 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
 
         {
             // outer (spread) gradient
+#ifdef NEW_SHADOWS
+            const qreal gradientSize = shadowSize;
+            const qreal hoffset = shadowConfiguration.horizontalOffset()*gradientSize/fixedSize;
+            const qreal voffset = shadowConfiguration.verticalOffset()*gradientSize/fixedSize;
+
+            QRadialGradient rg = QRadialGradient( size+12.0*hoffset, size+12.0*voffset, gradientSize );
+            rg.setColorAt(1, Qt::transparent );
+
+            // gaussian shadow is used
+            int nPoints( (10*gradientSize)/fixedSize );
+            Gaussian f( 0.46, 0.34 );
+            QColor c = shadowConfiguration.outerColor();
+            for( int i = 0; i < nPoints; i++ )
+            {
+                qreal x = qreal(i)/nPoints;
+                c.setAlphaF( f(x) );
+                rg.setColorAt( x, c );
+
+            }
+#else
             int             nPoints = 7;
             qreal           x[7] = {0, 0.15, 0.3, 0.45, 0.65, 0.75, 1 };
             int             values[7] = {120, 95, 50, 20, 10, 5, 0 };
@@ -183,7 +224,7 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
                 c.setAlpha(values[i]);
                 rg.setColorAt(x[i], c);
             }
-
+#endif
             p.setBrush(rg);
             p.drawRect(shadow.rect());
         }

@@ -32,11 +32,17 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
+//#define NEW_SHADOWS
+
 #include <QtCore/QCache>
 #include <QtGui/QRadialGradient>
 
 #include "qtcurveshadowconfiguration.h"
 #include "tileset.h"
+
+#ifdef NEW_SHADOWS
+#include <cmath>
+#endif
 
 class QtCurveHelper;
 
@@ -97,6 +103,28 @@ class QtCurveShadowCache
         bool active,
              isShade;
     };
+
+#ifdef NEW_SHADOWS
+    static qreal square(qreal x) { return x*x; }
+
+    class Gaussian
+    {
+        public:
+
+        Gaussian(qreal amplitude, qreal width): amplitude_(amplitude), width_(width) {}
+
+        virtual ~Gaussian() {}
+
+        //! value
+        virtual qreal operator() ( qreal x ) const
+        { return qMax( 0.0, amplitude_*(std::exp( -square(x/width_) -0.05 ) ) ); }
+
+        private:
+
+        qreal amplitude_,
+               width_;
+    };
+#endif
 
     //! complex pixmap (when needed)
     QPixmap shadowPixmap(const QtCurveClient *client, bool active, bool roundAllCorners) const;
