@@ -982,7 +982,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
-    setupGradientsTab();
     setupStack();
 
     Options currentStyle,
@@ -997,6 +996,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     setupShadesTab();
     setWidgetOptions(currentStyle);
 
+    setupGradientsTab();
     setupPresets(currentStyle, defaultStyle);
     setupPreview();
 }
