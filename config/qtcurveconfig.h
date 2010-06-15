@@ -35,6 +35,7 @@ class KDoubleNumInput;
 class CExportThemeDialog;
 #endif
 class QtCurveConfig;
+class QtCurveKWinConfig;
 class QStyle;
 
 class CGradientPreview : public QWidget
@@ -193,6 +194,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     KDoubleNumInput       *shadeVals[NUM_STD_SHADES];
     QString               currentText,
                           defaultText;
+    QtCurveKWinConfig     *kwin;
 };
 
 #endif

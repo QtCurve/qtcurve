@@ -24,8 +24,8 @@
   Boston, MA 02110-1301, USA.
  */
 
-#ifndef QTCURVE_KWIN_CONFIG_H
-#define QTCURVE_KWIN_CONFIG_H
+#ifndef QTCURVE_KWIN_CONFIG_WIDGET_H
+#define QTCURVE_KWIN_CONFIG_WIDGET_H
 
 #include <QObject>
 #include "ui_qtcurvekwinconfigwidget.h"
@@ -34,14 +34,7 @@
 
 class KConfig;
 
-class QtCurveKWinConfigWidget : public QWidget, public Ui::QtCurveKWinConfigWidget
-{
-    public:
-
-    QtCurveKWinConfigWidget(QWidget *parent) : QWidget(parent) {  setupUi( this ); }
-};
-
-class QtCurveKWinConfig : public QObject
+class QtCurveKWinConfig : public QWidget, public Ui::QtCurveKWinConfigWidget
 {
     Q_OBJECT
 
@@ -56,31 +49,31 @@ class QtCurveKWinConfig : public QObject
 
     public Q_SLOTS:
 
-    void load(const KConfigGroup &config);
-    void save(KConfigGroup &config);
+    void load(const KConfigGroup &);
+    void save(KConfigGroup &);
     void defaults();
     void outerBorderChanged();
     void innerBorderChanged();
     void activeShadowColorTypeChanged();
     void inactiveShadowColorTypeChanged();
     void sizeChanged();
+
+    public:
+
+    void setNote(const QString &txt);
+    void load(KConfig *config);
+    void save(KConfig *config);
     
     private:
     
-#if KDE_IS_VERSION(4, 3, 0)
     void setShadows();
-#endif
     void setWidgets(const KWinQtCurve::QtCurveConfig &cfg);
     void setWidgetStates();
 
     private:
 
-    KConfig                                *itsConfig;
-    QtCurveKWinConfigWidget                *itsWidget;
-#if KDE_IS_VERSION(4, 3, 0)
     KWinQtCurve::QtCurveShadowConfiguration itsActiveShadows,
                                             itsInactiveShadows;
-#endif
 };
 
 #endif // KNIFTYCONFIG_H

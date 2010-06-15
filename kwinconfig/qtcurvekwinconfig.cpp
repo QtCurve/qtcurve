@@ -24,14 +24,13 @@
   Boston, MA 02110-1301, USA.
  */
 
-#include <kdeversion.h>
 #include <kconfig.h>
 #include <klocale.h>
 #include <kglobal.h>
 #include "config.h"
+#include "common.h"
 #include "qtcurvekwinconfig.h"
 
-#if KDE_IS_VERSION(4, 3, 0)
 static void insertColorEntries(QComboBox *combo)
 {
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_FOCUS, i18n("Focus"));
@@ -41,7 +40,6 @@ static void insertColorEntries(QComboBox *combo)
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_GRAY, i18n("Gray"));
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM, i18n("Custom:"));
 }
-#endif
 
 static void insertSizeEntries(QComboBox *combo)
 {
@@ -57,182 +55,169 @@ static void insertSizeEntries(QComboBox *combo)
 }
 
 QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
-                 : QObject(parent)
-                 , itsConfig(new KConfig("kwinqtcurverc"))
-                 , itsWidget(new QtCurveKWinConfigWidget(parent))
-#if KDE_IS_VERSION(4, 3, 0)
+                 : QWidget(parent)
                  , itsActiveShadows(QPalette::Active)
                  , itsInactiveShadows(QPalette::Inactive)
-#endif
 {
     Q_UNUSED(config);
-    KConfigGroup configGroup(itsConfig, "General");
+
     KGlobal::locale()->insertCatalog("qtcurve");
     KGlobal::locale()->insertCatalog("kwin_clients");
+    setupUi(this);
 
-    itsWidget->show();
+    insertSizeEntries(borderSize);
+    insertColorEntries(activeShadowColorType);
+    insertColorEntries(inactiveShadowColorType);
 
-    insertSizeEntries(itsWidget->borderSize);
-#if KDE_IS_VERSION(4, 3, 0)
-    insertColorEntries(itsWidget->activeShadowColorType);
-    insertColorEntries(itsWidget->inactiveShadowColorType);
-#endif
-
-    load(configGroup);
-
-    connect(itsWidget->borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
-    connect(itsWidget->roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(itsWidget->outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
-    connect(itsWidget->innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
-    connect(itsWidget->borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(itsWidget->titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    itsWidget->titleBarPad->setRange(0, 10);
-#if KDE_IS_VERSION(4, 3, 0)
-    connect(itsWidget->useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(itsWidget->activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->activeShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->activeShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(activeShadowColorTypeChanged()));
-    connect(itsWidget->activeShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
-    connect(itsWidget->inactiveShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->inactiveShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->inactiveShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->inactiveShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(inactiveShadowColorTypeChanged()));
-    connect(itsWidget->inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
+    connect(borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
+    connect(roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
+    connect(innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
+    connect(borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    titleBarPad->setRange(0, 10);
+    connect(useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(activeShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(activeShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(activeShadowColorTypeChanged()));
+    connect(activeShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
+    connect(inactiveShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(inactiveShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(inactiveShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(inactiveShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(inactiveShadowColorTypeChanged()));
+    connect(inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
     activeShadowColorTypeChanged();
     inactiveShadowColorTypeChanged();
     setShadows();
-    itsWidget->activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
+    activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
                                           KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
-    itsWidget->inactiveShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
+    inactiveShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
                                             KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
-    itsWidget->activeShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+    activeShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
                                              KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    itsWidget->inactiveShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+    inactiveShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    itsWidget->activeShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+    activeShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
                                              KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    itsWidget->inactiveShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+    inactiveShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-#else
-    itsWidget->shadowTab->setVisible(false);
-#endif
-#if KDE_IS_VERSION(4, 3, 85)
-    connect(itsWidget->grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(itsWidget->activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->inactiveOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(itsWidget->opaqueBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-#else
-    itsWidget->grouping->setVisible(false);
-    itsWidget->opacityTab->setVisible(false);
-#endif
+
+    connect(grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    connect(activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(inactiveOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+    connect(opaqueBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
 }
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
 {
-    delete itsWidget;
-    delete itsConfig;
 }
 
 void QtCurveKWinConfig::load(const KConfigGroup &)
 {
-#if KDE_IS_VERSION(4, 3, 0)
-    itsActiveShadows.load(itsConfig);
-    itsInactiveShadows.load(itsConfig);
-    setShadows();
-#endif
-    KWinQtCurve::QtCurveConfig cfg;
+    load(0L);
+}
 
-    cfg.load(itsConfig);
-    setWidgets(cfg);
+void QtCurveKWinConfig::load(KConfig *c)
+{
+    KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
+
+    itsActiveShadows.load(cfg);
+    itsInactiveShadows.load(cfg);
+    setShadows();
+    KWinQtCurve::QtCurveConfig config;
+
+    config.load(cfg, c ? KWIN_GROUP : 0L);
+    setWidgets(config);
+    if(!c)
+        delete cfg;
 }
 
 void QtCurveKWinConfig::save(KConfigGroup &)
 {
+    save(0L);
+}
+
+void QtCurveKWinConfig::save(KConfig *c)
+{
+    KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
+    
     KWinQtCurve::QtCurveConfig config;
 
-    config.setBorderSize((KWinQtCurve::QtCurveConfig::Size)itsWidget->borderSize->currentIndex());
-    config.setRoundBottom(itsWidget->roundBottom->isChecked());
-    config.setOuterBorder(itsWidget->outerBorder->isChecked());
-    config.setInnerBorder(itsWidget->innerBorder->isChecked());
-    config.setBorderlessMax(itsWidget->borderlessMax->isChecked());
-    config.setTitleBarPad(itsWidget->titleBarPad->value());
+    config.setBorderSize((KWinQtCurve::QtCurveConfig::Size)borderSize->currentIndex());
+    config.setRoundBottom(roundBottom->isChecked());
+    config.setOuterBorder(outerBorder->isChecked());
+    config.setInnerBorder(innerBorder->isChecked());
+    config.setBorderlessMax(borderlessMax->isChecked());
+    config.setTitleBarPad(titleBarPad->value());
 
-#if KDE_IS_VERSION(4, 3, 0)
-    config.setCustomShadows(itsWidget->useShadows->isChecked());
-    if(itsWidget->useShadows->isChecked())
+    config.setCustomShadows(useShadows->isChecked());
+    if(useShadows->isChecked())
     {
-        itsActiveShadows.setShadowSize(itsWidget->activeShadowSize->value());
-        itsActiveShadows.setHorizontalOffset(itsWidget->activeShadowHOffset->value());
-        itsActiveShadows.setVerticalOffset(itsWidget->activeShadowVOffset->value());
-        itsActiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)itsWidget->activeShadowColorType->currentIndex());
-        if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==itsWidget->activeShadowColorType->currentIndex())
-            itsActiveShadows.setColor(itsWidget->activeShadowColor->color());
-        itsInactiveShadows.setShadowSize(itsWidget->inactiveShadowSize->value());
-        itsInactiveShadows.setHorizontalOffset(itsWidget->inactiveShadowHOffset->value());
-        itsInactiveShadows.setVerticalOffset(itsWidget->inactiveShadowVOffset->value());
-        itsInactiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)itsWidget->inactiveShadowColorType->currentIndex());
-        if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==itsWidget->inactiveShadowColorType->currentIndex())
-            itsInactiveShadows.setColor(itsWidget->inactiveShadowColor->color());
+        itsActiveShadows.setShadowSize(activeShadowSize->value());
+        itsActiveShadows.setHorizontalOffset(activeShadowHOffset->value());
+        itsActiveShadows.setVerticalOffset(activeShadowVOffset->value());
+        itsActiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)activeShadowColorType->currentIndex());
+        if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==activeShadowColorType->currentIndex())
+            itsActiveShadows.setColor(activeShadowColor->color());
+        itsInactiveShadows.setShadowSize(inactiveShadowSize->value());
+        itsInactiveShadows.setHorizontalOffset(inactiveShadowHOffset->value());
+        itsInactiveShadows.setVerticalOffset(inactiveShadowVOffset->value());
+        itsInactiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)inactiveShadowColorType->currentIndex());
+        if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==inactiveShadowColorType->currentIndex())
+            itsInactiveShadows.setColor(inactiveShadowColor->color());
     }
     else
     {
         itsActiveShadows.defaults();
         itsInactiveShadows.defaults();
     }
-    itsActiveShadows.save(itsConfig);
-    itsInactiveShadows.save(itsConfig);
-#endif
-#if KDE_IS_VERSION(4, 3, 85)
-    config.setGrouping(itsWidget->grouping->isChecked());
-    config.setOpacity(itsWidget->activeOpacity->value(), true);
-    config.setOpacity(itsWidget->inactiveOpacity->value(), false);
-    config.setOpaqueBorder(itsWidget->opaqueBorder->isChecked());
-#endif
-    config.save(itsConfig);
-    itsConfig->sync();
+    itsActiveShadows.save(cfg);
+    itsInactiveShadows.save(cfg);
+    config.setGrouping(grouping->isChecked());
+    config.setOpacity(activeOpacity->value(), true);
+    config.setOpacity(inactiveOpacity->value(), false);
+    config.setOpaqueBorder(opaqueBorder->isChecked());
+    config.save(cfg, c ? KWIN_GROUP : 0L);
+    cfg->sync();
+    if(!c)
+        delete cfg;
 }
 
 void QtCurveKWinConfig::defaults()
 {
     setWidgets(KWinQtCurve::QtCurveConfig());
-#if KDE_IS_VERSION(4, 3, 0)
     itsActiveShadows.defaults();
     itsInactiveShadows.defaults();
     setShadows();
-#endif
 }
 
 void QtCurveKWinConfig::outerBorderChanged()
 {
-    if(!itsWidget->outerBorder->isChecked())
-        itsWidget->innerBorder->setChecked(false);
+    if(!outerBorder->isChecked())
+        innerBorder->setChecked(false);
     emit changed();
 }
 
 void QtCurveKWinConfig::innerBorderChanged()
 {
-    if(itsWidget->innerBorder->isChecked())
-        itsWidget->outerBorder->setChecked(true);
+    if(innerBorder->isChecked())
+        outerBorder->setChecked(true);
     emit changed();
 }
 
 void QtCurveKWinConfig::activeShadowColorTypeChanged()
 {
-#if KDE_IS_VERSION(4, 3, 0)
-    itsWidget->activeShadowColor->setEnabled(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==itsWidget->activeShadowColorType->currentIndex());
-    if(itsActiveShadows.colorType()!=itsWidget->activeShadowColorType->currentIndex())
+    activeShadowColor->setEnabled(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==activeShadowColorType->currentIndex());
+    if(itsActiveShadows.colorType()!=activeShadowColorType->currentIndex())
         emit changed();
-#endif
 }
 
 void QtCurveKWinConfig::inactiveShadowColorTypeChanged()
 {
-#if KDE_IS_VERSION(4, 3, 0)
-    itsWidget->inactiveShadowColor->setEnabled(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==itsWidget->inactiveShadowColorType->currentIndex());
-    if(itsInactiveShadows.colorType()!=itsWidget->inactiveShadowColorType->currentIndex())
+    inactiveShadowColor->setEnabled(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==inactiveShadowColorType->currentIndex());
+    if(itsInactiveShadows.colorType()!=inactiveShadowColorType->currentIndex())
         emit changed();
-#endif
 }
 
 void QtCurveKWinConfig::sizeChanged()
@@ -243,63 +228,62 @@ void QtCurveKWinConfig::sizeChanged()
 
 void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
 {
-    itsWidget->borderSize->setCurrentIndex(cfg.borderSize());
-    itsWidget->roundBottom->setChecked(cfg.roundBottom());
-    itsWidget->outerBorder->setChecked(cfg.outerBorder());
-    itsWidget->innerBorder->setChecked(cfg.innerBorder());
-    itsWidget->borderlessMax->setChecked(cfg.borderlessMax());
-    itsWidget->titleBarPad->setValue(cfg.titleBarPad());
-#if KDE_IS_VERSION(4, 3, 0)
-    itsWidget->useShadows->setChecked(cfg.customShadows());
-#endif
-#if KDE_IS_VERSION(4, 3, 85)
-    itsWidget->grouping->setChecked(cfg.grouping());
-    itsWidget->activeOpacity->setValue(cfg.opacity(true));
-    itsWidget->inactiveOpacity->setValue(cfg.opacity(false));
-    itsWidget->opaqueBorder->setChecked(cfg.opaqueBorder());
-#endif
+    borderSize->setCurrentIndex(cfg.borderSize());
+    roundBottom->setChecked(cfg.roundBottom());
+    outerBorder->setChecked(cfg.outerBorder());
+    innerBorder->setChecked(cfg.innerBorder());
+    borderlessMax->setChecked(cfg.borderlessMax());
+    titleBarPad->setValue(cfg.titleBarPad());
+    useShadows->setChecked(cfg.customShadows());
+    grouping->setChecked(cfg.grouping());
+    activeOpacity->setValue(cfg.opacity(true));
+    inactiveOpacity->setValue(cfg.opacity(false));
+    opaqueBorder->setChecked(cfg.opaqueBorder());
     setWidgetStates();
 }
 
 void QtCurveKWinConfig::setWidgetStates()
 {
-    if(KWinQtCurve::QtCurveConfig::BORDER_NONE==itsWidget->borderSize->currentIndex())
+    if(KWinQtCurve::QtCurveConfig::BORDER_NONE==borderSize->currentIndex())
     {
-        itsWidget->roundBottom->setEnabled(false);
-        itsWidget->roundBottom->setChecked(false);
+        roundBottom->setEnabled(false);
+        roundBottom->setChecked(false);
     }
     else
-        itsWidget->roundBottom->setEnabled(true);
+        roundBottom->setEnabled(true);
 
-    if(itsWidget->borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
+    if(borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
     {
-        itsWidget->outerBorder->setEnabled(false);
-        itsWidget->innerBorder->setEnabled(false);
-        itsWidget->outerBorder->setChecked(false);
-        itsWidget->innerBorder->setChecked(false);
+        outerBorder->setEnabled(false);
+        innerBorder->setEnabled(false);
+        outerBorder->setChecked(false);
+        innerBorder->setChecked(false);
     }
     else
     {
-        itsWidget->outerBorder->setEnabled(true);
-        itsWidget->innerBorder->setEnabled(true);
+        outerBorder->setEnabled(true);
+        innerBorder->setEnabled(true);
     }
 }
 
-#if KDE_IS_VERSION(4, 3, 0)
+void QtCurveKWinConfig::setNote(const QString &txt)
+{
+    noteLabel->setText(txt);
+}
+
 void QtCurveKWinConfig::setShadows()
 {
-    itsWidget->activeShadowSize->setValue(itsActiveShadows.shadowSize());
-    itsWidget->activeShadowHOffset->setValue(itsActiveShadows.horizontalOffset());
-    itsWidget->activeShadowVOffset->setValue(itsActiveShadows.verticalOffset());
-    itsWidget->activeShadowColor->setColor(itsActiveShadows.color());
-    itsWidget->activeShadowColorType->setCurrentIndex(itsActiveShadows.colorType());
-    itsWidget->inactiveShadowSize->setValue(itsInactiveShadows.shadowSize());
-    itsWidget->inactiveShadowHOffset->setValue(itsInactiveShadows.horizontalOffset());
-    itsWidget->inactiveShadowVOffset->setValue(itsInactiveShadows.verticalOffset());
-    itsWidget->inactiveShadowColor->setColor(itsInactiveShadows.color());
-    itsWidget->inactiveShadowColorType->setCurrentIndex(itsInactiveShadows.colorType());
+    activeShadowSize->setValue(itsActiveShadows.shadowSize());
+    activeShadowHOffset->setValue(itsActiveShadows.horizontalOffset());
+    activeShadowVOffset->setValue(itsActiveShadows.verticalOffset());
+    activeShadowColor->setColor(itsActiveShadows.color());
+    activeShadowColorType->setCurrentIndex(itsActiveShadows.colorType());
+    inactiveShadowSize->setValue(itsInactiveShadows.shadowSize());
+    inactiveShadowHOffset->setValue(itsInactiveShadows.horizontalOffset());
+    inactiveShadowVOffset->setValue(itsInactiveShadows.verticalOffset());
+    inactiveShadowColor->setColor(itsInactiveShadows.color());
+    inactiveShadowColorType->setCurrentIndex(itsInactiveShadows.colorType());
 }
-#endif
 
 extern "C"
 {

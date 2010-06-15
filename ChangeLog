@@ -14,6 +14,8 @@
     blur-behind hint is set when the opacity!=100
  9. Don't alter agua 'shine' for mouse-overed disabled widgets.
 10. Fix KDE SC4.5 sidebar buttons when set to now draw as standard buttons.
+11. Display kwin options in style config dialog, and import/export these when
+    importing/exporting QtCurve themes.
 
 1.4.3
 -----

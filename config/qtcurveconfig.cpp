@@ -19,6 +19,7 @@
 */
 
 #include "qtcurveconfig.h"
+#include "../kwinconfig/qtcurvekwinconfig.h"
 #ifdef QTC_STYLE_SUPPORT
 #include "exportthemedialog.h"
 #endif
@@ -974,9 +975,13 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
+    setupGradientsTab();
+    setupStack();
+
     Options currentStyle,
             defaultStyle;
 
+    kwin->load(0L);
     defaultSettings(&defaultStyle);
     if(!readConfig(NULL, &currentStyle, &defaultStyle))
         currentStyle=defaultStyle;
@@ -985,8 +990,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     setupShadesTab();
     setWidgetOptions(currentStyle);
 
-    setupGradientsTab();
-    setupStack();
     setupPresets(currentStyle, defaultStyle);
     setupPreview();
 }
@@ -1027,6 +1030,7 @@ void QtCurveConfig::save()
     else
         kde.deleteEntry("ButtonLayout");
 
+    kwin->save(0L);
     // If using QtCurve window decoration, get this to update...
     KConfig      kwin("kwinrc", KConfig::CascadeConfig);
     KConfigGroup style(&kwin, "Style");
@@ -1049,6 +1053,7 @@ void QtCurveConfig::defaults()
 
     presetsCombo->setCurrentIndex(index);
     setPreset();
+    kwin->defaults();
 }
 
 void QtCurveConfig::emboldenToggled()
@@ -1377,6 +1382,15 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Tabs"), i++);
     new CStackItem(stackList, i18n("Checks and Radios"), i++);
     new CStackItem(stackList, i18n("Windows"), i++);
+
+    kwin=new QtCurveKWinConfig(0L, this);
+    kwin->setNote(i18n("<p><b>NOTE:</b><i>The settings here affect the borders drawn around application windows and dialogs - and "
+                       "not internal (or MDI) windows. Therefore, these settings will <b>not</b> be reflected in the Preview "
+                       "page.</i></p>"));
+    connect(kwin, SIGNAL(changed()), SLOT(updateChanged()));
+    stack->insertWidget(i, kwin);
+    new CStackItem(stackList, i18n("Window Manager"), i++);
+
     new CStackItem(stackList, i18n("Window buttons"), i++);
     new CStackItem(stackList, i18n("Window button colors"), i++);
     new CStackItem(stackList, i18n("Menubars"), i++);
@@ -2147,7 +2161,11 @@ void QtCurveConfig::deletePreset()
                                           presets[presetsCombo->currentText()].fileName));
     }
 }
-    
+
+#ifndef MAKE_VERSION
+#define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
+#endif
+
 void QtCurveConfig::importPreset()
 {
     QString file(KFileDialog::getOpenFileName(KUrl(),
@@ -2172,6 +2190,18 @@ void QtCurveConfig::importPreset()
             {
                 setWidgetOptions(opts);
                 savePreset(name);
+
+                // Load kwin options - if present
+                KConfig cfg(file, KConfig::SimpleConfig);
+
+                if(cfg.hasGroup(KWIN_GROUP))
+                {
+                    KConfigGroup grp(&cfg, SETTINGS_GROUP);
+                    QStringList  ver(grp.readEntry("version", QString()).split('.'));
+
+                    if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=MAKE_VERSION(1, 5))
+                        kwin->load(&cfg);
+                }
             }
         }
         else
@@ -2212,6 +2242,8 @@ void QtCurveConfig::exportPreset()
 
             setOptions(opts);
             rv=writeConfig(&cfg, opts, presets[defaultText].opts, true);
+            if(rv)
+                kwin->save(&cfg);
         }
 
         if(!rv)
