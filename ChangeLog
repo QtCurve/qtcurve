@@ -9,6 +9,7 @@
 6. Add option to use menubar colour for titlebar when a window has a menubar visible.
    (Only valid when not blending titlebars and not using window border colours for
    menubars)
+7. 'Fix' toolbar handles in OpenOffice.org
 
 1.4.3
 -----

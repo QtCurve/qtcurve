@@ -12108,11 +12108,19 @@ void QtCurveStyle::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, cons
     }
 }
 
-void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &r, const QStyleOption *option, bool tb,
+void QtCurveStyle::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *option, bool tb,
                                      ELine handles) const
 {
-    if(r.width()<2 || r.height()<2)
+    if(rx.width()<2 || rx.height()<2)
         return;
+
+    QRect r(rx);
+
+    if(APP_OPENOFFICE==theThemedApp)
+    {
+        r.setX(r.x()+2);
+        r.setWidth(10);
+    }
 
     // CPD: Mouse over of toolbar handles not working - the whole toolbar seems to be active :-(
     QStyleOption opt(*option);
