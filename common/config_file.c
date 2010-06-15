@@ -1602,6 +1602,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(dwtSettings)
             CFG_READ_INT(bgndOpacity)
             CFG_READ_INT(menuBgndOpacity)
+            CFG_READ_BOOL(dlgOpacity)
 #endif
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             CFG_READ_APPEARANCE(menuStripeAppearance, false, false)
@@ -2340,6 +2341,7 @@ static void defaultSettings(Options *opts)
     opts->centerTabText=false;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->bgndOpacity=opts->menuBgndOpacity=100;
+    opts->dlgOpacity=false;
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
@@ -3013,6 +3015,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(dwtSettings)
         CFG_WRITE_ENTRY_NUM(bgndOpacity)
         CFG_WRITE_ENTRY_NUM(menuBgndOpacity)
+        CFG_WRITE_ENTRY(dlgOpacity)
 #endif
         CFG_WRITE_ENTRY(titlebarMenuColor)
         CFG_WRITE_ENTRY(titlebarBorder)

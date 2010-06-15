@@ -1052,6 +1052,7 @@ typedef struct
     int              dwtSettings,
                      bgndOpacity,
                      menuBgndOpacity;
+    bool             dlgOpacity;
 #endif
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
