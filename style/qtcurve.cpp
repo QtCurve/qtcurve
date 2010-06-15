@@ -10748,6 +10748,9 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
 
         if(drawShine)
         {
+            bool   mo(option->state&State_Enabled && option->state&State_MouseOver && opts.highlightFactor);
+            QColor white(Qt::white);
+
             if(WIDGET_MDI_WINDOW_BUTTON==w || WIDGET_RADIO_BUTTON==w || CIRCULAR_SLIDER(w))
             {
                 QRectF ra(r.x()+0.5, r.y()+0.5, r.width(), r.height());
@@ -10764,8 +10767,6 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                                             ra.width()-(topWidthAdjust*2)-1, topSize-1);
                 QLinearGradient //botGrad(botGradRect.topLeft(), botGradRect.bottomLeft()),
                                 topGrad(topGradRect.topLeft(), topGradRect.bottomLeft());
-                QColor          white(Qt::white);
-                bool            mo(option->state&State_MouseOver && opts.highlightFactor);
 
 //                 white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
 //                 botGrad.setColorAt(0.0, white);
@@ -10809,8 +10810,6 @@ void QtCurveStyle::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QSt
                 QRectF          gr(horiz ? QRectF(ra.x()+mod, ra.y(), ra.width()-(mod*2)-1, size-1)
                                          : QRectF(ra.x(), ra.y()+mod, size-1, ra.height()-(mod*2)-1));
                 QLinearGradient g(gr.topLeft(), horiz ? gr.bottomLeft() : gr.topRight());
-                QColor          white(Qt::white);
-                bool            mo(option->state&State_MouseOver && opts.highlightFactor);
 
                 white.setAlphaF(mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
                 g.setColorAt(0.0, white);
