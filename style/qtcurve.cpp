@@ -8404,10 +8404,16 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 else
                     painter->setRenderHint(QPainter::Antialiasing, false);
 
+                if(kwin)
+                {
+                    painter->restore();
+                    break;
+                }
+
                 int   adjust(0);
                 QRect captionRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
 
-                if(!kwin && opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && opts.titlebarButtons&TITLEBAR_BUTTON_ROUND &&
+                if(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && opts.titlebarButtons&TITLEBAR_BUTTON_ROUND &&
                     captionRect!=r)
                 {
                     adjust=1;
@@ -8602,6 +8608,30 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     else
                         drawMdiControl(painter, titleBar, SC_TitleBarSysMenu, widget, TITLEBAR_MENU, iconColor, btnCols, bgndCols,
                                        adjust, active);
+
+                    if(active && opts.windowBorder&WINDOW_BORDER_SEPARATOR)
+                    {
+                        QColor        color(active ? itsActiveMdiTextColor : itsMdiTextColor);
+                        Qt::Alignment align(pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
+                        QRect         lr(r.x(), captionRect.y(), r.width(), captionRect.height());
+
+                        lr.adjust(16, lr.height()-2, -16, 0);
+                        if(EFFECT_NONE!=opts.titlebarEffect)
+                        {
+                            QColor eCol(blendColors(WINDOW_SHADOW_COLOR(opts.titlebarEffect), titleCols[ORIGINAL_SHADE],
+                                                    WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect)));
+
+                            eCol.setAlphaF(0.6);
+                            drawFadedLine(painter, lr, eCol, align&(Qt::AlignHCenter|Qt::AlignRight),
+                                          align&(Qt::AlignHCenter|Qt::AlignLeft), true);
+                            lr.adjust(0, -1, 0, 0);
+//                             if (!active && DARK_WINDOW_TEXT(color))
+//                                 color=blendColors(color, titleCols[ORIGINAL_SHADE], ((255 * 180) >> 8)/256.0);
+                        }
+                        color.setAlphaF(0.6);
+                        drawFadedLine(painter, lr, color, align&(Qt::AlignHCenter|Qt::AlignRight),
+                                      align&(Qt::AlignHCenter|Qt::AlignLeft), true);
+                    }
                 }
 
                 painter->restore();

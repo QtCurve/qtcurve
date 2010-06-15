@@ -862,6 +862,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(windowBorder_colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(windowBorder_colorTitlebarOnlyChanged()));
     connect(windowBorder_blend, SIGNAL(toggled(bool)), SLOT(windowBorder_blendChanged()));
     connect(windowBorder_menuColor, SIGNAL(toggled(bool)), SLOT(windowBorder_menuColorChanged()));
+    connect(windowBorder_separator, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(selectionAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(shadeCheckRadio, SIGNAL(currentIndexChanged(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -2649,6 +2650,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     windowBorder_colorTitlebarOnly->setChecked(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY);
     windowBorder_blend->setChecked(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR);
     windowBorder_menuColor->setChecked(opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR);
+    windowBorder_separator->setChecked(opts.windowBorder&WINDOW_BORDER_SEPARATOR);
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
     shadeCheckRadio->setCurrentIndex(opts.shadeCheckRadio);
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
@@ -2878,6 +2880,8 @@ int QtCurveConfig::getWindowBorderFlags()
         flags|=WINDOW_BORDER_ADD_LIGHT_BORDER;
     if(windowBorder_blend->isChecked())
         flags|=WINDOW_BORDER_BLEND_TITLEBAR;
+    if(windowBorder_separator->isChecked())
+        flags|=WINDOW_BORDER_SEPARATOR;
     return flags;
 }
 

@@ -77,9 +77,6 @@ class QtCurveClient :
     void                      paintTitle(QPainter *painter, const QRect &capRect, const QRect &alignFullRect,
                                          const QString &cap, const QPixmap &pix, int shadowSize=0,
                                          bool isTab=false, bool activeTab=false);
-#if KDE_IS_VERSION(4, 3, 85)
-    void                      paintSeparator(QPainter *painter, const QRect &r);
-#endif
     void                      updateWindowShape();
     QRegion                   getMask(int round, const QRect &r) const;
     void                      updateCaption();

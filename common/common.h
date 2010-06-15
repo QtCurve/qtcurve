@@ -510,7 +510,8 @@ typedef enum
     WINDOW_BORDER_COLOR_TITLEBAR_ONLY            = 0x01, // colorTitlebarOnly
     WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR = 0x02, // titlebarMenuColor
     WINDOW_BORDER_ADD_LIGHT_BORDER               = 0x04, // titlebarBorder
-    WINDOW_BORDER_BLEND_TITLEBAR                 = 0x08  // titlebarBlend
+    WINDOW_BORDER_BLEND_TITLEBAR                 = 0x08, // titlebarBlend
+    WINDOW_BORDER_SEPARATOR                      = 0x10
 } EWindowBorder;
 
 typedef enum

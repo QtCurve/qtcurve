@@ -24,6 +24,7 @@
 16. Fix QDial 'handle' position.
 17. Replace custom window-drag code with that of Oxygen.
 18. Change window-drag options to allow dragging via toolbars and other empty areas.
+19. Add option to draw separator between titlebar and window contents.
 
 1.4.3
 -----

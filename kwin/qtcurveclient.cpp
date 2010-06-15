@@ -149,6 +149,35 @@ static QColor blendColors(const QColor &foreground, const QColor &background, do
     return KColorUtils::mix(background, foreground, alpha);
 }
 
+static void drawFadedLine(QPainter *painter, const QRect &r, const QColor &col, bool horiz=false, bool fadeStart=true, bool fadeEnd=true)
+{
+    bool            aa(painter->testRenderHint(QPainter::Antialiasing));
+    QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),
+                    end(r.x()+(horiz ? r.width()-1 : 0)+(aa ? 0.5 : 0.0),
+                        r.y()+(horiz ? 0 : r.height()-1)+(aa ? 0.5 : 0.0));
+    QLinearGradient grad(start, end);
+    QColor          c(col),
+                    blank(Qt::white);
+
+    c.setAlphaF(horiz ? 0.6 : 0.3);
+    blank.setAlphaF(0.0);
+    grad.setColorAt(0, fadeStart ? blank : c);
+    grad.setColorAt(FADE_SIZE, c);
+    grad.setColorAt(1.0-FADE_SIZE, c);
+    grad.setColorAt(1, fadeEnd ? blank : c);
+    painter->setPen(QPen(QBrush(grad), 1));
+    painter->drawLine(start, end);
+}
+
+#if KDE_IS_VERSION(4, 3, 85)
+static void paintTabSeparator(QPainter *painter, const QRect &r)
+{
+    drawFadedLine(painter, r, Qt::white);
+    drawFadedLine(painter, r.adjusted(1, 0, 1, 0), Qt::black);
+    drawFadedLine(painter, r.adjusted(2, 0, 2, 0), Qt::white);
+}
+#endif
+
 // static inline bool isModified(const QString &title)
 // {
 //     return title.indexOf(i18n(" [modified] ")) > 3 ||
@@ -420,7 +449,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          outerBorder(Handler()->outerBorder()),
                          preview(isPreview()),
                          blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
-                         menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR);
+                         menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR),
+                         separator(active && windowBorder&WINDOW_BORDER_SEPARATOR);
     const int            border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -652,7 +682,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             int iconSize(TAB_CLOSE_ICON_SIZE);
 
             if(0==i)
-                paintSeparator(&painter, tabGeom);
+                paintTabSeparator(&painter, tabGeom);
             paintTitle(&painter, tabGeom.adjusted(showIcon ? constTitlePad : 0, 0,
                                                   -(iconSize+(showIcon ? constTitlePad : 0)), 0), QRect(), tabList[i].title(),
                        showIcon ? tabList[i].icon().pixmap(iconSize) : QPixmap(),  0, true, activeTab==i);
@@ -669,7 +699,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             QRect br(tabGeom);
 
             tabGeom.translate(tabGeom.width() - 1, 0);
-            paintSeparator(&painter, tabGeom.adjusted(-1, 0, -1, 0));
+            paintTabSeparator(&painter, tabGeom.adjusted(-1, 0, -1, 0));
 
             if(i!=activeTab)
             {
@@ -772,6 +802,26 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             itsToggleMenuBarButton->hide();
         if(itsToggleStatusBarButton)
             itsToggleStatusBarButton->hide();
+    }
+
+    if(separator)
+    {
+        EEffect       effect((EEffect)(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
+        QColor        color(KDecoration::options()->color(KDecoration::ColorFont, isActive())),
+                      bgnd(KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
+        Qt::Alignment align((Qt::Alignment)Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
+
+        r.adjust(16, titleBarHeight-1, -16, 0);
+        if(EFFECT_NONE!=effect)
+        {
+            drawFadedLine(&painter, r,
+                          blendColors(WINDOW_SHADOW_COLOR(effect), bgnd, WINDOW_TEXT_SHADOW_ALPHA(effect)), true,
+                          align&(Qt::AlignHCenter|Qt::AlignRight), align&(Qt::AlignHCenter|Qt::AlignLeft));
+            r.adjust(0, -1, 0, 0);
+//             if (!isActive() && DARK_WINDOW_TEXT(color))
+//                 color=blendColors(color, bgnd, ((255 * 180) >> 8)/256.0);
+        }
+        drawFadedLine(&painter, r, color, true, align&(Qt::AlignHCenter|Qt::AlignRight), align&(Qt::AlignHCenter|Qt::AlignLeft));
     }
     
     painter.end();
@@ -911,36 +961,6 @@ void QtCurveClient::paintTitle(QPainter *painter, const QRect &capRect, const QR
             painter->drawPixmap(iconX, capRect.y()+((capRect.height()-pix.height())/2)+1+(isTab && !isActiveTab ? 1 : 0), pix);
     }
 }
-
-#if KDE_IS_VERSION(4, 3, 85)
-static void drawFadedLine(QPainter *painter, const QRect &r, const QColor &col)
-{
-    bool            aa(painter->testRenderHint(QPainter::Antialiasing));
-    QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),
-                    end(r.x()+(aa ? 0.5 : 0.0),
-                        r.y()+(r.height()-1)+(aa ? 0.5 : 0.0));
-    QLinearGradient grad(start, end);
-    QColor          c(col),
-                    outer(Qt::white),
-                    blank(Qt::white);
-
-    c.setAlphaF(0.3);
-    blank.setAlphaF(0.0);
-    grad.setColorAt(0, blank);
-    grad.setColorAt(0.4, c);
-    grad.setColorAt(0.6, c);
-    grad.setColorAt(1, blank);
-    painter->setPen(QPen(QBrush(grad), 1));
-    painter->drawLine(start, end);
-}
-
-void QtCurveClient::paintSeparator(QPainter *painter, const QRect &r)
-{
-    drawFadedLine(painter, r, Qt::white);
-    drawFadedLine(painter, r.adjusted(1, 0, 1, 0), Qt::black);
-    drawFadedLine(painter, r.adjusted(2, 0, 2, 0), Qt::white);
-}
-#endif
 
 void QtCurveClient::updateWindowShape()
 {
