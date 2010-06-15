@@ -9493,6 +9493,8 @@ QRect QtCurveStyle::subElementRect(SubElement element, const QStyleOption *optio
                 if (!opts.centerTabText && !tabV2.rightButtonSize.isNull() && tabV2.rightButtonSize.width()>0)
                     rect.setRight(rect.right() - constTabPad - 2 -
                                   (verticalTabs ? tabV2.rightButtonSize.height() : tabV2.rightButtonSize.width()));
+                else
+                    rect.setRight(rect.right() - constTabPad);
 
 
                 if (!verticalTabs)
