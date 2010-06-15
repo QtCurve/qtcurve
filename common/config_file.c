@@ -1673,7 +1673,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(dwtSettings)
             CFG_READ_INT(bgndOpacity)
             CFG_READ_INT(menuBgndOpacity)
-            CFG_READ_BOOL(dlgOpacity)
+            CFG_READ_INT(dlgOpacity)
 #endif
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             CFG_READ_APPEARANCE(menuStripeAppearance, false, false)
@@ -2082,6 +2082,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && QT_VERSION >= 0x040000
             if(opts->bgndOpacity<0 || opts->bgndOpacity>100)
                 opts->bgndOpacity=100;
+            if(opts->dlgOpacity<0 || opts->dlgOpacity>100)
+                opts->dlgOpacity=100;
             if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
                 opts->menuBgndOpacity=100;
 #endif
@@ -2354,8 +2356,7 @@ static void defaultSettings(Options *opts)
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    opts->bgndOpacity=opts->menuBgndOpacity=100;
-    opts->dlgOpacity=false;
+    opts->bgndOpacity=opts->dlgOpacity=opts->menuBgndOpacity=100;
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
@@ -3030,7 +3031,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(dwtSettings)
         CFG_WRITE_ENTRY_NUM(bgndOpacity)
         CFG_WRITE_ENTRY_NUM(menuBgndOpacity)
-        CFG_WRITE_ENTRY(dlgOpacity)
+        CFG_WRITE_ENTRY_NUM(dlgOpacity)
 #endif
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)

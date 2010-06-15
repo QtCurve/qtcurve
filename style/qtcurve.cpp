@@ -1773,9 +1773,9 @@ void QtCurveStyle::polish(QWidget *widget)
             case Qt::Dialog:
                 widget->installEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground);
-                if(100!=opts.bgndOpacity && widget->isWindow() && !widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) &&
-                   !widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                   (!opts.dlgOpacity || Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)))
+                if(!widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) &&!widget->testAttribute(Qt::WA_TranslucentBackground) && widget->isWindow() &&
+                   ( (100!=opts.bgndOpacity && Qt::Dialog!=(widget->windowFlags() & Qt::WindowType_Mask)) ||
+                     (100!=opts.dlgOpacity && Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)) ) )
                 {
                     widget->setAttribute(Qt::WA_TranslucentBackground);
                     // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
@@ -10957,11 +10957,11 @@ void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
     EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
-    int           opacity = isWindow ? opts.bgndOpacity : opts.menuBgndOpacity;
-
-    // Check if we are to apply opacity to dialogs only...
-    if(100!=opacity && isWindow && opts.dlgOpacity && !::qobject_cast<QDialog *>(widget))
-        opacity=100;
+    int           opacity = isWindow
+                                ? qobject_cast<QDialog *>(widget)
+                                    ? opts.dlgOpacity
+                                    : opts.bgndOpacity 
+                                : opts.menuBgndOpacity;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 

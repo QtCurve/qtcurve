@@ -899,7 +899,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(bgndAppearanceChanged()));
     connect(bgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
-    connect(dlgOpacity, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(dlgOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuBgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(menuBgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -2432,7 +2432,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
     opts.bgndImage.type=(EImageType)bgndImage->currentIndex();
     opts.bgndOpacity=bgndOpacity->value();
-    opts.dlgOpacity=dlgOpacity->isChecked();
+    opts.dlgOpacity=dlgOpacity->value();
     opts.menuBgndImage.type=(EImageType)menuBgndImage->currentIndex();
     opts.menuBgndOpacity=menuBgndOpacity->value();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
@@ -2686,7 +2686,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     // TODO: Add UI to specify file? Needs thought as to how to export, etc?
     bgndImage->setCurrentIndex(IMG_FILE==opts.bgndImage.type ? IMG_BORDERED_RINGS : opts.bgndImage.type);
     bgndOpacity->setValue(opts.bgndOpacity);
-    dlgOpacity->setChecked(opts.dlgOpacity);
+    dlgOpacity->setValue(opts.dlgOpacity);
     menuBgndImage->setCurrentIndex(IMG_FILE==opts.menuBgndImage.type ? IMG_BORDERED_RINGS : opts.menuBgndImage.type);
     menuBgndOpacity->setValue(opts.menuBgndOpacity);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
@@ -3037,7 +3037,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||
          bgndImage->currentIndex()!=opts.bgndImage.type ||
          bgndOpacity->value()!=opts.bgndOpacity ||
-         dlgOpacity->isChecked()!=opts.dlgOpacity ||
+         dlgOpacity->value()!=opts.dlgOpacity ||
          menuBgndImage->currentIndex()!=opts.menuBgndImage.type ||
          menuBgndOpacity->value()!=opts.menuBgndOpacity ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||

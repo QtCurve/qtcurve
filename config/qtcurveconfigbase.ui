@@ -262,7 +262,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="label_47a">
          <property name="text">
-          <string>Background opacity:</string>
+          <string>Window background opacity:</string>
          </property>
         </widget>
        </item>
@@ -276,10 +276,20 @@
          </property>
         </widget>
        </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_47x">
+         <property name="text">
+          <string>Dialog background opacity:</string>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="1">
-        <widget class="QCheckBox" name="dlgOpacity">
+        <widget class="KIntNumInput" name="dlgOpacity">
          <property name="whatsThis">
-          <string>Apply to dialogs only.</string>
+          <string>Sets the opacity of dialog backgrounds when using deskop effects.</string>
+         </property>
+         <property name="suffix">
+          <string>%</string>
          </property>
         </widget>
        </item>
