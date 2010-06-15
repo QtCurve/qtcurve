@@ -2063,6 +2063,13 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
 #endif
 
+#if defined QT_VERSION && QT_VERSION >= 0x040000
+            if(opts->bgndOpacity<0 || opts->bgndOpacity>100)
+                opts->bgndOpacity=100;
+            if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
+                opts->menuBgndOpacity=100;
+#endif
+
 #ifndef CONFIG_DIALOG
             opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
             opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);

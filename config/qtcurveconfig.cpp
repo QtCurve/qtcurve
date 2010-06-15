@@ -639,7 +639,7 @@ static void insertLvLinesEntries(QComboBox *combo)
 
 static void insertImageEntries(QComboBox *combo)
 {
-    combo->insertItem(IMG_NONE, i18n("No background image"));
+    combo->insertItem(IMG_NONE, i18n("None"));
     combo->insertItem(IMG_BORDERED_RINGS, i18n("Bordered rings"));
     combo->insertItem(IMG_PLAIN_RINGS, i18n("Plain rings"));
     combo->insertItem(IMG_SQUARE_RINGS, i18n("Square rings"));
@@ -755,6 +755,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
    
     menuDelay->setRange(MIN_MENU_DELAY, MAX_MENU_DELAY);
     menuDelay->setValue(DEFAULT_MENU_DELAY);
+
+    bgndOpacity->setRange(0, 100, 10);
+    bgndOpacity->setValue(100);
+    menuBgndOpacity->setRange(0, 100, 10);
+    menuBgndOpacity->setValue(100);
 
     sliderWidth->setRange(MIN_SLIDER_WIDTH, MAX_SLIDER_WIDTH, 2);
     sliderWidth->setValue(DEFAULT_SLIDER_WIDTH);
@@ -882,7 +887,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(bgndAppearanceChanged()));
     connect(bgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(bgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuBgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(menuBgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2415,7 +2422,9 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.sliderFill=(EAppearance)sliderFill->currentIndex();
     opts.bgndAppearance=(EAppearance)bgndAppearance->currentIndex();
     opts.bgndImage.type=(EImageType)bgndImage->currentIndex();
+    opts.bgndOpacity=bgndOpacity->value();
     opts.menuBgndImage.type=(EImageType)menuBgndImage->currentIndex();
+    opts.menuBgndOpacity=menuBgndOpacity->value();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
     opts.xbar=xbar->isChecked();
     opts.crColor=(EShade)crColor->currentIndex();
@@ -2665,7 +2674,9 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
     // TODO: Add UI to specify file? Needs thought as to how to export, etc?
     bgndImage->setCurrentIndex(IMG_FILE==opts.bgndImage.type ? IMG_BORDERED_RINGS : opts.bgndImage.type);
+    bgndOpacity->setValue(opts.bgndOpacity);
     menuBgndImage->setCurrentIndex(IMG_FILE==opts.menuBgndImage.type ? IMG_BORDERED_RINGS : opts.menuBgndImage.type);
+    menuBgndOpacity->setValue(opts.menuBgndOpacity);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&DWT_BUTTONS_AS_PER_TITLEBAR);
     dwtColAsPerTitleBar->setChecked(opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR);
@@ -2999,7 +3010,9 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          sliderFill->currentIndex()!=opts.sliderFill ||
          bgndAppearance->currentIndex()!=opts.bgndAppearance ||
          bgndImage->currentIndex()!=opts.bgndImage.type ||
+         bgndOpacity->value()!=opts.bgndOpacity ||
          menuBgndImage->currentIndex()!=opts.menuBgndImage.type ||
+         menuBgndOpacity->value()!=opts.menuBgndOpacity ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
          xbar->isChecked()!=opts.xbar ||
          crColor->currentIndex()!=opts.crColor ||
