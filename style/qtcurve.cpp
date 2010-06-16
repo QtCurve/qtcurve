@@ -8965,17 +8965,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             if(isOO31)
                                 field.adjust(0, 0, 0, -2);
                         }
-                        //field.adjust(-1,-1, 0, 1);
-//                         painter->setPen(state&State_Enabled ? palette.base().color() : palette.background().color());
-//                         drawRect(painter, field);
-                        // 2 for frame width
-                        if(!opts.unifyCombo)
-                        {
-//                             int pad=/*opts.round>ROUND_FULL ? */2/* : 0*/;
-// 
-//                             field.adjust(-(2+pad),-2, (2+pad), 2);
-                            field.adjust(reverse ? -6 : -2, -2, reverse ? 2 : 6, 2);
-                        }
+                        else
+                            field.adjust(reverse ? -4 : -2, -1, reverse ? 2 : 4, 1);
                         drawEntryField(painter, field, widget, option, opts.unifyCombo ? ROUNDED_ALL : reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
                     }
                     else if(opts.comboSplitter && !(SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
@@ -9262,7 +9253,7 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
                 // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
                 other = qMax(DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
 
-            newSize+=QSize(margin+other, margin);
+            newSize+=QSize(margin+other, margin-2);
             newSize.rheight() += ((1 - newSize.rheight()) & 1);
 
             if(!opts.etchEntry && DO_EFFECT)
@@ -9531,14 +9522,12 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
         case CC_ComboBox:
             if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
             {
-                bool doEtch(opts.etchEntry && DO_EFFECT),
-                     ed(comboBox->editable);
+                bool ed(comboBox->editable),
+                     doEtch((!ed || opts.etchEntry) && DO_EFFECT);
                 int  x(r.x()),
                      y(r.y()),
                      w(r.width()),
-                     h(r.height()),
-                     margin(comboBox->frame ? 3 : 0),
-                     bmarg(comboBox->frame ? 2 : 0);
+                     h(r.height());
 
                 switch (subControl)
                 {
@@ -9551,20 +9540,26 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                         }
                         break;
                     case SC_ComboBoxArrow:
-                        r.setRect(x + w - bmarg - (doEtch ? 17 : 16), y + bmarg, 16, h - 2*bmarg);
+                    {
+                        int bmarg(comboBox->frame ? 2 : 0);
+
+                        r.setRect(x + w - bmarg - (doEtch ? 16 : 15), y + bmarg, 16, h - 2*bmarg);
                         if(ed)
-                            r.adjust(1, 0, 0, 0);
+                            r.adjust(-1, 0, 0, 0);
                         break;
+                    }
                     case SC_ComboBoxEditField:
-                        r.setRect(x + (ed /*&& opts.unifyCombo*/ ? 1 : margin) +1, y + margin + 1, w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin -2);
+                    {
+                        int margin(comboBox->frame ? 3 : 0);
+
+                        r.setRect(x + margin, y + margin,
+                                  w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin);
                         if(doEtch)
-                            r.adjust(1, 1, -1, -1);
+                            r.adjust(ed ? 0 : 1, 1, ed ? 0 : -1, -1);
                         if(ed)
-                        {
-                            int pad=/*opts.round>ROUND_FULL ? */2/* : 0*/;
-                            r.adjust(-2+pad, -2, 2-pad, 2);
-                        }
+                            r.adjust(-1, -2, 1, 2);
                         break;
+                    }
                     case SC_ComboBoxListBoxPopup:
                     default:
                         break;
