@@ -995,6 +995,7 @@ static QtcKey createKey(const QColor &color, EPixmap p)
            (((qulonglong)1)<<38);
 }
 
+#if !defined QTC_QT_ONLY
 static void parseWindowLine(const QString &line, QList<int> &data)
 {
     int len(line.length());
@@ -1026,6 +1027,7 @@ static void parseWindowLine(const QString &line, QList<int> &data)
                 break;
         }
 }
+#endif
 
 static const QWidget * getWidget(const QPainter *p)
 {
@@ -12316,7 +12318,7 @@ const QColor * QtCurveStyle::popupMenuCols(const QStyleOption *option) const
     return opts.shadePopupMenu ? menuColors(option, true) : backgroundColors(option);
 }
 
-QColor  QtCurveStyle::popupMenuCol(int shade) const
+const QColor & QtCurveStyle::popupMenuCol(int shade) const
 {
     return opts.shadePopupMenu
         ? menuColors(0L, true)[ORIGINAL_SHADE]
@@ -12494,8 +12496,8 @@ const QColor * QtCurveStyle::getMdiColors(const QStyleOption *option, bool activ
     if(!itsActiveMdiColors)
     {
 #if defined QTC_QT_ONLY
-        itsActiveMdiTextColor=option ? option->palette.text().color() : QApplication::palette.text().color();
-        itsMdiTextColor=option ? option->palette.text().color() : QApplication::palette.text().color();
+        itsActiveMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
+        itsMdiTextColor=option ? option->palette.text().color() : QApplication::palette().text().color();
 
         QFile f(kdeHome()+"/share/config/kdeglobals");
 

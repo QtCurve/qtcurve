@@ -61,7 +61,13 @@
 
 #ifdef Q_WS_X11
 #include <QX11Info>
+#ifdef QTC_QT_ONLY
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "fixx11h.h"
+#else
 #include <NETRootInfo>
+#endif
 #endif
 
 namespace QtCurve
@@ -606,9 +612,30 @@ namespace QtCurve
         {
 
             #ifdef Q_WS_X11
+            #ifdef QTC_QT_ONLY
+            static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
+            //...Taken from bespin...
+            // stolen... errr "adapted!" from QSizeGrip
+            QX11Info info;
+            XEvent xev;
+            xev.xclient.type = ClientMessage;
+            xev.xclient.message_type = constNetMoveResize;
+            xev.xclient.display = QX11Info::display();
+            xev.xclient.window = widget->window()->winId();
+            xev.xclient.format = 32;
+            xev.xclient.data.l[0] = position.x();
+            xev.xclient.data.l[1] = position.y();
+            xev.xclient.data.l[2] = 8; // NET::Move
+            xev.xclient.data.l[3] = Button1;
+            xev.xclient.data.l[4] = 0;
+            XUngrabPointer(QX11Info::display(), QX11Info::appTime());
+            XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
+                       SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+            #else    
             XUngrabPointer(QX11Info::display(), QX11Info::appTime());
             NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
             rootInfo.moveResizeRequest( widget->window()->winId(), position.x(), position.y(), NET::Move);
+            #endif // QTC_QT_ONLY
             #endif
 
         }

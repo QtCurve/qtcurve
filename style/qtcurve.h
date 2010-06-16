@@ -209,7 +209,7 @@ class QtCurveStyle : public QCommonStyle
     const QColor * buttonColors(const QStyleOption *option) const;
     QColor         titlebarIconColor(const QStyleOption *option) const;
     const QColor * popupMenuCols(const QStyleOption *option) const;
-    QColor         popupMenuCol(int shade=ORIGINAL_SHADE) const;
+    const QColor & popupMenuCol(int shade=ORIGINAL_SHADE) const;
     const QColor * checkRadioColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;
