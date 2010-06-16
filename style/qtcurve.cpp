@@ -9249,19 +9249,22 @@ QSize QtCurveStyle::sizeFromContents(ContentsType type, const QStyleOption *opti
 //             if(size.height()<iconHeight+2)
 //                 newSize.setHeight(iconHeight+2);
 
-            int margin = (pixelMetric(PM_ButtonMargin, option, widget)+
-                             (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-MAX_ROUND_BTN_PAD,
-                textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
-                // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
-                other = qMax(DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
+            const QStyleOptionComboBox *combo = qstyleoption_cast<const QStyleOptionComboBox *>(option);
 
+            int  margin = (pixelMetric(PM_ButtonMargin, option, widget)+
+                              (pixelMetric(PM_DefaultFrameWidth, option, widget) * 2))-MAX_ROUND_BTN_PAD,
+                 textMargins = 2*(pixelMetric(PM_FocusFrameHMargin) + 1),
+                 // QItemDelegate::sizeHint expands the textMargins two times, thus the 2*textMargins...
+                 other = qMax(DO_EFFECT ? 20 : 18, 2*textMargins + pixelMetric(QStyle::PM_ScrollBarExtent, option, widget));
+            bool editable=combo ? combo->editable : false;
             newSize+=QSize(margin+other, margin-2);
             newSize.rheight() += ((1 - newSize.rheight()) & 1);
 
-            if(!opts.etchEntry && DO_EFFECT)
-                if (const QStyleOptionComboBox *combo = qstyleoption_cast<const QStyleOptionComboBox *>(option))
-                    if(combo->editable)
-                        newSize.rheight()-=2;
+            if(!opts.etchEntry && DO_EFFECT && editable)
+                newSize.rheight()-=2;
+            // KWord's zoom combo clips 'Fit Page Width' without the following... 
+            if(editable)
+                newSize.rwidth()+=6;
             break;
         }
         case CT_MenuItem:
