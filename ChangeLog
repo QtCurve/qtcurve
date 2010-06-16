@@ -11,7 +11,7 @@
     (Only valid when not blending titlebars and not using window border colours for
     menubars)
  8. 'Fix' toolbar handles in OpenOffice.org
- 9. Add options to set opacity for window and poup-menu backgrounds.The KDE SC4.5
+ 9. Add options to set opacity for window and poup-menu backgrounds. The KDE SC4.5
     blur-behind hint is set when the opacity!=100
 10. Don't alter agua 'shine' for mouse-overed disabled widgets.
 11. Fix KDE SC4.5 sidebar buttons when set to not draw as standard buttons.
