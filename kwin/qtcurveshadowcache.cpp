@@ -159,7 +159,7 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
 
                 // gaussian shadow is used
                 int nPoints( (10*gradientSize)/fixedSize );
-                Gaussian f( 0.85, 0.17 );
+                Gaussian f( 0.85, 0.25 );
                 QColor c = shadowConfiguration.innerColor();
                 for( int i = 0; i < nPoints; i++ )
                 {
@@ -184,7 +184,7 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
 
                 // gaussian shadow is used
                 int nPoints( (10*gradientSize)/fixedSize );
-                Gaussian f( 0.46, 0.34 );
+                Gaussian f( 0.46, 0.42 );
                 QColor c = shadowConfiguration.outerColor();
                 for( int i = 0; i < nPoints; i++ )
                 {
