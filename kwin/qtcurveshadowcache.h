@@ -39,10 +39,9 @@
 
 #include "qtcurveshadowconfiguration.h"
 #include "tileset.h"
-
-#ifdef NEW_SHADOWS
 #include <cmath>
-#endif
+
+#define DIFF_INACTIVE_SHADOWS
 
 class QtCurveHelper;
 
@@ -104,8 +103,29 @@ class QtCurveShadowCache
              isShade;
     };
 
-#ifdef NEW_SHADOWS
     static qreal square(qreal x) { return x*x; }
+
+#ifdef DIFF_INACTIVE_SHADOWS
+    class Parabolic
+    {
+        public:
+
+        //! constructor
+        Parabolic(qreal amplitude, qreal width): amplitude_( amplitude ), width_( width ) {}
+
+        //! destructor
+        virtual ~Parabolic() {}
+
+        //! value
+        virtual qreal operator() (qreal x)  const { return qMax( 0.0, amplitude_*(1.0 - square(x/width_) ) ); }
+
+        private:
+
+        qreal amplitude_;
+        qreal width_;
+
+    };
+#endif
 
     class Gaussian
     {
@@ -116,15 +136,13 @@ class QtCurveShadowCache
         virtual ~Gaussian() {}
 
         //! value
-        virtual qreal operator() ( qreal x ) const
-        { return qMax( 0.0, amplitude_*(std::exp( -square(x/width_) -0.05 ) ) ); }
+        virtual qreal operator() (qreal x) const { return qMax( 0.0, amplitude_*(std::exp( -square(x/width_) -0.05 ) ) ); }
 
         private:
 
         qreal amplitude_,
-               width_;
+              width_;
     };
-#endif
 
     //! complex pixmap (when needed)
     QPixmap shadowPixmap(const QtCurveClient *client, bool active, bool roundAllCorners) const;
@@ -138,7 +156,7 @@ class QtCurveShadowCache
 
     //! draw gradient into rect
     /*! a separate method is used in order to properly account for corners */
-    void renderGradient(QPainter &p, const QRectF &rect, const QRadialGradient &rg) const;
+    void renderGradient(QPainter &p, const QRectF &rect, const QRadialGradient &rg, bool hasBorder) const;
 
     typedef QCache<int, TileSet> TileSetCache;
 
