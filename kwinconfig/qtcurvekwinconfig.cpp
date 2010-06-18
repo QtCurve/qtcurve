@@ -90,7 +90,6 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
     connect(inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
     activeShadowColorTypeChanged();
     inactiveShadowColorTypeChanged();
-    setShadows();
     activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
                                           KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
     inactiveShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
@@ -103,6 +102,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
                                              KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
     inactiveShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+    setShadows();
 
     connect(grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
     connect(activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
