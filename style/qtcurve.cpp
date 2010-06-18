@@ -1950,7 +1950,20 @@ void QtCurveStyle::polish(QWidget *widget)
         setMenuTextColors(widget, true);
     }
     else if(qobject_cast<QLabel*>(widget))
+    {
         widget->installEventFilter(this);
+        if(WM_DRAG_ALL==opts.windowDrag &&
+           ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
+           widget->parentWidget() && widget->parentWidget()->parentWidget() && ::qobject_cast<QFrame *>(widget->parentWidget()) &&
+#ifdef QTC_QT_ONLY
+           widget->parentWidget()->parentWidget()->inherits("KTitleWidget")
+#else
+            ::qobject_cast<KTitleWidget *>(widget->parentWidget()->parentWidget())
+#endif
+         )
+            ((QLabel *)widget)->setTextInteractionFlags(((QLabel *)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
+            
+    }
     else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
     {
         if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
