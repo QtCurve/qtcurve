@@ -3900,7 +3900,7 @@
        <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="customShading">
          <property name="title">
-          <string>Use Custom Values</string>
+          <string>Use Custom Shades</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -3918,12 +3918,6 @@
           </item>
           <item row="0" column="1" rowspan="7">
            <widget class="QLabel" name="label_4">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="text">
              <string>&lt;i&gt;&lt;p&gt;QtCurve uses various hard-coded shading values to draw elements such as button frames, the background for pressed buttons, etc. The following is a brief overview of how each shade is used - use this as a guide only, as shades are used for various things.&lt;/p&gt;
 &lt;p&gt;&lt;ol&gt;
@@ -3993,18 +3987,76 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
-           <spacer>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QGroupBox" name="customAlphas">
+         <property name="title">
+          <string>Use Custom Alpha Values</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_light_alpha">
+            <property name="text">
+             <string>Light:</string>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>16</height>
-             </size>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
-           </spacer>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="KDoubleNumInput" name="alpha0">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" rowspan="3">
+           <widget class="QLabel" name="label_4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>&lt;i&gt;&lt;p&gt;QtCurve uses dark/light borders to create etch and shadow effects. By default QtCurve tries to lighten (or darken) the parent's background to achieve this - if no parent can be found, then white/black is used with an alpha value set. This behavious maybe overriden, and alpha values always used, by checking the option above.&lt;/p&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_dark_alpha">
+            <property name="text">
+             <string>Dark:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="KDoubleNumInput" name="alpha1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -4282,6 +4334,15 @@
   <tabstop>previewColor</tabstop>
   <tabstop>shading</tabstop>
   <tabstop>customShading</tabstop>
+  <tabstop>shade0</tabstop>
+  <tabstop>shade1</tabstop>
+  <tabstop>shade2</tabstop>
+  <tabstop>shade3</tabstop>
+  <tabstop>shade4</tabstop>
+  <tabstop>shade5</tabstop>
+  <tabstop>customAlphas</tabstop>
+  <tabstop>alpha0</tabstop>
+  <tabstop>alpha1</tabstop>
  </tabstops>
  <includes>
   <include location="local">kcolorbutton.h</include>

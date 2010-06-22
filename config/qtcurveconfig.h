@@ -169,6 +169,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void setupGradientsTab();
     void setupShadesTab();
     void setupShade(KDoubleNumInput *w, int shade);
+    void setupAlpha(KDoubleNumInput *w, int alpha);
     void populateShades(const Options &opts);
     bool diffShades(const Options &opts);
     void setPasswordChar(int ch);
@@ -192,7 +193,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 #endif
     CGradientPreview      *gradPreview;
     GradientCont          customGradient;
-    KDoubleNumInput       *shadeVals[NUM_STD_SHADES];
+    KDoubleNumInput       *shadeVals[NUM_STD_SHADES],
+                          *alphaVals[NUM_STD_ALPHAS];
     QString               currentText,
                           defaultText;
     QtCurveKWinConfig     *kwin;

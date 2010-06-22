@@ -1941,6 +1941,10 @@ void QtCurveConfig::setupShadesTab()
     setupShade(shade4, shade++);
     setupShade(shade5, shade++);
     connect(customShading, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    shade=0;
+    setupAlpha(alpha0, shade++);
+    setupAlpha(alpha1, shade++);
+    connect(customAlphas, SIGNAL(toggled(bool)), SLOT(updateChanged()));
 }
 
 void QtCurveConfig::setupShade(KDoubleNumInput *w, int shade)
@@ -1948,6 +1952,13 @@ void QtCurveConfig::setupShade(KDoubleNumInput *w, int shade)
     w->setRange(0.0, 2.0, 0.05, false);
     connect(w, SIGNAL(valueChanged(double)), SLOT(updateChanged()));
     shadeVals[shade]=w;
+}
+
+void QtCurveConfig::setupAlpha(KDoubleNumInput *w, int alpha)
+{
+    w->setRange(0.0, 1.0, 0.05, false);
+    connect(w, SIGNAL(valueChanged(double)), SLOT(updateChanged()));
+    alphaVals[alpha]=w;
 }
 
 void QtCurveConfig::populateShades(const Options &opts)
@@ -1967,6 +1978,10 @@ void QtCurveConfig::populateShades(const Options &opts)
                                             ? 1 : 0]
                                           [contrast]
                                           [i]);
+
+    customAlphas->setChecked(USE_CUSTOM_ALPHAS(opts));
+    alphaVals[0]->setValue(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[0] : ETCH_TOP_ALPHA);
+    alphaVals[1]->setValue(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[1] : ETCH_BOTTOM_ALPHA);
 }
 
 bool QtCurveConfig::diffShades(const Options &opts)
@@ -1982,6 +1997,16 @@ bool QtCurveConfig::diffShades(const Options &opts)
                 return true;
     }
 
+    if( (!USE_CUSTOM_ALPHAS(opts) && customAlphas->isChecked()) ||
+        (USE_CUSTOM_ALPHAS(opts) && !customAlphas->isChecked()) )
+        return true;
+
+    if(customAlphas->isChecked())
+    {
+        for(int i=0; i<NUM_STD_ALPHAS; ++i)
+            if(!equal(alphaVals[i]->value(), opts.customAlphas[i]))
+                return true;
+    }
     return false;
 }
 
@@ -2476,6 +2501,14 @@ void QtCurveConfig::setOptions(Options &opts)
     }
     else
         opts.customShades[0]=0;
+
+    if(customAlphas->isChecked())
+    {
+        for(int i=0; i<NUM_STD_ALPHAS; ++i)
+            opts.customAlphas[i]=alphaVals[i]->value();
+    }
+    else
+        opts.customAlphas[0]=0;
 
     opts.titlebarButtons=getTitleBarButtonFlags();
     opts.titlebarButtonColors.clear();
