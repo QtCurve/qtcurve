@@ -27,6 +27,8 @@
 19. Add option to draw separator between titlebar and window contents.
 20. Make combo-boxes slightly thinner.
 21. Update kwin shadow code.
+22. Draw faded lines for vertical table header splitters.
+23. Draw header gradients in top/left corner of table headers.
 
 1.4.3
 -----

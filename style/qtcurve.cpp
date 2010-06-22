@@ -5607,8 +5607,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             opt.state&=~State_MouseOver;
             painter->save();
 
-            drawBevelGradient(getFill(&opt, use), painter, r, horiz,
-                              false, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
+            drawBevelGradient(getFill(&opt, use), painter, r, horiz, false, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
             painter->setRenderHint(QPainter::Antialiasing, true);
             if(APPEARANCE_RAISED==opts.lvAppearance)
@@ -5652,9 +5651,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                     if(-1==ho->section && !(state&State_Enabled) && widget && widget->isEnabled())
                         opt.state|=State_Enabled;
 
-                    drawBevelGradient(getFill(&opt, use), painter, r,
-                                        Qt::Horizontal==ho->orientation,
-                                        sunken, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
+                    drawBevelGradient(getFill(&opt, use), painter, r, Qt::Horizontal==ho->orientation, sunken,
+                                      opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
 
                     painter->setRenderHint(QPainter::Antialiasing, true);
                     if(APPEARANCE_RAISED==opts.lvAppearance)
@@ -5676,10 +5674,8 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            drawFadedLine(painter, QRect(r.x()+r.width()-2, r.y()+5, 1, r.height()-10),
-                                          use[STD_BORDER], true, true, false);
-                            drawFadedLine(painter, QRect(r.x()+r.width()-1, r.y()+5, 1, r.height()-10),
-                                          use[0], true, true, false);
+                            drawFadedLine(painter, QRect(r.x()+r.width()-2, r.y()+5, 1, r.height()-10), use[STD_BORDER], true, true, false);
+                            drawFadedLine(painter, QRect(r.x()+r.width()-1, r.y()+5, 1, r.height()-10), use[0], true, true, false);
                         }
                     }
                     else
@@ -5690,17 +5686,24 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
                         {
-                            painter->setPen(use[STD_BORDER]);
-                            drawAaLine(painter, r.x()+5, r.y()+r.height()-2, r.x()+r.width()-6,
-                                      r.y()+r.height()-2);
-                            painter->setPen(use[0]);
-                            drawAaLine(painter, r.x()+5, r.y()+r.height()-1, r.x()+r.width()-6,
-                                      r.y()+r.height()-1);
+                            drawFadedLine(painter, QRect(r.x()+5, r.y()+r.height()-2, r.width()-10, 1), use[STD_BORDER], true, true, true);
+                            drawFadedLine(painter, QRect(r.x()+5, r.y()+r.height()-1, r.width()-10, 1), use[0], true, true, true);
                         }
                         if(opts.coloredMouseOver && state&State_MouseOver && state&State_Enabled)
                             drawHighlight(painter, QRect(r.x(), r.y()+r.height()-3, r.width(), 2), true, true);
                     }
                     painter->setRenderHint(QPainter::Antialiasing, false);
+                }
+                else if(!IS_FLAT(opts.lvAppearance) && ((State_Enabled|State_Active)==state || State_Enabled==state))
+                {
+                    QPolygon     top;
+                    const QColor &col(getFill(option, use));
+
+                    top.setPoints(3, r.x(), r.y(), r.x()+r.width(), r.y(), r.x()+r.width(), r.y()+r.height());
+                    painter->setClipRegion(QRegion(top));
+                    drawBevelGradient(col, painter, r, true, false, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
+                    painter->setClipRegion(QRegion(r).eor(QRegion(top)));
+                    drawBevelGradient(col, painter, r, false, false, opts.lvAppearance, WIDGET_LISTVIEW_HEADER);
                 }
                 else
                     painter->fillRect(r, getFill(option, use));
