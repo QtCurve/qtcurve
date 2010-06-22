@@ -2284,7 +2284,7 @@
          <item row="0" column="3">
           <widget class="QLabel" name="label_96">
            <property name="text">
-            <string>InactiveIcon</string>
+            <string>Inactive Icon</string>
            </property>
           </widget>
          </item>
