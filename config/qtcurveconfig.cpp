@@ -768,6 +768,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     bgndOpacity->setRange(0, 100, 10);
     bgndOpacity->setValue(100);
+    dlgOpacity->setRange(0, 100, 10);
+    dlgOpacity->setValue(100);
     menuBgndOpacity->setRange(0, 100, 10);
     menuBgndOpacity->setValue(100);
 
