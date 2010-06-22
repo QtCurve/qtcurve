@@ -9017,8 +9017,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         painter->save();
                         painter->setClipRect(btn, Qt::IntersectClip);
                         drawLightBevel(painter, opts.comboSplitter
-                                                    ? btn
-                                                    : btn.adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0),
+                                                    ? btn.adjusted(reverse ? -2 : 0, 0, reverse ? 2 : 1, 0)
+                                                    : btn.adjusted(reverse ? -3 : -2, 0, reverse ? 2 : 1, 0),
                                        &frameOpt, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT,
                                        getFill(&frameOpt, cols, false,
                                                SHADE_DARKEN==opts.comboBtn || (SHADE_NONE!=opts.comboBtn &&
@@ -9555,7 +9555,7 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     case SC_ComboBoxFrame:
                         if(ed)
                         {
-                            int btnWidth(doEtch ? 20 : 18);
+                            int btnWidth(doEtch ? 22 : 20);
 
                             r=QRect(x+w-btnWidth, y, btnWidth, h);
                         }
@@ -9564,8 +9564,8 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     {
                         int bmarg(comboBox->frame ? 2 : 0);
 
-                        r.setRect(x + w - bmarg - (doEtch ? 16 : 15), y + bmarg, 16, h - 2*bmarg);
-                        if(ed)
+                        r.setRect(x + w - bmarg - (doEtch ? 17 : 16), y + bmarg, 16, h - 2*bmarg);
+                        if(ed && opts.unifyCombo)
                             r.adjust(-1, 0, 0, 0);
                         break;
                     }
@@ -9573,8 +9573,8 @@ QRect QtCurveStyle::subControlRect(ComplexControl control, const QStyleOptionCom
                     {
                         int margin(comboBox->frame ? 3 : 0);
 
-                        r.setRect(x + margin, y + margin,
-                                  w - 2 * margin - (opts.unifyCombo ? 15 : 19), h - 2 * margin);
+                        r.setRect(x + margin+(opts.unifyCombo ? 0 : 2), y + margin,
+                                  w - 2 * margin - (opts.unifyCombo ? 15 : 23), h - 2 * margin);
                         if(doEtch)
                             r.adjust(ed ? 0 : 1, 1, ed ? 0 : -1, -1);
                         if(ed)
