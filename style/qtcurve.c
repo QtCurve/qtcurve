@@ -4490,6 +4490,7 @@ debugDisplayWidget(widget, 3);
             int         menuBarAdjust=0;
 
 //             if(menubar)
+            if(!isMozilla())
                 qtcWMMoveSetup(widget);
 
             if(menubar && BLEND_TITLEBAR)
