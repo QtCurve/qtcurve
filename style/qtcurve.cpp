@@ -1171,8 +1171,8 @@ QtCurveStyle::QtCurveStyle()
                                                   "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
     }
 
-    if((100!=opts.bgndOpacity || 100!=opts.menuBgndOpacity) && !compositingActive())
-        opts.bgndOpacity=opts.menuBgndOpacity=100;
+    if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) && !compositingActive())
+        opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
 #endif
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
@@ -1776,7 +1776,7 @@ void QtCurveStyle::polish(QWidget *widget)
                 widget->installEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground);
                 if(!widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) &&!widget->testAttribute(Qt::WA_TranslucentBackground) && widget->isWindow() &&
-                   ( (100!=opts.bgndOpacity && Qt::Dialog!=(widget->windowFlags() & Qt::WindowType_Mask)) ||
+                   ( (100!=opts.bgndOpacity && Qt::Window==(widget->windowFlags() & Qt::WindowType_Mask)) ||
                      (100!=opts.dlgOpacity && Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)) ) )
                 {
                     widget->setAttribute(Qt::WA_TranslucentBackground);
@@ -2070,7 +2070,7 @@ void QtCurveStyle::polish(QWidget *widget)
         if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity)
         {
             widget->installEventFilter(this);
-            if(100!=opts.bgndOpacity && !widget->testAttribute(Qt::WA_TranslucentBackground))
+            if(100!=opts.menuBgndOpacity && !widget->testAttribute(Qt::WA_TranslucentBackground))
             {
                 widget->setAttribute(Qt::WA_TranslucentBackground);
 #ifdef Q_WS_X11
@@ -2328,7 +2328,8 @@ void QtCurveStyle::unpolish(QWidget *widget)
                 widget->removeEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground, false);
 #ifdef Q_WS_X11
-                if(100!=opts.bgndOpacity)
+                if((100!=opts.bgndOpacity && Qt::Window==(widget->windowFlags() & Qt::WindowType_Mask)) ||
+                   (100!=opts.dlgOpacity && Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)) )
                     enableBlurBehind(widget, false);
 #endif
                 break;
@@ -2663,8 +2664,14 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         QWidget *widget=qobject_cast<QWidget *>(object);
 
         if(widget && (widget->isWindow() || (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))) && widget->isVisible() &&
-           widget->testAttribute(Qt::WA_StyledBackground) && (opts.bgndOpacity!=100 || !widget->testAttribute(Qt::WA_NoSystemBackground)))
-            drawBackground(widget);
+           widget->testAttribute(Qt::WA_StyledBackground))
+        {
+            bool isDialog=qobject_cast<QDialog *>(widget);
+
+            if((isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100) ||
+               !widget->testAttribute(Qt::WA_NoSystemBackground))
+                drawBackground(widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
+        }
     }
 
     switch(event->type())
@@ -2715,7 +2722,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         case QEvent::Paint:
             if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity) &&
                 qobject_cast<QMenu*>(object))
-                drawBackground((QWidget*)object, false);
+                drawBackground((QWidget*)object, BGND_MENU);
             else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
             {
                 // paint focus rect
@@ -10967,17 +10974,18 @@ void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int s
     }
 }
 
-void QtCurveStyle::drawBackground(QWidget *widget, bool isWindow) const
+void QtCurveStyle::drawBackground(QWidget *widget, BackgroundType type) const
 {
     QPainter      p(widget);
+    bool          isWindow(BGND_MENU!=type);
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
     EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
-    int           opacity = isWindow
-                                ? qobject_cast<QDialog *>(widget)
+    int           opacity = BGND_MENU==type
+                                ? opts.menuBgndOpacity
+                                : BGND_DIALOG==type
                                     ? opts.dlgOpacity
-                                    : opts.bgndOpacity 
-                                : opts.menuBgndOpacity;
+                                    : opts.bgndOpacity;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 

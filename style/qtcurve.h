@@ -79,6 +79,13 @@ class QtCurveStyle : public QCommonStyle
     };
 #endif
 
+    enum BackgroundType
+    {
+        BGND_WINDOW,
+        BGND_DIALOG,
+        BGND_MENU
+    };
+    
     enum CustomElements
     {
         CE_QtC_KCapacityBar = CE_CustomBase+0xFFFF00,
@@ -178,7 +185,7 @@ class QtCurveStyle : public QCommonStyle
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;
     void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false) const;
     void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, bool isWindow) const;
-    void drawBackground(QWidget *widget, bool isWindow=true) const;
+    void drawBackground(QWidget *widget, BackgroundType type) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
     void buildSplitPath(const QRect &r, int round, double radius, QPainterPath &tl, QPainterPath &br) const;
