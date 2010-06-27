@@ -1289,7 +1289,8 @@ typedef enum
     DF_DO_CORNERS      = 0x004,
     DF_SUNKEN          = 0x008,
     DF_DO_BORDER       = 0x010,
-    DF_VERT            = 0x020
+    DF_VERT            = 0x020,
+    DF_HIDE_EFFECT     = 0x040
 } EDrawFlags;
 
 #define drawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m, n) \
@@ -1829,7 +1830,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     unsetCairoClipping(cr);
 
-    if(doEtch)
+    if(doEtch && !(flags&DF_HIDE_EFFECT))
         if(!sunken && GTK_STATE_INSENSITIVE!=state &&
             ((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
              MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
@@ -4111,7 +4112,7 @@ debugDisplayWidget(widget, 3);
                     }
                     drawLightBevel(cr, style, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                    &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
-                                   BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+                                   BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|DF_HIDE_EFFECT, widget);
                     if(!opts.comboSplitter)
                         unsetCairoClipping(cr);
                 }
@@ -4174,7 +4175,7 @@ debugDisplayWidget(widget, 3);
                         }
                         drawLightBevel(cr, style, state, area, NULL, btn.x, btn.y, btn.width, btn.height,
                                     &cols[bg], cols, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO,
-                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|DF_HIDE_EFFECT, widget);
                         if(!opts.comboSplitter)
                             unsetCairoClipping(cr);
                     }

@@ -5,6 +5,7 @@
    general setting set to round.
 3. Add option to use menubar colours for popup menus.
 4. Add option to set alpha values used to draw etch/shadow effect.
+5. Dont draw double shadow for coloured combo buttons.
 
 1.4.1
 -----
