@@ -198,6 +198,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     QString               currentText,
                           defaultText;
     QtCurveKWinConfig     *kwin;
+    int                   kwinPage;
 };
 
 #endif

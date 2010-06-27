@@ -998,21 +998,30 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     setupStack();
 
-    Options currentStyle,
-            defaultStyle;
+    if(kwin->ok())
+    {
+        Options currentStyle,
+                defaultStyle;
 
-    kwin->load(0L);
-    defaultSettings(&defaultStyle);
-    if(!readConfig(NULL, &currentStyle, &defaultStyle))
-        currentStyle=defaultStyle;
+        kwin->load(0L);
+        defaultSettings(&defaultStyle);
+        if(!readConfig(NULL, &currentStyle, &defaultStyle))
+            currentStyle=defaultStyle;
 
-    previewStyle=currentStyle;
-    setupShadesTab();
-    setWidgetOptions(currentStyle);
+        previewStyle=currentStyle;
+        setupShadesTab();
+        setWidgetOptions(currentStyle);
 
-    setupGradientsTab();
-    setupPresets(currentStyle, defaultStyle);
-    setupPreview();
+        setupGradientsTab();
+        setupPresets(currentStyle, defaultStyle);
+        setupPreview();
+    }
+    else
+    {
+        stack->setCurrentIndex(kwinPage);
+        titleLabel->setVisible(false);
+        stackList->setVisible(false);
+    }
 }
 
 QtCurveConfig::~QtCurveConfig()
@@ -1037,6 +1046,9 @@ QSize QtCurveConfig::sizeHint() const
 
 void QtCurveConfig::save()
 {
+    if(!kwin->ok())
+        return;
+
     Options opts=presets[currentText].opts;
 
     setOptions(opts);
@@ -1066,6 +1078,9 @@ void QtCurveConfig::save()
 
 void QtCurveConfig::defaults()
 {
+    if(!kwin->ok())
+        return;
+
     int index=-1;
 
     for(int i=0; i<presetsCombo->count() && -1==index; ++i)
@@ -1405,10 +1420,15 @@ void QtCurveConfig::setupStack()
     new CStackItem(stackList, i18n("Windows"), i++);
 
     kwin=new QtCurveKWinConfig(0L, this);
-    kwin->setNote(i18n("<p><b>NOTE:</b><i>The settings here affect the borders drawn around application windows and dialogs - and "
-                       "not internal (or MDI) windows. Therefore, these settings will <b>not</b> be reflected in the Preview "
-                       "page.</i></p>"));
-    connect(kwin, SIGNAL(changed()), SLOT(updateChanged()));
+    kwinPage=i;
+
+    if(kwin->ok())
+    {
+        kwin->setNote(i18n("<p><b>NOTE:</b><i>The settings here affect the borders drawn around application windows and dialogs - and "
+                           "not internal (or MDI) windows. Therefore, these settings will <b>not</b> be reflected in the Preview "
+                           "page.</i></p>"));
+        connect(kwin, SIGNAL(changed()), SLOT(updateChanged()));
+    }
     stack->insertWidget(i, kwin);
     new CStackItem(stackList, i18n("Window Manager"), i++);
 

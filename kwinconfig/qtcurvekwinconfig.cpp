@@ -2,12 +2,6 @@
   QtCurve KWin window decoration
   Copyright (C) 2007 - 2010 Craig Drummond <craig.p.drummond@googlemail.com>
 
-  based on the window decoration "Plastik":
-  Copyright (C) 2003-2005 Sandro Giessl <sandro@giessl.com>
-
-  based on the window decoration "Web":
-  Copyright (C) 2001 Rik Hemsley (rikkus) <rik@kde.org>
-
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
   License as published by the Free Software Foundation; either
@@ -27,6 +21,7 @@
 #include <kconfig.h>
 #include <klocale.h>
 #include <kglobal.h>
+#include <QtDBus/QDBusConnection>
 #include "config.h"
 #include "common.h"
 #include "qtcurvekwinconfig.h"
@@ -54,6 +49,8 @@ static void insertSizeEntries(QComboBox *combo)
     combo->insertItem(KWinQtCurve::QtCurveConfig::BORDER_OVERSIZED, i18n("Oversized"));
 }
 
+static const char * constDBusService="org.kde.kcontrol.QtCurve";
+
 QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
                  : QWidget(parent)
                  , itsActiveShadows(QPalette::Active)
@@ -63,55 +60,70 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
 
     KGlobal::locale()->insertCatalog("qtcurve");
     KGlobal::locale()->insertCatalog("kwin_clients");
-    setupUi(this);
+    
+    if(!QDBusConnection::sessionBus().registerService(constDBusService))
+    {
+        itsOk=false;
+        QBoxLayout *layout=new QBoxLayout(QBoxLayout::TopToBottom, this);
+        layout->addWidget(new QLabel(i18n("<h3>Already Open</h3><p>Another QtCurve configuration dialog is already open. "
+                                          "Please close the other before proceeding."), this));
+    }
+    else
+    {
+        itsOk=true;
 
-    insertSizeEntries(borderSize);
-    insertColorEntries(activeShadowColorType);
-    insertColorEntries(inactiveShadowColorType);
+        setupUi(this);
 
-    load(0L);
-    connect(borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
-    connect(roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
-    connect(innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
-    connect(borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    titleBarPad->setRange(0, 10);
-    connect(useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(activeShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(activeShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(activeShadowColorTypeChanged()));
-    connect(activeShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
-    connect(inactiveShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(inactiveShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(inactiveShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(inactiveShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(inactiveShadowColorTypeChanged()));
-    connect(inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
-    activeShadowColorTypeChanged();
-    inactiveShadowColorTypeChanged();
-    activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
-                                          KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
-    inactiveShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
+        insertSizeEntries(borderSize);
+        insertColorEntries(activeShadowColorType);
+        insertColorEntries(inactiveShadowColorType);
+
+        load(0L);
+        connect(borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
+        connect(roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+        connect(outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
+        connect(innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
+        connect(borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+        connect(titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        titleBarPad->setRange(0, 10);
+        connect(useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+        connect(activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(activeShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(activeShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(activeShadowColorTypeChanged()));
+        connect(activeShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
+        connect(inactiveShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(inactiveShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(inactiveShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(inactiveShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(inactiveShadowColorTypeChanged()));
+        connect(inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
+        activeShadowColorTypeChanged();
+        inactiveShadowColorTypeChanged();
+        activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
                                             KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
-    activeShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
-                                             KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    inactiveShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
-                                               KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    activeShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
-                                             KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    inactiveShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
-                                               KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
-    setShadows();
+        inactiveShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
+                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_SIZE);
+        activeShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+        inactiveShadowHOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+        activeShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+        inactiveShadowVOffset->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_OFFSET,
+                                                KWinQtCurve::QtCurveShadowConfiguration::MAX_OFFSET);
+        setShadows();
 
-    connect(grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-    connect(activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(inactiveOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-    connect(opaqueBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+        connect(grouping, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+        connect(activeOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(inactiveOpacity, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(opaqueBorder, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+    }
 }
 
 QtCurveKWinConfig::~QtCurveKWinConfig()
 {
+    if(itsOk)
+        QDBusConnection::sessionBus().unregisterService(constDBusService);
 }
 
 void QtCurveKWinConfig::load(const KConfigGroup &)
@@ -121,6 +133,9 @@ void QtCurveKWinConfig::load(const KConfigGroup &)
 
 void QtCurveKWinConfig::load(KConfig *c)
 {
+    if(!itsOk)
+        return;
+
     KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
 
     itsActiveShadows.load(cfg);
@@ -141,6 +156,9 @@ void QtCurveKWinConfig::save(KConfigGroup &)
 
 void QtCurveKWinConfig::save(KConfig *c)
 {
+    if(!itsOk)
+        return;
+
     KConfig *cfg=c ? c : new KConfig("kwinqtcurverc");
     
     KWinQtCurve::QtCurveConfig config;
@@ -187,6 +205,9 @@ void QtCurveKWinConfig::save(KConfig *c)
 
 void QtCurveKWinConfig::defaults()
 {
+    if(!itsOk)
+        return;
+
     setWidgets(KWinQtCurve::QtCurveConfig());
     itsActiveShadows.defaults();
     itsInactiveShadows.defaults();
