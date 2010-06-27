@@ -1,6 +1,6 @@
 // krazy:excludeall=qclasses
 
-// Copied from oxygenwindowmanager.cpp svnversion: 1137865
+// Copied from oxygenwindowmanager.cpp svnversion: 1139230
 
 //////////////////////////////////////////////////////////////////////////////
 // oxygenwindowmanager.cpp
@@ -36,7 +36,6 @@
 #include "common.h"
 
 #include <QtGui/QApplication>
-#include <QtGui/QComboBox>
 #include <QtGui/QDockWidget>
 #include <QtGui/QGroupBox>
 #include <QtGui/QLabel>
@@ -102,7 +101,7 @@ namespace QtCurve
     }
 
     //_____________________________________________________________
-    void WindowManager::initialize( int windowDrag )
+    void WindowManager::initialize( int windowDrag, const QStringList &whiteList, const QStringList &blackList )
     {
 
         setEnabled( windowDrag );
@@ -114,8 +113,8 @@ namespace QtCurve
 #endif
         setDragDelay( QApplication::startDragTime() );
 
-        initializeWhiteList();
-        initializeBlackList();
+        initializeWhiteList( whiteList );
+        initializeBlackList( blackList );
 
     }
 
@@ -151,7 +150,7 @@ namespace QtCurve
     }
 
     //_____________________________________________________________
-    void WindowManager::initializeWhiteList( void )
+    void WindowManager::initializeWhiteList( const QStringList &list )
     {
 
         whiteList_.clear();
@@ -161,30 +160,27 @@ namespace QtCurve
         whiteList_.insert( ExceptionId( "ViewSliders@kmix" ) );
         whiteList_.insert( ExceptionId( "Sidebar_Widget@konqueror" ) );
 
-#if 0 // CPD: TODO!!!
-        foreach( const QString& exception, OxygenStyleConfigData::windowDragWhiteList() )
+        foreach( const QString& exception, list )
         {
             ExceptionId id( exception );
             if( !id.className().isEmpty() )
             { whiteList_.insert( exception ); }
         }
-#endif
     }
 
     //_____________________________________________________________
-    void WindowManager::initializeBlackList( void )
+    void WindowManager::initializeBlackList( const QStringList &list )
     {
 
         blackList_.clear();
         blackList_.insert( ExceptionId( "CustomTrackView@kdenlive" ) );
-#if 0 // CPD: TODO!!!
-        foreach( const QString& exception, OxygenStyleConfigData::windowDragBlackList() )
+
+        foreach( const QString& exception, list )
         {
             ExceptionId id( exception );
             if( !id.className().isEmpty() )
             { blackList_.insert( exception ); }
         }
-#endif
     }
 
     //_____________________________________________________________
@@ -395,13 +391,6 @@ namespace QtCurve
     bool WindowManager::isBlackListed( QWidget* widget )
     {
 
-        // hard coded blacklisted widgets
-        if(
-            widget->inherits( "QComboBox" ) ||
-            widget->inherits( "KCategorizedView" )
-        )
-        { return true; }
-
         // list-based blacklisted widgets
         QString appName( qApp->applicationName() );
         foreach( const ExceptionId& id, blackList_ )
@@ -466,6 +455,15 @@ namespace QtCurve
 
         // retrieve child at given position and check cursor again
         if( child && child->cursor().shape() != Qt::ArrowCursor ) return false;
+
+        /*
+        check against children from which drag should never be enabled,
+        even if mousePress/Move has been passed to the parent
+        */
+        if( child && (
+          child->inherits( "QComboBox" ) ||
+          child->inherits( "QProgressBar" ) ) )
+        { return false; }
 
         // tool buttons
         if( QToolButton* toolButton = qobject_cast<QToolButton*>( widget ) )
@@ -546,35 +544,46 @@ namespace QtCurve
 
         }
 
-        QAbstractItemView* itemView( NULL );
-        if( (itemView = qobject_cast<QListView*>( widget->parentWidget() ) ) )
-        {
-            // QListView
-            if( itemView->frameShape() != QFrame::NoFrame ) return false;
-            else if(
-                itemView->selectionMode() != QAbstractItemView::NoSelection &&
-                itemView->selectionMode() != QAbstractItemView::SingleSelection &&
-                itemView->model()->rowCount() ) return false;
-            else if( itemView->indexAt( position ).isValid() ) return false;
-
-        } else if( (itemView = qobject_cast<QAbstractItemView*>( widget->parentWidget() ) ) ) {
-
-            // QAbstractItemView
-            if( itemView->frameShape() != QFrame::NoFrame ) return false;
-            else if( itemView->indexAt( position ).isValid() ) return false;
-
-        } else if( QGraphicsView* graphicsView =  qobject_cast<QGraphicsView*>( widget->parentWidget() ) )  {
-
-            // QGraphicsView
-            if( graphicsView->frameShape() != QFrame::NoFrame ) return false;
-            else if( graphicsView->dragMode() != QGraphicsView::NoDrag ) return false;
-            else if( graphicsView->itemAt( position ) ) return false;
-
-        }
-
         // labels
         if( QLabel* label = qobject_cast<QLabel*>( widget ) )
         { if( label->textInteractionFlags().testFlag( Qt::TextSelectableByMouse ) ) return false; }
+
+        // abstract item views
+        QAbstractItemView* itemView( NULL );
+        if( ( itemView = qobject_cast<QListView*>( widget->parentWidget() ) ) )
+        {
+            if( widget == itemView->viewport() )
+            {
+                // QListView
+                if( itemView->frameShape() != QFrame::NoFrame ) return false;
+                else if(
+                    itemView->selectionMode() != QAbstractItemView::NoSelection &&
+                    itemView->selectionMode() != QAbstractItemView::SingleSelection &&
+                    itemView->model()->rowCount() ) return false;
+                else if( itemView->indexAt( position ).isValid() ) return false;
+            }
+
+        } else if( ( itemView = qobject_cast<QAbstractItemView*>( widget->parentWidget() ) ) ) {
+
+
+            if( widget == itemView->viewport() )
+            {
+                // QAbstractItemView
+                if( itemView->frameShape() != QFrame::NoFrame ) return false;
+                else if( itemView->indexAt( position ).isValid() ) return false;
+            }
+
+        } else if( QGraphicsView* graphicsView =  qobject_cast<QGraphicsView*>( widget->parentWidget() ) )  {
+
+            if( widget == graphicsView->viewport() )
+            {
+                // QGraphicsView
+                if( graphicsView->frameShape() != QFrame::NoFrame ) return false;
+                else if( graphicsView->dragMode() != QGraphicsView::NoDrag ) return false;
+                else if( graphicsView->itemAt( position ) ) return false;
+            }
+
+        }
 
         return true;
 

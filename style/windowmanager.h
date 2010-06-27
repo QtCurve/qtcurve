@@ -1,7 +1,7 @@
 #ifndef __WINDOW_MANAGER_H__
 #define __WINDOW_MANAGER_H__
 
-// Copied from oxygenwindowmanager.h svnversion: 1137865
+// Copied from oxygenwindowmanager.h svnversion: 1137195
 
 //////////////////////////////////////////////////////////////////////////////
 // oxygenwindowmanager.h
@@ -61,7 +61,7 @@ namespace QtCurve
 
         //! initialize
         /*! read relevant options from OxygenStyleConfigData */
-        void initialize( int windowDrag );
+        void initialize( int windowDrag, const QStringList &whiteList=QStringList(), const QStringList &blackList=QStringList() );
 
         //! register widget
         void registerWidget( QWidget* );
@@ -127,14 +127,14 @@ namespace QtCurve
         white list is read from options and is used to adjust
         per-app window dragging issues
         */
-        void initializeWhiteList();
+        void initializeWhiteList( const QStringList &list );
 
         //! set list of blackListed widgets
         /*!
         black list is read from options and is used to adjust
         per-app window dragging issues
         */
-        void initializeBlackList( void );
+        void initializeBlackList( const QStringList &list );
 
         //@}
 
