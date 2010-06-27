@@ -2110,6 +2110,9 @@ void QtCurveConfig::savePreset()
 
 bool QtCurveConfig::savePreset(const QString &name)
 {
+    if(!kwin->ok())
+        return false;
+
     QString dir(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates));
 
     KConfig cfg(dir+name+EXTENSION, KConfig::NoGlobals);
@@ -2136,6 +2139,7 @@ bool QtCurveConfig::savePreset(const QString &name)
             setPreset();
         }
 
+        kwin->save(0L);
         return true;
     }
 
