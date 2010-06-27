@@ -1190,7 +1190,7 @@ QtCurveStyle::QtCurveStyle()
     setupKde4();
 #endif
 
-    itsWindowManager->initialize(opts.windowDrag);
+    itsWindowManager->initialize(opts.windowDrag, opts.windowDragWhiteList.toList(), opts.windowDragBlackList.toList());
 
     switch(opts.shadeSliders)
     {

@@ -1737,6 +1737,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_STRING_LIST(menubarApps)
             CFG_READ_STRING_LIST(statusbarApps)
             CFG_READ_STRING_LIST(useQtFileDialogApps)
+            CFG_READ_STRING_LIST(windowDragWhiteList)
+            CFG_READ_STRING_LIST(windowDragBlackList)
 #endif
             readDoubleList(cfg, "customShades", opts->customShades, NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);

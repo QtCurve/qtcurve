@@ -1161,7 +1161,9 @@ typedef struct
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     Strings          menubarApps,
                      statusbarApps,
-                     useQtFileDialogApps;
+                     useQtFileDialogApps,
+                     windowDragWhiteList,
+                     windowDragBlackList;
 #endif
 
 #ifndef __cplusplus
