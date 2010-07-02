@@ -183,7 +183,7 @@ class QtCurveStyle : public QCommonStyle
     void drawLightBevelReal(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                             const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound) const;
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;
-    void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false) const;
+    void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false, int round=ROUNDED_ALL) const;
     void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, bool isWindow) const;
     void drawBackground(QWidget *widget, BackgroundType type) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;

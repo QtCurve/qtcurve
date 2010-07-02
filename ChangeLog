@@ -2,6 +2,8 @@
 -----
 1. Always use active palette to draw progressbar gradient.
 2. Fix style-support enabled builds
+3. Fix etched combos and spinbuttons when using round widgets, but square entry
+   fields.
 
 1.5.0
 -----

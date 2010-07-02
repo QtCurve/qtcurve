@@ -8045,7 +8045,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(doEtch)
                 {
-                    drawEtch(painter, all, widget, WIDGET_SPIN);
+                    drawEtch(painter, all, widget, WIDGET_SPIN, false,
+                             opts.square&SQUARE_ENTRY
+                                ? opts.unifySpin
+                                    ? ROUNDED_NONE
+                                    : reverse
+                                        ? ROUNDED_LEFT
+                                        : ROUNDED_RIGHT
+                                : ROUNDED_ALL);
                     down.adjust(reverse ? 1 : 0, 0, reverse ? 0 : -1, -1);
                     up.adjust(reverse ? 1 : 0, 1, reverse ? 0 : -1, 0);
                     frame.adjust(reverse ? 0 : 1, 1, reverse ? -1 : 0, -1);
@@ -8945,7 +8952,14 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                         drawGlow(painter, r, FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO);
                     else
                         drawEtch(painter, r, widget, WIDGET_COMBO,
-                                !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken);
+                                 !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken,
+                                 comboBox->editable && opts.square&SQUARE_ENTRY
+                                    ? opts.unifyCombo
+                                        ? ROUNDED_NONE
+                                        : reverse
+                                            ? ROUNDED_LEFT
+                                            : ROUNDED_RIGHT
+                                    : ROUNDED_ALL);
 
                     frame.adjust(1, 1, -1, -1);
                 }
@@ -10925,13 +10939,13 @@ void QtCurveStyle::drawGlow(QPainter *p, const QRect &r, EWidget w) const
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget,  EWidget w, bool raised) const
+void QtCurveStyle::drawEtch(QPainter *p, const QRect &r, const QWidget *widget,  EWidget w, bool raised, int round) const
 {
     QPainterPath tl,
                  br;
     QColor       col(Qt::black);
 
-    buildSplitPath(r, ROUNDED_ALL, getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
+    buildSplitPath(r, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
 
     col.setAlphaF(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[ALPHA_ETCH_DARK] : ETCH_TOP_ALPHA);
     p->setBrush(Qt::NoBrush);
