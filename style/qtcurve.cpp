@@ -9005,6 +9005,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                             if(isOO31)
                                 field.adjust(0, 0, 0, -2);
                         }
+                        else if(doEffect)
+                            field.adjust(reverse ? -4 : -3, -1, reverse ? 3 : 4, 1);
                         else
                             field.adjust(reverse ? -4 : -2, -1, reverse ? 2 : 4, 1);
                         drawEntryField(painter, field, widget, option, opts.unifyCombo ? ROUNDED_ALL : reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, true, false);
