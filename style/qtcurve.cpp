@@ -11856,7 +11856,8 @@ void QtCurveStyle::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QSt
                    getFill(&opt, use, false, SHADE_DARKEN==opts.shadeSliders), use, true,
                    slider ? WIDGET_SLIDER : WIDGET_SB_SLIDER);
 
-    if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)))
+    if(LINE_NONE!=opts.sliderThumbs && (slider || ((opt.state&State_Horizontal && r.width()>=min)|| r.height()>=min)) &&
+        (!slider || SLIDER_CIRCULAR!=opts.sliderStyle))
     {
         const QColor *markers(/*opts.coloredMouseOver && opt.state&State_MouseOver
                                 ? itsMouseOverCols
