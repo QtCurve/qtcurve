@@ -6,6 +6,8 @@
    fields.
 4. Fix etch of non-unified combos.
 5. Fix config module compilation when kwin headers are not installed.
+6. Dont apply background opacity setting to plasma - seems to cuase an icon for
+   plasma to appear in the taskbar!
 
 1.5.0
 -----

@@ -1547,6 +1547,9 @@ void QtCurveStyle::polish(QApplication *app)
     if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
 
+    if(APP_PLASMA==theThemedApp)
+        opts.bgndOpacity=100;
+
     if(APP_OPENOFFICE==theThemedApp)
     {
         if(APPEARANCE_FADE==opts.menuitemAppearance)
