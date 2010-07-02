@@ -534,7 +534,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         if(!compositing && !preview)
 #endif
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
-    
+
     if(!compositing)
         painter.fillRect(r, fillCol);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -972,7 +972,8 @@ void QtCurveClient::updateWindowShape()
 #if KDE_IS_VERSION(4, 3, 0)
                 Handler()->customShadows()
                     ? widget()->rect().adjusted(layoutMetric(LM_OuterPaddingLeft), layoutMetric(LM_OuterPaddingTop),
-                                               -layoutMetric(LM_OuterPaddingRight), 0) // -layoutMetric(LM_OuterPaddingBottom))
+                                               -layoutMetric(LM_OuterPaddingRight),
+                                                COMPOSITING_ENABLED ? 0 : -layoutMetric(LM_OuterPaddingBottom))
                     : 
 #endif
                       widget()->rect());
