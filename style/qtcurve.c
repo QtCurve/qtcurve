@@ -6417,7 +6417,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
        /* Orientation is always vertical with Mozilla, why? Anyway this hack should be OK - as we only draw
           dashes when slider is larger than 'min' pixels... */
         orientation=width<height ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL;
-        if(LINE_NONE!=opts.sliderThumbs &&
+        if(LINE_NONE!=opts.sliderThumbs && (scrollbar || SLIDER_CIRCULAR!=opts.sliderStyle) &&
            (scale || ((GTK_ORIENTATION_HORIZONTAL==orientation && width>=min) || height>=min)))
         {
             GdkColor *markers=/*opts.coloredMouseOver && GTK_STATE_PRELIGHT==state

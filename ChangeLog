@@ -1,6 +1,7 @@
 1.5.1
 -----
 1. Fix drawing of square frames, when general setting set to round.
+2. Dont draw thumbs on circular sliders - they dont look good!
 
 1.5.0
 -----
