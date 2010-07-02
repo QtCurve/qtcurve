@@ -1,5 +1,5 @@
 if (QTC_STYLE_SUPPORT)
-    set(kstyle_qtcurve_config_PART_SRCS qtcurveconfig.cpp exportthemedialog.cpp qtcurvekwinconfig.cpp ../kwin/qtcurveconfig.cpp ../kwin/qtcurveshadowconfiguration.cpp)
+    set(kstyle_qtcurve_config_PART_SRCS qtcurveconfig.cpp exportthemedialog.cpp ../kwinconfig/qtcurvekwinconfig.cpp ../kwin/qtcurveconfig.cpp ../kwin/qtcurveshadowconfiguration.cpp)
 else (QTC_STYLE_SUPPORT)
     set(kstyle_qtcurve_config_PART_SRCS qtcurveconfig.cpp ../kwinconfig/qtcurvekwinconfig.cpp ../kwin/qtcurveconfig.cpp ../kwin/qtcurveshadowconfiguration.cpp)
 endif (QTC_STYLE_SUPPORT)
