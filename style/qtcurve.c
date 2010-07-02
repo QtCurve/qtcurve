@@ -4950,7 +4950,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean frame=!detail || 0==strcmp(detail, "frame"),
                  scrolledWindow=DETAIL("scrolled_window"),
                  viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
-                 drawSquare=(frame & opts.square&SQUARE_FRAME) || (!viewport && !scrolledWindow && !detail && !widget),
+                 drawSquare=(frame && opts.square&SQUARE_FRAME) || (!viewport && !scrolledWindow && !detail && !widget),
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
                             ? frame : isStatusBarFrame(widget);
 
@@ -4960,7 +4960,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         debugDisplayWidget(widget, 3);
     #endif
 
-        if(!statusBar && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && ROUNDED)
+        if(!statusBar && !drawSquare && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))

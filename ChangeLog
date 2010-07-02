@@ -1,3 +1,7 @@
+1.5.1
+-----
+1. Fix drawing of square frames, when general setting set to round.
+
 1.5.0
 -----
 1. Add option to set progressbar colour.
