@@ -21,7 +21,6 @@
 #include "qtcurveconfig.h"
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
-#include <kdecoration.h>
 
 namespace KWinQtCurve
 {
@@ -58,7 +57,7 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
         KConfigGroup style(&kwin, "Style");
         int          size=style.readEntry("BorderSize", 1);
 
-        if(KDecorationDefines::BorderTiny==size)
+        if(0==size) // KDecorationDefines::BorderTiny
         {
             if(group.readEntry("DrawBottom", false))
                 itsBorderSize=BORDER_NO_SIDES;
