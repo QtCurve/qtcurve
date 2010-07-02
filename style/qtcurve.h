@@ -259,6 +259,7 @@ class QtCurveStyle : public QCommonStyle
     void           titlebarSizeChangedChange();
     void           toggleMenuBar(unsigned int xid);
     void           toggleStatusBar(unsigned int xid);
+    void           compositingToggled();
 
     private:
 
@@ -336,6 +337,7 @@ class QtCurveStyle : public QCommonStyle
     KComponentData                     itsComponentData;
 #endif
     QtCurve::WindowManager             *itsWindowManager;
+    mutable bool                       itsCompositingActive;
 };
 
 #endif

@@ -1099,7 +1099,8 @@ QtCurveStyle::QtCurveStyle()
               itsQtVersion(VER_UNKNOWN),
 #endif
               itsSViewSBar(0L),
-              itsWindowManager(new QtCurve::WindowManager(this))
+              itsWindowManager(new QtCurve::WindowManager(this)),
+              itsCompositingActive(false)
 {
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
@@ -1124,6 +1125,9 @@ QtCurveStyle::QtCurveStyle()
 #ifdef Q_WS_X11
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
+    itsCompositingActive=compositingActive();
+    QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
+                                          "compositingToggled", this, SLOT(compositingToggled()));
 #endif // Q_WS_X11
 #endif
     // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
@@ -1170,9 +1174,6 @@ QtCurveStyle::QtCurveStyle()
             QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
                                                   "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
     }
-
-    if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) && !compositingActive())
-        opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
 #endif
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
@@ -11001,11 +11002,13 @@ void QtCurveStyle::drawBackground(QWidget *widget, BackgroundType type) const
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
     EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
-    int           opacity = BGND_MENU==type
-                                ? opts.menuBgndOpacity
-                                : BGND_DIALOG==type
-                                    ? opts.dlgOpacity
-                                    : opts.bgndOpacity;
+    int           opacity = itsCompositingActive
+                                ? BGND_MENU==type
+                                    ? opts.menuBgndOpacity
+                                    : BGND_DIALOG==type
+                                        ? opts.dlgOpacity
+                                        : opts.bgndOpacity
+                                : 100;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
@@ -11074,11 +11077,12 @@ void QtCurveStyle::drawBackground(QWidget *widget, BackgroundType type) const
         p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
                           striped || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
-    else if(100!=opacity)
+    else
     {
         QColor col(isWindow ? window->palette().window().color() : popupMenuCol());
 
-        col.setAlphaF(opacity/100.0);
+        if(100!=opacity)
+            col.setAlphaF(opacity/100.0);
         p.fillRect(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()), col);
     }
 
@@ -13062,7 +13066,20 @@ void QtCurveStyle::toggleStatusBar(unsigned int xid)
         toggleStatusBar(win);
 #endif
 }
-    
+
+void QtCurveStyle::compositingToggled()
+{
+#ifdef Q_WS_X11
+    itsCompositingActive=compositingActive();
+    QWidgetList                tlw=QApplication::topLevelWidgets();
+    QWidgetList::ConstIterator it(tlw.begin()),
+                               end(tlw.end());
+
+    for(; it!=end; ++it)
+        (*it)->update();
+#endif
+}
+
 void QtCurveStyle::toggleMenuBar(QMainWindow *window)
 {
     bool triggeredAction(false);
