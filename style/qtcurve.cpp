@@ -1550,8 +1550,9 @@ void QtCurveStyle::polish(QApplication *app)
 
     if(APP_PLASMA==theThemedApp)
         opts.bgndOpacity=100;
-
-    if(APP_OPENOFFICE==theThemedApp)
+    else if(APP_KWIN==theThemedApp)
+        opts.bgndOpacity=opts.dlgOpacity=100;
+    else if(APP_OPENOFFICE==theThemedApp)
     {
         if(APPEARANCE_FADE==opts.menuitemAppearance)
             opts.menuitemAppearance=APPEARANCE_FLAT;
