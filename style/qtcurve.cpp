@@ -5920,12 +5920,13 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 }
 #endif
 
-                double vc6Workaround(((bar->progress - qint64(bar->minimum)) / double(qint64(bar->maximum) - qint64(bar->minimum))) * r.width());
-                int    progressIndicatorPos=(int)vc6Workaround;
-                bool   flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || ((Qt::LeftToRight==bar->direction) && inverted))) ||
+                double               vc6Workaround(((bar->progress - qint64(bar->minimum)) / double(qint64(bar->maximum) - qint64(bar->minimum))) * r.width());
+                int                  progressIndicatorPos=(int)vc6Workaround;
+                bool                 flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || ((Qt::LeftToRight==bar->direction) && inverted))) ||
                             (vertical && ((!inverted && !bottomToTop) || (inverted && bottomToTop))));
-                QRect  leftRect,
-                       rightRect;
+                QRect                leftRect,
+                                     rightRect;
+                QPalette::ColorGroup cg=state&State_Enabled || State_None==state ? QPalette::Active : QPalette::Current;
 
                 if (flip)
                 {
@@ -5933,14 +5934,14 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
 
                     if (indicatorPos >= 0 && indicatorPos <= r.width())
                     {
-                        painter->setPen(palette.base().color());
+                        painter->setPen(palette.brush(cg, QPalette::Base).color());
                         leftRect = QRect(r.left(), r.top(), indicatorPos, r.height());
                         rightRect = QRect(r.left()+indicatorPos, r.top(), r.width()-indicatorPos, r.height());
                     }
                     else if (indicatorPos > r.width())
-                        painter->setPen(palette.text().color());
+                        painter->setPen(palette.brush(cg, QPalette::Text).color());
                     else
-                        painter->setPen(palette.highlightedText().color());
+                        painter->setPen(palette.brush(cg, QPalette::HighlightedText).color());
                 }
                 else
                 {
@@ -5950,9 +5951,9 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         rightRect = QRect(r.left()+progressIndicatorPos, r.top(), r.width()-progressIndicatorPos, r.height());
                     }
                     else if (progressIndicatorPos > r.width())
-                        painter->setPen(palette.highlightedText().color());
+                        painter->setPen(palette.brush(cg, QPalette::HighlightedText).color());
                     else
-                        painter->setPen(palette.text().color());
+                        painter->setPen(palette.brush(cg, QPalette::Text).color());
                 }
 
                 QString text = bar->fontMetrics.elidedText(bar->text, Qt::ElideRight, r.width());
@@ -5965,7 +5966,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                 if (!leftRect.isNull())
                 {
                     painter->restore();
-                    painter->setPen(flip ? palette.text().color() : palette.highlightedText().color());
+                    painter->setPen(palette.brush(cg, flip ? QPalette::Text : QPalette::HighlightedText).color());
                     painter->setClipRect(leftRect, Qt::IntersectClip);
                     painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 }
@@ -11682,7 +11683,7 @@ void QtCurveStyle::drawProgress(QPainter *p, const QRect &r, const QStyleOption 
     const QColor *use=option->state&State_Enabled || State_None==option->state || ECOLOR_BACKGROUND==opts.progressGrooveColor
                     ? itsProgressCols
                         ? itsProgressCols
-                        : highlightColors(option)
+                        : highlightColors(option, true)
                     : itsBackgroundCols;
 
     drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,

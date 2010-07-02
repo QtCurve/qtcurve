@@ -223,8 +223,8 @@ class QtCurveStyle : public QCommonStyle
     const QColor * backgroundColors(const QStyleOption *option) const
         { return backgroundColors(option->palette.background().color()); }
     const QColor * highlightColors(const QColor &col) const;
-    const QColor * highlightColors(const QStyleOption *option) const
-        { return highlightColors(option->palette.highlight().color()); }
+    const QColor * highlightColors(const QStyleOption *option, bool useActive) const
+        { return highlightColors(option->palette.brush(useActive ? QPalette::Active : QPalette::Current, QPalette::Highlight).color()); }
     const QColor * borderColors(const QStyleOption *option, const QColor *use) const;
     const QColor * getSidebarButtons() const;
     void           setMenuColors(const QColor &bgnd);
