@@ -1292,7 +1292,7 @@ static void copyOpts(Options *src, Options *dest)
     if(src && dest && src!=dest)
     {
         memcpy(dest, src, sizeof(Options));
-        src->noBgndGradientApps=src->noBgndImageApps=src->noDlgFixApps=src->noMenuStripeApps=NULL;
+        src->noBgndGradientApps=src->noBgndOpacityApps=src->noBgndImageApps=src->noDlgFixApps=src->noMenuStripeApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
         memcpy(dest->customAlphas, src->customAlphas, sizeof(double)*NUM_STD_ALPHAS);
         copyGradients(src, dest);
@@ -1307,7 +1307,9 @@ static void freeOpts(Options *opts)
 
         if(opts->noBgndGradientApps)
             g_strfreev(opts->noBgndGradientApps);
-        if(opts->noBgndGradientApps)
+        if(opts->noBgndOpacityApps)
+            g_strfreev(opts->noBgndOpacityApps);
+        if(opts->noBgndImageApps)
             g_strfreev(opts->noBgndImageApps);
         if(opts->noDlgFixApps)
             g_strfreev(opts->noDlgFixApps);       
@@ -1731,6 +1733,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_STRING_LIST(noMenuStripeApps)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_STRING_LIST(noBgndGradientApps)
+            CFG_READ_STRING_LIST(noBgndOpacityApps)
             CFG_READ_STRING_LIST(noBgndImageApps)
 #endif 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -2362,11 +2365,13 @@ static void defaultSettings(Options *opts)
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
+    opts->noBgndOpacityApps << "smplayer" << "amarok" << "dragon" << "kscreenlocker";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
+    opts->noBgndOpacityApps=NULL;
     opts->noBgndImageApps=NULL;
     opts->noDlgFixApps=NULL;
     opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
@@ -3083,6 +3088,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(centerTabText)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_STRING_LIST_ENTRY(noBgndGradientApps)
+        CFG_WRITE_STRING_LIST_ENTRY(noBgndOpacityApps)
         CFG_WRITE_STRING_LIST_ENTRY(noBgndImageApps)
         CFG_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
         CFG_WRITE_STRING_LIST_ENTRY(noMenuStripeApps)

@@ -1150,6 +1150,7 @@ typedef struct
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     /* NOTE: If add any more settings here, need to alter copyOpts/freeOpts/defaultSettings in config_file.c */
     Strings          noBgndGradientApps,
+                     noBgndOpacityApps,
                      noBgndImageApps;
 #endif
     Strings          noDlgFixApps,

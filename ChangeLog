@@ -11,7 +11,9 @@
  7. Dont draw thumbs on circular sliders - they dont look good!
  8. Fix black bottom corners on fully rounded windows when not using compositing.
  9. Dont draw transparent windows if compositing is turned off.
-10. Fix odd kwin behaviour when style set to use transparent backgrounds.
+10. Exclude kwin and screensavers from having transparent backgrounds.
+11. Add config option of apps to exclude from background opacity setting. Defaults
+    to amarok, dragon, kscreenlocker, and smplayer.
 
 1.5.0
 -----

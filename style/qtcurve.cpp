@@ -1548,6 +1548,9 @@ void QtCurveStyle::polish(QApplication *app)
     if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
 
+    if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && (opts.noBgndOpacityApps.contains(appName) || appName.endsWith(".kss")))
+        opts.bgndOpacity=opts.dlgOpacity=100;
+
     if(APP_PLASMA==theThemedApp)
         opts.bgndOpacity=100;
     else if(APP_KWIN==theThemedApp)
