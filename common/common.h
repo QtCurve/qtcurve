@@ -405,11 +405,7 @@ enum
 #define RINGS_SQUARE_LARGE_SIZE  120.0
 #define RINGS_SQUARE_SMALL_SIZE  100.0
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type || 100!=opts.bgndOpacity || 100!=opts.dlgOpacity)
-#else
-#define CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
-#endif
 
 #define GLOW_PROG_ALPHA 0.55
 
@@ -1067,12 +1063,12 @@ typedef struct
                      statusbarHiding,
                      square,
                      windowDrag,
-                     windowBorder;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    int              dwtSettings,
+                     windowBorder,
                      bgndOpacity,
                      menuBgndOpacity,
                      dlgOpacity;
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+    int              dwtSettings;
 #endif
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;

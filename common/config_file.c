@@ -1671,10 +1671,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             CFG_READ_BOOL(xbar)
             CFG_READ_INT(dwtSettings)
+#endif
             CFG_READ_INT(bgndOpacity)
             CFG_READ_INT(menuBgndOpacity)
             CFG_READ_INT(dlgOpacity)
-#endif
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             CFG_READ_APPEARANCE(menuStripeAppearance, false, false)
             if(version<MAKE_VERSION(0, 63) && IS_BLACK(opts->customMenuStripeColor))
@@ -2081,14 +2081,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
 #endif
 
-#if defined QT_VERSION && QT_VERSION >= 0x040000
             if(opts->bgndOpacity<0 || opts->bgndOpacity>100)
                 opts->bgndOpacity=100;
             if(opts->dlgOpacity<0 || opts->dlgOpacity>100)
                 opts->dlgOpacity=100;
             if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
                 opts->menuBgndOpacity=100;
-#endif
 
 #ifndef CONFIG_DIALOG
             opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
@@ -2357,8 +2355,8 @@ static void defaultSettings(Options *opts)
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->bgndOpacity=opts->dlgOpacity=opts->menuBgndOpacity=100;
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
@@ -3031,10 +3029,10 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
+#endif
         CFG_WRITE_ENTRY_NUM(bgndOpacity)
         CFG_WRITE_ENTRY_NUM(menuBgndOpacity)
         CFG_WRITE_ENTRY_NUM(dlgOpacity)
-#endif
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(stdBtnSizes)
         CFG_WRITE_ENTRY_NUM(titlebarButtons)
