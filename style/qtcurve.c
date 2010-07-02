@@ -2281,24 +2281,24 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
 
 #define STRIPE_OUTER(A, B, PART) (B.PART=((3*A.PART+B.PART)/4))
 static void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y, gint w, gint h, GdkColor *col,
-                            gboolean isWindow)
+                            gboolean isWindow, double alpha)
 {
     GdkColor col2;
 
     shade(&opts, col, &col2, BGND_STRIPE_SHADE);
 
     cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x, y+4);
-    cairo_pattern_add_color_stop_rgb(pat, 0.0, CAIRO_COL(*col));
-    cairo_pattern_add_color_stop_rgb(pat, 0.25-0.0001, CAIRO_COL(*col));
-    cairo_pattern_add_color_stop_rgb(pat, 0.5, CAIRO_COL(col2));
-    cairo_pattern_add_color_stop_rgb(pat, 0.75-0.0001, CAIRO_COL(col2));
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, CAIRO_COL(*col), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.25-0.0001, CAIRO_COL(*col), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, CAIRO_COL(col2), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.75-0.0001, CAIRO_COL(col2), alpha);
     col2.red=(3*col->red+col2.red)/4;
     col2.green=(3*col->green+col2.green)/4;
     col2.blue=(3*col->blue+col2.blue)/4;
-    cairo_pattern_add_color_stop_rgb(pat, 0.25, CAIRO_COL(col2));
-    cairo_pattern_add_color_stop_rgb(pat, 0.5-0.0001, CAIRO_COL(col2));
-    cairo_pattern_add_color_stop_rgb(pat, 0.75, CAIRO_COL(col2));
-    cairo_pattern_add_color_stop_rgb(pat, 1.0, CAIRO_COL(col2));
+    cairo_pattern_add_color_stop_rgba(pat, 0.25, CAIRO_COL(col2), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.5-0.0001, CAIRO_COL(col2), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.75, CAIRO_COL(col2), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, CAIRO_COL(col2), alpha);
 
     cairo_pattern_set_extend(pat, CAIRO_EXTEND_REPEAT);
     cairo_set_source(cr, pat);
@@ -2334,6 +2334,42 @@ static void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gi
 */
 }
 
+static gboolean compositingActive(GtkWidget *widget)
+{
+    GdkScreen *screen=widget ? gtk_widget_get_screen(widget) : gdk_screen_get_default();
+
+    return screen && gdk_screen_is_composited(screen);
+}
+
+#define BLUR_BEHIND_OBJECT "QTC_BLUR_BEHIND"
+static void enableBlurBehind(GtkWidget *w, gboolean enable)
+{
+    GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+
+    if(topLevel)
+    {
+        GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+
+        if(display)
+        {
+            int oldValue=(int)g_object_get_data(G_OBJECT(w), BLUR_BEHIND_OBJECT);
+
+            if(0==oldValue || (enable && 1!=oldValue) || (!enable && 2!=oldValue))
+            {
+                Atom atom = gdk_x11_get_xatom_by_name_for_display(display, "_KDE_NET_WM_BLUR_BEHIND_REGION");
+                int  value=enable ? 1 : 2;
+
+                g_object_set_data(G_OBJECT(w), MENU_SIZE_ATOM, (gpointer)value);
+                if (enable)
+                    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window), atom,
+                                    XA_CARDINAL, 32, PropModeReplace, 0, 0);
+                else
+                    XDeleteProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window), atom);
+            }
+        }
+    }
+}
+
 static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget,
                                gint x, gint y, gint width, gint height)
 {
@@ -2360,29 +2396,40 @@ debugDisplayWidget(widget, 20);
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
             GdkRectangle clip;
-
+            int          opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity;
+            double       alpha=1.0;
+            gboolean     useAlpha=opacity<100 && compositingActive(window);
             clip.x=x, clip.y=-ypos, clip.width=width, clip.height=window->allocation.height;
             setCairoClipping(cr, &clip, NULL);
-                    
+
+            if(useAlpha)
+            {
+                alpha=opacity/100.0;
+                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+            }
+
             if(IS_FLAT_BGND(opts.bgndAppearance))
             {
                 GdkColor *parent_col=getParentBgCol(widget);
 
                 if(parent_col)
-                    drawAreaColor(cr, area, NULL, parent_col , x, -ypos, width, window->allocation.height);
+                    drawAreaColorAlpha(cr, area, NULL, parent_col , x, -ypos, width, window->allocation.height, alpha);
             }
             else if(APPEARANCE_STRIPED==opts.bgndAppearance)
-                drawStripedBgnd(cr, style, area,  x, -ypos, width, window->allocation.height, &style->bg[GTK_STATE_NORMAL], TRUE);
+                drawStripedBgnd(cr, style, area,  x, -ypos, width, window->allocation.height, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
             else
             {
                 if(GT_HORIZ==opts.bgndGrad)
-                    drawBevelGradient(cr, style, area, NULL, x, -ypos, width, window->allocation.height,
-                                      &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+                    drawBevelGradientAlpha(cr, style, area, NULL, x, -ypos, width, window->allocation.height,
+                                           &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
                 else
-                    drawBevelGradient(cr, style, area, NULL, -xpos, y, window->allocation.width, height,
-                                      &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER);
+                    drawBevelGradientAlpha(cr, style, area, NULL, -xpos, y, window->allocation.width, height,
+                                           &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
             }
-   
+
+            if(useAlpha)
+                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+                
             drawBgndRings(cr, -ypos, window->allocation.width, TRUE);
             unsetCairoClipping(cr);
             return TRUE;
@@ -2930,6 +2977,9 @@ debugDisplayWidget(widget, 3);
         }
     }
 
+    if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget))
+        enableBlurBehind(widget, TRUE);
+    
     if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) &&
         widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) && !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
@@ -4702,17 +4752,42 @@ debugDisplayWidget(widget, 3);
     {
         gboolean comboMenu=isComboMenu(widget);
 
+        if(widget && !comboMenu && 100!=opts.menuBgndOpacity && !isFixedWidget(widget))
+            enableBlurBehind(widget, TRUE);
+
         if(!comboMenu && !IS_FLAT_BGND(opts.menuBgndAppearance))
         {
+            double   alpha=1.0;
+            gboolean useAlpha=opts.menuBgndOpacity<100 && compositingActive(widget);
+            
+            if(useAlpha)
+            {
+                alpha=opts.menuBgndOpacity/100.0;
+                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+            }
             if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
-                drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE);
+                drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
             else
-                drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                                  &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance,
-                                  WIDGET_OTHER);
+                drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height,
+                                       &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance,
+                                       WIDGET_OTHER, alpha);
+            if(useAlpha)
+                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
         }
         else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
-            drawAreaColor(cr, area, NULL, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height);
+        {
+            double   alpha=1.0;
+            gboolean useAlpha=!comboMenu  && opts.menuBgndOpacity<100 && compositingActive(widget);
+
+            if(useAlpha)
+            {
+                alpha=opts.menuBgndOpacity/100.0;
+                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+            }
+            drawAreaColorAlpha(cr, area, NULL, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height, alpha);
+            if(useAlpha)
+                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+        }
 
         if(!comboMenu && IMG_NONE!=opts.menuBgndImage.type)
             drawBgndRings(cr, y, width, FALSE);
@@ -7616,7 +7691,17 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
     lastSlider.widget=NULL;
     if(qtInit())
+    {
         generateColors();
+
+        if(opts.dlgOpacity<100 || opts.bgndOpacity<100 ||  opts.menuBgndOpacity<100)
+        {
+            GdkColormap *colormap = gdk_screen_get_rgba_colormap(gdk_screen_get_default());
+
+            if (colormap)
+                gtk_widget_set_default_colormap(colormap);;
+        }
+    }
 #ifdef QTC_ADD_EVENT_FILTER____DISABLED
     qtcAddEventFilter();
 #endif

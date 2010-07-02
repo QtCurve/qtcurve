@@ -2,6 +2,8 @@
 -----
 1. Fix drawing of square frames, when general setting set to round.
 2. Dont draw thumbs on circular sliders - they dont look good!
+3. Add options to set opacity for window and poup-menu backgrounds. The KDE SC4.5
+   blur-behind hint is set when the opacity!=100
 
 1.5.0
 -----
