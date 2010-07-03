@@ -2261,6 +2261,9 @@ static gboolean qtInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
+            if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && excludedApp(opts.noBgndOpacityApps))
+                opts.bgndOpacity=opts.dlgOpacity=100;
+
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
                 opts.fixParentlessDialogs=FALSE;
 
