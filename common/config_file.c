@@ -2345,6 +2345,7 @@ static void defaultSettings(Options *opts)
     opts->doubleGtkComboArrow=true;
     opts->stdSidebarButtons=false;
     opts->toolbarTabs=false;
+    opts->bgndOpacity=opts->dlgOpacity=opts->menuBgndOpacity=100;
 #ifdef __cplusplus
     opts->gtkComboMenus=false;
     opts->customMenubarsColor.setRgb(0, 0, 0);
@@ -2358,7 +2359,6 @@ static void defaultSettings(Options *opts)
     opts->titlebarAlignment=ALIGN_FULL_CENTER;
     opts->titlebarEffect=EFFECT_SHADOW;
     opts->centerTabText=false;
-    opts->bgndOpacity=opts->dlgOpacity=opts->menuBgndOpacity=100;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->xbar=false;
     opts->dwtSettings=DWT_BUTTONS_AS_PER_TITLEBAR|DWT_ROUND_TOP_ONLY;
