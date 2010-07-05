@@ -38,7 +38,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QString>
+#if QT_VERSION < 0x040600
+#include <QtCore/QSharedPointer>
+#include "qtcweakpointer.h"
+#else
 #include <QtCore/QWeakPointer>
+#endif
 
 #include <QtGui/QWidget>
 
@@ -241,9 +246,14 @@ namespace QtCurve
         //! drag timer
         QBasicTimer dragTimer_;
 
+
         //! target being dragged
         /*! QWeakPointer is used in case the target gets deleted while drag is in progress */
+#if QT_VERSION < 0x040600
+        QtCWeakPointer<QWidget> target_;
+#else
         QWeakPointer<QWidget> target_;
+#endif
 
         //! true if drag is about to start
         bool dragAboutToStart_;
