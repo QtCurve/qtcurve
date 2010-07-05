@@ -1787,7 +1787,12 @@ void QtCurveStyle::polish(QWidget *widget)
                    ( (100!=opts.bgndOpacity && Qt::Window==(widget->windowFlags() & Qt::WindowType_Mask)) ||
                      (100!=opts.dlgOpacity && Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)) ) )
                 {
+                    // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
+                    // ...unfortunately some properties are lost, among them the window icon.
+                    QIcon icon(widget->windowIcon());
+                    
                     widget->setAttribute(Qt::WA_TranslucentBackground);
+                    widget->setWindowIcon(icon);
                     // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
                     // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
                     widget->move(10000,10000);

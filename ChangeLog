@@ -14,6 +14,8 @@
 10. Exclude kwin and screensavers from having transparent backgrounds.
 11. Add config option of apps to exclude from background opacity setting. Defaults
     to amarok, dragon, kscreenlocker, and smplayer.
+12. Fix missing titlebar/taskbar icons in some apps (e.g. dolphin and kcalc) when
+    using background trasnparency - thanks to Thomas Lübking.
 
 1.5.0
 -----
