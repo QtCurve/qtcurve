@@ -8463,8 +8463,7 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 int   adjust(0);
                 QRect captionRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarLabel, widget));
 
-                if(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && opts.titlebarButtons&TITLEBAR_BUTTON_ROUND &&
-                    captionRect!=r)
+                if(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && captionRect!=r)
                 {
                     adjust=1;
                     if(captionRect.left()>(r.left()+constWindowMargin))
@@ -10546,7 +10545,14 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
 
 void QtCurveStyle::drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const
 {
-    QPainterPath    path(buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, r.height()/2.0));
+    double          radius=opts.titlebarButtons&TITLEBAR_BUTTON_ROUND
+                            ? r.height()/2.0
+                            : opts.round>ROUND_FULL
+                                ? 5.0
+                                : opts.round>ROUND_SLIGHT
+                                    ? 3.0
+                                    : 2.0;
+    QPainterPath    path(buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, radius));
     QLinearGradient g(r.topLeft(), r.bottomLeft());
     QColor          black(Qt::black),
                     white(Qt::white);

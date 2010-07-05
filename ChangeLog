@@ -20,6 +20,7 @@
 13. Fix colour of arrow-style min/max kwin buttons with dark colour schemes.
 14. Base alpha values, used to create sunken titlebar button background, on the
     'value' of the background colour HSV.
+15. Allow usage of sunken background even when not using circular titlebar buttons.
 
 1.5.0
 -----

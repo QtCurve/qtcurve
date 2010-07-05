@@ -143,8 +143,6 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void fillProgressChanged();
     void bgndAppearanceChanged();
     void menuBgndAppearanceChanged();
-    void titlebarButtonsRoundChanged();
-    void titlebarButtonsSunkenBackgroundChanged();
     void changeStack();
     void gradChanged(int i);
     void borderChanged(int i);

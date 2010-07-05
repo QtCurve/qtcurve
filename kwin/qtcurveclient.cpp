@@ -130,9 +130,16 @@ static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false,
 }
 #endif
 
-static void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &bgnd)
+static void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &bgnd, bool circular, int round)
 {
-    QPainterPath    path(createPath(QRectF(r), r.height()/2.0));
+    double          radius=circular
+                            ? r.height()/2.0
+                            : round>ROUND_FULL
+                                ? 5.0
+                                : round>ROUND_SLIGHT
+                                    ? 3.0
+                                    : 2.0;
+    QPainterPath    path(createPath(QRectF(r), radius));
     QLinearGradient g(r.topLeft(), r.bottomLeft());
     QColor          black(Qt::black),
                     white(Qt::white);
@@ -637,7 +644,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
 
-    if(buttonFlags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && buttonFlags&TITLEBAR_BUTTON_ROUND)
+    if(buttonFlags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND)
     {
         int hOffset=2,
             vOffset=hOffset+(outerBorder ? 1 :0),
@@ -645,10 +652,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         
         if(buttonsLeftWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust, r.top()+vOffset,
-                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*vOffset), col);
+                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*vOffset), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
         if(buttonsRightWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust), r.top()+vOffset,
-                                            buttonsRightWidth(), titleBarHeight-2*vOffset), col);
+                                            buttonsRightWidth(), titleBarHeight-2*vOffset), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
     }
     
     bool showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);
