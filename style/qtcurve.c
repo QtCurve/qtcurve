@@ -2414,6 +2414,8 @@ debugDisplayWidget(widget, 20);
 
                 if(parent_col)
                     drawAreaColorAlpha(cr, area, NULL, parent_col , x, -ypos, width, window->allocation.height, alpha);
+                else if(useAlpha)
+                    drawAreaColorAlpha(cr, area, NULL, &style->bg[GTK_STATE_NORMAL] , x, -ypos, width, window->allocation.height, alpha);
             }
             else if(APPEARANCE_STRIPED==opts.bgndAppearance)
                 drawStripedBgnd(cr, style, area,  x, -ypos, width, window->allocation.height, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
@@ -2977,7 +2979,8 @@ debugDisplayWidget(widget, 3);
         }
     }
 
-    if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget))
+    if(widget && ((100!=opts.bgndOpacity && GTK_IS_WINDOW(widget)) || (100!=opts.dlgOpacity && GTK_IS_DIALOG(widget))) &&
+       !isFixedWidget(widget))
         enableBlurBehind(widget, TRUE);
     
     if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) &&
