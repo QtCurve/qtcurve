@@ -6,16 +6,16 @@
     fields.
  4. Fix etch of non-unified combos.
  5. Fix config module compilation when kwin headers are not installed.
- 6. Dont apply background opacity setting to plasma - seems to cuase an icon for
-    plasma to appear in the taskbar!
- 7. Dont draw thumbs on circular sliders - they dont look good!
- 8. Fix black bottom corners on fully rounded windows when not using compositing.
- 9. Dont draw transparent windows if compositing is turned off.
-10. Exclude kwin and screensavers from having transparent backgrounds.
-11. Add config option of apps to exclude from background opacity setting. Defaults
+ 6. Dont draw thumbs on circular sliders - they dont look good!
+ 7. Fix black bottom corners on fully rounded windows when not using compositing.
+ 8. Dont apply background opacity setting to; plasma (seems to cause an icon for
+    plasma to appear in the taskbar), kwin, or screensavers (prevents these from
+    being displayed).
+ 9. Add config option of apps to exclude from background opacity setting. Defaults
     to amarok, dragon, kscreenlocker, and smplayer.
-12. Fix missing titlebar/taskbar icons in some apps (e.g. dolphin and kcalc) when
-    using background trasnparency - thanks to Thomas Lübking.
+10. Dont draw transparent windows if compositing is turned off.
+11. Fix missing titlebar/taskbar icons in some apps (e.g. dolphin and kcalc) when
+    using background transparency - thanks to Thomas Lübking.
 
 1.5.0
 -----
