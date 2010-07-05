@@ -177,7 +177,7 @@ class QtCurveStyle : public QCommonStyle
         drawBevelGradientReal(base, p, r, QPainterPath(), horiz, sel, bevApp, w);
     }
 
-    void drawSunkenBevel(QPainter *p, const QRect &r) const;
+    void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const;
     void drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                         const QColor *custom=0, bool doBorder=true, EWidget w=WIDGET_OTHER) const;
     void drawLightBevelReal(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,

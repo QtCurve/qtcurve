@@ -186,8 +186,8 @@ enum
 #define DEF_BNT_TINT      0.4
 #define ENTRY_INNER_ALPHA 0.4
 
-#define SUNKEN_BEVEL_DARK_ALPHA  0.25
-#define SUNKEN_BEVEL_LIGHT_ALPHA 0.40
+#define SUNKEN_BEVEL_DARK_ALPHA(X)  (X.value()/800.0) // 0.25
+#define SUNKEN_BEVEL_LIGHT_ALPHA(X) (X.value()/500.0) // 0.40
 
 #define MENU_SIZE_ATOM        "_QTCURVE_MENUBAR_SIZE_"
 #define STATUSBAR_ATOM        "_QTCURVE_STATUSBAR_"

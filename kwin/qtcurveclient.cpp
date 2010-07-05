@@ -130,15 +130,15 @@ static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false,
 }
 #endif
 
-static void drawSunkenBevel(QPainter *p, const QRect &r)
+static void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &bgnd)
 {
     QPainterPath    path(createPath(QRectF(r), r.height()/2.0));
     QLinearGradient g(r.topLeft(), r.bottomLeft());
     QColor          black(Qt::black),
                     white(Qt::white);
 
-    black.setAlphaF(SUNKEN_BEVEL_DARK_ALPHA);
-    white.setAlphaF(SUNKEN_BEVEL_LIGHT_ALPHA);
+    black.setAlphaF(SUNKEN_BEVEL_DARK_ALPHA(bgnd));
+    white.setAlphaF(SUNKEN_BEVEL_LIGHT_ALPHA(bgnd));
     g.setColorAt(0, black);
     g.setColorAt(1, white);
     p->fillPath(path, QBrush(g));
@@ -645,10 +645,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         
         if(buttonsLeftWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust, r.top()+vOffset,
-                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*vOffset));
+                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*vOffset), col);
         if(buttonsRightWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust), r.top()+vOffset,
-                                            buttonsRightWidth(), titleBarHeight-2*vOffset));
+                                            buttonsRightWidth(), titleBarHeight-2*vOffset), col);
     }
     
     bool showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);

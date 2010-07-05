@@ -8470,12 +8470,12 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                     if(captionRect.left()>(r.left()+constWindowMargin))
                         drawSunkenBevel(painter, QRect(r.left()+constWindowMargin+1, r.top()+constWindowMargin+1,
                                                        captionRect.left()-(r.left()+(2*constWindowMargin)),
-                                                       r.height()-(1+(2*constWindowMargin))));
+                                                       r.height()-(1+(2*constWindowMargin))), titleCols[ORIGINAL_SHADE]);
 
                     if(captionRect.right()<(r.right()-constWindowMargin))
                         drawSunkenBevel(painter, QRect(captionRect.right()+constWindowMargin, r.top()+constWindowMargin+1,
                                                        r.right()-(captionRect.right()+(2*constWindowMargin)),
-                                                       r.height()-(1+(2*constWindowMargin))));
+                                                       r.height()-(1+(2*constWindowMargin))), titleCols[ORIGINAL_SHADE]);
                 }
 
                 bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && !titleBar->icon.isNull();
@@ -10544,15 +10544,15 @@ void QtCurveStyle::drawBevelGradientReal(const QColor &base, QPainter *p, const 
         p->fillPath(path, QBrush(g));
 }
 
-void QtCurveStyle::drawSunkenBevel(QPainter *p, const QRect &r) const
+void QtCurveStyle::drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) const
 {
     QPainterPath    path(buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, r.height()/2.0));
     QLinearGradient g(r.topLeft(), r.bottomLeft());
     QColor          black(Qt::black),
                     white(Qt::white);
 
-    black.setAlphaF(SUNKEN_BEVEL_DARK_ALPHA);
-    white.setAlphaF(SUNKEN_BEVEL_LIGHT_ALPHA);
+    black.setAlphaF(SUNKEN_BEVEL_DARK_ALPHA(col));
+    white.setAlphaF(SUNKEN_BEVEL_LIGHT_ALPHA(col));
     g.setColorAt(0, black);
     g.setColorAt(1, white);
     p->save();
