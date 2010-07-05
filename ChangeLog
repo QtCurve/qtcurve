@@ -17,6 +17,7 @@
 11. Fix missing titlebar/taskbar icons in some apps (e.g. dolphin and kcalc) when
     using background transparency - thanks to Thomas Lübking.
 12. Fix Qt4.5 compilation - include a striped down version of qsharedpointer_impl.h
+13. Fix colour of arrow-style min/max kwin buttons with dark colour schemes.
 
 1.5.0
 -----

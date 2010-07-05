@@ -3791,18 +3791,22 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowLeft:
         case PE_IndicatorArrowRight:
-        {
-            QColor col(MO_ARROW(QPalette::Text));
-            if(state&(State_Sunken|State_On) &&
-               !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
-                             (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) && ((const QComboBox *)widget)->isEditable()))))
-                r.adjust(1, 1, 1, 1);
-            if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
-                col=blendColors(col, palette.background().color(), col.alphaF());
+            if((QStyle::State_Enabled|QtC_StateKWin)==state)
+                drawArrow(painter, r, element, Qt::color1, false, true);
+            else
+            {
+                QColor col(MO_ARROW(QPalette::Text));
+                if(state&(State_Sunken|State_On) &&
+                !(widget && ( (opts.unifySpin && qobject_cast<const QSpinBox *>(widget)) ||
+                                (opts.unifyCombo && qobject_cast<const QComboBox *>(widget) &&
+                                ((const QComboBox *)widget)->isEditable()))))
+                    r.adjust(1, 1, 1, 1);
+                if(col.alpha()<255 && PE_IndicatorArrowRight==element && widget && widget->inherits("KUrlButton"))
+                    col=blendColors(col, palette.background().color(), col.alphaF());
 
-            drawArrow(painter, r, element, col, false, state&QtC_StateKWin);
+                drawArrow(painter, r, element, col, false, false);
+            }
             break;
-        }
         case PE_IndicatorSpinMinus:
         case PE_IndicatorSpinPlus:
         case PE_IndicatorSpinUp:
