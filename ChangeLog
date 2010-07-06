@@ -21,6 +21,7 @@
 14. Base alpha values, used to create sunken titlebar button background, on the
     'value' of the background colour HSV.
 15. Allow usage of sunken background even when not using circular titlebar buttons.
+16. Fix qmake compilation - thanks to Hugues Delorme
 
 1.5.0
 -----
