@@ -16,7 +16,7 @@ static void qtcWindowCleanup(GtkWidget *widget)
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_DESTROY_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID"));               
-        if(opts.menubarHiding || opts.statusbarHiding)
+        if((opts.menubarHiding&HIDE_KEYBOARD) || (opts.statusbarHiding&HIDE_KEYBOARD))
             g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID"));
         if(opts.shadeMenubarOnlyWhenActive || BLEND_TITLEBAR|| opts.menubarHiding || opts.statusbarHiding)
@@ -286,7 +286,7 @@ static gboolean qtcWindowSetup(GtkWidget *widget)
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
                                                      (GtkSignalFunc)qtcWindowStyleSet, NULL));
-        if(opts.menubarHiding || opts.statusbarHiding)
+        if((opts.menubarHiding&HIDE_KEYBOARD) || (opts.statusbarHiding&HIDE_KEYBOARD))
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
                                                          (GtkSignalFunc)qtcWindowKeyRelease, NULL));
