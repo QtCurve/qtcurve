@@ -22,6 +22,8 @@
     'value' of the background colour HSV.
 15. Allow usage of sunken background even when not using circular titlebar buttons.
 16. Fix qmake compilation - thanks to Hugues Delorme
+17. Fix kwin painting of some shaded windows (e.g. YaST) when using unified titlebar
+    and menubar
 
 1.5.0
 -----

@@ -624,7 +624,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
     
-    if(!preview && blend && -1!=itsMenuBarSize)
+    if(!preview && !isShade() && blend && -1!=itsMenuBarSize)
         opt.rect.adjust(0, 0, 0, itsMenuBarSize);
 
 #ifdef DRAW_INTO_PIXMAPS
