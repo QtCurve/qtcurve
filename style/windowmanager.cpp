@@ -72,6 +72,30 @@
 namespace QtCurve
 {
 
+#if QT_VERSION < 0x040600
+    QtCPointer & QtCPointer::operator=(QWidget *w)
+    {
+        widget_=w;
+        if(widget_)
+            widget_->installEventFilter(this);
+        return *this;
+    }
+
+    void QtCPointer::clear()
+    {
+        if(widget_)
+            widget_->removeEventFilter(this);
+        widget_=0L;
+    }
+
+    bool QtCPointer::eventFilter(QObject *o, QEvent *e)
+    {
+        if(o==widget_ && QEvent::Destroy==e->type())
+            widget_=0L;
+        return false;
+    }
+#endif
+
     //_____________________________________________________________
     WindowManager::WindowManager( QObject* parent ):
         QObject( parent ),

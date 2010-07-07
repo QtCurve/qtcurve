@@ -38,17 +38,27 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QString>
-#if QT_VERSION < 0x040600
-#include <QtCore/QSharedPointer>
-#include "qtcweakpointer.h"
-#else
 #include <QtCore/QWeakPointer>
-#endif
 
 #include <QtGui/QWidget>
 
 namespace QtCurve
 {
+#if QT_VERSION < 0x040600
+    class QtCPointer : public QObject
+    {
+        public:
+        QtCPointer(QWidget *w=0L) : widget_(w) {}
+        QtCPointer & operator=(QWidget *w);
+        operator bool() const { return 0L!=widget_; }
+        void clear();
+        bool eventFilter(QObject *, QEvent *);
+        QWidget *data() { return widget_; }
+
+        private:
+        QWidget *widget_;
+    };
+#endif
 
     class WindowManager: public QObject
     {
@@ -250,7 +260,7 @@ namespace QtCurve
         //! target being dragged
         /*! QWeakPointer is used in case the target gets deleted while drag is in progress */
 #if QT_VERSION < 0x040600
-        QtCWeakPointer<QWidget> target_;
+        QtCPointer target_;
 #else
         QWeakPointer<QWidget> target_;
 #endif
