@@ -24,6 +24,7 @@
 16. Fix qmake compilation - thanks to Hugues Delorme
 17. Fix kwin painting of some shaded windows (e.g. YaST) when using unified titlebar
     and menubar
+18. Fix clipping of etched/rounded editable combo frames that have icons.
 
 1.5.0
 -----

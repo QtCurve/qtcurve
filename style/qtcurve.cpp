@@ -6466,7 +6466,17 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                         iconRect = alignedRect(QApplication::layoutDirection(), Qt::AlignLeft|Qt::AlignVCenter,
                                                iconRect.size(), editRect);
                     if (comboBox->editable)
-                        painter->fillRect(iconRect.adjusted(0, 1, 0, -1), palette.brush(QPalette::Base));
+                    {
+                        int adjust=opts.etchEntry ? 2 : 1;
+
+                        if(opts.square&SQUARE_ENTRY || opts.round<ROUND_FULL)
+                            painter->fillRect(iconRect.adjusted(adjust-1, adjust, -(adjust-1), -adjust), palette.brush(QPalette::Base));
+                        else
+                        {
+                            painter->fillRect(iconRect.adjusted(1, adjust, -1, -adjust), palette.brush(QPalette::Base));
+                            painter->fillRect(iconRect.adjusted(0, adjust+1, 0, -(adjust+1)), palette.brush(QPalette::Base));
+                        }
+                    }
 
                     if (sunken)
                         iconRect.translate(shiftH, shiftV);
