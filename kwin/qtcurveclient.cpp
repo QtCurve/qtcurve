@@ -123,7 +123,7 @@ static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false,
 {
     double radius((fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0));
     int    adjust(botOnly ? 0 : 6);
-    QRect  fr(inner ? r.adjusted(1, 1, -1, -1) : r);
+    QRect  fr(inner ? r.adjusted(1, 1, -1, -1) : r.adjusted(0, 1, 0, 0));
     QRectF rf(fr.x(), fr.y()+adjust, fr.width(), fr.height() - adjust);
 
     return createPath(rf, radius, botOnly);

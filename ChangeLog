@@ -1,3 +1,8 @@
+1.5.2
+-----
+1. Fix 'white line' appearing at the bottom of kwin titlebars when not using
+   an outer border.
+
 1.5.1
 -----
  1. Always use active palette to draw progressbar gradient.
