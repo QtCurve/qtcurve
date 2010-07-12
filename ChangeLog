@@ -2,6 +2,8 @@
 -----
 1. Fix 'white line' appearing at the bottom of kwin titlebars when not using
    an outer border.
+2. If drawing an inner frame for kwin decorations, draw after titlebar has been
+   drawn.
 
 1.5.1
 -----
