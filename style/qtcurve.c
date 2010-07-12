@@ -6046,9 +6046,8 @@ static void gtkDrawBoxGap(GtkStyle *style, GdkWindow *window, GtkStateType state
     CAIRO_END
 }
 
-static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangle *area, GtkStateType state,
-                    GdkColor *col, int x, int y, int width, int height, gboolean horiz,
-                    EWidget tab, gboolean grad)
+static void fillTab(cairo_t *cr, GtkStyle *style, GtkWidget *widget, GdkWindow *window, GdkRectangle *area, GtkStateType state,
+                    GdkColor *col, int x, int y, int width, int height, gboolean horiz, EWidget tab, gboolean grad)
 {
     gboolean selected=GTK_STATE_NORMAL==state,
              flatBgnd=!CUSTOM_BGND || 0!=opts.tabBgnd;
@@ -6058,23 +6057,36 @@ static void fillTab(cairo_t *cr, GtkStyle *style, GdkWindow *window, GdkRectangl
 
     GdkColor *c=col,
              b;
+    double   alpha=1.0;
 
     if(selected && 0!=opts.tabBgnd)
     {
         shade(&opts, col, &b, TO_FACTOR(opts.tabBgnd));
         c=&b;
     }
-    
+
+    if(!selected && (100!=opts.bgndOpacity || 100!=opts.dlgOpacity))
+    {
+        GtkWidget *top=widget ? gtk_widget_get_toplevel(widget) : 0L;
+        gboolean  isDialog=top && GTK_IS_DIALOG(top);
+
+        // Note: opacity is divided by 150 to make dark inactive tabs more translucent
+        if(isDialog && 100!=opts.dlgOpacity)
+            alpha=opts.dlgOpacity/150.0;
+        else if(!isDialog && 100!=opts.bgndOpacity)
+            alpha=opts.bgndOpacity/150.0;
+    }
+
     if(selected && APPEARANCE_INVERTED==opts.appearance)
     {
         if(flatBgnd)
-            drawAreaColor(cr, area, NULL, &style->bg[GTK_STATE_NORMAL], x, y, width, height);
+            drawAreaColorAlpha(cr, area, NULL, &style->bg[GTK_STATE_NORMAL], x, y, width, height, alpha);
     }
     else if(grad)
-        drawBevelGradient(cr, style, area, NULL, x, y, width, height,
-                          c, horiz, selected, selected ? SEL_TAB_APP : NORM_TAB_APP, tab);
+        drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height,
+                               c, horiz, selected, selected ? SEL_TAB_APP : NORM_TAB_APP, tab, alpha);
     else if(!selected || flatBgnd)
-        drawAreaColor(cr, area, NULL, c, x, y, width, height);
+        drawAreaColorAlpha(cr, area, NULL, c, x, y, width, height, alpha);
 }
 
 static void colorTab(cairo_t *cr, int x, int y, int width, int height, int round, EWidget tab, gboolean horiz)
@@ -6249,7 +6261,7 @@ debugDisplayWidget(widget, 3);
                     height-=2;
     #endif
                 clipPath(cr, x, y-4, width, height+4, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
+                fillTab(cr, style, widget, window, area, state, col, x+mod+sizeAdjust, y, width-(2*mod+(sizeAdjust)), height-1, TRUE,
                         WIDGET_TAB_BOT, NULL!=notebook);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y-4, width-(2*sizeAdjust), height+4,
@@ -6301,8 +6313,8 @@ debugDisplayWidget(widget, 3);
                 }
     #endif
                 clipPath(cr, x+mod+sizeAdjust, y, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height+5, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+mod+sizeAdjust, y+1, width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE,
-                        WIDGET_TAB_TOP, NULL!=notebook);
+                fillTab(cr, style, widget, window, area, state, col, x+mod+sizeAdjust, y+1,
+                        width-(2*(mod+(mozTab ? 2 *sizeAdjust : sizeAdjust))), height-1, TRUE, WIDGET_TAB_TOP, NULL!=notebook);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x+sizeAdjust, y, width-(2*(mozTab ? 2 : 1)*sizeAdjust), height+4,
                            glowMo ? qtcPalette.mouseover : qtcPalette.background, round,
@@ -6349,7 +6361,7 @@ debugDisplayWidget(widget, 3);
                     width-=2;
     #endif
                 clipPath(cr, x-4, y, width+4, height, WIDGET_TAB_BOT, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
+                fillTab(cr, style, widget, window, area, state, col, x, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)), FALSE,
                         WIDGET_TAB_BOT, NULL!=notebook);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x-4, y+sizeAdjust, width+4, height-(2*sizeAdjust),
@@ -6400,7 +6412,7 @@ debugDisplayWidget(widget, 3);
                 }
     #endif
                 clipPath(cr, x, y, width+4, height, WIDGET_TAB_TOP, RADIUS_EXTERNAL, round);
-                fillTab(cr, style, window, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
+                fillTab(cr, style, widget, window, area, state, col, x+1, y+mod+sizeAdjust, width-1, height-(2*(mod+sizeAdjust)),
                         FALSE, WIDGET_TAB_TOP, NULL!=notebook);
                 cairo_restore(cr);
                 drawBorder(cr, style, state, area, NULL, x, y+sizeAdjust, width+4, height-(2*sizeAdjust),

@@ -1,3 +1,7 @@
+1.5.2
+-----
+1. Apply opacity settings to inactive tabs.
+
 1.5.1
 -----
 1. Fix drawing of square frames, when general setting set to round.
