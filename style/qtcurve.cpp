@@ -11866,8 +11866,8 @@ void QtCurveStyle::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, 
     p->setBrush(col);
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
     p->fillPath(path, col);
-    p->setRenderHint(QPainter::Antialiasing, false);
 #endif
+    p->setRenderHint(QPainter::Antialiasing, false);
     p->drawPolygon(a);
     p->restore();
 }

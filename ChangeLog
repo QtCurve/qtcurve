@@ -5,6 +5,7 @@
    an outer border.
 3. If drawing an inner frame for kwin decorations, draw after titlebar has been
    drawn.
+4. Fix blurry arrows in Amarok's collection browser.
 
 1.5.1
 -----
