@@ -6735,7 +6735,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                              mouseOver(state&State_Enabled && state&State_MouseOver),
                              glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver);
                 const QColor *use(backgroundColors(option));
-                const QColor &fill(getTabFill(selected, mouseOver, use));
+                QColor       fill(getTabFill(selected, mouseOver, use));
                 double       radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
                 EBorder      borderProfile(selected || opts.borderInactiveTab
                                         ? opts.borderTab
@@ -6744,6 +6744,19 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
                                         : BORDER_FLAT);
 
                 painter->save();
+
+                if(!selected && (100!=opts.bgndOpacity || 100!=opts.dlgOpacity))
+                {
+                    QWidget *top=widget ? widget->topLevelWidget() : 0L;
+                    bool    isDialog=top && Qt::Dialog==(top->windowFlags() & Qt::WindowType_Mask);
+
+                    // Note: opacity is divided by 150 to make dark inactive tabs more translucent
+                    if(isDialog && 100!=opts.dlgOpacity)
+                        fill.setAlphaF(opts.dlgOpacity/150.0);
+                    else if(!isDialog && 100!=opts.bgndOpacity)
+                        fill.setAlphaF(opts.bgndOpacity/150.0);
+                }
+                
                 switch(tab->shape)
                 {
                     case QTabBar::RoundedNorth:
