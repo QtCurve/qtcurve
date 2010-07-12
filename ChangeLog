@@ -7,6 +7,8 @@
    drawn.
 4. Fix blurry arrows in Amarok's collection browser.
 5. qmake updates - thanks to Hugues Delorme.
+6. Dont call killTimer if timer was never registered - fixes Qt warning on app 
+   closure under windows. Thanks to Hugues Delorme.
 
 1.5.1
 -----

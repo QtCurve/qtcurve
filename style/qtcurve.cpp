@@ -1447,7 +1447,8 @@ QtCurveStyle::QtCurveStyle()
 
 QtCurveStyle::~QtCurveStyle()
 {
-    killTimer(itsProgressBarAnimateTimer);
+    if(0!=itsProgressBarAnimateTimer)
+        killTimer(itsProgressBarAnimateTimer);
 #if !defined QTC_QT_ONLY && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
 #if !KDE_IS_VERSION(4, 1, 0)
     unsetFileDialogs();
