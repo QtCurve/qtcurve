@@ -990,6 +990,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     connect(noBgndGradientApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noBgndOpacityApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(noMenuBgndOpacityApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noBgndImageApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(useQtFileDialogApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(menubarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
@@ -2562,6 +2563,7 @@ void QtCurveConfig::setOptions(Options &opts)
 
     opts.noBgndGradientApps=toSet(noBgndGradientApps->text());
     opts.noBgndOpacityApps=toSet(noBgndOpacityApps->text());
+    opts.noMenuBgndOpacityApps=toSet(noMenuBgndOpacityApps->text());
     opts.noBgndImageApps=toSet(noBgndImageApps->text());
     opts.useQtFileDialogApps=toSet(useQtFileDialogApps->text());
     opts.menubarApps=toSet(menubarApps->text());
@@ -2864,6 +2866,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
 
     noBgndGradientApps->setText(toString(opts.noBgndGradientApps));
     noBgndOpacityApps->setText(toString(opts.noBgndOpacityApps));
+    noMenuBgndOpacityApps->setText(toString(opts.noMenuBgndOpacityApps));
     noBgndImageApps->setText(toString(opts.noBgndImageApps));
     useQtFileDialogApps->setText(toString(opts.useQtFileDialogApps));
     menubarApps->setText(toString(opts.menubarApps));
@@ -3134,6 +3137,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
 
          toSet(noBgndGradientApps->text())!=opts.noBgndGradientApps ||
          toSet(noBgndOpacityApps->text())!=opts.noBgndOpacityApps ||
+         toSet(noMenuBgndOpacityApps->text())!=opts.noMenuBgndOpacityApps ||
          toSet(noBgndImageApps->text())!=opts.noBgndImageApps ||
          toSet(useQtFileDialogApps->text())!=opts.useQtFileDialogApps ||
          toSet(menubarApps->text())!=opts.menubarApps ||

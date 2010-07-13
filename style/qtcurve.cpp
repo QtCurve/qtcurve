@@ -1572,6 +1572,8 @@ void QtCurveStyle::polish(QApplication *app)
 
     if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && (opts.noBgndOpacityApps.contains(appName) || appName.endsWith(".kss")))
         opts.bgndOpacity=opts.dlgOpacity=100;
+    if(100!=opts.menuBgndOpacity && opts.noMenuBgndOpacityApps.contains(appName))
+        opts.menuBgndOpacity=100;
 
     if(APP_PLASMA==theThemedApp)
         opts.bgndOpacity=100;

@@ -1151,6 +1151,7 @@ typedef struct
     /* NOTE: If add any more settings here, need to alter copyOpts/freeOpts/defaultSettings in config_file.c */
     Strings          noBgndGradientApps,
                      noBgndOpacityApps,
+                     noMenuBgndOpacityApps,
                      noBgndImageApps;
 #endif
     Strings          noDlgFixApps,
