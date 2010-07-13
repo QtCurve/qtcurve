@@ -131,7 +131,7 @@ class QtCurveStyle : public QCommonStyle
     void polishFormLayout(QFormLayout *layout);
     void polishLayout(QLayout *layout);
 #endif
-    void polishScrollArea(QAbstractScrollArea *scrollArea) const;
+    void polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlacesView=false) const;
 
     void unpolish(QApplication *app) { BASE_STYLE::unpolish(app); }
     void unpolish(QWidget *widget);

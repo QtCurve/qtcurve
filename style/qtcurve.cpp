@@ -1940,7 +1940,11 @@ void QtCurveStyle::polish(QWidget *widget)
             widget->installEventFilter(this);
     }
     else if (qobject_cast<QAbstractScrollArea *>(widget) && widget->inherits("KFilePlacesView"))
+    {
+        if(CUSTOM_BGND)
+            polishScrollArea(static_cast<QAbstractScrollArea *>(widget), true);
         installEventFilter(this);
+    }
     else if (qobject_cast<QProgressBar *>(widget))
     {
         if(widget->palette().color(QPalette::Inactive, QPalette::HighlightedText)!=widget->palette().color(QPalette::Active, QPalette::HighlightedText))
@@ -2219,6 +2223,12 @@ void QtCurveStyle::polish(QWidget *widget)
     {
         widget->removeEventFilter(this);
         widget->installEventFilter(this);
+
+        if(widget->inherits("KFilePlacesView"))
+        {
+            widget->setAutoFillBackground(false);
+            widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+        }
     }
 #endif
 }
@@ -2355,7 +2365,7 @@ void QtCurveStyle::polishLayout(QLayout *layout)
 #endif
 
 // Taken from oxygen!
-void QtCurveStyle::polishScrollArea(QAbstractScrollArea *scrollArea) const
+void QtCurveStyle::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlacesView) const
 {
 
     if( !scrollArea ) return;
@@ -2380,7 +2390,7 @@ void QtCurveStyle::polishScrollArea(QAbstractScrollArea *scrollArea) const
 
     // get viewport and check background role
     QWidget* viewport( scrollArea->viewport() );
-    if( !( viewport && viewport->backgroundRole() == QPalette::Window ) ) return;
+    if( !( viewport && viewport->backgroundRole() == QPalette::Window ) && !isKFilePlacesView ) return;
 
     // change viewport autoFill background.
     // do the same for children if the background role is QPalette::Window
