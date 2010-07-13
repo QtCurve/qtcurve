@@ -57,6 +57,7 @@ class QScrollBar;
 class QDBusInterface;
 class QMainWindow;
 class QStatusBar;
+class QAbstractScrollArea;
 
 namespace QtCurve
 {
@@ -130,6 +131,7 @@ class QtCurveStyle : public QCommonStyle
     void polishFormLayout(QFormLayout *layout);
     void polishLayout(QLayout *layout);
 #endif
+    void polishScrollArea(QAbstractScrollArea *scrollArea) const;
 
     void unpolish(QApplication *app) { BASE_STYLE::unpolish(app); }
     void unpolish(QWidget *widget);

@@ -2001,6 +2001,8 @@ void QtCurveStyle::polish(QWidget *widget)
     }
     else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
     {
+        if(CUSTOM_BGND)
+            polishScrollArea(static_cast<QAbstractScrollArea *>(widget));
         if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
             widget->installEventFilter(this);
         if(APP_KONTACT==theThemedApp && widget->parentWidget())
@@ -2351,6 +2353,46 @@ void QtCurveStyle::polishLayout(QLayout *layout)
             polishLayout(l);
 }
 #endif
+
+// Taken from oxygen!
+void QtCurveStyle::polishScrollArea(QAbstractScrollArea *scrollArea) const
+{
+
+    if( !scrollArea ) return;
+
+    // HACK: add exception for KPIM transactionItemView, which is an overlay widget
+    // and must have filled background. This is a temporary workaround until a more
+    // robust solution is found.
+    if( scrollArea->inherits( "KPIM::TransactionItemView" ) )
+    {
+        // also need to make the scrollarea background plain (using autofill background)
+        // so that optional vertical scrollbar background is not transparent either.
+        // TODO: possibly add an event filter to use the "normal" window background
+        // instead of something flat.
+        scrollArea->setAutoFillBackground( true );
+        return;
+    }
+
+
+    // check frame style and background role
+    if( scrollArea->frameShape() != QFrame::NoFrame ) return;
+    if( scrollArea->backgroundRole() != QPalette::Window ) return;
+
+    // get viewport and check background role
+    QWidget* viewport( scrollArea->viewport() );
+    if( !( viewport && viewport->backgroundRole() == QPalette::Window ) ) return;
+
+    // change viewport autoFill background.
+    // do the same for children if the background role is QPalette::Window
+    viewport->setAutoFillBackground( false );
+    QList<QWidget*> children( viewport->findChildren<QWidget*>() );
+    foreach( QWidget* child, children )
+    {
+        if( child->parent() == viewport && child->backgroundRole() == QPalette::Window )
+        { child->setAutoFillBackground( false ); }
+    }
+
+}
 
 void QtCurveStyle::unpolish(QWidget *widget)
 {

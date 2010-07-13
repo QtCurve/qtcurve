@@ -11,6 +11,8 @@
    closure under windows. Thanks to Hugues Delorme.
 7. When setting KDE SC4.5 blur-behind hint, only set rects that can actually be
    blurred - should speed things up. (Idea and code stolen from Bespin)
+8. Fix non-styles background of scroll areas with no frame - such as in plasma's
+   configure desktop mouse actions page.
 
 1.5.1
 -----
