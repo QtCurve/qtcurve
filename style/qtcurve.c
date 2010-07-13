@@ -7709,7 +7709,7 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
     {
         generateColors();
 
-        if(opts.dlgOpacity<100 || opts.bgndOpacity<100 ||  opts.menuBgndOpacity<100)
+        if(opts.dlgOpacity<100 || opts.bgndOpacity<100 || opts.menuBgndOpacity<100)
         {
             GdkColormap *colormap = gdk_screen_get_rgba_colormap(gdk_screen_get_default());
 

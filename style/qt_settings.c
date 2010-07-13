@@ -2267,6 +2267,9 @@ static gboolean qtInit()
             if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && excludedApp(opts.noBgndOpacityApps))
                 opts.bgndOpacity=opts.dlgOpacity=100;
 
+            if(100!=opts.menuBgndOpacity  && excludedApp(opts.noMenuBgndOpacityApps))
+                opts.menuBgndOpacity=100;
+    
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
                 opts.fixParentlessDialogs=FALSE;
 

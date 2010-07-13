@@ -1,6 +1,9 @@
 1.5.2
 -----
 1. Apply opacity settings to inactive tabs.
+2. Add config option of apps that should not use menu opacity - default is
+   to exclude nspluginviewer and plugin-container (these are used to embed flash
+   in browsers).
 
 1.5.1
 -----
