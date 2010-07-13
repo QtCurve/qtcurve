@@ -260,6 +260,7 @@ class QtCurveStyle : public QCommonStyle
     void           toggleMenuBar(unsigned int xid);
     void           toggleStatusBar(unsigned int xid);
     void           compositingToggled();
+    void           updateBlurRegions();
 
     private:
 
@@ -327,6 +328,7 @@ class QtCurveStyle : public QCommonStyle
     QWidget                            *itsHoverWidget;
 #ifdef Q_WS_X11
     QDBusInterface                     *itsDBus;
+    QList<QWidget *>                   itsPendingBlurUpdates;
 #endif
 #if QT_VERSION < 0x040500
     mutable Version                    itsQtVersion;
