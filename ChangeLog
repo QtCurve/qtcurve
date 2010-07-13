@@ -4,6 +4,7 @@
 2. Add config option of apps that should not use menu opacity - default is
    to exclude nspluginviewer and plugin-container (these are used to embed flash
    in browsers).
+3. Exclude opacity settings for chrome's libflashplugin instance.
 
 1.5.1
 -----

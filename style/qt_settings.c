@@ -138,7 +138,8 @@ typedef enum
     GTK_APP_GIMP_PLUGIN,
     GTK_APP_JAVA,
     GTK_APP_JAVA_SWT,
-    GTK_APP_EVOLUTION
+    GTK_APP_EVOLUTION,
+    GTK_APP_FLASH_PLUGIN
     /*GTK_APP_GAIM*/
 } EGtkApp;
 
@@ -1583,7 +1584,8 @@ static char * getIconPath()
     return path;
 }
 
-#define GIMP_PLUGIN "gimpplugin"
+#define GIMP_PLUGIN  "gimpplugin"
+#define FLASH_PLUGIN "libflashplayer.so"
 
 static char * getAppNameFromPid(int pid)
 {
@@ -1603,23 +1605,32 @@ static char * getAppNameFromPid(int pid)
                      pos=0;
             gboolean found_slash=FALSE;
 
-            for(pos=len-1; pos>=0 && cmdline[pos] && !found_slash; --pos)
-                if('/'==cmdline[pos])
-                {
-                    pos++;
-                    found_slash=TRUE;
-                }
+            if(qtSettings.debug)
+                printf("CMD: \"%s\"\n", cmdline);
 
-            if(!found_slash)
-                pos=0;  /* Perhaps no / */
-            if(pos>=0)
+            /* Try to detect chrome's flash plugin */
+            if(NULL!=strstr(cmdline, "browser-plugins/libflashplayer.so"))
+                strcpy(app_name, FLASH_PLUGIN);
+            else
             {
-                if(NULL!=strstr(cmdline, "gimp/2.0/plug-ins"))
-                    strcpy(app_name, GIMP_PLUGIN);
-                else
+                for(pos=len-1; pos>=0 && cmdline[pos] && !found_slash; --pos)
+                    if('/'==cmdline[pos])
+                    {
+                        pos++;
+                        found_slash=TRUE;
+                    }
+
+                if(!found_slash)
+                    pos=0;  /* Perhaps no / */
+                if(pos>=0)
                 {
-                    strncpy(app_name, &cmdline[pos ? pos+1 : 0], MAX_APP_NAME_LEN);
-                    app_name[MAX_APP_NAME_LEN]='\0';
+                    if(NULL!=strstr(cmdline, "gimp/2.0/plug-ins"))
+                        strcpy(app_name, GIMP_PLUGIN);
+                    else
+                    {
+                        strncpy(app_name, &cmdline[pos ? pos+1 : 0], MAX_APP_NAME_LEN);
+                        app_name[MAX_APP_NAME_LEN]='\0';
+                    }
                 }
             }
         }
@@ -2241,6 +2252,8 @@ static gboolean qtInit()
                     qtSettings.app=GTK_APP_EVOLUTION;
                 else if(0==strcmp(qtSettings.appName, "eclipse"))
                     qtSettings.app=GTK_APP_JAVA_SWT;
+                else if(0==strcmp(qtSettings.appName, FLASH_PLUGIN))
+                    qtSettings.app=GTK_APP_FLASH_PLUGIN;
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }
@@ -2261,13 +2274,13 @@ static gboolean qtInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
-            if(isMozilla())
+            if(isMozilla() || GTK_APP_FLASH_PLUGIN==qtSettings.app)
                 opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
             
             if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && excludedApp(opts.noBgndOpacityApps))
                 opts.bgndOpacity=opts.dlgOpacity=100;
 
-            if(100!=opts.menuBgndOpacity  && excludedApp(opts.noMenuBgndOpacityApps))
+            if(100!=opts.menuBgndOpacity && excludedApp(opts.noMenuBgndOpacityApps))
                 opts.menuBgndOpacity=100;
     
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
