@@ -1609,7 +1609,7 @@ static char * getAppNameFromPid(int pid)
                 printf("CMD: \"%s\"\n", cmdline);
 
             /* Try to detect chrome's flash plugin */
-            if(NULL!=strstr(cmdline, "browser-plugins/libflashplayer.so"))
+            if(NULL!=strstr(cmdline, "plugins/libflashplayer.so"))
                 strcpy(app_name, FLASH_PLUGIN);
             else
             {
