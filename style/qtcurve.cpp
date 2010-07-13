@@ -1553,6 +1553,8 @@ void QtCurveStyle::polish(QApplication *app)
         theThemedApp=APP_KDEVELOP;
     else if("soffice.bin"==appName)
         theThemedApp=APP_OPENOFFICE;
+    else if("kdmgreet"==appName)
+        opts.forceAlternateLvCols=false;
 
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);

@@ -1,21 +1,22 @@
 1.5.2
 -----
-1. Apply opacity settings to inactive tabs.
-2. Add config option of apps that should not use menu opacity - default is
-   to exclude nspluginviewer and plugin-container (these are used to embed flash
-   in browsers).
-3. Fix 'white line' appearing at the bottom of kwin titlebars when not using
-   an outer border.
-4. If drawing an inner frame for kwin decorations, draw after titlebar has been
-   drawn.
-5. Fix blurry arrows in Amarok's collection browser.
-6. qmake updates - thanks to Hugues Delorme.
-7. Dont call killTimer if timer was never registered - fixes Qt warning on app 
-   closure under windows. Thanks to Hugues Delorme.
-8. When setting KDE SC4.5 blur-behind hint, only set rects that can actually be
-   blurred - should speed things up. (Idea and code stolen from Bespin)
-9. Fix non-styles background of scroll areas with no frame - such as in plasma's
-   configure desktop mouse actions page.
+ 1. Apply opacity settings to inactive tabs.
+ 2. Add config option of apps that should not use menu opacity - default is
+    to exclude nspluginviewer and plugin-container (these are used to embed flash
+    in browsers).
+ 3. Fix 'white line' appearing at the bottom of kwin titlebars when not using
+    an outer border.
+ 4. If drawing an inner frame for kwin decorations, draw after titlebar has been
+    drawn.
+ 5. Fix blurry arrows in Amarok's collection browser.
+ 6. qmake updates - thanks to Hugues Delorme.
+ 7. Dont call killTimer if timer was never registered - fixes Qt warning on app 
+    closure under windows. Thanks to Hugues Delorme.
+ 8. When setting KDE SC4.5 blur-behind hint, only set rects that can actually be
+    blurred - should speed things up. (Idea and code stolen from Bespin)
+ 9. Fix non-styles background of scroll areas with no frame - such as in plasma's
+    configure desktop mouse actions page.
+10. Don't force alternate listview colours for KDM - looks bad!
 
 1.5.1
 -----
