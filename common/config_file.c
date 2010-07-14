@@ -1292,6 +1292,12 @@ static void copyOpts(Options *src, Options *dest)
     if(src && dest && src!=dest)
     {
         memcpy(dest, src, sizeof(Options));
+        dest->noBgndGradientApps=src->noBgndGradientApps;
+        dest->noBgndOpacityApps=src->noBgndOpacityApps;
+        dest->noMenuBgndOpacityApps=src->noMenuBgndOpacityApps;
+        dest->noBgndImageApps=src->noBgndImageApps;
+        dest->noDlgFixApps=src->noDlgFixApps;
+        dest->noMenuStripeApps=src->noMenuStripeApps;
         src->noBgndGradientApps=src->noBgndOpacityApps=src->noMenuBgndOpacityApps=src->noBgndImageApps=src->noDlgFixApps=src->noMenuStripeApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
         memcpy(dest->customAlphas, src->customAlphas, sizeof(double)*NUM_STD_ALPHAS);
@@ -1317,12 +1323,14 @@ static void freeOpts(Options *opts)
             g_strfreev(opts->noDlgFixApps);       
         if(opts->noMenuStripeApps)
             g_strfreev(opts->noMenuStripeApps); 
+        opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noDlgFixApps=opts->noMenuStripeApps=NULL;
         for(i=0; i<NUM_CUSTOM_GRAD; ++i)
             if(opts->customGradient[i])
             {
                 if(opts->customGradient[i]->stops)
                     free(opts->customGradient[i]->stops);
                 free(opts->customGradient[i]);
+                opts->customGradient[i]=NULL;
             }
     }
 }
@@ -1413,6 +1421,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             Options newOpts;
             Options *def=&newOpts;
 
+            opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noDlgFixApps=opts->noMenuStripeApps=NULL;
+            for(i=0; i<NUM_CUSTOM_GRAD; ++i)
+                opts->customGradient[i]=NULL;
+            
             if(defOpts)
                 copyOpts(defOpts, &newOpts);
             else
