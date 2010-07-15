@@ -7290,7 +7290,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
             }
 
             painter->save();
-            if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+            if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) /*&& SCROLLBAR_NONE!=opts.scrollbarType*/)
                 drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, state&State_Horizontal, false,
                                       opts.sbarBgndAppearance, WIDGET_SB_BGND);
 //             else if(!(state&NO_BGND_BUTTON) && (!widget || !widget->testAttribute(Qt::WA_NoSystemBackground)))
@@ -8941,7 +8941,8 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
                 else if(opts.thinSbarGroove && APP_ARORA==theThemedApp && widget && widget->inherits("WebView"))
                     painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
 
-                if(opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
+                if(!opts.gtkScrollViews ||
+                   (opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance)/* && SCROLLBAR_NONE!=opts.scrollbarType*/))
                     drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, horiz, false,
                                           opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
