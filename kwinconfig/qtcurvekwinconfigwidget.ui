@@ -360,6 +360,20 @@
           <item row="4" column="1">
            <widget class="KColorButton" name="inactiveShadowColor"/>
           </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="ias_g_l">
+            <property name="text">
+             <string>Gradients:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QCheckBox" name="inactiveUsesActiveGradients">
+            <property name="text">
+             <string>As per active windows</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -416,6 +430,7 @@
   <tabstop>inactiveShadowVOffset</tabstop>
   <tabstop>inactiveShadowColorType</tabstop>
   <tabstop>inactiveShadowColor</tabstop>
+  <tabstop>inactiveUsesActiveGradients</tabstop>
  </tabstops>
  <resources/>
  <connections>

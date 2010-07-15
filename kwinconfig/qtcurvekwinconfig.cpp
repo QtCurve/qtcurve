@@ -97,6 +97,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
         connect(inactiveShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(inactiveShadowColorType, SIGNAL(currentIndexChanged(int)), this, SLOT(inactiveShadowColorTypeChanged()));
         connect(inactiveShadowColor, SIGNAL(changed(const QColor &)), this, SIGNAL(changed()));
+        connect(inactiveUsesActiveGradients, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
         activeShadowColorTypeChanged();
         inactiveShadowColorTypeChanged();
         activeShadowSize->setRange(KWinQtCurve::QtCurveShadowConfiguration::MIN_SIZE,
@@ -183,6 +184,9 @@ void QtCurveKWinConfig::save(KConfig *c)
         itsInactiveShadows.setHorizontalOffset(inactiveShadowHOffset->value());
         itsInactiveShadows.setVerticalOffset(inactiveShadowVOffset->value());
         itsInactiveShadows.setColorType((KWinQtCurve::QtCurveShadowConfiguration::ColorType)inactiveShadowColorType->currentIndex());
+        itsInactiveShadows.setShadowType(inactiveUsesActiveGradients->isChecked()
+                                            ? KWinQtCurve::QtCurveShadowConfiguration::SH_ACTIVE
+                                            : KWinQtCurve::QtCurveShadowConfiguration::SH_INACTIVE);
         if(KWinQtCurve::QtCurveShadowConfiguration::CT_CUSTOM==inactiveShadowColorType->currentIndex())
             itsInactiveShadows.setColor(inactiveShadowColor->color());
     }
@@ -305,6 +309,7 @@ void QtCurveKWinConfig::setShadows()
     inactiveShadowVOffset->setValue(itsInactiveShadows.verticalOffset());
     inactiveShadowColor->setColor(itsInactiveShadows.color());
     inactiveShadowColorType->setCurrentIndex(itsInactiveShadows.colorType());
+    inactiveUsesActiveGradients->setChecked(KWinQtCurve::QtCurveShadowConfiguration::SH_ACTIVE==itsInactiveShadows.shadowType());
 }
 
 extern "C"

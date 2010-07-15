@@ -144,10 +144,8 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
 
     if(shadowSize)
     {
-#ifdef DIFF_INACTIVE_SHADOWS
-        if(active)
+        if(QtCurveShadowConfiguration::SH_ACTIVE==shadowConfiguration.shadowType())
         {
-#endif
             {
                 // inner (shark) gradient
                 const qreal gradientSize = qMin( shadowSize,(shadowSize+fixedSize)/2 );
@@ -196,7 +194,6 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
                 p.setBrush(rg);
                 p.drawRect(shadow.rect());
             }
-#ifdef DIFF_INACTIVE_SHADOWS
         } else {
             {
                 // inner (sharp gradient)
@@ -277,7 +274,6 @@ QPixmap QtCurveShadowCache::simpleShadowPixmap(const QColor &color, bool active,
 
             }
         }
-#endif
     }
 
     // draw the corner of the window - actually all 4 corners as one circle

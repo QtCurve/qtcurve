@@ -17,6 +17,8 @@
  9. Fix non-styles background of scroll areas with no frame - such as in plasma's
     configure desktop mouse actions page.
 10. Don't force alternate listview colours for KDM - looks bad!
+11. Add option to use same gradients for inactive kwin shadows as those used for
+    active windows.
 
 1.5.1
 -----

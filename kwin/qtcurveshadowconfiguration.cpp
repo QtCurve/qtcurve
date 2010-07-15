@@ -39,18 +39,20 @@ QtCurveShadowConfiguration::QtCurveShadowConfiguration(QPalette::ColorGroup colo
 
 void QtCurveShadowConfiguration::defaults()
 {
-    itsHorizontalOffset = 0;
-    itsVerticalOffset = 5;
+    itsHOffset = 0;
+    itsVOffset = 5;
         
     if(QPalette::Active==itsColorGroup)
     {
-        itShadowSize = 35;
+        itsSize = 35;
         setColorType(CT_FOCUS);
+        itsShadowType = SH_ACTIVE;
     }
     else
     {
-        itShadowSize = 30;
+        itsSize = 30;
         setColorType(CT_GRAY);
+        itsShadowType = SH_INACTIVE;
     }
 }
 
@@ -82,59 +84,54 @@ void QtCurveShadowConfiguration::setColorType(ColorType ct)
 }
 
 #define CFG_GROUP (QPalette::Active==itsColorGroup ? "ActiveShadows" : "InactiveShadows")
-#define CFG_SIZE         "Size"
-#define CFG_HORIZ_OFFSET "HOffset"
-#define CFG_VERT_OFFSET  "VOffset"
-#define CFG_COLOR_TYPE   "ColorType"
-#define CFG_COLOR        "Color"
+
+#define READ_ENTRY(ENTRY) \
+    its##ENTRY=group.readEntry(#ENTRY, def.its##ENTRY);
 
 void QtCurveShadowConfiguration::load(KConfig *cfg)
 {
-    KConfigGroup               configGroup(cfg, CFG_GROUP);
+    KConfigGroup               group(cfg, CFG_GROUP);
     QtCurveShadowConfiguration def(itsColorGroup);
-    itShadowSize=configGroup.readEntry(CFG_SIZE, itShadowSize);
-    itsHorizontalOffset=configGroup.readEntry(CFG_HORIZ_OFFSET, itsHorizontalOffset);
-    itsVerticalOffset=configGroup.readEntry(CFG_VERT_OFFSET, itsVerticalOffset);
-    itsColorType=(ColorType)configGroup.readEntry(CFG_COLOR_TYPE, (int)itsColorType);
+
+    READ_ENTRY(Size)
+    READ_ENTRY(HOffset)
+    READ_ENTRY(VOffset)
+    READ_ENTRY(ColorType)
+    READ_ENTRY(ShadowType)
+    
     if(CT_CUSTOM==itsColorType)
-        itsColor=configGroup.readEntry(CFG_COLOR, itsColor);
-    if(itShadowSize<MIN_SIZE || itShadowSize>MAX_SIZE)
-        itShadowSize=def.shadowSize();
-    if(itsHorizontalOffset<MIN_OFFSET || itsHorizontalOffset>MAX_OFFSET)
-        itsHorizontalOffset=def.horizontalOffset();
-    if(itsVerticalOffset<MIN_OFFSET || itsVerticalOffset>MAX_OFFSET)
-        itsVerticalOffset=def.verticalOffset();
+        READ_ENTRY(Color)
+    if(itsSize<MIN_SIZE || itsSize>MAX_SIZE)
+        itsSize=def.shadowSize();
+    if(itsHOffset<MIN_OFFSET || itsHOffset>MAX_OFFSET)
+        itsHOffset=def.horizontalOffset();
+    if(itsVOffset<MIN_OFFSET || itsVOffset>MAX_OFFSET)
+        itsVOffset=def.verticalOffset();
 }
+
+#define WRITE_ENTRY(ENTRY) \
+    if (def.its##ENTRY==its##ENTRY) \
+        group.deleteEntry(#ENTRY); \
+    else \
+        group.writeEntry(#ENTRY, its##ENTRY);
 
 void QtCurveShadowConfiguration::save(KConfig *cfg)
 {
-    KConfigGroup               configGroup(cfg, CFG_GROUP);
+    KConfigGroup               group(cfg, CFG_GROUP);
     QtCurveShadowConfiguration def(itsColorGroup);
+
+    WRITE_ENTRY(Size)
+    WRITE_ENTRY(HOffset)
+    WRITE_ENTRY(VOffset)
+    WRITE_ENTRY(ColorType)
+    WRITE_ENTRY(ShadowType)
     
-    if(itShadowSize==def.itShadowSize)
-        configGroup.deleteEntry(CFG_SIZE);
+    if(CT_CUSTOM!=itsColorType)
+        group.deleteEntry("Color");
     else
-        configGroup.writeEntry(CFG_SIZE, itShadowSize);
-
-    if(itsHorizontalOffset==def.itsHorizontalOffset)
-        configGroup.deleteEntry(CFG_HORIZ_OFFSET);
-    else
-        configGroup.writeEntry(CFG_HORIZ_OFFSET, itsHorizontalOffset);
-
-    if(itsVerticalOffset==def.itsVerticalOffset)
-        configGroup.deleteEntry(CFG_VERT_OFFSET);
-    else
-        configGroup.writeEntry(CFG_VERT_OFFSET, itsVerticalOffset);
-
-    if(itsColorType==def.itsColorType)
-        configGroup.deleteEntry(CFG_COLOR_TYPE);
-    else
-        configGroup.writeEntry(CFG_COLOR_TYPE, (int)itsColorType);
-    
-    if(CT_CUSTOM!=itsColorType || itsColor==def.itsColor)
-        configGroup.deleteEntry(CFG_COLOR);
-    else
-        configGroup.writeEntry(CFG_COLOR, itsColor);
+    {
+        WRITE_ENTRY(Color);
+    }
 }
 
 }

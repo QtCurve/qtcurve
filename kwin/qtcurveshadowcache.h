@@ -41,8 +41,6 @@
 #include "tileset.h"
 #include <cmath>
 
-#define DIFF_INACTIVE_SHADOWS
-
 class QtCurveHelper;
 
 namespace KWinQtCurve
@@ -105,7 +103,6 @@ class QtCurveShadowCache
 
     static qreal square(qreal x) { return x*x; }
 
-#ifdef DIFF_INACTIVE_SHADOWS
     class Parabolic
     {
         public:
@@ -125,7 +122,6 @@ class QtCurveShadowCache
         qreal width_;
 
     };
-#endif
 
     class Gaussian
     {
