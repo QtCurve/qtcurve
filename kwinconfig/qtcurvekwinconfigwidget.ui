@@ -44,6 +44,9 @@
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::AdjustToContents</enum>
            </property>
+           <property name="whatsThis">
+            <string>Controls the size of the window borders (bottom, left, and right).</string>
+           </property>
           </widget>
          </item>
          <item row="1" column="0">
@@ -58,12 +61,18 @@
            <property name="text">
             <string>Round all corners</string>
            </property>
+           <property name="whatsThis">
+            <string>If enabled, and the QtCurve style is set to rounded, then all corners of the window decoration will be rounded. Otherwise, only the top corners will be rounded.</string>
+           </property>
           </widget>
          </item>
          <item row="2" column="1">
           <widget class="QCheckBox" name="outerBorder">
            <property name="text">
             <string>Draw dark outer border</string>
+           </property>
+           <property name="whatsThis">
+            <string>If enabled, a 1 pixel dark border will be drawn around the outside of windows. This is useful if you are not using desktop effects.</string>
            </property>
           </widget>
          </item>
@@ -72,12 +81,18 @@
            <property name="text">
             <string>Draw dark inner border</string>
            </property>
+           <property name="whatsThis">
+            <string>If enabled, a 1 pixel dark border will be drawn between the window contents and the decoration. This is useful if you are using transparent decorations.</string>
+           </property>
           </widget>
          </item>
          <item row="4" column="1">
           <widget class="QCheckBox" name="borderlessMax">
            <property name="text">
             <string>Remove from maximised windows</string>
+           </property>
+           <property name="whatsThis">
+            <string>If enabled, all borders (including the titlebar) will be removed from maximised windows.</string>
            </property>
           </widget>
          </item>
@@ -93,6 +108,9 @@
            <property name="text">
             <string>Enabled</string>
            </property>
+           <property name="whatsThis">
+            <string>If enabled, QtCurve will allow windows to be grouped - causing the titlebar to act as a kind-of tab-widget.</string>
+           </property>
           </widget>
          </item>
          <item row="6" column="0">
@@ -106,6 +124,9 @@
           <widget class="KIntSpinBox" name="titleBarPad">
            <property name="suffix">
             <string>px</string>
+           </property>
+           <property name="whatsThis">
+            <string>Controls the amount of extra padding added to the top and bottom of the titlebar.</string>
            </property>
           </widget>
          </item>
@@ -171,6 +192,9 @@
          <property name="suffix">
           <string>%</string>
          </property>
+         <property name="whatsThis">
+          <string>Controls the opacity of the active window decoration. 0% would cause the decoration to be totally translucent.</string>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
@@ -197,6 +221,9 @@
          <property name="suffix">
           <string>%</string>
          </property>
+         <property name="whatsThis">
+          <string>Controls the opacity of the inactive window decoration. 0% would cause the decoration to be totally translucent.</string>
+         </property>
         </widget>
        </item>
        <item row="2" column="0">
@@ -211,6 +238,9 @@
          <property name="text">
           <string>Ignore opacity settings</string>
          </property>
+         <property name="whatsThis">
+          <string>If enabled, only the titlebar part of the decoration will use the opacity setting.</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -224,6 +254,9 @@
         <widget class="QCheckBox" name="useShadows">
          <property name="text">
           <string>Use custom shadows</string>
+         </property>
+         <property name="whatsThis">
+          <string>If enabled, QtCurve will draw its own shadows - and not use the generic window manager shadows. This will allow you to specify different shadow colours, etc, for active and inactive windows.</string>
          </property>
         </widget>
        </item>
@@ -371,6 +404,9 @@
            <widget class="QCheckBox" name="inactiveUsesActiveGradients">
             <property name="text">
              <string>As per active windows</string>
+            </property>
+            <property name="whatsThis">
+             <string>If enabled, the shadows of inactive windows will be drawn using the same gradient routine as that used for active windows.</string>
             </property>
            </widget>
           </item>
