@@ -751,9 +751,8 @@ static void setFont(QtFontDetails *font, int f)
                 italicStr(font->italic),
                 font->size);
     }
-#ifdef QTC_DEBUG
-    printf("REQUEST FONT: %s\n", qtSettings.fonts[f]);
-#endif
+    if(qtSettings.debug)
+        printf("QtCurve: Font[%d] - %s\n", f, qtSettings.fonts[f]);
 }
 
 #define MIX(a, b, bias) (a + ((b - a) * bias))
@@ -1579,7 +1578,7 @@ static char * getIconPath()
     }
 
     if(qtSettings.debug && path)
-        printf("%s\n", path);
+        printf("QtCurve: %s\n", path);
 
     return path;
 }
@@ -1606,7 +1605,7 @@ static char * getAppNameFromPid(int pid)
             gboolean found_slash=FALSE;
 
             if(qtSettings.debug)
-                printf("CMD: \"%s\"\n", cmdline);
+                printf("QtCurve: Command - \"%s\"\n", cmdline);
 
             /* Try to detect chrome's flash plugin */
             if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) &&
@@ -2160,9 +2159,8 @@ static gboolean qtInit()
             /* Is the user using a non-default QtCurve style? */
             if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, THEME_PREFIX))
             {
-#ifdef DEBUG
-                printf("Look for themerc file for %s\n", qtSettings.styleName);
-#endif
+                if(qtSettings.debug)
+                    printf("QtCurve: Look for themerc file for %s\n", qtSettings.styleName);
                 rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
 
                 if(!rcFile)
@@ -2263,7 +2261,7 @@ static gboolean qtInit()
             }
 
             if(qtSettings.debug)
-                printf("Name: \"%s\"\n", qtSettings.appName ? qtSettings.appName : "<unknown>");
+                printf("QtCurve: Application name: \"%s\"\n", qtSettings.appName ? qtSettings.appName : "<unknown>");
 
             /* Eclipse sets a application name, so if this is set then we're not a Swing java app */
             if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
@@ -2431,14 +2429,12 @@ static gboolean qtInit()
                     g_object_set(settings, "gtk-font-name", qtSettings.fonts[FONT_GENERAL], NULL);
 
                 gtk_settings_set_long_property(settings, "gtk-toolbar-style", qtSettings.toolbarStyle, "KDE-Settings");
-#ifdef DEBUG
-                printf("gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
-#endif
+                if(qtSettings.debug)
+                    printf("QtCurve: gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
                 if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
                 {
-#ifdef DEBUG
-                    printf("gtk-button-images %d\n", qtSettings.buttonIcons);
-#endif
+                    if(qtSettings.debug)
+                        printf("QtCurve: gtk-button-images %d\n", qtSettings.buttonIcons);
                     gtk_settings_set_long_property(settings, "gtk-button-images", qtSettings.buttonIcons, "KDE-Settings");
 #if 0
                     if(opts.drawStatusBarFrames)
