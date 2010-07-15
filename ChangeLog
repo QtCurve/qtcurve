@@ -7,6 +7,7 @@
 3. Add inkscape to list of apps to exclude opacity settings from.
 4. Exclude opacity settings for chrome's libflashplugin instance.
 5. Exclude opacity settings for openoffice.org.
+6. Check widget's colormap before drawing transparent.
 
 1.5.1
 -----

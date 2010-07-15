@@ -2341,6 +2341,18 @@ static gboolean compositingActive(GtkWidget *widget)
     return screen && gdk_screen_is_composited(screen);
 }
 
+static gboolean isRgbaWidget(GtkWidget *widget)
+{
+    if (widget)
+    {
+        GdkScreen *screen = gtk_widget_get_screen (widget);
+        if (gdk_screen_get_rgba_colormap(screen))
+            return gtk_widget_get_colormap(widget)==gdk_screen_get_rgba_colormap(screen);
+    }
+
+    return FALSE;
+}
+
 #define BLUR_BEHIND_OBJECT "QTC_BLUR_BEHIND"
 static void enableBlurBehind(GtkWidget *w, gboolean enable)
 {
@@ -2398,7 +2410,7 @@ debugDisplayWidget(widget, 20);
             GdkRectangle clip;
             int          opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity;
             double       alpha=1.0;
-            gboolean     useAlpha=opacity<100 && compositingActive(window);
+            gboolean     useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window);
             clip.x=x, clip.y=-ypos, clip.width=width, clip.height=window->allocation.height;
             setCairoClipping(cr, &clip, NULL);
 
@@ -2980,7 +2992,7 @@ debugDisplayWidget(widget, 3);
     }
 
     if(widget && ((100!=opts.bgndOpacity && GTK_IS_WINDOW(widget)) || (100!=opts.dlgOpacity && GTK_IS_DIALOG(widget))) &&
-       !isFixedWidget(widget))
+       !isFixedWidget(widget) && isRgbaWidget(widget))
         enableBlurBehind(widget, TRUE);
     
     if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) &&
@@ -4755,13 +4767,13 @@ debugDisplayWidget(widget, 3);
     {
         gboolean comboMenu=isComboMenu(widget);
 
-        if(widget && !comboMenu && 100!=opts.menuBgndOpacity && !isFixedWidget(widget))
+        if(widget && !comboMenu && 100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
             enableBlurBehind(widget, TRUE);
 
         if(!comboMenu && !IS_FLAT_BGND(opts.menuBgndAppearance))
         {
             double   alpha=1.0;
-            gboolean useAlpha=opts.menuBgndOpacity<100 && compositingActive(widget);
+            gboolean useAlpha=opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
             
             if(useAlpha)
             {
@@ -4780,7 +4792,7 @@ debugDisplayWidget(widget, 3);
         else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
         {
             double   alpha=1.0;
-            gboolean useAlpha=!comboMenu  && opts.menuBgndOpacity<100 && compositingActive(widget);
+            gboolean useAlpha=!comboMenu  && opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
 
             if(useAlpha)
             {
