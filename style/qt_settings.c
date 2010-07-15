@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <errno.h>
+#include <locale.h>
 
 #define READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
 #define RC_SETTING "QtC__"
@@ -2085,11 +2086,13 @@ static gboolean qtInit()
 
         if(abs(now-lastRead)>1)
         {
-            char        *path=NULL,
+            char        *locale=setlocale(LC_NUMERIC, NULL),
+                        *path=NULL,
                         *tmpStr=NULL,
                         *rcFile=NULL;
             GtkSettings *settings=NULL;
 
+            setlocale(LC_NUMERIC, "C");
             qtSettings.icons=NULL;
             memset(qtSettings.fonts, 0, sizeof(char *)*FONT_NUM_TOTAL);
             qtSettings.iconSizes.smlTbSize=16;
@@ -2883,6 +2886,7 @@ static gboolean qtInit()
             if(opts.shadeMenubarOnlyWhenActive && SHADE_WINDOW_BORDER==opts.shadeMenubars &&
                EQUAL_COLOR(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER], qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]))
                 opts.shadeMenubarOnlyWhenActive=false;
+            setlocale(LC_NUMERIC, locale);
         }
         return TRUE;
     }
