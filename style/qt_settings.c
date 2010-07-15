@@ -1584,8 +1584,8 @@ static char * getIconPath()
     return path;
 }
 
-#define GIMP_PLUGIN  "gimpplugin"
-#define FLASH_PLUGIN "libflashplayer.so"
+#define GIMP_PLUGIN         "gimpplugin"
+#define CHROME_FLASH_PLUGIN "chrome-flashplugin"
 
 static char * getAppNameFromPid(int pid)
 {
@@ -1609,8 +1609,10 @@ static char * getAppNameFromPid(int pid)
                 printf("CMD: \"%s\"\n", cmdline);
 
             /* Try to detect chrome's flash plugin */
-            if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) && NULL!=strstr(cmdline, FLASH_PLUGIN))
-                strcpy(app_name, FLASH_PLUGIN);
+            if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) &&
+                NULL!=strstr(cmdline, "--type=plugin") && NULL!=strstr(cmdline, "--plugin-path=") &&
+                (NULL!=strstr(cmdline, "libflashplayer.so") || NULL!=strstr(cmdline, "libgcflashplayer.so")))
+                strcpy(app_name, CHROME_FLASH_PLUGIN);
             else
             {
                 for(pos=len-1; pos>=0 && cmdline[pos] && !found_slash; --pos)
@@ -2252,7 +2254,9 @@ static gboolean qtInit()
                     qtSettings.app=GTK_APP_EVOLUTION;
                 else if(0==strcmp(qtSettings.appName, "eclipse"))
                     qtSettings.app=GTK_APP_JAVA_SWT;
-                else if(0==strcmp(qtSettings.appName, FLASH_PLUGIN))
+                else if(0==strcmp(qtSettings.appName, CHROME_FLASH_PLUGIN) ||
+                        0==strcmp(qtSettings.appName, "nspluginviewer") ||
+                        0==strcmp(qtSettings.appName, "plugin-container"))
                     qtSettings.app=GTK_APP_FLASH_PLUGIN;
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
@@ -2274,7 +2278,7 @@ static gboolean qtInit()
             if(IMG_NONE!=opts.bgndImage.type && excludedApp(opts.noBgndImageApps))
                 opts.bgndImage.type=IMG_NONE;
 
-            if(isMozilla() || GTK_APP_FLASH_PLUGIN==qtSettings.app)
+            if(isMozilla() || GTK_APP_FLASH_PLUGIN==qtSettings.app || GTK_APP_OPEN_OFFICE==qtSettings.app)
                 opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
             
             if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && excludedApp(opts.noBgndOpacityApps))

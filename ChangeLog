@@ -1,12 +1,11 @@
 1.5.2
 -----
 1. Apply opacity settings to inactive tabs.
-2. Add config option of apps that should not use menu opacity - default is
-   to exclude nspluginviewer and plugin-container (these are used to embed flash
-   in browsers).
+2. Add config option of apps that should not use menu opacity.
 3. Add inkscape to list of apps to exclude opacity settings from.
-4. Exclude opacity settings for chrome's libflashplugin instance.
-5. Exclude opacity settings for openoffice.org.
+4. Exclude opacity settings from browser plugins - nspluginviewer,
+   plugin-container, and chrome (instance used to load plugins).
+5. Exclude opacity settings for openoffice.org - crashes otherwise!
 6. Check widget's colormap before drawing transparent.
 
 1.5.1
