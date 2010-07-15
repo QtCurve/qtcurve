@@ -2381,17 +2381,17 @@ static void defaultSettings(Options *opts)
     opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
     opts->noBgndOpacityApps << "smplayer" << "amarok" << "dragon" << "kscreenlocker" << "inkscape";
-    opts->noMenuBgndOpacityApps << "nspluginviewer" << "plugin-container" << "inkscape";
+    opts->noMenuBgndOpacityApps << "inkscape";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
-    opts->noBgndOpacityApps=g_strsplit("nspluginviewer,plugin-container,inkscape,soffice.bin",",", -1);;
+    opts->noBgndOpacityApps=g_strsplit("inkscape",",", -1);;
     opts->noBgndImageApps=NULL;
     opts->noDlgFixApps=NULL;
-    opts->noMenuStripeApps=g_strsplit("gtk,soffice.bin",",", -1);
-    opts->noMenuBgndOpacityApps=g_strsplit("nspluginviewer,plugin-container,inkscape,soffice.bin",",", -1);
+    opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
+    opts->noMenuBgndOpacityApps=g_strsplit("inkscape",",", -1);
 /*
     opts->setDialogButtonOrder=false;
 */
