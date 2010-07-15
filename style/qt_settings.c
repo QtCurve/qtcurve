@@ -189,7 +189,7 @@ struct QtData
                     debug;
 #ifdef FIX_FIREFOX_LOCATION_BAR
     gboolean        isBrowser;
-    int             fontSize;
+    float           fontSize;
 #endif
 };
 
@@ -725,15 +725,15 @@ static void setFont(QtFontDetails *font, int f)
         strlen(italicStr(font->italic)) + 1 +
         20+  /* point size */ +1);
 
-    sprintf(qtSettings.fonts[f], "%s %s %s %d",
+    sprintf(qtSettings.fonts[f], "%s %s %s %f",
             font->family,
             weightStr(font->weight),
             italicStr(font->italic),
-            (int)font->size);
+            font->size);
 
 #ifdef FIX_FIREFOX_LOCATION_BAR
     if(FONT_GENERAL==f)
-        qtSettings.fontSize=(int)(font->size);
+        qtSettings.fontSize=font->size;
 #endif
 
     /* Qt uses a bold font for progressbars, try to mimic this... */
@@ -745,11 +745,11 @@ static void setFont(QtFontDetails *font, int f)
             strlen(italicStr(font->italic)) + 1 +
             20+  /* point size */ +1);
 
-        sprintf(qtSettings.fonts[FONT_BOLD], "%s %s %s %d",
+        sprintf(qtSettings.fonts[FONT_BOLD], "%s %s %s %f",
                 font->family,
                 weightStr(WEIGHT_BOLD),
                 italicStr(font->italic),
-                (int)font->size);
+                font->size);
     }
 #ifdef QTC_DEBUG
     printf("REQUEST FONT: %s\n", qtSettings.fonts[f]);
