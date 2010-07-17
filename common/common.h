@@ -427,7 +427,8 @@ typedef enum
     QtC_ShadeMenubarOnlyWhenActive,
     QtC_ToggleButtons,
     QtC_MenubarColor,
-    QtC_WindowBorder
+    QtC_WindowBorder,
+    QtC_CustomBgnd
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
@@ -435,6 +436,8 @@ typedef enum
 #define QtC_StateKWinNoBorder    ((QStyle::StateFlag)0x40000000)
 #define QtC_StateKWinCompositing ((QStyle::StateFlag)0x80000000)
 #define QtC_StateKWinTabDrag     ((QStyle::StateFlag)0x00000001)
+
+#define QtC_PE_DrawBackground    ((QStyle::PrimitiveElement)(QStyle::PE_CustomBase+10000))
 
 #define CLOSE_COLOR              QColor(191, 82, 82)
 #define DARK_WINDOW_TEXT(A)  ((A).red()<230 || (A).green()<230 || (A).blue()<230)

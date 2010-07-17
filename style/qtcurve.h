@@ -187,6 +187,7 @@ class QtCurveStyle : public QCommonStyle
     void drawGlow(QPainter *p, const QRect &r, EWidget w) const;
     void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false, int round=ROUNDED_ALL) const;
     void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, bool isWindow) const;
+    QPixmap drawStripes(const QColor &color, int opacity) const;
     void drawBackground(QWidget *widget, BackgroundType type) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;

@@ -3349,6 +3349,8 @@ int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, co
             return (int)opts.round;
         case QtC_WindowBorder:
             return opts.windowBorder;
+        case QtC_CustomBgnd:
+            return APPEARANCE_STRIPED==opts.bgndAppearance; //TODO: CUSTOM_BGND;
         case QtC_TitleBarButtonAppearance:
             return (int)opts.titlebarButtonAppearance;
         case QtC_TitleAlignment:
@@ -5072,6 +5074,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             dark.setAlphaF(1.0);
 
             painter->save();
+
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
@@ -5335,6 +5338,14 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
             break;
         }
 #endif
+        case QtC_PE_DrawBackground:
+            // TODO: Extend this for all background gradients???
+            if(option && APPEARANCE_STRIPED==opts.bgndAppearance && state&QtC_StateKWin)
+            {
+                QColor col(palette.brush(QPalette::Window).color());
+                painter->drawTiledPixmap(r, drawStripes(col, (int)(col.alphaF()*100)));
+            }
+            break;
         // TODO: This is the only part left from QWindosStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
         default:
@@ -8513,30 +8524,25 @@ void QtCurveStyle::drawComplexControl(ComplexControl control, const QStyleOption
 
                 if(APPEARANCE_STRIPED==opts.bgndAppearance && opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR)
                 {
-                    QColor col2(shade(itsBackgroundCols[ORIGINAL_SHADE], BGND_STRIPE_SHADE));
+                    painter->save();
 
-                    if(!path.isEmpty())
+                    if(path.isEmpty())
+                        painter->setClipRect(r, Qt::IntersectClip);
+                    else
                     {
-                        painter->save();
+                        painter->setPen(itsBackgroundCols[ORIGINAL_SHADE]);
+                        painter->drawPath(painter->testRenderHint(QPainter::Antialiasing) ? path.translated(0.5, 0.5) : path);
                         painter->setRenderHint(QPainter::Antialiasing, false);
                         painter->setClipPath(path, Qt::IntersectClip);
                     }
-                    if(path.isEmpty() || !kwin)
-                        painter->fillRect(r, itsBackgroundCols[ORIGINAL_SHADE]);
-                    painter->setPen(QColor((3*itsBackgroundCols[ORIGINAL_SHADE].red()+col2.red())/4,
-                                           (3*itsBackgroundCols[ORIGINAL_SHADE].green()+col2.green())/4,
-                                           (3*itsBackgroundCols[ORIGINAL_SHADE].blue()+col2.blue())/4));
 
-                    for(int i=r.y()+r.height()-1; i>r.y()+8; i-=4)
-                    {
-                        painter->drawLine(r.x(), i, r.x()+r.width()-1, i);
-                        painter->drawLine(r.x(), i+2, r.x()+r.width()-1, i+2);
-                    }
-                    painter->setPen(col2);
-                    for(int i=r.y()+r.height()-2; i>r.y()+8; i-=4)
-                        painter->drawLine(r.x(), i, r.x()+r.width()-1, i);
-                    if(!path.isEmpty())
-                        painter->restore();
+                    painter->drawTiledPixmap(r.adjusted(0, -(4-(r.height()%4)), 0, 0),
+                                             drawStripes(itsBackgroundCols[ORIGINAL_SHADE],
+                                                         !widget || !widget->topLevelWidget() || !qobject_cast<QDialog *>(widget->topLevelWidget()) 
+                                                            ? opts.bgndOpacity : opts.dlgOpacity));
+
+                    painter->restore();
+
                 }
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -11196,6 +11202,56 @@ void QtCurveStyle::drawBgndRing(QPainter &painter, int x, int y, int size, int s
     }
 }
 
+QPixmap QtCurveStyle::drawStripes(const QColor &color, int opacity) const
+{
+    QPixmap pix;
+    QString key;
+    QColor  col(color);
+
+    if(100!=opacity)
+        col.setAlphaF(opacity/100.0);
+
+    key.sprintf("qtc-stripes-%x", col.rgba());
+    if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+    {        
+        pix=QPixmap(QSize(64, 64));
+
+        if(100!=opacity)
+            pix.fill(Qt::transparent);
+
+        QPainter pixPainter(&pix);
+        QColor   col2(shade(col, BGND_STRIPE_SHADE));
+
+        if(100!=opacity)
+        {
+            col2.setAlphaF(opacity/100.0);
+            pixPainter.setPen(col);
+            for(int i=0; i<pix.height(); i+=4)
+                pixPainter.drawLine(0, i, pix.width()-1, i);
+        }
+        else
+            pixPainter.fillRect(pix.rect(), col);
+        pixPainter.setPen(QColor((3*col.red()+col2.red())/4,
+                                 (3*col.green()+col2.green())/4,
+                                 (3*col.blue()+col2.blue())/4,
+                                 100!=opacity ? col2.alpha() : 255));
+
+        for(int i=1; i<pix.height(); i+=4)
+        {
+            pixPainter.drawLine(0, i, pix.width()-1, i);
+            pixPainter.drawLine(0, i+2, pix.width()-1, i+2);
+        }
+        pixPainter.setPen(col2);
+        for(int i=2; i<pix.height()-1; i+=4)
+            pixPainter.drawLine(0, i, pix.width()-1, i);
+
+        if(itsUsePixmapCache)
+            QPixmapCache::insert(key, pix);
+    }
+    
+    return pix;
+}
+
 void QtCurveStyle::drawBackground(QWidget *widget, BackgroundType type) const
 {
     QPainter      p(widget);
@@ -11215,68 +11271,45 @@ void QtCurveStyle::drawBackground(QWidget *widget, BackgroundType type) const
 
     if(!IS_FLAT_BGND(app))
     {
-        static const int constPixmapWidth  = 16;
-        static const int constPixmapHeight = 256;
-        QString   key;
-        QColor    col(isWindow ? window->palette().window().color() : popupMenuCol());
-        EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
-        QSize     scaledSize(GT_HORIZ==grad ? constPixmapWidth : window->rect().width(),
-                             GT_HORIZ==grad ? window->rect().height() : constPixmapWidth);
-        bool      striped(APPEARANCE_STRIPED==app);
-        QPixmap   pix;
+        QColor  col(isWindow ? window->palette().window().color() : popupMenuCol());
+        QPixmap pix;
+        QSize   scaledSize;
 
-        if(100!=opacity)
-            col.setAlphaF(opacity/100.0);
-
-        key.sprintf("qtc-bgnd-%x-%d-%d", col.rgba(), grad, app);
-        if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+        if(APPEARANCE_STRIPED==app)
+            pix=drawStripes(col, opacity);
+        else
         {
-            pix=QPixmap(striped
-                            ? QSize(64, 64)
-                            : QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight,
-                                    GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
+            static const int constPixmapWidth  = 16;
+            static const int constPixmapHeight = 256;
+            QString   key;
+            EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
+
+            scaledSize=QSize(GT_HORIZ==grad ? constPixmapWidth : window->rect().width(),
+                             GT_HORIZ==grad ? window->rect().height() : constPixmapWidth);
 
             if(100!=opacity)
-                pix.fill(Qt::transparent);
+                col.setAlphaF(opacity/100.0);
 
-            QPainter pixPainter(&pix);
-
-            if(striped)
+            key.sprintf("qtc-bgnd-%x-%d-%d", col.rgba(), grad, app);
+            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
-                QColor col2(shade(col, BGND_STRIPE_SHADE));
+                pix=QPixmap(QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight,
+                                  GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
 
                 if(100!=opacity)
-                {
-                    col2.setAlphaF(opacity/100.0);
-                    pixPainter.setPen(col);
-                    for(int i=0; i<pix.height(); i+=4)
-                        pixPainter.drawLine(0, i, pix.width()-1, i);
-                }
-                else
-                    pixPainter.fillRect(pix.rect(), col);
-                pixPainter.setPen(QColor((3*col.red()+col2.red())/4,
-                                         (3*col.green()+col2.green())/4,
-                                         (3*col.blue()+col2.blue())/4,
-                                         100!=opacity ? col2.alpha() : 255));
+                    pix.fill(Qt::transparent);
 
-                for(int i=1; i<pix.height(); i+=4)
-                {
-                    pixPainter.drawLine(0, i, pix.width()-1, i);
-                    pixPainter.drawLine(0, i+2, pix.width()-1, i+2);
-                }
-                pixPainter.setPen(col2);
-                for(int i=2; i<pix.height()-1; i+=4)
-                    pixPainter.drawLine(0, i, pix.width()-1, i);
-            }
-            else
+                QPainter pixPainter(&pix);
+
                 drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
-                                      GT_HORIZ==grad, false, app, WIDGET_OTHER);
-            if(itsUsePixmapCache)
-                QPixmapCache::insert(key, pix);
+                                        GT_HORIZ==grad, false, app, WIDGET_OTHER);
+                if(itsUsePixmapCache)
+                    QPixmapCache::insert(key, pix);
+            }
         }
 
         p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
-                          striped || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+                          APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
     else
     {

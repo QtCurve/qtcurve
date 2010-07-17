@@ -18,6 +18,7 @@
 11. Don't force alternate listview colours for KDM - looks bad!
 12. Add option to use same gradients for inactive kwin shadows as those used for
     active windows.
+13. Draw stripes into kwin border, if colouring the titlebar only.
 
 1.5.1
 -----

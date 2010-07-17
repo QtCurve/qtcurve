@@ -185,6 +185,32 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 }
 #endif
 
+static void fillBackground(bool customBgnd, QPainter &painter, const QColor &col, const QRect &r, 
+                           const QPainterPath fillPath=QPainterPath(), const QPainterPath outerPath=QPainterPath())
+{
+    if(customBgnd)
+    {
+        QStyleOption opt;
+        opt.state|=QtC_StateKWin;
+        opt.rect=r;
+        opt.palette.setColor(QPalette::Window, col);
+        if(!fillPath.isEmpty())
+        {
+            painter.save();
+            painter.setPen(col);
+            painter.drawPath(outerPath);
+            painter.setClipPath(fillPath, Qt::IntersectClip);
+        }
+        Handler()->wStyle()->drawPrimitive(QtC_PE_DrawBackground, &opt, &painter, NULL);
+        if(!fillPath.isEmpty())
+            painter.restore();
+    }
+    else if(fillPath.isEmpty())
+        painter.fillRect(r, col);
+    else
+        painter.fillPath(fillPath, col);
+}
+
 // static inline bool isModified(const QString &title)
 // {
 //     return title.indexOf(i18n(" [modified] ")) > 3 ||
@@ -456,6 +482,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          outerBorder(Handler()->outerBorder()),
                          preview(isPreview()),
                          blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
+                         customBgnd(colorTitleOnly && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_CustomBgnd, 0L, 0L)),
                          menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR),
                          separator(active && windowBorder&WINDOW_BORDER_SEPARATOR);
     const int            border(Handler()->borderEdgeSize()),
@@ -543,17 +570,20 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
 
     if(!compositing)
-        painter.fillRect(r, fillCol);
+        fillBackground(customBgnd, painter, fillCol, r);
+
     painter.setRenderHint(QPainter::Antialiasing, true);
     if(compositing)
     {
 #if KDE_IS_VERSION(4, 3, 0)
         if(roundBottom)
-            painter.fillPath(createPath(r.adjusted(0, titleBarHeight-1, 0, 0), round>ROUND_SLIGHT, outerBorder, true),
-                                        fillCol);
+            fillBackground(customBgnd, painter, fillCol, r.adjusted(0, titleBarHeight, 0, 0), 
+                           createPath(r.adjusted(0, titleBarHeight-1, 0, 0), round>ROUND_SLIGHT, outerBorder, true),
+                           customBgnd ? createPath(r.adjusted(0, titleBarHeight-1, -1, 0), round>ROUND_SLIGHT, outerBorder, true).translated(0.5, 0.5) 
+                                      : QPainterPath());
         else
 #endif
-            painter.fillRect(r.adjusted(0, titleBarHeight, 0, 0), fillCol);
+            fillBackground(customBgnd, painter, fillCol, r.adjusted(0, titleBarHeight, 0, 0));
     }
 
     opt.init(widget());
