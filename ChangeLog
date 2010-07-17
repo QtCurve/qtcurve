@@ -2,23 +2,22 @@
 -----
  1. Apply opacity settings to inactive tabs.
  2. Add config option of apps that should not use menu opacity.
- 3. Add inkscape to list of apps to exclude opacity settings from.
- 4. Fix 'white line' appearing at the bottom of kwin titlebars when not using
+ 3. Fix 'white line' appearing at the bottom of kwin titlebars when not using
     an outer border.
- 5. If drawing an inner frame for kwin decorations, draw after titlebar has been
+ 4. If drawing an inner frame for kwin decorations, draw after titlebar has been
     drawn.
- 6. Fix blurry arrows in Amarok's collection browser.
- 7. qmake updates - thanks to Hugues Delorme.
- 8. Dont call killTimer if timer was never registered - fixes Qt warning on app
+ 5. Fix blurry arrows in Amarok's collection browser.
+ 6. qmake updates - thanks to Hugues Delorme.
+ 7. Dont call killTimer if timer was never registered - fixes Qt warning on app
     closure under windows. Thanks to Hugues Delorme.
- 9. When setting KDE SC4.5 blur-behind hint, only set rects that can actually be
+ 8. When setting KDE SC4.5 blur-behind hint, only set rects that can actually be
     blurred - should speed things up. (Idea and code stolen from Bespin)
-10. Fix non-styles background of scroll areas with no frame - such as in plasma's
+ 9. Fix non-styled background of scroll areas with no frame - such as in plasma's
     configure desktop mouse actions page.
-11. Don't force alternate listview colours for KDM - looks bad!
-12. Add option to use same gradients for inactive kwin shadows as those used for
+10. Don't force alternate listview colours for KDM - looks bad!
+11. Add option to use same gradients for inactive kwin shadows as those used for
     active windows.
-13. Draw stripes into kwin border, if colouring the titlebar only.
+12. Draw stripes into kwin border, if colouring the titlebar only.
 
 1.5.1
 -----
