@@ -38,6 +38,7 @@
 
 #define READ_INACTIVE_PAL /* Control whether QtCurve should read the inactive palette as well.. */
 #define RC_SETTING "QtC__"
+#define DEBUG_PREFIX "QtCurve: "
 
 #define COL_EQ(A, B)(abs(A-B)<(3<<8))
 
@@ -170,6 +171,13 @@ enum QtFont
     FONT_NUM_TOTAL
 };
 
+typedef enum
+{
+    DEBUG_NONE,
+    DEBUG_SETTINGS,
+    DEBUG_ALL,
+} QtcDebug;
+
 struct QtData
 {
     GdkColor        colors[PAL_NUMPALS][COLOR_NUMCOLORS]; /*,
@@ -186,8 +194,8 @@ struct QtData
                     shadeSortedList;
     EGtkApp         app;
     gboolean        qt4,
-                    inactiveChangeSelectionColor,
-                    debug;
+                    inactiveChangeSelectionColor;
+    QtcDebug        debug;
 #ifdef FIX_FIREFOX_LOCATION_BAR
     gboolean        isBrowser;
     float           fontSize;
@@ -753,7 +761,7 @@ static void setFont(QtFontDetails *font, int f)
                 font->size);
     }
     if(qtSettings.debug)
-        printf("QtCurve: Font[%d] - %s\n", f, qtSettings.fonts[f]);
+        printf(DEBUG_PREFIX"Font[%d] - %s\n", f, qtSettings.fonts[f]);
 }
 
 #define MIX(a, b, bias) (a + ((b - a) * bias))
@@ -846,6 +854,9 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
     if(f)
     {
         int section=SECT_NONE;
+
+        if(qtSettings.debug)
+            printf(DEBUG_PREFIX"Reading kdeglobals - %s\n", rc);
 
         while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
             if(line[0]=='[')
@@ -1240,6 +1251,9 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
         {
             int section=SECT_NONE;
 
+            if(qtSettings.debug)
+                printf(DEBUG_PREFIX"Reading qtrc - %s\n", absolute ? rc : fname);
+
             while(found!=rd && NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
                 if(line[0]=='[')
                 {
@@ -1579,7 +1593,7 @@ static char * getIconPath()
     }
 
     if(qtSettings.debug && path)
-        printf("QtCurve: %s\n", path);
+        printf(DEBUG_PREFIX"%s\n", path);
 
     return path;
 }
@@ -1606,7 +1620,7 @@ static char * getAppNameFromPid(int pid)
             gboolean found_slash=FALSE;
 
             if(qtSettings.debug)
-                printf("QtCurve: Command - \"%s\"\n", cmdline);
+                printf(DEBUG_PREFIX"Command - \"%s\"\n", cmdline);
 
             /* Try to detect chrome's flash plugin */
             if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) &&
@@ -2074,6 +2088,26 @@ static gboolean excludedApp(Strings config)
     return FALSE;
 }
 
+static QtcDebug debugLevel()
+{
+    const char *dbg=getenv("QTCURVE_DEBUG");
+
+    if(dbg)
+    {
+        switch(atoi(dbg))
+        {
+            case 1:
+                return DEBUG_SETTINGS;
+            case 2:
+                return DEBUG_ALL;
+            default:
+                return DEBUG_NONE;
+        }
+    }
+
+    return DEBUG_NONE;
+}
+
 static gboolean qtInit()
 {
     if(0==qt_refs++)
@@ -2109,7 +2143,7 @@ static gboolean qtInit()
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
-            qtSettings.debug=NULL!=getenv("QTCURVE_DEBUG");
+            qtSettings.debug=debugLevel();
             opts.contrast=DEFAULT_CONTRAST;
 
             lastRead=now;
@@ -2163,7 +2197,7 @@ static gboolean qtInit()
             if(qtSettings.styleName && qtSettings.styleName==strstr(qtSettings.styleName, THEME_PREFIX))
             {
                 if(qtSettings.debug)
-                    printf("QtCurve: Look for themerc file for %s\n", qtSettings.styleName);
+                    printf(DEBUG_PREFIX"Look for themerc file for %s\n", qtSettings.styleName);
                 rcFile=themeFile(getKdeHome(), qtSettings.styleName, &tmpStr);
 
                 if(!rcFile)
@@ -2264,7 +2298,7 @@ static gboolean qtInit()
             }
 
             if(qtSettings.debug)
-                printf("QtCurve: Application name: \"%s\"\n", qtSettings.appName ? qtSettings.appName : "<unknown>");
+                printf(DEBUG_PREFIX"Application name: \"%s\"\n", qtSettings.appName ? qtSettings.appName : "<unknown>");
 
             /* Eclipse sets a application name, so if this is set then we're not a Swing java app */
             if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
@@ -2433,11 +2467,11 @@ static gboolean qtInit()
 
                 gtk_settings_set_long_property(settings, "gtk-toolbar-style", qtSettings.toolbarStyle, "KDE-Settings");
                 if(qtSettings.debug)
-                    printf("QtCurve: gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
+                    printf(DEBUG_PREFIX"gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
                 if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
                 {
                     if(qtSettings.debug)
-                        printf("QtCurve: gtk-button-images %d\n", qtSettings.buttonIcons);
+                        printf(DEBUG_PREFIX"gtk-button-images %d\n", qtSettings.buttonIcons);
                     gtk_settings_set_long_property(settings, "gtk-button-images", qtSettings.buttonIcons, "KDE-Settings");
 #if 0
                     if(opts.drawStatusBarFrames)
