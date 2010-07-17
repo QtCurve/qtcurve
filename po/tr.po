@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kde4-qtcurve\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2010-07-13 20:22+0100\n"
+"POT-Creation-Date: 2010-07-17 21:10+0100\n"
 "PO-Revision-Date: 2009-07-04 02:05+0300\n"
 "Last-Translator: Necmettin Begiter <necmettin.begiter@gmail.com>\n"
 "Language-Team: Turkish <kde-i18n-doc@kde.org>\n"
@@ -1146,9 +1146,9 @@ msgstr ""
 #. i18n: ectx: property (suffix), widget (KIntNumInput, stopPosition)
 #. i18n: file: config/qtcurveconfigbase.ui:3804
 #. i18n: ectx: property (suffix), widget (KIntNumInput, stopValue)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:172
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:193
 #. i18n: ectx: property (suffix), widget (KIntNumInput, activeOpacity)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:198
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:222
 #. i18n: ectx: property (suffix), widget (KIntNumInput, inactiveOpacity)
 #. i18n: file: config/qtcurveconfigbase.ui:275
 #. i18n: ectx: property (suffix), widget (KIntNumInput, bgndOpacity)
@@ -1174,16 +1174,16 @@ msgstr ""
 #. i18n: ectx: property (suffix), widget (KIntNumInput, stopPosition)
 #. i18n: file: config/qtcurveconfigbase.ui:3804
 #. i18n: ectx: property (suffix), widget (KIntNumInput, stopValue)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:172
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:193
 #. i18n: ectx: property (suffix), widget (KIntNumInput, activeOpacity)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:198
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:222
 #. i18n: ectx: property (suffix), widget (KIntNumInput, inactiveOpacity)
 #: po/rc.cpp:63 po/rc.cpp:73 po/rc.cpp:257 po/rc.cpp:437 po/rc.cpp:516
 #: po/rc.cpp:541 po/rc.cpp:680 po/rc.cpp:1050 po/rc.cpp:1076 po/rc.cpp:1278
-#: po/rc.cpp:1388 po/rc.cpp:1396 po/rc.cpp:1666 po/rc.cpp:1673 rc.cpp:63
+#: po/rc.cpp:1388 po/rc.cpp:1396 po/rc.cpp:1687 po/rc.cpp:1698 rc.cpp:63
 #: rc.cpp:73 rc.cpp:257 rc.cpp:437 rc.cpp:516 rc.cpp:541 rc.cpp:680
-#: rc.cpp:1050 rc.cpp:1076 rc.cpp:1278 rc.cpp:1388 rc.cpp:1396 rc.cpp:1666
-#: rc.cpp:1673
+#: rc.cpp:1050 rc.cpp:1076 rc.cpp:1278 rc.cpp:1388 rc.cpp:1396 rc.cpp:1687
+#: rc.cpp:1698
 #, no-c-format
 msgid "%"
 msgstr "%"
@@ -2729,7 +2729,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QCheckBox, popupBorder)
 #. i18n: file: config/qtcurveconfigbase.ui:3121
 #. i18n: ectx: property (text), widget (QCheckBox, shadePopupMenu)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:94
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:109
 #. i18n: ectx: property (text), widget (QCheckBox, grouping)
 #. i18n: file: config/qtcurveconfigbase.ui:2070
 #. i18n: ectx: property (text), widget (QCheckBox, windowBorder_addLightBorder)
@@ -2741,11 +2741,11 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QCheckBox, popupBorder)
 #. i18n: file: config/qtcurveconfigbase.ui:3121
 #. i18n: ectx: property (text), widget (QCheckBox, shadePopupMenu)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:94
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:109
 #. i18n: ectx: property (text), widget (QCheckBox, grouping)
 #: po/rc.cpp:764 po/rc.cpp:773 po/rc.cpp:1010 po/rc.cpp:1106 po/rc.cpp:1112
-#: po/rc.cpp:1647 rc.cpp:764 rc.cpp:773 rc.cpp:1010 rc.cpp:1106 rc.cpp:1112
-#: rc.cpp:1647
+#: po/rc.cpp:1662 rc.cpp:764 rc.cpp:773 rc.cpp:1010 rc.cpp:1106 rc.cpp:1112
+#: rc.cpp:1662
 msgid "Enabled"
 msgstr ""
 
@@ -4497,62 +4497,117 @@ msgstr ""
 msgid "Border size:"
 msgstr "Kenarlık:"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:52
-#. i18n: ectx: property (text), widget (QLabel, label_4)
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:48
+#. i18n: ectx: property (whatsThis), widget (KComboBox, borderSize)
 #: po/rc.cpp:1629 rc.cpp:1629
+msgid "Controls the size of the window borders (bottom, left, and right)."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:55
+#. i18n: ectx: property (text), widget (QLabel, label_4)
+#: po/rc.cpp:1632 rc.cpp:1632
 #, fuzzy
 msgid "Borders:"
 msgstr "Kenarlık:"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:59
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:62
 #. i18n: ectx: property (text), widget (QCheckBox, roundBottom)
-#: po/rc.cpp:1632 rc.cpp:1632
+#: po/rc.cpp:1635 rc.cpp:1635
 msgid "Round all corners"
 msgstr ""
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:66
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:65
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, roundBottom)
+#: po/rc.cpp:1638 rc.cpp:1638
+msgid ""
+"If enabled, and the QtCurve style is set to rounded, then all corners of the "
+"window decoration will be rounded. Otherwise, only the top corners will be "
+"rounded."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:72
 #. i18n: ectx: property (text), widget (QCheckBox, outerBorder)
-#: po/rc.cpp:1635 rc.cpp:1635
+#: po/rc.cpp:1641 rc.cpp:1641
 #, fuzzy
 msgid "Draw dark outer border"
 msgstr "Dış koyu renk kenarlığı çizme."
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:73
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:75
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, outerBorder)
+#: po/rc.cpp:1644 rc.cpp:1644
+msgid ""
+"If enabled, a 1 pixel dark border will be drawn around the outside of "
+"windows. This is useful if you are not using desktop effects."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:82
 #. i18n: ectx: property (text), widget (QCheckBox, innerBorder)
-#: po/rc.cpp:1638 rc.cpp:1638
+#: po/rc.cpp:1647 rc.cpp:1647
 #, fuzzy
 msgid "Draw dark inner border"
 msgstr "Dış koyu renk kenarlığı çizme."
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:80
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:85
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, innerBorder)
+#: po/rc.cpp:1650 rc.cpp:1650
+msgid ""
+"If enabled, a 1 pixel dark border will be drawn between the window contents "
+"and the decoration. This is useful if you are using transparent decorations."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:92
 #. i18n: ectx: property (text), widget (QCheckBox, borderlessMax)
-#: po/rc.cpp:1641 rc.cpp:1641
+#: po/rc.cpp:1653 rc.cpp:1653
 msgid "Remove from maximised windows"
 msgstr ""
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:87
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:95
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, borderlessMax)
+#: po/rc.cpp:1656 rc.cpp:1656
+msgid ""
+"If enabled, all borders (including the titlebar) will be removed from "
+"maximised windows."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:102
 #. i18n: ectx: property (text), widget (QLabel, label_2x)
-#: po/rc.cpp:1644 rc.cpp:1644
+#: po/rc.cpp:1659 rc.cpp:1659
 #, fuzzy
 msgid "Window grouping:"
 msgstr "Düğme yok"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:101
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:112
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, grouping)
+#: po/rc.cpp:1665 rc.cpp:1665
+msgid ""
+"If enabled, QtCurve will allow windows to be grouped - causing the titlebar "
+"to act as a kind-of tab-widget."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:119
 #. i18n: ectx: property (text), widget (QLabel, label_2)
-#: po/rc.cpp:1650 rc.cpp:1650
+#: po/rc.cpp:1668 rc.cpp:1668
 #, fuzzy
 msgid "Titlebar padding:"
 msgstr "Sadece başlık çubuğu renkli (KDE4)"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:108
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:126
 #. i18n: ectx: property (suffix), widget (KIntSpinBox, titleBarPad)
-#: po/rc.cpp:1653 rc.cpp:1653
+#: po/rc.cpp:1671 rc.cpp:1671
 msgid "px"
 msgstr ""
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:133
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:129
+#. i18n: ectx: property (whatsThis), widget (KIntSpinBox, titleBarPad)
+#: po/rc.cpp:1674 rc.cpp:1674
+msgid ""
+"Controls the amount of extra padding added to the top and bottom of the "
+"titlebar."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:154
 #. i18n: ectx: property (text), widget (QLabel, noteLabel)
-#: po/rc.cpp:1656 rc.cpp:1656
+#: po/rc.cpp:1677 rc.cpp:1677
 #, fuzzy
 msgid ""
 "<p><b>NOTE:</b><i>This window decoration uses the QtCurve widget style, and "
@@ -4566,124 +4621,184 @@ msgstr ""
 "hizalaması gibi ayarları değiştirmek için gereç biçeminde ilgili yerleri "
 "değiştirmeniz gerekir</i></p>"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:147
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:168
 #. i18n: ectx: attribute (title), widget (QWidget, opacityTab)
-#: po/rc.cpp:1659 rc.cpp:1659
+#: po/rc.cpp:1680 rc.cpp:1680
 msgid "Opacity"
 msgstr ""
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:153
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:174
 #. i18n: ectx: property (text), widget (QLabel, label_3)
-#: po/rc.cpp:1662 rc.cpp:1662
+#: po/rc.cpp:1683 rc.cpp:1683
 #, fuzzy
 msgid "Active windows:"
 msgstr "Renklendirmeyi sadece etkin pencereye uygula"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:179
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:196
+#. i18n: ectx: property (whatsThis), widget (KIntNumInput, activeOpacity)
+#: po/rc.cpp:1691 rc.cpp:1691
+#, no-c-format
+msgid ""
+"Controls the opacity of the active window decoration. 0% would cause the "
+"decoration to be totally translucent."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:203
 #. i18n: ectx: property (text), widget (QLabel, label_7)
-#: po/rc.cpp:1669 rc.cpp:1669
+#: po/rc.cpp:1694 rc.cpp:1694
 #, fuzzy
 msgid "Inactive windows:"
 msgstr "Renklendirmeyi sadece etkin pencereye uygula"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:205
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:225
+#. i18n: ectx: property (whatsThis), widget (KIntNumInput, inactiveOpacity)
+#: po/rc.cpp:1702 rc.cpp:1702
+#, no-c-format
+msgid ""
+"Controls the opacity of the inactive window decoration. 0% would cause the "
+"decoration to be totally translucent."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:232
 #. i18n: ectx: property (text), widget (QLabel, label_8)
-#: po/rc.cpp:1676 rc.cpp:1676
+#: po/rc.cpp:1705 rc.cpp:1705
 #, fuzzy
 msgid "Side and bottom borders:"
 msgstr "Hafif bir parlama ekle"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:212
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:239
 #. i18n: ectx: property (text), widget (QCheckBox, opaqueBorder)
-#: po/rc.cpp:1679 rc.cpp:1679
+#: po/rc.cpp:1708 rc.cpp:1708
 msgid "Ignore opacity settings"
 msgstr ""
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:220
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:242
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, opaqueBorder)
+#: po/rc.cpp:1711 rc.cpp:1711
+msgid ""
+"If enabled, only the titlebar part of the decoration will use the opacity "
+"setting."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:250
 #. i18n: ectx: attribute (title), widget (QWidget, shadowTab)
-#: po/rc.cpp:1682 rc.cpp:1682
+#: po/rc.cpp:1714 rc.cpp:1714
 #, fuzzy
 msgid "Shadows"
 msgstr "Gölgeli"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:226
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:256
 #. i18n: ectx: property (text), widget (QCheckBox, useShadows)
-#: po/rc.cpp:1685 rc.cpp:1685
+#: po/rc.cpp:1717 rc.cpp:1717
 #, fuzzy
 msgid "Use custom shadows"
 msgstr "Özel renkler kullan"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:236
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:259
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, useShadows)
+#: po/rc.cpp:1720 rc.cpp:1720
+msgid ""
+"If enabled, QtCurve will draw its own shadows - and not use the generic "
+"window manager shadows. This will allow you to specify different shadow "
+"colours, etc, for active and inactive windows."
+msgstr ""
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:269
 #. i18n: ectx: property (title), widget (QGroupBox, activeShadows)
-#: po/rc.cpp:1688 rc.cpp:1688
+#: po/rc.cpp:1723 rc.cpp:1723
 #, fuzzy
 msgid "Active Windows"
 msgstr "Renklendirmeyi sadece etkin pencereye uygula"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:242
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:275
 #. i18n: ectx: property (text), widget (QLabel, label_5)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:310
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:343
 #. i18n: ectx: property (text), widget (QLabel, label_10)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:242
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:275
 #. i18n: ectx: property (text), widget (QLabel, label_5)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:310
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:343
 #. i18n: ectx: property (text), widget (QLabel, label_10)
-#: po/rc.cpp:1691 po/rc.cpp:1706 rc.cpp:1691 rc.cpp:1706
+#: po/rc.cpp:1726 po/rc.cpp:1741 rc.cpp:1726 rc.cpp:1741
 #, fuzzy
 msgid "Size: "
 msgstr "Çizgili"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:255
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:288
 #. i18n: ectx: property (text), widget (QLabel, label_6)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:323
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:356
 #. i18n: ectx: property (text), widget (QLabel, label_11)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:255
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:288
 #. i18n: ectx: property (text), widget (QLabel, label_6)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:323
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:356
 #. i18n: ectx: property (text), widget (QLabel, label_11)
-#: po/rc.cpp:1694 po/rc.cpp:1709 rc.cpp:1694 rc.cpp:1709
+#: po/rc.cpp:1729 po/rc.cpp:1744 rc.cpp:1729 rc.cpp:1744
 msgid "Horizontal offset:"
 msgstr ""
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:268
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:301
 #. i18n: ectx: property (text), widget (QLabel, label_6b)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:336
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:369
 #. i18n: ectx: property (text), widget (QLabel, label_11b)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:268
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:301
 #. i18n: ectx: property (text), widget (QLabel, label_6b)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:336
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:369
 #. i18n: ectx: property (text), widget (QLabel, label_11b)
-#: po/rc.cpp:1697 po/rc.cpp:1712 rc.cpp:1697 rc.cpp:1712
+#: po/rc.cpp:1732 po/rc.cpp:1747 rc.cpp:1732 rc.cpp:1747
 #, fuzzy
 msgid "Vertical offset:"
 msgstr "Düğme efekti:"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:281
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:314
 #. i18n: ectx: property (text), widget (QLabel, label_9)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:349
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:382
 #. i18n: ectx: property (text), widget (QLabel, label_12)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:281
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:314
 #. i18n: ectx: property (text), widget (QLabel, label_9)
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:349
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:382
 #. i18n: ectx: property (text), widget (QLabel, label_12)
-#: po/rc.cpp:1700 po/rc.cpp:1715 rc.cpp:1700 rc.cpp:1715
+#: po/rc.cpp:1735 po/rc.cpp:1750 rc.cpp:1735 rc.cpp:1750
 #, fuzzy
 msgid "Color:"
 msgstr "Renk"
 
-#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:304
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:337
 #. i18n: ectx: property (title), widget (QGroupBox, inactiveShadows)
-#: po/rc.cpp:1703 rc.cpp:1703
+#: po/rc.cpp:1738 rc.cpp:1738
 #, fuzzy
 msgid "Inactive Windows"
 msgstr "Renklendirmeyi sadece etkin pencereye uygula"
 
-#: po/rc.cpp:1716 rc.cpp:1716
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:399
+#. i18n: ectx: property (text), widget (QLabel, ias_g_l)
+#: po/rc.cpp:1753 rc.cpp:1753
+#, fuzzy
+msgid "Gradients:"
+msgstr "Eğim Durağı"
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:406
+#. i18n: ectx: property (text), widget (QCheckBox, inactiveUsesActiveGradients)
+#: po/rc.cpp:1756 rc.cpp:1756
+#, fuzzy
+msgid "As per active windows"
+msgstr "Renklendirmeyi sadece etkin pencereye uygula"
+
+#. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:409
+#. i18n: ectx: property (whatsThis), widget (QCheckBox, inactiveUsesActiveGradients)
+#: po/rc.cpp:1759 rc.cpp:1759
+#, fuzzy
+msgid ""
+"If enabled, the shadows of inactive windows will be drawn using the same "
+"gradient routine as that used for active windows."
+msgstr ""
+"Bu ayar fare üzerlerine geldiğinde gereçlerin yüzde kaç oranda "
+"vurgulanacağını belirler."
+
+#: po/rc.cpp:1760 rc.cpp:1760
 msgctxt "NAME OF TRANSLATORS"
 msgid "Your names"
 msgstr "Necmettin Begiter"
 
-#: po/rc.cpp:1717 rc.cpp:1717
+#: po/rc.cpp:1761 rc.cpp:1761
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "necmettin.begiter@gmail.com"
