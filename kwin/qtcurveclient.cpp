@@ -186,7 +186,7 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 #endif
 
 static void fillBackground(bool customBgnd, QPainter &painter, const QColor &col, const QRect &r, 
-                           const QPainterPath fillPath=QPainterPath(), const QPainterPath outerPath=QPainterPath())
+                           const QPainterPath path=QPainterPath(), const QRegion &mask=QRegion())
 {
     if(customBgnd)
     {
@@ -194,21 +194,24 @@ static void fillBackground(bool customBgnd, QPainter &painter, const QColor &col
         opt.state|=QtC_StateKWin;
         opt.rect=r;
         opt.palette.setColor(QPalette::Window, col);
-        if(!fillPath.isEmpty())
+        if(!mask.isEmpty())
         {
             painter.save();
-            painter.setPen(col);
-            painter.drawPath(outerPath);
-            painter.setClipPath(fillPath, Qt::IntersectClip);
+            if(!path.isEmpty())
+            {
+                painter.setPen(col);
+                painter.drawPath(path);
+            }
+            painter.setClipRegion(mask, Qt::IntersectClip);
         }
         Handler()->wStyle()->drawPrimitive(QtC_PE_DrawBackground, &opt, &painter, NULL);
-        if(!fillPath.isEmpty())
+        if(!mask.isEmpty())
             painter.restore();
     }
-    else if(fillPath.isEmpty())
+    else if(path.isEmpty())
         painter.fillRect(r, col);
     else
-        painter.fillPath(fillPath, col);
+        painter.fillPath(path, col);
 }
 
 // static inline bool isModified(const QString &title)
@@ -578,9 +581,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #if KDE_IS_VERSION(4, 3, 0)
         if(roundBottom)
             fillBackground(customBgnd, painter, fillCol, r.adjusted(0, titleBarHeight, 0, 0), 
-                           createPath(r.adjusted(0, titleBarHeight-1, 0, 0), round>ROUND_SLIGHT, outerBorder, true),
-                           customBgnd ? createPath(r.adjusted(0, titleBarHeight-1, -1, 0), round>ROUND_SLIGHT, outerBorder, true).translated(0.5, 0.5) 
-                                      : QPainterPath());
+                           customBgnd
+                                ? outerBorder
+                                    ? QPainterPath()
+                                    : createPath(r.adjusted(0, titleBarHeight-1, -1, 0), round>ROUND_SLIGHT, outerBorder, true).translated(0.5, 0.5) 
+                                : createPath(r.adjusted(0, titleBarHeight-1, 0, 0), round>ROUND_SLIGHT, outerBorder, true),
+                           customBgnd ? getMask(round, r.adjusted(0, 0, 0, outerBorder ? 0 : 1)) : QRegion());
         else
 #endif
             fillBackground(customBgnd, painter, fillCol, r.adjusted(0, titleBarHeight, 0, 0));
