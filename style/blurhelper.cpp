@@ -202,6 +202,10 @@ namespace QtCurve
 
         }
 
+        // force update
+        if( widget->isVisible() )
+        { widget->update(); }
+
         #endif
 
     }
