@@ -1,3 +1,7 @@
+1.5.3
+-----
+1. Fix some compiler warnings under openSUSE 11.3
+
 1.5.2
 -----
  1. Apply opacity settings to inactive tabs.

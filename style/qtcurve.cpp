@@ -2785,7 +2785,7 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
         }
     }
 
-    switch(event->type())
+    switch((int)(event->type()))
     {
 #ifdef Q_WS_X11
         case QEvent::Resize:
@@ -3137,7 +3137,7 @@ void QtCurveStyle::timerEvent(QTimerEvent *event)
 
 int QtCurveStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
-    switch(metric)
+    switch((int)metric)
     {
         case PM_MdiSubWindowFrameWidth:
             return 3;
@@ -5362,7 +5362,7 @@ void QtCurveStyle::drawControl(ControlElement element, const QStyleOption *optio
     const QPalette      &palette(option->palette);
     bool                reverse(Qt::RightToLeft==option->direction);
 
-    switch(element)
+    switch((int)element)
     {
         case CE_QtC_Preview:
             if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option))
