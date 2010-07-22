@@ -45,6 +45,7 @@ class MacMenu : public QObject
 public:
     static void manage(QMenuBar *menu);
     static void release(QMenuBar *menu);
+    static bool isActive();
     void popup(qlonglong key, int idx, int x, int y);
     void hover(qlonglong key, int idx,  int x, int y);
     void popDown(qlonglong key);
