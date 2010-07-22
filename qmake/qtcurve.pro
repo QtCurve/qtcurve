@@ -14,9 +14,12 @@ INCLUDEPATH += . .. ../common ../config
 HEADERS += \
            ../style/qtcurve.h \
            ../style/windowmanager.h \
+           ../style/blurhelper.h \
+           ../style/utils.h
 
 SOURCES += \
            ../style/qtcurve.cpp \
            ../style/windowmanager.cpp \
+           ../style/blurhelper.cpp
 
 win32-msvc200*:QMAKE_CXXFLAGS += -wd4996

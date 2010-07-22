@@ -25,6 +25,7 @@
 #define COMMON_FUNCTIONS
 #include "qtcurve.h"
 #include "windowmanager.h"
+#include "blurhelper.h"
 #include "pixmaps.h"
 #define CONFIG_READ
 #include "config_file.c"
@@ -33,8 +34,6 @@
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
 // in CT_PushButton and CT_ComboBox
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
-
-#define CALC_BLUR_REGIONS
 
 #ifdef Q_WS_X11
 #include "macmenu.h"
@@ -685,49 +684,6 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef Q_WS_X11
-static void enableBlurBehind(QWidget *w, bool enable=true
-#ifdef CALC_BLUR_REGIONS
-                             , const QRegion &region = QRegion()
-#endif
-                            )
-{
-    Display *dpy = QX11Info::display();
-
-    static const Atom atom = XInternAtom(dpy, "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
-
-    if (enable)
-    {
-#ifdef CALC_BLUR_REGIONS
-        QVector<QRect>         rects = region.rects();
-        QVector<unsigned long> data(region.rectCount() * 4);
-
-        for (int i = 0; i < rects.count(); i++)
-        {
-            const QRect r = rects[i];
-            data << r.x() << r.y() << r.width() << r.height();
-        }
-        XChangeProperty(dpy, w->window()->winId(), atom, XA_CARDINAL, 32, PropModeReplace,
-                        reinterpret_cast<const unsigned char *>(data.constData()), data.size());
-#else
-        XChangeProperty(dpy, w->window()->winId(), atom, XA_CARDINAL, 32, PropModeReplace, 0, 0);
-#endif
-    }
-    else
-        XDeleteProperty(dpy, w->window()->winId(), atom);
-}
-
-static bool compositingActive()
-{
-    Display *dpy = QX11Info::display();
-    char    string[100];
-
-    sprintf(string, "_NET_WM_CM_S%d", DefaultScreen(dpy));
-
-    Atom atom = XInternAtom(dpy, string, False);
-
-    return XGetSelectionOwner(QX11Info::display(), atom) != None;
-}
-
 void setSbProp(QWidget *w)
 {
     if(w)
@@ -1121,7 +1077,7 @@ QtCurveStyle::QtCurveStyle()
 #endif
               itsSViewSBar(0L),
               itsWindowManager(new QtCurve::WindowManager(this)),
-              itsCompositingActive(false)
+              itsBlurHelper(new QtCurve::BlurHelper(this))
 {
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
@@ -1146,7 +1102,6 @@ QtCurveStyle::QtCurveStyle()
 #ifdef Q_WS_X11
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-    itsCompositingActive=compositingActive();
     QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
                                           "compositingToggled", this, SLOT(compositingToggled()));
 #endif // Q_WS_X11
@@ -1451,6 +1406,8 @@ QtCurveStyle::QtCurveStyle()
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
         calcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+
+    itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity);
 
 #if !defined QTC_QT_ONLY
     // Ensure the link to libkio is not stripped, by placing a call to a kio function.
@@ -1801,6 +1758,13 @@ void QtCurveStyle::polish(QWidget *widget)
 
     itsWindowManager->registerWidget(widget);
 
+    /*
+    need to register all widgets to blur helper, in order to
+    have proper blur_behind region set have proper regions removed for opaque widgets.
+    Note: that the helper does nothing as long as compositing and ARGB are not enabled
+    */
+    itsBlurHelper->registerWidget(widget);
+
     if(CUSTOM_BGND)
     {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
@@ -1822,9 +1786,6 @@ void QtCurveStyle::polish(QWidget *widget)
                     // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
                     // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
                     widget->move(10000,10000);
-#if defined Q_WS_X11 && !defined CALC_BLUR_REGIONS
-                    enableBlurBehind(widget, true);
-#endif
                 }
                 break;
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
@@ -2116,12 +2077,7 @@ void QtCurveStyle::polish(QWidget *widget)
         {
             widget->installEventFilter(this);
             if(100!=opts.menuBgndOpacity && !widget->testAttribute(Qt::WA_TranslucentBackground))
-            {
                 widget->setAttribute(Qt::WA_TranslucentBackground);
-#ifdef Q_WS_X11
-                enableBlurBehind(widget, true);
-#endif
-            }
         }
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
         {
@@ -2420,6 +2376,7 @@ void QtCurveStyle::unpolish(QWidget *widget)
     }
 
     itsWindowManager->unregisterWidget(widget);
+    itsBlurHelper->unregisterWidget(widget);
 
     if(CUSTOM_BGND)
     {
@@ -2429,11 +2386,6 @@ void QtCurveStyle::unpolish(QWidget *widget)
             case Qt::Dialog:
                 widget->removeEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground, false);
-#ifdef Q_WS_X11
-                if((100!=opts.bgndOpacity && Qt::Window==(widget->windowFlags() & Qt::WindowType_Mask)) ||
-                   (100!=opts.dlgOpacity && Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)) )
-                    enableBlurBehind(widget, false);
-#endif
                 break;
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
             case Qt::Tool: // this we exclude as it is used for dragging of icons etc
@@ -2614,10 +2566,6 @@ void QtCurveStyle::unpolish(QWidget *widget)
         widget->removeEventFilter(this);
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
             widget->setPalette(QApplication::palette());
-#ifdef Q_WS_X11
-        if(100!=opts.menuBgndOpacity)
-            enableBlurBehind(widget, false);
-#endif
     }
 
     if (qobject_cast<QMenuBar *>(widget) ||
@@ -2797,26 +2745,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 if (re->size().height() != re->oldSize().height())
                     emitMenuSize((QMenuBar *)object, re->size().height());
             }
-            
-#ifdef CALC_BLUR_REGIONS
-            if(APP_PLASMA!=theThemedApp && !qobject_cast<QMenu *>(object))
-            {
-                QWidget *widget = qobject_cast<QWidget *>(object),
-                        *window = widget ? widget->window() : 0L;
-
-                if (window && window->testAttribute(Qt::WA_TranslucentBackground) &&
-                    ((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-                     (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask))) && 
-                    (widget->isWindow() || widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) &&
-                                                                            !qobject_cast<QScrollBar*>(widget))) )
-                {
-                    if (itsPendingBlurUpdates.isEmpty())
-                        QTimer::singleShot(1, this, SLOT(updateBlurRegions()));
-                    if (!itsPendingBlurUpdates.contains(window))
-                        itsPendingBlurUpdates << window;
-                }
-            }
-#endif // CALC_BLUR_REGIONS
             break;
         }
 #endif
@@ -2950,25 +2878,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, mb->size().height());
             }
-
-#ifdef CALC_BLUR_REGIONS
-            if(QEvent::Show==event->type() && APP_PLASMA!=theThemedApp && !qobject_cast<QMenu *>(object))
-            {
-                QWidget *widget = qobject_cast<QWidget *>(object),
-                        *window = widget && !widget->isWindow() ? widget->window() : 0L;
-
-                if (window && 
-                    ((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-                     (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask))) && 
-                    (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) )
-                {
-                    if (itsPendingBlurUpdates.isEmpty())
-                        QTimer::singleShot(1, this, SLOT(updateBlurRegions()));
-                    if (!itsPendingBlurUpdates.contains(window))
-                        itsPendingBlurUpdates << window;
-                }
-            }
-#endif // CALC_BLUR_REGIONS
 #endif
             break;
         }
@@ -2981,25 +2890,6 @@ bool QtCurveStyle::eventFilter(QObject *object, QEvent *event)
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, 0);
             }
-
-#ifdef CALC_BLUR_REGIONS
-            if(QEvent::Show==event->type() && APP_PLASMA!=theThemedApp && !qobject_cast<QMenu *>(object))
-            {
-                QWidget *widget = qobject_cast<QWidget *>(object),
-                        *window = widget && !widget->isWindow() ? widget->window() : 0L;
-
-                if (window && 
-                    ((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
-                     (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask))) && 
-                    (widget->autoFillBackground() || (widget->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(widget))) )
-                {
-                    if (itsPendingBlurUpdates.isEmpty())
-                        QTimer::singleShot(1, this, SLOT(updateBlurRegions()));
-                    if (!itsPendingBlurUpdates.contains(window))
-                        itsPendingBlurUpdates << window;
-                }
-            }
-#endif // CALC_BLUR_REGIONS
 #endif
             if(itsHoverWidget && object==itsHoverWidget)
             {
@@ -3810,7 +3700,7 @@ void QtCurveStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *o
     const QPalette      &palette(option->palette);
     bool                reverse(Qt::RightToLeft==option->direction);
 
-    switch (element)
+    switch ((int)element)
     {
 #if (QT_VERSION >= 0x040500) && !defined QTC_QT_ONLY
         case PE_IndicatorTabClose:
@@ -11259,13 +11149,14 @@ void QtCurveStyle::drawBackground(QWidget *widget, BackgroundType type) const
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
     EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
-    int           opacity = itsCompositingActive
-                                ? BGND_MENU==type
-                                    ? opts.menuBgndOpacity
-                                    : BGND_DIALOG==type
-                                        ? opts.dlgOpacity
-                                        : opts.bgndOpacity
-                                : 100;
+    int           opacity = BGND_MENU==type
+                                ? opts.menuBgndOpacity
+                                : BGND_DIALOG==type
+                                    ? opts.dlgOpacity
+                                    : opts.bgndOpacity;
+
+    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
+        opacity=100;
 
     p.setClipRegion(widget->rect(), Qt::IntersectClip);
 
@@ -13304,60 +13195,12 @@ void QtCurveStyle::toggleStatusBar(unsigned int xid)
 void QtCurveStyle::compositingToggled()
 {
 #ifdef Q_WS_X11
-    itsCompositingActive=compositingActive();
     QWidgetList                tlw=QApplication::topLevelWidgets();
     QWidgetList::ConstIterator it(tlw.begin()),
                                end(tlw.end());
 
     for(; it!=end; ++it)
         (*it)->update();
-#endif
-}
-
-// Taken from Bespin...
-#if defined Q_WS_X11 && defined CALC_BLUR_REGIONS
-static void detectBlurRegion(QWidget *window, const QWidget *widget, QRegion &blur)
-{
-    const QObjectList &kids = widget->children();
-    QObjectList::const_iterator i;
-    for ( i = kids.begin(); i != kids.end(); ++i )
-    {
-        QObject *o = (*i);
-        if ( !o->isWidgetType() )
-            continue;
-        QWidget *w = static_cast<QWidget*>(o);
-        if ( w->isVisible() &&
-            (w->autoFillBackground() || (w->testAttribute(Qt::WA_OpaquePaintEvent) && !qobject_cast<QScrollBar*>(w))) )
-        {
-            QPoint offset = w->mapTo(window, QPoint(0,0));
-            if (w->mask().isEmpty())
-                blur -= w->rect().translated(offset);
-            else
-                blur -= w->mask().translated(offset);
-            continue; // ne nood for deeper checks
-        }
-        else
-            detectBlurRegion(window, w, blur);
-    }
-}
-#endif
-
-void QtCurveStyle::updateBlurRegions()
-{
-#if defined Q_WS_X11 && defined CALC_BLUR_REGIONS
-    foreach (QWidget *widget, itsPendingBlurUpdates)
-    {
-        if (widget && !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
-            continue;
-
-        QRegion blur = widget->mask().isEmpty() ? widget->rect() : widget->mask();
-        detectBlurRegion(widget, widget, blur);
-        if (blur.isEmpty())
-            continue;
-
-        enableBlurBehind(widget, true, blur);
-    }
-    itsPendingBlurUpdates.clear();
 #endif
 }
 

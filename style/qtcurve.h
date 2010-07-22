@@ -62,6 +62,7 @@ class QAbstractScrollArea;
 namespace QtCurve
 {
     class WindowManager;
+    class BlurHelper;
 }
 
 class QtCurveStyle : public QCommonStyle
@@ -263,7 +264,6 @@ class QtCurveStyle : public QCommonStyle
     void           toggleMenuBar(unsigned int xid);
     void           toggleStatusBar(unsigned int xid);
     void           compositingToggled();
-    void           updateBlurRegions();
 
     private:
 
@@ -342,7 +342,7 @@ class QtCurveStyle : public QCommonStyle
     KComponentData                     itsComponentData;
 #endif
     QtCurve::WindowManager             *itsWindowManager;
-    mutable bool                       itsCompositingActive;
+    QtCurve::BlurHelper                *itsBlurHelper;
 };
 
 #endif
