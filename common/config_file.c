@@ -2380,7 +2380,7 @@ static void defaultSettings(Options *opts)
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
-    opts->noBgndOpacityApps << "smplayer" << "amarok" << "dragon" << "kscreenlocker" << "inkscape";
+    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape";
     opts->noMenuBgndOpacityApps << "inkscape";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
