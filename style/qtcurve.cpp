@@ -89,156 +89,6 @@ extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #include <KDE/KIcon>
 #endif
 
-#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
-static int theInstanceCount=0;
-
-// KDE4.1 does this functionality for us!
-#include <KDE/KDirSelectDialog>
-#include <KDE/KGlobal>
-
-static QString qt2KdeFilter(const QString &f)
-{
-    QString               filter;
-    QTextStream           str(&filter, QIODevice::WriteOnly);
-    QStringList           list(f.split(";;"));
-    QStringList::Iterator it(list.begin()),
-                          end(list.end());
-    bool                  first=true;
-
-    for(; it!=end; ++it)
-    {
-        int ob=(*it).lastIndexOf('('),
-            cb=(*it).lastIndexOf(')');
-
-        if(-1!=cb && ob<cb)
-        {
-            if(first)
-                first=false;
-            else
-                str << '\n';
-            str << (*it).mid(ob+1, (cb-ob)-1) << '|' << (*it).mid(0, ob);
-        }
-    }
-
-    return filter;
-}
-
-static void kde2QtFilter(const QString &orig, const QString &kde, QString *sel)
-{
-    if(sel)
-    {
-        QStringList           list(orig.split(";;"));
-        QStringList::Iterator it(list.begin()),
-                              end(list.end());
-        int                   pos;
-
-        for(; it!=end; ++it)
-            if(-1!=(pos=(*it).indexOf(kde)) && pos>0 &&
-               ('('==(*it)[pos-1] || ' '==(*it)[pos-1]) &&
-               (*it).length()>=kde.length()+pos &&
-               (')'==(*it)[pos+kde.length()] || ' '==(*it)[pos+kde.length()]))
-            {
-                *sel=*it;
-                return;
-            }
-    }
-}
-
-static QString getExistingDirectory(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options)
-{
-    KUrl url(KDirSelectDialog::selectDirectory(KUrl(dir), true, parent, caption));
-
-    if(url.isLocalFile())
-        return url.pathOrUrl();
-    else
-        return QString();
-}
-
-static QString getOpenFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter,
-                               QFileDialog::Options)
-{
-    KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
-
-    dlg.setOperationMode(KFileDialog::Opening);
-    dlg.setMode(KFile::File|KFile::LocalOnly);
-    dlg.setCaption(caption);
-    dlg.exec();
-
-    QString rv(dlg.selectedFile());
-
-    if(!rv.isEmpty())
-        kde2QtFilter(filter, dlg.currentFilter(), selectedFilter);
-
-    return rv;
-}
-
-static QStringList getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QString &filter,
-                                    QString *selectedFilter, QFileDialog::Options)
-{
-    KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
-
-    dlg.setOperationMode(KFileDialog::Opening);
-    dlg.setMode(KFile::Files|KFile::LocalOnly);
-    dlg.setCaption(caption);
-    dlg.exec();
-
-    QStringList rv(dlg.selectedFiles());
-
-    if(rv.count())
-        kde2QtFilter(filter, dlg.currentFilter(), selectedFilter);
-
-    return rv;
-}
-
-static QString getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter,
-                               QFileDialog::Options)
-{
-    KFileDialog dlg(KUrl(dir), qt2KdeFilter(filter), parent);
-
-    dlg.setOperationMode(KFileDialog::Saving);
-    dlg.setMode(KFile::File|KFile::LocalOnly);
-    dlg.setCaption(caption);
-    dlg.exec();
-
-    QString rv(dlg.selectedFile());
-
-    if(!rv.isEmpty())
-        kde2QtFilter(filter, dlg.currentFilter(), selectedFilter);
-
-    return rv;
-}
-
-static void setFileDialogs()
-{
-    if(1==++theInstanceCount)
-    {
-        if(!qt_filedialog_existing_directory_hook)
-            qt_filedialog_existing_directory_hook=&getExistingDirectory;
-        if(!qt_filedialog_open_filename_hook)
-            qt_filedialog_open_filename_hook=&getOpenFileName;
-        if(!qt_filedialog_open_filenames_hook)
-            qt_filedialog_open_filenames_hook=&getOpenFileNames;
-        if(!qt_filedialog_save_filename_hook)
-            qt_filedialog_save_filename_hook=&getSaveFileName;
-    }
-}
-
-static void unsetFileDialogs()
-{
-    if(0==--theInstanceCount)
-    {
-        if(qt_filedialog_existing_directory_hook==&getExistingDirectory)
-            qt_filedialog_existing_directory_hook=0;
-        if(qt_filedialog_open_filename_hook==&getOpenFileName)
-            qt_filedialog_open_filename_hook=0;
-        if(qt_filedialog_open_filenames_hook==&getOpenFileNames)
-            qt_filedialog_open_filenames_hook=0;
-        if(qt_filedialog_save_filename_hook==&getSaveFileName)
-            qt_filedialog_save_filename_hook=0;
-    }
-}
-
-#endif
 #endif
 
 #if defined FIX_DISABLED_ICONS && !defined QTC_QT_ONLY
@@ -1096,9 +946,6 @@ QtCurveStyle::QtCurveStyle()
 
         itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
-#if !defined QTC_DISABLE_KDEFILEDIALOG_CALLS && !KDE_IS_VERSION(4, 1, 0)
-    setFileDialogs();
-#endif
 #ifdef Q_WS_X11
     QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                           "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
@@ -1427,11 +1274,6 @@ QtCurveStyle::~QtCurveStyle()
 {
     if(0!=itsProgressBarAnimateTimer)
         killTimer(itsProgressBarAnimateTimer);
-#if !defined QTC_QT_ONLY && !defined QTC_DISABLE_KDEFILEDIALOG_CALLS
-#if !KDE_IS_VERSION(4, 1, 0)
-    unsetFileDialogs();
-#endif
-#endif
 
     if(itsSidebarButtonsCols &&
        itsSidebarButtonsCols!=itsSliderCols &&

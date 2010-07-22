@@ -13,9 +13,6 @@ The following options may be supplied to cmake:
     -DQTC_QT_ONLY=true
         Build style as a pure Qt4 style.
 
-    -DQTC_DISABLE_KDEFILEDIALOG_CALLS=true
-        Do not override Qt's file dialogs with KDE ones.
-
     -DQTC_OLD_NVIDIA_ARROW_FIX=true
         Due to QtCurve mixing AA-drawing, with non-AA drawing (specifically for
         arrows) - sometimes the arrows would not draw correctly under NVidia. To

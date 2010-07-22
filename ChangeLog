@@ -3,6 +3,7 @@
 1. Fix some compiler warnings under openSUSE 11.3
 2. Refactor blur-behind code.
 3. Update XBar code to r1158
+4. Remove KFileDialog code - has been in KDE since 4.1
 
 1.5.2
 -----
