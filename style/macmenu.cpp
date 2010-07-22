@@ -359,6 +359,7 @@ MacMenu::hover(qlonglong key, int idx,  int x, int y)
     }
 }
 
+#if 0 // CPD - see below!
 static QMenuBar *bar4menu(QMenu *menu)
 {
     if (!menu->menuAction())
@@ -370,6 +371,7 @@ static QMenuBar *bar4menu(QMenu *menu)
             return static_cast<QMenuBar *>(w);
     return 0;
 }
+#endif
 
 void
 MacMenu::menuClosed()
