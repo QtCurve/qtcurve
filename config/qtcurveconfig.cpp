@@ -316,7 +316,7 @@ void CGradientPreview::paintEvent(QPaintEvent *)
 
     if(style)
     {
-        QtCurveStyle::PreviewOption styleOpt;
+        QtCurve::Style::PreviewOption styleOpt;
 
         styleOpt.init(this);
 
@@ -325,7 +325,7 @@ void CGradientPreview::paintEvent(QPaintEvent *)
         styleOpt.opts.customGradient[APPEARANCE_CUSTOM1]=grad;
         styleOpt.palette.setColor(QPalette::Button, color);
         styleOpt.state|=QStyle::State_Raised;
-        style->drawControl((QStyle::ControlElement)QtCurveStyle::CE_QtC_Preview, &styleOpt, &p, this);
+        style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_Preview, &styleOpt, &p, this);
     }
     p.end();
 }

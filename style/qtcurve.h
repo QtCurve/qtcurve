@@ -63,23 +63,13 @@ namespace QtCurve
 {
     class WindowManager;
     class BlurHelper;
-}
 
-class QtCurveStyle : public QCommonStyle
+class Style : public QCommonStyle
 {
     Q_OBJECT
     Q_CLASSINFO("X-KDE-CustomElements", "true")
 
     public:
-
-#if QT_VERSION < 0x040500
-    enum Version
-    {
-        VER_UNKNOWN,
-        VER_4x,  // <=4.4
-        VER_45   // >=4.5
-    };
-#endif
 
     enum BackgroundType
     {
@@ -116,11 +106,11 @@ class QtCurveStyle : public QCommonStyle
     };
 
 #ifdef QTC_STYLE_SUPPORT
-    QtCurveStyle(const QString &name=QString());
+    Style(const QString &name=QString());
 #else
-    QtCurveStyle();
+    Style();
 #endif
-    ~QtCurveStyle();
+    ~Style();
 
     Options & options() { return opts; }
 
@@ -242,9 +232,6 @@ class QtCurveStyle : public QCommonStyle
     QColor         menuStripeCol() const;
     QPixmap *      getPixmap(const QColor col, EPixmap p, double shade=1.0) const;
     int            konqMenuBarSize(const QMenuBar *menu) const;
-#if QT_VERSION < 0x040500
-    Version        qtVersion() const;
-#endif
     const QColor & checkRadioCol(const QStyleOption *opt) const;
     QColor         shade(const QColor &a, double k) const;
     void           shade(const color &ca, color *cb, double k) const;
@@ -333,9 +320,6 @@ class QtCurveStyle : public QCommonStyle
     QDBusInterface                     *itsDBus;
     QList<QWidget *>                   itsPendingBlurUpdates;
 #endif
-#if QT_VERSION < 0x040500
-    mutable Version                    itsQtVersion;
-#endif
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
 #if !defined QTC_QT_ONLY
@@ -344,5 +328,7 @@ class QtCurveStyle : public QCommonStyle
     QtCurve::WindowManager             *itsWindowManager;
     QtCurve::BlurHelper                *itsBlurHelper;
 };
+
+}
 
 #endif
