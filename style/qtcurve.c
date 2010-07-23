@@ -1280,6 +1280,30 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
     }
 }
 
+#if 0
+static gboolean drawBackgroundPng(const char *png)
+{
+    int             size=512;
+    cairo_surface_t *surface=cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 512, 512);
+    gboolean        rv=FALSE;
+    
+    if(surface)
+    {
+        cairo_t *cr=cairo_create(surface);
+        
+        if(cr)
+        {
+            drawBevelGradientAlpha(cr, NULL, NULL, NULL, 0, 0, size, size, &(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
+                                   GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER, 1.0);
+            rv=CAIRO_STATUS_SUCCESS==cairo_surface_write_to_png(surface, png);
+            cairo_destroy(cr);
+        }
+    }
+    
+    return rv;
+}
+#endif
+
 typedef enum
 {
     DF_DRAW_INSIDE     = 0x001,

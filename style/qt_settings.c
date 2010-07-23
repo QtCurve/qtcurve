@@ -53,6 +53,9 @@
     ((col<<8)+col)
 
 static void shadeColors(GdkColor *base, GdkColor *vals);
+#if 0
+static gboolean drawBackgroundPng(const char *png);
+#endif
 
 static GdkColor setGdkColor(int r, int g, int b)
 {
@@ -2305,7 +2308,34 @@ static gboolean qtInit()
                 qtSettings.app=GTK_APP_JAVA_SWT;
 
             if(GTK_APP_JAVA==qtSettings.app || GTK_APP_JAVA_SWT==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
+            {
+#if 0 // Does not work - Gdk tiles the image :-(
+                if(APPEARANCE_FLAT!=opts.bgndAppearance)
+                {
+                    static const char *constFileName="background.png";
+                    char *fileName=(char *)malloc(strlen(qtcConfDir())+strlen(constFileName)+1);
+                    if(fileName)
+                    {
+                        sprintf(fileName, "%s%s", qtcConfDir(), constFileName);
+                        if(drawBackgroundPng(fileName))
+                        {
+                            static const char *format="pixmap_path \"%s\"\nstyle \""RC_SETTING"gradient\" = \"default\" "
+                                                      "{ bg_pixmap[NORMAL] = \"%s\" } "
+                                                      " class \"GtkWindow\" style \""RC_SETTING"gradient\"";
+                            tmpStr=(char *)realloc(tmpStr, strlen(format)+strlen(qtcConfDir())+strlen(constFileName)+1);
+
+                            if(tmpStr)
+                            {
+                                sprintf(tmpStr, format, qtcConfDir(), constFileName);
+                                gtk_rc_parse_string(tmpStr);
+                            }
+                        }
+                        free(fileName);
+                    }
+                }
+#endif
                 opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
+            }
 
             if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
                 opts.bgndAppearance=APPEARANCE_FLAT;
