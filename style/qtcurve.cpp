@@ -497,6 +497,15 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef Q_WS_X11
+void setOpacityProp(QWidget *w, unsigned short opacity)
+{
+    if(w)
+    {
+        static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
+        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+    }
+}
+
 void setSbProp(QWidget *w)
 {
     if(w)
@@ -506,11 +515,11 @@ void setSbProp(QWidget *w)
 
         if(!prop.isValid() || !prop.toBool())
         {
-            static const Atom constQtCStatusBar = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
+            static const Atom constAtom = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
 
             unsigned short s=1;
             w->setProperty(constStatusBarProperty, true);
-            XChangeProperty(QX11Info::display(), w->window()->winId(), constQtCStatusBar, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&s, 1);
+            XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&s, 1);
         }
     }
 }
@@ -1553,11 +1562,13 @@ void Style::polish(QWidget *widget)
         {
             case Qt::Window:
             case Qt::Dialog:
+            {
+                int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+
                 widget->installEventFilter(this);
                 widget->setAttribute(Qt::WA_StyledBackground);
-                if(!widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) &&!widget->testAttribute(Qt::WA_TranslucentBackground) && widget->isWindow() &&
-                   ( (100!=opts.bgndOpacity && Qt::Window==(widget->windowFlags() & Qt::WindowType_Mask)) ||
-                     (100!=opts.dlgOpacity && Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)) ) )
+                if(!widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) && !widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                    widget->isWindow() && 100!=opacity)
                 {
                     // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
                     // ...unfortunately some properties are lost, among them the window icon.
@@ -1567,9 +1578,11 @@ void Style::polish(QWidget *widget)
                     widget->setWindowIcon(icon);
                     // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
                     // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
-                    widget->move(10000,10000);
+                    widget->move(10000, 10000);
+                    setOpacityProp(widget, (unsigned short)opacity);
                 }
                 break;
+            }
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
             case Qt::Tool: // this we exclude as it is used for dragging of icons etc
             default:

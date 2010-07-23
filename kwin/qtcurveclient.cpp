@@ -91,6 +91,47 @@ static inline int tabCloseIconSize(int titleHeight)
 
 #endif
 
+int getProperty(WId wId, const Atom &atom)
+{
+
+    unsigned char *data;
+    int           dummy;
+    unsigned long num,
+                  dummy2;
+    int           rv(-1);
+
+    if (Success==XGetWindowProperty(QX11Info::display(), wId, atom, 0L, 1, False, XA_CARDINAL, &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+    {
+        unsigned short val=*((unsigned short*)data);
+
+        if(val<512)
+            rv=val;
+        XFree(data);
+    }
+    //else
+    //    *data = NULL; // superflous?!?
+    return rv;
+}
+
+int getMenubarSizeProperty(WId wId)
+{
+    static const Atom constAtom  = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+    return getProperty(wId, constAtom);
+}
+
+int getStatusbarSizeProperty(WId wId)
+{
+    static const Atom constAtom = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
+    return getProperty(wId, constAtom);
+}
+
+int getOpacityProperty(WId wId)
+{
+    static const Atom constAtom  = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
+    int o=getProperty(wId, constAtom);
+    return o<0 || o>100 ? 100 : o;
+}
+
 static QPainterPath createPath(const QRectF &r, double radius, bool botOnly=false)
 {
     double       dr(radius * 2);
@@ -502,6 +543,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     painter.setClipRegion(e->region());
 
+    if(!preview && compositing && 100==opacity)
+        opacity=getOpacityProperty(windowId());
+    
 #if KDE_IS_VERSION(4, 3, 0)
     if(Handler()->customShadows())
     {
@@ -545,7 +589,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
         else
         {
-            int val=getProperty();
+            int val=getMenubarSizeProperty(windowId());
             if(val>-1)
                 itsMenuBarSize=val;
         }
@@ -641,7 +685,17 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else
         opt.state|=QtC_StateKWinNoBorder;
 
-    opt.palette.setColor(QPalette::Button, col);
+    if(opacity<100 && (blend||menuColor))
+    {
+        // Turn off opacity for titlebar...
+        QColor c(col);
+        c.setAlphaF(1.0);
+        opt.palette.setColor(QPalette::Button, c);
+        c=windowCol;
+        c.setAlphaF(1.0);
+        opt.palette.setColor(QPalette::Window, c);
+    }
+
     opt.rect=QRect(r.x(), r.y(), r.width(), titleBarHeight);
     opt.titleBarState=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
     
@@ -669,9 +723,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(outerBorder && Handler()->innerBorder())
     {
         QStyleOptionFrame frameOpt;
-        int side(layoutMetric(LM_BorderLeft)),
-            bot(layoutMetric(LM_BorderBottom));
-
+        int               side(layoutMetric(LM_BorderLeft)),
+                          bot(layoutMetric(LM_BorderBottom));
 
         frameOpt.palette=opt.palette;
         frameOpt.rect=widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot))
@@ -785,9 +838,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(toggleButtons)
     {
-        if(!itsToggleMenuBarButton && toggleButtons&0x01 && (Handler()->wasLastMenu(windowId()) || getProperty()>-1))
+        if(!itsToggleMenuBarButton && toggleButtons&0x01 && (Handler()->wasLastMenu(windowId()) || getMenubarSizeProperty(windowId())>-1))
             itsToggleMenuBarButton=createToggleButton(true);
-        if(!itsToggleStatusBarButton && toggleButtons&0x02 && (Handler()->wasLastStatus(windowId()) || getProperty(false)>-1))
+        if(!itsToggleStatusBarButton && toggleButtons&0x02 && (Handler()->wasLastStatus(windowId()) || getStatusbarSizeProperty(windowId())>-1))
             itsToggleStatusBarButton=createToggleButton(false);
 
     //     if(itsHover)
@@ -1614,31 +1667,6 @@ QtCurveToggleButton * QtCurveClient::createToggleButton(bool menubar)
 //     widget()->setAttribute(Qt::WA_Hover, true);
 //     widget()->installEventFilter(this);
     return button;
-}
-
-int QtCurveClient::getProperty(bool menubar)
-{
-    static const Atom constQtcMenuSize  = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-    static const Atom constQtcStatusBar = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
-
-    unsigned char *data;
-    int           dummy;
-    unsigned long num,
-                  dummy2;
-    int           rv(-1);
-
-    if (Success==XGetWindowProperty(QX11Info::display(), windowId(), menubar ? constQtcMenuSize : constQtcStatusBar, 0L, 1, False,
-                                    XA_CARDINAL, &dummy2, &dummy, &num, &dummy2, &data) && num>0)
-    {
-        unsigned short val=*((unsigned short*)data);
-
-        if(val<512)
-            rv=val;
-        XFree(data);
-    }
-    //else
-    //    *data = NULL; // superflous?!?
-    return rv;
 }
 
 }
