@@ -1,3 +1,8 @@
+1.5.3
+-----
+1. Store dialog/window opacity in an XProperty - so that kwin theme can use
+   this as the titlebar opacity.
+
 1.5.2
 -----
 1. Apply opacity settings to inactive tabs.

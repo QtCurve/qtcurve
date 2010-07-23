@@ -256,6 +256,16 @@ static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
     return FALSE;
 }
 
+static void qtcWindowSetOpacity(GtkWidget *w, unsigned short opacity)
+{
+    GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+    GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+
+    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                    gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
+                    XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+}
+
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
     if(GDK_CONTROL_MASK&event->state && GDK_MOD1_MASK&event->state && !event->is_modifier &&
@@ -276,6 +286,11 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
 
 static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
+    int opacity=(int)g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY");
+
+    if(100!=opacity)
+        qtcWindowSetOpacity(widget, (unsigned short)opacity);
+
     if(opts.menubarHiding&HIDE_KWIN)
     {
         GtkWidget *menuBar=qtcWindowGetMenuBar(widget, 0);
@@ -299,7 +314,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
     return FALSE;
 }
 
-static gboolean qtcWindowSetup(GtkWidget *widget)
+static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET"))
     {
@@ -318,7 +333,13 @@ static gboolean qtcWindowSetup(GtkWidget *widget)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
                                                          (GtkSignalFunc)qtcWindowKeyRelease, NULL));
-        if((opts.menubarHiding&HIDE_KWIN) || (opts.statusbarHiding&HIDE_KWIN))
+        if(100!=opacity)
+        {
+            g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY", (gpointer)opacity);
+            qtcWindowSetOpacity(widget, (unsigned short)opacity);
+        }
+
+        if((opts.menubarHiding&HIDE_KWIN) || (opts.statusbarHiding&HIDE_KWIN) || 100!=opacity)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_MAP_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "map-event",
                                                          (GtkSignalFunc)qtcWindowMap, NULL));
