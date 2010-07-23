@@ -8,6 +8,7 @@
 5. Remove KFileDialog code - has been in KDE since 4.1
 6. Dont apply background opacity to kaffeine.
 7. Remove amarok from list off app not to apply opacity to.
+8. Fix MDI window border when using opacity.
 
 1.5.2
 -----

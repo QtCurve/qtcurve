@@ -4615,6 +4615,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
+                if(!(state&QtC_StateKWin))
+                    painter->fillRect(r, palette.background());
                 if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
                 {
                     painter->setPen(light);
