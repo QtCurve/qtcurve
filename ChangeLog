@@ -2,6 +2,7 @@
 -----
 1. Store dialog/window opacity in an XProperty - so that kwin theme can use
    this as the titlebar opacity.
+2. Fix potential crash in rgbToHsv
 
 1.5.2
 -----
