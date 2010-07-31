@@ -1274,21 +1274,22 @@ static void rgbToHsv(double r, double g, double b, double *h, double *s, double 
     if(max != 0)
         *s=delta / max;
     else
-    {
-        /* r=g=b=0                  s=0, v is undefined */
         *s=0;
-        *h=-1;
-        return;
-    }
-    if(r == max)
-        *h=(g - b) / delta;         /* between yellow & magenta */
-    else if(g == max)
-        *h=2 + (b - r) / delta;     /* between cyan & yellow */
+
+    if (*s==0.0)
+        *h = 0.0;
     else
-        *h=4 + (r - g) / delta;     /* between magenta & cyan */
-    *h *= 60;                       /* degrees */
-    if(*h < 0)
-        *h += 360;
+    {
+        if(r == max)
+            *h=(g - b) / delta;         /* between yellow & magenta */
+        else if(g == max)
+            *h=2 + (b - r) / delta;     /* between cyan & yellow */
+        else if(b == max)
+            *h=4 + (r - g) / delta;     /* between magenta & cyan */
+        *h *= 60;                       /* degrees */
+        if(*h < 0)
+            *h += 360;
+    }
 }
 
 static void hsvToRgb(double *r, double *g, double *b, double h, double s, double v)

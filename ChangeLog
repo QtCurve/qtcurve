@@ -9,6 +9,7 @@
 6. Dont apply background opacity to kaffeine.
 7. Remove amarok from list off app not to apply opacity to.
 8. Fix MDI window border when using opacity.
+9. Fix potential crash in rgbToHsv
 
 1.5.2
 -----
