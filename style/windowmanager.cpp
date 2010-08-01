@@ -34,6 +34,7 @@
 #include "windowmanager.h"
 #include "qtcurve.h"
 #include "common.h"
+#include "utils.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDockWidget>
@@ -77,7 +78,7 @@ namespace QtCurve
     {
         widget_=w;
         if(widget_)
-            widget_->installEventFilter(this);
+            Utils::addEventFilter(widget_, this);
         return *this;
     }
 
@@ -154,14 +155,10 @@ namespace QtCurve
             to be able to catch the relevant events and prevent
             the drag to happen
             */
-            widget->removeEventFilter( this );
-            widget->installEventFilter( this );
+            Utils::addEventFilter(widget, this);
 
         } else if( isDragable( widget ) ) {
-
-            widget->removeEventFilter( this );
-            widget->installEventFilter( this );
-
+            Utils::addEventFilter(widget, this);
         }
 
     }

@@ -64,7 +64,7 @@ namespace QtCurve
 
     //___________________________________________________________
     void BlurHelper::registerWidget( QWidget* widget )
-    { widget->installEventFilter( this ); }
+    { Utils::addEventFilter(widget, this); }
 
     //___________________________________________________________
     void BlurHelper::unregisterWidget( QWidget* widget )
@@ -135,6 +135,7 @@ namespace QtCurve
     //___________________________________________________________
     QRegion BlurHelper::blurRegion( QWidget* widget ) const
     {
+        if( !widget->isVisible() ) return QRegion();
 
         // get main region
         QRegion region = widget->mask().isEmpty() ? widget->rect():widget->mask();

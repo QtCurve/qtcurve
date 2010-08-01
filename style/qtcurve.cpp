@@ -1565,22 +1565,28 @@ void Style::polish(QWidget *widget)
             {
                 int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
-                widget->installEventFilter(this);
+                Utils::addEventFilter(widget, this);
                 widget->setAttribute(Qt::WA_StyledBackground);
-                if(!widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) && !widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                    widget->isWindow() && 100!=opacity)
-                {
-                    // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
-                    // ...unfortunately some properties are lost, among them the window icon.
-                    QIcon icon(widget->windowIcon());
-                    
-                    widget->setAttribute(Qt::WA_TranslucentBackground);
-                    widget->setWindowIcon(icon);
-                    // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
-                    // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+                
+                if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                   widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
+                   widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") || 
+                   widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint))
+                    break;
+
+                // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
+                // ...unfortunately some properties are lost, among them the window icon.
+                QIcon icon(widget->windowIcon());
+                
+                widget->setAttribute(Qt::WA_TranslucentBackground);
+                widget->setWindowIcon(icon);
+                // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
+                // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+                if(!widget->isVisible())
                     widget->move(10000, 10000);
-                    setOpacityProp(widget, (unsigned short)opacity);
-                }
+                itsTransparentWidgets.insert(widget);
+                connect(widget, SIGNAL(destroyed(QObject *)), SLOT( widgetDestroyed(QObject *)));
+                setOpacityProp(widget, (unsigned short)opacity);
                 break;
             }
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
@@ -1604,16 +1610,16 @@ void Style::polish(QWidget *widget)
         
         if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
         {
-            widget->installEventFilter(this);
+            Utils::addEventFilter(widget, this);
             widget->setAttribute(Qt::WA_StyledBackground);
         }
     }
 
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
         if(itsSaveMenuBarStatus)
-            static_cast<QMainWindow *>(widget)->menuWidget()->installEventFilter(this);
+            Utils::addEventFilter(static_cast<QMainWindow *>(widget)->menuWidget(), this);
         if(itsSaveMenuBarStatus && qtcMenuBarHidden(appName))
         {
             static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
@@ -1630,13 +1636,13 @@ void Style::polish(QWidget *widget)
 
         if(sb.count())
         {
-            widget->installEventFilter(this);
+            Utils::addEventFilter(widget, this);
             QList<QStatusBar *>::ConstIterator it(sb.begin()),
                                                end(sb.end());
             for(; it!=end; ++it)
             {
                 if(itsSaveStatusBarStatus)
-                    (*it)->installEventFilter(this);
+                    Utils::addEventFilter(*it, this);
                 if(itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
                     (*it)->setHidden(true);
             }
@@ -1695,13 +1701,13 @@ void Style::polish(QWidget *widget)
             widget->setAttribute(Qt::WA_Hover, true);
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         if(!opts.gtkScrollViews)
-            widget->installEventFilter(this);
+            Utils::addEventFilter(widget, this);
     }
     else if (qobject_cast<QAbstractScrollArea *>(widget) && widget->inherits("KFilePlacesView"))
     {
         if(CUSTOM_BGND)
             polishScrollArea(static_cast<QAbstractScrollArea *>(widget), true);
-        installEventFilter(this);
+        Utils::addEventFilter(widget, this);
     }
     else if (qobject_cast<QProgressBar *>(widget))
     {
@@ -1714,16 +1720,16 @@ void Style::polish(QWidget *widget)
 
         if(opts.boldProgress)
             setBold(widget);
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
     }
     else if (widget->inherits("Q3Header"))
     {
         widget->setMouseTracking(true);
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
     }
     else if(opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
     {
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
         widget->setAttribute(Qt::WA_Hover, true);
     }
     else if(qobject_cast<QMenuBar *>(widget))
@@ -1742,13 +1748,13 @@ void Style::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover, true);
 
 //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
-            widget->installEventFilter(this);
+            Utils::addEventFilter(widget, this);
 
         setMenuTextColors(widget, true);
     }
     else if(qobject_cast<QLabel*>(widget))
     {
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
         if(WM_DRAG_ALL==opts.windowDrag &&
            ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
            widget->parentWidget() && widget->parentWidget()->parentWidget() && ::qobject_cast<QFrame *>(widget->parentWidget()) &&
@@ -1766,14 +1772,14 @@ void Style::polish(QWidget *widget)
         if(CUSTOM_BGND)
             polishScrollArea(static_cast<QAbstractScrollArea *>(widget));
         if(!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth()>0))
-            widget->installEventFilter(this);
+            Utils::addEventFilter(widget, this);
         if(APP_KONTACT==theThemedApp && widget->parentWidget())
         {
             QWidget *frame=scrollViewFrame(widget->parentWidget());
 
             if(frame)
             {
-                frame->installEventFilter(this);
+                Utils::addEventFilter(frame, this);
                 itsSViewContainers[frame].insert(widget);
                 connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
                 connect(frame, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
@@ -1815,7 +1821,7 @@ void Style::polish(QWidget *widget)
             itsReparentedDialogs[widget]=widget->parentWidget();
             widget->setParent(activeWindow, widget->windowFlags());
         }
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
     }
 
     if (!widget->isWindow())
@@ -1825,7 +1831,7 @@ void Style::polish(QWidget *widget)
             if (QFrame::Box==frame->frameShape() || QFrame::Panel==frame->frameShape() || QFrame::WinPanel==frame->frameShape())
                 frame->setFrameShape(QFrame::StyledPanel);
             //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
-                 widget->installEventFilter(this);
+                 Utils::addEventFilter(widget, this);
 
 #ifdef QTC_QT_ONLY
             if(widget->parent() && widget->parent()->inherits("KTitleWidget"))
@@ -1864,7 +1870,7 @@ void Style::polish(QWidget *widget)
     {
         if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity)
         {
-            widget->installEventFilter(this);
+            Utils::addEventFilter(widget, this);
             if(100!=opts.menuBgndOpacity && !widget->testAttribute(Qt::WA_TranslucentBackground))
                 widget->setAttribute(Qt::WA_TranslucentBackground);
         }
@@ -1877,7 +1883,7 @@ void Style::polish(QWidget *widget)
             if(opts.shadePopupMenu)
                 setMenuTextColors(widget, false);
             if(IMG_NONE!=opts.menuBgndImage.type)
-                 widget->installEventFilter(this);
+                 Utils::addEventFilter(widget, this);
         }
     }
 
@@ -1963,7 +1969,7 @@ void Style::polish(QWidget *widget)
        (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask)) )
     {
         widget->removeEventFilter(this);
-        widget->installEventFilter(this);
+        Utils::addEventFilter(widget, this);
 
         if(widget->inherits("KFilePlacesView"))
         {
@@ -2116,6 +2122,7 @@ void Style::unpolish(QWidget *widget)
 
     itsWindowManager->unregisterWidget(widget);
     itsBlurHelper->unregisterWidget(widget);
+    unregisterArgbWidget(widget);
 
     if(CUSTOM_BGND)
     {
@@ -2655,7 +2662,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 {
                     widget->removeEventFilter(this);
                     widget->setParent(itsReparentedDialogs[widget]);
-                    widget->installEventFilter(this);
+                    Utils::addEventFilter(widget, this);
                 }
                 itsReparentedDialogs.remove(widget);
             }
@@ -12466,6 +12473,15 @@ int Style::getFrameRound(const QWidget *widget) const
     return ROUNDED_ALL;
 }
 
+void Style::unregisterArgbWidget(QWidget *w)
+{
+    if(itsTransparentWidgets.contains(w))
+    {
+        w->setAttribute(Qt::WA_NoSystemBackground, false);
+        w->setAttribute(Qt::WA_TranslucentBackground, false);
+    }
+}
+
 void Style::widgetDestroyed(QObject *o)
 {
     QWidget *w=static_cast<QWidget *>(o);
@@ -12490,6 +12506,7 @@ void Style::widgetDestroyed(QObject *o)
         for(; r!=remEnd; ++r)
             itsSViewContainers.remove(*r);
     }
+    unregisterArgbWidget(w);
 }
 
 #if !defined QTC_QT_ONLY

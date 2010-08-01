@@ -238,6 +238,7 @@ class Style : public QCommonStyle
     QColor         getLowerEtchCol(const QWidget *widget) const;
     QPalette::ColorRole getTextRole(const QWidget *w, const QPainter *p, QPalette::ColorRole def) const;
     int            getFrameRound(const QWidget *widget) const;
+    void           unregisterArgbWidget(QWidget *w);
 
     private Q_SLOTS:
 
@@ -305,6 +306,7 @@ class Style : public QCommonStyle
     mutable const QWidget              *itsSbWidget;
     mutable QLabel                     *itsClickedLabel;
     QSet<QProgressBar *>               itsProgressBars;
+    QSet<QWidget *>                    itsTransparentWidgets;
     int                                itsProgressBarAnimateTimer,
                                        itsAnimateStep;
     QTime                              itsTimer;
