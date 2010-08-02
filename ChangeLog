@@ -1,13 +1,13 @@
 1.5.3
 -----
 1. If titlebar opacity=100, and window/dialog opacity does not, then use
-   window/dialgo opacity for titlebar.
+   window/dialog opacity for titlebar.
 2. Fix some compiler warnings under openSUSE 11.3
 3. Refactor blur-behind code.
 4. Update XBar code to r1158
 5. Remove KFileDialog code - has been in KDE since 4.1
 6. Dont apply background opacity to kaffeine.
-7. Remove amarok from list off app not to apply opacity to.
+7. Remove amarok from list off apps not to apply opacity to.
 8. Fix MDI window border when using opacity.
 9. Fix potential crash in rgbToHsv
 
