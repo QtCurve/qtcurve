@@ -20,7 +20,11 @@
 
 #include "utils.h"
 #include "config.h"
+#include <stdio.h>
 #ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include "fixx11h.h"
 #include <QX11Info>
 #endif
 

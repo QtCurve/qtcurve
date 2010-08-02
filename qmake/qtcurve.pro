@@ -20,6 +20,7 @@ HEADERS += \
 SOURCES += \
            ../style/qtcurve.cpp \
            ../style/windowmanager.cpp \
-           ../style/blurhelper.cpp
+           ../style/blurhelper.cpp \
+           ../style/utils.cpp
 
 win32-msvc200*:QMAKE_CXXFLAGS += -wd4996
