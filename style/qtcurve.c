@@ -6986,8 +6986,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         }
     }
 
-    if(GTK_STATE_PRELIGHT==state && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver &&
-       (btn || comboButton))
+    if(GTK_STATE_PRELIGHT==state && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver && !listViewHeader && (btn || comboButton))
         return;
 
     if(FOCUS_GLOW==opts.focus && !comboButton && !listViewHeader && (btn || GTK_IS_SCALE(widget)))
