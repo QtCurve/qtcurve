@@ -1502,10 +1502,12 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     }
 }
 
-static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
-                     int x, int y, int w, int h, int round, EWidget widget)
+#define drawGlow(cr, area, region, x, y, w, h, round, widget) \
+        drawGlowReal(cr, area, region, x, y, w, h, round, widget, NULL)
+static void drawGlowReal(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
+                         int x, int y, int w, int h, int round, EWidget widget, const GdkColor *colors)
 {
-    if(qtcPalette.mouseover || qtcPalette.defbtn)
+    if(qtcPalette.mouseover || qtcPalette.defbtn || colors)
     {
         double   xd=x+0.5,
                  yd=y+0.5,
@@ -1514,7 +1516,9 @@ static void drawGlow(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
                  defShade=def && (!qtcPalette.defbtn ||
                                   (qtcPalette.mouseover &&
                                    EQUAL_COLOR(qtcPalette.defbtn[ORIGINAL_SHADE], qtcPalette.mouseover[ORIGINAL_SHADE])));
-        GdkColor *col=(def && qtcPalette.defbtn) || !qtcPalette.mouseover
+        const GdkColor *col=colors
+                        ? &colors[GLOW_MO]
+                        : (def && qtcPalette.defbtn) || !qtcPalette.mouseover
                             ? &qtcPalette.defbtn[GLOW_DEFBTN] : &qtcPalette.mouseover[GLOW_MO];
 
         setCairoClipping(cr, area, region);
@@ -1607,6 +1611,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 drawShine=DRAW_SHINE(sunken, app),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && DO_EFFECT,
+                glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && GTK_WIDGET_HAS_FOCUS(wid) &&
+                          GTK_STATE_INSENSITIVE!=state,
+                glowFocusSunkenToggle=sunken && glowFocus && wid && GTK_IS_TOGGLE_BUTTON(wid),
                 horiz=!(flags&DF_VERT);
     int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
     double      xd=x+0.5, yd=y+0.5;
@@ -1852,13 +1859,15 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     unsetCairoClipping(cr);
 
-    if(doEtch && !(flags&DF_HIDE_EFFECT))
-        if(!sunken && GTK_STATE_INSENSITIVE!=state &&
+    if((doEtch || glowFocus) && !(flags&DF_HIDE_EFFECT))
+        if((!sunken || glowFocusSunkenToggle) && GTK_STATE_INSENSITIVE!=state &&
             ((WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget && WIDGET_COMBO_BUTTON!=widget &&
              MO_GLOW==opts.coloredMouseOver && GTK_STATE_PRELIGHT==state) ||
+             glowFocus ||
             (WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
-            drawGlow(cr, area, region, xe-1, ye-1, we+2, he+2, round,
-                     WIDGET_DEF_BUTTON==widget && GTK_STATE_PRELIGHT==state ? WIDGET_STD_BUTTON : widget);
+            drawGlowReal(cr, area, region, xe-1, ye-1, we+2, he+2, round,
+                         WIDGET_DEF_BUTTON==widget && GTK_STATE_PRELIGHT==state ? WIDGET_STD_BUTTON : widget,
+                         glowFocus ? qtcPalette.focus : NULL);
         else
             drawEtch(cr, area, region, wid, xe-(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 3 : 1) : 1), ye-1,
                                             we+(WIDGET_COMBO_BUTTON==widget ? (ROUNDED_RIGHT==round ? 4 : 5) : 2), he+2,
@@ -1868,16 +1877,18 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     xd-=1, x--, yd-=1, y--, width+=2, height+=2;
     if(flags&DF_DO_BORDER && width>2 && height>2)
     {
-        GdkColor *borderCols=(WIDGET_COMBO==widget || WIDGET_COMBO_BUTTON==widget) && colors==qtcPalette.combobtn
-                            ? GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver && !sunken
-                                ? qtcPalette.mouseover
-                                : qtcPalette.button[PAL_ACTIVE]
-                            : colors;
+        GdkColor *borderCols=glowFocus && (!sunken || glowFocusSunkenToggle)
+                            ? qtcPalette.focus
+                            : (WIDGET_COMBO==widget || WIDGET_COMBO_BUTTON==widget) && colors==qtcPalette.combobtn
+                                ? GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver && !sunken
+                                    ? qtcPalette.mouseover
+                                    : qtcPalette.button[PAL_ACTIVE]
+                                : colors;
                             
         cairo_new_path(cr);
         /* Yuck! this is a mess!!!! */
 // Copied from KDE4 version...
-        if(!sunken && GTK_STATE_INSENSITIVE!=state &&
+        if(!sunken && GTK_STATE_INSENSITIVE!=state && !glowFocus &&
             ( ( ( (doEtch && WIDGET_OTHER!=widget && WIDGET_SLIDER_TROUGH!=widget) || SLIDER(widget) || WIDGET_COMBO==widget || WIDGET_MENU_BUTTON==widget ) &&
                  (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && GTK_STATE_PRELIGHT==state) ||
                (doEtch && WIDGET_DEF_BUTTON==widget && IND_GLOW==opts.defBtnIndicator)))
@@ -5335,7 +5346,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
             drawLightBevel(cr, style, state, area, NULL, x, y,
                            checkSpace, checkSpace, &btn_colors[getFill(state, false)],
                            btn_colors, ROUNDED_ALL, WIDGET_CHECKBOX, BORDER_FLAT,
-                           DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), widget);
+                           DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
             if(doEtch)
                 x++, y++;
         }
@@ -5477,7 +5488,7 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
             drawLightBevel(cr, style, state, area, NULL, x, y,
                            optSpace, optSpace, &btn_colors[getFill(state, false)],
                            btn_colors, ROUNDED_ALL, WIDGET_RADIO_BUTTON, BORDER_FLAT,
-                           DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), widget);
+                           DF_DO_BORDER|(GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0), list ? NULL : widget);
             if(doEtch)
                 x++, y++;
         }
@@ -6901,7 +6912,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
              btn=false,
              comboButton=false,
              rev=widget && reverseLayout(widget->parent),
-             view=isList(widget);
+             view=isList(widget),
+             listViewHeader=isListViewHeader(widget);
 
     if(opts.comboSplitter && !FULL_FOCUS && isComboBox(widget))
     {
@@ -6947,6 +6959,9 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
+            if(FOCUS_GLOW==opts.focus)
+                return;
+
             if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])  // Gimps buttons in its toolbox are
             {
                 if(FOCUS_LINE==opts.focus)
@@ -6975,6 +6990,9 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
        (btn || comboButton))
         return;
 
+    if(FOCUS_GLOW==opts.focus && !comboButton && !listViewHeader && (btn || GTK_IS_SCALE(widget)))
+        return;
+        
     if(FOCUS_STANDARD==opts.focus)
         parent_class->draw_focus(style, window, state, area, widget, detail, x, y, width, height);
     else
@@ -6986,9 +7004,9 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         CAIRO_BEGIN
 
-        if(FOCUS_LINE==opts.focus)
+        if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
         {
-            if(view || isListViewHeader(widget))
+            if(view || listViewHeader)
                 height-=2;
             drawFadedLine(cr, x, y+height-1, width, 1, col, area, NULL, TRUE, TRUE, TRUE);
         }
