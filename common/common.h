@@ -209,7 +209,7 @@ enum
 #define SLIDER_MO_BORDER_VAL 3
 
 #define FRAME_DARK_SHADOW 2
-#define FOCUS_SHADE(SEL)         ((SEL) ? 3 : ORIGINAL_SHADE)
+#define FOCUS_SHADE(SEL)         (FOCUS_GLOW==opts.focus ? GLOW_MO : ((SEL) ? 3 : ORIGINAL_SHADE))
 #define MENU_STRIPE_SHADE (USE_LIGHTER_POPUP_MENU ? ORIGINAL_SHADE : 2)
 #define MENU_SEP_SHADE    (USE_LIGHTER_POPUP_MENU ? 4 : 3)
 
@@ -279,6 +279,7 @@ enum
 #define SIZE_GRIP_SIZE 12
 
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
+#define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)
 #define MENUBAR_GLASS_SELECTED_DARK_FACTOR 0.9

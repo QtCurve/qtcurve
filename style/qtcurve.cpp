@@ -4440,7 +4440,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     else
                     {
                         painter->setPen(c);
-                        if(FOCUS_FILLED==opts.focus || FOCUS_GLOW==opts.focus)
+                        if(FOCUS_FILLED==opts.focus)
                         {
                             c.setAlphaF(FOCUS_ALPHA);
                             painter->setBrush(c);
