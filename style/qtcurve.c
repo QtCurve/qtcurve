@@ -7003,7 +7003,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         CAIRO_BEGIN
 
-        if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
+        if(FOCUS_LINE==opts.focus)
         {
             if(view || listViewHeader)
                 height-=2;
@@ -7021,7 +7021,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 btn=false;
                 y++, x++, width-=2, height-=3;
             }
-            if(FULL_FOCUS)
+            if(FULL_FOCUS || FOCUS_GLOW==opts.focus)
             {
                 if(btn)
                 {
@@ -7037,7 +7037,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         x-=3, y-=3, width+=6, height+=6;
                 }
 
-                if(FOCUS_FILLED==opts.focus)
+                if(FOCUS_FILLED==opts.focus || FOCUS_GLOW==opts.focus)
                 {
                     if(drawRounded)
                         createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(&opts, width, height, WIDGET_OTHER,
