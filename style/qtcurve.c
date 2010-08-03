@@ -7011,7 +7011,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         }
         else
         {
-            if((view && opts.square&SQUARE_LISTVIEW_SELECTION) || width<3 || height < 3)
+            if(width<3 || height < 3)
                 drawRounded=FALSE;
 
             cairo_new_path(cr);
@@ -7050,8 +7050,11 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             }
             if(drawRounded)
-                createPath(cr, x+0.5, y+0.5, width-1, height-1, getRadius(&opts, width, height, WIDGET_OTHER,
-                           FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION),
+                createPath(cr, x+0.5, y+0.5, width-1, height-1,
+                           (view && opts.square&SQUARE_LISTVIEW_SELECTION)
+                            ? SLIGHT_INNER_RADIUS
+                            : getRadius(&opts, width, height, WIDGET_OTHER,
+                                        FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION),
                            FULL_FOCUS && comboButton ? (rev ? ROUNDED_LEFT : ROUNDED_RIGHT) :
                            ROUNDED_ALL);
             else
