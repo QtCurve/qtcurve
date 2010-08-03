@@ -2,7 +2,7 @@
 -----
  1. Add 'glow' focus option.
  2. Fix potential crash in rgbToHsv
- 3. Use square focus for view items if using squared selection.
+ 3. Use square-ish focus for view items if using squared selection.
  4. If titlebar opacity=100, and window/dialog opacity does not, then use
     window/dialog opacity for titlebar.
  5. Fix some compiler warnings under openSUSE 11.3

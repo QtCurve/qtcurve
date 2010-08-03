@@ -4446,23 +4446,23 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->setBrush(c);
                         }
 
-                        bool square(!ROUNDED ||
-                                      ( (opts.square&SQUARE_LISTVIEW_SELECTION) &&
+                        if(ROUNDED)
+                        {
+                            bool square((opts.square&SQUARE_LISTVIEW_SELECTION) &&
                                         ( (/*(!widget && r.height()<=40 && r.width()>=48) || */
                                           (widget && !widget->inherits("KFilePlacesView") &&
                                           (qobject_cast<const QTreeView *>(widget) ||
                                             (qobject_cast<const QListView *>(widget) &&
                                              QListView::IconMode!=((const QListView *)widget)->viewMode())))) ||
-                                          (!widget && view) ) ) );
+                                          (!widget && view) ) );
 
-                        if(square)
-                            drawRect(painter, r2);
-                        else
-                        {
                             painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,getRadius(&opts, r2.width(), r2.height(), WIDGET_OTHER,
-                                                                                                    FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
+                            painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
+                                                        square ? SLIGHT_INNER_RADIUS : getRadius(&opts, r2.width(), r2.height(), WIDGET_OTHER,
+                                                                                                 FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
                         }
+                        else
+                            drawRect(painter, r2);
                     }
                     painter->restore();
                 }
