@@ -7012,7 +7012,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         }
         else
         {
-            if(/*isList(widget) || */width<3 || height < 3)
+            if((view && opts.square&SQUARE_LISTVIEW_SELECTION) || width<3 || height < 3)
                 drawRounded=FALSE;
 
             cairo_new_path(cr);

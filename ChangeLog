@@ -2,7 +2,8 @@
 -----
 1. Add 'glow' focus option.
 2. Fix potential crash in rgbToHsv
-3. Store dialog/window opacity in an XProperty - so that kwin theme can use
+3. Use square focus for view items if using squared selection.
+4. Store dialog/window opacity in an XProperty - so that kwin theme can use
    this as the titlebar opacity.
 
 1.5.2
