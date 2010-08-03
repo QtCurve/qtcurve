@@ -4368,7 +4368,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                 if(widget && FOCUS_GLOW==opts.focus &&
                     (::qobject_cast<const QAbstractButton *>(widget) || ::qobject_cast<const QComboBox *>(widget) ||
-                     ::qobject_cast<const QGroupBox *>(widget)))
+                     ::qobject_cast<const QGroupBox *>(widget) || ::qobject_cast<const QDial *>(widget)))
                     return;
 
                 QRect r2(r);
