@@ -2075,11 +2075,20 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->defBtnIndicator=IND_TINT;
 #endif
 #ifndef CONFIG_DIALOG
-            if(opts->round>ROUND_EXTRA && FOCUS_GLOW!=opts->focus && FOCUS_LINE!=opts->focus)
+            if(opts->round>ROUND_EXTRA && FOCUS_GLOW!=opts->focus)
                 opts->focus=FOCUS_LINE;
 
             if(EFFECT_NONE==opts->buttonEffect)
+            {
                 opts->etchEntry=false;
+#if defined QT_VERSION && (QT_VERSION < 0x040000)
+                if(FOCUS_GLOW==opts->focus)
+                    opts->focus=FOCUS_FULL;
+#else
+                if(FOCUS_GLOW==opts->focus)
+                    opts->focus=FOCUS_FILLED;
+#endif
+            }
 
 //             if(opts->squareScrollViews)
 //                 opts->highlightScrollViews=false;
