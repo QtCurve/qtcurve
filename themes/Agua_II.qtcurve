@@ -15,6 +15,7 @@ customgradient1=light,0,1.2,0.45,1,1,1
 customgradient2=3d,0,0.75,0.3,0.9,1,1.1
 customgradient3=none,0,1.1,0.99,0.94,1,0.75
 defBtnIndicator=tint
+focus=glow
 forceAlternateLvCols=true
 grooveAppearance=customgradient2
 gtkComboMenus=true

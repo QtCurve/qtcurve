@@ -819,7 +819,8 @@ typedef enum
     FOCUS_RECTANGLE,
     FOCUS_FULL,
     FOCUS_FILLED,
-    FOCUS_LINE
+    FOCUS_LINE,
+    FOCUS_GLOW
 } EFocus;
 
 typedef enum

@@ -381,6 +381,8 @@ static EFocus toFocus(const char *str, EFocus def)
             return FOCUS_FULL;
         if(0==memcmp(str, "line", 4))
             return FOCUS_LINE;
+        if(0==memcmp(str, "glow", 4))
+            return FOCUS_GLOW;
     }
 
     return def;
@@ -2073,7 +2075,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->defBtnIndicator=IND_TINT;
 #endif
 #ifndef CONFIG_DIALOG
-            if(opts->round>ROUND_EXTRA)
+            if(opts->round>ROUND_EXTRA && FOCUS_GLOW!=opts->focus && FOCUS_LINE!=opts->focus)
                 opts->focus=FOCUS_LINE;
 
             if(EFFECT_NONE==opts->buttonEffect)
@@ -2711,6 +2713,8 @@ static const char *toStr(EFocus f)
             return "full";
         case FOCUS_LINE:
             return "line";
+        case FOCUS_GLOW:
+            return "glow";
     }
 }
 

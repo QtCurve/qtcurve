@@ -4366,6 +4366,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     (widget && widget->inherits("QComboBoxListView")))
                     return;
 
+                if(widget && FOCUS_GLOW==opts.focus &&
+                    (::qobject_cast<const QAbstractButton *>(widget) || ::qobject_cast<const QComboBox *>(widget) ||
+                     ::qobject_cast<const QGroupBox *>(widget)))
+                    return;
+
                 QRect r2(r);
 
                 if(widget && (::qobject_cast<const QCheckBox *>(widget) || ::qobject_cast<const QRadioButton *>(widget)) &&
@@ -4427,7 +4432,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                   ? palette.highlightedText().color()
                                   : itsFocusCols[FOCUS_SHADE(state&State_Selected)]);
 
-                    if(FOCUS_LINE==opts.focus)
+                    if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
                         if(!(state&State_Horizontal) && widget && qobject_cast<const QTabBar *>(widget))
                             drawFadedLine(painter, QRect(r2.x()+r2.width()-1, r2.y(), 1, r2.height()), c, true, true, false);
                         else
@@ -6273,7 +6278,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                        x2 - x1 - 2*constOffset, tabV2.rect.height() - 2*constOffset);
 
                     fropt.state|=State_Horizontal;
-                    if(TAB_MO_BOTTOM==opts.tabMouseOver && FOCUS_LINE==opts.focus)
+                    if(TAB_MO_BOTTOM==opts.tabMouseOver && (FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus))
                         switch(tabV2.shape)
                         {
                             case QTabBar::RoundedNorth:
@@ -7439,7 +7444,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                              QPalette::ButtonText));
                 }
 
-                if (toolbutton->state & State_HasFocus)
+                if (FOCUS_GLOW!=opts.focus && toolbutton->state&State_HasFocus)
                 {
                     QStyleOptionFocusRect fr;
 
@@ -7809,7 +7814,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                     drawSliderHandle(painter, handle, &s);
 
-                    if (state&State_HasFocus)
+                    if (state&State_HasFocus && FOCUS_GLOW!=opts.focus)
                     {
                         QStyleOptionFocusRect fropt;
                         fropt.QStyleOption::operator=(*slider);
@@ -8575,10 +8580,13 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 //                 painter->fillRect(r, Qt::transparent);
                 if(doEffect)
                 {
+                    bool glowFocus(state&State_HasFocus && state&State_Enabled && USE_GLOW_FOCUS(state&State_MouseOver));
+
                     if(!glowOverFocus && !sunken && MO_GLOW==opts.coloredMouseOver &&
-                        ((FULL_FOCUS && state&State_HasFocus) || state&State_MouseOver) &&
+                        (((FULL_FOCUS || glowFocus) && state&State_HasFocus) || state&State_MouseOver) &&
                        state&State_Enabled && !comboBox->editable)
-                        drawGlow(painter, r, FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO);
+                        drawGlow(painter, r, FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO,
+                                 glowFocus ? itsFocusCols : 0L);
                     else
                         drawEtch(painter, r, widget, WIDGET_COMBO,
                                  !comboBox->editable && EFFECT_SHADOW==opts.buttonEffect && !sunken,
@@ -8695,7 +8703,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 }
 
                 if(state&State_Enabled && state&State_HasFocus &&
-                    /*state&State_KeyboardFocusChange &&*/ !comboBox->editable)
+                    /*state&State_KeyboardFocusChange &&*/ !comboBox->editable && FOCUS_GLOW!=opts.focus)
                 {
                     QStyleOptionFocusRect focus;
                     bool                  listViewCombo=comboBox->frame && widget && widget->rect().height()<(DO_EFFECT ? 22 : 20);
@@ -10266,6 +10274,8 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                                         MO_COLORED_THICK==opts.coloredMouseOver ||
                                               (MO_GLOW==opts.coloredMouseOver && !DO_EFFECT))),
                  doEtch(doBorder && ETCH_WIDGET(w) && DO_EFFECT),
+                 glowFocus(doEtch && USE_GLOW_FOCUS(option->state&State_MouseOver) && option->state&State_HasFocus &&
+                           option->state&State_Enabled),
                  horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w));
     const QColor *cols(custom ? custom : itsBackgroundCols),
                  *border(colouredMouseOver ? borderColors(option, cols) : cols);
@@ -10460,29 +10470,36 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
         p->restore();
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    if(doEtch)
+    if(doEtch || glowFocus)
     {
-        if( !sunken &&
+        if( (!sunken || (sunken && glowFocus && widget && ::qobject_cast<const QAbstractButton *>(widget) &&
+                         static_cast<const QAbstractButton *>(widget)->isCheckable())) &&
             ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
-            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
-            drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w);
+            (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator) ||
+            glowFocus) )
+            drawGlow(p, rOrig, WIDGET_DEF_BUTTON==w && option->state&State_MouseOver ? WIDGET_STD_BUTTON : w,
+                     glowFocus ? itsFocusCols : 0L);
         else
             drawEtch(p, rOrig, widget, w, EFFECT_SHADOW==opts.buttonEffect && WIDGET_BUTTON(w) && !sunken);
     }
 
     if(doBorder)
     {
-        const QColor *borderCols=(WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w) && border==itsComboBtnCols
-                            ? option->state&State_MouseOver && MO_GLOW==opts.coloredMouseOver && !sunken
-                                ? itsMouseOverCols
-                                : itsButtonCols
-                            : cols;
+        const QColor *borderCols=glowFocus || ( (WIDGET_COMBO==w || WIDGET_MENU_BUTTON==w || (WIDGET_NO_ETCH_BTN==w && ROUNDED_ALL!=round)) &&
+                                                USE_GLOW_FOCUS(option->state&State_MouseOver) &&
+                                                option->state&State_HasFocus && option->state&State_Enabled)
+                            ? itsFocusCols
+                            : (WIDGET_COMBO==w || WIDGET_COMBO_BUTTON==w) && border==itsComboBtnCols
+                                ? option->state&State_MouseOver && MO_GLOW==opts.coloredMouseOver && !sunken
+                                    ? itsMouseOverCols
+                                    : itsButtonCols
+                                : cols;
 
         r.adjust(-1, -1, 1, 1);
-        if(!sunken && option->state&State_Enabled &&
+        if(!sunken && option->state&State_Enabled && !glowFocus &&
             ( ( ( (doEtch && WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w) || SLIDER(w) || WIDGET_COMBO==w || WIDGET_MENU_BUTTON==w ) &&
                  (MO_GLOW==opts.coloredMouseOver/* || MO_COLORED==opts.colorMenubarMouseOver*/) && option->state&State_MouseOver) ||
-               (doEtch && WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
+               glowFocus || (doEtch && WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator)))
             drawBorder(p, r, option, round,
                        WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator && !(option->state&State_MouseOver)
                             ? itsDefBtnCols : itsMouseOverCols, w);
@@ -10494,12 +10511,13 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
     p->restore();
 }
 
-void Style::drawGlow(QPainter *p, const QRect &r, EWidget w) const
+void Style::drawGlow(QPainter *p, const QRect &r, EWidget w, const QColor *cols) const
 {
     bool   def(WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator),
            defShade=def && (!itsDefBtnCols ||
                             (itsDefBtnCols[ORIGINAL_SHADE]==itsMouseOverCols[ORIGINAL_SHADE]));
-    QColor col(def && itsDefBtnCols
+    QColor col(cols ? cols[GLOW_MO]
+                    : def && itsDefBtnCols
                     ? itsDefBtnCols[GLOW_DEFBTN] : itsMouseOverCols[GLOW_MO]);
 
     col.setAlphaF(GLOW_ALPHA(defShade));

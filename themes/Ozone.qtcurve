@@ -19,3 +19,4 @@ centerTabText=true
 smallRadio=true
 crSize=15
 titlebarButtons=2053
+focus=glow
