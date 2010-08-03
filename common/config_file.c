@@ -2081,13 +2081,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(EFFECT_NONE==opts->buttonEffect)
             {
                 opts->etchEntry=false;
-#if defined QT_VERSION && (QT_VERSION < 0x040000)
                 if(FOCUS_GLOW==opts->focus)
                     opts->focus=FOCUS_FULL;
-#else
-                if(FOCUS_GLOW==opts->focus)
-                    opts->focus=FOCUS_FILLED;
-#endif
             }
 
 //             if(opts->squareScrollViews)
