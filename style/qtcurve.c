@@ -7053,7 +7053,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
             if(drawRounded)
                 createPath(cr, x+0.5, y+0.5, width-1, height-1,
-                           (view && opts.square&SQUARE_LISTVIEW_SELECTION)
+                           (view && opts.square&SQUARE_LISTVIEW_SELECTION) && ROUNDED
                             ? SLIGHT_INNER_RADIUS
                             : getRadius(&opts, width, height, WIDGET_OTHER,
                                         FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION),
