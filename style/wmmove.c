@@ -34,13 +34,16 @@ static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event, int adjus
     int           nx=0,
                   ny=0;
 
+    // Need to get absolute co-ordinates...
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_get_allocation(widget, &alloc);
+#else
+    alloc=widget->allocation;
+#endif
     alloc.x-=adjust;
     alloc.y-=adjust;
     alloc.width+=adjust;
     alloc.height+=adjust;
-
-    // Need to get absolute co-ordinates...
-    gtk_widget_get_allocation(widget, &alloc);
     gdk_window_get_origin(widget->window, &nx, &ny);
     alloc.x+=nx;
     alloc.y+=ny;

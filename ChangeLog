@@ -6,6 +6,8 @@
 4. Store dialog/window opacity in an XProperty - so that kwin theme can use
    this as the titlebar opacity.
 5. Don't hide focus rect on listview headers when mouse-overed.
+6. Fix crash due to missing gtk_widget_get_allocation - this was only
+   introduced in Gtk 2.18.0
 
 1.5.2
 -----
