@@ -1,6 +1,6 @@
 1.6.0
 -----
- 1. Add 'glow' focus option.
+ 1. Add 'glow' focus option - this is now the default.
  2. Fix potential crash in rgbToHsv
  3. Use square-ish focus for view items if using squared selection.
  4. If titlebar opacity=100, and window/dialog opacity does not, then use

@@ -1436,6 +1436,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 
             /* Check if the config file expects old default values... */
+            if(version<MAKE_VERSION(1, 6))
+                opts->focus=FOCUS_LINE;
             if(version<MAKE_VERSION(1, 5))
             {
                 opts->windowBorder=
@@ -2308,7 +2310,7 @@ static void defaultSettings(Options *opts)
     opts->thinnerBtns=true;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_SHADOW;
-    opts->focus=FOCUS_LINE;
+    opts->focus=FOCUS_GLOW;
     opts->lvButton=false;
     opts->lvLines=LV_NONE;
     opts->drawStatusBarFrames=false;
