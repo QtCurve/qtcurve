@@ -384,6 +384,7 @@ enum
 
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define FOCUS_ALPHA              0.08
+#define FOCUS_GLOW_LINE_ALPHA    0.5
 #define BORDER_BLEND_ALPHA       0.7
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1

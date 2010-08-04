@@ -4439,6 +4439,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-(view ? 3 : 1), r2.width(), 1), c, true, true, true);
                     else
                     {
+                        if(FOCUS_GLOW==opts.focus)
+                            c.setAlphaF(FOCUS_GLOW_LINE_ALPHA);
                         painter->setPen(c);
                         if(FOCUS_FILLED==opts.focus)
                         {
