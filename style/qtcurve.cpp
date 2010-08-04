@@ -4420,23 +4420,32 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         // Try to determine if we are in a KPageView...
                         const QWidget *wid=getWidget(painter);
 
-                        if(wid && wid->parentWidget() && wid->parentWidget()->inherits("KDEPrivate::KPageListView"))
+                        if(wid && wid->parentWidget())
                         {
-                            r.adjust(2, 2, -2, -2);
-                            view=true;
+                            if(wid->parentWidget()->inherits("KDEPrivate::KPageListView"))
+                            {
+                                r.adjust(2, 2, -2, -2);
+                                view=true;
+                            }
+                            else if(APP_KONTACT==theThemedApp && (wid->parentWidget()->inherits("KMail::MainFolderView") ||
+                                                                  wid->parentWidget()->inherits("MessageList::Core::View")))
+                            {
+                                view=true;
+                            }
                         }
                     }
-                    
                     painter->save();
                     QColor c(view && state&State_Selected
                                   ? palette.highlightedText().color()
                                   : itsFocusCols[FOCUS_SHADE(state&State_Selected)]);
 
                     if(FOCUS_LINE==opts.focus)
+                    {
                         if(!(state&State_Horizontal) && widget && qobject_cast<const QTabBar *>(widget))
                             drawFadedLine(painter, QRect(r2.x()+r2.width()-1, r2.y(), 1, r2.height()), c, true, true, false);
                         else
                             drawFadedLine(painter, QRect(r2.x(), r2.y()+r2.height()-(view ? 3 : 1), r2.width(), 1), c, true, true, true);
+                    }
                     else
                     {
                         if(FOCUS_GLOW==opts.focus)
