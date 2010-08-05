@@ -9753,32 +9753,47 @@ void Style::drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOpt
         else
             r2.adjust(1, 1, -1, -1);
 
-        painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
-
-        if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+        if(MO_GLOW==opts.coloredMouseOver)
         {
-            painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
-            painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
+            QColor col(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
+
+            col.setAlphaF(GLOW_ALPHA(false));
+            painter->setPen(col);
+            drawRect(painter, r);
+            col=itsMouseOverCols[opt.state&State_On ? 4 : 3];
+            col.setAlphaF(0.8);
+            painter->setPen(col);
+            drawRect(painter, r2);
         }
-
-        if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+        else
         {
-            painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
-            painter->drawLine(r2.x(), r2.y(), r2.x(), r2.y()+r2.height()-1);
-            if(MO_PLASTIK!=opts.coloredMouseOver)
-                painter->setPen(itsMouseOverCols[opt.state&State_On ? 1 : 2]);
-        }
+            painter->setPen(itsMouseOverCols[opt.state&State_On ? 0 : 1]);
 
-        if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
-        {
-            painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
-            painter->drawLine(r2.x(), r2.y()+r2.height()-1, r2.x()+r2.width()-1, r2.y()+r2.height()-1);
-        }
+            if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+            {
+                painter->drawLine(r.x(), r.y(), r.x()+r.width()-1, r.y());
+                painter->drawLine(r2.x(), r2.y(), r2.x()+r2.width()-1, r2.y());
+            }
 
-        if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
-        {
-            painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
-            painter->drawLine(r2.x()+r2.width()-1, r2.y(), r2.x()+r2.width()-1, r2.y()+r2.height()-1);
+            if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+            {
+                painter->drawLine(r.x(), r.y(), r.x(), r.y()+r.height()-1);
+                painter->drawLine(r2.x(), r2.y(), r2.x(), r2.y()+r2.height()-1);
+                if(MO_PLASTIK!=opts.coloredMouseOver)
+                    painter->setPen(itsMouseOverCols[opt.state&State_On ? 1 : 2]);
+            }
+
+            if(horiz || MO_PLASTIK!=opts.coloredMouseOver)
+            {
+                painter->drawLine(r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+                painter->drawLine(r2.x(), r2.y()+r2.height()-1, r2.x()+r2.width()-1, r2.y()+r2.height()-1);
+            }
+
+            if(!horiz || MO_PLASTIK!=opts.coloredMouseOver)
+            {
+                painter->drawLine(r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                painter->drawLine(r2.x()+r2.width()-1, r2.y(), r2.x()+r2.width()-1, r2.y()+r2.height()-1);
+            }
         }
     }
 

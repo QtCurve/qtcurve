@@ -12,6 +12,7 @@
  9. Dont apply background opacity to kaffeine.
 10. Remove amarok from list off apps not to apply opacity to.
 11. Fix MDI window border when using opacity.
+12. Improved glow mouse-over for non-standard sidebar buttons.
 
 1.5.2
 -----
