@@ -6904,7 +6904,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     sanitizeSize(window, &width, &height);
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw focus %d %d %d %d %d %s ", state, x, y, width, height, detail ? detail : "NULL"),
+    /*if(DEBUG_ALL==qtSettings.debug)*/ printf("Draw focus %d %d %d %d %d %s ", state, x, y, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     {
@@ -6959,7 +6959,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
-            if(FOCUS_GLOW==opts.focus)
+            if(FOCUS_GLOW==opts.focus && !isMozilla())
                 return;
 
             if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])  // Gimps buttons in its toolbox are

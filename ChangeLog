@@ -1,6 +1,9 @@
 1.6.0
 -----
-1. Add 'glow' focus option - this is now the default.
+1. Add 'glow' focus option - this is now the default. (Note, for firefox
+   the label of checkboxes and radiobuttons will have a rounded focus rect
+   drawn - this is because the 'glow' does not seem to work for firefox's
+   usage of checks and radios).
 2. Fix potential crash in rgbToHsv
 3. Use square-ish focus for view items if using squared selection.
 4. Store dialog/window opacity in an XProperty - so that kwin theme can use
