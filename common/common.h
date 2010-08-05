@@ -373,11 +373,9 @@ enum
                                     : MO_PLASTIK_LIGHT(W))
 
 #define FULLLY_ROUNDED     (opts.round>=ROUND_FULL)
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define DO_EFFECT          (EFFECT_NONE!=opts.buttonEffect)
+#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define SLIDER_GLOW        (DO_EFFECT && MO_GLOW==opts.coloredMouseOver /*&& SLIDER_TRIANGULAR!=opts.sliderStyle*/ ? 2 : 0)
-#else
-#define DO_EFFECT          (FULLLY_ROUNDED && EFFECT_NONE!=opts.buttonEffect)
 #endif
 
 #define ENTRY_MO (opts.unifyCombo && opts.unifySpin)

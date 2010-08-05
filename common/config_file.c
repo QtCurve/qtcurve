@@ -2069,14 +2069,14 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
             if(opts->round>ROUND_FULL)
                 opts->round=ROUND_FULL;
-
-            if(MO_GLOW==opts->coloredMouseOver && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
-                opts->coloredMouseOver=MO_COLORED;
-
-            if(IND_GLOW==opts->defBtnIndicator && (EFFECT_NONE==opts->buttonEffect || opts->round<ROUND_FULL))
-                opts->defBtnIndicator=IND_TINT;
 #endif
 #ifndef CONFIG_DIALOG
+            if(MO_GLOW==opts->coloredMouseOver && EFFECT_NONE==opts->buttonEffect)
+                opts->coloredMouseOver=MO_COLORED_THICK;
+
+            if(IND_GLOW==opts->defBtnIndicator && EFFECT_NONE==opts->buttonEffect)
+                opts->defBtnIndicator=IND_TINT;
+
             if(opts->round>ROUND_EXTRA && FOCUS_GLOW!=opts->focus)
                 opts->focus=FOCUS_LINE;
 
@@ -2154,10 +2154,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(APPEARANCE_FLAT==opts->tabAppearance)
                 opts->tabAppearance=APPEARANCE_RAISED;
-
-            if(EFFECT_NONE==opts->buttonEffect && MO_GLOW==opts->coloredMouseOver)
-                opts->coloredMouseOver=MO_COLORED_THICK;
-
             if(EFFECT_NONE==opts->buttonEffect)
                 opts->etchEntry=false;
             if(opts->colorSliderMouseOver &&
