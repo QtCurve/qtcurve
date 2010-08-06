@@ -20,3 +20,5 @@ smallRadio=true
 crSize=15
 titlebarButtons=2053
 focus=glow
+customgradient3=none,0,1.12,1.0,1.15
+sunkenAppearance=customgradient3
