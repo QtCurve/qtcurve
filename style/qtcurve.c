@@ -5228,7 +5228,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
         
     if(GTK_SHADOW_NONE!=shadow_type)
     {
-        int round=opts.square&SQUARE_TAB_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+        int round=((!isTab && opts.square&SQUARE_FRAME) || (isTab && opts.square&SQUARE_TAB_FRAME)) ? ROUNDED_NONE : ROUNDED_ALL;
 
         if(!(opts.square&SQUARE_TAB_FRAME) && gap_x<=0)
             switch(gap_side)

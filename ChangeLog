@@ -11,6 +11,7 @@
 5. Don't hide focus rect on listview headers when mouse-overed.
 6. Fix crash due to missing gtk_widget_get_allocation - this was only
    introduced in Gtk 2.18.0
+7. Group boxes need to respect 'square frames' setting.
 
 1.5.2
 -----
