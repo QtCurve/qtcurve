@@ -39,12 +39,13 @@ QtCurveToggleButton::QtCurveToggleButton(bool menubar, QtCurveClient *parent)
                      isMenuBar(menubar),
                      itsHover(false)
 {
-    setAttribute(Qt::WA_PaintOnScreen, false);
+//     setAttribute(Qt::WA_PaintOnScreen, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAutoFillBackground(false);
-    setFocusPolicy(Qt::NoFocus);
-    setAttribute(Qt::WA_OpaquePaintEvent, false);
-    setAttribute(Qt::WA_Hover, true);
+//     setFocusPolicy(Qt::NoFocus);
+//     setAttribute(Qt::WA_OpaquePaintEvent, false);
+//     setAttribute(Qt::WA_Hover, true);
+    setCursor(Qt::ArrowCursor);
     setToolTip(menubar ? i18n("Toggle Menubar") : i18n("Toggle Statusbar"));
     reset(DecorationReset);
 }
@@ -57,25 +58,22 @@ void QtCurveToggleButton::reset(unsigned long changed)
 
 void QtCurveToggleButton::enterEvent(QEvent *e)
 {
-    QAbstractButton::enterEvent(e);
-
     itsHover = true;
-    repaint();
+    KCommonDecorationButton::enterEvent(e);
+    update();
 }
 
 void QtCurveToggleButton::leaveEvent(QEvent *e)
 {
-    QAbstractButton::leaveEvent(e);
-
     itsHover = false;
-    repaint();
+    KCommonDecorationButton::leaveEvent(e);
+    update();
 }
 
 void QtCurveToggleButton::paintEvent(QPaintEvent *ev)
 {
     QPainter p(this);
     p.setClipRect(rect().intersected(ev->rect()));
-    p.setRenderHints(QPainter::Antialiasing);
     drawButton(&p);
 }
 

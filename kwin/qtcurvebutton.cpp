@@ -44,12 +44,13 @@ QtCurveButton::QtCurveButton(ButtonType type, QtCurveClient *parent)
                itsIconType(NumButtonIcons),
                itsHover(false)
 {
-    setAttribute(Qt::WA_PaintOnScreen, false);
+//     setAttribute(Qt::WA_PaintOnScreen, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAutoFillBackground(false);
-    setFocusPolicy(Qt::NoFocus);
-    setAttribute(Qt::WA_OpaquePaintEvent, false);
-    setAttribute(Qt::WA_Hover, true);
+//     setFocusPolicy(Qt::NoFocus);
+//     setAttribute(Qt::WA_OpaquePaintEvent, false);
+//     setAttribute(Qt::WA_Hover, true);
+    setCursor(Qt::ArrowCursor); 
     reset(DecorationReset);
 }
 
@@ -102,25 +103,22 @@ void QtCurveButton::reset(unsigned long changed)
 
 void QtCurveButton::enterEvent(QEvent *e)
 {
-    QAbstractButton::enterEvent(e);
-
     itsHover = true;
-    repaint();
+    KCommonDecorationButton::enterEvent(e);
+    update();
 }
 
 void QtCurveButton::leaveEvent(QEvent *e)
 {
-    QAbstractButton::leaveEvent(e);
-
     itsHover = false;
-    repaint();
+    KCommonDecorationButton::leaveEvent(e);
+    update();
 }
 
 void QtCurveButton::paintEvent(QPaintEvent *ev)
 {
     QPainter p(this);
     p.setClipRect(rect().intersected(ev->rect()));
-    p.setRenderHints(QPainter::Antialiasing);
     drawButton(&p);
 }
 
