@@ -6299,7 +6299,12 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                        x2 - x1 - 2*constOffset, tabV2.rect.height() - 2*constOffset);
 
                     fropt.state|=State_Horizontal;
-                    if(TAB_MO_BOTTOM==opts.tabMouseOver && (FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus))
+                    if(FOCUS_LINE!=opts.focus)
+                    {
+                        if(QTabBar::RoundedNorth==tabV2.shape || QTabBar::TriangularNorth==tabV2.shape)
+                            fropt.rect.adjust(0, 1, 0, 0);
+                    }
+                    else if(TAB_MO_BOTTOM==opts.tabMouseOver && FOCUS_LINE==opts.focus)
                         switch(tabV2.shape)
                         {
                             case QTabBar::RoundedNorth:
