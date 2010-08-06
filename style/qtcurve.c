@@ -6904,7 +6904,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     sanitizeSize(window, &width, &height);
 
-    /*if(DEBUG_ALL==qtSettings.debug)*/ printf("Draw focus %d %d %d %d %d %s ", state, x, y, width, height, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf("Draw focus %d %d %d %d %d %s ", state, x, y, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     {
