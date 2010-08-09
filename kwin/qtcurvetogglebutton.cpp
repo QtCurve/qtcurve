@@ -61,6 +61,8 @@ void QtCurveToggleButton::enterEvent(QEvent *e)
     itsHover = true;
     KCommonDecorationButton::enterEvent(e);
     update();
+    // Hacky NVIDIA fix - sometimes mouseover state gets 'stuck' - but only for some windows!!!
+    QTimer::singleShot(100, this, SLOT(update()));
 }
 
 void QtCurveToggleButton::leaveEvent(QEvent *e)
@@ -68,6 +70,8 @@ void QtCurveToggleButton::leaveEvent(QEvent *e)
     itsHover = false;
     KCommonDecorationButton::leaveEvent(e);
     update();
+    // Hacky NVIDIA fix - sometimes mouseover state gets 'stuck' - but only for some windows!!!
+    QTimer::singleShot(100, this, SLOT(update()));
 }
 
 void QtCurveToggleButton::paintEvent(QPaintEvent *ev)
