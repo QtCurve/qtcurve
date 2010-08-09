@@ -6913,7 +6913,9 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
              comboButton=false,
              rev=widget && reverseLayout(widget->parent),
              view=isList(widget),
-             listViewHeader=isListViewHeader(widget);
+             listViewHeader=isListViewHeader(widget),
+             dummy,
+             toolbarBtn=!listViewHeader && !view && isButtonOnToolbar(widget, &dummy);
 
     if(opts.comboSplitter && !FULL_FOCUS && isComboBox(widget))
     {
@@ -6959,10 +6961,18 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     {
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
-            if(FOCUS_GLOW==opts.focus && !isMozilla())
+            // Gimps buttons in its toolbox are
+            toolbarBtn=GTK_APP_GIMP==qtSettings.app && NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0];
+
+            if(!toolbarBtn && FOCUS_GLOW==opts.focus && !isMozilla())
                 return;
 
-            if(NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0])  // Gimps buttons in its toolbox are
+            if(toolbarBtn)
+            {
+                if(GTK_APP_GIMP==qtSettings.app && FOCUS_GLOW==opts.focus && toolbarBtn)
+                    x-=2, width+=4, y-=1, height+=2;
+            }
+            else
             {
                 if(FOCUS_LINE==opts.focus)
                     height--;
@@ -6974,6 +6984,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             }
         }
+        else if(FOCUS_GLOW==opts.focus && toolbarBtn)
+            x-=2, width+=4, y-=2, height+=4;
         else
         {
             if(doEtch)
@@ -6989,7 +7001,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     if(GTK_STATE_PRELIGHT==state && FULL_FOCUS && MO_NONE!=opts.coloredMouseOver && !listViewHeader && (btn || comboButton))
         return;
 
-    if(FOCUS_GLOW==opts.focus && !comboButton && !listViewHeader && (btn || GTK_IS_SCALE(widget)))
+    if(FOCUS_GLOW==opts.focus && !comboButton && !listViewHeader && !toolbarBtn && (btn || GTK_IS_SCALE(widget)))
         return;
         
     if(FOCUS_STANDARD==opts.focus)
@@ -7027,9 +7039,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             {
                 if(btn)
                 {
-                    gboolean d;
-
-                    if(isButtonOnToolbar(widget, &d))
+                    if(toolbarBtn)
                     {
                         x-=2, y-=2, width+=4, height+=4;
                         if(!doEtch)
