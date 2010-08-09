@@ -12,6 +12,10 @@
 6. Fix crash due to missing gtk_widget_get_allocation - this was only
    introduced in Gtk 2.18.0
 7. Group boxes need to respect 'square frames' setting.
+8. Some Java Swing fixes/workarounds:
+    - always use plain slider style
+    - dont depress sliders
+    - slightly improve tabs
 
 1.5.2
 -----

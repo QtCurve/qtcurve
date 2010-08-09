@@ -5216,6 +5216,10 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
 
     sanitizeSize(window, &width, &height);
 
+    if(DEBUG_ALL==qtSettings.debug) printf("Draw box gap %d %d %d %d %d %d %d %d %d ", shadow_type, state, x, y, width, height, gap_x,
+                                           gap_width, isTab),
+                                    debugDisplayWidget(widget, 3);
+
     if(isTab && 0!=opts.tabBgnd)
     {
         clipPath(cr, x-1, y-1, width+2, height+2, WIDGET_TAB_FRAME, RADIUS_EXTERNAL, ROUNDED_ALL);
@@ -5256,6 +5260,8 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
             {
                 case GTK_POS_TOP:
                     gapRect.x=x+gap_x+adjust, gapRect.y=y, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
+                    if(GTK_APP_JAVA==qtSettings.app && isTab)
+                        gapRect.width-=3;
                     break;
                 case GTK_POS_BOTTOM:
                     gapRect.x=x+gap_x+adjust, gapRect.y=y+height-2, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
@@ -6492,9 +6498,17 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
              *btn_colors;
     int      min=MIN_SLIDER_SIZE(opts.sliderThumbs);
 
+    if(DEBUG_ALL==qtSettings.debug) printf("Draw slider %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height,
+                                           detail ? detail : "NULL"),
+                                    debugDisplayWidget(widget, 3);
+
     CAIRO_BEGIN
 
     lastSlider.widget=NULL;
+
+    /* Fix Java swing sliders looking pressed */
+    if(!scrollbar && GTK_STATE_ACTIVE==state)
+        state=GTK_STATE_PRELIGHT;
 
     if(useButtonColor(detail))
     {
@@ -6576,7 +6590,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
     {
         gboolean     coloredMouseOver=GTK_STATE_PRELIGHT==state && opts.coloredMouseOver &&
                                       !opts.colorSliderMouseOver,
-                     horiz=SLIDER_TRIANGULAR==opts.sliderStyle ? height>width : width>height;
+                     horiz=SLIDER_TRIANGULAR==opts.sliderStyle ? (height>width || DETAIL("hscale")) : width>height;
         int          bgnd=getFillReal(state, FALSE, SHADE_DARKEN==opts.shadeSliders),
                      xo=horiz ? 8 : 0,
                      yo=horiz ? 0 : 8,

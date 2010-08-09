@@ -2307,6 +2307,9 @@ static gboolean qtInit()
             if(GTK_APP_JAVA==qtSettings.app && g_get_application_name() && 0!=strcmp(g_get_application_name(), "<unknown>"))
                 qtSettings.app=GTK_APP_JAVA_SWT;
 
+            if(GTK_APP_JAVA==qtSettings.app)
+                opts.sliderStyle=SLIDER_PLAIN;
+
             if(GTK_APP_JAVA==qtSettings.app || GTK_APP_JAVA_SWT==qtSettings.app || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app)
             {
 #if 0 // Does not work - Gdk tiles the image :-(
