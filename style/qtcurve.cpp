@@ -2771,7 +2771,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_MdiSubWindowFrameWidth:
             return 3;
         case PM_DockWidgetTitleMargin:
-            return 2;
+            return 0;
         case PM_DockWidgetTitleBarButtonMargin:
             return 4;
         case PM_DockWidgetFrameWidth:
@@ -5206,13 +5206,15 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 #else
                 bool                           verticalTitleBar(false);
 #endif
+                bool                           isKOffice(widget && widget->inherits("KoDockWidgetTitleBar"));
+                QRect                          fillRect(r);
+
+                // This fixes the look of KOffice's dock widget titlebars...
+                if(isKOffice)
+                    fillRect.adjust(-r.x(), -r.y(), 0, 0);
+
                 if(!IS_FLAT(opts.dwtAppearance))
                 {
-                    // This section fixes the look of KOffice's dock widget titlebars...
-                    QRect fillRect(r);
-                    if(widget && widget->inherits("KoDockWidgetTitleBar"))
-                        fillRect.adjust(-r.x(), -r.y(), 0, 0);
-
                     painter->save();
 
                     QColor col((opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR)
@@ -5263,9 +5265,12 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     const int margin(4);
                     QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
 #endif
-
-                    QString title(painter->fontMetrics().elidedText(dwOpt->title, Qt::ElideRight, titleRect.width(),
-                                                                    QPalette::WindowText));
+#if !defined QTC_QT_ONLY
+                    if(opts.dwtSettings&DWT_FONT_AS_PER_TITLEBAR)
+                        painter->setFont(KGlobalSettings::windowTitleFont());
+#endif
+                    QFontMetrics fm(painter->fontMetrics());
+                    QString      title(fm.elidedText(dwOpt->title, Qt::ElideRight, titleRect.width(), QPalette::WindowText));
                     painter->save();
                     getMdiColors(option, state&State_Active);
 
@@ -5281,6 +5286,20 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         switch(opts.titlebarAlignment)
                         {
                             case ALIGN_FULL_CENTER:
+                                if(!verticalTitleBar && !reverse)
+                                {
+                                    QFontMetrics fm(painter->fontMetrics());
+                                    int          width=fm.boundingRect(title).width();
+
+                                    if(((fillRect.width()+width)/2)<=titleRect.width()+(isKOffice ? r.x() : 0))
+                                    {
+                                        titleRect=fillRect;
+                                        textOpt|=Qt::AlignHCenter;
+                                    }
+                                    else
+                                        textOpt|=Qt::AlignRight;
+                                    break;
+                                }
                             case ALIGN_CENTER:
                                 textOpt|=Qt::AlignHCenter;
                                 break;
@@ -5293,10 +5312,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         }
                     else
                         textOpt|=Qt::AlignLeft;
-#if !defined QTC_QT_ONLY
-                    if(opts.dwtSettings&DWT_FONT_AS_PER_TITLEBAR)
-                        painter->setFont(KGlobalSettings::windowTitleFont());
-#endif
+
                     if((opts.dwtSettings&DWT_EFFECT_AS_PER_TITLEBAR) &&
                        EFFECT_NONE!=opts.titlebarEffect)
                     {
