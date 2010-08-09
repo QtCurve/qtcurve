@@ -2975,7 +2975,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_MenuBarPanelWidth:
             return 0;
         case QtC_Round:
-            return (int)opts.round;
+            return (int)((opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round);
         case QtC_WindowBorder:
             return opts.windowBorder;
         case QtC_CustomBgnd:
@@ -3093,7 +3093,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
             {
                 QRect r(option->rect);
 
-                switch(opts.round)
+                switch((opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round)
                 {
                     case ROUND_NONE:
                         mask->region=r;
@@ -7974,6 +7974,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                              shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                 QStyleOption opt(*option);
                 QRect        tr(r);
+                ERound       round=(opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round;
 
                 if(!kwin && BLEND_TITLEBAR && widget && qobject_cast<const QMdiSubWindow *>(widget))
                 {
@@ -7997,12 +7998,12 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QPainterPath path;
 #else
 #if KDE_IS_VERSION(4, 3, 0)
-                QPainterPath path(opts.round<ROUND_SLIGHT
+                QPainterPath path(round<ROUND_SLIGHT
                                     ? QPainterPath()
                                     : buildPath(QRectF(state&QtC_StateKWinNoBorder ? tr : tr.adjusted(1, 1, -1, 0)),
                                                 WIDGET_MDI_WINDOW_TITLE, state&QtC_StateKWin && state&QtC_StateKWinTabDrag
                                                     ? ROUNDED_ALL : ROUNDED_TOP,
-                                                (opts.round>ROUND_SLIGHT /*&& kwin*/
+                                                (round>ROUND_SLIGHT /*&& kwin*/
                                                     ? 6.0
                                                     : 2.0)-(state&QtC_StateKWinNoBorder ? 0.0 : 1.0)));
 #else
@@ -8057,9 +8058,9 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         painter->save();
                         painter->setClipRect(r.adjusted(0, 0, -1, -1));
                         painter->drawPath(buildPath(r.adjusted(1, 1, 0, 1), WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
-                                                    opts.round<ROUND_SLIGHT
+                                                    round<ROUND_SLIGHT
                                                         ? 0
-                                                        : opts.round>ROUND_SLIGHT /*&& kwin*/
+                                                        : round>ROUND_SLIGHT /*&& kwin*/
                                                             ? 5.0
                                                             : 1.0));
                         painter->restore();
@@ -8067,9 +8068,9 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                     painter->setPen(dark);
                     painter->drawPath(buildPath(r, WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
-                                                opts.round<ROUND_SLIGHT
+                                                round<ROUND_SLIGHT
                                                     ? 0
-                                                    : opts.round>ROUND_SLIGHT /*&& kwin*/
+                                                    : round>ROUND_SLIGHT /*&& kwin*/
                                                         ? 6.0
                                                         : 2.0));
 
@@ -8081,7 +8082,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
                     }
 
-                    if(FULLLY_ROUNDED)
+                    if(round>ROUND_SLIGHT && FULLLY_ROUNDED)
                     {
                         if(!(state&QtC_StateKWinCompositing))
                         {

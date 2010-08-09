@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>755</width>
+    <width>756</width>
     <height>522</height>
    </rect>
   </property>
@@ -503,6 +503,13 @@
         <widget class="QCheckBox" name="squareScrollbarSlider">
          <property name="text">
           <string>Scrollbar sliders</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="QCheckBox" name="squareWindows">
+         <property name="text">
+          <string>Window borders (will use slight round)</string>
          </property>
         </widget>
        </item>
@@ -2096,8 +2103,7 @@
         </widget>
        </item>
        <item row="10" column="1">
-        <widget class="QComboBox" name="windowDrag">
-        </widget>
+        <widget class="QComboBox" name="windowDrag"/>
        </item>
       </layout>
      </widget>
@@ -4160,6 +4166,7 @@
   <tabstop>squareFrame</tabstop>
   <tabstop>squareSlider</tabstop>
   <tabstop>squareScrollbarSlider</tabstop>
+  <tabstop>squareWindows</tabstop>
   <tabstop>framelessGroupBoxes</tabstop>
   <tabstop>groupBoxLine</tabstop>
   <tabstop>comboBtn</tabstop>

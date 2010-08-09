@@ -13,6 +13,10 @@
 10. Remove amarok from list off apps not to apply opacity to.
 11. Fix MDI window border when using opacity.
 12. Improved glow mouse-over for non-standard sidebar buttons.
+13. Fix dock widget titlebar alignment when set to center on full width (not
+    just on text space width).
+14. Add option to use slight rounding for window decorations - set in style
+    config as option also affects MDI windows.
 
 1.5.2
 -----

@@ -947,6 +947,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(squareTabFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squareSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squareScrollbarSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squareWindows, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_customIcon, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2773,6 +2774,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     squareTabFrame->setChecked(opts.square&SQUARE_TAB_FRAME);
     squareSlider->setChecked(opts.square&SQUARE_SLIDER);
     squareScrollbarSlider->setChecked(opts.square&SQUARE_SB_SLIDER);
+    squareWindows->setChecked(opts.square&SQUARE_WINDOWS);
 
     if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
     {
@@ -2917,6 +2919,8 @@ int QtCurveConfig::getSquareFlags()
         square|=SQUARE_SLIDER;
     if(squareScrollbarSlider->isChecked())
         square|=SQUARE_SB_SLIDER;
+    if(squareWindows->isChecked())
+        square|=SQUARE_WINDOWS;
     return square;
 }
 

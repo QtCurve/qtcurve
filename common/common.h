@@ -539,15 +539,16 @@ typedef struct
 
 typedef enum
 {
-    SQUARE_NONE               = 0x0,
-    SQUARE_ENTRY              = 0x01,
-    SQUARE_PROGRESS           = 0x02,
-    SQUARE_SCROLLVIEW         = 0x04,
-    SQUARE_LISTVIEW_SELECTION = 0x08,
-    SQUARE_FRAME              = 0x10,
-    SQUARE_TAB_FRAME          = 0x20,
-    SQUARE_SLIDER             = 0x40,
-    SQUARE_SB_SLIDER          = 0x80
+    SQUARE_NONE               = 0x0000,
+    SQUARE_ENTRY              = 0x0001,
+    SQUARE_PROGRESS           = 0x0002,
+    SQUARE_SCROLLVIEW         = 0x0004,
+    SQUARE_LISTVIEW_SELECTION = 0x0008,
+    SQUARE_FRAME              = 0x0010,
+    SQUARE_TAB_FRAME          = 0x0020,
+    SQUARE_SLIDER             = 0x0040,
+    SQUARE_SB_SLIDER          = 0x0080,
+    SQUARE_WINDOWS            = 0x0100
 } ESquare;
 
 typedef enum
