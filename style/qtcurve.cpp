@@ -4366,10 +4366,17 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     (widget && widget->inherits("QComboBoxListView")))
                     return;
 
-                if(widget && FOCUS_GLOW==opts.focus &&
-                    (::qobject_cast<const QAbstractButton *>(widget) || ::qobject_cast<const QComboBox *>(widget) ||
-                     ::qobject_cast<const QGroupBox *>(widget) || ::qobject_cast<const QDial *>(widget)))
-                    return;
+                if(widget && FOCUS_GLOW==opts.focus)
+                {
+                    if(::qobject_cast<const QAbstractButton *>(widget))
+                    {
+                        if(!::qobject_cast<const QToolButton *>(widget) || !static_cast<const QToolButton *>(widget)->autoRaise())
+                            return;
+                    }
+                    else if(::qobject_cast<const QComboBox *>(widget) || ::qobject_cast<const QGroupBox *>(widget) ||
+                            ::qobject_cast<const QDial *>(widget))
+                        return;
+                }
 
                 QRect r2(r);
 
@@ -7422,7 +7429,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #endif
                 }
 
-                bool         drawMenu=mflags & (State_Sunken | State_On | State_Raised);
+                bool         drawMenu=mflags & (State_Sunken | State_On | State_Raised),
+                             drawnBevel=false;
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
 
@@ -7435,6 +7443,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     tool.rect.adjust(0, 0, -widthAdjust, -heightAdjust);
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
                         tool.state &= ~State_MouseOver;
+                    drawnBevel=true;
 
                     drawPrimitive(PE_PanelButtonTool, &tool, painter, widget);
                 }
@@ -7470,22 +7479,25 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                              QPalette::ButtonText));
                 }
 
-                if (FOCUS_GLOW!=opts.focus && toolbutton->state&State_HasFocus)
+                if ((FOCUS_GLOW!=opts.focus || !drawnBevel) && toolbutton->state&State_HasFocus)
                 {
                     QStyleOptionFocusRect fr;
 
                     fr.QStyleOption::operator=(*toolbutton);
                     if(FULL_FOCUS)
                     {
-                        if(etched && MO_GLOW==opts.coloredMouseOver)
+                        if(etched)
                             fr.rect.adjust(1, 1, -1, -1);
                     }
                     else
                     {
-                        if(etched)
+                        if(FOCUS_GLOW==opts.focus)
+                            fr.rect.adjust(1, 1, -1, -1);
+                        else if(etched)
                             fr.rect.adjust(4, 4, -4, -4);
                         else
                             fr.rect.adjust(3, 3, -3, -3);
+
 #if QT_VERSION >= 0x040300
                         if (toolbutton->features & QStyleOptionToolButton::MenuButtonPopup)
 #else
