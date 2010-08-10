@@ -6976,7 +6976,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         if(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))
         {
             // Gimps buttons in its toolbox are
-            toolbarBtn=GTK_APP_GIMP==qtSettings.app && NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0];
+            toolbarBtn=GTK_APP_GIMP==qtSettings.app && (NULL==GTK_BUTTON(widget)->label_text || '\0'==GTK_BUTTON(widget)->label_text[0]);
 
             if(!toolbarBtn && FOCUS_GLOW==opts.focus && !isMozilla())
                 return;
