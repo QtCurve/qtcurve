@@ -1585,7 +1585,7 @@ void Style::polish(QWidget *widget)
                 if(!widget->isVisible())
                     widget->move(10000, 10000);
                 itsTransparentWidgets.insert(widget);
-                connect(widget, SIGNAL(destroyed(QObject *)), SLOT( widgetDestroyed(QObject *)));
+                connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
                 setOpacityProp(widget, (unsigned short)opacity);
                 break;
             }
@@ -4923,6 +4923,18 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             break;
         // TODO: This is the only part left from QWindosStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
+        case PE_PanelTipLabel:
+        {
+            painter->save();
+            drawBevelGradient(palette.toolTipBase().color(), painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);
+            QColor black(Qt::black);
+            black.setAlphaF(0.25);
+            painter->setPen(black);
+            drawRect(painter, r);
+            painter->restore();
+            break;
+        }
+            // Fall through!
         default:
             BASE_STYLE::drawPrimitive(element, option, painter, widget);
             break;
