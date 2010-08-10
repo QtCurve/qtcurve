@@ -679,6 +679,15 @@ static void insertDragEntries(QComboBox *combo)
     combo->insertItem(WM_DRAG_ALL, i18n("All empty areas"));
 }
 
+
+static void insertFrameEntries(QComboBox *combo)
+{
+    combo->insertItem(FRAME_NONE, i18n("No border"));
+    combo->insertItem(FRAME_PLAIN, i18n("Standard frame border"));
+    combo->insertItem(FRAME_LINE, i18n("Single separator line"));
+    combo->insertItem(FRAME_SUNKEN, i18n("Sunken with a darker background"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                widgetStyle(NULL),
@@ -746,8 +755,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertImageEntries(menuBgndImage);
     insertGlowEntries(glowProgress);
     insertCrSizeEntries(crSize);
-
     insertDragEntries(windowDrag);
+    insertFrameEntries(groupBox);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -923,10 +932,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(reorderGtkButtons, SIGNAL(toggled(bool)), SLOT(reorderGtkButtonsChanged()));
     connect(mapKdeIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(passwordChar, SIGNAL(clicked()), SLOT(passwordCharClicked()));
-    connect(framelessGroupBoxes, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(groupBox, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(colorMenubarMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(useHighlightForMenu, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(groupBoxLine, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(boldGroupBox, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(fadeLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menuIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(stdBtnSizes, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2487,11 +2496,11 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.reorderGtkButtons=reorderGtkButtons->isChecked();
     opts.mapKdeIcons=mapKdeIcons->isChecked();
     opts.passwordChar=toInt(passwordChar->text());
-    opts.framelessGroupBoxes=framelessGroupBoxes->isChecked();
+    opts.groupBox=(EFrame)groupBox->currentIndex();
     opts.customGradient=customGradient;
     opts.colorMenubarMouseOver=colorMenubarMouseOver->isChecked();
     opts.useHighlightForMenu=useHighlightForMenu->isChecked();
-    opts.groupBoxLine=groupBoxLine->isChecked();
+    opts.boldGroupBox=boldGroupBox->isChecked();
     opts.fadeLines=fadeLines->isChecked();
     opts.menuIcons=menuIcons->isChecked();
     opts.stdBtnSizes=stdBtnSizes->isChecked();
@@ -2707,7 +2716,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
     colorMenubarMouseOver->setChecked(opts.colorMenubarMouseOver);
     useHighlightForMenu->setChecked(opts.useHighlightForMenu);
-    groupBoxLine->setChecked(opts.groupBoxLine);
+    boldGroupBox->setChecked(opts.boldGroupBox);
     fadeLines->setChecked(opts.fadeLines);
     menuIcons->setChecked(opts.menuIcons);
     stdBtnSizes->setChecked(opts.stdBtnSizes);
@@ -2759,7 +2768,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     reorderGtkButtons->setChecked(opts.reorderGtkButtons);
     mapKdeIcons->setChecked(opts.mapKdeIcons);
     setPasswordChar(opts.passwordChar);
-    framelessGroupBoxes->setChecked(opts.framelessGroupBoxes);
+    groupBox->setCurrentIndex(opts.groupBox);
     customGradient=opts.customGradient;
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
     borderProgress->setChecked(opts.borderProgress);
@@ -3064,7 +3073,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          splitters->currentIndex()!=opts.splitters ||
          colorMenubarMouseOver->isChecked()!=opts.colorMenubarMouseOver ||
          useHighlightForMenu->isChecked()!=opts.useHighlightForMenu ||
-         groupBoxLine->isChecked()!=opts.groupBoxLine ||
+         boldGroupBox->isChecked()!=opts.boldGroupBox ||
          fadeLines->isChecked()!=opts.fadeLines ||
          menuIcons->isChecked()!=opts.menuIcons ||
          stdBtnSizes->isChecked()!=opts.stdBtnSizes ||
@@ -3105,7 +3114,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          gtkButtonOrder->isChecked()!=opts.gtkButtonOrder ||
          reorderGtkButtons->isChecked()!=opts.reorderGtkButtons ||
          mapKdeIcons->isChecked()!=opts.mapKdeIcons ||
-         framelessGroupBoxes->isChecked()!=opts.framelessGroupBoxes ||
+         groupBox->currentIndex()!=opts.groupBox ||
 
          toInt(passwordChar->text())!=opts.passwordChar ||
          highlightFactor->value()!=opts.highlightFactor ||

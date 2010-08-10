@@ -282,6 +282,23 @@ static EScrollbar toScrollbar(const char *str, EScrollbar def)
     return def;
 }
 
+static EFrame toFrame(const char *str, EFrame def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "none", 4))
+            return FRAME_NONE;
+        if(0==memcmp(str, "plain", 5))
+            return FRAME_PLAIN;
+        if(0==memcmp(str, "line", 4))
+            return FRAME_LINE;
+        if(0==memcmp(str, "sunken", 6))
+            return FRAME_SUNKEN;
+    }
+
+    return def;
+}
+
 static EEffect toEffect(const char *str, EEffect def)
 {
     if(str)
@@ -1213,6 +1230,9 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
 #define CFG_READ_SCROLLBAR(ENTRY) \
     opts->ENTRY=toScrollbar(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#define CFG_READ_FRAME(ENTRY) \
+    opts->ENTRY=toFrame(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 #define CFG_READ_EFFECT(ENTRY) \
     opts->ENTRY=toEffect(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
@@ -1437,7 +1457,19 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             /* Check if the config file expects old default values... */
             if(version<MAKE_VERSION(1, 6))
-                opts->focus=FOCUS_LINE;
+            {
+                bool framelessGroupBoxes=readBoolEntry(cfg, "framelessGroupBoxes", true),
+                     groupBoxLine=readBoolEntry(cfg, "groupBoxLine", true);
+                opts->groupBox=framelessGroupBoxes ? (groupBoxLine ? FRAME_LINE : FRAME_NONE) : FRAME_PLAIN;
+                opts->boldGroupBox=framelessGroupBoxes;
+                def->focus=FOCUS_LINE;
+            }
+            else
+            {
+                CFG_READ_FRAME(groupBox)
+                CFG_READ_BOOL(boldGroupBox)
+            }
+
             if(version<MAKE_VERSION(1, 5))
             {
                 opts->windowBorder=
@@ -1542,7 +1574,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->handles=LINE_DOTS;
                 def->lighterPopupMenuBgnd=15;
                 def->activeTabAppearance=APPEARANCE_GRADIENT;
-                def->groupBoxLine=false;
+                def->boldGroupBox=true;
+                def->groupBox=FRAME_NONE;
+                def->boldGroupBox=true;
                 def->shadeSliders=SHADE_BLEND_SELECTED;
                 def->progressGrooveColor=ECOLOR_BASE;
                 def->shadeMenubars=SHADE_DARKEN;
@@ -1644,8 +1678,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(darkerBorders)
             CFG_READ_BOOL(vArrows)
             CFG_READ_BOOL(xCheck)
-            CFG_READ_BOOL(framelessGroupBoxes)
-            CFG_READ_BOOL(groupBoxLine)
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             CFG_READ_BOOL(fadeLines)
             CFG_READ_GLOW(glowProgress)
@@ -2090,9 +2122,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 //             if(opts->squareScrollViews)
 //                 opts->highlightScrollViews=false;
 
-            if(!opts->framelessGroupBoxes)
-                opts->groupBoxLine=false;
-
             if(SHADE_WINDOW_BORDER==opts->shadeMenubars)
                 opts->shadeMenubarOnlyWhenActive=true;
 #endif
@@ -2316,8 +2345,6 @@ static void defaultSettings(Options *opts)
     opts->darkerBorders=false;
     opts->vArrows=true;
     opts->xCheck=false;
-    opts->framelessGroupBoxes=true;
-    opts->groupBoxLine=true;
     opts->colorMenubarMouseOver=true;
     opts->crButton=true;
     opts->crColor=SHADE_NONE;
@@ -2351,6 +2378,8 @@ static void defaultSettings(Options *opts)
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
     opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
+    opts->groupBox=FRAME_SUNKEN;
+    opts->boldGroupBox=false;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
@@ -2615,6 +2644,22 @@ static const char *toStr(EScrollbar sb)
             return "next";
         case SCROLLBAR_NONE:
             return "none";
+    }
+}
+
+static const char *toStr(EFrame sb)
+{
+    switch(sb)
+    {
+        case FRAME_NONE:
+            return "none";
+        case FRAME_PLAIN:
+            return "plain";
+        case FRAME_LINE:
+            return "line";
+        default:
+        case FRAME_SUNKEN:
+            return "sunken";
     }
 }
 
@@ -3011,8 +3056,8 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(darkerBorders)
         CFG_WRITE_ENTRY(vArrows)
         CFG_WRITE_ENTRY(xCheck)
-        CFG_WRITE_ENTRY(framelessGroupBoxes)
-        CFG_WRITE_ENTRY(groupBoxLine)
+        CFG_WRITE_ENTRY(groupBox)
+        CFG_WRITE_ENTRY(boldGroupBox)
         CFG_WRITE_ENTRY(fadeLines)
         CFG_WRITE_ENTRY(glowProgress)
         CFG_WRITE_IMAGE_ENTRY(bgndImage)

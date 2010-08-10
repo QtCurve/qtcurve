@@ -3680,17 +3680,37 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             break;
         }
         case PE_FrameGroupBox:
-            if(opts.framelessGroupBoxes && !opts.groupBoxLine)
+            if(FRAME_NONE==opts.groupBox)
                 break;
             if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame *>(option))
             {
                 QStyleOptionFrameV2 frameV2(*frame);
-                if (frameV2.features & QStyleOptionFrameV2::Flat || opts.groupBoxLine)
+                if (frameV2.features & QStyleOptionFrameV2::Flat || FRAME_LINE==opts.groupBox)
                     drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[STD_BORDER], reverse, !reverse, true);
                 else
                 {
-                    frameV2.state &= ~(State_Sunken | State_HasFocus);
-                    drawPrimitive(PE_Frame, &frameV2, painter, widget);
+                    if(FRAME_SUNKEN==opts.groupBox)
+                    {
+                        QColor col(Qt::black);
+                        int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+
+                        col.setAlphaF(0.025);
+                        painter->save();
+                        painter->setClipping(false);
+                        painter->fillPath(buildPath(r, WIDGET_FRAME, round,
+                                                    ROUNDED_ALL==round
+                                                        ? getRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
+                                                        : 0.0),
+                                          col);
+                        painter->restore();
+                        drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_FRAME,
+                                   state&State_Raised ? BORDER_RAISED : BORDER_SUNKEN);
+                    }
+                    else
+                    {
+                        frameV2.state &= ~(State_Sunken | State_HasFocus);
+                        drawPrimitive(PE_Frame, &frameV2, painter, widget);
+                    }
                 }
             }
             break;
@@ -7557,7 +7577,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             break;
         case CC_GroupBox:
-            if(opts.framelessGroupBoxes)
+            if(opts.boldGroupBox)
             {
                 QFont font(painter->font());
 
@@ -7567,7 +7587,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             BASE_STYLE::drawComplexControl(control, option, painter, widget);
 
-            if(opts.framelessGroupBoxes)
+            if(opts.boldGroupBox)
                 painter->restore();
             break;
         case CC_Q3ListView:
@@ -9606,12 +9626,12 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             }
             break;
         case CC_GroupBox:
-            if(opts.framelessGroupBoxes && (SC_GroupBoxCheckBox==subControl || SC_GroupBoxLabel==subControl))
+            if(NO_FRAME(opts.groupBox) && (SC_GroupBoxCheckBox==subControl || SC_GroupBoxLabel==subControl))
                 if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
                 {
                     QFont font(widget ? widget->font() : QApplication::font());
 
-                    font.setBold(true);
+                    font.setBold(opts.boldGroupBox);
 
                     QFontMetrics fontMetrics(font);
                     int          h(fontMetrics.height()),

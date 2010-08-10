@@ -516,19 +516,30 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_18">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QCheckBox" name="framelessGroupBoxes">
-         <property name="whatsThis">
-          <string>Controls whether group-boxes should have an outer frame, or just an emboldened title.</string>
-         </property>
+      <layout class="QFormLayout" name="formLayout_11">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_98">
          <property name="text">
+          <string>Frame type:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="groupBox">
+         <property name="text" stdset="0">
           <string>Frameless</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="groupBoxLine">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_99">
+         <property name="text">
+          <string>Label:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="boldGroupBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -536,25 +547,12 @@
           </sizepolicy>
          </property>
          <property name="whatsThis">
-          <string>With frame-less group boxes, this controls whether these should have a dividing line drawn after the title.</string>
+          <string>Controls whether group boxes should use a bold for for their title.</string>
          </property>
          <property name="text">
-          <string>Draw line after title</string>
+          <string>Use bold font</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>384</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -4167,8 +4165,8 @@
   <tabstop>squareSlider</tabstop>
   <tabstop>squareScrollbarSlider</tabstop>
   <tabstop>squareWindows</tabstop>
-  <tabstop>framelessGroupBoxes</tabstop>
-  <tabstop>groupBoxLine</tabstop>
+  <tabstop>groupBox</tabstop>
+  <tabstop>boldGroupBox</tabstop>
   <tabstop>comboBtn</tabstop>
   <tabstop>customComboBtnColor</tabstop>
   <tabstop>comboSplitter</tabstop>

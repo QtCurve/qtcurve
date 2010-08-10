@@ -787,6 +787,16 @@ typedef enum
 
 typedef enum
 {
+    FRAME_NONE,
+    FRAME_PLAIN,
+    FRAME_LINE,
+    FRAME_SUNKEN
+} EFrame;
+
+#define NO_FRAME(A) (FRAME_NONE==(A) || FRAME_LINE==(A))
+
+typedef enum
+{
     MO_NONE,
     MO_COLORED,
     MO_COLORED_THICK,
@@ -1026,8 +1036,7 @@ typedef struct
                      darkerBorders,
                      vArrows,
                      xCheck,
-                     framelessGroupBoxes,
-                     groupBoxLine,
+                     boldGroupBox,
                      crButton,
                      smallRadio,
                      fillProgress,
@@ -1061,6 +1070,7 @@ typedef struct
                      borderSelection,
                      stripedSbar,
                      shadePopupMenu;
+    EFrame           groupBox;
     EGlow            glowProgress;
     ELvLines         lvLines;
     EGradType        bgndGrad,
