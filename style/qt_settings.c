@@ -2541,7 +2541,7 @@ static gboolean qtInit()
                 static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""RC_SETTING"BFnt\" "
                                                    "widget_class \"*GtkProgress*\" style \""RC_SETTING"BFnt\" ";
 
-                if(opts.framelessGroupBoxes)
+                if(opts.boldGroupBox)
                 {
                     static const char *constStdPrefix="style \""RC_SETTING"Fnt\"{font_name=\"";
                     static const char *constStdSuffix="\"} ";

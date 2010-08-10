@@ -1,23 +1,24 @@
 1.6.0
 -----
-1. Add 'glow' focus option - this is now the default. (Note, for firefox
-   the label of checkboxes and radiobuttons will have a rounded focus rect
-   drawn - this is because the 'glow' does not seem to work for firefox's
-   usage of checks and radios).
-2. Fix potential crash in rgbToHsv
-3. Use square-ish focus for view items if using squared selection.
-4. Store dialog/window opacity in an XProperty - so that kwin theme can use
-   this as the titlebar opacity.
-5. Don't hide focus rect on listview headers when mouse-overed.
-6. Fix crash due to missing gtk_widget_get_allocation - this was only
-   introduced in Gtk 2.18.0
-7. Group boxes need to respect 'square frames' setting.
-8. Some Java Swing fixes/workarounds:
-    - always use plain slider style
-    - dont depress sliders
-    - slightly improve tabs
-9. Draw tooltips using the selection gradient.
-   
+ 1. Add 'glow' focus option - this is now the default. (Note, for firefox
+    the label of checkboxes and radiobuttons will have a rounded focus rect
+    drawn - this is because the 'glow' does not seem to work for firefox's
+    usage of checks and radios).
+ 2. Fix potential crash in rgbToHsv
+ 3. Use square-ish focus for view items if using squared selection.
+ 4. Store dialog/window opacity in an XProperty - so that kwin theme can use
+    this as the titlebar opacity.
+ 5. Don't hide focus rect on listview headers when mouse-overed.
+ 6. Fix crash due to missing gtk_widget_get_allocation - this was only
+    introduced in Gtk 2.18.0
+ 7. Group boxes need to respect 'square frames' setting.
+ 8. Some Java Swing fixes/workarounds:
+     - always use plain slider style
+     - dont depress sliders
+     - slightly improve tabs
+ 9. Draw tooltips using the selection gradient.
+10. Added option to draw sunken group boxes.
+
 1.5.2
 -----
 1. Apply opacity settings to inactive tabs.

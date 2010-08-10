@@ -5284,7 +5284,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
     
         drawBorder(cr, widget && widget->parent ? widget->parent->style : style, state,
                    area, NULL, x, y, width, height, NULL, round,
-                   borderProfile, WIDGET_TAB_FRAME, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
+                   borderProfile, isTab ? WIDGET_TAB_FRAME : WIDGET_FRAME, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
         if(gap_width>0)
             unsetCairoClipping(cr);
     }
@@ -5777,14 +5777,14 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         {
 
             int diff=widget->allocation.x-widget->parent->allocation.x;
-            if(opts.framelessGroupBoxes)
+            if(NO_FRAME(opts.groupBox))
                 x-=MAX(0, MIN(diff, 6));
             else
                 x+=5;
             if(area)
             {
                 area2=*area;
-                if(opts.framelessGroupBoxes)
+                if(NO_FRAME(opts.groupBox))
                     area2.x-=MAX(0, MIN(diff, 6));
                 else
                     area2.x+=5;
@@ -6757,26 +6757,56 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                              const gchar *detail, gint x, gint y, gint width,
                              gint height, GtkPositionType gap_side, gint gap_x, gint gap_width)
 {
+    CAIRO_BEGIN
+
+    gboolean drawFrame=TRUE,
+             isGroupBox=FALSE;
+
     if(GTK_IS_FRAME(widget) && (NULL!=gtk_frame_get_label(GTK_FRAME(widget)) || NULL!=gtk_frame_get_label_widget(GTK_FRAME(widget))))
     {
         if(gap_x<5)
             gap_x+=5, gap_width+=2;
 
-        if(opts.framelessGroupBoxes)
+        isGroupBox=TRUE;
+        switch(opts.groupBox)
         {
-            if(opts.groupBoxLine)
+            case FRAME_LINE:
             {
-                CAIRO_BEGIN
                 GdkRectangle gap={x, y, gap_width, 1};
                 drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[STD_BORDER], area, &gap, FALSE, TRUE, TRUE);
-                CAIRO_END
+                drawFrame=FALSE;
+                break;
             }
-            return;
+            case FRAME_NONE:
+                drawFrame=FALSE;
+                return;
+            case FRAME_SUNKEN:
+            {
+                int round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+
+                cairo_save(cr);
+                cairo_new_path(cr);
+                createPath(cr, x, y, width, height, ROUNDED_ALL==round
+                                    ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL)
+                                    : 0.0,
+                           round);
+                cairo_clip(cr);
+                cairo_rectangle(cr, x, y, width, height);
+                cairo_set_source_rgba(cr, 0, 0, 0, 0.025);
+                cairo_fill(cr);
+                cairo_restore(cr);
+                break;
+            }
+            default:
+                break;
         }
     }
-    CAIRO_BEGIN
-    drawBoxGap(cr, style, window, shadow_type, state, widget, area, x, y,
-            width, height, gap_side, gap_x, gap_width, shadowToBorder(shadow_type), FALSE);
+    if(drawFrame)
+        drawBoxGap(cr, style, window, shadow_type, state, widget, area, x, y,
+                   width, height, gap_side, gap_x, gap_width,
+                   isGroupBox && GTK_SHADOW_NONE==shadow_type && FRAME_SUNKEN==opts.groupBox
+                        ? BORDER_SUNKEN : shadowToBorder(shadow_type),
+                   FALSE);
     CAIRO_END
 }
 
