@@ -4431,7 +4431,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         {
                             if(wid->parentWidget()->inherits("KDEPrivate::KPageListView"))
                             {
-                                r.adjust(2, 2, -2, -2);
+                                r2.adjust(2, 2, -2, -2);
                                 view=true;
                             }
                             else if(APP_KONTACT==theThemedApp && (wid->parentWidget()->inherits("KMail::MainFolderView") ||
