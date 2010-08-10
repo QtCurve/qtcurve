@@ -2427,7 +2427,7 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         int       xpos=0,
                   ypos=0;
 
-        if(DEBUG_ALL==qtSettings.debug) printf("Draw bgnd grad box %d %d %d %d  ", x, y, width, height), debugDisplayWidget(widget, 20);
+        if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d  ", __FUNCTION__, x, y, width, height), debugDisplayWidget(widget, 20);
 
         while(window && !GTK_IS_WINDOW(window))
             window=window->parent;
@@ -2948,8 +2948,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                                    ((widget->name && 0==strcmp(widget->name, "gtk-tooltip")) ||
                                     isMenuWindow(widget));
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw flat box %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height,
-                                           detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     sanitizeSize(window, &width, &height);
@@ -3172,7 +3171,7 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
 
     FN_CHECK
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw handle %d %d %d %d %s  ", state, shadow_type, width, height, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     sanitizeSize(window, &width, &height);
@@ -3380,7 +3379,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          const gchar *detail, GtkArrowType arrow_type,
                          gboolean fill, gint x, gint y, gint width, gint height)
 {
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw arrow %d %d %d %d %d %d %d %s  ", state, shadow, arrow_type, x, y, width, height,
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, arrow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
@@ -3580,7 +3579,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         togglebutton=TRUE;
     }
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw box %d %d %d %d %d %d %d %s  ", btn_down, state, shadow_type, x, y, width, height,
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, btn_down, state, shadow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
@@ -5069,7 +5068,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
                             ? frame : isStatusBarFrame(widget);
 
-        if(DEBUG_ALL==qtSettings.debug) printf("Draw shadow %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height,
+        if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height,
                                                detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 3);
 
@@ -5216,7 +5215,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
 
     sanitizeSize(window, &width, &height);
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw box gap %d %d %d %d %d %d %d %d %d ", shadow_type, state, x, y, width, height, gap_x,
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %d %d ", __FUNCTION__, shadow_type, state, x, y, width, height, gap_x,
                                            gap_width, isTab),
                                     debugDisplayWidget(widget, 3);
 
@@ -5334,7 +5333,7 @@ static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state,
     x+=(width-checkSpace)>>1;
     y+=(height-checkSpace)>>1;
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw check %d %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height, mnu,
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height, mnu,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
@@ -5646,7 +5645,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         gboolean activeWindow=TRUE;
         int      i=0;
 
-        if(DEBUG_ALL==qtSettings.debug) printf("Draw layout %s %d %d %d %d %d %s  ", pango_layout_get_text(layout), x, y, state, use_text,
+        if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %s %d %d %d %d %d %s  ", __FUNCTION__, pango_layout_get_text(layout), x, y, state, use_text,
                                                IS_MENU_ITEM(widget), detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 3);
 
@@ -5938,7 +5937,7 @@ static void gtkDrawTab(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                                                    [COLOR_BUTTON_TEXT]);
     //if(DO_EFFECT)
     //    x--;
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw tab %d %d %s  ", state, shadow_type, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %s  ", __FUNCTION__, state, shadow_type, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 5);
 
     if(isActiveCombo(widget))
@@ -6151,7 +6150,7 @@ static void gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType st
                              const gchar *detail, gint x, gint y, gint width,
                              gint height, GtkPositionType gap_side)
 {
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw extension %d %d %d %d %d %d %d %s  ", state, shadow_type, gap_side, x, y, width, height,
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, gap_side, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
@@ -6498,7 +6497,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
              *btn_colors;
     int      min=MIN_SLIDER_SIZE(opts.sliderThumbs);
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw slider %d %d %d %d %d %d %s  ", state, shadow_type, x, y, width, height,
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
@@ -6792,7 +6791,7 @@ static void gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     FN_CHECK
     CAIRO_BEGIN
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw hline %d %d %d %d %s  ", state, x1, x2, y, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x1, x2, y, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     if(tbar)
@@ -6868,7 +6867,7 @@ static void gtkDrawVLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
     FN_CHECK
     CAIRO_BEGIN
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw vline %d %d %d %d %s  ", state, x, y1, y2, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x, y1, y2, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     if(!(DETAIL("vseparator") && isOnComboBox(widget, 0))) /* CPD: Combo handled in drawBox */
@@ -6918,7 +6917,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     sanitizeSize(window, &width, &height);
 
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw focus %d %d %d %d %d %s ", state, x, y, width, height, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %s ", __FUNCTION__, state, x, y, width, height, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 3);
 
     {
@@ -7146,7 +7145,7 @@ static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType sta
                             GdkRectangle *area, GtkWidget *widget, const gchar *detail,
                             gint x, gint y, GtkExpanderStyle expander_style)
 {
-    if(DEBUG_ALL==qtSettings.debug) printf("Draw expander %d %s  ", state, detail ? detail : "NULL"),
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 5);
 
     gboolean isExpander=widget && GTK_IS_EXPANDER(widget),
