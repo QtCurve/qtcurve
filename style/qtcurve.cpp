@@ -1215,7 +1215,7 @@ Style::Style()
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
         calcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
-    itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity);
+    itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
 #if !defined QTC_QT_ONLY
     // Ensure the link to libkio is not stripped, by placing a call to a kio function.
@@ -1554,7 +1554,10 @@ void Style::polish(QWidget *widget)
 
     // Need to register all widgets to blur helper, in order to have proper blur_behind region set have proper regions removed for opaque widgets.
     // Note: that the helper does nothing as long as compositing and ARGB are not enabled
-    itsBlurHelper->registerWidget(widget);
+    if( (100!=opts.menuBgndOpacity && qobject_cast<QMenu *>(widget)) ||
+        (100!=opts.bgndOpacity && (!widget->topLevelWidget() || Qt::Dialog!=(widget->topLevelWidget()->windowFlags() & Qt::WindowType_Mask))) ||
+        (100!=opts.dlgOpacity && (!widget->topLevelWidget() || Qt::Dialog==(widget->topLevelWidget()->windowFlags() & Qt::WindowType_Mask))) )
+        itsBlurHelper->registerWidget(widget);
 
     if(CUSTOM_BGND)
     {
