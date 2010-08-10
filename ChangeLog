@@ -16,7 +16,8 @@
     - always use plain slider style
     - dont depress sliders
     - slightly improve tabs
-
+9. Draw tooltips using the selection gradient.
+   
 1.5.2
 -----
 1. Apply opacity settings to inactive tabs.
