@@ -1130,7 +1130,8 @@ typedef struct
                      grooveAppearance,
                      sunkenAppearance,
                      sbarBgndAppearance,
-                     sliderFill;
+                     sliderFill,
+                     tooltipAppearance;
     EShade           shadeSliders,
                      shadeMenubars,
                      menuStripe,

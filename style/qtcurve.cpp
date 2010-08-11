@@ -4949,11 +4949,19 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         case PE_PanelTipLabel:
         {
             painter->save();
-            drawBevelGradient(palette.toolTipBase().color(), painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);
-            QColor black(Qt::black);
-            black.setAlphaF(0.25);
-            painter->setPen(black);
-            drawRect(painter, r);
+            drawBevelGradient(palette.toolTipBase().color(), painter, r, true, false, opts.tooltipAppearance, WIDGET_OTHER);
+            if(IS_FLAT(opts.tooltipAppearance))
+            {
+                painter->setPen(QPen(palette.toolTipText(), 0));
+                drawRect(painter, r);
+            }
+            else if(!Utils::compositingActive())
+            {
+                QColor black(Qt::black);
+                black.setAlphaF(0.25);
+                painter->setPen(black);
+                drawRect(painter, r);
+            }
             painter->restore();
             break;
         }

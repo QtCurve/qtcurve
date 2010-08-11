@@ -728,6 +728,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(sliderFill);
     insertAppearanceEntries(bgndAppearance, true, true, false, true);
     insertAppearanceEntries(dwtAppearance);
+    insertAppearanceEntries(tooltipAppearance);
     insertLineEntries(handles, true, true);
     insertLineEntries(sliderThumbs, true, false);
     insertLineEntries(toolbarSeparators, false, false);
@@ -918,6 +919,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(menuBgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(menuBgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(tooltipAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(dwtBtnAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(dwtIconColAsPerTitleBar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2496,6 +2498,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menuBgndImage.type=(EImageType)menuBgndImage->currentIndex();
     opts.menuBgndOpacity=menuBgndOpacity->value();
     opts.dwtAppearance=(EAppearance)dwtAppearance->currentIndex();
+    opts.tooltipAppearance=(EAppearance)tooltipAppearance->currentIndex();
     opts.xbar=xbar->isChecked();
     opts.crColor=(EShade)crColor->currentIndex();
     opts.customCrBgndColor=customCrBgndColor->color();
@@ -2761,6 +2764,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     menuBgndImage->setCurrentIndex(IMG_FILE==opts.menuBgndImage.type ? IMG_BORDERED_RINGS : opts.menuBgndImage.type);
     menuBgndOpacity->setValue(opts.menuBgndOpacity);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
+    tooltipAppearance->setCurrentIndex(opts.tooltipAppearance);
     dwtBtnAsPerTitleBar->setChecked(opts.dwtSettings&DWT_BUTTONS_AS_PER_TITLEBAR);
     dwtColAsPerTitleBar->setChecked(opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR);
     dwtIconColAsPerTitleBar->setChecked(opts.dwtSettings&DWT_ICON_COLOR_AS_PER_TITLEBAR);
@@ -3098,7 +3102,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          titlebarIcon->currentIndex()!=opts.titlebarIcon ||
          getCrSize(crSize)!=opts.crSize ||
          borderProgress->isChecked()!=opts.borderProgress ||
-
          shading->currentIndex()!=(int)opts.shading ||
          gtkScrollViews->isChecked()!=opts.gtkScrollViews ||
          highlightScrollViews->isChecked()!=opts.highlightScrollViews ||
@@ -3118,6 +3121,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          menuBgndImage->currentIndex()!=opts.menuBgndImage.type ||
          menuBgndOpacity->value()!=opts.menuBgndOpacity ||
          dwtAppearance->currentIndex()!=opts.dwtAppearance ||
+         tooltipAppearance->currentIndex()!=opts.tooltipAppearance ||
          xbar->isChecked()!=opts.xbar ||
          crColor->currentIndex()!=opts.crColor ||
          smallRadio->isChecked()!=opts.smallRadio ||

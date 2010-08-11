@@ -144,6 +144,7 @@ toolbarAppearance=flat
 toolbarBorders=light-all
 toolbarSeparators=sunken
 toolbarTabs=false
+tooltipAppearance=flat
 unifyCombo=false
 unifySpin=false
 unifySpinBtns=false

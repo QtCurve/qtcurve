@@ -1658,6 +1658,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_APPEARANCE(grooveAppearance, false, false)
             CFG_READ_APPEARANCE(sunkenAppearance, false, false)
             CFG_READ_APPEARANCE(sbarBgndAppearance, false, false)
+            if(version<MAKE_VERSION(1, 6))
+                opts->tooltipAppearance=APPEARANCE_FLAT;
+            else
+            {
+                CFG_READ_APPEARANCE(tooltipAppearance, false, false)
+            }
 
             if(version<MAKE_VERSION(0, 63))
                 opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
@@ -2003,6 +2009,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             checkAppearance(&opts->sunkenAppearance, opts);
             checkAppearance(&opts->sbarBgndAppearance, opts);
             checkAppearance(&opts->sliderFill, opts);
+            checkAppearance(&opts->tooltipAppearance, opts);
 #ifndef __cplusplus
             releaseConfig(cfg);
 #endif
@@ -2152,6 +2159,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
             opts->lvAppearance=MODIFY_AGUA_X(opts->lvAppearance, APPEARANCE_LV_AGUA);
             opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
+            opts->tooltipAppearance=MODIFY_AGUA(opts->tooltipAppearance);
             opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
             opts->menuBgndAppearance=MODIFY_AGUA(opts->menuBgndAppearance);
             opts->menuStripeAppearance=MODIFY_AGUA(opts->menuStripeAppearance);
@@ -2319,6 +2327,7 @@ static void defaultSettings(Options *opts)
     opts->grooveAppearance=APPEARANCE_INVERTED;
     opts->sunkenAppearance=APPEARANCE_SOFT_GRADIENT;
     opts->sbarBgndAppearance=APPEARANCE_FLAT;
+    opts->tooltipAppearance=APPEARANCE_GRADIENT;
     opts->sliderFill=APPEARANCE_GRADIENT;
     opts->defBtnIndicator=IND_GLOW;
     opts->sliderThumbs=LINE_FLAT;
