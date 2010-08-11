@@ -57,14 +57,6 @@ static int lstat(const char* fileName, struct stat* s)
 */
 #define INCREASE_SB_SLIDER
 
-/*
-    Control shading used for glass variants.
-    0 => As used in 0.51.1 +
-    1 => As used in 0.51
-    2 => As used in <0.51
-*/
-#define GLASS_SHADING 0
-
 typedef enum
 {
     SHADING_SIMPLE=0,
