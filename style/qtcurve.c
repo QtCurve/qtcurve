@@ -692,6 +692,22 @@ static gboolean isMenuWindow(GtkWidget *w)
     return GTK_WINDOW(w)->default_widget && GTK_IS_MENU(GTK_WINDOW(w)->default_widget);
 }
 
+#define IS_GROUP_BOX(W) ((W) && GTK_IS_FRAME((W)) && (NULL!=gtk_frame_get_label(GTK_FRAME((W))) || \
+                                                      NULL!=gtk_frame_get_label_widget(GTK_FRAME((W)))))
+
+static gboolean isInGroupBox(GtkWidget *w, int level)
+{
+    if(w)
+    {
+        if(IS_GROUP_BOX(w))
+            return TRUE;
+        else if(level<5)
+            return isInGroupBox(w->parent, level++);
+    }
+
+    return FALSE;
+}
+
 static gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
 {
     if(w)
@@ -2151,7 +2167,7 @@ static void drawDots(cairo_t *cr, int rx, int ry, int rwidth, int rheight, gbool
     unsetCairoClipping(cr);
 }
 
-void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
+static void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
 {
     const GtkWidget *parent;
 
@@ -2177,6 +2193,30 @@ void getEntryParentBgCol(const GtkWidget *widget, GdkColor *color)
         parent = widget;
 
     *color = parent->style->bg[GTK_WIDGET_STATE(parent)];
+}
+
+static void drawEntryCorners(cairo_t *cr, GdkRectangle *area, int round, int x, int y, int width, int height,
+                             double r, double g, double b, double a)
+{
+    setCairoClipping(cr, area, NULL);
+    cairo_set_source_rgba(cr, r, g, b, a);
+    cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+    if(DO_EFFECT && opts.etchEntry)
+        cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-3);
+    if(opts.round>ROUND_FULL)
+    {
+        if(round&CORNER_TL)
+            cairo_rectangle(cr, x+2.5, y+2.5, 1, 1);
+        if(round&CORNER_BL)
+            cairo_rectangle(cr, x+2.5, y+height-3.5, 1, 1);
+        if(round&CORNER_TR)
+            cairo_rectangle(cr, x+width-2.5, y+2.5, 1, 1);
+        if(round&CORNER_BR)
+            cairo_rectangle(cr, x+width-2.5, y+height-3.5, 1, 1);
+    }
+    cairo_set_line_width(cr, opts.round>ROUND_FULL && GTK_APP_OPEN_OFFICE!=qtSettings.app ? 2 : 1);
+    cairo_stroke(cr);
+    unsetCairoClipping(cr);
 }
 
 static void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolean isWindow)
@@ -2508,29 +2548,13 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
         else
         {
             GdkColor parentBgCol;
-
             getEntryParentBgCol(widget, &parentBgCol);
-            setCairoClipping(cr, area, NULL);
-            cairo_set_source_rgb(cr, CAIRO_COL(parentBgCol));
-            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-            if(doEtch)
-                cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-3);
-            if(opts.round>ROUND_FULL)
-            {
-                if(round&CORNER_TL)
-                    cairo_rectangle(cr, x+2.5, y+2.5, 1, 1);
-                if(round&CORNER_BL)
-                    cairo_rectangle(cr, x+2.5, y+height-3.5, 1, 1);
-                if(round&CORNER_TR)
-                    cairo_rectangle(cr, x+width-2.5, y+2.5, 1, 1);
-                if(round&CORNER_BR)
-                    cairo_rectangle(cr, x+width-2.5, y+height-3.5, 1, 1);
-            }
-            cairo_set_line_width(cr, opts.round>ROUND_FULL && GTK_APP_OPEN_OFFICE!=qtSettings.app ? 2 : 1);
-            cairo_stroke(cr);
-            unsetCairoClipping(cr);
+            drawEntryCorners(cr, area, round, x, y, width, height, CAIRO_COL(parentBgCol), 1.0);
         }
 
+    if(FRAME_SUNKEN==opts.groupBox && isInGroupBox(widget, 0))
+        drawEntryCorners(cr, area, round, x, y, width, height, 0.0, 0.0, 0.0, 0.025);
+    
     if(doEtch)
         y++,  x++, height-=2,  width-=2;
 
@@ -6760,14 +6784,13 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
     CAIRO_BEGIN
 
     gboolean drawFrame=TRUE,
-             isGroupBox=FALSE;
+             isGroupBox=IS_GROUP_BOX(widget);
 
-    if(GTK_IS_FRAME(widget) && (NULL!=gtk_frame_get_label(GTK_FRAME(widget)) || NULL!=gtk_frame_get_label_widget(GTK_FRAME(widget))))
+    if(isGroupBox)
     {
         if(gap_x<5)
             gap_x+=5, gap_width+=2;
 
-        isGroupBox=TRUE;
         switch(opts.groupBox)
         {
             case FRAME_LINE:
