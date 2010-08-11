@@ -685,7 +685,7 @@ static void insertFrameEntries(QComboBox *combo)
     combo->insertItem(FRAME_NONE, i18n("No border"));
     combo->insertItem(FRAME_PLAIN, i18n("Standard frame border"));
     combo->insertItem(FRAME_LINE, i18n("Single separator line"));
-    combo->insertItem(FRAME_SUNKEN, i18n("Sunken with a darker background"));
+    combo->insertItem(FRAME_SHADED, i18n("Shaded background"));
 }
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
@@ -776,6 +776,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     menuDelay->setRange(MIN_MENU_DELAY, MAX_MENU_DELAY);
     menuDelay->setValue(DEFAULT_MENU_DELAY);
 
+    gbFactor->setRange(MIN_GB_FACTOR, MAX_GB_FACTOR);
+    gbFactor->setValue(DEF_GB_FACTOR);
+    
     bgndOpacity->setRange(0, 100, 10);
     bgndOpacity->setValue(100);
     dlgOpacity->setRange(0, 100, 10);
@@ -932,7 +935,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(reorderGtkButtons, SIGNAL(toggled(bool)), SLOT(reorderGtkButtonsChanged()));
     connect(mapKdeIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(passwordChar, SIGNAL(clicked()), SLOT(passwordCharClicked()));
-    connect(groupBox, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(groupBox, SIGNAL(currentIndexChanged(int)), SLOT(groupBoxChanged()));
+    connect(gbFactor, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(colorMenubarMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(useHighlightForMenu, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(boldGroupBox, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1397,7 +1401,13 @@ void QtCurveConfig::menuBgndAppearanceChanged()
     menuBgndGrad->setEnabled(APPEARANCE_STRIPED!=menuBgndAppearance->currentIndex());
     updateChanged();
 }
-    
+
+void QtCurveConfig::groupBoxChanged()
+{
+    gbFactor->setEnabled(FRAME_SHADED==groupBox->currentIndex());
+    updateChanged();
+}
+
 void QtCurveConfig::setupStack()
 {
     int i=0;
@@ -2497,6 +2507,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.mapKdeIcons=mapKdeIcons->isChecked();
     opts.passwordChar=toInt(passwordChar->text());
     opts.groupBox=(EFrame)groupBox->currentIndex();
+    opts.gbFactor=gbFactor->value();
     opts.customGradient=customGradient;
     opts.colorMenubarMouseOver=colorMenubarMouseOver->isChecked();
     opts.useHighlightForMenu=useHighlightForMenu->isChecked();
@@ -2769,6 +2780,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     mapKdeIcons->setChecked(opts.mapKdeIcons);
     setPasswordChar(opts.passwordChar);
     groupBox->setCurrentIndex(opts.groupBox);
+    gbFactor->setValue(opts.gbFactor);
     customGradient=opts.customGradient;
     gradCombo->setCurrentIndex(APPEARANCE_CUSTOM1);
     borderProgress->setChecked(opts.borderProgress);
@@ -3115,6 +3127,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          reorderGtkButtons->isChecked()!=opts.reorderGtkButtons ||
          mapKdeIcons->isChecked()!=opts.mapKdeIcons ||
          groupBox->currentIndex()!=opts.groupBox ||
+         (FRAME_SHADED==opts.groupBox && gbFactor->value()!=opts.gbFactor) ||
 
          toInt(passwordChar->text())!=opts.passwordChar ||
          highlightFactor->value()!=opts.highlightFactor ||

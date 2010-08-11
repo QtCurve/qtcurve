@@ -292,8 +292,8 @@ static EFrame toFrame(const char *str, EFrame def)
             return FRAME_PLAIN;
         if(0==memcmp(str, "line", 4))
             return FRAME_LINE;
-        if(0==memcmp(str, "sunken", 6))
-            return FRAME_SUNKEN;
+        if(0==memcmp(str, "shaded", 6))
+            return FRAME_SHADED;
     }
 
     return def;
@@ -1180,9 +1180,6 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
 
 #endif
 
-#define CFG_READ_NUM(ENTRY) \
-    opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
-
 #define CFG_READ_BOOL(ENTRY) \
     opts->ENTRY=readBoolEntry(cfg, #ENTRY, def->ENTRY);
 
@@ -1591,7 +1588,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     memcpy(opts->customShades, def->customShades, sizeof(double)*NUM_STD_SHADES);
             }
 
-            CFG_READ_NUM(passwordChar)
+            CFG_READ_INT(gbFactor)
+            CFG_READ_INT(passwordChar)
             CFG_READ_ROUND(round)
             CFG_READ_INT(highlightFactor)
             CFG_READ_INT(menuDelay)
@@ -2081,6 +2079,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->animatedProgress && !opts->stripedProgress)
                 opts->animatedProgress=false;
 
+            if(0==opts->gbFactor)
+                opts->groupBox=FRAME_PLAIN;
+
+            if(opts->gbFactor<MIN_GB_FACTOR || opts->gbFactor>MAX_GB_FACTOR)
+                opts->gbFactor=DEF_GB_FACTOR;
+
 #if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
             opts->crSize=CR_SMALL_SIZE;
             if(SLIDER_CIRCULAR==opts->sliderStyle)
@@ -2263,6 +2267,7 @@ static void defaultSettings(Options *opts)
     opts->customAlphas[0]=0;
     opts->contrast=7;
     opts->passwordChar=0x25CF;
+    opts->gbFactor=0;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
     opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
     opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
@@ -2378,7 +2383,8 @@ static void defaultSettings(Options *opts)
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
     opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
-    opts->groupBox=FRAME_SUNKEN;
+    opts->groupBox=FRAME_SHADED;
+    opts->gbFactor=DEF_GB_FACTOR;
     opts->boldGroupBox=false;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
@@ -2658,8 +2664,8 @@ static const char *toStr(EFrame sb)
         case FRAME_LINE:
             return "line";
         default:
-        case FRAME_SUNKEN:
-            return "sunken";
+        case FRAME_SHADED:
+            return "shaded";
     }
 }
 
@@ -2985,6 +2991,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
 #endif
         CFG.writeEntry(VERSION_KEY, VERSION);
         CFG_WRITE_ENTRY_NUM(passwordChar)
+        CFG_WRITE_ENTRY_NUM(gbFactor)
         CFG_WRITE_ENTRY(round)
         CFG_WRITE_ENTRY_NUM(highlightFactor)
         CFG_WRITE_ENTRY_NUM(menuDelay)

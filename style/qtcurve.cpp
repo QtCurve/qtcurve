@@ -3692,12 +3692,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[STD_BORDER], reverse, !reverse, true);
                 else
                 {
-                    if(FRAME_SUNKEN==opts.groupBox)
+                    if(FRAME_SHADED==opts.groupBox)
                     {
-                        QColor col(Qt::black);
+                        QColor col(opts.gbFactor<0 ? Qt::black : Qt::white);
                         int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
 
-                        col.setAlphaF(0.025);
+                        col.setAlphaF(TO_ALPHA(opts.gbFactor));
                         painter->save();
                         painter->setClipping(false);
                         painter->fillPath(buildPath(r, WIDGET_FRAME, round,
@@ -3707,7 +3707,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                           col);
                         painter->restore();
                         drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_FRAME,
-                                   state&State_Raised ? BORDER_RAISED : BORDER_SUNKEN);
+                                   /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
                     }
                     else
                     {

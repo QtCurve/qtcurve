@@ -259,7 +259,11 @@ enum
 #define MIN_LIGHTER_POPUP_MENU                  -100
 #define MAX_LIGHTER_POPUP_MENU                   100
 
-#define TO_ALPHA(A) (((double)(A))/100.0)
+#define MIN_GB_FACTOR -50
+#define MAX_GB_FACTOR  50
+#define DEF_GB_FACTOR  -3
+
+#define TO_ALPHA(A) (((double)((A)<0 ? -(A) : (A)))/100.0)
 #define DEF_COLOR_SEL_TAB_FACTOR  25
 #define MIN_COLOR_SEL_TAB_FACTOR   0
 #define MAX_COLOR_SEL_TAB_FACTOR 100
@@ -790,7 +794,7 @@ typedef enum
     FRAME_NONE,
     FRAME_PLAIN,
     FRAME_LINE,
-    FRAME_SUNKEN
+    FRAME_SHADED
 } EFrame;
 
 #define NO_FRAME(A) (FRAME_NONE==(A) || FRAME_LINE==(A))
@@ -998,7 +1002,8 @@ typedef struct
                      expanderHighlight,
                      crHighlight,
                      splitterHighlight,
-                     crSize;
+                     crSize,
+                     gbFactor;
     ERound           round;
     bool             embolden,
                      highlightTab,

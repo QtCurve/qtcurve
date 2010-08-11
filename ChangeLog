@@ -18,7 +18,7 @@
 14. Add option to use slight rounding for window decorations - set in style
     config as option also affects MDI windows.
 15. Draw tooltips using the selection gradient.
-16. Added option to draw sunken group boxes.
+16. Added option to draw shaded group boxes.
 
 1.5.2
 -----
