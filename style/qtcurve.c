@@ -3156,11 +3156,17 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     else if(DETAIL("tooltip"))
     {
         drawBevelGradient(cr, style, area, NULL, x, y, width, height, &qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP],
-                          true, FALSE, opts.selectionAppearance, WIDGET_SELECTION);
-        cairo_new_path(cr);
-        cairo_set_source_rgba(cr, 0, 0, 0, 0.25);
-        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-        cairo_stroke(cr);
+                          true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
+        if(IS_FLAT(opts.tooltipAppearance) || !compositingActive(widget))
+        {
+            cairo_new_path(cr);
+            if(IS_FLAT(opts.tooltipAppearance))
+                cairo_set_source_rgb(cr, CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
+            else
+                cairo_set_source_rgba(cr, 0, 0, 0, 0.25);
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            cairo_stroke(cr);
+        }
     }
     else if(DETAIL("icon_view_item"))
         drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);

@@ -16,7 +16,7 @@
      - always use plain slider style
      - dont depress sliders
      - slightly improve tabs
- 9. Draw tooltips using the selection gradient.
+ 9. Added option to sepcify tooltip background appearance.
 10. Added option to draw shaded group boxes.
 
 1.5.2
