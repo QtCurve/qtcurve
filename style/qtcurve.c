@@ -2552,8 +2552,11 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
             drawEntryCorners(cr, area, round, x, y, width, height, CAIRO_COL(parentBgCol), 1.0);
         }
 
-    if(FRAME_SUNKEN==opts.groupBox && isInGroupBox(widget, 0))
-        drawEntryCorners(cr, area, round, x, y, width, height, 0.0, 0.0, 0.0, 0.025);
+    if(FRAME_SHADED==opts.groupBox && isInGroupBox(widget, 0))
+    {
+        double col=opts.gbFactor<0 ? 0.0 : 1.0;
+        drawEntryCorners(cr, area, round, x, y, width, height, col, col, col, TO_ALPHA(opts.gbFactor));
+    }
     
     if(doEtch)
         y++,  x++, height-=2,  width-=2;
@@ -6803,9 +6806,10 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
             case FRAME_NONE:
                 drawFrame=FALSE;
                 return;
-            case FRAME_SUNKEN:
+            case FRAME_SHADED:
             {
-                int round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                double col=opts.gbFactor<0 ? 0.0 : 1.0;
 
                 cairo_save(cr);
                 cairo_new_path(cr);
@@ -6815,7 +6819,7 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                            round);
                 cairo_clip(cr);
                 cairo_rectangle(cr, x, y, width, height);
-                cairo_set_source_rgba(cr, 0, 0, 0, 0.025);
+                cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
                 cairo_fill(cr);
                 cairo_restore(cr);
                 break;
@@ -6827,8 +6831,11 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
     if(drawFrame)
         drawBoxGap(cr, style, window, shadow_type, state, widget, area, x, y,
                    width, height, gap_side, gap_x, gap_width,
-                   isGroupBox && GTK_SHADOW_NONE==shadow_type && FRAME_SUNKEN==opts.groupBox
-                        ? BORDER_SUNKEN : shadowToBorder(shadow_type),
+                   isGroupBox && FRAME_SHADED==opts.groupBox
+                    ? /*opts.gbFactor<0
+                        ?*/ BORDER_SUNKEN
+                        /*: BORDER_RAISED*/
+                    : shadowToBorder(shadow_type),
                    FALSE);
     CAIRO_END
 }

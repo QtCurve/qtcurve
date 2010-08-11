@@ -17,7 +17,7 @@
      - dont depress sliders
      - slightly improve tabs
  9. Draw tooltips using the selection gradient.
-10. Added option to draw sunken group boxes.
+10. Added option to draw shaded group boxes.
 
 1.5.2
 -----
