@@ -779,11 +779,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     gbFactor->setRange(MIN_GB_FACTOR, MAX_GB_FACTOR);
     gbFactor->setValue(DEF_GB_FACTOR);
     
-    bgndOpacity->setRange(0, 100, 10);
+    bgndOpacity->setRange(0, 100, 5);
     bgndOpacity->setValue(100);
-    dlgOpacity->setRange(0, 100, 10);
+    dlgOpacity->setRange(0, 100, 5);
     dlgOpacity->setValue(100);
-    menuBgndOpacity->setRange(0, 100, 10);
+    menuBgndOpacity->setRange(0, 100, 5);
     menuBgndOpacity->setValue(100);
 
     sliderWidth->setRange(MIN_SLIDER_WIDTH, MAX_SLIDER_WIDTH, 2);
