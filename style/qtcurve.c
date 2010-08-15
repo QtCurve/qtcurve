@@ -6813,23 +6813,24 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                 drawFrame=FALSE;
                 return;
             case FRAME_SHADED:
-            {
-                int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
-                double col=opts.gbFactor<0 ? 0.0 : 1.0;
+                if(GTK_SHADOW_NONE!=shadow_type)
+                {
+                    int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                    double col=opts.gbFactor<0 ? 0.0 : 1.0;
 
-                cairo_save(cr);
-                cairo_new_path(cr);
-                createPath(cr, x, y, width, height, ROUNDED_ALL==round
-                                    ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL)
-                                    : 0.0,
-                           round);
-                cairo_clip(cr);
-                cairo_rectangle(cr, x, y, width, height);
-                cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
-                cairo_fill(cr);
-                cairo_restore(cr);
+                    cairo_save(cr);
+                    cairo_new_path(cr);
+                    createPath(cr, x, y, width, height, ROUNDED_ALL==round
+                                        ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL)
+                                        : 0.0,
+                            round);
+                    cairo_clip(cr);
+                    cairo_rectangle(cr, x, y, width, height);
+                    cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
+                    cairo_fill(cr);
+                    cairo_restore(cr);
+                }
                 break;
-            }
             default:
                 break;
         }
@@ -6837,7 +6838,7 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
     if(drawFrame)
         drawBoxGap(cr, style, window, shadow_type, state, widget, area, x, y,
                    width, height, gap_side, gap_x, gap_width,
-                   isGroupBox && FRAME_SHADED==opts.groupBox
+                   isGroupBox && FRAME_SHADED==opts.groupBox && GTK_SHADOW_NONE!=shadow_type
                     ? /*opts.gbFactor<0
                         ?*/ BORDER_SUNKEN
                         /*: BORDER_RAISED*/
