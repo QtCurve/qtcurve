@@ -5239,7 +5239,7 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gap_side
     if(gap_width>0)
     {
         GdkRectangle gapRect;
-        int          adjust=gap_x>1 ? 1 : 2;
+        int          adjust=isTab ? (gap_x>1 ? 1 : 2) : 0;
 
         switch(gap_side)
         {
