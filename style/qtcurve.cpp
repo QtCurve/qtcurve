@@ -4769,7 +4769,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             painter->save();
 
             if(const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
-                if((opts.round || (CUSTOM_BGND && 0==opts.tabBgnd)) &&
+                if((opts.round || (/*CUSTOM_BGND && */0==opts.tabBgnd)) &&
                     widget && ::qobject_cast<const QTabWidget *>(widget))
                 {
                     struct QtcTabWidget : public QTabWidget
@@ -4782,7 +4782,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                     if(tw->count()>0 && ((const QtcTabWidget *)widget)->tabsVisible())
                     {
-                        if(!reverse && CUSTOM_BGND && 0==opts.tabBgnd) // Does not work for reverse :-(
+                        if(!reverse && /*CUSTOM_BGND && */0==opts.tabBgnd) // Does not work for reverse :-(
                         {
                             QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
 
@@ -10256,7 +10256,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             else
             {
                 col=base;
-                if((sel && CUSTOM_BGND && 0==opts.tabBgnd) || dwt)
+                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd) || dwt)
                     col.setAlphaF(0.0);
             }
         }
