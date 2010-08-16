@@ -3747,6 +3747,11 @@
                <string>Value (%)</string>
               </property>
              </column>
+             <column>
+              <property name="text">
+               <string>Alpha (%)</string>
+              </property>
+             </column>
             </widget>
            </item>
            <item row="2" column="0">
@@ -3803,6 +3808,13 @@
                   </property>
                  </widget>
                 </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_6alpha">
+                  <property name="text">
+                   <string>Alpha:</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="0" column="1">
                  <widget class="KIntNumInput" name="stopPosition">
                   <property name="sizePolicy">
@@ -3835,6 +3847,25 @@
                   </property>
                   <property name="maximum">
                    <number>200</number>
+                  </property>
+                  <property name="suffix">
+                   <string>%</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="KIntNumInput" name="stopAlpha">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="whatsThis">
+                   <string>Sets the alpha value of the gradient at the defined position.</string>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
                   </property>
                   <property name="suffix">
                    <string>%</string>

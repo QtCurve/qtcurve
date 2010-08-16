@@ -10262,6 +10262,8 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
         }
         else
             shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
+        if((*it).alpha<1.0)
+            col.setAlphaF(col.alphaF()*(*it).alpha);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     

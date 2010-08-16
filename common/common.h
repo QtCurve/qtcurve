@@ -896,22 +896,22 @@ typedef struct
 #endif
 {
 #ifdef __cplusplus
-    GradientStop(double p=0.0, double v=0.0) : pos(p), val(v) { }
+    GradientStop(double p=0.0, double v=0.0, double a=1.0) : pos(p), val(v), alpha(a) { }
 
     bool operator==(const GradientStop &o) const
     {
-        return equal(pos, o.pos) && equal(val, o.val);
+        return equal(pos, o.pos) && equal(val, o.val) && equal(alpha, o.alpha);
     }
 
     bool operator<(const GradientStop &o) const
     {
-        return pos<o.pos || (equal(pos, o.pos) && val<o.val);
+        return pos<o.pos || (equal(pos, o.pos) && (val<o.val || (equal(val, o.val) && alpha<o.alpha)));
     }
 #endif
 
     double pos,
-           val;
-
+           val,
+           alpha;
 }
 #ifndef __cplusplus
 GradientStop
@@ -1575,7 +1575,7 @@ static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, 
     grad->border=border;
 #ifndef __cplusplus
     grad->numStops=numStops;
-    grad->stops=malloc(sizeof(GradientStop) * numStops*2);
+    grad->stops=malloc(sizeof(GradientStop) * numStops);
 #endif
     va_start(ap, numStops);
     for(i=0; i<numStops; ++i)
@@ -1587,6 +1587,7 @@ static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, 
 #else
         grad->stops[i].pos=pos;
         grad->stops[i].val=val;
+        grad->stops[i].alpha=1.0;
 #endif
     }
     va_end(ap);
