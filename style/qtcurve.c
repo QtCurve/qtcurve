@@ -1276,7 +1276,7 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             }
 
             cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
-                                              CAIRO_COL(col), alpha);
+                                              CAIRO_COL(col), alpha*grad->stops[i].alpha);
         }
 
         if(APPEARANCE_AGUA==app && !(topTab || botTab) && (horiz ? height : width)>AGUA_MAX)
@@ -1284,8 +1284,8 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             GdkColor col;
             double pos=AGUA_MAX/((horiz ? height : width)*2.0);
             shade(&opts, base, &col, AGUA_MID_SHADE);
-            cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha);
-            cairo_pattern_add_color_stop_rgba(pt, 1.0-pos, CAIRO_COL(col), alpha);
+            cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha*grad->stops[i].alpha);
+            cairo_pattern_add_color_stop_rgba(pt, 1.0-pos, CAIRO_COL(col), alpha*grad->stops[i].alpha);
         }
 
         cairo_set_source(cr, pt);
