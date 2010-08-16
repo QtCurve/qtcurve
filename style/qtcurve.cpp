@@ -3435,10 +3435,10 @@ int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizeP
 void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
                                  const QWidget *widget) const
 {
-    QRect               r(option->rect);
-    const QFlags<State> &state(option->state);
-    const QPalette      &palette(option->palette);
-    bool                reverse(Qt::RightToLeft==option->direction);
+    QRect          r(option->rect);
+    QFlags<State>  state(option->state);
+    const QPalette &palette(option->palette);
+    bool           reverse(Qt::RightToLeft==option->direction);
 
     switch ((int)element)
     {
@@ -3575,6 +3575,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowLeft:
         case PE_IndicatorArrowRight:
+            if(State_None==state)
+                state|=State_Enabled;
             if((QStyle::State_Enabled|QtC_StateKWin)==state)
                 drawArrow(painter, r, element, Qt::color1, false, true);
             else
