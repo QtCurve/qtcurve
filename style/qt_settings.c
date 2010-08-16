@@ -2543,7 +2543,7 @@ static gboolean qtInit()
                 static const char *constBoldSuffix="\"} class \"GtkProgress\" style \""RC_SETTING"BFnt\" "
                                                    "widget_class \"*GtkProgress*\" style \""RC_SETTING"BFnt\" ";
 
-                if(opts.boldGroupBox)
+                if(opts.gbLabel&GB_LBL_BOLD)
                 {
                     static const char *constStdPrefix="style \""RC_SETTING"Fnt\"{font_name=\"";
                     static const char *constStdSuffix="\"} ";

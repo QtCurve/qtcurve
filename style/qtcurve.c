@@ -5817,6 +5817,8 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             int diff=widget->allocation.x-widget->parent->allocation.x;
             if(NO_FRAME(opts.groupBox))
                 x-=MAX(0, MIN(diff, 6));
+            else if(opts.gbLabel&GB_LBL_OUTSIDE)
+                x-=MAX(0, MIN(diff, 2));
             else
                 x+=5;
             if(area)
@@ -5824,6 +5826,8 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                 area2=*area;
                 if(NO_FRAME(opts.groupBox))
                     area2.x-=MAX(0, MIN(diff, 6));
+                else if(opts.gbLabel&GB_LBL_OUTSIDE)
+                    area2.x-=MAX(0, MIN(diff, 2));
                 else
                     area2.x+=5;
                 area=&area2;
@@ -6819,6 +6823,21 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                 return;
             case FRAME_SHADED:
             case FRAME_FADED:
+                if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE) && widget && GTK_IS_FRAME(widget))
+                {
+                    GtkFrame       *frame=GTK_FRAME(widget);
+                    GtkRequisition child_requisition;
+                    gint           height_extra;
+
+                    gtk_widget_get_child_requisition (frame->label_widget, &child_requisition);
+                    height_extra = (MAX(0, child_requisition.height - widget->style->ythickness)
+                                    - frame->label_yalign * child_requisition.height) + 2;
+
+                    if(opts.gbLabel&GB_LBL_INSIDE)
+                        y-=height_extra, height+=height_extra, gap_width=0;
+                    else if(opts.gbLabel&GB_LBL_OUTSIDE)
+                        y+=height_extra, height-=height_extra, gap_width=0;
+                }
                 if(GTK_SHADOW_NONE!=shadow_type)
                 {
                     int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
