@@ -294,6 +294,8 @@ static EFrame toFrame(const char *str, EFrame def)
             return FRAME_LINE;
         if(0==memcmp(str, "shaded", 6))
             return FRAME_SHADED;
+        if(0==memcmp(str, "faded", 5))
+            return FRAME_FADED;
     }
 
     return def;
@@ -2392,7 +2394,7 @@ static void defaultSettings(Options *opts)
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
     opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
-    opts->groupBox=FRAME_SHADED;
+    opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
     opts->boldGroupBox=false;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
@@ -2672,9 +2674,11 @@ static const char *toStr(EFrame sb)
             return "plain";
         case FRAME_LINE:
             return "line";
-        default:
         case FRAME_SHADED:
             return "shaded";
+        case FRAME_FADED:
+        default:
+            return "faded";
     }
 }
 

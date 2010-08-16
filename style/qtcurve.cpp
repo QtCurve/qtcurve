@@ -3694,22 +3694,47 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[STD_BORDER], reverse, !reverse, true);
                 else
                 {
-                    if(FRAME_SHADED==opts.groupBox)
+                    if(FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
                     {
-                        QColor col(opts.gbFactor<0 ? Qt::black : Qt::white);
-                        int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                        QColor          col(opts.gbFactor<0 ? Qt::black : Qt::white);
+                        int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                        QPainterPath    path(buildPath(r, WIDGET_FRAME, round,
+                                                       ROUNDED_ALL==round
+                                                           ? getRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
+                                                           : 0.0));
+                        QLinearGradient grad(r.topLeft(), r.bottomLeft());
 
                         col.setAlphaF(TO_ALPHA(opts.gbFactor));
+
                         painter->save();
                         painter->setClipping(false);
-                        painter->fillPath(buildPath(r, WIDGET_FRAME, round,
-                                                    ROUNDED_ALL==round
-                                                        ? getRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
-                                                        : 0.0),
-                                          col);
+                        if(FRAME_SHADED==opts.groupBox)
+                            painter->fillPath(path, col);
+                        else
+                        {
+                            grad.setColorAt(0, col);
+                            col.setAlphaF(0.0);
+                            grad.setColorAt(1, col);
+                            painter->fillPath(path, grad);
+                        }
+
                         painter->restore();
-                        drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_FRAME,
-                                   /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
+                        if(FRAME_SHADED==opts.groupBox)
+                            drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_FRAME,
+                                        /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
+                        else
+                        {
+                            const QColor *cols=backgroundColors(option);
+                            col=cols[STD_BORDER];
+                            grad.setColorAt(0, col);
+                            col.setAlphaF(0.0);
+                            grad.setColorAt(1, col);
+                            painter->save();
+                            painter->setRenderHint(QPainter::Antialiasing, true);
+                            painter->setPen(QPen(QBrush(grad), 1));
+                            painter->drawPath(path);
+                            painter->restore();
+                        }
                     }
                     else
                     {

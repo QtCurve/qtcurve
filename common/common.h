@@ -786,7 +786,8 @@ typedef enum
     FRAME_NONE,
     FRAME_PLAIN,
     FRAME_LINE,
-    FRAME_SHADED
+    FRAME_SHADED,
+    FRAME_FADED
 } EFrame;
 
 #define NO_FRAME(A) (FRAME_NONE==(A) || FRAME_LINE==(A))

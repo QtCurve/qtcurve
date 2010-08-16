@@ -686,6 +686,7 @@ static void insertFrameEntries(QComboBox *combo)
     combo->insertItem(FRAME_PLAIN, i18n("Standard frame border"));
     combo->insertItem(FRAME_LINE, i18n("Single separator line"));
     combo->insertItem(FRAME_SHADED, i18n("Shaded background"));
+    combo->insertItem(FRAME_FADED, i18n("Faded background"));
 }
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
@@ -1406,7 +1407,7 @@ void QtCurveConfig::menuBgndAppearanceChanged()
 
 void QtCurveConfig::groupBoxChanged()
 {
-    gbFactor->setEnabled(FRAME_SHADED==groupBox->currentIndex());
+    gbFactor->setEnabled(FRAME_SHADED==groupBox->currentIndex() || FRAME_FADED==groupBox->currentIndex());
     updateChanged();
 }
 
