@@ -10256,7 +10256,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             else
             {
                 col=base;
-                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd) || dwt)
+                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd && Qt::RightToLeft!=QApplication::layoutDirection()) || dwt)
                     col.setAlphaF(0.0);
             }
         }
