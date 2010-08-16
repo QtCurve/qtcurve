@@ -1463,6 +1463,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 opts->groupBox=framelessGroupBoxes ? (groupBoxLine ? FRAME_LINE : FRAME_NONE) : FRAME_PLAIN;
                 opts->gbLabel=framelessGroupBoxes ? GB_LBL_BOLD : 0;
                 def->focus=FOCUS_LINE;
+                def->crHighlight=3;
             }
             else
             {
