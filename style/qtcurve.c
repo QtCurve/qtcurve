@@ -2552,7 +2552,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
             drawEntryCorners(cr, area, round, x, y, width, height, CAIRO_COL(parentBgCol), 1.0);
         }
 
-    if(FRAME_SHADED==opts.groupBox && isInGroupBox(widget, 0))
+    if((FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox) && isInGroupBox(widget, 0))
     {
         double col=opts.gbFactor<0 ? 0.0 : 1.0;
         drawEntryCorners(cr, area, round, x, y, width, height, col, col, col, TO_ALPHA(opts.gbFactor));
@@ -5233,6 +5233,43 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
     CAIRO_END
 }
 
+static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gap_side, int gap_x, int gap_width, int x, int y, int width,
+                       int height, gboolean isTab)
+{
+    if(gap_width>0)
+    {
+        GdkRectangle gapRect;
+        int          adjust=gap_x>1 ? 1 : 2;
+
+        switch(gap_side)
+        {
+            case GTK_POS_TOP:
+                gapRect.x=x+gap_x+adjust, gapRect.y=y, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
+                if(GTK_APP_JAVA==qtSettings.app && isTab)
+                    gapRect.width-=3;
+                break;
+            case GTK_POS_BOTTOM:
+                gapRect.x=x+gap_x+adjust, gapRect.y=y+height-2, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
+                break;
+            case GTK_POS_LEFT:
+                gapRect.x=x, gapRect.y=y+gap_x+adjust, gapRect.width=2, gapRect.height=gap_width-(2*adjust);
+                break;
+            case GTK_POS_RIGHT:
+                gapRect.x=x+width-2, gapRect.y=y+gap_x+adjust, gapRect.width=2, gapRect.height=gap_width-(2*adjust);
+                break;
+        }
+
+        GdkRectangle r={x, y, width, height};
+        GdkRegion    *region=gdk_region_rectangle(area ? area : &r),
+                        *inner=gdk_region_rectangle(&gapRect);
+
+        gdk_region_xor(region, inner);
+        setCairoClipping(cr, NULL, region);
+        gdk_region_destroy(inner);
+        gdk_region_destroy(region);
+    }
+}
+
 static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShadowType shadow_type,
                        GtkStateType state, GtkWidget *widget, GdkRectangle *area, gint x, gint y,
                        gint width, gint height, GtkPositionType gap_side, gint gap_x,
@@ -5282,39 +5319,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GdkWindow *window, GtkShado
                     break;
             }
 
-        if(gap_width>0)
-        {
-            GdkRectangle gapRect;
-            int          adjust=gap_x>1 ? 1 : 2;
-
-            switch(gap_side)
-            {
-                case GTK_POS_TOP:
-                    gapRect.x=x+gap_x+adjust, gapRect.y=y, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
-                    if(GTK_APP_JAVA==qtSettings.app && isTab)
-                        gapRect.width-=3;
-                    break;
-                case GTK_POS_BOTTOM:
-                    gapRect.x=x+gap_x+adjust, gapRect.y=y+height-2, gapRect.width=gap_width-(2*adjust), gapRect.height=2;
-                    break;
-                case GTK_POS_LEFT:
-                    gapRect.x=x, gapRect.y=y+gap_x+adjust, gapRect.width=2, gapRect.height=gap_width-(2*adjust);
-                    break;
-                case GTK_POS_RIGHT:
-                    gapRect.x=x+width-2, gapRect.y=y+gap_x+adjust, gapRect.width=2, gapRect.height=gap_width-(2*adjust);
-                    break;
-            }
-
-            GdkRectangle r={x, y, width, height};
-            GdkRegion    *region=gdk_region_rectangle(area ? area : &r),
-                         *inner=gdk_region_rectangle(&gapRect);
-
-            gdk_region_xor(region, inner);
-            setCairoClipping(cr, NULL, region);
-            gdk_region_destroy(inner);
-            gdk_region_destroy(region);
-        }
-    
+        setGapClip(cr, area, gap_side, gap_x, gap_width, x, y, width, height, isTab);
         drawBorder(cr, widget && widget->parent ? widget->parent->style : style, state,
                    area, NULL, x, y, width, height, NULL, round,
                    borderProfile, isTab ? WIDGET_TAB_FRAME : WIDGET_FRAME, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
@@ -6813,22 +6818,46 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                 drawFrame=FALSE;
                 return;
             case FRAME_SHADED:
+            case FRAME_FADED:
                 if(GTK_SHADOW_NONE!=shadow_type)
                 {
-                    int    round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
-                    double col=opts.gbFactor<0 ? 0.0 : 1.0;
+                    int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                    double          col=opts.gbFactor<0 ? 0.0 : 1.0,
+                                    radius=ROUNDED_ALL==round ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL) : 0.0;
+                    cairo_pattern_t *pt=NULL;
 
                     cairo_save(cr);
                     cairo_new_path(cr);
-                    createPath(cr, x, y, width, height, ROUNDED_ALL==round
-                                        ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL)
-                                        : 0.0,
-                            round);
+                    createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
                     cairo_clip(cr);
                     cairo_rectangle(cr, x, y, width, height);
-                    cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
+                    if(FRAME_SHADED==opts.groupBox)
+                        cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
+                    else
+                    {
+                        pt=cairo_pattern_create_linear(x, y, x, y+height-1);
+                        cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
+                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+                        cairo_set_source(cr, pt);
+                    }
                     cairo_fill(cr);
                     cairo_restore(cr);
+
+                    if(pt)
+                        cairo_pattern_destroy(pt);
+
+                    if(FRAME_FADED==opts.groupBox)
+                    {
+                        pt=cairo_pattern_create_linear(x, y, x, y+height-1);
+                        cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0);
+                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+                        setGapClip(cr, area, gap_side, gap_x, gap_width, x, y, width, height, FALSE);
+                        cairo_set_source(cr, pt);
+                        createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
+                        cairo_stroke(cr);
+                        cairo_pattern_destroy(pt);
+                        drawFrame=false;
+                    }
                 }
                 break;
             default:
