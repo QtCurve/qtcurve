@@ -3057,6 +3057,12 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_Menu_MouseTracking:
         case SH_UnderlineShortcut:
             return true;
+        case SH_GroupBox_TextLabelVerticalAlignment:
+            return opts.gbLabel&GB_LBL_INSIDE
+                    ? Qt::AlignBottom
+                    : opts.gbLabel&GB_LBL_OUTSIDE
+                        ? Qt::AlignTop
+                        : Qt::AlignVCenter;
         case SH_MessageBox_CenterButtons:
         case SH_ProgressDialog_CenterCancelButton:
         case SH_DitherDisabledText:
@@ -3691,9 +3697,13 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 QStyleOptionFrameV2 frameV2(*frame);
                 if (frameV2.features & QStyleOptionFrameV2::Flat || FRAME_LINE==opts.groupBox)
-                    drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[STD_BORDER], reverse, !reverse, true);
+                    drawFadedLine(painter, QRect(r.x(), r.y(), r.width(), 1), backgroundColors(option)[STD_BORDER],
+                                  opts.gbLabel&GB_LBL_CENTRED || reverse, opts.gbLabel&GB_LBL_CENTRED || !reverse, true);
                 else
                 {
+                    if(opts.gbLabel&GB_LBL_OUTSIDE)
+                        r.adjust(0, 2, 0, 0);
+                        
                     if(FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
                     {
                         QColor          col(opts.gbFactor<0 ? Qt::black : Qt::white);
@@ -3718,7 +3728,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->fillPath(path, grad);
                         }
 
-                        painter->restore();
+                        if(!(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
+                            painter->restore();
+
                         if(FRAME_SHADED==opts.groupBox)
                             drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_FRAME,
                                         /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
@@ -3729,16 +3741,17 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             grad.setColorAt(0, col);
                             col.setAlphaF(0.0);
                             grad.setColorAt(1, col);
-                            painter->save();
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->setPen(QPen(QBrush(grad), 1));
                             painter->drawPath(path);
-                            painter->restore();
                         }
+                       if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE))
+                            painter->restore();
                     }
                     else
                     {
                         frameV2.state &= ~(State_Sunken | State_HasFocus);
+                        frameV2.rect=r;
                         drawPrimitive(PE_Frame, &frameV2, painter, widget);
                     }
                 }
@@ -7615,7 +7628,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             break;
         case CC_GroupBox:
-            if(opts.boldGroupBox)
+            if(opts.gbLabel&GB_LBL_BOLD)
             {
                 QFont font(painter->font());
 
@@ -7625,7 +7638,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             BASE_STYLE::drawComplexControl(control, option, painter, widget);
 
-            if(opts.boldGroupBox)
+            if(opts.gbLabel&GB_LBL_BOLD)
                 painter->restore();
             break;
         case CC_Q3ListView:
@@ -9664,25 +9677,40 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
             }
             break;
         case CC_GroupBox:
-            if(NO_FRAME(opts.groupBox) && (SC_GroupBoxCheckBox==subControl || SC_GroupBoxLabel==subControl))
+            if(SC_GroupBoxCheckBox==subControl || SC_GroupBoxLabel==subControl)
                 if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
                 {
                     QFont font(widget ? widget->font() : QApplication::font());
 
-                    font.setBold(opts.boldGroupBox);
+                    font.setBold(opts.gbLabel&GB_LBL_BOLD);
 
                     QFontMetrics fontMetrics(font);
                     int          h(fontMetrics.height()),
                                  tw(fontMetrics.size(Qt::TextShowMnemonic, groupBox->text + QLatin1Char(' ')).width()),
+                                 marg((groupBox->features & QStyleOptionFrameV2::Flat) ||
+                                       NO_FRAME(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE
+                                            ? 0
+                                            : opts.gbLabel&GB_LBL_INSIDE
+                                                ? 2
+                                                : 6),
                                  indicatorWidth(pixelMetric(PM_IndicatorWidth, option, widget)),
                                  indicatorSpace(pixelMetric(PM_CheckBoxLabelSpacing, option, widget) - 1);
                     bool         hasCheckBox(groupBox->subControls & QStyle::SC_GroupBoxCheckBox);
                     int          checkBoxSize(hasCheckBox ? (indicatorWidth + indicatorSpace) : 0);
 
+                    r.adjust(marg, 0, -marg, 0);
+                    if(!NO_FRAME(opts.groupBox) && opts.gbLabel&GB_LBL_INSIDE)
+                        r.adjust(0, 2, 0, 2);
                     r.setHeight(h);
 
                     // Adjusted rect for label + indicatorWidth + indicatorSpace
-                    r=alignedRect(groupBox->direction, groupBox->textAlignment, QSize(tw + checkBoxSize, h), r);
+                    Qt::Alignment align(groupBox->textAlignment);
+                    if(opts.gbLabel&GB_LBL_CENTRED)
+                    {
+                        align&=~(Qt::AlignLeft|Qt::AlignRight);
+                        align|=Qt::AlignHCenter;
+                    }
+                    r=alignedRect(groupBox->direction, align, QSize(tw + checkBoxSize, h), r);
 
                     // Adjust totalRect if checkbox is set
                     if (hasCheckBox)
@@ -9914,7 +9942,7 @@ void Style::drawHighlight(QPainter *p, const QRect &r, bool horiz, bool inc) con
 }
 
 void Style::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool fadeStart, bool fadeEnd, bool horiz,
-                                 double fadeSizeStart, double fadeSizeEnd) const
+                          double fadeSizeStart, double fadeSizeEnd) const
 {
     bool            aa(p->testRenderHint(QPainter::Antialiasing));
     QPointF         start(r.x()+(aa ? 0.5 : 0.0), r.y()+(aa ? 0.5 : 0.0)),

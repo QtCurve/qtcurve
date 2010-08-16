@@ -1460,13 +1460,13 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 bool framelessGroupBoxes=readBoolEntry(cfg, "framelessGroupBoxes", true),
                      groupBoxLine=readBoolEntry(cfg, "groupBoxLine", true);
                 opts->groupBox=framelessGroupBoxes ? (groupBoxLine ? FRAME_LINE : FRAME_NONE) : FRAME_PLAIN;
-                opts->boldGroupBox=framelessGroupBoxes;
+                opts->gbLabel=framelessGroupBoxes ? GB_LBL_BOLD : 0;
                 def->focus=FOCUS_LINE;
             }
             else
             {
                 CFG_READ_FRAME(groupBox)
-                CFG_READ_BOOL(boldGroupBox)
+                CFG_READ_INT(gbLabel)
             }
 
             if(version<MAKE_VERSION(1, 5))
@@ -1573,9 +1573,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->handles=LINE_DOTS;
                 def->lighterPopupMenuBgnd=15;
                 def->activeTabAppearance=APPEARANCE_GRADIENT;
-                def->boldGroupBox=true;
+                def->gbLabel=GB_LBL_BOLD;
                 def->groupBox=FRAME_NONE;
-                def->boldGroupBox=true;
                 def->shadeSliders=SHADE_BLEND_SELECTED;
                 def->progressGrooveColor=ECOLOR_BASE;
                 def->shadeMenubars=SHADE_DARKEN;
@@ -2396,7 +2395,7 @@ static void defaultSettings(Options *opts)
     opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
     opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
-    opts->boldGroupBox=false;
+    opts->gbLabel=0;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
@@ -3077,7 +3076,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(vArrows)
         CFG_WRITE_ENTRY(xCheck)
         CFG_WRITE_ENTRY(groupBox)
-        CFG_WRITE_ENTRY(boldGroupBox)
+        CFG_WRITE_ENTRY_NUM(gbLabel)
         CFG_WRITE_ENTRY(fadeLines)
         CFG_WRITE_ENTRY(glowProgress)
         CFG_WRITE_IMAGE_ENTRY(bgndImage)

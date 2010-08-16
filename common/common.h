@@ -790,6 +790,14 @@ typedef enum
     FRAME_FADED
 } EFrame;
 
+typedef enum
+{
+    GB_LBL_BOLD     = 0x01,
+    GB_LBL_CENTRED  = 0x02,
+    GB_LBL_INSIDE   = 0x04,
+    GB_LBL_OUTSIDE  = 0x08
+} EGBLabel;
+
 #define NO_FRAME(A) (FRAME_NONE==(A) || FRAME_LINE==(A))
 
 typedef enum
@@ -996,7 +1004,8 @@ typedef struct
                      crHighlight,
                      splitterHighlight,
                      crSize,
-                     gbFactor;
+                     gbFactor,
+                     gbLabel;
     ERound           round;
     bool             embolden,
                      highlightTab,
@@ -1034,7 +1043,6 @@ typedef struct
                      darkerBorders,
                      vArrows,
                      xCheck,
-                     boldGroupBox,
                      crButton,
                      smallRadio,
                      fillProgress,

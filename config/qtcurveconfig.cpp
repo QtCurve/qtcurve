@@ -689,6 +689,20 @@ static void insertFrameEntries(QComboBox *combo)
     combo->insertItem(FRAME_FADED, i18n("Faded background"));
 }
 
+enum EGBLabelVPos
+{
+    GBV_OUTSIDE,
+    GBV_STANDARD,
+    GBV_INSIDE
+};
+
+static void insertGbLabelEntries(QComboBox *combo)
+{
+    combo->insertItem(GBV_OUTSIDE, i18n("Outside frame"));
+    combo->insertItem(GBV_STANDARD, i18n("On frame"));
+    combo->insertItem(GBV_INSIDE, i18n("Inside frame"));
+}
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                widgetStyle(NULL),
@@ -759,6 +773,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertCrSizeEntries(crSize);
     insertDragEntries(windowDrag);
     insertFrameEntries(groupBox);
+    insertGbLabelEntries(gbLabel_textPos);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -942,7 +957,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(gbFactor, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(colorMenubarMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(useHighlightForMenu, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(boldGroupBox, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(gbLabel_bold, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(gbLabel_textPos, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(gbLabel_centred, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(fadeLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(menuIcons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(stdBtnSizes, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -2381,6 +2398,26 @@ int QtCurveConfig::getTitleBarButtonFlags()
     return titlebarButtons;
 }
 
+int QtCurveConfig::getGroupBoxLabelFlags()
+{
+    int flags=0;
+    if(gbLabel_bold->isChecked())
+        flags+=GB_LBL_BOLD;
+    if(gbLabel_centred->isChecked())
+        flags+=GB_LBL_CENTRED;
+    switch(gbLabel_textPos->currentIndex())
+    {
+        case GBV_INSIDE:
+            flags+=GB_LBL_INSIDE;
+            break;
+        case GBV_OUTSIDE:
+            flags+=GB_LBL_OUTSIDE;
+        default:
+            break;
+    }
+    return flags;
+}
+
 void QtCurveConfig::setOptions(Options &opts)
 {
     opts.round=(ERound)round->currentIndex();
@@ -2515,7 +2552,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.customGradient=customGradient;
     opts.colorMenubarMouseOver=colorMenubarMouseOver->isChecked();
     opts.useHighlightForMenu=useHighlightForMenu->isChecked();
-    opts.boldGroupBox=boldGroupBox->isChecked();
+    opts.gbLabel=getGroupBoxLabelFlags();
     opts.fadeLines=fadeLines->isChecked();
     opts.menuIcons=menuIcons->isChecked();
     opts.stdBtnSizes=stdBtnSizes->isChecked();
@@ -2731,7 +2768,13 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     customCheckRadioColor->setColor(opts.customCheckRadioColor);
     colorMenubarMouseOver->setChecked(opts.colorMenubarMouseOver);
     useHighlightForMenu->setChecked(opts.useHighlightForMenu);
-    boldGroupBox->setChecked(opts.boldGroupBox);
+    gbLabel_bold->setChecked(opts.gbLabel&GB_LBL_BOLD);
+    gbLabel_centred->setChecked(opts.gbLabel&GB_LBL_CENTRED);
+    gbLabel_textPos->setCurrentIndex(opts.gbLabel&GB_LBL_INSIDE
+                                        ? GBV_INSIDE
+                                        : opts.gbLabel&GB_LBL_OUTSIDE
+                                            ? GBV_OUTSIDE
+                                            : GBV_STANDARD);
     fadeLines->setChecked(opts.fadeLines);
     menuIcons->setChecked(opts.menuIcons);
     stdBtnSizes->setChecked(opts.stdBtnSizes);
@@ -3090,7 +3133,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          splitters->currentIndex()!=opts.splitters ||
          colorMenubarMouseOver->isChecked()!=opts.colorMenubarMouseOver ||
          useHighlightForMenu->isChecked()!=opts.useHighlightForMenu ||
-         boldGroupBox->isChecked()!=opts.boldGroupBox ||
+         getGroupBoxLabelFlags()!=opts.gbLabel ||
          fadeLines->isChecked()!=opts.fadeLines ||
          menuIcons->isChecked()!=opts.menuIcons ||
          stdBtnSizes->isChecked()!=opts.stdBtnSizes ||
