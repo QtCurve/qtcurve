@@ -1462,6 +1462,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                      groupBoxLine=readBoolEntry(cfg, "groupBoxLine", true);
                 opts->groupBox=framelessGroupBoxes ? (groupBoxLine ? FRAME_LINE : FRAME_NONE) : FRAME_PLAIN;
                 opts->gbLabel=framelessGroupBoxes ? GB_LBL_BOLD : 0;
+                opts->gbFactor=0;
                 def->focus=FOCUS_LINE;
                 def->crHighlight=3;
             }
@@ -2303,7 +2304,7 @@ static void defaultSettings(Options *opts)
     opts->customAlphas[0]=0;
     opts->contrast=7;
     opts->passwordChar=0x25CF;
-    opts->gbFactor=0;
+    opts->gbFactor=DEF_GB_FACTOR;
     opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
     opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
     opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
@@ -2422,7 +2423,7 @@ static void defaultSettings(Options *opts)
     opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
     opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
-    opts->gbLabel=0;
+    opts->gbLabel=GB_LBL_BOLD|GB_LBL_OUTSIDE;
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     opts->stdBtnSizes=false;
     opts->titlebarButtons=TITLEBAR_BUTTON_ROUND|TITLEBAR_BUTTON_HOVER_SYMBOL;
