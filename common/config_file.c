@@ -1959,6 +1959,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                                 else
                                                     ok=false;
                                             }
+                                            else
+                                                opts->customGradient[i]->stops[stop].alpha=1.0;
                                         }
                                         else
                                             ok=false;
