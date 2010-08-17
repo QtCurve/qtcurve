@@ -7628,18 +7628,77 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             }
             break;
         case CC_GroupBox:
-            if(opts.gbLabel&GB_LBL_BOLD)
-            {
-                QFont font(painter->font());
+            if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+                // Draw frame
+                QRect textRect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
+                QRect checkBoxRect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
+                if (groupBox->subControls & QStyle::SC_GroupBoxFrame)
+                {
+                    QStyleOptionFrameV2 frame;
+                    frame.QStyleOption::operator=(*groupBox);
+                    frame.features = groupBox->features;
+                    frame.lineWidth = groupBox->lineWidth;
+                    frame.midLineWidth = groupBox->midLineWidth;
+                    frame.rect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
 
-                font.setBold(true);
-                painter->save();
-                painter->setFont(font);
+                    if(!(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
+                    {
+                        painter->save();
+                        QRegion region(r);
+                        if (!groupBox->text.isEmpty())
+                            region -= QRect(groupBox->subControls&QStyle::SC_GroupBoxCheckBox
+                                                ? checkBoxRect.united(textRect).adjusted(reverse ? 0 : -2, 0, reverse ? 2 : 0, 0)
+                                                : textRect);
+                        painter->setClipRegion(region);
+                    }
+                    /*proxy()->*/drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
+                    if(!(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
+                        painter->restore();
+                }
+
+                // Draw title
+                if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) && !groupBox->text.isEmpty())
+                {
+                    QColor textColor = groupBox->textColor;
+                    if (textColor.isValid())
+                        painter->setPen(textColor);
+                    int alignment = int(groupBox->textAlignment);
+                    if (!/*proxy()->*/styleHint(QStyle::SH_UnderlineShortcut, option, widget))
+                        alignment |= Qt::TextHideMnemonic;
+
+                    if(opts.gbLabel&GB_LBL_BOLD)
+                    {
+                        QFont font(painter->font());
+
+                        font.setBold(true);
+                        painter->save();
+                        painter->setFont(font);
+                    }
+                    /*proxy()->*/drawItemText(painter, textRect,  Qt::TextShowMnemonic | Qt::AlignHCenter | alignment,
+                                palette, state & State_Enabled, groupBox->text,
+                                textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+
+                    if(opts.gbLabel&GB_LBL_BOLD)
+                        painter->restore();
+
+                    if (state & State_HasFocus)
+                    {
+                        QStyleOptionFocusRect fropt;
+                        fropt.QStyleOption::operator=(*groupBox);
+                        fropt.rect = textRect;
+                        /*proxy()->*/drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
+                    }
+                }
+
+                // Draw checkbox
+                if (groupBox->subControls & SC_GroupBoxCheckBox)
+                {
+                    QStyleOptionButton box;
+                    box.QStyleOption::operator=(*groupBox);
+                    box.rect = checkBoxRect;
+                    /*proxy()->*/drawPrimitive(PE_IndicatorCheckBox, &box, painter, widget);
+                }
             }
-            BASE_STYLE::drawComplexControl(control, option, painter, widget);
-
-            if(opts.gbLabel&GB_LBL_BOLD)
-                painter->restore();
             break;
         case CC_Q3ListView:
             if (const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option))
@@ -9720,10 +9779,10 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                             int indicatorHeight(pixelMetric(PM_IndicatorHeight, option, widget)),
                                 top(r.top() + (fontMetrics.height() - indicatorHeight) / 2);
 
-                            r.setRect(reverse ? (r.right() - indicatorWidth) : r.left(), top, indicatorWidth, indicatorHeight);
+                            r.setRect(reverse ? (r.right() - indicatorWidth) : r.left()+2, top, indicatorWidth, indicatorHeight);
                         }
                         else // Adjust for label
-                            r.setRect(reverse ? r.left() : (r.left() + checkBoxSize - 2), r.top(), r.width() - checkBoxSize, r.height());
+                            r.setRect(reverse ? r.left() : (r.left() + checkBoxSize), r.top(), r.width() - checkBoxSize, r.height());
                     }
                     return r;
                 }
