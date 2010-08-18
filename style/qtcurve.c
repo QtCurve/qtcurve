@@ -3928,9 +3928,9 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 int xo=x, yo=y, wo=width, ho=height, stepper=STEPPER_NONE;
 
                 /* Try and guess if this button is a toolbar button... */
-                if(!opts.coloredTbarMo && WIDGET_STD_BUTTON==widgetType && isMozillaWidget(widget) &&
-                    GTK_IS_BUTTON(widget) && DETAIL("button") && ((width>22 && width<50 && height>30) || height>32))
-                    widgetType=WIDGET_UNCOLOURED_MO_BUTTON;
+                if((WIDGET_STD_BUTTON==widgetType || WIDGET_TOGGLE_BUTTON==widgetType) && isMozillaWidget(widget) &&
+                    GTK_IS_BUTTON(widget) && DETAIL("button") && ((width>22 && width<56 && height>30) || height>32))
+                    widgetType=opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON;
 
                 if(ROUND_MAX==opts.round &&
                     ( (WIDGET_TOGGLE_BUTTON==widgetType && height>(opts.crSize+8) && width<(height+10)) ||
