@@ -206,13 +206,13 @@ static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolb
 }
 
 #define WINDOWTITLE_SPACER    0x10000000
-#define STATE_REVERSE     (QStyle::StateFlag)0x10000000
-#define STATE_MENU        (QStyle::StateFlag)0x20000000
-#define STATE_VIEW        (QStyle::StateFlag)0x40000000
-#define STATE_KWIN_BUTTON (QStyle::StateFlag)0x40000000
-#define STATE_TBAR_BUTTON (QStyle::StateFlag)0x80000000
-#define STATE_DWT_BUTTON  (QStyle::StateFlag)0x20000000
-// #define NO_BGND_BUTTON    (QStyle::StateFlag)0x80000000
+#define STATE_REVERSE       (QStyle::StateFlag)0x10000000
+#define STATE_MENU          (QStyle::StateFlag)0x20000000
+#define STATE_VIEW          (QStyle::StateFlag)0x40000000
+#define STATE_KWIN_BUTTON   (QStyle::StateFlag)0x40000000
+#define STATE_TBAR_BUTTON   (QStyle::StateFlag)0x80000000
+#define STATE_DWT_BUTTON    (QStyle::StateFlag)0x20000000
+#define STATE_TOGGLE_BUTTON (QStyle::StateFlag)0x10000000
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -4568,6 +4568,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 return;
             }
 
+            if(!widget)
+                widget=getWidget(painter);
+
             const QColor *use(buttonColors(option));
             bool         isDefault(false),
                          isFlat(false),
@@ -4646,6 +4649,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 opt.state|=STATE_KWIN_BUTTON;
 
             bool coloredDef=isDefault && state&State_Enabled && IND_COLORED==opts.defBtnIndicator;
+
+            if(widget && qobject_cast<const QAbstractButton *>(widget) && (static_cast<const QAbstractButton *>(widget))->isCheckable())
+                opt.state|=STATE_TOGGLE_BUTTON;
 
             drawLightBevel(painter, r, &opt, widget, ROUNDED_ALL,
                            coloredDef ? itsDefBtnCols[MO_DEF_BTN]
@@ -10488,7 +10494,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                  draw3d(!flatWidget && (draw3dfull || (
                             !lightBorder && DRAW_3D_BORDER(sunken, app)))),
                  drawShine(DRAW_SHINE(sunken, app)),
-                 doColouredMouseOver(!sunken && doBorder && option->state&State_Enabled &&
+                 doColouredMouseOver(doBorder && option->state&State_Enabled &&
                                      WIDGET_MDI_WINDOW_BUTTON!=w &&
                                      WIDGET_SPIN!=w && WIDGET_COMBO_BUTTON!=w && WIDGET_SB_BUTTON!=w &&
                                      (!SLIDER(w) || !opts.colorSliderMouseOver) &&
@@ -10496,7 +10502,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                                      (opts.coloredTbarMo || !(option->state&STATE_TBAR_BUTTON)) &&
                                      opts.coloredMouseOver && option->state&State_MouseOver &&
                                      WIDGET_PROGRESSBAR!=w &&
-                                     (/*option->state&TOGGLE_BUTTON ||*/ !sunken)),
+                                     (option->state&STATE_TOGGLE_BUTTON || !sunken)),
                  plastikMouseOver(doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver),
                  colouredMouseOver(doColouredMouseOver && WIDGET_MENU_BUTTON!=w &&
                                        (MO_COLORED==opts.coloredMouseOver ||
@@ -10505,7 +10511,8 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                  doEtch(doBorder && ETCH_WIDGET(w) && DO_EFFECT),
                  glowFocus(doEtch && USE_GLOW_FOCUS(option->state&State_MouseOver) && option->state&State_HasFocus &&
                            option->state&State_Enabled),
-                 horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w));
+                 horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w)),
+                 sunkenToggleMo(sunken && !(option->state&State_Sunken) && option->state&(State_MouseOver|STATE_TOGGLE_BUTTON));
     const QColor *cols(custom ? custom : itsBackgroundCols),
                  *border(colouredMouseOver ? borderColors(option, cols) : cols);
 
@@ -10531,8 +10538,8 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                                 : buildPath(QRectF(r), w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)),
                               horiz, sunken, app, w, useCache);
 
-            if(!sunken)
-                if(plastikMouseOver && !sunken)
+            if(!sunken || sunkenToggleMo)
+                if(plastikMouseOver) // && !sunken)
                 {
                     p->save();
                     p->setClipPath(buildPath(r.adjusted(0, 0, 0, -1), w, round,
@@ -10660,7 +10667,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
 
     r.adjust(1, 1, -1, -1);
 
-    if(plastikMouseOver && !sunken)
+    if(plastikMouseOver && (!sunken  || sunkenToggleMo))
     {
         bool thin(WIDGET_SB_BUTTON==w || WIDGET_SPIN==w || ((horiz ? r.height() : r.width())<16)),
              horizontal(SLIDER(w) ? !horiz : (horiz && WIDGET_SB_BUTTON!=w)|| (!horiz && WIDGET_SB_BUTTON==w));
@@ -10695,14 +10702,15 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
             p->drawPath(innerBrPath);
         }
     }
-    if(plastikMouseOver && !sunken)
+    if(plastikMouseOver && (!sunken  || sunkenToggleMo))
         p->restore();
     p->setRenderHint(QPainter::Antialiasing, false);
 
     if(doEtch || glowFocus)
     {
-        if( (!sunken || (sunken && glowFocus && widget && ::qobject_cast<const QAbstractButton *>(widget) &&
-                         static_cast<const QAbstractButton *>(widget)->isCheckable())) &&
+        if( (!sunken || sunkenToggleMo ||
+               (sunken && glowFocus && widget && ::qobject_cast<const QAbstractButton *>(widget) &&
+                static_cast<const QAbstractButton *>(widget)->isCheckable())) &&
             ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
             (WIDGET_DEF_BUTTON==w && IND_GLOW==opts.defBtnIndicator) ||
             glowFocus) )

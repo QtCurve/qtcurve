@@ -2169,6 +2169,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(SHADE_WINDOW_BORDER==opts->shadeMenubars)
                 opts->shadeMenubarOnlyWhenActive=true;
+
+            if(MO_GLOW==opts->coloredMouseOver)
+                opts->coloredTbarMo=true;
 #endif
 #ifndef __cplusplus
             if(!defOpts)
