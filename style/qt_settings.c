@@ -2606,7 +2606,8 @@ static gboolean qtInit()
             if(isMozilla())
                 gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \""RC_SETTING"Mz\"");
 
-            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app)
+            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app ||
+               (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()))
                 opts.scrollbarType=SCROLLBAR_WINDOWS;
             else
             {

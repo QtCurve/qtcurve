@@ -19,6 +19,10 @@
  9. Added option to sepcify tooltip background appearance.
 10. Added options to draw shaded, or faded, group boxes.
 11. Added options to sepcify location of group box label; inside, outside.
+12. Dont use the 'no buttons' scrollbar setting for mozilla apps. This
+    setting seems to cause odd behaviour with the horizontal scrollbar
+    (sometimes it is not displayed). Use signle top/bottom left/right
+    buttons instead.
 
 1.5.2
 -----
