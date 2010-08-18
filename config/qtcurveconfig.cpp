@@ -241,7 +241,9 @@ class CGradItem : public QTreeWidgetItem
     {
         return text(0).toDouble()<i.text(0).toDouble() ||
                (equal(text(0).toDouble(), i.text(0).toDouble()) &&
-               text(1).toDouble()<i.text(1).toDouble());
+               (text(1).toDouble()<i.text(1).toDouble() ||
+               (equal(text(1).toDouble(), i.text(1).toDouble()) &&
+               (text(2).toDouble()<i.text(2).toDouble()))));
     }
 };
 
@@ -812,6 +814,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     colorSelTab->setRange(MIN_COLOR_SEL_TAB_FACTOR, MAX_COLOR_SEL_TAB_FACTOR);
     colorSelTab->setValue(DEF_COLOR_SEL_TAB_FACTOR);
+
+    stopPosition->setValue(0);
+    stopValue->setValue(100);
+    stopAlpha->setValue(100);
 
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(tabBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
@@ -1573,7 +1579,9 @@ void QtCurveConfig::gradChanged(int i)
 
         GradientStopCont::const_iterator git((*it).second.stops.begin()),
                                          gend((*it).second.stops.end());
+        CGradItem                        *first=0L;
 
+        gradStops->blockSignals(true);
         for(; git!=gend; ++git)
         {
             QStringList details;
@@ -1581,11 +1589,14 @@ void QtCurveConfig::gradChanged(int i)
             details << QString().setNum((*git).pos*100.0)
                     << QString().setNum((*git).val*100.0)
                     << QString().setNum((*git).alpha*100.0);
-
-            new CGradItem(gradStops, details);
+            CGradItem *grad=new CGradItem(gradStops, details);
+            if(!first)
+                first=grad;
         }
-
+        gradStops->blockSignals(false);
         gradStops->sortItems(0, Qt::AscendingOrder);
+        if(first)
+            gradStops->setCurrentItem(first);
     }
     else
     {
@@ -1627,7 +1638,7 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
     if(ok && equal(val, prev))
         return;
 
-    if(!ok || (0==col && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)) || (1==col && (val<0.0 || val>1.0)))
+    if(!ok || ((0==col || 2==col) && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
         i->setText(col, QString().setNum(prev));
     else
     {
@@ -1777,7 +1788,7 @@ void QtCurveConfig::stopSelected()
     }
     else
     {
-        stopPosition->setValue(100);
+        stopPosition->setValue(0);
         stopValue->setValue(100);
         stopAlpha->setValue(100);
     }

@@ -1869,9 +1869,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                val=ok ? (*(++it)).toDouble(&ok) : 0.0,
                                alpha=haveAlpha && ok ? (*(++it)).toDouble(&ok) : 1.0;
 
-                        if(ok)
-                            ok=(pos>=0 && pos<=1.0) &&
-                                (val>=0.0 && val<=2.0);
+                        ok=ok && (pos>=0 && pos<=1.0) && (val>=0.0 && val<=2.0) && (alpha>=0.0 && alpha<=1.0);
 
                         if(ok)
                             grad.stops.insert(GradientStop(pos, val, alpha));
@@ -1967,6 +1965,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                                     }
                                     else
                                         ok=false;
+
+                                    ok=ok &&
+                                       (opts->customGradient[i]->stops[stop].pos>=0 && opts->customGradient[i]->stops[stop].pos<=1.0) &&
+                                       (opts->customGradient[i]->stops[stop].val>=0.0 && opts->customGradient[i]->stops[stop].val<=2.0) &&
+                                       (opts->customGradient[i]->stops[stop].alpha>=0.0 && opts->customGradient[i]->stops[stop].alpha<=1.0);
                                 }
 
                                 if(ok)
