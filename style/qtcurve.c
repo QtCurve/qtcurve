@@ -1628,7 +1628,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && DO_EFFECT,
                 glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && GTK_WIDGET_HAS_FOCUS(wid) &&
-                          GTK_STATE_INSENSITIVE!=state,
+                          GTK_STATE_INSENSITIVE!=state &&
+                          ((WIDGET_RADIO_BUTTON!=widget && WIDGET_CHECKBOX!=widget) || GTK_STATE_ACTIVE!=state),
                 glowFocusSunkenToggle=sunken && glowFocus && wid && GTK_IS_TOGGLE_BUTTON(wid),
                 horiz=!(flags&DF_VERT);
     int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
