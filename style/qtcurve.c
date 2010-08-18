@@ -1616,7 +1616,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                                   (!SLIDER(widget) || !opts.colorSliderMouseOver) &&
                                   WIDGET_UNCOLOURED_MO_BUTTON!=widget &&
                                   GTK_STATE_PRELIGHT==state &&
-                                  (IS_TOGGLE_BUTTON(widget) || !sunken),
+                                  (!sunken || IS_TOGGLE_BUTTON(widget) || (WIDGET_TOOLBAR_BUTTON==widget && opts.coloredTbarMo)),
                 plastikMouseOver=doColouredMouseOver && MO_PLASTIK==opts.coloredMouseOver,
                 colouredMouseOver=doColouredMouseOver &&
                                   (MO_COLORED==opts.coloredMouseOver || MO_COLORED_THICK==opts.coloredMouseOver),
@@ -1630,7 +1630,8 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && GTK_WIDGET_HAS_FOCUS(wid) &&
                           GTK_STATE_INSENSITIVE!=state &&
                           ((WIDGET_RADIO_BUTTON!=widget && WIDGET_CHECKBOX!=widget) || GTK_STATE_ACTIVE!=state),
-                glowFocusSunkenToggle=sunken && glowFocus && wid && GTK_IS_TOGGLE_BUTTON(wid),
+                glowFocusSunkenToggle=sunken && (glowFocus || (doColouredMouseOver && MO_GLOW==opts.coloredMouseOver)) &&
+                                      wid && GTK_IS_TOGGLE_BUTTON(wid),
                 horiz=!(flags&DF_VERT);
     int         xe=x, ye=y, we=width, he=height, origWidth=width, origHeight=height;
     double      xd=x+0.5, yd=y+0.5;
@@ -1826,7 +1827,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     }
     xd+=1, x++, yd+=1, y++, width-=2, height-=2;
 
-    if(plastikMouseOver && !sunken)
+    if(plastikMouseOver) // && !sunken)
     {
         bool         thin=WIDGET_SB_BUTTON==widget || WIDGET_SPIN==widget || ((horiz ? height : width)<16),
                      horizontal=SLIDER(widget) ? !horiz
