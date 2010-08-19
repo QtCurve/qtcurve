@@ -1202,6 +1202,7 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
         }
 
         qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
+#if 0 // Use alpha values instead...
         if(qtSettings.inactiveChangeSelectionColor)
             if(effects[PAL_INACTIVE].enabled)
                 qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED]=ColorUtils_tint(&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW],
@@ -1209,6 +1210,7 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
                                                                                 0.4);
             else
                 qtSettings.inactiveChangeSelectionColor=FALSE;
+#endif
     }
 
     if(rd&RD_ICONS && !qtSettings.icons)
@@ -2401,30 +2403,30 @@ static gboolean qtInit()
                 }
             }
 
-            if(qtSettings.inactiveChangeSelectionColor)
-            {
-                static const char *format="style \""RC_SETTING"HlFix\" "
-                                          "{base[ACTIVE]=\"#%02X%02X%02X\"}"
-                                          //" text[ACTIVE]=\"#%02X%02X%02X\"}"
-                                          "class \"*\" style \""RC_SETTING"HlFix\"";
-
-                tmpStr=(char *)realloc(tmpStr, strlen(format));
-
-                if(tmpStr)
-                {
-                    sprintf(tmpStr, format, toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].red),
-                                            toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].green),
-                                            toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].blue));
-
-                    // KDE4 does not set the text colour...
-                    /*
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
-                                            toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue));
-                    */
-                    gtk_rc_parse_string(tmpStr);
-                }
-            }
+//             if(qtSettings.inactiveChangeSelectionColor)
+//             {
+//                 static const char *format="style \""RC_SETTING"HlFix\" "
+//                                           "{base[ACTIVE]=\"#%02X%02X%02X\"}"
+//                                           //" text[ACTIVE]=\"#%02X%02X%02X\"}"
+//                                           "class \"*\" style \""RC_SETTING"HlFix\"";
+// 
+//                 tmpStr=(char *)realloc(tmpStr, strlen(format));
+// 
+//                 if(tmpStr)
+//                 {
+//                     sprintf(tmpStr, format, toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].red),
+//                                             toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].green),
+//                                             toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].blue));
+// 
+//                     // KDE4 does not set the text colour...
+//                     /*
+//                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
+//                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].green),
+//                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].blue));
+//                     */
+//                     gtk_rc_parse_string(tmpStr);
+//                 }
+//             }
 
             if(GTK_APP_VMPLAYER==qtSettings.app)
             {

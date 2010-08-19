@@ -26,6 +26,8 @@
 13. Draw coloured mouse over for 'checked' toggle buttons.
 14. Fix look of some sunken toolbar button in firefox.
 15. Use Highlight colour for default button glow.
+16. When KDE4's 'Inactive selection changes colour' setting is enabled, dont change
+    the selection colour - use same colour, but set 50% transparent.
 
 1.5.2
 -----

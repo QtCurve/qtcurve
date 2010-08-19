@@ -2923,8 +2923,9 @@ static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType sta
 static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
                           int x, int y, int width, int height, int round, gboolean isLvSelection)
 {
-    double   alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
-    GdkColor *col=&style->base[GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
+    gboolean hasFocus=GTK_WIDGET_HAS_FOCUS(widget);
+    double   alpha=(GTK_STATE_PRELIGHT==state ? 0.20 : 1.0)*(hasFocus || !qtSettings.inactiveChangeSelectionColor ? 1.0 : INACTIVE_SEL_ALPHA);
+    GdkColor *col=&style->base[hasFocus ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
 
     drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, round, isLvSelection, alpha, col, TRUE);
 
