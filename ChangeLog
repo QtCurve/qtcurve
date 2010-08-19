@@ -16,10 +16,10 @@
 13. Fix dock widget titlebar alignment when set to center on full width (not
     just on text space width).
 14. Add option to use slight rounding for window decorations - set in style
-    config as option also affects MDI windows.
-15. Added option to sepcify tooltip background appearance.
+    config, as option also affects MDI windows.
+15. Added option to specify tooltip background appearance.
 16. Added options to draw shaded, or faded, group boxes.
-17. Added options to sepcify location of group box label; inside, outside, centered.
+17. Added options to specify location of group box label; inside, outside, centered.
 18. Fix disabled looking slider in KDE colour dialog.
 19. Draw coloured mouse over for 'checked' toggle buttons.
 20. Just draw bold title for KMenu titles.
