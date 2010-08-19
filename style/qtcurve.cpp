@@ -1000,8 +1000,6 @@ Style::Style()
     switch(opts.defBtnIndicator)
     {
         case IND_GLOW:
-            itsDefBtnCols=itsFocusCols;
-            break;
         case IND_SELECTED:
             itsDefBtnCols=itsHighlightCols;
             break;
@@ -1389,6 +1387,7 @@ void Style::polish(QPalette &palette)
          newSlider(itsSliderCols && itsHighlightCols!=itsSliderCols && SHADE_BLEND_SELECTED==opts.shadeSliders &&
                    (newButton || newHighlight)),
          newDefBtn(itsDefBtnCols && (IND_COLORED!=opts.defBtnIndicator || SHADE_BLEND_SELECTED!=opts.shadeSliders) &&
+                   IND_SELECTED!=opts.defBtnIndicator && IND_GLOW!=opts.defBtnIndicator &&
                    (newContrast || newButton || newHighlight)),
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
