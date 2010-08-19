@@ -1558,7 +1558,9 @@ void Style::polish(QWidget *widget)
         (100!=opts.dlgOpacity && (!widget->topLevelWidget() || Qt::Dialog==(widget->topLevelWidget()->windowFlags() & Qt::WindowType_Mask))) )
         itsBlurHelper->registerWidget(widget);
 
-    if(CUSTOM_BGND)
+    // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
+    // fix this,..
+    if(CUSTOM_BGND || FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
     {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
         {
@@ -2126,7 +2128,9 @@ void Style::unpolish(QWidget *widget)
     itsBlurHelper->unregisterWidget(widget);
     unregisterArgbWidget(widget);
 
-    if(CUSTOM_BGND)
+    // Sometimes get background errors with QToolBox (e.g. in Bespin config), and setting WA_StyledBackground seems to
+    // fix this,..
+    if(CUSTOM_BGND || FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
     {
         switch (widget->windowFlags() & Qt::WindowType_Mask)
         {
