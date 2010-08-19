@@ -7496,9 +7496,6 @@ static void generateColors()
 
     switch(opts.defBtnIndicator)
     {
-        case IND_GLOW:
-            qtcPalette.defbtn=qtcPalette.focus;
-            break;
         case IND_TINT:
         {
             GdkColor col=tint(&qtcPalette.button[PAL_ACTIVE][ORIGINAL_SHADE],
@@ -7507,6 +7504,7 @@ static void generateColors()
             shadeColors(&col, qtcPalette.defbtn);
             break;
         }
+        case IND_GLOW:
         case IND_SELECTED:
             qtcPalette.defbtn=qtcPalette.highlight;
             break;
