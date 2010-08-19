@@ -236,7 +236,6 @@ class Style : public QCommonStyle
     QColor         shade(const QColor &a, double k) const;
     void           shade(const color &ca, color *cb, double k) const;
     QColor         getLowerEtchCol(const QWidget *widget) const;
-    QPalette::ColorRole getTextRole(const QWidget *w, const QPainter *p, QPalette::ColorRole def) const;
     int            getFrameRound(const QWidget *widget) const;
     void           unregisterArgbWidget(QWidget *w);
 
@@ -292,7 +291,8 @@ class Style : public QCommonStyle
     bool                               itsSaveMenuBarStatus,
                                        itsSaveStatusBarStatus,
                                        itsUsePixmapCache,
-                                       itsIsPreview;
+                                       itsIsPreview,
+                                       itsInactiveChangeSelectionColor;
     mutable QColor                     *itsSidebarButtonsCols;
     mutable QColor                     *itsActiveMdiColors;
     mutable QColor                     *itsMdiColors;

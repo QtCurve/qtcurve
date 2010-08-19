@@ -177,6 +177,7 @@ enum
 #define GLOW_ALPHA(DEF)   ((DEF) ? 0.5 : 0.65)
 #define DEF_BNT_TINT      0.4
 #define ENTRY_INNER_ALPHA 0.4
+#define INACTIVE_SEL_ALPHA 0.5
 
 #define SUNKEN_BEVEL_DARK_ALPHA(X)  (X.value()/800.0) // 0.25
 #define SUNKEN_BEVEL_LIGHT_ALPHA(X) (X.value()/500.0) // 0.40

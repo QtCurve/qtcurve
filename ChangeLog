@@ -24,6 +24,8 @@
 19. Draw coloured mouse over for 'checked' toggle buttons.
 20. Just draw bold title for KMenu titles.
 21. Use Highlight colour for default button glow.
+22. When KDE4's 'Inactive selection changes colour' setting is enabled, dont change
+    the selection colour - use same colour, but set 50% transparent.
 
 1.5.2
 -----

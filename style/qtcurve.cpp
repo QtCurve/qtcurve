@@ -874,6 +874,7 @@ Style::Style()
         itsSaveMenuBarStatus(false),
         itsUsePixmapCache(false),
         itsIsPreview(false),
+        itsInactiveChangeSelectionColor(false),
         itsSidebarButtonsCols(0L),
         itsActiveMdiColors(0L),
         itsMdiColors(0L),
@@ -1518,8 +1519,11 @@ void Style::polish(QPalette &palette)
     palette.setColor(QPalette::Disabled, QPalette::Background, palette.color(QPalette::Active, QPalette::Background));
 
     // Fix KDE4's palette...
+    if(palette.color(QPalette::Active, QPalette::Highlight)!=palette.color(QPalette::Inactive, QPalette::Highlight))
+        itsInactiveChangeSelectionColor=true;
+
     for(int i=QPalette::WindowText; i<QPalette::NColorRoles; ++i)
-        if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
+        //if(i!=QPalette::Highlight && i!=QPalette::HighlightedText)
             palette.setColor(QPalette::Inactive, (QPalette::ColorRole)i, palette.color(QPalette::Active, (QPalette::ColorRole)i));
 
     // Force this to be re-generated!
@@ -4920,6 +4924,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         color = color.lighter(110);
                 }
 
+                if(!(state&State_Active) && itsInactiveChangeSelectionColor)
+                    color.setAlphaF(color.alphaF()*INACTIVE_SEL_ALPHA);
                 if(square)
                     drawBevelGradient(color, painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                 else
@@ -6210,7 +6216,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 int num(opts.embolden && button->features&QStyleOptionButton::DefaultButton ? 2 : 1);
 
                 for(int i=0; i<num; ++i)
-                    drawItemTextWithRole(painter, r.adjusted(i, 0, i, 0), tf, button->palette, (button->state&State_Enabled),
+                    drawItemTextWithRole(painter, r.adjusted(i, 0, i, 0), tf, palette, (button->state&State_Enabled),
                                          button->text, QPalette::ButtonText);
             }
             break;
@@ -7039,8 +7045,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 // Arrow type always overrules and is always shown
                 bool hasArrow = tb->features & QStyleOptionToolButton::Arrow;
 
-                if (((!hasArrow && tb->icon.isNull()) && !tb->text.isEmpty())
-                    || Qt::ToolButtonTextOnly==tb->toolButtonStyle)
+                if (((!hasArrow && tb->icon.isNull()) && !tb->text.isEmpty()) || Qt::ToolButtonTextOnly==tb->toolButtonStyle)
                 {
                     int alignment = Qt::AlignCenter|Qt::TextShowMnemonic;
 
@@ -7048,8 +7053,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         alignment |= Qt::TextHideMnemonic;
 
                     r.translate(shiftX, shiftY);
-                    drawItemTextWithRole(painter, r, alignment, tb->palette, state&State_Enabled, tb->text,
-                                         getTextRole(widget, painter, QPalette::ButtonText));
+
+                    drawItemTextWithRole(painter, r, alignment, palette, state&State_Enabled, tb->text, QPalette::ButtonText);
                 }
                 else
                 {
@@ -7123,8 +7128,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             alignment |= Qt::AlignLeft | Qt::AlignVCenter;
                         }
                         tr.translate(shiftX, shiftY);
-                        drawItemTextWithRole(painter, QStyle::visualRect(option->direction, r, tr), alignment, tb->palette,
-                                             tb->state & State_Enabled, tb->text, getTextRole(widget, painter, QPalette::ButtonText));
+                        drawItemTextWithRole(painter, QStyle::visualRect(option->direction, r, tr), alignment, palette,
+                                             state & State_Enabled, tb->text, QPalette::ButtonText);
                     }
                     else
                     {
@@ -8951,15 +8956,30 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
 // Use 'drawItemTextWithRole' when already know which role to use.
 void Style::drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled,
-                                        const QString &text, QPalette::ColorRole textRole) const
+                                 const QString &text, QPalette::ColorRole textRole) const
 {
     BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
 void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
-                                QPalette::ColorRole textRole) const
+                         QPalette::ColorRole textRole) const
 {
-    BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, getTextRole(0L, painter, textRole));
+    if(QPalette::ButtonText==textRole && !opts.stdSidebarButtons)
+    {
+        const QAbstractButton *button=getButton(NULL, painter);
+
+        if(button && isMultiTabBarTab(button) && button->isChecked())
+        {
+            QPalette p(pal);
+
+            if(itsInactiveChangeSelectionColor && QPalette::Inactive==p.currentColorGroup())
+                p.setCurrentColorGroup(QPalette::Active);
+            BASE_STYLE::drawItemText(painter, rect, flags, p, enabled, text, QPalette::HighlightedText);
+            return;
+        }
+    }
+
+    BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
 QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
@@ -12699,18 +12719,6 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
     col.setAlphaF(0.1); // IS_FLAT_BGND(opts.bgndAppearance) ? 0.25 : 0.4);
 
     return col;
-}
-
-QPalette::ColorRole Style::getTextRole(const QWidget *w, const QPainter *p, QPalette::ColorRole def) const
-{
-    if(QPalette::ButtonText==def && !opts.stdSidebarButtons)
-    {
-        const QAbstractButton *button=getButton(w, p);
-
-        if(button && isMultiTabBarTab(button) && button->isChecked())
-            return QPalette::HighlightedText;
-    }
-    return def;
 }
 
 int Style::getFrameRound(const QWidget *widget) const
