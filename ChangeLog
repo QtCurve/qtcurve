@@ -23,6 +23,8 @@
     setting seems to cause odd behaviour with the horizontal scrollbar
     (sometimes it is not displayed). Use signle top/bottom left/right
     buttons instead.
+13. Draw coloured mouse over for 'checked' toggle buttons.
+14. Fix look of some sunken toolbar button in firefox.
 
 1.5.2
 -----
