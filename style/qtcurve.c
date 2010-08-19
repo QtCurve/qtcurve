@@ -7132,7 +7132,10 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
     if(FOCUS_GLOW==opts.focus && !comboButton && !listViewHeader && !toolbarBtn && (btn || GTK_IS_SCALE(widget)))
         return;
-        
+
+    if(FOCUS_GLOW==opts.focus && toolbarBtn && GTK_STATE_NORMAL!=state)
+        return;
+
     if(FOCUS_STANDARD==opts.focus)
         parent_class->draw_focus(style, window, state, area, widget, detail, x, y, width, height);
     else
