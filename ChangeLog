@@ -22,6 +22,7 @@
 17. Added options to sepcify location of group box label; inside, outside, centered.
 18. Fix disabled looking slider in KDE colour dialog.
 19. Draw coloured mouse over for 'checked' toggle buttons.
+20. Just draw bold title for KMenu titles.
 
 1.5.2
 -----

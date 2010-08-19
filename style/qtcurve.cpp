@@ -7463,7 +7463,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     const QToolButton *btn = qobject_cast<const QToolButton *>(widget);
 
                     if(btn && btn->isDown() && Qt::ToolButtonTextBesideIcon==btn->toolButtonStyle() &&
-                       widget->parentWidget() && widget->parentWidget()->inherits("KMenu"))
+                       widget->parentWidget() && qobject_cast<QMenu *>(widget->parentWidget()))
                     {
                         painter->save();
                         if(opts.menuStripe)
@@ -7476,15 +7476,19 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                               false, opts.menuStripeAppearance, WIDGET_OTHER);
                         }
 
+#if 0
                         // For some reason the MenuTitle has a larger border on the left, so adjust the width by 1 pixel to make this look nicer.
                         //drawBorder(painter, r.adjusted(2, 2, -3, -2), option, ROUNDED_ALL, 0L, WIDGET_OTHER, BORDER_SUNKEN);
                         QStyleOptionToolButton opt(*toolbutton);
                         opt.rect = r.adjusted(2, 2, -3, -2);
                         opt.state=State_Raised|State_Enabled|State_Horizontal;
                         drawLightBevel(painter, opt.rect, &opt, widget, ROUNDED_ALL,
-                                       getFill(&opt, itsBackgroundCols), itsBackgroundCols,
-                                       true, WIDGET_NO_ETCH_BTN);
-
+                                       getFill(&opt, itsBackgroundCols), itsBackgroundCols, true, WIDGET_NO_ETCH_BTN);
+#else
+                        if(!opts.menuStripe)
+                            drawFadedLine(painter, QRect(r.x()+3, r.y()+r.height()-1, r.width()-7, 1),
+                                          popupMenuCols(option)[MENU_SEP_SHADE], true, true, true);
+#endif
                         QFont font(toolbutton->font);
 
                         font.setBold(true);
