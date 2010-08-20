@@ -333,11 +333,9 @@ static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
                                                          (GtkSignalFunc)qtcWindowKeyRelease, NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY", (gpointer)opacity);
         if(100!=opacity)
-        {
-            g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY", (gpointer)opacity);
             qtcWindowSetOpacity(widget, (unsigned short)opacity);
-        }
 
         if((opts.menubarHiding&HIDE_KWIN) || (opts.statusbarHiding&HIDE_KWIN) || 100!=opacity)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_MAP_ID",
