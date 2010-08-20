@@ -4914,18 +4914,23 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                (widget && !widget->inherits("KFilePlacesView") &&
                                 (qobject_cast<const QTreeView *>(widget) ||
                                   (qobject_cast<const QListView *>(widget) &&
-                                  QListView::IconMode!=((const QListView *)widget)->viewMode())))));
+                                  QListView::IconMode!=((const QListView *)widget)->viewMode()))))),
+                       modAlpha(!(state&State_Active) && itsInactiveChangeSelectionColor);
 
                 if (hover && !hasCustomBackground)
                 {
                     if (!(state & State_Selected))
-                        color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? 0.5 : 0.20);
+                        color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
                     else
+                    {
                         color = color.lighter(110);
+                        if(modAlpha)
+                            color.setAlphaF(INACTIVE_SEL_ALPHA);
+                    }
                 }
-
-                if(!(state&State_Active) && itsInactiveChangeSelectionColor)
+                else if(modAlpha)
                     color.setAlphaF(color.alphaF()*INACTIVE_SEL_ALPHA);
+
                 if(square)
                     drawBevelGradient(color, painter, r, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                 else
