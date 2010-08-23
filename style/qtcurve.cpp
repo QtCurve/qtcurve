@@ -3048,8 +3048,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
     }
 }
 
-int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget,
-                            QStyleHintReturn *returnData) const
+int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const
 {
     switch (hint)
     {
@@ -3065,6 +3064,11 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_UnderlineShortcut:
             return true;
         case SH_GroupBox_TextLabelVerticalAlignment:
+            if (const QStyleOptionGroupBox *frame = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
+            {
+                if (frame->features & QStyleOptionFrameV2::Flat)
+                    return Qt::AlignVCenter;
+            }
             return opts.gbLabel&GB_LBL_INSIDE
                     ? Qt::AlignBottom
                     : opts.gbLabel&GB_LBL_OUTSIDE
@@ -7664,7 +7668,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     frame.midLineWidth = groupBox->midLineWidth;
                     frame.rect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
 
-                    if(!(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
+                    if((groupBox->features&QStyleOptionFrameV2::Flat) || !(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
                     {
                         painter->save();
                         QRegion region(r);
@@ -7675,7 +7679,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         painter->setClipRegion(region);
                     }
                     /*proxy()->*/drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
-                    if(!(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
+                    if((groupBox->features&QStyleOptionFrameV2::Flat) || !(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
                         painter->restore();
                 }
 
