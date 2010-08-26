@@ -2781,7 +2781,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_MdiSubWindowFrameWidth:
             return 3;
         case PM_DockWidgetTitleMargin:
-            return 4;
+            return !(opts.dwtSettings&DWT_TEXT_ALIGN_AS_PER_TITLEBAR) || ALIGN_LEFT==opts.titlebarAlignment ? 4 : 0;
         case PM_DockWidgetTitleBarButtonMargin:
             return 4;
         case PM_DockWidgetFrameWidth:
