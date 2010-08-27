@@ -2505,12 +2505,10 @@ static gboolean qtInit()
                     g_object_set(settings, "gtk-font-name", qtSettings.fonts[FONT_GENERAL], NULL);
 
                 gtk_settings_set_long_property(settings, "gtk-toolbar-style", qtSettings.toolbarStyle, "KDE-Settings");
-                if(qtSettings.debug)
-                    printf(DEBUG_PREFIX"gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
+                if(qtSettings.debug) printf(DEBUG_PREFIX"gtk-toolbar-style %d\n", qtSettings.toolbarStyle);
                 if(NULL==gtk_check_version(2, 4, 0)) /* The following settings only apply for GTK>=2.4.0 */
                 {
-                    if(qtSettings.debug)
-                        printf(DEBUG_PREFIX"gtk-button-images %d\n", qtSettings.buttonIcons);
+                    if(qtSettings.debug) printf(DEBUG_PREFIX"gtk-button-images %d\n", qtSettings.buttonIcons);
                     gtk_settings_set_long_property(settings, "gtk-button-images", qtSettings.buttonIcons, "KDE-Settings");
 #if 0
                     if(opts.drawStatusBarFrames)
@@ -2529,6 +2527,8 @@ static gboolean qtInit()
                 /* The following settings only apply for GTK>=2.6.0 */
                 if(!opts.gtkButtonOrder && NULL==gtk_check_version(2, 6, 0))
                     g_object_set(settings, "gtk-alternative-button-order", TRUE, NULL);
+
+                gtk_settings_set_int_property(settings, "gtk-menu-popup-delay", opts.menuDelay, "KDE-Settings");
             }
 
             if(qtSettings.fonts[FONT_GENERAL])
@@ -2868,14 +2868,6 @@ static gboolean qtInit()
                         toQtColor(qtcPalette.background[4].red),
                         toQtColor(qtcPalette.background[4].green),
                         toQtColor(qtcPalette.background[4].blue));
-                gtk_rc_parse_string(tmpStr);
-            }
-
-            {
-                static const char *constStrFormat="gtk-menu-popup-delay=%d";
-
-                tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+16);
-                sprintf(tmpStr, constStrFormat, opts.menuDelay);
                 gtk_rc_parse_string(tmpStr);
             }
 
