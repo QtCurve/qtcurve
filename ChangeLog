@@ -28,6 +28,8 @@
 15. Use Highlight colour for default button glow.
 16. When KDE4's 'Inactive selection changes colour' setting is enabled, dont change
     the selection colour - use same colour, but set 50% transparent.
+17. Add "npviewer.bin" to list of apps that are brower plugin viewers - opacity
+    settings are excluded from these.
 
 1.5.2
 -----

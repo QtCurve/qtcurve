@@ -2296,7 +2296,8 @@ static gboolean qtInit()
                     qtSettings.app=GTK_APP_JAVA_SWT;
                 else if(0==strcmp(qtSettings.appName, CHROME_FLASH_PLUGIN) ||
                         0==strcmp(qtSettings.appName, "nspluginviewer") ||
-                        0==strcmp(qtSettings.appName, "plugin-container"))
+                        0==strcmp(qtSettings.appName, "plugin-container") ||
+                        0==strcmp(qtSettings.appName, "npviewer.bin") )
                     qtSettings.app=GTK_APP_FLASH_PLUGIN;
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
