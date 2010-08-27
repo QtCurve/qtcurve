@@ -30,6 +30,7 @@
     the selection colour - use same colour, but set 50% transparent.
 17. Add "npviewer.bin" to list of apps that are brower plugin viewers - opacity
     settings are excluded from these.
+18. Exclude opacity settings from SWT apps such as eclipse.
 
 1.5.2
 -----
