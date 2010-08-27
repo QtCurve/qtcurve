@@ -27,6 +27,7 @@
 22. When KDE4's 'Inactive selection changes colour' setting is enabled, dont change
     the selection colour - use same colour, but set 50% transparent.
 23. Add 4 pixel padding to dock window titlebars.
+24. Default sub-menu popup delay to 225 - matches Gtk2 standard default.
 
 1.5.2
 -----

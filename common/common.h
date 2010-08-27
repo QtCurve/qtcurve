@@ -265,7 +265,7 @@ enum
 #define MIN_TAB_BGND        -5
 #define MAX_TAB_BGND         5
 
-#define DEFAULT_MENU_DELAY 100
+#define DEFAULT_MENU_DELAY 225
 #define MIN_MENU_DELAY       0
 #define MAX_MENU_DELAY     500
 
