@@ -31,6 +31,8 @@
 17. Add "npviewer.bin" to list of apps that are brower plugin viewers - opacity
     settings are excluded from these.
 18. Exclude opacity settings from SWT apps such as eclipse.
+19. Default sub-menu popup delay to 225 - matches Gtk2 standard default. The previous
+    default of 100 seems to cause issues with Thunar.
 
 1.5.2
 -----
