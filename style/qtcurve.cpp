@@ -2574,39 +2574,33 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             }
             break;
         case QEvent::MouseButtonPress:
-            if(dynamic_cast<QMouseEvent*>(event))
+            if(dynamic_cast<QMouseEvent*>(event) && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy())
             {
-                if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy())
-                {
-                    QLabel      *lbl = (QLabel *)object;
-                    QMouseEvent *mev = (QMouseEvent *)event;
+                QLabel      *lbl = (QLabel *)object;
+                QMouseEvent *mev = (QMouseEvent *)event;
 
-                    if (lbl->rect().contains(mev->pos()))
-                    {
-                        itsClickedLabel=lbl;
-                        lbl->repaint();
-                    }
+                if (lbl->rect().contains(mev->pos()))
+                {
+                    itsClickedLabel=lbl;
+                    lbl->repaint();
                 }
             }
             break;
         case QEvent::MouseButtonRelease:
-            if(dynamic_cast<QMouseEvent*>(event))
+            if(dynamic_cast<QMouseEvent*>(event) && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy())
             {
-                if(qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy())
+                QLabel      *lbl = (QLabel *)object;
+                QMouseEvent *mev = (QMouseEvent *)event;
+
+                if(itsClickedLabel)
                 {
-                    QLabel      *lbl = (QLabel *)object;
-                    QMouseEvent *mev = (QMouseEvent *)event;
-
-                    if(itsClickedLabel)
-                    {
-                        itsClickedLabel=0;
-                        lbl->update();
-                    }
-
-                    // set focus to the buddy...
-                    if (lbl->rect().contains(mev->pos()))
-                        ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
+                    itsClickedLabel=0;
+                    lbl->update();
                 }
+
+                // set focus to the buddy...
+                if (lbl->rect().contains(mev->pos()))
+                    ((QLabel *)object)->buddy()->setFocus(Qt::ShortcutFocusReason);
             }
             break;
         case QEvent::StyleChange:
