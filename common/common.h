@@ -993,7 +993,8 @@ typedef struct
 #endif
 {
 
-    int              contrast,
+    int              version,
+                     contrast,
                      passwordChar,
                      highlightFactor,
                      lighterPopupMenuBgnd,

@@ -1424,8 +1424,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
         if(cfg)
         {
 #endif
-            int     i,
-                    version=readVersionEntry(cfg, VERSION_KEY);
+            int     i;
+            
+            opts->version=readVersionEntry(cfg, VERSION_KEY);
+
 #ifdef __cplusplus
             Options newOpts;
 
@@ -1456,7 +1458,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 
             /* Check if the config file expects old default values... */
-            if(version<MAKE_VERSION(1, 6))
+            if(opts->version<MAKE_VERSION(1, 6))
             {
                 bool framelessGroupBoxes=readBoolEntry(cfg, "framelessGroupBoxes", true),
                      groupBoxLine=readBoolEntry(cfg, "groupBoxLine", true);
@@ -1472,7 +1474,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 CFG_READ_INT(gbLabel)
             }
 
-            if(version<MAKE_VERSION(1, 5))
+            if(opts->version<MAKE_VERSION(1, 5))
             {
                 opts->windowBorder=
                     (readBoolEntry(cfg, "colorTitlebarOnly", def->windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY)
@@ -1485,7 +1487,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else
                 CFG_READ_INT(windowBorder);
 
-            if(version<MAKE_VERSION(1, 4))
+            if(opts->version<MAKE_VERSION(1, 4))
             {
                 opts->square=
                     (readBoolEntry(cfg, "squareLvSelection", def->square&SQUARE_LISTVIEW_SELECTION) ? SQUARE_LISTVIEW_SELECTION : SQUARE_NONE)+
@@ -1496,9 +1498,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else
                 CFG_READ_INT(square)
 
-            if(version<MAKE_VERSION(1, 2))
+            if(opts->version<MAKE_VERSION(1, 2))
                 def->crSize=CR_SMALL_SIZE;
-            if(version<MAKE_VERSION(1, 0))
+            if(opts->version<MAKE_VERSION(1, 0))
             {
                 def->roundAllTabs=false;
                 def->smallRadio=false;
@@ -1513,9 +1515,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
                 def->inactiveTitlebarAppearance=APPEARANCE_CUSTOM2;
             }
-            if(version<MAKE_VERSION(0, 67))
+            if(opts->version<MAKE_VERSION(0, 67))
                 def->doubleGtkComboArrow=false;
-            if(version<MAKE_VERSION(0, 66))
+            if(opts->version<MAKE_VERSION(0, 66))
             {
                 def->menuStripeAppearance=APPEARANCE_GRADIENT;
                 def->etchEntry=true;
@@ -1526,7 +1528,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->titlebarIcon=TITLEBAR_ICON_MENU_BUTTON;
 #endif
             }
-            if(version<MAKE_VERSION(0, 65))
+            if(opts->version<MAKE_VERSION(0, 65))
             {
                 def->tabMouseOver=TAB_MO_BOTTOM;
                 def->activeTabAppearance=APPEARANCE_FLAT;
@@ -1535,7 +1537,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->borderTab=false;
                 def->thinnerBtns=false;
             }
-            if(version<MAKE_VERSION(0, 63))
+            if(opts->version<MAKE_VERSION(0, 63))
             {
                 def->tabMouseOver=TAB_MO_TOP;
                 def->sliderStyle=SLIDER_TRIANGULAR;
@@ -1543,7 +1545,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->titlebarAlignment=ALIGN_LEFT;
 #endif
             }
-            if(version<MAKE_VERSION(0, 62))
+            if(opts->version<MAKE_VERSION(0, 62))
             {
                 def->titlebarAppearance=APPEARANCE_GRADIENT;
                 def->inactiveTitlebarAppearance=APPEARANCE_GRADIENT;
@@ -1562,7 +1564,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->sunkenAppearance=APPEARANCE_INVERTED;
                 def->focus=FOCUS_FILLED;
             }
-            if(version<MAKE_VERSION(0, 61))
+            if(opts->version<MAKE_VERSION(0, 61))
             {
                 def->coloredMouseOver=MO_PLASTIK;
                 def->buttonEffect=EFFECT_NONE;
@@ -1640,7 +1642,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
             CFG_READ_BOOL(thinnerMenuItems)
             CFG_READ_BOOL(thinnerBtns)
-            if(version<MAKE_VERSION(0, 63))
+            if(opts->version<MAKE_VERSION(0, 63))
             {
                 if(IS_BLACK(opts->customSlidersColor))
                     CFG_READ_COLOR(customSlidersColor)
@@ -1662,14 +1664,14 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_APPEARANCE(grooveAppearance, false, false)
             CFG_READ_APPEARANCE(sunkenAppearance, false, false)
             CFG_READ_APPEARANCE(sbarBgndAppearance, false, false)
-            if(version<MAKE_VERSION(1, 6))
+            if(opts->version<MAKE_VERSION(1, 6))
                 opts->tooltipAppearance=APPEARANCE_FLAT;
             else
             {
                 CFG_READ_APPEARANCE(tooltipAppearance, false, false)
             }
 
-            if(version<MAKE_VERSION(0, 63))
+            if(opts->version<MAKE_VERSION(0, 63))
                 opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
             else
             {
@@ -1737,7 +1739,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(dlgOpacity)
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
             CFG_READ_APPEARANCE(menuStripeAppearance, false, false)
-            if(version<MAKE_VERSION(0, 63) && IS_BLACK(opts->customMenuStripeColor))
+            if(opts->version<MAKE_VERSION(0, 63) && IS_BLACK(opts->customMenuStripeColor))
                 CFG_READ_COLOR(customMenuStripeColor)
             CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
             CFG_READ_BOOL(gtkScrollViews)

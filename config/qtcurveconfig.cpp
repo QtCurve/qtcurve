@@ -71,7 +71,8 @@
 #define CONFIG_WRITE
 #include "config_file.c"
 
-#define EXTENSION ".qtcurve"
+#define EXTENSION                  ".qtcurve"
+#define VERSION_WITH_KWIN_SETTINGS MAKE_VERSION(1, 5)
 
 extern "C"
 {
@@ -2135,6 +2136,19 @@ void QtCurveConfig::setPreset()
         readConfig(p.fileName, &p.opts, &presets[defaultText].opts);
 
     setWidgetOptions(p.opts);
+    
+    if(defaultText==presetsCombo->currentText())
+        kwin->defaults();
+    else if(currentText==presetsCombo->currentText())
+        kwin->load(0);
+    else if(p.opts.version>=VERSION_WITH_KWIN_SETTINGS)
+    {
+        KConfig cfg(p.fileName, KConfig::SimpleConfig);
+
+        if(cfg.hasGroup(KWIN_GROUP))
+            kwin->load(&cfg);
+    }
+
     if (settingsChanged(previewStyle))
         updatePreview();
     if (settingsChanged())
@@ -2171,6 +2185,8 @@ bool QtCurveConfig::savePreset(const QString &name)
     setOptions(opts);
     if(writeConfig(&cfg, opts, presets[defaultText].opts, true))
     {
+        kwin->save(&cfg);
+
         QMap<QString, Preset>::iterator it(presets.find(name)),
                                         end(presets.end());
 
@@ -2189,7 +2205,6 @@ bool QtCurveConfig::savePreset(const QString &name)
             setPreset();
         }
 
-        kwin->save(0L);
         return true;
     }
 
@@ -2319,7 +2334,7 @@ void QtCurveConfig::importPreset()
                     KConfigGroup grp(&cfg, SETTINGS_GROUP);
                     QStringList  ver(grp.readEntry("version", QString()).split('.'));
 
-                    if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=MAKE_VERSION(1, 5))
+                    if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=VERSION_WITH_KWIN_SETTINGS)
                         kwin->load(&cfg);
                 }
             }
