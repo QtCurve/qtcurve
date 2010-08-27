@@ -2528,7 +2528,7 @@ static gboolean qtInit()
                 if(!opts.gtkButtonOrder && NULL==gtk_check_version(2, 6, 0))
                     g_object_set(settings, "gtk-alternative-button-order", TRUE, NULL);
 
-                gtk_settings_set_int_property(settings, "gtk-menu-popup-delay", opts.menuDelay, "KDE-Settings");
+                gtk_settings_set_long_property(settings, "gtk-menu-popup-delay", opts.menuDelay, "KDE-Settings");
             }
 
             if(qtSettings.fonts[FONT_GENERAL])
