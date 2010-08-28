@@ -2467,18 +2467,18 @@ static void defaultSettings(Options *opts)
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
-    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape";
-    opts->noMenuBgndOpacityApps << "inkscape";
+    opts->noMenuBgndOpacityApps << "inkscape" << "inkscape" << "sonata" << "totem";
+    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "inkscape" << "sonata" << "totem";
 #endif
     opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
-    opts->noBgndOpacityApps=g_strsplit("inkscape",",", -1);;
+    opts->noBgndOpacityApps=g_strsplit("inkscape,sonata,totem",",", -1);;
     opts->noBgndImageApps=NULL;
     opts->noDlgFixApps=NULL;
     opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
-    opts->noMenuBgndOpacityApps=g_strsplit("inkscape",",", -1);
+    opts->noMenuBgndOpacityApps=g_strsplit("inkscape,sonata,totem",",", -1);
 /*
     opts->setDialogButtonOrder=false;
 */
