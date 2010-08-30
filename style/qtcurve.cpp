@@ -27,6 +27,7 @@
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "pixmaps.h"
+#include <iostream>
 #define CONFIG_READ
 #include "config_file.c"
 
@@ -1314,6 +1315,12 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_OPENOFFICE;
     else if("kdmgreet"==appName)
         opts.forceAlternateLvCols=false;
+
+    if(NULL!=getenv("QTCURVE_DEBUG"))
+    {
+        QByteArray l1(appName.toLatin1());
+        std::cout << "QtCurve: Application name: \"" << l1.constData() << "\"\n";
+    }
 
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);
