@@ -580,7 +580,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>&lt;i&gt;&lt;B&gt;NOTE:&lt;/B&gt; Opacity settings are &lt;b&gt;experimental&lt;/b&gt; and can cause certain applications (mainly Gtk2 ones) to crash. If you have an application that crashes, use the &quot;Applications&quot; page to disable opacity settings for that application.&lt;/i&gt;</string>
+          <string>&lt;B&gt;NOTE:&lt;/B&gt; &lt;i&gt;Opacity settings are &lt;b&gt;experimental&lt;/b&gt; and can cause certain applications (mainly Gtk2 ones) to crash. If you have an application that crashes, use the &quot;Applications&quot; page to disable opacity settings for that application.&lt;/i&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
