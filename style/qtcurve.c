@@ -2563,7 +2563,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(doEtch)
         y++,  x++, height-=2,  width-=2;
 
-    if(DEBUG_ALL==qtSettings.debug)  printf("Draw entry_field %d %d %d %d %d %d ", state, x, y, width, height, round),
+    if(DEBUG_ALL==qtSettings.debug)  printf(DEBUG_PREFIX "%s %d %d %d %d %d %d ", __FUNCTION__, state, x, y, width, height, round),
                                      debugDisplayWidget(widget, 3);
 
     if(ROUNDED_ALL!=round)
