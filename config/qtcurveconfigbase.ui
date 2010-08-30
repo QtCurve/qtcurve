@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>756</width>
-    <height>522</height>
+    <height>529</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -260,68 +260,34 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_47a">
-         <property name="text">
-          <string>Window background opacity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="KIntNumInput" name="bgndOpacity">
-         <property name="whatsThis">
-          <string>Sets the opacity of window backgrounds when using deskop effects.</string>
-         </property>
-         <property name="suffix">
-          <string>%</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_47x">
-         <property name="text">
-          <string>Dialog background opacity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="KIntNumInput" name="dlgOpacity">
-         <property name="whatsThis">
-          <string>Sets the opacity of dialog backgrounds when using deskop effects.</string>
-         </property>
-         <property name="suffix">
-          <string>%</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
         <widget class="QLabel" name="label_29">
          <property name="text">
           <string>Sunken appearance:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="4" column="1">
         <widget class="QComboBox" name="sunkenAppearance">
          <property name="whatsThis">
           <string>Define the gradient to be used for sunken widgets - e.g. pressed buttons.</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
           <string>Button effect:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="buttonEffect">
          <property name="whatsThis">
           <string>Control what effect should be applied to buttons, combo boxes, etc.</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="6" column="1">
         <widget class="QCheckBox" name="thinnerBtns">
          <property name="whatsThis">
           <string>Make buttons, and other widgets, slightly thinner.</string>
@@ -331,7 +297,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="7" column="1">
         <widget class="QCheckBox" name="etchEntry">
          <property name="whatsThis">
           <string>When the 'Button effect' is set to etched or shadowed, then this option controls whether line-edits and scrollviews (such as listviews and treeviews) should have an etched look.</string>
@@ -341,35 +307,35 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_25">
          <property name="text">
           <string>Focus rectangle:</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="8" column="1">
         <widget class="QComboBox" name="focus">
          <property name="whatsThis">
           <string>Controls how QtCurve indicates that a widget has keyboard focus.</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_tt">
          <property name="text">
           <string>Tooltips:</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="9" column="1">
         <widget class="QComboBox" name="tooltipAppearance">
          <property name="whatsThis">
           <string>Controls the appearance of tooltip backgrounds.</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="0" colspan="2">
+       <item row="10" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string/>
@@ -529,6 +495,103 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_29">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QFormLayout" name="formLayout_23">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_47a">
+           <property name="text">
+            <string>Windows:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="KIntNumInput" name="bgndOpacity">
+           <property name="whatsThis">
+            <string>Sets the opacity of window backgrounds when using deskop effects.</string>
+           </property>
+           <property name="suffix">
+            <string>%</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_47x">
+           <property name="text">
+            <string>Dialogs:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="KIntNumInput" name="dlgOpacity">
+           <property name="whatsThis">
+            <string>Sets the opacity of dialog backgrounds when using deskop effects.</string>
+           </property>
+           <property name="suffix">
+            <string>%</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_yy">
+           <property name="text">
+            <string>Pop-up menus:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="KIntNumInput" name="menuBgndOpacity">
+           <property name="whatsThis">
+            <string>Sets the opacity of popup menus when using deskop effects.</string>
+           </property>
+           <property name="suffix">
+            <string>%</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>13</width>
+           <height>13</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_100">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>&lt;i&gt;&lt;B&gt;NOTE:&lt;/B&gt; Opacity settings are &lt;b&gt;experimental&lt;/b&gt; and can cause certain applications (mainly Gtk2 ones) to crash. If you have an application that crashes, use the &quot;Applications&quot; page to disable opacity settings for that application.&lt;/i&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_18">
       <layout class="QFormLayout" name="formLayout_11">
        <item row="0" column="0">
@@ -539,8 +602,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="groupBox">
-        </widget>
+        <widget class="QComboBox" name="groupBox"/>
        </item>
        <item row="1" column="1">
         <widget class="KIntNumInput" name="gbFactor">
@@ -2109,7 +2171,7 @@
         </widget>
        </item>
        <item row="9" column="0">
-        <widget class="QLabel" name="label_55">
+        <widget class="QLabel" name="label_55b">
          <property name="text">
           <string>Draw separator on active windows:</string>
          </property>
@@ -2950,6 +3012,9 @@
      </widget>
      <widget class="QWidget" name="page_23">
       <layout class="QFormLayout" name="formLayout_14">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_60">
          <property name="text">
@@ -3051,30 +3116,13 @@
         </widget>
        </item>
        <item row="8" column="0">
-        <widget class="QLabel" name="label_yy">
-         <property name="text">
-          <string>Background opacity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="KIntNumInput" name="menuBgndOpacity">
-         <property name="whatsThis">
-          <string>Sets the opacity of popup menus when using deskop effects.</string>
-         </property>
-         <property name="suffix">
-          <string>%</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
         <widget class="QLabel" name="label_45">
          <property name="text">
           <string>Sub-menu delay:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="8" column="1">
         <widget class="KIntNumInput" name="menuDelay">
          <property name="whatsThis">
           <string>Defines the delay before a sub-menu appears.</string>
@@ -3087,21 +3135,21 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_44">
          <property name="text">
           <string>Stripe:</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="9" column="1">
         <widget class="QComboBox" name="menuStripe">
          <property name="whatsThis">
           <string>Defines the coloration of the menu-stripe that will be drawn on the left of poup menus - but only if this option is not set to 'none'.</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="10" column="1">
         <widget class="KColorButton" name="customMenuStripeColor">
          <property name="enabled">
           <bool>false</bool>
@@ -3117,7 +3165,7 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="11" column="1">
         <widget class="QComboBox" name="menuStripeAppearance">
          <property name="enabled">
           <bool>false</bool>
@@ -3127,14 +3175,14 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_61">
          <property name="text">
           <string>Border popupmenus:</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="12" column="1">
         <widget class="QCheckBox" name="popupBorder">
          <property name="whatsThis">
           <string>If enabled, the whole popup menu will have a border, otherwise no border will be drawn. This option should be enabled unless you have also enabled shadows in your window manager.</string>
@@ -3144,14 +3192,14 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_97">
          <property name="text">
           <string>Use menubar colour settings:</string>
          </property>
         </widget>
        </item>
-       <item row="14" column="1">
+       <item row="13" column="1">
         <widget class="QCheckBox" name="shadePopupMenu">
          <property name="text">
           <string>Enabled</string>
@@ -3525,133 +3573,167 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_26">
-      <layout class="QFormLayout" name="formLayout_20">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::ExpandingFieldsGrow</enum>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_81">
+      <layout class="QVBoxLayout" name="verticalLayout_17">
+       <item>
+        <layout class="QFormLayout" name="formLayout_20">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_81">
+           <property name="text">
+            <string>No background gradient:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="KLineEdit" name="noBgndGradientApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background gradient setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_82">
+           <property name="text">
+            <string>No background image:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="KLineEdit" name="noBgndImageApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background image setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_81b">
+           <property name="text">
+            <string>No background opacity:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="KLineEdit" name="noBgndOpacityApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background opacity setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_81mnu">
+           <property name="text">
+            <string>No menu opacity:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="KLineEdit" name="noMenuBgndOpacityApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu opacity setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_82y">
+           <property name="text">
+            <string>No menu stripe:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="KLineEdit" name="noMenuStripeApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu stripe setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_83">
+           <property name="text">
+            <string>Use Qt file dialog:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="KLineEdit" name="useQtFileDialogApps">
+           <property name="whatsThis">
+            <string>Comma seperated list of names of Qt4 applications which should not use the KDE4 file dialog.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_83a">
+           <property name="text">
+            <string>Save menubar visibility:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="KLineEdit" name="menubarApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the menubar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The menubar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_89">
+           <property name="text">
+            <string>Save statusbar visibility:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="KLineEdit" name="statusbarApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the statusbar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The statusbar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_83x">
+           <property name="text">
+            <string>Don't apply parent-less dialog fix:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="KLineEdit" name="noDlgFixApps">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Comma seperated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications, and &lt;i&gt;kde&lt;/i&gt; to disable for all KDE applications&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>8</width>
+           <height>8</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_101">
          <property name="text">
-          <string>No background gradient:</string>
+          <string>&lt;i&gt;&lt;p&gt;In the bove lists, you need to enter the executable name. e.g For Google Earth this is actually &quot;googleearth-bin&quot;. You may use &quot;gtk2&quot; to disable for all Gtk2 applications, or &quot;kde&quot; for all KDE/Qt applications.&lt;/p&gt;
+&lt;p&gt;To determine the name that QtCurve will detect, you can start an application from a konsole window using the following syntax (example is for Firefox):&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;QTCURVE_DEBUG=1 firefox&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;This will cause QtCurve to display the detected process name, as follows:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;QtCurve: Application name: &quot;firefox&quot;&lt;/code&gt;&lt;/p&gt;&lt;/i&gt;</string>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="KLineEdit" name="noBgndGradientApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background gradient setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_82">
-         <property name="text">
-          <string>No background image:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="KLineEdit" name="noBgndImageApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background image setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_81">
-         <property name="text">
-          <string>No background opacity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="KLineEdit" name="noBgndOpacityApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the background opacity setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_81mnu">
-         <property name="text">
-          <string>No menu opacity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="KLineEdit" name="noMenuBgndOpacityApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu opacity setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_82y">
-         <property name="text">
-          <string>No menu stripe:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="KLineEdit" name="noMenuStripeApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications which should not use the menu stripe setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_83">
-         <property name="text">
-          <string>Use Qt file dialog:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="KLineEdit" name="useQtFileDialogApps">
-         <property name="whatsThis">
-          <string>Comma seperated list of names of Qt4 applications which should not use the KDE4 file dialog.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_83a">
-         <property name="text">
-          <string>Save menubar visibility:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="KLineEdit" name="menubarApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the menubar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The menubar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_83x">
-         <property name="text">
-          <string>Don't apply parent-less dialog fix:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="KLineEdit" name="noDlgFixApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of applications where QtCurve should not attempt to fix parent-less dialogs.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications, and &lt;i&gt;kde&lt;/i&gt; to disable for all KDE applications&lt;/p&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_89">
-         <property name="text">
-          <string>Save statusbar visibility:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="KLineEdit" name="statusbarApps">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Comma seperated list of names of KDE4 applications where QtCurve needs to manually save whether the statusbar is hidden or not.&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;kde&lt;/i&gt; to set for all KDE applications. The statusbar state of Gtk2 applications is always manually saved.&lt;/p&gt;</string>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -3718,7 +3800,7 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="groupBox_b">
           <property name="title">
            <string>Settings</string>
           </property>
@@ -4082,6 +4164,22 @@
             </property>
            </widget>
           </item>
+          <item row="6" column="0">
+           <spacer name="verticalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>36</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
@@ -4115,7 +4213,7 @@
            </widget>
           </item>
           <item row="0" column="2" rowspan="3">
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="label_4b">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
               <horstretch>0</horstretch>
@@ -4207,8 +4305,6 @@
   <tabstop>bgndAppearance</tabstop>
   <tabstop>bgndGrad</tabstop>
   <tabstop>bgndImage</tabstop>
-  <tabstop>bgndOpacity</tabstop>
-  <tabstop>dlgOpacity</tabstop>
   <tabstop>sunkenAppearance</tabstop>
   <tabstop>buttonEffect</tabstop>
   <tabstop>thinnerBtns</tabstop>
@@ -4229,6 +4325,9 @@
   <tabstop>squareSlider</tabstop>
   <tabstop>squareScrollbarSlider</tabstop>
   <tabstop>squareWindows</tabstop>
+  <tabstop>bgndOpacity</tabstop>
+  <tabstop>dlgOpacity</tabstop>
+  <tabstop>menuBgndOpacity</tabstop>
   <tabstop>groupBox</tabstop>
   <tabstop>gbFactor</tabstop>
   <tabstop>gbLabel_bold</tabstop>
@@ -4387,7 +4486,6 @@
   <tabstop>menuBgndAppearance</tabstop>
   <tabstop>menuBgndGrad</tabstop>
   <tabstop>menuBgndImage</tabstop>
-  <tabstop>menuBgndOpacity</tabstop>
   <tabstop>menuStripe</tabstop>
   <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>
@@ -4462,12 +4560,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>410</y>
+     <x>352</x>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
-     <x>360</x>
-     <y>325</y>
+     <x>355</x>
+     <y>315</y>
     </hint>
    </hints>
   </connection>
@@ -4483,7 +4581,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>662</x>
-     <y>-11</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -4494,12 +4592,12 @@
    <slot>exportQt()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
-     <y>57</y>
+     <x>434</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
      <x>532</x>
-     <y>-1</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>

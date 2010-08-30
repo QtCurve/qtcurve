@@ -1441,6 +1441,7 @@ void QtCurveConfig::setupStack()
     CStackItem *first=new CStackItem(stackList, i18n("Presets and Preview"), i++);
     new CStackItem(stackList, i18n("General"), i++);
     new CStackItem(stackList, i18n("Rounding"), i++);
+    new CStackItem(stackList, i18n("Opacity"), i++);
     new CStackItem(stackList, i18n("Group Boxes"), i++);
     new CStackItem(stackList, i18n("Combos"), i++);
     new CStackItem(stackList, i18n("Spin Buttons"), i++);
