@@ -607,7 +607,7 @@
        <item row="1" column="1">
         <widget class="KIntNumInput" name="gbFactor">
          <property name="whatsThis">
-          <string>Defines how much a group boxe's background should be darkened or lightened by.</string>
+          <string>Defines how much a group box's background should be darkened or lightened by.</string>
          </property>
          <property name="suffix">
           <string>%</string>
