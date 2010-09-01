@@ -956,6 +956,9 @@ Style::Style()
 #endif
     readConfig(rcFile, &opts);
 
+    if(itsIsPreview)
+        opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+
 #ifdef Q_WS_X11
     if(!qApp || QString(qApp->argv()[0])!="kwin")
     {
