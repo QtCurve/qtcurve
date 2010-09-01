@@ -2480,9 +2480,20 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
             GdkRectangle clip;
-            int          opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity;
+            int          opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity,
+                         xmod=0, ymod=0, wmod=0, hmod=0;
             double       alpha=1.0;
             gboolean     useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window);
+
+            if(!IS_FLAT_BGND(opts.bgndAppearance))
+            {
+                WindowBorders borders=qtcGetWindowBorderSize(FALSE);
+                xmod=-borders.sides;
+                ymod=-borders.titleHeight;
+                wmod=2*borders.sides;
+                hmod=borders.titleHeight+borders.bottom;
+            }
+
             clip.x=x, clip.y=-ypos, clip.width=width, clip.height=window->allocation.height;
             setCairoClipping(cr, &clip, NULL);
 
@@ -2502,14 +2513,15 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                     drawAreaColorAlpha(cr, area, NULL, &style->bg[GTK_STATE_NORMAL] , x, -ypos, width, window->allocation.height, alpha);
             }
             else if(APPEARANCE_STRIPED==opts.bgndAppearance)
-                drawStripedBgnd(cr, style, area,  x, -ypos, width, window->allocation.height, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+                drawStripedBgnd(cr, style, area,  x+xmod, -ypos+ymod, width+wmod, window->allocation.height+hmod,
+                                &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
             else
             {
                 if(GT_HORIZ==opts.bgndGrad)
-                    drawBevelGradientAlpha(cr, style, area, NULL, x, -ypos, width, window->allocation.height,
+                    drawBevelGradientAlpha(cr, style, area, NULL, x+xmod, -ypos+ymod, width+wmod, window->allocation.height+hmod,
                                            &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
                 else
-                    drawBevelGradientAlpha(cr, style, area, NULL, -xpos, y, window->allocation.width, height,
+                    drawBevelGradientAlpha(cr, style, area, NULL, -xpos+xmod, y+ymod, window->allocation.width+wmod, height+hmod,
                                            &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
             }
 
@@ -4620,7 +4632,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
             if(menubar && BLEND_TITLEBAR)
             {
-                menuBarAdjust=qtcGetWindowBorderSize(FALSE);
+                menuBarAdjust=qtcGetWindowBorderSize(FALSE).titleHeight;
                 if(widget)
                 {
                     if(qtcEmitMenuSize(widget, height) &&

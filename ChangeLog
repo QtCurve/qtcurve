@@ -34,6 +34,7 @@
 19. Exclude opacity settings from SWT apps such as eclipse.
 20. Default sub-menu popup delay to 225 - matches Gtk2 standard default. The previous
     default of 100 seems to cause issues with Thunar.
+21. Extend background gradients into window decoration.
 
 1.5.2
 -----
