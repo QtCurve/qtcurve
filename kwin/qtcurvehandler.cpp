@@ -260,20 +260,18 @@ bool QtCurveHandler::readConfig()
     KConfig            configFile("kwinqtcurverc");
     const KConfigGroup config(&configFile, "General");
     QFontMetrics       fm(itsTitleFont);  // active font = inactive font
-    int                titleHeightMin = config.readEntry("MinTitleHeight", 16),
-                       oldSize=itsTitleHeight,
+    int                oldSize=itsTitleHeight,
                        oldToolSize=itsTitleHeightTool;
 
     // The title should stretch with bigger font sizes!
-    itsTitleHeight = qMax(titleHeightMin, fm.height() + 4); // 4 px for the shadow etc.
+    itsTitleHeight = qMax(20, fm.height() + 4); // 4 px for the shadow etc.
     // have an even title/button size so the button icons are fully centered...
     if (itsTitleHeight%2 == 0)
         itsTitleHeight++;
 
     fm = QFontMetrics(itsTitleFontTool);  // active font = inactive font
-    int titleHeightToolMin = config.readEntry("MinTitleHeightTool", 13);
     // The title should stretch with bigger font sizes!
-    itsTitleHeightTool = qMax(titleHeightToolMin, fm.height()); // don't care about the shadow etc.
+    itsTitleHeightTool = qMax(18, fm.height()); // don't care about the shadow etc.
     // have an even title/button size so the button icons are fully centered...
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;
