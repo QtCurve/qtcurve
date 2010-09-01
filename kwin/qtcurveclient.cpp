@@ -238,6 +238,12 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &r,
                            const QPainterPath path=QPainterPath(), const QRegion &mask=QRegion())
 {
+    if(!path.isEmpty())
+    {
+        painter.setPen(col);
+        painter.drawPath(path);
+    }
+            
     if(!IS_FLAT_BGND(app))
     {
         QtCurve::Style::BgndOption opt;
@@ -248,11 +254,6 @@ static void fillBackground(EAppearance app, QPainter &painter, const QColor &col
         if(!mask.isEmpty())
         {
             painter.save();
-            if(!path.isEmpty())
-            {
-                painter.setPen(col);
-                painter.drawPath(path);
-            }
             painter.setClipRegion(mask, Qt::IntersectClip);
         }
         Handler()->wStyle()->drawPrimitive(QtC_PE_DrawBackground, &opt, &painter, NULL);
