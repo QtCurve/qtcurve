@@ -24,7 +24,6 @@
   Boston, MA 02110-1301, USA.
  */
 #define DRAW_INTO_PIXMAPS
-
 #include <KDE/KLocale>
 #include <QBitmap>
 #include <QDateTime>
@@ -57,6 +56,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include "../style/fixx11h.h"
+#include "../style/qtcurve.h"
 #include <QX11Info>
 
 #if KDE_IS_VERSION(4, 3, 85)
@@ -130,6 +130,13 @@ int getOpacityProperty(WId wId)
     static const Atom constAtom  = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
     int o=getProperty(wId, constAtom);
     return o<0 || o>100 ? 100 : o;
+}
+
+EAppearance getAppearance(WId wId)
+{
+    static const Atom constAtom  = XInternAtom(QX11Info::display(), BGND_ATOM, False);
+    int app=getProperty(wId, constAtom);
+    return app<0 || app>APPEARANCE_STRIPED ? APPEARANCE_FLAT : (EAppearance)app;
 }
 
 static QPainterPath createPath(const QRectF &r, double radius, bool roundTop, bool roundBot)
@@ -228,15 +235,16 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 }
 #endif
 
-static void fillBackground(bool customBgnd, QPainter &painter, const QColor &col, const QRect &r, 
+static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &r,
                            const QPainterPath path=QPainterPath(), const QRegion &mask=QRegion())
 {
-    if(customBgnd)
+    if(!IS_FLAT_BGND(app))
     {
-        QStyleOption opt;
+        QtCurve::Style::BgndOption opt;
         opt.state|=QtC_StateKWin;
         opt.rect=r;
         opt.palette.setColor(QPalette::Window, col);
+        opt.app=app;
         if(!mask.isEmpty())
         {
             painter.save();
@@ -528,7 +536,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          outerBorder(Handler()->outerBorder()),
                          preview(isPreview()),
                          blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
-                         customBgnd(colorTitleOnly && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_CustomBgnd, 0L, 0L)),
                          menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR),
                          separator(active && windowBorder&WINDOW_BORDER_SEPARATOR);
     const int            border(Handler()->borderEdgeSize()),
@@ -542,6 +549,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          buttonFlags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, NULL, NULL);
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
                          opacity(compositing ? Handler()->opacity(active) : 100);
+    EAppearance          bgndAppearance=getAppearance(windowId());
+    bool                 customBgnd=!IS_FLAT_BGND(bgndAppearance);
 
     painter.setClipRegion(e->region());
 
@@ -619,11 +628,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
 
     if(!compositing)
-        fillBackground(customBgnd, painter, fillCol, r);
+        fillBackground(bgndAppearance, painter, fillCol, r);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
     if(compositing)
-        fillBackground(customBgnd, painter, fillCol, r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0),
+        fillBackground(bgndAppearance, painter, fillCol, r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0),
                        customBgnd && outerBorder
                             ? QPainterPath()
                             : createPath(r, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom),

@@ -507,6 +507,15 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
     }
 }
 
+void setBgndProp(QWidget *w, unsigned short app)
+{
+    if(w)
+    {
+        static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
+        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&app, 1);
+    }
+}
+
 void setSbProp(QWidget *w)
 {
     if(w)
@@ -1578,6 +1587,8 @@ void Style::polish(QWidget *widget)
             case Qt::Window:
             case Qt::Dialog:
             {
+                setBgndProp(widget, opts.bgndAppearance);
+
                 int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
                 Utils::addEventFilter(widget, this);
@@ -5002,14 +5013,15 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         }
 #endif
         case QtC_PE_DrawBackground:
-            if(option && state&QtC_StateKWin)
-            {
-                QColor col(palette.brush(QPalette::Window).color());
-                int    opacity(col.alphaF()*100);
+            if (const QtCurve::Style::BgndOption *bgnd = qstyleoption_cast<const QtCurve::Style::BgndOption *>(option))
+                if(state&QtC_StateKWin)
+                {
+                    QColor col(palette.brush(QPalette::Window).color());
+                    int    opacity(col.alphaF()*100);
 
-                col.setAlphaF(1.0);
-                drawBackground(painter, col, r, opacity, BGND_WINDOW);
-            }
+                    col.setAlphaF(1.0);
+                    drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app);
+                }
             break;
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
@@ -10881,10 +10893,9 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
     return pix;
 }
 
-void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type) const
+void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app) const
 {
-    bool        isWindow(BGND_MENU!=type);
-    EAppearance app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
+    bool isWindow(BGND_MENU!=type);
 
     if(!IS_FLAT_BGND(app))
     {
@@ -10958,7 +10969,8 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
         WindowBorders borders=qtcGetWindowBorderSize();
         r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
     }
-    drawBackground(&p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type);
+    drawBackground(&p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
+                   BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
 
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
                               (IMG_FILE!=opts.bgndImage.type || 
