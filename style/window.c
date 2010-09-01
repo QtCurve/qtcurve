@@ -256,14 +256,23 @@ static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
     return FALSE;
 }
 
-static void qtcWindowSetOpacity(GtkWidget *w, unsigned short opacity)
+static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 {
-    GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+    GtkWindow      *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+    GdkDisplay     *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
 
-    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
-                    gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
-                    XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+    if(100!=opacity)
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                        gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
+                        XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
+
+    if(!IS_FLAT(opts.bgndAppearance))
+    {
+        unsigned short app=opts.bgndAppearance;
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                        gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
+                        XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&app, 1);
+    }
 }
 
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -286,10 +295,7 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
 
 static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-    int opacity=(int)g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY");
-
-    if(100!=opacity)
-        qtcWindowSetOpacity(widget, (unsigned short)opacity);
+    qtcWindowSetProperties(widget, (unsigned short)g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY"));
 
     if(opts.menubarHiding&HIDE_KWIN)
     {
@@ -334,8 +340,7 @@ static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
                               (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
                                                          (GtkSignalFunc)qtcWindowKeyRelease, NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY", (gpointer)opacity);
-        if(100!=opacity)
-            qtcWindowSetOpacity(widget, (unsigned short)opacity);
+        qtcWindowSetProperties(widget, (unsigned short)opacity);
 
         if((opts.menubarHiding&HIDE_KWIN) || (opts.statusbarHiding&HIDE_KWIN) || 100!=opacity)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_MAP_ID",
