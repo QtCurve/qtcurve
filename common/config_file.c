@@ -711,12 +711,17 @@ static const char *qtcConfDir()
 }
 
 #ifdef __cplusplus
-static int qtcGetWindowBorderSize(bool force=false)
+static WindowBorders qtcGetWindowBorderSize(bool force=false)
+#else
+static WindowBorders qtcGetWindowBorderSize(bool force)
+#endif
 {
-    static int size=-1;
+    static WindowBorders def={24, 18, 4, 4};
+    static WindowBorders sizes={-1, -1, -1, -1};
 
-    if(-1==size || force)
+    if(-1==sizes.titleHeight || force)
     {
+#ifdef __cplusplus
         QFile f(qtcConfDir()+QString(BORDER_SIZE_FILE));
 
 #if QT_VERSION >= 0x040000
@@ -728,20 +733,13 @@ static int qtcGetWindowBorderSize(bool force=false)
             QTextStream stream(&f);
             QString     line;
 
-            size=stream.readLine().toInt();
+            sizes.titleHeight=stream.readLine().toInt();
+            sizes.toolTitleHeight=stream.readLine().toInt();
+            sizes.bottom=stream.readLine().toInt();
+            sizes.sides=stream.readLine().toInt();
             f.close();
         }
-    }
-
-    return size<12 ? 24 : size;
-}
-#else
-static int qtcGetWindowBorderSize(gboolean force)
-{
-    static int size=-1;
-
-    if(-1==size || force)
-    {
+#else // __cplusplus
         char *filename=(char *)malloc(strlen(qtcConfDir())+strlen(BORDER_SIZE_FILE)+1);
         FILE *f=NULL;
 
@@ -751,17 +749,23 @@ static int qtcGetWindowBorderSize(gboolean force)
             char *line=NULL;
             size_t len;
             getline(&line, &len, f);
-            size=atoi(line);
+            sizes.titleHeight=atoi(line);
+            getline(&line, &len, f);
+            sizes.toolTitleHeight=atoi(line);
+            getline(&line, &len, f);
+            sizes.bottom=atoi(line);
+            getline(&line, &len, f);
+            sizes.sides=atoi(line);
             if(line)
                 free(line);
             fclose(f);
         }
         free(filename);
+#endif // __cplusplus
     }
 
-    return size<12 ? 24 : size;
+    return sizes.titleHeight<12 ? def : sizes;
 }
-#endif // __cplusplus
 
 #if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
 

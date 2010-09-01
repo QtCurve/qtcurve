@@ -951,7 +951,7 @@ Style::Style()
     if(!qApp || QString(qApp->argv()[0])!="kwin")
     {
         QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                              "titlebarSizeChanged", this, SLOT(titlebarSizeChangedChange()));
+                                              "borderSizesChanged", this, SLOT(borderSizesChanged()));
         if(opts.menubarHiding&HIDE_KWIN)
             QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
                                                   "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
@@ -2990,7 +2990,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case QtC_WindowBorder:
             return opts.windowBorder;
         case QtC_CustomBgnd:
-            return APPEARANCE_STRIPED==opts.bgndAppearance; //TODO: CUSTOM_BGND;
+            return CUSTOM_BGND;
         case QtC_TitleBarButtonAppearance:
             return (int)opts.titlebarButtonAppearance;
         case QtC_TitleAlignment:
@@ -5002,14 +5002,16 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         }
 #endif
         case QtC_PE_DrawBackground:
-            // TODO: Extend this for all background gradients???
-            if(option && APPEARANCE_STRIPED==opts.bgndAppearance && state&QtC_StateKWin)
+            if(option && state&QtC_StateKWin)
             {
                 QColor col(palette.brush(QPalette::Window).color());
-                painter->drawTiledPixmap(r, drawStripes(col, (int)(col.alphaF()*100)));
+                int    opacity(col.alphaF()*100);
+
+                col.setAlphaF(1.0);
+                drawBackground(painter, col, r, opacity, BGND_WINDOW);
             }
             break;
-        // TODO: This is the only part left from QWindosStyle - but I dont think its actually used!
+        // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
         // case PE_IndicatorProgressChunk:
         case PE_PanelTipLabel:
         {
@@ -8182,34 +8184,11 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #endif
                 if(!kwin)
                     painter->fillRect(tr, titleCols[STD_BORDER]);
-
-                if(APPEARANCE_STRIPED==opts.bgndAppearance && opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR)
-                {
-                    painter->save();
-
-                    if(path.isEmpty())
-                        painter->setClipRect(r, Qt::IntersectClip);
-                    else
-                    {
-                        painter->setPen(itsBackgroundCols[ORIGINAL_SHADE]);
-                        painter->drawPath(painter->testRenderHint(QPainter::Antialiasing) ? path.translated(0.5, 0.5) : path);
-                        painter->setRenderHint(QPainter::Antialiasing, false);
-                        painter->setClipPath(path, Qt::IntersectClip);
-                    }
-
-                    painter->drawTiledPixmap(r.adjusted(0, -(4-(r.height()%4)), 0, 0),
-                                             drawStripes(itsBackgroundCols[ORIGINAL_SHADE],
-                                                         !widget || !widget->topLevelWidget() || !qobject_cast<QDialog *>(widget->topLevelWidget()) 
-                                                            ? opts.bgndOpacity : opts.dlgOpacity));
-
-                    painter->restore();
-
-                }
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false,
-                                    widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active),
-                                    WIDGET_MDI_WINDOW, false);
+                EAppearance app= widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active);
+                if(!kwin || !IS_FLAT(app) || (titleCols[ORIGINAL_SHADE]!=QApplication::palette().background().color()))
+                    drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, app, WIDGET_MDI_WINDOW, false);
 
                 if(!(state&QtC_StateKWinNoBorder))
                 {
@@ -10352,7 +10331,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             if(titleBar)
             {
                 col=itsBackgroundCols[ORIGINAL_SHADE];
-                if(APPEARANCE_STRIPED==opts.bgndAppearance)
+                //if(APPEARANCE_STRIPED==opts.bgndAppearance)
                     col.setAlphaF(0.0);
             }
             else
@@ -10902,27 +10881,14 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
     return pix;
 }
 
-void Style::drawBackground(QWidget *widget, BackgroundType type) const
+void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type) const
 {
-    QPainter      p(widget);
-    bool          isWindow(BGND_MENU!=type);
-    const QWidget *window = itsIsPreview ? widget : widget->window();
-    int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0;
-    EAppearance   app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
-    int           opacity = BGND_MENU==type
-                                ? opts.menuBgndOpacity
-                                : BGND_DIALOG==type
-                                    ? opts.dlgOpacity
-                                    : opts.bgndOpacity;
-
-    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
-        opacity=100;
-
-    p.setClipRegion(widget->rect(), Qt::IntersectClip);
+    bool        isWindow(BGND_MENU!=type);
+    EAppearance app = isWindow ? opts.bgndAppearance : opts.menuBgndAppearance;
 
     if(!IS_FLAT_BGND(app))
     {
-        QColor  col(isWindow ? window->palette().window().color() : popupMenuCol());
+        QColor  col(bgnd);
         QPixmap pix;
         QSize   scaledSize;
 
@@ -10935,7 +10901,7 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
             QString   key;
             EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
 
-            scaledSize=QSize(GT_HORIZ==grad ? constPixmapWidth : window->rect().width(), GT_HORIZ==grad ? window->rect().height() : constPixmapWidth);
+            scaledSize=QSize(GT_HORIZ==grad ? constPixmapWidth : r.width(), GT_HORIZ==grad ? r.height() : constPixmapWidth);
 
             if(100!=opacity)
                 col.setAlphaF(opacity/100.0);
@@ -10957,17 +10923,42 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
             }
         }
 
-        p.drawTiledPixmap(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()),
-                          APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+        p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
     }
     else
     {
-        QColor col(isWindow ? window->palette().window().color() : popupMenuCol());
+        QColor col(bgnd);
 
         if(100!=opacity)
             col.setAlphaF(opacity/100.0);
-        p.fillRect(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()), col);
+        p->fillRect(r, col);
     }
+}
+
+void Style::drawBackground(QWidget *widget, BackgroundType type) const
+{
+    QPainter      p(widget);
+    bool          isWindow(BGND_MENU!=type);
+    const QWidget *window = itsIsPreview ? widget : widget->window();
+    int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0,
+                  opacity = BGND_MENU==type
+                                ? opts.menuBgndOpacity
+                                : BGND_DIALOG==type
+                                    ? opts.dlgOpacity
+                                    : opts.bgndOpacity;
+    QRect         r(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()));
+
+    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
+        opacity=100;
+
+    p.setClipRegion(widget->rect(), Qt::IntersectClip);
+
+    if(isWindow)
+    {
+        WindowBorders borders=qtcGetWindowBorderSize();
+        r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+    }
+    drawBackground(&p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type);
 
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
                               (IMG_FILE!=opts.bgndImage.type || 
@@ -10986,7 +10977,7 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
             loadBgndImage(&img);
             if(!img.pix.isNull())
             {
-                p.drawPixmap(widget->width()-img.pix.width(), y, img.pix);
+                p.drawPixmap(widget->width()-img.pix.width(), 0, img.pix);
                 break;
             }
         case IMG_PLAIN_RINGS:
@@ -11040,7 +11031,7 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
                                               WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
                 pixPainter.end();
             }
-            p.drawPixmap(widget->width()-img.pix.width(), y+1, img.pix);
+            p.drawPixmap(widget->width()-img.pix.width(), 1, img.pix);
             break;    
     }
 }
@@ -12088,7 +12079,7 @@ void Style::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyl
     {
         QRect rx(r);
         if(menu && BLEND_TITLEBAR)
-            rx.adjust(0, -qtcGetWindowBorderSize(), 0, 0);
+            rx.adjust(0, -qtcGetWindowBorderSize().titleHeight, 0, 0);
 
         drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? menuColors(option, itsActive)[ORIGINAL_SHADE]
@@ -12854,12 +12845,12 @@ void Style::kdeGlobalSettingsChange(int type, int)
     itsWindowManager->initialize(opts.windowDrag);
 }
 
-void Style::titlebarSizeChangedChange()
+void Style::borderSizesChanged()
 {
 #if !defined QTC_QT_ONLY
-    int old=qtcGetWindowBorderSize();
+    int old=qtcGetWindowBorderSize().titleHeight;
 
-    if(old!=qtcGetWindowBorderSize(true))
+    if(old!=qtcGetWindowBorderSize(true).titleHeight)
     {
         QWidgetList                tlw=QApplication::topLevelWidgets();
         QWidgetList::ConstIterator it(tlw.begin()),

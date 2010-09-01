@@ -85,7 +85,7 @@ class QtCurveClient :
     void                      menuBarSize(int size);
     void                      statusBarState(bool state);
     QtCurveToggleButton *     createToggleButton(bool menubar);
-    void                      informAppOfTitlebarSizeChanged();
+    void                      informAppOfBorderSizeChanges();
     void                      sendToggleToApp(bool menubar);
 
     public Q_SLOTS:

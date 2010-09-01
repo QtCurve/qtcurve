@@ -132,42 +132,44 @@ int getOpacityProperty(WId wId)
     return o<0 || o>100 ? 100 : o;
 }
 
-static QPainterPath createPath(const QRectF &r, double radius, bool botOnly=false)
+static QPainterPath createPath(const QRectF &r, double radius, bool roundTop, bool roundBot)
 {
-    double       dr(radius * 2);
     QPainterPath path;
+    double       diameter(radius*2);
 
-    if(botOnly)
-    {
-        path.moveTo(r.right(), r.top());
-        path.lineTo(r.left(), r.top());
-    }
+    if (roundBot)
+        path.moveTo(r.x()+r.width(), r.y()+r.height()-radius);
     else
-    {
-        path.moveTo(r.right(), r.top() + radius);
-        path.arcTo(r.right() - dr, r.top(), dr, dr, 0.0, 90.0);
-        path.lineTo(r.left() + radius, r.top());
-        path.arcTo(r.left(), r.top(), dr, dr, 90.0, 90.0);
-    }
-    path.lineTo(r.left(), r.bottom() - radius);
-    path.arcTo(r.left(), r.bottom() - dr, dr, dr, 180.0, 90.0);
-    path.lineTo(r.right() - radius, r.bottom());
-    path.arcTo(r.right() - dr, r.bottom() - dr, dr, dr,  270.0, 90.0);
-    if(botOnly)
-        path.lineTo(r.right(), r.top());
+        path.moveTo(r.x()+r.width(), r.y()+r.height());
+
+    if (roundTop)
+        path.arcTo(r.x()+r.width()-diameter, r.y(), diameter, diameter, 0, 90);
+    else
+        path.lineTo(r.x()+r.width(), r.y());
+
+    if (roundTop)
+        path.arcTo(r.x(), r.y(), diameter, diameter, 90, 90);
+    else
+        path.lineTo(r.x(), r.y());
+
+    if (roundBot)
+        path.arcTo(r.x(), r.y()+r.height()-diameter, diameter, diameter, 180, 90);
+    else
+        path.lineTo(r.x(), r.y()+r.height());
+
+    if (roundBot)
+        path.arcTo(r.x()+r.width()-diameter, r.y()+r.height()-diameter, diameter, diameter, 270, 90);
+    else
+        path.lineTo(r.x()+r.width(), r.y()+r.height());
 
     return path;
 }
 
 #if KDE_IS_VERSION(4, 3, 0)
-static QPainterPath createPath(const QRect &r, bool fullRound, bool inner=false, bool botOnly=false)
+static QPainterPath createPath(const QRect &r, bool fullRound, bool inner, bool roundTop, bool roundBot)
 {
-    double radius((fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0));
-    int    adjust(botOnly ? 0 : 6);
-    QRect  fr(inner ? r.adjusted(1, 1, -1, -1) : r.adjusted(0, 1, 0, 0));
-    QRectF rf(fr.x(), fr.y()+adjust, fr.width(), fr.height() - adjust);
-
-    return createPath(rf, radius, botOnly);
+    return createPath(QRectF(inner ? r.adjusted(1, 1, -1, -1) : r).adjusted(0, 0, -1, -1),
+                      (fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0), roundTop, roundBot).translated(0.5, 0.5);
 }
 #endif
 
@@ -180,7 +182,7 @@ static void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &bgnd, boo
                                 : round>ROUND_SLIGHT
                                     ? 3.0
                                     : 2.0;
-    QPainterPath    path(createPath(QRectF(r), radius));
+    QPainterPath    path(createPath(QRectF(r), radius, true, true));
     QLinearGradient g(r.topLeft(), r.bottomLeft());
     QColor          black(Qt::black),
                     white(Qt::white);
@@ -621,20 +623,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     painter.setRenderHint(QPainter::Antialiasing, true);
     if(compositing)
-    {
-#if KDE_IS_VERSION(4, 3, 0)
-        if(roundBottom)
-            fillBackground(customBgnd, painter, fillCol, r.adjusted(0, titleBarHeight, 0, 0), 
-                           customBgnd
-                                ? outerBorder
-                                    ? QPainterPath()
-                                    : createPath(r.adjusted(0, titleBarHeight-1, -1, 0), round>ROUND_SLIGHT, outerBorder, true).translated(0.5, 0.5) 
-                                : createPath(r.adjusted(0, titleBarHeight-1, 0, 0), round>ROUND_SLIGHT, outerBorder, true),
-                           customBgnd ? getMask(round, r.adjusted(0, 0, 0, outerBorder ? 0 : 1)) : QRegion());
-        else
-#endif
-            fillBackground(customBgnd, painter, fillCol, r.adjusted(0, titleBarHeight, 0, 0));
-    }
+        fillBackground(customBgnd, painter, fillCol, r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0),
+                       customBgnd && outerBorder
+                            ? QPainterPath()
+                            : createPath(r, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom),
+                       customBgnd ? getMask(round, r) : QRegion());
 
     opt.init(widget());
 
@@ -703,7 +696,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         opt.rect.adjust(0, 0, 0, itsMenuBarSize);
 
 #ifdef DRAW_INTO_PIXMAPS
-    if(!compositing && !preview)
+    if(!compositing && !preview && !(customBgnd && blend))
     {
         QPixmap  tPix(32, titleBarHeight+(!blend || itsMenuBarSize<0 ? 0 : itsMenuBarSize));
         QPainter tPainter(&tPix);
@@ -718,7 +711,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else
 #endif
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
-
     
     if(outerBorder && Handler()->innerBorder())
     {
@@ -1548,7 +1540,7 @@ void QtCurveClient::deleteSizeGrip()
     }
 }
 
-void QtCurveClient::informAppOfTitlebarSizeChanged()
+void QtCurveClient::informAppOfBorderSizeChanges()
 {
     static const Atom constQtCTitleBarSize = XInternAtom(QX11Info::display(), TITLEBAR_SIZE_ATOM, False);
 

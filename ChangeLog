@@ -31,6 +31,7 @@
 25. When saving a preset, or selecting a preset, update the kwin settings.
 26. Move opacity settings into their own page - and add warning that they may cause
     applications to crash.
+27. Extend background gradients into window decoration.
 
 1.5.2
 -----

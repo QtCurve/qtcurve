@@ -85,6 +85,7 @@ class QtCurveHandler : public QObject,
     ~QtCurveHandler();
     void setStyle();
     virtual bool reset(unsigned long changed);
+    void setBorderSize();
 
     virtual KDecoration * createDecoration(KDecorationBridge *);
     virtual bool supports(Ability ability) const;
@@ -117,7 +118,7 @@ class QtCurveHandler : public QObject,
     void                  statusBarState(unsigned int xid, bool state);
     void                  emitToggleMenuBar(int xid);
     void                  emitToggleStatusBar(int xid);
-    void                  titlebarSizeChanged();
+    void                  borderSizeChanged();
     void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
     void                  removeClient(QtCurveClient *c) { itsClients.removeAll(c); }
     bool                  wasLastMenu(int id)            { return id==itsLastMenuXid; }

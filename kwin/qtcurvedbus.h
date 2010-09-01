@@ -36,13 +36,13 @@ class QtCurveDBus : public QDBusAbstractAdaptor
 
     QtCurveDBus(QtCurveHandler *handler) : QDBusAbstractAdaptor(handler) { }
 
-    void emitTbSize()                   { emit titlebarSizeChanged(); }
+    void emitBorderSizes()              { emit borderSizesChanged(); }
     void emitMbToggle(unsigned int xid) { emit toggleMenuBar(xid); }
     void emitSbToggle(unsigned int xid) { emit toggleStatusBar(xid); }
 
     Q_SIGNALS:
 
-    void titlebarSizeChanged();
+    void borderSizesChanged();
     void toggleMenuBar(unsigned int xid);
     void toggleStatusBar(unsigned int xid);
 

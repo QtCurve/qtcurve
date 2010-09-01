@@ -152,6 +152,30 @@ bool QtCurveHandler::reset(unsigned long changed)
     // read in the configuration
     bool configChanged=readConfig();
 
+    setBorderSize();
+
+    for (int t=0; t < 2; ++t)
+        for (int i=0; i < NumButtonIcons; i++)
+            itsBitmaps[t][i]=QPixmap();
+
+    // Do we need to "hit the wooden hammer" ?
+    bool needHardReset = true;
+    // TODO: besides the Color and Font settings I can maybe handle more changes
+    //       without a hard reset. I will do this later...
+    if (!styleChanged && (changed & ~(SettingColors | SettingFont | SettingButtons)) == 0)
+       needHardReset = false;
+
+    if (needHardReset || configChanged)
+        return true;
+    else
+    {
+        resetDecorations(changed);
+        return false;
+    }
+}
+
+void QtCurveHandler::setBorderSize()
+{
     switch(itsConfig.borderSize())
     {
         case QtCurveConfig::BORDER_NONE:
@@ -185,25 +209,6 @@ bool QtCurveHandler::reset(unsigned long changed)
         itsBorderSize--;
     else if(outerBorder() && innerBorder() && itsConfig.borderSize()<=QtCurveConfig::BORDER_NORMAL)
         itsBorderSize+=2;
-
-    for (int t=0; t < 2; ++t)
-        for (int i=0; i < NumButtonIcons; i++)
-            itsBitmaps[t][i]=QPixmap();
-
-    // Do we need to "hit the wooden hammer" ?
-    bool needHardReset = true;
-    // TODO: besides the Color and Font settings I can maybe handle more changes
-    //       without a hard reset. I will do this later...
-    if (!styleChanged && (changed & ~(SettingColors | SettingFont | SettingButtons)) == 0)
-       needHardReset = false;
-
-    if (needHardReset || configChanged)
-        return true;
-    else
-    {
-        resetDecorations(changed);
-        return false;
-    }
 }
 
 KDecoration * QtCurveHandler::createDecoration(KDecorationBridge *bridge)
@@ -278,18 +283,24 @@ bool QtCurveHandler::readConfig()
     itsTitleHeight+=2*titleBarPad();
 
     QFile in(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
-    int   prevSize(-1), prevToolSize(-1);
+    int   prevSize(-1), prevToolSize(-1), prevSide(-1), prevBot(-1);
 
     if(in.open(QIODevice::ReadOnly))
     {
         QTextStream stream(&in);
         prevSize=in.readLine().toInt();
         prevToolSize=in.readLine().toInt();
+        prevBot=in.readLine().toInt();
+        prevSide=in.readLine().toInt();
         in.close();
     }
 
-    int borderEdge=borderEdgeSize();
-    if(prevSize!=(itsTitleHeight+borderEdge) || prevToolSize!=(itsTitleHeightTool+borderEdge))
+    setBorderSize();
+
+    int borderEdge=borderEdgeSize()*2;
+    bool borderSizesChanged=prevSize!=(itsTitleHeight+borderEdge) || prevToolSize!=(itsTitleHeightTool+borderEdge) ||
+                            prevBot!=borderSize(true) || prevSide!=borderSize(false);
+    if(borderSizesChanged)
     {
         KSaveFile sizeFile(xdgConfigFolder()+"/qtcurve/"BORDER_SIZE_FILE);
 
@@ -297,7 +308,9 @@ bool QtCurveHandler::readConfig()
         {
             QTextStream stream(&sizeFile);
             stream << itsTitleHeight+borderEdge << endl
-                << itsTitleHeightTool+borderEdge;
+                   << itsTitleHeightTool+borderEdge << endl
+                   << borderSize(true) << endl
+                   << borderSize(false) << endl;
             stream.flush();
             sizeFile.finalize();
             sizeFile.close();
@@ -325,10 +338,10 @@ bool QtCurveHandler::readConfig()
     }
 #endif
 
-    if(itsDBus && (oldSize!=itsTitleHeight || oldToolSize!=itsTitleHeightTool))
+    if(itsDBus && borderSizesChanged)
     {
-        itsDBus->emitTbSize(); // KDE4 apps...
-        titlebarSizeChanged(); // Gtk2 apps...
+        itsDBus->emitBorderSizes(); // KDE4 apps...
+        borderSizeChanged(); // Gtk2 apps...
     }
 
     return oldSize!=itsTitleHeight ||
@@ -352,13 +365,13 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
     return itsBitmaps[toolWindow][typeIndex];
 }
 
-void QtCurveHandler::titlebarSizeChanged()
+void QtCurveHandler::borderSizeChanged()
 {
     QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),
                                           end(itsClients.end());
 
     for(; it!=end; ++it)
-        (*it)->informAppOfTitlebarSizeChanged();
+        (*it)->informAppOfBorderSizeChanges();
 }
 
 void QtCurveHandler::menuBarSize(unsigned int xid, int size)

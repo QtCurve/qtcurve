@@ -935,6 +935,14 @@ typedef enum
     LV_OLD
 } ELvLines;
 
+typedef struct
+{
+    int titleHeight,
+        toolTitleHeight,
+        bottom,
+        sides;
+} WindowBorders;
+
 #ifdef __cplusplus
 struct GradientStopCont : public std::set<GradientStop>
 {
