@@ -1378,13 +1378,13 @@ void QtCurveConfig::windowBorder_menuColorChanged()
 void QtCurveConfig::thinSbarGrooveChanged()
 {
     if(thinSbarGroove->isChecked())
-        borderSbarGroove->setChecked(false);
+        borderSbarGroove->setChecked(true);
     updateChanged();
 }
 
 void QtCurveConfig::borderSbarGrooveChanged()
 {
-    if(borderSbarGroove->isChecked())
+    if(!borderSbarGroove->isChecked())
         thinSbarGroove->setChecked(false);
     updateChanged();
 }
