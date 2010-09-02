@@ -10966,11 +10966,16 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
         
         if(isWindow && APPEARANCE_STRIPED!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
         {
+            int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
+
             QString key(QLatin1String("qtc-radial"));
+            key.sprintf("qtc-radial-%x", size/4);
 
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
-                pix=QPixmap(BGND_SHINE_SIZE, BGND_SHINE_SIZE/2);
+                size/=4;
+                size*=4;
+                pix=QPixmap(size, size/2);
                 pix.fill(Qt::transparent);
                 QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
                 QColor          c(Qt::white);
@@ -10990,9 +10995,8 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                 if(itsUsePixmapCache)
                     QPixmapCache::insert(key, pix);
             }
-            int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
             
-            p->drawPixmap((r.width()-size)/2, 0, pix.scaled(QSize(size, size/2)));
+            p->drawPixmap((r.width()-pix.width())/2, 0, pix);
         }
     }
     else
