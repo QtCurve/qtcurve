@@ -919,16 +919,10 @@ Style::Style()
 
         itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
-#ifdef Q_WS_X11
-    QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
-                                          "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-    QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
-                                          "compositingToggled", this, SLOT(compositingToggled()));
-#endif // Q_WS_X11
 #endif
     // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
-    // to a temporary filename. If this is set, we read the settings from there - and dont not use
-    // the QPixmapCache - as it will interfere with that of the kcm's widgets!
+    // to a temporary filename. If this is set, we read the settings from there - and do not use the QPixmapCache - as it
+    // will interfere with that of the kcm's widgets!
     QString rcFile=QString::fromLocal8Bit(qgetenv(QTCURVE_PREVIEW_CONFIG));
 
     if(!rcFile.isEmpty())
@@ -958,19 +952,26 @@ Style::Style()
 
     if(itsIsPreview)
         opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
-
 #ifdef Q_WS_X11
-    if(!qApp || QString(qApp->argv()[0])!="kwin")
+    else
     {
-        QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                              "borderSizesChanged", this, SLOT(borderSizesChanged()));
-        if(opts.menubarHiding&HIDE_KWIN)
-            QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                  "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+        QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
+                                              "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
+        QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
+                                              "compositingToggled", this, SLOT(compositingToggled()));
 
-        if(opts.statusbarHiding&HIDE_KWIN)
+        if(!qApp || QString(qApp->argv()[0])!="kwin")
+        {
             QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                  "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+                                              "borderSizesChanged", this, SLOT(borderSizesChanged()));
+            if(opts.menubarHiding&HIDE_KWIN)
+                QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                                      "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+
+            if(opts.statusbarHiding&HIDE_KWIN)
+                QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                                      "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+        }
     }
 #endif
 
