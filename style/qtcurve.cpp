@@ -1590,13 +1590,22 @@ void Style::polish(QWidget *widget)
             case Qt::Window:
             case Qt::Dialog:
             {
-                setBgndProp(widget, opts.bgndAppearance);
-
                 int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
                 Utils::addEventFilter(widget, this);
                 widget->setAttribute(Qt::WA_StyledBackground);
-                
+
+                // Hack: stop here if application is of type Plasma
+                /*
+                Right now we need to reject window candidates if the application is of type plasma
+                because it conflicts with some widgets embedded into the SysTray. Ideally one would
+                rather find a "generic" reason, not to handle them
+                */
+                if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
+                    break;
+
+                setBgndProp(widget, opts.bgndAppearance);
+
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
                    widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") || 
