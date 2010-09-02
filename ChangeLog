@@ -32,6 +32,7 @@
 26. Move opacity settings into their own page - and add warning that they may cause
     applications to crash.
 27. Extend background gradients into window decoration.
+28. Fix faded menuitems when using menu background gradients.
 
 1.5.2
 -----

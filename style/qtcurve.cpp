@@ -11544,9 +11544,11 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
         }
 
         QLinearGradient grad(fade.topLeft(), fade.topRight());
+        QColor          trans(Qt::white);
 
-        grad.setColorAt(0, reverse ? option->palette.background().color() : cols[fill]);
-        grad.setColorAt(1, reverse ? cols[fill] : option->palette.background().color());
+        trans.setAlphaF(0.0);
+        grad.setColorAt(0, reverse ? trans : cols[fill]);
+        grad.setColorAt(1, reverse ? cols[fill] : trans);
         p->fillRect(fade, QBrush(grad));
     }
     else if(mbi || opts.borderMenuitems)
