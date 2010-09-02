@@ -36,6 +36,8 @@
     default of 100 seems to cause issues with Thunar.
 21. Extend background gradients into window decoration.
 22. Fix faded menuitems when using menu background gradients.
+23. If background gradient has a 'shine', then when used for backgrounds draw a
+    radial gradient top centered.
 
 1.5.2
 -----

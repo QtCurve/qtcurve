@@ -2523,11 +2523,30 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 else
                     drawBevelGradientAlpha(cr, style, area, NULL, -xpos+xmod, y+ymod, window->allocation.width+wmod, height+hmod,
                                            &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
-            }
 
+                if(GT_HORIZ==opts.bgndGrad && GB_SHINE==getGradient(opts.bgndAppearance, &opts)->border)
+                {
+                    int    wwidth=window->allocation.width+wmod,
+                           wheight=window->allocation.height+hmod,
+                           size=MIN(BGND_SHINE_SIZE, MIN(wheight*2, wwidth));
+                    double alpha=shineAlpha(&style->bg[GTK_STATE_NORMAL]);
+
+                    cairo_pattern_t *pat=cairo_pattern_create_radial(x+xmod+(wwidth/2.0), ypos+ymod, 0,
+                                                                     x+xmod+(wwidth/2.0), ypos+ymod, size/2.0);
+
+                    cairo_pattern_add_color_stop_rgba(pat, 0, 1, 1, 1, alpha);
+                    cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1, alpha*0.625);
+                    cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1, alpha*0.175);
+                    cairo_pattern_add_color_stop_rgba(pat, 1.0, 1, 1, 1, 0.0);
+                    cairo_set_source(cr, pat);
+                    cairo_rectangle(cr, x+xmod+((wwidth-size)/2.0), ypos+ymod, size, size);
+                    cairo_fill(cr);
+                    cairo_pattern_destroy(pat);
+                }
+            }
             if(useAlpha)
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-                
+
             drawBgndRings(cr, -ypos, window->allocation.width, TRUE);
             unsetCairoClipping(cr);
             return TRUE;
