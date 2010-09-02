@@ -35,6 +35,7 @@
 20. Default sub-menu popup delay to 225 - matches Gtk2 standard default. The previous
     default of 100 seems to cause issues with Thunar.
 21. Extend background gradients into window decoration.
+22. Fix faded menuitems when using menu background gradients.
 
 1.5.2
 -----

@@ -4797,12 +4797,10 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                   itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_MENU_ITEM, 0, fillVal);
 
                 {
-                    GdkColor        *left=reverse ? &qtcPalette.menu[ORIGINAL_SHADE] : &itemCols[fillVal],
-                                    *right=reverse ? &itemCols[fillVal] : &qtcPalette.menu[ORIGINAL_SHADE];
                     cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
 
-                    cairo_pattern_add_color_stop_rgb(pt, 0, CAIRO_COL(*left));
-                    cairo_pattern_add_color_stop_rgb(pt, 1.00, CAIRO_COL(*right));
+                    cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
+                    cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
                     cairo_set_source(cr, pt);
                     cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
                     cairo_fill(cr);
