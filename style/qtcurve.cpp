@@ -1650,14 +1650,11 @@ void Style::polish(QWidget *widget)
             widget->parentWidget()->setAutoFillBackground(false);
             widget->setAutoFillBackground(false);
         }
-        
-        if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
-        {
-            Utils::addEventFilter(widget, this);
-            widget->setAttribute(Qt::WA_StyledBackground);
-        }
     }
 
+    if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+        widget->setAttribute(Qt::WA_StyledBackground);
+        
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
         Utils::addEventFilter(widget, this);
@@ -2186,14 +2183,11 @@ void Style::unpolish(QWidget *widget)
 
         if(qobject_cast<QSlider *>(widget))
             widget->setBackgroundRole(QPalette::Window);
-        
-        if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
-        {
-            widget->removeEventFilter(this);
-            widget->setAttribute(Qt::WA_StyledBackground, false);
-        }
     }
 
+    if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
+        widget->setAttribute(Qt::WA_StyledBackground, false);
+        
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
         widget->removeEventFilter(this);
@@ -2564,8 +2558,9 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             {
                 QWidget *widget=qobject_cast<QWidget *>(object);
                 
-                if(widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow() &&
-                   widget->testAttribute(Qt::WA_TranslucentBackground) && widget->testAttribute(Qt::WA_StyledBackground))
+                if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
+                   (widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) &&
+                    widget->testAttribute(Qt::WA_TranslucentBackground)))
                 {
                     QPainter p(widget);
                     drawBackground(&p, widget, qobject_cast<QDialog *>(widget) ? BGND_DIALOG : BGND_WINDOW);
@@ -3507,12 +3502,14 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         }
 #endif
         case PE_Widget:
-            if(widget && widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground) &&
-               ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow())
+            if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
+                ( (!widget->testAttribute(Qt::WA_NoSystemBackground) &&
+                  ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
+                  (itsIsPreview && widget && qobject_cast<const QMdiSubWindow *>(widget)) ) )
             {
                 bool isDialog=qobject_cast<const QDialog *>(widget);
 
-                if(CUSTOM_BGND || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))
+                if(CUSTOM_BGND || itsIsPreview || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))
                     drawBackground(painter, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
             }
             break;
