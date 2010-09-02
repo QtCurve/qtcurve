@@ -1604,7 +1604,8 @@ void Style::polish(QWidget *widget)
                 if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
                     break;
 
-                setBgndProp(widget, opts.bgndAppearance);
+                if(!IS_FLAT(opts.bgndAppearance))
+                    setBgndProp(widget, opts.bgndAppearance);
 
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
