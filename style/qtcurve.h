@@ -187,7 +187,7 @@ class Style : public QCommonStyle
     void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, bool isWindow) const;
     QPixmap drawStripes(const QColor &color, int opacity) const;
     void drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app) const;
-    void drawBackground(QWidget *widget, BackgroundType type) const;
+    void drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
     void buildSplitPath(const QRect &r, int round, double radius, QPainterPath &tl, QPainterPath &br) const;

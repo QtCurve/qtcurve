@@ -177,8 +177,8 @@ static Style::Icon subControlToIcon(QStyle::SubControl sc)
     }
 }
 
-static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
-                        const QRect &rect, QPainter *painter, const QWidget *widget = 0)
+static void drawTbArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton, const QRect &rect, QPainter *painter,
+                        const QWidget *widget = 0)
 {
     QStyle::PrimitiveElement pe;
     switch (toolbutton->arrowType)
@@ -1590,9 +1590,8 @@ void Style::polish(QWidget *widget)
             case Qt::Window:
             case Qt::Dialog:
             {
-                int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
-
-                Utils::addEventFilter(widget, this);
+                // For non-transparent widgets, only need to set WA_StyledBackground - and PE_Widget will be called to
+                // render background...
                 widget->setAttribute(Qt::WA_StyledBackground);
 
                 // Hack: stop here if application is of type Plasma
@@ -1606,6 +1605,8 @@ void Style::polish(QWidget *widget)
 
                 if(!IS_FLAT(opts.bgndAppearance))
                     setBgndProp(widget, opts.bgndAppearance);
+
+                int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
@@ -1623,6 +1624,9 @@ void Style::polish(QWidget *widget)
                 // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
                 if(!widget->isVisible())
                     widget->move(10000, 10000);
+
+                // PE_Widget is not called for transparent widgets, so need event filter here...
+                Utils::addEventFilter(widget, this);
                 itsTransparentWidgets.insert(widget);
                 connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
                 setOpacityProp(widget, (unsigned short)opacity);
@@ -2505,23 +2509,11 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         }
     }
 
-    if(CUSTOM_BGND && QEvent::Paint==event->type())
-    {
-        QWidget *widget=qobject_cast<QWidget *>(object);
-
-        if(widget && (widget->isWindow() || (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))) && widget->isVisible() &&
-           widget->testAttribute(Qt::WA_StyledBackground))
-        {
-            bool isDialog=qobject_cast<QDialog *>(widget);
-
-            if((isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100) ||
-               !widget->testAttribute(Qt::WA_NoSystemBackground))
-                drawBackground(widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
-        }
-    }
-
     switch((int)(event->type()))
     {
+        case QEvent::Timer:
+        case QEvent::Move:
+            return false; // just for performance - they can occur really often
 #ifdef Q_WS_X11
         case QEvent::Resize:
         {
@@ -2568,9 +2560,23 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 static_cast<QStatusBar *>(object)->setHidden(true);
             break;
         case QEvent::Paint:
-            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity) &&
-                qobject_cast<QMenu*>(object))
-                drawBackground((QWidget*)object, BGND_MENU);
+            if(CUSTOM_BGND)
+            {
+                QWidget *widget=qobject_cast<QWidget *>(object);
+                
+                if(widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow() &&
+                   widget->testAttribute(Qt::WA_TranslucentBackground) && widget->testAttribute(Qt::WA_StyledBackground))
+                {
+                    QPainter p(widget);
+                    drawBackground(&p, widget, qobject_cast<QDialog *>(widget) ? BGND_DIALOG : BGND_WINDOW);
+                }
+            }
+            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity) && qobject_cast<QMenu*>(object))
+            {
+                QWidget  *widget=qobject_cast<QWidget *>(object);
+                QPainter p(widget);
+                drawBackground(&p, widget, BGND_MENU);
+            }
             else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
             {
                 // paint focus rect
@@ -3465,17 +3471,15 @@ QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *
     return BASE_STYLE::standardIconImplementation(pix, option, widget);
 }
 
-int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2,
-                                              Qt::Orientation orientation, const QStyleOption *option,
-                                              const QWidget *widget) const
+int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2, Qt::Orientation orientation,
+                                       const QStyleOption *option, const QWidget *widget) const
 {
     Q_UNUSED(control1); Q_UNUSED(control2); Q_UNUSED(orientation);
 
     return pixelMetric(PM_DefaultLayoutSpacing, option, widget);
 }
 
-void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
-                                 const QWidget *widget) const
+void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     QRect          r(option->rect);
     QFlags<State>  state(option->state);
@@ -3502,6 +3506,16 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             break;
         }
 #endif
+        case PE_Widget:
+            if(widget && widget->testAttribute(Qt::WA_StyledBackground) && !widget->testAttribute(Qt::WA_NoSystemBackground) &&
+               ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow())
+            {
+                bool isDialog=qobject_cast<const QDialog *>(widget);
+
+                if(CUSTOM_BGND || (isDialog && opts.dlgOpacity!=100) || (!isDialog && opts.bgndOpacity!=100))
+                    drawBackground(painter, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
+            }
+            break;
         case PE_PanelScrollAreaCorner:
             // disable painting of PE_PanelScrollAreaCorner
             // the default implementation fills the rect with the window background color which does not work for windows that have gradients.
@@ -5063,8 +5077,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
     }
 }
 
-void Style::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter,
-                               const QWidget *widget) const
+void Style::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
     QRect               r(option->rect);
     const QFlags<State> &state(option->state);
@@ -9403,8 +9416,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
     return visualRect(option->direction, option->rect, rect);
 }
 
-QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option,
-                                   SubControl subControl, const QWidget *widget) const
+QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
     QRect r(option->rect);
     bool  reverse(Qt::RightToLeft==option->direction);
@@ -9922,7 +9934,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
 }
 
 QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
-                                                       const QPoint &pos, const QWidget *widget) const
+                                                const QPoint &pos, const QWidget *widget) const
 {
     itsSbWidget=0L;
     switch (control)
@@ -10073,8 +10085,8 @@ void Style::drawFadedLine(QPainter *p, const QRect &r, const QColor &col, bool f
     p->drawLine(start, end);
 }
 
-void Style::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset,
-                             const QColor *cols, int startOffset, int dark, ELine type) const
+void Style::drawLines(QPainter *p, const QRect &r, bool horiz, int nLines, int offset, const QColor *cols, int startOffset,
+                      int dark, ELine type) const
 {
     int  space((nLines*2)+(LINE_DASHES!=type ? (nLines-1) : 0)),
          step(LINE_DASHES!=type ? 3 : 2),
@@ -10259,7 +10271,7 @@ void Style::drawProgressBevelGradient(QPainter *p, const QRect &origRect, const 
 }
 
 void Style::drawBevelGradient(const QColor &base, QPainter *p, const QRect &origRect, const QPainterPath &path,
-                                     bool horiz, bool sel, EAppearance bevApp, EWidget w, bool useCache) const
+                              bool horiz, bool sel, EAppearance bevApp, EWidget w, bool useCache) const
 {
     if(origRect.width()<1 || origRect.height()<1)
         return;
@@ -10413,9 +10425,8 @@ void Style::drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) cons
     p->restore();
 }
 
-void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option,
-                                  const QWidget *widget, int round, const QColor &fill, const QColor *custom,
-                                  bool doBorder, EWidget w) const
+void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
+                           const QColor *custom, bool doBorder, EWidget w) const
 {
     if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin)/* || !itsUsePixmapCache*/)
         drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round);
@@ -10518,9 +10529,8 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
     }
 }
 
-void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option,
-                                      const QWidget *widget, int round, const QColor &fill, const QColor *custom,
-                                      bool doBorder, EWidget w, bool useCache, ERound realRound) const
+void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option, const QWidget *widget, int round,
+                               const QColor &fill, const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound) const
 {
     EAppearance  app(widgetApp(w, &opts, option->state&State_Active));
     QRect        r(rOrig);
@@ -10958,9 +10968,8 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
     }
 }
 
-void Style::drawBackground(QWidget *widget, BackgroundType type) const
+void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
 {
-    QPainter      p(widget);
     bool          isWindow(BGND_MENU!=type);
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0,
@@ -10974,14 +10983,14 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
     if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
         opacity=100;
 
-    p.setClipRegion(widget->rect(), Qt::IntersectClip);
+    p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
     if(isWindow)
     {
         WindowBorders borders=qtcGetWindowBorderSize();
         r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
     }
-    drawBackground(&p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
+    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
                    BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
 
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
@@ -11001,7 +11010,7 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
             loadBgndImage(&img);
             if(!img.pix.isNull())
             {
-                p.drawPixmap(widget->width()-img.pix.width(), 0, img.pix);
+                p->drawPixmap(widget->width()-img.pix.width(), 0, img.pix);
                 break;
             }
         case IMG_PLAIN_RINGS:
@@ -11026,7 +11035,7 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
                 drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
                 pixPainter.end();
             }
-            p.drawPixmap(widget->width()-img.pix.width(), y+1, img.pix);
+            p->drawPixmap(widget->width()-img.pix.width(), y+1, img.pix);
             break;
         case IMG_SQUARE_RINGS:
             if(img.pix.isNull())
@@ -11055,7 +11064,7 @@ void Style::drawBackground(QWidget *widget, BackgroundType type) const
                                               WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
                 pixPainter.end();
             }
-            p.drawPixmap(widget->width()-img.pix.width(), 1, img.pix);
+            p->drawPixmap(widget->width()-img.pix.width(), 1, img.pix);
             break;    
     }
 }
@@ -11160,9 +11169,8 @@ void Style::buildSplitPath(const QRect &r, int round, double radius, QPainterPat
         br.lineTo(xd+width, yd);
 }
 
-void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
-                              int round, const QColor *custom, EWidget w,
-                              EBorder borderProfile, bool doBlend, int borderVal) const
+void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, int round, const QColor *custom, EWidget w,
+                       EBorder borderProfile, bool doBlend, int borderVal) const
 {
     if(ROUND_NONE==opts.round)
         round=ROUNDED_NONE;
@@ -11269,8 +11277,8 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option,
 }
 
 void Style::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, SubControl sc, const QWidget *widget,
-                                  ETitleBarButtons btn, const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols,
-                                  int adjust, bool activeWindow) const
+                           ETitleBarButtons btn, const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols,
+                           int adjust, bool activeWindow) const
 {
     bool hover((titleBar->activeSubControls&sc) && (titleBar->state&State_MouseOver));
 
@@ -11306,7 +11314,7 @@ void Style::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, Su
 }
 
 void Style::drawDwtControl(QPainter *p, const QFlags<State> &state, const QRect &rect, ETitleBarButtons btn, Icon icon,
-                                  const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols) const
+                           const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols) const
 {
     bool    sunken(state&State_Sunken),
             hover(state&State_MouseOver),
@@ -11352,8 +11360,8 @@ bool Style::drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool su
     return false;
 }
 
-void Style::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd,
-                               const QRect &r, bool hover, bool sunken, Icon icon, bool stdSize, bool drewFrame) const
+void Style::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd,  const QRect &r, bool hover, bool sunken, Icon icon,
+                        bool stdSize, bool drewFrame) const
 {
     if(!(opts.titlebarButtons&TITLEBAR_BUTTON_HOVER_SYMBOL_FULL) || hover || sunken)
     {
@@ -11481,7 +11489,7 @@ void Style::drawIcon(QPainter *painter, const QColor &color, const QRect &r, boo
 }
 
 void Style::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option,
-                                  int round, bool fill, bool doEtch, EWidget w) const
+                           int round, bool fill, bool doEtch, EWidget w) const
 {
     QRect r(rx);
 
@@ -12039,8 +12047,8 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
    }
 }
 
-void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle,
-                                    const QStyleOptionSlider *slider, const QWidget *widget) const
+void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &handle,  const QStyleOptionSlider *slider,
+                             const QWidget *widget) const
 {
     bool               horiz(Qt::Horizontal==slider->orientation);
     QRect              grv(groove);
@@ -12112,8 +12120,7 @@ void Style::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyl
     }
 }
 
-void Style::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *option, bool tb,
-                                     ELine handles) const
+void Style::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *option, bool tb, ELine handles) const
 {
     if(rx.width()<2 || rx.height()<2)
         return;
@@ -12159,8 +12166,8 @@ void Style::drawHandleMarkers(QPainter *p, const QRect &rx, const QStyleOption *
     }
 }
 
-void Style::fillTab(QPainter *p, const QRect &r, const QStyleOption *option, const QColor &fill, bool horiz,
-                           EWidget tab, bool tabOnly) const
+void Style::fillTab(QPainter *p, const QRect &r, const QStyleOption *option, const QColor &fill, bool horiz, EWidget tab,
+                    bool tabOnly) const
 {
     bool   invertedSel=option->state&State_Selected && APPEARANCE_INVERTED==opts.appearance;
     QColor col(invertedSel ? option->palette.background().color() : fill);
