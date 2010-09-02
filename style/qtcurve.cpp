@@ -2563,8 +2563,14 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                    (widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) &&
                     widget->testAttribute(Qt::WA_TranslucentBackground)))
                 {
-                    QPainter p(widget);
-                    drawBackground(&p, widget, qobject_cast<QDialog *>(widget) ? BGND_DIALOG : BGND_WINDOW);
+                    bool isDialog=qobject_cast<QDialog *>(widget);
+
+                    if((100!=opts.bgndOpacity && !isDialog) || (100!=opts.dlgOpacity && isDialog) ||
+                       !(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
+                    {
+                        QPainter p(widget);
+                        drawBackground(&p, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
+                    }
                 }
             }
             if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity) && qobject_cast<QMenu*>(object))
@@ -3506,7 +3512,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
                 ( (!widget->testAttribute(Qt::WA_NoSystemBackground) &&
                   ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) && widget->isWindow()) ||
-                  (itsIsPreview && widget && qobject_cast<const QMdiSubWindow *>(widget)) ) )
+                  (itsIsPreview && qobject_cast<const QMdiSubWindow *>(widget)) ) )
             {
                 bool isDialog=qobject_cast<const QDialog *>(widget);
 
@@ -8183,7 +8189,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QRect        tr(r);
                 ERound       round=(opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round;
 
-                if(!kwin && BLEND_TITLEBAR && widget && qobject_cast<const QMdiSubWindow *>(widget))
+                if(!kwin && widget && BLEND_TITLEBAR && qobject_cast<const QMdiSubWindow *>(widget))
                 {
                     const QWidget *w=NULL;
                     if(qobject_cast<const QMainWindow *>(widget))
@@ -8217,7 +8223,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QPainterPath path;
 #endif
 #endif
-                if(!kwin)
+                if(!kwin && !CUSTOM_BGND)
                     painter->fillRect(tr, titleCols[STD_BORDER]);
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
@@ -10970,13 +10976,12 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
 {
     bool          isWindow(BGND_MENU!=type);
     const QWidget *window = itsIsPreview ? widget : widget->window();
-    int           y = itsIsPreview && isWindow ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0,
-                  opacity = BGND_MENU==type
+    int           opacity = BGND_MENU==type
                                 ? opts.menuBgndOpacity
                                 : BGND_DIALOG==type
                                     ? opts.dlgOpacity
                                     : opts.bgndOpacity;
-    QRect         r(QRect(widget->rect().x(), y, widget->rect().width(), window->rect().height()));
+    QRect         r(QRect(widget->rect().x(), 0, widget->rect().width(), window->rect().height()));
 
     if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
         opacity=100;
@@ -11033,7 +11038,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                 drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
                 pixPainter.end();
             }
-            p->drawPixmap(widget->width()-img.pix.width(), y+1, img.pix);
+            p->drawPixmap(widget->width()-img.pix.width(), 1, img.pix);
             break;
         case IMG_SQUARE_RINGS:
             if(img.pix.isNull())
