@@ -1985,6 +1985,26 @@ static void calcRingAlphas(const color *bgnd)
     qtcRingAlpha[2]=v*0.55;
 }
 
+#define BGND_SHINE_SIZE 500
+
+static double shineAlpha(const color *bgnd)
+{
+#ifdef __cplusplus
+    double r=bgnd->red()/255.0,
+           g=bgnd->green()/255.0,
+           b=bgnd->blue()/255.0,
+#else
+    double r=bgnd->red/65535.0,
+           g=bgnd->green/65535.0,
+           b=bgnd->blue/65535.0,
+#endif
+           h=0,
+           s=0,
+           v=0;
+    rgbToHsv(r, g, b, &h, &s, &v);
+    return v*0.8;
+}
+
 #endif
 
 #endif

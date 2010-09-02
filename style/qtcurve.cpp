@@ -10925,18 +10925,19 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 
     if(!IS_FLAT_BGND(app))
     {
-        QColor  col(bgnd);
-        QPixmap pix;
-        QSize   scaledSize;
+        static const int constPixmapWidth  = 16;
+        static const int constPixmapHeight = 512;
+            
+        QColor    col(bgnd);
+        QPixmap   pix;
+        QSize     scaledSize;
+        EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
 
         if(APPEARANCE_STRIPED==app)
             pix=drawStripes(col, opacity);
         else
         {
-            static const int constPixmapWidth  = 16;
-            static const int constPixmapHeight = 256;
             QString   key;
-            EGradType grad=isWindow ? opts.bgndGrad : opts.menuBgndGrad;
 
             scaledSize=QSize(GT_HORIZ==grad ? constPixmapWidth : r.width(), GT_HORIZ==grad ? r.height() : constPixmapWidth);
 
@@ -10955,12 +10956,44 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 
                 drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
                                         GT_HORIZ==grad, false, app, WIDGET_OTHER);
+                pixPainter.end();
                 if(itsUsePixmapCache)
                     QPixmapCache::insert(key, pix);
             }
         }
 
         p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+        
+        if(isWindow && APPEARANCE_STRIPED!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
+        {
+            QString key(QLatin1String("qtc-radial"));
+
+            if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
+            {
+                pix=QPixmap(BGND_SHINE_SIZE, BGND_SHINE_SIZE/2);
+                pix.fill(Qt::transparent);
+                QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
+                QColor          c(Qt::white);
+                double          alpha(shineAlpha(&col));
+
+                c.setAlphaF(alpha);
+                gradient.setColorAt(0, c);
+                c.setAlphaF(alpha*0.625);
+                gradient.setColorAt(0.5, c);
+                c.setAlphaF(alpha*0.175);
+                gradient.setColorAt(0.75, c);
+                c.setAlphaF(0);
+                gradient.setColorAt(1, c);
+                QPainter pixPainter(&pix);
+                pixPainter.fillRect(QRect(0, 0, pix.width(), pix.height()), gradient);
+                pixPainter.end();
+                if(itsUsePixmapCache)
+                    QPixmapCache::insert(key, pix);
+            }
+            int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
+            
+            p->drawPixmap((r.width()-size)/2, 0, pix.scaled(QSize(size, size/2)));
+        }
     }
     else
     {

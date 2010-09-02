@@ -33,6 +33,8 @@
     applications to crash.
 27. Extend background gradients into window decoration.
 28. Fix faded menuitems when using menu background gradients.
+29. If background gradient has a 'shine', then when used for backgrounds draw a
+    radial gradient top centered.
 
 1.5.2
 -----
