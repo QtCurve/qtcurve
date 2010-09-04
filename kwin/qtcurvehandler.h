@@ -94,9 +94,8 @@ class QtCurveHandler : public QObject,
     int                   titleHeight() const        { return itsTitleHeight; }
     int                   titleHeightTool() const    { return itsTitleHeightTool; }
     const QFont &         titleFont()                { return itsTitleFont; }
-    const QFont &         titleFontTool()               { return itsTitleFontTool; }
-    int                   borderSize(bool bot=false) const { return bot && QtCurveConfig::BORDER_NO_SIDES==itsConfig.borderSize()
-                                                                ? itsBorderSize+5 : itsBorderSize; }
+    const QFont &         titleFontTool()            { return itsTitleFontTool; }
+    int                   borderSize(bool bot=false) const;
     bool                  showResizeGrip() const     { return QtCurveConfig::BORDER_NONE==itsConfig.borderSize(); }
     bool                  roundBottom() const        { return itsConfig.roundBottom() && itsConfig.borderSize()>QtCurveConfig::BORDER_NONE; }
     bool                  outerBorder() const        { return itsConfig.outerBorder(); }

@@ -363,6 +363,18 @@ const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size,
     return itsBitmaps[toolWindow][typeIndex];
 }
 
+int QtCurveHandler::borderSize(bool bot) const
+{
+    if(bot)
+    {
+        if(QtCurveConfig::BORDER_NO_SIDES==itsConfig.borderSize())
+            return itsBorderSize+5;
+        else if(QtCurveConfig::BORDER_TINY==itsConfig.borderSize() && itsConfig.roundBottom() && itsConfig.outerBorder())
+            return itsBorderSize+1;
+    }
+    return itsBorderSize; 
+}
+
 void QtCurveHandler::borderSizeChanged()
 {
     QList<QtCurveClient *>::ConstIterator it(itsClients.begin()),

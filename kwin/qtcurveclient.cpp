@@ -1149,11 +1149,11 @@ QRegion QtCurveClient::getMask(int round, const QRect &r) const
                 }
                 else
                 {
-                    mask += QRegion(x, y+5, 1, h-6);
+                    mask += QRegion(x, y+5, 1, h-5);
                     mask += QRegion(x+1, y+3, 1, h-3);
                     mask += QRegion(x+2, y+2, 1, h-2);
                     mask += QRegion(x+3, y+1, 2, h-1);
-                    mask += QRegion(x+w-1, y+5, 1, h-6);
+                    mask += QRegion(x+w-1, y+5, 1, h-5);
                     mask += QRegion(x+w-2, y+3, 1, h-3);
                     mask += QRegion(x+w-3, y+2, 1, h-2);
                     mask += QRegion(x+w-5, y+1, 2, h-1);
