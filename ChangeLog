@@ -37,6 +37,7 @@
     radial gradient top centered.
 30. Always use windows-style scrollbars for OpenOffice.org - it seems to assume this
     button layout anyway, regardless of what is painted on screen.
+31. In kwin decoration, allow to use outer border when border size set to none/no sides.
 
 1.5.2
 -----

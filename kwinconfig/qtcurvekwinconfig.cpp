@@ -278,18 +278,13 @@ void QtCurveKWinConfig::setWidgetStates()
     else
         roundBottom->setEnabled(true);
 
-    if(borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
+    if(!outerBorder->isChecked() || borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
     {
-        outerBorder->setEnabled(false);
         innerBorder->setEnabled(false);
-        outerBorder->setChecked(false);
         innerBorder->setChecked(false);
     }
     else
-    {
-        outerBorder->setEnabled(true);
         innerBorder->setEnabled(true);
-    }
 }
 
 void QtCurveKWinConfig::setNote(const QString &txt)

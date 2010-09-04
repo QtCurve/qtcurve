@@ -85,10 +85,10 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
     else
         READ_ENTRY(RoundBottom)
 
+    READ_ENTRY(OuterBorder)
     if(itsBorderSize<BORDER_TINY)
-        itsOuterBorder=itsInnerBorder=false;
-    else
-        READ_ENTRY(OuterBorder)
+        itsInnerBorder=false;
+        
     if(itsOuterBorder)
         READ_ENTRY(InnerBorder)
     else
