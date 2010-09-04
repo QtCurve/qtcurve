@@ -1362,6 +1362,7 @@ void Style::polish(QApplication *app)
         opts.bgndOpacity=opts.dlgOpacity=100;
     else if(APP_OPENOFFICE==theThemedApp)
     {
+        opts.scrollbarType=SCROLLBAR_WINDOWS;
         if(APPEARANCE_FADE==opts.menuitemAppearance)
             opts.menuitemAppearance=APPEARANCE_FLAT;
         opts.borderMenuitems=opts.etchEntry=opts.sunkenScrollViews=false;

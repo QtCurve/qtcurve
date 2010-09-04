@@ -35,6 +35,8 @@
 28. Fix faded menuitems when using menu background gradients.
 29. If background gradient has a 'shine', then when used for backgrounds draw a
     radial gradient top centered.
+30. Always use windows-style scrollbars for OpenOffice.org - it seems to assume this
+    button layout anyway, regardless of what is painted on screen.
 
 1.5.2
 -----
