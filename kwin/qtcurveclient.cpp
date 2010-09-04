@@ -40,9 +40,7 @@
 #include <KDE/KColorUtils>
 #include <KDE/KWindowInfo>
 #include <KDE/KIconEffect>
-#ifdef DRAW_INTO_PIXMAPS
 #include <KDE/KWindowSystem>
-#endif
 #include <qdesktopwidget.h>
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
