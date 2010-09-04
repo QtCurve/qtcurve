@@ -295,7 +295,8 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
 
 static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-    qtcWindowSetProperties(widget, (unsigned short)g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY"));
+    int opacity=(int)g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY");
+    qtcWindowSetProperties(widget, (unsigned short)opacity);
 
     if(opts.menubarHiding&HIDE_KWIN)
     {
