@@ -431,7 +431,10 @@ typedef enum
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)
+// PE_FrameWindow
 #define QtC_StateKWinNotFull     ((QStyle::StateFlag)0x20000000)
+// CC_TitleBar
+#define QtC_StateKWinFillBgnd    ((QStyle::StateFlag)0x20000000)
 #define QtC_StateKWinNoBorder    ((QStyle::StateFlag)0x40000000)
 #define QtC_StateKWinCompositing ((QStyle::StateFlag)0x80000000)
 #define QtC_StateKWinTabDrag     ((QStyle::StateFlag)0x00000001)

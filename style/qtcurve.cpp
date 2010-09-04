@@ -8229,6 +8229,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 EAppearance app= widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active);
+                if(kwin && (state&QtC_StateKWinFillBgnd))
+                    drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, APPEARANCE_FLAT, WIDGET_MDI_WINDOW, false);
                 if(!kwin || !IS_FLAT(app) || (titleCols[ORIGINAL_SHADE]!=QApplication::palette().background().color()))
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, app, WIDGET_MDI_WINDOW, false);
 

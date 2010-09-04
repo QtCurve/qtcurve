@@ -630,16 +630,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     QRect fillRect(r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0));
 
-    if(!compositing)
-        fillBackground(bgndAppearance, painter, fillCol, fillRect);
-
     painter.setRenderHint(QPainter::Antialiasing, true);
-    if(compositing)
-        fillBackground(bgndAppearance, painter, fillCol, fillRect, customBgnd && outerBorder
-                            ? QPainterPath()
-                            : createPath(fillRect, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT,
-                                         round>ROUND_SLIGHT && roundBottom),
-                       customBgnd ? getMask(round, fillRect) : QRegion());
+    fillBackground(bgndAppearance, painter, fillCol, fillRect, customBgnd && outerBorder
+                        ? QPainterPath()
+                        : createPath(fillRect, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom),
+                   customBgnd ? getMask(round, fillRect) : QRegion());
 
     opt.init(widget());
 
@@ -713,6 +708,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         QPixmap  tPix(32, titleBarHeight+(!blend || itsMenuBarSize<0 ? 0 : itsMenuBarSize));
         QPainter tPainter(&tPix);
         tPainter.setRenderHint(QPainter::Antialiasing, true);
+        if(!customBgnd)
+            opt.state|=QtC_StateKWinFillBgnd;
         opt.rect=QRect(0, 0, tPix.width(), tPix.height());
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &tPainter, widget());
         tPainter.end();
