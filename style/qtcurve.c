@@ -2526,14 +2526,15 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
 
                 if(GT_HORIZ==opts.bgndGrad && GB_SHINE==getGradient(opts.bgndAppearance, &opts)->border)
                 {
-                    int    wwidth=window->allocation.width+wmod,
-                           wheight=window->allocation.height+hmod,
-                           size=MIN(BGND_SHINE_SIZE, MIN(wheight*2, wwidth));
-                    double alpha=shineAlpha(&style->bg[GTK_STATE_NORMAL]);
+                    int             wwidth=window->allocation.width+wmod,
+                                    wheight=window->allocation.height+hmod,
+                                    size=MIN(BGND_SHINE_SIZE, MIN(wheight*2, wwidth));
+                    double          alpha=shineAlpha(&style->bg[GTK_STATE_NORMAL]);
+                    cairo_pattern_t *pat=NULL;
 
-                    cairo_pattern_t *pat=cairo_pattern_create_radial(x+xmod+(wwidth/2.0), ypos+ymod, 0,
-                                                                     x+xmod+(wwidth/2.0), ypos+ymod, size/2.0);
-
+                    size/=BGND_SHINE_STEPS;
+                    size*=BGND_SHINE_STEPS;
+                    pat=cairo_pattern_create_radial(x+xmod+(wwidth/2.0), ypos+ymod, 0, x+xmod+(wwidth/2.0), ypos+ymod, size/2.0);
                     cairo_pattern_add_color_stop_rgba(pat, 0, 1, 1, 1, alpha);
                     cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1, alpha*0.625);
                     cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1, alpha*0.175);
