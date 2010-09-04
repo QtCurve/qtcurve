@@ -215,6 +215,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         opt.state|=(isDown() ? QStyle::State_Sunken : QStyle::State_Raised) |
                    (active ? QStyle::State_Active : QStyle::State_None) |
                    (itsHover ? QStyle::State_MouseOver : QStyle::State_None)|QStyle::State_Horizontal|QtC_StateKWin;
+        opt.state&=~QStyle::State_HasFocus;
         if(!isEnabled())
             opt.palette.setColor(QPalette::Button, buttonColor);
         else
