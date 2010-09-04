@@ -10938,7 +10938,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
             pix=drawStripes(col, opacity);
         else
         {
-            QString   key;
+            QString key;
 
             scaledSize=QSize(GT_HORIZ==grad ? constPixmapWidth : r.width(), GT_HORIZ==grad ? r.height() : constPixmapWidth);
 
@@ -10969,7 +10969,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
         {
             int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
 
-            QString key(QLatin1String("qtc-radial"));
+            QString key;
             key.sprintf("qtc-radial-%x", size/BGND_SHINE_STEPS);
 
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
@@ -10997,7 +10997,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                     QPixmapCache::insert(key, pix);
             }
             
-            p->drawPixmap((r.width()-pix.width())/2, 0, pix);
+            p->drawPixmap(r.x()+((r.width()-pix.width())/2), r.y(), pix);
         }
     }
     else

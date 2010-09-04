@@ -628,16 +628,18 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
 
+    QRect fillRect(r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0));
+
     if(!compositing)
-        fillBackground(bgndAppearance, painter, fillCol, r);
+        fillBackground(bgndAppearance, painter, fillCol, fillRect);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
     if(compositing)
-        fillBackground(bgndAppearance, painter, fillCol, r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0),
-                       customBgnd && outerBorder
+        fillBackground(bgndAppearance, painter, fillCol, fillRect, customBgnd && outerBorder
                             ? QPainterPath()
-                            : createPath(r, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom),
-                       customBgnd ? getMask(round, r) : QRegion());
+                            : createPath(fillRect, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT,
+                                         round>ROUND_SLIGHT && roundBottom),
+                       customBgnd ? getMask(round, fillRect) : QRegion());
 
     opt.init(widget());
 
@@ -706,7 +708,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         opt.rect.adjust(0, 0, 0, itsMenuBarSize);
 
 #ifdef DRAW_INTO_PIXMAPS
-    if(!compositing && !preview && !(customBgnd && blend))
+    if(!compositing && !preview && !customBgnd)
     {
         QPixmap  tPix(32, titleBarHeight+(!blend || itsMenuBarSize<0 ? 0 : itsMenuBarSize));
         QPainter tPainter(&tPix);
