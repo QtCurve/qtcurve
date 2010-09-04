@@ -1986,6 +1986,7 @@ static void calcRingAlphas(const color *bgnd)
 }
 
 #define BGND_SHINE_SIZE 500
+#define BGND_SHINE_STEPS  8
 
 static double shineAlpha(const color *bgnd)
 {

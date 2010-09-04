@@ -10969,12 +10969,12 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
             int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
 
             QString key(QLatin1String("qtc-radial"));
-            key.sprintf("qtc-radial-%x", size/4);
+            key.sprintf("qtc-radial-%x", size/BGND_SHINE_STEPS);
 
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
-                size/=4;
-                size*=4;
+                size/=BGND_SHINE_STEPS;
+                size*=BGND_SHINE_STEPS;
                 pix=QPixmap(size, size/2);
                 pix.fill(Qt::transparent);
                 QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
