@@ -125,7 +125,7 @@ class QtCurveHandler : public QObject,
 
     private:
 
-    bool readConfig();
+    bool readConfig(bool compositingToggled=false);
 
     private:
 

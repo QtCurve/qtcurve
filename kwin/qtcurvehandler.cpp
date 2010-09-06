@@ -35,6 +35,7 @@
 #include <QTextStream>
 #include <QApplication>
 #include <QDBusConnection>
+#include <QDBusMessage>
 #include "qtcurvehandler.h"
 #include "qtcurveclient.h"
 #include "qtcurvebutton.h"
@@ -45,6 +46,7 @@
 #include <KColorScheme>
 #include <KGlobalSettings>
 #include <KSaveFile>
+#include <KWindowSystem>
 #include <unistd.h>
 #include <sys/types.h>
 #include <kde_file.h>
@@ -150,7 +152,11 @@ bool QtCurveHandler::reset(unsigned long changed)
     itsTitleFontTool = KDecoration::options()->font(true, true); // small
 
     // read in the configuration
-    bool configChanged=readConfig();
+    bool configChanged=readConfig(
+#if KDE_IS_VERSION(4, 3, 85)
+                                  changed&SettingCompositing
+#endif
+                                  );
 
     setBorderSize();
 
@@ -254,7 +260,7 @@ bool QtCurveHandler::supports(Ability ability) const
     };
 }
 
-bool QtCurveHandler::readConfig()
+bool QtCurveHandler::readConfig(bool compositingToggled)
 {
     QtCurveConfig      oldConfig=itsConfig;
     KConfig            configFile("kwinqtcurverc");
@@ -262,6 +268,7 @@ bool QtCurveHandler::readConfig()
     QFontMetrics       fm(itsTitleFont);  // active font = inactive font
     int                oldSize=itsTitleHeight,
                        oldToolSize=itsTitleHeightTool;
+    bool               changedBorder=false;
 
     // The title should stretch with bigger font sizes!
     itsTitleHeight = qMax(20, fm.height() + 4); // 4 px for the shadow etc.
@@ -277,6 +284,23 @@ bool QtCurveHandler::readConfig()
         itsTitleHeightTool++;
 
     itsConfig.load(&configFile);
+
+#if KDE_IS_VERSION(4, 3, 85)
+    static bool borderHack=false;
+    if(borderHack)
+    {
+        itsConfig.setOuterBorder(!KWindowSystem::compositingActive());
+        changedBorder=true;
+        borderHack=false;
+    }
+    else if(compositingToggled && !itsConfig.outerBorder() &&
+           (itsConfig.borderSize()<QtCurveConfig::BORDER_TINY || 
+            (wStyle()->pixelMetric((QStyle::PixelMetric)QtC_WindowBorder, 0L, 0L)&WINDOW_BORDER_COLOR_TITLEBAR_ONLY)))
+    {
+        QDBusConnection::sessionBus().send(QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig"));
+        borderHack=true;
+    }
+#endif
 
     itsTitleHeight+=2*titleBarPad();
 
@@ -336,13 +360,14 @@ bool QtCurveHandler::readConfig()
     }
 #endif
 
-    if(itsDBus && borderSizesChanged)
+    if(itsDBus && (borderSizesChanged || changedBorder))
     {
         itsDBus->emitBorderSizes(); // KDE4 apps...
         borderSizeChanged(); // Gtk2 apps...
     }
 
-    return oldSize!=itsTitleHeight ||
+    return changedBorder ||
+           oldSize!=itsTitleHeight ||
            oldToolSize!=itsTitleHeightTool ||
 #if KDE_IS_VERSION(4, 3, 0)
            shadowChanged ||
