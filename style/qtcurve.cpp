@@ -4763,8 +4763,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             break;
         case PE_FrameWindow:
         {
-            const QColor *borderCols(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
-                                        ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
+            bool         colTbarOnly=opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY,
+                         fillBgnd=!(state&QtC_StateKWin) && !itsIsPreview && !IS_FLAT_BGND(opts.bgndAppearance);
+            const QColor *bgndCols(colTbarOnly || fillBgnd ? backgroundColors(palette.color(QPalette::Active, QPalette::Window)) : 0L),
+                         *borderCols(colTbarOnly
+                                        ? bgndCols
                                         : theThemedApp==APP_KWIN
                                             ? buttonColors(option)
                                             : getMdiColors(option, state&State_Active));
@@ -4776,6 +4779,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
             painter->save();
 
+            if(fillBgnd)
+                painter->fillRect(r, bgndCols[ORIGINAL_SHADE]);
             if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
@@ -8170,14 +8175,19 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             if (const QStyleOptionTitleBar *titleBar = qstyleoption_cast<const QStyleOptionTitleBar *>(option))
             {
                 painter->save();
-            
+
+                EAppearance  app=widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active);
                 bool         active(state&State_Active),
                              kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin);
-                const QColor *bgndCols(kwin ? buttonColors(option) : getMdiColors(titleBar, active)),
+                const QColor *bgndCols(APPEARANCE_NONE==app
+                                        ? kwin ? backgroundColors(option) : backgroundColors(palette.color(QPalette::Active, QPalette::Window))
+                                        : kwin ? buttonColors(option) : getMdiColors(titleBar, active)),
                              *btnCols(kwin || opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR
                                         ? buttonColors(option)
                                         : getMdiColors(titleBar, active)),
-                             *titleCols(kwin || !(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR)
+                             *titleCols(APPEARANCE_NONE==app
+                                        ? bgndCols
+                                        : kwin || !(opts.titlebarButtons&TITLEBAR_BUTTON_STD_COLOR)
                                             ? btnCols : getMdiColors(titleBar, active));
                 QColor       textColor(theThemedApp==APP_KWIN
                                         ? option->palette.color(QPalette::WindowText)
@@ -8228,10 +8238,11 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     painter->fillRect(tr, titleCols[STD_BORDER]);
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                EAppearance app= widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active);
+
                 if(kwin && (state&QtC_StateKWinFillBgnd))
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, APPEARANCE_FLAT, WIDGET_MDI_WINDOW, false);
-                if(!kwin || !IS_FLAT(app) || (titleCols[ORIGINAL_SHADE]!=QApplication::palette().background().color()))
+                if((!kwin && !itsIsPreview) ||
+                   (APPEARANCE_NONE!=app && (!IS_FLAT(app) || (titleCols[ORIGINAL_SHADE]!=QApplication::palette().background().color()))))
                     drawBevelGradient(titleCols[ORIGINAL_SHADE], painter, tr, path, true, false, app, WIDGET_MDI_WINDOW, false);
 
                 if(!(state&QtC_StateKWinNoBorder))

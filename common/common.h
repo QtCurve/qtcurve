@@ -637,6 +637,14 @@ typedef enum
 
 typedef enum
 {
+    APP_ALLOW_BASIC,
+    APP_ALLOW_FADE,
+    APP_ALLOW_STRIPED,
+    APP_ALLOW_NONE
+} EAppAllow;
+
+typedef enum
+{
     APPEARANCE_CUSTOM1,
     APPEARANCE_CUSTOM2,
     APPEARANCE_CUSTOM3,
@@ -676,6 +684,7 @@ typedef enum
     APPEARANCE_BEVELLED,
         APPEARANCE_FADE, /* Only for poupmenu items! */
         APPEARANCE_STRIPED = APPEARANCE_FADE, /* Only for windows  and menus */
+        APPEARANCE_NONE = APPEARANCE_FADE, /* Only for titlebars */
         APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
         APPEARANCE_AGUA_MOD,
         APPEARANCE_LV_AGUA,

@@ -449,7 +449,8 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
         combo->insertItem(SHADE_WINDOW_BORDER, i18n("Titlebar border"));
 }
 
-static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=true, bool fade=false, bool striped=false)
+
+static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_BASIC)
 {
     for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
         combo->insertItem(i, i18n("Custom gradient %1", (i-APPEARANCE_CUSTOM1)+1));
@@ -464,17 +465,20 @@ static void insertAppearanceEntries(QComboBox *combo, bool split=true, bool bev=
     combo->insertItem(APPEARANCE_HARSH_GRADIENT, i18n("Harsh gradient"));
     combo->insertItem(APPEARANCE_INVERTED, i18n("Inverted gradient"));
     combo->insertItem(APPEARANCE_DARK_INVERTED, i18n("Dark inverted gradient"));
-    if(split)
+    combo->insertItem(APPEARANCE_SPLIT_GRADIENT, i18n("Split gradient"));
+    combo->insertItem(APPEARANCE_BEVELLED, i18n("Bevelled"));
+    switch(allow)
     {
-        combo->insertItem(APPEARANCE_SPLIT_GRADIENT, i18n("Split gradient"));
-        if(bev)
-        {
-            combo->insertItem(APPEARANCE_BEVELLED, i18n("Bevelled"));
-            if(fade)
-                combo->insertItem(APPEARANCE_FADE, i18n("Fade out (popup menuitems)"));
-            else if(striped)
-                combo->insertItem(APPEARANCE_STRIPED, i18n("Striped"));
-        }
+        case APP_ALLOW_FADE:
+            combo->insertItem(APPEARANCE_FADE, i18n("Fade out (popup menuitems)"));
+            break;
+        case APP_ALLOW_STRIPED:
+            combo->insertItem(APPEARANCE_STRIPED, i18n("Striped"));
+            break;
+        case APP_ALLOW_NONE:
+            combo->insertItem(APPEARANCE_NONE, i18n("None"));
+        default:
+            break;
     }
 }
 
@@ -729,22 +733,22 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(toolbarAppearance);
     insertAppearanceEntries(lvAppearance);
     insertAppearanceEntries(sliderAppearance);
-    insertAppearanceEntries(tabAppearance, false);
-    insertAppearanceEntries(activeTabAppearance, false);
+    insertAppearanceEntries(tabAppearance);
+    insertAppearanceEntries(activeTabAppearance);
     insertAppearanceEntries(progressAppearance);
     insertAppearanceEntries(progressGrooveAppearance);
     insertAppearanceEntries(grooveAppearance);
     insertAppearanceEntries(sunkenAppearance);
-    insertAppearanceEntries(menuitemAppearance, true, true, true);
-    insertAppearanceEntries(menuBgndAppearance, true, true, false, true);
-    insertAppearanceEntries(titlebarAppearance, true, false);
-    insertAppearanceEntries(inactiveTitlebarAppearance, true, false);
+    insertAppearanceEntries(menuitemAppearance, APP_ALLOW_FADE);
+    insertAppearanceEntries(menuBgndAppearance, APP_ALLOW_STRIPED);
+    insertAppearanceEntries(titlebarAppearance, APP_ALLOW_NONE);
+    insertAppearanceEntries(inactiveTitlebarAppearance, APP_ALLOW_NONE);
     insertAppearanceEntries(titlebarButtonAppearance);
-    insertAppearanceEntries(selectionAppearance, true, false);
-    insertAppearanceEntries(menuStripeAppearance, true, false);
+    insertAppearanceEntries(selectionAppearance);
+    insertAppearanceEntries(menuStripeAppearance);
     insertAppearanceEntries(sbarBgndAppearance);
     insertAppearanceEntries(sliderFill);
-    insertAppearanceEntries(bgndAppearance, true, true, false, true);
+    insertAppearanceEntries(bgndAppearance, APP_ALLOW_STRIPED);
     insertAppearanceEntries(dwtAppearance);
     insertAppearanceEntries(tooltipAppearance);
     insertLineEntries(handles, true, true);

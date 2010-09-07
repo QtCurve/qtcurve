@@ -167,7 +167,7 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
     return def;
 }
 
-static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade, bool allowStripe)
+static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow)
 {
     if(str)
     {
@@ -199,10 +199,12 @@ static EAppearance toAppearance(const char *str, EAppearance def, bool allowFade
             return APPEARANCE_SPLIT_GRADIENT;
         if(0==memcmp(str, "bevelled", 8))
             return APPEARANCE_BEVELLED;
-        if(allowFade && 0==memcmp(str, "fade", 4))
+        if(APP_ALLOW_FADE==allow && 0==memcmp(str, "fade", 4))
             return APPEARANCE_FADE;
-        if(allowStripe && 0==memcmp(str, "striped", 7))
+        if(APP_ALLOW_STRIPED==allow && 0==memcmp(str, "striped", 7))
             return APPEARANCE_STRIPED;
+        if(APP_ALLOW_NONE==allow && 0==memcmp(str, "none", 4))
+            return APPEARANCE_NONE;
 
         if(0==memcmp(str, "customgradient", 14) && strlen(str)>14)
         {
@@ -1208,8 +1210,8 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
 #define CFG_READ_MOUSE_OVER(ENTRY) \
     opts->ENTRY=toMouseOver(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
-#define CFG_READ_APPEARANCE(ENTRY, ALLOW_FADE, ALLOW_STRIPE) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW_FADE, ALLOW_STRIPE);
+#define CFG_READ_APPEARANCE(ENTRY, ALLOW) \
+    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW);
 
 /*
 #define CFG_READ_APPEARANCE(ENTRY) \
@@ -1607,11 +1609,11 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd)
             CFG_READ_INT(tabBgnd)
             CFG_READ_TB_BORDER(toolbarBorders)
-            CFG_READ_APPEARANCE(appearance, false, false)
-            CFG_READ_APPEARANCE(bgndAppearance, false, true)
+            CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(bgndAppearance, APP_ALLOW_STRIPED)
             CFG_READ_GRAD_TYPE(bgndGrad)
             CFG_READ_GRAD_TYPE(menuBgndGrad)
-            CFG_READ_APPEARANCE(menuBgndAppearance, false, true)
+            CFG_READ_APPEARANCE(menuBgndAppearance, APP_ALLOW_STRIPED)
             CFG_READ_BOOL(fixParentlessDialogs)
             CFG_READ_STRIPE(stripedProgress)
             CFG_READ_SLIDER(sliderStyle)
@@ -1630,12 +1632,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_SHADE(sortedLv, true, false, &opts->customSortedLvColor)
             CFG_READ_SHADE(crColor,  true, false, &opts->customCrBgndColor)
             CFG_READ_SHADE(progressColor, false, false, &opts->customProgressColor)
-            CFG_READ_APPEARANCE(menubarAppearance, false, false)
-            CFG_READ_APPEARANCE(menuitemAppearance, true, false)
-            CFG_READ_APPEARANCE(toolbarAppearance, false, false)
-            CFG_READ_APPEARANCE(selectionAppearance, false, false)
+            CFG_READ_APPEARANCE(menubarAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(menuitemAppearance, APP_ALLOW_FADE)
+            CFG_READ_APPEARANCE(toolbarAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(selectionAppearance, APP_ALLOW_BASIC)
 #ifdef __cplusplus
-            CFG_READ_APPEARANCE(dwtAppearance, false, false)
+            CFG_READ_APPEARANCE(dwtAppearance, APP_ALLOW_BASIC)
 #endif
             CFG_READ_LINE(toolbarSeparators)
             CFG_READ_LINE(splitters)
@@ -1659,27 +1661,27 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_COLOR(customMenuNormTextColor)
             CFG_READ_SCROLLBAR(scrollbarType)
             CFG_READ_EFFECT(buttonEffect)
-            CFG_READ_APPEARANCE(lvAppearance, false, false)
-            CFG_READ_APPEARANCE(tabAppearance, false, false)
-            CFG_READ_APPEARANCE(activeTabAppearance, false, false)
-            CFG_READ_APPEARANCE(sliderAppearance, false, false)
-            CFG_READ_APPEARANCE(progressAppearance, false, false)
-            CFG_READ_APPEARANCE(progressGrooveAppearance, false, false)
-            CFG_READ_APPEARANCE(grooveAppearance, false, false)
-            CFG_READ_APPEARANCE(sunkenAppearance, false, false)
-            CFG_READ_APPEARANCE(sbarBgndAppearance, false, false)
+            CFG_READ_APPEARANCE(lvAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(tabAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(activeTabAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(sliderAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(progressAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(progressGrooveAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(grooveAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(sunkenAppearance, APP_ALLOW_BASIC)
+            CFG_READ_APPEARANCE(sbarBgndAppearance, APP_ALLOW_BASIC)
             if(opts->version<MAKE_VERSION(1, 6))
                 opts->tooltipAppearance=APPEARANCE_FLAT;
             else
             {
-                CFG_READ_APPEARANCE(tooltipAppearance, false, false)
+                CFG_READ_APPEARANCE(tooltipAppearance, APP_ALLOW_BASIC)
             }
 
             if(opts->version<MAKE_VERSION(0, 63))
                 opts->sliderFill=IS_FLAT(opts->appearance) ? opts->grooveAppearance : APPEARANCE_GRADIENT;
             else
             {
-                CFG_READ_APPEARANCE(sliderFill, false, false)
+                CFG_READ_APPEARANCE(sliderFill, APP_ALLOW_BASIC)
             }
             CFG_READ_ECOLOR(progressGrooveColor)
             CFG_READ_FOCUS(focus)
@@ -1742,7 +1744,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(menuBgndOpacity)
             CFG_READ_INT(dlgOpacity)
             CFG_READ_SHADE(menuStripe, true, true, &opts->customMenuStripeColor)
-            CFG_READ_APPEARANCE(menuStripeAppearance, false, false)
+            CFG_READ_APPEARANCE(menuStripeAppearance, APP_ALLOW_BASIC)
             if(opts->version<MAKE_VERSION(0, 63) && IS_BLACK(opts->customMenuStripeColor))
                 CFG_READ_COLOR(customMenuStripeColor)
             CFG_READ_SHADE(comboBtn, true, false, &opts->customComboBtnColor);
@@ -1770,8 +1772,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(reorderGtkButtons)
 #endif
-            CFG_READ_APPEARANCE(titlebarAppearance, false, false)
-            CFG_READ_APPEARANCE(inactiveTitlebarAppearance, false, false)
+            CFG_READ_APPEARANCE(titlebarAppearance, APP_ALLOW_NONE)
+            CFG_READ_APPEARANCE(inactiveTitlebarAppearance, APP_ALLOW_NONE)
 
             if(APPEARANCE_BEVELLED==opts->titlebarAppearance)
                 opts->titlebarAppearance=APPEARANCE_GRADIENT;
@@ -1784,7 +1786,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else if(APPEARANCE_RAISED==opts->inactiveTitlebarAppearance)
                 opts->inactiveTitlebarAppearance=APPEARANCE_FLAT;
 #ifdef __cplusplus
-            CFG_READ_APPEARANCE(titlebarButtonAppearance, false, false)
+            CFG_READ_APPEARANCE(titlebarButtonAppearance, APP_ALLOW_BASIC)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             if(opts->xbar && opts->menubarHiding)
                 opts->xbar=false;
@@ -2601,7 +2603,7 @@ static const char *toStr(EMouseOver mo)
     }
 }
 
-static QString toStr(EAppearance exp, bool fade)
+static QString toStr(EAppearance exp, EAppAllow allow)
 {
     switch(exp)
     {
@@ -2630,7 +2632,16 @@ static QString toStr(EAppearance exp, bool fade)
         case APPEARANCE_BEVELLED:
             return "bevelled";
         case APPEARANCE_FADE:
-            return fade ? "fade" : "striped";
+            switch(allow)
+            {
+                case APP_ALLOW_BASIC: // Should not get here!
+                case APP_ALLOW_FADE:
+                    return "fade";
+                case APP_ALLOW_STRIPED:
+                    return "striped";
+                case APP_ALLOW_NONE:
+                    return "none";
+            }
         default:
         {
             QString app;
@@ -2960,11 +2971,11 @@ static const char * toStr(EGlow lv)
     else \
         CFG.writeEntry(#ENTRY, toStr(opts.ENTRY));
 
-#define CFG_WRITE_APPEARANCE_ENTRY(ENTRY, USE_FADE) \
+#define CFG_WRITE_APPEARANCE_ENTRY(ENTRY, ALLOW) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
     else \
-        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, USE_FADE));
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, ALLOW));
     
 #define CFG_WRITE_ENTRY_B(ENTRY, B) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
@@ -3051,11 +3062,11 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(menuDelay)
         CFG_WRITE_ENTRY_NUM(sliderWidth)
         CFG_WRITE_ENTRY(toolbarBorders)
-        CFG_WRITE_APPEARANCE_ENTRY(appearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(bgndAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(appearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(bgndAppearance, APP_ALLOW_STRIPED)
         CFG_WRITE_ENTRY(bgndGrad)
         CFG_WRITE_ENTRY(menuBgndGrad)
-        CFG_WRITE_APPEARANCE_ENTRY(menuBgndAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(menuBgndAppearance, APP_ALLOW_STRIPED)
         CFG_WRITE_ENTRY(fixParentlessDialogs)
         CFG_WRITE_ENTRY(stripedProgress)
         CFG_WRITE_ENTRY(sliderStyle)
@@ -3070,15 +3081,15 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(colorSelTab)
         CFG_WRITE_ENTRY(roundAllTabs)
         CFG_WRITE_ENTRY(tabMouseOver)
-        CFG_WRITE_APPEARANCE_ENTRY(menubarAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(menuitemAppearance, true)
-        CFG_WRITE_APPEARANCE_ENTRY(toolbarAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(selectionAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(menubarAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(menuitemAppearance, APP_ALLOW_FADE)
+        CFG_WRITE_APPEARANCE_ENTRY(toolbarAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(selectionAppearance, APP_ALLOW_BASIC)
 #ifdef __cplusplus
-        CFG_WRITE_APPEARANCE_ENTRY(dwtAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(dwtAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_ENTRY(titlebarEffect)
 #endif
-        CFG_WRITE_APPEARANCE_ENTRY(menuStripeAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(menuStripeAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_ENTRY_B(toolbarSeparators, false)
         CFG_WRITE_ENTRY_B(splitters, true)
         CFG_WRITE_ENTRY(customMenuTextColor)
@@ -3096,15 +3107,15 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_SHADE_ENTRY(shadeCheckRadio, customCheckRadioColor)
         CFG_WRITE_ENTRY(scrollbarType)
         CFG_WRITE_ENTRY(buttonEffect)
-        CFG_WRITE_APPEARANCE_ENTRY(lvAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(tabAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(activeTabAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(sliderAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(progressAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(progressGrooveAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(grooveAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(sunkenAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(sbarBgndAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(lvAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(tabAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(activeTabAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(sliderAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(progressAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(progressGrooveAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(grooveAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(sunkenAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(sbarBgndAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_ENTRY(sliderFill)
         CFG_WRITE_ENTRY(progressGrooveColor)
         CFG_WRITE_ENTRY(focus)
@@ -3201,9 +3212,9 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_SHADE_ENTRY(comboBtn, customComboBtnColor)
         CFG_WRITE_ENTRY(stdSidebarButtons)
         CFG_WRITE_ENTRY(toolbarTabs)
-        CFG_WRITE_APPEARANCE_ENTRY(titlebarAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(inactiveTitlebarAppearance, false)
-        CFG_WRITE_APPEARANCE_ENTRY(titlebarButtonAppearance, false)
+        CFG_WRITE_APPEARANCE_ENTRY(titlebarAppearance, APP_ALLOW_NONE)
+        CFG_WRITE_APPEARANCE_ENTRY(inactiveTitlebarAppearance, APP_ALLOW_NONE)
+        CFG_WRITE_APPEARANCE_ENTRY(titlebarButtonAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_ENTRY(gtkScrollViews)
         CFG_WRITE_ENTRY(gtkComboMenus)
         CFG_WRITE_ENTRY(doubleGtkComboArrow)
