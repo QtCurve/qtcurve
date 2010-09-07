@@ -140,6 +140,7 @@ class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
         componentData = new KComponentData(aboutData);
 
         QWidget *main=new QWidget(this);
+        setObjectName("QtCurvePreview");
         setupUi(main);
         setCentralWidget(main);
         setComponentData(*componentData);

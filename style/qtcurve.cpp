@@ -63,6 +63,7 @@
 #include <KDE/KStandardAction>
 #include <KDE/KActionCollection>
 #include <KDE/KIconEffect>
+#include <KDE/KMenu>
 
 #if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
@@ -1908,7 +1909,13 @@ void Style::polish(QWidget *widget)
             }
         }
 
-    if(qobject_cast<QMenu *>(widget))
+    if(qobject_cast<QMenu *>(widget) && !(widget->parentWidget() &&
+#ifdef QTC_QT_ONLY
+        widget->inherits("KMenu") && widget->parentWidget()->inherits("KXmlGuiWindow")
+#else
+        qobject_cast<KMenu *>(widget) && qobject_cast<KXmlGuiWindow *>(widget->parentWidget())
+#endif
+        && QLatin1String("QtCurvePreview")==widget->parentWidget()->objectName()))
     {
         if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity)
         {
