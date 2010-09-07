@@ -415,71 +415,95 @@ enum ShadeWidget
     SW_PROGRESS
 };
 
-static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
+static QString uiString(EShade shade, ShadeWidget sw)
 {
-    switch(sw)
+    switch(shade)
     {
-        case SW_MENUBAR:
-        case SW_PROGRESS:
-            combo->insertItem(SHADE_NONE, i18n("Background"));
-            break;
-        case SW_COMBO:
-        case SW_SLIDER:
-            combo->insertItem(SHADE_NONE, i18n("Button"));
-            break;
-        case SW_CHECK_RADIO:
-            combo->insertItem(SHADE_NONE, i18n("Text"));
-            break;
-        case SW_CR_BGND:
-        case SW_LV_HEADER:
-        case SW_MENU_STRIPE:
-            combo->insertItem(SHADE_NONE, i18n("None"));
-            break;
+        case SHADE_NONE:
+            switch(sw)
+            {
+                case SW_MENUBAR:
+                case SW_PROGRESS:
+                    return i18n("Background");
+                case SW_COMBO:
+                case SW_SLIDER:
+                    return i18n("Button");
+                case SW_CHECK_RADIO:
+                    return i18n("Text");
+                case SW_CR_BGND:
+                case SW_LV_HEADER:
+                case SW_MENU_STRIPE:
+                    return i18n("None");
+            }
+        default:
+            return i18n("<unknown>");
+        case SHADE_CUSTOM:
+            return i18n("Custom:");
+        case SHADE_SELECTED:
+            return i18n("Selected background");
+        case SHADE_BLEND_SELECTED:
+            return i18n("Blended selected background");
+        case SHADE_DARKEN:
+            return SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken");
+        case SHADE_WINDOW_BORDER:
+            return i18n("Titlebar");
     }
-
-    combo->insertItem(SHADE_CUSTOM, i18n("Custom:"));
-    combo->insertItem(SHADE_SELECTED, i18n("Selected background"));
-    if(SW_CHECK_RADIO!=sw) // For check/radio, we dont blend, and dont allow darken
-    {
-        combo->insertItem(SHADE_BLEND_SELECTED, i18n("Blended selected background"));
-        if(SW_PROGRESS!=sw)
-            combo->insertItem(SHADE_DARKEN, SW_MENU_STRIPE==sw ? i18n("Menu background") : i18n("Darken"));
-    }
-    if(SW_MENUBAR==sw)
-        combo->insertItem(SHADE_WINDOW_BORDER, i18n("Titlebar border"));
 }
 
+static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
+{
+    combo->insertItem(SHADE_NONE, uiString(SHADE_NONE, sw));
+    combo->insertItem(SHADE_CUSTOM, uiString(SHADE_CUSTOM, sw));
+    combo->insertItem(SHADE_SELECTED, uiString(SHADE_SELECTED, sw));
+    if(SW_CHECK_RADIO!=sw) // For check/radio, we dont blend, and dont allow darken
+    {
+        combo->insertItem(SHADE_BLEND_SELECTED, uiString(SHADE_BLEND_SELECTED, sw));
+        if(SW_PROGRESS!=sw)
+            combo->insertItem(SHADE_DARKEN, uiString(SHADE_DARKEN, sw));
+    }
+    if(SW_MENUBAR==sw)
+        combo->insertItem(SHADE_WINDOW_BORDER, uiString(SHADE_WINDOW_BORDER, sw));
+}
+
+static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
+{
+    if(app>=APPEARANCE_CUSTOM1 && app<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
+        return i18n("Custom gradient %1", (app-APPEARANCE_CUSTOM1)+1);
+
+    switch(app)
+    {
+        case APPEARANCE_FLAT: return i18n("Flat");
+        case APPEARANCE_RAISED: return i18n("Raised");
+        case APPEARANCE_DULL_GLASS: return i18n("Dull glass");
+        case APPEARANCE_SHINY_GLASS: return i18n("Shiny glass");
+        case APPEARANCE_AGUA: return i18n("Agua");
+        case APPEARANCE_SOFT_GRADIENT: return i18n("Soft gradient");
+        case APPEARANCE_GRADIENT: return i18n("Standard gradient");
+        case APPEARANCE_HARSH_GRADIENT: return i18n("Harsh gradient");
+        case APPEARANCE_INVERTED: return i18n("Inverted gradient");
+        case APPEARANCE_DARK_INVERTED: return i18n("Dark inverted gradient");
+        case APPEARANCE_SPLIT_GRADIENT: return i18n("Split gradient");
+        case APPEARANCE_BEVELLED: return i18n("Bevelled");
+        case APPEARANCE_FADE:
+            switch(allow)
+            {
+                case APP_ALLOW_FADE:
+                    return i18n("Fade out (popup menuitems)");
+                case APP_ALLOW_STRIPED:
+                    return i18n("Striped");
+                default:
+                case APP_ALLOW_NONE:
+                    return i18n("None");
+            }
+        default:
+            return i18n("<unknown>");
+    }
+}
 
 static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_BASIC)
 {
-    for(int i=APPEARANCE_CUSTOM1; i<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD); ++i)
-        combo->insertItem(i, i18n("Custom gradient %1", (i-APPEARANCE_CUSTOM1)+1));
-
-    combo->insertItem(APPEARANCE_FLAT, i18n("Flat"));
-    combo->insertItem(APPEARANCE_RAISED, i18n("Raised"));
-    combo->insertItem(APPEARANCE_DULL_GLASS, i18n("Dull glass"));
-    combo->insertItem(APPEARANCE_SHINY_GLASS, i18n("Shiny glass"));
-    combo->insertItem(APPEARANCE_AGUA, i18n("Agua"));
-    combo->insertItem(APPEARANCE_SOFT_GRADIENT, i18n("Soft gradient"));
-    combo->insertItem(APPEARANCE_GRADIENT, i18n("Standard gradient"));
-    combo->insertItem(APPEARANCE_HARSH_GRADIENT, i18n("Harsh gradient"));
-    combo->insertItem(APPEARANCE_INVERTED, i18n("Inverted gradient"));
-    combo->insertItem(APPEARANCE_DARK_INVERTED, i18n("Dark inverted gradient"));
-    combo->insertItem(APPEARANCE_SPLIT_GRADIENT, i18n("Split gradient"));
-    combo->insertItem(APPEARANCE_BEVELLED, i18n("Bevelled"));
-    switch(allow)
-    {
-        case APP_ALLOW_FADE:
-            combo->insertItem(APPEARANCE_FADE, i18n("Fade out (popup menuitems)"));
-            break;
-        case APP_ALLOW_STRIPED:
-            combo->insertItem(APPEARANCE_STRIPED, i18n("Striped"));
-            break;
-        case APP_ALLOW_NONE:
-            combo->insertItem(APPEARANCE_NONE, i18n("None"));
-        default:
-            break;
-    }
+    for(int i=APPEARANCE_CUSTOM1; i<APPEARANCE_FADE+1; ++i)
+        combo->insertItem(i, uiString((EAppearance)i, allow));
 }
 
 static void insertLineEntries(QComboBox *combo,  bool singleDot, bool dashes)
@@ -1043,6 +1067,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(statusbarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+
+    connect(menubarBlend, SIGNAL(clicked(bool)), SLOT(menubarTitlebarBlend()));
 
     setupStack();
 
@@ -1895,6 +1921,26 @@ void QtCurveConfig::exportQt()
         pal.writeEntry("disabled", dis.join(sep));
         pal.writeEntry("inactive", inact.join(sep));
         kde.writeEntry("contrast", QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", 7).toInt());
+    }
+}
+
+void QtCurveConfig::menubarTitlebarBlend()
+{
+    if(KMessageBox::Yes==KMessageBox::questionYesNo(this,
+        i18n("<p>Set the following config items so that window titlebar and menubars appear blended?</p>"
+             "<ul><li>Menubar, titlebar, and inactive titlebar gradient to \"%1\"</li>"
+             "<li>Disable \"Blend titlebar color into background color\"</li>"
+             "<li>Set menubar coloration to \"%2\"</li>"
+             "<li>Extend window dragging into menubar</li>",
+             uiString((EAppearance)menubarAppearance->currentIndex()),
+             uiString(SHADE_WINDOW_BORDER, SW_MENUBAR))))
+    {
+        titlebarAppearance->setCurrentIndex(menubarAppearance->currentIndex());
+        inactiveTitlebarAppearance->setCurrentIndex(menubarAppearance->currentIndex());
+        windowBorder_blend->setChecked(false);
+        shadeMenubars->setCurrentIndex(SHADE_WINDOW_BORDER);
+        if(windowDrag->currentIndex()<WM_DRAG_MENUBAR)
+            windowDrag->setCurrentIndex(WM_DRAG_MENUBAR);
     }
 }
 

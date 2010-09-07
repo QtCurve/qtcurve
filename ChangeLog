@@ -42,6 +42,8 @@
     only the titlebar - then add outer border until compositing is re-enabled.
 33. Alow to specify 'none' as apeparance setting for titlebars - so that background
     gradient can be used.
+34. Add a button in config UI to set the required config items to enable blended menubars
+    and titlebars.
 
 1.5.2
 -----

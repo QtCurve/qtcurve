@@ -155,6 +155,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void stopSelected();
     void exportKDE3();
     void exportQt();
+    void menubarTitlebarBlend();
     void updatePreview();
     void copyGradient(QAction *act);
 
