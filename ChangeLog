@@ -38,6 +38,7 @@
 22. Fix faded menuitems when using menu background gradients.
 23. If background gradient has a 'shine', then when used for backgrounds draw a
     radial gradient top centered.
+24. Use arrows on pathbar buttons.
 
 1.5.2
 -----

@@ -3919,12 +3919,14 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
 
                 if(GTK_IS_TOGGLE_BUTTON(widget))
-                {
-                    cairo_new_path(cr);
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[5]));
-                    cairo_move_to(cr, x+width-0.5, y+9.5);
-                    cairo_line_to(cr, x+width-3.5, y+height-9.5);
-                    cairo_stroke(cr);
+                {                       
+                    drawArrow(window, style, &qtcPalette.background[5], area, GTK_ARROW_RIGHT,
+                              x+width-((LARGE_ARR_WIDTH>>1)+4), y+((height-(LARGE_ARR_HEIGHT>>1))>>1)+1, FALSE, TRUE);
+//                     cairo_new_path(cr);
+//                     cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[5]));
+//                     cairo_move_to(cr, x+width-0.5, y+9.5);
+//                     cairo_line_to(cr, x+width-3.5, y+height-9.5);
+//                     cairo_stroke(cr);
                 }
             }
 // Re-enable this to stop the button background being drawn for tab widget icons.
