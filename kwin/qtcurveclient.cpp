@@ -700,6 +700,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(!preview && !isShade() && blend && -1!=itsMenuBarSize)
         opt.rect.adjust(0, 0, 0, itsMenuBarSize);
 
+    // Remove QtC_StateKWinNotFull settings - as its the same value as QtC_StateKWinFillBgnd, and it is not
+    // used in CC_TitleBar...
+    if(!roundBottom)
+        opt.state&=~QtC_StateKWinNotFull;
+
 #ifdef DRAW_INTO_PIXMAPS
     if(!compositing && !preview && !customBgnd)
     {
