@@ -742,14 +742,15 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     {
         int hOffset=2,
             vOffset=hOffset+(outerBorder ? 1 :0),
-            posAdjust=isMaximized() || outerBorder ? 2 : 0;
+            posAdjust=isMaximized() || outerBorder ? 2 : 0,
+            edgePad=Handler()->edgePad();
         
         if(buttonsLeftWidth()>(titleBarHeight-2*hOffset))
-            drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust, r.top()+vOffset,
-                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*vOffset), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
+            drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust+edgePad, r.top()+vOffset+edgePad,
+                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
         if(buttonsRightWidth()>(titleBarHeight-2*hOffset))
-            drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust), r.top()+vOffset,
-                                            buttonsRightWidth(), titleBarHeight-2*vOffset), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
+            drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust+edgePad), r.top()+vOffset+edgePad,
+                                            buttonsRightWidth(), titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
     }
     
     bool showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIcon,  0L, 0L);

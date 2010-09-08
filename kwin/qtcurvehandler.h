@@ -103,6 +103,7 @@ class QtCurveHandler : public QObject,
     QStyle *              wStyle() const             { return itsStyle ? itsStyle : QApplication::style(); }
     int                   borderEdgeSize() const;
     int                   titleBarPad() const        { return itsConfig.titleBarPad(); }
+    int                   edgePad() const            { return itsConfig.edgePad(); }
     bool                  borderlessMax() const      { return itsConfig.borderlessMax(); }
     int                   opacity(bool active) const { return itsConfig.opacity(active); }
     bool                  opaqueBorder() const       { return itsConfig.opaqueBorder(); }
