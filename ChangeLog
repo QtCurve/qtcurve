@@ -19,10 +19,9 @@
  9. Added option to specify tooltip background appearance.
 10. Added options to draw shaded, or faded, group boxes.
 11. Added options to specify location of group box label; inside, outside.
-12. Dont use the 'no buttons' scrollbar setting for mozilla apps. This
-    setting seems to cause odd behaviour with the horizontal scrollbar
-    (sometimes it is not displayed). Use signle top/bottom left/right
-    buttons instead.
+12. Dont use the 'no buttons' scrollbar setting for mozilla apps. This setting
+    seems to cause odd behaviour with the horizontal scrollbar (sometimes it is
+    not displayed). Use signle top/bottom left/right buttons instead.
 13. Draw coloured mouse over for 'checked' toggle buttons.
 14. Fix look of some sunken toolbar button in firefox.
 15. Use Highlight colour for default button glow.
@@ -30,15 +29,14 @@
     the selection colour - use same colour, but set 50% transparent.
 17. Add "npviewer.bin" to list of apps that are brower plugin viewers - opacity
     settings are excluded from these.
-18. Add totem and sonata to list of apps to exclude opacity settings from.
-19. Exclude opacity settings from SWT apps such as eclipse.
-20. Default sub-menu popup delay to 225 - matches Gtk2 standard default. The previous
+18. Exclude opacity settings from SWT apps (e.g. eclipse), totem, and sonata.
+19. Default sub-menu popup delay to 225 - matches Gtk2 standard default. The previous
     default of 100 seems to cause issues with Thunar.
-21. Extend background gradients into window decoration.
-22. Fix faded menuitems when using menu background gradients.
-23. If background gradient has a 'shine', then when used for backgrounds draw a
+20. Extend background gradients into window decoration.
+21. Fix faded menuitems when using menu background gradients.
+22. If background gradient has a 'shine', then when used for backgrounds draw a
     radial gradient top centered.
-24. Use arrows on pathbar buttons.
+23. Use arrows on pathbar buttons.
 
 1.5.2
 -----
