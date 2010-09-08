@@ -46,6 +46,7 @@
     gradient can be used.
 34. Add a button in config UI to set the required config items to enable blended
     menubars and titlebars.
+35. Add option to add extra padding around border of kwin titlebar contents.
 
 1.5.2
 -----

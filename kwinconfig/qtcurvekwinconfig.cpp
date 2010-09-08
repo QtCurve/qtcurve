@@ -85,7 +85,9 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
         connect(innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
         connect(borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
         connect(titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
+        connect(edgePad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         titleBarPad->setRange(0, 10);
+        edgePad->setRange(0, 10);
         connect(useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
         connect(activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
@@ -170,6 +172,7 @@ void QtCurveKWinConfig::save(KConfig *c)
     config.setInnerBorder(innerBorder->isChecked());
     config.setBorderlessMax(borderlessMax->isChecked());
     config.setTitleBarPad(titleBarPad->value());
+    config.setEdgePad(edgePad->value());
 
     config.setCustomShadows(useShadows->isChecked());
     if(useShadows->isChecked())
@@ -260,6 +263,7 @@ void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
     innerBorder->setChecked(cfg.innerBorder());
     borderlessMax->setChecked(cfg.borderlessMax());
     titleBarPad->setValue(cfg.titleBarPad());
+    edgePad->setValue(cfg.edgePad());
     useShadows->setChecked(cfg.customShadows());
     grouping->setChecked(cfg.grouping());
     activeOpacity->setValue(cfg.opacity(true));

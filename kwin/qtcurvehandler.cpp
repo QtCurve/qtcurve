@@ -449,14 +449,15 @@ void QtCurveHandler::emitToggleStatusBar(int xid)
     
 int QtCurveHandler::borderEdgeSize() const
 {
-    return outerBorder()
-                ? (itsConfig.borderSize()>QtCurveConfig::BORDER_NO_SIDES &&
-                    wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, 0L, 0L)<ROUND_FULL)
-                    ? wStyle()->pixelMetric((QStyle::PixelMetric)QtC_WindowBorder, 0L, 0L)&WINDOW_BORDER_ADD_LIGHT_BORDER
-                        ? 2
-                        : 1
-                    : 3
-                : 1;
+    return itsConfig.edgePad()+
+                (outerBorder()
+                    ? (itsConfig.borderSize()>QtCurveConfig::BORDER_NO_SIDES &&
+                        wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, 0L, 0L)<ROUND_FULL)
+                        ? wStyle()->pixelMetric((QStyle::PixelMetric)QtC_WindowBorder, 0L, 0L)&WINDOW_BORDER_ADD_LIGHT_BORDER
+                            ? 2
+                            : 1
+                        : 3
+                    : 1);
 }
 
 // make the handler accessible to other classes...

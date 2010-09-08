@@ -39,6 +39,7 @@ void QtCurveConfig::defaults()
     itsTitleBarPad=0;
     itsActiveOpacity=itsInactiveOpacity=100;
     itsOpaqueBorder=true;
+    itsEdgePad=0;
 }
 
 #define READ_ENTRY(ENTRY) \
@@ -77,9 +78,12 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
     READ_ENTRY(ActiveOpacity)
     READ_ENTRY(InactiveOpacity)
     READ_ENTRY(OpaqueBorder)
+    READ_ENTRY(EdgePad)
 
     if(itsTitleBarPad<0 || itsTitleBarPad>10)
         itsTitleBarPad=0;
+    if(itsEdgePad<0 || itsEdgePad>10)
+        itsEdgePad=0;
     if(BORDER_NONE==itsBorderSize)
         itsRoundBottom=false;
     else
@@ -124,6 +128,7 @@ void QtCurveConfig::save(KConfig *cfg, const char *grp)
     WRITE_ENTRY(ActiveOpacity)
     WRITE_ENTRY(InactiveOpacity)
     WRITE_ENTRY(OpaqueBorder)
+    WRITE_ENTRY(EdgePad)
 }
 
 }

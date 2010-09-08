@@ -7,7 +7,8 @@ CustomShadows=true
 Grouping=false
 OpaqueBorder=false
 OuterBorder=true
-TitleBarPad=1
+TitleBarPad=0
+EdgePad=1
 
 [Settings]
 activeTabAppearance=soft
