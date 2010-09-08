@@ -2823,7 +2823,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QPushButton" name="menubarBlend">
+        <widget class="KPushButton" name="menubarBlend">
          <property name="text">
           <string>Blend with titlebar</string>
          </property>

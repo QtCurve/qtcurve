@@ -1069,6 +1069,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
+    menubarBlend->setIcon(KIcon("configure"));
     connect(menubarBlend, SIGNAL(clicked(bool)), SLOT(menubarTitlebarBlend()));
 
     setupStack();
