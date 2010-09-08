@@ -12,7 +12,7 @@ TitleBarPad=1
 [Settings]
 activeTabAppearance=soft
 animatedProgress=false
-appearance=soft
+appearance=customgradient5
 bgndAppearance=customgradient4
 bgndGrad=horiz
 bgndImage=none
@@ -45,6 +45,7 @@ customgradient1=3d,0,1.2,0.5,1,1,1
 customgradient2=3d,0,0.9,0.5,1,1,1
 customgradient3=none,0,1.12,1,1.15
 customgradient4=shine,0,1.05,1,0.92
+customgradient5=light,0,1.04,1,0.92
 darkerBorders=false
 defBtnIndicator=glow
 dlgOpacity=100
