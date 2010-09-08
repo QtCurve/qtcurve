@@ -28,7 +28,7 @@
     the selection colour - use same colour, but set 50% transparent.
 23. Add 4 pixel padding to dock window titlebars.
 24. Default sub-menu popup delay to 225 - matches Gtk2 standard default.
-25. When saving a preset, or selecting a preset, update the kwin settings.
+25. When saving, or selecting, a preset update the kwin settings.
 26. Move opacity settings into their own page - and add warning that they may cause
     applications to crash.
 27. Extend background gradients into window decoration.
@@ -37,13 +37,15 @@
     radial gradient top centered.
 30. Always use windows-style scrollbars for OpenOffice.org - it seems to assume this
     button layout anyway, regardless of what is painted on screen.
-31. In kwin decoration, allow to use outer border when border size set to none/no sides.
-32. In kwin decoration, if disable compositing and not drawing outer border and colouring
-    only the titlebar - then add outer border until compositing is re-enabled.
-33. Alow to specify 'none' as apeparance setting for titlebars - so that background
+31. In kwin decoration, allow to use outer border when border size set to none/no
+    sides.
+32. In kwin decoration, if disable compositing and not drawing outer border and
+    colouring only the titlebar - then add outer border until compositing is
+    re-enabled.
+33. Alow to specify 'none' as appearance setting for titlebars - so that background
     gradient can be used.
-34. Add a button in config UI to set the required config items to enable blended menubars
-    and titlebars.
+34. Add a button in config UI to set the required config items to enable blended
+    menubars and titlebars.
 
 1.5.2
 -----
