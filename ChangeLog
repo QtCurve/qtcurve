@@ -37,6 +37,9 @@
 22. If background gradient has a 'shine', then when used for backgrounds draw a
     radial gradient top centered.
 23. Use arrows on pathbar buttons.
+24. If using compositing then use rounded and semi-transparent tooltips. (Note:
+    when using rounded tooltips, the kwin dissapears.)
+25. Add option to force square tooltips.
 
 1.5.2
 -----

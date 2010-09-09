@@ -3190,16 +3190,19 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     }
     else if(DETAIL("tooltip"))
     {
-/* The following code draws rounded tooltips - by giving the window a mask. However this doesnt work very well, and the
- * shadow is lost! */
-#if 0 && GTK_CHECK_VERSION(2,9,0)
+        gboolean composActive=compositingActive(widget);
+
+#if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
-        gboolean rounded=!(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
+        gboolean rounded=widget && composActive && !(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
+
+        if(GTK_IS_WINDOW(widget))
+            gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
 
         if(rounded)
         {
-            GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
-            cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
+            int size=((width&0xFFFF)<<16)+(height&0xFFFF),
+                old=(int)g_object_get_data(G_OBJECT(widget), "QTC_TOOLTIP_MASK");
 
             radius=5.0; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
             cairo_save(cr);
@@ -3207,43 +3210,47 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
             cairo_clip(cr);
 
-            cairo_rectangle(crMask, 0, 0, width, height);
-            cairo_set_source_rgba(crMask, 1, 1, 1, 0);
-            cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
-            cairo_paint(crMask);
+            if(size!=old)
+            {
+                GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
+                cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
 
-            cairo_new_path(crMask);
-            createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
-            cairo_set_source_rgba(crMask, 1, 0, 0, 1);
-            cairo_fill(crMask);
-            cairo_destroy(crMask);
+                cairo_rectangle(crMask, 0, 0, width, height);
+                cairo_set_source_rgba(crMask, 1, 1, 1, 0);
+                cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
+                cairo_paint(crMask);
+                cairo_new_path(crMask);
+                createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
+                cairo_set_source_rgba(crMask, 1, 0, 0, 1);
+                cairo_fill(crMask);
+                cairo_destroy(crMask);
 
-            gtk_widget_shape_combine_mask (widget, NULL, 0, 0);
-            gtk_widget_shape_combine_mask (widget, mask, 0, 0);
-            //gdk_window_shape_combine_mask(gtk_widget_get_window(widget), mask, 0, 0);
+                gtk_widget_shape_combine_mask (widget, NULL, 0, 0);
+                gtk_widget_shape_combine_mask (widget, mask, 0, 0);
+                //gdk_window_shape_combine_mask(gtk_widget_get_window(widget), mask, 0, 0);
+                g_object_set_data(G_OBJECT(widget), "QTC_TOOLTIP_MASK", (gpointer)size);
+                gtk_widget_unmap(widget);
+                gtk_widget_map(widget);
+                gtk_widget_queue_draw(widget);
+            }
         }
 #endif
         drawBevelGradient(cr, style, area, NULL, x, y, width, height, &qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP],
                           true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
-        if(IS_FLAT(opts.tooltipAppearance) || !compositingActive(widget))
+#if GTK_CHECK_VERSION(2,9,0)
+        if(rounded)
+            cairo_restore(cr);
+#endif
+        if(IS_FLAT(opts.tooltipAppearance) || !composActive)
         {
             cairo_new_path(cr);
             if(IS_FLAT(opts.tooltipAppearance))
                 cairo_set_source_rgb(cr, CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
             else
                 cairo_set_source_rgba(cr, 0, 0, 0, 0.25);
-#if 0 && GTK_CHECK_VERSION(2,9,0)
-            if(rounded)
-                createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
-            else
-#endif
-                cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_stroke(cr);
         }
-#if 0 && GTK_CHECK_VERSION(2,9,0)
-        if(rounded)
-            cairo_restore(cr);
-#endif
     }
     else if(DETAIL("icon_view_item"))
         drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
