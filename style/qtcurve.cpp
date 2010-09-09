@@ -4446,7 +4446,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                             : palette.background().color());
                     QPainterPath path;
 
-                    path.addEllipse(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5));
+                    path.addEllipse(QRectF(rect).adjusted(0.5, 0.5, -1.0, -1.0));
                     drawBevelGradient(bgnd, painter, rect.adjusted(1, 1, -1, -1), path, true, false, APPEARANCE_INVERTED, WIDGET_TROUGH);
                     painter->setRenderHint(QPainter::Antialiasing, true);
                     if(coloredMo)
