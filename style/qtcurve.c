@@ -3191,7 +3191,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     else if(DETAIL("tooltip"))
     {
 /* The following code draws rounded tooltips - by giving the window a mask. However this doesnt work very well, and the
- * shadow is list! */
+ * shadow is lost! */
 #if 0 && GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
         gboolean rounded=!(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
@@ -3201,7 +3201,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
             cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
 
-            radius=4.0; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
+            radius=5.0; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
             cairo_save(cr);
             cairo_new_path(cr);
             createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
