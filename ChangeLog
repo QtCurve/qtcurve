@@ -47,8 +47,7 @@
 34. Add a button in config UI to set the required config items to enable blended
     menubars and titlebars.
 35. Add option to add extra padding around border of kwin titlebar contents.
-36. If using compositing and tooltip appearance not set to flat, then use rounded
-    and semi-transparent tooltips.
+36. If using compositing then use rounded and semi-transparent tooltips.
 37. Add option to force square tooltips.
 38. If drawing a separator in active titlebar, then only draw 1 line (and at 50% opacity)
 
