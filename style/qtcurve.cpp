@@ -5088,14 +5088,14 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         {
             bool         haveAlpha=Utils::hasAlphaChannel(widget),
                          rounded=haveAlpha && !(opts.square&SQUARE_TOOLTIPS) && ROUNDED;
-            QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 4) : QPainterPath();
+            QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 5) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
             painter->save();
             if(haveAlpha)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                col.setAlphaF(0.8);
+                col.setAlphaF(0.875);
             }
             drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_OTHER, !haveAlpha);
             if(IS_FLAT(opts.tooltipAppearance))
