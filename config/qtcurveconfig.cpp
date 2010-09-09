@@ -503,7 +503,7 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
 
 static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_BASIC)
 {
-    for(int i=APPEARANCE_CUSTOM1; i<APPEARANCE_FADE+1; ++i)
+    for(int i=APPEARANCE_CUSTOM1; i<(APP_ALLOW_BASIC==allow ? APPEARANCE_FADE : APPEARANCE_FADE+1); ++i)
         combo->insertItem(i, uiString((EAppearance)i, allow));
 }
 
