@@ -3191,7 +3191,8 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     else if(DETAIL("tooltip"))
     {
         gboolean composActive=compositingActive(widget);
-
+        GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
+        
 #if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
         gboolean rounded=widget && composActive && !(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
@@ -3201,14 +3202,11 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
         if(rounded)
         {
-            int size=((width&0xFFFF)<<16)+(height&0xFFFF),
-                old=(int)g_object_get_data(G_OBJECT(widget), "QTC_TOOLTIP_MASK");
+            int      size=((width&0xFFFF)<<16)+(height&0xFFFF),
+                     old=(int)g_object_get_data(G_OBJECT(widget), "QTC_TOOLTIP_MASK");
+            GdkColor shadow;
 
             radius=5.0; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
-            cairo_save(cr);
-            cairo_new_path(cr);
-            createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
-            cairo_clip(cr);
 
             if(size!=old)
             {
@@ -3220,7 +3218,12 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
                 cairo_paint(crMask);
                 cairo_new_path(crMask);
-                createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
+                createPath(crMask, 0, 0, width-1, height-1, radius, ROUNDED_ALL);
+                cairo_set_source_rgba(crMask, 1, 0, 0, 1);
+                cairo_fill(crMask);
+                cairo_new_path(crMask);
+                /* Fake a shadow... */
+                createPath(crMask, 1, 1, width-1, height-1, radius, ROUNDED_ALL);
                 cairo_set_source_rgba(crMask, 1, 0, 0, 1);
                 cairo_fill(crMask);
                 cairo_destroy(crMask);
@@ -3233,15 +3236,30 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 gtk_widget_map(widget);
                 gtk_widget_queue_draw(widget);
             }
+
+            width--, height--;
+
+            shadow=ColorUtils_darken(col, 0.25, 1.0);
+            cairo_save(cr);
+            cairo_new_path(cr);
+            createPath(cr, x+1, y+1, width, height, radius, ROUNDED_ALL);
+            cairo_clip(cr);
+            drawBevelGradient(cr, style, area, NULL, x+1, y+1, width, height, &shadow, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
+            cairo_restore(cr);
+
+            cairo_save(cr);
+            cairo_new_path(cr);
+            createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
+            cairo_clip(cr);
         }
 #endif
-        drawBevelGradient(cr, style, area, NULL, x, y, width, height, &qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP],
-                          true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
+        drawBevelGradient(cr, style, area, NULL, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
 #if GTK_CHECK_VERSION(2,9,0)
         if(rounded)
             cairo_restore(cr);
+        else
 #endif
-        if(IS_FLAT(opts.tooltipAppearance) || !composActive)
+        if(!IS_FLAT(opts.tooltipAppearance) || !composActive)
         {
             cairo_new_path(cr);
             if(IS_FLAT(opts.tooltipAppearance))
