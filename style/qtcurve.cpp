@@ -1867,6 +1867,12 @@ void Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
     }
 
+    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
+    {
+        widget->setBackgroundRole(QPalette::NoRole);
+        widget->setAttribute(Qt::WA_TranslucentBackground);
+    }
+
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
         {
@@ -2324,6 +2330,12 @@ void Style::unpolish(QWidget *widget)
         widget->removeEventFilter(this);
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
+
+    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
+    {
+        widget->setAttribute(Qt::WA_PaintOnScreen, false);
+        widget->setAttribute(Qt::WA_NoSystemBackground, false);
+    }
 
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
@@ -2819,6 +2831,8 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
 {
     switch((int)metric)
     {
+        case PM_ToolTipLabelFrameWidth:
+            return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::pixelMetric(metric, option, widget) : 3;
         case PM_MdiSubWindowFrameWidth:
             return 3;
         case PM_DockWidgetTitleMargin:
@@ -3093,6 +3107,8 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
 {
     switch (hint)
     {
+        case SH_ToolTip_Mask:
+            return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::styleHint(hint, option, widget, returnData) : true;
         case SH_ComboBox_ListMouseTracking:
         case SH_PrintDialog_RightAlignButtons:
         case SH_ItemView_ArrowKeysNavigateIntoChildren:
@@ -5070,14 +5086,24 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         // case PE_IndicatorProgressChunk:
         case PE_PanelTipLabel:
         {
+            bool         haveAlpha=Utils::hasAlphaChannel(widget),
+                         rounded=haveAlpha && !(opts.square&SQUARE_TOOLTIPS) && ROUNDED;
+            QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 4) : QPainterPath();
+            QColor       col=palette.toolTipBase().color();
+
             painter->save();
-            drawBevelGradient(palette.toolTipBase().color(), painter, r, true, false, opts.tooltipAppearance, WIDGET_OTHER);
+            if(haveAlpha)
+            {
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                col.setAlphaF(0.8);
+            }
+            drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_OTHER, !haveAlpha);
             if(IS_FLAT(opts.tooltipAppearance))
             {
                 painter->setPen(QPen(palette.toolTipText(), 0));
                 drawRect(painter, r);
             }
-            else if(!Utils::compositingActive())
+            else if(!haveAlpha)
             {
                 QColor black(Qt::black);
                 black.setAlphaF(0.25);

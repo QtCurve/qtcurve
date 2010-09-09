@@ -1504,6 +1504,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else
                 CFG_READ_INT(square)
 
+            if(opts->version<MAKE_VERSION(1, 6))
+                opts->square|=SQUARE_TOOLTIPS;
             if(opts->version<MAKE_VERSION(1, 2))
                 def->crSize=CR_SMALL_SIZE;
             if(opts->version<MAKE_VERSION(1, 0))

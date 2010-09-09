@@ -549,7 +549,8 @@ typedef enum
     SQUARE_TAB_FRAME          = 0x0020,
     SQUARE_SLIDER             = 0x0040,
     SQUARE_SB_SLIDER          = 0x0080,
-    SQUARE_WINDOWS            = 0x0100
+    SQUARE_WINDOWS            = 0x0100,
+    SQUARE_TOOLTIPS           = 0x0200
 } ESquare;
 
 typedef enum
