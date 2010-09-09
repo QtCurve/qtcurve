@@ -908,21 +908,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(separator)
     {
-        EEffect       effect((EEffect)(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
-        QColor        color(KDecoration::options()->color(KDecoration::ColorFont, isActive())),
-                      bgnd(KDecoration::options()->color(KDecoration::ColorTitleBar, isActive()));
+        QColor        color(KDecoration::options()->color(KDecoration::ColorFont, isActive()));
         Qt::Alignment align((Qt::Alignment)Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleAlignment, 0L, 0L));
 
         r.adjust(16, titleBarHeight-1, -16, 0);
-        if(EFFECT_NONE!=effect)
-        {
-            drawFadedLine(&painter, r,
-                          blendColors(WINDOW_SHADOW_COLOR(effect), bgnd, WINDOW_TEXT_SHADOW_ALPHA(effect)), true,
-                          align&(Qt::AlignHCenter|Qt::AlignRight), align&(Qt::AlignHCenter|Qt::AlignLeft));
-            r.adjust(0, -1, 0, 0);
-//             if (!isActive() && DARK_WINDOW_TEXT(color))
-//                 color=blendColors(color, bgnd, ((255 * 180) >> 8)/256.0);
-        }
+        color.setAlphaF(0.5);
         drawFadedLine(&painter, r, color, true, align&(Qt::AlignHCenter|Qt::AlignRight), align&(Qt::AlignHCenter|Qt::AlignLeft));
     }
     

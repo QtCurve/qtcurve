@@ -50,6 +50,7 @@
 36. If using compositing and tooltip appearance not set to flat, then use rounded
     and semi-transparent tooltips.
 37. Add option to force square tooltips.
+38. If drawing a separator in active titlebar, then only draw 1 line (and at 50% opacity)
 
 1.5.2
 -----

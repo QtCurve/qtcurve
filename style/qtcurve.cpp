@@ -8579,19 +8579,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         QRect         lr(r.x(), captionRect.y(), r.width(), captionRect.height());
 
                         lr.adjust(16, lr.height()-2, -16, 0);
-                        if(EFFECT_NONE!=opts.titlebarEffect)
-                        {
-                            QColor eCol(blendColors(WINDOW_SHADOW_COLOR(opts.titlebarEffect), titleCols[ORIGINAL_SHADE],
-                                                    WINDOW_TEXT_SHADOW_ALPHA(opts.titlebarEffect)));
-
-                            eCol.setAlphaF(0.6);
-                            drawFadedLine(painter, lr, eCol, align&(Qt::AlignHCenter|Qt::AlignRight),
-                                          align&(Qt::AlignHCenter|Qt::AlignLeft), true);
-                            lr.adjust(0, -1, 0, 0);
-//                             if (!active && DARK_WINDOW_TEXT(color))
-//                                 color=blendColors(color, titleCols[ORIGINAL_SHADE], ((255 * 180) >> 8)/256.0);
-                        }
-                        color.setAlphaF(0.6);
+                        color.setAlphaF(0.5);
                         drawFadedLine(painter, lr, color, align&(Qt::AlignHCenter|Qt::AlignRight),
                                       align&(Qt::AlignHCenter|Qt::AlignLeft), true);
                     }
