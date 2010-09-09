@@ -12962,6 +12962,7 @@ void Style::kdeGlobalSettingsChange(int type, int)
     }
 #endif
 
+    itsBlurHelper->setEnabled(Utils::compositingActive());
     itsWindowManager->initialize(opts.windowDrag);
 }
 
