@@ -3195,9 +3195,10 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         
 #if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
-        gboolean rounded=widget && composActive && !(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
+        gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+                 rounded=!nonGtk && widget && composActive && !(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
 
-        if(GTK_IS_WINDOW(widget))
+        if(!nonGtk && GTK_IS_WINDOW(widget))
             gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
 
         if(rounded)
@@ -3232,8 +3233,11 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 gtk_widget_shape_combine_mask (widget, mask, 0, 0);
                 //gdk_window_shape_combine_mask(gtk_widget_get_window(widget), mask, 0, 0);
                 g_object_set_data(G_OBJECT(widget), "QTC_TOOLTIP_MASK", (gpointer)size);
-                gtk_widget_unmap(widget);
-                gtk_widget_map(widget);
+                if(gtk_widget_get_visible(widget))
+                {
+                    gtk_widget_unmap(widget);
+                    gtk_widget_map(widget);
+                }
                 gtk_widget_queue_draw(widget);
             }
 
