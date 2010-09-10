@@ -99,7 +99,7 @@ if (GTK_INCLUDE_DIR)
     add_subdirectory(style)
     add_subdirectory(mozilla)
     if(QTC_REORDER_GTK_DIALOG_BUTTONS)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Warning: You have enabled the option for QtCurve to try to manually\n"
                 "         re-order the buttons of Gtk dialogs. Note: This will cause\n"
                 "         errors to be printed to the console, and is only an\n"
@@ -107,27 +107,27 @@ if (GTK_INCLUDE_DIR)
                 "**************************************************************\n")
     endif(QTC_REORDER_GTK_DIALOG_BUTTONS)
     if(QTC_OLD_MOZILLA)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Information: Defaulting to treating Firefox as Firefox < 3.0\n"
                 "**************************************************************\n")
     else(QTC_OLD_MOZILLA)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Information: Defaulting to treating Firefox as Firefox >= 3.0\n"
                 "**************************************************************\n")
     endif(QTC_OLD_MOZILLA)
     if(QTC_DEFAULT_TO_KDE3)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Information: Defaulting to reading KDE3 settings if \n"
                 "             KDE_SESSION_VERSION is not set\n"
                 "**************************************************************\n")
     else(QTC_DEFAULT_TO_KDE3)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Information: Defaulting to reading KDE4 settings if \n"
                 "             KDE_SESSION_VERSION is not set\n"
                 "**************************************************************\n")
     endif(QTC_DEFAULT_TO_KDE3)
     if(QTC_MODIFY_MOZILLA)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "**************************************************************\n"
                 "Warning: You have enabled the option for QtCurve to modify the\n"
                 "         configuration files of Mozilla applications (Firefox, \n"
@@ -146,18 +146,18 @@ if (GTK_INCLUDE_DIR)
     endif(QTC_MODIFY_MOZILLA)
 
     if(QTC_USE_CAIRO_FOR_ARROWS)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Warning: Using ciaro to draw arrows - this has been reported to \n"
                 "         fail with intel Xorg driver > 2.8\n"
                 "**************************************************************\n")
     else(QTC_USE_CAIRO_FOR_ARROWS)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "Information: Using Gdk to draw arrows.\n"
                 "**************************************************************\n")
     endif(QTC_USE_CAIRO_FOR_ARROWS)
     
     if(QTC_CAIRO_1_10_HACK)
-        message("\n**************************************************************\n"
+        message("**************************************************************\n"
                 "**************************************************************\n"
                 "Warning: You have enabled the option for QtCurve to workaround\n"
                 "         issues with Cairo 1.10 and NVIDIA. This may have an \n"
