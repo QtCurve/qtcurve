@@ -1266,8 +1266,9 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             }
 
 #ifdef QTC_CAIRO_1_10_HACK
-            cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
-                                              CAIRO_COL(col), alpha*grad->stops[i].alpha);
+            if(0==i || i==(grad->numStops-1))
+                cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
+                                                  CAIRO_COL(col), alpha*grad->stops[i].alpha);
 #endif
             cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
                                               CAIRO_COL(col), alpha*grad->stops[i].alpha);

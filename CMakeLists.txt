@@ -160,8 +160,8 @@ if (GTK_INCLUDE_DIR)
         message("\n**************************************************************\n"
                 "**************************************************************\n"
                 "Warning: You have enabled the option for QtCurve to workaround\n"
-                "         issues with Cairo 1.10 and NVIDIA. This will have a\n"
-                "         SIGNIFICANT impact on performance.\n"
+                "         issues with Cairo 1.10 and NVIDIA. This may have an \n"
+                "         impact on performance..\n"
                 "**************************************************************\n"
                 "**************************************************************\n")
     endif(QTC_CAIRO_1_10_HACK)

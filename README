@@ -41,7 +41,7 @@ The following options may be supplied to cmake:
 
     -DQTC_CAIRO_1_10_HACK=true
        Duplicate ach stop in a gradient - seems to workaround issues with NVIDIA and
-       cairo 1.10. NOTE: This has a very significant performance penalty.
+       cairo 1.10. NOTE: This may have an impact on performance.
 
     -DQTC_STYLE_SUPPORT=true
        Support QtCurve style files. These are stored as
