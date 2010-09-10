@@ -294,16 +294,6 @@ static void shadeColors(GdkColor *base, GdkColor *vals)
     vals[ORIGINAL_SHADE]=*base;
 }
 
-static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
-{
-    GdkGCValues gc_values;
-
-    gdk_colormap_alloc_color(style->colormap, color, FALSE, TRUE);
-    gc_values.foreground = *color;
-
-    return gtk_gc_get(style->depth, style->colormap, &gc_values, GDK_GC_FOREGROUND);
-}
-
 static gboolean isSortColumn(GtkWidget *button)
 {
     if(button && button->parent && GTK_IS_TREE_VIEW(button->parent))
@@ -5740,18 +5730,40 @@ static void gtkDrawOption(GtkStyle *style, GdkWindow *window, GtkStateType state
     }
 }
 
+
+static void ge_cairo_transform_for_layout (cairo_t *cr, PangoLayout *layout, int x, int y)
+{
+    const PangoMatrix *matrix;
+
+    matrix = pango_context_get_matrix (pango_layout_get_context (layout));
+    if (matrix)
+    {
+        cairo_matrix_t cairo_matrix;
+        PangoRectangle rect;
+
+        cairo_matrix_init(&cairo_matrix, matrix->xx, matrix->yx, matrix->xy, matrix->yy, matrix->x0, matrix->y0);
+        pango_layout_get_extents(layout, NULL, &rect);
+        pango_matrix_transform_rectangle(matrix, &rect);
+        pango_extents_to_pixels(&rect, NULL);
+
+        cairo_matrix.x0 += x - rect.x;
+        cairo_matrix.y0 += y - rect.y;
+
+        cairo_set_matrix(cr, &cairo_matrix);
+    }
+    else
+        cairo_translate(cr, x, y);
+}
+
+
 static void qtcDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text,
                           GdkRectangle *area, gint x, gint y, PangoLayout *layout)
 {
-    GdkGC *gc=use_text || GTK_STATE_INSENSITIVE==state ? style->text_gc[state] : style->fg_gc[state];
-
-    if(area)
-        gdk_gc_set_clip_rectangle(gc, area);
-
-    gdk_draw_layout(window, gc, x, y, layout);
-
-    if(area)
-        gdk_gc_set_clip_rectangle(gc, NULL);
+    CAIRO_BEGIN
+    gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);
+    ge_cairo_transform_for_layout(cr, layout, x, y);
+    pango_cairo_show_layout(cr, layout);
+    CAIRO_END
 }
 
 #define NUM_GCS 5
@@ -5764,7 +5776,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         qtcDrawLayout(style, window, state, use_text, area, x, y, layout);
     else
     {
-        QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
+        QtCurveStyle *qtcurveStyle=(QtCurveStyle *)style;
         gboolean     isMenuItem=IS_MENU_ITEM(widget);
         GtkMenuBar   *mb=isMenuItem ? isMenubar(widget, 0) : NULL;
         gboolean     activeMb=mb ? GTK_MENU_SHELL(mb)->active : FALSE,
@@ -5774,7 +5786,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                                       : ((!mb || activeMb) && GTK_STATE_PRELIGHT==state)),
                      def_but=FALSE,
                      but=isOnButton(widget, 0, &def_but),
-                     swap_gc=FALSE;
+                     swapColors=FALSE;
         GdkRectangle area2;
 
         if(!opts.colorMenubarMouseOver && mb && !activeMb && GTK_STATE_PRELIGHT==state)
@@ -5784,7 +5796,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         GtkNotebook *nb=mb || isMenuItem || !GTK_IS_LABEL(widget) ||
                        !widget->parent || !GTK_IS_NOTEBOOK(widget->parent) ? NULL : GTK_NOTEBOOK(widget->parent);
 #endif
-        GdkGC    *prevGcs[NUM_GCS];
+        GdkColor prevColors[NUM_GCS];
         gboolean activeWindow=TRUE;
         int      i=0;
 
@@ -5825,11 +5837,11 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(but && ((qtSettings.qt4 && GTK_STATE_INSENSITIVE==state) || (!qtSettings.qt4  && GTK_STATE_INSENSITIVE!=state)))
         {
             use_text=TRUE;
-            swap_gc=TRUE;
+            swapColors=TRUE;
             for(i=0; i<NUM_GCS; ++i)
             {
-                prevGcs[i]=style->text_gc[i];
-                style->text_gc[i]=qtcurveStyle->button_text_gc[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
+                prevColors[i]=style->text[i];
+                style->text[i]=*qtcurveStyle->button_text[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
             }
             if(state==GTK_STATE_INSENSITIVE)
                 state=GTK_STATE_NORMAL;
@@ -5841,21 +5853,21 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                 if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
                 {
                     for(i=0; i<NUM_GCS; ++i)
-                        prevGcs[i]=style->text_gc[i];
-                    swap_gc=TRUE;
-                    style->text_gc[GTK_STATE_NORMAL]=qtcurveStyle->menutext_gc[activeWindow ? 1 : 0];
+                        prevColors[i]=style->text[i];
+                    swapColors=TRUE;
+                    style->text[GTK_STATE_NORMAL]=*qtcurveStyle->menutext[activeWindow ? 1 : 0];
                     use_text=TRUE;
                 }
-                else if(opts.customMenuTextColor && qtcurveStyle->menutext_gc[0])
+                else if(opts.customMenuTextColor && qtcurveStyle->menutext[0])
                 {
                     for(i=0; i<NUM_GCS; ++i)
-                        prevGcs[i]=style->text_gc[i];
-                    swap_gc=TRUE;
-                    style->text_gc[GTK_STATE_NORMAL]=qtcurveStyle->menutext_gc[0];
-                    style->text_gc[GTK_STATE_ACTIVE]=qtcurveStyle->menutext_gc[1];
-                    style->text_gc[GTK_STATE_PRELIGHT]=qtcurveStyle->menutext_gc[0];
-                    style->text_gc[GTK_STATE_SELECTED]=qtcurveStyle->menutext_gc[1];
-                    style->text_gc[GTK_STATE_INSENSITIVE]=qtcurveStyle->menutext_gc[0];
+                        prevColors[i]=style->text[i];
+                    swapColors=TRUE;
+                    style->text[GTK_STATE_NORMAL]=*qtcurveStyle->menutext[0];
+                    style->text[GTK_STATE_ACTIVE]=*qtcurveStyle->menutext[1];
+                    style->text[GTK_STATE_PRELIGHT]=*qtcurveStyle->menutext[0];
+                    style->text[GTK_STATE_SELECTED]=*qtcurveStyle->menutext[1];
+                    style->text[GTK_STATE_INSENSITIVE]=*qtcurveStyle->menutext[0];
                     use_text=TRUE;
                 }
                 else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
@@ -5949,9 +5961,9 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             qtcDrawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area,
                           x+1, y, layout);
 
-        if(swap_gc)
+        if(swapColors)
             for(i=0; i<5; ++i)
-                style->text_gc[i]=prevGcs[i];
+                style->text[i]=prevColors[i];
     }
 }
 
@@ -7387,34 +7399,41 @@ static void gtkDrawExpander(GtkStyle *style, GdkWindow *window, GtkStateType sta
         drawArrow(window, style, col, area, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
 }
 
+static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
+{
+    GdkGCValues gc_values;
+
+    gdk_colormap_alloc_color(style->colormap, color, FALSE, TRUE);
+    gc_values.foreground = *color;
+
+    return gtk_gc_get(style->depth, style->colormap, &gc_values, GDK_GC_FOREGROUND);
+}
+
 static void styleRealize(GtkStyle *style)
 {
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 
     parent_class->realize(style);
 
-    qtcurveStyle->button_text_gc[PAL_ACTIVE]=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT]);
-    qtcurveStyle->button_text_gc[PAL_DISABLED]=qtSettings.qt4
-                            ? realizeColors(style, &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT])
-                            : style->text_gc[GTK_STATE_INSENSITIVE];
+    qtcurveStyle->button_text[PAL_ACTIVE]=&qtSettings.colors[PAL_ACTIVE][COLOR_BUTTON_TEXT];
+    qtcurveStyle->button_text[PAL_DISABLED]=qtSettings.qt4
+                            ? &qtSettings.colors[PAL_DISABLED][COLOR_BUTTON_TEXT]
+                            : &style->text[GTK_STATE_INSENSITIVE];
 
     if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
     {
-        qtcurveStyle->menutext_gc[0]=realizeColors(style, &qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT]);
-        qtcurveStyle->menutext_gc[1]=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT]);
+        qtcurveStyle->menutext[0]=&qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER_TEXT];
+        qtcurveStyle->menutext[1]=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
     }
     else if(opts.customMenuTextColor)
     {
-        qtcurveStyle->menutext_gc[0]=realizeColors(style, &opts.customMenuNormTextColor);
-        qtcurveStyle->menutext_gc[1]=realizeColors(style, &opts.customMenuSelTextColor);
+        qtcurveStyle->menutext[0]=&opts.customMenuNormTextColor;
+        qtcurveStyle->menutext[1]=&opts.customMenuSelTextColor;
     }
     else
-        qtcurveStyle->menutext_gc[0]=NULL;
+        qtcurveStyle->menutext[0]=NULL;
 
-    if(opts.lvLines)
-        qtcurveStyle->lv_lines_gc=realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_MID]);
-    else
-        qtcurveStyle->lv_lines_gc=NULL;
+    qtcurveStyle->lv_lines_gc=opts.lvLines ? realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_MID]) : NULL;
 #ifndef QTC_USE_CAIRO_FOR_ARROWS
     qtcurveStyle->arrow_gc=NULL;
 #endif
@@ -7425,15 +7444,6 @@ static void styleUnrealize(GtkStyle *style)
     QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
 
     parent_class->unrealize(style);
-    gtk_gc_release(qtcurveStyle->button_text_gc[PAL_ACTIVE]);
-    if(qtSettings.qt4)
-        gtk_gc_release(qtcurveStyle->button_text_gc[PAL_DISABLED]);
-    if(opts.customMenuTextColor || SHADE_WINDOW_BORDER==opts.shadeMenubars)
-    {
-        gtk_gc_release(qtcurveStyle->menutext_gc[0]);
-        gtk_gc_release(qtcurveStyle->menutext_gc[1]);
-        qtcurveStyle->menutext_gc[0]=qtcurveStyle->menutext_gc[1]=NULL;
-    }
 
     if(opts.lvLines)
     {

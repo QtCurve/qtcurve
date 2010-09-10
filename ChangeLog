@@ -40,6 +40,7 @@
 24. If using compositing then use rounded and semi-transparent tooltips. (Note:
     when using rounded tooltips, the kwin shadow dissapears.)
 25. Add option to force square tooltips.
+26. Reduce GdkGC usage - use cairo for text layout.
 
 1.5.2
 -----

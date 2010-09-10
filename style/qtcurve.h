@@ -63,9 +63,9 @@ void qtcurve_rc_style_register_type (GTypeModule *module);
 typedef struct 
 {
     GtkStyle parent_instance;
-    GdkGC   *button_text_gc[2],
-            *menutext_gc[2],
-            *lv_lines_gc;
+    GdkColor *button_text[2],
+             *menutext[2];
+    GdkGC    *lv_lines_gc;
 #ifndef QTC_USE_CAIRO_FOR_ARROWS
     GdkGC   *arrow_gc;
 #endif
