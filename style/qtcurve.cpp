@@ -5103,6 +5103,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 painter->setPen(QPen(palette.toolTipText(), 0));
                 drawRect(painter, r);
             }
+            /*
             else if(!haveAlpha)
             {
                 QColor black(Qt::black);
@@ -5110,6 +5111,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 painter->setPen(black);
                 drawRect(painter, r);
             }
+            */
             painter->restore();
             break;
         }
