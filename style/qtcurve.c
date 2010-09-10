@@ -1265,6 +1265,10 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
                 shade(&opts, base, &col, botTab && opts.invertBotTab ? MAX(val, 0.9) : val);
             }
 
+#ifdef QTC_CAIRO_1_10_HACK
+            cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
+                                              CAIRO_COL(col), alpha*grad->stops[i].alpha);
+#endif
             cairo_pattern_add_color_stop_rgba(pt, botTab ? 1.0-grad->stops[i].pos : grad->stops[i].pos,
                                               CAIRO_COL(col), alpha*grad->stops[i].alpha);
         }
@@ -1275,6 +1279,10 @@ static void drawBevelGradientAlpha(cairo_t *cr, GtkStyle *style, GdkRectangle *a
             double pos=AGUA_MAX/((horiz ? height : width)*2.0);
             shade(&opts, base, &col, AGUA_MID_SHADE);
             cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
+#ifdef QTC_CAIRO_1_10_HACK
+            cairo_pattern_add_color_stop_rgba(pt, pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
+            cairo_pattern_add_color_stop_rgba(pt, 1.0-pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
+#endif
             cairo_pattern_add_color_stop_rgba(pt, 1.0-pos, CAIRO_COL(col), alpha); /* *grad->stops[i].alpha); */
         }
 
@@ -1585,6 +1593,10 @@ static void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
     cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x+endx, y+endy);
 
     cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
+#ifdef QTC_CAIRO_1_10_HACK    
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0, 0.15);
+#endif
     cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0, 0.15);
     cairo_pattern_set_extend(pat, CAIRO_EXTEND_REFLECT);
     cairo_set_source(cr, pat);
@@ -1755,6 +1767,10 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 cairo_clip(cr);
 
                 cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.8 : 0.7) : 0.75);
+#ifdef QTC_CAIRO_1_10_HACK
+                cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.8 : 0.7) : 0.75);
+                cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, /*mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) :*/ 0.2);
+#endif
                 cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, /*mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) :*/ 0.2);
 
                 cairo_set_source(cr, pt);
@@ -1803,6 +1819,10 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 cairo_clip(cr);
 
                 cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
+#ifdef QTC_CAIRO_1_10_HACK
+                cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
+                cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
+#endif
                 cairo_pattern_add_color_stop_rgba(pt, 1.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.3 : 0.1) : 0.2);
 
                 cairo_set_source(cr, pt);
@@ -1955,6 +1975,10 @@ static void drawFadedLineReal(cairo_t *cr, int x, int y, int width, int height, 
         setCairoClipping(cr, area, NULL);
     cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(*col), fadeStart && opts.fadeLines ? 0.0 : alpha);
     cairo_pattern_add_color_stop_rgba(pt, FADE_SIZE, CAIRO_COL(*col), alpha);
+#ifdef QTC_CAIRO_1_10_HACK
+    cairo_pattern_add_color_stop_rgba(pt, FADE_SIZE, CAIRO_COL(*col), alpha);
+    cairo_pattern_add_color_stop_rgba(pt, 1.0-FADE_SIZE, CAIRO_COL(*col), alpha);
+#endif
     cairo_pattern_add_color_stop_rgba(pt, 1.0-FADE_SIZE, CAIRO_COL(*col), alpha);
     cairo_pattern_add_color_stop_rgba(pt, 1, CAIRO_COL(*col), fadeEnd && opts.fadeLines ? 0.0 : alpha);
     cairo_set_source(cr, pt);
@@ -1987,6 +2011,10 @@ static void setLineCol(cairo_t *cr, cairo_pattern_t *pt, GdkColor *col)
     {
         cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(*col), 0.0);
         cairo_pattern_add_color_stop_rgba(pt, 0.4, CAIRO_COL(*col), 1.0);
+#ifdef QTC_CAIRO_1_10_HACK
+        cairo_pattern_add_color_stop_rgba(pt, 0.4, CAIRO_COL(*col), 1.0);
+        cairo_pattern_add_color_stop_rgba(pt, 0.6, CAIRO_COL(*col), 1.0);
+#endif
         cairo_pattern_add_color_stop_rgba(pt, 0.6, CAIRO_COL(*col), 1.0);
         cairo_pattern_add_color_stop_rgba(pt, 1, CAIRO_COL(*col), 0.0);
         cairo_set_source(cr, pt);
@@ -2084,8 +2112,17 @@ static void drawDot(cairo_t *cr, int x, int y, int w, int h, GdkColor *cols)
                     *p2=cairo_pattern_create_linear(dx+2, dy+2, dx+4, dx+4);
 
     cairo_pattern_add_color_stop_rgba(p1, 0.0, CAIRO_COL(cols[STD_BORDER]), 1.0);
+#ifdef QTC_CAIRO_1_10_HACK
+    cairo_pattern_add_color_stop_rgba(p1, 0.0, CAIRO_COL(cols[STD_BORDER]), 1.0);
     cairo_pattern_add_color_stop_rgba(p1, 1.0, CAIRO_COL(cols[STD_BORDER]), 0.4);
+#endif
+    cairo_pattern_add_color_stop_rgba(p1, 1.0, CAIRO_COL(cols[STD_BORDER]), 0.4);
+
     cairo_pattern_add_color_stop_rgba(p2, 1.0, 1.0, 1.0, 1.0, 0.9);
+#ifdef QTC_CAIRO_1_10_HACK
+    cairo_pattern_add_color_stop_rgba(p2, 1.0, 1.0, 1.0, 1.0, 0.9);
+    cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.7);
+#endif
     cairo_pattern_add_color_stop_rgba(p2, 0.0, 1.0, 1.0, 1.0, 0.7);
 
     cairo_new_path(cr);
@@ -2355,6 +2392,10 @@ static void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gi
     cairo_pattern_t *pat=cairo_pattern_create_linear(x, y, x, y+4);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, CAIRO_COL(*col), alpha);
     cairo_pattern_add_color_stop_rgba(pat, 0.25-0.0001, CAIRO_COL(*col), alpha);
+#ifdef QTC_CAIRO_1_10_HACK
+    cairo_pattern_add_color_stop_rgba(pat, 0.25-0.0001, CAIRO_COL(*col), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, CAIRO_COL(col2), alpha);
+#endif
     cairo_pattern_add_color_stop_rgba(pat, 0.5, CAIRO_COL(col2), alpha);
     cairo_pattern_add_color_stop_rgba(pat, 0.75-0.0001, CAIRO_COL(col2), alpha);
     col2.red=(3*col->red+col2.red)/4;
@@ -2362,6 +2403,10 @@ static void drawStripedBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gi
     col2.blue=(3*col->blue+col2.blue)/4;
     cairo_pattern_add_color_stop_rgba(pat, 0.25, CAIRO_COL(col2), alpha);
     cairo_pattern_add_color_stop_rgba(pat, 0.5-0.0001, CAIRO_COL(col2), alpha);
+#ifdef QTC_CAIRO_1_10_HACK
+    cairo_pattern_add_color_stop_rgba(pat, 0.5-0.0001, CAIRO_COL(col2), alpha);
+    cairo_pattern_add_color_stop_rgba(pat, 0.75, CAIRO_COL(col2), alpha);
+#endif
     cairo_pattern_add_color_stop_rgba(pat, 0.75, CAIRO_COL(col2), alpha);
     cairo_pattern_add_color_stop_rgba(pat, 1.0, CAIRO_COL(col2), alpha);
 
@@ -2527,6 +2572,10 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                     pat=cairo_pattern_create_radial(x+xmod+(wwidth/2.0), ypos+ymod, 0, x+xmod+(wwidth/2.0), ypos+ymod, size/2.0);
                     cairo_pattern_add_color_stop_rgba(pat, 0, 1, 1, 1, alpha);
                     cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1, alpha*0.625);
+#ifdef QTC_CAIRO_1_10_HACK
+                    cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1, alpha*0.625);
+                    cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1, alpha*0.175);
+#endif
                     cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1, alpha*0.175);
                     cairo_pattern_add_color_stop_rgba(pat, 1.0, 1, 1, 1, 0.0);
                     cairo_set_source(cr, pat);
@@ -2819,8 +2868,16 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
             cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0,
                                               (inverted ? GLOW_END : GLOW_START)==opts.glowProgress ? GLOW_PROG_ALPHA : 0.0);
+#ifdef QTC_CAIRO_1_10_HACK
+            cairo_pattern_add_color_stop_rgba(pat, 0.0, 1.0, 1.0, 1.0,
+                                              (inverted ? GLOW_END : GLOW_START)==opts.glowProgress ? GLOW_PROG_ALPHA : 0.0);
+#endif
             if(GLOW_MIDDLE==opts.glowProgress)
                 cairo_pattern_add_color_stop_rgba(pat, 0.5, 1.0, 1.0, 1.0, GLOW_PROG_ALPHA);
+#ifdef QTC_CAIRO_1_10_HACK
+            cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0,
+                                              (inverted ? GLOW_START : GLOW_END)==opts.glowProgress ? GLOW_PROG_ALPHA : 0.0);
+#endif
             cairo_pattern_add_color_stop_rgba(pat, 1.0, 1.0, 1.0, 1.0,
                                               (inverted ? GLOW_START : GLOW_END)==opts.glowProgress ? GLOW_PROG_ALPHA : 0.0);
             cairo_set_source(cr, pat);
@@ -4883,6 +4940,10 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                     cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
 
                     cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
+#ifdef QTC_CAIRO_1_10_HACK
+                    cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
+                    cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
+#endif
                     cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
                     cairo_set_source(cr, pt);
                     cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
@@ -6290,6 +6351,12 @@ static void colorTab(cairo_t *cr, int x, int y, int width, int height, int round
     clipPath(cr, x, y, width, height, tab, RADIUS_EXTERNAL, round);
     cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
                                       WIDGET_TAB_TOP==tab ? (TO_ALPHA(opts.colorSelTab)) : 0.0);
+#ifdef QTC_CAIRO_1_10_HACK
+    cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
+                                      WIDGET_TAB_TOP==tab ? (TO_ALPHA(opts.colorSelTab)) : 0.0);
+    cairo_pattern_add_color_stop_rgba(pt, 1, CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
+                                      WIDGET_TAB_TOP==tab ? 0.0 : (TO_ALPHA(opts.colorSelTab)));
+#endif
     cairo_pattern_add_color_stop_rgba(pt, 1, CAIRO_COL(qtcPalette.highlight[ORIGINAL_SHADE]),
                                       WIDGET_TAB_TOP==tab ? 0.0 : (TO_ALPHA(opts.colorSelTab)));
     cairo_set_source(cr, pt);
@@ -6974,6 +7041,10 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                     {
                         pt=cairo_pattern_create_linear(x, y, x, y+height-1);
                         cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
+#ifdef QTC_CAIRO_1_10_HACK
+                        cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
+                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+#endif
                         cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
                         cairo_set_source(cr, pt);
                     }
@@ -6987,6 +7058,10 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                     {
                         pt=cairo_pattern_create_linear(x, y, x, y+height-1);
                         cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0);
+#ifdef QTC_CAIRO_1_10_HACK
+                        cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0);
+                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+#endif
                         cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
                         setGapClip(cr, area, gap_side, gap_x, gap_width, x, y, width, height, FALSE);
                         cairo_set_source(cr, pt);

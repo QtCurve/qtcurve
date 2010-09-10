@@ -41,6 +41,9 @@
     when using rounded tooltips, the kwin shadow dissapears.)
 25. Add option to force square tooltips.
 26. Reduce GdkGC usage - use cairo for text layout.
+27. Add a hack to work-around issues with NVIDIA and cairo 1.10. This 'fix' invloves
+    duplicating each stop in a gradient - and has a very significant performance 
+    penalty. To enable this, pass -DQTC_CAIRO_1_10_HACK=true to cmake.
 
 1.5.2
 -----

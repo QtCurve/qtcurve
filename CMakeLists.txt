@@ -155,6 +155,17 @@ if (GTK_INCLUDE_DIR)
                 "Information: Using Gdk to draw arrows.\n"
                 "**************************************************************\n")
     endif(QTC_USE_CAIRO_FOR_ARROWS)
+    
+    if(QTC_CAIRO_1_10_HACK)
+        message("\n**************************************************************\n"
+                "**************************************************************\n"
+                "Warning: You have enabled the option for QtCurve to workaround\n"
+                "         issues with Cairo 1.10 and NVIDIA. This will have a\n"
+                "         SIGNIFICANT impact on performance.\n"
+                "**************************************************************\n"
+                "**************************************************************\n")
+    endif(QTC_CAIRO_1_10_HACK)
+
 else (GTK_INCLUDE_DIR)
     message(FATAL_ERROR "Could not locate Gtk2 include files")
 endif (GTK_INCLUDE_DIR)
