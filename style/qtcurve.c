@@ -3190,12 +3190,12 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
     }
     else if(DETAIL("tooltip"))
     {
-        gboolean composActive=compositingActive(widget);
         GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
         
 #if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
-        gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+        gboolean composActive=compositingActive(widget),
+                 nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
                  rounded=!nonGtk && widget && composActive && !(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
 
         if(!nonGtk && GTK_IS_WINDOW(widget))
@@ -3263,13 +3263,13 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             cairo_restore(cr);
         else
 #endif
-        if(!IS_FLAT(opts.tooltipAppearance) || !composActive)
+        if(IS_FLAT(opts.tooltipAppearance) /*|| !composActive*/)
         {
             cairo_new_path(cr);
-            if(IS_FLAT(opts.tooltipAppearance))
+            /*if(IS_FLAT(opts.tooltipAppearance))*/
                 cairo_set_source_rgb(cr, CAIRO_COL(qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP_TEXT]));
-            else
-                cairo_set_source_rgba(cr, 0, 0, 0, 0.25);
+            /*else
+                cairo_set_source_rgba(cr, 0, 0, 0, 0.25);*/
             cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_stroke(cr);
         }
