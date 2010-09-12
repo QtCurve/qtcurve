@@ -1,3 +1,5 @@
+#define GE_IS_NOTEBOOK(object) ((object) && objectIsA((GObject*)(object), "GtkNotebook"))
+
 typedef struct
 {
     int          id;
@@ -54,82 +56,54 @@ static gboolean qtcTabStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpoi
 
 static gboolean qtcTabDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-    qtcTabCleanup (widget);
+    qtcTabCleanup(widget);
     return FALSE;
 }
 
 static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if (widget)
+    if (GE_IS_NOTEBOOK(widget))
     {
-        static int last_x=-100, last_y=-100;
+        GtkNotebook *notebook=GTK_NOTEBOOK(widget);
 
-        if(abs(last_x-event->x_root)>4 || abs(last_y-event->y_root)>4)
+        if(notebook)
         {
-            last_x=event->x_root;
-            last_y=event->y_root;
+            /* TODO! check if mouse is over tab portion! */
+            /* Find tab that mouse is currently over...*/
+            QtCTab *prevTab=lookupTabHash(widget, TRUE),
+                   currentTab;
+            int    numChildren=g_list_length(notebook->children),
+                   i,
+                   nx, ny;
 
-            GtkNotebook *notebook=GTK_NOTEBOOK(widget);
-
-            if(notebook)
+            currentTab.id=currentTab.rect.x=currentTab.rect.y=
+            currentTab.rect.width=currentTab.rect.height=-1;
+            gdk_window_get_origin(GTK_WIDGET(notebook)->window, &nx, &ny);
+            for (i = 0; i < numChildren; i++ )
             {
-                /* TODO! check if mouse is over tab portion! */
-                /* Find tab that mouse is currently over...*/
-                QtCTab *prevTab=lookupTabHash(widget, TRUE),
-                       currentTab;
-                int    numChildren=g_list_length(notebook->children),
-                       i,
-                       nx, ny;
+                GtkWidget *page=gtk_notebook_get_nth_page(notebook, i),
+                          *tabLabel=gtk_notebook_get_tab_label(notebook, page);
+                int       tx=(tabLabel->allocation.x+nx)-4,
+                          ty=(tabLabel->allocation.y+ny)-3,
+                          tw=(tabLabel->allocation.width)+10,
+                          th=(tabLabel->allocation.height)+7;
 
-                currentTab.id=currentTab.rect.x=currentTab.rect.y=
-                currentTab.rect.width=currentTab.rect.height=-1;
-                gdk_window_get_origin(GTK_WIDGET(notebook)->window, &nx, &ny);
-                for (i = 0; i < numChildren; i++ )
+                if(tx<=event->x_root && ty<=event->y_root && (tx+tw)>event->x_root && (ty+th)>event->y_root)
                 {
-                    GtkWidget *page=gtk_notebook_get_nth_page(notebook, i),
-                              *tabLabel=gtk_notebook_get_tab_label(notebook, page);
-                    int       tx=(tabLabel->allocation.x+nx)-2,
-                              ty=(tabLabel->allocation.y+ny)-2,
-                              tw=(tabLabel->allocation.width)+4,
-                              th=(tabLabel->allocation.height)+4;
-
-                    if(tx<=event->x_root && ty<=event->y_root &&
-                        (tx+tw)>event->x_root && (ty+th)>event->y_root)
-                    {
-                        currentTab.rect.x=tx-nx;
-                        currentTab.rect.y=ty-ny;
-                        currentTab.rect.width=tw;
-                        currentTab.rect.height=th;
-                        currentTab.id=i;
-                        break;
-                    }
+                    currentTab.rect.x=tx-nx;
+                    currentTab.rect.y=ty-ny;
+                    currentTab.rect.width=tw;
+                    currentTab.rect.height=th;
+                    currentTab.id=i;
+                    break;
                 }
+            }
 
-                if(currentTab.id!=prevTab->id)
-                {
-                    if(currentTab.rect.x<0)
-                    {
-                        prevTab->id=currentTab.id;
-                        prevTab->rect=currentTab.rect;
-                        gtk_widget_queue_draw(widget);
-                    }
-                    else
-                    {
-                        GdkRectangle area;
-
-                        if(prevTab->rect.x<0)
-                            area=currentTab.rect;
-                        else
-                            gdk_rectangle_union(&(prevTab->rect), &(currentTab.rect), &area);
-                        prevTab->id=currentTab.id;
-                        prevTab->rect=currentTab.rect;
-                        area.x-=12;
-                        area.y-=12;
-                        area.width+=24;
-                        area.height+=24;
-                        gtk_widget_queue_draw_area(widget, area.x, area.y, area.width, area.height);
-                    }
-                }
+            if(currentTab.id!=prevTab->id)
+            {
+                prevTab->id=currentTab.id;
+                prevTab->rect=currentTab.rect;
+                gtk_widget_queue_draw(widget);
             }
         }
     }
@@ -139,7 +113,7 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
 
 static gboolean qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-    if (widget)
+    if (GE_IS_NOTEBOOK(widget))
     {
         QtCTab *prevTab=lookupTabHash(widget, FALSE);
 

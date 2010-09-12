@@ -44,6 +44,7 @@
 27. Add a hack to work-around issues with NVIDIA and cairo 1.10. This 'fix' invloves
     duplicating the 1st and last stop in a gradient - and may have an impact on
     performance. To enable this, pass -DQTC_CAIRO_1_10_HACK=true to cmake.
+28. Improve tab mouse-over code.
 
 1.5.2
 -----
