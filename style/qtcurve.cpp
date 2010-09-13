@@ -1607,7 +1607,7 @@ void Style::polish(QWidget *widget)
                 if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
                     break;
 
-                if(!IS_FLAT(opts.bgndAppearance))
+                if(!IS_FLAT_BGND(opts.bgndAppearance))
                     setBgndProp(widget, opts.bgndAppearance);
 
                 int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
