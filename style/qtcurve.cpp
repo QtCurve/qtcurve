@@ -2614,7 +2614,10 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     p.setClipping(false);
                     p.setRenderHint(QPainter::Antialiasing, true);
                     p.setPen(use[STD_BORDER]);
-                    p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 5));
+                    if(opts.square&SQUARE_POPUP_MENUS)
+                        drawRect(&p, r);
+                    else
+                        p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 5));
 
                     if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
                     {
@@ -4111,11 +4114,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(!opts.drawStatusBarFrames)
                 break;
         case PE_FrameMenu:
-            if(opts.square&SQUARE_POPUP_MENUS || itsIsPreview ||
+            if((opts.square&SQUARE_POPUP_MENUS) || itsIsPreview ||
                (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent())))
             {
                 const QColor *use(popupMenuCols(option));
-
                 painter->save();
                 painter->setPen(use[STD_BORDER]);
                 drawRect(painter, r);
