@@ -2340,6 +2340,7 @@ static gboolean qtInit()
                     }
                 }
 #endif
+                opts.square|=SQUARE_POPUP_MENUS;
                 opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
                 if(FRAME_SHADED==opts.groupBox)
                     opts.groupBox=FRAME_PLAIN;
