@@ -3268,18 +3268,24 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
                 cairo_set_source_rgba(crMask, 1, 0, 0, 1);
                 cairo_fill(crMask);
-                cairo_new_path(crMask);
-
-                gtk_widget_shape_combine_mask (widget, NULL, 0, 0);
-                gtk_widget_shape_combine_mask (widget, mask, 0, 0);
-                //gdk_window_shape_combine_mask(gtk_widget_get_window(widget), mask, 0, 0);
+                
                 g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
+
+                gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
+                gtk_widget_shape_combine_mask(widget, mask, 0, 0);
                 if(gtk_widget_get_visible(widget))
                 {
                     gtk_widget_unmap(widget);
+                    /* Setting the window type to 'popup menu' seems to re-eanble kwin shadows! */
+                    if(GTK_IS_WINDOW(widget))
+                        gtk_window_set_type_hint(GTK_WINDOW(widget), GDK_WINDOW_TYPE_HINT_POPUP_MENU);
                     gtk_widget_map(widget);
                 }
+                else if(GTK_IS_WINDOW(widget)) /* See above! */
+                    gtk_window_set_type_hint(GTK_WINDOW(widget), GDK_WINDOW_TYPE_HINT_POPUP_MENU);
                 gtk_widget_queue_draw(widget);
+
+                cairo_destroy(crMask);
             }
 
             cairo_save(cr);
@@ -4991,6 +4997,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
                 g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
+                cairo_destroy(crMask);
             }
             clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
         }
