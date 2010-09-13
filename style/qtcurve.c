@@ -4943,8 +4943,22 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
+            {
+                gboolean roundedMenu=(!widget || !isComboMenu(widget->parent)) &&
+                                     !(opts.square&SQUARE_POPUP_MENUS) && opts.round>=ROUND_FULL;
+
+                if(roundedMenu)
+                {
+                    cairo_save(cr);
+                    cairo_new_path(cr);
+                    createPath(cr, x, y, width, height, 4, round);
+                    cairo_clip(cr);
+                }
                 drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
                                   TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+                if(roundedMenu)
+                    unsetCairoClipping(cr);
+            }
             else if(stdColors && opts.borderMenuitems)
             {
                 drawLightBevel(cr, style, new_state, area, NULL, x, y,
@@ -4970,8 +4984,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else if(DETAIL("menu"))
     {
         gboolean comboMenu=isComboMenu(widget),
-                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS) && opts.round>=ROUND_FULL &&
-                             !(isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app);
+                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS) && opts.round>=ROUND_FULL;
         double   radius=0.0;
 
         if(roundedMenu)
