@@ -1,3 +1,7 @@
+1.6.1
+-----
+1. Add option to have rounded popup menus.
+
 1.6.0
 -----
  1. Add 'glow' focus option - this is now the default. (Note, for firefox
