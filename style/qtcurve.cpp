@@ -2603,7 +2603,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 QRect    r(widget->rect());
 
                 if(!(opts.square&SQUARE_POPUP_MENUS))
-                    p.setClipPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 3.5), Qt::IntersectClip);
+                    p.setClipPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 4.5), Qt::IntersectClip);
                 drawBackground(&p, widget, BGND_MENU);
                 if(opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS))
                 {
@@ -2614,7 +2614,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     p.setClipping(false);
                     p.setRenderHint(QPainter::Antialiasing, true);
                     p.setPen(use[STD_BORDER]);
-                    p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 4));
+                    p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 5));
 
                     if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
                     {
@@ -2622,7 +2622,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                                      br;
                         QRect        ri(r.adjusted(1, 1, 1, 1));
 
-                        buildSplitPath(ri, ROUNDED_ALL, 3.5, tl, br);
+                        buildSplitPath(ri, ROUNDED_ALL, 4, tl, br);
                         p.setPen(use[0]);
                         p.drawPath(tl);
                         p.setPen(use[FRAME_DARK_SHADOW]);
@@ -3139,7 +3139,26 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     switch (hint)
     {
         case SH_ToolTip_Mask:
-            return !ROUNDED || opts.square&SQUARE_TOOLTIPS ? BASE_STYLE::styleHint(hint, option, widget, returnData) : true;
+        case SH_Menu_Mask:
+            if(opts.round<ROUND_FULL || (SH_ToolTip_Mask==hint && (opts.square&SQUARE_TOOLTIPS)) ||
+                                        (SH_Menu_Mask==hint && (opts.square&SQUARE_POPUP_MENUS)))
+                return BASE_STYLE::styleHint(hint, option, widget, returnData);
+            else
+            {
+                if(!Utils::hasAlphaChannel(widget) && (!widget || widget->isWindow()))
+                    if(QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
+                    {
+                        int x, y, w, h;
+                        option->rect.getRect(&x, &y, &w, &h);
+
+                        mask->region  = QRegion(x + 4, y + 0, w-4*2, h-0*2);
+                        mask->region += QRegion(x + 0, y + 4, w-0*2, h-4*2);
+                        mask->region += QRegion(x + 2, y + 1, w-2*2, h-1*2);
+                        mask->region += QRegion(x + 1, y + 2, w-1*2, h-2*2);
+                    }
+
+                return true;
+            }
         case SH_ComboBox_ListMouseTracking:
         case SH_PrintDialog_RightAlignButtons:
         case SH_ItemView_ArrowKeysNavigateIntoChildren:
@@ -5120,15 +5139,16 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         case PE_PanelTipLabel:
         {
             bool         haveAlpha=Utils::hasAlphaChannel(widget),
-                         rounded=haveAlpha && !(opts.square&SQUARE_TOOLTIPS) && ROUNDED;
+                         rounded=!(opts.square&SQUARE_TOOLTIPS) && opts.round>=ROUND_FULL;
             QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 5) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
             painter->save();
-            if(haveAlpha)
+            if(rounded)
             {
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                col.setAlphaF(0.875);
+                if(haveAlpha)
+                    col.setAlphaF(0.875);
             }
             drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_OTHER, !haveAlpha);
             if(IS_FLAT(opts.tooltipAppearance))
@@ -5136,15 +5156,6 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 painter->setPen(QPen(palette.toolTipText(), 0));
                 drawRect(painter, r);
             }
-            /*
-            else if(!haveAlpha)
-            {
-                QColor black(Qt::black);
-                black.setAlphaF(0.25);
-                painter->setPen(black);
-                drawRect(painter, r);
-            }
-            */
             painter->restore();
             break;
         }
