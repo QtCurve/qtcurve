@@ -3,8 +3,7 @@
 1. Add option to have rounded popup menus.
 2. Allow rounded tooltips when not compositing.
 3. Use a hack to re-enable shadows for rounded tooltips.
-4. Only use gtk_widget_get_visible for Gtk2 2.20 and above, otherwise
-   use GTK_WIDGET_VISIBLE.
+4. Don't map/unmap tooltips - not required?.
 5. Fix kwin titlebar blending for striped backgrounds.
 6. Use flat selection for items of editable combo - matches KDE4 better.
 
