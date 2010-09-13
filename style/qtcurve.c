@@ -4944,8 +4944,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
             {
-                gboolean roundedMenu=(!widget || !isComboMenu(widget->parent)) &&
-                                     !(opts.square&SQUARE_POPUP_MENUS) && opts.round>=ROUND_FULL;
+                gboolean roundedMenu=(!widget || !isComboMenu(widget->parent)) && !(opts.square&SQUARE_POPUP_MENUS);
 
                 if(roundedMenu)
                 {
@@ -4984,7 +4983,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else if(DETAIL("menu"))
     {
         gboolean comboMenu=isComboMenu(widget),
-                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS) && opts.round>=ROUND_FULL;
+                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS);
         double   radius=0.0;
 
         if(roundedMenu)
