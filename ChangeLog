@@ -1,6 +1,7 @@
 1.6.1
 -----
 1. Add option to have rounded popup menus.
+2. Allow rounded tooltips when not compositing.
 
 1.6.0
 -----

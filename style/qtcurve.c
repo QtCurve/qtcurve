@@ -3242,18 +3242,16 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         
 #if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
-        gboolean composActive=compositingActive(widget),
-                 nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
-                 rounded=!nonGtk && widget && composActive && !(opts.square&SQUARE_TOOLTIPS) && ROUND_NONE!=opts.round;
+        gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+                 rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS) && opts.round>=ROUND_FULL;
 
         if(!nonGtk && GTK_IS_WINDOW(widget))
             gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
 
         if(rounded)
         {
-            int      size=((width&0xFFFF)<<16)+(height&0xFFFF),
-                     old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
-            GdkColor shadow;
+            int size=((width&0xFFFF)<<16)+(height&0xFFFF),
+                old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
 
             radius=5.0; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
 
@@ -3267,15 +3265,10 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
                 cairo_paint(crMask);
                 cairo_new_path(crMask);
-                createPath(crMask, 0, 0, width-1, height-1, radius, ROUNDED_ALL);
+                createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
                 cairo_set_source_rgba(crMask, 1, 0, 0, 1);
                 cairo_fill(crMask);
                 cairo_new_path(crMask);
-                /* Fake a shadow... */
-                createPath(crMask, 1, 1, width-1, height-1, radius, ROUNDED_ALL);
-                cairo_set_source_rgba(crMask, 1, 0, 0, 1);
-                cairo_fill(crMask);
-                cairo_destroy(crMask);
 
                 gtk_widget_shape_combine_mask (widget, NULL, 0, 0);
                 gtk_widget_shape_combine_mask (widget, mask, 0, 0);
@@ -3289,16 +3282,6 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 gtk_widget_queue_draw(widget);
             }
 
-            width--, height--;
-
-            shadow=ColorUtils_darken(col, 0.25, 1.0);
-            cairo_save(cr);
-            cairo_new_path(cr);
-            createPath(cr, x+1, y+1, width, height, radius, ROUNDED_ALL);
-            cairo_clip(cr);
-            drawBevelGradient(cr, style, area, NULL, x+1, y+1, width, height, &shadow, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
-            cairo_restore(cr);
-
             cairo_save(cr);
             cairo_new_path(cr);
             createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
@@ -3307,11 +3290,9 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 #endif
         drawBevelGradient(cr, style, area, NULL, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
 #if GTK_CHECK_VERSION(2,9,0)
-        if(rounded)
-            cairo_restore(cr);
-        else
+        if(!rounded)
 #endif
-        if(IS_FLAT(opts.tooltipAppearance) /*|| !composActive*/)
+        if(IS_FLAT(opts.tooltipAppearance))
         {
             cairo_new_path(cr);
             /*if(IS_FLAT(opts.tooltipAppearance))*/
@@ -4983,9 +4964,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else if(DETAIL("menu"))
     {
         gboolean comboMenu=isComboMenu(widget),
-                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS) &&
-                             !(isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app) &&
-                             widget && compositingActive(widget) && opts.round>=ROUND_FULL;
+                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS) && opts.round>=ROUND_FULL &&
+                             !(isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app);
         double   radius=0.0;
 
         if(roundedMenu)
