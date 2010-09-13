@@ -6,6 +6,7 @@
 4. Only use gtk_widget_get_visible for Gtk2 2.20 and above, otherwise
    use GTK_WIDGET_VISIBLE.
 5. Fix kwin titlebar blending for striped backgrounds.
+6. Use flat selection for items of editable combo - matches KDE4 better.
 
 1.6.0
 -----

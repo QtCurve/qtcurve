@@ -3172,15 +3172,16 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
         qtcWindowSetup(widget, GTK_IS_DIALOG(widget) ? opts.dlgOpacity : opts.bgndOpacity);
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
-        int round=detail && GTK_STATE_SELECTED==state && ROUNDED
-                    ? 0!=strstr(detail, "_start")
-                        ? ROUNDED_LEFT
-                        : 0!=strstr(detail, "_end")
-                            ? ROUNDED_RIGHT
-                            : 0!=strstr(detail, "_middle")
-                                ? ROUNDED_NONE
-                                : ROUNDED_ALL
-                    : ROUNDED_NONE;
+        gboolean combo=isComboBoxPopupWindow(widget, 0);
+        int      round=!combo && detail && GTK_STATE_SELECTED==state && ROUNDED
+                            ? 0!=strstr(detail, "_start")
+                                ? ROUNDED_LEFT
+                                : 0!=strstr(detail, "_end")
+                                    ? ROUNDED_RIGHT
+                                    : 0!=strstr(detail, "_middle")
+                                        ? ROUNDED_NONE
+                                        : ROUNDED_ALL
+                            : ROUNDED_NONE;
 
         if(opts.lvLines)
         {
@@ -3209,7 +3210,10 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                           x, y, width, height);
 
         if(GTK_STATE_SELECTED==state)
-            drawSelection(cr, style, state, area, widget, x, y, width, height, round, TRUE);
+            if(combo)
+                drawAreaColor(cr, area, NULL, &style->base[widget && GTK_WIDGET_HAS_FOCUS(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE], x, y, width, height);
+            else
+                drawSelection(cr, style, state, area, widget, x, y, width, height, round, TRUE);
     }
     else if(detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED))
     {
