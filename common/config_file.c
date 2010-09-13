@@ -2185,6 +2185,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(MO_GLOW==opts->coloredMouseOver)
                 opts->coloredTbarMo=true;
+
+            if(opts->round<ROUND_FULL)
+                opts->square|=SQUARE_POPUP_MENUS;
 #endif
 #ifndef __cplusplus
             if(!defOpts)
