@@ -1923,10 +1923,11 @@ void Style::polish(QWidget *widget)
 #endif
         && QLatin1String("QtCurvePreview")==widget->parentWidget()->objectName()))
     {
-        if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity)
+        if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
         {
             Utils::addEventFilter(widget, this);
-            if(100!=opts.menuBgndOpacity && !widget->testAttribute(Qt::WA_TranslucentBackground))
+            if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
+               !widget->testAttribute(Qt::WA_TranslucentBackground))
                 widget->setAttribute(Qt::WA_TranslucentBackground);
         }
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
@@ -2370,6 +2371,7 @@ void Style::unpolish(QWidget *widget)
     if(qobject_cast<QMenu *>(widget))
     {
         widget->removeEventFilter(this);
+        widget->setAttribute(Qt::WA_TranslucentBackground, false);
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
             widget->setPalette(QApplication::palette());
     }
@@ -2593,11 +2595,40 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     }
                 }
             }
-            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity) && qobject_cast<QMenu*>(object))
+            if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity ||
+                !(opts.square&SQUARE_POPUP_MENUS)) && qobject_cast<QMenu*>(object))
             {
                 QWidget  *widget=qobject_cast<QWidget *>(object);
                 QPainter p(widget);
+                QRect    r(widget->rect());
+
+                if(!(opts.square&SQUARE_POPUP_MENUS))
+                    p.setClipPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 3.5), Qt::IntersectClip);
                 drawBackground(&p, widget, BGND_MENU);
+                if(opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS))
+                {
+                    QStyleOption opt;
+                    opt.init(widget);
+                    const QColor *use(popupMenuCols(&opt));
+
+                    p.setClipping(false);
+                    p.setRenderHint(QPainter::Antialiasing, true);
+                    p.setPen(use[STD_BORDER]);
+                    p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 4));
+
+                    if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
+                    {
+                        QPainterPath tl,
+                                     br;
+                        QRect        ri(r.adjusted(1, 1, 1, 1));
+
+                        buildSplitPath(ri, ROUNDED_ALL, 3.5, tl, br);
+                        p.setPen(use[0]);
+                        p.drawPath(tl);
+                        p.setPen(use[FRAME_DARK_SHADOW]);
+                        p.drawPath(br);
+                    }
+                }
             }
             else if(itsClickedLabel==object && qobject_cast<QLabel*>(object) && ((QLabel *)object)->buddy() && ((QLabel *)object)->buddy()->isEnabled())
             {
@@ -2961,7 +2992,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
             if ((USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !IS_FLAT_BGND(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
-                qobject_cast<const QMenu *>(widget))
+                opts.square&SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
                 return 1;
 
             if(DO_EFFECT && opts.etchEntry &&
@@ -4061,25 +4092,27 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(!opts.drawStatusBarFrames)
                 break;
         case PE_FrameMenu:
-        {
-            const QColor *use(popupMenuCols(option));
-
-            painter->save();
-            painter->setPen(use[STD_BORDER]);
-            drawRect(painter, r);
-
-            if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
+            if(opts.square&SQUARE_POPUP_MENUS || itsIsPreview ||
+               (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent())))
             {
-                painter->setPen(use[0]);
-                painter->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2,  r.y()+1);
-                painter->drawLine(r.x()+1, r.y()+1, r.x()+1,  r.y()+r.height()-2);
-                painter->setPen(use[FRAME_DARK_SHADOW]);
-                painter->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2,  r.y()+r.height()-2);
-                painter->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2,  r.y()+r.height()-2);
+                const QColor *use(popupMenuCols(option));
+
+                painter->save();
+                painter->setPen(use[STD_BORDER]);
+                drawRect(painter, r);
+
+                if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
+                {
+                    painter->setPen(use[0]);
+                    painter->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2,  r.y()+1);
+                    painter->drawLine(r.x()+1, r.y()+1, r.x()+1,  r.y()+r.height()-2);
+                    painter->setPen(use[FRAME_DARK_SHADOW]);
+                    painter->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2,  r.y()+r.height()-2);
+                    painter->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2,  r.y()+r.height()-2);
+                }
+                painter->restore();
             }
-            painter->restore();
             break;
-        }
         case PE_FrameDockWidget:
         {
             const QColor *use(backgroundColors(option));
@@ -5903,8 +5936,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
 
                 if(active)
-                    drawMenuItem(painter, r, option, true, (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly
-                                                                ? ROUNDED_TOP : ROUNDED_ALL,
+                    drawMenuItem(painter, !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS) ? r.adjusted(1, 1, -1, -1) : r,
+                                 option, true, (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
                                  opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down || APP_OPENOFFICE==theThemedApp)
                                             ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : itsBackgroundCols);
 

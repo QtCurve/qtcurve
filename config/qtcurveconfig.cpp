@@ -914,7 +914,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(centerTabText, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderMenuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(shadePopupMenu, SIGNAL(toggled(bool)), SLOT(shadePopupMenuChanged()));
-    connect(popupBorder, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(popupBorder, SIGNAL(toggled(bool)), SLOT(popupBorderChanged()));
     connect(progressAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(progressColor, SIGNAL(currentIndexChanged(int)), SLOT(progressColorChanged()));
     connect(customProgressColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -1018,6 +1018,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(squareScrollbarSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squareWindows, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squareTooltips, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(squarePopupMenus, SIGNAL(toggled(bool)), SLOT(squarePopupMenusChanged()));
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_customIcon, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1465,6 +1466,20 @@ void QtCurveConfig::menuBgndAppearanceChanged()
 void QtCurveConfig::groupBoxChanged()
 {
     gbFactor->setEnabled(FRAME_SHADED==groupBox->currentIndex() || FRAME_FADED==groupBox->currentIndex());
+    updateChanged();
+}
+
+void QtCurveConfig::popupBorderChanged()
+{
+    if(!popupBorder->isChecked())
+        squarePopupMenus->setChecked(true);
+    updateChanged();
+}
+
+void QtCurveConfig::squarePopupMenusChanged()
+{
+    if(!squarePopupMenus->isChecked())
+        popupBorder->setChecked(true);
     updateChanged();
 }
 
@@ -2935,6 +2950,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     squareScrollbarSlider->setChecked(opts.square&SQUARE_SB_SLIDER);
     squareWindows->setChecked(opts.square&SQUARE_WINDOWS);
     squareTooltips->setChecked(opts.square&SQUARE_TOOLTIPS);
+    squarePopupMenus->setChecked(opts.square&SQUARE_POPUP_MENUS);
 
     if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
     {
@@ -3083,6 +3099,8 @@ int QtCurveConfig::getSquareFlags()
         square|=SQUARE_WINDOWS;
     if(squareTooltips->isChecked())
         square|=SQUARE_TOOLTIPS;
+    if(squarePopupMenus->isChecked())
+        square|=SQUARE_POPUP_MENUS;
     return square;
 }
 

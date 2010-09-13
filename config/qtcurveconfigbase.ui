@@ -500,6 +500,13 @@
          </property>
         </widget>
        </item>
+       <item row="11" column="1">
+        <widget class="QCheckBox" name="squarePopupMenus">
+         <property name="text">
+          <string>Popup menus</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_29">
@@ -4343,6 +4350,7 @@
   <tabstop>squareScrollbarSlider</tabstop>
   <tabstop>squareWindows</tabstop>
   <tabstop>squareTooltips</tabstop>
+  <tabstop>squarePopupMenus</tabstop>
   <tabstop>bgndOpacity</tabstop>
   <tabstop>dlgOpacity</tabstop>
   <tabstop>menuBgndOpacity</tabstop>

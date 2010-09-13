@@ -33,6 +33,7 @@
 #endif
 
 #define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
+#define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
 
 #define MAX_CONFIG_FILENAME_LEN   1024
 #define MAX_CONFIG_INPUT_LINE_LEN 256
@@ -947,10 +948,10 @@ static int readNumEntry(QtCConfig &cfg, const QString &key, int def)
 static int readVersionEntry(QtCConfig &cfg, const QString &key)
 {
     const QString &val(readStringEntry(cfg, key));
-    int           major, minor;
+    int           major, minor, patch;
 
-    return !val.isEmpty() && 2==sscanf(TO_LATIN1(val), "%d.%d", &major, &minor)
-            ? MAKE_VERSION(major, minor)
+    return !val.isEmpty() && 3==sscanf(TO_LATIN1(val), "%d.%d.%d", &major, &minor, &patch)
+            ? MAKE_VERSION3(major, minor, patch)
             : 0;
 }
 
@@ -1097,10 +1098,10 @@ static int readNumEntry(GHashTable *cfg, char *key, int def)
 static int readVersionEntry(GHashTable *cfg, char *key)
 {
     char *str=readStringEntry(cfg, key);
-    int  major, minor;
+    int  major, minor, patch;
 
-    return str && 2==sscanf(str, "%d.%d", &major, &minor)
-            ? MAKE_VERSION(major, minor)
+    return str && 3==sscanf(str, "%d.%d.%d", &major, &minor, &patch)
+            ? MAKE_VERSION3(major, minor, patch)
             : 0;
 }
 
@@ -1506,6 +1507,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
             if(opts->version<MAKE_VERSION(1, 6))
                 opts->square|=SQUARE_TOOLTIPS;
+            if(opts->version<MAKE_VERSION3(1, 6, 1))
+                opts->square|=SQUARE_POPUP_MENUS;
             if(opts->version<MAKE_VERSION(1, 2))
                 def->crSize=CR_SMALL_SIZE;
             if(opts->version<MAKE_VERSION(1, 0))
@@ -2201,6 +2204,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
                 opts->menuBgndOpacity=100;
 
+            if(!(opts->square&SQUARE_POPUP_MENUS))
+                opts->popupBorder=true;
+
 #ifndef CONFIG_DIALOG
             opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
             opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
@@ -2434,7 +2440,7 @@ static void defaultSettings(Options *opts)
     opts->boldProgress=true;
     opts->coloredTbarMo=false;
     opts->borderSelection=false;
-    opts->square=SQUARE_NONE;
+    opts->square=SQUARE_POPUP_MENUS;
     opts->stripedSbar=false;
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;

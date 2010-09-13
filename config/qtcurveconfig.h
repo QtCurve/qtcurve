@@ -144,6 +144,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void bgndAppearanceChanged();
     void menuBgndAppearanceChanged();
     void groupBoxChanged();
+    void popupBorderChanged();
+    void squarePopupMenusChanged();
     void changeStack();
     void gradChanged(int i);
     void borderChanged(int i);
