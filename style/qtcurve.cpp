@@ -5951,7 +5951,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 if(active)
                     drawMenuItem(painter, !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS) ? r.adjusted(1, 1, -1, -1) : r,
-                                 option, true, (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
+                                 option, true, false,
+                                 (down || APP_OPENOFFICE==theThemedApp) && opts.roundMbTopOnly ? ROUNDED_TOP : ROUNDED_ALL,
                                  opts.useHighlightForMenu && (opts.colorMenubarMouseOver || down || APP_OPENOFFICE==theThemedApp)
                                             ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : itsBackgroundCols);
 
@@ -6056,7 +6057,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                       false, false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                 if (selected && enabled)
-                    drawMenuItem(painter, r, option, false, ROUNDED_ALL,
+                    drawMenuItem(painter, r, option, false, comboMenu, ROUNDED_ALL,
                                  opts.useHighlightForMenu ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : use);
 
                 if(comboMenu)
@@ -11639,7 +11640,8 @@ void Style::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget,
     drawBorder(p, r, option, round, 0L, w, BORDER_SUNKEN);
 }
 
-void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const
+void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, bool combo, int round,
+                         const QColor *cols) const
 {
     int fill=opts.useHighlightForMenu && (!mbi || itsHighlightCols==cols || APP_OPENOFFICE==theThemedApp) ? ORIGINAL_SHADE : 4,
         border=opts.borderMenuitems ? 0 : fill;
@@ -11698,8 +11700,18 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
         }
     }
     else
-        drawBevelGradient(cols[fill], p, r, true, false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
-
+    {
+        if(combo || opts.square&SQUARE_POPUP_MENUS)
+            drawBevelGradient(cols[fill], p, r, true, false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
+        else
+        {
+            p->save();
+            p->setRenderHint(QPainter::Antialiasing, true);
+            drawBevelGradient(cols[fill], p, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 4), true, false,
+                              opts.menuitemAppearance, WIDGET_MENU_ITEM, false);
+            p->restore();
+        }
+    }
 }
 
 void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical, bool reverse) const

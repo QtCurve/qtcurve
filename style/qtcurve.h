@@ -204,7 +204,7 @@ class Style : public QCommonStyle
     void drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize=true) const;
     void drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option, int round,
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;
-    void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, int round, const QColor *cols) const;
+    void drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option, bool mbi, bool combo, int round, const QColor *cols) const;
     void drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical=false, bool reverse=false) const;
     void drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor col, bool small=false, bool kwin=false) const;
     void drawSbSliderHandle(QPainter *p, const QRect &r, const QStyleOption *option, bool slider=false) const;
