@@ -44,7 +44,7 @@ static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event, int adjus
     alloc.y-=adjust;
     alloc.width+=adjust;
     alloc.height+=adjust;
-    gdk_window_get_origin(widget->window, &nx, &ny);
+    gdk_window_get_origin(gtk_widget_get_parent_window(widget), &nx, &ny);
     alloc.x+=nx;
     alloc.y+=ny;
 
