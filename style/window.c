@@ -266,7 +266,7 @@ static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
                         gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
 
-    if(!IS_FLAT(opts.bgndAppearance))
+    if(!IS_FLAT_BGND(opts.bgndAppearance))
     {
         unsigned short app=opts.bgndAppearance;
         XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),

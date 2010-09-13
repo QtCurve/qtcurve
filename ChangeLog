@@ -5,7 +5,8 @@
 3. Use a hack to re-enable shadows for rounded tooltips.
 4. Only use gtk_widget_get_visible for Gtk2 2.20 and above, otherwise
    use GTK_WIDGET_VISIBLE.
-   
+5. Fix kwin titlebar blending for striped backgrounds.
+
 1.6.0
 -----
  1. Add 'glow' focus option - this is now the default. (Note, for firefox
