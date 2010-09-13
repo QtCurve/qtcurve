@@ -3273,7 +3273,11 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
                 gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
                 gtk_widget_shape_combine_mask(widget, mask, 0, 0);
+#if GTK_CHECK_VERSION(2,20,0)
                 if(gtk_widget_get_visible(widget))
+#else
+                if(GTK_WIDGET_VISIBLE(widget))
+#endif
                 {
                     gtk_widget_unmap(widget);
                     /* Setting the window type to 'popup menu' seems to re-eanble kwin shadows! */
