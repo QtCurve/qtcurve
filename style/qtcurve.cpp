@@ -478,6 +478,18 @@ static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect,
     }
 }
 
+static QRegion windowMask(const QRect &r)
+{
+    int x, y, w, h;
+    r.getRect(&x, &y, &w, &h);
+
+    QRegion region(x + 4, y + 0, w-4*2, h-0*2);
+    region += QRegion(x + 0, y + 4, w-0*2, h-4*2);
+    region += QRegion(x + 2, y + 1, w-2*2, h-1*2);
+    region += QRegion(x + 1, y + 2, w-1*2, h-2*2);
+    return region;
+}
+
 enum WindowsStyleConsts
 {
     windowsItemFrame      =  2, // menu item frame width
@@ -2608,12 +2620,14 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 QRect    r(widget->rect());
 
                 if(!(opts.square&SQUARE_POPUP_MENUS))
-                    p.setClipPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 4.5), Qt::IntersectClip);
+                    p.setClipRegion(windowMask(r), Qt::IntersectClip);
+
                 drawBackground(&p, widget, BGND_MENU);
                 if(opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS))
                 {
                     QStyleOption opt;
                     opt.init(widget);
+
                     const QColor *use(popupMenuCols(&opt));
 
                     p.setClipping(false);
@@ -3157,16 +3171,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
             {
                 if(!Utils::hasAlphaChannel(widget) && (!widget || widget->isWindow()))
                     if(QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
-                    {
-                        int x, y, w, h;
-                        option->rect.getRect(&x, &y, &w, &h);
-
-                        mask->region  = QRegion(x + 4, y + 0, w-4*2, h-0*2);
-                        mask->region += QRegion(x + 0, y + 4, w-0*2, h-4*2);
-                        mask->region += QRegion(x + 2, y + 1, w-2*2, h-1*2);
-                        mask->region += QRegion(x + 1, y + 2, w-1*2, h-2*2);
-                    }
-
+                        mask->region = windowMask(option->rect);
                 return true;
             }
         case SH_ComboBox_ListMouseTracking:
