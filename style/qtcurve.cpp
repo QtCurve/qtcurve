@@ -2551,7 +2551,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 #ifdef Q_WS_X11
         case QEvent::Resize:
         {
-            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) && qobject_cast<QMenuBar *>(object))
+            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
+                qobject_cast<QMenuBar *>(object))
             {
                 QResizeEvent *re = static_cast<QResizeEvent *>(event);
 
@@ -2732,7 +2733,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 }
             }
 #ifdef Q_WS_X11
-            else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) && qobject_cast<QMenuBar *>(object))
+            else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
+                    qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, mb->size().height());
@@ -2744,7 +2746,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         case QEvent::Hide:
         {
 #ifdef Q_WS_X11
-            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) && qobject_cast<QMenuBar *>(object))
+            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
+                qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
                 emitMenuSize((QMenuBar *)mb, 0);

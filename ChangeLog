@@ -7,7 +7,8 @@
 5. When drawing progressbar contents and label, use same calculations
    to determine position. Fixes odd text on some of Krita's progressbar/spin
    button widgets.
-   
+6. Fix menubar-hiding kwin icon when not blending menubar/titlebar.
+
 1.6.0
 -----
  1. Add 'glow' focus option - this is now the default.
