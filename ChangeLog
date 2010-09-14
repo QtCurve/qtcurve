@@ -3,7 +3,7 @@
 1. Add option to have rounded popup menus.
 2. Allow rounded tooltips when not compositing.
 3. Fix kwin titlebar blending for striped backgrounds.
-4. Simpify faded menu item code.
+4. Simplify faded menu item code.
 5. When drawing progressbar contents and label, use same calculations
    to determine position. Fixes odd text on some of Krita's progressbar/spin
    button widgets.
