@@ -5081,7 +5081,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_stroke(cr);
-            if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu)
+            if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
             {
                 if(roundedMenu)
                 {
