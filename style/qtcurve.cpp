@@ -1916,13 +1916,13 @@ void Style::polish(QWidget *widget)
             }
         }
 
-    if(qobject_cast<QMenu *>(widget) && !(widget->parentWidget() &&
+    if(qobject_cast<QMenu *>(widget)/* && !(widget->parentWidget() &&
 #ifdef QTC_QT_ONLY
         widget->inherits("KMenu") && widget->parentWidget()->inherits("KXmlGuiWindow")
 #else
         qobject_cast<KMenu *>(widget) && qobject_cast<KXmlGuiWindow *>(widget->parentWidget())
 #endif
-        && QLatin1String("QtCurvePreview")==widget->parentWidget()->objectName()))
+        && QLatin1String("QtCurvePreview")==widget->parentWidget()->objectName())*/)
     {
         if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
         {
@@ -2372,7 +2372,11 @@ void Style::unpolish(QWidget *widget)
     if(qobject_cast<QMenu *>(widget))
     {
         widget->removeEventFilter(this);
+        widget->setAttribute(Qt::WA_PaintOnScreen, false);
+        widget->setAttribute(Qt::WA_NoSystemBackground, false);
         widget->setAttribute(Qt::WA_TranslucentBackground, false);
+        widget->clearMask();
+
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
             widget->setPalette(QApplication::palette());
     }
@@ -4115,7 +4119,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             if(!opts.drawStatusBarFrames)
                 break;
         case PE_FrameMenu:
-            if((opts.square&SQUARE_POPUP_MENUS) || itsIsPreview ||
+            if((opts.square&SQUARE_POPUP_MENUS) ||
                (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent())))
             {
                 const QColor *use(popupMenuCols(option));
