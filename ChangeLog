@@ -6,7 +6,7 @@
 4. Don't map/unmap tooltips - not required?.
 5. Fix kwin titlebar blending for striped backgrounds.
 6. Use flat selection for items of editable combo - matches KDE4 better.
-7. Simpify faded menu item code.
+7. Simplify faded menu item code.
 
 1.6.0
 -----
