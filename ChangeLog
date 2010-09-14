@@ -3,6 +3,7 @@
 1. Add option to have rounded popup menus.
 2. Allow rounded tooltips when not compositing.
 3. Fix kwin titlebar blending for striped backgrounds.
+4. Simpify faded menu item code.
 
 1.6.0
 -----

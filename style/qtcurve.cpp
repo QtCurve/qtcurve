@@ -11656,30 +11656,26 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
 
     if(!mbi && APPEARANCE_FADE==opts.menuitemAppearance)
     {
-        bool  reverse=Qt::RightToLeft==option->direction;
-        int   roundOffet=ROUNDED ? 1 : 0;
-        QRect main(r.adjusted(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1, roundOffet+1,
-                              reverse ? -(roundOffet+1) : -(roundOffet+MENUITEM_FADE_SIZE), -(roundOffet+1))),
-              fade(reverse ? r.x()+1 : r.width()-MENUITEM_FADE_SIZE, r.y()+1, MENUITEM_FADE_SIZE, r.height()-2);
-
-        p->fillRect(main, cols[fill]);
-        if(ROUNDED)
-        {
-            QStyleOption opt(*option);
-
-            opt.state|=State_Horizontal|State_Raised;
-            opt.state&=~(State_Sunken|State_On);
-
-            drawBorder(p, main.adjusted(-1, -1, 1, 1), &opt, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, cols, WIDGET_MENU_ITEM, BORDER_FLAT, false, fill);
-        }
-
-        QLinearGradient grad(fade.topLeft(), fade.topRight());
+        bool            reverse=Qt::RightToLeft==option->direction;
         QColor          trans(Qt::white);
+        QRect           r2(ROUNDED ? r.adjusted(1, 1, -1, -1) : r);
+        QRectF          rf(r2);
+        double          fadePercent=((double)MENUITEM_FADE_SIZE)/rf.width();
+        QLinearGradient grad(r2.topLeft(), r2.topRight());
 
         trans.setAlphaF(0.0);
         grad.setColorAt(0, reverse ? trans : cols[fill]);
+        grad.setColorAt(reverse ? fadePercent : 1.0-fadePercent, cols[fill]);
         grad.setColorAt(1, reverse ? cols[fill] : trans);
-        p->fillRect(fade, QBrush(grad));
+        if(ROUNDED)
+        {
+            p->save();
+            p->setRenderHint(QPainter::Antialiasing, true);
+            p->fillPath(buildPath(rf, WIDGET_OTHER, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, 4), QBrush(grad));
+            p->restore();
+        }
+        else
+            p->fillRect(r2, QBrush(grad));
     }
     else if(mbi || opts.borderMenuitems)
     {
