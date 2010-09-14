@@ -1578,12 +1578,17 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GdkRegion *region,
     unsetCairoClipping(cr);
 }
 
-static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, int rad, int round)
+static void clipPathRadius(cairo_t *cr, double x, double y, int w, int h, double radius, int round)
 {
     cairo_new_path(cr);
     cairo_save(cr);
-    createPath(cr, x+0.5, y+0.5, w-1, h-1, getRadius(&opts, w, h, widget, rad), round);
+    createPath(cr, x, y, w, h, radius, round);
     cairo_clip(cr);
+}
+
+static void clipPath(cairo_t *cr, int x, int y, int w, int h, EWidget widget, int rad, int round)
+{
+    clipPathRadius(cr, x+0.5, y+0.5, w-1, h-1, getRadius(&opts, w, h, widget, rad), round);
 }
 
 static void addStripes(cairo_t *cr, int x, int y, int w, int h, bool horizontal)
@@ -1657,12 +1662,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
     if(width>0 && height>0)
     {
         if(!(flags&DF_DO_BORDER))
-        {
-            cairo_new_path(cr);
-            cairo_save(cr);
-            createPath(cr, x, y, width, height, getRadius(&opts, width, height, widget, RADIUS_EXTERNAL), round);
-            cairo_clip(cr);
-        }
+            clipPathRadius(cr, x, y, width, height, getRadius(&opts, width, height, widget, RADIUS_EXTERNAL), round);
         else
             clipPath(cr, x, y, width, height, widget, RADIUS_EXTERNAL, round);
 
@@ -1760,12 +1760,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                                 topGradRectH=topSize-1;
                 cairo_pattern_t *pt=cairo_pattern_create_linear(topGradRectX, topGradRectY, topGradRectX, topGradRectY+topGradRectH);
 
-                cairo_new_path(cr);
-                cairo_save(cr);
-
-                createPath(cr, topGradRectX+0.5, topGradRectY+0.5, topGradRectW, topGradRectH, topGradRectW/2.0, ROUNDED_ALL);
-
-                cairo_clip(cr);
+                clipPathRadius(cr, topGradRectX+0.5, topGradRectY+0.5, topGradRectW, topGradRectH, topGradRectW/2.0, ROUNDED_ALL);
 
                 cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.8 : 0.7) : 0.75);
 #ifdef QTC_CAIRO_1_10_HACK
@@ -1802,8 +1797,6 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                         ha+=8;
                 }
                 pt=cairo_pattern_create_linear(xa, ya, xa+(horiz ? 0.0 : size), ya+(horiz ? size : 0.0));
-                cairo_new_path(cr);
-                cairo_save(cr);
 
                 if(getWidgetRound(&opts, origWidth, origHeight, widget)<ROUND_MAX ||
                 (!IS_MAX_ROUND_WIDGET(widget) && !IS_SLIDER(widget)))
@@ -1813,11 +1806,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
                 }
 
                 if(horiz)
-                    createPath(cr, xa+mod+0.5, ya+0.5, wa-(mod*2)-1, size-1, rad, round);
+                    clipPathRadius(cr, xa+mod+0.5, ya+0.5, wa-(mod*2)-1, size-1, rad, round);
                 else
-                    createPath(cr, xa+0.5, ya+mod+0.5, size-1, ha-(mod*2)-1, rad, round);
-
-                cairo_clip(cr);
+                    clipPathRadius(cr, xa+0.5, ya+mod+0.5, size-1, ha-(mod*2)-1, rad, round);
 
                 cairo_pattern_add_color_stop_rgba(pt, 0.0, 1.0, 1.0, 1.0, mo ? (opts.highlightFactor>0 ? 0.95 : 0.85) : 0.9);
 #ifdef QTC_CAIRO_1_10_HACK
@@ -1940,10 +1931,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
     if(WIDGET_SB_SLIDER==widget && opts.stripedSbar)
     {
-        cairo_save(cr);
-        cairo_new_path(cr);
-        createPath(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SB_SLIDER, RADIUS_INTERNAL), round);
-        cairo_clip(cr);
+        clipPathRadius(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SB_SLIDER, RADIUS_INTERNAL), round);
         addStripes(cr, x, y, width, height, horiz);
         cairo_restore(cr);
     }
@@ -2988,12 +2976,7 @@ static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType sta
                                   double alpha, GdkColor *col, gboolean horiz)
 {
     if((!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)) && ROUND_NONE!=opts.round)
-    {
-        cairo_save(cr);
-        cairo_new_path(cr);
-        createPath(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION), round);
-        cairo_clip(cr);
-    }
+        clipPathRadius(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION), round);
     drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height, col,
                            horiz, FALSE, opts.selectionAppearance, WIDGET_SELECTION, alpha);
     if((!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)) && ROUND_NONE!=opts.round)
@@ -3284,10 +3267,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
                 cairo_destroy(crMask);
             }
 
-            cairo_save(cr);
-            cairo_new_path(cr);
-            createPath(cr, x, y, width, height, radius, ROUNDED_ALL);
-            cairo_clip(cr);
+            clipPathRadius(cr, x, y, width, height, radius, ROUNDED_ALL);
         }
 #endif
         drawBevelGradient(cr, style, area, NULL, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
@@ -4912,10 +4892,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 if(ROUNDED)
                 {
                     x++, y++, width-=2, height-=2;
-                    cairo_save(cr);
-                    cairo_new_path(cr);
-                    createPath(cr, x, y, width, height, 4, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
-                    cairo_clip(cr);
+                    clipPathRadius(cr, x, y, width, height, 4, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
                 }
 
                 fadePercent=((double)MENUITEM_FADE_SIZE)/(double)width;
@@ -4942,12 +4919,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 gboolean roundedMenu=(!widget || !isComboMenu(widget->parent)) && !(opts.square&SQUARE_POPUP_MENUS);
 
                 if(roundedMenu)
-                {
-                    cairo_save(cr);
-                    cairo_new_path(cr);
-                    createPath(cr, x, y, width, height, 4, round);
-                    cairo_clip(cr);
-                }
+                    clipPathRadius(cr, x, y, width, height, 4, round);
                 drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
                                   TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
                 if(roundedMenu)
@@ -7078,10 +7050,7 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                                     radius=ROUNDED_ALL==round ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL) : 0.0;
                     cairo_pattern_t *pt=NULL;
 
-                    cairo_save(cr);
-                    cairo_new_path(cr);
-                    createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
-                    cairo_clip(cr);
+                    clipPathRadius(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
                     cairo_rectangle(cr, x, y, width, height);
                     if(FRAME_SHADED==opts.groupBox)
                         cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
