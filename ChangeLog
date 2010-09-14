@@ -8,6 +8,7 @@
    to determine position. Fixes odd text on some of Krita's progressbar/spin
    button widgets.
 6. Fix menubar-hiding kwin icon when not blending menubar/titlebar.
+7. 'Fix' konsole titlebar opacity. Note: Menubar is still opaque :-(
 
 1.6.0
 -----

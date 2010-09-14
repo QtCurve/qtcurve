@@ -237,6 +237,7 @@ static enum
     APP_KDEVELOP,
     APP_K3B,
     APP_OPENOFFICE,
+    APP_KONSOLE,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -1341,6 +1342,8 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_OPENOFFICE;
     else if("kdmgreet"==appName)
         opts.forceAlternateLvCols=false;
+    else if("konsole"==appName)
+        theThemedApp=APP_KONSOLE;
 
     if(NULL!=getenv("QTCURVE_DEBUG"))
     {
@@ -1622,29 +1625,41 @@ void Style::polish(QWidget *widget)
                 if(!IS_FLAT_BGND(opts.bgndAppearance))
                     setBgndProp(widget, opts.bgndAppearance);
 
-                int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+                int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+                bool konsoleWindow(false);
 
-                if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                if(APP_KONSOLE==theThemedApp && 100!=opacity && widget->testAttribute(Qt::WA_TranslucentBackground) &&
+                   widget->inherits("Konsole::MainWindow"))
+                {
+                    konsoleWindow=true;
+                }
+                else if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
                    widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") || 
                    widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint))
                     break;
 
-                // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
-                // ...unfortunately some properties are lost, among them the window icon.
-                QIcon icon(widget->windowIcon());
+                if(!konsoleWindow)
+                {
+                    // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
+                    // ...unfortunately some properties are lost, among them the window icon.
+                    QIcon icon(widget->windowIcon());
                 
-                widget->setAttribute(Qt::WA_TranslucentBackground);
-                widget->setWindowIcon(icon);
-                // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
-                // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
-                if(!widget->isVisible())
-                    widget->move(10000, 10000);
+                    widget->setAttribute(Qt::WA_TranslucentBackground);
+                    widget->setWindowIcon(icon);
+                    // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
+                    // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+                    if(!widget->isVisible())
+                        widget->move(10000, 10000);
+                }
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
                 Utils::addEventFilter(widget, this);
-                itsTransparentWidgets.insert(widget);
-                connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
+                if(!konsoleWindow)
+                {
+                    itsTransparentWidgets.insert(widget);
+                    connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
+                }
                 setOpacityProp(widget, (unsigned short)opacity);
                 break;
             }
