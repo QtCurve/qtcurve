@@ -1389,7 +1389,7 @@ void Style::polish(QApplication *app)
             shadeColors(tint(popupMenuCol(), itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
         }
         opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
-        opts.square|=SQUARE_POPUP_MENUS;
+        opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
     }
 
 #ifndef QTC_QT_ONLY
