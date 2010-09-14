@@ -5812,8 +5812,10 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 }
                 else if(r.isValid() && bar->progress>0)
                 {
-                    double pg(((double)bar->progress) / (bar->maximum-bar->minimum));
-
+                    qint64 progress = qMax<qint64>(bar->progress, bar->minimum); // workaround for bug in QProgressBar
+                    double pg = ((progress - qint64(bar->minimum)) /
+                                qMax(double(1.0), double(qint64(bar->maximum) - qint64(bar->minimum))));
+            
                     if(vertical)
                     {
                         int height(qMin(r.height(), (int)(pg * r.height())));
@@ -5888,14 +5890,13 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 }
 #endif
 
-                double               vc6Workaround(((bar->progress - qint64(bar->minimum)) / 
-                                                    double(qint64(bar->maximum) - qint64(bar->minimum))) * r.width());
-                int                  progressIndicatorPos=(int)vc6Workaround;
+                int                  progressIndicatorPos = (bar->progress - qreal(bar->minimum)) /
+                                                             qMax(qreal(1.0), qreal(bar->maximum) - bar->minimum) * r.width();
                 bool                 flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || 
                                                         ((Qt::LeftToRight==bar->direction) && inverted))) ||
                                           (vertical && ((!inverted && !bottomToTop) || (inverted && bottomToTop))));
-                QRect                leftRect,
-                                     rightRect;
+                QRect                leftRect;
+                QRegion              rightRect(r);
                 QPalette::ColorGroup cg=state&State_Enabled || State_None==state ? QPalette::Active : QPalette::Current;
 
                 if (flip)
@@ -5906,7 +5907,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     {
                         painter->setPen(palette.brush(cg, QPalette::Base).color());
                         leftRect = QRect(r.left(), r.top(), indicatorPos, r.height());
-                        rightRect = QRect(r.left()+indicatorPos, r.top(), r.width()-indicatorPos, r.height());
+                        //rightRect = QRect(r.left()+indicatorPos, r.top(), r.width()-indicatorPos, r.height());
                     }
                     else if (indicatorPos > r.width())
                         painter->setPen(palette.brush(cg, QPalette::Text).color());
@@ -5918,26 +5919,23 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     if (progressIndicatorPos >= 0 && progressIndicatorPos <= r.width())
                     {
                         leftRect = QRect(r.left(), r.top(), progressIndicatorPos, r.height());
-                        rightRect = QRect(r.left()+progressIndicatorPos, r.top(), r.width()-progressIndicatorPos, r.height());
+                        //rightRect = QRect(r.left()+progressIndicatorPos, r.top(), r.width()-progressIndicatorPos, r.height());
                     }
                     else if (progressIndicatorPos > r.width())
                         painter->setPen(palette.brush(cg, QPalette::HighlightedText).color());
                     else
                         painter->setPen(palette.brush(cg, QPalette::Text).color());
                 }
-
+                    
                 QString text = bar->fontMetrics.elidedText(bar->text, Qt::ElideRight, r.width());
-                if (!leftRect.isNull())
-                {
-                    painter->save();
-                    painter->setClipRect(rightRect, Qt::IntersectClip);
-                }
+
+                rightRect = rightRect.subtracted(leftRect);
+                painter->setClipRegion(rightRect);
                 painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 if (!leftRect.isNull())
                 {
-                    painter->restore();
                     painter->setPen(palette.brush(cg, flip ? QPalette::Text : QPalette::HighlightedText).color());
-                    painter->setClipRect(leftRect, Qt::IntersectClip);
+                    painter->setClipRect(leftRect);
                     painter->drawText(r, text, QTextOption(Qt::AlignAbsolute | Qt::AlignHCenter | Qt::AlignVCenter));
                 }
 
