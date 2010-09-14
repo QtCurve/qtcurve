@@ -4905,38 +4905,37 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
             if(!mb && menuitem && APPEARANCE_FADE==opts.menuitemAppearance)
             {
-                gboolean reverse=FALSE; /* TODO !!! */
-                int      roundOffet=ROUNDED ? 1 : 0,
-                         mainX=x+(reverse ? 1+MENUITEM_FADE_SIZE : roundOffet+1),
-                         mainY=y+roundOffet+1,
-                         mainWidth=width-(reverse ? roundOffet+1 : 1+MENUITEM_FADE_SIZE),
-                         fadeX=reverse ? x+1 : width-MENUITEM_FADE_SIZE;
+                gboolean        reverse=FALSE; /* TODO !!! */
+                cairo_pattern_t *pt=NULL;
+                double          fadePercent=0.0;
 
                 if(ROUNDED)
-                    clipPath(cr, mainX-1, mainY-1, mainWidth+1, height-2, WIDGET_MENU_ITEM, RADIUS_INTERNAL,
-                             reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
-                drawAreaColor(cr, area, NULL, &itemCols[fillVal], mainX, mainY, mainWidth, height-(2+(roundOffet*2)));
+                {
+                    x++, y++, width-=2, height-=2;
+                    cairo_save(cr);
+                    cairo_new_path(cr);
+                    createPath(cr, x, y, width, height, 4, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT);
+                    cairo_clip(cr);
+                }
+
+                fadePercent=((double)MENUITEM_FADE_SIZE)/(double)width;
+                pt=cairo_pattern_create_linear(x, y, x+width-1, y);
+
+                cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
+#ifdef QTC_CAIRO_1_10_HACK
+                cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
+#endif
+                cairo_pattern_add_color_stop_rgba(pt, reverse ? fadePercent : 1.0-fadePercent, CAIRO_COL(itemCols[fillVal]), 1.0);
+#ifdef QTC_CAIRO_1_10_HACK  
+                cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
+#endif
+                cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
+                cairo_set_source(cr, pt);
+                cairo_rectangle(cr, x, y, width, height);
+                cairo_fill(cr);
+                cairo_pattern_destroy(pt);
                 if(ROUNDED)
                     unsetCairoClipping(cr);
-
-                if(ROUNDED)
-                    realDrawBorder(cr, style, state, area, NULL, mainX-1, mainY-1, mainWidth+1, height-2,
-                                  itemCols, reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, BORDER_FLAT, WIDGET_MENU_ITEM, 0, fillVal);
-
-                {
-                    cairo_pattern_t *pt=cairo_pattern_create_linear(fadeX, y+1, fadeX+MENUITEM_FADE_SIZE-1, y+1);
-
-                    cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
-#ifdef QTC_CAIRO_1_10_HACK
-                    cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(itemCols[fillVal]), reverse ? 0.0 : 1.0);
-                    cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
-#endif
-                    cairo_pattern_add_color_stop_rgba(pt, 1.00, CAIRO_COL(itemCols[fillVal]), reverse ? 1.0 : 0.0);
-                    cairo_set_source(cr, pt);
-                    cairo_rectangle(cr, fadeX, y+1, MENUITEM_FADE_SIZE, height-2);
-                    cairo_fill(cr);
-                    cairo_pattern_destroy(pt);
-                }
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
             {
