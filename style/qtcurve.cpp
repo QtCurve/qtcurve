@@ -1626,12 +1626,14 @@ void Style::polish(QWidget *widget)
                     setBgndProp(widget, opts.bgndAppearance);
 
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
-                bool konsoleWindow(false);
 
                 if(APP_KONSOLE==theThemedApp && 100!=opacity && widget->testAttribute(Qt::WA_TranslucentBackground) &&
                    widget->inherits("Konsole::MainWindow"))
                 {
-                    konsoleWindow=true;
+                    // Background translucency does not work for konsole :-(
+                    // So, just set titlebar opacity...
+                    setOpacityProp(widget, (unsigned short)opacity);
+                    break;
                 }
                 else if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
@@ -1639,31 +1641,25 @@ void Style::polish(QWidget *widget)
                    widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint))
                     break;
 
-                if(!konsoleWindow)
-                {
-                    // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
-                    // ...unfortunately some properties are lost, among them the window icon.
-                    QIcon icon(widget->windowIcon());
-                
-                    widget->setAttribute(Qt::WA_TranslucentBackground);
-                    widget->setWindowIcon(icon);
-                    // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
-                    // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
-                    if(!widget->isVisible())
-                        widget->move(10000, 10000);
+                // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
+                // ...unfortunately some properties are lost, among them the window icon.
+                QIcon icon(widget->windowIcon());
 
-                    // Need to reset this, as new window created!
-                    if(!IS_FLAT_BGND(opts.bgndAppearance))
-                        setBgndProp(widget, opts.bgndAppearance);
-                }
+                widget->setAttribute(Qt::WA_TranslucentBackground);
+                widget->setWindowIcon(icon);
+                // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
+                // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
+                if(!widget->isVisible())
+                    widget->move(10000, 10000);
+
+                // Need to reset this, as new window created!
+                if(!IS_FLAT_BGND(opts.bgndAppearance))
+                    setBgndProp(widget, opts.bgndAppearance);
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
                 Utils::addEventFilter(widget, this);
-                if(!konsoleWindow)
-                {
-                    itsTransparentWidgets.insert(widget);
-                    connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
-                }
+                itsTransparentWidgets.insert(widget);
+                connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
                 setOpacityProp(widget, (unsigned short)opacity);
 
                 break;
