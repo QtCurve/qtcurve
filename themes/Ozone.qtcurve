@@ -10,6 +10,7 @@ OpaqueBorder=false
 OuterBorder=true
 
 [Settings]
+customAlphas=0.4,0.1
 activeTabAppearance=soft
 animatedProgress=false
 appearance=customgradient5
