@@ -3326,8 +3326,8 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
     sanitizeSize(window, &width, &height);
     if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
     {
-        gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
-                                           area, x, y, width, height);
+//         gtk_style_apply_default_background(style, window, widget && !GTK_WIDGET_NO_WINDOW(widget), state,
+//                                            area, x, y, width, height);
         if(widget && IMG_NONE!=opts.bgndImage.type)
             drawWindowBgnd(cr, style, area, widget, x, y, width, height);
     }
@@ -7431,7 +7431,7 @@ static void gtkDrawResizeGrip(GtkStyle *style, GdkWindow *window, GtkStateType s
     /* Clear background */
     if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
     {
-        gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
+//         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
         if(widget && IMG_NONE!=opts.bgndImage.type)
             drawWindowBgnd(cr, style, area, widget, x, y, width, height);
     }
