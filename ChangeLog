@@ -1,16 +1,17 @@
 1.6.1
 -----
-1. Add option to have rounded popup menus.
-2. Allow rounded tooltips when not compositing.
-3. Fix kwin titlebar blending for striped backgrounds.
-4. Simplify faded menu item code.
-5. When drawing progressbar contents and label, use same calculations
-   to determine position. Fixes odd text on some of Krita's progressbar/spin
-   button widgets.
-6. Fix menubar-hiding kwin icon when not blending menubar/titlebar.
-7. 'Fix' konsole titlebar opacity. Note: Menubar is still opaque :-(
-8. Fix background gradient in titlebars when using translucent backgrounds.
-9. Square tooltips for OpenOffice.org
+ 1. Add option to have rounded popup menus.
+ 2. Allow rounded tooltips when not compositing.
+ 3. Fix kwin titlebar blending for striped backgrounds.
+ 4. Simplify faded menu item code.
+ 5. When drawing progressbar contents and label, use same calculations
+    to determine position. Fixes odd text on some of Krita's progressbar/spin
+    button widgets.
+ 6. Fix menubar-hiding kwin icon when not blending menubar/titlebar.
+ 7. 'Fix' konsole titlebar opacity. Note: Menubar is still opaque :-(
+ 8. Fix background gradient in titlebars when using translucent backgrounds.
+ 9. Square tooltips for OpenOffice.org
+10. Fix windows build.
 
 1.6.0
 -----

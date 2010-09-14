@@ -1622,11 +1622,13 @@ void Style::polish(QWidget *widget)
                 if(APP_PLASMA==theThemedApp && !widget->inherits("QDialog"))
                     break;
 
+#ifdef Q_WS_X11
                 if(!IS_FLAT_BGND(opts.bgndAppearance))
                     setBgndProp(widget, opts.bgndAppearance);
-
+#endif
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
+#ifdef Q_WS_X11
                 if(APP_KONSOLE==theThemedApp && 100!=opacity && widget->testAttribute(Qt::WA_TranslucentBackground) &&
                    widget->inherits("Konsole::MainWindow"))
                 {
@@ -1635,7 +1637,9 @@ void Style::polish(QWidget *widget)
                     setOpacityProp(widget, (unsigned short)opacity);
                     break;
                 }
-                else if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                else
+#endif
+                if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
                    widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") || 
                    widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint))
@@ -1652,16 +1656,19 @@ void Style::polish(QWidget *widget)
                 if(!widget->isVisible())
                     widget->move(10000, 10000);
 
+#ifdef Q_WS_X11
                 // Need to reset this, as new window created!
                 if(!IS_FLAT_BGND(opts.bgndAppearance))
                     setBgndProp(widget, opts.bgndAppearance);
+#endif
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
                 Utils::addEventFilter(widget, this);
                 itsTransparentWidgets.insert(widget);
                 connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
+#ifdef Q_WS_X11
                 setOpacityProp(widget, (unsigned short)opacity);
-
+#endif
                 break;
             }
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
