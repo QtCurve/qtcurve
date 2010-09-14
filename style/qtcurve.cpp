@@ -1651,6 +1651,10 @@ void Style::polish(QWidget *widget)
                     // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
                     if(!widget->isVisible())
                         widget->move(10000, 10000);
+
+                    // Need to reset this, as new window created!
+                    if(!IS_FLAT_BGND(opts.bgndAppearance))
+                        setBgndProp(widget, opts.bgndAppearance);
                 }
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
@@ -1661,6 +1665,7 @@ void Style::polish(QWidget *widget)
                     connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
                 }
                 setOpacityProp(widget, (unsigned short)opacity);
+
                 break;
             }
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc

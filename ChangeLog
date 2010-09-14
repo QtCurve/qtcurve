@@ -9,6 +9,7 @@
    button widgets.
 6. Fix menubar-hiding kwin icon when not blending menubar/titlebar.
 7. 'Fix' konsole titlebar opacity. Note: Menubar is still opaque :-(
+8. Fix background gradient in titlebars when using translucent backgrounds.
 
 1.6.0
 -----
