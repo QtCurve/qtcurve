@@ -4888,6 +4888,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                             : getMdiColors(option, state&State_Active));
             QColor       light(borderCols[0]),
                          dark(borderCols[STD_BORDER]);
+            bool         isKWin=state&QtC_StateKWin,
+                         addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize().sides>1);
 
             light.setAlphaF(1.0);
             dark.setAlphaF(1.0);
@@ -4896,11 +4898,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
             if(fillBgnd)
                 painter->fillRect(r, bgndCols[ORIGINAL_SHADE]);
-            if(opts.round<ROUND_SLIGHT || !(state&QtC_StateKWin) || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
+            if(opts.round<ROUND_SLIGHT || !isKWin || (state&QtC_StateKWinNotFull && state&QtC_StateKWin))
             {
                 painter->setRenderHint(QPainter::Antialiasing, false);
 
-                if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
+                if(addLight)
                 {
                     painter->setPen(light);
                     painter->drawLine(r.x()+1, r.y(), r.x()+1, r.y()+r.height()-1);
@@ -4910,7 +4912,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             }
             else
             {
-                if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
+                if(addLight)
                 {
                     painter->setRenderHint(QPainter::Antialiasing, false);
                     painter->setPen(light);
@@ -8345,9 +8347,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                     : buildPath(QRectF(state&QtC_StateKWinNoBorder ? tr : tr.adjusted(1, 1, -1, 0)),
                                                 WIDGET_MDI_WINDOW_TITLE, state&QtC_StateKWin && state&QtC_StateKWinTabDrag
                                                     ? ROUNDED_ALL : ROUNDED_TOP,
-                                                (round>ROUND_SLIGHT /*&& kwin*/
-                                                    ? 6.0
-                                                    : 2.0)-(state&QtC_StateKWinNoBorder ? 0.0 : 1.0)));
+                                                (round>ROUND_SLIGHT /*&& kwin*/ ? 6.0 : 2.0)));
 #else
                 QPainterPath path;
 #endif
@@ -8367,6 +8367,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 {
                     QColor light(titleCols[0]),
                            dark(titleCols[STD_BORDER]);
+                    bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize().sides>1);
 
                     if(kwin)
                     {
@@ -8374,7 +8375,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         dark.setAlphaF(1.0);
                     }
                     
-                    if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
+                    if(addLight)
                     {
                         painter->setPen(light);
                         painter->save();
@@ -8398,7 +8399,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                     painter->setRenderHint(QPainter::Antialiasing, false);
 
-                    if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
+                    if(addLight)
                     {
                         painter->setPen(light);
                         painter->drawPoint(r.x()+1, r.y()+r.height()-1);
@@ -8418,7 +8419,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                             painter->drawLine(r.x()+r.width()-4, r.y()+1, r.x()+r.width()-5, r.y()+1);
                         }
 
-                        if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER &&
+                        if(addLight &&
                             (APPEARANCE_SHINY_GLASS!=(active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance)))
                         {
                             painter->setPen(light);
@@ -8441,7 +8442,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         painter->drawLine(r.x(), start.y(), r.x(), end.y());
                         painter->drawLine(r.x()+r.width()-1, start.y(), r.x()+r.width()-1, end.y());
 
-                        if(opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER)
+                        if(addLight)
                         {
                             grad.setColorAt(0, light);
                             grad.setColorAt(1, itsBackgroundCols[0]);

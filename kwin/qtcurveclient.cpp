@@ -171,9 +171,9 @@ static QPainterPath createPath(const QRectF &r, double radius, bool roundTop, bo
 }
 
 #if KDE_IS_VERSION(4, 3, 0)
-static QPainterPath createPath(const QRect &r, bool fullRound, bool inner, bool roundTop, bool roundBot)
+static QPainterPath createPath(const QRect &r, bool fullRound, bool roundTop, bool roundBot)
 {
-    return createPath(QRectF(r), (fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0), roundTop, roundBot);
+    return createPath(QRectF(r), (fullRound ? 6.0 : 2.0), roundTop, roundBot);
 }
 #endif
 
@@ -605,8 +605,15 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QRect fillRect(r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0));
 
     painter.setRenderHint(QPainter::Antialiasing, true);
+    if(outerBorder)
+    {
+        painter.save();
+        painter.setClipRegion(getMask(round, r));
+    }
     fillBackground(bgndAppearance, painter, fillCol, fillRect,
-                   createPath(fillRect, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom));
+                   createPath(fillRect, round>ROUND_SLIGHT, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom));
+    if(outerBorder)
+        painter.restore();
 
     opt.init(widget());
 
@@ -626,11 +633,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(outerBorder)
     {
-        if(opacity<100)
-        {
-            painter.save();
-            painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
-        }
+        painter.save();
+        painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
 #ifdef DRAW_INTO_PIXMAPS
         if(!compositing && !preview)
         {
@@ -651,8 +655,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         else
 #endif
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &painter, widget());
-        if(opacity<100)
-            painter.restore();
+        painter.restore();
     }
     else
         opt.state|=QtC_StateKWinNoBorder;
