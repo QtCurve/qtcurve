@@ -31,8 +31,8 @@ void QtCurveConfig::defaults()
 {
     itsBorderSize=BORDER_NORMAL;
     itsRoundBottom=true;
-    itsOuterBorder=false;
-    itsInnerBorder=false;
+    itsOuterBorder=SHADE_NONE;
+    itsInnerBorder=SHADE_NONE;
     itsBorderlessMax=false;
     itsCustomShadows=false;
     itsGrouping=true;
@@ -44,6 +44,20 @@ void QtCurveConfig::defaults()
 
 #define READ_ENTRY(ENTRY) \
     its##ENTRY=group.readEntry(#ENTRY, def.its##ENTRY);
+
+static QtCurveConfig::Shade readShade(KConfigGroup &group, const char *key)
+{
+    QString entry=group.readEntry(key, QString());
+
+    if(entry.isEmpty() || QLatin1String("false")==entry)
+        return QtCurveConfig::SHADE_NONE;
+    if(QLatin1String("true")==entry)
+        return QtCurveConfig::SHADE_DARK;
+    int val=entry.toInt();
+    if(val>QtCurveConfig::SHADE_NONE && val<=QtCurveConfig::SHADE_SHADOW)
+        return (QtCurveConfig::Shade)val;
+    return QtCurveConfig::SHADE_NONE;
+}
 
 void QtCurveConfig::load(const KConfig *cfg, const char *grp)
 {
@@ -89,14 +103,12 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
     else
         READ_ENTRY(RoundBottom)
 
-    READ_ENTRY(OuterBorder)
-    if(itsBorderSize<BORDER_TINY)
-        itsInnerBorder=false;
-        
-    if(itsOuterBorder)
-        READ_ENTRY(InnerBorder)
+    itsOuterBorder=readShade(group, "OuterBorder");
+    if(itsBorderSize<BORDER_TINY || SHADE_NONE==itsOuterBorder)
+        itsInnerBorder=SHADE_NONE;
     else
-        itsInnerBorder=false;
+        itsInnerBorder=readShade(group, "InnerBorder");
+
     if(itsActiveOpacity<0 || itsActiveOpacity>100)
         itsActiveOpacity=100;
     if(itsInactiveOpacity<0 || itsInactiveOpacity>100)
@@ -119,8 +131,8 @@ void QtCurveConfig::save(KConfig *cfg, const char *grp)
     // compatible with QtCurve<1.4
     group.writeEntry("BorderSize", itsBorderSize);
     WRITE_ENTRY(RoundBottom)
-    WRITE_ENTRY(OuterBorder)
-    WRITE_ENTRY(InnerBorder)
+    group.writeEntry("OuterBorder", (int)itsOuterBorder);
+    group.writeEntry("InnerBorder", (int)itsInnerBorder);
     WRITE_ENTRY(BorderlessMax)
     WRITE_ENTRY(CustomShadows)
     WRITE_ENTRY(Grouping)

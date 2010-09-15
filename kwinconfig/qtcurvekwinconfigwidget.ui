@@ -67,32 +67,40 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QCheckBox" name="outerBorder">
-           <property name="whatsThis">
-            <string>If enabled, a 1 pixel dark border will be drawn around the outside of windows. This is useful if you are not using desktop effects.</string>
-           </property>
-           <property name="text">
-            <string>Draw dark outer border</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="innerBorder">
-           <property name="whatsThis">
-            <string>If enabled, a 1 pixel dark border will be drawn between the window contents and the decoration. This is useful if you are using transparent decorations.</string>
-           </property>
-           <property name="text">
-            <string>Draw dark inner border</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
           <widget class="QCheckBox" name="borderlessMax">
            <property name="whatsThis">
             <string>If enabled, all borders (including the titlebar) will be removed from maximised windows.</string>
            </property>
            <property name="text">
             <string>Remove from maximised windows</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="outerBorder_label">
+           <property name="text">
+            <string>Outer border:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="outerBorder">
+           <property name="whatsThis">
+            <string>Adds 1 pixel border around the outside of windows. This is useful if you are not using desktop effects.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="innerBorder_label">
+           <property name="text">
+            <string>Inner border:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="innerBorder">
+           <property name="whatsThis">
+            <string>Adds a 1 pixel dark border between the window contents and the decoration. This is useful if you are using transparent decorations.</string>
            </property>
           </widget>
          </item>
@@ -532,9 +540,9 @@
   <tabstop>tabWidget</tabstop>
   <tabstop>borderSize</tabstop>
   <tabstop>roundBottom</tabstop>
+  <tabstop>borderlessMax</tabstop>
   <tabstop>outerBorder</tabstop>
   <tabstop>innerBorder</tabstop>
-  <tabstop>borderlessMax</tabstop>
   <tabstop>grouping</tabstop>
   <tabstop>titleBarPad</tabstop>
   <tabstop>activeOpacity</tabstop>

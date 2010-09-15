@@ -26,6 +26,10 @@
 #include "common.h"
 #include "qtcurvekwinconfig.h"
 
+/*
+#define ENABLE_SHADE_SHADOW
+*/
+
 static void insertColorEntries(QComboBox *combo)
 {
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_FOCUS, i18n("Focus"));
@@ -47,6 +51,16 @@ static void insertSizeEntries(QComboBox *combo)
     combo->insertItem(KWinQtCurve::QtCurveConfig::BORDER_HUGE, i18n("Huge"));
     combo->insertItem(KWinQtCurve::QtCurveConfig::BORDER_VERY_HUGE, i18n("Very Huge"));
     combo->insertItem(KWinQtCurve::QtCurveConfig::BORDER_OVERSIZED, i18n("Oversized"));
+}
+
+static void insertShadeEntries(QComboBox *combo)
+{
+    combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_NONE, i18n("None"));
+    combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_DARK, i18n("Dark"));
+    combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_LIGHT, i18n("Light"));
+#ifdef ENABLE_SHADE_SHADOW
+    combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_SHADOW, i18n("Shadow"));
+#endif
 }
 
 static const char * constDBusService="org.kde.kcontrol.QtCurve";
@@ -77,18 +91,20 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
         insertSizeEntries(borderSize);
         insertColorEntries(activeShadowColorType);
         insertColorEntries(inactiveShadowColorType);
+        insertShadeEntries(outerBorder);
+        insertShadeEntries(innerBorder);
 
         load(0L);
         connect(borderSize, SIGNAL(currentIndexChanged(int)), this, SLOT(sizeChanged()));
         connect(roundBottom, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
-        connect(outerBorder, SIGNAL(toggled(bool)), this, SLOT(outerBorderChanged()));
-        connect(innerBorder, SIGNAL(toggled(bool)), this, SLOT(innerBorderChanged()));
+        connect(outerBorder, SIGNAL(currentIndexChanged(int)), this, SLOT(outerBorderChanged()));
+        connect(innerBorder, SIGNAL(currentIndexChanged(int)), this, SLOT(innerBorderChanged()));
         connect(borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
         connect(titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(edgePad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         titleBarPad->setRange(0, 10);
         edgePad->setRange(0, 10);
-        connect(useShadows, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
+        connect(useShadows, SIGNAL(toggled(bool)), this, SLOT(shadowsChanged()));
         connect(activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(activeShadowHOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(activeShadowVOffset, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
@@ -168,8 +184,8 @@ void QtCurveKWinConfig::save(KConfig *c)
 
     config.setBorderSize((KWinQtCurve::QtCurveConfig::Size)borderSize->currentIndex());
     config.setRoundBottom(roundBottom->isChecked());
-    config.setOuterBorder(outerBorder->isChecked());
-    config.setInnerBorder(innerBorder->isChecked());
+    config.setOuterBorder((KWinQtCurve::QtCurveConfig::Shade)outerBorder->currentIndex());
+    config.setInnerBorder((KWinQtCurve::QtCurveConfig::Shade)innerBorder->currentIndex());
     config.setBorderlessMax(borderlessMax->isChecked());
     config.setTitleBarPad(titleBarPad->value());
     config.setEdgePad(edgePad->value());
@@ -223,15 +239,38 @@ void QtCurveKWinConfig::defaults()
 
 void QtCurveKWinConfig::outerBorderChanged()
 {
-    if(!outerBorder->isChecked())
-        innerBorder->setChecked(false);
+    if(KWinQtCurve::QtCurveConfig::SHADE_NONE==outerBorder->currentIndex())
+        innerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_NONE);
+#ifdef ENABLE_SHADE_SHADOW
+    if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
+        useShadows->setChecked(true);
+#endif
     emit changed();
 }
 
 void QtCurveKWinConfig::innerBorderChanged()
 {
-    if(innerBorder->isChecked())
-        outerBorder->setChecked(true);
+    if(KWinQtCurve::QtCurveConfig::SHADE_NONE!=innerBorder->currentIndex() &&
+       KWinQtCurve::QtCurveConfig::SHADE_NONE==outerBorder->currentIndex())
+        outerBorder->setCurrentIndex(innerBorder->currentIndex());
+#ifdef ENABLE_SHADE_SHADOW
+    if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
+        useShadows->setChecked(true);
+#endif
+    emit changed();
+}
+
+void QtCurveKWinConfig::shadowsChanged()
+{
+#ifdef ENABLE_SHADE_SHADOW
+    if(!useShadows->isChecked())
+    {
+        if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
+            outerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_DARK);
+        if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==innerBorder->currentIndex())
+            innerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_DARK);
+    }
+#endif
     emit changed();
 }
 
@@ -259,8 +298,8 @@ void QtCurveKWinConfig::setWidgets(const KWinQtCurve::QtCurveConfig &cfg)
 {
     borderSize->setCurrentIndex(cfg.borderSize());
     roundBottom->setChecked(cfg.roundBottom());
-    outerBorder->setChecked(cfg.outerBorder());
-    innerBorder->setChecked(cfg.innerBorder());
+    outerBorder->setCurrentIndex(cfg.outerBorder());
+    innerBorder->setCurrentIndex(cfg.innerBorder());
     borderlessMax->setChecked(cfg.borderlessMax());
     titleBarPad->setValue(cfg.titleBarPad());
     edgePad->setValue(cfg.edgePad());
@@ -282,10 +321,11 @@ void QtCurveKWinConfig::setWidgetStates()
     else
         roundBottom->setEnabled(true);
 
-    if(!outerBorder->isChecked() || borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
+    if(KWinQtCurve::QtCurveConfig::SHADE_NONE==outerBorder->currentIndex() ||
+       borderSize->currentIndex()<KWinQtCurve::QtCurveConfig::BORDER_TINY)
     {
         innerBorder->setEnabled(false);
-        innerBorder->setChecked(false);
+        innerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_NONE);
     }
     else
         innerBorder->setEnabled(true);

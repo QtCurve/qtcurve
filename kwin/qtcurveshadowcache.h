@@ -55,6 +55,11 @@ class QtCurveShadowCache
     QtCurveShadowCache();
     virtual ~QtCurveShadowCache() { }
 
+    const QColor & color(bool active)
+    {
+        return active ? activeShadowConfiguration_.color() : inactiveShadowConfiguration_.color();
+    }
+    
     void invalidateCaches()
     {
         shadowCache_.clear();

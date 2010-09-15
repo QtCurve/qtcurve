@@ -518,12 +518,13 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     bool                 active(isActive()),
                          colorTitleOnly(windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY),
                          roundBottom(Handler()->roundBottom()),
-                         outerBorder(Handler()->outerBorder()),
                          preview(isPreview()),
                          blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
                          menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR),
                          separator(active && windowBorder&WINDOW_BORDER_SEPARATOR),
                          maximized(isMaximized());
+    QtCurveConfig::Shade outerBorder(Handler()->outerBorder()),
+                         innerBorder(Handler()->innerBorder());
     const int            border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -536,7 +537,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
                          opacity(compositing ? Handler()->opacity(active) : 100);
     EAppearance          bgndAppearance=getAppearance(windowId());
-    bool                 customBgnd=!IS_FLAT_BGND(bgndAppearance);
+    bool                 customBgnd=!IS_FLAT_BGND(bgndAppearance),
+                         customShadows=
+#if KDE_IS_VERSION(4, 3, 0)             
+                            Handler()->customShadows()
+#else
+                            false
+#endif
+                            ;
 
     painter.setClipRegion(e->region());
 
@@ -544,7 +552,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         opacity=getOpacityProperty(windowId());
     
 #if KDE_IS_VERSION(4, 3, 0)
-    if(Handler()->customShadows())
+    if(customShadows)
     {
         shadowSize=Handler()->shadowCache().shadowSize();
 
@@ -636,6 +644,15 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
     if(outerBorder)
     {
+#if KDE_IS_VERSION(4, 3, 0)
+        if(QtCurveConfig::SHADE_SHADOW==outerBorder && customShadows)
+        {
+            opt.version=2+TBAR_BORDER_VERSION_HACK;
+            opt.palette.setColor(QPalette::Shadow, Handler()->shadowCache().color(active));
+        }
+        else
+#endif
+            opt.version=(QtCurveConfig::SHADE_LIGHT==outerBorder ? 0 : 1)+TBAR_BORDER_VERSION_HACK;
         painter.save();
         painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
 #ifdef DRAW_INTO_PIXMAPS
@@ -704,12 +721,21 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 #endif
         Handler()->wStyle()->drawComplexControl(QStyle::CC_TitleBar, &opt, &painter, widget());
     
-    if(outerBorder && Handler()->innerBorder())
+    if(outerBorder && innerBorder)
     {
         QStyleOptionFrame frameOpt;
         int               side(layoutMetric(LM_BorderLeft)),
                           bot(layoutMetric(LM_BorderBottom));
 
+#if KDE_IS_VERSION(4, 3, 0)
+        if(QtCurveConfig::SHADE_SHADOW==innerBorder && customShadows)
+        {
+            opt.version=2+TBAR_BORDER_VERSION_HACK;
+            opt.palette.setColor(QPalette::Shadow, Handler()->shadowCache().color(active));
+        }
+        else
+#endif
+            opt.version=(QtCurveConfig::SHADE_LIGHT==innerBorder ? 0 : 1)+TBAR_BORDER_VERSION_HACK;
         frameOpt.palette=opt.palette;
         frameOpt.rect=widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot))
                                       .adjusted(-1, -1, 1, 1);

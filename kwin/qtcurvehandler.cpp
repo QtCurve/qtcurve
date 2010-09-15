@@ -289,7 +289,8 @@ bool QtCurveHandler::readConfig(bool compositingToggled)
     static bool borderHack=false;
     if(borderHack)
     {
-        itsConfig.setOuterBorder(!KWindowSystem::compositingActive());
+    itsConfig.setOuterBorder(KWindowSystem::compositingActive() ? QtCurveConfig::SHADE_NONE :
+                             (itsConfig.customShadows() ? QtCurveConfig::SHADE_SHADOW : QtCurveConfig::SHADE_DARK));
         changedBorder=true;
         borderHack=false;
     }

@@ -501,7 +501,8 @@ typedef enum
     NUM_TITLEBAR_BUTTONS
 } ETitleBarButtons;
 
-#define TBAR_VERSION_HACK 65535
+#define TBAR_VERSION_HACK        65535
+#define TBAR_BORDER_VERSION_HACK (TBAR_VERSION_HACK+1000)
 
 typedef std::map<int, QColor> TBCols;
 #endif

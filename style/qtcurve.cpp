@@ -3968,17 +3968,23 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 }
                 else if((QtC_StateKWin==state || (QtC_StateKWin|State_Active)==state) && fo && 1==fo->lineWidth && 1==fo->midLineWidth)
                 {
-                    const QColor *borderCols(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
-                                                ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
-                                                : theThemedApp==APP_KWIN
-                                                    ? buttonColors(option)
-                                                    : getMdiColors(option, state&State_Active));
-                    QColor        dark(borderCols[STD_BORDER]);
+                    QColor border;
+                    if(fo->version==(TBAR_BORDER_VERSION_HACK+2))
+                        border=palette.color(QPalette::Active, QPalette::Shadow);
+                    else
+                    {
+                        const QColor *borderCols(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY
+                                                    ? backgroundColors(palette.color(QPalette::Active, QPalette::Window))
+                                                    : theThemedApp==APP_KWIN
+                                                        ? buttonColors(option)
+                                                        : getMdiColors(option, state&State_Active));
+                        border=borderCols[fo->version==TBAR_BORDER_VERSION_HACK ? 0 : STD_BORDER];
+                    }
 
-                    dark.setAlphaF(1.0);
+                    border.setAlphaF(1.0);
                     painter->save();
                     painter->setRenderHint(QPainter::Antialiasing, false);
-                    painter->setPen(dark);
+                    painter->setPen(border);
                     drawRect(painter, r);
                     painter->restore();
                 }
@@ -4887,7 +4893,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                             ? buttonColors(option)
                                             : getMdiColors(option, state&State_Active));
             QColor       light(borderCols[0]),
-                         dark(borderCols[STD_BORDER]);
+                         dark(option->version==(TBAR_BORDER_VERSION_HACK+2)
+                                ? palette.color(QPalette::Active, QPalette::Shadow)
+                                : borderCols[option && option->version==TBAR_BORDER_VERSION_HACK ? 0 : STD_BORDER]);
             bool         isKWin=state&QtC_StateKWin,
                          addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!isKWin || qtcGetWindowBorderSize().sides>1);
 
@@ -8319,6 +8327,9 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QStyleOption opt(*option);
                 QRect        tr(r);
                 ERound       round=(opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round;
+                QColor       borderCol(kwin && option->version==(TBAR_BORDER_VERSION_HACK+2)
+                                        ? palette.color(QPalette::Active, QPalette::Shadow)
+                                        : titleCols[kwin && option->version==TBAR_BORDER_VERSION_HACK ? 0 : STD_BORDER]);
 
                 if(!kwin && widget && BLEND_TITLEBAR && qobject_cast<const QMdiSubWindow *>(widget))
                 {
@@ -8353,7 +8364,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #endif
 #endif
                 if(!kwin && !CUSTOM_BGND)
-                    painter->fillRect(tr, titleCols[STD_BORDER]);
+                    painter->fillRect(tr, borderCol);
                 
                 painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -8366,7 +8377,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 if(!(state&QtC_StateKWinNoBorder))
                 {
                     QColor light(titleCols[0]),
-                           dark(titleCols[STD_BORDER]);
+                           dark(borderCol);
                     bool   addLight=opts.windowBorder&WINDOW_BORDER_ADD_LIGHT_BORDER && (!kwin || qtcGetWindowBorderSize().sides>1);
 
                     if(kwin)

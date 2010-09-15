@@ -56,6 +56,7 @@ class QtCurveKWinConfig : public QWidget, public Ui::QtCurveKWinConfigWidget
     void defaults();
     void outerBorderChanged();
     void innerBorderChanged();
+    void shadowsChanged();
     void activeShadowColorTypeChanged();
     void inactiveShadowColorTypeChanged();
     void sizeChanged();

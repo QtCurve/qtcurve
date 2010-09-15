@@ -98,8 +98,8 @@ class QtCurveHandler : public QObject,
     int                   borderSize(bool bot=false) const;
     bool                  showResizeGrip() const     { return QtCurveConfig::BORDER_NONE==itsConfig.borderSize(); }
     bool                  roundBottom() const        { return itsConfig.roundBottom() && itsConfig.borderSize()>QtCurveConfig::BORDER_NONE; }
-    bool                  outerBorder() const        { return itsConfig.outerBorder(); }
-    bool                  innerBorder() const        { return itsConfig.innerBorder(); }
+    QtCurveConfig::Shade  outerBorder() const        { return itsConfig.outerBorder(); }
+    QtCurveConfig::Shade  innerBorder() const        { return itsConfig.innerBorder(); }
     QStyle *              wStyle() const             { return itsStyle ? itsStyle : QApplication::style(); }
     int                   borderEdgeSize() const;
     int                   titleBarPad() const        { return itsConfig.titleBarPad(); }
