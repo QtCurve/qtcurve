@@ -244,6 +244,8 @@ static void fillBackground(EAppearance app, QPainter &painter, const QColor &col
         opt.path=path;
         Handler()->wStyle()->drawPrimitive(QtC_PE_DrawBackground, &opt, &painter, NULL);
     }
+    else if(path.isEmpty())
+        painter.fillRect(r, col);
     else
         painter.fillPath(path, col);
 }
@@ -520,7 +522,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          preview(isPreview()),
                          blend(!preview && Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_BlendMenuAndTitleBar, NULL, NULL)),
                          menuColor(windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR),
-                         separator(active && windowBorder&WINDOW_BORDER_SEPARATOR);
+                         separator(active && windowBorder&WINDOW_BORDER_SEPARATOR),
+                         maximized(isMaximized());
     const int            border(Handler()->borderEdgeSize()),
                          titleHeight(layoutMetric(LM_TitleHeight)),
                          titleEdgeTop(layoutMetric(LM_TitleEdgeTop)),
@@ -602,22 +605,22 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             fillCol.setAlphaF(alpha);
     }
 
-    QRect fillRect(r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0));
+    QRect fillRect(r.adjusted(0, maximized ? -Handler()->borderEdgeSize() : 0, 0, 0));
 
     painter.setRenderHint(QPainter::Antialiasing, true);
-    if(outerBorder)
+    if(outerBorder && !maximized)
     {
         painter.save();
         painter.setClipRegion(getMask(round, r));
     }
     fillBackground(bgndAppearance, painter, fillCol, fillRect,
-                   createPath(fillRect, round>ROUND_SLIGHT, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom));
-    if(outerBorder)
+                   maximized || round<=ROUND_SLIGHT ? QPainterPath() : createPath(fillRect, true, true, roundBottom));
+    if(outerBorder && !maximized)
         painter.restore();
 
     opt.init(widget());
 
-    if(isMaximized())
+    if(maximized)
         r.adjust(-3, -border, 3, 0);
     opt.palette.setColor(QPalette::Button, col);
     opt.palette.setColor(QPalette::Window, windowCol);
@@ -719,7 +722,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     {
         int hOffset=2,
             vOffset=hOffset+(outerBorder ? 1 :0),
-            posAdjust=isMaximized() || outerBorder ? 2 : 0,
+            posAdjust=maximized || outerBorder ? 2 : 0,
             edgePad=Handler()->edgePad();
         
         if(buttonsLeftWidth()>(titleBarHeight-2*hOffset))
@@ -848,7 +851,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                     }
 
                     int     offset=2,
-                            posAdjust=isMaximized() ? 2 : 0;
+                            posAdjust=maximized ? 2 : 0;
                     QRect   cr(onLeft
                                 ? r.left()+buttonsLeftWidth()+posAdjust+constTitlePad+2
                                 : r.right()-(buttonsRightWidth()+posAdjust+constTitlePad+2+
