@@ -237,6 +237,7 @@ void QtCurveKWinConfig::outerBorderChanged()
         innerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_NONE);
     if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
         useShadows->setChecked(true);
+    setWidgetStates();
     emit changed();
 }
 
