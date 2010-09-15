@@ -651,7 +651,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         if(QtCurveConfig::SHADE_SHADOW==outerBorder && customShadows)
         {
             opt.version=2+TBAR_BORDER_VERSION_HACK;
-            opt.palette.setColor(QPalette::Shadow, Handler()->shadowCache().color(active));
+            opt.palette.setColor(QPalette::Shadow, blendColors(Handler()->shadowCache().color(active), windowCol, active ? 0.75 : 0.4));
         }
         else
 #endif
@@ -730,16 +730,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         int               side(layoutMetric(LM_BorderLeft)),
                           bot(layoutMetric(LM_BorderBottom));
 
+        frameOpt.palette=opt.palette;
 #if KDE_IS_VERSION(4, 3, 0)
         if(QtCurveConfig::SHADE_SHADOW==innerBorder && customShadows)
         {
-            opt.version=2+TBAR_BORDER_VERSION_HACK;
-            opt.palette.setColor(QPalette::Shadow, Handler()->shadowCache().color(active));
+            frameOpt.version=2+TBAR_BORDER_VERSION_HACK;
+            frameOpt.palette.setColor(QPalette::Shadow, blendColors(Handler()->shadowCache().color(active), windowCol, active ? 0.75 : 0.4));
         }
         else
 #endif
-            opt.version=(QtCurveConfig::SHADE_LIGHT==innerBorder ? 0 : 1)+TBAR_BORDER_VERSION_HACK;
-        frameOpt.palette=opt.palette;
+            frameOpt.version=(QtCurveConfig::SHADE_LIGHT==innerBorder ? 0 : 1)+TBAR_BORDER_VERSION_HACK;
         frameOpt.rect=widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot))
                                       .adjusted(-1, -1, 1, 1);
         frameOpt.state=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;

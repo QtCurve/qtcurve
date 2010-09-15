@@ -26,10 +26,6 @@
 #include "common.h"
 #include "qtcurvekwinconfig.h"
 
-/*
-#define ENABLE_SHADE_SHADOW
-*/
-
 static void insertColorEntries(QComboBox *combo)
 {
     combo->insertItem(KWinQtCurve::QtCurveShadowConfiguration::CT_FOCUS, i18n("Focus"));
@@ -58,9 +54,7 @@ static void insertShadeEntries(QComboBox *combo)
     combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_NONE, i18n("None"));
     combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_DARK, i18n("Dark"));
     combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_LIGHT, i18n("Light"));
-#ifdef ENABLE_SHADE_SHADOW
     combo->insertItem(KWinQtCurve::QtCurveConfig::SHADE_SHADOW, i18n("Shadow"));
-#endif
 }
 
 static const char * constDBusService="org.kde.kcontrol.QtCurve";
@@ -241,10 +235,8 @@ void QtCurveKWinConfig::outerBorderChanged()
 {
     if(KWinQtCurve::QtCurveConfig::SHADE_NONE==outerBorder->currentIndex())
         innerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_NONE);
-#ifdef ENABLE_SHADE_SHADOW
     if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
         useShadows->setChecked(true);
-#endif
     emit changed();
 }
 
@@ -253,16 +245,13 @@ void QtCurveKWinConfig::innerBorderChanged()
     if(KWinQtCurve::QtCurveConfig::SHADE_NONE!=innerBorder->currentIndex() &&
        KWinQtCurve::QtCurveConfig::SHADE_NONE==outerBorder->currentIndex())
         outerBorder->setCurrentIndex(innerBorder->currentIndex());
-#ifdef ENABLE_SHADE_SHADOW
     if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
         useShadows->setChecked(true);
-#endif
     emit changed();
 }
 
 void QtCurveKWinConfig::shadowsChanged()
 {
-#ifdef ENABLE_SHADE_SHADOW
     if(!useShadows->isChecked())
     {
         if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==outerBorder->currentIndex())
@@ -270,7 +259,6 @@ void QtCurveKWinConfig::shadowsChanged()
         if(KWinQtCurve::QtCurveConfig::SHADE_SHADOW==innerBorder->currentIndex())
             innerBorder->setCurrentIndex(KWinQtCurve::QtCurveConfig::SHADE_DARK);
     }
-#endif
     emit changed();
 }
 
