@@ -3,7 +3,7 @@
 1. Fix light border on kwin titlebars when using background opacity
    and gradients.
 2. Dont add light border to kwin titlebars if not using side borders.
-3. Add option to use light or dark for outer and inner kwin borders.
+3. Add option to use light, dark, or shadow for outer and inner kwin borders.
 
 1.6.1
 -----
