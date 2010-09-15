@@ -137,45 +137,39 @@ EAppearance getAppearance(WId wId)
     return app<0 || app>APPEARANCE_STRIPED ? APPEARANCE_FLAT : (EAppearance)app;
 }
 
-static QPainterPath createPath(const QRectF &r, double radius, bool roundTop, bool roundBot)
+static QPainterPath createPath(const QRectF &r, double radiusTop, double radiusBot)
 {
     QPainterPath path;
-    double       diameter(radius*2);
+    double       diameterTop(radiusTop*2),
+                 diameterBot(radiusBot*2);
 
-    if (roundBot)
-        path.moveTo(r.x()+r.width(), r.y()+r.height()-radius);
+    if (radiusBot>1.0)
+        path.moveTo(r.x()+r.width(), r.y()+r.height()-radiusBot);
     else
         path.moveTo(r.x()+r.width(), r.y()+r.height());
 
-    if (roundTop)
-        path.arcTo(r.x()+r.width()-diameter, r.y(), diameter, diameter, 0, 90);
+    if (radiusTop>1.0)
+        path.arcTo(r.x()+r.width()-diameterTop, r.y(), diameterTop, diameterTop, 0, 90);
     else
         path.lineTo(r.x()+r.width(), r.y());
 
-    if (roundTop)
-        path.arcTo(r.x(), r.y(), diameter, diameter, 90, 90);
+    if (radiusTop>1.0)
+        path.arcTo(r.x(), r.y(), diameterTop, diameterTop, 90, 90);
     else
         path.lineTo(r.x(), r.y());
 
-    if (roundBot)
-        path.arcTo(r.x(), r.y()+r.height()-diameter, diameter, diameter, 180, 90);
+    if (radiusBot>1.0)
+        path.arcTo(r.x(), r.y()+r.height()-diameterBot, diameterBot, diameterBot, 180, 90);
     else
         path.lineTo(r.x(), r.y()+r.height());
 
-    if (roundBot)
-        path.arcTo(r.x()+r.width()-diameter, r.y()+r.height()-diameter, diameter, diameter, 270, 90);
+    if (radiusBot>1.0)
+        path.arcTo(r.x()+r.width()-diameterBot, r.y()+r.height()-diameterBot, diameterBot, diameterBot, 270, 90);
     else
         path.lineTo(r.x()+r.width(), r.y()+r.height());
 
     return path;
 }
-
-#if KDE_IS_VERSION(4, 3, 0)
-static QPainterPath createPath(const QRect &r, bool fullRound, bool roundTop, bool roundBot)
-{
-    return createPath(QRectF(r), (fullRound ? 6.0 : 2.0), roundTop, roundBot);
-}
-#endif
 
 static void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &bgnd, bool circular, int round)
 {
@@ -186,7 +180,7 @@ static void drawSunkenBevel(QPainter *p, const QRect &r, const QColor &bgnd, boo
                                 : round>ROUND_SLIGHT
                                     ? 3.0
                                     : 2.0;
-    QPainterPath    path(createPath(QRectF(r), radius, true, true));
+    QPainterPath    path(createPath(QRectF(r), radius, radius));
     QLinearGradient g(r.topLeft(), r.bottomLeft());
     QColor          black(Qt::black),
                     white(Qt::white);
@@ -613,10 +607,15 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             fillCol.setAlphaF(alpha);
     }
 
+    opt.init(widget());
+    opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
+             (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
+
     QRect fillRect(r.adjusted(0, maximized ? -Handler()->borderEdgeSize() : 0, 0, 0));
+    bool  clipRegion((outerBorder || round<=ROUND_SLIGHT) && !maximized);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
-    if(outerBorder && !maximized)
+    if(clipRegion)
     {
         painter.save();
         painter.setClipRegion(getMask(round, r));
@@ -625,19 +624,20 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.setClipRect(r, Qt::IntersectClip);
 
     fillBackground(bgndAppearance, painter, fillCol, fillRect,
-                   maximized || round<=ROUND_SLIGHT ? QPainterPath() : createPath(fillRect, true, true, roundBottom));
-    if(outerBorder && !maximized)
-        painter.restore();
+                   maximized || round<=ROUND_SLIGHT
+                    ? QPainterPath() 
+                    : createPath(QRectF(fillRect), APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp, &opt, NULL) ? 6.0 : 8.0, 
+                                 roundBottom ? 6.0 : 1.0));
 
-    opt.init(widget());
+    if(clipRegion)
+        painter.restore();
 
     if(maximized)
         r.adjust(-3, -border, 3, 0);
     opt.palette.setColor(QPalette::Button, col);
     opt.palette.setColor(QPalette::Window, windowCol);
     opt.rect=QRect(r.x(), r.y()+6, r.width(), r.height()-6);
-    opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
-             (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
+
 
     if(!roundBottom)
         opt.state|=QtC_StateKWinNotFull;

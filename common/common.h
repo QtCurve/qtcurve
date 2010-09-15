@@ -427,7 +427,8 @@ typedef enum
     QtC_ToggleButtons,
     QtC_MenubarColor,
     QtC_WindowBorder,
-    QtC_CustomBgnd
+    QtC_CustomBgnd,
+    QtC_TitleBarApp
 } QtCMetrics;
 
 #define QtC_StateKWin            ((QStyle::StateFlag)0x10000000)

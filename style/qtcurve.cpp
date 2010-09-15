@@ -3158,6 +3158,8 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                    (opts.statusbarHiding&HIDE_KWIN ? 0x2 : 0);
         case QtC_MenubarColor:
             return itsMenubarCols[ORIGINAL_SHADE].rgb();
+        case QtC_TitleBarApp:
+            return !option || option->state&State_Active ? opts.titlebarAppearance : opts.inactiveTitlebarAppearance;
 // The following is a somewhat hackyish fix for konqueror's show close button on tab setting...
 // ...its hackish in the way that I'm assuming when KTabBar is positioning the close button and it
 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
