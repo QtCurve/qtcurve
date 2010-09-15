@@ -5171,7 +5171,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     int    opacity(col.alphaF()*100);
 
                     col.setAlphaF(1.0);
-                    drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app);
+                    drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app, bgnd->path);
                 }
             break;
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
@@ -11039,7 +11039,8 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
     return pix;
 }
 
-void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app) const
+void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app,
+                          const QPainterPath &path) const
 {
     bool isWindow(BGND_MENU!=type);
 
@@ -11074,15 +11075,21 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 
                 QPainter pixPainter(&pix);
 
-                drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()),
-                                        GT_HORIZ==grad, false, app, WIDGET_OTHER);
+                drawBevelGradientReal(col, &pixPainter, QRect(0, 0, pix.width(), pix.height()), GT_HORIZ==grad, false, app, WIDGET_OTHER);
                 pixPainter.end();
                 if(itsUsePixmapCache)
                     QPixmapCache::insert(key, pix);
             }
         }
 
-        p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+        if(path.isEmpty())
+            p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+        else
+        {
+            p->setBrushOrigin(r.x(), r.y());
+            p->fillPath(path,
+                        QBrush(APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
+        }
         
         if(isWindow && APPEARANCE_STRIPED!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
         {
@@ -11125,7 +11132,13 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 
         if(100!=opacity)
             col.setAlphaF(opacity/100.0);
-        p->fillRect(r, col);
+        if(path.isEmpty())
+            p->fillRect(r, col);
+        else
+        {
+            p->setBrushOrigin(r.x(), r.y());
+            p->fillPath(path, col);
+        }
     }
 }
 

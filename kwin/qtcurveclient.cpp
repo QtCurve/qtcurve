@@ -173,8 +173,7 @@ static QPainterPath createPath(const QRectF &r, double radius, bool roundTop, bo
 #if KDE_IS_VERSION(4, 3, 0)
 static QPainterPath createPath(const QRect &r, bool fullRound, bool inner, bool roundTop, bool roundBot)
 {
-    return createPath(QRectF(inner ? r.adjusted(1, 1, -1, -1) : r).adjusted(0, 0, -1, -1),
-                      (fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0), roundTop, roundBot).translated(0.5, 0.5);
+    return createPath(QRectF(r), (fullRound ? 6.0 : 2.0) - (inner ? 1.0 : 0.0), roundTop, roundBot);
 }
 #endif
 
@@ -233,15 +232,8 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 }
 #endif
 
-static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &r,
-                           const QPainterPath path=QPainterPath(), const QRegion &mask=QRegion())
+static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &r, const QPainterPath path)
 {
-    if(!path.isEmpty())
-    {
-        painter.setPen(col);
-        painter.drawPath(path);
-    }
-            
     if(!IS_FLAT_BGND(app))
     {
         QtCurve::Style::BgndOption opt;
@@ -249,17 +241,9 @@ static void fillBackground(EAppearance app, QPainter &painter, const QColor &col
         opt.rect=r;
         opt.palette.setColor(QPalette::Window, col);
         opt.app=app;
-        if(!mask.isEmpty())
-        {
-            painter.save();
-            painter.setClipRegion(mask, Qt::IntersectClip);
-        }
+        opt.path=path;
         Handler()->wStyle()->drawPrimitive(QtC_PE_DrawBackground, &opt, &painter, NULL);
-        if(!mask.isEmpty())
-            painter.restore();
     }
-    else if(path.isEmpty())
-        painter.fillRect(r, col);
     else
         painter.fillPath(path, col);
 }
@@ -618,21 +602,11 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             fillCol.setAlphaF(alpha);
     }
 
-    if(isMaximized())
-        painter.setClipRect(r, Qt::IntersectClip);
-    else
-#if KDE_IS_VERSION(4, 3, 0)
-        if(!compositing && !preview)
-#endif
-        painter.setClipRegion(getMask(round, r), Qt::IntersectClip);
-
     QRect fillRect(r.adjusted(0, isMaximized() ? -Handler()->borderEdgeSize() : 0, 0, 0));
 
     painter.setRenderHint(QPainter::Antialiasing, true);
-    fillBackground(bgndAppearance, painter, fillCol, fillRect, customBgnd && outerBorder
-                        ? QPainterPath()
-                        : createPath(fillRect, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom),
-                   customBgnd ? getMask(round, fillRect) : QRegion());
+    fillBackground(bgndAppearance, painter, fillCol, fillRect,
+                   createPath(fillRect, round>ROUND_SLIGHT, outerBorder, round>ROUND_SLIGHT, round>ROUND_SLIGHT && roundBottom));
 
     opt.init(widget());
 

@@ -95,7 +95,8 @@ class Style : public QCommonStyle
     {
         public:
 
-        EAppearance app;
+        EAppearance  app;
+        QPainterPath path;
     };
 
     enum Icon
@@ -186,7 +187,8 @@ class Style : public QCommonStyle
     void drawEtch(QPainter *p, const QRect &r,  const QWidget *widget, EWidget w, bool raised=false, int round=ROUNDED_ALL) const;
     void drawBgndRing(QPainter &painter, int x, int y, int size, int size2, bool isWindow) const;
     QPixmap drawStripes(const QColor &color, int opacity) const;
-    void drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app) const;
+    void drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app,
+                        const QPainterPath &path=QPainterPath()) const;
     void drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
