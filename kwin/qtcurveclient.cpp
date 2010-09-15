@@ -621,6 +621,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         painter.save();
         painter.setClipRegion(getMask(round, r));
     }
+    else if(maximized)
+        painter.setClipRect(r, Qt::IntersectClip);
+
     fillBackground(bgndAppearance, painter, fillCol, fillRect,
                    maximized || round<=ROUND_SLIGHT ? QPainterPath() : createPath(fillRect, true, true, roundBottom));
     if(outerBorder && !maximized)
