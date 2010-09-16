@@ -1390,6 +1390,9 @@ void Style::polish(QApplication *app)
         }
         opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
         opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
+        if(!IS_FLAT_BGND(opts.menuBgndAppearance) && 0==opts.lighterPopupMenuBgnd)
+            opts.lighterPopupMenuBgnd=1; // shade so that we dont have 3d-ish borders...
+        opts.menuBgndAppearance=APPEARANCE_FLAT;
     }
 
 #ifndef QTC_QT_ONLY
