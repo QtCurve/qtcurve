@@ -4,10 +4,13 @@ Size=35
 [KWin]
 BorderSize=3
 CustomShadows=true
-EdgePad=1
+EdgePad=0
 Grouping=false
 OpaqueBorder=false
-OuterBorder=true
+OuterBorder=2
+InnerBorder=0
+RoundBottom=true
+TitleBarPad=0
 
 [Settings]
 customAlphas=0.4,0.1
@@ -161,7 +164,7 @@ useHighlightForMenu=false
 useQtFileDialogApps=googleearth-bin
 vArrows=true
 version=1.6.1
-windowBorder=5
+windowBorder=1
 windowDrag=3
 xCheck=false
 xbar=false
