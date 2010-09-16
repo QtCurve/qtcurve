@@ -96,7 +96,7 @@ QtCurveKWinConfig::QtCurveKWinConfig(KConfig *config, QWidget *parent)
         connect(borderlessMax, SIGNAL(toggled(bool)), this, SIGNAL(changed()));
         connect(titleBarPad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
         connect(edgePad, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
-        titleBarPad->setRange(0, 10);
+        titleBarPad->setRange(-5, 10);
         edgePad->setRange(0, 10);
         connect(useShadows, SIGNAL(toggled(bool)), this, SLOT(shadowsChanged()));
         connect(activeShadowSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));

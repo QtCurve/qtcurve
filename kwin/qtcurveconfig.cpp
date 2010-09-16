@@ -94,7 +94,7 @@ void QtCurveConfig::load(const KConfig *cfg, const char *grp)
     READ_ENTRY(OpaqueBorder)
     READ_ENTRY(EdgePad)
 
-    if(itsTitleBarPad<0 || itsTitleBarPad>10)
+    if(itsTitleBarPad<-5 || itsTitleBarPad>10)
         itsTitleBarPad=0;
     if(itsEdgePad<0 || itsEdgePad>10)
         itsEdgePad=0;

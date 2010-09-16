@@ -6,6 +6,7 @@
 3. Add option to use light, dark, or shadow for outer and inner kwin borders.
 4. Write tooltipAppearance setting to config file!
 5. Always used flat menus for OpenOffice.org
+6. Allow to specify titlebar pad in the range -5 to +10
 
 1.6.1
 -----
