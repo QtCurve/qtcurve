@@ -3127,6 +3127,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_APPEARANCE_ENTRY(grooveAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_APPEARANCE_ENTRY(sunkenAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_APPEARANCE_ENTRY(sbarBgndAppearance, APP_ALLOW_BASIC)
+        CFG_WRITE_APPEARANCE_ENTRY(tooltipAppearance, APP_ALLOW_BASIC)
         CFG_WRITE_ENTRY(sliderFill)
         CFG_WRITE_ENTRY(progressGrooveColor)
         CFG_WRITE_ENTRY(focus)

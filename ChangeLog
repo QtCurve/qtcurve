@@ -4,6 +4,7 @@
    and gradients.
 2. Dont add light border to kwin titlebars if not using side borders.
 3. Add option to use light, dark, or shadow for outer and inner kwin borders.
+4. Write tooltipAppearance setting to config file!
 
 1.6.1
 -----
