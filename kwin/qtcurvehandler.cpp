@@ -271,14 +271,14 @@ bool QtCurveHandler::readConfig(bool compositingToggled)
     bool               changedBorder=false;
 
     // The title should stretch with bigger font sizes!
-    itsTitleHeight = qMax(20, fm.height() + 4); // 4 px for the shadow etc.
+    itsTitleHeight = qMax(16, fm.height() + 4); // 4 px for the shadow etc.
     // have an even title/button size so the button icons are fully centered...
     if (itsTitleHeight%2 == 0)
         itsTitleHeight++;
 
     fm = QFontMetrics(itsTitleFontTool);  // active font = inactive font
     // The title should stretch with bigger font sizes!
-    itsTitleHeightTool = qMax(18, fm.height()); // don't care about the shadow etc.
+    itsTitleHeightTool = qMax(13, fm.height()); // don't care about the shadow etc.
     // have an even title/button size so the button icons are fully centered...
     if (itsTitleHeightTool%2 == 0)
         itsTitleHeightTool++;

@@ -9,6 +9,7 @@
 6. Allow to specify titlebar pad in the range -5 to +10
 7. Calculate font size to use for hide menu/status bar kwin buttons based
    upon button height. If too small,do not draw border.
+8. Restore the minimum titlebar heights to thos of the 1.5 release.
 
 1.6.1
 -----
