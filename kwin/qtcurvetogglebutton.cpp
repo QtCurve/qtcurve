@@ -26,12 +26,19 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QTimer>
+#include <QX11Info>
 #include <KDE/KLocale>
 #include "qtcurveclient.h"
 #include "common.h"
 
+#include <stdio.h>
 namespace KWinQtCurve
 {
+
+static int point2Pixel(double point)
+{
+    return (int)(((point*QX11Info::appDpiY())/72.0)+0.5);
+}
 
 QtCurveToggleButton::QtCurveToggleButton(bool menubar, QtCurveClient *parent)
                    : KCommonDecorationButton(AboveButton, parent),
@@ -94,10 +101,29 @@ void QtCurveToggleButton::drawButton(QPainter *painter)
     painter->setPen(col);
     r.adjust(1, 1, -1, -1);
 
+    QFont font(Handler()->titleFont());
+    int   maxPixelSize=r.height()-2,
+          fontPixelSize=font.pixelSize();
+    bool  drawBorder=true;
+
+    if(maxPixelSize<9)
+    {
+        maxPixelSize=r.height()+2;
+        drawBorder=false;
+        r.adjust(-1, -1, 1, 1);
+    }
+
+    if(-1==fontPixelSize)
+        fontPixelSize=point2Pixel(font.pointSizeF());
+
+    if(fontPixelSize>maxPixelSize)
+        font.setPixelSize(maxPixelSize-2);
+    painter->setFont(font);
+
     QRectF       ellipse(r.x()+0.5, r.y()+0.5, r.width(), r.height());
     QColor       bgnd(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
     QPainterPath path;
-    EEffect      effect((EEffect)(style()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
+//    EEffect      effect((EEffect)(style()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
 
     bgnd.setAlphaF(itsHover ? 0.9 : 0.4);
     path.addEllipse(ellipse);
@@ -108,12 +134,12 @@ void QtCurveToggleButton::drawButton(QPainter *painter)
         bgnd.setAlphaF(0.2);
         painter->fillPath(path, bgnd);
     }
-    painter->drawEllipse(ellipse);
+    if(drawBorder)
+        painter->drawEllipse(ellipse);
 
-    if(EFFECT_ETCH==effect)
-        effect=EFFECT_SHADOW;
+//    if(EFFECT_ETCH==effect)
+//        effect=EFFECT_SHADOW;
 
-    painter->setFont(Handler()->titleFont());
     if(sunken)
         r.adjust(1, 1, 1, 1);
 //     else if (EFFECT_NONE!=effect && itsHover)

@@ -7,6 +7,8 @@
 4. Write tooltipAppearance setting to config file!
 5. Always used flat menus for OpenOffice.org
 6. Allow to specify titlebar pad in the range -5 to +10
+7. Calculate font size to use for hide menu/status bar kwin buttons based
+   upon button height. If too small,do not draw border.
 
 1.6.1
 -----
