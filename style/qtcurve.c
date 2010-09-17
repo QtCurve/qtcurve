@@ -480,9 +480,10 @@ static gboolean isEvolutionListViewHeader(GtkWidget *widget, const gchar *detail
     return GTK_APP_EVOLUTION==qtSettings.app &&
            widget && widget->parent && widget->parent->parent && DETAIL("button") &&
            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget)), "ECanvas") &&
-           (0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "ETree") ||
-            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "ETable"));
-
+           /*(0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "ETree") ||
+            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "MessageList") ||
+            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget->parent)), "ETable")) &&*/
+           GTK_IS_SCROLLED_WINDOW(widget->parent->parent);
 }
 
 static gboolean isOnListViewHeader(GtkWidget *w, int level)
