@@ -1,4 +1,5 @@
 gtk-menu-images = 1
+gtk-fallback-icon-theme="gnome"
 
 style "qtcurve-default"
 {

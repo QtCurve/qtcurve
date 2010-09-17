@@ -2440,7 +2440,7 @@ static gboolean qtInit()
 
             if(opts.mapKdeIcons && qtSettings.icons)
             {
-                static const char *constFormat="gtk-icon-theme-name=\"%s\" gtk-fallback-icon-theme=\"hicolor\"";
+                static const char *constFormat="gtk-icon-theme-name=\"%s\"";
                 tmpStr=(char *)realloc(tmpStr, strlen(constFormat)+strlen(qtSettings.icons)+1);
 
                 sprintf(tmpStr, constFormat, qtSettings.icons);

@@ -1,3 +1,9 @@
+1.6.2
+-----
+1. Theme evolution's headers as headers, and not buttons.
+2. Set fallback icon theme to gnome instead of hicolor. This helps with some
+   missing icons in evolution.
+
 1.6.1
 -----
 1. Add option to have rounded popup menus.
@@ -9,7 +15,6 @@
 7. Simplify faded menu item code.
 8. Dont use gtk_style_apply_default_background for resize widgets - messes up
    translucency!
-9. Theme evolution's headers as headers, and not buttons.
 
 1.6.0
 -----
