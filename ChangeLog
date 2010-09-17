@@ -10,6 +10,9 @@
 7. Calculate font size to use for hide menu/status bar kwin buttons based
    upon button height. If too small, do not draw border.
 8. Restore the minimum titlebar heights to those of the 1.5 release.
+9. When reading in shadow configuration, actually set the correct items! Custom
+   shadows was always defaulting to using 'focus' colour, no matter what was in
+   the config file!
 
 1.6.1
 -----

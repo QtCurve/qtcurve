@@ -80,6 +80,8 @@ void QtCurveShadowConfiguration::setColorType(ColorType ct)
         case CT_GRAY:
             itsColor = QColor("#393835");
             break;
+        case CT_CUSTOM:
+            break;
     }
 }
 
@@ -107,6 +109,7 @@ void QtCurveShadowConfiguration::load(KConfig *cfg)
         itsHOffset=def.horizontalOffset();
     if(itsVOffset<MIN_OFFSET || itsVOffset>MAX_OFFSET)
         itsVOffset=def.verticalOffset();
+    setColorType((ColorType)itsColorType);
 }
 
 #define WRITE_ENTRY(ENTRY) \
