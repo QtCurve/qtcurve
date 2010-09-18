@@ -80,8 +80,9 @@ class Style : public QCommonStyle
     
     enum CustomElements
     {
-        CE_QtC_KCapacityBar = CE_CustomBase+0xFFFF00,
-        CE_QtC_Preview
+        CE_QtC_KCapacityBar = CE_CustomBase+0x00FFFF00,
+        CE_QtC_Preview,
+        CE_QtC_SetOptions
     };
 
     class PreviewOption : public QStyleOption
@@ -116,8 +117,10 @@ class Style : public QCommonStyle
 
 #ifdef QTC_STYLE_SUPPORT
     Style(const QString &name=QString());
+    void init(const QString &name=QString());
 #else
     Style();
+    void init();
 #endif
     ~Style();
 

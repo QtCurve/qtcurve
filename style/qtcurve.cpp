@@ -918,6 +918,28 @@ Style::Style()
         itsWindowManager(new WindowManager(this)),
         itsBlurHelper(new BlurHelper(this))
 {
+    const char *env=getenv(QTCURVE_PREVIEW_CONFIG);
+    if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG))
+    {
+        // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
+        // and use CE_QtC_SetOptions to set options. If this is set, we do not use the QPixmapCache as it
+        // will interfere with that of the kcm's widgets!
+        itsIsPreview=true;
+        itsUsePixmapCache=false;
+    }
+#ifdef QTC_STYLE_SUPPORT
+        init(name);
+#else
+        init();
+#endif
+}
+
+#ifdef QTC_STYLE_SUPPORT
+void Style::init(const QString &name)
+#else
+void Style::init()
+#endif
+{
 #if !defined QTC_QT_ONLY
     if(KGlobal::hasMainComponent())
         itsComponentData=KGlobal::mainComponent();
@@ -934,41 +956,30 @@ Style::Style()
         itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
     }
 #endif
-    // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
-    // to a temporary filename. If this is set, we read the settings from there - and do not use the QPixmapCache - as it
-    // will interfere with that of the kcm's widgets!
-    QString rcFile=QString::fromLocal8Bit(qgetenv(QTCURVE_PREVIEW_CONFIG));
-
-    if(!rcFile.isEmpty())
-    {
-        if(QFile::exists(rcFile))
-        {
-            itsUsePixmapCache=false;
-            itsIsPreview=true;
-        }
-        else
-            rcFile=QString();
-    }
-#ifdef QTC_STYLE_SUPPORT
-    if(rcFile.isEmpty() && !name.isEmpty())
-    {
-        rcFile=themeFile(kdeHome(), name);
-
-        if(rcFile.isEmpty())
-        {
-            rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), name, useQt3Settings());
-            if(rcFile.isEmpty())
-                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), name, !useQt3Settings());
-        }
-    }
-#endif
-    readConfig(rcFile, &opts);
 
     if(itsIsPreview)
         opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
-#ifdef Q_WS_X11
     else
     {
+#ifdef QTC_STYLE_SUPPORT
+        QString rcFile;
+        if(!name.isEmpty())
+        {
+            rcFile=themeFile(kdeHome(), name);
+
+            if(rcFile.isEmpty())
+            {
+                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), name, useQt3Settings());
+                if(rcFile.isEmpty())
+                    rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), name, !useQt3Settings());
+            }
+        }
+        readConfig(rcFile, &opts);
+#else
+        readConfig(QString(), &opts);
+#endif
+
+#ifdef Q_WS_X11
         QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
                                               "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
         QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
@@ -986,8 +997,8 @@ Style::Style()
                 QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
                                                       "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
         }
-    }
 #endif
+    }
 
     opts.contrast=QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
     if(opts.contrast<0 || opts.contrast>10)
@@ -1253,7 +1264,7 @@ Style::Style()
         (void)KFileDialog::getSaveFileName();
 
     // We need to set the decoration colours for the preview now...
-    if(!rcFile.isEmpty())
+    if(itsIsPreview)
         setDecorationColors();
 #endif
 }
@@ -5232,10 +5243,21 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
     switch((int)element)
     {
+        case CE_QtC_SetOptions:
+            if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option))
+            {
+                if(!painter && widget && QLatin1String("QtCurveConfigDialog")==widget->objectName())
+                {
+                    Style *that=(Style *)this;
+                    opts=preview->opts;
+                    that->init();
+                }
+            }
+            break;
         case CE_QtC_Preview:
             if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option))
             {
-                if(widget && "qtc-preview"==widget->property("qtc-widget-name").toString())
+                if(widget && widget && QLatin1String("QtCurveConfigDialog-GradientPreview")==widget->objectName())
                 {
                     Options      old=opts;
                     const QColor *use(buttonColors(option));

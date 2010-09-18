@@ -18,6 +18,8 @@
 11. Fix menubar/titlebar blending for Thunderbird's message composer window.
 12. If drawing a background image, ensure that this can also be drawn onto kwin
     border - if it has a bottom edge.
+13. When showing style preview in config dialog, do not save current settings to
+    a temp file to pass to the style - pass the options via a style based function.
 
 1.6.1
 -----

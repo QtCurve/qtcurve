@@ -56,7 +56,6 @@
 #include <KDE/KCharSelect>
 #include <KDE/KDialog>
 #include <KDE/KIntNumInput>
-#include <KDE/KTemporaryFile>
 #include <KDE/KXmlGuiWindow>
 #include <KDE/KStandardAction>
 #include <KDE/KStatusBar>
@@ -292,7 +291,7 @@ CGradientPreview::CGradientPreview(QtCurveConfig *c, QWidget *p)
                   style(0L)
 {
 //     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    setProperty("qtc-widget-name", "qtc-preview");
+    setObjectName("QtCurveConfigDialog-GradientPreview");
 }
 
 CGradientPreview::~CGradientPreview()
@@ -744,6 +743,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
                gradPreview(NULL)
 {
     setupUi(this);
+    setObjectName("QtCurveConfigDialog");
     titleLabel->setText("QtCurve " VERSION " - (C) Craig Drummond, 2003-2010");
     insertShadeEntries(shadeSliders, SW_SLIDER);
     insertShadeEntries(shadeMenubars, SW_MENUBAR);
@@ -1964,34 +1964,22 @@ void QtCurveConfig::menubarTitlebarBlend()
 
 void QtCurveConfig::updatePreview()
 {
-    KTemporaryFile tempFile;
+    setOptions(previewStyle);
 
-    if(tempFile.open())
-    {
-        KConfig cfg(tempFile.fileName(), KConfig::NoGlobals);
-        bool    rv(true);
-
-        if(rv)
-        {
-            setOptions(previewStyle);
-            rv=writeConfig(&cfg, previewStyle, presets[defaultText].opts, true);
-        }
-
-        if(rv)
-        {
-            qputenv(QTCURVE_PREVIEW_CONFIG, QFile::encodeName(tempFile.fileName()));
-            QStyle *style = QStyleFactory::create("qtcurve");
-            if (!style)
-            {
-                tempFile.close();
-                return;
-            }
-            setStyleRecursive(previewFrame, style);
-            delete widgetStyle;
-            widgetStyle = style;
-        }
-        tempFile.close();
-    }
+    qputenv(QTCURVE_PREVIEW_CONFIG, QTCURVE_PREVIEW_CONFIG);
+    QStyle *style = QStyleFactory::create("qtcurve");
+    qputenv(QTCURVE_PREVIEW_CONFIG, "");
+    if (!style)
+        return;
+    
+    // Very hacky way to pass preview options to style!!!
+    QtCurve::Style::PreviewOption styleOpt;
+    styleOpt.opts=previewStyle;
+    style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
+       
+    setStyleRecursive(previewFrame, style);
+    delete widgetStyle;
+    widgetStyle = style;
 }
 
 static const char * constGradValProp="qtc-grad-val";
