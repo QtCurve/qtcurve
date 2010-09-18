@@ -1668,14 +1668,14 @@ void QtCurveConfig::borderChanged(int i)
     }
 }
 
-static double prev=0.0;
+static double prev=-1.0;
 
 void QtCurveConfig::editItem(QTreeWidgetItem *i, int col)
 {
     bool   ok;
     prev=i->text(col).toDouble(&ok);
     if(!ok)
-        prev=0.0;
+        prev=-1.0;
 
     gradStops->editItem(i, col);
 }
@@ -1685,7 +1685,7 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
     bool   ok;
     double val=i->text(col).toDouble(&ok)/100.0;
 
-    if(ok && equal(val, prev))
+    if(prev<0 || (ok && equal(val, prev)))
         return;
 
     if(!ok || ((0==col || 2==col) && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
@@ -2226,6 +2226,7 @@ void QtCurveConfig::setPreset()
     deleteButton->setEnabled(currentText!=presetsCombo->currentText() &&
                              defaultText!=presetsCombo->currentText() &&
                              0==presets[presetsCombo->currentText()].fileName.indexOf(QDir::homePath()));
+    gradChanged(gradCombo->currentIndex());
 }
 
 void QtCurveConfig::savePreset()
