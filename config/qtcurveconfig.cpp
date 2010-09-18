@@ -3309,7 +3309,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          reorderGtkButtons->isChecked()!=opts.reorderGtkButtons ||
          mapKdeIcons->isChecked()!=opts.mapKdeIcons ||
          groupBox->currentIndex()!=opts.groupBox ||
-         (FRAME_SHADED==opts.groupBox && gbFactor->value()!=opts.gbFactor) ||
+         ((FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox) && gbFactor->value()!=opts.gbFactor) ||
 
          toInt(passwordChar->text())!=opts.passwordChar ||
          highlightFactor->value()!=opts.highlightFactor ||
