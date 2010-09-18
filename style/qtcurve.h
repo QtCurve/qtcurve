@@ -237,7 +237,7 @@ class Style : public QCommonStyle
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;
     const QColor * backgroundColors(const QStyleOption *option) const
-        { return backgroundColors(option->palette.background().color()); }
+        { return option ? backgroundColors(option->palette.background().color()) : itsBackgroundCols; }
     const QColor * highlightColors(const QColor &col) const;
     const QColor * highlightColors(const QStyleOption *option, bool useActive) const
         { return highlightColors(option->palette.brush(useActive ? QPalette::Active : QPalette::Current, QPalette::Highlight).color()); }
