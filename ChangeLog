@@ -15,6 +15,7 @@
     the config file!
 10. Fix issues with duplicate gradient stops when editing gradients in config
     dialog.
+11. Fix menubar/titlebar blending for Thunderbird's message composer window.
 
 1.6.1
 -----
