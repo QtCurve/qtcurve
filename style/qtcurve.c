@@ -2577,7 +2577,7 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             if(useAlpha)
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 
-            drawBgndRings(cr, -ypos, window->allocation.width, TRUE);
+            drawBgndRings(cr, -ypos, window->allocation.width-1, TRUE);
             unsetCairoClipping(cr);
             return TRUE;
         }
