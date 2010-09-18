@@ -2034,11 +2034,10 @@ void QtCurveConfig::previewControlPressed()
         mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
         mdiWindow->move(4, 4);
         mdiWindow->show();
-        previewControlButton->setText(i18n("Detach"));
-        // Call update preview here so that style is reset - causing menubar size to always be set to 0
-        updatePreview();
+        previewControlButton->setText(i18n("Detach"));        
     }
     KGlobal::setAllowQuit(true);
+    updatePreview();
 }
 
 void QtCurveConfig::setupGradientsTab()
