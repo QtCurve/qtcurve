@@ -226,20 +226,21 @@ static void paintTabSeparator(QPainter *painter, const QRect &r)
 }
 #endif
 
-static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &r, const QPainterPath path)
+static void fillBackground(EAppearance app, QPainter &painter, const QColor &col, const QRect &fillRect, const QRect &widgetRect, const QPainterPath path)
 {
-    if(!IS_FLAT_BGND(app))
+    if(!IS_FLAT_BGND(app) || !widgetRect.isEmpty())
     {
         QtCurve::Style::BgndOption opt;
         opt.state|=QtC_StateKWin;
-        opt.rect=r;
+        opt.rect=fillRect;
+        opt.widgetRect=widgetRect;
         opt.palette.setColor(QPalette::Window, col);
         opt.app=app;
         opt.path=path;
         Handler()->wStyle()->drawPrimitive(QtC_PE_DrawBackground, &opt, &painter, NULL);
     }
     else if(path.isEmpty())
-        painter.fillRect(r, col);
+        painter.fillRect(fillRect, col);
     else
         painter.fillPath(path, col);
 }
@@ -531,7 +532,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
                          opacity(compositing ? Handler()->opacity(active) : 100);
     EAppearance          bgndAppearance=getAppearance(windowId());
-    bool                 customBgnd=!IS_FLAT_BGND(bgndAppearance),
+                         // APPEARANCE_RAISED is used to signal flat background, but have background image!
+                         // So, if app is not FLAT, and we have a bottom kwin border, then we might need to draw bgnd rings!
+    bool                 ringsBgnd=APPEARANCE_FLAT!=bgndAppearance && Handler()->haveBottomBorder(), 
+                         customBgnd=!IS_FLAT_BGND(bgndAppearance),
                          customShadows=
 #if KDE_IS_VERSION(4, 3, 0)             
                             Handler()->customShadows()
@@ -569,6 +573,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         r.adjust(shadowSize, shadowSize, -shadowSize, -shadowSize);
     }
 #endif
+
+    int   side(layoutMetric(LM_BorderLeft)),
+          bot(layoutMetric(LM_BorderBottom));
+    QRect widgetRect(widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot)));
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
 
@@ -624,7 +632,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else if(maximized)
         painter.setClipRect(r, Qt::IntersectClip);
 
-    fillBackground(bgndAppearance, painter, fillCol, fillRect,
+    fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(),
                    maximized || round<=ROUND_SLIGHT
                     ? QPainterPath() 
                     : createPath(QRectF(fillRect), APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp, &opt, NULL) ? 6.0 : 8.0, 
@@ -728,8 +736,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(outerBorder && innerBorder)
     {
         QStyleOptionFrame frameOpt;
-        int               side(layoutMetric(LM_BorderLeft)),
-                          bot(layoutMetric(LM_BorderBottom));
 
         frameOpt.palette=opt.palette;
 #if KDE_IS_VERSION(4, 3, 0)
@@ -741,8 +747,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         else
 #endif
             frameOpt.version=(QtCurveConfig::SHADE_LIGHT==innerBorder ? 0 : 1)+TBAR_BORDER_VERSION_HACK;
-        frameOpt.rect=widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot))
-                                      .adjusted(-1, -1, 1, 1);
+        frameOpt.rect=widgetRect.adjusted(-1, -1, 1, 1);
         frameOpt.state=(active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
         frameOpt.lineWidth=frameOpt.midLineWidth=1;
         Handler()->wStyle()->drawPrimitive(QStyle::PE_Frame, &frameOpt, &painter, widget());

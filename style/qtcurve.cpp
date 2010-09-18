@@ -1626,8 +1626,8 @@ void Style::polish(QWidget *widget)
                     break;
 
 #ifdef Q_WS_X11
-                if(!IS_FLAT_BGND(opts.bgndAppearance))
-                    setBgndProp(widget, opts.bgndAppearance);
+                if(!IS_FLAT_BGND(opts.bgndAppearance) || IMG_NONE!=opts.bgndImage.type)
+                    setBgndProp(widget, IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance);
 #endif
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
@@ -1661,8 +1661,8 @@ void Style::polish(QWidget *widget)
 
 #ifdef Q_WS_X11
                 // Need to reset this, as new window created!
-                if(!IS_FLAT_BGND(opts.bgndAppearance))
-                    setBgndProp(widget, opts.bgndAppearance);
+                if(!IS_FLAT_BGND(opts.bgndAppearance) || IMG_NONE!=opts.bgndImage.type)
+                    setBgndProp(widget, IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance);
 #endif
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
@@ -5187,6 +5187,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                     col.setAlphaF(1.0);
                     drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app, bgnd->path);
+                    if(!bgnd->widgetRect.isEmpty())
+                        drawBackgroundImage(painter, true, bgnd->widgetRect.x()+bgnd->widgetRect.width(), bgnd->widgetRect.y());
                 }
             break;
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
@@ -11159,30 +11161,8 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
     }
 }
 
-void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
+void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffset) const
 {
-    bool          isWindow(BGND_MENU!=type);
-    const QWidget *window = itsIsPreview ? widget : widget->window();
-    int           opacity = BGND_MENU==type
-                                ? opts.menuBgndOpacity
-                                : BGND_DIALOG==type
-                                    ? opts.dlgOpacity
-                                    : opts.bgndOpacity;
-    QRect         r(QRect(widget->rect().x(), 0, widget->rect().width(), window->rect().height()));
-
-    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
-        opacity=100;
-
-    p->setClipRegion(widget->rect(), Qt::IntersectClip);
-
-    if(isWindow)
-    {
-        WindowBorders borders=qtcGetWindowBorderSize();
-        r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
-    }
-    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
-                   BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
-
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
                               (IMG_FILE!=opts.bgndImage.type || 
                                 (opts.bgndImage.height==opts.bgndImage.height &&
@@ -11200,7 +11180,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
             loadBgndImage(&img);
             if(!img.pix.isNull())
             {
-                p->drawPixmap(widget->width()-img.pix.width(), 0, img.pix);
+                p->drawPixmap(width-img.pix.width(), yOffset, img.pix);
                 break;
             }
         case IMG_PLAIN_RINGS:
@@ -11225,7 +11205,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                 drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
                 pixPainter.end();
             }
-            p->drawPixmap(widget->width()-img.pix.width(), 1, img.pix);
+            p->drawPixmap(width-img.pix.width(), yOffset+1, img.pix);
             break;
         case IMG_SQUARE_RINGS:
             if(img.pix.isNull())
@@ -11254,9 +11234,35 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                                               WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
                 pixPainter.end();
             }
-            p->drawPixmap(widget->width()-img.pix.width(), 1, img.pix);
+            p->drawPixmap(width-img.pix.width(), yOffset+1, img.pix);
             break;    
     }
+}
+
+void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
+{
+    bool          isWindow(BGND_MENU!=type);
+    const QWidget *window = itsIsPreview ? widget : widget->window();
+    int           opacity = BGND_MENU==type
+                                ? opts.menuBgndOpacity
+                                : BGND_DIALOG==type
+                                    ? opts.dlgOpacity
+                                    : opts.bgndOpacity;
+    QRect         r(QRect(widget->rect().x(), 0, widget->rect().width(), window->rect().height()));
+
+    if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
+        opacity=100;
+
+    p->setClipRegion(widget->rect(), Qt::IntersectClip);
+
+    if(isWindow)
+    {
+        WindowBorders borders=qtcGetWindowBorderSize();
+        r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+    }
+    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
+                   BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
+    drawBackgroundImage(p, isWindow, widget->width());
 }
 
 QPainterPath Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const

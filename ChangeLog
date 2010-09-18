@@ -16,6 +16,8 @@
 10. Fix issues with duplicate gradient stops when editing gradients in config
     dialog.
 11. Fix menubar/titlebar blending for Thunderbird's message composer window.
+12. If drawing a background image, ensure that this can also be drawn onto kwin
+    border - if it has a bottom edge.
 
 1.6.1
 -----

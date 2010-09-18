@@ -97,6 +97,7 @@ class Style : public QCommonStyle
 
         EAppearance  app;
         QPainterPath path;
+        QRect        widgetRect;
     };
 
     enum Icon
@@ -189,6 +190,7 @@ class Style : public QCommonStyle
     QPixmap drawStripes(const QColor &color, int opacity) const;
     void drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int opacity, BackgroundType type, EAppearance app,
                         const QPainterPath &path=QPainterPath()) const;
+    void drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffset=0) const;
     void drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const;
     QPainterPath buildPath(const QRectF &r, EWidget w, int round, double radius) const;
     QPainterPath buildPath(const QRect &r, EWidget w, int round, double radius) const;
