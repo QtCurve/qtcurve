@@ -22,6 +22,9 @@
     a temp file to pass to the style - pass the options via a style based function.
 14. Make it possible to detach style preview from config dialog - this way changes
     can be seen immediately.
+15. If preview is embedded in config dialog, then always set the menubar size
+    XProperty to 0. This prevents the kwin decoration thinking that the main config
+    dialog has a menubar.
 
 1.6.1
 -----

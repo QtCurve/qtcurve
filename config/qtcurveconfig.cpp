@@ -2035,6 +2035,8 @@ void QtCurveConfig::previewControlPressed()
         mdiWindow->move(4, 4);
         mdiWindow->show();
         previewControlButton->setText(i18n("Detach"));
+        // Call update preview here so that style is reset - causing menubar size to always be set to 0
+        updatePreview();
     }
     KGlobal::setAllowQuit(true);
 }
