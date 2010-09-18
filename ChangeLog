@@ -20,6 +20,8 @@
     border - if it has a bottom edge.
 13. When showing style preview in config dialog, do not save current settings to
     a temp file to pass to the style - pass the options via a style based function.
+14. Make it possible to detach style preview from config dialog - this way changes
+    can be seen immediately.
 
 1.6.1
 -----

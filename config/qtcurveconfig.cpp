@@ -1073,6 +1073,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     menubarBlend->setIcon(KIcon("configure"));
     connect(menubarBlend, SIGNAL(clicked(bool)), SLOT(menubarTitlebarBlend()));
+    connect(previewControlButton, SIGNAL(clicked(bool)), SLOT(previewControlPressed()));
 
     setupStack();
 
@@ -1103,7 +1104,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 }
 
 QtCurveConfig::~QtCurveConfig()
-{
+{   
     // Remove QTCURVE_PREVIEW_CONFIG setting, so that main kcmstyle preview does not revert to
     // default settings!
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
@@ -1114,6 +1115,8 @@ QtCurveConfig::~QtCurveConfig()
     // KGlobal to quit, kcmshell4 would exit immediately after QtCurve's config dialog was closed :-(
     KGlobal::setAllowQuit(false);
     delete previewFrame;
+    if(!mdiWindow)
+        delete stylePreview;
     KGlobal::setAllowQuit(true);
 }
 
@@ -1589,13 +1592,13 @@ void QtCurveConfig::setupPresets(const Options &currentStyle, const Options &def
 void QtCurveConfig::setupPreview()
 {
     QVBoxLayout *layout = new QVBoxLayout(previewFrame);
-    CWorkspace  *workSpace = new CWorkspace(previewFrame);
-
+    
+    workSpace = new CWorkspace(previewFrame);
     layout->setMargin(0);
     layout->addWidget(workSpace);
 
-    CStylePreview *stylePreview = new CStylePreview;
-    QMdiSubWindow *mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
+    stylePreview = new CStylePreview;
+    mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
     mdiWindow->move(4, 4);
     mdiWindow->show();
     updatePreview();
@@ -1966,7 +1969,7 @@ void QtCurveConfig::updatePreview()
 {
     setOptions(previewStyle);
 
-    qputenv(QTCURVE_PREVIEW_CONFIG, QTCURVE_PREVIEW_CONFIG);
+    qputenv(QTCURVE_PREVIEW_CONFIG, mdiWindow ? QTCURVE_PREVIEW_CONFIG : QTCURVE_PREVIEW_CONFIG_FULL);
     QStyle *style = QStyleFactory::create("qtcurve");
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
     if (!style)
@@ -1977,7 +1980,7 @@ void QtCurveConfig::updatePreview()
     styleOpt.opts=previewStyle;
     style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
        
-    setStyleRecursive(previewFrame, style);
+    setStyleRecursive(stylePreview, style);
     delete widgetStyle;
     widgetStyle = style;
 }
@@ -2009,6 +2012,31 @@ void QtCurveConfig::copyGradient(QAction *act)
         gradChanged(gradCombo->currentIndex());
         emit changed(true);
     }
+}
+
+void QtCurveConfig::previewControlPressed()
+{
+    KGlobal::setAllowQuit(false);
+    if(mdiWindow)
+    {
+        previewControlButton->setText(i18n("Reattach"));
+        workSpace->removeSubWindow(stylePreview);
+        delete stylePreview;
+        delete mdiWindow;
+        mdiWindow=0L;
+        stylePreview = new CStylePreview(this);
+        stylePreview->show();
+    }
+    else
+    {
+        delete stylePreview;
+        stylePreview = new CStylePreview;
+        mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
+        mdiWindow->move(4, 4);
+        mdiWindow->show();
+        previewControlButton->setText(i18n("Detach"));
+    }
+    KGlobal::setAllowQuit(true);
 }
 
 void QtCurveConfig::setupGradientsTab()
@@ -2150,6 +2178,10 @@ void QtCurveConfig::setPasswordChar(int ch)
 
 void QtCurveConfig::updateChanged()
 {
+    // Check if we have a floating preview!
+    if(!mdiWindow && settingsChanged(previewStyle))
+        updatePreview();
+            
     if (settingsChanged())
         emit changed(true);
 }

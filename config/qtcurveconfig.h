@@ -37,6 +37,9 @@ class CExportThemeDialog;
 class QtCurveConfig;
 class QtCurveKWinConfig;
 class QStyle;
+class QMdiSubWindow;
+class CWorkspace;
+class CStylePreview;
 
 class CGradientPreview : public QWidget
 {
@@ -160,6 +163,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void menubarTitlebarBlend();
     void updatePreview();
     void copyGradient(QAction *act);
+    void previewControlPressed();
 
     public:
 
@@ -190,6 +194,9 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     Options               previewStyle;
     QStyle                *widgetStyle;
+    CWorkspace            *workSpace;
+    CStylePreview         *stylePreview;
+    QMdiSubWindow         *mdiWindow;
     QMap<QString, Preset> presets;
 #ifdef QTC_STYLE_SUPPORT
     CExportThemeDialog    *exportDialog;

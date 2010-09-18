@@ -897,8 +897,8 @@ Style::Style()
         itsProgressCols(0L),
         itsSaveMenuBarStatus(false),
         itsUsePixmapCache(false),
-        itsIsPreview(false),
         itsInactiveChangeSelectionColor(false),
+        itsIsPreview(PREVIEW_FALSE),
         itsSidebarButtonsCols(0L),
         itsActiveMdiColors(0L),
         itsMdiColors(0L),
@@ -924,9 +924,16 @@ Style::Style()
         // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
         // and use CE_QtC_SetOptions to set options. If this is set, we do not use the QPixmapCache as it
         // will interfere with that of the kcm's widgets!
-        itsIsPreview=true;
+        itsIsPreview=PREVIEW_MDI;
         itsUsePixmapCache=false;
     }
+    else if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL))
+    {
+        // As above, but preview is in window - so can use opacity settings!
+        itsIsPreview=PREVIEW_WINDOW;
+        itsUsePixmapCache=false;
+    }
+    else
 #ifdef QTC_STYLE_SUPPORT
         init(name);
 #else
@@ -958,7 +965,10 @@ void Style::init()
 #endif
 
     if(itsIsPreview)
-        opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+    {
+        if(PREVIEW_WINDOW!=itsIsPreview)
+            opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+    }
     else
     {
 #ifdef QTC_STYLE_SUPPORT

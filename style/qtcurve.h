@@ -85,6 +85,13 @@ class Style : public QCommonStyle
         CE_QtC_SetOptions
     };
 
+    enum PreviewType
+    {
+        PREVIEW_FALSE,
+        PREVIEW_MDI,
+        PREVIEW_WINDOW
+    };
+    
     class PreviewOption : public QStyleOption
     {
         public:
@@ -306,8 +313,8 @@ class Style : public QCommonStyle
     bool                               itsSaveMenuBarStatus,
                                        itsSaveStatusBarStatus,
                                        itsUsePixmapCache,
-                                       itsIsPreview,
                                        itsInactiveChangeSelectionColor;
+    PreviewType                        itsIsPreview;
     mutable QColor                     *itsSidebarButtonsCols;
     mutable QColor                     *itsActiveMdiColors;
     mutable QColor                     *itsMdiColors;
