@@ -589,7 +589,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         QString wc(windowClass());
         if(wc==QLatin1String("Navigator Firefox") ||
             wc==QLatin1String("Mail Thunderbird") ||
-            wc==QLatin1String("Msgcompose Thunderbird"))
+            wc==QLatin1String("Calendar Thunderbird EventDialog") ||
+            wc==QLatin1String("Msgcompose Thunderbird EventDialog"))
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
         else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
                 wc.startsWith(QLatin1String("VCLSalFrame OpenOffice.org")) ||
@@ -1614,16 +1615,24 @@ void QtCurveClient::sendToggleToApp(bool menubar)
     }
 }
 
-const QString & QtCurveClient::windowClass(bool normalWindowsOnly)
+const QString & QtCurveClient::windowClass()
 {
     if(itsWindowClass.isEmpty())
     {
-        KWindowInfo info(windowId(), normalWindowsOnly ? NET::WMWindowType : 0, NET::WM2WindowClass);
-
-        if(normalWindowsOnly && NET::Normal!=info.windowType(NET::AllTypesMask))
-            itsWindowClass="<>";
-        else
-            itsWindowClass=info.windowClassName()+' '+info.windowClassClass();
+        KWindowInfo info(windowId(), NET::WMWindowType, NET::WM2WindowClass|NET::WM2WindowRole);
+        
+        switch(info.windowType(NET::AllTypesMask))
+        {
+            case NET::Normal:
+                itsWindowClass=info.windowClassName()+' '+info.windowClassClass();
+                break;
+            case NET::Dialog:
+                itsWindowClass=info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
+                break;
+            default:
+                itsWindowClass="<>";
+                break;
+        }
     }
 
     return itsWindowClass;
