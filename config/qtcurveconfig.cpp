@@ -1599,7 +1599,7 @@ void QtCurveConfig::setupPreview()
     stylePreview = new CStylePreview;
     mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
     mdiWindow->move(4, 4);
-    mdiWindow->show();
+    mdiWindow->showMaximized();
     updatePreview();
 }
 
@@ -2030,7 +2030,7 @@ void QtCurveConfig::previewControlPressed()
         stylePreview = new CStylePreview;
         mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
         mdiWindow->move(4, 4);
-        mdiWindow->show();
+        mdiWindow->showMaximized();
         previewControlButton->setText(i18n("Detach"));        
     }
     KGlobal::setAllowQuit(true);
