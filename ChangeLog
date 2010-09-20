@@ -6,6 +6,7 @@
 3. If drawing a background image, ensure that this can also be drawn onto kwin
    border - if it has a bottom edge.
 4. Attempt to fix light text on dark background for OpenOffice.org
+5. Use same radius for all corners of progressbar.
 
 1.6.1
 -----

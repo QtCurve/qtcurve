@@ -935,26 +935,6 @@ static gboolean isComboFrame(GtkWidget *widget)
 }
 #endif
 
-static int progressbarRound(GtkWidget *widget, gboolean rev)
-{
-    if(!widget || !GTK_IS_PROGRESS_BAR(widget) || isMozilla() ||
-       equal(gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(widget)), 100.0))
-        return ROUNDED_NONE;
-
-    switch(GTK_PROGRESS_BAR(widget)->orientation)
-    {
-        default:
-        case GTK_PROGRESS_LEFT_TO_RIGHT:
-            return rev ? ROUNDED_LEFT : ROUNDED_RIGHT;
-        case GTK_PROGRESS_RIGHT_TO_LEFT:
-            return rev ? ROUNDED_RIGHT : ROUNDED_LEFT;
-        case GTK_PROGRESS_BOTTOM_TO_TOP:
-            return ROUNDED_TOP;
-        case GTK_PROGRESS_TOP_TO_BOTTOM:
-            return ROUNDED_BOTTOM;
-    }
-}
-
 static gboolean isFixedWidget(GtkWidget *widget)
 {
     return widget && widget->parent && widget->parent->parent &&
@@ -2802,9 +2782,8 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
                             : qtcPalette.progress
                                 ? qtcPalette.progress
                                 : qtcPalette.highlight;
-        int      round=opts.fillProgress || isEntryProg ? ROUNDED_ALL : progressbarRound(widget, rev),
-                 new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
-        int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
+        int      new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state,
+                 fillVal=grayItem ? 4 : ORIGINAL_SHADE,
                  borderVal=0;
 
         x++, y++, width-=2, height-=2;
@@ -2815,7 +2794,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
         if((horiz ? width : height)>1)
             drawLightBevel(cr, style, new_state, area, NULL, x, y,
                         width, height, &itemCols[fillVal],
-                        itemCols, round, wid, BORDER_FLAT,
+                        itemCols, ROUNDED_ALL, wid, BORDER_FLAT,
                         (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
         if(opts.stripedProgress && width>4 && height>4)
@@ -2829,7 +2808,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
             else
                 drawLightBevel(cr, style, new_state, NULL, region, x, y,
                                width, height, &itemCols[1],
-                               qtcPalette.highlight, round, wid, BORDER_FLAT,
+                               qtcPalette.highlight, ROUNDED_ALL, wid, BORDER_FLAT,
                                (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
 
         if(opts.glowProgress && (horiz ? width : height)>3)
@@ -2878,31 +2857,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state,
 
         if(width>2 && height>2 && opts.borderProgress)
             realDrawBorder(cr, style, state, area, NULL, x, y, width, height,
-                            itemCols, round, BORDER_FLAT, wid, 0, PBAR_BORDER);
-        if(!opts.fillProgress && ROUNDED && ROUNDED_ALL!=round && width>4 && height>4 && opts.borderProgress)
-        {
-            /*if(!isMozilla())
-            {
-                x--; y--; width+=2; height+=2;
-            }*/
-            cairo_new_path(cr);
-            if(opts.fillProgress)
-            {
-                x++, y++, width-=2, height-=2;
-                cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
-            }
-            else
-                cairo_set_source_rgba(cr, CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]), 0.75);
-            if(!(round&CORNER_TL))
-                cairo_rectangle(cr, x, y, 1, 1);
-            if(!(round&CORNER_TR))
-                cairo_rectangle(cr, x+width-1, y, 1, 1);
-            if(!(round&CORNER_BR))
-                cairo_rectangle(cr, x+width-1, y+height-1, 1, 1);
-            if(!(round&CORNER_BL))
-                cairo_rectangle(cr, x, y+height-1, 1, 1);
-            cairo_fill(cr);
-        }
+                           itemCols, ROUNDED_ALL, BORDER_FLAT, wid, 0, PBAR_BORDER);
         
         if(!opts.borderProgress)
             if(horiz)
