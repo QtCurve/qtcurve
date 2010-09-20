@@ -5260,6 +5260,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 {
                     Style *that=(Style *)this;
                     opts=preview->opts;
+                    checkConfig(&opts);
                     that->init();
                 }
             }

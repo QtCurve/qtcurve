@@ -1365,6 +1365,228 @@ static void freeOpts(Options *opts)
 }
 #endif
 
+static void checkConfig(Options *opts)
+{
+    /* **Must** check appearance first, as the rest will default to this */
+    checkAppearance(&opts->appearance, opts);
+    checkAppearance(&opts->bgndAppearance, opts);
+    checkAppearance(&opts->menuBgndAppearance, opts);
+    checkAppearance(&opts->menubarAppearance, opts);
+    checkAppearance(&opts->menuitemAppearance, opts);
+    checkAppearance(&opts->toolbarAppearance, opts);
+    checkAppearance(&opts->lvAppearance, opts);
+    checkAppearance(&opts->tabAppearance, opts);
+    checkAppearance(&opts->activeTabAppearance, opts);
+    checkAppearance(&opts->sliderAppearance, opts);
+    checkAppearance(&opts->selectionAppearance, opts);
+    checkAppearance(&opts->titlebarAppearance, opts);
+    checkAppearance(&opts->inactiveTitlebarAppearance, opts);
+#ifdef __cplusplus
+    checkAppearance(&opts->titlebarButtonAppearance, opts);
+    checkAppearance(&opts->selectionAppearance, opts);
+    checkAppearance(&opts->dwtAppearance, opts);
+#endif
+    checkAppearance(&opts->menuStripeAppearance, opts);
+    checkAppearance(&opts->progressAppearance, opts);
+    checkAppearance(&opts->progressGrooveAppearance, opts);
+    checkAppearance(&opts->grooveAppearance, opts);
+    checkAppearance(&opts->sunkenAppearance, opts);
+    checkAppearance(&opts->sbarBgndAppearance, opts);
+    checkAppearance(&opts->sliderFill, opts);
+    checkAppearance(&opts->tooltipAppearance, opts);
+
+    if(SHADE_BLEND_SELECTED==opts->shadeCheckRadio)
+        opts->shadeCheckRadio=SHADE_SELECTED;
+
+    checkColor(&opts->shadeMenubars, &opts->customMenubarsColor);
+    checkColor(&opts->shadeSliders, &opts->customSlidersColor);
+    checkColor(&opts->shadeCheckRadio, &opts->customCheckRadioColor);
+    checkColor(&opts->menuStripe, &opts->customMenuStripeColor);
+    checkColor(&opts->comboBtn, &opts->customComboBtnColor);
+    checkColor(&opts->sortedLv, &opts->customSortedLvColor);
+    if(APPEARANCE_BEVELLED==opts->toolbarAppearance)
+        opts->toolbarAppearance=APPEARANCE_GRADIENT;
+    else if(APPEARANCE_RAISED==opts->toolbarAppearance)
+        opts->toolbarAppearance=APPEARANCE_FLAT;
+
+    if(APPEARANCE_BEVELLED==opts->menubarAppearance)
+        opts->menubarAppearance=APPEARANCE_GRADIENT;
+    else if(APPEARANCE_RAISED==opts->menubarAppearance)
+        opts->menubarAppearance=APPEARANCE_FLAT;
+
+    if(APPEARANCE_BEVELLED==opts->sliderAppearance)
+        opts->sliderAppearance=APPEARANCE_GRADIENT;
+
+    if(APPEARANCE_BEVELLED==opts->tabAppearance)
+        opts->tabAppearance=APPEARANCE_GRADIENT;
+
+    if(APPEARANCE_BEVELLED==opts->activeTabAppearance)
+        opts->activeTabAppearance=APPEARANCE_GRADIENT;
+
+    if(APPEARANCE_RAISED==opts->selectionAppearance)
+        opts->selectionAppearance=APPEARANCE_FLAT;
+    else if(APPEARANCE_BEVELLED==opts->selectionAppearance)
+        opts->selectionAppearance=APPEARANCE_GRADIENT;
+
+    if(APPEARANCE_RAISED==opts->menuStripeAppearance)
+        opts->menuStripeAppearance=APPEARANCE_FLAT;
+    else if(APPEARANCE_BEVELLED==opts->menuStripeAppearance)
+        opts->menuStripeAppearance=APPEARANCE_GRADIENT;
+
+    if(opts->highlightFactor<MIN_HIGHLIGHT_FACTOR || opts->highlightFactor>MAX_HIGHLIGHT_FACTOR)
+        opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
+
+    if(opts->crHighlight<MIN_HIGHLIGHT_FACTOR || opts->crHighlight>MAX_HIGHLIGHT_FACTOR)
+        opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
+
+    if(opts->splitterHighlight<MIN_HIGHLIGHT_FACTOR || opts->splitterHighlight>MAX_HIGHLIGHT_FACTOR)
+        opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
+
+#if !defined __cplusplus || defined CONFIG_DIALOG
+    if(opts->expanderHighlight<MIN_HIGHLIGHT_FACTOR || opts->expanderHighlight>MAX_HIGHLIGHT_FACTOR)
+        opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
+#endif
+
+    if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
+        opts->menuDelay=DEFAULT_MENU_DELAY;
+
+    if(0==opts->sliderWidth%2)
+        opts->sliderWidth++;
+
+    if(opts->sliderWidth<MIN_SLIDER_WIDTH || opts->sliderWidth>MAX_SLIDER_WIDTH)
+        opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
+
+    if(opts->sliderWidth<DEFAULT_SLIDER_WIDTH)
+        opts->sliderThumbs=LINE_NONE;
+
+    if(opts->lighterPopupMenuBgnd<MIN_LIGHTER_POPUP_MENU || opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
+        opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
+
+    if(opts->tabBgnd<MIN_TAB_BGND || opts->tabBgnd>MAX_TAB_BGND)
+        opts->tabBgnd=DEF_TAB_BGND;
+
+    if(opts->animatedProgress && !opts->stripedProgress)
+        opts->animatedProgress=false;
+
+    if(0==opts->gbFactor)
+        opts->groupBox=FRAME_PLAIN;
+
+    if(opts->gbFactor<MIN_GB_FACTOR || opts->gbFactor>MAX_GB_FACTOR)
+        opts->gbFactor=DEF_GB_FACTOR;
+
+#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
+    opts->crSize=CR_SMALL_SIZE;
+    if(SLIDER_CIRCULAR==opts->sliderStyle)
+        opts->sliderStyle=SLIDER_ROUND;
+    if(STRIPE_FADE==opts->stripedProgress)
+        opts->stripedProgress=STRIPE_PLAIN;
+#endif
+    /* For now, only 2 sizes... */
+    if(opts->crSize!=CR_SMALL_SIZE && opts->crSize!=CR_LARGE_SIZE)
+        opts->crSize=CR_SMALL_SIZE;
+
+/*
+??
+    if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
+        opts->colorMenubarMouseOver=true;
+*/
+
+#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
+    if(opts->round>ROUND_FULL)
+        opts->round=ROUND_FULL;
+#endif
+#ifndef CONFIG_DIALOG
+    if(MO_GLOW==opts->coloredMouseOver && EFFECT_NONE==opts->buttonEffect)
+        opts->coloredMouseOver=MO_COLORED_THICK;
+
+    if(IND_GLOW==opts->defBtnIndicator && EFFECT_NONE==opts->buttonEffect)
+        opts->defBtnIndicator=IND_TINT;
+
+    if(opts->round>ROUND_EXTRA && FOCUS_GLOW!=opts->focus)
+        opts->focus=FOCUS_LINE;
+
+    if(EFFECT_NONE==opts->buttonEffect)
+    {
+        opts->etchEntry=false;
+        if(FOCUS_GLOW==opts->focus)
+            opts->focus=FOCUS_FULL;
+    }
+
+//     if(opts->squareScrollViews)
+//         opts->highlightScrollViews=false;
+
+    if(SHADE_WINDOW_BORDER==opts->shadeMenubars)
+        opts->shadeMenubarOnlyWhenActive=true;
+
+    if(MO_GLOW==opts->coloredMouseOver)
+        opts->coloredTbarMo=true;
+
+    if(opts->round<ROUND_FULL)
+        opts->square|=SQUARE_POPUP_MENUS;
+#endif
+
+    if(opts->bgndOpacity<0 || opts->bgndOpacity>100)
+        opts->bgndOpacity=100;
+    if(opts->dlgOpacity<0 || opts->dlgOpacity>100)
+        opts->dlgOpacity=100;
+    if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
+        opts->menuBgndOpacity=100;
+
+    if(!(opts->square&SQUARE_POPUP_MENUS))
+        opts->popupBorder=true;
+
+#ifndef CONFIG_DIALOG
+    opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
+    opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
+    opts->lvAppearance=MODIFY_AGUA_X(opts->lvAppearance, APPEARANCE_LV_AGUA);
+    opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
+    opts->tooltipAppearance=MODIFY_AGUA(opts->tooltipAppearance);
+    opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
+    opts->menuBgndAppearance=MODIFY_AGUA(opts->menuBgndAppearance);
+    opts->menuStripeAppearance=MODIFY_AGUA(opts->menuStripeAppearance);
+    opts->grooveAppearance=MODIFY_AGUA(opts->grooveAppearance);
+    opts->progressAppearance=MODIFY_AGUA(opts->progressAppearance);
+    opts->sliderFill=MODIFY_AGUA(opts->sliderFill);
+    opts->tabAppearance=MODIFY_AGUA(opts->tabAppearance);
+    opts->activeTabAppearance=MODIFY_AGUA(opts->activeTabAppearance);
+    opts->menuitemAppearance=MODIFY_AGUA(opts->menuitemAppearance);
+
+    if(!opts->borderProgress && (!opts->fillProgress || !(opts->square&SQUARE_PROGRESS)))
+        opts->borderProgress=true;
+
+    opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
+    opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
+
+    if(opts->shadePopupMenu && SHADE_NONE==opts->shadeMenubars)
+        opts->shadePopupMenu=false;
+
+    if(opts->shadePopupMenu)
+        opts->lighterPopupMenuBgnd=0;
+#ifdef __cplusplus
+
+#if defined QT_VERSION && QT_VERSION >= 0x040000
+    if(!(opts->titlebarButtons&TITLEBAR_BUTTON_ROUND))
+#endif
+        opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
+    opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
+#endif
+    if(opts->windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR &&
+        (opts->windowBorder&WINDOW_BORDER_BLEND_TITLEBAR || SHADE_WINDOW_BORDER==opts->shadeMenubars))
+        opts->windowBorder-=WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR;
+
+    if(APPEARANCE_FLAT==opts->tabAppearance)
+        opts->tabAppearance=APPEARANCE_RAISED;
+    if(EFFECT_NONE==opts->buttonEffect)
+        opts->etchEntry=false;
+    if(opts->colorSliderMouseOver &&
+        (SHADE_NONE==opts->shadeSliders || SHADE_DARKEN==opts->shadeSliders))
+        opts->colorSliderMouseOver=false;
+#endif /* ndef CONFIG_DIALOG */
+
+    if(LINE_1DOT==opts->toolbarSeparators)
+        opts->toolbarSeparators=LINE_DOTS;
+}
+
 #ifdef __cplusplus
 static bool readConfig(const QString &file, Options *opts, Options *defOpts=0L)
 #else
@@ -2030,165 +2252,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
 #endif
 
-            /* **Must** check appearance first, as the rest will default to this */
-            checkAppearance(&opts->appearance, opts);
-            checkAppearance(&opts->bgndAppearance, opts);
-            checkAppearance(&opts->menuBgndAppearance, opts);
-            checkAppearance(&opts->menubarAppearance, opts);
-            checkAppearance(&opts->menuitemAppearance, opts);
-            checkAppearance(&opts->toolbarAppearance, opts);
-            checkAppearance(&opts->lvAppearance, opts);
-            checkAppearance(&opts->tabAppearance, opts);
-            checkAppearance(&opts->activeTabAppearance, opts);
-            checkAppearance(&opts->sliderAppearance, opts);
-            checkAppearance(&opts->selectionAppearance, opts);
-            checkAppearance(&opts->titlebarAppearance, opts);
-            checkAppearance(&opts->inactiveTitlebarAppearance, opts);
-#ifdef __cplusplus
-            checkAppearance(&opts->titlebarButtonAppearance, opts);
-            checkAppearance(&opts->selectionAppearance, opts);
-            checkAppearance(&opts->dwtAppearance, opts);
-#endif
-            checkAppearance(&opts->menuStripeAppearance, opts);
-            checkAppearance(&opts->progressAppearance, opts);
-            checkAppearance(&opts->progressGrooveAppearance, opts);
-            checkAppearance(&opts->grooveAppearance, opts);
-            checkAppearance(&opts->sunkenAppearance, opts);
-            checkAppearance(&opts->sbarBgndAppearance, opts);
-            checkAppearance(&opts->sliderFill, opts);
-            checkAppearance(&opts->tooltipAppearance, opts);
-#ifndef __cplusplus
-            releaseConfig(cfg);
-#endif
-            if(SHADE_BLEND_SELECTED==opts->shadeCheckRadio)
-                opts->shadeCheckRadio=SHADE_SELECTED;
+            checkConfig(opts);
 
-            checkColor(&opts->shadeMenubars, &opts->customMenubarsColor);
-            checkColor(&opts->shadeSliders, &opts->customSlidersColor);
-            checkColor(&opts->shadeCheckRadio, &opts->customCheckRadioColor);
-            checkColor(&opts->menuStripe, &opts->customMenuStripeColor);
-            checkColor(&opts->comboBtn, &opts->customComboBtnColor);
-            checkColor(&opts->sortedLv, &opts->customSortedLvColor);
-            if(APPEARANCE_BEVELLED==opts->toolbarAppearance)
-                opts->toolbarAppearance=APPEARANCE_GRADIENT;
-            else if(APPEARANCE_RAISED==opts->toolbarAppearance)
-                opts->toolbarAppearance=APPEARANCE_FLAT;
-
-            if(APPEARANCE_BEVELLED==opts->menubarAppearance)
-                opts->menubarAppearance=APPEARANCE_GRADIENT;
-            else if(APPEARANCE_RAISED==opts->menubarAppearance)
-                opts->menubarAppearance=APPEARANCE_FLAT;
-
-            if(APPEARANCE_BEVELLED==opts->sliderAppearance)
-                opts->sliderAppearance=APPEARANCE_GRADIENT;
-
-            if(APPEARANCE_BEVELLED==opts->tabAppearance)
-                opts->tabAppearance=APPEARANCE_GRADIENT;
-
-            if(APPEARANCE_BEVELLED==opts->activeTabAppearance)
-                opts->activeTabAppearance=APPEARANCE_GRADIENT;
-
-            if(APPEARANCE_RAISED==opts->selectionAppearance)
-                opts->selectionAppearance=APPEARANCE_FLAT;
-            else if(APPEARANCE_BEVELLED==opts->selectionAppearance)
-                opts->selectionAppearance=APPEARANCE_GRADIENT;
-
-            if(APPEARANCE_RAISED==opts->menuStripeAppearance)
-                opts->menuStripeAppearance=APPEARANCE_FLAT;
-            else if(APPEARANCE_BEVELLED==opts->menuStripeAppearance)
-                opts->menuStripeAppearance=APPEARANCE_GRADIENT;
-
-            if(opts->highlightFactor<MIN_HIGHLIGHT_FACTOR || opts->highlightFactor>MAX_HIGHLIGHT_FACTOR)
-                opts->highlightFactor=DEFAULT_HIGHLIGHT_FACTOR;
-
-            if(opts->crHighlight<MIN_HIGHLIGHT_FACTOR || opts->crHighlight>MAX_HIGHLIGHT_FACTOR)
-                opts->crHighlight=DEFAULT_CR_HIGHLIGHT_FACTOR;
-
-            if(opts->splitterHighlight<MIN_HIGHLIGHT_FACTOR || opts->splitterHighlight>MAX_HIGHLIGHT_FACTOR)
-                opts->splitterHighlight=DEFAULT_SPLITTER_HIGHLIGHT_FACTOR;
-
-#if !defined __cplusplus || defined CONFIG_DIALOG
-            if(opts->expanderHighlight<MIN_HIGHLIGHT_FACTOR || opts->expanderHighlight>MAX_HIGHLIGHT_FACTOR)
-                opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
-#endif
-
-            if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
-                opts->menuDelay=DEFAULT_MENU_DELAY;
-
-            if(0==opts->sliderWidth%2)
-                opts->sliderWidth++;
-
-            if(opts->sliderWidth<MIN_SLIDER_WIDTH || opts->sliderWidth>MAX_SLIDER_WIDTH)
-                opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
-
-            if(opts->sliderWidth<DEFAULT_SLIDER_WIDTH)
-                opts->sliderThumbs=LINE_NONE;
-
-            if(opts->lighterPopupMenuBgnd<MIN_LIGHTER_POPUP_MENU || opts->lighterPopupMenuBgnd>MAX_LIGHTER_POPUP_MENU)
-                opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
-
-            if(opts->tabBgnd<MIN_TAB_BGND || opts->tabBgnd>MAX_TAB_BGND)
-                opts->tabBgnd=DEF_TAB_BGND;
-
-            if(opts->animatedProgress && !opts->stripedProgress)
-                opts->animatedProgress=false;
-
-            if(0==opts->gbFactor)
-                opts->groupBox=FRAME_PLAIN;
-
-            if(opts->gbFactor<MIN_GB_FACTOR || opts->gbFactor>MAX_GB_FACTOR)
-                opts->gbFactor=DEF_GB_FACTOR;
-
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
-            opts->crSize=CR_SMALL_SIZE;
-            if(SLIDER_CIRCULAR==opts->sliderStyle)
-                opts->sliderStyle=SLIDER_ROUND;
-            if(STRIPE_FADE==opts->stripedProgress)
-                opts->stripedProgress=STRIPE_PLAIN;
-#endif
-            /* For now, only 2 sizes... */
-            if(opts->crSize!=CR_SMALL_SIZE && opts->crSize!=CR_LARGE_SIZE)
-                opts->crSize=CR_SMALL_SIZE;
-
-/*
-??
-            if(SHADE_CUSTOM==opts->shadeMenubars || SHADE_BLEND_SELECTED==opts->shadeMenubars || !opts->borderMenuitems)
-                opts->colorMenubarMouseOver=true;
-*/
-
-#if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
-            if(opts->round>ROUND_FULL)
-                opts->round=ROUND_FULL;
-#endif
-#ifndef CONFIG_DIALOG
-            if(MO_GLOW==opts->coloredMouseOver && EFFECT_NONE==opts->buttonEffect)
-                opts->coloredMouseOver=MO_COLORED_THICK;
-
-            if(IND_GLOW==opts->defBtnIndicator && EFFECT_NONE==opts->buttonEffect)
-                opts->defBtnIndicator=IND_TINT;
-
-            if(opts->round>ROUND_EXTRA && FOCUS_GLOW!=opts->focus)
-                opts->focus=FOCUS_LINE;
-
-            if(EFFECT_NONE==opts->buttonEffect)
-            {
-                opts->etchEntry=false;
-                if(FOCUS_GLOW==opts->focus)
-                    opts->focus=FOCUS_FULL;
-            }
-
-//             if(opts->squareScrollViews)
-//                 opts->highlightScrollViews=false;
-
-            if(SHADE_WINDOW_BORDER==opts->shadeMenubars)
-                opts->shadeMenubarOnlyWhenActive=true;
-
-            if(MO_GLOW==opts->coloredMouseOver)
-                opts->coloredTbarMo=true;
-
-            if(opts->round<ROUND_FULL)
-                opts->square|=SQUARE_POPUP_MENUS;
-#endif
 #ifndef __cplusplus
             if(!defOpts)
             {
@@ -2198,70 +2263,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                     if(def->customGradient[i])
                         free(def->customGradient[i]);
             }
-#endif
-
-            if(opts->bgndOpacity<0 || opts->bgndOpacity>100)
-                opts->bgndOpacity=100;
-            if(opts->dlgOpacity<0 || opts->dlgOpacity>100)
-                opts->dlgOpacity=100;
-            if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
-                opts->menuBgndOpacity=100;
-
-            if(!(opts->square&SQUARE_POPUP_MENUS))
-                opts->popupBorder=true;
-
-#ifndef CONFIG_DIALOG
-            opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
-            opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
-            opts->lvAppearance=MODIFY_AGUA_X(opts->lvAppearance, APPEARANCE_LV_AGUA);
-            opts->sbarBgndAppearance=MODIFY_AGUA(opts->sbarBgndAppearance);
-            opts->tooltipAppearance=MODIFY_AGUA(opts->tooltipAppearance);
-            opts->progressGrooveAppearance=MODIFY_AGUA(opts->progressGrooveAppearance);
-            opts->menuBgndAppearance=MODIFY_AGUA(opts->menuBgndAppearance);
-            opts->menuStripeAppearance=MODIFY_AGUA(opts->menuStripeAppearance);
-            opts->grooveAppearance=MODIFY_AGUA(opts->grooveAppearance);
-            opts->progressAppearance=MODIFY_AGUA(opts->progressAppearance);
-            opts->sliderFill=MODIFY_AGUA(opts->sliderFill);
-            opts->tabAppearance=MODIFY_AGUA(opts->tabAppearance);
-            opts->activeTabAppearance=MODIFY_AGUA(opts->activeTabAppearance);
-            opts->menuitemAppearance=MODIFY_AGUA(opts->menuitemAppearance);
-
-            if(!opts->borderProgress && (!opts->fillProgress || !(opts->square&SQUARE_PROGRESS)))
-                opts->borderProgress=true;
-
-            opts->titlebarAppearance=MODIFY_AGUA(opts->titlebarAppearance);
-            opts->inactiveTitlebarAppearance=MODIFY_AGUA(opts->inactiveTitlebarAppearance);
-
-            if(opts->shadePopupMenu && SHADE_NONE==opts->shadeMenubars)
-                opts->shadePopupMenu=false;
-
-            if(opts->shadePopupMenu)
-                opts->lighterPopupMenuBgnd=0;
-#ifdef __cplusplus
-
-#if defined QT_VERSION && QT_VERSION >= 0x040000
-            if(!(opts->titlebarButtons&TITLEBAR_BUTTON_ROUND))
-#endif
-                opts->titlebarButtonAppearance=MODIFY_AGUA(opts->titlebarButtonAppearance);
-            opts->dwtAppearance=MODIFY_AGUA(opts->dwtAppearance);
-#endif
-            if(opts->windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR &&
-              (opts->windowBorder&WINDOW_BORDER_BLEND_TITLEBAR || SHADE_WINDOW_BORDER==opts->shadeMenubars))
-                opts->windowBorder-=WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR;
-
-            if(APPEARANCE_FLAT==opts->tabAppearance)
-                opts->tabAppearance=APPEARANCE_RAISED;
-            if(EFFECT_NONE==opts->buttonEffect)
-                opts->etchEntry=false;
-            if(opts->colorSliderMouseOver &&
-               (SHADE_NONE==opts->shadeSliders || SHADE_DARKEN==opts->shadeSliders))
-                opts->colorSliderMouseOver=false;
-#endif /* ndef CONFIG_DIALOG */
-
-            if(LINE_1DOT==opts->toolbarSeparators)
-                opts->toolbarSeparators=LINE_DOTS;
-
-#ifndef __cplusplus
+            releaseConfig(cfg);
             freeOpts(defOpts);
 #endif
             return true;
