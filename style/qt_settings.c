@@ -2404,6 +2404,63 @@ static gboolean qtInit()
                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED].blue));
                     gtk_rc_parse_string(tmpStr);
                 }
+
+                if(GTK_APP_OPEN_OFFICE==qtSettings.app)
+                {
+                    GdkColor *active=NULL,
+                             *inactive=NULL;
+
+                    if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
+                    {
+                        active=&qtSettings.colors[PAL_ACTIVE][opts.useHighlightForMenu ? COLOR_TEXT_SELECTED : COLOR_WINDOW_BORDER_TEXT];
+                        inactive=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
+                    }
+                    else if(opts.customMenuTextColor)
+                    {
+                        active=&opts.customMenuSelTextColor;
+                        inactive=&opts.customMenuNormTextColor;
+                    }
+                    else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
+                         (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
+                    {
+                        active=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
+                        inactive=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
+                    }
+
+                    if(active && inactive)
+                    {
+                        static const char *format="style \""RC_SETTING"MnuTxt\""
+                                                  " {fg[NORMAL]=\"#%02X%02X%02X\""
+                                                  " fg[PRELIGHT]=\"#%02X%02X%02X\""
+                                                  " fg[ACTIVE]=\"#%02X%02X%02X\""
+                                                  " fg[SELECTED]=\"#%02X%02X%02X\""
+                                                  " text[NORMAL]=\"#%02X%02X%02X\"}"
+                                                  " widget_class \"*<GtkMenuBar>*\" style \""RC_SETTING"MnuTxt\" %s";
+                        static const char *menutitem=" widget_class \"*<GtkMenuItem>*\" style \""RC_SETTING"MnuTxt\" ";
+                        tmpStr=(char *)realloc(tmpStr, strlen(format)+(opts.shadePopupMenu ? strlen(menutitem) : 1));
+
+                        if(tmpStr)
+                        {
+                            sprintf(tmpStr, format, toQtColor(inactive->red),
+                                                    toQtColor(inactive->green),
+                                                    toQtColor(inactive->blue),
+                                                    toQtColor(active->red),
+                                                    toQtColor(active->green),
+                                                    toQtColor(active->blue),
+                                                    toQtColor(active->red),
+                                                    toQtColor(active->green),
+                                                    toQtColor(active->blue),
+                                                    toQtColor(active->red),
+                                                    toQtColor(active->green),
+                                                    toQtColor(active->blue),
+                                                    toQtColor(inactive->red),
+                                                    toQtColor(inactive->green),
+                                                    toQtColor(inactive->blue),
+                                                    opts.shadePopupMenu ? menutitem : " ");
+                            gtk_rc_parse_string(tmpStr);
+                        }
+                    }
+                }
             }
 
 //             if(qtSettings.inactiveChangeSelectionColor)
