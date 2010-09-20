@@ -736,7 +736,6 @@ static void insertGbLabelEntries(QComboBox *combo)
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
-               widgetStyle(NULL),
 #ifdef QTC_STYLE_SUPPORT
                exportDialog(NULL),
 #endif
@@ -1981,8 +1980,6 @@ void QtCurveConfig::updatePreview()
     style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
        
     setStyleRecursive(stylePreview, style);
-    delete widgetStyle;
-    widgetStyle = style;
 }
 
 static const char * constGradValProp="qtc-grad-val";

@@ -193,7 +193,6 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     private:
 
     Options               previewStyle;
-    QStyle                *widgetStyle;
     CWorkspace            *workSpace;
     CStylePreview         *stylePreview;
     QMdiSubWindow         *mdiWindow;
