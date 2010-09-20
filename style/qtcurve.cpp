@@ -5884,7 +5884,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                     opt.state|=State_Raised|State_Horizontal;
                     drawProgress(painter, vertical ? QRect(r.x(), r.y()+step, r.width(), chunkSize) : QRect(r.x()+step, r.y(), chunkSize, r.height()),
-                                 option, ROUNDED_ALL, vertical);
+                                 option, vertical);
                 }
                 else if(r.isValid() && bar->progress>0)
                 {
@@ -5897,22 +5897,18 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         int height(qMin(r.height(), (int)(pg * r.height())));
 
                         if(inverted)
-                            drawProgress(painter, QRect(r.x(), r.y(), r.width(), height), 
-                                         option, height==r.height() ?  ROUNDED_NONE : ROUNDED_BOTTOM, true);
+                            drawProgress(painter, QRect(r.x(), r.y(), r.width(), height), option, true);
                         else
-                            drawProgress(painter, QRect(r.x(), r.y()+(r.height()-height), r.width(), height),
-                                         option, height==r.height() ? ROUNDED_NONE : ROUNDED_TOP, true);
+                            drawProgress(painter, QRect(r.x(), r.y()+(r.height()-height), r.width(), height), option, true);
                     }
                     else
                     {
                         int width(qMin(r.width(), (int)(pg * r.width())));
 
                         if(reverse || inverted)
-                            drawProgress(painter, QRect(r.x()+(r.width()-width), r.y(), width, r.height()),
-                                         option, width==r.width() ? ROUNDED_NONE : ROUNDED_LEFT, false, true);
+                            drawProgress(painter, QRect(r.x()+(r.width()-width), r.y(), width, r.height()), option, false, true);
                         else
-                            drawProgress(painter, QRect(r.x(), r.y(), width, r.height()), option,
-                                         width==r.width() ? ROUNDED_NONE : ROUNDED_RIGHT);
+                            drawProgress(painter, QRect(r.x(), r.y(), width, r.height()), option);
                     }
                 }
 
@@ -10758,7 +10754,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
             drawProgressBevelGradient(p, opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r, option, horiz, app, custom);
         else
         {
-            drawBevelGradient(fill, p, r,
+            drawBevelGradient(fill, p, WIDGET_PROGRESSBAR==w && opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r,
                               doBorder
                                 ? buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))
                                 : buildPath(QRectF(r), w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)),
@@ -11814,7 +11810,7 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
     }
 }
 
-void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, int round, bool vertical, bool reverse) const
+void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option, bool vertical, bool reverse) const
 {
     QStyleOption opt(*option);
     QRect        rx(r);
@@ -11840,7 +11836,6 @@ void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option
     if(!vertical && rx.width()<3)
         rx.setWidth(3);
 
-    int          length(vertical ? rx.height() : rx.width());
     // KTorrent's progressbars seem to have state==State_None
     const QColor *use=option->state&State_Enabled || State_None==option->state || ECOLOR_BACKGROUND==opts.progressGrooveColor
                     ? itsProgressCols
@@ -11848,8 +11843,7 @@ void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option
                         : highlightColors(option, true)
                     : itsBackgroundCols;
 
-    drawLightBevel(p, rx, &opt, 0L, opts.fillProgress ? ROUNDED_ALL : round, use[ORIGINAL_SHADE], use, false,
-                   WIDGET_PROGRESSBAR);
+    drawLightBevel(p, rx, &opt, 0L, ROUNDED_ALL, use[ORIGINAL_SHADE], use, opts.borderProgress, WIDGET_PROGRESSBAR);
 
     if(opts.glowProgress && (vertical ? rx.height() : rx.width())>3)
     {
@@ -11868,26 +11862,7 @@ void Style::drawProgress(QPainter *p, const QRect &r, const QStyleOption *option
         p->fillRect(ri, grad);
     }
 
-    if(opts.borderProgress)
-    {
-        drawBorder(p, rx, option, opts.fillProgress ? ROUNDED_ALL : round, use, WIDGET_PROGRESSBAR);
-
-        if(!opts.fillProgress && ROUNDED && length>2 && ROUNDED_ALL!=round)
-        {
-            bool drawFull(length > 3);
-
-            p->setPen(midColor(option->palette.background().color(), itsHighlightCols[PBAR_BORDER]));
-            if(!(round&CORNER_TL) || !drawFull)
-                p->drawPoint(rx.x(), rx.y());
-            if(!(round&CORNER_BL) || !drawFull)
-                p->drawPoint(rx.x(), rx.y()+rx.height()-1);
-            if(!(round&CORNER_TR) || !drawFull)
-                p->drawPoint(rx.x()+rx.width()-1, rx.y());
-            if(!(round&CORNER_BR) || !drawFull)
-                p->drawPoint(rx.x()+rx.width()-1, rx.y()+rx.height()-1);
-        }
-    }
-    else
+    if(!opts.borderProgress)
     {
         p->setPen(use[PBAR_BORDER]);
         if(!vertical)

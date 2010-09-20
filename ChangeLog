@@ -26,6 +26,7 @@
 15. If preview is embedded in config dialog, then always set the menubar size
     XProperty to 0. This prevents the kwin decoration thinking that the main config
     dialog has a menubar.
+16. Use same radius for all corners of progressbar.
 
 1.6.1
 -----

@@ -1880,6 +1880,13 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
         return (w>h ? h : w)/2.0;
 #endif
 
+    if(RADIUS_EXTERNAL==rad && !opts->fillProgress && (WIDGET_PROGRESSBAR==widget
+#ifndef __cplusplus
+                                                        || WIDGET_ENTRY_PROGRESSBAR==widget
+#endif
+      ))
+        rad=RADIUS_INTERNAL;
+
     switch(rad)
     {
         case RADIUS_SELECTION:
