@@ -27,6 +27,8 @@
     XProperty to 0. This prevents the kwin decoration thinking that the main config
     dialog has a menubar.
 16. Use same radius for all corners of progressbar.
+17. Apply menu background settings to menus of non-editable combos. Rounding is
+    not applied due to clipping/shadow issues with Gtk2)
 
 1.6.1
 -----
