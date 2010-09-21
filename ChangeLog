@@ -10,6 +10,7 @@
 6. Apply menu background settings to menus of non-editable combos. (Rounding is
    not applied due to clipping/shadow issues with Gtk2)
 7. Allow borderless rounded popup menus.
+8. Don't draw double focus on Gimp combos.
 
 1.6.1
 -----

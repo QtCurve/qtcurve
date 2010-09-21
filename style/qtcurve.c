@@ -7249,6 +7249,9 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
     }
     else if(isGimpCombo(widget))
     {
+        if(FOCUS_GLOW==opts.focus)
+            return;
+
         x-=2, width+=4;
         if(!doEtch)
             x--, y--, width+=2, height+=2;
