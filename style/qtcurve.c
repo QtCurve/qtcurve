@@ -4872,6 +4872,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
             else if(!opts.borderMenuitems && !mb && menuitem)
             {
+                /*For now dont round combos - getting weird effects with shadow/clipping :-( */
                 gboolean roundedMenu=(!widget || !isComboMenu(widget->parent)) && !(opts.square&SQUARE_POPUP_MENUS);
 
                 if(roundedMenu)
@@ -4906,10 +4907,11 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
     else if(DETAIL("menu"))
     {
         gboolean comboMenu=isComboMenu(widget),
-                 roundedMenu=!comboMenu && !(opts.square&SQUARE_POPUP_MENUS);
+                 roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS);
         double   radius=0.0;
 
-        if(roundedMenu)
+        /*For now dont round combos - getting weird effects with shadow/clipping :-( */
+        if(roundedMenu && !comboMenu)
         {
             int      size=((width&0xFFFF)<<16)+(height&0xFFFF),
                      old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
@@ -4937,10 +4939,10 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
         }
         
-        if(widget && !comboMenu && 100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
+        if(widget && /*!comboMenu && */100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
             enableBlurBehind(widget, TRUE);
 
-        if(!comboMenu && !IS_FLAT_BGND(opts.menuBgndAppearance))
+        if(/*!comboMenu && */!IS_FLAT_BGND(opts.menuBgndAppearance))
         {
             double   alpha=1.0;
             gboolean useAlpha=opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
@@ -4962,7 +4964,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
         {
             double   alpha=1.0;
-            gboolean useAlpha=!comboMenu  && opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
+            gboolean useAlpha=/*!comboMenu  && */opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
 
             if(useAlpha)
             {
@@ -4974,7 +4976,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
         }
 
-        if(!comboMenu && IMG_NONE!=opts.menuBgndImage.type)
+        if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)
             drawBgndRings(cr, y, width, FALSE);
 
         if(opts.menuStripe && !comboMenu)
@@ -5022,13 +5024,14 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                               &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
         }
 
-        if(opts.popupBorder || roundedMenu)
+        /*For now dont round combos - getting weird effects with shadow/clipping :-( */
+        if(opts.popupBorder || (roundedMenu && !comboMenu))
         {
             GdkColor *cols=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
                             ? qtcPalette.menu
                             : qtcPalette.background;
 
-            if(roundedMenu)
+            if(roundedMenu && !comboMenu)
                 unsetCairoClipping(cr);
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
