@@ -1532,9 +1532,6 @@ static void checkConfig(Options *opts)
     if(opts->menuBgndOpacity<0 || opts->menuBgndOpacity>100)
         opts->menuBgndOpacity=100;
 
-    if(!(opts->square&SQUARE_POPUP_MENUS))
-        opts->popupBorder=true;
-
 #ifndef CONFIG_DIALOG
     opts->bgndAppearance=MODIFY_AGUA(opts->bgndAppearance);
     opts->selectionAppearance=MODIFY_AGUA(opts->selectionAppearance);
