@@ -591,7 +591,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
             wc==QLatin1String("W Mail Thunderbird 3pane") ||
             wc==QLatin1String("W Mail Thunderbird addressbook") ||
             wc==QLatin1String("D Calendar Thunderbird EventDialog") ||
-            wc==QLatin1String("W Msgcompose Thunderbird Msgcompose")) 
+            wc==QLatin1String("W Msgcompose Thunderbird Msgcompose") ||
             wc==QLatin1String("D Msgcompose Thunderbird Msgcompose")) 
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
         else if(wc.startsWith(QLatin1String("W VCLSalFrame.DocumentWindow OpenOffice.org")) ||
