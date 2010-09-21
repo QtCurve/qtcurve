@@ -9,6 +9,7 @@
 5. Use same radius for all corners of progressbar.
 6. Apply menu background settings to menus of non-editable combos. (Rounding is
    not applied due to clipping/shadow issues with Gtk2)
+7. Allow borderless rounded popup menus.
 
 1.6.1
 -----

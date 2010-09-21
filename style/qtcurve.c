@@ -5024,8 +5024,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                               &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
         }
 
-        /*For now dont round combos - getting weird effects with shadow/clipping :-( */
-        if(opts.popupBorder || (roundedMenu && !comboMenu))
+        if(opts.popupBorder)
         {
             GdkColor *cols=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
                             ? qtcPalette.menu
@@ -5035,7 +5034,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 unsetCairoClipping(cr);
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
-            if(roundedMenu)
+             /*For now dont round combos - getting weird effects with shadow/clipping :-( */
+            if(roundedMenu && !comboMenu)
                 createPath(cr, x+0.5, y+0.5, width-1, height-1, radius-1, ROUNDED_ALL);
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
