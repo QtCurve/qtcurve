@@ -587,15 +587,17 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     if(!preview && (blend||menuColor) && -1==itsMenuBarSize)
     {
         QString wc(windowClass());
-        if(wc==QLatin1String("Navigator Firefox") ||
-            wc==QLatin1String("Mail Thunderbird") ||
-            wc==QLatin1String("Calendar Thunderbird EventDialog") ||
-            wc==QLatin1String("Msgcompose Thunderbird EventDialog"))
+        if(wc==QLatin1String("W Navigator Firefox browser") ||
+            wc==QLatin1String("W Mail Thunderbird 3pane") ||
+            wc==QLatin1String("W Mail Thunderbird addressbook") ||
+            wc==QLatin1String("D Calendar Thunderbird EventDialog") ||
+            wc==QLatin1String("W Msgcompose Thunderbird Msgcompose")) 
+            wc==QLatin1String("D Msgcompose Thunderbird Msgcompose")) 
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
-        else if(wc.startsWith(QLatin1String("VCLSalFrame.DocumentWindow OpenOffice.org")) ||
-                wc.startsWith(QLatin1String("VCLSalFrame OpenOffice.org")) ||
-                wc==QLatin1String("soffice.bin Soffice.bin"))
-            itsMenuBarSize=QFontMetrics(QApplication::font()).height()+9;
+        else if(wc.startsWith(QLatin1String("W VCLSalFrame.DocumentWindow OpenOffice.org")) ||
+                wc.startsWith(QLatin1String("W VCLSalFrame OpenOffice.org")) ||
+                wc==QLatin1String("W soffice.bin Soffice.bin"))
+            itsMenuBarSize=QFontMetrics(QApplication::font()).height()+7;
         else
         {
             int val=getMenubarSizeProperty(windowId());
@@ -1623,11 +1625,11 @@ const QString & QtCurveClient::windowClass()
         
         switch(info.windowType(NET::AllTypesMask))
         {
-            case NET::Normal:
-                itsWindowClass=info.windowClassName()+' '+info.windowClassClass();
-                break;
             case NET::Dialog:
-                itsWindowClass=info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
+                itsWindowClass="D "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
+                break;
+            case NET::Normal:
+                itsWindowClass="W "+info.windowClassName()+' '+info.windowClassClass()+' '+info.windowRole();
                 break;
             default:
                 itsWindowClass="<>";
