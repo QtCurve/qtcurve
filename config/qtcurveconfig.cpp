@@ -1979,7 +1979,7 @@ void QtCurveConfig::updatePreview()
     styleOpt.opts=previewStyle;
     style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
        
-    setStyleRecursive(stylePreview, style);
+    setStyleRecursive(mdiWindow ? (QWidget *)mdiWindow : (QWidget *)stylePreview, style);
 }
 
 static const char * constGradValProp="qtc-grad-val";
