@@ -1521,8 +1521,8 @@ static void checkConfig(Options *opts)
     if(MO_GLOW==opts->coloredMouseOver)
         opts->coloredTbarMo=true;
 
-    if(opts->round<ROUND_FULL)
-        opts->square|=SQUARE_POPUP_MENUS;
+    if(opts->round<ROUND_SLIGHT)
+        opts->square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
 #endif
 
     if(opts->bgndOpacity<0 || opts->bgndOpacity>100)

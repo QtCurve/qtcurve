@@ -404,6 +404,12 @@ enum
 #define RINGS_SQUARE_LARGE_SIZE  120.0
 #define RINGS_SQUARE_SMALL_SIZE  100.0
 
+#if !defined __cplusplus
+#define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 3.5)
+#else
+#define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 2.5)
+#endif
+
 #define CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type || 100!=opts.bgndOpacity || 100!=opts.dlgOpacity)
 
 #define GLOW_PROG_ALPHA 0.55

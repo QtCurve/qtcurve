@@ -479,16 +479,26 @@ static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect,
     }
 }
 
-static QRegion windowMask(const QRect &r)
+static QRegion windowMask(const QRect &r, bool full)
 {
     int x, y, w, h;
     r.getRect(&x, &y, &w, &h);
 
-    QRegion region(x + 4, y + 0, w-4*2, h-0*2);
-    region += QRegion(x + 0, y + 4, w-0*2, h-4*2);
-    region += QRegion(x + 2, y + 1, w-2*2, h-1*2);
-    region += QRegion(x + 1, y + 2, w-1*2, h-2*2);
-    return region;
+    if(full)
+    {
+        QRegion region(x + 4, y + 0, w-4*2, h-0*2);
+        region += QRegion(x + 0, y + 4, w-0*2, h-4*2);
+        region += QRegion(x + 2, y + 1, w-2*2, h-1*2);
+        region += QRegion(x + 1, y + 2, w-1*2, h-2*2);
+        return region;
+    }
+    else
+    {
+        QRegion region(x+1, y+1, w-2, h-2);
+        region += QRegion(x, y+2, w, h-4);
+        region += QRegion(x+2, y, w-4, h);
+        return region;
+    }
 }
 
 enum WindowsStyleConsts
@@ -2694,6 +2704,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 QWidget      *widget=qobject_cast<QWidget *>(object);
                 QPainter     p(widget);
                 QRect        r(widget->rect());
+                double       radius=MENU_AND_TOOLTIP_RADIUS;
                 QStyleOption opt;
                 opt.init(widget);
                 const QColor *use(popupMenuCols(&opt));
@@ -2702,11 +2713,11 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 {
                     p.setRenderHint(QPainter::Antialiasing, true);
                     p.setPen(use[ORIGINAL_SHADE]);
-                    p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 5));
+                    p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
                     p.setRenderHint(QPainter::Antialiasing, false);
                 }
                 if(!(opts.square&SQUARE_POPUP_MENUS) && !isCombo)
-                    p.setClipRegion(windowMask(r), Qt::IntersectClip);
+                    p.setClipRegion(windowMask(r, opts.round>ROUND_SLIGHT), Qt::IntersectClip);
 
                 drawBackground(&p, widget, BGND_MENU);
                 if(opts.popupBorder)
@@ -2719,7 +2730,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     else
                     {
                         p.setRenderHint(QPainter::Antialiasing, true);
-                        p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, 5));
+                        p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
                     }
 
                     if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
@@ -2728,7 +2739,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                                      br;
                         QRect        ri(r.adjusted(1, 1, 1, 1));
 
-                        buildSplitPath(ri, ROUNDED_ALL, 4, tl, br);
+                        buildSplitPath(ri, ROUNDED_ALL, radius-1.0, tl, br);
                         p.setPen(use[0]);
                         p.drawPath(tl);
                         p.setPen(use[FRAME_DARK_SHADOW]);
@@ -3251,14 +3262,14 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
     {
         case SH_ToolTip_Mask:
         case SH_Menu_Mask:
-            if(opts.round<ROUND_FULL || (SH_ToolTip_Mask==hint && (opts.square&SQUARE_TOOLTIPS)) ||
-                                        (SH_Menu_Mask==hint && (opts.square&SQUARE_POPUP_MENUS)))
+            if((SH_ToolTip_Mask==hint && (opts.square&SQUARE_TOOLTIPS)) ||
+               (SH_Menu_Mask==hint && (opts.square&SQUARE_POPUP_MENUS)))
                 return BASE_STYLE::styleHint(hint, option, widget, returnData);
             else
             {
                 if(!Utils::hasAlphaChannel(widget) && (!widget || widget->isWindow()))
                     if(QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
-                        mask->region = windowMask(option->rect);
+                        mask->region = windowMask(option->rect, opts.round>ROUND_SLIGHT);
                 return true;
             }
         case SH_ComboBox_ListMouseTracking:
@@ -5253,8 +5264,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         case PE_PanelTipLabel:
         {
             bool         haveAlpha=Utils::hasAlphaChannel(widget),
-                         rounded=!(opts.square&SQUARE_TOOLTIPS) && opts.round>=ROUND_FULL;
-            QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 5) : QPainterPath();
+                         rounded=!(opts.square&SQUARE_TOOLTIPS);
+            QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
             painter->save();
@@ -11839,7 +11850,8 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
         {
             p->save();
             p->setRenderHint(QPainter::Antialiasing, true);
-            drawBevelGradient(cols[fill], p, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, 4), true, false,
+            drawBevelGradient(cols[fill], p, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL,
+                                                          MENU_AND_TOOLTIP_RADIUS-(opts.round>ROUND_SLIGHT ? 1.0 : 0.5)), true, false,
                               opts.menuitemAppearance, WIDGET_MENU_ITEM, false);
             p->restore();
         }
