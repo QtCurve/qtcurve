@@ -3186,7 +3186,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 #if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
         gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
-                 rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS) && opts.round>=ROUND_FULL;
+                 rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS);
 
         if(!nonGtk && GTK_IS_WINDOW(widget))
             gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
@@ -3196,7 +3196,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             int size=((width&0xFFFF)<<16)+(height&0xFFFF),
                 old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
 
-            radius=5.0; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
+            radius=MENU_AND_TOOLTIP_RADIUS; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
 
             if(size!=old)
             {
@@ -4876,7 +4876,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 gboolean roundedMenu=(!widget || !isComboMenu(widget->parent)) && !(opts.square&SQUARE_POPUP_MENUS);
 
                 if(roundedMenu)
-                    clipPathRadius(cr, x, y, width, height, 4, round);
+                    clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS-1.0, round);
                 drawBevelGradient(cr, style, area, region, x, y, width, height, &itemCols[fillVal],
                                   TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
                 if(roundedMenu)
@@ -4916,7 +4916,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             int      size=((width&0xFFFF)<<16)+(height&0xFFFF),
                      old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
 
-            radius=5; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
+            radius=MENU_AND_TOOLTIP_RADIUS; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
             if(size!=old)
             {
                 GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);

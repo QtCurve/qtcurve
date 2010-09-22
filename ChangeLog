@@ -11,6 +11,7 @@
    not applied due to clipping/shadow issues with Gtk2)
 7. Allow borderless rounded popup menus.
 8. Don't draw double focus on Gimp combos.
+9. Allow rounded menus when rounding is set to slight.
 
 1.6.1
 -----
