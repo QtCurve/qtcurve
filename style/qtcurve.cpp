@@ -10570,7 +10570,8 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
                                      titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
                                                     (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
                                                      (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
-                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt)));
+                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt))),
+                                     useBgndAlpha((WIDGET_MENUBAR==w || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w) && BLEND_TITLEBAR);
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
@@ -10598,6 +10599,8 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
         }
         else
             shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
+        if(useBgndAlpha && col.alphaF()>0.0)
+            col.setAlphaF(opts.bgndOpacity/100.0);
         if((*it).alpha<1.0)
             col.setAlphaF(col.alphaF()*(*it).alpha);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
@@ -12381,7 +12384,7 @@ void Style::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyl
         drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
                             ? menuColors(option, itsActive)[ORIGINAL_SHADE]
                             : option->palette.background().color(),
-                          p, rx, horiz, false, MODIFY_AGUA(app));
+                          p, rx, horiz, false, MODIFY_AGUA(app), menu ? WIDGET_MENUBAR : WIDGET_OTHER);
     }
 }
 

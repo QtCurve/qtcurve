@@ -631,6 +631,7 @@ typedef enum
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
+    WIDGET_MENUBAR,            // Qt4 only
     WIDGET_DOCK_WIDGET_TITLE,
     WIDGET_DIAL,
 #endif
