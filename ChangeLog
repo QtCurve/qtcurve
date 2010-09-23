@@ -1,6 +1,7 @@
 1.6.3
 -----
 1. Fix sunken kwin button backgrounds when using background gradients.
+2. In config dialog, dont enforce bordered popup menus if rounded.
 
 1.6.2
 -----
