@@ -11181,9 +11181,11 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
             p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
         else
         {
+            const QPointF prevOrigin(p->brushOrigin());
             p->setBrushOrigin(r.x(), r.y());
             p->fillPath(path,
                         QBrush(APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
+            p->setBrushOrigin(prevOrigin);
         }
         
         if(isWindow && APPEARANCE_STRIPED!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
@@ -11231,8 +11233,10 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
             p->fillRect(r, col);
         else
         {
+            const QPointF prevOrigin(p->brushOrigin());
             p->setBrushOrigin(r.x(), r.y());
             p->fillPath(path, col);
+            p->setBrushOrigin(prevOrigin);
         }
     }
 }

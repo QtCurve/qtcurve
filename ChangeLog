@@ -1,3 +1,7 @@
+1.6.3
+-----
+1. Fix sunken kwin button backgrounds when using background gradients.
+
 1.6.2
 -----
  1. Fix light border on kwin titlebars when using background opacity
