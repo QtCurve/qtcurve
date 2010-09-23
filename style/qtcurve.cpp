@@ -2027,13 +2027,23 @@ void Style::polish(QWidget *widget)
             widget->setAttribute(Qt::WA_TranslucentBackground);
     }
 
-    bool    parentIsToolbar(false);
-    QWidget *wid=widget ? widget->parentWidget() : 0L;
-
-    while(wid && !parentIsToolbar)
+    bool parentIsToolbar(false);
+    
+    // Using dark menubars - konqueror's combo box texts get messed up. Seems to be when a plain QWidget has widget->setBackgroundRole(QPalette::Window);
+    // and widget->setAutoFillBackground(false); set (below). These onyl happen if 'parentIsToolbar' - so dont bather detecting this if the widget
+    // is a plain QWidget
+    //
+    // QWidget QComboBoxListView QComboBoxPrivateContainer SearchBarCombo KToolBar KonqMainWindow
+    // QWidget KCompletionBox KLineEdit SearchBarCombo KToolBar KonqMainWindow
+    if(strcmp(widget->metaObject()->className(), "QWidget"))
     {
-        parentIsToolbar=qobject_cast<QToolBar *>(wid) || wid->inherits("Q3ToolBar");
-        wid=wid->parentWidget();
+        QWidget *wid=widget ? widget->parentWidget() : 0L;
+
+        while(wid && !parentIsToolbar)
+        {
+            parentIsToolbar=qobject_cast<QToolBar *>(wid) || wid->inherits("Q3ToolBar");
+            wid=wid->parentWidget();
+        }
     }
 
     if(APP_QTCREATOR==theThemedApp && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
@@ -2060,11 +2070,8 @@ void Style::polish(QWidget *widget)
 
     if(parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
         widget->setFont(QApplication::font());
-
-    if (qobject_cast<QMenuBar *>(widget) ||
-        widget->inherits("Q3ToolBar") ||
-        qobject_cast<QToolBar *>(widget) ||
-        parentIsToolbar)
+    
+    if (qobject_cast<QMenuBar *>(widget) || widget->inherits("Q3ToolBar") || qobject_cast<QToolBar *>(widget) || parentIsToolbar)
         widget->setBackgroundRole(QPalette::Window);
 
     if(!IS_FLAT(opts.toolbarAppearance) && parentIsToolbar)
