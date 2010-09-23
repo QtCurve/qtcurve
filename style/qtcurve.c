@@ -4685,6 +4685,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
             int         menuBarAdjust=0;
+            gboolean    useAlpha=menubar && BLEND_TITLEBAR && opts.bgndOpacity!=100;
+            double      alpha=useAlpha ? (opts.bgndOpacity/100.00) : 1.0;
 
 //             if(menubar)
             if(!isMozilla())
@@ -4703,21 +4705,31 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
             /* Toolbars and menus */
             if(GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app))
-                drawBevelGradient(cr, style, area, NULL, x, y-menuBarAdjust, width, height+menuBarAdjust, col,
+            {
+                if(useAlpha)
+                    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+                drawBevelGradientAlpha(cr, style, area, NULL, x, y-menuBarAdjust, width, height+menuBarAdjust, col,
                                 menubar
                                     ? TRUE
                                     : DETAIL("handlebox")
                                             ? width<height
                                             : width>height,
-                                FALSE, MODIFY_AGUA(app), WIDGET_OTHER);
+                                FALSE, MODIFY_AGUA(app), WIDGET_OTHER, alpha);
+                if(useAlpha)
+                    cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+            }
             else if((menubar && SHADE_NONE!=opts.shadeMenubars) || !CUSTOM_BGND ||
                     !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
             {
                 if(menubar)
                 {
-                    drawAreaColor(cr, area, NULL, col, x, y, width, height);
+                    if(useAlpha)
+                        cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+                    drawAreaColorAlpha(cr, area, NULL, col, x, y, width, height, alpha);
 //                     if(widget && IMG_NONE!=opts.bgndImage.type)
 //                         drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+                    if(useAlpha)
+                        cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
                 }
             }
 

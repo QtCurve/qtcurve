@@ -1,3 +1,7 @@
+1.6.3
+-----
+1. Apply background opacity to menubar/titlebar if blended.
+
 1.6.2
 -----
 1. Theme evolution's headers as headers, and not buttons.
