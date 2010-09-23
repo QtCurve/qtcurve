@@ -5873,6 +5873,9 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
+        if(!use_text && widget && widget->parent && GTK_IS_LABEL(widget) && GTK_IS_OPTION_MENU(widget->parent))
+            use_text=TRUE;
+
         /*
            This check of 'requisition' size (and not 'allocation') seems to match better
            with Qt4's text positioning. For example, 10pt verdana - no shift is required

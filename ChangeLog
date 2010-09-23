@@ -1,6 +1,7 @@
 1.6.3
 -----
 1. Apply background opacity to menubar/titlebar if blended.
+2. Always use text colours when drawing labels on a GtkOptionMenu.
 
 1.6.2
 -----
