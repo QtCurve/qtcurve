@@ -13314,7 +13314,7 @@ void Style::emitMenuSize(QWidget *w, unsigned short size)
     {
         static const char * constMenuSizeProperty="qtcMenuSize";
         QVariant       prop(w->property(constMenuSizeProperty));
-        unsigned short oldSize=0;
+        unsigned short oldSize=2000;
 
         if(prop.isValid())
         {
