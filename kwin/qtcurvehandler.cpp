@@ -461,6 +461,15 @@ int QtCurveHandler::borderEdgeSize() const
                     : 1);
 }
 
+void QtCurveHandler::removeClient(QtCurveClient *c)
+{
+    if(c->windowId()==itsLastMenuXid)
+        itsLastMenuXid=0;
+    if(c->windowId()==itsLastStatusXid)
+        itsLastStatusXid=0;
+    itsClients.removeAll(c);
+}
+ 
 // make the handler accessible to other classes...
 static QtCurveHandler *handler = 0;
 

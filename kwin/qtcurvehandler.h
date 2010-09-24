@@ -121,7 +121,7 @@ class QtCurveHandler : public QObject,
     void                  emitToggleStatusBar(int xid);
     void                  borderSizeChanged();
     void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
-    void                  removeClient(QtCurveClient *c) { itsClients.removeAll(c); }
+    void                  removeClient(QtCurveClient *c);
     bool                  wasLastMenu(int id)            { return id==itsLastMenuXid; }
     bool                  wasLastStatus(int id)          { return id==itsLastStatusXid; }
 
