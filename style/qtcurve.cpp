@@ -42,6 +42,7 @@
 #include <X11/Xatom.h>
 #include "fixx11h.h"
 #include <QX11Info>
+#include <sys/time.h>
 #endif
 
 #ifndef QTC_QT_ONLY
@@ -13205,27 +13206,57 @@ static QMainWindow * getWindow(unsigned int xid)
                                end(tlw.end());
 
     for(; it!=end; ++it)
+    {
         if(qobject_cast<QMainWindow *>(*it) && (*it)->winId()==xid)
             return static_cast<QMainWindow*>(*it);
+    }
     return 0L;
+}
+
+static bool diffTime(struct timeval *lastTime)
+{
+    struct timeval now, diff;
+
+    gettimeofday(&now, NULL);
+    timersub(&now, lastTime, &diff);
+    *lastTime=now;
+    return diff.tv_sec>0 || diff.tv_usec>500000;
 }
 #endif
 
 void Style::toggleMenuBar(unsigned int xid)
 {
 #ifdef Q_WS_X11
-    QMainWindow *win=getWindow(xid);
-    if(win)
-        toggleMenuBar(win);
+    static unsigned int   lastXid  = 0;
+    static struct timeval lastTime = {0, 0};
+
+    if(diffTime(&lastTime) || lastXid!=xid)
+    {
+        QMainWindow *win=getWindow(xid);
+        if(win)
+            toggleMenuBar(win);
+    }
+    lastXid=xid;
+#else
+    Q_UNUSED(xid);
 #endif
 }
 
 void Style::toggleStatusBar(unsigned int xid)
 {
 #ifdef Q_WS_X11
-    QMainWindow *win=getWindow(xid);
-    if(win)
-        toggleStatusBar(win);
+    static unsigned int   lastXid  = 0;
+    static struct timeval lastTime = {0, 0};
+
+    if(diffTime(&lastTime) || lastXid!=xid)
+    {
+        QMainWindow *win=getWindow(xid);
+        if(win)
+            toggleStatusBar(win);
+    }
+    lastXid=xid;
+#else
+    Q_UNUSED(xid);
 #endif
 }
 

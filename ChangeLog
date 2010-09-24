@@ -8,6 +8,8 @@
    has a menubar, but it's hidden - QtCurve detected the menubar, and informed
    the kwin style of this, cuasing the titlebar to have an incorrect gradient.
 6. Disable statusbar hiding for rekonq - it does not use standard statusbars.
+7. When hiding status/menubars via kwin buttons, only re-act if there has been more
+   then 1/2 a second between presses.
 
 1.6.2
 -----
