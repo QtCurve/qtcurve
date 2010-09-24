@@ -590,6 +590,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         if(wc==QLatin1String("W Navigator Firefox browser") ||
             wc==QLatin1String("W Mail Thunderbird 3pane") ||
             wc==QLatin1String("W Mail Thunderbird addressbook") ||
+            wc==QLatin1String("W Mail Thunderbird messageWindow") ||
             wc==QLatin1String("D Calendar Thunderbird EventDialog") ||
             wc==QLatin1String("W Msgcompose Thunderbird Msgcompose") ||
             wc==QLatin1String("D Msgcompose Thunderbird Msgcompose")) 

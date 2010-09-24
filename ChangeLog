@@ -14,6 +14,7 @@
  9. When initialising, selecting a preset, or importing a settings file, dont update
     preview until fully loaded.
 10. Use preview windows close button to detatch/attach preview.
+11. Fix menubar/titlebar blending for Thunderbird's 'show message in new window'
 
 1.6.2
 -----
