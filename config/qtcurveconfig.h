@@ -25,8 +25,10 @@
 #define CONFIG_DIALOG
 
 #include <ui_qtcurveconfigbase.h>
+#include "ui_stylepreview.h"
 #include <QMap>
 #include <QComboBox>
+#include <KDE/KXmlGuiWindow>
 #include "common.h"
 
 class QComboBox;
@@ -40,6 +42,8 @@ class QStyle;
 class QMdiSubWindow;
 class CWorkspace;
 class CStylePreview;
+class KAboutData;
+class KComponentData;
 
 class CGradientPreview : public QWidget
 {
@@ -75,6 +79,28 @@ struct Preset
     bool    loaded;
     Options opts;
     QString fileName;
+};
+
+class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
+{
+    Q_OBJECT
+
+    public:
+
+    CStylePreview(QWidget *parent = 0);
+    ~CStylePreview();
+
+    void closeEvent(QCloseEvent *e);
+    QSize sizeHint() const;
+
+    Q_SIGNALS:
+
+    void closePressed();
+
+    private:
+
+    KAboutData     *aboutData;
+    KComponentData *componentData;
 };
 
 class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
@@ -206,6 +232,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
                           defaultText;
     QtCurveKWinConfig     *kwin;
     int                   kwinPage;
+    bool                  readyForPreview;
 };
 
 #endif

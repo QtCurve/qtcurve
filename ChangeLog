@@ -1,18 +1,19 @@
 1.6.3
 -----
-1. Fix sunken kwin button backgrounds when using background gradients.
-2. In config dialog, dont enforce bordered popup menus if rounded.
-3. Apply background opacity to menubars and toolbars.
-4. Fix issues with konqueror's combo-boxes and dark menubars.
-5. Fix display of rekonq titlebar when blending menubar and titlebar. Rekonq
-   has a menubar, but it's hidden - QtCurve detected the menubar, and informed
-   the kwin style of this, cuasing the titlebar to have an incorrect gradient.
-6. Disable statusbar hiding for rekonq - it does not use standard statusbars.
-7. When hiding status/menubars via kwin buttons, only re-act if there has been more
-   then 1/2 a second between presses.
-8. Dont hightlight menu item arrows when not enabled.
-9. When initialising, selecting a preset, or importing a settings file, dont update
-   preview until fully loaded.
+ 1. Fix sunken kwin button backgrounds when using background gradients.
+ 2. In config dialog, dont enforce bordered popup menus if rounded.
+ 3. Apply background opacity to menubars and toolbars.
+ 4. Fix issues with konqueror's combo-boxes and dark menubars.
+ 5. Fix display of rekonq titlebar when blending menubar and titlebar. Rekonq
+    has a menubar, but it's hidden - QtCurve detected the menubar, and informed
+    the kwin style of this, cuasing the titlebar to have an incorrect gradient.
+ 6. Disable statusbar hiding for rekonq - it does not use standard statusbars.
+ 7. When hiding status/menubars via kwin buttons, only re-act if there has been more
+    then 1/2 a second between presses.
+ 8. Dont hightlight menu item arrows when not enabled.
+ 9. When initialising, selecting a preset, or importing a settings file, dont update
+    preview until fully loaded.
+10. Use preview windows close button to detatch/attach preview.
 
 1.6.2
 -----

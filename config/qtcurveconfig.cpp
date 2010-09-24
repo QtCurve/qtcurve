@@ -23,7 +23,6 @@
 #ifdef QTC_STYLE_SUPPORT
 #include "exportthemedialog.h"
 #endif
-#include "ui_stylepreview.h"
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGroupBox>
@@ -56,7 +55,6 @@
 #include <KDE/KCharSelect>
 #include <KDE/KDialog>
 #include <KDE/KIntNumInput>
-#include <KDE/KXmlGuiWindow>
 #include <KDE/KStandardAction>
 #include <KDE/KStatusBar>
 #include <KDE/KAboutData>
@@ -125,55 +123,47 @@ static QSet<QString> toSet(const QString &str)
     return QSet<QString>::fromList(list);
 }
 
-class CStylePreview : public KXmlGuiWindow, public Ui::StylePreview
+CStylePreview::CStylePreview(QWidget *parent)
+             : KXmlGuiWindow(parent)
 {
-    public:
+    aboutData = new KAboutData("QtCurve", 0, ki18n("QtCurve"), VERSION,
+                               ki18n("Unified widget style."),
+                               KAboutData::License_GPL,
+                               ki18n("(C) Craig Drummond, 2003-2010"),
+                               KLocalizedString());
+    aboutData->setProgramIconName("preferences-desktop-theme");
+    componentData = new KComponentData(aboutData);
 
-    CStylePreview(QWidget *parent = 0)
-        : KXmlGuiWindow(parent)
-    {
-        aboutData = new KAboutData("QtCurve", 0, ki18n("QtCurve"), VERSION,
-                                   ki18n("Unified widget style."),
-                                   KAboutData::License_GPL,
-                                   ki18n("(C) Craig Drummond, 2003-2010"),
-                                   KLocalizedString());
-        aboutData->setProgramIconName("preferences-desktop-theme");
-        componentData = new KComponentData(aboutData);
+    QWidget *main=new QWidget(this);
+    setObjectName("QtCurvePreview");
+    setupUi(main);
+    setCentralWidget(main);
+    setComponentData(*componentData);
+    for (uint i = 0; standardAction[i] != KStandardAction::ActionNone; ++i)
+        actionCollection()->addAction(standardAction[i]);
+    createGUI();
+    statusBar()->setSizeGripEnabled(true);
+    toolBar()->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    setCaption(i18n("Preview Window"));
+}
 
-        QWidget *main=new QWidget(this);
-        setObjectName("QtCurvePreview");
-        setupUi(main);
-        setCentralWidget(main);
-        setComponentData(*componentData);
-        for (uint i = 0; standardAction[i] != KStandardAction::ActionNone; ++i)
-            actionCollection()->addAction(standardAction[i]);
-        createGUI();
-        statusBar()->setSizeGripEnabled(true);
-        toolBar()->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        setCaption(i18n("Preview Window"));
-    }
+CStylePreview::~CStylePreview()
+{
+    delete componentData;
+    delete aboutData;
+}
 
-    ~CStylePreview()
-    {
-        delete componentData;
-        delete aboutData;
-    }
+void CStylePreview::closeEvent(QCloseEvent *e)
+{
+    emit closePressed();
+    e->ignore();
+}
 
-    void closeEvent(QCloseEvent *e)
-    {
-        e->ignore();
-    }
+QSize CStylePreview::sizeHint() const
+{
+    return QSize(500, 260);
+}
 
-    QSize sizeHint() const
-    {
-        return QSize(500, 260);
-    }
-
-    private:
-
-    KAboutData     *aboutData;
-    KComponentData *componentData;
-};
 
 class CWorkspace : public QMdiArea
 {
@@ -1591,11 +1581,7 @@ void QtCurveConfig::setupPreview()
     layout->setMargin(0);
     layout->addWidget(workSpace);
 
-    stylePreview = new CStylePreview;
-    mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
-    mdiWindow->move(4, 4);
-    mdiWindow->showMaximized();
-    updatePreview();
+    previewControlPressed();
 }
 
 void QtCurveConfig::changeStack()
@@ -2016,21 +2002,24 @@ void QtCurveConfig::previewControlPressed()
     {
         previewControlButton->setText(i18n("Reattach"));
         workSpace->removeSubWindow(stylePreview);
-        delete stylePreview;
-        delete mdiWindow;
+        if(stylePreview)
+            stylePreview->deleteLater();
+        mdiWindow->deleteLater();
         mdiWindow=0L;
         stylePreview = new CStylePreview(this);
         stylePreview->show();
     }
     else
     {
-        delete stylePreview;
+        if(stylePreview)
+            stylePreview->deleteLater();
         stylePreview = new CStylePreview;
         mdiWindow = workSpace->addSubWindow(stylePreview, Qt::Window);
         mdiWindow->move(4, 4);
         mdiWindow->showMaximized();
         previewControlButton->setText(i18n("Detach"));        
     }
+    connect(stylePreview, SIGNAL(closePressed()), SLOT(previewControlPressed()));
     KGlobal::setAllowQuit(true);
     updatePreview();
 }
