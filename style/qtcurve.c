@@ -989,6 +989,24 @@ static GdkColor * getParentBgCol(GtkWidget *widget)
                : NULL;
 }
 
+static int getOpacity(GtkWidget *widget)
+{
+    if(opts.bgndOpacity==opts.dlgOpacity)
+        return opts.bgndOpacity;
+
+    if(opts.bgndOpacity!=100 || opts.dlgOpacity!=100)
+    {
+        if(!widget)
+            return opts.bgndOpacity;
+        else
+        {
+            GtkWidget *top=gtk_widget_get_toplevel(widget);
+            return top && GTK_IS_DIALOG(top) ? opts.dlgOpacity : opts.bgndOpacity;
+        }
+    }
+    return 100;
+}
+
 static gboolean eqRect(GdkRectangle *a, GdkRectangle *b)
 {
     return a->x==b->x && a->y==b->y && a->width==b->width && a->height==b->height;
@@ -4684,9 +4702,10 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                 ? &menuColors(activeWindow)[ORIGINAL_SHADE]
                                 : &style->bg[state];
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
-            int         menuBarAdjust=0;
-            gboolean    useAlpha=menubar && BLEND_TITLEBAR && opts.bgndOpacity!=100;
-            double      alpha=useAlpha ? (opts.bgndOpacity/100.00) : 1.0;
+            int         menuBarAdjust=0,
+                        opacity=getOpacity(widget);
+            gboolean    useAlpha=opacity!=100;
+            double      alpha=useAlpha ? (opacity/100.00) : 1.0;
 
 //             if(menubar)
             if(!isMozilla())
