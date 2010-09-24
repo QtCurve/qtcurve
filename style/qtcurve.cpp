@@ -6341,7 +6341,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                                              QRect(xpos, menuItem->rect.top() + menuItem->rect.height() / 2 - dim / 2, dim, dim)));
 
                     drawArrow(painter, vSubMenuRect, arrow,
-                              opts.useHighlightForMenu && state&State_Selected && !itsOOMenuCols
+                              opts.useHighlightForMenu && state&State_Enabled && state&State_Selected && !itsOOMenuCols
                                 ? palette.highlightedText().color()
                                 : palette.text().color());
                 }

@@ -10,6 +10,7 @@
 6. Disable statusbar hiding for rekonq - it does not use standard statusbars.
 7. When hiding status/menubars via kwin buttons, only re-act if there has been more
    then 1/2 a second between presses.
+8. Dont hightlight menu item arrows when not enabled.
 
 1.6.2
 -----
