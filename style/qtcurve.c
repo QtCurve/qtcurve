@@ -4704,8 +4704,9 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             EAppearance app=menubar ? opts.menubarAppearance : opts.toolbarAppearance;
             int         menuBarAdjust=0,
                         opacity=getOpacity(widget);
-            gboolean    useAlpha=opacity!=100;
-            double      alpha=useAlpha ? (opacity/100.00) : 1.0;
+            double      alpha=opacity!=100 ? (opacity/100.00) : 1.0;
+            gboolean    drawGradient=GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app),
+                        fillBackground=menubar && SHADE_NONE!=opts.shadeMenubars;
 
 //             if(menubar)
             if(!isMozilla())
@@ -4722,11 +4723,11 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 }
             }
 
-            /* Toolbars and menus */
-            if(GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app))
+            if(widget && (opacity!=100 || (CUSTOM_BGND && !drawGradient && !fillBackground)))
+                drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+            
+            if(drawGradient)
             {
-                if(useAlpha)
-                    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
                 drawBevelGradientAlpha(cr, style, area, NULL, x, y-menuBarAdjust, width, height+menuBarAdjust, col,
                                 menubar
                                     ? TRUE
@@ -4734,22 +4735,10 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                             ? width<height
                                             : width>height,
                                 FALSE, MODIFY_AGUA(app), WIDGET_OTHER, alpha);
-                if(useAlpha)
-                    cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
             }
-            else if((menubar && SHADE_NONE!=opts.shadeMenubars) || !CUSTOM_BGND ||
-                    !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+            else if(fillBackground)
             {
-                if(menubar)
-                {
-                    if(useAlpha)
-                        cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-                    drawAreaColorAlpha(cr, area, NULL, col, x, y, width, height, alpha);
-//                     if(widget && IMG_NONE!=opts.bgndImage.type)
-//                         drawWindowBgnd(cr, style, area, widget, x, y, width, height);
-                    if(useAlpha)
-                        cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-                }
+                drawAreaColorAlpha(cr, area, NULL, col, x, y, width, height, alpha);
             }
 
             if(GTK_SHADOW_NONE!=shadow_type && TB_NONE!=opts.toolbarBorders)
