@@ -232,6 +232,7 @@ static enum
     APP_KONQUEROR,
     APP_KONTACT,
     APP_ARORA,
+    APP_REKONQ,
     APP_QTDESIGNER,
     APP_QTCREATOR,
     APP_KDEVELOP,
@@ -1363,6 +1364,8 @@ void Style::polish(QApplication *app)
         theThemedApp=APP_SKYPE;
     else if("arora"==appName)
         theThemedApp=APP_ARORA;
+    else if("rekonq"==appName)
+        theThemedApp=APP_REKONQ;
     else if("Designer"==QCoreApplication::applicationName())
         theThemedApp=APP_QTDESIGNER;
     else if("QtCreator"==QCoreApplication::applicationName())
@@ -1382,6 +1385,8 @@ void Style::polish(QApplication *app)
         std::cout << "QtCurve: Application name: \"" << l1.constData() << "\"\n";
     }
 
+    if(APP_REKONQ==theThemedApp)
+        opts.statusbarHiding=0;
     if(opts.menubarHiding)
         itsSaveMenuBarStatus=opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);
     if(opts.statusbarHiding)
