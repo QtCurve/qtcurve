@@ -2,7 +2,7 @@
 -----
 1. Fix sunken kwin button backgrounds when using background gradients.
 2. In config dialog, dont enforce bordered popup menus if rounded.
-2. Apply background opacity to menubar/titlebar if blended.
+3. Apply background opacity to menubars and toolbars.
 4. Fix issues with konqueror's combo-boxes and dark menubars.
 
 1.6.2

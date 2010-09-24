@@ -4160,7 +4160,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 painter->save();
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, r, option);
+                    drawMenuOrToolBarBackground(widget, painter, r, option);
                 if(TB_NONE!=opts.toolbarBorders)
                 {
                     const QColor *use=itsActive
@@ -4367,7 +4367,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                 r2.setHeight(tb->rect().height());
                             }
                             painter->setClipRegion(QRegion(r2).subtract(QRegion(r2.adjusted(2, 2, -2, -2))));
-                            drawMenuOrToolBarBackground(painter, r2, &opt, false, true);
+                            drawMenuOrToolBarBackground(widget, painter, r2, &opt, false, true);
                             painter->restore();
                         }
                     }
@@ -5524,9 +5524,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 if(!widget || !widget->parent() || qobject_cast<QMainWindow *>(widget->parent()))
                 {
                     painter->save();
-                    drawMenuOrToolBarBackground(painter, r, option, false, Qt::NoToolBarArea==toolbar->toolBarArea ||
-                                                                           Qt::BottomToolBarArea==toolbar->toolBarArea ||
-                                                                           Qt::TopToolBarArea==toolbar->toolBarArea);
+                    drawMenuOrToolBarBackground(widget, painter, r, option, false, Qt::NoToolBarArea==toolbar->toolBarArea ||
+                                                                                   Qt::BottomToolBarArea==toolbar->toolBarArea ||
+                                                                                   Qt::TopToolBarArea==toolbar->toolBarArea);
                     if(TB_NONE!=opts.toolbarBorders)
                     {
                         const QColor *use=/*PE_PanelMenuBar==pe && itsActive
@@ -6082,7 +6082,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, mbi->menuRect, option);
+                    drawMenuOrToolBarBackground(widget, painter, mbi->menuRect, option);
 
                 if(active)
                     drawMenuItem(painter, !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS) ? r.adjusted(1, 1, -1, -1) : r,
@@ -6559,7 +6559,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 painter->save();
 
                 if(!opts.xbar || (!widget || 0!=strcmp("QWidget", widget->metaObject()->className())))
-                    drawMenuOrToolBarBackground(painter, r, option);
+                    drawMenuOrToolBarBackground(widget, painter, r, option);
                 if (TB_NONE!=opts.toolbarBorders && widget && widget->parentWidget() &&
                     (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow")))
                 {
@@ -10577,8 +10577,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
                                      titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
                                                     (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
                                                      (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
-                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt))),
-                                     useBgndAlpha((WIDGET_MENUBAR==w || WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w) && BLEND_TITLEBAR);
+                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt)));
     const Gradient                   *grad=getGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
@@ -10606,8 +10605,6 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
         }
         else
             shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
-        if(useBgndAlpha && col.alphaF()>0.0)
-            col.setAlphaF(opts.bgndOpacity/100.0);
         if((*it).alpha<1.0)
             col.setAlphaF(col.alphaF()*(*it).alpha);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
@@ -12379,19 +12376,43 @@ void Style::drawSliderGroove(QPainter *p, const QRect &groove, const QRect &hand
     }
 }
 
-void Style::drawMenuOrToolBarBackground(QPainter *p, const QRect &r, const QStyleOption *option, bool menu, bool horiz) const
+
+int Style::getOpacity(const QWidget *widget, QPainter *p) const
+{
+    if(opts.bgndOpacity==opts.dlgOpacity)
+        return opts.bgndOpacity;
+
+    if(opts.bgndOpacity!=100 || opts.dlgOpacity!=100)
+    {
+         const QWidget *w=widget ? widget : getWidget(p);
+
+        if(!w)
+            return opts.bgndOpacity;
+        else
+            return w->topLevelWidget() && Qt::Dialog==(w->topLevelWidget()->windowFlags() & Qt::WindowType_Mask)
+                    ? opts.dlgOpacity : opts.bgndOpacity;
+    }
+    return 100;
+}
+
+void Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p, const QRect &r, const QStyleOption *option,
+                                        bool menu, bool horiz) const
 {
     EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
     {
-        QRect rx(r);
+        QRect  rx(r);
+        QColor col(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
+                            ? menuColors(option, itsActive)[ORIGINAL_SHADE]
+                            : option->palette.background().color());
+        int    opacity(getOpacity(widget, p));
+
         if(menu && BLEND_TITLEBAR)
             rx.adjust(0, -qtcGetWindowBorderSize().titleHeight, 0, 0);
 
-        drawBevelGradient(menu && (option->state&State_Enabled || SHADE_NONE!=opts.shadeMenubars)
-                            ? menuColors(option, itsActive)[ORIGINAL_SHADE]
-                            : option->palette.background().color(),
-                          p, rx, horiz, false, MODIFY_AGUA(app), menu ? WIDGET_MENUBAR : WIDGET_OTHER);
+        if(opacity<100)
+            col.setAlphaF(opacity/100.0);
+        drawBevelGradient(col, p, rx, horiz, false, MODIFY_AGUA(app));
     }
 }
 
