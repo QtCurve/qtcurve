@@ -1857,7 +1857,7 @@ void Style::polish(QWidget *widget)
             Bespin::MacMenu::manage((QMenuBar *)widget);
 
         if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-            emitMenuSize((QWidget *)widget, PREVIEW_MDI==itsIsPreview ? 0 : widget->rect().height());
+            emitMenuSize(widget, PREVIEW_MDI==itsIsPreview || !widget->isVisible() ? 0 : widget->rect().height());
 #endif
         if(CUSTOM_BGND)
             widget->setBackgroundRole(QPalette::NoRole);
@@ -2645,7 +2645,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 QResizeEvent *re = static_cast<QResizeEvent *>(event);
 
                 if (re->size().height() != re->oldSize().height())
-                    emitMenuSize((QMenuBar *)object, PREVIEW_MDI==itsIsPreview ? 0 : re->size().height());
+                    emitMenuSize((QMenuBar *)object, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)object)->isVisible()
+                                    ? 0 : re->size().height());
             }
             break;
         }
@@ -2837,7 +2838,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
-                emitMenuSize((QMenuBar *)mb, PREVIEW_MDI==itsIsPreview ? 0 : mb->size().height());
+                emitMenuSize((QMenuBar *)mb, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)mb)->isVisible() ? 0 : mb->size().height());
             }
 #endif
             break;
