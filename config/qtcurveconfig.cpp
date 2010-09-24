@@ -83,15 +83,17 @@ extern "C"
     }
 }
 
-static void setStyleRecursive(QWidget* w, QStyle* s)
+static void setStyleRecursive(QWidget *w, QStyle *s)
 {
+    if(!w)
+        return;
     w->setStyle(s);
 
     const QObjectList children = w->children();
 
-    foreach (QObject* child, children)
+    foreach (QObject *child, children)
     {
-        if (child->isWidgetType())
+        if (child && child->isWidgetType())
             setStyleRecursive((QWidget *) child, s);
     }
 }
@@ -736,10 +738,14 @@ static void insertGbLabelEntries(QComboBox *combo)
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
+               workSpace(NULL),
+               stylePreview(NULL),
+               mdiWindow(NULL),
 #ifdef QTC_STYLE_SUPPORT
                exportDialog(NULL),
 #endif
-               gradPreview(NULL)
+               gradPreview(NULL),
+               readyForPreview(false)
 {
     setupUi(this);
     setObjectName("QtCurveConfigDialog");
@@ -1100,6 +1106,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
         titleLabel->setVisible(false);
         stackList->setVisible(false);
     }
+
+    readyForPreview=true;
+    updatePreview();
 }
 
 QtCurveConfig::~QtCurveConfig()
@@ -1952,6 +1961,9 @@ void QtCurveConfig::menubarTitlebarBlend()
 
 void QtCurveConfig::updatePreview()
 {
+    if(!readyForPreview)
+        return;
+
     setOptions(previewStyle);
 
     qputenv(QTCURVE_PREVIEW_CONFIG, mdiWindow ? QTCURVE_PREVIEW_CONFIG : QTCURVE_PREVIEW_CONFIG_FULL);
@@ -1965,7 +1977,7 @@ void QtCurveConfig::updatePreview()
     styleOpt.opts=previewStyle;
     style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
        
-    setStyleRecursive(mdiWindow ? (QWidget *)mdiWindow : (QWidget *)stylePreview, style);
+    setStyleRecursive(mdiWindow ? (QWidget *)previewFrame : (QWidget *)stylePreview, style);
 }
 
 static const char * constGradValProp="qtc-grad-val";
@@ -2203,6 +2215,7 @@ void QtCurveConfig::roundChanged()
 
 void QtCurveConfig::setPreset()
 {
+    readyForPreview=false;
     Preset &p(presets[presetsCombo->currentText()]);
 
     if(!p.loaded)
@@ -2222,6 +2235,7 @@ void QtCurveConfig::setPreset()
             kwin->load(&cfg);
     }
 
+    readyForPreview=true;
     if (settingsChanged(previewStyle))
         updatePreview();
     if (settingsChanged())
@@ -2397,6 +2411,7 @@ void QtCurveConfig::importPreset()
             name=getPresetName(i18n("Import Preset"), QString(), name, name);
             if(!name.isEmpty())
             {
+                readyForPreview=false;
                 setWidgetOptions(opts);
                 savePreset(name);
 
@@ -2411,6 +2426,8 @@ void QtCurveConfig::importPreset()
                     if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=VERSION_WITH_KWIN_SETTINGS)
                         kwin->load(&cfg);
                 }
+                readyForPreview=true;
+                updatePreview();
             }
         }
         else
