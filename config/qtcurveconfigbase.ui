@@ -3566,7 +3566,7 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_78">
+        <widget class="QLabel" name="fixParentlessDialogs_label">
          <property name="text">
           <string>'Parent-less' dialogs:</string>
          </property>
@@ -3743,7 +3743,7 @@
           </widget>
          </item>
          <item row="8" column="0">
-          <widget class="QLabel" name="label_83x">
+          <widget class="QLabel" name="noDlgFixApps_label">
            <property name="text">
             <string>Don't apply parent-less dialog fix:</string>
            </property>

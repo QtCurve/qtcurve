@@ -872,10 +872,15 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(activeTabAppearance, SIGNAL(currentIndexChanged(int)), SLOT(activeTabAppearanceChanged()));
     connect(toolbarSeparators, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(splitters, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
-    connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     connect(fillSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+    connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+#else
+    fixParentlessDialogs_label->hide();
+    fixParentlessDialogs->hide();
+    noDlgFixApps_label->hide();
+    noDlgFixApps->hide();
 #endif
     connect(stripedSbar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
