@@ -3777,7 +3777,7 @@
        <item>
         <widget class="QLabel" name="label_101">
          <property name="text">
-          <string>&lt;i&gt;&lt;p&gt;In the bove lists, you need to enter the executable name. e.g For Google Earth this is actually &quot;googleearth-bin&quot;. You may use &quot;gtk2&quot; to disable for all Gtk2 applications, or &quot;kde&quot; for all KDE/Qt applications.&lt;/p&gt;
+          <string>&lt;i&gt;&lt;p&gt;In the above lists, you need to enter the executable name. e.g For Google Earth this is actually &quot;googleearth-bin&quot;. You may use &quot;gtk2&quot; to disable for all Gtk2 applications, or &quot;kde&quot; for all KDE/Qt applications.&lt;/p&gt;
 &lt;p&gt;To determine the name that QtCurve will detect, you can start an application from a konsole window using the following syntax (example is for Firefox):&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;QTCURVE_DEBUG=1 firefox&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;This will cause QtCurve to display the detected process name, as follows:&lt;/p&gt;
