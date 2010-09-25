@@ -2,7 +2,7 @@
 #define __QTCURVE_CONFIG_H__
 
 /*
-  QtCurve (C) Craig Drummond, 2010 craig.p.drummond@googlemail.com
+  QtCurve (C) Craig Drummond, 2010 craig.p.drummond@gmail.com
 
   ----
 

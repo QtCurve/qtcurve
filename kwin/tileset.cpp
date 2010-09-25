@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Long Huynh Huu <long.upcase@googlemail.com>
+ * Copyright 2008 Long Huynh Huu <long.upcase@gmail.com>
  * Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or

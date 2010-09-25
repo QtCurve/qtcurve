@@ -1,6 +1,6 @@
 /*
   QtCurve KWin window decoration
-  Copyright (C) 2007 - 2010 Craig Drummond <craig.p.drummond@googlemail.com>
+  Copyright (C) 2007 - 2010 Craig Drummond <craig.p.drummond@gmail.com>
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
