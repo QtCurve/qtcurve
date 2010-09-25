@@ -17,5 +17,6 @@
 #cmakedefine QTC_USE_CAIRO_FOR_ARROWS
 #cmakedefine QTC_STYLE_SUPPORT
 #cmakedefine QTC_CAIRO_1_10_HACK
+#cmakedefine QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 
 #endif

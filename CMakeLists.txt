@@ -166,6 +166,15 @@ if (GTK_INCLUDE_DIR)
                 "**************************************************************\n")
     endif(QTC_CAIRO_1_10_HACK)
 
+    if (QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+        message("**************************************************************\n"
+                "Warning: You have enabled support for the 'fix parentless dialogs'\n"
+                "         option. This is known to BREAK some applications. Please\n"
+                "         DO NOT report errors to application authors when you have\n"
+                "         this enabled. Please reconsider DISABLING this option.\n"
+                "**************************************************************\n")
+    endif (QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT)
+
 else (GTK_INCLUDE_DIR)
     message(FATAL_ERROR "Could not locate Gtk2 include files")
 endif (GTK_INCLUDE_DIR)

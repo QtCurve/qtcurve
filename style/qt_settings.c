@@ -2361,9 +2361,11 @@ static gboolean qtInit()
 
             if(100!=opts.menuBgndOpacity && excludedApp(opts.noMenuBgndOpacityApps))
                 opts.menuBgndOpacity=100;
-    
+            
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
                 opts.fixParentlessDialogs=FALSE;
+#endif
 
             if(opts.menuStripe && excludedApp(opts.noMenuStripeApps))
                 opts.menuStripe=SHADE_NONE;
