@@ -23,6 +23,10 @@ The following options may be supplied to cmake:
     -DQTC_STYLE_SUPPORT=true
         Support QtCurve style files. These are stored as
         <kde prefix>/share/apps/kstyle/themes/qtc_<stylename>.themerc
+        
+    -DQTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT=true
+        Enable support for the 'fixParentlessDialogs' config option. NOTE: This is
+        known to break some applications - hence is disabled by default!
 
 Windows
 -------

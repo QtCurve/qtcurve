@@ -1325,9 +1325,12 @@ static void copyOpts(Options *src, Options *dest)
         dest->noBgndOpacityApps=src->noBgndOpacityApps;
         dest->noMenuBgndOpacityApps=src->noMenuBgndOpacityApps;
         dest->noBgndImageApps=src->noBgndImageApps;
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         dest->noDlgFixApps=src->noDlgFixApps;
+        src->noDlgFixApps=NULL;
+#endif
         dest->noMenuStripeApps=src->noMenuStripeApps;
-        src->noBgndGradientApps=src->noBgndOpacityApps=src->noMenuBgndOpacityApps=src->noBgndImageApps=src->noDlgFixApps=src->noMenuStripeApps=NULL;
+        src->noBgndGradientApps=src->noBgndOpacityApps=src->noMenuBgndOpacityApps=src->noBgndImageApps=src->noMenuStripeApps=NULL;
         memcpy(dest->customShades, src->customShades, sizeof(double)*NUM_STD_SHADES);
         memcpy(dest->customAlphas, src->customAlphas, sizeof(double)*NUM_STD_ALPHAS);
         copyGradients(src, dest);
@@ -1348,11 +1351,14 @@ static void freeOpts(Options *opts)
             g_strfreev(opts->noMenuBgndOpacityApps);
         if(opts->noBgndImageApps)
             g_strfreev(opts->noBgndImageApps);
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         if(opts->noDlgFixApps)
-            g_strfreev(opts->noDlgFixApps);       
+            g_strfreev(opts->noDlgFixApps);
+        opts->noDlgFixApps=NULL
+#endif
         if(opts->noMenuStripeApps)
             g_strfreev(opts->noMenuStripeApps); 
-        opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noDlgFixApps=opts->noMenuStripeApps=NULL;
+        opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
         for(i=0; i<NUM_CUSTOM_GRAD; ++i)
             if(opts->customGradient[i])
             {
@@ -1670,8 +1676,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #else
             Options newOpts;
             Options *def=&newOpts;
-
-            opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noDlgFixApps=opts->noMenuStripeApps=NULL;
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+            opts->noDlgFixApps=NULL;
+#endif
+            opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
             for(i=0; i<NUM_CUSTOM_GRAD; ++i)
                 opts->customGradient[i]=NULL;
             
@@ -1838,7 +1846,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_GRAD_TYPE(bgndGrad)
             CFG_READ_GRAD_TYPE(menuBgndGrad)
             CFG_READ_APPEARANCE(menuBgndAppearance, APP_ALLOW_STRIPED)
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             CFG_READ_BOOL(fixParentlessDialogs)
+            CFG_READ_STRING_LIST(noDlgFixApps)
+#endif
             CFG_READ_STRIPE(stripedProgress)
             CFG_READ_SLIDER(sliderStyle)
             CFG_READ_BOOL(animatedProgress)
@@ -2019,7 +2030,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_SHADING(shading)
             CFG_READ_IMAGE(bgndImage)
             CFG_READ_IMAGE(menuBgndImage)
-            CFG_READ_STRING_LIST(noDlgFixApps)
             CFG_READ_STRING_LIST(noMenuStripeApps)
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_STRING_LIST(noBgndGradientApps)
@@ -2394,7 +2404,14 @@ static void defaultSettings(Options *opts)
     opts->toolbarBorders=TB_NONE;
     opts->toolbarSeparators=LINE_SUNKEN;
     opts->splitters=LINE_1DOT;
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     opts->fixParentlessDialogs=false;
+#ifdef __cplusplus
+    opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
+#else
+    opts->noDlgFixApps=NULL;
+#endif
+#endif
     opts->customMenuTextColor=false;
     opts->coloredMouseOver=MO_GLOW;
     opts->menubarMouseOver=true;
@@ -2486,13 +2503,11 @@ static void defaultSettings(Options *opts)
     opts->noMenuBgndOpacityApps << "inkscape" << "inkscape" << "sonata" << "totem";
     opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "inkscape" << "sonata" << "totem";
 #endif
-    opts->noDlgFixApps << "kate" << "plasma" << "plasma-desktop" << "plasma-netbook";
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
     opts->noBgndOpacityApps=g_strsplit("inkscape,sonata,totem",",", -1);;
     opts->noBgndImageApps=NULL;
-    opts->noDlgFixApps=NULL;
     opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
     opts->noMenuBgndOpacityApps=g_strsplit("inkscape,sonata,totem",",", -1);
 /*
@@ -3077,7 +3092,12 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(bgndGrad)
         CFG_WRITE_ENTRY(menuBgndGrad)
         CFG_WRITE_APPEARANCE_ENTRY(menuBgndAppearance, APP_ALLOW_STRIPED)
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         CFG_WRITE_ENTRY(fixParentlessDialogs)
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
+        CFG_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
+#endif
+#endif
         CFG_WRITE_ENTRY(stripedProgress)
         CFG_WRITE_ENTRY(sliderStyle)
         CFG_WRITE_ENTRY(animatedProgress)
@@ -3242,7 +3262,6 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_STRING_LIST_ENTRY(noBgndOpacityApps)
         CFG_WRITE_STRING_LIST_ENTRY(noMenuBgndOpacityApps)
         CFG_WRITE_STRING_LIST_ENTRY(noBgndImageApps)
-        CFG_WRITE_STRING_LIST_ENTRY(noDlgFixApps)
         CFG_WRITE_STRING_LIST_ENTRY(noMenuStripeApps)
         CFG_WRITE_STRING_LIST_ENTRY(menubarApps)
         CFG_WRITE_STRING_LIST_ENTRY(statusbarApps)

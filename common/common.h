@@ -1045,7 +1045,9 @@ typedef struct
                      highlightTab,
                      roundAllTabs,
                      animatedProgress,
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
                      fixParentlessDialogs,
+#endif
                      customMenuTextColor,
                      menubarMouseOver,
                      useHighlightForMenu,
@@ -1211,8 +1213,10 @@ typedef struct
                      noMenuBgndOpacityApps,
                      noBgndImageApps;
 #endif
-    Strings          noDlgFixApps,
-                     noMenuStripeApps;
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+    Strings          noDlgFixApps;
+#endif
+    Strings          noMenuStripeApps;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     Strings          menubarApps,
                      statusbarApps,

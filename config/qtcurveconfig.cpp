@@ -873,7 +873,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(toolbarSeparators, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(splitters, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(fixParentlessDialogs, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     connect(fillSlider, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
+#endif
     connect(stripedSbar, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(sliderStyle, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(roundMbTopOnly, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1063,7 +1066,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(useQtFileDialogApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(menubarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(statusbarApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
-    connect(noDlgFixApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
     connect(noMenuStripeApps, SIGNAL(editingFinished()), SLOT(updateChanged()));
 
     menubarBlend->setIcon(KIcon("configure"));
@@ -2549,7 +2551,10 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.shadeMenubarOnlyWhenActive=shadeMenubarOnlyWhenActive->isChecked();
     opts.thinnerMenuItems=thinnerMenuItems->isChecked();
     opts.thinnerBtns=thinnerBtns->isChecked();
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     opts.fixParentlessDialogs=fixParentlessDialogs->isChecked();
+    opts.noDlgFixApps=toSet(noDlgFixApps->text());
+#endif
     opts.animatedProgress=animatedProgress->isChecked();
     opts.stripedProgress=(EStripe)stripedProgress->currentIndex();
     opts.lighterPopupMenuBgnd=lighterPopupMenuBgnd->value();
@@ -2747,7 +2752,6 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.useQtFileDialogApps=toSet(useQtFileDialogApps->text());
     opts.menubarApps=toSet(menubarApps->text());
     opts.statusbarApps=toSet(statusbarApps->text());
-    opts.noDlgFixApps=toSet(noDlgFixApps->text());
     opts.noMenuStripeApps=toSet(noMenuStripeApps->text());
 }
 
@@ -2785,7 +2789,10 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     shadeMenubarOnlyWhenActive->setChecked(opts.shadeMenubarOnlyWhenActive);
     thinnerMenuItems->setChecked(opts.thinnerMenuItems);
     thinnerBtns->setChecked(opts.thinnerBtns);
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     fixParentlessDialogs->setChecked(opts.fixParentlessDialogs);
+    noDlgFixApps->setText(toString(opts.noDlgFixApps));
+#endif
     animatedProgress->setChecked(opts.animatedProgress);
     stripedProgress->setCurrentIndex(opts.stripedProgress);
     embolden->setChecked(opts.embolden);
@@ -3061,7 +3068,6 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     useQtFileDialogApps->setText(toString(opts.useQtFileDialogApps));
     menubarApps->setText(toString(opts.menubarApps));
     statusbarApps->setText(toString(opts.statusbarApps));
-    noDlgFixApps->setText(toString(opts.noDlgFixApps));
     noMenuStripeApps->setText(toString(opts.noMenuStripeApps));
 }
 
@@ -3180,7 +3186,10 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          shadeMenubarOnlyWhenActive->isChecked()!=opts.shadeMenubarOnlyWhenActive ||
          thinnerMenuItems->isChecked()!=opts.thinnerMenuItems ||
          thinnerBtns->isChecked()!=opts.thinnerBtns ||
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
          fixParentlessDialogs->isChecked()!=opts.fixParentlessDialogs ||
+         toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||
+#endif
          animatedProgress->isChecked()!=opts.animatedProgress ||
          stripedProgress->currentIndex()!=opts.stripedProgress ||
          lighterPopupMenuBgnd->value()!=opts.lighterPopupMenuBgnd ||
@@ -3339,7 +3348,6 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          toSet(useQtFileDialogApps->text())!=opts.useQtFileDialogApps ||
          toSet(menubarApps->text())!=opts.menubarApps ||
          toSet(statusbarApps->text())!=opts.statusbarApps ||
-         toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||
          toSet(noMenuStripeApps->text())!=opts.noMenuStripeApps ||
 
          diffShades(opts);

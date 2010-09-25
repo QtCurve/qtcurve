@@ -1400,9 +1400,11 @@ void Style::polish(QApplication *app)
     if(SHADE_NONE!=opts.menuStripe && opts.noMenuStripeApps.contains(appName))
         opts.menuStripe=SHADE_NONE;
 
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     // Plasma and Kate do not like the 'Fix parentless dialogs' option...
     if(opts.fixParentlessDialogs && (APP_PLASMA==theThemedApp || opts.noDlgFixApps.contains(appName) || opts.noDlgFixApps.contains("kde")))
         opts.fixParentlessDialogs=false;
+#endif
 
     if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && (opts.noBgndOpacityApps.contains(appName) || appName.endsWith(".kss")))
         opts.bgndOpacity=opts.dlgOpacity=100;
@@ -1934,6 +1936,7 @@ void Style::polish(QWidget *widget)
             widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
             widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
         ((QDockWidget *)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
            (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/)
     {
@@ -1946,7 +1949,7 @@ void Style::polish(QWidget *widget)
         }
         Utils::addEventFilter(widget, this);
     }
-
+#endif
     if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
     {
         widget->setBackgroundRole(QPalette::NoRole);
@@ -2424,8 +2427,10 @@ void Style::unpolish(QWidget *widget)
         delete ((QDockWidget *)widget)->titleBarWidget();
         ((QDockWidget *)widget)->setTitleBarWidget(0L);
     }
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     else if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget))
         widget->removeEventFilter(this);
+#endif
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
@@ -2878,10 +2883,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     itsProgressBarAnimateTimer = 0;
                 }
             }
-
-            if(opts.fixParentlessDialogs &&
-               qobject_cast<QDialog *>(object) &&
-               itsReparentedDialogs.contains((QWidget*)object))
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
+            if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object) && itsReparentedDialogs.contains((QWidget*)object))
             {
                 QWidget *widget=(QWidget*)object;
 
@@ -2894,6 +2897,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 }
                 itsReparentedDialogs.remove(widget);
             }
+#endif
             break;
         }
         case QEvent::Enter:
@@ -2950,6 +2954,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 return false;
             }
             break;
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         case 70: // QEvent::ChildInserted - QT3_SUPPORT
             if(opts.fixParentlessDialogs && qobject_cast<QDialog *>(object))
             {
@@ -2971,6 +2976,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     }
                 }
             }
+#endif
         default:
             break;
     }

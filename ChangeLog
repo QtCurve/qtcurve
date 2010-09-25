@@ -15,6 +15,9 @@
     preview until fully loaded.
 10. Use preview windows close button to detatch/attach preview.
 11. Fix menubar/titlebar blending for Thunderbird's 'show message in new window'
+12. Disable the support for 'fix parent-less dialog' option - this causes too many
+    issues with applications to be worth the fuss. If you really want this enabled,
+    use the -DQTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT=true cmake option.
 
 1.6.2
 -----

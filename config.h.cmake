@@ -9,5 +9,6 @@
 #cmakedefine QTC_OLD_NVIDIA_ARROW_FIX
 #cmakedefine QTC_STYLE_SUPPORT
 #cmakedefine QTC_KWIN_MAX_BUTTON_HACK
+#cmakedefine QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 
 #endif
