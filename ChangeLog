@@ -1,6 +1,8 @@
 1.6.4
 -----
 1. Fix Claws Mail listview headers.
+2. When drawing text on an option menu, look deeper into parent heirarchy to
+   determine if the label is on a GtkOptionMenu.
 
 1.6.3
 -----

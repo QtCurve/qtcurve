@@ -628,6 +628,18 @@ static gboolean isOnCombo(GtkWidget *w, int level)
     return FALSE;
 }
 
+static gboolean isOnOptionMenu(GtkWidget *w, int level)
+{
+    if(w)
+    {
+        if(GTK_IS_OPTION_MENU(w))
+            return TRUE;
+        else if(level<4)
+            return isOnOptionMenu(w->parent, ++level);
+    }
+    return FALSE;
+}
+
 static gboolean isActiveCombo(GtkWidget *widget)
 {
     if(GTK_IS_OPTION_MENU(widget))
@@ -5884,7 +5896,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
-        if(!use_text && widget && widget->parent && GTK_IS_LABEL(widget) && GTK_IS_OPTION_MENU(widget->parent))
+        if(!use_text && widget && widget->parent && GTK_IS_LABEL(widget) && isOnOptionMenu(widget->parent, 0))
             use_text=TRUE;
 
         /*
