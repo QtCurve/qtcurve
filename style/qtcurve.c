@@ -462,7 +462,8 @@ static gboolean isList(GtkWidget *widget)
 #ifdef GTK_ENABLE_BROKEN
             GTK_IS_TREE(widget) ||
 #endif
-            GTK_IS_CTREE(widget));
+            GTK_IS_CTREE(widget) ||
+            0==strcmp(gtk_type_name(GTK_WIDGET_TYPE(widget)), "GtkSCTree"));
 }
 
 static gboolean isListViewHeader(GtkWidget *widget)
