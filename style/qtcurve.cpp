@@ -3967,26 +3967,30 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         
                     if(FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
                     {
-                        QColor          col(opts.gbFactor<0 ? Qt::black : Qt::white);
-                        int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
-                        QPainterPath    path(buildPath(r, WIDGET_FRAME, round,
-                                                       ROUNDED_ALL==round
-                                                           ? getRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
-                                                           : 0.0));
-                        QLinearGradient grad(r.topLeft(), r.bottomLeft());
-
-                        col.setAlphaF(TO_ALPHA(opts.gbFactor));
+                        int          round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
+                        QPainterPath path(buildPath(r, WIDGET_FRAME, round,
+                                                    ROUNDED_ALL==round
+                                                        ? getRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
+                                                        : 0.0));
 
                         painter->save();
                         painter->setClipping(false);
-                        if(FRAME_SHADED==opts.groupBox)
-                            painter->fillPath(path, col);
-                        else
+                        if(0!=opts.gbFactor)
                         {
-                            grad.setColorAt(0, col);
-                            col.setAlphaF(0.0);
-                            grad.setColorAt(1, col);
-                            painter->fillPath(path, grad);
+                            QColor col(opts.gbFactor<0 ? Qt::black : Qt::white);
+
+                            col.setAlphaF(TO_ALPHA(opts.gbFactor));
+                            if(FRAME_SHADED==opts.groupBox)
+                                painter->fillPath(path, col);
+                            else
+                            {
+                                QLinearGradient grad(r.topLeft(), r.bottomLeft());
+
+                                grad.setColorAt(0, col);
+                                col.setAlphaF(0.0);
+                                grad.setColorAt(1, col);
+                                painter->fillPath(path, grad);
+                            }
                         }
 
                         if(!(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE)))
@@ -3997,8 +4001,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                         /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
                         else
                         {
-                            const QColor *cols=backgroundColors(option);
-                            col=cols[STD_BORDER];
+                            QColor          col(backgroundColors(option)[STD_BORDER]);
+                            QLinearGradient grad(r.topLeft(), r.bottomLeft());
+
+                            col.setAlphaF(1.0);
                             grad.setColorAt(0, col);
                             col.setAlphaF(0.0);
                             grad.setColorAt(1, col);
@@ -4006,7 +4012,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->setPen(QPen(QBrush(grad), 1));
                             painter->drawPath(path);
                         }
-                       if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE))
+                        if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE))
                             painter->restore();
                     }
                     else

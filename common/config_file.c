@@ -1474,7 +1474,7 @@ static void checkConfig(Options *opts)
     if(opts->animatedProgress && !opts->stripedProgress)
         opts->animatedProgress=false;
 
-    if(0==opts->gbFactor)
+    if(0==opts->gbFactor && FRAME_SHADED==opts->groupBox)
         opts->groupBox=FRAME_PLAIN;
 
     if(opts->gbFactor<MIN_GB_FACTOR || opts->gbFactor>MAX_GB_FACTOR)

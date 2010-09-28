@@ -1,6 +1,9 @@
 1.6.4
 -----
 1. Add Chinese translations - thanks to LiShaohui.
+2. Fix toolbar/menubar borders (if being drawn) when colouring menubars as per
+   titlebars.
+3. Allow faded groupbox frame even when not shading background.
 
 1.6.3
 -----
