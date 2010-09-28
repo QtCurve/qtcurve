@@ -4764,8 +4764,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                          right=FALSE,
                          all=TB_LIGHT_ALL==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders;
                 int      border=TB_DARK==opts.toolbarBorders || TB_DARK_ALL==opts.toolbarBorders ? 3 : 4;
-                GdkColor *cols=activeWindow && menubar && GTK_STATE_INSENSITIVE!=state
-                                ? qtcPalette.menubar : qtcPalette.background;
+                GdkColor *cols=activeWindow && menubar && (GTK_STATE_INSENSITIVE!=state || SHADE_NONE!=opts.shadeMenubars)
+                                ? menuColors(activeWindow) : qtcPalette.background;
 
                 if(menubar)
                 {
