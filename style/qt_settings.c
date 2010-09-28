@@ -2344,6 +2344,7 @@ static gboolean qtInit()
                 opts.bgndAppearance=APPEARANCE_FLAT, opts.bgndImage.type=IMG_NONE;
                 if(FRAME_SHADED==opts.groupBox)
                     opts.groupBox=FRAME_PLAIN;
+                opts.gbFactor=0;
             }
                 
             if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))

@@ -2626,7 +2626,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,
             drawEntryCorners(cr, area, round, x, y, width, height, CAIRO_COL(parentBgCol), 1.0);
         }
 
-    if((FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox) && isInGroupBox(widget, 0))
+    if(0!=opts.gbFactor && (FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox) && isInGroupBox(widget, 0))
     {
         double col=opts.gbFactor<0 ? 0.0 : 1.0;
         drawEntryCorners(cr, area, round, x, y, width, height, col, col, col, TO_ALPHA(opts.gbFactor));
@@ -7047,26 +7047,28 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                                     radius=ROUNDED_ALL==round ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL) : 0.0;
                     cairo_pattern_t *pt=NULL;
 
-                    clipPathRadius(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
-                    cairo_rectangle(cr, x, y, width, height);
-                    if(FRAME_SHADED==opts.groupBox)
-                        cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
-                    else
+                    if(0!=opts.gbFactor)
                     {
-                        pt=cairo_pattern_create_linear(x, y, x, y+height-1);
-                        cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
+                        clipPathRadius(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
+                        cairo_rectangle(cr, x, y, width, height);
+                        if(FRAME_SHADED==opts.groupBox)
+                            cairo_set_source_rgba(cr, col, col, col, TO_ALPHA(opts.gbFactor));
+                        else
+                        {
+                            pt=cairo_pattern_create_linear(x, y, x, y+height-1);
+                            cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
 #ifdef QTC_CAIRO_1_10_HACK
-                        cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
-                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+                            cairo_pattern_add_color_stop_rgba(pt, 0, col, col, col, TO_ALPHA(opts.gbFactor));
+                            cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
 #endif
-                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
-                        cairo_set_source(cr, pt);
+                            cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+                            cairo_set_source(cr, pt);
+                        }
+                        cairo_fill(cr);
+                        cairo_restore(cr);
+                        if(pt)
+                            cairo_pattern_destroy(pt);
                     }
-                    cairo_fill(cr);
-                    cairo_restore(cr);
-
-                    if(pt)
-                        cairo_pattern_destroy(pt);
 
                     if(FRAME_FADED==opts.groupBox)
                     {
@@ -7074,9 +7076,9 @@ static void gtkDrawShadowGap(GtkStyle *style, GdkWindow *window, GtkStateType st
                         cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0);
 #ifdef QTC_CAIRO_1_10_HACK
                         cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0);
-                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+                        cairo_pattern_add_color_stop_rgba(pt, 1, CAIRO_COL(qtcPalette.background[STD_BORDER]), 0);
 #endif
-                        cairo_pattern_add_color_stop_rgba(pt, 1, col, col, col, 0);
+                        cairo_pattern_add_color_stop_rgba(pt, 1, CAIRO_COL(qtcPalette.background[STD_BORDER]), 0);
                         setGapClip(cr, area, gap_side, gap_x, gap_width, x, y, width, height, FALSE);
                         cairo_set_source(cr, pt);
                         createPath(cr, x+0.5, y+0.5, width-1, height-1, radius, round);

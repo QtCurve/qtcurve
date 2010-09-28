@@ -3,6 +3,9 @@
 1. Fix Claws Mail listview headers.
 2. When drawing text on an option menu, look deeper into parent heirarchy to
    determine if the label is on a GtkOptionMenu.
+3. Fix menubar borders when menubars set to be coloured as per titlebar.
+4. Allow faded groupbox frame even when not shading background.
+5. Dont draw shaded/faded background groupboxes for Mozilla, Java, or OpenOffice.org
 
 1.6.3
 -----
