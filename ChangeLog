@@ -4,6 +4,8 @@
 2. Fix toolbar/menubar borders (if being drawn) when colouring menubars as per
    titlebars.
 3. Allow faded groupbox frame even when not shading background.
+4. If there is no group box frame, this is set to none, or the frame is below
+   the text - then don't indent the checkbox (if there is one).
 
 1.6.3
 -----

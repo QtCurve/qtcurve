@@ -10058,7 +10058,11 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                                  indicatorWidth(pixelMetric(PM_IndicatorWidth, option, widget)),
                                  indicatorSpace(pixelMetric(PM_CheckBoxLabelSpacing, option, widget) - 1);
                     bool         hasCheckBox(groupBox->subControls & QStyle::SC_GroupBoxCheckBox);
-                    int          checkBoxSize(hasCheckBox ? (indicatorWidth + indicatorSpace) : 0);
+                    int          checkBoxSize(hasCheckBox ? (indicatorWidth + indicatorSpace) : 0),
+                                 checkAdjust(NO_FRAME(opts.groupBox) || opts.gbLabel&GB_LBL_OUTSIDE ? 0 : 2);
+
+                    if(0==checkAdjust)
+                        checkBoxSize-=2;
 
                     r.adjust(marg, 0, -marg, 0);
                     if(!NO_FRAME(opts.groupBox) && opts.gbLabel&GB_LBL_INSIDE)
@@ -10082,7 +10086,7 @@ QRect Style::subControlRect(ComplexControl control, const QStyleOptionComplex *o
                             int indicatorHeight(pixelMetric(PM_IndicatorHeight, option, widget)),
                                 top(r.top() + (fontMetrics.height() - indicatorHeight) / 2);
 
-                            r.setRect(reverse ? (r.right() - indicatorWidth) : r.left()+2, top, indicatorWidth, indicatorHeight);
+                            r.setRect(reverse ? (r.right() - indicatorWidth) : r.left()+checkAdjust, top, indicatorWidth, indicatorHeight);
                         }
                         else // Adjust for label
                             r.setRect(reverse ? r.left() : (r.left() + checkBoxSize), r.top(), r.width() - checkBoxSize, r.height());
