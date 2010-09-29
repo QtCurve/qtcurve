@@ -316,12 +316,14 @@ static void unSetBold(QWidget *widget)
     }
 }
 
+#ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 static QWidget * getActiveWindow(QWidget *widget)
 {
     QWidget *activeWindow=QApplication::activeWindow();
 
     return activeWindow && activeWindow!=widget ? activeWindow : 0L;
 }
+#endif
 
 static const QWidget * getToolBar(const QWidget *w/*, bool checkQ3*/)
 {
