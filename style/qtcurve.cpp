@@ -4090,10 +4090,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 }
                 else
                 {
-                    bool sv(isOOWidget(widget) ||
+                    bool kateView(isKateView(widget)),
+                         kontactPreview(!kateView && isKontactPreviewPane(widget)),
+                         sv(isOOWidget(widget) ||
                             ::qobject_cast<const QAbstractScrollArea *>(widget) ||
                             (widget && widget->inherits("Q3ScrollView")) ||
-                            ((opts.square&SQUARE_SCROLLVIEW) && (isKateView(widget) || isKontactPreviewPane(widget)))),
+                            ((opts.square&SQUARE_SCROLLVIEW) && (kateView || kontactPreview))),
                         squareSv(sv && ((opts.square&SQUARE_SCROLLVIEW) || (widget && widget->isWindow()))),
                         inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
 
@@ -4144,15 +4146,6 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         if(!opts.highlightScrollViews)
                             opt.state&=~State_HasFocus;
 
-                        if(sv)
-                        {
-                            painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->setPen(option->palette.brush(QPalette::Base).color());
-                            painter->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, ROUNDED_ALL,
-                                                        getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)));
-                            painter->setRenderHint(QPainter::Antialiasing, false);
-                        }
-
                         if(opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100==opts.bgndOpacity &&
                            widget && widget->parentWidget() && !inQAbstractItemView/* &&
                            widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/)
@@ -4162,13 +4155,23 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                             painter->drawRect(r.adjusted(1, 1, -1, -1));
                         }
 
+                        if(sv || kateView || kontactPreview)
+                        {
+                            painter->setRenderHint(QPainter::Antialiasing, true);
+                            painter->setPen(option->palette.brush(QPalette::Base).color());
+                            painter->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW, ROUNDED_ALL,
+                                                        getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW, RADIUS_INTERNAL)));
+                            painter->setRenderHint(QPainter::Antialiasing, false);
+                        }
+
                         drawBorder(painter, r, &opt,
                                    opts.round ?  getFrameRound(widget) : ROUND_NONE, backgroundColors(option),
-                                   sv ? WIDGET_SCROLLVIEW : WIDGET_FRAME, state&State_Sunken || state&State_HasFocus
-                                                          ? BORDER_SUNKEN
-                                                            : state&State_Raised
-                                                                ? BORDER_RAISED
-                                                                : BORDER_FLAT);
+                                   sv || kateView || kontactPreview ? WIDGET_SCROLLVIEW : WIDGET_FRAME,
+                                   state&State_Sunken || state&State_HasFocus
+                                        ? BORDER_SUNKEN
+                                        : state&State_Raised
+                                            ? BORDER_RAISED
+                                            : BORDER_FLAT);
                         painter->restore();
                     }
                 }
@@ -11533,30 +11536,34 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
             }
             else if(doBlend)
             {
-                tl.setAlphaF(BORDER_BLEND_ALPHA);
-                br.setAlphaF(BORDER_SUNKEN ? 0.0 : BORDER_BLEND_ALPHA);
+                tl.setAlphaF(BORDER_BLEND_ALPHA(w));
+                br.setAlphaF(BORDER_SUNKEN==borderProfile ? 0.0 : BORDER_BLEND_ALPHA(w));
             }
 
             QRect inner(r.adjusted(1, 1, -1, -1));
 
-            buildSplitPath(inner, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL),
-                            topPath, botPath);
+            buildSplitPath(inner, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
 
             p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
                         (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
                             ? tl
                             : option->palette.background().color());
             p->drawPath(topPath);
-            if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
-                p->setPen(WIDGET_SCROLLVIEW==w && !hasFocus
-                            ? checkColour(option, QPalette::Window)
-                            : WIDGET_ENTRY==w && !hasFocus
-                                ? checkColour(option, QPalette::Base)
-                                : enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                    WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
-                                    ? br
-                                    : checkColour(option, QPalette::Window));
-            p->drawPath(botPath);
+            if(WIDGET_SCROLLVIEW==w || // Because of list view headers, need to draw dark line on right!
+                (! ( (WIDGET_ENTRY==w && !hasFocus && !hasMouseOver) ||
+                     (WIDGET_ENTRY!=w && doBlend && BORDER_SUNKEN==borderProfile) ) ) )
+            {
+                if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile && WIDGET_SCROLLVIEW!=w)
+                    p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
+                                ? checkColour(option, QPalette::Window)
+                                : WIDGET_ENTRY==w && !hasFocus
+                                    ? checkColour(option, QPalette::Base)
+                                    : */enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                        WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                        ? br
+                                        : checkColour(option, QPalette::Window));
+                p->drawPath(botPath);
+            }
         }
     }
 
@@ -11804,18 +11811,18 @@ void Style::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget,
     if(doEtch && opts.etchEntry)
         r.adjust(1, 1, -1, -1);
 
+    p->setRenderHint(QPainter::Antialiasing, true);
     if(fill)
-        p->fillPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, round,
-                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)),
+        p->fillPath(buildPath(QRectF(r).adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, round,
+                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)),
                     option->palette.brush(QPalette::Base));
     else
     {
-        p->setRenderHint(QPainter::Antialiasing, true);
         p->setPen(checkColour(option, QPalette::Base));
-        p->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_ENTRY, round,
-                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_ENTRY, RADIUS_INTERNAL)));
-        p->setRenderHint(QPainter::Antialiasing, false);
+        p->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, round,
+                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)));
     }
+    p->setRenderHint(QPainter::Antialiasing, false);
 
     if(doEtch && opts.etchEntry)
         drawEtch(p, rx, widget, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, false);

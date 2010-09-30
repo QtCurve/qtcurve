@@ -381,7 +381,12 @@ enum
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 #define FOCUS_ALPHA              0.08
 #define FOCUS_GLOW_LINE_ALPHA    0.5
-#define BORDER_BLEND_ALPHA       0.7
+#if !defined __cplusplus
+#define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) || WIDGET_SPIN==(W) || WIDGET_COMBO_BUTTON==(W) ? 0.4 : 0.7)
+#else
+#define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) ? 0.45 : 0.7)
+#endif
+ 
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
 // #if defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -1820,7 +1825,8 @@ ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
     ERound r=opts->round;
 
     if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && (opts->square&SQUARE_PROGRESS)) ||
-        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) )
+        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) ||
+        (WIDGET_SCROLLVIEW==widget && (opts->square&SQUARE_SCROLLVIEW)) )
         return ROUND_NONE;
 
     if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
@@ -1871,7 +1877,8 @@ static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadi
         r=ROUND_SLIGHT;
 
     if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && (opts->square&SQUARE_PROGRESS)) ||
-        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) )
+        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) ||
+        (WIDGET_SCROLLVIEW==widget && (opts->square&SQUARE_SCROLLVIEW)) )
         return 0.0;
 
 #if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
