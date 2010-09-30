@@ -7240,6 +7240,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             opt.rect = ar;
 
+            if(!(opt.state&State_Enabled))
+                opt.palette.setCurrentColorGroup(QPalette::Disabled);
+
             if(opt.palette.text().color()!=opt.palette.buttonText().color()) // The following fixes gwenviews scrollbars...
                 opt.palette.setColor(QPalette::Text, opt.palette.buttonText().color());
 

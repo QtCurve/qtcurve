@@ -7,6 +7,8 @@
 4. If there is no group box frame, this is set to none, or the frame is below
    the text - then don't indent the checkbox (if there is one).
 5. Improve inner 3d part of line edits, combos, spinboxes, etc.
+6. Fix some scrollbar arrows not appearing disabled even though they should
+   be - e.g. in 'About Dolphin' dialog.
 
 1.6.3
 -----
