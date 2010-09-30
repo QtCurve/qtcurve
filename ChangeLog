@@ -6,6 +6,7 @@
 3. Fix menubar borders when menubars set to be coloured as per titlebar.
 4. Allow faded groupbox frame even when not shading background.
 5. Dont draw shaded/faded background groupboxes for Mozilla, Java, or OpenOffice.org
+6. Improve inner 3d part of line edits, combos, spinboxes, etc.
 
 1.6.3
 -----

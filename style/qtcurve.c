@@ -1463,7 +1463,7 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                    xdi=xd+1,
                    ydi=yd+1,
                    alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
-                            ? ENTRY_INNER_ALPHA : BORDER_BLEND_ALPHA;
+                            ? ENTRY_INNER_ALPHA : BORDER_BLEND_ALPHA(widget);
             int    widthi=width-2,
                    heighti=height-2;
 
@@ -1473,22 +1473,37 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                 GdkColor *col=&colors[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile
                                             ? 0 : FRAME_DARK_SHADOW];
                 if(flags&DF_BLEND)
+                {
+                    if(WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget || WIDGET_SCROLLVIEW==widget)
+                    {
+                        cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
+                        createTLPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
+                        cairo_stroke(cr);
+                    }
+
                     cairo_set_source_rgba(cr, CAIRO_COL(*col), alpha);
+                }
                 else
                     cairo_set_source_rgb(cr, CAIRO_COL(*col));
-                
             }
             else
                 cairo_set_source_rgb(cr, CAIRO_COL(style->bg[state]));
-
+            
             createTLPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
             cairo_stroke(cr);
             if(WIDGET_CHECKBOX!=widget)
             {
                 if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile)
-                    if(WIDGET_SCROLLVIEW==widget && !hasFocus)
-                        cairo_set_source_rgb(cr, CAIRO_COL(style->bg[state]));
-                    else if(WIDGET_ENTRY==widget && !hasFocus)
+                    if(WIDGET_SCROLLVIEW==widget)
+                    {
+                        /* Because of list view headers, need to draw dark line on right! */
+                        cairo_save(cr);
+                        cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
+                        createBRPath(cr, xdi, ydi, widthi, heighti, radiusi, round);
+                        cairo_stroke(cr);
+                        cairo_restore(cr);
+                    }
+                    else if(WIDGET_SCROLLVIEW==widget || WIDGET_ENTRY==widget)
                         cairo_set_source_rgb(cr, CAIRO_COL(style->base[state]));
                     else if(GTK_STATE_INSENSITIVE!=state && (BORDER_SUNKEN==borderProfile || /*APPEARANCE_FLAT!=app ||*/
                                                             WIDGET_TAB_TOP==widget || WIDGET_TAB_BOT==widget))
@@ -3847,8 +3862,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                      moz=isMozillaWidget(widget);
 
             if(!rev)
-                x-=2;
-            width+=2;
+                x-=4;
+            width+=4;
             
             if(moz)
             {
@@ -4193,8 +4208,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                         rev=reverseLayout(entry);
 
                     if(!rev)
-                        x-=2;
-                    width+=2;
+                        x-=4;
+                    width+=4;
                     if((mozToolbar && state==GTK_STATE_PRELIGHT) || state==GTK_STATE_ACTIVE)
                         state=GTK_STATE_NORMAL;
 
