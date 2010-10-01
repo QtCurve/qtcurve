@@ -9,6 +9,7 @@
 5. Improve inner 3d part of line edits, combos, spinboxes, etc.
 6. Fix some scrollbar arrows not appearing disabled even though they should
    be - e.g. in 'About Dolphin' dialog.
+7. Support loading of png, jpeg, etc file types for background image.
 
 1.6.3
 -----

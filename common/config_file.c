@@ -848,15 +848,34 @@ static void loadBgndImage(QtCImage *img)
 #ifdef __cplusplus
         if(!img->file.isEmpty())
         {
-            QSvgRenderer svg(img->file);
-
-            if(svg.isValid())
+            bool loaded=false;
+            if(img->file.endsWith(".svg", Qt::CaseInsensitive) || img->file.endsWith(".svgz", Qt::CaseInsensitive))
             {
-                img->pix=QPixmap(img->width, img->height);
-                img->pix.fill(Qt::transparent);
-                QPainter painter(&img->pix);
-                svg.render(&painter);
-                painter.end();
+                QSvgRenderer svg(img->file);
+
+                if(svg.isValid())
+                {
+                    img->pix=QPixmap(img->width, img->height);
+                    img->pix.fill(Qt::transparent);
+                    QPainter painter(&img->pix);
+                    svg.render(&painter);
+                    painter.end();
+                    loaded=true;
+                }
+            }
+            if(!loaded) // Try loading via QImage...
+            {
+                QImage image(img->file);
+
+                if(!image.isNull())
+                {
+                    img->pix=QPixmap::fromImage(image);
+                    if(image.height()!=img->height || image.width()!=img->width)
+                        img->pix=img->pix.scaled(img->width, img->height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                    QPainter painter(&img->pix);
+                    painter.drawPixmap(0, 0, img->pix);
+                    painter.end();
+                }
             }
         }
 #else // __cplusplus
