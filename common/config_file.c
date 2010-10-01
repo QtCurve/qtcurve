@@ -846,6 +846,7 @@ static void loadBgndImage(QtCImage *img)
     {
         img->loaded=true;
 #ifdef __cplusplus
+        img->pix=QPixmap();
         if(!img->file.isEmpty())
         {
             bool loaded=false;
@@ -1025,6 +1026,10 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
             } \
+            else \
+            { \
+                opts->ENTRY.type=IMG_NONE; \
+            } \
         } \
     }
 
@@ -1192,6 +1197,10 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
                 opts->ENTRY.file=file; \
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
+            } \
+            else \
+            { \
+                opts->ENTRY.type=IMG_NONE; \
             } \
         } \
     }
