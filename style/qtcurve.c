@@ -2298,7 +2298,7 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
                                (IMG_FILE!=opts.bgndImage.type || 
                                 (opts.bgndImage.height==opts.menuBgndImage.height &&
                                  opts.bgndImage.width==opts.menuBgndImage.width &&
-                                 opts.bgndImage.file==opts.menuBgndImage.file)));
+                                 opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)));
     QtCImage *img=useWindow ? &opts.bgndImage : &opts.menuBgndImage;
     int      imgWidth=IMG_FILE==img->type ? img->width : RINGS_WIDTH(img->type),
              imgHeight=IMG_FILE==img->type ? img->height : RINGS_HEIGHT(img->type);
@@ -2309,9 +2309,9 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
             break;
         case IMG_FILE:
             loadBgndImage(img);
-            if(img->pix)
+            if(img->pixmap.img)
             {
-                gdk_cairo_set_source_pixbuf(cr, img->pix, width-img->width, y);
+                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, width-img->width, y);
                 cairo_paint(cr);
                 break;
             }
@@ -2395,6 +2395,21 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
             break;
         }
     }
+}
+
+static void drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint x, gint y, gint w, gint h, GdkColor *col,
+                          gboolean isWindow, double alpha)
+{
+    GdkPixbuf *pix=isWindow ? opts.bgndPixmap.img : opts.menuBgndPixmap.img;//getPixbuf(getCheckRadioCol(style, ind_state, mnu), PIX_CHECK, 1.0);
+//     int       pw=gdk_pixbuf_get_width(pix),
+//               ph=gdk_pixbuf_get_height(pix),
+//               dx=(x+(opts.crSize/2))-(pw/2),
+//               dy=(y+(opts.crSize/2))-(ph/2);
+
+    gdk_cairo_set_source_pixbuf(cr, pix, 0, 0);
+    cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+    cairo_rectangle(cr, x, y, w, h);
+    cairo_fill(cr);
 }
 
 #define STRIPE_OUTER(A, B, PART) (B.PART=((3*A.PART+B.PART)/4))
@@ -2566,6 +2581,9 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             else if(APPEARANCE_STRIPED==opts.bgndAppearance)
                 drawStripedBgnd(cr, style, area,  x+xmod, -ypos+ymod, width+wmod, window->allocation.height+hmod,
                                 &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+            else if(APPEARANCE_FILE==opts.bgndAppearance)
+                drawBgndImage(cr, style, area,  x+xmod, -ypos+ymod, width+wmod, window->allocation.height+hmod,
+                              &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
             else
             {
                 if(GT_HORIZ==opts.bgndGrad)
@@ -5004,6 +5022,8 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             }
             if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
                 drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
+            else if(APPEARANCE_FILE==opts.bgndAppearance)
+                drawBgndImage(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
             else
                 drawBevelGradientAlpha(cr, style, area, NULL, x, y, width, height,
                                        &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance,

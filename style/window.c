@@ -95,7 +95,8 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
         GdkRectangle rect;
 
         if(IS_FLAT(opts.bgndAppearance))
-            rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=opts.bgndImage.pix ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type);
+            rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=opts.bgndImage.pixmap.img 
+                                                                        ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type);
         else
             rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=widget->allocation.height;
         gdk_window_invalidate_rect(widget->window, &rect, FALSE);
