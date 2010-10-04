@@ -171,7 +171,13 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void squareProgressChanged();
     void fillProgressChanged();
     void bgndAppearanceChanged();
+    void bgndImageChanged();
     void menuBgndAppearanceChanged();
+    void menuBgndImageChanged();
+    void configureBgndAppearanceFile();
+    void configureBgndImageFile();
+    void configureMenuBgndAppearanceFile();
+    void configureMenuBgndImageFile();
     void groupBoxChanged();
     void changeStack();
     void gradChanged(int i);
@@ -190,7 +196,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void previewControlPressed();
 
     public:
-
+    void configureImage(const QString &title, QString &file, int &width, int &height);
     bool savePreset(const QString &name);
     QString getPresetName(const QString &cap, QString label, QString def, QString name=QString());
     void setupStack();

@@ -11189,6 +11189,8 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 
         if(APPEARANCE_STRIPED==app)
             pix=drawStripes(col, opacity);
+        else if(APPEARANCE_FILE==app)
+            pix=isWindow ? opts.bgndPixmap.img : opts.menuBgndPixmap.img;
         else
         {
             QString key;
@@ -11216,17 +11218,19 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
         }
 
         if(path.isEmpty())
-            p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
+            p->drawTiledPixmap(r, APPEARANCE_STRIPED==app || APPEARANCE_FILE==app || scaledSize==pix.size()
+                                    ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio));
         else
         {
             const QPointF prevOrigin(p->brushOrigin());
             p->setBrushOrigin(r.x(), r.y());
             p->fillPath(path,
-                        QBrush(APPEARANCE_STRIPED==app || scaledSize==pix.size() ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
+                        QBrush(APPEARANCE_STRIPED==app || APPEARANCE_FILE==app || scaledSize==pix.size()
+                                ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
             p->setBrushOrigin(prevOrigin);
         }
         
-        if(isWindow && APPEARANCE_STRIPED!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
+        if(isWindow && APPEARANCE_STRIPED!=app && APPEARANCE_FILE!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
         {
             int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
 
@@ -11285,7 +11289,7 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
                               (IMG_FILE!=opts.bgndImage.type || 
                                 (opts.bgndImage.height==opts.bgndImage.height &&
                                  opts.bgndImage.width==opts.bgndImage.width &&
-                                 opts.bgndImage.file==opts.menuBgndImage.file)))
+                                 opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)))
                     ? opts.bgndImage : opts.menuBgndImage;
     int      imgWidth=IMG_FILE==img.type ? img.width : RINGS_WIDTH(img.type),
              imgHeight=IMG_FILE==img.type ? img.height : RINGS_HEIGHT(img.type);
@@ -11296,18 +11300,18 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
             break;
         case IMG_FILE:
             loadBgndImage(&img);
-            if(!img.pix.isNull())
+            if(!img.pixmap.img.isNull())
             {
-                p->drawPixmap(width-img.pix.width(), yOffset, img.pix);
+                p->drawPixmap(width-img.pixmap.img.width(), yOffset, img.pixmap.img);
                 break;
             }
         case IMG_PLAIN_RINGS:
         case IMG_BORDERED_RINGS:
-            if(img.pix.isNull())
+            if(img.pixmap.img.isNull())
             {
-                img.pix=QPixmap(imgWidth, imgHeight);
-                img.pix.fill(Qt::transparent);
-                QPainter pixPainter(&img.pix);
+                img.pixmap.img=QPixmap(imgWidth, imgHeight);
+                img.pixmap.img.fill(Qt::transparent);
+                QPainter pixPainter(&img.pixmap.img);
 
                 pixPainter.setRenderHint(QPainter::Antialiasing);
                 drawBgndRing(pixPainter, 0, 0, 200, 140, isWindow);
@@ -11323,14 +11327,14 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
                 drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
                 pixPainter.end();
             }
-            p->drawPixmap(width-img.pix.width(), yOffset+1, img.pix);
+            p->drawPixmap(width-img.pixmap.img.width(), yOffset+1, img.pixmap.img);
             break;
         case IMG_SQUARE_RINGS:
-            if(img.pix.isNull())
+            if(img.pixmap.img.isNull())
             {
-                img.pix=QPixmap(imgWidth, imgHeight);
-                img.pix.fill(Qt::transparent);
-                QPainter pixPainter(&img.pix);
+                img.pixmap.img=QPixmap(imgWidth, imgHeight);
+                img.pixmap.img.fill(Qt::transparent);
+                QPainter pixPainter(&img.pixmap.img);
                 QColor   col(Qt::white);
                 double   halfWidth=RINGS_SQUARE_LINE_WIDTH/2.0;
 
@@ -11352,7 +11356,7 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
                                               WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
                 pixPainter.end();
             }
-            p->drawPixmap(width-img.pix.width(), yOffset+1, img.pix);
+            p->drawPixmap(width-img.pixmap.img.width(), yOffset+1, img.pixmap.img);
             break;    
     }
 }

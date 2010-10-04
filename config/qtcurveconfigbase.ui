@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>756</width>
-    <height>529</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -197,7 +197,6 @@
                <property name="frameShadow">
                 <enum>QFrame::Sunken</enum>
                </property>
-               <zorder>previewWidget</zorder>
               </widget>
              </item>
              <item row="1" column="0">
@@ -230,9 +229,6 @@
      </widget>
      <widget class="QWidget" name="page">
       <layout class="QFormLayout" name="formLayout">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::ExpandingFieldsGrow</enum>
-       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
@@ -261,11 +257,22 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="bgndAppearance">
-         <property name="whatsThis">
-          <string>&lt;p&gt;Sets a gradient to be used as the background for windows and dialogs.&lt;/p&gt;&lt;p&gt;&lt;b&gt;NOTE&lt;/b&gt; This is an experimental option, and will (probably) have a detrimental effect on performance.&lt;/p&gt;</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QComboBox" name="bgndAppearance">
+           <property name="whatsThis">
+            <string>&lt;p&gt;Sets a gradient to be used as the background for windows and dialogs.&lt;/p&gt;&lt;p&gt;&lt;b&gt;NOTE&lt;/b&gt; This is an experimental option, and will (probably) have a detrimental effect on performance.&lt;/p&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="bgndAppearance_btn">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="2" column="1">
         <widget class="QComboBox" name="bgndGrad">
@@ -282,12 +289,23 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="bgndImage">
-         <property name="whatsThis">
-          <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QComboBox" name="bgndImage">
+           <property name="whatsThis">
+            <string>&lt;p&gt;This adds a background image to the top-right of dialogs and windows.
             &lt;ul&gt;&lt;li&gt;None - No image.&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders.&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;Square rings - 3 simple rounded sqaures.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
-         </property>
-        </widget>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="bgndImage_btn">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_29">
@@ -3066,9 +3084,6 @@
      </widget>
      <widget class="QWidget" name="page_23">
       <layout class="QFormLayout" name="formLayout_14">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::ExpandingFieldsGrow</enum>
-       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_60">
          <property name="text">
@@ -3141,11 +3156,22 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QComboBox" name="menuBgndAppearance">
-         <property name="whatsThis">
-          <string>Defines the gradient applied to the background of the popup menus.</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QComboBox" name="menuBgndAppearance">
+           <property name="whatsThis">
+            <string>Defines the gradient applied to the background of the popup menus.</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="menuBgndAppearance_btn">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="6" column="1">
         <widget class="QComboBox" name="menuBgndGrad">
@@ -3162,12 +3188,23 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QComboBox" name="menuBgndImage">
-         <property name="whatsThis">
-          <string>&lt;p&gt;This adds a background image to popup menus.
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QComboBox" name="menuBgndImage">
+           <property name="whatsThis">
+            <string>&lt;p&gt;This adds a background image to popup menus.
             &lt;ul&gt;&lt;li&gt;None - No image.&lt;/li&gt;&lt;li&gt;Bordered rings - 'Air' like rings with borders.&lt;/li&gt;&lt;li&gt;Plain rings - 'Air' like rings, but without any border.&lt;/li&gt;&lt;li&gt;Square rings - 3 simple rounded sqaures.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;</string>
-         </property>
-        </widget>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="menuBgndImage_btn">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="8" column="0">
         <widget class="QLabel" name="label_45">
@@ -4357,8 +4394,10 @@
   <tabstop>exportButton</tabstop>
   <tabstop>appearance</tabstop>
   <tabstop>bgndAppearance</tabstop>
+  <tabstop>bgndAppearance_btn</tabstop>
   <tabstop>bgndGrad</tabstop>
   <tabstop>bgndImage</tabstop>
+  <tabstop>bgndImage_btn</tabstop>
   <tabstop>sunkenAppearance</tabstop>
   <tabstop>buttonEffect</tabstop>
   <tabstop>thinnerBtns</tabstop>
@@ -4540,8 +4579,10 @@
   <tabstop>useHighlightForMenu</tabstop>
   <tabstop>thinnerMenuItems</tabstop>
   <tabstop>menuBgndAppearance</tabstop>
+  <tabstop>menuBgndAppearance_btn</tabstop>
   <tabstop>menuBgndGrad</tabstop>
   <tabstop>menuBgndImage</tabstop>
+  <tabstop>menuBgndImage_btn</tabstop>
   <tabstop>menuStripe</tabstop>
   <tabstop>customMenuStripeColor</tabstop>
   <tabstop>menuStripeAppearance</tabstop>

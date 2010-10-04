@@ -91,6 +91,44 @@ static void setRgb(color *col, const char *str)
 #endif
 }
 
+static const char *qtcConfDir();
+
+#ifdef __cplusplus
+static QString deletermineFileName(const QString &file)
+{
+    if(file.startsWith("/"))
+        return file;
+    return qtcConfDir()+file;
+}
+
+#else
+static const char * deletermineFileName(const char *file)
+{
+    if('/'==file[0])
+        return file;
+
+    static char *filename=NULL;
+
+    filename=realloc(filename, strlen(qtcConfDir())+strlen(file)+1);
+    sprintf(filename, "%s%s", qtcConfDir(), file);
+    return filename;
+}
+#endif
+
+#ifdef __cplusplus
+static bool loadImage(const QString &file, QtCPixmap *pixmap)
+#else
+static bool loadImage(const char *file, QtCPixmap *pixmap)
+#endif
+{
+#ifdef __cplusplus
+    return pixmap->img.load(deletermineFileName(file));
+#else // __cplusplus
+    pixmap->img=gdk_pixbuf_new_from_file(deletermineFileName(file), NULL);
+    return NULL!=pixmap->img;
+#endif // __cplusplus
+}
+
 static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
 {
     if(str)
@@ -168,7 +206,7 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
     return def;
 }
 
-static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow)
+static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow, QtCPixmap *pix)
 {
     if(str)
     {
@@ -206,6 +244,8 @@ static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allo
             return APPEARANCE_STRIPED;
         if(APP_ALLOW_NONE==allow && 0==memcmp(str, "none", 4))
             return APPEARANCE_NONE;
+        if(NULL!=pix && APP_ALLOW_STRIPED==allow && 0==memcmp(str, "file", 4) && strlen(str)>9)
+            return loadImage(&str[5], pix) ? APPEARANCE_FILE : def;
 
         if(0==memcmp(str, "customgradient", 14) && strlen(str)>14)
         {
@@ -804,13 +844,10 @@ static bool qtcFileExists(const char *name)
 
 static char * qtcGetBarFileName(const char *app, const char *prefix)
 {
-    char *filename=NULL;
+    static char *filename=NULL;
 
-    if(!filename)
-    {
-        filename=(char *)malloc(strlen(qtcConfDir())+strlen(prefix)+strlen(app)+1);
-        sprintf(filename, "%s%s%s", qtcConfDir(), prefix, app);
-    }
+    filename=(char *)realloc(filename, strlen(qtcConfDir())+strlen(prefix)+strlen(app)+1);
+    sprintf(filename, "%s%s%s", qtcConfDir(), prefix, app);
 
     return filename;
 }
@@ -846,43 +883,33 @@ static void loadBgndImage(QtCImage *img)
     {
         img->loaded=true;
 #ifdef __cplusplus
-        img->pix=QPixmap();
-        if(!img->file.isEmpty())
+        img->pixmap.img=QPixmap();
+        QString file(deletermineFileName(img->pixmap.file));
+        if(!file.isEmpty())
         {
             bool loaded=false;
-            if(img->file.endsWith(".svg", Qt::CaseInsensitive) || img->file.endsWith(".svgz", Qt::CaseInsensitive))
+            if(file.endsWith(".svg", Qt::CaseInsensitive) || file.endsWith(".svgz", Qt::CaseInsensitive))
             {
-                QSvgRenderer svg(img->file);
+                QSvgRenderer svg(file);
 
                 if(svg.isValid())
                 {
-                    img->pix=QPixmap(img->width, img->height);
-                    img->pix.fill(Qt::transparent);
-                    QPainter painter(&img->pix);
+                    img->pixmap.img=QPixmap(img->width, img->height);
+                    img->pixmap.img.fill(Qt::transparent);
+                    QPainter painter(&img->pixmap.img);
                     svg.render(&painter);
                     painter.end();
                     loaded=true;
                 }
             }
-            if(!loaded) // Try loading via QImage...
-            {
-                QImage image(img->file);
-
-                if(!image.isNull())
-                {
-                    img->pix=QPixmap::fromImage(image);
-                    if(image.height()!=img->height || image.width()!=img->width)
-                        img->pix=img->pix.scaled(img->width, img->height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-                    QPainter painter(&img->pix);
-                    painter.drawPixmap(0, 0, img->pix);
-                    painter.end();
-                }
-            }
+            if(!loaded && img->pixmap.img.load(file) &&
+               (img->pixmap.img.height()!=img->height || img->pixmap.img.width()!=img->width))
+                img->pixmap.img=img->pixmap.img.scaled(img->width, img->height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         }
 #else // __cplusplus
-        img->pix=0L;
-        if(img->file)
-            img->pix=gdk_pixbuf_new_from_file_at_scale(img->file, img->width, img->height, FALSE, NULL);
+        img->pixmap.img=0L;
+        if(img->pixmap.file)
+            img->pixmap.img=gdk_pixbuf_new_from_file_at_scale(deletermineFileName(img->pixmap.file), img->width, img->height, FALSE, NULL);
 #endif // __cplusplus
     }
 }
@@ -1022,7 +1049,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
             QString file(cfg.readEntry(#ENTRY ".file")); \
             if(!file.isEmpty()) \
             { \
-                opts->ENTRY.file=file; \
+                opts->ENTRY.pixmap.file=file; \
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
             } \
@@ -1194,7 +1221,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
             const char *file=readStringEntry(cfg, #ENTRY ".file"); \
             if(file) \
             { \
-                opts->ENTRY.file=file; \
+                opts->ENTRY.pixmap.file=file; \
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
             } \
@@ -1240,7 +1267,10 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
     opts->ENTRY=toMouseOver(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define CFG_READ_APPEARANCE(ENTRY, ALLOW) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW);
+    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, NULL);
+
+#define CFG_READ_APPEARANCE_PIXMAP(ENTRY, ALLOW, PIXMAP) \
+    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, PIXMAP);
 
 /*
 #define CFG_READ_APPEARANCE(ENTRY) \
@@ -1870,10 +1900,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(tabBgnd)
             CFG_READ_TB_BORDER(toolbarBorders)
             CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE(bgndAppearance, APP_ALLOW_STRIPED)
+            CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, &(opts->bgndPixmap))
             CFG_READ_GRAD_TYPE(bgndGrad)
             CFG_READ_GRAD_TYPE(menuBgndGrad)
-            CFG_READ_APPEARANCE(menuBgndAppearance, APP_ALLOW_STRIPED)
+            CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, &(opts->menuBgndPixmap))
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             CFG_READ_BOOL(fixParentlessDialogs)
             CFG_READ_STRING_LIST(noDlgFixApps)
@@ -2656,7 +2686,7 @@ static const char *toStr(EMouseOver mo)
     }
 }
 
-static QString toStr(EAppearance exp, EAppAllow allow)
+static QString toStr(EAppearance exp, EAppAllow allow, QtCPixmap *pix)
 {
     switch(exp)
     {
@@ -2684,6 +2714,8 @@ static QString toStr(EAppearance exp, EAppAllow allow)
             return "splitgradient";
         case APPEARANCE_BEVELLED:
             return "bevelled";
+        case APPEARANCE_FILE:
+            return QString("file:")+pix->file;
         case APPEARANCE_FADE:
             switch(allow)
             {
@@ -3028,8 +3060,14 @@ static const char * toStr(EGlow lv)
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
     else \
-        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, ALLOW));
-    
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, ALLOW, NULL));
+
+#define CFG_WRITE_APPEARANCE_ENTRY_PIXMAP(ENTRY, ALLOW, PIXMAP) \
+    if (!exportingStyle && def.ENTRY==opts.ENTRY) \
+        CFG.deleteEntry(#ENTRY); \
+    else \
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, ALLOW, PIXMAP));
+
 #define CFG_WRITE_ENTRY_B(ENTRY, B) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
@@ -3061,7 +3099,7 @@ static const char * toStr(EGlow lv)
     } \
     else \
     { \
-        CFG.writeEntry(#ENTRY ".file", opts.ENTRY.file); \
+        CFG.writeEntry(#ENTRY ".file", opts.ENTRY.pixmap.file); \
         CFG.writeEntry(#ENTRY ".width", opts.ENTRY.width); \
         CFG.writeEntry(#ENTRY ".height", opts.ENTRY.height); \
     }

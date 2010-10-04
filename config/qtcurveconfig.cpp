@@ -23,6 +23,7 @@
 #ifdef QTC_STYLE_SUPPORT
 #include "exportthemedialog.h"
 #endif
+#include "imagepropertiesdialog.h"
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGroupBox>
@@ -487,6 +488,8 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
                 case APP_ALLOW_NONE:
                     return i18n("None");
             }
+        case APPEARANCE_FILE:
+            return i18n("File");
         default:
             return i18n("<unknown>");
     }
@@ -494,7 +497,13 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
 
 static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_BASIC)
 {
-    for(int i=APPEARANCE_CUSTOM1; i<(APP_ALLOW_BASIC==allow ? APPEARANCE_FADE : APPEARANCE_FADE+1); ++i)
+    int max=APP_ALLOW_BASIC==allow
+                ? APPEARANCE_FADE
+                : APP_ALLOW_STRIPED==allow
+                    ? APPEARANCE_FADE+2
+                    : APPEARANCE_FADE+1;
+
+    for(int i=APPEARANCE_CUSTOM1; i<max; ++i)
         combo->insertItem(i, uiString((EAppearance)i, allow));
 }
 
@@ -667,7 +676,7 @@ static void insertImageEntries(QComboBox *combo)
     combo->insertItem(IMG_BORDERED_RINGS, i18n("Bordered rings"));
     combo->insertItem(IMG_PLAIN_RINGS, i18n("Plain rings"));
     combo->insertItem(IMG_SQUARE_RINGS, i18n("Square rings"));
-    //combo->insertItem(IMG_FILE, i18n("File:"));
+    combo->insertItem(IMG_FILE, i18n("File"));
 }
 
 static void insertGlowEntries(QComboBox *combo)
@@ -968,10 +977,10 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(sbarBgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(sliderFill, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(bgndAppearance, SIGNAL(currentIndexChanged(int)), SLOT(bgndAppearanceChanged()));
-    connect(bgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(bgndImage, SIGNAL(currentIndexChanged(int)), SLOT(bgndImageChanged()));
     connect(bgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(dlgOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
-    connect(menuBgndImage, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(menuBgndImage, SIGNAL(currentIndexChanged(int)), SLOT(menuBgndImageChanged()));
     connect(menuBgndOpacity, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(dwtAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(tooltipAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -1077,6 +1086,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(menubarBlend, SIGNAL(clicked(bool)), SLOT(menubarTitlebarBlend()));
     connect(previewControlButton, SIGNAL(clicked(bool)), SLOT(previewControlPressed()));
 
+    connect(bgndAppearance_btn, SIGNAL(clicked(bool)), SLOT(configureBgndAppearanceFile()));
+    connect(bgndImage_btn, SIGNAL(clicked(bool)), SLOT(configureBgndImageFile()));
+    connect(menuBgndAppearance_btn, SIGNAL(clicked(bool)), SLOT(configureMenuBgndAppearanceFile()));
+    connect(menuBgndImage_btn, SIGNAL(clicked(bool)), SLOT(configureMenuBgndImageFile()));
+    
     setupStack();
 
     if(kwin->ok())
@@ -1459,16 +1473,54 @@ void QtCurveConfig::bgndAppearanceChanged()
 {
     if(APPEARANCE_STRIPED==bgndAppearance->currentIndex())
         bgndGrad->setCurrentIndex(GT_HORIZ);
-    bgndGrad->setEnabled(APPEARANCE_STRIPED!=bgndAppearance->currentIndex());
+    bgndGrad->setEnabled(APPEARANCE_STRIPED!=bgndAppearance->currentIndex() && APPEARANCE_FILE!=bgndAppearance->currentIndex());
+    bgndAppearance_btn->setEnabled(APPEARANCE_FILE==bgndAppearance->currentIndex());
     updateChanged();
 }
-    
+
+void QtCurveConfig::bgndImageChanged()
+{
+    bgndImage_btn->setEnabled(IMG_FILE==bgndImage->currentIndex());
+    updateChanged();
+}
+
 void QtCurveConfig::menuBgndAppearanceChanged()
 {
     if(APPEARANCE_STRIPED==menuBgndAppearance->currentIndex())
         menuBgndGrad->setCurrentIndex(GT_HORIZ);
-    menuBgndGrad->setEnabled(APPEARANCE_STRIPED!=menuBgndAppearance->currentIndex());
+    menuBgndGrad->setEnabled(APPEARANCE_STRIPED!=menuBgndAppearance->currentIndex() && APPEARANCE_FILE!=menuBgndAppearance->currentIndex());
+    menuBgndAppearance_btn->setEnabled(APPEARANCE_FILE==menuBgndAppearance->currentIndex());
     updateChanged();
+}
+
+void QtCurveConfig::menuBgndImageChanged()
+{
+    menuBgndImage_btn->setEnabled(IMG_FILE==menuBgndImage->currentIndex());
+    updateChanged();
+}
+
+void QtCurveConfig::configureBgndAppearanceFile()
+{
+    int dummy=-1;
+    configureImage(i18n("Background Appearance"), previewStyle.bgndPixmap.file, dummy, dummy);
+}
+
+void QtCurveConfig::configureBgndImageFile()
+{
+}
+
+void QtCurveConfig::configureMenuBgndAppearanceFile()
+{
+}
+
+void QtCurveConfig::configureMenuBgndImageFile()
+{
+}
+
+void QtCurveConfig::configureImage(const QString &title, QString &file, int &width, int &height)
+{
+    CImagePropertiesDialog *dlg=new CImagePropertiesDialog(this);
+    dlg->run(title, file, width, height);
 }
 
 void QtCurveConfig::groupBoxChanged()

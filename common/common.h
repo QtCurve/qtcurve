@@ -540,16 +540,22 @@ typedef enum
 
 typedef struct
 {
+#if defined __cplusplus
+    QString   file;
+    QPixmap   img;
+#else
+    const char *file;
+    GdkPixbuf *img;
+#endif
+} QtCPixmap;
+
+typedef struct
+{
     EImageType type;
     bool       loaded;
-#if defined __cplusplus
-    QString    file;
-    QPixmap    pix;
-#else // __cplusplus
-    const char *file;
-    GdkPixbuf  *pix;
-#endif // __cplusplus
-    int width, height;
+    QtCPixmap  pixmap;
+    int        width,
+               height;
 } QtCImage;
 
 typedef enum
@@ -701,6 +707,7 @@ typedef enum
         APPEARANCE_FADE, /* Only for poupmenu items! */
         APPEARANCE_STRIPED = APPEARANCE_FADE, /* Only for windows  and menus */
         APPEARANCE_NONE = APPEARANCE_FADE, /* Only for titlebars */
+        APPEARANCE_FILE,  /* Only for windows  and menus */
         APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
         APPEARANCE_AGUA_MOD,
         APPEARANCE_LV_AGUA,
@@ -1209,6 +1216,8 @@ typedef struct
 #else
     Gradient         *customGradient[NUM_CUSTOM_GRAD];
 #endif
+    QtCPixmap        bgndPixmap;
+    QtCPixmap        menuBgndPixmap;
     QtCImage         bgndImage,
                      menuBgndImage;
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
