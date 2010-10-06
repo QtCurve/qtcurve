@@ -914,7 +914,7 @@ static void loadBgndImage(QtCImage *img)
         img->pixmap.img=0L;
         if(img->pixmap.file)
             img->pixmap.img=0==img->width
-                            ? gdk_pixbuf_new_from_file(determineFileName(file), NULL);
+                            ? gdk_pixbuf_new_from_file(determineFileName(img->pixmap.file), NULL)
                             : gdk_pixbuf_new_from_file_at_scale(determineFileName(img->pixmap.file), img->width, img->height, FALSE, NULL);
 #endif // __cplusplus
     }
@@ -1683,7 +1683,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
         }
     }
 #else
-    checkImages=true;
     if(!file)
     {
         const char *env=getenv("QTCURVE_CONFIG_FILE");
