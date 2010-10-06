@@ -1111,7 +1111,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(squareTooltips, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(squarePopupMenus, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_button, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(titlebarButtons_custom, SIGNAL(toggled(bool)), SLOT(titlebarButtons_customChanged()));
+    connect(titlebarButtons_useHover, SIGNAL(toggled(bool)), SLOT(titlebarButtons_useHoverChanged()));
     connect(titlebarButtons_customIcon, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_noFrame, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(titlebarButtons_round, SIGNAL(toggled(bool)), SLOT(updateChanged()));
@@ -1576,6 +1577,20 @@ void QtCurveConfig::fillProgressChanged()
 {
     if(!fillProgress->isChecked() || !squareProgress->isChecked())
         borderProgress->setChecked(true);
+    updateChanged();
+}
+
+void QtCurveConfig::titlebarButtons_customChanged()
+{
+    if(titlebarButtons_custom->isChecked())
+        titlebarButtons_useHover->setChecked(false);
+    updateChanged();
+}
+
+void QtCurveConfig::titlebarButtons_useHoverChanged()
+{
+    if(titlebarButtons_useHover->isChecked())
+        titlebarButtons_custom->setChecked(false);
     updateChanged();
 }
 
@@ -2852,6 +2867,8 @@ int QtCurveConfig::getTitleBarButtonFlags()
         titlebarButtons+=TITLEBAR_BUTTOM_ARROW_MIN_MAX;
     if(titlebarButtons_hideOnInactiveWindow->isChecked())
         titlebarButtons+=TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW;
+    if(titlebarButtons_useHover->isChecked())
+        titlebarButtons+=TITLEBAR_BUTTON_USE_HOVER_COLOR;
     return titlebarButtons;
 }
 
@@ -3423,6 +3440,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtons_sunkenBackground->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND);
     titlebarButtons_arrowMinMax->setChecked(opts.titlebarButtons&TITLEBAR_BUTTOM_ARROW_MIN_MAX);
     titlebarButtons_hideOnInactiveWindow->setChecked(opts.titlebarButtons&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW);
+    titlebarButtons_useHover->setChecked(opts.titlebarButtons&TITLEBAR_BUTTON_USE_HOVER_COLOR);
 
     populateShades(opts);
 

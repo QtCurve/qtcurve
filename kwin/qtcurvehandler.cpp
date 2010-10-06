@@ -151,6 +151,9 @@ bool QtCurveHandler::reset(unsigned long changed)
     itsTitleFont = KDecoration::options()->font(true, false); // not small
     itsTitleFontTool = KDecoration::options()->font(true, true); // small
 
+    itsHoverCols[0]=KColorScheme(QPalette::Inactive).decoration(KColorScheme::HoverColor).color();
+    itsHoverCols[1]=KColorScheme(QPalette::Active).decoration(KColorScheme::HoverColor).color();
+
     // read in the configuration
     bool configChanged=readConfig(
 #if KDE_IS_VERSION(4, 3, 85)

@@ -11626,9 +11626,13 @@ void Style::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, Su
                                 ? opts.titlebarButtonColors[btn+(NUM_TITLEBAR_BUTTONS*(titleBar->state&State_Active ? 1 : 2))]
                                 : colored && opts.titlebarButtons&TITLEBAR_BUTTON_COLOR_SYMBOL
                                     ? itsTitleBarButtonsCols[btn][ORIGINAL_SHADE]
-                                    : (SC_TitleBarCloseButton==sc && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) && (hover || sunken)
+                                    : SC_TitleBarCloseButton==sc && hover && !sunken && !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
                                         ? CLOSE_COLOR
-                                        : iconColor);
+                                        : SC_TitleBarCloseButton!=sc && hover && !sunken && itsMouseOverCols &&
+                                          !(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR) &&
+                                          opts.titlebarButtons&TITLEBAR_BUTTON_USE_HOVER_COLOR
+                                            ? itsMouseOverCols[ORIGINAL_SHADE]
+                                            : iconColor;
 
         bool drewFrame=drawMdiButton(p, rect, hover, sunken, buttonColors);
         drawMdiIcon(p, icnColor, (drewFrame ? buttonColors : bgndCols)[ORIGINAL_SHADE],

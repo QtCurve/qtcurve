@@ -294,12 +294,17 @@ void QtCurveButton::drawButton(QPainter *painter)
             bP.drawPixmap(EFFECT_SHADOW==effect ? dX+1 : dX, dY+1, icon);
         }
 
-        if( (CloseButton==type()
+        if(itsHover && !sunken && !(flags&TITLEBAR_BUTTON_COLOR) && !customCol)
+        {
+            if(CloseButton==type()
 #if KDE_IS_VERSION(4, 3, 85)
-              || isTabClose
+                || isTabClose
 #endif
-             ) && itsHover && !(flags&TITLEBAR_BUTTON_COLOR) && !customCol)
-            col=CLOSE_COLOR;
+                )
+                col=CLOSE_COLOR;
+            else if(flags&TITLEBAR_BUTTON_USE_HOVER_COLOR)
+                col=Handler()->hoverCol(active);
+        }
 
         if(faded)
             col.setAlphaF(HOVER_BUTTON_ALPHA(col));

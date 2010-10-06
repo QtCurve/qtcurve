@@ -124,6 +124,7 @@ class QtCurveHandler : public QObject,
     void                  removeClient(QtCurveClient *c);
     bool                  wasLastMenu(int id)            { return id==itsLastMenuXid; }
     bool                  wasLastStatus(int id)          { return id==itsLastStatusXid; }
+    const QColor &        hoverCol(bool active)          { return itsHoverCols[active ? 1 : 0]; }
 
     private:
 
@@ -145,6 +146,7 @@ class QtCurveHandler : public QObject,
     QtCurveConfig          itsConfig;
     QList<QtCurveClient *> itsClients;
     QtCurveDBus            *itsDBus;
+    QColor                 itsHoverCols[2];
 #if KDE_IS_VERSION(4, 3, 0)
     QtCurveShadowCache     itsShadowCache;
 #endif

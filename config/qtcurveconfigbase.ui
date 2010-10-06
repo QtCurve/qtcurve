@@ -2348,6 +2348,16 @@
         </widget>
        </item>
        <item row="10" column="1">
+        <widget class="QCheckBox" name="titlebarButtons_useHover">
+         <property name="whatsThis">
+          <string>If enabled, symbols will use the KDE4 hover color when moused-over.</string>
+         </property>
+         <property name="text">
+          <string>Use hover color for mouse-over of symbols</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
         <widget class="QCheckBox" name="titlebarButtons_sunkenBackground">
          <property name="whatsThis">
           <string>If enabled, a sunken background is drawn behind the buttons.</string>
@@ -2357,7 +2367,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QCheckBox" name="titlebarButtons_arrowMinMax">
          <property name="whatsThis">
           <string>If enabled, arrows are drawn as the icons for min and max buttons.</string>
@@ -2367,7 +2377,7 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="13" column="1">
         <widget class="QCheckBox" name="titlebarButtons_hideOnInactiveWindow">
          <property name="whatsThis">
           <string>If enabled, buttons on inactive windows are only drawn when the mouse hovers over them.</string>
@@ -2377,14 +2387,14 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_57">
          <property name="text">
           <string>Custom colors:</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="14" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorSymbolsOnly">
          <property name="whatsThis">
           <string>If enabled, custom colors will be applied to the symbols, otherwise they will be applied to the button background.</string>
@@ -2394,7 +2404,7 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="1">
+       <item row="15" column="1">
         <widget class="QCheckBox" name="titlebarButtons_colorInactive">
          <property name="whatsThis">
           <string>If enabled, custom colors will be applied to active and inactive windows, otherwise they will only be applied to active windows.</string>
@@ -4528,6 +4538,7 @@
   <tabstop>titlebarButtons_custom</tabstop>
   <tabstop>titlebarButtons_customIcon</tabstop>
   <tabstop>titlebarButtons_colorOnMouseOver</tabstop>
+  <tabstop>titlebarButtons_useHover</tabstop>
   <tabstop>titlebarButtons_sunkenBackground</tabstop>
   <tabstop>titlebarButtons_arrowMinMax</tabstop>
   <tabstop>titlebarButtons_hideOnInactiveWindow</tabstop>
