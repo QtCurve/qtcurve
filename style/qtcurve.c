@@ -2582,8 +2582,13 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 drawStripedBgnd(cr, style, area,  x+xmod, -ypos+ymod, width+wmod, window->allocation.height+hmod,
                                 &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
             else if(APPEARANCE_FILE==opts.bgndAppearance)
-                drawBgndImage(cr, style, area,  x+xmod, -ypos+ymod, width+wmod, window->allocation.height+hmod,
+            {
+                cairo_save(cr);
+                cairo_translate(cr, xmod, ymod);
+                drawBgndImage(cr, style, area,  x, -ypos, width+wmod, window->allocation.height+hmod,
                               &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+                cairo_restore(cr);
+            }
             else
             {
                 if(GT_HORIZ==opts.bgndGrad)
