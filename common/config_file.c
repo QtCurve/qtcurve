@@ -1683,6 +1683,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
         }
     }
 #else
+    bool checkImages=true;
     if(!file)
     {
         const char *env=getenv("QTCURVE_CONFIG_FILE");
