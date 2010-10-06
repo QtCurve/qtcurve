@@ -94,7 +94,7 @@ static void setRgb(color *col, const char *str)
 static const char *qtcConfDir();
 
 #ifdef __cplusplus
-static QString deletermineFileName(const QString &file)
+static QString determineFileName(const QString &file)
 {
     if(file.startsWith("/"))
         return file;
@@ -102,7 +102,7 @@ static QString deletermineFileName(const QString &file)
 }
 
 #else
-static const char * deletermineFileName(const char *file)
+static const char * determineFileName(const char *file)
 {
     if('/'==file[0])
         return file;
@@ -122,9 +122,12 @@ static bool loadImage(const char *file, QtCPixmap *pixmap)
 #endif
 {
 #ifdef __cplusplus
-    return pixmap->img.load(deletermineFileName(file));
+    // Need to store filename for config dialog!
+    QString f(determineFileName(file));
+    pixmap->file=f;
+    return pixmap->img.load(f);
 #else // __cplusplus
-    pixmap->img=gdk_pixbuf_new_from_file(deletermineFileName(file), NULL);
+    pixmap->img=gdk_pixbuf_new_from_file(determineFileName(file), NULL);
     return NULL!=pixmap->img;
 #endif // __cplusplus
 }
@@ -206,7 +209,7 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
     return def;
 }
 
-static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow, QtCPixmap *pix)
+static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow, QtCPixmap *pix, bool checkImage)
 {
     if(str)
     {
@@ -245,7 +248,7 @@ static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allo
         if(APP_ALLOW_NONE==allow && 0==memcmp(str, "none", 4))
             return APPEARANCE_NONE;
         if(NULL!=pix && APP_ALLOW_STRIPED==allow && 0==memcmp(str, "file", 4) && strlen(str)>9)
-            return loadImage(&str[5], pix) ? APPEARANCE_FILE : def;
+            return loadImage(&str[5], pix) || !checkImage ? APPEARANCE_FILE : def;
 
         if(0==memcmp(str, "customgradient", 14) && strlen(str)>14)
         {
@@ -879,16 +882,17 @@ static void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
 static void loadBgndImage(QtCImage *img)
 {
     if(!img->loaded &&
-        img->width>16 && img->width<1024 && img->height>16 && img->height<1024)
+        ( (img->width>16 && img->width<1024 && img->height>16 && img->height<1024) || (0==img->width && 0==img->height)) )
     {
         img->loaded=true;
 #ifdef __cplusplus
         img->pixmap.img=QPixmap();
-        QString file(deletermineFileName(img->pixmap.file));
+        QString file(determineFileName(img->pixmap.file));
+
         if(!file.isEmpty())
         {
             bool loaded=false;
-            if(file.endsWith(".svg", Qt::CaseInsensitive) || file.endsWith(".svgz", Qt::CaseInsensitive))
+            if(0!=img->width && (file.endsWith(".svg", Qt::CaseInsensitive) || file.endsWith(".svgz", Qt::CaseInsensitive)))
             {
                 QSvgRenderer svg(file);
 
@@ -902,14 +906,16 @@ static void loadBgndImage(QtCImage *img)
                     loaded=true;
                 }
             }
-            if(!loaded && img->pixmap.img.load(file) &&
+            if(!loaded && img->pixmap.img.load(file) && 0!=img->width &&
                (img->pixmap.img.height()!=img->height || img->pixmap.img.width()!=img->width))
                 img->pixmap.img=img->pixmap.img.scaled(img->width, img->height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         }
 #else // __cplusplus
         img->pixmap.img=0L;
         if(img->pixmap.file)
-            img->pixmap.img=gdk_pixbuf_new_from_file_at_scale(deletermineFileName(img->pixmap.file), img->width, img->height, FALSE, NULL);
+            img->pixmap.img=0==img->width
+                            ? gdk_pixbuf_new_from_file(determineFileName(file), NULL);
+                            : gdk_pixbuf_new_from_file_at_scale(determineFileName(img->pixmap.file), img->width, img->height, FALSE, NULL);
 #endif // __cplusplus
     }
 }
@@ -1056,6 +1062,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
             else \
             { \
                 opts->ENTRY.type=IMG_NONE; \
+                opts->ENTRY.width=opts->ENTRY.height=0; \
             } \
         } \
     }
@@ -1267,10 +1274,10 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
     opts->ENTRY=toMouseOver(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
 #define CFG_READ_APPEARANCE(ENTRY, ALLOW) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, NULL);
+    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, NULL, false);
 
-#define CFG_READ_APPEARANCE_PIXMAP(ENTRY, ALLOW, PIXMAP) \
-    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, PIXMAP);
+#define CFG_READ_APPEARANCE_PIXMAP(ENTRY, ALLOW, PIXMAP, CHECK) \
+    opts->ENTRY=toAppearance(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY, ALLOW, PIXMAP, CHECK);
 
 /*
 #define CFG_READ_APPEARANCE(ENTRY) \
@@ -1649,7 +1656,7 @@ static void checkConfig(Options *opts)
 }
 
 #ifdef __cplusplus
-static bool readConfig(const QString &file, Options *opts, Options *defOpts=0L)
+static bool readConfig(const QString &file, Options *opts, Options *defOpts=0L, bool checkImages=true)
 #else
 static bool readConfig(const char *file, Options *opts, Options *defOpts)
 #endif
@@ -1676,6 +1683,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
         }
     }
 #else
+    checkImages=true;
     if(!file)
     {
         const char *env=getenv("QTCURVE_CONFIG_FILE");
@@ -1900,10 +1908,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(tabBgnd)
             CFG_READ_TB_BORDER(toolbarBorders)
             CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
-            CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, &(opts->bgndPixmap))
+            CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, &(opts->bgndPixmap), checkImages)
             CFG_READ_GRAD_TYPE(bgndGrad)
             CFG_READ_GRAD_TYPE(menuBgndGrad)
-            CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, &(opts->menuBgndPixmap))
+            CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, &(opts->menuBgndPixmap), checkImages)
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             CFG_READ_BOOL(fixParentlessDialogs)
             CFG_READ_STRING_LIST(noDlgFixApps)
@@ -2686,7 +2694,7 @@ static const char *toStr(EMouseOver mo)
     }
 }
 
-static QString toStr(EAppearance exp, EAppAllow allow, QtCPixmap *pix)
+static QString toStr(EAppearance exp, EAppAllow allow, const QtCPixmap *pix)
 {
     switch(exp)
     {
@@ -2715,7 +2723,11 @@ static QString toStr(EAppearance exp, EAppAllow allow, QtCPixmap *pix)
         case APPEARANCE_BEVELLED:
             return "bevelled";
         case APPEARANCE_FILE:
-            return QString("file:")+pix->file;
+            // When savng, strip users config dir from location.
+            return QLatin1String("file:")+
+                    (pix->file.startsWith(qtcConfDir())
+                        ? pix->file.mid(strlen(qtcConfDir())+1)
+                        : pix->file);
         case APPEARANCE_FADE:
             switch(allow)
             {
@@ -3066,7 +3078,7 @@ static const char * toStr(EGlow lv)
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
         CFG.deleteEntry(#ENTRY); \
     else \
-        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, ALLOW, PIXMAP));
+        CFG.writeEntry(#ENTRY, toStr(opts.ENTRY, ALLOW, &opts.PIXMAP));
 
 #define CFG_WRITE_ENTRY_B(ENTRY, B) \
     if (!exportingStyle && def.ENTRY==opts.ENTRY) \
@@ -3154,10 +3166,10 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(sliderWidth)
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_APPEARANCE_ENTRY(appearance, APP_ALLOW_BASIC)
-        CFG_WRITE_APPEARANCE_ENTRY(bgndAppearance, APP_ALLOW_STRIPED)
+        CFG_WRITE_APPEARANCE_ENTRY_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, bgndPixmap)
         CFG_WRITE_ENTRY(bgndGrad)
         CFG_WRITE_ENTRY(menuBgndGrad)
-        CFG_WRITE_APPEARANCE_ENTRY(menuBgndAppearance, APP_ALLOW_STRIPED)
+        CFG_WRITE_APPEARANCE_ENTRY_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, menuBgndPixmap)
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         CFG_WRITE_ENTRY(fixParentlessDialogs)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)

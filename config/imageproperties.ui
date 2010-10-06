@@ -25,7 +25,7 @@
     <widget class="KUrlRequester" name="fileRequester"/>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="scaleLabel">
+    <widget class="QCheckBox" name="scaleImage">
      <property name="text">
       <string>Scale to:</string>
      </property>

@@ -21,23 +21,26 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <kdialog.h>
+#include <KDE/KDialog>
+#include <KDE/KIntSpinBox>
+#include <KDE/KUrlRequester>
+#include <KDE/KUrl>
+
 #include "ui_imageproperties.h"
 
 class CImagePropertiesDialog : public KDialog,  public Ui::ImageProperties
 {
-    Q_OBJECT
-
     public:
 
-    CImagePropertiesDialog(QWidget *parent);
+    CImagePropertiesDialog(const QString &title, QWidget *parent);
 
-    void  run(const QString &title, const QString &file, int width, int height);
+    bool  run();
+    void  set(const QString &file, int width=-1, int height=-1);
     QSize sizeHint() const;
 
-    private slots:
-
-    void slotButtonClicked(int button);
+    QString fileName()  { return fileRequester->url().toLocalFile(); }
+    int     imgWidth()  { return scaleImage->isChecked() ? scaleWidth->value() : 0; }
+    int     imgHeight() { return scaleImage->isChecked() ? scaleHeight->value() : 0; }
 };
 
 #endif

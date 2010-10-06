@@ -62,6 +62,9 @@
 #include <KDE/KComponentData>
 #include <KDE/KActionCollection>
 #include <KDE/KToolBar>
+#include <KDE/KTemporaryFile>
+#include <KDE/KTempDir>
+#include <KDE/KZip>
 #include <unistd.h>
 #include "config.h"
 #include "../style/qtcurve.h"
@@ -70,7 +73,13 @@
 #include "config_file.c"
 
 #define EXTENSION                  ".qtcurve"
+#define COMPRESSED_EXTENSION       ".qtcurve.zip"
 #define VERSION_WITH_KWIN_SETTINGS MAKE_VERSION(1, 5)
+
+#define THEME_IMAGE_PREFIX "style"
+#define BGND_FILE "-bgnd"
+#define IMAGE_FILE "-img"
+#define MENU_FILE  "-menu"
 
 extern "C"
 {
@@ -80,6 +89,71 @@ extern "C"
 
         return new QtCurveConfig(parent);
     }
+}
+
+static QString getExt(const QString &file)
+{
+    int dotPos=file.lastIndexOf('.');
+
+    return dotPos!=-1 ? file.mid(dotPos) : QString();
+}
+
+static QString getThemeFile(const QString &file)
+{
+    if(file.startsWith(THEME_IMAGE_PREFIX BGND_FILE))
+        return QString(qtcConfDir()+file).replace("//", "/");
+    else if(!file.startsWith("/"))
+    {
+        QString f(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates)+'/'+file);
+
+        if(QFile::exists(f))
+            return f.replace("//", "/");
+    }
+    return QString(file).replace("//", "/");
+}
+
+static QString installThemeFile(const QString &src, const QString &dest)
+{
+    QString source(getThemeFile(src)),
+            name(QLatin1String(THEME_IMAGE_PREFIX)+dest+getExt(source)),
+            destination(qtcConfDir()+name);
+
+    if(source!=destination)
+        QFile::copy(source, destination);
+
+    return name;
+}
+
+static QString saveThemeFile(const QString &src, const QString &dest, const QString &themeName)
+{
+    QString source(getThemeFile(src)),
+            destination(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates)+
+                        themeName+dest+getExt(source));
+
+    if(source!=destination)
+        QFile::copy(source, destination);
+
+    return destination;
+}
+
+static void removeInstalledThemeFile(const QString &file)
+{
+    QString f(qtcConfDir()+QLatin1String(THEME_IMAGE_PREFIX)+file);
+
+    if(QFile::exists(f))
+        QFile::remove(f);
+}
+
+static void removeThemeImages(const QString &themeFile)
+{
+    QString                    themeName(QFileInfo(themeFile).fileName().remove(EXTENSION).replace(' ', '_'));
+    QDir                       dir(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates));
+    QStringList                files(dir.entryList());
+    QStringList::ConstIterator it(files.begin()),
+                               end(files.end());
+    for(; it!=end; ++it)
+        if((*it).startsWith(themeName+BGND_FILE))
+            QFile::remove(dir.path()+"/"+(*it));
 }
 
 static void setStyleRecursive(QWidget *w, QStyle *s)
@@ -489,7 +563,7 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
                     return i18n("None");
             }
         case APPEARANCE_FILE:
-            return i18n("File");
+            return i18n("Tiled image");
         default:
             return i18n("<unknown>");
     }
@@ -853,6 +927,11 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     stopValue->setValue(100);
     stopAlpha->setValue(100);
 
+    bgndPixmapDlg=new CImagePropertiesDialog(i18n("Background"), this);
+    menuBgndPixmapDlg=new CImagePropertiesDialog(i18n("Menu Background"), this);
+    bgndImageDlg=new CImagePropertiesDialog(i18n("Background Image"), this);
+    menuBgndImageDlg=new CImagePropertiesDialog(i18n("Menu Image"), this);
+                           
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(tabBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(menuDelay, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
@@ -1090,7 +1169,20 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(bgndImage_btn, SIGNAL(clicked(bool)), SLOT(configureBgndImageFile()));
     connect(menuBgndAppearance_btn, SIGNAL(clicked(bool)), SLOT(configureMenuBgndAppearanceFile()));
     connect(menuBgndImage_btn, SIGNAL(clicked(bool)), SLOT(configureMenuBgndImageFile()));
-    
+
+    bgndAppearance_btn->setAutoRaise(true);
+    bgndAppearance_btn->setVisible(false);
+    bgndAppearance_btn->setIcon(KIcon("configure"));
+    bgndImage_btn->setAutoRaise(true);
+    bgndImage_btn->setVisible(false);
+    bgndImage_btn->setIcon(KIcon("configure"));
+    menuBgndAppearance_btn->setAutoRaise(true);
+    menuBgndAppearance_btn->setVisible(false);
+    menuBgndAppearance_btn->setIcon(KIcon("configure"));
+    menuBgndImage_btn->setAutoRaise(true);
+    menuBgndImage_btn->setVisible(false);
+    menuBgndImage_btn->setIcon(KIcon("configure"));
+
     setupStack();
 
     if(kwin->ok())
@@ -1152,6 +1244,24 @@ void QtCurveConfig::save()
     Options opts=presets[currentText].opts;
 
     setOptions(opts);
+
+    if(IMG_FILE==opts.bgndImage.type)
+        opts.bgndImage.pixmap.file=installThemeFile(bgndImageDlg->fileName(), BGND_FILE IMAGE_FILE);
+    else
+        removeInstalledThemeFile(BGND_FILE IMAGE_FILE);
+    if(APPEARANCE_FILE==opts.bgndAppearance)
+        opts.bgndPixmap.file=installThemeFile(bgndPixmapDlg->fileName(), BGND_FILE);
+    else
+        removeInstalledThemeFile(BGND_FILE);
+    if(IMG_FILE==opts.menuBgndImage.type)
+        opts.menuBgndImage.pixmap.file=installThemeFile(menuBgndImageDlg->fileName(), BGND_FILE MENU_FILE IMAGE_FILE);
+    else
+        removeInstalledThemeFile(BGND_FILE MENU_FILE IMAGE_FILE);
+    if(APPEARANCE_FILE==opts.menuBgndAppearance)
+        opts.menuBgndPixmap.file=installThemeFile(menuBgndPixmapDlg->fileName(), BGND_FILE MENU_FILE);
+    else
+        removeInstalledThemeFile(BGND_FILE MENU_FILE);
+
     writeConfig(NULL, opts, presets[defaultText].opts);
 
     // This is only read by KDE3...
@@ -1474,13 +1584,13 @@ void QtCurveConfig::bgndAppearanceChanged()
     if(APPEARANCE_STRIPED==bgndAppearance->currentIndex())
         bgndGrad->setCurrentIndex(GT_HORIZ);
     bgndGrad->setEnabled(APPEARANCE_STRIPED!=bgndAppearance->currentIndex() && APPEARANCE_FILE!=bgndAppearance->currentIndex());
-    bgndAppearance_btn->setEnabled(APPEARANCE_FILE==bgndAppearance->currentIndex());
+    bgndAppearance_btn->setVisible(APPEARANCE_FILE==bgndAppearance->currentIndex());
     updateChanged();
 }
 
 void QtCurveConfig::bgndImageChanged()
 {
-    bgndImage_btn->setEnabled(IMG_FILE==bgndImage->currentIndex());
+    bgndImage_btn->setVisible(IMG_FILE==bgndImage->currentIndex());
     updateChanged();
 }
 
@@ -1489,38 +1599,38 @@ void QtCurveConfig::menuBgndAppearanceChanged()
     if(APPEARANCE_STRIPED==menuBgndAppearance->currentIndex())
         menuBgndGrad->setCurrentIndex(GT_HORIZ);
     menuBgndGrad->setEnabled(APPEARANCE_STRIPED!=menuBgndAppearance->currentIndex() && APPEARANCE_FILE!=menuBgndAppearance->currentIndex());
-    menuBgndAppearance_btn->setEnabled(APPEARANCE_FILE==menuBgndAppearance->currentIndex());
+    menuBgndAppearance_btn->setVisible(APPEARANCE_FILE==menuBgndAppearance->currentIndex());
     updateChanged();
 }
 
 void QtCurveConfig::menuBgndImageChanged()
 {
-    menuBgndImage_btn->setEnabled(IMG_FILE==menuBgndImage->currentIndex());
+    menuBgndImage_btn->setVisible(IMG_FILE==menuBgndImage->currentIndex());
     updateChanged();
 }
 
 void QtCurveConfig::configureBgndAppearanceFile()
 {
-    int dummy=-1;
-    configureImage(i18n("Background Appearance"), previewStyle.bgndPixmap.file, dummy, dummy);
+    if(bgndPixmapDlg->run())
+        updateChanged();
 }
 
 void QtCurveConfig::configureBgndImageFile()
 {
+    if(bgndImageDlg->run())
+        updateChanged();
 }
 
 void QtCurveConfig::configureMenuBgndAppearanceFile()
 {
+    if(menuBgndPixmapDlg->run())
+        updateChanged();
 }
 
 void QtCurveConfig::configureMenuBgndImageFile()
 {
-}
-
-void QtCurveConfig::configureImage(const QString &title, QString &file, int &width, int &height)
-{
-    CImagePropertiesDialog *dlg=new CImagePropertiesDialog(this);
-    dlg->run(title, file, width, height);
+    if(menuBgndImageDlg->run())
+        updateChanged();
 }
 
 void QtCurveConfig::groupBoxChanged()
@@ -2210,6 +2320,28 @@ bool QtCurveConfig::diffShades(const Options &opts)
     return false;
 }
 
+bool QtCurveConfig::haveImages()
+{
+    return IMG_FILE==bgndImage->currentIndex() ||
+           IMG_FILE==menuBgndImage->currentIndex() ||
+           APPEARANCE_FILE==bgndAppearance->currentIndex() ||
+           APPEARANCE_FILE==menuBgndAppearance->currentIndex();
+}
+
+bool QtCurveConfig::diffImages(const Options &opts)
+{
+    return (IMG_FILE==bgndImage->currentIndex() &&
+                ( getThemeFile(bgndImageDlg->fileName())!=getThemeFile(opts.bgndImage.pixmap.file) ||
+                  bgndImageDlg->imgWidth()!=opts.bgndImage.width || bgndImageDlg->imgHeight()!=opts.bgndImage.height ) ) ||
+           (IMG_FILE==menuBgndImage->currentIndex() &&
+                ( getThemeFile(menuBgndImageDlg->fileName())!=getThemeFile(opts.menuBgndImage.pixmap.file) ||
+                  menuBgndImageDlg->imgWidth()!=opts.menuBgndImage.width || menuBgndImageDlg->imgHeight()!=opts.menuBgndImage.height ) ) ||
+           (APPEARANCE_FILE==bgndAppearance->currentIndex() &&
+                (getThemeFile(bgndPixmapDlg->fileName())!=getThemeFile(opts.bgndPixmap.file))) ||
+           (APPEARANCE_FILE==menuBgndAppearance->currentIndex() &&
+                (getThemeFile(menuBgndPixmapDlg->fileName())!=getThemeFile(opts.menuBgndPixmap.file)));
+}
+
 void QtCurveConfig::setPasswordChar(int ch)
 {
     QString     str;
@@ -2267,7 +2399,7 @@ void QtCurveConfig::setPreset()
     Preset &p(presets[presetsCombo->currentText()]);
 
     if(!p.loaded)
-        readConfig(p.fileName, &p.opts, &presets[defaultText].opts);
+        readConfig(p.fileName, &p.opts, &presets[defaultText].opts, false);
 
     setWidgetOptions(p.opts);
     
@@ -2313,12 +2445,23 @@ bool QtCurveConfig::savePreset(const QString &name)
     if(!kwin->ok())
         return false;
 
+    QString fname=QString(name).replace(' ', '_');
     QString dir(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates));
 
-    KConfig cfg(dir+name+EXTENSION, KConfig::NoGlobals);
+    KConfig cfg(dir+fname+EXTENSION, KConfig::NoGlobals);
     Options opts;
 
     setOptions(opts);
+
+    if(IMG_FILE==opts.bgndImage.type)
+        opts.bgndImage.pixmap.file=saveThemeFile(bgndImageDlg->fileName(), BGND_FILE IMAGE_FILE, fname);
+    if(APPEARANCE_FILE==opts.bgndAppearance)
+        opts.bgndPixmap.file=saveThemeFile(bgndPixmapDlg->fileName(), BGND_FILE, fname);
+    if(IMG_FILE==opts.menuBgndImage.type)
+        opts.menuBgndImage.pixmap.file=saveThemeFile(menuBgndImageDlg->fileName(), BGND_FILE MENU_FILE IMAGE_FILE, fname);
+    if(APPEARANCE_FILE==opts.menuBgndAppearance)
+        opts.menuBgndPixmap.file=saveThemeFile(menuBgndPixmapDlg->fileName(), BGND_FILE MENU_FILE, fname);
+
     if(writeConfig(&cfg, opts, presets[defaultText].opts, true))
     {
         kwin->save(&cfg);
@@ -2326,7 +2469,7 @@ bool QtCurveConfig::savePreset(const QString &name)
         QMap<QString, Preset>::iterator it(presets.find(name)),
                                         end(presets.end());
 
-        presets[name]=Preset(opts, dir+name+EXTENSION);
+        presets[name]=Preset(opts, dir+fname+EXTENSION);
         if(it==end)
         {
             presetsCombo->insertItem(0, name);
@@ -2424,6 +2567,7 @@ void QtCurveConfig::deletePreset()
     {
         if(QFile::remove(presets[presetsCombo->currentText()].fileName))
         {
+            removeThemeImages(presets[presetsCombo->currentText()].fileName);
             presets.remove(presetsCombo->currentText());
             presetsCombo->removeItem(presetsCombo->currentIndex());
         }
@@ -2440,13 +2584,15 @@ void QtCurveConfig::deletePreset()
 void QtCurveConfig::importPreset()
 {
     QString file(KFileDialog::getOpenFileName(KUrl(),
-                                              i18n("*"EXTENSION"|QtCurve Settings Files\n"
+                                              i18n("*"EXTENSION" *"COMPRESSED_EXTENSION"|QtCurve Settings Files\n"
                                                    THEME_PREFIX"*"THEME_SUFFIX"|QtCurve KDE Theme Files"), this));
 
     if(!file.isEmpty())
     {
+        bool    compressed=file.endsWith(COMPRESSED_EXTENSION);
         QString fileName(QFileInfo(file).fileName()),
-                name(fileName.remove(EXTENSION).replace('_', ' '));
+                baseName(fileName.remove(compressed ? COMPRESSED_EXTENSION : EXTENSION).replace(' ', '_')),
+                name(QString(baseName).replace('_', ' '));
         Options opts;
 
         if(name.isEmpty())
@@ -2454,32 +2600,108 @@ void QtCurveConfig::importPreset()
         else if(name==currentText || name==defaultText)
             KMessageBox::error(this, i18n("<p>Sorry, failed to load file.</p><p><i>Cannot have a preset named "
                                           "\"%1\"</i></p>", name));
-        else if (readConfig(file, &opts, &presets[defaultText].opts))
-        {
-            name=getPresetName(i18n("Import Preset"), QString(), name, name);
-            if(!name.isEmpty())
-            {
-                readyForPreview=false;
-                setWidgetOptions(opts);
-                savePreset(name);
-
-                // Load kwin options - if present
-                KConfig cfg(file, KConfig::SimpleConfig);
-
-                if(cfg.hasGroup(KWIN_GROUP))
-                {
-                    KConfigGroup grp(&cfg, SETTINGS_GROUP);
-                    QStringList  ver(grp.readEntry("version", QString()).split('.'));
-
-                    if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=VERSION_WITH_KWIN_SETTINGS)
-                        kwin->load(&cfg);
-                }
-                readyForPreview=true;
-                updatePreview();
-            }
-        }
         else
-            KMessageBox::error(this, i18n("Sorry, failed to load file."));
+        {
+            QString  qtcFile(file);
+            KZip     *zip=compressed ? new KZip(file) : 0L;
+            KTempDir *tmpDir=0L;
+    
+            if(compressed)
+            {
+                qtcFile=QString();
+                if(!zip->open(QIODevice::ReadOnly))
+                    KMessageBox::error(this, i18n("Sorry, failed to open compressed file."));
+                else
+                {
+                    const KArchiveDirectory *zipDir=zip->directory();
+
+                    if(zipDir)
+                    {
+                        tmpDir=new KTempDir(KStandardDirs::locateLocal("tmp", "qtcurve"));
+                        tmpDir->setAutoRemove(false); // true);
+                        zipDir->copyTo(tmpDir->name(), false);
+
+                        // Find settings file...
+                        QDir                       dir(tmpDir->name());
+                        QStringList                files(dir.entryList());
+                        QStringList::ConstIterator it(files.begin()),
+                                                   end(files.end());
+                        for(; it!=end; ++it)
+                            if((*it).endsWith(EXTENSION))
+                                qtcFile=dir.path()+"/"+(*it);
+
+                        if(qtcFile.isEmpty())
+                            KMessageBox::error(this, i18n("Invalid compressed settings file.\n(Could not locate settings file.)"));
+                    }
+                    else
+                        KMessageBox::error(this, i18n("Invalid compressed settings file.\n(Could not list ZIP contents.)"));
+                }
+            }
+
+            if(!qtcFile.isEmpty())
+            {
+                if (readConfig(qtcFile, &opts, &presets[defaultText].opts, false))
+                {
+                    name=getPresetName(i18n("Import Preset"), QString(), name, name);
+                    if(!name.isEmpty())
+                    {
+                        QString qtcDir(KGlobal::dirs()->saveLocation("data", "QtCurve/", KStandardDirs::NoDuplicates)+'/');
+                        name=name.replace(' ', '_');
+
+                        if(compressed && tmpDir)
+                        {
+                            if(IMG_FILE==opts.bgndImage.type)
+                            {
+                                QString fileName(name+BGND_FILE IMAGE_FILE+getExt(opts.bgndImage.pixmap.file));
+                                QFile::copy(tmpDir->name()+'/'+opts.bgndImage.pixmap.file, qtcDir+fileName);
+                                opts.bgndImage.pixmap.file=fileName;
+                            }
+                            if(IMG_FILE==opts.menuBgndImage.type)
+                            {
+                                QString fileName(name+BGND_FILE MENU_FILE IMAGE_FILE+getExt(opts.menuBgndImage.pixmap.file));
+                                QFile::copy(tmpDir->name()+'/'+opts.menuBgndImage.pixmap.file, qtcDir+fileName);
+                                opts.menuBgndImage.pixmap.file=fileName;
+                            }
+                            if(APPEARANCE_FILE==opts.bgndAppearance)
+                            {
+                                QString fileName(name+BGND_FILE+getExt(opts.bgndPixmap.file));
+                                QFile::copy(tmpDir->name()+'/'+opts.bgndPixmap.file, qtcDir+fileName);
+                                opts.bgndPixmap.file=fileName;
+                            }
+                            if(APPEARANCE_FILE==opts.menuBgndAppearance)
+                            {
+                                QString fileName(name+BGND_FILE MENU_FILE+getExt(opts.menuBgndPixmap.file));
+                                QFile::copy(tmpDir->name()+'/'+opts.menuBgndPixmap.file, qtcDir+fileName);
+                                opts.menuBgndPixmap.file=fileName;
+                            }
+                        }
+
+                        readyForPreview=false;
+                        setWidgetOptions(opts);
+                        savePreset(name);
+
+                        // Load kwin options - if present
+                        KConfig cfg(qtcFile, KConfig::SimpleConfig);
+
+                        if(cfg.hasGroup(KWIN_GROUP))
+                        {
+                            KConfigGroup grp(&cfg, SETTINGS_GROUP);
+                            QStringList  ver(grp.readEntry("version", QString()).split('.'));
+
+                            if(3==ver.count() && MAKE_VERSION(ver[0].toInt(), ver[1].toInt())>=VERSION_WITH_KWIN_SETTINGS)
+                                kwin->load(&cfg);
+                        }
+                        readyForPreview=true;
+                        updatePreview();
+                    }
+                }
+                else
+                    KMessageBox::error(this, i18n("Sorry, failed to load file."));
+            }
+
+            delete zip;
+            delete tmpDir;
+        }
     }
 }
 
@@ -2503,25 +2725,85 @@ void QtCurveConfig::exportPreset()
     }
 #endif
 
-    QString file(KFileDialog::getSaveFileName(KUrl(), i18n("*"EXTENSION"|QtCurve Settings Files"), this));
+    bool    compressed=haveImages();
+    QString file(KFileDialog::getSaveFileName(KUrl(), i18n("*"EXTENSION" *"COMPRESSED_EXTENSION"|QtCurve Settings Files"), this));
 
     if(!file.isEmpty())
     {
-        KConfig cfg(file, KConfig::NoGlobals);
-        bool    rv(true);
+        KZip *zip(compressed ? new KZip(file) : 0L);
+        bool rv(true);
+
+        if(zip && !zip->open(QIODevice::WriteOnly))
+            rv=false;
 
         if(rv)
         {
-            Options opts;
+            KTemporaryFile *temp(compressed ? new KTemporaryFile() : 0L);
 
-            setOptions(opts);
-            rv=writeConfig(&cfg, opts, presets[defaultText].opts, true);
+            if(temp && !temp->open())
+                rv=false;
+
             if(rv)
-                kwin->save(&cfg);
-        }
+            {
+                KConfig cfg(compressed ? temp->fileName() : file, KConfig::NoGlobals);
+                Options opts;
+                QString bgndImageName, menuBgndImageName, bgndPixmapName, menuBgndPixmapName;
+                QString themeName(QFileInfo(file).fileName().remove(compressed ? COMPRESSED_EXTENSION : EXTENSION).replace(' ', '_'));
 
+                setOptions(opts);
+
+                if(compressed)
+                {
+                    if(IMG_FILE==opts.bgndImage.type)
+                    {
+                        bgndImageName=getThemeFile(opts.bgndImage.pixmap.file);
+                        opts.bgndImage.pixmap.file=themeName+BGND_FILE IMAGE_FILE+getExt(bgndImageName);
+                    }
+                    if(IMG_FILE==opts.menuBgndImage.type)
+                    {
+                        menuBgndImageName=getThemeFile(opts.menuBgndImage.pixmap.file);
+                        opts.menuBgndImage.pixmap.file=themeName+BGND_FILE MENU_FILE IMAGE_FILE+getExt(menuBgndImageName);
+                    }
+                    if(APPEARANCE_FILE==opts.bgndAppearance)
+                    {
+                        bgndPixmapName=getThemeFile(opts.bgndPixmap.file);
+                        opts.bgndPixmap.file=themeName+BGND_FILE+getExt(bgndPixmapName);
+                    }
+                    if(APPEARANCE_FILE==opts.menuBgndAppearance)
+                    {
+                        menuBgndPixmapName=getThemeFile(opts.menuBgndPixmap.file);
+                        opts.menuBgndPixmap.file=themeName+BGND_FILE MENU_FILE+getExt(menuBgndPixmapName);
+                    }
+                }
+
+                rv=writeConfig(&cfg, opts, presets[defaultText].opts, true);
+                if(rv)
+                    kwin->save(&cfg);
+                if(rv && compressed)
+                {
+                    zip->addLocalFile(temp->fileName(), themeName+EXTENSION);
+                    if(!bgndImageName.isEmpty())
+                        zip->addLocalFile(bgndImageName, opts.bgndImage.pixmap.file);
+                    if(!menuBgndImageName.isEmpty())
+                        zip->addLocalFile(menuBgndImageName, opts.menuBgndImage.pixmap.file);
+                    if(!bgndPixmapName.isEmpty())
+                        zip->addLocalFile(bgndPixmapName, opts.bgndPixmap.file);
+                    if(!menuBgndPixmapName.isEmpty())
+                        zip->addLocalFile(menuBgndPixmapName, opts.menuBgndPixmap.file);
+                    zip->close();
+                }
+            }
+
+            if(temp)
+            {
+                temp->setAutoRemove(true);
+                delete temp;
+            }
+        }
         if(!rv)
             KMessageBox::error(this, i18n("Could not write to file:\n%1").arg(file));
+        if(zip)
+            delete zip;
     }
 }
 
@@ -2810,6 +3092,33 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.menubarApps=toSet(menubarApps->text());
     opts.statusbarApps=toSet(statusbarApps->text());
     opts.noMenuStripeApps=toSet(noMenuStripeApps->text());
+
+    if(IMG_FILE==opts.bgndImage.type)
+    {
+        opts.bgndImage.pixmap.file=getThemeFile(bgndImageDlg->fileName());
+        opts.bgndImage.width=bgndImageDlg->imgWidth();
+        opts.bgndImage.height=bgndImageDlg->imgHeight();
+        opts.bgndImage.loaded=false;
+    }
+    if(APPEARANCE_FILE==opts.bgndAppearance)
+    {
+        opts.bgndPixmap.file=getThemeFile(bgndPixmapDlg->fileName());
+        if((&opts) == (&previewStyle))
+            opts.bgndPixmap.img=QPixmap(opts.bgndPixmap.file);
+    }
+    if(IMG_FILE==opts.menuBgndImage.type)
+    {
+        opts.menuBgndImage.pixmap.file=getThemeFile(menuBgndImageDlg->fileName());
+        opts.menuBgndImage.width=menuBgndImageDlg->imgWidth();
+        opts.menuBgndImage.height=menuBgndImageDlg->imgHeight();
+        opts.menuBgndImage.loaded=false;
+    }
+    if(APPEARANCE_FILE==opts.menuBgndAppearance)
+    {
+        opts.menuBgndPixmap.file=getThemeFile(menuBgndPixmapDlg->fileName());
+        if((&opts) == (&previewStyle))
+            opts.menuBgndPixmap.img=QPixmap(opts.menuBgndPixmap.file);
+    }
 }
 
 static QColor getColor(const TBCols &cols, int btn, int offset=0, const QColor &def=Qt::black)
@@ -2981,11 +3290,10 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     sbarBgndAppearance->setCurrentIndex(opts.sbarBgndAppearance);
     sliderFill->setCurrentIndex(opts.sliderFill);
     bgndAppearance->setCurrentIndex(opts.bgndAppearance);
-    // TODO: Add UI to specify file? Needs thought as to how to export, etc?
-    bgndImage->setCurrentIndex(IMG_FILE==opts.bgndImage.type ? IMG_BORDERED_RINGS : opts.bgndImage.type);
+    bgndImage->setCurrentIndex(opts.bgndImage.type);
     bgndOpacity->setValue(opts.bgndOpacity);
     dlgOpacity->setValue(opts.dlgOpacity);
-    menuBgndImage->setCurrentIndex(IMG_FILE==opts.menuBgndImage.type ? IMG_BORDERED_RINGS : opts.menuBgndImage.type);
+    menuBgndImage->setCurrentIndex(opts.menuBgndImage.type);
     menuBgndOpacity->setValue(opts.menuBgndOpacity);
     dwtAppearance->setCurrentIndex(opts.dwtAppearance);
     tooltipAppearance->setCurrentIndex(opts.tooltipAppearance);
@@ -3126,6 +3434,11 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     menubarApps->setText(toString(opts.menubarApps));
     statusbarApps->setText(toString(opts.statusbarApps));
     noMenuStripeApps->setText(toString(opts.noMenuStripeApps));
+
+    bgndImageDlg->set(getThemeFile(opts.bgndImage.pixmap.file), opts.bgndImage.width, opts.bgndImage.height);
+    bgndPixmapDlg->set(getThemeFile(opts.bgndPixmap.file));
+    menuBgndImageDlg->set(getThemeFile(opts.bgndImage.pixmap.file), opts.bgndImage.width, opts.bgndImage.height);
+    menuBgndPixmapDlg->set(getThemeFile(opts.menuBgndPixmap.file));
 }
 
 int QtCurveConfig::getDwtSettingsFlags()
@@ -3407,7 +3720,9 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          toSet(statusbarApps->text())!=opts.statusbarApps ||
          toSet(noMenuStripeApps->text())!=opts.noMenuStripeApps ||
 
-         diffShades(opts);
+         diffShades(opts) ||
+
+         diffImages(opts);
 }
 
 #include "qtcurveconfig.moc"

@@ -11363,7 +11363,8 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
 
 void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType type) const
 {
-    bool          isWindow(BGND_MENU!=type);
+    bool          isWindow(BGND_MENU!=type),
+                  previewMdi(isWindow && itsIsPreview && qobject_cast<const QMdiSubWindow *>(widget));
     const QWidget *window = itsIsPreview ? widget : widget->window();
     int           opacity = BGND_MENU==type
                                 ? opts.menuBgndOpacity
@@ -11377,14 +11378,14 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    if(isWindow)
+    if(isWindow && !previewMdi)
     {
         WindowBorders borders=qtcGetWindowBorderSize();
         r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
     }
     drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
                    BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
-    drawBackgroundImage(p, isWindow, widget->width());
+    drawBackgroundImage(p, isWindow, widget->width(), previewMdi ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0);
 }
 
 QPainterPath Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const

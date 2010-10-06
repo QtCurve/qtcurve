@@ -42,6 +42,7 @@ class QStyle;
 class QMdiSubWindow;
 class CWorkspace;
 class CStylePreview;
+class CImagePropertiesDialog;
 class KAboutData;
 class KComponentData;
 
@@ -196,7 +197,7 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void previewControlPressed();
 
     public:
-    void configureImage(const QString &title, QString &file, int &width, int &height);
+
     bool savePreset(const QString &name);
     QString getPresetName(const QString &cap, QString label, QString def, QString name=QString());
     void setupStack();
@@ -208,6 +209,8 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
     void setupAlpha(KDoubleNumInput *w, int alpha);
     void populateShades(const Options &opts);
     bool diffShades(const Options &opts);
+    bool haveImages();
+    bool diffImages(const Options &opts);
     void setPasswordChar(int ch);
     int  getTitleBarButtonFlags();
     void setOptions(Options &opts);
@@ -222,23 +225,27 @@ class QtCurveConfig : public QWidget, private Ui::QtCurveConfigBase
 
     private:
 
-    Options               previewStyle;
-    CWorkspace            *workSpace;
-    CStylePreview         *stylePreview;
-    QMdiSubWindow         *mdiWindow;
-    QMap<QString, Preset> presets;
+    Options                previewStyle;
+    CWorkspace             *workSpace;
+    CStylePreview          *stylePreview;
+    QMdiSubWindow          *mdiWindow;
+    QMap<QString, Preset>  presets;
 #ifdef QTC_STYLE_SUPPORT
-    CExportThemeDialog    *exportDialog;
+    CExportThemeDialog     *exportDialog;
 #endif
-    CGradientPreview      *gradPreview;
-    GradientCont          customGradient;
-    KDoubleNumInput       *shadeVals[NUM_STD_SHADES],
-                          *alphaVals[NUM_STD_ALPHAS];
-    QString               currentText,
-                          defaultText;
-    QtCurveKWinConfig     *kwin;
-    int                   kwinPage;
-    bool                  readyForPreview;
+    CGradientPreview       *gradPreview;
+    GradientCont           customGradient;
+    KDoubleNumInput        *shadeVals[NUM_STD_SHADES],
+                           *alphaVals[NUM_STD_ALPHAS];
+    QString                currentText,
+                           defaultText;
+    QtCurveKWinConfig      *kwin;
+    int                    kwinPage;
+    bool                   readyForPreview;
+    CImagePropertiesDialog *bgndPixmapDlg,
+                           *menuBgndPixmapDlg,
+                           *bgndImageDlg,
+                           *menuBgndImageDlg;
 };
 
 #endif
