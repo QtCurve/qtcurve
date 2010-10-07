@@ -277,6 +277,10 @@ enum
 #define SIZE_GRIP_SIZE 12
 
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
+#define USE_BORDER(B)          (GB_SHINE!=(B) && GB_NONE!=(B))
+#define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && \
+                                USE_BORDER(getGradient(opts.menuBgndAppearance, &opts)->border))
+
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
 #define USE_SHADED_MENU_BAR_COLORS (SHADE_CUSTOM==opts.shadeMenubars || SHADE_BLEND_SELECTED==opts.shadeMenubars)

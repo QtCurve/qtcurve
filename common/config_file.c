@@ -1757,7 +1757,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
 
-            /* Check if the config file expects old default values... */
+            /* Check if the config file expects old default values... */           
             if(opts->version<MAKE_VERSION(1, 6))
             {
                 bool framelessGroupBoxes=readBoolEntry(cfg, "framelessGroupBoxes", true),
@@ -1904,14 +1904,18 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT(highlightFactor)
             CFG_READ_INT(menuDelay)
             CFG_READ_INT(sliderWidth)
-            CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd)
             CFG_READ_INT(tabBgnd)
             CFG_READ_TB_BORDER(toolbarBorders)
             CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
             CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, &(opts->bgndPixmap), checkImages)
             CFG_READ_GRAD_TYPE(bgndGrad)
             CFG_READ_GRAD_TYPE(menuBgndGrad)
+            CFG_READ_INT_BOOL(lighterPopupMenuBgnd, def->lighterPopupMenuBgnd)
             CFG_READ_APPEARANCE_PIXMAP(menuBgndAppearance, APP_ALLOW_STRIPED, &(opts->menuBgndPixmap), checkImages)
+
+            if(APPEARANCE_FLAT==opts->menuBgndAppearance && 0==opts->lighterPopupMenuBgnd && opts->version<MAKE_VERSION(1, 7))
+                opts->menuBgndAppearance=APPEARANCE_RAISED;
+
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             CFG_READ_BOOL(fixParentlessDialogs)
             CFG_READ_STRING_LIST(noDlgFixApps)

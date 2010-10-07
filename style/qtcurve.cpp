@@ -2743,6 +2743,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 drawBackground(&p, widget, BGND_MENU);
                 if(opts.popupBorder)
                 {
+                    EGradientBorder border=getGradient(opts.menuBgndAppearance, &opts)->border;
+
                     p.setClipping(false);
                     p.setPen(use[STD_BORDER]);
                     // For now dont round combos - getting weird effects with shadow/clipping in Gtk2 style :-(
@@ -2754,17 +2756,40 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                         p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
                     }
 
-                    if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
+                    if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
                     {
-                        QPainterPath tl,
-                                     br;
-                        QRect        ri(r.adjusted(1, 1, 1, 1));
+                        QRect ri(r.adjusted(1, 1, -1, -1));
 
-                        buildSplitPath(ri, ROUNDED_ALL, radius-1.0, tl, br);
                         p.setPen(use[0]);
-                        p.drawPath(tl);
-                        p.setPen(use[FRAME_DARK_SHADOW]);
-                        p.drawPath(br);
+                        if(GB_LIGHT==border)
+                        {
+                            if(opts.square&SQUARE_POPUP_MENUS || isCombo)
+                                drawRect(&p, ri);
+                            else
+                                p.drawPath(buildPath(ri, WIDGET_OTHER, ROUNDED_ALL, radius-1.0));
+                        }
+                        else if(opts.square&SQUARE_POPUP_MENUS || isCombo)
+                        {
+                            if(GB_3D!=border)
+                            {
+                                p.drawLine(ri.x(), ri.y(), ri.x()+ri.width()-1,  ri.y());
+                                p.drawLine(ri.x(), ri.y(), ri.x(), ri.y()+ri.height()-1);
+                            }
+                            p.setPen(use[FRAME_DARK_SHADOW]);
+                            p.drawLine(ri.x(), ri.y()+ri.height()-1, ri.x()+ri.width()-1,  ri.y()+ri.height()-1);
+                            p.drawLine(ri.x()+ri.width()-1, ri.y(), ri.x()+ri.width()-1,  ri.y()+ri.height()-1);
+                        }
+                        else
+                        {
+                            QPainterPath tl,
+                                         br;
+
+                            buildSplitPath(ri, ROUNDED_ALL, radius-1.0, tl, br);
+                            if(GB_3D!=border)
+                                p.drawPath(tl);
+                            p.setPen(use[FRAME_DARK_SHADOW]);
+                            p.drawPath(br);
+                        }
                     }
                 }
             }
@@ -3133,8 +3158,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                 (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
                 return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
-            if ((USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !IS_FLAT_BGND(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
-                opts.square&SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
+            if (!DRAW_MENU_BORDER && !opts.borderMenuitems && opts.square&SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
                 return 1;
 
             if(DO_EFFECT && opts.etchEntry &&
@@ -4265,19 +4289,28 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 (IS_FLAT_BGND(opts.menuBgndAppearance) ||
                 (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))))
             {
-                const QColor *use(popupMenuCols(option));
+                const QColor    *use(popupMenuCols(option));
+                EGradientBorder border=getGradient(opts.menuBgndAppearance, &opts)->border;
                 painter->save();
                 painter->setPen(use[STD_BORDER]);
                 drawRect(painter, r);
 
-                if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
+                if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
                 {
                     painter->setPen(use[0]);
-                    painter->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2,  r.y()+1);
-                    painter->drawLine(r.x()+1, r.y()+1, r.x()+1,  r.y()+r.height()-2);
-                    painter->setPen(use[FRAME_DARK_SHADOW]);
-                    painter->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2,  r.y()+r.height()-2);
-                    painter->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2,  r.y()+r.height()-2);
+                    if(GB_LIGHT==border)
+                         drawRect(painter, r.adjusted(1, 1, -1, -1));
+                    else
+                    {
+                        if(GB_3D!=border)
+                        {
+                            painter->drawLine(r.x()+1, r.y()+1, r.x()+r.width()-2,  r.y()+1);
+                            painter->drawLine(r.x()+1, r.y()+1, r.x()+1,  r.y()+r.height()-2);
+                        }
+                        painter->setPen(use[FRAME_DARK_SHADOW]);
+                        painter->drawLine(r.x()+1, r.y()+r.height()-2, r.x()+r.width()-2,  r.y()+r.height()-2);
+                        painter->drawLine(r.x()+r.width()-2, r.y()+1, r.x()+r.width()-2,  r.y()+r.height()-2);
+                    }
                 }
                 painter->restore();
             }
