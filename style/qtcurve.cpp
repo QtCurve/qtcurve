@@ -5112,23 +5112,24 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         if(!reverse && /*CUSTOM_BGND && */0==opts.tabBgnd) // Does not work for reverse :-(
                         {
                             QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
+                            int   adjust(TAB_MO_GLOW==opts.tabMouseOver ? 2 : 1);
 
                             switch(tw->tabPosition())
                             {
                                 case QTabWidget::South:
-                                    tabRect=QRect(tabRect.x()+2, r.y()+r.height()-2, tabRect.width()-4, 4);
+                                    tabRect=QRect(tabRect.x()+adjust, r.y()+r.height()-2, tabRect.width()-(2*adjust), 4);
                                     break;
                                 case QTabWidget::North:
                                 {
                                     int leftAdjust=twf->leftCornerWidgetSize.width()>0 ? twf->leftCornerWidgetSize.width() : 0;
-                                    tabRect.adjust(leftAdjust+2, 0, leftAdjust-2, 2);
+                                    tabRect.adjust(leftAdjust+adjust, 0, leftAdjust-adjust, 2);
                                     break;
                                 }
                                 case QTabWidget::West:
-                                    tabRect.adjust(0, 2, 2, -2);
+                                    tabRect.adjust(0, adjust, 2, -adjust);
                                     break;
                                 case QTabWidget::East:
-                                    tabRect=QRect(r.x()+r.width()-2, tabRect.y()+2, 4, tabRect.height()-4);
+                                    tabRect=QRect(r.x()+r.width()-2, tabRect.y()+adjust, 4, tabRect.height()-(2*adjust));
                                     break;
                             }
 

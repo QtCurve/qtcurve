@@ -5,6 +5,7 @@
 3. Use popup menu gradient's border setting to determine border type of menus.
 4. In preview window, draw background rings/image down from titlebar.
 5. Add option to use KDE4 palette's hove colour for kwin button symbol mouse-over.
+6. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
 
 1.6.4
 -----
