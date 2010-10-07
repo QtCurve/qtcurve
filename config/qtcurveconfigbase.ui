@@ -4322,7 +4322,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>&lt;i&gt;&lt;p&gt;QtCurve uses dark/light borders to create etch and shadow effects. By default QtCurve tries to lighten (or darken) the parent's background to achieve this - if no parent can be found, then white/black is used with an alpha value set. This behavious maybe overriden, and alpha values always used, by checking the option above.&lt;/p&gt;</string>
+             <string>&lt;i&gt;&lt;p&gt;QtCurve uses dark/light borders to create etch and shadow effects. By default QtCurve tries to lighten (or darken) the parent's background to achieve this - if no parent can be found, then white/black is used with an alpha value set. This behaviour maybe overriden, and alpha values always used, by checking the option above.&lt;/p&gt;</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
