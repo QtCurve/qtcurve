@@ -5793,6 +5793,8 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             painter->setPen(use[STD_BORDER]);
             if(horiz)
                 drawAaLine(painter, r.x(), r.y()+r.height()-1, r.x()+r.width()-1, r.y()+r.height()-1);
+            else if(reverse)
+                drawAaLine(painter, r.x(), r.y(), r.x(), r.y()+r.height()-1);
             else
                 drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
             painter->setRenderHint(QPainter::Antialiasing, false);
@@ -5851,7 +5853,10 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     else
                     {
                         painter->setPen(use[STD_BORDER]);
-                        drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
+                        if(reverse)
+                            drawAaLine(painter, r.x(), r.y(), r.x(), r.y()+r.height()-1);
+                        else
+                            drawAaLine(painter, r.x()+r.width()-1, r.y(), r.x()+r.width()-1, r.y()+r.height()-1);
 
                         if(q3Header ||
                            (QStyleOptionHeader::End!=ho->position && QStyleOptionHeader::OnlyOneSection!=ho->position))
@@ -5864,7 +5869,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     }
                     painter->setRenderHint(QPainter::Antialiasing, false);
                 }
-                else if(!IS_FLAT(opts.lvAppearance) && ((State_Enabled|State_Active)==state || State_Enabled==state))
+                else if(!IS_FLAT(opts.lvAppearance) && !reverse && ((State_Enabled|State_Active)==state || State_Enabled==state))
                 {
                     QPolygon     top;
                     const QColor &col(getFill(option, use));
