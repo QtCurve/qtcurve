@@ -1,6 +1,7 @@
 1.7.0
 -----
 1. Add option to use tiled pixmap as background for windows and menus.
+2. Draw line focus for items that cannot use glow focus.
 
 1.6.4
 -----

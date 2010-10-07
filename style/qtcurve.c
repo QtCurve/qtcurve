@@ -7397,7 +7397,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         CAIRO_BEGIN
 
-        if(FOCUS_LINE==opts.focus)
+        if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
         {
             if(view || listViewHeader)
                 height-=2;
@@ -7405,7 +7405,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
         }
         else
         {
-            double alpha=FOCUS_GLOW==opts.focus ? FOCUS_GLOW_LINE_ALPHA : 1.0;
+            /*double alpha=FOCUS_GLOW==opts.focus ? FOCUS_GLOW_LINE_ALPHA : 1.0;*/
 
             if(width<3 || height < 3)
                 drawRounded=FALSE;
@@ -7453,7 +7453,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
                            ROUNDED_ALL);
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-            cairo_set_source_rgba(cr, CAIRO_COL(*col), alpha);
+            /*cairo_set_source_rgba(cr, CAIRO_COL(*col), alpha);*/
+            cairo_set_source_rgb(cr, CAIRO_COL(*col));
             cairo_stroke(cr);
         }
         CAIRO_END
