@@ -2861,8 +2861,7 @@ static gboolean qtInit()
             if(!opts.popupBorder)
                 gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=0 ythickness=0 }\n"
                                     "class \"*GtkMenu\" style \""RC_SETTING"M\"");
-            else if((USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !IS_FLAT(opts.menuBgndAppearance)) && !opts.borderMenuitems &&
-                    opts.square&SQUARE_POPUP_MENUS)
+            else if(!DRAW_MENU_BORDER && !opts.borderMenuitems && opts.square&SQUARE_POPUP_MENUS)
                 gtk_rc_parse_string("style \""RC_SETTING"M\" { xthickness=1 ythickness=1 }\n"
                                     "class \"*GtkMenu\" style \""RC_SETTING"M\"");
 

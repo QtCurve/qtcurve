@@ -5101,9 +5101,10 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         if(opts.popupBorder)
         {
-            GdkColor *cols=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
-                            ? qtcPalette.menu
-                            : qtcPalette.background;
+            GdkColor        *cols=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
+                                ? qtcPalette.menu
+                                : qtcPalette.background;
+            EGradientBorder border=getGradient(opts.menuBgndAppearance, &opts)->border;
 
             if(roundedMenu && !comboMenu)
                 unsetCairoClipping(cr);
@@ -5115,25 +5116,31 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
             else
                 cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_stroke(cr);
-            if(!USE_LIGHTER_POPUP_MENU && !opts.shadePopupMenu && IS_FLAT_BGND(opts.menuBgndAppearance))
+            if(USE_BORDER(border) && APPEARANCE_FLAT!=opts.menuBgndAppearance)
             {
                 if(roundedMenu)
                 {
+                    if(GB_3D!=border)
+                    {
+                        cairo_new_path(cr);
+                        cairo_set_source_rgb(cr, CAIRO_COL(cols[0]));
+                        createTLPath(cr, x+1.5, y+1.5, width-3, height-3, radius-2, ROUNDED_ALL);
+                        cairo_stroke(cr);
+                    }
                     cairo_new_path(cr);
-                    cairo_set_source_rgb(cr, CAIRO_COL(cols[0]));
-                    createTLPath(cr, x+1.5, y+1.5, width-3, height-3, radius-2, ROUNDED_ALL);
-                    cairo_stroke(cr);
-                    cairo_new_path(cr);
-                    cairo_set_source_rgb(cr, CAIRO_COL(cols[FRAME_DARK_SHADOW]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(cols[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]));
                     createBRPath(cr, x+1.5, y+1.5, width-3, height-3, radius-2, ROUNDED_ALL);
                     cairo_stroke(cr);
                 }
                 else
                 {
-                    drawHLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, width-2);
-                    drawVLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, height-2);
-                    drawHLine(cr, CAIRO_COL(cols[FRAME_DARK_SHADOW]), 1.0, x+1, y+height-2, width-2);
-                    drawVLine(cr, CAIRO_COL(cols[FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
+                    if(GB_3D!=border)
+                    {
+                        drawHLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, width-2);
+                        drawVLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, height-2);
+                    }
+                    drawHLine(cr, CAIRO_COL(cols[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]), 1.0, x+1, y+height-2, width-2);
+                    drawVLine(cr, CAIRO_COL(cols[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
                 }
             }
         }
