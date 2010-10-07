@@ -4789,7 +4789,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                   ? palette.highlightedText().color()
                                   : itsFocusCols[FOCUS_SHADE(state&State_Selected)]);
 
-                    if(FOCUS_LINE==opts.focus)
+                    if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
                     {
                         if(!(state&State_Horizontal) && widget && qobject_cast<const QTabBar *>(widget))
                             drawFadedLine(painter, QRect(r2.x()+r2.width()-1, r2.y(), 1, r2.height()), c, true, true, false);
@@ -4798,8 +4798,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     }
                     else
                     {
-                        if(FOCUS_GLOW==opts.focus)
-                            c.setAlphaF(FOCUS_GLOW_LINE_ALPHA);
+                        //if(FOCUS_GLOW==opts.focus)
+                        //    c.setAlphaF(FOCUS_GLOW_LINE_ALPHA);
                         painter->setPen(c);
                         if(FOCUS_FILLED==opts.focus)
                         {
