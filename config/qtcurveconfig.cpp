@@ -65,6 +65,7 @@
 #include <KDE/KTemporaryFile>
 #include <KDE/KTempDir>
 #include <KDE/KZip>
+#include <KDE/KMimeType>
 #include <unistd.h>
 #include "config.h"
 #include "../style/qtcurve.h"
@@ -73,7 +74,6 @@
 #include "config_file.c"
 
 #define EXTENSION                  ".qtcurve"
-#define COMPRESSED_EXTENSION       ".qtcurve.zip"
 #define VERSION_WITH_KWIN_SETTINGS MAKE_VERSION(1, 5)
 
 #define THEME_IMAGE_PREFIX "style"
@@ -2599,16 +2599,17 @@ void QtCurveConfig::deletePreset()
 void QtCurveConfig::importPreset()
 {
     QString file(KFileDialog::getOpenFileName(KUrl(),
-                                              i18n("*"EXTENSION" *"COMPRESSED_EXTENSION"|QtCurve Settings Files\n"
+                                              i18n("*"EXTENSION"|QtCurve Settings Files\n"
                                                    THEME_PREFIX"*"THEME_SUFFIX"|QtCurve KDE Theme Files"), this));
 
     if(!file.isEmpty())
     {
-        bool    compressed=file.endsWith(COMPRESSED_EXTENSION);
-        QString fileName(QFileInfo(file).fileName()),
-                baseName(fileName.remove(compressed ? COMPRESSED_EXTENSION : EXTENSION).replace(' ', '_')),
-                name(QString(baseName).replace('_', ' '));
-        Options opts;
+        KMimeType::Ptr mimeType=KMimeType::findByFileContent(file);;
+        bool           compressed(mimeType && mimeType->is("application/zip"));
+        QString        fileName(QFileInfo(file).fileName()),
+                       baseName(fileName.remove(EXTENSION).replace(' ', '_')),
+                       name(QString(baseName).replace('_', ' '));
+        Options        opts;
 
         if(name.isEmpty())
             KMessageBox::error(this, i18n("<p>Sorry, failed to load file.</p><p><i>Empty preset name?</i></p>"));
@@ -2741,7 +2742,7 @@ void QtCurveConfig::exportPreset()
 #endif
 
     bool    compressed=haveImages();
-    QString file(KFileDialog::getSaveFileName(KUrl(), i18n("*"EXTENSION" *"COMPRESSED_EXTENSION"|QtCurve Settings Files"), this));
+    QString file(KFileDialog::getSaveFileName(KUrl(), i18n("*"EXTENSION"|QtCurve Settings Files"), this));
 
     if(!file.isEmpty())
     {
@@ -2763,7 +2764,7 @@ void QtCurveConfig::exportPreset()
                 KConfig cfg(compressed ? temp->fileName() : file, KConfig::NoGlobals);
                 Options opts;
                 QString bgndImageName, menuBgndImageName, bgndPixmapName, menuBgndPixmapName;
-                QString themeName(QFileInfo(file).fileName().remove(compressed ? COMPRESSED_EXTENSION : EXTENSION).replace(' ', '_'));
+                QString themeName(QFileInfo(file).fileName().remove(EXTENSION).replace(' ', '_'));
 
                 setOptions(opts);
 
