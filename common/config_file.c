@@ -32,9 +32,6 @@
 #include <pwd.h>
 #endif
 
-#define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
-#define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
-
 #define MAX_CONFIG_FILENAME_LEN   1024
 #define MAX_CONFIG_INPUT_LINE_LEN 256
 #define CONFIG_FILE               "stylerc"

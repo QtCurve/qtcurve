@@ -29,6 +29,9 @@
 #include <math.h>
 #include "config.h"
 
+#define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
+#define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
+
 #if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
 #include <sys/stat.h>
 #include <float.h>
@@ -278,7 +281,7 @@ enum
 
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 #define USE_BORDER(B)          (GB_SHINE!=(B) && GB_NONE!=(B))
-#define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && \
+#define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=MAKE_VERSION(1,7) && \
                                 USE_BORDER(getGradient(opts.menuBgndAppearance, &opts)->border))
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
