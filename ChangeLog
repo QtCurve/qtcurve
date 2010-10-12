@@ -7,6 +7,8 @@
 5. Add option to use KDE4 palette's hove colour for kwin button symbol mouse-over.
 6. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
 7. RTL fixes/workarounds for table headers.
+8. Workaround kcmshell terminating immediately after QtCurve config dialog is
+   closed - increase KGlobal reference count.
 
 1.6.4
 -----

@@ -239,14 +239,13 @@ QSize CStylePreview::sizeHint() const
     return QSize(500, 260);
 }
 
-
 class CWorkspace : public QMdiArea
 {
     public:
 
     CWorkspace(QWidget *parent) : QMdiArea(parent)
     {
-         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
     QSize sizeHint() const
@@ -809,6 +808,8 @@ static void insertGbLabelEntries(QComboBox *combo)
     combo->insertItem(GBV_INSIDE, i18n("Inside frame"));
 }
 
+static int refCount=0;
+
 QtCurveConfig::QtCurveConfig(QWidget *parent)
              : QWidget(parent),
                workSpace(NULL),
@@ -1213,6 +1214,15 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
 
     readyForPreview=true;
     updatePreview();
+    // KMainWindow dereferences KGlobal when it closes. When KGlobal's refs get to 0 it quits!
+    // ...running kcmshell4 style does not seem to increase ref count of KGlobal - therefore we
+    // do it here - otherwse kcmshell4 would exit immediately after QtCurve's config dialog was
+    // closed :-(
+    if(0==refCount && QLatin1String("kcmshell")==QCoreApplication::applicationName())
+    {
+        refCount++;
+        KGlobal::ref();
+    }
 }
 
 QtCurveConfig::~QtCurveConfig()
@@ -1222,14 +1232,9 @@ QtCurveConfig::~QtCurveConfig()
     qputenv(QTCURVE_PREVIEW_CONFIG, "");
     previewFrame->hide();
     previewFrame->setParent(0);
-    // When KMainWindow closes it dereferences KGlobal. When KGlobal's refs get to 0 it quits!
-    // ...runnin kcmshell4 style does not seem to increase ref count of KGlobal. So if we allowed
-    // KGlobal to quit, kcmshell4 would exit immediately after QtCurve's config dialog was closed :-(
-    KGlobal::setAllowQuit(false);
     delete previewFrame;
     if(!mdiWindow)
         delete stylePreview;
-    KGlobal::setAllowQuit(true);
 }
 
 QSize QtCurveConfig::sizeHint() const
@@ -2181,7 +2186,6 @@ void QtCurveConfig::copyGradient(QAction *act)
 
 void QtCurveConfig::previewControlPressed()
 {
-    KGlobal::setAllowQuit(false);
     if(mdiWindow)
     {
         previewControlButton->setText(i18n("Reattach"));
@@ -2204,7 +2208,6 @@ void QtCurveConfig::previewControlPressed()
         previewControlButton->setText(i18n("Detach"));        
     }
     connect(stylePreview, SIGNAL(closePressed()), SLOT(previewControlPressed()));
-    KGlobal::setAllowQuit(true);
     updatePreview();
 }
 
