@@ -9,6 +9,8 @@
 7. RTL fixes/workarounds for table headers.
 8. Workaround kcmshell terminating immediately after QtCurve config dialog is
    closed - increase KGlobal reference count.
+9. When shading tab background, use fillRect() and not fillPath() - seems to
+   workaround glithches with intel 2.12 graphics driver.
 
 1.6.4
 -----

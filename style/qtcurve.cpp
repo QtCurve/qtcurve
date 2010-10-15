@@ -5170,8 +5170,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
             opt.state|=State_Enabled;
             if(0!=opts.tabBgnd)
-                painter->fillPath(buildPath(r, WIDGET_TAB_FRAME, ROUNDED_ALL, getRadius(&opts, r.width(), r.height(), WIDGET_TAB_FRAME, RADIUS_EXTERNAL)),
-                                  shade(use[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd)));
+            {
+                QColor bgnd(shade(use[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd)));
+
+                painter->fillRect(r.adjusted(0, 1, 0, -1), bgnd);
+                painter->fillRect(r.adjusted(1, 0, -1, 0), bgnd);
+            }
             drawBorder(painter, r, &opt, round, use, WIDGET_TAB_FRAME, opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, false);
             painter->restore();
             break;
