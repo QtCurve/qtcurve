@@ -7820,11 +7820,11 @@ static void generateColors()
         static const char *format="style \""RC_SETTING"Mnu\" { "
                                     "bg[NORMAL]=\"#%02X%02X%02X\" "
                                     "fg[NORMAL]=\"#%02X%02X%02X\" "
-                                    "text[NORMAL]=\"#%02X%02X%02X\" "
                                     "text[INSENSITIVE]=\"#%02X%02X%02X\" "
                                     "} class \"GtkMenu\" style \""RC_SETTING"Mnu\" "
                                     "widget_class \"*Menu.*Label\" style \""RC_SETTING"Mnu\""
-                                    " widget_class \"*<GtkMenuItem>*<GtkCellView>\" style \""RC_SETTING"Mnu\"";
+                                    " style  \""RC_SETTING"CView\" = \""RC_SETTING"Mnu\" { text[NORMAL]=\"#%02X%02X%02X\" } "
+                                    " widget_class \"*<GtkMenuItem>*<GtkCellView>\" style \""RC_SETTING"CView\"";
         char *str=(char *)malloc(strlen(format)+24+1);
 
         if(str)
@@ -7843,8 +7843,8 @@ static void generateColors()
                      mid=opts.shadePopupMenu ? midColor(col, &text) : qtSettings.colors[PAL_DISABLED][COLOR_TEXT];
             sprintf(str, format, toQtColor(col->red), toQtColor(col->green), toQtColor(col->blue),
                                  toQtColor(text.red), toQtColor(text.green), toQtColor(text.blue),
-                                 toQtColor(text.red), toQtColor(text.green), toQtColor(text.blue),
-                                 toQtColor(mid.red), toQtColor(mid.green), toQtColor(mid.blue));
+                                 toQtColor(mid.red),  toQtColor(mid.green),  toQtColor(mid.blue),
+                                 toQtColor(text.red), toQtColor(text.green), toQtColor(text.blue));
             gtk_rc_parse_string(str);
             free(str);
         }
