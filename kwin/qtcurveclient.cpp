@@ -617,8 +617,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         double alpha=opacity/100.0;
         col.setAlphaF(alpha);
         windowCol.setAlphaF(alpha);
-        if(!Handler()->opaqueBorder())
-            fillCol.setAlphaF(alpha);
+        fillCol.setAlphaF(alpha);
     }
 
     opt.init(widget());
@@ -637,13 +636,27 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else if(maximized)
         painter.setClipRect(r, Qt::IntersectClip);
 
-    fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(),
-                   maximized || round<=ROUND_SLIGHT
-                    ? QPainterPath() 
-                    : createPath(QRectF(fillRect), APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp, &opt, NULL) ? 6.0 : 8.0, 
-                                 roundBottom ? 6.0 : 1.0));
+    QPainterPath fillPath(maximized || round<=ROUND_SLIGHT
+                                ? QPainterPath() 
+                                : createPath(QRectF(fillRect), 
+                                             APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp, &opt, NULL) ? 6.0 : 8.0, 
+                                             roundBottom ? 6.0 : 1.0));
 
-    if(clipRegion)
+    if(opacity<100 && Handler()->opaqueBorder())
+    {
+        QColor fc(fillCol);
+        fc.setAlphaF(1.0);
+        painter.save();
+        painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
+        fillBackground(bgndAppearance, painter, fc, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+        painter.restore();
+        if(!clipRegion)
+            painter.save();
+        painter.setClipRect(QRect(r.x(), r.y(), r.width(), titleBarHeight), Qt::IntersectClip);
+    }
+
+    fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+    if(clipRegion || (opacity<100 && Handler()->opaqueBorder()))
         painter.restore();
 
     if(maximized)

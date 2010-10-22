@@ -12,6 +12,7 @@
     closed - increase KGlobal reference count.
 10. When shading tab background, use fillRect() and not fillPath() - seems to
     workaround glithches with intel 2.12 graphics driver.
+11. Fix kwin option to only apply opacity to titlebar.
 
 1.6.4
 -----
