@@ -325,11 +325,44 @@ static QWidget * getActiveWindow(QWidget *widget)
 }
 #endif
 
-static const QWidget * getToolBar(const QWidget *w/*, bool checkQ3*/)
+static void adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar, int &leftAdjust, int &topAdjust,
+                                 int &rightAdjust, int &bottomAdjust, int &round)
+{
+    const int constAdjust=4;
+    const int d = 1;
+    QRect geo(widget->geometry());
+
+    if (Qt::Horizontal==toolbar->orientation())
+    {
+        bool haveLeft=qobject_cast<QToolButton*>(toolbar->childAt(geo.x()-d, geo.y())),
+             haveRight=qobject_cast<QToolButton*>(toolbar->childAt(geo.right()+d, geo.y()));
+
+        if(haveLeft && haveRight)
+            leftAdjust=-constAdjust, rightAdjust=constAdjust, round=ROUNDED_NONE;
+        else if(haveLeft)
+            leftAdjust=-constAdjust, round=ROUNDED_RIGHT;
+        else if(haveRight)
+            rightAdjust=constAdjust, round=ROUNDED_LEFT;
+    }
+    else
+    {
+        bool haveTop=qobject_cast<QToolButton*>(toolbar->childAt(geo.x(), geo.y()-d)),
+             haveBot=qobject_cast<QToolButton*>(toolbar->childAt(geo.x(), geo.bottom()+d));
+
+        if(haveTop && haveBot)
+            topAdjust=-constAdjust, bottomAdjust=constAdjust, round=ROUNDED_NONE;
+        else if(haveTop)
+            topAdjust=-constAdjust, round=ROUNDED_BOTTOM;
+        else if(haveBot)
+            bottomAdjust=constAdjust, round=ROUNDED_TOP;
+    }
+}
+
+static const QToolBar * getToolBar(const QWidget *w/*, bool checkQ3*/)
 {
     return w
             ? qobject_cast<const QToolBar *>(w) // || (checkQ3 && w->inherits("Q3ToolBar"))
-                ? w
+                ? static_cast<const QToolBar *>(w)
                 : getToolBar(w->parentWidget()/*, checkQ3*/)
             : 0L;
 }
@@ -773,9 +806,10 @@ static void drawDots(QPainter *p, const QRect &r, bool horiz, int nLines, int of
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
-static bool isHoriz(const QStyleOption *option, EWidget w)
+static bool isHoriz(const QStyleOption *option, EWidget w, bool joinedTBar)
 {
-    return WIDGET_BUTTON(w) || option->state&QStyle::State_Horizontal;
+    return option->state&QStyle::State_Horizontal ||
+           (WIDGET_BUTTON(w) && (!joinedTBar || (WIDGET_TOOLBAR_BUTTON!=w && WIDGET_NO_ETCH_BTN!=w && WIDGET_MENU_BUTTON!=w)));
 }
 
 #define PIXMAP_DIMENSION 10
@@ -3107,7 +3141,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_ToolBarItemMargin:
             return 0;
         case PM_ToolBarItemSpacing:
-            return 1;
+            return TBTN_JOINED==opts.tbarBtns ? 0 : 1;
         case PM_ToolBarFrameWidth:
             // Remove because, in KDE4 at least, if have two locked toolbars together then the last/first items are too close
             return /*TB_NONE==opts.toolbarBorders ? 0 : */1;
@@ -4400,7 +4434,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     if(DO_EFFECT && opts.etchEntry && APP_ARORA==theThemedApp && widget &&
                        widget->parentWidget() && 0==strcmp(widget->metaObject()->className(), "LocationBar"))
                     {
-                        const QToolBar *tb=(const QToolBar *)getToolBar(widget->parentWidget()/*, false*/);
+                        const QToolBar *tb=getToolBar(widget->parentWidget()/*, false*/);
 
                         if(tb)
                         {
@@ -7867,14 +7901,34 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 QRect button(subControlRect(control, toolbutton, SC_ToolButton, widget)),
                       menuarea(subControlRect(control, toolbutton, SC_ToolButtonMenu, widget));
                 State bflags(toolbutton->state);
-                bool  etched(DO_EFFECT);
+                bool  etched(DO_EFFECT),
+                      raised=widget && (TBTN_RAISED==opts.tbarBtns || TBTN_JOINED==opts.tbarBtns),
+                      horizTBar(true);
+                int   round=ROUNDED_ALL,
+                      leftAdjust(0), topAdjust(0), rightAdjust(0), bottomAdjust(0);
 
+                if(raised)
+                {
+                    const QToolBar *toolbar=getToolBar(widget);
+
+                    if(toolbar)
+                    {
+                        if(TBTN_JOINED==opts.tbarBtns)
+                        {
+                            horizTBar=Qt::Horizontal==toolbar->orientation();
+                            adjustToolbarButtons(widget, toolbar, leftAdjust, topAdjust, rightAdjust, bottomAdjust, round);
+                        }
+                    }
+                    else
+                        raised=false;
+                }
+                
                 if (!(bflags&State_Enabled))
                     bflags &= ~(State_MouseOver/* | State_Raised*/);
 
                 if(bflags&State_MouseOver)
                     bflags |= State_Raised;
-                else if(bflags&State_AutoRaise)
+                else if(!raised && (bflags&State_AutoRaise))
                     bflags &= ~State_Raised;
 
                 if(state&State_AutoRaise || toolbutton->subControls&SC_ToolButtonMenu)
@@ -7893,23 +7947,47 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #endif
                 }
 
-                bool         drawMenu=mflags & (State_Sunken | State_On | State_Raised),
+                bool         drawMenu=raised || (mflags & (State_Sunken | State_On | State_Raised)),
                              drawnBevel=false;
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
 
-                if ( (toolbutton->subControls&SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised))) ||
+                if ( raised ||
+                     (toolbutton->subControls&SC_ToolButton && (bflags & (State_Sunken | State_On | State_Raised))) ||
                      (toolbutton->subControls&SC_ToolButtonMenu && drawMenu))
                 {
-                    tool.rect = toolbutton->subControls&SC_ToolButtonMenu ? button.united(menuarea) : button;
-                    tool.state = bflags;
+                    const QColor *use(buttonColors(toolbutton));
 
+                    tool.rect = (toolbutton->subControls&SC_ToolButtonMenu ? button.united(menuarea) : button)
+                                .adjusted(leftAdjust, topAdjust, rightAdjust, bottomAdjust);
+                    tool.state = bflags|State_Horizontal;
+
+                    if(raised && TBTN_JOINED==opts.tbarBtns && !horizTBar)
+                        tool.state &= ~State_Horizontal;
+                            
                     tool.rect.adjust(0, 0, -widthAdjust, -heightAdjust);
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
                         tool.state &= ~State_MouseOver;
                     drawnBevel=true;
+                    drawLightBevel(painter, tool.rect, &tool, widget, round, getFill(&tool, use), use, true, WIDGET_TOOLBAR_BUTTON);
 
-                    drawPrimitive(PE_PanelButtonTool, &tool, painter, widget);
+                    if(raised && TBTN_JOINED==opts.tbarBtns)
+                    {
+                        const int constSpace=4;
+
+                        QRect br(tool.rect.adjusted(-leftAdjust, -topAdjust, -rightAdjust, -bottomAdjust));
+
+                        if(leftAdjust)
+                            drawFadedLine(painter, QRect(br.x(), br.y()+constSpace, 1, br.height()-(constSpace*2)), use[0], true, true, false);
+                        if(topAdjust)
+                            drawFadedLine(painter, QRect(br.x()+constSpace, br.y(), br.width()-(constSpace*2), 1), use[0], true, true, true);
+                        if(rightAdjust)
+                            drawFadedLine(painter, QRect(br.x()+br.width()-1, br.y()+constSpace, 1, br.height()-(constSpace*2)),
+                                          use[STD_BORDER], true, true, false);
+                        if(bottomAdjust)
+                            drawFadedLine(painter, QRect(br.x()+constSpace, br.y()+br.height()-1, br.width()-(constSpace*2), 1),
+                                          use[STD_BORDER], true, true, true);
+                    }
                 }
 
                 if (toolbutton->subControls&SC_ToolButtonMenu)
@@ -7928,12 +8006,26 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     if(drawMenu)
                     {
                         const QColor *use(buttonColors(option));
+                        int          mRound=reverse ? ROUNDED_LEFT : ROUNDED_RIGHT;
 
                         if(mflags&State_Sunken)
                             tool.state&=~State_MouseOver;
 
-                        drawLightBevel(painter, menuarea, &tool, widget, reverse ? ROUNDED_LEFT : ROUNDED_RIGHT, getFill(&tool, use), use, true,
+                        if(raised && TBTN_JOINED==opts.tbarBtns)
+                        {
+                            if(!horizTBar)
+                                tool.state &= ~State_Horizontal;
+                            painter->save();
+                            painter->setClipRect(menuarea, Qt::IntersectClip);
+                            tool.rect.adjust(-4, 0, horizTBar && rightAdjust ? 4 : 0, 0);
+                            if((reverse && leftAdjust) || (!reverse && rightAdjust))
+                                mRound=ROUNDED_NONE;
+                        }
+                        
+                        drawLightBevel(painter, tool.rect, &tool, widget, mRound, getFill(&tool, use), use, true,
                                        MO_GLOW==opts.coloredMouseOver ? WIDGET_MENU_BUTTON : WIDGET_NO_ETCH_BTN);
+                        if(raised && TBTN_JOINED==opts.tbarBtns)
+                            painter->restore(), tool.rect=menuarea;
                     }
 
                     if(mflags&State_Sunken)
@@ -10736,7 +10828,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
 
         int    endSize=0,
                middleSize=8;
-        bool   horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w)),
+        bool   horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w, TBTN_JOINED==opts.tbarBtns)),
                circular( (WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
                          WIDGET_RADIO_BUTTON==w || WIDGET_DIAL==w || CIRCULAR_SLIDER(w));
         double radius=0;
@@ -10861,7 +10953,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                  doEtch(doBorder && ETCH_WIDGET(w) && DO_EFFECT),
                  glowFocus(doEtch && USE_GLOW_FOCUS(option->state&State_MouseOver) && option->state&State_HasFocus &&
                            option->state&State_Enabled),
-                 horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w)),
+                 horiz(CIRCULAR_SLIDER(w) || isHoriz(option, w, TBTN_JOINED==opts.tbarBtns)),
                  sunkenToggleMo(sunken && !(option->state&State_Sunken) && option->state&(State_MouseOver|STATE_TOGGLE_BUTTON));
     const QColor *cols(custom ? custom : itsBackgroundCols),
                  *border(colouredMouseOver ? borderColors(option, cols) : cols);

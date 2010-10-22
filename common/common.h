@@ -780,6 +780,13 @@ typedef enum
 
 typedef enum
 {
+    TBTN_STANDARD,
+    TBTN_RAISED,
+    TBTN_JOINED
+} ETBarBtn;
+
+typedef enum
+{
     BORDER_FLAT,
     BORDER_RAISED,
     BORDER_SUNKEN,
@@ -1089,10 +1096,8 @@ typedef struct
 */
 #endif
                      mapKdeIcons,
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
                      gtkButtonOrder,
                      fadeLines,
-#endif
                      reorderGtkButtons,
                      borderMenuitems,
                      colorMenubarMouseOver,
@@ -1157,6 +1162,7 @@ typedef struct
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
     ETBarBorder      toolbarBorders;
+    ETBarBtn         tbarBtns;
     EDefBtnIndicator defBtnIndicator;
     ELine            sliderThumbs,
                      handles,

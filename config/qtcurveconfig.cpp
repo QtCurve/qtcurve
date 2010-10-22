@@ -808,6 +808,13 @@ static void insertGbLabelEntries(QComboBox *combo)
     combo->insertItem(GBV_INSIDE, i18n("Inside frame"));
 }
 
+static void insertTBarBtnEntries(QComboBox *combo)
+{
+    combo->insertItem(TBTN_STANDARD, i18n("Standard (auto-raise)"));
+    combo->insertItem(TBTN_RAISED, i18n("Raised"));
+    combo->insertItem(TBTN_JOINED, i18n("Raised and joined"));
+}
+
 static int refCount=0;
 
 QtCurveConfig::QtCurveConfig(QWidget *parent)
@@ -885,6 +892,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertDragEntries(windowDrag);
     insertFrameEntries(groupBox);
     insertGbLabelEntries(gbLabel_textPos);
+    insertTBarBtnEntries(tbarBtns);
 
     highlightFactor->setRange(MIN_HIGHLIGHT_FACTOR, MAX_HIGHLIGHT_FACTOR);
     highlightFactor->setValue(DEFAULT_HIGHLIGHT_FACTOR);
@@ -1097,6 +1105,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarIcon, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(boldProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(coloredTbarMo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(tbarBtns, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(borderSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderProgress, SIGNAL(toggled(bool)), SLOT(borderProgressChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(fillProgressChanged()));
@@ -3039,6 +3048,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.stdBtnSizes=stdBtnSizes->isChecked();
     opts.boldProgress=boldProgress->isChecked();
     opts.coloredTbarMo=coloredTbarMo->isChecked();
+    opts.tbarBtns=(ETBarBtn)tbarBtns->currentIndex();
     opts.borderSelection=borderSelection->isChecked();
     opts.forceAlternateLvCols=forceAlternateLvCols->isChecked();
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
@@ -3292,6 +3302,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     boldProgress_false->setChecked(!opts.boldProgress);
     coloredTbarMo->setChecked(opts.coloredTbarMo);
     coloredTbarMo_false->setChecked(!opts.coloredTbarMo);
+    tbarBtns->setCurrentIndex(opts.tbarBtns);
     borderSelection->setChecked(opts.borderSelection);
     forceAlternateLvCols->setChecked(opts.forceAlternateLvCols);
     titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
@@ -3662,6 +3673,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          stdBtnSizes->isChecked()!=opts.stdBtnSizes ||
          boldProgress->isChecked()!=opts.boldProgress ||
          coloredTbarMo->isChecked()!=opts.coloredTbarMo ||
+         tbarBtns->currentIndex()!=opts.tbarBtns ||
          borderSelection->isChecked()!=opts.borderSelection ||
          forceAlternateLvCols->isChecked()!=opts.forceAlternateLvCols ||
          titlebarAlignment->currentIndex()!=opts.titlebarAlignment ||

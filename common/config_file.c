@@ -577,6 +577,20 @@ static EGlow toGlow(const char *str, EGlow def)
     }
     return def;
 }
+
+static ETBarBtn toTBarBtn(const char *str, ETBarBtn def)
+{
+    if(str)
+    {
+        if(0==memcmp(str, "standard", 8))
+            return TBTN_STANDARD;
+        if(0==memcmp(str, "raised", 6))
+            return TBTN_RAISED;
+        if(0==memcmp(str, "joined", 6))
+            return TBTN_JOINED;
+    }
+    return def;
+}
 #endif
 
 static const char * getHome()
@@ -1336,6 +1350,9 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
 #define CFG_READ_GLOW(ENTRY) \
     opts->ENTRY=toGlow(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
+#define CFG_READ_TBAR_BTN(ENTRY) \
+    opts->ENTRY=toTBarBtn(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
+
 static void checkAppearance(EAppearance *ap, Options *opts)
 {
     if(*ap>=APPEARANCE_CUSTOM1 && *ap<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
@@ -1794,7 +1811,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
             else
                 CFG_READ_INT(square)
-
+            if(opts->version<MAKE_VERSION(1, 7))
+                def->tbarBtns=TBTN_STANDARD;
             if(opts->version<MAKE_VERSION(1, 6))
                 opts->square|=SQUARE_TOOLTIPS;
             if(opts->version<MAKE_VERSION3(1, 6, 1))
@@ -1950,6 +1968,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
             CFG_READ_BOOL(thinnerMenuItems)
             CFG_READ_BOOL(thinnerBtns)
+            CFG_READ_TBAR_BTN(tbarBtns)
             if(opts->version<MAKE_VERSION(0, 63))
             {
                 if(IS_BLACK(opts->customSlidersColor))
@@ -1996,10 +2015,8 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(darkerBorders)
             CFG_READ_BOOL(vArrows)
             CFG_READ_BOOL(xCheck)
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             CFG_READ_BOOL(fadeLines)
             CFG_READ_GLOW(glowProgress)
-#endif
             CFG_READ_BOOL(colorMenubarMouseOver)
             CFG_READ_INT_BOOL(crHighlight, opts->highlightFactor)
             CFG_READ_BOOL(crButton)
@@ -2415,10 +2432,10 @@ static void defaultSettings(Options *opts)
     opts->menuDelay=DEFAULT_MENU_DELAY;
     opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
     opts->selectionAppearance=APPEARANCE_HARSH_GRADIENT;
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
-    opts->round=ROUND_EXTRA;
     opts->fadeLines=true;
     opts->glowProgress=GLOW_NONE;
+#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
+    opts->round=ROUND_EXTRA;
     opts->gtkButtonOrder=false;
 #else
     opts->round=ROUND_FULL;
@@ -2486,6 +2503,7 @@ static void defaultSettings(Options *opts)
     opts->shadeMenubarOnlyWhenActive=false;
     opts->thinnerMenuItems=false;
     opts->thinnerBtns=true;
+    opts->tbarBtns=TBTN_STANDARD;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_SHADOW;
     opts->focus=FOCUS_GLOW;
@@ -3056,6 +3074,20 @@ static const char * toStr(EGlow lv)
     }
 }
 
+static const char * toStr(ETBarBtn tb)
+{
+    switch(tb)
+    {
+        default:
+        case TBTN_STANDARD:
+            return "standard";
+        case TBTN_RAISED:
+            return "raised";
+        case TBTN_JOINED:
+            return "joined";
+    }
+}
+
 #if QT_VERSION >= 0x040000
 #include <QTextStream>
 #define CFG config
@@ -3281,6 +3313,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY_NUM(windowDrag)
         CFG_WRITE_ENTRY(shadePopupMenu)
         CFG_WRITE_ENTRY_NUM(windowBorder)
+        CFG_WRITE_ENTRY(tbarBtns)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
         CFG_WRITE_ENTRY(xbar)
         CFG_WRITE_ENTRY_NUM(dwtSettings)
