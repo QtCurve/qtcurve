@@ -22,7 +22,8 @@
 #include <KLocale>
 #include <KUrlRequester>
 #include <KFileDialog>
-#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
 
@@ -73,7 +74,7 @@ void CImagePropertiesDialog::set(const QString &file, int width, int height)
         scaleWidth->setValue(width<MIN_SIZE || width>MAX_SIZE ? DEF_SIZE : width);
         scaleHeight->setValue(height<MIN_SIZE || height>MAX_SIZE ? DEF_SIZE : height);
     }
-    fileRequester->setUrl(KUrl(file));
+    fileRequester->setUrl(QFile::exists(file) && !QFileInfo(file).isDir() ? KUrl(file) : KUrl());
 }
 
 QSize CImagePropertiesDialog::sizeHint() const
