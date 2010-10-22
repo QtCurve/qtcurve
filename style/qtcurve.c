@@ -1211,6 +1211,73 @@ GdkPixbuf * getPixbuf(GdkColor *widgetColor, EPixmap p, double shade)
     return g_cache_insert(pixbufCache, &key);
 }
 
+static void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, int *height, int *round, gboolean horiz)
+{
+    GtkToolbar  *toolbar=NULL;
+    GtkToolItem *toolitem=NULL;
+    GtkWidget   *w=widget;
+    int         i;
+    
+    for(i=0; i<5 && w && (NULL==toolbar || NULL==toolitem); ++i)
+    {
+        if(GTK_IS_TOOLBAR(w))
+            toolbar=GTK_TOOLBAR(w);
+        else if(GTK_IS_TOOL_ITEM(w))
+            toolitem=GTK_TOOL_ITEM(w);
+        w=w->parent;
+    }
+
+    if(toolbar && toolitem)
+    {
+        int num=gtk_toolbar_get_n_items(toolbar);
+
+        if(num>1)
+        {
+            int index=gtk_toolbar_get_item_index(toolbar, toolitem);
+            GtkToolItem *prev=index ? gtk_toolbar_get_nth_item(toolbar, index-1) : NULL,
+                        *next=index<(num-1) ? gtk_toolbar_get_nth_item(toolbar, index+1) : NULL;
+            gboolean    roundLeft=!prev || !GTK_IS_TOOL_BUTTON(prev),
+                        roundRight=!next || !GTK_IS_TOOL_BUTTON(next),
+                        isMenuButton=widget->parent && widget->parent->parent && GTK_IS_BUTTON(widget) &&
+                                      GTK_IS_BOX(widget->parent) && GTK_IS_MENU_TOOL_BUTTON(widget->parent->parent),
+                        isArrowButton=isMenuButton && GTK_IS_TOGGLE_BUTTON(widget);
+            int         *pos=horiz ? x : y,
+                        *size=horiz ? width : height;
+
+            if(isArrowButton)
+            {
+                if(roundLeft && roundRight)
+                    *round=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM, *pos-=4, *size+=4;
+                else if(roundLeft)
+                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
+                else if(roundRight)
+                    *round=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM, *pos-=4, *size+=4;
+                else
+                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
+            }
+            else if(isMenuButton)
+            {
+                if(roundLeft && roundRight)
+                    *round=horiz ? ROUNDED_LEFT : ROUNDED_TOP, *size+=4;
+                else if(roundLeft)
+                    *round=horiz ? ROUNDED_LEFT : ROUNDED_TOP, *size+=4;
+                else if(roundRight)
+                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
+                else
+                    *round=ROUNDED_NONE, *pos-=4, *size+=8;
+            }
+            else if(roundLeft && roundRight)
+                ;
+            else if(roundLeft)
+                *round=horiz ? ROUNDED_LEFT : ROUNDED_TOP, *size+=4;
+            else if(roundRight)
+                *round=horiz ? ROUNDED_RIGHT : ROUNDED_BOTTOM, *pos-=4, *size+=4;
+            else
+                *round=ROUNDED_NONE, *pos-=4, *size+=8;
+        }
+    }
+}
+
 static gboolean sanitizeSize(GdkWindow *window, gint *width, gint *height)
 {
     gboolean set_bg = FALSE;
@@ -3985,6 +4052,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                  horiz_tbar,
                  tbar_button=isButtonOnToolbar(widget, &horiz_tbar),
                  handle_button=!tbar_button && isButtonOnHandlebox(widget, &horiz_tbar);
+        int      xAdjust=0, yAdjust=0, wAdjust=0, hAdjust=0;
 
 //        drawBgnd(cr, &btn_colors[bgnd], widget, area, x, y, width, height); // CPD removed as it messes up toolbars and firefox3
 
@@ -3992,6 +4060,12 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         {
             sunken=TRUE;
             bgnd=4;
+        }
+
+        if(tbar_button && TBTN_JOINED==opts.tbarBtns)
+        {
+            adjustToolbarButtons(widget, &xAdjust, &yAdjust, &wAdjust, &hAdjust, &round, horiz_tbar);
+            x+=xAdjust, y+=yAdjust, width+=wAdjust, height+=hAdjust;
         }
 
         if(!qtc_paned)
@@ -4045,6 +4119,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
 //             }
             else
             {
+                /* Yuck this is a horrible mess!!!!! */
                 gboolean glowFocus=widget && GTK_WIDGET_HAS_FOCUS(widget) && MO_GLOW==opts.coloredMouseOver && FULL_FOCUS;
                 EWidget  widgetType=isComboBoxButton(widget)
                                     ? WIDGET_COMBO_BUTTON
@@ -4288,6 +4363,21 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
                                    BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|
                                                 (lvh ? 0 : DF_DO_BORDER)|
                                                 (horiz ? 0 : DF_VERT), widget);
+
+                    if(tbar_button && TBTN_JOINED==opts.tbarBtns)
+                    {
+                        const int constSpace=4;
+                        int xo=x-xAdjust, yo=y-yAdjust, wo=width-wAdjust, ho=height-hAdjust;
+
+                        if(xAdjust)
+                            drawFadedLine(cr, xo, yo+constSpace, 1, ho-(2*constSpace), &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
+                        if(yAdjust)
+                            drawFadedLine(cr, xo+constSpace, yo, wo-(2*constSpace), 1, &btn_colors[0], area, NULL, TRUE, TRUE, TRUE);
+                        if(wAdjust)
+                            drawFadedLine(cr, xo+wo-1, yo+constSpace, 1, ho-(2*constSpace), &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
+                        if(hAdjust)
+                            drawFadedLine(cr, xo+constSpace, yo+ho-1, wo-(2*constSpace), 1, &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
+                    }
                 }
 
                 /* Gtk draws slider first, and then the buttons. But if we have a shaded slider, and extend this so that it

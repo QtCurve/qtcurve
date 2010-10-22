@@ -3006,7 +3006,10 @@ static gboolean qtInit()
                 gtk_rc_parse_string("style \""RC_SETTING"TbB\" { xthickness = 0 ythickness = 0 GtkToolbar::internal-padding = 0 }"
                                     " widget_class \"*<GtkToolbar>\" style  \""RC_SETTING"TbB\"");
 #endif
-            
+
+            if(TBTN_RAISED==opts.tbarBtns || TBTN_JOINED==opts.tbarBtns)
+                gtk_rc_parse_string("style \""RC_SETTING"TbJ\" { GtkToolbar::button-relief = 1 } "
+                                    "widget_class \"*<GtkToolbar>\"  style \""RC_SETTING"TbJ\"");
             if(tmpStr)
                 free(tmpStr);
 

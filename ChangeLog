@@ -3,7 +3,8 @@
 1. Add option to use tiled pixmap as background for windows and menus.
 2. Draw line focus for items that cannot use glow focus.
 3. Use popup menu gradient's border setting to determine border type of menus.
-4. Fix combo-box meenu text when shading popup menus.
+4. Add option to draw raised or joined toolbar buttons..
+5. Fix combo-box meenu text when shading popup menus.
 
 1.6.4
 -----
