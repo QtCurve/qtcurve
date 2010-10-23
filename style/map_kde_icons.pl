@@ -138,10 +138,10 @@ while($entry=<icons>)
             }
             print "\t}\n";
         }
-        else
-        {
-            print "#\tstock[\"$iconMap[0]\"]=<No matching KDE icon>\n";
-        }
+        #else
+        #{
+        #    print "#\tstock[\"$iconMap[0]\"]=<No matching KDE icon>\n";
+        #}
     }
 }
 print "}\nclass \"*\" style \"KDE$ARGV[2]-icons\"\n";
