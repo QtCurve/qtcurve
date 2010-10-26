@@ -3,10 +3,11 @@
  1. Add option to use tiled pixmap as background for windows and menus.
  2. Draw line focus for items that cannot use glow focus.
  3. Use popup menu gradient's border setting to determine border type of menus.
- 4. Add option to draw raised or joined toolbar buttons.
+ 4. Add option to draw standard, raised, or joined toolbar buttons.
  5. Add option to use thinner frames, focus, etc.
  6. In preview window, draw background rings/image down from titlebar.
- 7. Add option to use KDE4 palette's hove colour for kwin button symbol mouse-over.
+ 7. Add option to use KDE4 palette's hover colour for kwin button symbol
+    mouse-over.
  8. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
  9. RTL fixes/workarounds for table headers.
 10. Workaround kcmshell terminating immediately after QtCurve config dialog is
