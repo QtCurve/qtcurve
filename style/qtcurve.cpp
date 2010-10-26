@@ -4216,7 +4216,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         if(sv || kateView || kontactPreview)
                         {
                             painter->setRenderHint(QPainter::Antialiasing, true);
-                            painter->setPen(option->palette.brush(QPalette::Base).color());
+                            painter->setPen(option->palette.brush(opts.thin&THIN_FRAMES && !(opts.square&SQUARE_SCROLLVIEW)
+                                                                    ? QPalette::Window
+                                                                    : QPalette::Base).color());
                             painter->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW, ROUNDED_ALL,
                                                         getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW, RADIUS_INTERNAL)));
                             painter->setRenderHint(QPainter::Antialiasing, false);
