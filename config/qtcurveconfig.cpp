@@ -1042,8 +1042,9 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(coloredMouseOver, SIGNAL(currentIndexChanged(int)), SLOT(coloredMouseOverChanged()));
     connect(menubarMouseOver, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(shadeMenubarOnlyWhenActive, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(thinnerMenuItems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
-    connect(thinnerBtns, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(thin_menuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(thin_buttons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(thin_frames, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(customSlidersColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(customMenubarsColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(customMenuSelTextColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -2918,8 +2919,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.coloredMouseOver=(EMouseOver)coloredMouseOver->currentIndex();
     opts.menubarMouseOver=menubarMouseOver->isChecked();
     opts.shadeMenubarOnlyWhenActive=shadeMenubarOnlyWhenActive->isChecked();
-    opts.thinnerMenuItems=thinnerMenuItems->isChecked();
-    opts.thinnerBtns=thinnerBtns->isChecked();
+    opts.thin=getThinFlags();
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     opts.fixParentlessDialogs=fixParentlessDialogs->isChecked();
     opts.noDlgFixApps=toSet(noDlgFixApps->text());
@@ -3184,8 +3184,9 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     coloredMouseOver->setCurrentIndex(opts.coloredMouseOver);
     menubarMouseOver->setChecked(opts.menubarMouseOver);
     shadeMenubarOnlyWhenActive->setChecked(opts.shadeMenubarOnlyWhenActive);
-    thinnerMenuItems->setChecked(opts.thinnerMenuItems);
-    thinnerBtns->setChecked(opts.thinnerBtns);
+    thin_menuitems->setChecked(opts.thin&THIN_MENU_ITEMS);
+    thin_buttons->setChecked(opts.thin&THIN_BUTTONS);
+    thin_frames->setChecked(opts.thin&THIN_FRAMES);
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
     fixParentlessDialogs->setChecked(opts.fixParentlessDialogs);
     noDlgFixApps->setText(toString(opts.noDlgFixApps));
@@ -3541,6 +3542,19 @@ int QtCurveConfig::getWindowBorderFlags()
     return flags;
 }
 
+int QtCurveConfig::getThinFlags()
+{
+    int flags(0);
+
+    if(thin_buttons->isChecked())
+        flags|=THIN_BUTTONS;
+    if(thin_menuitems->isChecked())
+        flags|=THIN_MENU_ITEMS;
+    if(thin_frames->isChecked())
+        flags|=THIN_FRAMES;
+    return flags;
+}
+
 bool QtCurveConfig::diffTitleBarButtonColors(const Options &opts)
 {
     return (titlebarButtons_custom->isChecked() &&
@@ -3587,8 +3601,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          coloredMouseOver->currentIndex()!=(int)opts.coloredMouseOver ||
          menubarMouseOver->isChecked()!=opts.menubarMouseOver ||
          shadeMenubarOnlyWhenActive->isChecked()!=opts.shadeMenubarOnlyWhenActive ||
-         thinnerMenuItems->isChecked()!=opts.thinnerMenuItems ||
-         thinnerBtns->isChecked()!=opts.thinnerBtns ||
+         getThinFlags()!=opts.thin ||
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
          fixParentlessDialogs->isChecked()!=opts.fixParentlessDialogs ||
          toSet(noDlgFixApps->text())!=opts.noDlgFixApps ||

@@ -568,6 +568,13 @@ typedef struct
 
 typedef enum
 {
+    THIN_BUTTONS    = 0x0001,
+    THIN_MENU_ITEMS = 0x0002,
+    THIN_FRAMES     = 0x0004
+} EThinFlags;
+
+typedef enum
+{
     SQUARE_NONE               = 0x0000,
     SQUARE_ENTRY              = 0x0001,
     SQUARE_PROGRESS           = 0x0002,
@@ -1066,7 +1073,8 @@ typedef struct
                      splitterHighlight,
                      crSize,
                      gbFactor,
-                     gbLabel;
+                     gbLabel,
+                     thin;
     ERound           round;
     bool             embolden,
                      highlightTab,
@@ -1079,8 +1087,6 @@ typedef struct
                      menubarMouseOver,
                      useHighlightForMenu,
                      shadeMenubarOnlyWhenActive,
-                     thinnerMenuItems,
-                     thinnerBtns,
                      lvButton,
                      drawStatusBarFrames,
                      fillSlider,

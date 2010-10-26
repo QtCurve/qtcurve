@@ -336,7 +336,7 @@
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QCheckBox" name="thinnerBtns">
+        <widget class="QCheckBox" name="thin_buttons">
          <property name="whatsThis">
           <string>Make buttons, and other widgets, slightly thinner.</string>
          </property>
@@ -429,6 +429,16 @@
             </property>
             <property name="text">
              <string>Draw fading lines</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="thin_frames">
+            <property name="whatsThis">
+             <string>Controls whether the internal 3d part of frames, etc, should be drawn..</string>
+            </property>
+            <property name="text">
+             <string>Thinner frames, edit boxes, etc.</string>
             </property>
            </widget>
           </item>
@@ -3122,7 +3132,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QCheckBox" name="thinnerMenuItems">
+        <widget class="QCheckBox" name="thin_menuitems">
          <property name="whatsThis">
           <string>Enable this to reduce the height of menuitems.</string>
          </property>
@@ -4427,7 +4437,7 @@
   <tabstop>bgndImage_btn</tabstop>
   <tabstop>sunkenAppearance</tabstop>
   <tabstop>buttonEffect</tabstop>
-  <tabstop>thinnerBtns</tabstop>
+  <tabstop>thin_buttons</tabstop>
   <tabstop>etchEntry</tabstop>
   <tabstop>focus</tabstop>
   <tabstop>tooltipAppearance</tabstop>
@@ -4435,6 +4445,7 @@
   <tabstop>stdSidebarButtons</tabstop>
   <tabstop>darkerBorders</tabstop>
   <tabstop>fadeLines</tabstop>
+  <tabstop>thin_frames</tabstop>
   <tabstop>round</tabstop>
   <tabstop>squareEntry</tabstop>
   <tabstop>squareProgress</tabstop>
@@ -4605,7 +4616,7 @@
   <tabstop>borderMenuitems</tabstop>
   <tabstop>shadePopupMenu</tabstop>
   <tabstop>useHighlightForMenu</tabstop>
-  <tabstop>thinnerMenuItems</tabstop>
+  <tabstop>thin_menuitems</tabstop>
   <tabstop>menuBgndAppearance</tabstop>
   <tabstop>menuBgndAppearance_btn</tabstop>
   <tabstop>menuBgndGrad</tabstop>

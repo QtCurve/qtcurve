@@ -1812,7 +1812,15 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             else
                 CFG_READ_INT(square)
             if(opts->version<MAKE_VERSION(1, 7))
+            {
                 def->tbarBtns=TBTN_STANDARD;
+                opts->thin=(readBoolEntry(cfg, "thinnerMenuItems", def->thin&THIN_MENU_ITEMS) ? THIN_MENU_ITEMS : 0)+
+                           (readBoolEntry(cfg, "thinnerBtns", def->thin&THIN_BUTTONS) ? THIN_BUTTONS : 0);
+            }
+            else
+            {
+                CFG_READ_INT(thin)
+            }
             if(opts->version<MAKE_VERSION(1, 6))
                 opts->square|=SQUARE_TOOLTIPS;
             if(opts->version<MAKE_VERSION3(1, 6, 1))
@@ -1854,7 +1862,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 def->unifySpin=false;
                 def->unifyCombo=false;
                 def->borderTab=false;
-                def->thinnerBtns=false;
+                def->thin=0;
             }
             if(opts->version<MAKE_VERSION(0, 63))
             {
@@ -1966,8 +1974,6 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(menubarMouseOver)
             CFG_READ_BOOL(useHighlightForMenu)
             CFG_READ_BOOL(shadeMenubarOnlyWhenActive)
-            CFG_READ_BOOL(thinnerMenuItems)
-            CFG_READ_BOOL(thinnerBtns)
             CFG_READ_TBAR_BTN(tbarBtns)
             if(opts->version<MAKE_VERSION(0, 63))
             {
@@ -2501,8 +2507,7 @@ static void defaultSettings(Options *opts)
     opts->menubarMouseOver=true;
     opts->useHighlightForMenu=false;
     opts->shadeMenubarOnlyWhenActive=false;
-    opts->thinnerMenuItems=false;
-    opts->thinnerBtns=true;
+    opts->thin=THIN_BUTTONS;
     opts->tbarBtns=TBTN_STANDARD;
     opts->scrollbarType=SCROLLBAR_KDE;
     opts->buttonEffect=EFFECT_SHADOW;
@@ -3238,8 +3243,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(menubarMouseOver)
         CFG_WRITE_ENTRY(useHighlightForMenu)
         CFG_WRITE_ENTRY(shadeMenubarOnlyWhenActive)
-        CFG_WRITE_ENTRY(thinnerMenuItems)
-        CFG_WRITE_ENTRY(thinnerBtns)
+        CFG_WRITE_ENTRY(thin)
         CFG_WRITE_SHADE_ENTRY(shadeSliders, customSlidersColor)
         CFG_WRITE_SHADE_ENTRY(shadeMenubars, customMenubarsColor)
         CFG_WRITE_SHADE_ENTRY(sortedLv, customSortedLvColor)

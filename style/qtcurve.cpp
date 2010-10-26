@@ -3162,8 +3162,8 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
                     (!widget || qobject_cast<const QToolButton *>(widget) ? 6 : 0);
         case PM_ButtonMargin:
             return (DO_EFFECT
-                    ? opts.thinnerBtns ? 4 : 6
-                    : opts.thinnerBtns ? 2 : 4)+MAX_ROUND_BTN_PAD;
+                    ? (opts.thin&THIN_BUTTONS) ? 4 : 6
+                    : (opts.thin&THIN_BUTTONS) ? 2 : 4)+MAX_ROUND_BTN_PAD;
         case PM_TabBarTabShiftVertical:
 #if QT_VERSION < 0x040500
             if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
@@ -4309,8 +4309,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                     : use[QTabBar::RoundedNorth==tbb->shape ? STD_BORDER
                                                                             : (opts.borderTab ? 0 : FRAME_DARK_SHADOW)],
                                   fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
-                    drawFadedLine(painter, QRect(bottomLine.p1(), bottomLine.p2()), use[QTabBar::RoundedNorth==tbb->shape ? 0 : STD_BORDER],
-                                  fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
+                    if(!(opts.thin&THIN_FRAMES))
+                        drawFadedLine(painter, QRect(bottomLine.p1(), bottomLine.p2()),
+                                      use[QTabBar::RoundedNorth==tbb->shape ? 0 : STD_BORDER],
+                                      fadeState, fadeEnd, horiz, fadeSizeStart, fadeSizeEnd);
                     painter->restore();
                 }
             }
@@ -4601,7 +4603,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                     if(doEtch && !view)
                     {
-                        if(glow)
+                        if(glow && !(opts.thin&THIN_FRAMES))
                             drawGlow(painter, r, WIDGET_CHECKBOX);
                         else
                             drawEtch(painter, r, widget, WIDGET_CHECKBOX, opts.crButton && EFFECT_SHADOW==opts.buttonEffect ? !sunken : false);
@@ -4910,7 +4912,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             // dont paint the button.
             if(0==option->palette.button().color().alpha())
             {
-                if(state&State_MouseOver && state&State_Enabled && MO_GLOW==opts.coloredMouseOver && doEtch)
+                if(state&State_MouseOver && state&State_Enabled && MO_GLOW==opts.coloredMouseOver && doEtch && !(opts.thin&THIN_FRAMES))
                     drawGlow(painter, r, WIDGET_STD_BUTTON);
                 return;
             }
@@ -5146,7 +5148,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         if(!reverse && /*CUSTOM_BGND && */0==opts.tabBgnd) // Does not work for reverse :-(
                         {
                             QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
-                            int   adjust(TAB_MO_GLOW==opts.tabMouseOver ? 2 : 1);
+                            int   adjust(TAB_MO_GLOW==opts.tabMouseOver && !(opts.thin&THIN_FRAMES) ? 2 : 1);
 
                             switch(tw->tabPosition())
                             {
@@ -6564,7 +6566,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                 pixelMetric(PM_ButtonShiftVertical, option, widget));
 
                 // The following is mainly for DejaVu Sans 11...
-                if(button->fontMetrics.height()==19 && r.height()==(23+(opts.thinnerBtns ? 0 : 2)))
+                if(button->fontMetrics.height()==19 && r.height()==(23+((opts.thin&THIN_BUTTONS) ? 0 : 2)))
                     r.translate(0, 1);
    
                 if (button->features&QStyleOptionButton::HasMenu)
@@ -6889,7 +6891,9 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                              fixLeft(!onlyTab && !leftCornerWidget && leftAligned && firstTab && !docMode),
                              fixRight(!onlyTab && !rightCornerWidget && rightAligned && lastTab && !docMode),
                              mouseOver(state&State_Enabled && state&State_MouseOver),
-                             glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver);
+                             glowMo(!selected && mouseOver && opts.coloredMouseOver && TAB_MO_GLOW==opts.tabMouseOver),
+                             thin(opts.thin&THIN_FRAMES),
+                             drawOuterGlow(glowMo && !thin);
                 const QColor *use(backgroundColors(option));
                 QColor       fill(getTabFill(selected, mouseOver, use));
                 double       radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
@@ -6932,27 +6936,33 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             r.adjust(-tabOverlap, 0, 0, 0);
                         painter->setClipPath(buildPath(r.adjusted(0, 0, 0, 4), WIDGET_TAB_TOP, round, radius));
                         fillTab(painter, r.adjusted(1+sizeAdjust, 1, -(1+sizeAdjust), 0), option, fill, true, WIDGET_TAB_TOP, (docMode || onlyTab));
-                        painter->setClipping(false);
-                        // This clipping helps with plasma's tabs and nvidia
-                        if(selected)
+                        // This clipping (for selected) helps with plasma's tabs and nvidia
+                        if(selected || thin)
                             painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
+                        else
+                            painter->setClipping(false);
                         drawBorder(painter, r.adjusted(sizeAdjust, 0, -sizeAdjust, 4), option, round, glowMo ? itsMouseOverCols : 0L, 
                                    WIDGET_TAB_TOP, borderProfile, false);
-                        if(glowMo)
+                        if(drawOuterGlow)
                             drawGlow(painter, r.adjusted(0, -1, 0, 5), WIDGET_TAB_TOP);
+
+                        if(selected || thin)
+                            painter->setClipping(false);
 
                         if(selected)
                         {
-                            painter->setClipping(false);
-                            painter->setPen(use[0]);
+                            if(!thin)
+                            {
+                                painter->setPen(use[0]);
 
-                            // The point drawn below is because of the clipping above...
-                            if(fixLeft)
-                                painter->drawPoint(r2.x()+1, r2.y()+r2.height()-1);
-                            else
-                                painter->drawLine(r2.left()-1, r2.bottom(), r2.left(), r2.bottom());
-                            if(!fixRight)
-                                painter->drawLine(r2.right()-1, r2.bottom(), r2.right(), r2.bottom());
+                                // The point drawn below is because of the clipping above...
+                                if(fixLeft)
+                                    painter->drawPoint(r2.x()+1, r2.y()+r2.height()-1);
+                                else
+                                    painter->drawLine(r2.left()-1, r2.bottom(), r2.left(), r2.bottom());
+                                if(!fixRight)
+                                    painter->drawLine(r2.right()-1, r2.bottom(), r2.right(), r2.bottom());
+                            }
 
                             if(docFixLeft)
                             {
@@ -6968,8 +6978,11 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                 r(fixRight ? r2.right()-2 : r2.right()+1);
                             painter->setPen(use[STD_BORDER]);
                             painter->drawLine(l, r2.bottom()-1, r, r2.bottom()-1);
-                            painter->setPen(use[0]);
-                            painter->drawLine(l, r2.bottom(), r, r2.bottom());
+                            if(!thin)
+                            {
+                                painter->setPen(use[0]);
+                                painter->drawLine(l, r2.bottom(), r, r2.bottom());
+                            }
                         }
 
                         if(selected)
@@ -7015,19 +7028,27 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                         painter->setClipPath(buildPath(r.adjusted(0, -4, 0, 0), WIDGET_TAB_BOT, round, radius));
                         fillTab(painter, r.adjusted(1+sizeAdjust, 0, -(1+sizeAdjust), -1), option, fill, true, WIDGET_TAB_BOT, (docMode || onlyTab));
-                        painter->setClipping(false);
+                        if(thin)
+                            painter->setClipRect(r2.adjusted(0, 1, 0, 0));
+                        else
+                            painter->setClipping(false);
                         drawBorder(painter, r.adjusted(sizeAdjust, -4, -sizeAdjust, 0), option, round, glowMo ? itsMouseOverCols : 0L, 
                                    WIDGET_TAB_BOT, borderProfile, false);
-                        if(glowMo)
+                        if(thin)
+                            painter->setClipping(false);
+                        if(drawOuterGlow)
                             drawGlow(painter, r.adjusted(0, -5, 0, 1), WIDGET_TAB_BOT);
 
                         if(selected)
                         {
-                            painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
-                            if(!fixLeft)
-                                painter->drawPoint(r2.left()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top());
-                            if(!fixRight)
-                                painter->drawLine(r2.right()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top(), r2.right(), r2.top());
+                            if(!thin)
+                            {
+                                painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
+                                if(!fixLeft)
+                                    painter->drawPoint(r2.left()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top());
+                                if(!fixRight)
+                                    painter->drawLine(r2.right()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.top(), r2.right(), r2.top());
+                            }
                             if(docFixLeft)
                             {
                                 QColor col(use[STD_BORDER]);
@@ -7042,8 +7063,11 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                 r(fixRight ? r2.right()-2 : r2.right());
                             painter->setPen(use[STD_BORDER]);
                             painter->drawLine(l, r2.top()+1, r, r2.top()+1);
-                            painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
-                            painter->drawLine(l, r2.top(), r, r2.top());
+                            if(!thin)
+                            {
+                                painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
+                                painter->drawLine(l, r2.top(), r, r2.top());
+                            }
                         }
 
                         if(selected)
@@ -7089,18 +7113,26 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             r.adjust(0, -tabOverlap, 0, 0);
                         painter->setClipPath(buildPath(r.adjusted(0, 0, 4, 0), WIDGET_TAB_TOP, round, radius));
                         fillTab(painter, r.adjusted(1, sizeAdjust, 0, -(1+sizeAdjust)), option, fill, false, WIDGET_TAB_TOP, (docMode || onlyTab));
-                        painter->setClipping(false);
+                        if(thin)
+                            painter->setClipRect(r2.adjusted(0, 0, -1, 0));
+                        else
+                            painter->setClipping(false);
                         drawBorder(painter, r.adjusted(0, sizeAdjust, 4, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, 
                                    WIDGET_TAB_TOP, borderProfile, false);
-                        if(glowMo)
+                        if(thin)
+                            painter->setClipping(false);
+                        if(drawOuterGlow)
                             drawGlow(painter, r.adjusted(-1, 0, 5, 0), WIDGET_TAB_TOP);
 
                         if(selected)
                         {
-                            painter->setPen(use[0]);
-                            if(!firstTab)
-                                painter->drawPoint(r2.right(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
-                            painter->drawLine(r2.right(), r2.bottom()-1, r2.right(), r2.bottom());
+                            if(!thin)
+                            {
+                                painter->setPen(use[0]);
+                                if(!firstTab)
+                                    painter->drawPoint(r2.right(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
+                                painter->drawLine(r2.right(), r2.bottom()-1, r2.right(), r2.bottom());
+                            }
                         }
                         else
                         {
@@ -7109,8 +7141,11 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                             painter->setPen(use[STD_BORDER]);
                             painter->drawLine(r2.right()-1, t, r2.right()-1, b);
-                            painter->setPen(use[0]);
-                            painter->drawLine(r2.right(), t, r2.right(), b);
+                            if(!thin)
+                            {
+                                painter->setPen(use[0]);
+                                painter->drawLine(r2.right(), t, r2.right(), b);
+                            }
                         }
 
                         if(selected)
@@ -7156,18 +7191,26 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             r.adjust(0, -tabOverlap, 0, 0);
                         painter->setClipPath(buildPath(r.adjusted(-4, 0, 0, 0), WIDGET_TAB_BOT, round, radius));
                         fillTab(painter, r.adjusted(0, sizeAdjust, -1, -(1+sizeAdjust)), option, fill, false, WIDGET_TAB_BOT, (docMode || onlyTab));
-                        painter->setClipping(false);
+                        if(thin)
+                            painter->setClipRect(r2.adjusted(1, 0, 0, 0));
+                        else
+                            painter->setClipping(false);
                         drawBorder(painter, r.adjusted(-4, sizeAdjust, 0, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, 
                                    WIDGET_TAB_BOT, borderProfile, false);
-                        if(glowMo)
+                        if(thin)
+                            painter->setClipping(false);
+                        if(drawOuterGlow)
                             drawGlow(painter, r.adjusted(-5, 0, 1, 0), WIDGET_TAB_BOT);
 
                         if(selected)
                         {
-                            painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
-                            if(!firstTab)
-                                painter->drawPoint(r2.left(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
-                            painter->drawLine(r2.left(), r2.bottom()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.left(), r2.bottom());
+                            if(!thin)
+                            {
+                                painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
+                                if(!firstTab)
+                                    painter->drawPoint(r2.left(), r2.top()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1));
+                                painter->drawLine(r2.left(), r2.bottom()-(TAB_MO_GLOW==opts.tabMouseOver ? 0 : 1), r2.left(), r2.bottom());
+                            }
                         }
                         else
                         {
@@ -7176,8 +7219,11 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                             painter->setPen(use[STD_BORDER]);
                             painter->drawLine(r2.left()+1, t, r2.left()+1, b);
-                            painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
-                            painter->drawLine(r2.left(), t, r2.left(), b);
+                            if(!thin)
+                            {
+                                painter->setPen(use[opts.borderTab ? 0 : FRAME_DARK_SHADOW]);
+                                painter->drawLine(r2.left(), t, r2.left(), b);
+                            }
                         }
 
                         if(selected)
@@ -9211,7 +9257,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 {
                     bool glowFocus(state&State_HasFocus && state&State_Enabled && USE_GLOW_FOCUS(state&State_MouseOver));
 
-                    if(!glowOverFocus && !sunken && MO_GLOW==opts.coloredMouseOver &&
+                    if(!glowOverFocus && !(opts.thin&THIN_FRAMES) && !sunken && MO_GLOW==opts.coloredMouseOver &&
                         (((FULL_FOCUS || glowFocus) && state&State_HasFocus) || state&State_MouseOver) &&
                        state&State_Enabled && !comboBox->editable)
                         drawGlow(painter, r, FULL_FOCUS && state&State_HasFocus ? WIDGET_DEF_BUTTON : WIDGET_COMBO,
@@ -9354,7 +9400,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         focus.rect=frame.adjusted(3, 3, -3, -3);
 
                     // Draw glow over top of filled focus
-                    if(glowOverFocus)
+                    if(glowOverFocus && !(opts.thin&THIN_FRAMES))
                         drawGlow(painter, frame.adjusted(-1, -1, 1, 1), WIDGET_COMBO);
                     else
                         drawPrimitive(PE_FrameFocusRect, &focus, painter, widget);
@@ -9611,7 +9657,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
 
                     if (h < 18)
                         h = 18;
-                    h+=(opts.thinnerMenuItems ? 2 : 4);
+                    h+=((opts.thin&THIN_MENU_ITEMS) ? 2 : 4);
 
                     if(QStyleOptionMenuItem::Separator==mi->menuItemType)
                         h+=4;
@@ -11150,7 +11196,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
 
     if(doEtch || glowFocus)
     {
-        if( (!sunken || sunkenToggleMo ||
+        if( !(opts.thin&THIN_FRAMES) && (!sunken || sunkenToggleMo ||
                (sunken && glowFocus && widget && ::qobject_cast<const QAbstractButton *>(widget) &&
                 static_cast<const QAbstractButton *>(widget)->isCheckable())) &&
             ((WIDGET_OTHER!=w && WIDGET_SLIDER_TROUGH!=w && MO_GLOW==opts.coloredMouseOver && option->state&State_MouseOver) ||
@@ -11657,58 +11703,59 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
     if(WIDGET_TAB_BOT==w || WIDGET_TAB_TOP==w)
         cols=itsBackgroundCols;
 
-    switch(borderProfile)
-    {
-        case BORDER_FLAT:
-            break;
-        case BORDER_RAISED:
-        case BORDER_SUNKEN:
-        case BORDER_LIGHT:
+    if(!(opts.thin&THIN_FRAMES))
+        switch(borderProfile)
         {
-            int          dark=FRAME_DARK_SHADOW;
-            QColor       tl(cols[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile ? 0 : dark]),
-                         br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
-            QPainterPath topPath,
-                         botPath;
-
-            if( ((hasMouseOver || hasFocus) && WIDGET_ENTRY==w) ||
-                (hasFocus && WIDGET_SCROLLVIEW==w))
+            case BORDER_FLAT:
+                break;
+            case BORDER_RAISED:
+            case BORDER_SUNKEN:
+            case BORDER_LIGHT:
             {
-                tl.setAlphaF(ENTRY_INNER_ALPHA);
-                br.setAlphaF(ENTRY_INNER_ALPHA);
-            }
-            else if(doBlend)
-            {
-                tl.setAlphaF(BORDER_BLEND_ALPHA(w));
-                br.setAlphaF(BORDER_SUNKEN==borderProfile ? 0.0 : BORDER_BLEND_ALPHA(w));
-            }
+                int          dark=FRAME_DARK_SHADOW;
+                QColor       tl(cols[BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile ? 0 : dark]),
+                             br(cols[BORDER_RAISED==borderProfile ? dark : 0]);
+                QPainterPath topPath,
+                             botPath;
 
-            QRect inner(r.adjusted(1, 1, -1, -1));
+                if( ((hasMouseOver || hasFocus) && WIDGET_ENTRY==w) ||
+                    (hasFocus && WIDGET_SCROLLVIEW==w))
+                {
+                    tl.setAlphaF(ENTRY_INNER_ALPHA);
+                    br.setAlphaF(ENTRY_INNER_ALPHA);
+                }
+                else if(doBlend)
+                {
+                    tl.setAlphaF(BORDER_BLEND_ALPHA(w));
+                    br.setAlphaF(BORDER_SUNKEN==borderProfile ? 0.0 : BORDER_BLEND_ALPHA(w));
+                }
 
-            buildSplitPath(inner, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
+                QRect inner(r.adjusted(1, 1, -1, -1));
 
-            p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
-                        (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
-                            ? tl
-                            : option->palette.background().color());
-            p->drawPath(topPath);
-            if(WIDGET_SCROLLVIEW==w || // Because of list view headers, need to draw dark line on right!
-                (! ( (WIDGET_ENTRY==w && !hasFocus && !hasMouseOver) ||
-                     (WIDGET_ENTRY!=w && doBlend && BORDER_SUNKEN==borderProfile) ) ) )
-            {
-                if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile && WIDGET_SCROLLVIEW!=w)
-                    p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
-                                ? checkColour(option, QPalette::Window)
-                                : WIDGET_ENTRY==w && !hasFocus
-                                    ? checkColour(option, QPalette::Base)
-                                    : */enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                        WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
-                                        ? br
-                                        : checkColour(option, QPalette::Window));
-                p->drawPath(botPath);
+                buildSplitPath(inner, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
+
+                p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
+                            (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
+                                ? tl
+                                : option->palette.background().color());
+                p->drawPath(topPath);
+                if(WIDGET_SCROLLVIEW==w || // Because of list view headers, need to draw dark line on right!
+                    (! ( (WIDGET_ENTRY==w && !hasFocus && !hasMouseOver) ||
+                        (WIDGET_ENTRY!=w && doBlend && BORDER_SUNKEN==borderProfile) ) ) )
+                {
+                    if(!hasFocus && !hasMouseOver && BORDER_LIGHT!=borderProfile && WIDGET_SCROLLVIEW!=w)
+                        p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
+                                    ? checkColour(option, QPalette::Window)
+                                    : WIDGET_ENTRY==w && !hasFocus
+                                        ? checkColour(option, QPalette::Base)
+                                        : */enabled && (BORDER_SUNKEN==borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                            WIDGET_TAB_TOP==w || WIDGET_TAB_BOT==w)
+                                            ? br
+                                            : checkColour(option, QPalette::Window));
+                    p->drawPath(botPath);
+                }
             }
         }
-    }
 
     if(BORDER_SUNKEN==borderProfile &&
        (WIDGET_FRAME==w || ((WIDGET_ENTRY==w || WIDGET_SCROLLVIEW==w) && !opts.etchEntry && !hasFocus && !hasMouseOver)))
