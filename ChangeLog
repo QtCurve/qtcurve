@@ -6,6 +6,7 @@
 4. Add option to draw standard, raised, or joined toolbar buttons.
 5. Add option to use thinner frames, focus, etc.
 6. Fix combo-box menu text when shading popup menus.
+7. Fix reading of QtCurve supplied default kdeglobals file.
 
 1.6.4
 -----

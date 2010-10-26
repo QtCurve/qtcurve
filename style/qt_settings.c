@@ -790,7 +790,7 @@ GdkColor mixColors(const GdkColor *c1, const GdkColor *c2, double bias)
     }
 }
 
-static void readKdeGlobals(const char *rc, int rd, bool kde4)
+static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
 {
     ColorEffect   effects[2];
     int           found=0,
@@ -803,7 +803,7 @@ static void readKdeGlobals(const char *rc, int rd, bool kde4)
     for(i=0; i<FONT_NUM_STD; ++i)
         initFont(&fonts[i], TRUE);
 
-    if(kde4)
+    if(first)
     {
         // Set defaults!
         effects[EFF_DISABLED].col.red=112;
@@ -2180,7 +2180,7 @@ static gboolean qtInit()
                 readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|RD_MENU_FONT|RD_TB_FONT|
                                          RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
                                          (qtSettings.qt4 || 0==f ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE : RD_LIST_COLOR),
-                               qtSettings.qt4 || 0==f);
+                               0==f, qtSettings.qt4 || 0==f);
             }
 
 #ifdef QTC_STYLE_SUPPORT
