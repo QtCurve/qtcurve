@@ -2216,6 +2216,16 @@
         </widget>
        </item>
        <item row="7" column="1">
+        <widget class="QCheckBox" name="windowBorder_fill">
+         <property name="whatsThis">
+          <string>If enabled, before drawing the titlebar gradient, it will be filled with the background colour/gradient.</string>
+         </property>
+         <property name="text">
+          <string>Fill titlebar background before applying gradient.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
         <widget class="QCheckBox" name="windowBorder_menuColor">
          <property name="whatsThis">
           <string>If enabled, the the configured menubar color will be used for windows that have menubars.</string>
@@ -2225,14 +2235,14 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_55">
          <property name="text">
           <string>Add a light border:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QCheckBox" name="windowBorder_addLightBorder">
          <property name="whatsThis">
           <string>If enabled, a 1 pixel light border is added to the top and left of the window.</string>
@@ -2242,14 +2252,14 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QLabel" name="label_55b">
          <property name="text">
           <string>Draw separator on active windows:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QCheckBox" name="windowBorder_separator">
          <property name="whatsThis">
           <string>If enabled, a separator is drawn between the titlebar and window.</string>
@@ -2259,14 +2269,14 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="11" column="0">
         <widget class="QLabel" name="label_92">
          <property name="text">
           <string>Drag windows from:</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QComboBox" name="windowDrag"/>
        </item>
       </layout>

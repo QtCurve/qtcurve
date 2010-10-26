@@ -1029,6 +1029,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(titlebarButtonAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(windowBorder_colorTitlebarOnly, SIGNAL(toggled(bool)), SLOT(windowBorder_colorTitlebarOnlyChanged()));
     connect(windowBorder_blend, SIGNAL(toggled(bool)), SLOT(windowBorder_blendChanged()));
+    connect(windowBorder_fill, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(windowBorder_menuColor, SIGNAL(toggled(bool)), SLOT(windowBorder_menuColorChanged()));
     connect(windowBorder_separator, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(selectionAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
@@ -2138,6 +2139,7 @@ void QtCurveConfig::menubarTitlebarBlend()
         titlebarAppearance->setCurrentIndex(menubarAppearance->currentIndex());
         inactiveTitlebarAppearance->setCurrentIndex(menubarAppearance->currentIndex());
         windowBorder_blend->setChecked(false);
+        windowBorder_fill->setChecked(true);
         shadeMenubars->setCurrentIndex(SHADE_WINDOW_BORDER);
         if(windowDrag->currentIndex()<WM_DRAG_MENUBAR)
             windowDrag->setCurrentIndex(WM_DRAG_MENUBAR);
@@ -3288,6 +3290,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     titlebarButtonAppearance->setCurrentIndex(opts.titlebarButtonAppearance);
     windowBorder_colorTitlebarOnly->setChecked(opts.windowBorder&WINDOW_BORDER_COLOR_TITLEBAR_ONLY);
     windowBorder_blend->setChecked(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR);
+    windowBorder_fill->setChecked(opts.windowBorder&WINDOW_BORDER_FILL_TITLEBAR);
     windowBorder_menuColor->setChecked(opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR);
     windowBorder_separator->setChecked(opts.windowBorder&WINDOW_BORDER_SEPARATOR);
     selectionAppearance->setCurrentIndex(opts.selectionAppearance);
@@ -3546,6 +3549,8 @@ int QtCurveConfig::getWindowBorderFlags()
         flags|=WINDOW_BORDER_BLEND_TITLEBAR;
     if(windowBorder_separator->isChecked())
         flags|=WINDOW_BORDER_SEPARATOR;
+    if(windowBorder_fill->isChecked())
+        flags|=WINDOW_BORDER_FILL_TITLEBAR;
     return flags;
 }
 

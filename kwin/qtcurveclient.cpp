@@ -636,29 +636,62 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else if(maximized)
         painter.setClipRect(r, Qt::IntersectClip);
 
+    //
+    // Fill titlebar and border backgrounds...
+    //
     QPainterPath fillPath(maximized || round<=ROUND_SLIGHT
                                 ? QPainterPath() 
                                 : createPath(QRectF(fillRect), 
-                                             APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp, &opt, NULL) ? 6.0 : 8.0, 
+                                             APPEARANCE_NONE==Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarApp,
+                                                                                               &opt, NULL) ? 6.0 : 8.0, 
                                              roundBottom ? 6.0 : 1.0));
 
-    if(opacity<100 && Handler()->opaqueBorder())
+
+    bool fillTitlebar(windowBorder&WINDOW_BORDER_FILL_TITLEBAR),
+         opaqueBorder(opacity<100 && Handler()->opaqueBorder());
+
+    if(opaqueBorder)
     {
         QColor fc(fillCol);
         fc.setAlphaF(1.0);
-        painter.save();
-        painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
-        fillBackground(bgndAppearance, painter, fc, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
-        painter.restore();
         if(!clipRegion)
             painter.save();
-        painter.setClipRect(QRect(r.x(), r.y(), r.width(), titleBarHeight), Qt::IntersectClip);
+        painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
+        fillBackground(bgndAppearance, painter, fc, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+        if(fillTitlebar)
+        {
+            painter.save();
+            painter.setClipRect(QRect(r.x(), r.y(), r.width(), titleBarHeight), Qt::IntersectClip);
+            fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+            painter.restore();
+        }
+    }
+    else
+    {
+        if(!fillTitlebar)
+        {
+            if(!clipRegion)
+                painter.save();
+            if(!compositing)
+            {
+                // Not compositing, so need to fill with background colour...
+                if(fillPath.isEmpty())
+                    painter.fillRect(QRect(r.x(), r.y(), r.width(), titleBarHeight), windowCol);
+                else
+                    painter.fillPath(fillPath, windowCol);
+            }
+
+            painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
+        }
+        fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
     }
 
-    fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
-    if(clipRegion || (opacity<100 && Handler()->opaqueBorder()))
+    if(clipRegion || opaqueBorder || !fillTitlebar)
         painter.restore();
-
+    //
+    // Titlebar and border backgrounds filled.
+    //
+        
     if(maximized)
         r.adjust(-3, -border, 3, 0);
     opt.palette.setColor(QPalette::Button, col);

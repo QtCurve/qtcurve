@@ -534,7 +534,8 @@ typedef enum
     WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR = 0x02, // titlebarMenuColor
     WINDOW_BORDER_ADD_LIGHT_BORDER               = 0x04, // titlebarBorder
     WINDOW_BORDER_BLEND_TITLEBAR                 = 0x08, // titlebarBlend
-    WINDOW_BORDER_SEPARATOR                      = 0x10
+    WINDOW_BORDER_SEPARATOR                      = 0x10,
+    WINDOW_BORDER_FILL_TITLEBAR                  = 0x20
 } EWindowBorder;
 
 typedef enum
@@ -589,7 +590,9 @@ typedef enum
     SQUARE_SB_SLIDER          = 0x0080,
     SQUARE_WINDOWS            = 0x0100,
     SQUARE_TOOLTIPS           = 0x0200,
-    SQUARE_POPUP_MENUS        = 0x0400
+    SQUARE_POPUP_MENUS        = 0x0400,
+
+    SQUARE_ALL                = 0xFFFF
 } ESquare;
 
 typedef enum

@@ -1608,8 +1608,8 @@ static void checkConfig(Options *opts)
     if(MO_GLOW==opts->coloredMouseOver)
         opts->coloredTbarMo=true;
 
-    if(opts->round<ROUND_SLIGHT)
-        opts->square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
+    if(ROUND_NONE==opts->round)
+        opts->square=SQUARE_ALL;
 #endif
 
     if(opts->bgndOpacity<0 || opts->bgndOpacity>100)
@@ -1802,6 +1802,9 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
             else
                 CFG_READ_INT(windowBorder);
+
+            if(opts->version<MAKE_VERSION(1, 7))
+                opts->windowBorder|=WINDOW_BORDER_FILL_TITLEBAR;
 
             if(opts->version<MAKE_VERSION(1, 4))
             {
@@ -2555,7 +2558,7 @@ static void defaultSettings(Options *opts)
     opts->stripedSbar=false;
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
-    opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER;
+    opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER|WINDOW_BORDER_FILL_TITLEBAR;
     opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
     opts->gbLabel=GB_LBL_BOLD|GB_LBL_OUTSIDE;
