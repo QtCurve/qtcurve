@@ -2613,15 +2613,17 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
 
         if(window && (!window->name || strcmp(window->name, "gtk-tooltip")))
         {
-            GdkRectangle clip;
-            int          opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity,
-                         xmod=0, ymod=0, wmod=0, hmod=0;
-            double       alpha=1.0;
-            gboolean     useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window);
+            GdkRectangle  clip;
+            int           opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity,
+                          xmod=0, ymod=0, wmod=0, hmod=0;
+            double        alpha=1.0;
+            gboolean      useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window);
+            WindowBorders borders;
 
+            if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
+                borders=qtcGetWindowBorderSize(FALSE);
             if(!IS_FLAT_BGND(opts.bgndAppearance))
             {
-                WindowBorders borders=qtcGetWindowBorderSize(FALSE);
                 xmod=-borders.sides;
                 ymod=-borders.titleHeight;
                 wmod=2*borders.sides;
@@ -2642,7 +2644,7 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 GdkColor *parent_col=getParentBgCol(widget);
 
                 if(parent_col)
-                    drawAreaColorAlpha(cr, area, NULL, parent_col , x, -ypos, width, window->allocation.height, alpha);
+                    drawAreaColorAlpha(cr, area, NULL, parent_col, x, -ypos, width, window->allocation.height, alpha);
                 else if(useAlpha)
                     drawAreaColorAlpha(cr, area, NULL, &style->bg[GTK_STATE_NORMAL] , x, -ypos, width, window->allocation.height, alpha);
             }
@@ -2693,6 +2695,12 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             }
             if(useAlpha)
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+
+            if(BGND_IMG_ON_BORDER)
+            {
+                ypos+=borders.titleHeight;
+                window->allocation.width+=borders.sides;
+            }
 
             drawBgndRings(cr, -ypos, window->allocation.width-1, TRUE);
             unsetCairoClipping(cr);
