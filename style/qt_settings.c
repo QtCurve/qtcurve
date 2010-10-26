@@ -2653,7 +2653,7 @@ static gboolean qtInit()
                 gtk_rc_parse_string(tmpStr);
             }
 
-            if(opts.thinnerMenuItems)
+            if((opts.thin&THIN_MENU_ITEMS))
                 gtk_rc_parse_string("style \""RC_SETTING"Mi\" {xthickness = 1 ythickness = 2 } "
                                     "class \"*MenuItem\" style \""RC_SETTING"Mi\"");
 
@@ -2747,7 +2747,7 @@ static gboolean qtInit()
                                         "class \"*GtkOptionMenu\" style \""RC_SETTING"Etch2\"";
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+2);
-                sprintf(tmpStr, constStrFormat, opts.thinnerBtns || !doEffect ? 1 : 2);
+                sprintf(tmpStr, constStrFormat, (opts.thin&THIN_BUTTONS) || !doEffect ? 1 : 2);
                 gtk_rc_parse_string(tmpStr);
                 }
 
