@@ -56,20 +56,24 @@ bool CImagePropertiesDialog::run()
     QString oldFile=fileName();
     int     oldWidth=imgWidth(),
             oldHeight=imgHeight();
+    bool    oldOnBorder=onBorder->isChecked();
 
     if(QDialog::Accepted==exec())
         return true;
 
-    set(oldFile, oldWidth, oldHeight);
+    set(oldFile, oldWidth, oldHeight, oldOnBorder);
     return false;
 }
          
-void CImagePropertiesDialog::set(const QString &file, int width, int height)
+void CImagePropertiesDialog::set(const QString &file, int width, int height, bool onWindowBorder)
 {
     scaleControls->setVisible(-1!=width);
     scaleImage->setVisible(-1!=width);
+    onBorder->setVisible(-1!=width);
+    onBorderLabel->setVisible(-1!=width);
     if(-1!=width)
     {
+        onBorder->setChecked(onWindowBorder);
         scaleImage->setChecked(0!=width || 0!=height);
         scaleWidth->setValue(width<MIN_SIZE || width>MAX_SIZE ? DEF_SIZE : width);
         scaleHeight->setValue(height<MIN_SIZE || height>MAX_SIZE ? DEF_SIZE : height);

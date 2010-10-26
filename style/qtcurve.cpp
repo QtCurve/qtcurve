@@ -5360,8 +5360,13 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                     col.setAlphaF(1.0);
                     drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app, bgnd->path);
-                    if(!bgnd->widgetRect.isEmpty())
-                        drawBackgroundImage(painter, true, bgnd->widgetRect.x()+bgnd->widgetRect.width(), bgnd->widgetRect.y());
+                     // APPEARANCE_RAISED is used to signal flat background, but have background image!
+                    if(APPEARANCE_FLAT!=bgnd->app && IMG_NONE!=opts.bgndImage.type)
+                    {
+                        const QRect &rect=BGND_IMG_ON_BORDER ? bgnd->rect : bgnd->widgetRect;
+
+                        drawBackgroundImage(painter, true, rect.x()+bgnd->rect.width(), rect.y());
+                    }
                 }
             break;
         // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
@@ -11551,7 +11556,9 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                                 ? opts.menuBgndOpacity
                                 : BGND_DIALOG==type
                                     ? opts.dlgOpacity
-                                    : opts.bgndOpacity;
+                                    : opts.bgndOpacity,
+                  xOffset = 0,
+                  yOffset = 0;
     QRect         r(QRect(widget->rect().x(), 0, widget->rect().width(), window->rect().height()));
 
     if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
@@ -11563,10 +11570,13 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
     {
         WindowBorders borders=qtcGetWindowBorderSize();
         r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+        if(BGND_IMG_ON_BORDER)
+            xOffset=borders.sides, yOffset=borders.titleHeight;
     }
     drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
                    BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
-    drawBackgroundImage(p, isWindow, widget->width(), previewMdi ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0);
+    drawBackgroundImage(p, isWindow, widget->width()+xOffset,
+                        (previewMdi ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0)-yOffset);
 }
 
 QPainterPath Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const

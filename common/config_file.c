@@ -1069,6 +1069,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
                 opts->ENTRY.pixmap.file=file; \
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
+                opts->ENTRY.onBorder=readBoolEntry(cfg, #ENTRY ".onBorder", false); \
             } \
             else \
             { \
@@ -1242,6 +1243,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
                 opts->ENTRY.pixmap.file=file; \
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
+                opts->ENTRY.onBorder=readBoolEntry(cfg, #ENTRY ".onBorder", false); \
             } \
             else \
             { \

@@ -557,10 +557,13 @@ typedef struct
 #endif
 } QtCPixmap;
 
+#define BGND_IMG_ON_BORDER (IMG_FILE==opts.bgndImage.type && opts.bgndImage.onBorder)
+
 typedef struct
 {
     EImageType type;
-    bool       loaded;
+    bool       loaded,
+               onBorder;
     QtCPixmap  pixmap;
     int        width,
                height;
