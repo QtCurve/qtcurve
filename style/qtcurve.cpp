@@ -8051,7 +8051,6 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                             menuarea.adjust(0, 1, -1, -1);
                     }
 
-                    tool.rect = menuarea;
                     tool.state = mflags|State_Horizontal;
 
                     if(drawMenu)
@@ -8068,16 +8067,23 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                 tool.state &= ~State_Horizontal;
                             painter->save();
                             painter->setClipRect(menuarea, Qt::IntersectClip);
-                            tool.rect.adjust(-4, 0, horizTBar && rightAdjust ? 4 : 0, 0);
                             if((reverse && leftAdjust) || (!reverse && rightAdjust))
                                 mRound=ROUNDED_NONE;
+                            if(reverse)
+                                tool.rect.adjust(1, 1, 0, -1);
+                            else
+                                tool.rect.adjust(0, 1, -1, -1);
                         }
+                        else
+                            tool.rect = menuarea;
                         
                         drawLightBevel(painter, tool.rect, &tool, widget, mRound, getFill(&tool, use), use, true,
                                        MO_GLOW==opts.coloredMouseOver ? WIDGET_MENU_BUTTON : WIDGET_NO_ETCH_BTN);
                         if(raised && TBTN_JOINED==opts.tbarBtns)
-                            painter->restore(), tool.rect=menuarea;
+                            painter->restore();
                     }
+
+                    tool.rect = menuarea;
 
                     if(mflags&State_Sunken)
                         tool.rect.adjust(1, 1, 1, 1);
