@@ -6694,6 +6694,7 @@ static void gtkDrawExtension(GtkStyle *style, GdkWindow *window, GtkStateType st
         }
 
         glowMo=glowMo && highlight;
+        drawOuterGlow=drawOuterGlow && highlight;
 
         switch(gap_side)
         {
