@@ -5367,7 +5367,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     {
                         painter->save();
                         painter->setClipRect(bgnd->rect, Qt::IntersectClip);
-                        drawBackgroundImage(painter, true, bgnd->rect.x()+bgnd->rect.width(), bgnd->rect.y());
+                        drawBackgroundImage(painter, true, bgnd->rect);
                         painter->restore();
                     }
                 }
@@ -11497,7 +11497,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
     }
 }
 
-void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffset) const
+void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const
 {
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
                               (IMG_FILE!=opts.bgndImage.type || 
@@ -11516,9 +11516,27 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
             loadBgndImage(&img);
             if(!img.pixmap.img.isNull())
             {
-                p->drawPixmap(width-img.pixmap.img.width(), yOffset, img.pixmap.img);
-                break;
+                switch(img.pos)
+                {
+                    case PP_TL:
+                        p->drawPixmap(r.x(), r.y(), img.pixmap.img);
+                        break;
+                    case PP_TR:
+                        p->drawPixmap(r.right()-img.pixmap.img.width(), r.y(), img.pixmap.img);
+                        break;
+                    case PP_BL:
+                        p->drawPixmap(r.x(), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                        break;
+                    case PP_BR:
+                        p->drawPixmap(r.right()-img.pixmap.img.width(), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                        break;
+                    case PP_CENTRED:
+                        p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2),
+                                      r.y()+((r.height()-img.pixmap.img.height())/2),
+                                      img.pixmap.img);
+                }
             }
+            break;
         case IMG_PLAIN_RINGS:
         case IMG_BORDERED_RINGS:
             if(img.pixmap.img.isNull())
@@ -11541,7 +11559,7 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
                 drawBgndRing(pixPainter, 310, 220, 80, 0, isWindow);
                 pixPainter.end();
             }
-            p->drawPixmap(width-img.pixmap.img.width(), yOffset+1, img.pixmap.img);
+            p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+1, img.pixmap.img);
             break;
         case IMG_SQUARE_RINGS:
             if(img.pixmap.img.isNull())
@@ -11570,7 +11588,7 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, int width, int yOffs
                                               WIDGET_OTHER, ROUNDED_ALL, RINGS_SQUARE_RADIUS));
                 pixPainter.end();
             }
-            p->drawPixmap(width-img.pixmap.img.width(), yOffset+1, img.pixmap.img);
+            p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+1, img.pixmap.img);
             break;    
     }
 }
@@ -11584,27 +11602,33 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
                                 ? opts.menuBgndOpacity
                                 : BGND_DIALOG==type
                                     ? opts.dlgOpacity
-                                    : opts.bgndOpacity,
-                  xOffset = 0,
-                  yOffset = 0;
-    QRect         r(QRect(widget->rect().x(), 0, widget->rect().width(), window->rect().height()));
+                                    : opts.bgndOpacity;
+    QRect         bgndRect(widget->rect()),
+                  imgRect(bgndRect);
 
     if(100!=opacity && !QtCurve::Utils::hasAlphaChannel(window))
         opacity=100;
 
     p->setClipRegion(widget->rect(), Qt::IntersectClip);
 
-    if(isWindow && !previewMdi)
+    if(isWindow)
     {
-        WindowBorders borders=qtcGetWindowBorderSize();
-        r.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+        if(!previewMdi)
+        {
+            WindowBorders borders=qtcGetWindowBorderSize();
+            bgndRect.adjust(-borders.sides, -borders.titleHeight, borders.sides, borders.bottom);
+        }
+        else
+        {
+            bgndRect.adjust(0, -pixelMetric(PM_TitleBarHeight, 0L, widget), 0, 0);
+        }
         if(BGND_IMG_ON_BORDER)
-            xOffset=borders.sides, yOffset=borders.titleHeight;
+            imgRect=bgndRect;
     }
-    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), r, opacity, type,
+
+    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), bgndRect, opacity, type,
                    BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
-    drawBackgroundImage(p, isWindow, widget->width()+xOffset,
-                        (previewMdi ? pixelMetric(PM_TitleBarHeight, 0L, widget) : 0)-yOffset);
+    drawBackgroundImage(p, isWindow, imgRect);
 }
 
 QPainterPath Style::buildPath(const QRectF &r, EWidget w, int round, double radius) const

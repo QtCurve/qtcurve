@@ -6,19 +6,21 @@
  4. Add option to draw standard, raised, or joined toolbar buttons.
  5. Add option to use thinner frames, focus, etc.
  6. If not rounding, enable all 'square' options.
- 7. In preview window, draw background rings/image down from titlebar.
- 8. Add option to use KDE4 palette's hover colour for kwin button symbol
+ 7. Add position setting for background image; top left, top right,
+    bottom left, bottom right, and centred.
+ 8. In preview window, draw background rings/image down from titlebar.
+ 9. Add option to use KDE4 palette's hover colour for kwin button symbol
     mouse-over.
- 9. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
-10. RTL fixes/workarounds for table headers.
-11. Workaround kcmshell terminating immediately after QtCurve config dialog is
+10. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
+11. RTL fixes/workarounds for table headers.
+12. Workaround kcmshell terminating immediately after QtCurve config dialog is
     closed - increase KGlobal reference count.
-12. When shading tab background, use fillRect() and not fillPath() - seems to
+13. When shading tab background, use fillRect() and not fillPath() - seems to
     workaround glithches with intel 2.12 graphics driver.
-13. Fix kwin option to only apply opacity to titlebar.
-14. Add option to control whether window titlebars are filled with the
+14. Fix kwin option to only apply opacity to titlebar.
+15. Add option to control whether window titlebars are filled with the
     background *before* the titlebar gradient is applied.
-15. Altered check/radio contents size - so as to better align cehckbox texts
+16. Altered check/radio contents size - so as to better align cehckbox texts
     when used in left part of a form-layout.
 
 1.6.4

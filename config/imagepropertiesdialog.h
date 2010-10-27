@@ -26,6 +26,7 @@
 #include <KDE/KUrlRequester>
 #include <KDE/KUrl>
 #include <QCheckBox>
+#include <QComboBox>
 
 #include "ui_imageproperties.h"
 
@@ -36,12 +37,13 @@ class CImagePropertiesDialog : public KDialog,  public Ui::ImageProperties
     CImagePropertiesDialog(const QString &title, QWidget *parent);
 
     bool  run();
-    void  set(const QString &file, int width=-1, int height=-1, bool onWindowBorder=false);
+    void  set(const QString &file, int width=-1, int height=-1, int pos=1, bool onWindowBorder=false);
     QSize sizeHint() const;
 
     QString fileName()       { return fileRequester->url().toLocalFile(); }
     int     imgWidth()       { return scaleImage->isChecked() ? scaleWidth->value() : 0; }
     int     imgHeight()      { return scaleImage->isChecked() ? scaleHeight->value() : 0; }
+    int     imgPos()         { return posCombo->currentIndex(); }
     bool    onWindowBorder() { return onBorder->isChecked(); }
 };
 

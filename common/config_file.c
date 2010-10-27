@@ -1077,6 +1077,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
                 opts->ENTRY.onBorder=readBoolEntry(cfg, #ENTRY ".onBorder", false); \
+                opts->ENTRY.pos=(EPixPos)readNumEntry(cfg, #ENTRY ".pos", (int)PP_TR); \
             } \
             else \
             { \
@@ -1251,6 +1252,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
                 opts->ENTRY.width=readNumEntry(cfg, #ENTRY ".width", 0); \
                 opts->ENTRY.height=readNumEntry(cfg, #ENTRY ".height", 0); \
                 opts->ENTRY.onBorder=readBoolEntry(cfg, #ENTRY ".onBorder", false); \
+                opts->ENTRY.pos=(EPixPos)readNumEntry(cfg, #ENTRY ".pos", (int)PP_TR); \
             } \
             else \
             { \
@@ -3158,12 +3160,16 @@ static const char * toStr(ETBarBtn tb)
         CFG.deleteEntry(#ENTRY ".file"); \
         CFG.deleteEntry(#ENTRY ".width"); \
         CFG.deleteEntry(#ENTRY ".height"); \
+        CFG.deleteEntry(#ENTRY ".onBorder"); \
+        CFG.deleteEntry(#ENTRY ".pos"); \
     } \
     else \
     { \
         CFG.writeEntry(#ENTRY ".file", opts.ENTRY.pixmap.file); \
         CFG.writeEntry(#ENTRY ".width", opts.ENTRY.width); \
         CFG.writeEntry(#ENTRY ".height", opts.ENTRY.height); \
+        CFG.writeEntry(#ENTRY ".onBorder", opts.ENTRY.onBorder); \
+        CFG.writeEntry(#ENTRY ".pos", (int)(opts.ENTRY.pos)); \
     }
 
 #define CFG_WRITE_STRING_LIST_ENTRY(ENTRY) \

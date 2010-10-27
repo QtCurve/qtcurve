@@ -560,6 +560,15 @@ typedef struct
 
 #define BGND_IMG_ON_BORDER (IMG_FILE==opts.bgndImage.type && opts.bgndImage.onBorder)
 
+typedef enum
+{
+    PP_TL,
+    PP_TR,
+    PP_BL,
+    PP_BR,
+    PP_CENTRED
+} EPixPos;
+
 typedef struct
 {
     EImageType type;
@@ -568,6 +577,7 @@ typedef struct
     QtCPixmap  pixmap;
     int        width,
                height;
+    EPixPos    pos;
 } QtCImage;
 
 typedef enum
