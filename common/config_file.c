@@ -924,9 +924,16 @@ static void loadBgndImage(QtCImage *img)
 #else // __cplusplus
         img->pixmap.img=0L;
         if(img->pixmap.file)
+        {
             img->pixmap.img=0==img->width
                             ? gdk_pixbuf_new_from_file(determineFileName(img->pixmap.file), NULL)
                             : gdk_pixbuf_new_from_file_at_scale(determineFileName(img->pixmap.file), img->width, img->height, FALSE, NULL);
+            if(0==img->width && img->pixmap.img)
+            {
+                img->width=gdk_pixbuf_get_width(img->pixmap.img);
+                img->height=gdk_pixbuf_get_height(img->pixmap.img);
+            }
+        }
 #endif // __cplusplus
     }
 }
