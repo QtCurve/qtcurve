@@ -2357,7 +2357,7 @@ static void drawBgndRing(cairo_t *cr, int x, int y, int size, int size2, gboolea
     }
 }
 
-static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
+static void drawBgndRings(cairo_t *cr, gint x, gint y, gint width, gint height, gboolean isWindow)
 {
     static cairo_surface_t *bgndImage=NULL;
     static cairo_surface_t *menuBgndImage=NULL;
@@ -2379,10 +2379,26 @@ static void drawBgndRings(cairo_t *cr, gint y, int width, gboolean isWindow)
             loadBgndImage(img);
             if(img->pixmap.img)
             {
-                gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, width-img->width, y);
+                switch(img->pos)
+                {
+                    case PP_TL:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y);
+                        break;
+                    case PP_TR:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width), y);
+                        break;
+                    case PP_BL:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+(height-img->height));
+                        break;
+                    case PP_BR:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width), y+(height-img->height));
+                        break;
+                    case PP_CENTRED:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+((height-img->height)/2));
+                }
                 cairo_paint(cr);
-                break;
             }
+            break;
         case IMG_PLAIN_RINGS:
         case IMG_BORDERED_RINGS:
         {
@@ -2700,7 +2716,7 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             else
                 wmod=0, hmod=0, ymod=0;
 
-            drawBgndRings(cr, -ypos+ymod, window->allocation.width+wmod-1, TRUE);
+            drawBgndRings(cr, -xpos+xmod, -ypos+ymod, window->allocation.width+wmod-1, window->allocation.height+hmod-1, TRUE);
             unsetCairoClipping(cr);
             return TRUE;
         }
@@ -5149,7 +5165,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state,
         }
 
         if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)
-            drawBgndRings(cr, y, width, FALSE);
+            drawBgndRings(cr, x, y, width, height, FALSE);
 
         if(opts.menuStripe && !comboMenu)
         {

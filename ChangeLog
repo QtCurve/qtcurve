@@ -6,8 +6,10 @@
 4. Add option to draw standard, raised, or joined toolbar buttons.
 5. Add option to use thinner frames, focus, etc.
 6. If not rounding, enable all 'square' options.
-7. Fix combo-box menu text when shading popup menus.
-8. Fix reading of QtCurve supplied default kdeglobals file.
+7. Add position setting for background image; top left, top right,
+   bottom left, bottom right, and centred.
+8. Fix combo-box menu text when shading popup menus.
+9. Fix reading of QtCurve supplied default kdeglobals file.
 
 1.6.4
 -----

@@ -96,18 +96,40 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
 
         rect.x=0;
         rect.y=0;
-        rect.width=widget->allocation.width;
 
         if(IS_FLAT(opts.bgndAppearance) && IMG_NONE!=opts.bgndImage.type)
         {
+            EPixPos pos=IMG_FILE==opts.bgndImage.type ? opts.bgndImage.pos : PP_TR;
+
             if(IMG_FILE==opts.bgndImage.type)
                 loadBgndImage(&opts.bgndImage);
-            rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
+            switch(pos)
+            {
+                case PP_TL:
+                    rect.width=opts.bgndImage.width+1;
+                    rect.height=opts.bgndImage.height+1;
+                    break;
+                case PP_TR:
+                    rect.width=widget->allocation.width;
+                    rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
+                    break;
+                case PP_BL:
+                    rect.width=opts.bgndImage.width+1;
+                    rect.height=widget->allocation.height;
+                    break;
+                case PP_CENTRED:
+                case PP_BR:
+                    rect.width=widget->allocation.width;
+                    rect.height=widget->allocation.height;
+                    break;
+            }
+            if(widget->allocation.width<rect.width)
+                rect.width=widget->allocation.width;
             if(widget->allocation.height<rect.height)
                 rect.height=widget->allocation.height;
         }
         else
-            rect.height=widget->allocation.height;
+            rect.width=widget->allocation.width, rect.height=widget->allocation.height;
         gdk_window_invalidate_rect(widget->window, &rect, FALSE);
     }
     return FALSE;
