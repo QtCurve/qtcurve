@@ -1701,7 +1701,7 @@ void Style::polish(QWidget *widget)
                     break;
 
 #ifdef Q_WS_X11
-                if(!IS_FLAT_BGND(opts.bgndAppearance) || IMG_NONE!=opts.bgndImage.type)
+                if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
                     setBgndProp(widget, IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance);
 #endif
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
@@ -1736,7 +1736,7 @@ void Style::polish(QWidget *widget)
 
 #ifdef Q_WS_X11
                 // Need to reset this, as new window created!
-                if(!IS_FLAT_BGND(opts.bgndAppearance) || IMG_NONE!=opts.bgndImage.type)
+                if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
                     setBgndProp(widget, IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance);
 #endif
 
@@ -5363,11 +5363,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     col.setAlphaF(1.0);
                     drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app, bgnd->path);
                      // APPEARANCE_RAISED is used to signal flat background, but have background image!
-                    if(APPEARANCE_FLAT!=bgnd->app && IMG_NONE!=opts.bgndImage.type)
+                    if(APPEARANCE_FLAT!=bgnd->app && BGND_IMG_ON_BORDER)
                     {
-                        const QRect &rect=BGND_IMG_ON_BORDER ? bgnd->rect : bgnd->widgetRect;
-
-                        drawBackgroundImage(painter, true, rect.x()+bgnd->rect.width(), rect.y());
+                        painter->save();
+                        painter->setClipRect(bgnd->rect, Qt::IntersectClip);
+                        drawBackgroundImage(painter, true, bgnd->rect.x()+bgnd->rect.width(), bgnd->rect.y());
+                        painter->restore();
                     }
                 }
             break;
