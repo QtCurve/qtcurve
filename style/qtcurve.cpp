@@ -9508,9 +9508,28 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
             }
             break;
         }
+//         case CT_RadioButton:
+//             ++newSize.rheight();
+//             ++newSize.rwidth();
+//             break;
         case CT_RadioButton:
-            ++newSize.rheight();
-            ++newSize.rwidth();
+        case CT_CheckBox:
+            if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option))
+            {
+                bool isRadio = CT_RadioButton==type;
+                int  w = /*proxy()->*/pixelMetric(isRadio ? PM_ExclusiveIndicatorWidth : PM_IndicatorWidth, btn, widget),
+                     h = /*proxy()->*/pixelMetric(isRadio ? PM_ExclusiveIndicatorHeight : PM_IndicatorHeight, btn, widget),
+                     margins = 0;
+
+                newSize=size;
+                // we add 4 pixels for label margins
+                if (btn->icon.isNull() || !btn->text.isEmpty())
+                    margins = 0+/*proxy()->*/pixelMetric(isRadio ? PM_RadioButtonLabelSpacing : PM_CheckBoxLabelSpacing, option, widget)+
+                              (opts.crHighlight ? 4 : 0);
+
+                newSize += QSize(w + margins, 4);
+                newSize.setHeight(qMax(newSize.height(), h));
+            }
             break;
         case CT_ScrollBar:
             if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>(option))

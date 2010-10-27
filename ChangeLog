@@ -18,6 +18,8 @@
 13. Fix kwin option to only apply opacity to titlebar.
 14. Add option to control whether window titlebars are filled with the
     background *before* the titlebar gradient is applied.
+15. Altered check/radio contents size - so as to better align cehckbox texts
+    when used in left part of a form-layout.
 
 1.6.4
 -----
