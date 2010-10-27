@@ -2617,13 +2617,12 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             int           opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity,
                           xmod=0, ymod=0, wmod=0, hmod=0;
             double        alpha=1.0;
-            gboolean      useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window);
-            WindowBorders borders;
+            gboolean      useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window),
+                          flatBgnd=IS_FLAT_BGND(opts.bgndAppearance);
 
-            if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
-                borders=qtcGetWindowBorderSize(FALSE);
-            if(!IS_FLAT_BGND(opts.bgndAppearance))
+            if(!flatBgnd || BGND_IMG_ON_BORDER)
             {
+                WindowBorders borders=qtcGetWindowBorderSize(FALSE);
                 xmod=-borders.sides;
                 ymod=-borders.titleHeight;
                 wmod=2*borders.sides;
@@ -2639,7 +2638,7 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
             }
 
-            if(IS_FLAT_BGND(opts.bgndAppearance))
+            if(flatBgnd)
             {
                 GdkColor *parent_col=getParentBgCol(widget);
 
@@ -2697,12 +2696,11 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 
             if(BGND_IMG_ON_BORDER)
-            {
-                ypos+=borders.titleHeight;
-                window->allocation.width+=borders.sides;
-            }
+                wmod=(wmod/2)+1;
+            else
+                wmod=0, hmod=0, ymod=0;
 
-            drawBgndRings(cr, -ypos, window->allocation.width-1, TRUE);
+            drawBgndRings(cr, -ypos+ymod, window->allocation.width+wmod-1, TRUE);
             unsetCairoClipping(cr);
             return TRUE;
         }

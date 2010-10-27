@@ -90,15 +90,24 @@ static gboolean qtcWindowIsActive(GtkWidget *widget)
 static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     // Need to invalidate the whole of the window on a resize, as gradient needs to be redone.
-    if(widget && CUSTOM_BGND)
+    if(widget && (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type))
     {
         GdkRectangle rect;
 
-        if(IS_FLAT(opts.bgndAppearance))
-            rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=opts.bgndImage.pixmap.img 
-                                                                        ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type);
+        rect.x=0;
+        rect.y=0;
+        rect.width=widget->allocation.width;
+
+        if(IS_FLAT(opts.bgndAppearance) && IMG_NONE!=opts.bgndImage.type)
+        {
+            if(IMG_FILE==opts.bgndImage.type)
+                loadBgndImage(&opts.bgndImage);
+            rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
+            if(widget->allocation.height<rect.height)
+                rect.height=widget->allocation.height;
+        }
         else
-            rect.x=0, rect.y=0, rect.width=widget->allocation.width, rect.height=widget->allocation.height;
+            rect.height=widget->allocation.height;
         gdk_window_invalidate_rect(widget->window, &rect, FALSE);
     }
     return FALSE;
@@ -267,7 +276,7 @@ static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
                         gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
 
-    if(!IS_FLAT_BGND(opts.bgndAppearance) || IMG_NONE!=opts.bgndImage.type)
+    if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
     {
         unsigned short app=IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance;
         XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
@@ -327,7 +336,7 @@ static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET"))
     {
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET", (gpointer)1);
-        if(CUSTOM_BGND)
+        if(!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_SIZE_REQUEST_ID",
                               (gpointer)g_signal_connect(G_OBJECT(widget), "size-request",
                                                         (GtkSignalFunc)qtcWindowSizeRequest, NULL));
