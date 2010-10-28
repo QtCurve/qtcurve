@@ -936,10 +936,15 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     stopValue->setValue(100);
     stopAlpha->setValue(100);
 
-    bgndPixmapDlg=new CImagePropertiesDialog(i18n("Background"), this);
-    menuBgndPixmapDlg=new CImagePropertiesDialog(i18n("Menu Background"), this);
-    bgndImageDlg=new CImagePropertiesDialog(i18n("Background Image"), this);
-    menuBgndImageDlg=new CImagePropertiesDialog(i18n("Menu Image"), this);
+    bgndPixmapDlg=new CImagePropertiesDialog(i18n("Background"), this, CImagePropertiesDialog::BASIC);
+    menuBgndPixmapDlg=new CImagePropertiesDialog(i18n("Menu Background"), this, CImagePropertiesDialog::BASIC);
+    bgndImageDlg=new CImagePropertiesDialog(i18n("Background Image"), this,
+                                            CImagePropertiesDialog::POS|
+                                            CImagePropertiesDialog::SCALE|
+                                            CImagePropertiesDialog::BORDER);
+    menuBgndImageDlg=new CImagePropertiesDialog(i18n("Menu Image"), this,
+                                                CImagePropertiesDialog::POS|
+                                                CImagePropertiesDialog::SCALE);
                            
     connect(lighterPopupMenuBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
     connect(tabBgnd, SIGNAL(valueChanged(int)), SLOT(updateChanged()));
@@ -2370,7 +2375,6 @@ bool QtCurveConfig::diffImages(const Options &opts)
                 ( getThemeFile(menuBgndImageDlg->fileName())!=getThemeFile(opts.menuBgndImage.pixmap.file) ||
                   menuBgndImageDlg->imgWidth()!=opts.menuBgndImage.width ||
                   menuBgndImageDlg->imgHeight()!=opts.menuBgndImage.height ||
-                  menuBgndImageDlg->onWindowBorder()!=opts.menuBgndImage.onBorder ||
                   menuBgndImageDlg->imgPos()!=opts.menuBgndImage.pos ) ) ||
            (APPEARANCE_FILE==bgndAppearance->currentIndex() &&
                 (getThemeFile(bgndPixmapDlg->fileName())!=getThemeFile(opts.bgndPixmap.file))) ||
@@ -3152,7 +3156,7 @@ void QtCurveConfig::setOptions(Options &opts)
         opts.menuBgndImage.pixmap.file=getThemeFile(menuBgndImageDlg->fileName());
         opts.menuBgndImage.width=menuBgndImageDlg->imgWidth();
         opts.menuBgndImage.height=menuBgndImageDlg->imgHeight();
-        opts.menuBgndImage.onBorder=menuBgndImageDlg->onWindowBorder();
+        opts.menuBgndImage.onBorder=false; // Not used!!!
         opts.menuBgndImage.pos=(EPixPos)menuBgndImageDlg->imgPos();
         opts.menuBgndImage.loaded=false;
     }
@@ -3486,7 +3490,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
                       opts.bgndImage.pos, opts.bgndImage.onBorder);
     bgndPixmapDlg->set(getThemeFile(opts.bgndPixmap.file));
     menuBgndImageDlg->set(getThemeFile(opts.menuBgndImage.pixmap.file), opts.menuBgndImage.width, opts.menuBgndImage.height,
-                          opts.menuBgndImage.pos, opts.menuBgndImage.onBorder);
+                          opts.menuBgndImage.pos);
     menuBgndPixmapDlg->set(getThemeFile(opts.menuBgndPixmap.file));
 }
 

@@ -41,8 +41,9 @@ static void insertPosEntries(QComboBox *combo)
     combo->insertItem(PP_CENTRED, i18n("Centred"));
 }
 
-CImagePropertiesDialog::CImagePropertiesDialog(const QString &title, QWidget *parent)
+CImagePropertiesDialog::CImagePropertiesDialog(const QString &title, QWidget *parent, int props)
                       : KDialog(parent)
+                      , properties(props)
 {
     QWidget *page = new QWidget(this);
 
@@ -52,15 +53,29 @@ CImagePropertiesDialog::CImagePropertiesDialog(const QString &title, QWidget *pa
     setMainWidget(page);
     fileRequester->setMode(KFile::File|KFile::ExistingOnly|KFile::LocalOnly);
     fileRequester->fileDialog()->setFilter("image/svg+xml image/png image/jpeg image/bmp image/gif image/xpixmap");
-    scaleWidth->setRange(MIN_SIZE, MAX_SIZE);
-    scaleWidth->setValue(DEF_SIZE);
-    scaleHeight->setRange(MIN_SIZE, MAX_SIZE);
-    scaleHeight->setValue(DEF_SIZE);
+    if(props&SCALE)
+    {
+        scaleWidth->setRange(MIN_SIZE, MAX_SIZE);
+        scaleWidth->setValue(DEF_SIZE);
+        scaleHeight->setRange(MIN_SIZE, MAX_SIZE);
+        scaleHeight->setValue(DEF_SIZE);
+        connect(scaleImage, SIGNAL(toggled(bool)), scaleWidth, SLOT(setEnabled(bool)));
+        connect(scaleImage, SIGNAL(toggled(bool)), scaleHeight, SLOT(setEnabled(bool)));
+    }
     setCaption(i18n("Edit %1", title));
-    connect(scaleImage, SIGNAL(toggled(bool)), scaleWidth, SLOT(setEnabled(bool)));
-    connect(scaleImage, SIGNAL(toggled(bool)), scaleHeight, SLOT(setEnabled(bool)));
-    insertPosEntries(posCombo);
-    posCombo->setCurrentIndex(PP_TR);
+
+    if(props&POS)
+    {
+        insertPosEntries(posCombo);
+        posCombo->setCurrentIndex(PP_TR);
+    }
+
+    scaleControls->setVisible(props&SCALE);
+    scaleImage->setVisible(props&SCALE);
+    onBorder->setVisible(props&BORDER);
+    onBorderLabel->setVisible(props&BORDER);
+    posCombo->setVisible(props&POS);
+    posLabel->setVisible(props&POS);
 }
 
 bool CImagePropertiesDialog::run()
@@ -80,20 +95,18 @@ bool CImagePropertiesDialog::run()
          
 void CImagePropertiesDialog::set(const QString &file, int width, int height, int pos, bool onWindowBorder)
 {
-    scaleControls->setVisible(-1!=width);
-    scaleImage->setVisible(-1!=width);
-    onBorder->setVisible(-1!=width);
-    onBorderLabel->setVisible(-1!=width);
-    posCombo->setVisible(-1!=width);
-    posLabel->setVisible(-1!=width);
-    if(-1!=width)
+    if(properties&SCALE)
     {
-        onBorder->setChecked(onWindowBorder);
         scaleImage->setChecked(0!=width || 0!=height);
         scaleWidth->setValue(width<MIN_SIZE || width>MAX_SIZE ? DEF_SIZE : width);
         scaleHeight->setValue(height<MIN_SIZE || height>MAX_SIZE ? DEF_SIZE : height);
-        posCombo->setCurrentIndex(pos);
     }
+
+    if(properties&BORDER)
+        onBorder->setChecked(onWindowBorder);
+    if(properties&POS)
+        posCombo->setCurrentIndex(pos);
+
     fileRequester->setUrl(QFile::exists(file) && !QFileInfo(file).isDir() ? KUrl(file) : KUrl());
 }
 
@@ -101,4 +114,3 @@ QSize CImagePropertiesDialog::sizeHint() const
 {
     return QSize(400, 120);
 }
-
