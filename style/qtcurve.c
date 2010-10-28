@@ -2384,14 +2384,27 @@ static void drawBgndRings(cairo_t *cr, gint x, gint y, gint width, gint height, 
                     case PP_TL:
                         gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y);
                         break;
+                    case PP_TM:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y);
+                        break;
+                    default:
                     case PP_TR:
                         gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width), y);
                         break;
                     case PP_BL:
                         gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+(height-img->height));
                         break;
+                    case PP_BM:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+(height-img->height));
+                        break;
                     case PP_BR:
                         gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width), y+(height-img->height));
+                        break;
+                    case PP_LM:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x, y+((height-img->height)/2));
+                        break;
+                    case PP_RM:
+                        gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+(width-img->width), y+((height-img->height)/2));
                         break;
                     case PP_CENTRED:
                         gdk_cairo_set_source_pixbuf(cr, img->pixmap.img, x+((width-img->width)/2), y+((height-img->height)/2));

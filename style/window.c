@@ -109,16 +109,20 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
                     rect.width=opts.bgndImage.width+1;
                     rect.height=opts.bgndImage.height+1;
                     break;
+                case PP_TM:
                 case PP_TR:
                     rect.width=widget->allocation.width;
                     rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
                     break;
+                case PP_LM:
                 case PP_BL:
                     rect.width=opts.bgndImage.width+1;
                     rect.height=widget->allocation.height;
                     break;
                 case PP_CENTRED:
                 case PP_BR:
+                case PP_BM:
+                case PP_RM:
                     rect.width=widget->allocation.width;
                     rect.height=widget->allocation.height;
                     break;
