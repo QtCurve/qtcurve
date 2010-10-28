@@ -62,7 +62,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="posLabel">
      <property name="text">
-      <string>On window border:</string>
+      <string>Position:</string>
      </property>
     </widget>
    </item>

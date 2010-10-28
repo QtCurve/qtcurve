@@ -55,24 +55,18 @@ CImagePropertiesDialog::CImagePropertiesDialog(const QString &title, QWidget *pa
     setDefaultButton(Ok);
     setupUi(page);
     setMainWidget(page);
+    setCaption(i18n("Edit %1", title));
     fileRequester->setMode(KFile::File|KFile::ExistingOnly|KFile::LocalOnly);
     fileRequester->fileDialog()->setFilter("image/svg+xml image/png image/jpeg image/bmp image/gif image/xpixmap");
+
     if(props&SCALE)
     {
         scaleWidth->setRange(MIN_SIZE, MAX_SIZE);
-        scaleWidth->setValue(DEF_SIZE);
         scaleHeight->setRange(MIN_SIZE, MAX_SIZE);
-        scaleHeight->setValue(DEF_SIZE);
-        connect(scaleImage, SIGNAL(toggled(bool)), scaleWidth, SLOT(setEnabled(bool)));
-        connect(scaleImage, SIGNAL(toggled(bool)), scaleHeight, SLOT(setEnabled(bool)));
     }
-    setCaption(i18n("Edit %1", title));
 
     if(props&POS)
-    {
         insertPosEntries(posCombo);
-        posCombo->setCurrentIndex(PP_TR);
-    }
 
     scaleControls->setVisible(props&SCALE);
     scaleImage->setVisible(props&SCALE);
@@ -80,6 +74,8 @@ CImagePropertiesDialog::CImagePropertiesDialog(const QString &title, QWidget *pa
     onBorderLabel->setVisible(props&BORDER);
     posCombo->setVisible(props&POS);
     posLabel->setVisible(props&POS);
+
+    set(QString(), DEF_SIZE, DEF_SIZE, PP_TR, false);
 }
 
 bool CImagePropertiesDialog::run()

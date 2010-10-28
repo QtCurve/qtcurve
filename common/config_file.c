@@ -1068,6 +1068,10 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
     { \
         opts->ENTRY.type=toImageType(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY.type); \
         opts->ENTRY.loaded=false; \
+        opts->ENTRY.type=IMG_NONE; \
+        opts->ENTRY.width=opts->ENTRY.height=0; \
+        opts->ENTRY.onBorder=false; \
+        opts->ENTRY.pos=PP_TR; \
         if(IMG_FILE==opts->ENTRY.type) \
         { \
             QString file(cfg.readEntry(#ENTRY ".file")); \
@@ -1080,10 +1084,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
                 opts->ENTRY.pos=(EPixPos)readNumEntry(cfg, #ENTRY ".pos", (int)PP_TR); \
             } \
             else \
-            { \
                 opts->ENTRY.type=IMG_NONE; \
-                opts->ENTRY.width=opts->ENTRY.height=0; \
-            } \
         } \
     }
 
@@ -2467,7 +2468,13 @@ static void defaultSettings(Options *opts)
     opts->reorderGtkButtons=false;
 #endif
     opts->bgndImage.type=IMG_NONE;
+    opts->bgndImage.width=opts->bgndImage.height=0;
+    opts->bgndImage.onBorder=false;
+    opts->bgndImage.pos=PP_TR;
     opts->menuBgndImage.type=IMG_NONE;
+    opts->menuBgndImage.width=opts->menuBgndImage.height=0;
+    opts->menuBgndImage.onBorder=false;
+    opts->menuBgndImage.pos=PP_TR;
     opts->lighterPopupMenuBgnd=DEF_POPUPMENU_LIGHT_FACTOR;
     opts->tabBgnd=DEF_TAB_BGND;
     opts->animatedProgress=false;
