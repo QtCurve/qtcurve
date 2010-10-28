@@ -35,9 +35,13 @@
 static void insertPosEntries(QComboBox *combo)
 {
     combo->insertItem(PP_TL, i18n("Top left"));
+    combo->insertItem(PP_TM, i18n("Top middle"));
     combo->insertItem(PP_TR, i18n("Top right"));
     combo->insertItem(PP_BL, i18n("Bottom left"));
+    combo->insertItem(PP_BM, i18n("Bottom middle"));
     combo->insertItem(PP_BR, i18n("Bottom right"));
+    combo->insertItem(PP_LM, i18n("Left middle"));
+    combo->insertItem(PP_RM, i18n("Right middle"));
     combo->insertItem(PP_CENTRED, i18n("Centred"));
 }
 

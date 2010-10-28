@@ -11521,14 +11521,27 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
                     case PP_TL:
                         p->drawPixmap(r.x(), r.y(), img.pixmap.img);
                         break;
+                    case PP_TM:
+                        p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2), r.y(), img.pixmap.img);
+                        break;
+                    default:
                     case PP_TR:
                         p->drawPixmap(r.right()-img.pixmap.img.width(), r.y(), img.pixmap.img);
                         break;
                     case PP_BL:
                         p->drawPixmap(r.x(), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
                         break;
+                    case PP_BM:
+                        p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                        break;
                     case PP_BR:
                         p->drawPixmap(r.right()-img.pixmap.img.width(), r.bottom()-img.pixmap.img.height(), img.pixmap.img);
+                        break;
+                    case PP_LM:
+                        p->drawPixmap(r.left(), r.y()+((r.height()-img.pixmap.img.height())/2), img.pixmap.img);
+                        break;
+                    case PP_RM:
+                        p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+((r.height()-img.pixmap.img.height())/2), img.pixmap.img);
                         break;
                     case PP_CENTRED:
                         p->drawPixmap(r.x()+((r.width()-img.pixmap.img.width())/2),

@@ -563,10 +563,14 @@ typedef struct
 typedef enum
 {
     PP_TL,
+    PP_TM,
     PP_TR,
     PP_BL,
+    PP_BM,
     PP_BR,
-    PP_CENTRED
+    PP_LM,
+    PP_RM,
+    PP_CENTRED,
 } EPixPos;
 
 typedef struct
