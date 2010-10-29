@@ -113,7 +113,7 @@ int getProperty(WId wId, const Atom &atom)
 
 int getMenubarSizeProperty(WId wId)
 {
-    static const Atom constAtom  = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
+    static const Atom constAtom = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
     return getProperty(wId, constAtom);
 }
 
@@ -125,16 +125,30 @@ int getStatusbarSizeProperty(WId wId)
 
 int getOpacityProperty(WId wId)
 {
-    static const Atom constAtom  = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
+    static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
     int o=getProperty(wId, constAtom);
     return o<0 || o>100 ? 100 : o;
 }
 
-EAppearance getAppearance(WId wId)
+void getBgndSettings(WId wId, EAppearance &app, QColor &col)
 {
-    static const Atom constAtom  = XInternAtom(QX11Info::display(), BGND_ATOM, False);
-    int app=getProperty(wId, constAtom);
-    return app<0 || app>APPEARANCE_STRIPED ? APPEARANCE_FLAT : (EAppearance)app;
+    static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
+
+    unsigned char *data;
+    int           dummy;
+    unsigned long num,
+                  dummy2;
+
+    if (Success==XGetWindowProperty(QX11Info::display(), wId, constAtom, 0L, 1, False, XA_CARDINAL, &dummy2, &dummy, &num, &dummy2, &data) && num>0)
+    {
+        unsigned long val=*((unsigned long*)data);
+        app=(EAppearance)(val&0xFF);
+        col.setRgb((val&0xFF000000)>>24, (val&0x00FF0000)>>16, (val&0x0000FF00)>>8);
+
+        XFree(data);
+    }
+    //else
+    //    *data = NULL; // superflous?!?
 }
 
 static QPainterPath createPath(const QRectF &r, double radiusTop, double radiusBot)
@@ -531,11 +545,16 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          buttonFlags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, NULL, NULL);
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
                          opacity(compositing ? Handler()->opacity(active) : 100);
-    EAppearance          bgndAppearance=getAppearance(windowId());
+    EAppearance          bgndAppearance=APPEARANCE_FLAT;
+    QColor               windowCol(widget()->palette().color(QPalette::Window));
+
+    getBgndSettings(windowId(), bgndAppearance, windowCol);
+
+    QColor               col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
+                         fillCol(colorTitleOnly ? windowCol : col);
                          // APPEARANCE_RAISED is used to signal flat background, but have background image!
-                         // So, if app is not FLAT, and we have a bottom kwin border, then we might need to draw bgnd rings!
-    bool                 ringsBgnd=APPEARANCE_FLAT!=bgndAppearance && Handler()->haveBottomBorder(), 
-                         customBgnd=!IS_FLAT_BGND(bgndAppearance),
+                         // In which case we still have a custom background to draw.
+    bool                 customBgnd=APPEARANCE_FLAT!=bgndAppearance,
                          customShadows=
 #if KDE_IS_VERSION(4, 3, 0)             
                             Handler()->customShadows()
@@ -579,10 +598,6 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     QRect widgetRect(widget()->rect().adjusted(shadowSize+side, shadowSize+titleBarHeight, -(shadowSize+side), -(shadowSize+bot)));
 
     r.getCoords(&rectX, &rectY, &rectX2, &rectY2);
-
-    QColor col(KDecoration::options()->color(KDecoration::ColorTitleBar, active)),
-           windowCol(widget()->palette().color(QPalette::Window)),
-           fillCol(colorTitleOnly ? windowCol : col);
 
     if(!preview && (blend||menuColor) && -1==itsMenuBarSize)
     {
@@ -657,12 +672,12 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         if(!clipRegion)
             painter.save();
         painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
-        fillBackground(bgndAppearance, painter, fc, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+        fillBackground(bgndAppearance, painter, fc, fillRect, widgetRect, fillPath);
         if(fillTitlebar)
         {
             painter.save();
             painter.setClipRect(QRect(r.x(), r.y(), r.width(), titleBarHeight), Qt::IntersectClip);
-            fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+            fillBackground(bgndAppearance, painter, fillCol, fillRect, widgetRect, fillPath);
             painter.restore();
         }
     }
@@ -683,7 +698,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
 
             painter.setClipRect(r.adjusted(0, titleBarHeight, 0, 0), Qt::IntersectClip);
         }
-        fillBackground(bgndAppearance, painter, fillCol, fillRect, ringsBgnd ? widgetRect : QRect(), fillPath);
+        fillBackground(bgndAppearance, painter, fillCol, fillRect, widgetRect, fillPath);
     }
 
     if(clipRegion || opaqueBorder || !fillTitlebar)

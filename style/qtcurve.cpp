@@ -568,12 +568,15 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
     }
 }
 
-void setBgndProp(QWidget *w, unsigned short app)
+void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
     if(w)
     {
         static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
-        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&app, 1);
+        unsigned long prop=((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ? APPEARANCE_RAISED : APPEARANCE_FLAT) : app)&0xFF) |
+                           (w->palette().background().color().rgb()&0x00FFFFFF)<<8;
+
+        XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
     }
 }
 
@@ -1701,8 +1704,8 @@ void Style::polish(QWidget *widget)
                     break;
 
 #ifdef Q_WS_X11
-                if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
-                    setBgndProp(widget, IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance);
+                setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
+                Utils::addEventFilter(widget, this);
 #endif
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
@@ -1736,8 +1739,7 @@ void Style::polish(QWidget *widget)
 
 #ifdef Q_WS_X11
                 // Need to reset this, as new window created!
-                if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
-                    setBgndProp(widget, IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance);
+                setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
 #endif
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
@@ -2730,6 +2732,16 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                qtcStatusBarHidden(appName))
                 static_cast<QStatusBar *>(object)->setHidden(true);
             break;
+#ifdef Q_WS_X11
+        case QEvent::PaletteChange:
+        {
+            QWidget *widget=qobject_cast<QWidget *>(object);
+
+            if(widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)))
+                setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
+            break;
+        }
+#endif
         case QEvent::Paint:
         {
             if(CUSTOM_BGND)
@@ -5363,7 +5375,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     col.setAlphaF(1.0);
                     drawBackground(painter, col, r, opacity, BGND_WINDOW, bgnd->app, bgnd->path);
                      // APPEARANCE_RAISED is used to signal flat background, but have background image!
-                    if(APPEARANCE_FLAT!=bgnd->app && BGND_IMG_ON_BORDER)
+                    if(APPEARANCE_FLAT!=bgnd->app)
                     {
                         painter->save();
                         painter->setClipRect(bgnd->rect, Qt::IntersectClip);
