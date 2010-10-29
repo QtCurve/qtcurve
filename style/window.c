@@ -294,21 +294,22 @@ static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
 
 static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 {
-    GtkWindow      *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
-    GdkDisplay     *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+    GtkWindow     *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
+    GdkDisplay    *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
+    unsigned long prop=(IS_FLAT_BGND(opts.bgndAppearance) ? (IMG_NONE!=opts.bgndImage.type ? APPEARANCE_RAISED : APPEARANCE_FLAT)
+                                                          : opts.bgndAppearance)&0xFF;
+    //GtkRcStyle    *rcStyle=gtk_widget_get_modifier_style(w);
+    GdkColor      *bgnd=/*rcStyle ? &rcStyle->bg[GTK_STATE_NORMAL] : */&qtcPalette.background[ORIGINAL_SHADE];
 
     if(100!=opacity)
         XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
                         gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
 
-    if(!IS_FLAT_BGND(opts.bgndAppearance) || BGND_IMG_ON_BORDER)
-    {
-        unsigned short app=IS_FLAT_BGND(opts.bgndAppearance) ? APPEARANCE_RAISED : opts.bgndAppearance;
-        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
-                        gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
-                        XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&app, 1);
-    }
+    prop|=((toQtColor(bgnd->red)&0xFF)<<24)|((toQtColor(bgnd->green)&0xFF)<<16)|((toQtColor(bgnd->blue)&0xFF)<<8);
+    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+                    gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
+                    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
 }
 
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)

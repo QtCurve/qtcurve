@@ -1,15 +1,17 @@
 1.7.0
 -----
-1. Add option to use tiled pixmap as background for windows and menus.
-2. Draw line focus for items that cannot use glow focus.
-3. Use popup menu gradient's border setting to determine border type of menus.
-4. Add option to draw standard, raised, or joined toolbar buttons.
-5. Add option to use thinner frames, focus, etc.
-6. If not rounding, enable all 'square' options.
-7. Add position setting for background image; top left, top middle, top right,
-   bottom left, bottom middle, bottom right, left middle, right middle, and centred.
-8. Fix combo-box menu text when shading popup menus.
-9. Fix reading of QtCurve supplied default kdeglobals file.
+ 1. Add option to use tiled pixmap as background for windows and menus.
+ 2. Draw line focus for items that cannot use glow focus.
+ 3. Use popup menu gradient's border setting to determine border type of menus.
+ 4. Add option to draw standard, raised, or joined toolbar buttons.
+ 5. Add option to use thinner frames, focus, etc.
+ 6. If not rounding, enable all 'square' options.
+ 7. Store background colour setting in XProperty - so that this can be used by
+    QtCurve kwin decoration. (At the moment, this is just the palette background)
+ 8. Add position setting for background image; top left, top middle, top right,
+    bottom left, bottom middle, bottom right, left middle, right middle, and centred.
+ 9. Fix combo-box menu text when shading popup menus.
+10. Fix reading of QtCurve supplied default kdeglobals file.
 
 1.6.4
 -----
