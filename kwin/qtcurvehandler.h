@@ -122,8 +122,8 @@ class QtCurveHandler : public QObject,
     void                  borderSizeChanged();
     void                  addClient(QtCurveClient *c)    { itsClients.append(c); }
     void                  removeClient(QtCurveClient *c);
-    bool                  wasLastMenu(int id)            { return id==itsLastMenuXid; }
-    bool                  wasLastStatus(int id)          { return id==itsLastStatusXid; }
+    bool                  wasLastMenu(unsigned int id)   { return id==itsLastMenuXid; }
+    bool                  wasLastStatus(unsigned int id) { return id==itsLastStatusXid; }
     const QColor &        hoverCol(bool active)          { return itsHoverCols[active ? 1 : 0]; }
 
     private:
@@ -136,8 +136,8 @@ class QtCurveHandler : public QObject,
                            itsBotBorderSize,
                            itsTitleHeight,
                            itsTitleHeightTool,
-                           itsTimeStamp,
-                           itsLastMenuXid,
+                           itsTimeStamp;
+    unsigned int           itsLastMenuXid,
                            itsLastStatusXid;
     QFont                  itsTitleFont,
                            itsTitleFontTool;
