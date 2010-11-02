@@ -30,16 +30,11 @@ static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
 
 static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event, int adjust)
 {
-    GtkAllocation alloc;
+    GtkAllocation alloc=qtcWidgetGetAllocation(widget);
     int           nx=0,
                   ny=0;
 
     // Need to get absolute co-ordinates...
-#if GTK_CHECK_VERSION(2, 18, 0)
-    gtk_widget_get_allocation(widget, &alloc);
-#else
-    alloc=widget->allocation;
-#endif
     alloc.x-=adjust;
     alloc.y-=adjust;
     alloc.width+=adjust;
@@ -198,22 +193,16 @@ static void qtcWMMoveSetup(GtkWidget *widget)
         gdk_window_set_events(gtk_widget_get_window(widget), gdk_window_get_events(gtk_widget_get_window(widget))|GDK_BUTTON1_MOTION_MASK);
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_MOTION_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event",
-                                                     (GtkSignalFunc)qtcWMMoveMotion, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcWMMoveMotion), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_LEAVE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event",
-                                                     (GtkSignalFunc)qtcWMMoveLeave, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcWMMoveLeave), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                                     (GtkSignalFunc)qtcWMMoveDestroy, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcWMMoveDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
-                                                     (GtkSignalFunc)qtcWMMoveStyleSet, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcWMMoveStyleSet), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_BUTTON_PRESS_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-press-event",
-                                                     G_CALLBACK(qtcWMMoveButtonPress), widget));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(qtcWMMoveButtonPress), widget));
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_BUTTON_RELEASE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-release-event",
-                                                     G_CALLBACK(qtcWMMoveButtonRelease), widget));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(qtcWMMoveButtonRelease), widget));
     }  
 }

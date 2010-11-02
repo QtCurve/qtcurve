@@ -70,23 +70,25 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
         {
             /* TODO! check if mouse is over tab portion! */
             /* Find tab that mouse is currently over...*/
+            GList  *children=gtk_container_get_children(GTK_CONTAINER(notebook));
             QtCTab *prevTab=lookupTabHash(widget, TRUE),
                    currentTab;
-            int    numChildren=g_list_length(notebook->children),
+            int    numChildren=g_list_length(children),
                    i,
                    nx, ny;
 
             currentTab.id=currentTab.rect.x=currentTab.rect.y=
             currentTab.rect.width=currentTab.rect.height=-1;
-            gdk_window_get_origin(GTK_WIDGET(notebook)->window, &nx, &ny);
+            gdk_window_get_origin(qtcWidgetGetWindow(GTK_WIDGET(notebook)), &nx, &ny);
             for (i = 0; i < numChildren; i++ )
             {
-                GtkWidget *page=gtk_notebook_get_nth_page(notebook, i),
-                          *tabLabel=gtk_notebook_get_tab_label(notebook, page);
-                int       tx=(tabLabel->allocation.x+nx)-4,
-                          ty=(tabLabel->allocation.y+ny)-3,
-                          tw=(tabLabel->allocation.width)+10,
-                          th=(tabLabel->allocation.height)+7;
+                GtkWidget     *page=gtk_notebook_get_nth_page(notebook, i),
+                              *tabLabel=gtk_notebook_get_tab_label(notebook, page);
+                GtkAllocation alloc=qtcWidgetGetAllocation(tabLabel);
+                int           tx=(alloc.x+nx)-4,
+                              ty=(alloc.y+ny)-3,
+                              tw=(alloc.width)+10,
+                              th=(alloc.height)+7;
 
                 if(tx<=event->x_root && ty<=event->y_root && (tx+tw)>event->x_root && (ty+th)>event->y_root)
                 {
@@ -105,6 +107,9 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
                 prevTab->rect=currentTab.rect;
                 gtk_widget_queue_draw(widget);
             }
+
+            if(children)
+                g_list_free(children);
         }
     }
  
@@ -132,21 +137,16 @@ static void qtcTabSetup(GtkWidget *widget)
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_SET"))
     { 
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event",
-                                                                                            (GtkSignalFunc)qtcTabMotion,
-                                                                                            NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event",
-                                                                                           (GtkSignalFunc)qtcTabLeave,
-                                                                                            NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                                                                             (GtkSignalFunc)qtcTabDestroy,
-                                                                                              NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize",
-                                                                                             (GtkSignalFunc)qtcTabDestroy,
-                                                                                              NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID", (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
-                                                                                               (GtkSignalFunc)qtcTabStyleSet,
-                                                                                               NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcTabMotion), NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcTabLeave), NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcTabDestroy), NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(qtcTabDestroy), NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcTabStyleSet), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_HACK_SET", (gpointer)1);
     }  
 }

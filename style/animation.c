@@ -8,7 +8,6 @@
  * heavily modified by Benjamin Berg <benjamin@sipsolutions.net>.
  */
 
-#define IS_PROGRESS_BAR(widget) GTK_IS_PROGRESS_BAR(widget) && widget->allocation.x != -1 && widget->allocation.y != -1
 /* #define CHECK_ANIMATION_TIME 0.5 */
 
 #include <glib/gtimer.h>

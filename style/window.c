@@ -92,7 +92,8 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
     // Need to invalidate the whole of the window on a resize, as gradient needs to be redone.
     if(widget && (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type))
     {
-        GdkRectangle rect;
+        GdkRectangle  rect;
+        GtkAllocation alloc=qtcWidgetGetAllocation(widget);
 
         rect.x=0;
         rect.y=0;
@@ -103,6 +104,7 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
 
             if(IMG_FILE==opts.bgndImage.type)
                 loadBgndImage(&opts.bgndImage);
+
             switch(pos)
             {
                 case PP_TL:
@@ -111,30 +113,30 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
                     break;
                 case PP_TM:
                 case PP_TR:
-                    rect.width=widget->allocation.width;
+                    rect.width=alloc.width;
                     rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
                     break;
                 case PP_LM:
                 case PP_BL:
                     rect.width=opts.bgndImage.width+1;
-                    rect.height=widget->allocation.height;
+                    rect.height=alloc.height;
                     break;
                 case PP_CENTRED:
                 case PP_BR:
                 case PP_BM:
                 case PP_RM:
-                    rect.width=widget->allocation.width;
-                    rect.height=widget->allocation.height;
+                    rect.width=alloc.width;
+                    rect.height=alloc.height;
                     break;
             }
-            if(widget->allocation.width<rect.width)
-                rect.width=widget->allocation.width;
-            if(widget->allocation.height<rect.height)
-                rect.height=widget->allocation.height;
+            if(alloc.width<rect.width)
+                rect.width=alloc.width;
+            if(alloc.height<rect.height)
+                rect.height=alloc.height;
         }
         else
-            rect.width=widget->allocation.width, rect.height=widget->allocation.height;
-        gdk_window_invalidate_rect(widget->window, &rect, FALSE);
+            rect.width=alloc.width, rect.height=alloc.height;
+        gdk_window_invalidate_rect(qtcWidgetGetWindow(widget), &rect, FALSE);
     }
     return FALSE;
 }
@@ -143,21 +145,23 @@ static GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
 {
     if(level<3 && GTK_IS_CONTAINER(parent))
     {
-        GList *child=gtk_container_get_children(GTK_CONTAINER(parent));
+        GtkWidget *rv       = NULL;
+        GList     *children = gtk_container_get_children(GTK_CONTAINER(parent)),
+                  *child    = children;
 
-        for(; child; child=child->next)
+        for(; child && !rv; child=child->next)
         {
-            GtkBoxChild *boxChild=(GtkBoxChild *)child->data;
+            GtkWidget *boxChild=(GtkWidget *)child->data;
 
             if(GTK_IS_MENU_BAR(boxChild))
-                return GTK_WIDGET(boxChild);
+                rv=GTK_WIDGET(boxChild);
             else if(GTK_IS_CONTAINER(boxChild))
-            {
-                GtkWidget *w=qtcWindowGetMenuBar(GTK_WIDGET(boxChild), level+1);
-                if(w)
-                    return w;
-            }
+                rv=qtcWindowGetMenuBar(GTK_WIDGET(boxChild), level+1);
         }
+
+        if(children)
+            g_list_free(children);
+        return rv;
     }
 
     return NULL;
@@ -167,21 +171,23 @@ static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level)
 {
     if(level<3 && GTK_IS_CONTAINER(parent))
     {
-        GList *child=gtk_container_get_children(GTK_CONTAINER(parent));
+        GtkWidget *rv       = NULL;
+        GList     *children = gtk_container_get_children(GTK_CONTAINER(parent)),
+                  *child    = children;
 
-        for(; child; child=child->next)
+        for(; child && !rv; child=child->next)
         {
-            GtkBoxChild *boxChild=(GtkBoxChild *)child->data;
+            GtkWidget *boxChild=(GtkWidget *)child->data;
 
             if(GTK_IS_STATUSBAR(boxChild))
-                return GTK_WIDGET(boxChild);
+                rv=GTK_WIDGET(boxChild);
             else if(GTK_IS_CONTAINER(boxChild))
-            {
-                GtkWidget *w=qtcWindowGetStatusBar(GTK_WIDGET(boxChild), level+1);
-                if(w)
-                    return w;
-            }
+                rv=qtcWindowGetStatusBar(GTK_WIDGET(boxChild), level+1);
         }
+
+        if(children)
+            g_list_free(children);
+        return rv;
     }
 
     return NULL;
@@ -190,7 +196,7 @@ static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level)
 static void qtcWindowMenuBarDBus(GtkWidget *widget, int size)
 {
     GtkWindow    *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
-    unsigned int xid=GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window);
+    unsigned int xid=GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel)));
 
     char         cmd[160];
     //sprintf(cmd, "qdbus org.kde.kwin /QtCurve menuBarSize %u %d", xid, size);
@@ -211,7 +217,7 @@ static void qtcWindowMenuBarDBus(GtkWidget *widget, int size)
 static void qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state)
 {
     GtkWindow    *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
-    unsigned int xid=GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window);
+    unsigned int xid=GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel)));
 
     char         cmd[160];
     //sprintf(cmd, "qdbus org.kde.kwin /QtCurve statusBarState %u %s", xid, state ? "true" : "false");
@@ -241,7 +247,7 @@ static gboolean qtcWindowToggleMenuBar(GtkWidget *widget)
             gtk_widget_hide(menuBar);
         else
         {
-            size=menuBar->allocation.height;
+            size=qtcWidgetGetAllocation(menuBar).height;
             gtk_widget_show(menuBar);
         }
 
@@ -257,6 +263,7 @@ static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level);
 
 static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
 {
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(w &&!g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM))
     {
         GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
@@ -264,12 +271,12 @@ static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
     
         unsigned short setting=1;
         g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
-        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
                         gdk_x11_get_xatom_by_name_for_display(display, STATUSBAR_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
         return TRUE;
     }
-
+#endif
     return FALSE;
 }
 
@@ -294,6 +301,7 @@ static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
 
 static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 {
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     GtkWindow     *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
     GdkDisplay    *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
     unsigned long prop=(IS_FLAT_BGND(opts.bgndAppearance) ? (IMG_NONE!=opts.bgndImage.type ? APPEARANCE_RAISED : APPEARANCE_FLAT)
@@ -302,14 +310,15 @@ static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     GdkColor      *bgnd=/*rcStyle ? &rcStyle->bg[GTK_STATE_NORMAL] : */&qtcPalette.background[ORIGINAL_SHADE];
 
     if(100!=opacity)
-        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
                         gdk_x11_get_xatom_by_name_for_display(display, OPACITY_ATOM),
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
 
     prop|=((toQtColor(bgnd->red)&0xFF)<<24)|((toQtColor(bgnd->green)&0xFF)<<16)|((toQtColor(bgnd->blue)&0xFF)<<8);
-    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(GTK_WIDGET(topLevel)->window),
+    XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
                     gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
                     XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
+#endif
 }
 
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -318,10 +327,10 @@ static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpoin
        0==(event->state&0xFF00)) // Ensure only ctrl/alt/shift/capsLock are pressed...
     {
         gboolean toggled=FALSE;
-        if(opts.menubarHiding&HIDE_KEYBOARD && (GDK_m==event->keyval || GDK_M==event->keyval))
+        if(opts.menubarHiding&HIDE_KEYBOARD && (QTC_KEY_m==event->keyval || QTC_KEY_M==event->keyval))
             toggled=qtcWindowToggleMenuBar(widget);
 
-        if(opts.statusbarHiding&HIDE_KEYBOARD && (GDK_s==event->keyval || GDK_S==event->keyval))
+        if(opts.statusbarHiding&HIDE_KEYBOARD && (QTC_KEY_s==event->keyval || QTC_KEY_S==event->keyval))
             toggled=qtcWindowToggleStatusBar(widget);
 
         if(toggled)
@@ -341,7 +350,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
 
         if(menuBar)
         {
-            int size=GTK_WIDGET_VISIBLE(menuBar) ? menuBar->allocation.height : 0;
+            int size=GTK_WIDGET_VISIBLE(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
 
             qtcEmitMenuSize(menuBar, size);
             qtcWindowMenuBarDBus(widget, size);
@@ -365,29 +374,23 @@ static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET", (gpointer)1);
         if(!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_SIZE_REQUEST_ID",
-                              (gpointer)g_signal_connect(G_OBJECT(widget), "size-request",
-                                                        (GtkSignalFunc)qtcWindowSizeRequest, NULL));
+                              (gpointer)g_signal_connect(G_OBJECT(widget), "size-request", G_CALLBACK(qtcWindowSizeRequest), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                                     (GtkSignalFunc)qtcWindowDestroy, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcWindowDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
-                                                     (GtkSignalFunc)qtcWindowStyleSet, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcWindowStyleSet), NULL));
         if((opts.menubarHiding&HIDE_KEYBOARD) || (opts.statusbarHiding&HIDE_KEYBOARD))
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID",
-                              (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event",
-                                                         (GtkSignalFunc)qtcWindowKeyRelease, NULL));
+                              (gpointer)g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(qtcWindowKeyRelease), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_OPACITY", (gpointer)opacity);
         qtcWindowSetProperties(widget, (unsigned short)opacity);
 
         if((opts.menubarHiding&HIDE_KWIN) || (opts.statusbarHiding&HIDE_KWIN) || 100!=opacity)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_MAP_ID",
-                              (gpointer)g_signal_connect(G_OBJECT(widget), "map-event",
-                                                         (GtkSignalFunc)qtcWindowMap, NULL));
+                              (gpointer)g_signal_connect(G_OBJECT(widget), "map-event", G_CALLBACK(qtcWindowMap), NULL));
         if(opts.shadeMenubarOnlyWhenActive || BLEND_TITLEBAR || opts.menubarHiding || opts.statusbarHiding)
             g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_CLIENT_EVENT_ID",
-                              (gpointer)g_signal_connect(G_OBJECT(widget), "client-event",
-                                                         (GtkSignalFunc)qtcWindowClientEvent, NULL));
+                              (gpointer)g_signal_connect(G_OBJECT(widget), "client-event", G_CALLBACK(qtcWindowClientEvent), NULL));
         return TRUE;
     }
 

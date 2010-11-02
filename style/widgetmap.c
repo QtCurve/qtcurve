@@ -70,14 +70,11 @@ static void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
     {
         g_object_set_data(G_OBJECT(from), MAP_ID(map), (gpointer)1);
         g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(from), "destroy-event",
-                                                     (GtkSignalFunc)qtcWidgetMapDestroy, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(from), "destroy-event", G_CALLBACK(qtcWidgetMapDestroy), NULL));
         g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_UNREALIZE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(from), "unrealize",
-                                                     (GtkSignalFunc)qtcWidgetMapDestroy, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(from), "unrealize", G_CALLBACK(qtcWidgetMapDestroy), NULL));
         g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(from), "style-set",
-                                                     (GtkSignalFunc)qtcWidgetMapStyleSet, NULL));
+                          (gpointer)g_signal_connect(G_OBJECT(from), "style-set", G_CALLBACK(qtcWidgetMapStyleSet), NULL));
         lookupWidgetMapHash(from, to, map);
     }  
 }

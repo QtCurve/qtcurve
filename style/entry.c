@@ -63,18 +63,18 @@ static void qtcEntrySetup(GtkWidget *widget)
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "enter-notify-event",
-                                                     (GtkSignalFunc)qtcEntryEnter, NULL));
+                                                     G_CALLBACK(qtcEntryEnter), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_LEAVE_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event",
-                                                     (GtkSignalFunc)qtcEntryLeave, NULL));
+                                                     G_CALLBACK(qtcEntryLeave), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_DESTROY_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event",
-                                                     (GtkSignalFunc)qtcEntryDestroy, NULL));
+                                                     G_CALLBACK(qtcEntryDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_UNREALIZE_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize",
-                                                     (GtkSignalFunc)qtcEntryDestroy, NULL));
+                                                     G_CALLBACK(qtcEntryDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_STYLE_SET_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "style-set",
-                                                     (GtkSignalFunc)qtcEntryStyleSet, NULL));
+                                                     G_CALLBACK(qtcEntryStyleSet), NULL));
     }  
 }

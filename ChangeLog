@@ -12,6 +12,7 @@
     bottom left, bottom middle, bottom right, left middle, right middle, and centred.
  9. Fix combo-box menu text when shading popup menus.
 10. Fix reading of QtCurve supplied default kdeglobals file.
+11. Make code more Gtk3 friendly.
 
 1.6.4
 -----

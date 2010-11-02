@@ -23,9 +23,8 @@
 #define CONFIG_READ
 #include "config_file.c"
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <time.h>
-#include <gdk/gdkcolor.h>
-#include <gtk/gtkenums.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
@@ -1986,6 +1985,7 @@ static GdkFilterReturn qtGdkEventFilter(GdkXEvent *xevent, GdkEvent *gevent, gpo
 
 static void qtcAddEventFilter() /* GdkWindow *widget) */
 {
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     static int done=0;
 
     if(!done)
@@ -2013,15 +2013,16 @@ static void qtcAddEventFilter() /* GdkWindow *widget) */
             knwmCommAtom = XInternAtom(gdk_x11_get_default_xdisplay(), "_KDE_NET_WM_FRAME_STRUT", FALSE);
             desktopWindowAtom = XInternAtom(gdk_x11_get_default_xdisplay(), "KDE_DESKTOP_WINDOW", FALSE);
 
-            XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(GTK_WIDGET(top)->window),
+            XChangeProperty(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(top))),
                             desktopWindowAtom, desktopWindowAtom, 32, PropModeReplace,
                             (unsigned char *)&data, 1);
             /* This filter will intercept those events */
-            gdk_window_add_filter(GTK_WIDGET(top)->window, qtGdkEventFilter, 0);
+            gdk_window_add_filter(qtcWidgetGetWindow(GTK_WIDGET(top)), qtGdkEventFilter, 0);
             gtk_widget_hide(top);
             done=1;
         }
     }
+#endif
 }
 
 /* ... */
