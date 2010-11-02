@@ -1068,7 +1068,6 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
     { \
         opts->ENTRY.type=toImageType(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY.type); \
         opts->ENTRY.loaded=false; \
-        opts->ENTRY.type=IMG_NONE; \
         opts->ENTRY.width=opts->ENTRY.height=0; \
         opts->ENTRY.onBorder=false; \
         opts->ENTRY.pos=PP_TR; \
