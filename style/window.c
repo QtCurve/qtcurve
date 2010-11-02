@@ -242,8 +242,8 @@ static gboolean qtcWindowToggleMenuBar(GtkWidget *widget)
     if(menuBar)
     {
         int size=0;
-        qtcSetMenuBarHidden(qtSettings.appName, GTK_WIDGET_VISIBLE(menuBar));
-        if(GTK_WIDGET_VISIBLE(menuBar))
+        qtcSetMenuBarHidden(qtSettings.appName, qtcWidgetVisible(menuBar));
+        if(qtcWidgetVisible(menuBar))
             gtk_widget_hide(menuBar);
         else
         {
@@ -286,7 +286,7 @@ static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
 
     if(statusBar)
     {
-        gboolean state=GTK_WIDGET_VISIBLE(statusBar);
+        gboolean state=qtcWidgetVisible(statusBar);
         qtcSetStatusBarHidden(qtSettings.appName, state);
         if(state)
             gtk_widget_hide(statusBar);
@@ -350,7 +350,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
 
         if(menuBar)
         {
-            int size=GTK_WIDGET_VISIBLE(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
+            int size=qtcWidgetVisible(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
 
             qtcEmitMenuSize(menuBar, size);
             qtcWindowMenuBarDBus(widget, size);
@@ -362,7 +362,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
         GtkWidget *statusBar=qtcWindowGetStatusBar(widget, 0);
 
         if(statusBar)
-            qtcWindowStatusBarDBus(widget, !GTK_WIDGET_VISIBLE(statusBar));
+            qtcWindowStatusBarDBus(widget, !qtcWidgetVisible(statusBar));
     }
     return FALSE;
 }

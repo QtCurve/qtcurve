@@ -17,7 +17,9 @@ set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${QTCURVE_VERSION_FULL}")
 include(CPack)
 
 include(UsePkgConfig)
-pkgconfig(gtk+-2.0 GTK_INCLUDE_DIR GTK_LIB_DIR GTK_LINK_FLAGS GTK_CFLAGS)
+
+set(GTK_MAJOR_VERSION "2")
+pkgconfig(gtk+-${GTK_MAJOR_VERSION}.0 GTK_INCLUDE_DIR GTK_LIB_DIR GTK_LINK_FLAGS GTK_CFLAGS)
 
 if (GTK_INCLUDE_DIR)
     # Try to determine KDE3's icon prefix...
@@ -55,10 +57,10 @@ if (GTK_INCLUDE_DIR)
     endif(KDE4CONFIG_EXECUTABLE)
 
     exec_program(${PKGCONFIG_EXECUTABLE}
-                 ARGS --variable=gtk_binary_version gtk+-2.0
+                 ARGS --variable=gtk_binary_version gtk+-${GTK_MAJOR_VERSION}.0
                  OUTPUT_VARIABLE GTK_VERSION)
     exec_program(${PKGCONFIG_EXECUTABLE}
-                 ARGS --variable=prefix gtk+-2.0
+                 ARGS --variable=prefix gtk+-${GTK_MAJOR_VERSION}.0
                  OUTPUT_VARIABLE GTK_PREFIX)
     set(GTK_THEME_DIR ${GTK_PREFIX}/share/themes/QtCurve)
     set(CMAKE_INSTALL_PREFIX ${GTK_PREFIX})

@@ -55,8 +55,8 @@ static gboolean menuIsSelectable(GtkWidget *menu)
 {
     return !((!qtcBinGetChild(GTK_BIN(menu)) && G_OBJECT_TYPE(menu) == GTK_TYPE_MENU_ITEM) ||
              GTK_IS_SEPARATOR_MENU_ITEM(menu) ||
-             !GTK_WIDGET_IS_SENSITIVE(menu) ||
-             !GTK_WIDGET_VISIBLE(menu));
+             !qtcWidgetIsSensitive(menu) ||
+             !qtcWidgetVisible(menu));
 }
 
 static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
@@ -190,7 +190,7 @@ static gboolean qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpo
             for(child = g_list_first(children); child; child = g_list_next(child))
             {
                 if((child->data) && GE_IS_WIDGET(child->data) &&
-                   (GTK_WIDGET_STATE(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
+                   (qtcWidgetState(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
                 {
                     GtkAllocation alloc=qtcWidgetGetAllocation(GTK_WIDGET(child->data));
 
@@ -223,15 +223,15 @@ static gboolean qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gp
         for(child = g_list_first(children); child; child = g_list_next(child))
         {
             if((child->data) && GE_IS_MENU_ITEM(child->data) &&
-               (GTK_WIDGET_STATE(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
+               (qtcWidgetState(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
             {
                 GtkWidget *submenu  = qtcMenuItemGetSubMenu(GTK_MENU_ITEM(child->data)),
                           *topLevel = submenu ? qtcMenuGetTopLevel(submenu) : NULL;
                 
                if(submenu &&
                   ((!GE_IS_MENU(submenu)) ||
-                        (!(GTK_WIDGET_REALIZED(submenu) && GTK_WIDGET_VISIBLE(submenu) &&
-                           GTK_WIDGET_REALIZED(topLevel) && GTK_WIDGET_VISIBLE(topLevel)))))
+                        (!(qtcWidgetRealized(submenu) && qtcWidgetVisible(submenu) &&
+                           qtcWidgetRealized(topLevel) && qtcWidgetVisible(topLevel)))))
                 gtk_widget_set_state(GTK_WIDGET(child->data), GTK_STATE_NORMAL);
             }
         }

@@ -422,7 +422,11 @@ static gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
         if(GTK_IS_TOOLBAR(widget))
         {
             if(horiz)
+#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+                *horiz=TRUE; 
+#else
                 *horiz=GTK_ORIENTATION_HORIZONTAL==gtk_toolbar_get_orientation(GTK_TOOLBAR(widget));
+#endif
             return TRUE;
         }
         else if(level<4)
@@ -2658,13 +2662,14 @@ static gboolean compositingActive(GtkWidget *widget)
 
 static gboolean isRgbaWidget(GtkWidget *widget)
 {
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if (widget)
     {
         GdkScreen *screen = gtk_widget_get_screen (widget);
         if (gdk_screen_get_rgba_colormap(screen))
             return gtk_widget_get_colormap(widget)==gdk_screen_get_rgba_colormap(screen);
     }
-
+#endif
     return FALSE;
 }
 

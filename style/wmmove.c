@@ -65,8 +65,8 @@ static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
                 //  1. There is no active menu being displayed - as the 'press' will be to cancel the menu
                 //  2. The click is not where a menu item is
                 if((child->data) && GE_IS_WIDGET(child->data) &&
-                    ((GTK_STATE_NORMAL!=GTK_WIDGET_STATE(GTK_WIDGET(child->data)) &&
-                      GTK_STATE_INSENSITIVE!=GTK_WIDGET_STATE(GTK_WIDGET(child->data))) ||
+                    ((GTK_STATE_NORMAL!=qtcWidgetState(GTK_WIDGET(child->data)) &&
+                      GTK_STATE_INSENSITIVE!=qtcWidgetState(GTK_WIDGET(child->data))) ||
                      withinWidget(GTK_WIDGET(child->data), event,
 #ifdef EXTEND_MENUBAR_ITEM_HACK
                                  constMenuAdjust
