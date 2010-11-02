@@ -1,7 +1,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define VERSION           "@QTCURVE_VERSION_FULL@"
+#define VERSION           "@QTCURVE_VERSION@"
 #define KDE3_ICONS_PREFIX "@KDE3_ICONS_PREFIX@"
 #define KDE4_ICONS_PREFIX "@KDE4_ICONS_PREFIX@"
 #define KDE3PREFIX        "@KDE3PREFIX@"
