@@ -382,8 +382,8 @@ bool QtCurveHandler::readConfig(bool compositingToggled)
 const QBitmap & QtCurveHandler::buttonBitmap(ButtonIcon type, const QSize &size, bool toolWindow)
 {
     int typeIndex(type),
-        reduceW(size.width()>14 ? static_cast<int>(2*(size.width()/3.5)) : 6),
-        reduceH(size.height()>14 ? static_cast<int>(2*(size.height()/3.5)) : 6),
+        reduceW(size.width()>14 ? static_cast<int>((2.0*(size.width()/3.5))+0.5) : 6),
+        reduceH(size.height()>14 ? static_cast<int>((2.0*(size.height()/3.5))+0.5) : 6),
         w(size.width() - reduceW),
         h(size.height() - reduceH);
 
