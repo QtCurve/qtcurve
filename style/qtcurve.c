@@ -288,8 +288,7 @@ static gboolean useButtonColor(const gchar *detail)
                        0==strcmp(detail, "spinbutton_down") ||
                        0==strcmp(detail, "slider") ||
                        0==strcmp(detail, "qtc-slider") ||
-                       0==strcmp(detail, "vscrollbar") ||
-                       0==strcmp(detail, "hscrollbar") ||
+                       (detail[1] && &detail[1]==strstr(detail, "scrollbar")) ||
                        0==strcmp(detail, "stepper") ||
                        0==strcmp(detail, QTC_PANED) );
 }
@@ -582,7 +581,7 @@ static GtkWidget * getComboButton(GtkWidget *widget)
         g_list_free(children);
     return rv;
 }
-
+                                  
 static gboolean isSideBarBtn(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
@@ -824,9 +823,25 @@ typedef enum
     STEPPER_NONE
 } EStepper;
 
+#if GTK_CHECK_VERSION(2, 90, 0)
+static EStepper getStepper(const char *detail)
+#else
 static EStepper getStepper(GtkWidget *widget, int x, int y, int width, int height)
+#endif
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if GTK_CHECK_VERSION(2, 90, 0)
+    if(detail && detail[1])
+    {
+        if(0==strcmp(&detail[11], "end_inner"))
+            return STEPPER_C;
+        else if(strstr(&detail[11], "start_inner"))
+            return STEPPER_B;
+        else if(0==strcmp(&detail[11], "end"))
+            return STEPPER_D;
+        else if(strstr(&detail[11], "start"))
+            return STEPPER_A;
+    }
+#else
     if(widget && GTK_IS_RANGE(widget))
     {
         GdkRectangle   tmp;
@@ -893,6 +908,16 @@ static int getFillReal(GtkStateType state, gboolean set, gboolean darker)
 
 #define getFill(state, set) getFillReal(state, set, FALSE)
 
+static gboolean isSbarDetail(const char *detail)
+{
+    return detail && (
+#if GTK_CHECK_VERSION(2, 90, 0)
+                      (detail[1] && &detail[1]==strstr(detail, "scrollbar")) ||
+#endif
+                      0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
+                      0==strcmp(detail, "stepper"));
+}
+
 static int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int height, gboolean rev)
 {
     if(detail)
@@ -916,15 +941,21 @@ static int getRound(const char *detail, GtkWidget *widget, int x, int y, int wid
             return rev ? ROUNDED_TOPLEFT : ROUNDED_TOPRIGHT;
         else if(0==strcmp(detail, "spinbutton_down"))
             return rev ? ROUNDED_BOTTOMLEFT : ROUNDED_BOTTOMRIGHT;
-        else if(0==strcmp(detail, "vscrollbar") || 0==strcmp(detail, "hscrollbar") ||
-                0==strcmp(detail, "stepper"))
+        else if(isSbarDetail(detail))
         {
-            switch(getStepper(widget, x, y, width, height))
+
+            switch(getStepper(
+#if GTK_CHECK_VERSION(2, 90, 0)
+                                detail
+#else
+                                widget, x, y, width, height
+#endif
+                              ))
             {
                 case STEPPER_A:
                     return 'h'==detail[0] ? ROUNDED_LEFT : ROUNDED_TOP;
                 case STEPPER_D:
-                    return 'v'==detail[0]  ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
+                    return 'v'==detail[0] ? ROUNDED_BOTTOM : ROUNDED_RIGHT;
                 default:
                     return ROUNDED_NONE;
             }
@@ -3805,10 +3836,15 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
                  isMenuItem = DETAIL("menuitem"),
                  a_width=LARGE_ARR_WIDTH,
                  a_height=LARGE_ARR_HEIGHT;
-        gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
-                                  0==strcmp(detail, "stepper")),
+        gboolean sbar=isSbarDetail(detail),
                  smallArrows=isSpinButton && !opts.unifySpin;
-        int      stepper=sbar ? getStepper(widget, x, y, opts.sliderWidth, opts.sliderWidth) : STEPPER_NONE;
+        int      stepper=sbar ? getStepper(
+#if GTK_CHECK_VERSION(2, 90, 0)
+                                            detail
+#else
+                                            widget, x, y, opts.sliderWidth, opts.sliderWidth
+#endif
+                                          ) : STEPPER_NONE;
 
         sanitizeSize(window, &width, &height);
 
@@ -3917,8 +3953,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                     const gchar *detail, gint x, gint y, gint width,
                     gint height, gboolean btn_down)
 {
-    gboolean sbar=detail && ( 0==strcmp(detail, "hscrollbar") || 0==strcmp(detail, "vscrollbar") ||
-                              0==strcmp(detail, "stepper")),
+    gboolean sbar=isSbarDetail(detail),
              pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
              qtc_paned=!pbar && IS_QTC_PANED,
              qtcSlider=!qtc_paned && DETAIL("qtc-slider"),
@@ -4288,7 +4323,13 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                 }
                 else */ if(WIDGET_SB_BUTTON==widgetType && GTK_APP_MOZILLA!=qtSettings.app)
                 {
-                    stepper=getStepper(widget, x, y, width, height);
+                    stepper=getStepper(
+#if GTK_CHECK_VERSION(2, 90, 0)
+                                        detail
+#else
+                                        widget, x, y, width, height
+#endif
+                                      );
                     switch(stepper)
                     {
                         case STEPPER_B:
