@@ -98,7 +98,8 @@ static QtCSlider lastSlider;
 #if GTK_CHECK_VERSION(2, 90, 0)
     #define CAIRO_BEGIN \
         { \
-        GdkRectangle *area=NULL;
+        GdkRectangle *area=NULL; \
+        cairo_set_line_width(cr, 1.0);
 
     #define CAIRO_END }
     #define FN_CHECK g_return_if_fail(GTK_IS_STYLE(style));
