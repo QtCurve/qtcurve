@@ -487,19 +487,18 @@ static gboolean isOnStatusBar(GtkWidget *widget, int level)
 
 static gboolean isList(GtkWidget *widget)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     return widget &&
-           (GTK_IS_CLIST(widget) ||
+           (GTK_IS_TREE_VIEW(widget) ||
+#if !GTK_CHECK_VERSION(2, 90, 0)
+            GTK_IS_CLIST(widget) ||
             GTK_IS_LIST(widget) ||
-            GTK_IS_TREE_VIEW(widget) ||
+            
 #ifdef GTK_ENABLE_BROKEN
             GTK_IS_TREE(widget) ||
 #endif
             GTK_IS_CTREE(widget) ||
-            0==strcmp(g_type_name(qtcWidgetType(widget)), "GtkSCTree"));
-#else
-    return FALSE;
 #endif
+            0==strcmp(g_type_name(qtcWidgetType(widget)), "GtkSCTree"));
 }
 
 static gboolean isListViewHeader(GtkWidget *widget)
@@ -4208,11 +4207,16 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                 if(GTK_STATE_PRELIGHT==state && opts.coloredMouseOver)
                     drawHighlight(cr, x, y+height-2, width, 2, area, true, true);
 
+#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+                drawFadedLine(cr, x+width-2, y+4, 1, height-8, &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
+                drawFadedLine(cr, x+width-1, y+4, 1, height-8, &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
+#else
                 if(x>3 && height>10)
                 {
                     drawFadedLine(cr, x, y+4, 1, height-8, &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
                     drawFadedLine(cr, x+1, y+4, 1, height-8, &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
                 }
+#endif
             }
             else if(isPathButton(widget))
             {
@@ -5664,7 +5668,10 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gap_side
                 break;
         }
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+        cairo_save(cr);
+        cairo_new_path(cr);
+#else
         GdkRectangle r={x, y, width, height};
         GdkRegion    *region=gdk_region_rectangle(area ? area : &r),
                         *inner=gdk_region_rectangle(&gapRect);
@@ -7314,7 +7321,6 @@ static void gtkDrawShadowGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
                     double          col=opts.gbFactor<0 ? 0.0 : 1.0,
                                     radius=ROUNDED_ALL==round ? getRadius(&opts, width, height, WIDGET_FRAME, RADIUS_EXTERNAL) : 0.0;
                     cairo_pattern_t *pt=NULL;
-
                     if(0!=opts.gbFactor)
                     {
                         clipPathRadius(cr, x+0.5, y+0.5, width-1, height-1, radius, round);
@@ -7337,7 +7343,6 @@ static void gtkDrawShadowGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
                         if(pt)
                             cairo_pattern_destroy(pt);
                     }
-
                     if(FRAME_FADED==opts.groupBox)
                     {
                         pt=cairo_pattern_create_linear(x, y, x, y+height-1);
