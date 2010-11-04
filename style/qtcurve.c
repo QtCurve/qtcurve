@@ -3002,7 +3002,9 @@ static void setProgressStripeClipping(cairo_t *cr, AREA_PARAM int x, int y, int 
                 {
                     QtcRect innerRect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
 
+#if !GTK_CHECK_VERSION(2, 90, 0)
                     constrainRect(&innerRect, area);
+#endif
                     if(innerRect.width>0 && innerRect.height>0)
                     {
                         QtcRegion *innerRegion=qtcRegionRect(&innerRect);
@@ -4099,13 +4101,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     {
         if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
         {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-            gtk_style_apply_default_background(style, window, widget && !qtcWidgetNoWindow(widget),
-                                               GTK_STATE_INSENSITIVE==state
-                                                    ? GTK_STATE_INSENSITIVE
-                                                    : GTK_STATE_NORMAL,
-                                               area, x, y, width, height);
-#endif
+            qtcStyleApplyDefBgnd(widget && !qtcWidgetNoWindow(widget),
+                                 GTK_STATE_INSENSITIVE==state ? GTK_STATE_INSENSITIVE : GTK_STATE_NORMAL);
             if(widget && IMG_NONE!=opts.bgndImage.type)
                 drawWindowBgnd(cr, style, area, widget, x, y, width, height);
         }

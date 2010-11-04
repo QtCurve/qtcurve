@@ -65,6 +65,8 @@
     #define IS_PROGRESS_BAR(W)          qtcIsProgressBar(W)
     #define IS_PROGRESS                 GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar")
 
+    #define qtcStyleApplyDefBgnd(SET_BG, STATE) gtk_style_apply_default_background(style, cr, gtk_widget_get_window(widget), STATE, x, y, width, height)
+
     #define QtcRegion                   cairo_region_t
     #define qtcRegionRect               cairo_region_create_rectangle
     #define qtcRegionXor                cairo_region_xor
@@ -119,6 +121,8 @@
     #define IS_PROGRESS_BAR(W)          (GTK_IS_PROGRESS_BAR((W)) && (W)->allocation.x != -1 && (W)->allocation.y != -1)
     #define IS_PROGRESS                 GTK_IS_PROGRESS(widget) || GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar")
 
+    #define qtcStyleApplyDefBgnd(SET_BG, STATE) gtk_style_apply_default_background(style, window, SET_BG, STATE, area, x, y, width, height)
+    
     #define QtcRegion                   GdkRegion
     #define qtcRegionRect               gdk_region_rectangle
     #define qtcRegionXor                gdk_region_xor
