@@ -190,33 +190,43 @@ static GCache         *pixbufCache                  = NULL;
 #define QTC_CHECKBOX "checkbox-qtc"
 #define IS_QTC_PANED DETAIL(QTC_PANED)
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-static void clipToRegion(cairo_t *cr, GdkRegion *region)
+static void clipToRegion(cairo_t *cr, QtcRegion *region)
 {
-    int          numRects;
-    GdkRectangle *rects;
-
-    gdk_region_get_rectangles(region, &rects, &numRects);
-
     cairo_new_path(cr);
-    while(numRects--)
     {
-        GdkRectangle *rect=&(rects[numRects]);
-        cairo_rectangle(cr, rect->x, rect->y, rect->width, rect->height);
+#if GTK_CHECK_VERSION(2, 90, 0)
+        int numRects=cairo_region_num_rectangles(region);
+
+        while(numRects--)
+        {
+            cairo_rectangle_int_t rect;
+            cairo_region_get_rectangle(region, numRects, &rect);
+            cairo_rectangle(cr, rect.x, rect.y, rect.width, rect.height);
+        }
+#else
+        int          numRects;
+        GdkRectangle *rects;
+
+        gdk_region_get_rectangles(region, &rects, &numRects);
+
+        while(numRects--)
+        {
+            GdkRectangle *rect=&(rects[numRects]);
+            cairo_rectangle(cr, rect->x, rect->y, rect->width, rect->height);
+        }
+        g_free(rects);
+#endif
     }
     cairo_clip(cr);
-
-    g_free(rects);
 }
 
-void setCairoClippingRegion(cairo_t *cr, GdkRegion *region)
+void setCairoClippingRegion(cairo_t *cr, QtcRegion *region)
 {
     cairo_save(cr);
     if(region)
         clipToRegion(cr, region);
     cairo_new_path(cr);
 }
-#endif
 
 void setCairoClipping(cairo_t *cr, GdkRectangle *area)
 {
@@ -1195,7 +1205,7 @@ static void drawAreaModColor(cairo_t *cr, GdkRectangle *area, GdkColor *orig, do
                     /* gint           */  height) \
     drawAreaModColor(cr, area, &style->bg[state], mod, x, y, width, height)
 
-static void constrainRect(GdkRectangle *rect, GdkRectangle *con)
+static void constrainRect(QtcRect *rect, QtcRect *con)
 {
     if(rect && con)
     {
@@ -2149,21 +2159,18 @@ static void drawFadedLineReal(cairo_t *cr, int x, int y, int width, int height, 
                     ry=y+0.5;
     cairo_pattern_t *pt=cairo_pattern_create_linear(rx, ry, horiz ? rx+(width-1) : rx+1, horiz ? ry+1 : ry+(height-1));
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(gap)
     {
-        GdkRectangle r={x, y, width, height},
-                     rect=area ? *area : r;
-        GdkRegion    *region=gdk_region_rectangle(&rect),
-                     *inner=gdk_region_rectangle(gap);
+        QtcRect   r={x, y, width, height};
+        QtcRegion *region=qtcRegionRect(area ? area : &r),
+                  *inner=qtcRegionRect(gap);
 
-        gdk_region_xor(region, inner);
+        qtcRegionXor(region, inner);
         setCairoClippingRegion(cr, region);
-        gdk_region_destroy(inner);
-        gdk_region_destroy(region);
+        qtcRegionDestroy(inner);
+        qtcRegionDestroy(region);
     }
     else
-#endif
         setCairoClipping(cr, area);
     cairo_pattern_add_color_stop_rgba(pt, 0, CAIRO_COL(*col), fadeStart && opts.fadeLines ? 0.0 : alpha);
     cairo_pattern_add_color_stop_rgba(pt, FADE_SIZE, CAIRO_COL(*col), alpha);
@@ -2933,11 +2940,10 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
     {
     int xo=x, yo=y, widtho=width, heighto=height;
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(doEtch)
     {
-        GdkRectangle rect;
-        GdkRegion    *region=NULL;
+        QtcRect   rect;
+        QtcRegion *region=NULL;
 
         y--;
         height+=2;
@@ -2945,7 +2951,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
         width+=2;
 
         rect.x=x; rect.y=y; rect.width=width; rect.height=height;
-        region=gdk_region_rectangle(&rect);
+        region=qtcRegionRect(&rect);
 
         if(!(WIDGET_SPIN==w && opts.unifySpin) && !(WIDGET_COMBO_BUTTON==w && opts.unifyCombo))
         {
@@ -2956,9 +2962,8 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
         }
 
         drawEtch(cr, area, widget, x, y, width, height, FALSE, round, WIDGET_ENTRY);
-        gdk_region_destroy(region);
+        qtcRegionDestroy(region);
     }
-#endif
 
     drawBorder(cr, style, !widget || qtcWidgetIsSensitive(widget) ? state : GTK_STATE_INSENSITIVE, area, xo, yo, widtho, heighto,
                colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
@@ -2974,7 +2979,6 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
 #if GTK_CHECK_VERSION(2, 90, 0)
     gboolean                  revProg=widget && gtk_progress_bar_get_inverted(GTK_PROGRESS_BAR(widget));
 #else
-    GdkRegion                 *region=NULL;
     GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
                                     ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
                                     : GTK_PROGRESS_LEFT_TO_RIGHT;
@@ -2983,6 +2987,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
     gboolean                  horiz=isHorizontalProgressbar(widget);
     int                       wid=isEntryProg ? WIDGET_ENTRY_PROGRESSBAR : WIDGET_PROGRESSBAR,
                               animShift=revProg ? 0 : -PROGRESS_CHUNK_WIDTH;
+    QtcRegion                 *region=NULL;
 
     if(opts.fillProgress)
         x--, y--, width+=2, height+=2;
@@ -2996,14 +3001,15 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
         animShift+=(revProg ? -1 : 1)*
                     (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
     }
+#endif
 
     if(STRIPE_NONE!=opts.stripedProgress && STRIPE_FADE!=opts.stripedProgress)
     {
-        GdkRectangle rect={x, y, width-2, height-2};
-        int          stripeOffset;
+        QtcRect rect={x, y, width-2, height-2};
+        int     stripeOffset;
 
         constrainRect(&rect, area);
-        region=gdk_region_rectangle(&rect);
+        region=qtcRegionRect(&rect);
 
         switch(opts.stripedProgress)
         {
@@ -3012,32 +3018,33 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                 if(horiz)
                     for(stripeOffset=0; stripeOffset<(width+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
                     {
-                        GdkRectangle inner_rect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
+                        QtcRect innerRect={x+stripeOffset+animShift, y+1, PROGRESS_CHUNK_WIDTH, height-2};
 
-                        constrainRect(&inner_rect, area);
-                        if(inner_rect.width>0 && inner_rect.height>0)
+                        constrainRect(&innerRect, area);
+                        if(innerRect.width>0 && innerRect.height>0)
                         {
-                            GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+                            QtcRegion *innerRegion=qtcRegionRect(&innerRect);
 
-                            gdk_region_xor(region, inner_region);
-                            gdk_region_destroy(inner_region);
+                            qtcRegionXor(region, innerRegion);
+                            qtcRegionDestroy(innerRegion);
                         }
                     }
                 else
                     for(stripeOffset=0; stripeOffset<(height+PROGRESS_CHUNK_WIDTH); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
                     {
-                        GdkRectangle inner_rect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
+                        QtcRect innerRect={x+1, y+stripeOffset+animShift, width-2, PROGRESS_CHUNK_WIDTH};
 
-                        /*constrainRect(&inner_rect, area);*/
-                        if(inner_rect.width>0 && inner_rect.height>0)
+                        /*constrainRect(&innerRect, area);*/
+                        if(innerRect.width>0 && innerRect.height>0)
                         {
-                            GdkRegion *inner_region=gdk_region_rectangle(&inner_rect);
+                            QtcRegion *innerRegion=qtcRegionRect(&innerRect);
 
-                            gdk_region_xor(region, inner_region);
-                            gdk_region_destroy(inner_region);
+                            qtcRegionXor(region, innerRegion);
+                            qtcRegionDestroy(innerRegion);
                         }
                     }
                 break;
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             case STRIPE_DIAGONAL:
                 if(horiz)
                     for(stripeOffset=0; stripeOffset<(width+height+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
@@ -3046,10 +3053,10 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                                          {x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH,          y},
                                          {(x+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-height, y+height-1},
                                          {(x+stripeOffset+animShift)-height,                      y+height-1}};
-                        GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
+                        GdkRegion *innerRegion=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
 
-                        gdk_region_xor(region, inner_region);
-                        gdk_region_destroy(inner_region);
+                        gdk_region_xor(region, innerRegion);
+                        qtcRegionDestroy(innerRegion);
                     }
                 else
                     for(stripeOffset=0; stripeOffset<(height+width+2); stripeOffset+=(PROGRESS_CHUNK_WIDTH*2))
@@ -3058,21 +3065,21 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                                         {x+width-1, (y+stripeOffset+animShift)-width},
                                         {x+width-1, (y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH)-width},
                                         {x,         y+stripeOffset+animShift+PROGRESS_CHUNK_WIDTH}};
-                        GdkRegion *inner_region=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
+                        GdkRegion *innerRegion=gdk_region_polygon(a, 4, GDK_EVEN_ODD_RULE);
 
-                        gdk_region_xor(region, inner_region);
-                        gdk_region_destroy(inner_region);
+                        gdk_region_xor(region, innerRegion);
+                        qtcRegionDestroy(innerRegion);
                     }
                 if(area)
                 {
-                    GdkRegion *outer_region=gdk_region_rectangle(area);
+                    GdkRegion *outerRegion=qtcRegionRect(area);
 
-                    gdk_region_intersect(region, outer_region);
-                    gdk_region_destroy(outer_region);
+                    gdk_region_intersect(region, outerRegion);
+                    qtcRegionDestroy(outerRegion);
                 }
+#endif
         }
     }
-#endif
 
     {
         gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
@@ -3102,7 +3109,6 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                 addStripes(cr, x-(horiz ? posMod : 0), y-(horiz ? 0 : posMod),
                                  width+(horiz ? sizeMod : 0), height+(horiz ? 0 : sizeMod), horiz);
             }
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             else
             {
                 setCairoClippingRegion(cr, region);
@@ -3112,7 +3118,6 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                                (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
                 unsetCairoClipping(cr);
             }
-#endif
 
         if(opts.glowProgress && (horiz ? width : height)>3)
         {
@@ -3170,10 +3175,8 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
             }
     }
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(region)
-        gdk_region_destroy(region);
-#endif
+        qtcRegionDestroy(region);
 }
 
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
@@ -3948,10 +3951,8 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
     }
 }
 
-static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state,
-                    GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
-                    const gchar *detail, gint x, gint y, gint width,
-                    gint height, gboolean btn_down)
+static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, GdkRectangle *area, GtkWidget *widget,
+                    const gchar *detail, gint x, gint y, gint width, gint height, gboolean btn_down)
 {
     gboolean sbar=isSbarDetail(detail),
              pbar=DETAIL("bar"), //  && GTK_IS_PROGRESS_BAR(widget),
@@ -5709,19 +5710,14 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gap_side
                 break;
         }
 
-#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        cairo_save(cr);
-        cairo_new_path(cr);
-#else
-        GdkRectangle r={x, y, width, height};
-        GdkRegion    *region=gdk_region_rectangle(area ? area : &r),
-                        *inner=gdk_region_rectangle(&gapRect);
+        QtcRect   r={x, y, width, height};
+        QtcRegion *region=qtcRegionRect(area ? area : &r),
+                  *inner=qtcRegionRect(&gapRect);
 
-        gdk_region_xor(region, inner);
+        qtcRegionXor(region, inner);
         setCairoClippingRegion(cr, region);
-        gdk_region_destroy(inner);
-        gdk_region_destroy(region);
-#endif
+        qtcRegionDestroy(inner);
+        qtcRegionDestroy(region);
     }
 }
 
@@ -7230,7 +7226,7 @@ static void gtkDrawSlider(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
         unsetCairoClipping(cr);
 
-        gdk_region_destroy(region);
+        qtcRegionDestroy(region);
 #endif
 
         { /* C-Scope */

@@ -65,6 +65,13 @@
     #define IS_PROGRESS_BAR(W)          qtcIsProgressBar(W)
     #define IS_PROGRESS                 GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar")
 
+    #define QtcRegion                   cairo_region_t
+    #define qtcRegionRect               cairo_region_create_rectangle
+    #define qtcRegionXor                cairo_region_xor
+    #define qtcRegionDestroy            cairo_region_destroy
+
+    #define QtcRect                     cairo_rectangle_int_t
+
     #define QTC_KEY_m GDK_KEY_m
     #define QTC_KEY_M GDK_KEY_M
     #define QTC_KEY_s GDK_KEY_s
@@ -111,6 +118,13 @@
     #define qtcMenuItemGetSubMenu(W)    ((W)->submenu)
     #define IS_PROGRESS_BAR(W)          (GTK_IS_PROGRESS_BAR((W)) && (W)->allocation.x != -1 && (W)->allocation.y != -1)
     #define IS_PROGRESS                 GTK_IS_PROGRESS(widget) || GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar")
+
+    #define QtcRegion                   GdkRegion
+    #define qtcRegionRect               gdk_region_rectangle
+    #define qtcRegionXor                gdk_region_xor
+    #define qtcRegionDestroy            gdk_region_destroy
+
+    #define QtcRect                     GdkRectangle
 
     #define QTC_KEY_m GDK_m
     #define QTC_KEY_M GDK_M
