@@ -6077,12 +6077,11 @@ static void gtkDrawOption(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
     }
 }
 
-
-static void ge_cairo_transform_for_layout (cairo_t *cr, PangoLayout *layout, int x, int y)
+static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int x, int y)
 {
     const PangoMatrix *matrix;
 
-    matrix = pango_context_get_matrix (pango_layout_get_context (layout));
+    matrix = pango_context_get_matrix(pango_layout_get_context(layout));
     if (matrix)
     {
         cairo_matrix_t cairo_matrix;
@@ -6102,12 +6101,13 @@ static void ge_cairo_transform_for_layout (cairo_t *cr, PangoLayout *layout, int
         cairo_translate(cr, x, y);
 }
 
-
-static void qtcDrawLayout(GtkStyle *style, cairo_t *cr, GtkStateType state, gboolean use_text, gint x, gint y, PangoLayout *layout)
+static void qtcDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboolean use_text, AREA_PARAM gint x, gint y, PangoLayout *layout)
 {
+    CAIRO_BEGIN
     gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);
     ge_cairo_transform_for_layout(cr, layout, x, y);
     pango_cairo_show_layout(cr, layout);
+    CAIRO_END
 }
 
 #define NUM_GCS 5
@@ -6115,9 +6115,8 @@ static void qtcDrawLayout(GtkStyle *style, cairo_t *cr, GtkStateType state, gboo
 static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboolean use_text, AREA_PARAM GtkWidget *widget,
                           const gchar *detail, gint x, gint y, PangoLayout *layout)
 {
-    CAIRO_BEGIN
     if(IS_PROGRESS)
-        qtcDrawLayout(style, cr, state, use_text, x, y, layout);
+        qtcDrawLayout(style, WINDOW_PARAM_VAL state, use_text, AREA_PARAM_VAL x, y, layout);
     else
     {
         QtCurveStyle *qtcurveStyle=(QtCurveStyle *)style;
@@ -6285,6 +6284,7 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
         }
 #endif
 
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if(parent && GTK_IS_LABEL(widget) && GTK_IS_FRAME(parent) && !isOnStatusBar(widget, 0))
         {
             int diff=qtcWidgetGetAllocation(widget).x-qtcWidgetGetAllocation(parent).x;
@@ -6295,7 +6295,6 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
                 x-=MAX(0, MIN(diff, 2));
             else
                 x+=5;
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             if(area)
             {
                 area2=*area;
@@ -6307,22 +6306,23 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
                     area2.x+=5;
                 area=&area2;
             }
-#endif
         }
+#endif
 
         if(!opts.useHighlightForMenu && (isMenuItem || mb) && GTK_STATE_INSENSITIVE!=state)
             state=GTK_STATE_NORMAL;
 
-        qtcDrawLayout(style, cr, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, x, y, layout);
+        qtcDrawLayout(style, WINDOW_PARAM_VAL selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, AREA_PARAM_VAL
+                      x, y, layout);
 
         if(opts.embolden && def_but)
-            qtcDrawLayout(style, cr, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, x+1, y, layout);
+            qtcDrawLayout(style, WINDOW_PARAM_VAL selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, AREA_PARAM_VAL
+                          x+1, y, layout);
 
         if(swapColors)
             for(i=0; i<5; ++i)
                 style->text[i]=prevColors[i];
     }
-    CAIRO_END
 }
 
 static GdkPixbuf * scaleOrRef(GdkPixbuf *src, int width, int height)
