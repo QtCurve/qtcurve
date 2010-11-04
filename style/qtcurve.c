@@ -3977,8 +3977,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
              optionmenu=!togglebutton && DETAIL("optionmenu"),
              stepper=!optionmenu && DETAIL("stepper"),
              checkbox=!stepper && DETAIL(QTC_CHECKBOX),
-             vscrollbar=!checkbox && DETAIL("vscrollbar"),
-             hscrollbar=!vscrollbar && DETAIL("hscrollbar"),
+             vscrollbar=!checkbox && detail && detail==strstr(detail, "vscrollbar"),
+             hscrollbar=!vscrollbar && detail && detail==strstr(detail, "hscrollbar"),
              spinUp=!hscrollbar && DETAIL("spinbutton_up"),
              spinDown=!spinUp && DETAIL("spinbutton_down"),
              menuScroll=detail && NULL!=strstr(detail, "menu_scroll_arrow_"),
@@ -4849,6 +4849,71 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                      thinner=opts.thinSbarGroove && (SCROLLBAR_NONE==opts.scrollbarType || opts.flatSbarButtons);
 
             if(opts.flatSbarButtons)
+            {
+#if GTK_CHECK_VERSION(2, 90, 0)
+                gboolean lower=detail && strstr(detail, "-lower");
+                sbarRound=lower
+                            ? horiz
+                                ? ROUNDED_LEFT
+                                : ROUNDED_TOP
+                            : horiz
+                                ? ROUNDED_RIGHT
+                                : ROUNDED_BOTTOM;
+
+                switch(opts.scrollbarType)
+                {
+                    case SCROLLBAR_KDE:
+                        if(lower)
+                        {
+                            if(horiz)
+                                x+=SBAR_BTN_SIZE;
+                            else
+                                y+=SBAR_BTN_SIZE;
+                        }
+                        else
+                        {
+                            if(horiz)
+                                width-=SBAR_BTN_SIZE*2;
+                            else
+                                height-=SBAR_BTN_SIZE*2;
+                        }
+                        break;
+                    case SCROLLBAR_WINDOWS:
+                        if(lower)
+                        {
+                            if(horiz)
+                                x+=SBAR_BTN_SIZE;
+                            else
+                                y+=SBAR_BTN_SIZE;
+                        }
+                        else
+                        {
+                            if(horiz)
+                                width-=SBAR_BTN_SIZE;
+                            else
+                                height-=SBAR_BTN_SIZE;
+                        }
+                        break;
+                    case SCROLLBAR_NEXT:
+                        if(lower)
+                        {
+                            if(horiz)
+                                x+=SBAR_BTN_SIZE*2;
+                            else
+                                y+=SBAR_BTN_SIZE*2;
+                        }
+                        break;
+                    case SCROLLBAR_PLATINUM:
+                        if(!lower)
+                        {
+                            if(horiz)
+                                width-=SBAR_BTN_SIZE*2;
+                            else
+                                height-=SBAR_BTN_SIZE*2;
+                        }
+                        break;
+                }
+#else
                 switch(opts.scrollbarType)
                 {
                     case SCROLLBAR_KDE:
@@ -4876,6 +4941,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                             height-=SBAR_BTN_SIZE*2;
                         break;
                 }
+#endif
+            }
             else
                 switch(opts.scrollbarType)
                 {
@@ -7091,6 +7158,11 @@ static void gtkDrawSlider(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
         }
 #endif
 
+#if GTK_CHECK_VERSION(2, 90, 0)
+        if(scrollbar && GTK_STATE_ACTIVE==state)
+            state=GTK_STATE_PRELIGHT;
+#endif
+                
         drawBox(style, WINDOW_PARAM_VAL state, shadow_type, area, widget, !scrollbar ? "qtc-slider" : "slider", x, y, width, height, FALSE);
 
        /* Orientation is always vertical with Mozilla, why? Anyway this hack should be OK - as we only draw
