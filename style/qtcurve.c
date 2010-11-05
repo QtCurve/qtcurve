@@ -5358,7 +5358,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)
             drawBgndRings(cr, x, y, width, height, FALSE);
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if(opts.menuStripe && !comboMenu)
         {
             gboolean mozOo=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
@@ -5370,13 +5369,14 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             if(!mozOo && widget)
             {
                 GtkMenuShell *menuShell=GTK_MENU_SHELL(widget);
-                GList        *children=menuShell->children;
+                GList        *children=gtk_container_get_children(GTK_CONTAINER(menuShell)),
+                             *child=children;
 
-                while (children)
+                for(; child; child = child->next)
                 {
-                    if(GTK_IS_IMAGE_MENU_ITEM(children->data))
+                    if(GTK_IS_IMAGE_MENU_ITEM(child->data))
                     {
-                        GtkImageMenuItem *item=GTK_IMAGE_MENU_ITEM(children->data);
+                        GtkImageMenuItem *item=GTK_IMAGE_MENU_ITEM(child->data);
                         stripeWidth=21;
 
                         if(0L==gtk_image_menu_item_get_image(item) ||
@@ -5396,14 +5396,15 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                         else // TODO: Check image size!
                             break;
                     }
-                    children = children->next;
                 }
+
+                if(children)
+                    g_list_free(children);
             }
 
             drawBevelGradient(cr, style, area, x+1, y+1, stripeWidth+1, height-2,
                               &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
         }
-#endif
 
         if(opts.popupBorder)
         {
