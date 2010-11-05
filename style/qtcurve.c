@@ -435,11 +435,7 @@ static gboolean isOnToolbar(GtkWidget *widget, gboolean *horiz, int level)
         if(GTK_IS_TOOLBAR(widget))
         {
             if(horiz)
-#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-                *horiz=TRUE; 
-#else
-                *horiz=GTK_ORIENTATION_HORIZONTAL==gtk_toolbar_get_orientation(GTK_TOOLBAR(widget));
-#endif
+                *horiz=GTK_ORIENTATION_HORIZONTAL==qtcToolbarGetOrientation(widget);
             return TRUE;
         }
         else if(level<4)
@@ -860,7 +856,7 @@ static EStepper getStepper(GtkWidget *widget, int x, int y, int width, int heigh
         GdkRectangle   tmp;
         GdkRectangle   check_rectangle,
                        stepper;
-        GtkOrientation orientation=GTK_RANGE(widget)->orientation;
+        GtkOrientation orientation=qtcRangeGetOrientation(widget);
         GtkAllocation  alloc=qtcWidgetGetAllocation(widget);
 
         stepper.x=x;
@@ -992,7 +988,9 @@ static gboolean isHorizontalProgressbar(GtkWidget *widget)
     if(!widget || isMozilla() ||!GTK_IS_PROGRESS_BAR(widget))
         return TRUE;
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if GTK_CHECK_VERSION(2, 90, 0)
+    return GTK_ORIENTATION_HORIZONTAL==qtcGetWidgetOrientation(widget);
+#else
     switch(GTK_PROGRESS_BAR(widget)->orientation)
     {
         default:
@@ -1003,8 +1001,6 @@ static gboolean isHorizontalProgressbar(GtkWidget *widget)
         case GTK_PROGRESS_TOP_TO_BOTTOM:
             return FALSE;
     }
-#else
-    return TRUE;
 #endif
 }
 
@@ -4374,18 +4370,17 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     }
                 }
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
                 if(/*GTK_APP_JAVA_SWT==qtSettings.app && */
                    widget && !isFixedWidget(widget) && /* Don't do for Firefox, etc. */
                    WIDGET_SB_SLIDER==widgetType && GTK_STATE_INSENSITIVE!=state && GTK_IS_RANGE(widget))
                 {
                     GtkAllocation alloc         = qtcWidgetGetAllocation(widget);
-                    gboolean      horizontal    = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL;
+                    gboolean      horizontal    = qtcRangeGetOrientation(widget) != GTK_ORIENTATION_HORIZONTAL;
                     int           sbarTroughLen = (horizontal ? alloc.height : alloc.width)-
-                                                  ( (GTK_RANGE(widget)->has_stepper_a ? opts.sliderWidth : 0)+
-                                                    (GTK_RANGE(widget)->has_stepper_b ? opts.sliderWidth : 0)+
-                                                    (GTK_RANGE(widget)->has_stepper_c ? opts.sliderWidth : 0)+
-                                                    (GTK_RANGE(widget)->has_stepper_d ? opts.sliderWidth : 0)),
+                                                  ( (qtcRangeHasStepperA(widget) ? opts.sliderWidth : 0)+
+                                                    (qtcRangeHasStepperB(widget) ? opts.sliderWidth : 0)+
+                                                    (qtcRangeHasStepperC(widget) ? opts.sliderWidth : 0)+
+                                                    (qtcRangeHasStepperD(widget) ? opts.sliderWidth : 0)),
                                   sliderLen     = (horizontal ? height : width);
 
                     if(sbarTroughLen==sliderLen)
@@ -4395,20 +4390,18 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                         bgnd=getFill(state, FALSE);
                     }
                 }
-#endif
 #ifdef INCREASE_SB_SLIDER
                 if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons && SCROLLBAR_NONE!=opts.scrollbarType
                    /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
                 {
                     GtkAdjustment *adj       = qtcRangeGetAdjustment(GTK_RANGE(widget));
-#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-                    gboolean      horizontal = width>height,
+                    gboolean      horizontal = GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget),
+#if GTK_CHECK_VERSION(2, 90, 0)
                                   hasStartStepper = SCROLLBAR_PLATINUM!=opts.scrollbarType,
                                   hasEndStepper   = SCROLLBAR_NEXT!=opts.scrollbarType,
 #else
-                    gboolean      horizontal = GTK_ORIENTATION_HORIZONTAL==GTK_RANGE(widget)->orientation,
-                                  hasStartStepper = GTK_RANGE(widget)->has_stepper_a || GTK_RANGE(widget)->has_stepper_b,
-                                  hasEndStepper   = GTK_RANGE(widget)->has_stepper_c || GTK_RANGE(widget)->has_stepper_d,
+                                  hasStartStepper = qtcRangeHasStepperA(widget) || qtcRangeHasStepperB(widget),
+                                  hasEndStepper   = qtcRangeHasStepperC(widget) || qtcRangeHasStepperD(widget),
 #endif
                                   atEnd      = FALSE;
                     double        value      = qtcAdjustmentGetValue(adj);
@@ -4441,7 +4434,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                    (SCROLLBAR_KDE==opts.scrollbarType || SCROLLBAR_WINDOWS==opts.scrollbarType) &&
                    widget && GTK_IS_RANGE(widget) && isFixedWidget(widget))
                 {
-                    if (GTK_RANGE(widget)->orientation!=GTK_ORIENTATION_HORIZONTAL)
+                    if (qtcRangeGetOrientation(widget)!=GTK_ORIENTATION_HORIZONTAL)
                         y++, height--;
                     else
                         x+=2, width-=2;
@@ -4724,7 +4717,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         gboolean horiz=width>height;
 #else
         gboolean horiz=GTK_IS_RANGE(widget)
-                        ? GTK_ORIENTATION_HORIZONTAL==GTK_RANGE(widget)->orientation
+                        ? GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget)
                         : width>height;
 #endif
 
@@ -5142,18 +5135,16 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 else if(0==strcmp(detail,"toolbar")) /*  && (GTK_IS_TOOLBAR(widget) ||
                     WIDGET_TYPE_NAME("BonoboUIToolbar"))) */
                 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
                     if(GTK_IS_TOOLBAR(widget))
                     {
                         if(all)
                             top=bottom=left=right=TRUE;
-                        else if(GTK_ORIENTATION_HORIZONTAL==GTK_TOOLBAR(widget)->orientation)
+                        else if(GTK_ORIENTATION_HORIZONTAL==qtcToolbarGetOrientation(widget))
                             top=bottom=TRUE;
                         else
                             left=right=TRUE;
                     }
                     else
-#endif
                         if(all)
                             if(width<height)
                                 left=right=bottom=TRUE;
