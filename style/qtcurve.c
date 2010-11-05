@@ -4121,8 +4121,10 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             if(!rev)
                 x-=4;
             width+=4;
-            
+
+#if !GTK_CHECK_VERSION(2, 90, 0)
             if(moz)
+#endif
             {
                 GdkRectangle a;
                 
@@ -4130,7 +4132,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 setCairoClipping(cr, &a);
             }
             drawEntryField(cr, style, state, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
+#if !GTK_CHECK_VERSION(2, 90, 0)
             if(moz)
+#endif
                 unsetCairoClipping(cr);
         }
         else if(opts.unifySpinBtns)
