@@ -10,9 +10,11 @@
     QtCurve kwin decoration. (At the moment, this is just the palette background)
  8. Add position setting for background image; top left, top middle, top right,
     bottom left, bottom middle, bottom right, left middle, right middle, and centred.
- 9. Fix combo-box menu text when shading popup menus.
-10. Fix reading of QtCurve supplied default kdeglobals file.
-11. Make code more Gtk3 friendly.
+ 9. Use square tooltips by default. (Problems have been reported with Pidgin and
+    rounded tooltip - but I cannot reproduce these!)
+10. Fix combo-box menu text when shading popup menus.
+11. Fix reading of QtCurve supplied default kdeglobals file.
+12. Make code more Gtk3 friendly.
 
 1.6.4
 -----
