@@ -2938,9 +2938,15 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
         if(opts.round>ROUND_FULL)
             clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
 
+#if GTK_CHECK_VERSION(2, 90, 0)
+        drawAreaColor(cr, area, enabled
+                                    ? &style->base[GTK_STATE_NORMAL]
+                                    : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
+#else
         drawAreaColor(cr, area, enabled
                                     ? &style->base[WIDGET_COMBO_BUTTON==w || GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state]
                                     : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
+#endif
         if(opts.round>ROUND_FULL)
             unsetCairoClipping(cr);
     }
