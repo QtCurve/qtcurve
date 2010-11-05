@@ -3693,12 +3693,12 @@ static void drawPolygon(WINDOW_PARAM GtkStyle *style, GdkColor *col, GdkRectangl
     int               i;
     cairo_antialias_t aa=cairo_get_antialias(cr);
     setCairoClipping(cr, area);
-    cairo_new_path(cr);
     cairo_set_source_rgb(cr, CAIRO_COL(*col));
     cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
+    cairo_move_to(cr, points[0].x+0.5, points[0].y+0.5);
     for(i=0; i<npoints; ++i)
         cairo_line_to(cr, points[i].x+0.5, points[i].y+0.5);
-    cairo_line_to(cr, points[0].x+0.5, points[0].y+0.5);
+    cairo_close_path(cr);
     cairo_stroke_preserve(cr);
     if(fill)
         cairo_fill(cr);
