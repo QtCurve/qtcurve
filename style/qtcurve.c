@@ -193,6 +193,37 @@ static GCache         *pixbufCache                  = NULL;
 #define QTC_CHECKBOX "checkbox-qtc"
 #define IS_QTC_PANED DETAIL(QTC_PANED)
 
+#if GTK_CHECK_VERSION(2, 90, 0)
+static cairo_rectangle_int_t createRect(int x, int y, int w, int h)
+{
+    cairo_rectangle_int_t r={x, y, w, h};
+    return r;
+}
+
+static QtcRegion * windowMask(int x, int y, int w, int h, gboolean full)
+{
+    cairo_rectangle_int_t rects[4];
+    int                   numRects=4;
+
+    if(full)
+    {
+        rects[0]=createRect(x + 4, y + 0, w-4*2, h-0*2);
+        rects[1]=createRect(x + 0, y + 4, w-0*2, h-4*2);
+        rects[2]=createRect(x + 2, y + 1, w-2*2, h-1*2);
+        rects[3]=createRect(x + 1, y + 2, w-1*2, h-2*2);
+    }
+    else
+    {
+        rects[0]=createRect(x+1, y+1, w-2, h-2);
+        rects[1]=createRect(x, y+2, w, h-4);
+        rects[2]=createRect(x+2, y, w-4, h);
+        numRects=3;
+    }
+
+    return cairo_region_create_rectangles(rects, numRects);
+}
+#endif
+
 static void clipToRegion(cairo_t *cr, QtcRegion *region)
 {
     cairo_new_path(cr);
@@ -3517,7 +3548,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     {
         GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
         
-#if GTK_CHECK_VERSION(2,9,0) && !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if GTK_CHECK_VERSION(2,9,0)
         double   radius=0;
         gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
                  rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS);
@@ -3534,6 +3565,13 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
 
             if(size!=old)
             {
+#if GTK_CHECK_VERSION(2, 90, 0)
+                QtcRegion *mask=windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
+
+                gtk_widget_shape_combine_region(widget, NULL);
+                gtk_widget_shape_combine_region(widget, mask);
+                qtcRegionDestroy(mask);
+#else
                 GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
                 cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
 
@@ -3545,23 +3583,22 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
                 cairo_set_source_rgba(crMask, 1, 0, 0, 1);
                 cairo_fill(crMask);
-                
-                g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
 
                 gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
                 gtk_widget_shape_combine_mask(widget, mask, 0, 0);
-
+                cairo_destroy(crMask);
+#endif
+                g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
                 /* Setting the window type to 'popup menu' seems to re-eanble kwin shadows! */
                 if(qtcWidgetGetWindow(widget))
                     gdk_window_set_type_hint(qtcWidgetGetWindow(widget), GDK_WINDOW_TYPE_HINT_POPUP_MENU);
-                cairo_destroy(crMask);
             }
 
             clipPathRadius(cr, x, y, width, height, radius, ROUNDED_ALL);
         }
 #endif
         drawBevelGradient(cr, style, area, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
-#if GTK_CHECK_VERSION(2,9,0) && !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if GTK_CHECK_VERSION(2,9,0)
         if(!rounded)
 #endif
         if(IS_FLAT(opts.tooltipAppearance))
@@ -5302,9 +5339,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         double   radius=0.0;
 
         /*For now dont round combos - getting weird effects with shadow/clipping :-( */
-#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        roundedMenu=FALSE;
-#else
         if(roundedMenu && !comboMenu)
         {
             int      size=((width&0xFFFF)<<16)+(height&0xFFFF),
@@ -5313,6 +5347,13 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             radius=MENU_AND_TOOLTIP_RADIUS; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
             if(size!=old)
             {
+#if GTK_CHECK_VERSION(2, 90, 0)
+                QtcRegion *mask=windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
+
+                gtk_widget_shape_combine_region(widget, NULL);
+                gtk_widget_shape_combine_region(widget, mask);
+                qtcRegionDestroy(mask);
+#else
                 GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
                 cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
 
@@ -5327,12 +5368,12 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
-                g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
                 cairo_destroy(crMask);
+#endif
+                g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
             }
             clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
         }
-#endif
 
         if(widget && /*!comboMenu && */100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
             enableBlurBehind(widget, TRUE);
