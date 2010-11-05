@@ -1398,23 +1398,33 @@ static void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, 
 }
 
 #if GTK_CHECK_VERSION(2, 90, 0)
-#define sanitizeSize(A, B, C) /* Gtk3:TODO !!! */
-#else
-static gboolean sanitizeSize(GdkWindow *window, gint *width, gint *height)
+#define sanitizeSize(A, B, C) sanitizeSizeReal(widget, B, C)
+static void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
 {
-    gboolean set_bg = FALSE;
-
-    if((-1==*width) && (-1==*height))
+    if(-1==*width || -1==*height)
     {
-        set_bg = GDK_IS_WINDOW(window);
-        gdk_window_get_size(window, width, height);
+        GdkWindow *window=gtk_widget_get_window(widget);
+
+        if(window)
+        {
+            if((-1==*width) && (-1==*height))
+                gdk_window_get_size(window, width, height);
+            else if(-1==*width)
+                gdk_window_get_size(window, width, NULL);
+            else if(-1==*height)
+                gdk_window_get_size(window, NULL, height);
+        }
     }
+}
+#else
+static void sanitizeSize(GdkWindow *window, gint *width, gint *height)
+{
+    if((-1==*width) && (-1==*height))
+        gdk_window_get_size(window, width, height);
     else if(-1==*width)
         gdk_window_get_size(window, width, NULL);
     else if(-1==*height)
         gdk_window_get_size(window, NULL, height);
-
-    return set_bg;
 }
 #endif
 
