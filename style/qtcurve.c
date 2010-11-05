@@ -29,6 +29,10 @@
 #define COMMON_FUNCTIONS
 #include "qtcurve.h"
 
+#if (defined INCREASE_SB_SLIDER) && GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#undef INCREASE_SB_SLIDER
+#endif
+
 #define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
 
@@ -72,7 +76,7 @@ static Options opts;
 #include "config.h"
 #include <cairo.h>
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#ifdef INCREASE_SB_SLIDER
 typedef struct
 {
     GtkStyle *style;
@@ -4396,7 +4400,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 }
 #endif
 #ifdef INCREASE_SB_SLIDER
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
                 if(slider && widget && GTK_IS_RANGE(widget) && !opts.flatSbarButtons && SCROLLBAR_NONE!=opts.scrollbarType
                    /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
                 {
@@ -4425,7 +4428,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     if(!isMozilla() && widget && lastSlider.widget==widget && !atEnd)
                         lastSlider.widget=NULL;
                 }
-#endif
 #endif
 
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
@@ -4528,7 +4530,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     }
                 }
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#ifdef INCREASE_SB_SLIDER
                 /* Gtk draws slider first, and then the buttons. But if we have a shaded slider, and extend this so that it
                    overlaps (by 1 pixel) the buttons, then the top/bottom is vut off if this is shaded...
                    So, work-around this by re-drawing the slider here! */
@@ -7136,7 +7138,7 @@ static void gtkDrawSlider(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
     CAIRO_BEGIN
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#ifdef INCREASE_SB_SLIDER
     lastSlider.widget=NULL;
 #endif
     /* Fix Java swing sliders looking pressed */
@@ -7161,7 +7163,7 @@ static void gtkDrawSlider(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
     if(scrollbar || SLIDER_TRIANGULAR!=opts.sliderStyle)
     {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#ifdef INCREASE_SB_SLIDER
         if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType && !isMozilla())
         {
             lastSlider.style=style;
@@ -8491,7 +8493,7 @@ void qtcurve_style_register_type(GTypeModule *module)
 
 static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#ifdef INCREASE_SB_SLIDER
     lastSlider.widget=NULL;
 #endif
     if(qtInit())
