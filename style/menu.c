@@ -7,7 +7,6 @@
 
 static gboolean qtcEmitMenuSize(GtkWidget *w, unsigned int size)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(w)
     {
         unsigned int oldSize=(unsigned int)g_object_get_data(G_OBJECT(w), MENU_SIZE_ATOM);
@@ -27,7 +26,6 @@ static gboolean qtcEmitMenuSize(GtkWidget *w, unsigned int size)
             return TRUE;
         }
     }
-#endif
     return FALSE;
 }
 

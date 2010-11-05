@@ -263,7 +263,6 @@ static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level);
 
 static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(w &&!g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM))
     {
         GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
@@ -276,7 +275,6 @@ static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
                         XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&setting, 1);
         return TRUE;
     }
-#endif
     return FALSE;
 }
 
@@ -301,7 +299,6 @@ static gboolean qtcWindowToggleStatusBar(GtkWidget *widget)
 
 static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     GtkWindow     *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
     GdkDisplay    *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
     unsigned long prop=(IS_FLAT_BGND(opts.bgndAppearance) ? (IMG_NONE!=opts.bgndImage.type ? APPEARANCE_RAISED : APPEARANCE_FLAT)
@@ -318,7 +315,6 @@ static void qtcWindowSetProperties(GtkWidget *w, unsigned short opacity)
     XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),
                     gdk_x11_get_xatom_by_name_for_display(display, BGND_ATOM),
                     XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
-#endif
 }
 
 static gboolean qtcWindowKeyRelease(GtkWidget *widget, GdkEventKey *event, gpointer user_data)

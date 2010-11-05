@@ -2736,7 +2736,6 @@ static gboolean isRgbaWidget(GtkWidget *widget)
 #define BLUR_BEHIND_OBJECT "QTC_BLUR_BEHIND"
 static void enableBlurBehind(GtkWidget *w, gboolean enable)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
 
     if(topLevel)
@@ -2761,7 +2760,6 @@ static void enableBlurBehind(GtkWidget *w, gboolean enable)
             }
         }
     }
-#endif
 }
 
 static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget, gint x, gint y, gint width,

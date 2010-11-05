@@ -14,7 +14,7 @@
         return req;
     }
 
-    #define qtcWidgetGetWindow(A) gtk_widget_get_parent_window(A)
+    #define qtcWidgetGetWindow(A) gtk_widget_get_window(A)
 
     static gboolean qtcIsProgressBar(GtkWidget *w)
     {
@@ -65,7 +65,7 @@
     #define IS_PROGRESS_BAR(W)          qtcIsProgressBar(W)
     #define IS_PROGRESS                 GTK_IS_PROGRESS_BAR(widget) || DETAIL("progressbar")
 
-    #define qtcStyleApplyDefBgnd(SET_BG, STATE) gtk_style_apply_default_background(style, cr, gtk_widget_get_window(widget), STATE, x, y, width, height)
+    #define qtcStyleApplyDefBgnd(SET_BG, STATE) gtk_style_apply_default_background(style, cr, qtcWidgetGetWindow(widget), STATE, x, y, width, height)
 
     #define QtcRegion                   cairo_region_t
     #define qtcRegionRect               cairo_region_create_rectangle
