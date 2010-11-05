@@ -5556,6 +5556,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         drawFadedLine(cr, x+(width>>1), y, 1, height, &qtcPalette.background[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
     else
     {
+        EWidget wt=!detail && GTK_IS_TREE_VIEW(widget) ? WIDGET_PBAR_TROUGH : WIDGET_FRAME;
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
         if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x+1, y+1, width-2, height-2))
         {
@@ -5565,7 +5566,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         }
         unsetCairoClipping(cr);
         drawBorder(cr, style, state, area, x, y, width, height,
-                   NULL, menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), WIDGET_FRAME, STD_BORDER);
+                   NULL, menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), wt, STD_BORDER);
     }
     CAIRO_END
 }

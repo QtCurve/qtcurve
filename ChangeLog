@@ -14,7 +14,7 @@
     rounded tooltip - but I cannot reproduce these!)
 10. Fix combo-box menu text when shading popup menus.
 11. Fix reading of QtCurve supplied default kdeglobals file.
-12. Make code more Gtk3 friendly.
+12. Fix rounding of troughs of progressbars within treeview.
 
 1.6.4
 -----
