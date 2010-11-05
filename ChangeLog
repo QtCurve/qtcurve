@@ -10,21 +10,23 @@
     QtCurve kwin decoration.
  8. Add position setting for background image; top left, top middle, top right,
     bottom left, bottom middle, bottom right, left middle, right middle, and centred.
- 9. In preview window, draw background rings/image down from titlebar.
-10. Add option to use KDE4 palette's hover colour for kwin button symbol
+ 9. Use square tooltips by default. (Problems have been reported with Pidgin and
+    rounded tooltip - but I cannot reproduce these!)
+10. In preview window, draw background rings/image down from titlebar.
+11. Add option to use KDE4 palette's hover colour for kwin button symbol
     mouse-over.
-11. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
-12. RTL fixes/workarounds for table headers.
-13. Workaround kcmshell terminating immediately after QtCurve config dialog is
+12. Fix slight drawing glitch when not using 'glow' for tab mouse-over.
+13. RTL fixes/workarounds for table headers.
+14. Workaround kcmshell terminating immediately after QtCurve config dialog is
     closed - increase KGlobal reference count.
-14. When shading tab background, use fillRect() and not fillPath() - seems to
+15. When shading tab background, use fillRect() and not fillPath() - seems to
     workaround glithches with intel 2.12 graphics driver.
-15. Fix kwin option to only apply opacity to titlebar.
-16. Add option to control whether window titlebars are filled with the
+16. Fix kwin option to only apply opacity to titlebar.
+17. Add option to control whether window titlebars are filled with the
     background *before* the titlebar gradient is applied.
-17. Altered check/radio contents size - so as to better align cehckbox texts
+18. Altered check/radio contents size - so as to better align cehckbox texts
     when used in left part of a form-layout.
-18. Slightly better kwin button icon size calculation.
+19. Slightly better kwin button icon size calculation.
 
 1.6.4
 -----

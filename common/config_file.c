@@ -1813,7 +1813,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 CFG_READ_INT(windowBorder);
 
             if(opts->version<MAKE_VERSION(1, 7))
+            {
                 opts->windowBorder|=WINDOW_BORDER_FILL_TITLEBAR;
+                def->square=SQUARE_POPUP_MENUS;
+            }
 
             if(opts->version<MAKE_VERSION(1, 4))
             {
@@ -2569,7 +2572,7 @@ static void defaultSettings(Options *opts)
     opts->boldProgress=true;
     opts->coloredTbarMo=false;
     opts->borderSelection=false;
-    opts->square=SQUARE_POPUP_MENUS;
+    opts->square=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
     opts->stripedSbar=false;
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
