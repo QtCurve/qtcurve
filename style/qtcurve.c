@@ -29,10 +29,6 @@
 #define COMMON_FUNCTIONS
 #include "qtcurve.h"
 
-#if (defined INCREASE_SB_SLIDER) && GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-#undef INCREASE_SB_SLIDER
-#endif
-
 #define MO_ARROW(MENU, COL) (!MENU && MO_NONE!=opts.coloredMouseOver && GTK_STATE_PRELIGHT==state \
                                     ? &qtcPalette.mouseover[ARROW_MO_SHADE] : (COL))
 
@@ -80,10 +76,13 @@ static Options opts;
 typedef struct
 {
     GtkStyle *style;
+#if GTK_CHECK_VERSION(2, 90, 0)
+    cairo_t *cr;
+#else
     GdkWindow *window;
+#endif
     GtkStateType state;
     GtkShadowType shadow_type;
-    GdkRectangle *area;
     GtkWidget *widget;
     const gchar *detail;
     gint x;
@@ -4402,24 +4401,33 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                    /*&& !(GTK_STATE_PRELIGHT==state && MO_GLOW==opts.coloredMouseOver)*/)
                 {
                     GtkAdjustment *adj       = qtcRangeGetAdjustment(GTK_RANGE(widget));
-                    gboolean      horizontal = GTK_RANGE(widget)->orientation != GTK_ORIENTATION_HORIZONTAL,
+#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+                    gboolean      horizontal = width>height,
+                                  hasStartStepper = SCROLLBAR_PLATINUM!=opts.scrollbarType,
+                                  hasEndStepper   = SCROLLBAR_NEXT!=opts.scrollbarType,
+#else
+                    gboolean      horizontal = GTK_ORIENTATION_HORIZONTAL==GTK_RANGE(widget)->orientation,
+                                  hasStartStepper = GTK_RANGE(widget)->has_stepper_a || GTK_RANGE(widget)->has_stepper_b,
+                                  hasEndStepper   = GTK_RANGE(widget)->has_stepper_c || GTK_RANGE(widget)->has_stepper_d,
+#endif
                                   atEnd      = FALSE;
                     double        value      = qtcAdjustmentGetValue(adj);
 
-                    if(value <= qtcAdjustmentGetLower(adj) && (GTK_RANGE(widget)->has_stepper_a || GTK_RANGE(widget)->has_stepper_b))
+                    if(hasStartStepper && value <= qtcAdjustmentGetLower(adj))
                     {
                         if (horizontal)
-                            y--, height++;
-                        else
                             x--, width++;
+                        else
+                            y--, height++;
+
                         atEnd=TRUE;
                     }
-                    if(value >= qtcAdjustmentGetUpper(adj) - qtcAdjustmentGetPageSize(adj) && (GTK_RANGE(widget)->has_stepper_c || GTK_RANGE(widget)->has_stepper_d))
+                    if(hasEndStepper && value >= qtcAdjustmentGetUpper(adj) - qtcAdjustmentGetPageSize(adj))
                     {
                         if (horizontal)
-                            height++;
-                        else
                             width++;
+                        else
+                            height++;
                         atEnd=TRUE;
                     }
 
@@ -4536,8 +4544,13 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                    WIDGET_SB_BUTTON==widgetType && widget && widget==lastSlider.widget && !isMozilla() &&
                    ( (SCROLLBAR_NEXT==opts.scrollbarType && STEPPER_B==stepper) || STEPPER_D==stepper))
                 {
+#if GTK_CHECK_VERSION(2, 90, 0)
+                    gtkDrawSlider(lastSlider.style, lastSlider.cr, lastSlider.state, lastSlider.shadow_type, lastSlider.widget,
+                                  lastSlider.detail, lastSlider.x, lastSlider.y, lastSlider.width, lastSlider.height, lastSlider.orientation);
+#else
                     gtkDrawSlider(lastSlider.style, lastSlider.window, lastSlider.state, lastSlider.shadow_type, NULL, lastSlider.widget,
                                   lastSlider.detail, lastSlider.x, lastSlider.y, lastSlider.width, lastSlider.height, lastSlider.orientation);
+#endif
                     lastSlider.widget=NULL;
                 }
 #endif
@@ -7165,10 +7178,13 @@ static void gtkDrawSlider(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
         if(!opts.flatSbarButtons && SHADE_NONE!=opts.shadeSliders && SCROLLBAR_NONE!=opts.scrollbarType && !isMozilla())
         {
             lastSlider.style=style;
+#if GTK_CHECK_VERSION(2, 90, 0)
+            lastSlider.cr=cr;
+#else
             lastSlider.window=window;
+#endif
             lastSlider.state=state;
             lastSlider.shadow_type=shadow_type;
-            lastSlider.area=area;
             lastSlider.widget=widget;
             lastSlider.detail=detail;
             lastSlider.x=x;
