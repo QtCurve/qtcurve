@@ -123,6 +123,12 @@ static QtCSlider lastSlider;
 #define STYLE style
 #define WIDGET_TYPE_NAME(xx) (widget && !strcmp(g_type_name (G_TYPE_FROM_INSTANCE(widget)), (xx)))
 
+#if GTK_CHECK_VERSION(2, 90, 0)
+    #define QTC_IS_COMBO(X) GTK_IS_COMBO_BOX_TEXT(X)
+#else
+    #define QTC_IS_COMBO(X) GTK_IS_COMBO(X)
+#endif
+
 #ifndef GTK_IS_COMBO_BOX_ENTRY
 #define GTK_IS_COMBO_BOX_ENTRY(x) 0
 #endif
@@ -636,33 +642,21 @@ static gboolean isComboBoxButton(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
-           (GTK_IS_COMBO_BOX_ENTRY(parent)
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-           || GTK_IS_COMBO(parent)
-#endif
-           );
+           (GTK_IS_COMBO_BOX_ENTRY(parent) || QTC_IS_COMBO(parent));
 }
 
 static gboolean isComboBox(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
-           !GTK_IS_COMBO_BOX_ENTRY(parent) && (GTK_IS_COMBO_BOX(parent)
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-                                                || GTK_IS_COMBO(parent)
-#endif
-                                               );
+           !GTK_IS_COMBO_BOX_ENTRY(parent) && (GTK_IS_COMBO_BOX(parent) || QTC_IS_COMBO(parent));
 }
 
 static gboolean isComboBoxEntry(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_ENTRY(widget) && (parent=qtcWidgetGetParent(widget)) &&
-           (GTK_IS_COMBO_BOX_ENTRY(parent)
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-           || GTK_IS_COMBO(parent)
-#endif
-           );
+           (GTK_IS_COMBO_BOX_ENTRY(parent) || QTC_IS_COMBO(parent));
 }
 
 static gboolean isComboBoxEntryButton(GtkWidget *widget)
@@ -714,16 +708,13 @@ static gboolean isOnComboBox(GtkWidget *w, int level)
 
 static gboolean isOnCombo(GtkWidget *w, int level)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(w)
     {
-        if(GTK_IS_COMBO(w))
+        if(QTC_IS_COMBO(w))
             return TRUE;
         else if(level<4)
             return isOnCombo(qtcWidgetGetParent(w), ++level);
     }
-#endif
-    return FALSE;
 }
 
 static gboolean isOnOptionMenu(GtkWidget *w, int level)
