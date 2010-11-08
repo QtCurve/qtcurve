@@ -4182,6 +4182,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             if(offset)
                 drawEtch(cr, area, widget, x, y, width, height, FALSE,
                          ROUNDED_RIGHT, WIDGET_SPIN);
+#if GTK_CHECK_VERSION(2, 90, 0)
+            bgnd=getFill(GTK_STATE_ACTIVE==state ? GTK_STATE_NORMAL : state, FALSE);
+#endif
             drawLightBevel(cr, style, state, area, x, y+offset, width-offset, height-(2*offset), &btn_colors[bgnd],
                            btn_colors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
                            DF_DO_CORNERS|DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
