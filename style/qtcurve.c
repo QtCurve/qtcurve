@@ -67,7 +67,9 @@ static Options opts;
 #include "widgetmap.c"
 #include "window.c"
 #include "entry.c"
+#if !GTK_CHECK_VERSION(2, 90, 0)
 #include "wmmove.c"
+#endif
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -5122,9 +5124,11 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             gboolean    drawGradient=GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app),
                         fillBackground=menubar && SHADE_NONE!=opts.shadeMenubars;
 
+#if !GTK_CHECK_VERSION(2, 90, 0)
 //             if(menubar)
             if(!isMozilla())
                 qtcWMMoveSetup(widget);
+#endif
 
             if(menubar && BLEND_TITLEBAR)
             {

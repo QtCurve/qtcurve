@@ -2944,6 +2944,23 @@ static gboolean qtInit()
             if(TBTN_RAISED==opts.tbarBtns || TBTN_JOINED==opts.tbarBtns)
                 gtk_rc_parse_string("style \""RC_SETTING"TbJ\" { GtkToolbar::button-relief = 1 } "
                                     "widget_class \"*<GtkToolbar>\"  style \""RC_SETTING"TbJ\"");
+
+#if GTK_CHECK_VERSION(2, 90, 0)
+            switch(opts.windowDrag)
+            {
+                case WM_DRAG_MENUBAR:
+                    gtk_rc_parse_string("style \""RC_SETTING"WDrag\" { GtkWidget::window-dragging = 1 } "
+                                        "widget_class \"*<GtkMenuShell>\"  style \""RC_SETTING"WDrag\"");
+                    break;
+                case WM_DRAG_ALL:
+                case WM_DRAG_MENU_AND_TOOLBAR:
+                    gtk_rc_parse_string("style \""RC_SETTING"WDrag\" { GtkWidget::window-dragging = 1 } "
+                                        "widget_class \"*<GtkMenuShell>\"  style \""RC_SETTING"WDrag\" "
+                                        "widget_class \"*<GtkToolbar>\"  style \""RC_SETTING"WDrag\"");
+                default:
+                    break;
+            }
+#endif
             if(tmpStr)
                 free(tmpStr);
 
