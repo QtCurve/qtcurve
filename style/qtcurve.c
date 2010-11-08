@@ -5659,6 +5659,10 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                     state=GTK_STATE_PRELIGHT, qtcWidgetSetState(widget, GTK_STATE_PRELIGHT);
             }
 
+#if GTK_CHECK_VERSION(2, 90, 0)
+            if(!opts.unifySpin && isSpin)
+                width-=16;
+#endif
             drawEntryField(cr, style, state, widget, area, x, y, width, height,
                         combo || isSpin
                             ? rev
