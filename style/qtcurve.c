@@ -3119,16 +3119,18 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
     if(opts.fillProgress)
         x--, y--, width+=2, height+=2, xo=x, yo=y, wo=width, ho=height;
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(STRIPE_NONE!=opts.stripedProgress && opts.animatedProgress && (isEntryProg || IS_PROGRESS_BAR(widget)))
     {
-        if(isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
+        if(isEntryProg
+#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+            || !GTK_PROGRESS(widget)->activity_mode
+#endif
+          )
             qtc_animation_progressbar_add((gpointer)widget, isEntryProg);
 
         animShift+=(revProg ? -1 : 1)*
                     (((int)(qtc_animation_elapsed(widget)*PROGRESS_CHUNK_WIDTH))%(PROGRESS_CHUNK_WIDTH*2));
     }
-#endif
 
     {
         gboolean grayItem=GTK_STATE_INSENSITIVE==state && ECOLOR_BACKGROUND!=opts.progressGrooveColor;
