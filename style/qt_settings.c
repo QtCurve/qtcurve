@@ -2145,6 +2145,12 @@ static gboolean qtInit()
             readConfig(0L, &opts, 0L);
 #endif
 
+#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+            opts.square|=SQUARE_POPUP_MENUS;
+            opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+            opts.animatedProgress=FALSE;
+#endif
+
 /*
             if(opts.inactiveHighlight)
                 generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),
