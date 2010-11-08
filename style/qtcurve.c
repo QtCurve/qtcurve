@@ -1890,7 +1890,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && DO_EFFECT,
                 glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && qtcWidgetHasFocus(wid) &&
-                          GTK_STATE_INSENSITIVE!=state &&
+                          GTK_STATE_INSENSITIVE!=state && !isComboBoxEntryButton(wid) &&
                           ((WIDGET_RADIO_BUTTON!=widget && WIDGET_CHECKBOX!=widget) || GTK_STATE_ACTIVE!=state),
                 glowFocusSunkenToggle=sunken && (glowFocus || (doColouredMouseOver && MO_GLOW==opts.coloredMouseOver)) &&
                                       wid && GTK_IS_TOGGLE_BUTTON(wid),
@@ -7729,10 +7729,17 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
 #endif
     if(isComboBoxEntryButton(widget))
     {
+#if GTK_CHECK_VERSION(2, 90, 0)
+        if(doEtch)
+            x-=2, y++, width+=3, height-=2;
+        else
+            x-=2, width+=4;
+#else
         if(doEtch)
             x++, y+=2, width-=3, height-=4;
         else
             x++, y++, width-=2, height-=2;
+#endif
         btn=comboButton=true;
     }
     else if(isGimpCombo(widget))
