@@ -123,17 +123,19 @@ static QtCSlider lastSlider;
 #define STYLE style
 #define WIDGET_TYPE_NAME(xx) (widget && !strcmp(g_type_name (G_TYPE_FROM_INSTANCE(widget)), (xx)))
 
-#if GTK_CHECK_VERSION(2, 90, 0)
-    #define QTC_IS_COMBO(X) GTK_IS_COMBO_BOX_TEXT(X)
-#else
-    #define QTC_IS_COMBO(X) GTK_IS_COMBO(X)
-#endif
-
 #ifndef GTK_IS_COMBO_BOX_ENTRY
 #define GTK_IS_COMBO_BOX_ENTRY(x) 0
 #endif
 #ifndef GTK_IS_COMBO_BOX
 #define GTK_IS_COMBO_BOX(x) 0
+#endif
+
+#if GTK_CHECK_VERSION(2, 90, 0)
+    #define QTC_IS_COMBO(X)    GTK_IS_COMBO_BOX_TEXT(X)
+    #define QTC_COMBO_ENTRY(X) GTK_IS_COMBO_BOX_TEXT(X)
+#else
+    #define QTC_IS_COMBO(X)    GTK_IS_COMBO(X)
+    #define QTC_COMBO_ENTRY(X) GTK_IS_COMBO_BOX_ENTRY(X)
 #endif
 
 #define SLIDER_TROUGH_SIZE 5
@@ -642,27 +644,27 @@ static gboolean isComboBoxButton(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
-           (GTK_IS_COMBO_BOX_ENTRY(parent) || QTC_IS_COMBO(parent));
+           (QTC_COMBO_ENTRY(parent) || QTC_IS_COMBO(parent));
 }
 
 static gboolean isComboBox(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_BUTTON(widget) && (parent=qtcWidgetGetParent(widget)) &&
-           !GTK_IS_COMBO_BOX_ENTRY(parent) && (GTK_IS_COMBO_BOX(parent) || QTC_IS_COMBO(parent));
+           !QTC_COMBO_ENTRY(parent) && (GTK_IS_COMBO_BOX(parent) || QTC_IS_COMBO(parent));
 }
 
 static gboolean isComboBoxEntry(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
     return widget && GTK_IS_ENTRY(widget) && (parent=qtcWidgetGetParent(widget)) &&
-           (GTK_IS_COMBO_BOX_ENTRY(parent) || QTC_IS_COMBO(parent));
+           (QTC_COMBO_ENTRY(parent) || QTC_IS_COMBO(parent));
 }
 
 static gboolean isComboBoxEntryButton(GtkWidget *widget)
 {
     GtkWidget *parent=NULL;
-    return widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) && GTK_IS_COMBO_BOX_ENTRY(parent);
+    return widget && (parent=qtcWidgetGetParent(widget)) && GTK_IS_TOGGLE_BUTTON(widget) && QTC_COMBO_ENTRY(parent);
 }
 
 /*
@@ -686,7 +688,7 @@ static gboolean isOnComboEntry(GtkWidget *w, int level)
 {
     if(w)
     {
-        if(GTK_IS_COMBO_BOX_ENTRY(w))
+        if(QTC_COMBO_ENTRY(w))
             return TRUE;
         else if(level<4)
             return isOnComboEntry(qtcWidgetGetParent(w), ++level);
@@ -1085,7 +1087,7 @@ static gboolean isComboMenu(GtkWidget *widget)
 #if 0
 static gboolean isComboFrame(GtkWidget *widget)
 {
-    return !GTK_IS_COMBO_BOX_ENTRY(widget) && GTK_IS_FRAME(widget) && qtcWidgetGetParent(widget) && GTK_IS_COMBO_BOX(qtcWidgetGetParent(widget));
+    return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && qtcWidgetGetParent(widget) && GTK_IS_COMBO_BOX(qtcWidgetGetParent(widget));
 }
 #endif
 
@@ -4476,7 +4478,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     gboolean     rev=FALSE,
                                  mozToolbar=isMozilla() && parent &&
                                             GTK_IS_TOGGLE_BUTTON(widget) &&
-                                            GTK_IS_COMBO_BOX_ENTRY(parent) &&
+                                            QTC_COMBO_ENTRY(parent) &&
                                             (parent=qtcWidgetGetParent(parent)) && GTK_IS_FIXED(parent) &&
                                             (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent) &&
                                             0==strcmp(qtcWidgetName(parent), "MozillaGtkWidget");
@@ -4496,7 +4498,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     // When we draw the entry, if its highlighted we want to highlight this button as well.
                     // Unfortunately, when the entry of a GtkComboBoxEntry draws itself, there is no way to
                     // determine the button associated with it. So, we store the mapping here...
-                    if(!mozToolbar && parent && GTK_IS_COMBO_BOX_ENTRY(parent))
+                    if(!mozToolbar && parent && QTC_COMBO_ENTRY(parent))
                         qtcWidgetMapSetup(parent, widget, 0);
                     // If the button is disabled, but the entry field is not - then use entry field's state
                     // for the button. This fixes an issue with LinuxDC++ and Gtk 2.18
@@ -5664,7 +5666,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                 if(btn && GTK_STATE_INSENSITIVE!=qtcWidgetGetState(widget))
                     gtk_widget_queue_draw(btn);
 
-                if(GTK_IS_COMBO_BOX_ENTRY(parent))
+                if(QTC_COMBO_ENTRY(parent))
                     qtcWidgetMapSetup(parent, widget, 1);
             }
         }

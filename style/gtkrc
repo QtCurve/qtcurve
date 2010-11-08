@@ -36,6 +36,7 @@ style "qtcurve-default"
   GtkNotebook::tab-curvature = 4
   GtkStatusbar::shadow-type = 0
   GtkComboBoxEntry::appears-as-list = 1
+  GtkComboBoxText::appears-as-list = 1
   GtkTreeView::allow-rules = 1
   GtkTreeView::row-ending-details = 1
   GtkMenu::vertical-padding = 0
