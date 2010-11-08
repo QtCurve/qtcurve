@@ -2148,6 +2148,8 @@ static gboolean qtInit()
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             opts.square|=SQUARE_POPUP_MENUS;
             opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+            opts.sortedLv=SHADE_NONE;
+            opts.lvLines=LV_NONE;
 #endif
 
 /*
