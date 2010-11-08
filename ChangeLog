@@ -15,6 +15,10 @@
 10. Fix combo-box menu text when shading popup menus.
 11. Fix reading of QtCurve supplied default kdeglobals file.
 12. Fix rounding of troughs of progressbars within treeview.
+13. When using glow focus, dont draw glow focus and line focus on button of editable
+    combo - jsut draw line.
+14. Improve background gradient performance - only re-draw on size-request if size
+    is different from last time.
 
 1.6.4
 -----

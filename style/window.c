@@ -92,51 +92,57 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointe
     // Need to invalidate the whole of the window on a resize, as gradient needs to be redone.
     if(widget && (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type))
     {
-        GdkRectangle  rect;
         GtkAllocation alloc=qtcWidgetGetAllocation(widget);
-
-        rect.x=0;
-        rect.y=0;
-
-        if(IS_FLAT(opts.bgndAppearance) && IMG_NONE!=opts.bgndImage.type)
+        int           size=((alloc.width&0xFFFF)<<16)+(alloc.height&0xFFFF);
+        
+        if(size!=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_SIZE"))
         {
-            EPixPos pos=IMG_FILE==opts.bgndImage.type ? opts.bgndImage.pos : PP_TR;
+            GdkRectangle  rect;
 
-            if(IMG_FILE==opts.bgndImage.type)
-                loadBgndImage(&opts.bgndImage);
+            rect.x=0;
+            rect.y=0;
 
-            switch(pos)
+            if(IS_FLAT(opts.bgndAppearance) && IMG_NONE!=opts.bgndImage.type)
             {
-                case PP_TL:
-                    rect.width=opts.bgndImage.width+1;
-                    rect.height=opts.bgndImage.height+1;
-                    break;
-                case PP_TM:
-                case PP_TR:
+                EPixPos pos=IMG_FILE==opts.bgndImage.type ? opts.bgndImage.pos : PP_TR;
+
+                if(IMG_FILE==opts.bgndImage.type)
+                    loadBgndImage(&opts.bgndImage);
+
+                switch(pos)
+                {
+                    case PP_TL:
+                        rect.width=opts.bgndImage.width+1;
+                        rect.height=opts.bgndImage.height+1;
+                        break;
+                    case PP_TM:
+                    case PP_TR:
+                        rect.width=alloc.width;
+                        rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
+                        break;
+                    case PP_LM:
+                    case PP_BL:
+                        rect.width=opts.bgndImage.width+1;
+                        rect.height=alloc.height;
+                        break;
+                    case PP_CENTRED:
+                    case PP_BR:
+                    case PP_BM:
+                    case PP_RM:
+                        rect.width=alloc.width;
+                        rect.height=alloc.height;
+                        break;
+                }
+                if(alloc.width<rect.width)
                     rect.width=alloc.width;
-                    rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
-                    break;
-                case PP_LM:
-                case PP_BL:
-                    rect.width=opts.bgndImage.width+1;
+                if(alloc.height<rect.height)
                     rect.height=alloc.height;
-                    break;
-                case PP_CENTRED:
-                case PP_BR:
-                case PP_BM:
-                case PP_RM:
-                    rect.width=alloc.width;
-                    rect.height=alloc.height;
-                    break;
             }
-            if(alloc.width<rect.width)
-                rect.width=alloc.width;
-            if(alloc.height<rect.height)
-                rect.height=alloc.height;
+            else
+                rect.width=alloc.width, rect.height=alloc.height;
+            gdk_window_invalidate_rect(qtcWidgetGetWindow(widget), &rect, FALSE);
+            g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_SIZE", (gpointer)size);
         }
-        else
-            rect.width=alloc.width, rect.height=alloc.height;
-        gdk_window_invalidate_rect(qtcWidgetGetWindow(widget), &rect, FALSE);
     }
     return FALSE;
 }
