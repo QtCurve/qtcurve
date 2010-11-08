@@ -3858,9 +3858,11 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
             //             isFixedWidget(qtcWidgetGetParent(widget)->parent->parent);
             x++;
 
+#if !GTK_CHECK_VERSION(2, 90, 0)
             // NOTE: Dont do this for moz - as looks odd fir widgets in HTML pages - arrow is shifted too much :-(
             if(!DO_EFFECT) // || moz)
                 x+=2;
+#endif
 
             if(opts.doubleGtkComboArrow)
             {
