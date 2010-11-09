@@ -27,6 +27,7 @@
 18. Altered check/radio contents size - so as to better align cehckbox texts
     when used in left part of a form-layout.
 19. Slightly better kwin button icon size calculation.
+20. Replace "..." in QPrintDialog with "document-open" icon.
 
 1.6.4
 -----
