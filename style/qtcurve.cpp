@@ -5329,7 +5329,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     QPixmap pix;
                     QString key;
 
-                    key.sprintf("qtc-sel-%x-%x", pix.height(), color.rgba());
+                    key.sprintf("qtc-sel-%x-%x", r.height(), color.rgba());
                     if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
                     {
                         pix=QPixmap(QSize(24, r.height()));
@@ -10982,13 +10982,14 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
             QString key;
             bool    small(circular || (horiz ? r.width() : r.height())<(2*endSize));
             QPixmap pix;
+            QSize   pixSize(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
             uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver|
                           (WIDGET_MDI_WINDOW_BUTTON==w ? State_Active : State_None)));
 
-            key.sprintf("qtc-%x-%d-%x-%x-%x-%x-%x", w, (int)realRound, pix.width(), pix.height(), state, fill.rgba(), (int)(radius*100));
+            key.sprintf("qtc-%x-%d-%x-%x-%x-%x-%x", w, (int)realRound, pixSize.width(), pixSize.height(), state, fill.rgba(), (int)(radius*100));
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
-                pix=QPixmap(small ? QSize(r.width(), r.height()) : QSize(horiz ? size : r.width(), horiz ? r.height() : size));
+                pix=QPixmap(pixSize);
                 pix.fill(Qt::transparent);
 
                 QPainter pixPainter(&pix);
