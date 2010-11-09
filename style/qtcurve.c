@@ -2743,14 +2743,23 @@ static gboolean compositingActive(GtkWidget *widget)
 
 static gboolean isRgbaWidget(GtkWidget *widget)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if (widget)
     {
-        GdkScreen *screen = gtk_widget_get_screen (widget);
-        if (gdk_screen_get_rgba_colormap(screen))
-            return gtk_widget_get_colormap(widget)==gdk_screen_get_rgba_colormap(screen);
-    }
+        GdkVisual *visual = gtk_widget_get_visual(widget);
+#if GTK_CHECK_VERSION(2, 90, 0)
+        guint32  redMask,
+                 greenMask,
+                 blueMask;
+
+        gdk_visual_get_red_pixel_details(visual, &redMask, NULL, NULL);
+        gdk_visual_get_green_pixel_details(visual, &greenMask, NULL, NULL);
+        gdk_visual_get_blue_pixel_details(visual, &blueMask, NULL, NULL);
+
+        return 32==gdk_visual_get_depth(visual) && (0xff0000==redMask && 0x00ff00==greenMask && 0x0000ff==blueMask);
+#else
+        return 32==visual->depth && (0xff0000==visual->red_mask && 0x00ff00==visual->green_mask && 0x0000ff==visual->blue_mask);
 #endif
+    }
     return FALSE;
 }
 
