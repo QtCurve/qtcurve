@@ -41,9 +41,11 @@ endif (NOT KDE4_KDECONFIG_EXECUTABLE)
 
 # Then set install prefix...
 if (KDE4_KDECONFIG_EXECUTABLE)
-    exec_program(${KDE4_KDECONFIG_EXECUTABLE}
-                 ARGS --prefix
-                 OUTPUT_VARIABLE CMAKE_INSTALL_PREFIX)
+    if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+        exec_program(${KDE4_KDECONFIG_EXECUTABLE}
+                     ARGS --prefix
+                     OUTPUT_VARIABLE CMAKE_INSTALL_PREFIX)
+    endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
     exec_program(${KDE4_KDECONFIG_EXECUTABLE}
                     ARGS --prefix
                     OUTPUT_VARIABLE KDE4PREFIX)

@@ -28,6 +28,7 @@
     when used in left part of a form-layout.
 19. Slightly better kwin button icon size calculation.
 20. Replace "..." in QPrintDialog with "document-open" icon.
+21. Dont overwrite user supplied CMAKE_INSTALL_PREFIX
 
 1.6.4
 -----
