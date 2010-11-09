@@ -8576,9 +8576,6 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
         }
 #endif
     }
-#ifdef QTC_ADD_EVENT_FILTER____DISABLED
-    qtcAddEventFilter();
-#endif
 }
 
 static void qtcurve_rc_style_finalize(GObject *object)
