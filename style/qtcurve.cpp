@@ -240,6 +240,7 @@ static enum
     APP_K3B,
     APP_OPENOFFICE,
     APP_KONSOLE,
+    APP_KMIX,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -561,7 +562,7 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #ifdef Q_WS_X11
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if(w)
+    if(w && APP_KMIX!=theThemedApp)
     {
         static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
         XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
@@ -570,7 +571,7 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
 
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if(w)
+    if(w && APP_KMIX!=theThemedApp)
     {
         static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
         unsigned long prop=((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ? APPEARANCE_RAISED : APPEARANCE_FLAT) : app)&0xFF) |
@@ -1418,6 +1419,8 @@ void Style::polish(QApplication *app)
         opts.forceAlternateLvCols=false;
     else if("konsole"==appName)
         theThemedApp=APP_KONSOLE;
+    else if("kmix"==appName)
+        theThemedApp=APP_KMIX;
 
     if(NULL!=getenv("QTCURVE_DEBUG"))
     {
