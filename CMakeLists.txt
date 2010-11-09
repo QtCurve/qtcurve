@@ -1,5 +1,5 @@
 project(QtCurve-Gtk2)
-cmake_minimum_required(VERSION 2.4.0)
+cmake_minimum_required(VERSION 2.4.4)
 
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
 set(CPACK_GENERATOR "DEB;RPM;TGZ")
@@ -59,14 +59,14 @@ if (GTK_INCLUDE_DIR)
     exec_program(${PKGCONFIG_EXECUTABLE}
                  ARGS --variable=gtk_binary_version gtk+-${GTK_MAJOR_VERSION}.0
                  OUTPUT_VARIABLE GTK_VERSION)
-    if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         exec_program(${PKGCONFIG_EXECUTABLE}
                      ARGS --variable=prefix gtk+-${GTK_MAJOR_VERSION}.0
                      OUTPUT_VARIABLE GTK_PREFIX)
         set(CMAKE_INSTALL_PREFIX ${GTK_PREFIX})
-    else(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    else(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(GTK_PREFIX ${CMAKE_INSTALL_PREFIX})
-    endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(GTK_THEME_DIR ${GTK_PREFIX}/share/themes/QtCurve)
 
     if(NOT KDE3PREFIX)
@@ -104,6 +104,8 @@ if (GTK_INCLUDE_DIR)
     configure_file(config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
     add_subdirectory(style)
     add_subdirectory(mozilla)
+    message("** PREFIX=${CMAKE_INSTALL_PREFIX}\n")
+
     if(QTC_REORDER_GTK_DIALOG_BUTTONS)
         message("**************************************************************\n"
                 "Warning: You have enabled the option for QtCurve to try to manually\n"
