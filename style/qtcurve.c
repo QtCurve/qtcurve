@@ -3123,11 +3123,9 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
 
     if(STRIPE_NONE!=opts.stripedProgress && opts.animatedProgress && (isEntryProg || IS_PROGRESS_BAR(widget)))
     {
-        if(isEntryProg
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-            || !GTK_PROGRESS(widget)->activity_mode
+        if(isEntryProg || !GTK_PROGRESS(widget)->activity_mode)
 #endif
-          )
             qtc_animation_progressbar_add((gpointer)widget, isEntryProg);
 
         animShift+=(revProg ? -1 : 1)*

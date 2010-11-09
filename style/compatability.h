@@ -63,6 +63,7 @@
     #define qtcWidgetType(W)                G_OBJECT_TYPE(W)
     #define qtcWidgetTopLevel(W)            gtk_widget_is_toplevel(W)
     #define qtcWidgetRealized(W)            gtk_widget_get_realized(W)
+    #define qtcWidgetDrawable(W)            gtk_widget_is_drawable(W)
     #define qtcMenuGetTopLevel(W)           gtk_widget_get_toplevel(W)  /* TODO ??? */
     #define qtcWindowTransientFor(W)        gtk_window_get_transient_for(GTK_WINDOW(W))
     #define qtcWindowDefaultWidget(W)       gtk_window_get_default_widget(GTK_WINDOW(W))
@@ -124,6 +125,7 @@
     #define qtcWidgetType(W)                GTK_WIDGET_TYPE(W)
     #define qtcWidgetTopLevel(W)            GTK_WIDGET_TOPLEVEL(W)
     #define qtcWidgetRealized(W)            GTK_WIDGET_REALIZED(W)
+    #define qtcWidgetDrawable(W)            GTK_WIDGET_DRAWABLE(W)
     #define qtcMenuGetTopLevel(W)           (GTK_MENU(W)->toplevel)
     #define qtcWindowTransientFor(W)        (GTK_WINDOW(W)->transient_parent)
     #define qtcWindowDefaultWidget(W)       (GTK_WINDOW(W)->default_widget)
