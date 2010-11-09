@@ -4752,13 +4752,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         int      border=BORDER_VAL(GTK_STATE_INSENSITIVE!=state || !scale);
         GdkColor *bgndcols=qtcPalette.background,
                  *bgndcol=&bgndcols[2];
-#if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        gboolean horiz=width>height;
-#else
         gboolean horiz=GTK_IS_RANGE(widget)
                         ? GTK_ORIENTATION_HORIZONTAL==qtcRangeGetOrientation(widget)
                         : width>height;
-#endif
 
         if(scale)
         {
