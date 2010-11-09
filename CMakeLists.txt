@@ -59,11 +59,15 @@ if (GTK_INCLUDE_DIR)
     exec_program(${PKGCONFIG_EXECUTABLE}
                  ARGS --variable=gtk_binary_version gtk+-${GTK_MAJOR_VERSION}.0
                  OUTPUT_VARIABLE GTK_VERSION)
-    exec_program(${PKGCONFIG_EXECUTABLE}
-                 ARGS --variable=prefix gtk+-${GTK_MAJOR_VERSION}.0
-                 OUTPUT_VARIABLE GTK_PREFIX)
+    if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+        exec_program(${PKGCONFIG_EXECUTABLE}
+                     ARGS --variable=prefix gtk+-${GTK_MAJOR_VERSION}.0
+                     OUTPUT_VARIABLE GTK_PREFIX)
+        set(CMAKE_INSTALL_PREFIX ${GTK_PREFIX})
+    else(NOT DEFINED CMAKE_INSTALL_PREFIX)
+        set(GTK_PREFIX ${CMAKE_INSTALL_PREFIX})
+    endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
     set(GTK_THEME_DIR ${GTK_PREFIX}/share/themes/QtCurve)
-    set(CMAKE_INSTALL_PREFIX ${GTK_PREFIX})
 
     if(NOT KDE3PREFIX)
         if(KDE4PREFIX)
