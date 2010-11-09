@@ -947,7 +947,7 @@ Style::Style()
         itsOOMenuCols(0L),
         itsProgressCols(0L),
         itsSaveMenuBarStatus(false),
-        itsUsePixmapCache(false),
+        itsUsePixmapCache(true),
         itsInactiveChangeSelectionColor(false),
         itsIsPreview(PREVIEW_FALSE),
         itsSidebarButtonsCols(0L),
