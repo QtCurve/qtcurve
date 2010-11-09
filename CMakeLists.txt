@@ -1,5 +1,5 @@
 project(QtCurve-KDE4)
-cmake_minimum_required(VERSION 2.4.0)
+cmake_minimum_required(VERSION 2.4.4)
 
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
 set(CPACK_GENERATOR "DEB;RPM;TGZ")
@@ -41,11 +41,11 @@ endif (NOT KDE4_KDECONFIG_EXECUTABLE)
 
 # Then set install prefix...
 if (KDE4_KDECONFIG_EXECUTABLE)
-    if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         exec_program(${KDE4_KDECONFIG_EXECUTABLE}
                      ARGS --prefix
                      OUTPUT_VARIABLE CMAKE_INSTALL_PREFIX)
-    endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     exec_program(${KDE4_KDECONFIG_EXECUTABLE}
                     ARGS --prefix
                     OUTPUT_VARIABLE KDE4PREFIX)
@@ -80,7 +80,6 @@ configure_file(config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 if (NOT QTC_QT_ONLY)
     find_package(KDE4 REQUIRED)
     include(KDE4Defaults)
-    message("** PREFIX=${CMAKE_INSTALL_PREFIX}")
 
     add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
     include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
@@ -106,6 +105,8 @@ else (NOT QTC_QT_ONLY)
 endif (NOT QTC_QT_ONLY)
 
 add_subdirectory(style)
+
+message("** PREFIX=${CMAKE_INSTALL_PREFIX}\n")
 
 if (QTC_KWIN_MAX_BUTTON_HACK)
     message("**************************************************************\n"
