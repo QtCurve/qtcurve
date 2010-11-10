@@ -4693,7 +4693,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             bool isOO(isOOWidget(widget)),
                  selectedOOMenu(isOO && (r==QRect(0, 0, 15, 15) || r==QRect(0, 0, 14, 15)) &&  // OO.o 3.2 =14x15?
                                 ((State_Sunken|State_Enabled)==state || (State_Sunken|State_Enabled|State_Selected)==state));
-                                 
+
+            if(isOO)
+                painter->fillRect(r, palette.brush(QPalette::Background));
+
             if(selectedOOMenu)
                 drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
             else

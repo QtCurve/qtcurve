@@ -31,6 +31,8 @@
 21. Dont overwrite user supplied CMAKE_INSTALL_PREFIX
 22. Dont set background XProperties for kmix - seem to cause a crash on exit when
     using raster graphicssystem.
+23. For OpenOffice, fill background before drawing radio buttons - seems to fix
+    the 'checkbox' that seems to get painted behind some radios!
 
 1.6.4
 -----
