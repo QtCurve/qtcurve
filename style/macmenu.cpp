@@ -359,7 +359,6 @@ MacMenu::hover(qlonglong key, int idx,  int x, int y)
     }
 }
 
-#if 0 // CPD - see below!
 static QMenuBar *bar4menu(QMenu *menu)
 {
     if (!menu->menuAction())
@@ -371,7 +370,6 @@ static QMenuBar *bar4menu(QMenu *menu)
             return static_cast<QMenuBar *>(w);
     return 0;
 }
-#endif
 
 void
 MacMenu::menuClosed()
@@ -386,11 +384,9 @@ MacMenu::menuClosed()
     {
         XBAR_SEND( MSG("setOpenPopup") << -500 );
 
-#if 0 // CPD setActiveWindow ??? Not in Qt4.6
         if (QMenu *menu = qobject_cast<QMenu*>(_sender))
         if (QMenuBar *bar = bar4menu(menu))
-            bar->setActiveWindow();
-#endif
+            bar->activateWindow();
     }
 }
 
