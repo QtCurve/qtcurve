@@ -4544,7 +4544,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
-#if !GTK_CHECK_VERSION(2, 90, 0)
                    /* if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && qtcWidgetGetParent(widget) && qtcWidgetGetParent(widget)->parent &&
                        GTK_IS_SCROLLED_WINDOW(qtcWidgetGetParent(widget)) && GTK_IS_NOTEBOOK(qtcWidgetGetParent(widget)->parent))
                         drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
@@ -4557,7 +4556,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 //                          else
 //                              drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
                     }
-#endif
                 }
                 else
                 {
@@ -5049,7 +5047,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             if(opts.square&SQUARE_SB_SLIDER)
                 sbarRound=ROUNDED_NONE;
 
-#if !GTK_CHECK_VERSION(2, 90, 0)
             if(drawBg)
             {
                 GtkWidget *parent=NULL;
@@ -5063,7 +5060,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                                       &qtcPalette.background[ORIGINAL_SHADE],
                                       horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
             }
-#endif
 
             if(isMozilla())
             {
