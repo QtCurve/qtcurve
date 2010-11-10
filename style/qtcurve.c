@@ -721,9 +721,9 @@ static gboolean isOnCombo(GtkWidget *w, int level)
     }
 }
 
+#if !GTK_CHECK_VERSION(2, 90, 0)
 static gboolean isOnOptionMenu(GtkWidget *w, int level)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(w)
     {
         if(GTK_IS_OPTION_MENU(w))
@@ -731,22 +731,20 @@ static gboolean isOnOptionMenu(GtkWidget *w, int level)
         else if(level<4)
             return isOnOptionMenu(qtcWidgetGetParent(w), ++level);
     }
-#endif
     return FALSE;
 }
 
-static gboolean isActiveCombo(GtkWidget *widget)
+static gboolean isActiveOptionMenu(GtkWidget *widget)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     if(GTK_IS_OPTION_MENU(widget))
     {
         GtkWidget *menu=gtk_option_menu_get_menu(GTK_OPTION_MENU(widget));
         if(menu && qtcWidgetVisible(menu) && qtcWidgetRealized(menu))
             return TRUE;
     }
-#endif
     return FALSE;
 }
+#endif
 
 static gboolean isSpinButton(GtkWidget *widget)
 {
@@ -816,7 +814,7 @@ static gboolean isOnButton(GtkWidget *w, int level, gboolean *def)
     if(w)
     {
         if((GTK_IS_BUTTON(w)
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if !GTK_CHECK_VERSION(2, 90, 0)
             || GTK_IS_OPTION_MENU(w)
 #endif
             ) && (!(GTK_IS_RADIO_BUTTON(w) || GTK_IS_CHECK_BUTTON(w))))
@@ -4279,11 +4277,13 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
 //        drawBgnd(cr, &btn_colors[bgnd], widget, area, x, y, width, height); // CPD removed as it messes up toolbars and firefox3
 
-        if(combo && !sunken && isActiveCombo(widget))
+#if !GTK_CHECK_VERSION(2, 90, 0)
+        if(combo && !sunken && isActiveOptionMenu(widget))
         {
             sunken=TRUE;
             bgnd=4;
         }
+#endif
 
         if(tbar_button && TBTN_JOINED==opts.tbarBtns)
         {
@@ -6320,8 +6320,10 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
+#if !GTK_CHECK_VERSION(2, 90, 0)
         if(!use_text && parent && GTK_IS_LABEL(widget) && isOnOptionMenu(parent, 0))
             use_text=TRUE;
+#endif
 
         /*
            This check of 'requisition' size (and not 'allocation') seems to match better
@@ -6616,8 +6618,10 @@ static void gtkDrawTab(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShad
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %s  ", __FUNCTION__, state, shadow_type, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 5);
 
-    if(isActiveCombo(widget))
+#if !GTK_CHECK_VERSION(2, 90, 0)
+    if(isActiveOptionMenu(widget))
         x++, y++;
+#endif
 
     x=reverseLayout(widget) || ((widget=qtcWidgetGetParent(widget)) && reverseLayout(widget))
                 ? x+1
@@ -7739,7 +7743,7 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
             x+=2, y+=2, width-=4, height-=4;
         btn=true;
     }
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if !GTK_CHECK_VERSION(2, 90, 0)
     else if(GTK_IS_OPTION_MENU(widget))
     {
         if((!opts.comboSplitter || FULL_FOCUS) && widget)
