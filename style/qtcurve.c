@@ -2921,7 +2921,8 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
              mouseOver=ENTRY_MO && enabled && (GTK_STATE_PRELIGHT==state || (lastMoEntry && widget==lastMoEntry) ) &&
                        qtcPalette.mouseover && GTK_APP_JAVA!=qtSettings.app,
              highlight=highlightReal || mouseOver,
-             doEtch=DO_EFFECT && opts.etchEntry;
+             doEtch=DO_EFFECT && opts.etchEntry,
+             comboOrSpin=WIDGET_SPIN==w || WIDGET_COMBO_BUTTON==w;
     GdkColor *colors=mouseOver
                         ? qtcPalette.mouseover
                         : highlightReal
@@ -2956,8 +2957,8 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
 
     if(ROUNDED_ALL!=round)
     {
-        if(WIDGET_SPIN==w || WIDGET_COMBO_BUTTON==w)
-            x--, width++;
+        if(comboOrSpin)
+            x-=2, width+=2;
         else if(highlight)
         {
             if(doEtch)
@@ -2973,22 +2974,26 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
                 width+=2;
     }
 
-    if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
+    /*if(GTK_APP_OPEN_OFFICE!=qtSettings.app)*/
     {
         if(opts.round>ROUND_FULL)
             clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_ENTRY, RADIUS_INTERNAL, ROUNDED_ALL);
 
-#if GTK_CHECK_VERSION(2, 90, 0)
         drawAreaColor(cr, area, enabled
                                     ? &style->base[GTK_STATE_NORMAL]
                                     : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
-#else
-        drawAreaColor(cr, area, enabled
-                                    ? &style->base[WIDGET_COMBO_BUTTON==w || GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state]
-                                    : &style->bg[GTK_STATE_INSENSITIVE], x+1, y+1, width-2, height-2);
-#endif
+
         if(opts.round>ROUND_FULL)
             unsetCairoClipping(cr);
+    }
+
+    if(GTK_APP_OPEN_OFFICE==qtSettings.app && comboOrSpin)
+    {
+        GdkRectangle rect;
+
+        rect.x=x, rect.width=width, rect.y=y, rect.height=height;
+        x-=4, width+=4;
+        setCairoClipping(cr, &rect);
     }
 
     {
@@ -3022,7 +3027,10 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
     drawBorder(cr, style, !widget || qtcWidgetIsSensitive(widget) ? state : GTK_STATE_INSENSITIVE, area, xo, yo, widtho, heighto,
                colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
     }
-               
+
+    if(GTK_APP_OPEN_OFFICE==qtSettings.app && comboOrSpin)
+        unsetCairoClipping(cr);
+                         
     if(GTK_IS_ENTRY(widget) && !gtk_entry_get_visibility(GTK_ENTRY(widget)))
         gtk_entry_set_invisible_char(GTK_ENTRY(widget), opts.passwordChar);
 }
@@ -4296,7 +4304,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             gboolean horiz=(tbar_button || handle_button) && IS_GLASS(opts.appearance) &&
                            IS_GLASS(opts.toolbarAppearance)
                                ? horiz_tbar
-                               : (slider && width<height) || vscrollbar || vscale
+                               : (slider && width<height) || vscrollbar || vscale || (stepper && widget && GTK_IS_VSCROLLBAR(widget))
                                    ? FALSE
                                    : TRUE,
                      defBtn=GTK_STATE_INSENSITIVE!=state && (button || togglebutton) && widget && qtcWidgetHasDefault(widget);
@@ -4382,7 +4390,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 if(ROUND_MAX==opts.round &&
                     ( (WIDGET_TOGGLE_BUTTON==widgetType && height>(opts.crSize+8) && width<(height+10)) ||
                       (GTK_APP_GIMP==qtSettings.app && WIDGET_STD_BUTTON==widgetType && WIDGET_TYPE_NAME("GimpViewableButton")) ||
-                      (opts.stdSidebarButtons && WIDGET_STD_BUTTON==widgetType && widget && isSideBarBtn(widget)) ) )
+                      (opts.stdSidebarButtons && WIDGET_STD_BUTTON==widgetType && widget && isSideBarBtn(widget)) ||
+                      (WIDGET_STD_BUTTON==widgetType && GTK_APP_OPEN_OFFICE==qtSettings.app && isFixedWidget(widget) &&
+                        height>30 && height<40 && width>16 && width<50) ) )
                     widgetType=WIDGET_TOOLBAR_BUTTON;
 
                 /* For some reason SWT combo's dont un-prelight when activated! So dont pre-light at all! */
@@ -4523,7 +4533,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     // for the button. This fixes an issue with LinuxDC++ and Gtk 2.18
                     if(GTK_STATE_INSENSITIVE==state && entry && GTK_STATE_INSENSITIVE!=entryState)
                         state=entryState;
+
                     drawEntryField(cr, style, state, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO_BUTTON);
+
                     // Get entry to redraw by setting its state...
                     // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
                     if(!mozToolbar && widget && entry && entryState!=qtcWidgetGetState(widget) && GTK_STATE_INSENSITIVE!=entryState &&

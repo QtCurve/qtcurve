@@ -20,6 +20,10 @@
 14. Improve background gradient performance - only re-draw on size-request if size
     is different from last time.
 15. Dont overwrite user supplied CMAKE_INSTALL_PREFIX
+16. OpenOffice.org fixes:
+        - toolbar buttons when using max rounded buttons.
+        - vertical scrollbar button detection
+        - background of unified spin widgets and combos
 
 1.6.4
 -----
