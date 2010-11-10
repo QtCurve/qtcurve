@@ -3484,9 +3484,12 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                                         : ROUNDED_ALL
                             : ROUNDED_NONE;
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if(opts.lvLines)
         {
+#if GTK_CHECK_VERSION(2, 90, 0)
+            if(!gtk_tree_view_get_enable_tree_lines(GTK_TREE_VIEW(widget)))
+                gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(widget), TRUE);
+#else
             QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
             GtkStyle     *style        = qtcWidgetGetStyle(widget);
 
@@ -3498,8 +3501,8 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(widget), TRUE);
                 style->black_gc=black; // Restore!
             }
-        }
 #endif
+        }
     /*
         int px, py;
         gtk_widget_get_pointer(widget, &px, &py);
@@ -7973,7 +7976,7 @@ static void gtkDrawExpander(GtkStyle *style, WINDOW_PARAM GtkStateType state, AR
         drawArrow(WINDOW_PARAM_VAL style, col, AREA_PARAM_VAL_L, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
 }
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if !GTK_CHECK_VERSION(2, 90, 0)
 static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
 {
     GdkGCValues gc_values;
@@ -8009,7 +8012,7 @@ static void styleRealize(GtkStyle *style)
     else
         qtcurveStyle->menutext[0]=NULL;
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if !GTK_CHECK_VERSION(2, 90, 0)
     qtcurveStyle->lv_lines_gc=opts.lvLines ? realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_MID]) : NULL;
 #ifndef QTC_USE_CAIRO_FOR_ARROWS
     qtcurveStyle->arrow_gc=NULL;
@@ -8023,7 +8026,7 @@ static void styleUnrealize(GtkStyle *style)
 
     parent_class->unrealize(style);
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if !GTK_CHECK_VERSION(2, 90, 0)
     if(opts.lvLines)
     {
         gtk_gc_release(qtcurveStyle->lv_lines_gc);

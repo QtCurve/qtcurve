@@ -65,7 +65,7 @@ typedef struct
     GtkStyle parent_instance;
     GdkColor *button_text[2],
              *menutext[2];
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if !GTK_CHECK_VERSION(2, 90, 0)
     GdkGC    *lv_lines_gc;
 #ifndef QTC_USE_CAIRO_FOR_ARROWS
     GdkGC   *arrow_gc;
