@@ -1672,17 +1672,6 @@ void Style::polish(QWidget *widget)
         printf("\n");
     }
     */
-#if !defined QTC_QT_ONLY
-    // Make file selection button in QPrintDialog appear more KUrlRequester like...
-    if(qobject_cast<QToolButton *>(widget) &&
-       widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
-       qobject_cast<QGroupBox *>(widget->parentWidget()) &&
-       qobject_cast<QPrintDialog *>(widget->parentWidget()->parentWidget()->parentWidget()) &&
-       static_cast<QToolButton *>(widget)->text()==QLatin1String("..."))
-    {
-        static_cast<QToolButton *>(widget)->setIcon(KIcon("document-open"));
-    }
-#endif
         
     // 'Fix' konqueror's large menubar...
     if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
@@ -2192,6 +2181,19 @@ void Style::polish(QWidget *widget)
             widget->setAutoFillBackground(false);
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
         }
+    }
+#endif
+
+#if !defined QTC_QT_ONLY
+    // Make file selection button in QPrintDialog appear more KUrlRequester like...
+    if(qobject_cast<QToolButton *>(widget) &&
+       widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
+       qobject_cast<QGroupBox *>(widget->parentWidget()) &&
+       qobject_cast<QPrintDialog *>(widget->parentWidget()->parentWidget()->parentWidget()) &&
+       static_cast<QToolButton *>(widget)->text()==QLatin1String("..."))
+    {
+        static_cast<QToolButton *>(widget)->setIcon(KIcon("document-open"));
+        static_cast<QToolButton *>(widget)->setAutoRaise(false);
     }
 #endif
 }
