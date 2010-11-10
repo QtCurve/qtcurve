@@ -6541,7 +6541,13 @@ static GdkPixbuf * gtkRenderIcon(GtkStyle *style, const GtkIconSource *source, G
         screen = gtk_widget_get_screen(widget);
         settings = gtk_settings_get_for_screen(screen);
     }
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
+#if GTK_CHECK_VERSION(2, 90, 0)
+    else if (style->visual)
+    {
+        screen = gdk_visual_get_screen(style->visual);
+        settings = gtk_settings_get_for_screen(screen);
+    }
+#else
     else if(style->colormap)
     {
         screen = gdk_colormap_get_screen(style->colormap);
@@ -8568,14 +8574,13 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
     if(qtInit())
     {
         generateColors();
-
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if(opts.dlgOpacity<100 || opts.bgndOpacity<100 || opts.menuBgndOpacity<100)
         {
             GdkColormap *colormap = gdk_screen_get_rgba_colormap(gdk_screen_get_default());
 
             if (colormap)
-                gtk_widget_set_default_colormap(colormap);;
+                gtk_widget_set_default_colormap(colormap);
         }
 #endif
     }
