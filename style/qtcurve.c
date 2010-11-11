@@ -3353,6 +3353,48 @@ static void qtcLogHandler(const gchar *domain, GLogLevelFlags level, const gchar
 {
 }
 
+static void createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gint width, gint height, double radius, gboolean isToolTip)
+{
+    if(widget)
+    {
+        int size=((width&0xFFFF)<<16)+(height&0xFFFF),
+            old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
+
+        if(size!=old)
+        {
+    #if GTK_CHECK_VERSION(2, 90, 0)
+            QtcRegion *mask=windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
+
+            gtk_widget_shape_combine_region(widget, NULL);
+            gtk_widget_shape_combine_region(widget, mask);
+            qtcRegionDestroy(mask);
+    #else
+            GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
+            cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
+
+            cairo_rectangle(crMask, 0, 0, width, height);
+            cairo_set_source_rgba(crMask, 1, 1, 1, 0);
+            cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
+            cairo_paint(crMask);
+            cairo_new_path(crMask);
+            createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
+            cairo_set_source_rgba(crMask, 0, 0, 0, 1);
+            cairo_fill(crMask);
+            if(isToolTip)
+                gtk_widget_shape_combine_mask(widget, mask, 0, 0);
+            else
+                gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
+            cairo_destroy(crMask);
+            gdk_pixmap_unref(mask);
+    #endif
+            g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
+            /* Setting the window type to 'popup menu' seems to re-eanble kwin shadows! */
+            if(isToolTip, qtcWidgetGetWindow(widget))
+                gdk_window_set_type_hint(qtcWidgetGetWindow(widget), GDK_WINDOW_TYPE_HINT_POPUP_MENU);
+        }
+    }
+}
+
 static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, AREA_PARAM
                            GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
 {
@@ -3562,55 +3604,31 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
         
 #if GTK_CHECK_VERSION(2,9,0)
-        double   radius=0;
         gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
-                 rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS);
+                 rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS),
+                 useAlpha=!nonGtk && qtSettings.useAlpha && isRgbaWidget(widget) && compositingActive(widget);
 
-        if(!nonGtk && GTK_IS_WINDOW(widget))
+        if(!nonGtk && !useAlpha && GTK_IS_WINDOW(widget))
             gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
 
         if(rounded)
         {
-            int size=((width&0xFFFF)<<16)+(height&0xFFFF),
-                old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
-
-            radius=MENU_AND_TOOLTIP_RADIUS; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
-
-            if(size!=old)
+            if(useAlpha)
             {
-#if GTK_CHECK_VERSION(2, 90, 0)
-                QtcRegion *mask=windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
-
-                gtk_widget_shape_combine_region(widget, NULL);
-                gtk_widget_shape_combine_region(widget, mask);
-                qtcRegionDestroy(mask);
-#else
-                GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
-                cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
-
-                cairo_rectangle(crMask, 0, 0, width, height);
-                cairo_set_source_rgba(crMask, 1, 1, 1, 0);
-                cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
-                cairo_paint(crMask);
-                cairo_new_path(crMask);
-                createPath(crMask, 0, 0, width, height, radius, ROUNDED_ALL);
-                cairo_set_source_rgba(crMask, 1, 0, 0, 1);
-                cairo_fill(crMask);
-
-                gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
-                gtk_widget_shape_combine_mask(widget, mask, 0, 0);
-                cairo_destroy(crMask);
-#endif
-                g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
-                /* Setting the window type to 'popup menu' seems to re-eanble kwin shadows! */
-                if(qtcWidgetGetWindow(widget))
-                    gdk_window_set_type_hint(qtcWidgetGetWindow(widget), GDK_WINDOW_TYPE_HINT_POPUP_MENU);
+                cairo_rectangle(cr, x, y, width, height);
+                cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
+                cairo_set_source_rgba(cr, 0, 0, 0, 1);
+                cairo_fill(cr);
             }
-
-            clipPathRadius(cr, x, y, width, height, radius, ROUNDED_ALL);
+            else
+                createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, TRUE);
+            clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
         }
 #endif
-        drawBevelGradient(cr, style, area, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER);
+        if(useAlpha)
+            cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+
+        drawBevelGradientAlpha(cr, style, area, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER, useAlpha ? 0.875 : 1.0);
 #if GTK_CHECK_VERSION(2,9,0)
         if(!rounded)
 #endif
@@ -3624,6 +3642,9 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
             cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
             cairo_stroke(cr);
         }
+
+        if(useAlpha)
+            cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
     }
     else if(DETAIL("icon_view_item"))
         drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
@@ -5357,59 +5378,47 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     else if(DETAIL("menu"))
     {
         gboolean comboMenu=isComboMenu(widget),
-                 roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS);
-        double   radius=0.0;
+                 roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS),
+                 useAlphaForCorners=FALSE;
+        double   radius=0.0,
+                 alpha=1.0;
+        gboolean isAlphaWidget=isRgbaWidget(widget) && compositingActive(widget),
+                 useAlpha=isAlphaWidget && opts.menuBgndOpacity<100;
 
         /*For now dont round combos - getting weird effects with shadow/clipping :-( */
         if(roundedMenu && !comboMenu)
         {
-            int      size=((width&0xFFFF)<<16)+(height&0xFFFF),
-                     old=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK");
-
-            radius=MENU_AND_TOOLTIP_RADIUS; // getRadius(&opts, width, height, WIDGET_SELECTION, RADIUS_SELECTION);
-            if(size!=old)
+            gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app;
+            //useAlphaForCorners=qtSettings.useAlpha && isAlphaWidget;
+            
+            radius=MENU_AND_TOOLTIP_RADIUS;
+            if(useAlphaForCorners)
             {
-#if GTK_CHECK_VERSION(2, 90, 0)
-                QtcRegion *mask=windowMask(0, 0, width, height, opts.round>ROUND_SLIGHT);
-
-                gtk_widget_shape_combine_region(widget, NULL);
-                gtk_widget_shape_combine_region(widget, mask);
-                qtcRegionDestroy(mask);
-#else
-                GdkBitmap *mask=gdk_pixmap_new(NULL, width, height, 1);
-                cairo_t   *crMask = gdk_cairo_create((GdkDrawable *) mask);
-
-                cairo_rectangle(crMask, 0, 0, width, height);
-                cairo_set_source_rgba(crMask, 1, 1, 1, 0);
-                cairo_set_operator(crMask, CAIRO_OPERATOR_SOURCE);
-                cairo_paint(crMask);
-                cairo_new_path(crMask);
-                createPath(crMask, 0, 0, width, height, radius-0.25, ROUNDED_ALL);
-                cairo_set_source_rgba(crMask, 1, 0, 0, 1);
-                cairo_fill(crMask);
-
-                gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
-                gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
-                cairo_destroy(crMask);
-#endif
-                g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)size);
+                cairo_rectangle(cr, x, y, width, height);
+                cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
+                cairo_set_source_rgba(cr, 0, 0, 0, 1);
+                cairo_fill(cr);
             }
+            else
+                createRoundedMask(cr, widget, x, y, width, height, radius-0.25, FALSE);
             clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
+
+            if(useAlphaForCorners)
+                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
         }
 
         if(widget && /*!comboMenu && */100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
             enableBlurBehind(widget, TRUE);
 
+        if(useAlpha)
+        {
+            alpha=opts.menuBgndOpacity/100.0;
+            if(!useAlphaForCorners)
+                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+        }
+
         if(/*!comboMenu && */!IS_FLAT_BGND(opts.menuBgndAppearance))
         {
-            double   alpha=1.0;
-            gboolean useAlpha=opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
-            
-            if(useAlpha)
-            {
-                alpha=opts.menuBgndOpacity/100.0;
-                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-            }
             if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
                 drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
             else if(APPEARANCE_FILE==opts.bgndAppearance)
@@ -5418,23 +5427,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 drawBevelGradientAlpha(cr, style, area, x, y, width, height,
                                        &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance,
                                        WIDGET_OTHER, alpha);
-            if(useAlpha)
-                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
         }
         else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
-        {
-            double   alpha=1.0;
-            gboolean useAlpha=/*!comboMenu  && */opts.menuBgndOpacity<100 && isRgbaWidget(widget) && compositingActive(widget);
-
-            if(useAlpha)
-            {
-                alpha=opts.menuBgndOpacity/100.0;
-                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-            }
             drawAreaColorAlpha(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height, alpha);
-            if(useAlpha)
-                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-        }
 
         if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)
             drawBgndRings(cr, x, y, width, height, FALSE);
@@ -5483,8 +5478,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     g_list_free(children);
             }
 
-            drawBevelGradient(cr, style, area, x+1, y+1, stripeWidth+1, height-2,
-                              &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER);
+            drawBevelGradientAlpha(cr, style, area, x+1, y+1, stripeWidth+1, height-2,
+                                   &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER, alpha);
         }
 
         if(opts.popupBorder)
@@ -5532,6 +5527,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 }
             }
         }
+
+        if(useAlpha || useAlphaForCorners)
+            cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
     }
     else if(detail &&(!strcmp(detail, "paned") || !strcmp(detail+1, "paned")))
     {
@@ -8590,12 +8588,15 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
     {
         generateColors();
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        if(opts.dlgOpacity<100 || opts.bgndOpacity<100 || opts.menuBgndOpacity<100)
+        if(opts.dlgOpacity<100 || opts.bgndOpacity<100 || opts.menuBgndOpacity<100 || qtSettings.useAlpha)
         {
             GdkColormap *colormap = gdk_screen_get_rgba_colormap(gdk_screen_get_default());
 
             if (colormap)
+            {
+                gtk_widget_push_colormap(colormap);
                 gtk_widget_set_default_colormap(colormap);
+            }
         }
 #endif
     }

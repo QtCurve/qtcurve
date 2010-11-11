@@ -196,7 +196,8 @@ struct QtData
                     shadeSortedList;
     EGtkApp         app;
     gboolean        qt4,
-                    inactiveChangeSelectionColor;
+                    inactiveChangeSelectionColor,
+                    useAlpha;
     QtcDebug        debug;
 #ifdef FIX_FIREFOX_LOCATION_BAR
     gboolean        isBrowser;
@@ -1627,7 +1628,7 @@ static char * getAppNameFromPid(int pid)
                 printf(DEBUG_PREFIX"Command - \"%s\"\n", cmdline);
 
             /* Try to detect chrome's flash plugin */
-            if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) &&
+            if(/*(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity) &&*/
                 NULL!=strstr(cmdline, "--type=plugin") && NULL!=strstr(cmdline, "--plugin-path=") &&
                 (NULL!=strstr(cmdline, "libflashplayer.so") || NULL!=strstr(cmdline, "libgcflashplayer.so")))
                 strcpy(app_name, CHROME_FLASH_PLUGIN);
@@ -2081,6 +2082,9 @@ static gboolean qtInit()
             lastRead=now;
 
             qtSettings.qt4=!useQt3Settings();
+            qtSettings.useAlpha=opts.bgndOpacity<100 || opts.dlgOpacity<100 || opts.menuBgndOpacity<100 ||
+                                !(opts.square&SQUARE_POPUP_MENUS) || !(opts.square&SQUARE_TOOLTIPS);
+
             if(!qtSettings.qt4)
             {
                 qtSettings.qt4=FALSE;
@@ -2149,6 +2153,7 @@ static gboolean qtInit()
             opts.square|=SQUARE_POPUP_MENUS;
             opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
             opts.sortedLv=SHADE_NONE;
+            qtSettings.useAlpha=FALSE;
 #endif
 
 /*
@@ -2288,7 +2293,10 @@ static gboolean qtInit()
 
             if(isMozilla() || GTK_APP_FLASH_PLUGIN==qtSettings.app || GTK_APP_OPEN_OFFICE==qtSettings.app ||
                GTK_APP_JAVA==qtSettings.app || GTK_APP_JAVA_SWT==qtSettings.app)
+            {
                 opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+                qtSettings.useAlpha=false;
+            }
             
             if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && excludedApp(opts.noBgndOpacityApps))
                 opts.bgndOpacity=opts.dlgOpacity=100;
