@@ -10,6 +10,7 @@
 5. Set KDE SC 4.6 'AbilityUsesBlurBehind' kwin setting if decoration or style supports
    opacity.
 6. Fix 'rasied and joined' toolbar buttons.
+7. Allow 'menus' of non-editable combos to be rounded.
 
 1.7.0
 -----

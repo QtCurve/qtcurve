@@ -2780,10 +2780,10 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 }
             }
 
-            bool isCombo=false;
+            //bool isCombo=false;
             if((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE!=opts.menuBgndImage.type || 100!=opts.menuBgndOpacity ||
                 !(opts.square&SQUARE_POPUP_MENUS)) &&
-                (qobject_cast<QMenu*>(object) || (isCombo=object->inherits("QComboBoxPrivateContainer"))))
+                (qobject_cast<QMenu*>(object) || (/*isCombo=*/object->inherits("QComboBoxPrivateContainer"))))
             {
                 QWidget      *widget=qobject_cast<QWidget *>(object);
                 QPainter     p(widget);
@@ -2800,7 +2800,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     p.drawPath(buildPath(r, WIDGET_OTHER, ROUNDED_ALL, radius));
                     p.setRenderHint(QPainter::Antialiasing, false);
                 }
-                if(!(opts.square&SQUARE_POPUP_MENUS) && !isCombo)
+                if(!(opts.square&SQUARE_POPUP_MENUS)) // && !isCombo)
                     p.setClipRegion(windowMask(r, opts.round>ROUND_SLIGHT), Qt::IntersectClip);
 
                 drawBackground(&p, widget, BGND_MENU);
@@ -2811,7 +2811,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     p.setClipping(false);
                     p.setPen(use[STD_BORDER]);
                     // For now dont round combos - getting weird effects with shadow/clipping in Gtk2 style :-(
-                    if(opts.square&SQUARE_POPUP_MENUS || isCombo)
+                    if(opts.square&SQUARE_POPUP_MENUS) // || isCombo)
                         drawRect(&p, r);
                     else
                     {
@@ -2826,12 +2826,12 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                         p.setPen(use[0]);
                         if(GB_LIGHT==border)
                         {
-                            if(opts.square&SQUARE_POPUP_MENUS || isCombo)
+                            if(opts.square&SQUARE_POPUP_MENUS) // || isCombo)
                                 drawRect(&p, ri);
                             else
                                 p.drawPath(buildPath(ri, WIDGET_OTHER, ROUNDED_ALL, radius-1.0));
                         }
-                        else if(opts.square&SQUARE_POPUP_MENUS || isCombo)
+                        else if(opts.square&SQUARE_POPUP_MENUS) // || isCombo)
                         {
                             if(GB_3D!=border)
                             {
@@ -6347,7 +6347,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                       false, false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                 if (selected && enabled)
-                    drawMenuItem(painter, r, option, comboMenu ? MENU_COMBO : MENU_POPUP, ROUNDED_ALL,
+                    drawMenuItem(painter, r, option, /*comboMenu ? MENU_COMBO : */MENU_POPUP, ROUNDED_ALL,
                                  opts.useHighlightForMenu ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : use);
 
                 if(comboMenu)
@@ -12201,7 +12201,7 @@ void Style::drawMenuItem(QPainter *p, const QRect &r, const QStyleOption *option
     else
     {
         // For now dont round combos - getting weird effects with shadow/clipping in Gtk2 style :-(
-        if(MENU_COMBO==type || opts.square&SQUARE_POPUP_MENUS)
+        if(/*MENU_COMBO==type || */opts.square&SQUARE_POPUP_MENUS)
             drawBevelGradient(cols[fill], p, r, true, false, opts.menuitemAppearance, WIDGET_MENU_ITEM);
         else
         {
