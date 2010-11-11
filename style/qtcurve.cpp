@@ -328,7 +328,7 @@ static QWidget * getActiveWindow(QWidget *widget)
 static void adjustToolbarButtons(const QWidget *widget, const QToolBar *toolbar, int &leftAdjust, int &topAdjust,
                                  int &rightAdjust, int &bottomAdjust, int &round)
 {
-    const int constAdjust=4;
+    const int constAdjust=6;
     const int d = 1;
     QRect geo(widget->geometry());
 
@@ -10996,7 +10996,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
             uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver|
                           (WIDGET_MDI_WINDOW_BUTTON==w ? State_Active : State_None)));
 
-            key.sprintf("qtc-%x-%d-%x-%x-%x-%x-%x", w, (int)realRound, pixSize.width(), pixSize.height(), state, fill.rgba(), (int)(radius*100));
+            key.sprintf("qtc-%x-%x-%x-%x-%x-%x-%x-%x", w, round, (int)realRound, pixSize.width(), pixSize.height(), state, fill.rgba(), (int)(radius*100));
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
                 pix=QPixmap(pixSize);

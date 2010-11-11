@@ -9,6 +9,7 @@
    menubars (or using menubar colour).
 5. Set KDE SC 4.6 'AbilityUsesBlurBehind' kwin setting if decoration or style supports
    opacity.
+6. Fix 'rasied and joined' toolbar buttons.
 
 1.7.0
 -----
