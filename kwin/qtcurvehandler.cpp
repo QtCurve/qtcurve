@@ -258,6 +258,10 @@ bool QtCurveHandler::supports(Ability ability) const
         case AbilityClientGrouping:
             return grouping();
 #endif
+#if KDE_IS_VERSION(4, 5, 85)
+        case AbilityUsesBlurBehind:
+            return opacity(true)<100 || opacity(false)<100 || wStyle()->pixelMetric((QStyle::PixelMetric)QtC_CustomBgnd, 0L, 0L);
+#endif
         default:
             return false;
     };
