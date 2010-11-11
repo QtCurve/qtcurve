@@ -240,7 +240,6 @@ static enum
     APP_K3B,
     APP_OPENOFFICE,
     APP_KONSOLE,
-    APP_KMIX,
     APP_OTHER
 } theThemedApp=APP_OTHER;
 
@@ -560,9 +559,14 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
 #ifdef Q_WS_X11
+static bool canAccessId(const QWidget *w)
+{
+    return w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
+}
+
 void setOpacityProp(QWidget *w, unsigned short opacity)
 {
-    if(w && APP_KMIX!=theThemedApp)
+    if(w && canAccessId(w))
     {
         static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
         XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
@@ -571,7 +575,7 @@ void setOpacityProp(QWidget *w, unsigned short opacity)
 
 void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 {
-    if(w && APP_KMIX!=theThemedApp)
+    if(w && canAccessId(w))
     {
         static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
         unsigned long prop=((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ? APPEARANCE_RAISED : APPEARANCE_FLAT) : app)&0xFF) |
@@ -583,7 +587,7 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 
 void setSbProp(QWidget *w)
 {
-    if(w)
+    if(w && canAccessId(w))
     {
         static const char * constStatusBarProperty="qtcStatusBar";
         QVariant            prop(w->property(constStatusBarProperty));
@@ -1419,8 +1423,6 @@ void Style::polish(QApplication *app)
         opts.forceAlternateLvCols=false;
     else if("konsole"==appName)
         theThemedApp=APP_KONSOLE;
-    else if("kmix"==appName)
-        theThemedApp=APP_KMIX;
 
     if(NULL!=getenv("QTCURVE_DEBUG"))
     {
@@ -13675,7 +13677,7 @@ void Style::toggleStatusBar(QMainWindow *window)
 #ifdef Q_WS_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size)
 {
-    if(w)
+    if(w && canAccessId(w))
     {
         static const char * constMenuSizeProperty="qtcMenuSize";
         QVariant       prop(w->property(constMenuSizeProperty));
