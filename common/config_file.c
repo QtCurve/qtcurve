@@ -3270,7 +3270,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(menubarMouseOver)
         CFG_WRITE_ENTRY(useHighlightForMenu)
         CFG_WRITE_ENTRY(shadeMenubarOnlyWhenActive)
-        CFG_WRITE_ENTRY(thin)
+        CFG_WRITE_ENTRY_NUM(thin)
         CFG_WRITE_SHADE_ENTRY(shadeSliders, customSlidersColor)
         CFG_WRITE_SHADE_ENTRY(shadeMenubars, customMenubarsColor)
         CFG_WRITE_SHADE_ENTRY(sortedLv, customSortedLvColor)
