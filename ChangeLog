@@ -7,6 +7,8 @@
 3. Fix saving of 'thin' options.
 4. Only disable opacity for titlebar, if using kwin configured setting and blending
    menubars (or using menubar colour).
+5. Set KDE SC 4.6 'AbilityUsesBlurBehind' kwin setting if decoration or style supports
+   opacity.
 
 1.7.0
 -----
