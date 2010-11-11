@@ -5389,7 +5389,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(roundedMenu && !comboMenu)
         {
             gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app;
-            //useAlphaForCorners=qtSettings.useAlpha && isAlphaWidget;
+            useAlphaForCorners=qtSettings.useAlpha && isAlphaWidget;
             
             radius=MENU_AND_TOOLTIP_RADIUS;
             if(useAlphaForCorners)
@@ -5401,7 +5401,10 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             }
             else
                 createRoundedMask(cr, widget, x, y, width, height, radius-0.25, FALSE);
-            clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
+            if(useAlphaForCorners && opts.popupBorder)
+                clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, radius+1, ROUNDED_ALL);
+            else
+                clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
 
             if(useAlphaForCorners)
                 cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
@@ -5491,6 +5494,10 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
             if(roundedMenu && !comboMenu)
                 unsetCairoClipping(cr);
+            
+            if(useAlphaForCorners) /* unsetCairoClipping reverts the cairo operator change */
+                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
              /*For now dont round combos - getting weird effects with shadow/clipping :-( */

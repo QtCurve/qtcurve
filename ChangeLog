@@ -1,6 +1,6 @@
 1.7.1
 -----
-1. Use rgba colormap to draw rounded tooltips - gives nicer border.
+1. Use rgba colormap to draw rounded tooltips and popup menus - gives nicer border.
 
 1.7.0
 -----
