@@ -1,6 +1,8 @@
 1.7.1
 -----
 1. Use rgba colormap to draw rounded tooltips and popup menus - gives nicer border.
+2. Allow 'menus' of non-editable combos to be rounded. (But *only* if the app can
+   be set to use an rgba colormap)
 
 1.7.0
 -----

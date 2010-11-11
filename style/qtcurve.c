@@ -5357,7 +5357,10 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             else if(!opts.borderMenuitems && !mb && menuitem)
             {
                 /*For now dont round combos - getting weird effects with shadow/clipping :-( */
-                gboolean roundedMenu=(!widget || !isComboMenu(qtcWidgetGetParent(widget))) && !(opts.square&SQUARE_POPUP_MENUS);
+                /*...but these work ok if we have an rgba colormap, so in that case we dont care if its a combo...*/
+                gboolean isCombo=!(opts.square&SQUARE_POPUP_MENUS) && widget && isComboMenu(qtcWidgetGetParent(widget)) &&
+                                 !(qtSettings.useAlpha && compositingActive(widget) && isRgbaWidget(widget)),
+                         roundedMenu=(!widget || !isCombo) && !(opts.square&SQUARE_POPUP_MENUS);
 
                 if(roundedMenu)
                     clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS-1.0, round);
@@ -5385,20 +5388,19 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     }
     else if(DETAIL("menu"))
     {
-        gboolean comboMenu=isComboMenu(widget),
-                 roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS),
-                 useAlphaForCorners=FALSE;
         double   radius=0.0,
                  alpha=1.0;
-        gboolean isAlphaWidget=isRgbaWidget(widget) && compositingActive(widget),
-                 useAlpha=isAlphaWidget && opts.menuBgndOpacity<100;
+        gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+                 roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS) && !nonGtk,
+                 isAlphaWidget=isRgbaWidget(widget) && compositingActive(widget),
+                 useAlpha=isAlphaWidget && opts.menuBgndOpacity<100,
+                 useAlphaForCorners=!nonGtk && qtSettings.useAlpha && isAlphaWidget,
+                 comboMenu=useAlphaForCorners ? FALSE : isComboMenu(widget);
+                 /* Cant round combos, unless using rgba - getting weird effects with shadow/clipping :-( */
+                 /* If 'useAlphaForCorners', then dont care if its a combo menu - as it can still be rounded */
 
-        /*For now dont round combos - getting weird effects with shadow/clipping :-( */
         if(roundedMenu && !comboMenu)
         {
-            gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app;
-            useAlphaForCorners=qtSettings.useAlpha && isAlphaWidget;
-            
             radius=MENU_AND_TOOLTIP_RADIUS;
             if(useAlphaForCorners)
             {
