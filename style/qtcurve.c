@@ -4565,6 +4565,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
+    #if 0 /* This section messes up Gtk3 scrollbars with custom background - and doesnt seem to be required for Gtk2 either. remove at 1.7.1 */
                    /* if(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) && 0!=opts.tabBgnd && widget && qtcWidgetGetParent(widget) && qtcWidgetGetParent(widget)->parent &&
                        GTK_IS_SCROLLED_WINDOW(qtcWidgetGetParent(widget)) && GTK_IS_NOTEBOOK(qtcWidgetGetParent(widget)->parent))
                         drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
@@ -4577,6 +4578,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 //                          else
 //                              drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
                     }
+    #endif
                 }
                 else
                 {
@@ -5075,11 +5077,17 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                   (parent=qtcWidgetGetParent(widget)) && GTK_IS_SCROLLED_WINDOW(parent) &&
                   (parent=qtcWidgetGetParent(parent)) && GTK_IS_NOTEBOOK(parent))
                     drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
+                else if(!IS_FLAT(opts.sbarBgndAppearance) || !opts.gtkScrollViews)
+                     drawBevelGradient(cr, style, area, xo, yo, wo, ho,
+                                       &qtcPalette.background[ORIGINAL_SHADE],
+                                       horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+#if 0 /* This was the old (pre 1.7.1) else if... but it messes up Gtk3 scrollbars wheb have custom background. And dont think its needed */
                 else if(!CUSTOM_BGND || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
                                                           widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
                     drawBevelGradient(cr, style, area, xo, yo, wo, ho,
                                       &qtcPalette.background[ORIGINAL_SHADE],
                                       horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+#endif
             }
 
             if(isMozilla())
