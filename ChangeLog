@@ -5,6 +5,8 @@
    Thomas Lübking
 2. Set XProperties on show event.
 3. Fix saving of 'thin' options.
+4. Only disable opacity for titlebar, if using kwin configured setting and blending
+   menubars (or using menubar colour).
 
 1.7.0
 -----

@@ -544,7 +544,8 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
                          round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, NULL, NULL),
                          buttonFlags=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, NULL, NULL);
     int                  rectX, rectY, rectX2, rectY2, shadowSize(0),
-                         opacity(compositing ? Handler()->opacity(active) : 100);
+                         kwinOpacity(compositing ? Handler()->opacity(active) : 100),
+                         opacity(kwinOpacity);
     EAppearance          bgndAppearance=APPEARANCE_FLAT;
     QColor               windowCol(widget()->palette().color(QPalette::Window));
 
@@ -758,7 +759,7 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     else
         opt.state|=QtC_StateKWinNoBorder;
 
-    if(opacity<100 && (blend||menuColor))
+    if(kwinOpacity<100 && (blend||menuColor))
     {
         // Turn off opacity for titlebar...
         QColor c(col);
