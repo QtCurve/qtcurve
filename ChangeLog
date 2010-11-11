@@ -3,7 +3,8 @@
 1. Remove kmix 'fix', and ue a proper fix! Dont access QWidgets' winId unless
    "w->testAttribute(Qt::WA_WState_Created) && w->internalWinId()" Thanks to
    Thomas Lübking
-2. Fix saving of 'thin' options.
+2. Set XProperties on show event.
+3. Fix saving of 'thin' options.
 
 1.7.0
 -----

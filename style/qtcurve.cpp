@@ -561,7 +561,7 @@ static const QLatin1String constDwtFloat("qt_dockwidget_floatbutton");
 #ifdef Q_WS_X11
 static bool canAccessId(const QWidget *w)
 {
-    return w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
+    return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
 }
 
 void setOpacityProp(QWidget *w, unsigned short opacity)
@@ -587,7 +587,7 @@ void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
 
 void setSbProp(QWidget *w)
 {
-    if(w && canAccessId(w))
+    if(w && canAccessId(w->window()))
     {
         static const char * constStatusBarProperty="qtcStatusBar";
         QVariant            prop(w->property(constStatusBarProperty));
@@ -1717,7 +1717,6 @@ void Style::polish(QWidget *widget)
                     break;
 
 #ifdef Q_WS_X11
-                setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
                 Utils::addEventFilter(widget, this);
 #endif
                 int  opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
@@ -1750,18 +1749,10 @@ void Style::polish(QWidget *widget)
                 if(!widget->isVisible())
                     widget->move(10000, 10000);
 
-#ifdef Q_WS_X11
-                // Need to reset this, as new window created!
-                setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
-#endif
-
                 // PE_Widget is not called for transparent widgets, so need event filter here...
                 Utils::addEventFilter(widget, this);
                 itsTransparentWidgets.insert(widget);
                 connect(widget, SIGNAL(destroyed(QObject *)), SLOT(widgetDestroyed(QObject *)));
-#ifdef Q_WS_X11
-                setOpacityProp(widget, (unsigned short)opacity);
-#endif
                 break;
             }
             case Qt::Popup: // we currently don't want that kind of gradient on menus etc
@@ -2948,7 +2939,19 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     qobject_cast<QMenuBar *>(object))
             {
                 QMenuBar *mb=(QMenuBar *)object;
-                emitMenuSize((QMenuBar *)mb, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)mb)->isVisible() ? 0 : mb->size().height());
+                emitMenuSize((QMenuBar *)mb, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)mb)->isVisible() ? 0 : mb->size().height(), true);
+            }
+            else if(QEvent::Show==event->type())
+            {
+                QWidget *widget=qobject_cast<QWidget *>(object);
+
+                if(widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)))
+                {
+                    setBgndProp(widget, opts.bgndAppearance, IMG_NONE!=opts.bgndImage.type);
+
+                    int opacity=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
+                    setOpacityProp(widget, (unsigned short)opacity);
+                }
             }
 #endif
             break;
@@ -13675,20 +13678,25 @@ void Style::toggleStatusBar(QMainWindow *window)
 }
                         
 #ifdef Q_WS_X11
-void Style::emitMenuSize(QWidget *w, unsigned short size)
+void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
-    if(w && canAccessId(w))
+    if(w && canAccessId(w->window()))
     {
         static const char * constMenuSizeProperty="qtcMenuSize";
-        QVariant       prop(w->property(constMenuSizeProperty));
+
         unsigned short oldSize=2000;
 
-        if(prop.isValid())
+        if(!force)
         {
-            bool ok;
-            oldSize=prop.toUInt(&ok);
-            if(!ok)
-                oldSize=0;
+            QVariant prop(w->property(constMenuSizeProperty));
+
+            if(prop.isValid())
+            {
+                bool ok;
+                oldSize=prop.toUInt(&ok);
+                if(!ok)
+                    oldSize=2000;
+            }
         }
 
         if(oldSize!=size)

@@ -297,7 +297,7 @@ class Style : public QCommonStyle
 #endif
 #ifdef Q_WS_X11
     bool           isWindowDragWidget(QObject *o);
-    void           emitMenuSize(QWidget *w, unsigned short size);
+    void           emitMenuSize(QWidget *w, unsigned short size, bool force=false);
     void           emitStatusBarState(QStatusBar *sb);
 #endif
 
