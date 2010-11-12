@@ -11,6 +11,7 @@
    opacity.
 6. Fix 'rasied and joined' toolbar buttons.
 7. Allow 'menus' of non-editable combos to be rounded.
+8. Turn config dialog's 'whats this' help messages into tooltips.
 
 1.7.0
 -----
