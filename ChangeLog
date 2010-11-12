@@ -4,6 +4,8 @@
 2. Allow 'menus' of non-editable combos to be rounded. (But *only* if the app can
    be set to use an rgba colormap)
 3. Remove resize grips - kwin handles this.
+4. Add mouse tracking to treeview lists.
+5. Indent treeview selection as per KDE
 
 1.7.0
 -----

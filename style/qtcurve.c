@@ -67,6 +67,7 @@ static Options opts;
 #include "widgetmap.c"
 #include "window.c"
 #include "entry.c"
+#include "treeview.c"
 #if !GTK_CHECK_VERSION(2, 90, 0)
 #include "wmmove.c"
 #endif
@@ -3308,10 +3309,10 @@ static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType sta
 }
 
 static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          int x, int y, int width, int height, int round, gboolean isLvSelection)
+                          int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod)
 {
     gboolean hasFocus=qtcWidgetHasFocus(widget);
-    double   alpha=(GTK_STATE_PRELIGHT==state ? 0.20 : 1.0)*(hasFocus || !qtSettings.inactiveChangeSelectionColor ? 1.0 : INACTIVE_SEL_ALPHA);
+    double   alpha=alphaMod*(GTK_STATE_PRELIGHT==state ? 0.20 : 1.0)*(hasFocus || !qtSettings.inactiveChangeSelectionColor ? 1.0 : INACTIVE_SEL_ALPHA);
     GdkColor *col=&style->base[hasFocus ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
 
     drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, round, isLvSelection, alpha, col, TRUE);
@@ -3531,7 +3532,10 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
         gboolean combo=isComboBoxPopupWindow(widget, 0);
-        int      round=!combo && detail && GTK_STATE_SELECTED==state && ROUNDED
+        double   alpha=1.0;
+        int      selX=x,
+                 selW=width,
+                 round=!combo && detail && GTK_STATE_SELECTED==state && ROUNDED
                             ? 0!=strstr(detail, "_start")
                                 ? ROUNDED_LEFT
                                 : 0!=strstr(detail, "_end")
@@ -3541,6 +3545,32 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                                         : ROUNDED_ALL
                             : ROUNDED_NONE;
 
+        if(!combo)
+        {
+            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
+            GtkTreePath       *path;
+            GtkTreeViewColumn *column;
+
+            gtk_tree_view_get_path_at_pos(treeView, x+1, y+1, &path, &column, 0L, 0L );
+            qtcTreeViewSetup(widget);
+            if(qtcTreeViewIsCellHovered(widget, path, column))
+                alpha=GTK_STATE_SELECTED==state ? INACTIVE_SEL_ALPHA : 0.2;
+
+            if((GTK_STATE_SELECTED==state || alpha<1.0) && column==gtk_tree_view_get_expander_column(treeView))
+            {
+                int depth=path ? (int)gtk_tree_path_get_depth(path) : 0,
+                    expanderSize=0,
+                    offset=0;
+
+                gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
+                offset=3 + expanderSize * depth + ( 4 + gtk_tree_view_get_level_indentation(treeView))*(depth-1);
+                selX += offset;
+                selW -= offset;
+            }
+            if(path)
+                gtk_tree_path_free(path);
+        }
+        
         if(opts.lvLines)
         {
 #if GTK_CHECK_VERSION(2, 90, 0)
@@ -3576,12 +3606,12 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                             : &style->base[GTK_STATE_NORMAL], detail),
                           x, y, width, height);
 
-        if(GTK_STATE_SELECTED==state)
+        if(GTK_STATE_SELECTED==state || (!combo && alpha<1.0))
             if(combo)
-                drawAreaColor(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
-                              x, y, width, height);
+                drawAreaColorAlpha(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
+                                   selX, y, selW, height, alpha);
             else
-                drawSelection(cr, style, state, area, widget, x, y, width, height, round, TRUE);
+                drawSelection(cr, style, state, area, widget, selX, y, selW, height, round, TRUE, alpha);
     }
     else if(detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED))
     {
@@ -3656,7 +3686,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
             cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
     }
     else if(DETAIL("icon_view_item"))
-        drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
+        drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))
@@ -4365,7 +4395,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             else if(isPathButton(widget))
             {
                 if(GTK_STATE_PRELIGHT==state)
-                    drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE);
+                    drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0);
 
                 if(GTK_IS_TOGGLE_BUTTON(widget))
                 {                       
