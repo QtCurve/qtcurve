@@ -3502,6 +3502,15 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 if(opts.menubarHiding&HIDE_KWIN)
                     qtcWindowMenuBarDBus(widget, hiddenMenubar ? 0 : alloc.height);
             }
+
+#if GTK_CHECK_VERSION(2, 90, 0)
+            if(gtk_window_get_has_resize_grip(GTK_WINDOW(widget)))
+                gtk_window_set_has_resize_grip(GTK_WINDOW(widget), FALSE);
+#else
+            if(statusBar && gtk_statusbar_get_has_resize_grip(GTK_STATUSBAR(statusBar)))
+                gtk_statusbar_set_has_resize_grip(GTK_STATUSBAR(statusBar), FALSE);
+#endif
+                
             if(opts.statusbarHiding && statusBar)
             {
                 gboolean hiddenStatusBar=qtcStatusBarHidden(qtSettings.appName);
