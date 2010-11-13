@@ -1006,12 +1006,14 @@ typedef enum
     GB_SHINE
 } EGradientBorder;
 
+#if 0
 typedef enum
 {
     LV_NONE,
     LV_NEW,
     LV_OLD
 } ELvLines;
+#endif
 
 typedef struct
 {
@@ -1165,7 +1167,7 @@ typedef struct
                      shadePopupMenu;
     EFrame           groupBox;
     EGlow            glowProgress;
-    ELvLines         lvLines;
+    bool             lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
     int              menubarHiding,

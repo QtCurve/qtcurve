@@ -1429,9 +1429,12 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QComboBox" name="lvLines">
+        <widget class="QCheckbox" name="lvLines">
          <property name="toolTip">
           <string>&lt;p&gt;Controls the style of lines drawn between items in a treeview.</string>
+         </property>
+         <property name="text">
+          <string>Enabled</string>
          </property>
         </widget>
        </item>

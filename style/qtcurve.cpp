@@ -3839,7 +3839,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         {
             int middleH((r.x() + r.width() / 2)-1),
                 middleV(r.y() + r.height() / 2),
+#if 0
                 beforeH(middleH),
+#endif
                 beforeV(middleV),
                 afterH(middleH),
                 afterV(middleV);
@@ -3850,14 +3852,13 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 QRect ar(r.x()+((r.width()-(LV_SIZE+4))>>1), r.y()+((r.height()-(LV_SIZE+4))>>1), LV_SIZE+4,
                          LV_SIZE+4);
-
-                if(LV_OLD==opts.lvLines)
+                if(/*LV_OLD==*/opts.lvLines)
                 {
-                    beforeH=ar.x();
                     beforeV=ar.y();
                     afterH=ar.x()+LV_SIZE+4;
                     afterV=ar.y()+LV_SIZE+4;
-
+#if 0
+                    beforeH=ar.x();
                     int lo(ROUNDED ? 2 : 0);
 
                     painter->setPen(palette.mid().color());
@@ -3882,8 +3883,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         painter->drawLine(ar.x()+1, ar.y()+ar.height()-2, ar.x()+2, ar.y()+ar.height()-1);
                         painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1, ar.y()+ar.height()-2);
                     }
+#endif
                 }
-
                 drawArrow(painter, ar, state&State_Open
                                                 ? PE_IndicatorArrowDown
                                                 : reverse
@@ -3891,12 +3892,12 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                                     : PE_IndicatorArrowRight, palette.text().color());
             }
 
-            const int constStep=LV_OLD==opts.lvLines
+            const int constStep=/*LV_OLD==*/opts.lvLines
                                     ? 0
                                     : widget && qobject_cast<const QTreeView *>(widget)
                                         ? ((QTreeView *)widget)->indentation() : 20;
 
-            if(opts.lvLines && (LV_OLD==opts.lvLines || (r.x()>=constStep && constStep>0)))
+            if(opts.lvLines && (/*LV_OLD==*/opts.lvLines || (r.x()>=constStep && constStep>0)))
             {
                 painter->setPen(palette.mid().color());
                 if (state&State_Item)
@@ -3905,6 +3906,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         painter->drawLine(r.left(), middleV, afterH, middleV);
                     else
                     {
+#if 0
                         if(LV_NEW==opts.lvLines)
                         {
                             if(state&State_Children)
@@ -3914,12 +3916,13 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                               false, true, true);
                         }
                         else
+#endif
                             painter->drawLine(afterH, middleV, r.right(), middleV);
                     }
                 }
                 if (state&State_Sibling && afterV<r.bottom())
                     painter->drawLine(middleH-constStep, afterV, middleH-constStep, r.bottom());
-                if (state & (State_Open | State_Children | State_Item | State_Sibling) && (LV_NEW==opts.lvLines || beforeV>r.y()))
+                if (state & (State_Open | State_Children | State_Item | State_Sibling) && (/*LV_NEW==opts.lvLines || */beforeV>r.y()))
                     painter->drawLine(middleH-constStep, r.y(), middleH-constStep, beforeV);
             }
             painter->restore();
@@ -8328,7 +8331,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                                     QRect ar(bx-4, linebot-4, 11, 11);
 
-                                    if(LV_OLD==opts.lvLines)
+                                    if(/*LV_OLD==*/opts.lvLines)
                                     {
                                         int lo(ROUNDED ? 2 : 0);
 

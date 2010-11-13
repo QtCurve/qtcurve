@@ -477,16 +477,20 @@ static EGradType toGradType(const char *str, EGradType def)
     return def;
 }
 
-static ELvLines toLvLines(const char *str, ELvLines def)
+static bool toLvLines(const char *str, bool def)
 {
     if(str)
     {
+#if 0
         if(0==memcmp(str, "true", 4) || 0==memcmp(str, "new", 3))
             return LV_NEW;
         if(0==memcmp(str, "old", 3))
             return LV_OLD;
         if(0==memcmp(str, "false", 5) || 0==memcmp(str, "none", 4))
             return LV_NONE;
+#else
+        return 0!=memcmp(str, "false", 5);
+#endif
     }
     return def;
 }
@@ -2536,7 +2540,7 @@ static void defaultSettings(Options *opts)
     opts->buttonEffect=EFFECT_SHADOW;
     opts->focus=FOCUS_GLOW;
     opts->lvButton=false;
-    opts->lvLines=LV_NONE;
+    opts->lvLines=false; /*LV_NONE;*/
     opts->drawStatusBarFrames=false;
     opts->fillSlider=true;
     opts->roundMbTopOnly=true;
@@ -3054,6 +3058,7 @@ static const char * toStr(EGradType gt)
     }
 }
 
+#if 0
 static const char * toStr(ELvLines lv)
 {
     switch(lv)
@@ -3067,6 +3072,7 @@ static const char * toStr(ELvLines lv)
             return "none";
     }
 }
+#endif
 
 static const char * toStr(EImageType lv)
 {

@@ -736,12 +736,14 @@ static void insertGradTypeEntries(QComboBox *combo)
     combo->insertItem(GT_VERT, i18n("Left to right"));
 }
 
+#if 0
 static void insertLvLinesEntries(QComboBox *combo)
 {
     combo->insertItem(LV_NONE, i18n("None"));
     combo->insertItem(LV_NEW, i18n("New style (KDE and Gtk2 similar)"));
     combo->insertItem(LV_OLD, i18n("Old style (KDE and Gtk2 different)"));
 }
+#endif
 
 static void insertImageEntries(QComboBox *combo)
 {
@@ -884,7 +886,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertTabMoEntries(tabMouseOver);
     insertGradTypeEntries(bgndGrad);
     insertGradTypeEntries(menuBgndGrad);
-    insertLvLinesEntries(lvLines);
+    //insertLvLinesEntries(lvLines);
     insertImageEntries(bgndImage);
     insertImageEntries(menuBgndImage);
     insertGlowEntries(glowProgress);
@@ -1041,7 +1043,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(shadeCheckRadio, SIGNAL(currentIndexChanged(int)), SLOT(shadeCheckRadioChanged()));
     connect(customCheckRadioColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(focus, SIGNAL(currentIndexChanged(int)), SLOT(focusChanged()));
-    connect(lvLines, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(lvLines, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(lvButton, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(drawStatusBarFrames, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(buttonEffect, SIGNAL(currentIndexChanged(int)), SLOT(buttonEffectChanged()));
@@ -2924,7 +2926,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.toolbarBorders=(ETBarBorder)toolbarBorders->currentIndex();
     opts.appearance=(EAppearance)appearance->currentIndex();
     opts.focus=(EFocus)focus->currentIndex();
-    opts.lvLines=(ELvLines)lvLines->currentIndex();
+    opts.lvLines=lvLines->isChecked();
     opts.lvButton=lvButton->isChecked();
     opts.drawStatusBarFrames=drawStatusBarFrames->isChecked();
     opts.buttonEffect=(EEffect)buttonEffect->currentIndex();
@@ -3193,7 +3195,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     handles->setCurrentIndex(opts.handles);
     appearance->setCurrentIndex(opts.appearance);
     focus->setCurrentIndex(opts.focus);
-    lvLines->setCurrentIndex(opts.lvLines);
+    lvLines->setChecked(opts.lvLines);
     lvButton->setChecked(opts.lvButton);
     drawStatusBarFrames->setChecked(opts.drawStatusBarFrames);
     buttonEffect->setCurrentIndex(opts.buttonEffect);
@@ -3615,7 +3617,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          toolbarBorders->currentIndex()!=opts.toolbarBorders ||
          appearance->currentIndex()!=(int)opts.appearance ||
          focus->currentIndex()!=(int)opts.focus ||
-         lvLines->currentIndex()!=(int)opts.lvLines ||
+         lvLines->isChecked()!=opts.lvLines ||
          lvButton->isChecked()!=opts.lvButton ||
          drawStatusBarFrames->isChecked()!=opts.drawStatusBarFrames ||
          buttonEffect->currentIndex()!=(EEffect)opts.buttonEffect ||

@@ -1,17 +1,19 @@
 1.7.1
 -----
-1. Remove kmix 'fix', and ue a proper fix! Dont access QWidgets' winId unless
-   "w->testAttribute(Qt::WA_WState_Created) && w->internalWinId()" Thanks to
-   Thomas Lübking
-2. Set XProperties on show event.
-3. Fix saving of 'thin' options.
-4. Only disable opacity for titlebar, if using kwin configured setting and blending
-   menubars (or using menubar colour).
-5. Set KDE SC 4.6 'AbilityUsesBlurBehind' kwin setting if decoration or style supports
-   opacity.
-6. Fix 'rasied and joined' toolbar buttons.
-7. Allow 'menus' of non-editable combos to be rounded.
-8. Turn config dialog's 'whats this' help messages into tooltips.
+ 1. Remove kmix 'fix', and ue a proper fix! Dont access QWidgets' winId unless
+    "w->testAttribute(Qt::WA_WState_Created) && w->internalWinId()" Thanks to
+    Thomas Lübking
+ 2. Set XProperties on show event.
+ 3. Fix saving of 'thin' options.
+ 4. Only disable opacity for titlebar, if using kwin configured setting and blending
+    menubars (or using menubar colour).
+ 5. Set KDE SC 4.6 'AbilityUsesBlurBehind' kwin setting if decoration or style supports
+    opacity.
+ 6. Fix 'rasied and joined' toolbar buttons.
+ 7. Allow 'menus' of non-editable combos to be rounded.
+ 8. Turn config dialog's 'whats this' help messages into tooltips.
+ 9. Remove box around arrow in listview lines - to match Gtk better.
+10. Remove 'new' listview lines setting - always use 'older' style.
 
 1.7.0
 -----
