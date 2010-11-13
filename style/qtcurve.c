@@ -3702,8 +3702,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
 
                 if(opts.lvLines)
-                        drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize,
-                                          treeView, path, column);
+                    drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView, path, column);
             }
             
             if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)
