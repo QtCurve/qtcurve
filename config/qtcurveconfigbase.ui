@@ -71,6 +71,15 @@
      <attribute name="headerMinimumSectionSize">
       <number>10</number>
      </attribute>
+     <attribute name="headerDefaultSectionSize">
+      <number>10</number>
+     </attribute>
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="headerMinimumSectionSize">
+      <number>10</number>
+     </attribute>
      <column>
       <property name="text">
        <string notr="true"/>
@@ -643,7 +652,8 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>&lt;B&gt;NOTE:&lt;/B&gt; &lt;i&gt;Opacity settings are &lt;b&gt;experimental&lt;/b&gt; and can cause certain applications (mainly Gtk2 ones) to crash. If you have an application that crashes, use the &quot;Applications&quot; page to disable opacity settings for that application.&lt;/i&gt;</string>
+          <string>&lt;p&gt;&lt;b&gt;NOTE:&lt;/b&gt; &lt;i&gt;Opacity settings are &lt;b&gt;experimental&lt;/b&gt; and can cause certain applications (mainly Gtk2 ones) to crash. If you have an application that crashes, use the &amp;quot;Applications&amp;quot; page to disable opacity settings for that application.&lt;/i&gt;&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;NOTE:&lt;/b&gt;&lt;i&gt;&lt;b&gt;DON'T&lt;/b&gt; use opacity settings when using the compiz window manager.&lt;/i&gt;&lt;/p&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -1429,11 +1439,11 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QCheckbox" name="lvLines">
+        <widget class="QCheckbox" name="lvLines" native="true">
          <property name="toolTip">
           <string>&lt;p&gt;Controls the style of lines drawn between items in a treeview.</string>
          </property>
-         <property name="text">
+         <property name="text" stdset="0">
           <string>Enabled</string>
          </property>
         </widget>
@@ -4427,6 +4437,11 @@
    <class>KIntNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QCheckbox</class>
+   <extends>QWidget</extends>
+   <header>qcheckbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

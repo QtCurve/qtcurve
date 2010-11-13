@@ -14,6 +14,7 @@
  8. Turn config dialog's 'whats this' help messages into tooltips.
  9. Remove box around arrow in listview lines - to match Gtk better.
 10. Remove 'new' listview lines setting - always use 'older' style.
+11. Add warning about opacity settings and compiz.
 
 1.7.0
 -----
