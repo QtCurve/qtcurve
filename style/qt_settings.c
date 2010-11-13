@@ -2298,11 +2298,11 @@ static gboolean qtInit()
                 qtSettings.useAlpha=false;
             }
             
-            if((100!=opts.bgndOpacity || 100!=opts.dlgOpacity) && excludedApp(opts.noBgndOpacityApps))
-                opts.bgndOpacity=opts.dlgOpacity=100;
+            if(excludedApp(opts.noBgndOpacityApps))
+                opts.bgndOpacity=opts.dlgOpacity=100, qtSettings.useAlpha=false;
 
-            if(100!=opts.menuBgndOpacity && excludedApp(opts.noMenuBgndOpacityApps))
-                opts.menuBgndOpacity=100;
+            if(excludedApp(opts.noMenuBgndOpacityApps))
+                opts.menuBgndOpacity=100, qtSettings.useAlpha=false;
             
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
@@ -2910,10 +2910,6 @@ static gboolean qtInit()
                 sprintf(tmpStr, constStrFormat, length, width);
                 gtk_rc_parse_string(tmpStr);
             }
-
-            if(opts.lvLines)
-                gtk_rc_parse_string("style \""RC_SETTING"LvL\" { GtkTreeView::tree-line-pattern=\"\\111\\111\" } "
-                                    "class \"*GtkWidget\" style \""RC_SETTING"LvL\"");
 
             if(!opts.menuIcons)
                 gtk_rc_parse_string("gtk-menu-images = 0");

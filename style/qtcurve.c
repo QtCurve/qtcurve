@@ -3396,6 +3396,132 @@ static void createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gi
     }
 }
 
+static gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path)
+{
+    // check treeview and path
+    if(treeView && path)
+    {
+        GtkTreeModel *model=gtk_tree_view_get_model(treeView);
+        if(model)
+        {
+            GtkTreeIter iter;
+            if(gtk_tree_model_get_iter(model, &iter, path))
+                return gtk_tree_model_iter_has_child(model, &iter);
+        }
+    }
+
+    return FALSE;
+}
+
+static gboolean treeViewCellIsLast(GtkTreeView *treeView, GtkTreePath *path)
+{
+    // check treeview and path
+    if(treeView && path)
+    {
+        GtkTreeModel *model=gtk_tree_view_get_model(treeView);
+        if(model)
+        {
+            GtkTreeIter iter;
+            if(gtk_tree_model_get_iter(model, &iter, path))
+                return !gtk_tree_model_iter_next(model, &iter);
+        }
+    }
+
+    return FALSE;
+}
+
+static GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path)
+{
+    if(path)
+    {
+        GtkTreePath *parent=gtk_tree_path_copy(path);
+        if(gtk_tree_path_up(parent))
+            return parent;
+        else
+            gtk_tree_path_free(parent);
+    }
+
+    return NULL;
+}
+        
+static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
+                              GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column)
+{
+    int       cellIndent=levelIndent + expanderSize,// + 4,
+              xStart=cellIndent/2,
+              i;
+    gboolean  haveChildren=treeViewCellHasChildren(treeView, path);
+    GByteArray *isLast=depth ? g_byte_array_sized_new(depth) : NULL;
+
+    if(isLast)
+    {
+        GtkTreePath *p = path ? gtk_tree_path_copy(path) : NULL;
+        while(p && gtk_tree_path_get_depth(p) > 0)
+        {
+            GtkTreePath *next=treeViewPathParent(treeView, p);
+            char        last=treeViewCellIsLast(treeView, p) ? 1 : 0;
+            isLast=g_byte_array_prepend(isLast, &last, 1);
+            gtk_tree_path_free(p);
+            p=next;
+        }
+
+        cairo_set_source_rgb(cr, CAIRO_COL(*col));
+
+        for(i=0; i<depth; ++i )
+        {
+            gboolean isLastCell=isLast->data[i] ? TRUE : FALSE,
+                     last=i == depth -1;
+            double   xCenter = xStart;
+
+            if(last)
+            {
+                double yCenter = (int)(y+h/2);
+
+                if(haveChildren)
+                {
+                    // first vertical line
+                    cairo_move_to(cr, xCenter + 0.5 , y);
+                    cairo_line_to(cr, xCenter + 0.5, yCenter - (LV_SIZE-1)); // (int)(expanderSize/3));
+
+                    // second vertical line
+                    if(!isLastCell)
+                    {
+                        cairo_move_to(cr, xCenter + 0.5, y+h);
+                        cairo_line_to(cr, xCenter + 0.5, yCenter + (LV_SIZE-1)); // (int)(expanderSize/3));
+                    }
+
+                    // horizontal line
+                    cairo_move_to(cr, xCenter + (int)(expanderSize/3), yCenter + 0.5);
+                    cairo_line_to(cr, xCenter + expanderSize*2/3, yCenter + 0.5);
+                }
+                else
+                {
+                    cairo_move_to(cr, xCenter + 0.5, y);
+                    if(isLastCell)
+                        cairo_line_to(cr, xCenter + 0.5, yCenter);
+                    else
+                        cairo_line_to(cr, xCenter + 0.5, y+h);
+
+                    // horizontal line
+                    cairo_move_to(cr, xCenter, yCenter + 0.5);
+                    cairo_line_to(cr, xCenter + expanderSize*2/3, yCenter + 0.5);
+                }
+            }
+            else if(!isLastCell)
+            {
+                // vertical line
+                cairo_move_to(cr, xCenter + 0.5, y);
+                cairo_line_to(cr, xCenter + 0.5, y + h);
+            }
+
+            cairo_stroke(cr);
+            xStart += cellIndent;
+        }
+
+        g_byte_array_free(isLast, FALSE);
+    }
+}
+
 static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, AREA_PARAM
                            GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
 {
@@ -3545,58 +3671,6 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                                         : ROUNDED_ALL
                             : ROUNDED_NONE;
 
-        if(!combo)
-        {
-            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
-            GtkTreePath       *path;
-            GtkTreeViewColumn *column;
-
-            gtk_tree_view_get_path_at_pos(treeView, x+1, y+1, &path, &column, 0L, 0L );
-            qtcTreeViewSetup(widget);
-            if(qtcTreeViewIsCellHovered(widget, path, column))
-                alpha=GTK_STATE_SELECTED==state ? INACTIVE_SEL_ALPHA : 0.2;
-
-            if((GTK_STATE_SELECTED==state || alpha<1.0) && column==gtk_tree_view_get_expander_column(treeView))
-            {
-                int depth=path ? (int)gtk_tree_path_get_depth(path) : 0,
-                    expanderSize=0,
-                    offset=0;
-
-                gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
-                offset=3 + expanderSize * depth + ( 4 + gtk_tree_view_get_level_indentation(treeView))*(depth-1);
-                selX += offset;
-                selW -= offset;
-            }
-            if(path)
-                gtk_tree_path_free(path);
-        }
-        
-        if(opts.lvLines)
-        {
-#if GTK_CHECK_VERSION(2, 90, 0)
-            if(!gtk_tree_view_get_enable_tree_lines(GTK_TREE_VIEW(widget)))
-                gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(widget), TRUE);
-#else
-            QtCurveStyle *qtcurveStyle = (QtCurveStyle *)style;
-            GtkStyle     *style        = qtcWidgetGetStyle(widget);
-
-            if(style)
-            {
-                // GtkTreeView copies the black GC! But dont want black lines, so hack around this...
-                GdkGC *black=style->black_gc;
-                style->black_gc=qtcurveStyle->lv_lines_gc;
-                gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(widget), TRUE);
-                style->black_gc=black; // Restore!
-            }
-#endif
-        }
-    /*
-        int px, py;
-        gtk_widget_get_pointer(widget, &px, &py);
-        if(px>=x && px<(x+width) && py>y && py<(y+height))
-            state=GTK_STATE_PRELIGHT;
-    */
-
         if(GTK_STATE_SELECTED!=state || ROUNDED_NONE!=round)
             drawAreaColor(cr, area,
                           getCellCol(haveAlternareListViewCol() &&
@@ -3605,6 +3679,50 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                             ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
                             : &style->base[GTK_STATE_NORMAL], detail),
                           x, y, width, height);
+
+        if(!combo)
+        {
+            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
+            GtkTreePath       *path;
+            GtkTreeViewColumn *column,
+                              *expanderColumn=gtk_tree_view_get_expander_column(treeView);
+            int               levelIndent=0,
+                              expanderSize=0,
+                              depth=0;
+
+            gtk_tree_view_get_path_at_pos(treeView, x+1, y+1, &path, &column, 0L, 0L );
+            qtcTreeViewSetup(widget);
+            if(qtcTreeViewIsCellHovered(widget, path, column))
+                alpha=GTK_STATE_SELECTED==state ? INACTIVE_SEL_ALPHA : 0.2;
+
+            if(column==expanderColumn)
+            {
+                gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
+                levelIndent=gtk_tree_view_get_level_indentation(treeView),
+                depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
+
+                if(opts.lvLines)
+                        drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize,
+                                          treeView, path, column);
+            }
+            
+            if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)
+            {
+                int offset=3 + expanderSize * depth + ( 4 + levelIndent)*(depth-1);
+                selX += offset;
+                selW -= offset;
+            }
+            
+            if(path)
+                gtk_tree_path_free(path);
+        }
+
+    /*
+        int px, py;
+        gtk_widget_get_pointer(widget, &px, &py);
+        if(px>=x && px<(x+width) && py>y && py<(y+height))
+            state=GTK_STATE_PRELIGHT;
+    */
 
         if(GTK_STATE_SELECTED==state || (!combo && alpha<1.0))
             if(combo)
@@ -8032,8 +8150,8 @@ static void gtkDrawExpander(GtkStyle *style, WINDOW_PARAM GtkStateType state, AR
                     ? &qtcPalette.mouseover[ARROW_MO_SHADE]
                     : &style->text[ARROW_STATE(state)];
 
-    x-=LV_SIZE>>1;
-    y-=LV_SIZE>>1;
+    x-=(LV_SIZE/2.0)+0.5;
+    y-=(LV_SIZE/2.0)+0.5;
 
     if(GTK_EXPANDER_COLLAPSED==expander_style)
         drawArrow(WINDOW_PARAM_VAL style, col, AREA_PARAM_VAL_L, reverseLayout(widget) ? GTK_ARROW_LEFT : GTK_ARROW_RIGHT,
@@ -8041,18 +8159,6 @@ static void gtkDrawExpander(GtkStyle *style, WINDOW_PARAM GtkStateType state, AR
     else
         drawArrow(WINDOW_PARAM_VAL style, col, AREA_PARAM_VAL_L, GTK_ARROW_DOWN, x+(LARGE_ARR_WIDTH>>1), y+LARGE_ARR_HEIGHT, FALSE, fill);
 }
-
-#if !GTK_CHECK_VERSION(2, 90, 0)
-static GdkGC * realizeColors(GtkStyle *style, GdkColor *color)
-{
-    GdkGCValues gc_values;
-
-    gdk_colormap_alloc_color(style->colormap, color, FALSE, TRUE);
-    gc_values.foreground = *color;
-
-    return gtk_gc_get(style->depth, style->colormap, &gc_values, GDK_GC_FOREGROUND);
-}
-#endif
 
 static void styleRealize(GtkStyle *style)
 {
@@ -8078,11 +8184,8 @@ static void styleRealize(GtkStyle *style)
     else
         qtcurveStyle->menutext[0]=NULL;
 
-#if !GTK_CHECK_VERSION(2, 90, 0)
-    qtcurveStyle->lv_lines_gc=opts.lvLines ? realizeColors(style, &qtSettings.colors[PAL_ACTIVE][COLOR_MID]) : NULL;
-#ifndef QTC_USE_CAIRO_FOR_ARROWS
+#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_USE_CAIRO_FOR_ARROWS
     qtcurveStyle->arrow_gc=NULL;
-#endif
 #endif
 }
 
@@ -8092,20 +8195,12 @@ static void styleUnrealize(GtkStyle *style)
 
     parent_class->unrealize(style);
 
-#if !GTK_CHECK_VERSION(2, 90, 0)
-    if(opts.lvLines)
-    {
-        gtk_gc_release(qtcurveStyle->lv_lines_gc);
-        qtcurveStyle->lv_lines_gc=NULL;
-    }
-
-#ifndef QTC_USE_CAIRO_FOR_ARROWS
+#if !GTK_CHECK_VERSION(2, 90, 0) && !defined QTC_USE_CAIRO_FOR_ARROWS
     if(qtcurveStyle->arrow_gc)
     {
         g_object_unref(qtcurveStyle->arrow_gc);
         qtcurveStyle->arrow_gc=NULL;
     }
-#endif
 #endif
 }
 
