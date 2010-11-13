@@ -8284,6 +8284,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     QPolygon                   lines;
 
                     painter->save();
+                    painter->setRenderHint(QPainter::Antialiasing, false);
                     if ((lv->activeSubControls&SC_All) && (lv->subControls&SC_Q3ListViewExpand))
                     {
                         c = 2;
