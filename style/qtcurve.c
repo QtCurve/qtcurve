@@ -3450,20 +3450,30 @@ static GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path
 static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
                               GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column)
 {
-    int       cellIndent=levelIndent + expanderSize,// + 4,
-              xStart=cellIndent/2,
-              i;
-    gboolean  haveChildren=treeViewCellHasChildren(treeView, path);
-    GByteArray *isLast=depth ? g_byte_array_sized_new(depth) : NULL;
+    int        cellIndent=levelIndent + expanderSize,// + 4,
+               xStart=cellIndent/2,
+               i,
+               isLastMask=0;
+    gboolean   haveChildren=treeViewCellHasChildren(treeView, path),
+               useBitMask=depth<33;
+    GByteArray *isLast=depth && !useBitMask ? g_byte_array_sized_new(depth) : NULL;
 
-    if(isLast)
+    if(useBitMask || isLast)
     {
-        GtkTreePath *p = path ? gtk_tree_path_copy(path) : NULL;
+        GtkTreePath  *p = path ? gtk_tree_path_copy(path) : NULL;
+        unsigned int index=depth-1;
+
         while(p && gtk_tree_path_get_depth(p) > 0)
         {
             GtkTreePath *next=treeViewPathParent(treeView, p);
             char        last=treeViewCellIsLast(treeView, p) ? 1 : 0;
-            isLast=g_byte_array_prepend(isLast, &last, 1);
+            if(useBitMask)
+            {
+                if(last)
+                    isLastMask|=1<<(index--);
+            }
+            else
+                isLast=g_byte_array_prepend(isLast, &last, 1);
             gtk_tree_path_free(p);
             p=next;
         }
@@ -3472,7 +3482,7 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
 
         for(i=0; i<depth; ++i )
         {
-            gboolean isLastCell=isLast->data[i] ? TRUE : FALSE,
+            gboolean isLastCell=(useBitMask ? isLastMask&(1<<i) : isLast->data[i]) ? TRUE : FALSE,
                      last=i == depth -1;
             double   xCenter = xStart;
 
@@ -3521,7 +3531,8 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
             xStart += cellIndent;
         }
 
-        g_byte_array_free(isLast, FALSE);
+        if(isLast)
+            g_byte_array_free(isLast, FALSE);
     }
 }
 
