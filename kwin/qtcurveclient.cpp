@@ -640,7 +640,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
     opt.state=QStyle::State_Horizontal|QStyle::State_Enabled|QStyle::State_Raised|
              (active ? QStyle::State_Active : QStyle::State_None)|QtC_StateKWin;
 
-    QRect fillRect(r.adjusted(0, maximized ? -Handler()->borderEdgeSize() : 0, 0, 0));
+    int   fillTopAdjust(maximized ? Handler()->borderEdgeSize() : 0),
+          fillBotAdjust(maximized ? Handler()->borderSize(true) : 0),
+          fillSideAdjust(maximized ? Handler()->borderSize(false) : 0);
+    QRect fillRect(r.adjusted(-fillSideAdjust, -fillTopAdjust, fillSideAdjust, fillBotAdjust));
     bool  clipRegion((outerBorder || round<=ROUND_SLIGHT) && !maximized);
 
     painter.setRenderHint(QPainter::Antialiasing, true);

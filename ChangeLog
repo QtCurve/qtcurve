@@ -15,6 +15,7 @@
  9. Remove box around arrow in listview lines - to match Gtk better.
 10. Remove 'new' listview lines setting - always use 'older' style.
 11. Add warning about opacity settings and compiz.
+12. Fix drawing of background images onto titlebar.
 
 1.7.0
 -----
