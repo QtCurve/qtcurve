@@ -3243,6 +3243,63 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
     }
 }
 
+static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height,
+                               gboolean isList, gboolean horiz)
+{
+    gboolean doEtch=!isList && DO_EFFECT;
+    GdkColor *col=&style->base[state];
+    int      offset=opts.borderProgress ? 1 : 0;
+
+    switch(opts.progressGrooveColor)
+    {
+        default:
+        case ECOLOR_BASE:
+            col=&style->base[state];
+            break;
+        case ECOLOR_BACKGROUND:
+            col=&qtcPalette.background[ORIGINAL_SHADE];
+            break;
+        case ECOLOR_DARK:
+            col=&qtcPalette.background[2];
+    }
+
+    if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+        && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
+        drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
+
+    if(doEtch && opts.borderProgress)
+        x++, y++, width-=2, height-=2;
+
+    /*clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);*/
+    drawBevelGradient(cr, style, area, x+offset, y+offset, width-(2*offset), height-(2*offset), col,
+                      horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
+    /*unsetCairoClipping(cr);*/
+
+    if(doEtch && opts.borderProgress)
+            drawEtch(cr, area, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
+
+    if(opts.borderProgress)
+    {
+        GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
+        GtkStyle  *style=widget ? qtcWidgetGetStyle(parent ? parent : widget) : NULL;
+        drawBorder(cr, style, state, area, x, y, width, height, NULL, ROUNDED_ALL,
+                    IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
+                        ? BORDER_SUNKEN : BORDER_FLAT,
+                    WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
+    }
+    else /* if(!opts.borderProgress) */
+        if(horiz)
+        {
+            drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y, width);
+            drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y+height-1, width);
+        }
+        else
+        {
+            drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y, height);
+            drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x+width-1, y, height);
+        }
+}
+
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
 #define GIMP_MAIN   "GimpToolbox"      /* Main GIMP toolbox */
 #define GIMP_WINDOW "GimpDisplayShell" /* Image window */
@@ -5068,61 +5125,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             }
         }
         else if(pbar)
-        {
-            gboolean doEtch=!list && DO_EFFECT;
-            GdkColor *col=&style->base[state];
-            int      offset=opts.borderProgress ? 1 : 0;
-
-            switch(opts.progressGrooveColor)
-            {
-                default:
-                case ECOLOR_BASE:
-                    col=&style->base[state];
-                    break;
-                case ECOLOR_BACKGROUND:
-                    col=&qtcPalette.background[ORIGINAL_SHADE];
-                    break;
-                case ECOLOR_DARK:
-                    col=&qtcPalette.background[2];
-            }
-
-            if(!list && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget &&
-                                                           drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
-                && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-                drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
-
-            if(doEtch && opts.borderProgress)
-                x++, y++, width-=2, height-=2;
-
-            /*clipPath(cr, x, y, width, height, WIDGET_PBAR_TROUGH, RADIUS_INTERNAL, ROUNDED_ALL);*/
-            drawBevelGradient(cr, style, area, x+offset, y+offset, width-(2*offset), height-(2*offset), col,
-                              horiz, FALSE, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
-            /*unsetCairoClipping(cr);*/
-
-            if(doEtch && opts.borderProgress)
-                 drawEtch(cr, area, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
-
-            if(opts.borderProgress)
-            {
-                GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
-                GtkStyle  *style=widget ? qtcWidgetGetStyle(parent ? parent : widget) : NULL;
-                drawBorder(cr, style, state, area, x, y, width, height, NULL, ROUNDED_ALL,
-                           IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
-                                ? BORDER_SUNKEN : BORDER_FLAT,
-                           WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
-            }
-            else if(!opts.borderProgress)
-                if(horiz)
-                {
-                    drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y, width);
-                    drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y+height-1, width);
-                }
-                else
-                {
-                    drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x, y, height);
-                    drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), 1.0, x+width-1, y, height);
-                }
-        }
+            drawProgressGroove(cr, style, state, widget, AREA_PARAM_VAL_L, x, y, width, height, list, horiz);
         else /* Scrollbars... */
         {
             int      sbarRound=ROUNDED_ALL,
@@ -5778,8 +5781,12 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 drawWindowBgnd(cr, style, area, widget, x, y, width, height);
         }
         unsetCairoClipping(cr);
-        drawBorder(cr, style, state, area, x, y, width, height,
-                   NULL, menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), wt, STD_BORDER);
+        
+        if(WIDGET_PBAR_TROUGH==wt)
+            drawProgressGroove(cr, style, state, widget, AREA_PARAM_VAL_L, x, y, width, height, TRUE, TRUE);
+        else
+            drawBorder(cr, style, state, area, x, y, width, height,
+                    NULL, menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), wt, STD_BORDER);
     }
     CAIRO_END
 }

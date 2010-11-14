@@ -11,6 +11,7 @@
    KDE 'old' style.
 7. When loading images for background/menus - check that image was loaded before
    attempting to ascertain its width/height.
+8. Fix drawing or progressbar groove in treeview.
 
 1.7.0
 -----
