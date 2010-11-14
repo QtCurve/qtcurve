@@ -2299,7 +2299,7 @@ static gboolean qtInit()
             }
             
             if(excludedApp(opts.noBgndOpacityApps))
-                opts.bgndOpacity=opts.dlgOpacity=100, qtSettings.useAlpha=false;
+                opts.bgndOpacity=opts.dlgOpacity=100;
 
             if(excludedApp(opts.noMenuBgndOpacityApps))
                 opts.menuBgndOpacity=100, qtSettings.useAlpha=false;
