@@ -5616,9 +5616,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             else if(APPEARANCE_FILE==opts.bgndAppearance)
                 drawBgndImage(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
             else
-                drawBevelGradientAlpha(cr, style, area, x, y, width, height,
-                                       &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad, FALSE, opts.menuBgndAppearance,
-                                       WIDGET_OTHER, alpha);
+                drawBevelGradientAlpha(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad,
+                                       FALSE, opts.menuBgndAppearance, WIDGET_OTHER, alpha);
         }
         else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
             drawAreaColorAlpha(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height, alpha);
@@ -5629,7 +5628,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(opts.menuStripe && !comboMenu)
         {
             gboolean mozOo=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
-            int stripeWidth=mozOo ? 22 : 21;
+            int      stripeWidth=mozOo ? 22 : 21;
 
             // To determine stripe size, we iterate over all menuitems of this menu. If we find a GtkImageMenuItem then
             // we can a width of 20. However, we need to check that at least one enttry actually has an image! So, if
@@ -5649,8 +5648,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
                         if(0L==gtk_image_menu_item_get_image(item) ||
                            (GTK_IS_IMAGE(gtk_image_menu_item_get_image(item)) &&
-                                GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(
-                                        gtk_image_menu_item_get_image(item)))))
+                                GTK_IMAGE_EMPTY==gtk_image_get_storage_type(GTK_IMAGE(gtk_image_menu_item_get_image(item)))))
                         {
                             // Give it a blank icon - so that menuStripe looks ok, plus this matches KDE style!
                             if(0L==gtk_image_menu_item_get_image(item))
@@ -5670,8 +5668,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     g_list_free(children);
             }
 
-            drawBevelGradientAlpha(cr, style, area, x+1, y+1, stripeWidth+1, height-2,
-                                   &opts.customMenuStripeColor, FALSE, FALSE, opts.menuStripeAppearance, WIDGET_OTHER, alpha);
+            drawBevelGradientAlpha(cr, style, area, x+1, y+1, stripeWidth+1, height-2, &opts.customMenuStripeColor, FALSE, FALSE,
+                                   opts.menuStripeAppearance, WIDGET_OTHER, alpha);
         }
 
         if(opts.popupBorder)
@@ -5734,8 +5732,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(*detail == 'h')
             orientation = GTK_ORIENTATION_VERTICAL;
 
-        gtkDrawHandle(style, WINDOW_PARAM_VAL state, shadow_type, AREA_PARAM_VAL widget, detail, x, y, width, height,
-                      orientation);
+        gtkDrawHandle(style, WINDOW_PARAM_VAL state, shadow_type, AREA_PARAM_VAL widget, detail, x, y, width, height, orientation);
     }
     else if(detail && 0==strcmp(detail+1, "ruler"))
     {
@@ -5785,8 +5782,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(WIDGET_PBAR_TROUGH==wt)
             drawProgressGroove(cr, style, state, widget, AREA_PARAM_VAL_L, x, y, width, height, TRUE, TRUE);
         else
-            drawBorder(cr, style, state, area, x, y, width, height,
-                    NULL, menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), wt, STD_BORDER);
+            drawBorder(cr, style, state, area, x, y, width, height, NULL, 
+                       menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), wt, STD_BORDER);
     }
     CAIRO_END
 }
