@@ -131,7 +131,7 @@ static bool loadImage(const char *file, QtCPixmap *pixmap)
 
 static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "fontcolor", 9) || 0==memcmp(str, "border", 6))
             return IND_FONT_COLOR;
@@ -156,7 +156,7 @@ static EDefBtnIndicator toInd(const char *str, EDefBtnIndicator def)
 
 static ELine toLine(const char *str, ELine def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "dashes", 6))
             return LINE_DASHES;
@@ -176,7 +176,7 @@ static ELine toLine(const char *str, ELine def)
 
 static ETBarBorder toTBarBorder(const char *str, ETBarBorder def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "dark", 4))
             return 0==memcmp(&str[4], "-all", 4) ? TB_DARK_ALL : TB_DARK;
@@ -190,7 +190,7 @@ static ETBarBorder toTBarBorder(const char *str, ETBarBorder def)
 
 static EMouseOver toMouseOver(const char *str, EMouseOver def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "true", 4) || 0==memcmp(str, "colored", 7))
             return MO_COLORED;
@@ -208,7 +208,7 @@ static EMouseOver toMouseOver(const char *str, EMouseOver def)
 
 static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allow, QtCPixmap *pix, bool checkImage)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "flat", 4))
             return APPEARANCE_FLAT;
@@ -261,7 +261,7 @@ static EAppearance toAppearance(const char *str, EAppearance def, EAppAllow allo
 
 static EShade toShade(const char *str, bool allowMenu, EShade def, bool menuShade, color *col)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         /* true/false is from 0.25... */
         if((!menuShade && 0==memcmp(str, "true", 4)) || 0==memcmp(str, "selected", 8))
@@ -289,7 +289,7 @@ static EShade toShade(const char *str, bool allowMenu, EShade def, bool menuShad
 /* Prior to 0.42 round was a bool - so need to read 'false' as 'none' */
 static ERound toRound(const char *str, ERound def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "none", 4) || 0==memcmp(str, "false", 5))
             return ROUND_NONE;
@@ -308,7 +308,7 @@ static ERound toRound(const char *str, ERound def)
 
 static EScrollbar toScrollbar(const char *str, EScrollbar def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "kde", 3))
             return SCROLLBAR_KDE;
@@ -327,7 +327,7 @@ static EScrollbar toScrollbar(const char *str, EScrollbar def)
 
 static EFrame toFrame(const char *str, EFrame def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "none", 4))
             return FRAME_NONE;
@@ -346,7 +346,7 @@ static EFrame toFrame(const char *str, EFrame def)
 
 static EEffect toEffect(const char *str, EEffect def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "none", 4))
             return EFFECT_NONE;
@@ -361,7 +361,7 @@ static EEffect toEffect(const char *str, EEffect def)
 
 static EShading toShading(const char *str, EShading def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "simple", 6))
             return SHADING_SIMPLE;
@@ -378,7 +378,7 @@ static EShading toShading(const char *str, EShading def)
 
 static EStripe toStripe(const char *str, EStripe def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "plain", 5) || 0==memcmp(str, "true", 4))
             return STRIPE_PLAIN;
@@ -395,7 +395,7 @@ static EStripe toStripe(const char *str, EStripe def)
 
 static ESliderStyle toSlider(const char *str, ESliderStyle def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "round", 5))
             return SLIDER_ROUND;
@@ -416,7 +416,7 @@ static ESliderStyle toSlider(const char *str, ESliderStyle def)
 
 static EColor toEColor(const char *str, EColor def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "base", 4))
             return ECOLOR_BASE;
@@ -431,7 +431,7 @@ static EColor toEColor(const char *str, EColor def)
 
 static EFocus toFocus(const char *str, EFocus def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "standard", 8))
             return FOCUS_STANDARD;
@@ -452,7 +452,7 @@ static EFocus toFocus(const char *str, EFocus def)
 
 static ETabMo toTabMo(const char *str, ETabMo def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "top", 3))
             return TAB_MO_TOP;
@@ -467,7 +467,7 @@ static ETabMo toTabMo(const char *str, ETabMo def)
 
 static EGradType toGradType(const char *str, EGradType def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "horiz", 5))
             return GT_HORIZ;
@@ -479,7 +479,7 @@ static EGradType toGradType(const char *str, EGradType def)
 
 static bool toLvLines(const char *str, bool def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
 #if 0
         if(0==memcmp(str, "true", 4) || 0==memcmp(str, "new", 3))
@@ -497,7 +497,7 @@ static bool toLvLines(const char *str, bool def)
 
 static EGradientBorder toGradientBorder(const char *str, bool *haveAlpha)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         *haveAlpha=strstr(str, "-alpha") ? true : false;
         if(0==memcmp(str, "light", 5) || 0==memcmp(str, "true", 4))
@@ -517,7 +517,7 @@ static EGradientBorder toGradientBorder(const char *str, bool *haveAlpha)
 #ifdef __cplusplus
 static EAlign toAlign(const char *str, EAlign def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "left", 4))
             return ALIGN_LEFT;
@@ -535,7 +535,7 @@ static EAlign toAlign(const char *str, EAlign def)
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "none", 4))
             return TITLEBAR_ICON_NONE;
@@ -550,7 +550,7 @@ static ETitleBarIcon toTitlebarIcon(const char *str, ETitleBarIcon def)
 
 static EImageType toImageType(const char *str, EImageType def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "none", 4))
             return IMG_NONE;
@@ -568,7 +568,7 @@ static EImageType toImageType(const char *str, EImageType def)
 
 static EGlow toGlow(const char *str, EGlow def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "none", 4))
             return GLOW_NONE;
@@ -584,7 +584,7 @@ static EGlow toGlow(const char *str, EGlow def)
 
 static ETBarBtn toTBarBtn(const char *str, ETBarBtn def)
 {
-    if(str)
+    if(str && 0!=str[0])
     {
         if(0==memcmp(str, "standard", 8))
             return TBTN_STANDARD;
@@ -1198,7 +1198,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
 {
     char *str=readStringEntry(cfg, key);
 
-    if(str)
+    if(str && 0!=str[0])
     {
         int  j,
              comma=0;
@@ -1238,7 +1238,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
     { \
         const char *str=readStringEntry(cfg, #ENTRY); \
     \
-        if(str) \
+        if(str && 0!=str[0]) \
             setRgb(&(opts->ENTRY), str); \
         else \
             opts->ENTRY=def->ENTRY; \
@@ -1267,7 +1267,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
 #define CFG_READ_STRING_LIST(ENTRY) \
     { \
         const gchar *str=readStringEntry(cfg, #ENTRY); \
-        if(str) \
+        if(str && 0!=str[0]) \
             opts->ENTRY=g_strsplit(str, ",", -1); \
         else if(def->ENTRY) \
         { \
