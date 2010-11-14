@@ -5327,11 +5327,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         color.setAlphaF(APP_PLASMA==theThemedApp && !widget ? (0.5 * (modAlpha ? 0.75 : 1.0)) : 0.20);
                     else
                     {
-                        //color = color.lighter(110);
+                        color = color.lighter(110);
                         if(modAlpha)
                             color.setAlphaF(INACTIVE_SEL_ALPHA);
-                        else
-                            color.setAlphaF(0.6);
                     }
                 }
                 else if(modAlpha)
