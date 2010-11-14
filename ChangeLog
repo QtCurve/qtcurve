@@ -8,6 +8,8 @@
 5. Indent treeview selection as per KDE.
 6. Dont use GtkStyle to draw treeview lines. Use custom code which matches previous
    KDE 'old' style.
+7. When loading images for background/menus - check that image was loaded before
+   attempting to ascertain its width/height.
 
 1.7.0
 -----
