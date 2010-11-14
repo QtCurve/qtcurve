@@ -3309,13 +3309,16 @@ static void drawSelectionGradient(cairo_t *cr, GtkStyle *style, GtkStateType sta
 }
 
 static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkRectangle *area, GtkWidget *widget,
-                          int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod)
+                          int x, int y, int width, int height, int round, gboolean isLvSelection, double alphaMod, int factor)
 {
     gboolean hasFocus=qtcWidgetHasFocus(widget);
     double   alpha=alphaMod*(GTK_STATE_PRELIGHT==state ? 0.20 : 1.0)*(hasFocus || !qtSettings.inactiveChangeSelectionColor ? 1.0 : INACTIVE_SEL_ALPHA);
-    GdkColor *col=&style->base[hasFocus ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
+    GdkColor col=style->base[hasFocus ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE];
 
-    drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, round, isLvSelection, alpha, col, TRUE);
+    if(factor!=0)
+        col=shadeColor(&col, TO_FACTOR(factor));
+        
+    drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, round, isLvSelection, alpha, &col, TRUE);
 
     if(opts.borderSelection && (!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)))
     {
@@ -3340,7 +3343,7 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
         cairo_new_path(cr);
         cairo_rectangle(cr, xo, y, widtho, height);
         cairo_clip(cr);
-        cairo_set_source_rgba(cr, CAIRO_COL(*col), alpha);
+        cairo_set_source_rgba(cr, CAIRO_COL(col), alpha);
         createPath(cr, xd, yd, width-1, height-1, getRadius(&opts, widtho, height, WIDGET_OTHER, RADIUS_SELECTION), round);
         cairo_stroke(cr);
         cairo_restore(cr);
@@ -3661,6 +3664,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         double   alpha=1.0;
         int      selX=x,
                  selW=width,
+                 factor=0,
                  round=!combo && detail && GTK_STATE_SELECTED==state && ROUNDED
                             ? 0!=strstr(detail, "_start")
                                 ? ROUNDED_LEFT
@@ -3693,7 +3697,12 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
             gtk_tree_view_get_path_at_pos(treeView, x+1, y+1, &path, &column, 0L, 0L );
             qtcTreeViewSetup(widget);
             if(qtcTreeViewIsCellHovered(widget, path, column))
-                alpha=GTK_STATE_SELECTED==state ? 0.6 : 0.2;
+            {
+                if(GTK_STATE_SELECTED==state)
+                    factor=10;
+                else
+                    alpha=0.2;
+            }
 
             if(column==expanderColumn)
             {
@@ -3728,7 +3737,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 drawAreaColorAlpha(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
                                    selX, y, selW, height, alpha);
             else
-                drawSelection(cr, style, state, area, widget, selX, y, selW, height, round, TRUE, alpha);
+                drawSelection(cr, style, state, area, widget, selX, y, selW, height, round, TRUE, alpha, factor);
     }
     else if(detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED))
     {
@@ -3803,7 +3812,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
             cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
     }
     else if(DETAIL("icon_view_item"))
-        drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0);
+        drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))
@@ -4512,7 +4521,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             else if(isPathButton(widget))
             {
                 if(GTK_STATE_PRELIGHT==state)
-                    drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0);
+                    drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
 
                 if(GTK_IS_TOGGLE_BUTTON(widget))
                 {                       
