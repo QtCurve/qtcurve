@@ -5430,11 +5430,9 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
             painter->save();
             if(rounded)
-            {
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                if(haveAlpha)
-                    col.setAlphaF(0.875);
-            }
+            if(haveAlpha)
+                col.setAlphaF(0.875);
             drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_OTHER, !haveAlpha);
             if(IS_FLAT(opts.tooltipAppearance))
             {
