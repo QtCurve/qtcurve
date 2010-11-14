@@ -1439,11 +1439,11 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QCheckBox" name="lvLines" native="true">
+        <widget class="QCheckBox" name="lvLines">
          <property name="toolTip">
           <string>&lt;p&gt;Controls the style of lines drawn between items in a treeview.</string>
          </property>
-         <property name="text" stdset="0">
+         <property name="text">
           <string>Enabled</string>
          </property>
         </widget>
@@ -3766,14 +3766,14 @@
          <item row="3" column="0">
           <widget class="QLabel" name="label_81mnu">
            <property name="text">
-            <string>No menu opacity:</string>
+            <string>No menu opacity (and no alpha channel for Gtk2):</string>
            </property>
           </widget>
          </item>
          <item row="3" column="1">
           <widget class="KLineEdit" name="noMenuBgndOpacityApps">
            <property name="toolTip">
-            <string>&lt;p&gt;Comma separated list of names of applications which should not use the menu opacity setting. &lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
+            <string>&lt;p&gt;Comma separated list of names of applications which should not use the menu opacity setting.&lt;p&gt;&lt;i&gt;For Gtk2, this option also disables using an allpha-channel to smoothly round tooltips and popup menus.&lt;/i&gt;&lt;/p&gt;&lt;p&gt;Use &lt;i&gt;gtk&lt;/i&gt; to disable for all Gtk2 applications.&lt;/p&gt;</string>
            </property>
           </widget>
          </item>
