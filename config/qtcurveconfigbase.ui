@@ -1439,7 +1439,7 @@
         </widget>
        </item>
        <item row="7" column="1">
-        <widget class="QCheckbox" name="lvLines" native="true">
+        <widget class="QCheckBox" name="lvLines" native="true">
          <property name="toolTip">
           <string>&lt;p&gt;Controls the style of lines drawn between items in a treeview.</string>
          </property>
@@ -4437,11 +4437,6 @@
    <class>KIntNumInput</class>
    <extends>QWidget</extends>
    <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QCheckbox</class>
-   <extends>QWidget</extends>
-   <header>qcheckbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
