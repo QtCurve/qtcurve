@@ -3122,7 +3122,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                          gboolean rev, gboolean isEntryProg)
 {
 #if GTK_CHECK_VERSION(2, 90, 0)
-    gboolean                  revProg=widget && gtk_progress_bar_get_inverted(GTK_PROGRESS_BAR(widget));
+    gboolean                  revProg=widget && GTK_IS_PROGRESS_BAR(widget) && gtk_progress_bar_get_inverted(GTK_PROGRESS_BAR(widget));
 #else
     GtkProgressBarOrientation orientation=widget && GTK_IS_PROGRESS_BAR(widget)
                                     ? gtk_progress_bar_get_orientation(GTK_PROGRESS_BAR(widget))
