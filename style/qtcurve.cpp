@@ -8334,7 +8334,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                                     QRect ar(bx-4, linebot-4, 11, 11);
 
-                                    if(/*LV_OLD==*/opts.lvLines)
+#if 0
+                                    if(LV_OLD==opts.lvLines)
                                     {
                                         int lo(ROUNDED ? 2 : 0);
 
@@ -8361,6 +8362,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                             painter->drawLine(ar.x()+ar.width()-2, ar.y()+ar.height()-1, ar.x()+ar.width()-1, ar.y()+ar.height()-2);
                                         }
                                     }
+#endif
 
                                     drawArrow(painter, ar,
                                               child.state&State_Open
