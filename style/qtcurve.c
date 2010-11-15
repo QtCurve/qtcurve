@@ -5583,13 +5583,11 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
                 cairo_set_source_rgba(cr, 0, 0, 0, 1);
                 cairo_fill(cr);
+                cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
             }
             else
                 createRoundedMask(cr, widget, x, y, width, height, radius-0.25, FALSE);
-            if(useAlphaForCorners && opts.popupBorder)
-                clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, radius+1, ROUNDED_ALL);
-            else
-                clipPath(cr, x, y, width, height, WIDGET_OTHER, radius+1, ROUNDED_ALL);
+            clipPathRadius(cr, x, y, width, height, radius, ROUNDED_ALL);
 
             if(useAlphaForCorners)
                 cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);

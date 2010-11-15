@@ -2,6 +2,7 @@
 -----
 1. Allow editable combo-box popup to be rounded.
 2. Fix initial treeview highlight.
+3. Fix rounded popup border when using compositing.
 
 1.7.1
 -----
