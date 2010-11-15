@@ -5588,9 +5588,6 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             else
                 createRoundedMask(cr, widget, x, y, width, height, radius-0.25, FALSE);
             clipPathRadius(cr, x, y, width, height, radius, ROUNDED_ALL);
-
-            if(useAlphaForCorners)
-                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
         }
 
         if(widget && /*!comboMenu && */100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
@@ -5599,8 +5596,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(useAlpha)
         {
             alpha=opts.menuBgndOpacity/100.0;
-            if(!useAlphaForCorners)
-                cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+            cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
         }
 
         if(/*!comboMenu && */!IS_FLAT_BGND(opts.menuBgndAppearance))
@@ -5613,7 +5609,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 drawBevelGradientAlpha(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad,
                                        FALSE, opts.menuBgndAppearance, WIDGET_OTHER, alpha);
         }
-        else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU)
+        else if(opts.shadePopupMenu || USE_LIGHTER_POPUP_MENU || useAlpha)
             drawAreaColorAlpha(cr, area, &qtcPalette.menu[ORIGINAL_SHADE], x, y, width, height, alpha);
 
         if(/*!comboMenu && */IMG_NONE!=opts.menuBgndImage.type)

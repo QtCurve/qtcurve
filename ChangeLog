@@ -3,6 +3,9 @@
 1. Allow editable combo-box popup to be rounded.
 2. Fix initial treeview highlight.
 3. Fix rounded popup border when using compositing.
+4. Add vmplayer to list of app to exclude from opacity settings. This also prevents
+   using RGBA for rounded tooltips and popup menus.
+5. Fix opacity setting of squared popu menus.
 
 1.7.1
 -----
