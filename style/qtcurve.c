@@ -3762,7 +3762,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
 
             gtk_tree_view_get_path_at_pos(treeView, x+1, y+1, &path, &column, 0L, 0L );
             qtcTreeViewSetup(widget);
-            if(qtcTreeViewIsCellHovered(widget, path, column))
+            if(path && qtcTreeViewIsCellHovered(widget, path, column))
             {
                 if(GTK_STATE_SELECTED==state)
                     factor=10;
