@@ -1458,7 +1458,7 @@ void Style::polish(QApplication *app)
     if(APP_PLASMA==theThemedApp)
         opts.bgndOpacity=100;
     else if(APP_KWIN==theThemedApp)
-        opts.bgndOpacity=opts.dlgOpacity=100;
+        opts.bgndOpacity=opts.dlgOpacity=100, opts.bgndAppearance=APPEARANCE_FLAT;
     else if(APP_OPENOFFICE==theThemedApp)
     {
         opts.scrollbarType=SCROLLBAR_WINDOWS;

@@ -2,6 +2,8 @@
 -----
 1. Allow editable combo-box popup to be rounded.
 2. For windows build, set FramelessWindowHint when setting WA_TranslucentBackground
+3. Always use flat background kwin, custom background messes up some aurorae
+   decorations.
 
 1.7.1
 -----
