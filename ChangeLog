@@ -1,3 +1,7 @@
+1.7.2
+-----
+1. Allow editable combo-box popup to be rounded.
+
 1.7.1
 -----
 1. Use rgba colormap to draw rounded tooltips and popup menus - gives nicer border.

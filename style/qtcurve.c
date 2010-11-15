@@ -5804,27 +5804,53 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
 
     CAIRO_BEGIN
 
-    if(isComboBoxList(widget))
+    gboolean comboBoxList=isComboBoxList(widget),
+             comboList=!comboBoxList && isComboList(widget);
+
+    if(comboBoxList || comboList)
     {
-        drawAreaColor(cr, area, &style->base[state], x, y, width, height);
-        if(opts.popupBorder)
+        if(!comboList || !DETAIL("viewport"))
         {
-            cairo_new_path(cr);
-            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-            cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
-            cairo_stroke(cr);
+            gboolean square=opts.square&SQUARE_POPUP_MENUS,
+                     nonGtk=square || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+                     isAlphaWidget=!nonGtk && isRgbaWidget(widget) && compositingActive(widget),
+                     useAlpha=!nonGtk && qtSettings.useAlpha && isAlphaWidget;
+                 
+            if(!useAlpha || (opts.popupBorder && square))
+            {
+                drawAreaColor(cr, area, &style->base[state], x, y, width, height);
+                cairo_new_path(cr);
+                cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+                cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
+                cairo_stroke(cr);
+            }
+            else // if(!opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS))
+            {
+                //if(useAlpha)
+                {
+                    cairo_rectangle(cr, x, y, width, height);
+                    cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
+                    cairo_set_source_rgba(cr, 0, 0, 0, 1);
+                    cairo_fill(cr);
+                    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+                }
+                //else
+                //    createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, TRUE);
+
+                clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
+                drawAreaColor(cr, area, &style->base[state], x, y, width, height);
+                //if(useAlpha)
+                    cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+                if(opts.popupBorder)
+                {
+                    createPath(cr, x+0.5, y+0.5, width-1, height-1, MENU_AND_TOOLTIP_RADIUS-1, ROUNDED_ALL);
+                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
+                    cairo_stroke(cr);
+                }
+            }
         }
-    }
-    else if(isComboList(widget))
-    {
-        drawAreaColor(cr, area, &style->base[state], x, y, width, height);
-        if(opts.popupBorder && !DETAIL("viewport"))
-        {
-            cairo_new_path(cr);
-            cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-            cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
-            cairo_stroke(cr);
-        }
+        else
+            drawAreaColor(cr, area, &style->base[state], x, y, width, height);
     }
 #if 0
     else if(isComboFrame(widget))
