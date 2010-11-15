@@ -1559,11 +1559,10 @@ typedef enum
 {
     DF_DRAW_INSIDE     = 0x001,
     DF_BLEND           = 0x002,
-    DF_DO_CORNERS      = 0x004,
-    DF_SUNKEN          = 0x008,
-    DF_DO_BORDER       = 0x010,
-    DF_VERT            = 0x020,
-    DF_HIDE_EFFECT     = 0x040
+    DF_SUNKEN          = 0x004,
+    DF_DO_BORDER       = 0x008,
+    DF_VERT            = 0x010,
+    DF_HIDE_EFFECT     = 0x020
 } EDrawFlags;
 
 #define drawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m) \
@@ -3026,7 +3025,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
     }
 
     drawBorder(cr, style, !widget || qtcWidgetIsSensitive(widget) ? state : GTK_STATE_INSENSITIVE, area, xo, yo, widtho, heighto,
-               colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_DO_CORNERS|DF_BLEND);
+               colors, round, BORDER_SUNKEN, WIDGET_ENTRY, DF_BLEND);
     }
 
     if(GTK_APP_OPEN_OFFICE==qtSettings.app && comboOrSpin)
@@ -3166,7 +3165,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
 
         if((horiz ? width : height)>1)
             drawLightBevel(cr, style, new_state, area, x, y, width, height, &itemCols[fillVal],
-                           itemCols, ROUNDED_ALL, wid, BORDER_FLAT, (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+                           itemCols, ROUNDED_ALL, wid, BORDER_FLAT, (horiz ? 0 : DF_VERT), widget);
 
         if(opts.stripedProgress && width>4 && height>4)
             if(STRIPE_FADE==opts.stripedProgress)
@@ -3181,8 +3180,7 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
                 setProgressStripeClipping(cr, AREA_PARAM_VAL xo, yo, wo, ho, animShift, horiz);
                 drawLightBevel(cr, style, new_state, NULL, x, y, width, height, &itemCols[1],
                                qtcPalette.highlight, ROUNDED_ALL, wid, BORDER_FLAT,
-                               (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|
-                               (horiz ? 0 : DF_VERT)|DF_DO_CORNERS, widget);
+                               (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT), widget);
                 unsetCairoClipping(cr);
             }
 
@@ -3285,7 +3283,7 @@ static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
         drawBorder(cr, style, state, area, x, y, width, height, NULL, ROUNDED_ALL,
                     IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
                         ? BORDER_SUNKEN : BORDER_FLAT,
-                    WIDGET_PBAR_TROUGH, DF_BLEND|DF_DO_CORNERS);
+                    WIDGET_PBAR_TROUGH, DF_BLEND);
     }
     else /* if(!opts.borderProgress) */
         if(horiz)
@@ -4413,7 +4411,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
             drawBgnd(cr, &btn_colors[bgnd], widget, area, x+1, y+1, width-2, height-2);
             drawLightBevel(cr, style, state, area, x, y, width, height-(WIDGET_SPIN_UP==wid && DO_EFFECT ? 1 : 0), &btn_colors[bgnd],
-                           btn_colors, round, wid, BORDER_FLAT, DF_DO_CORNERS|DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
+                           btn_colors, round, wid, BORDER_FLAT, DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
         }
     }
     else if(DETAIL("spinbutton"))
@@ -4461,7 +4459,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 #endif
             drawLightBevel(cr, style, state, area, x, y+offset, width-offset, height-(2*offset), &btn_colors[bgnd],
                            btn_colors, ROUNDED_RIGHT, WIDGET_SPIN, BORDER_FLAT,
-                           DF_DO_CORNERS|DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
+                           DF_DO_BORDER|(sunken ? DF_SUNKEN : 0), widget);
             drawFadedLine(cr, x+2, y+(height>>1), width-(offset+4), 1, &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
         }
 
@@ -5094,7 +5092,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             }
             drawLightBevel(cr, style, state, area, x, y, width, height,
                            bgndcol, bgndcols, opts.square&SQUARE_SLIDER ? ROUNDED_NONE : ROUNDED_ALL, wid,
-                           BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
+                           BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
 
             if(opts.fillSlider && upper!=lower && state!=GTK_STATE_INSENSITIVE && 0==strcmp(detail, "trough"))
             {
@@ -5120,7 +5118,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     drawLightBevel(cr, style, state, area, used_x, used_y, used_w, used_h,
                                    &usedcols[ORIGINAL_SHADE], usedcols,
                                    opts.square&SQUARE_SLIDER ? ROUNDED_NONE : ROUNDED_ALL, WIDGET_FILLED_SLIDER_TROUGH,
-                                   BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
+                                   BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
                 }
             }
         }
@@ -5315,7 +5313,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                            thinner && horiz  ? height-(THIN_SBAR_MOD*2) : height,
                            &qtcPalette.background[2], qtcPalette.background, sbarRound,
                            thinner ? WIDGET_SLIDER_TROUGH : WIDGET_TROUGH,
-                           BORDER_FLAT, DF_DO_CORNERS|DF_SUNKEN|DF_DO_BORDER|
+                           BORDER_FLAT, DF_SUNKEN|DF_DO_BORDER|
                            (horiz ? 0 : DF_VERT), widget);
         }
     }
@@ -5551,8 +5549,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             else if(stdColors && opts.borderMenuitems)
             {
                 drawLightBevel(cr, style, new_state, area, x, y, width, height, &itemCols[fillVal],
-                                itemCols, round, WIDGET_MENU_ITEM, BORDER_FLAT, DF_DRAW_INSIDE|
-                                (stdColors ? DF_DO_BORDER : 0)|(activeWindow && USE_SHADED_MENU_BAR_COLORS ? 0 : DF_DO_CORNERS), widget);
+                               itemCols, round, WIDGET_MENU_ITEM, BORDER_FLAT, DF_DRAW_INSIDE|(stdColors ? DF_DO_BORDER : 0), widget);
             }
             else
             {
@@ -5560,8 +5557,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     drawBevelGradient(cr, style, area, x+1, y+1, width-2, height-2, &itemCols[fillVal],
                                       TRUE, FALSE, opts.menuitemAppearance, WIDGET_MENU_ITEM);
 
-                realDrawBorder(cr, style, state, area, x, y, width, height,
-                               itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
+                realDrawBorder(cr, style, state, area, x, y, width, height, itemCols, round, BORDER_FLAT, WIDGET_MENU_ITEM, 0, borderVal);
             }
         }
     }
@@ -5993,7 +5989,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                 else if(doBorder)
                     drawBorder(cr, style, state, area, x, y, width, height,
                                NULL, ROUNDED_ALL, scrolledWindow ? BORDER_SUNKEN : BORDER_FLAT,
-                               scrolledWindow ? WIDGET_SCROLLVIEW : WIDGET_FRAME, DF_BLEND|(viewport ? 0 : DF_DO_CORNERS));
+                               scrolledWindow ? WIDGET_SCROLLVIEW : WIDGET_FRAME, DF_BLEND);
             }
         }
         else if(!statusBar || opts.drawStatusBarFrames)
@@ -6150,7 +6146,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow_type, 
 
         setGapClip(cr, area, gap_side, gap_x, gap_width, x, y, width, height, isTab);
         drawBorder(cr, qtcWidgetGetStyle(parent ? parent : widget), state, area, x, y, width, height, NULL, round,
-                   borderProfile, isTab ? WIDGET_TAB_FRAME : WIDGET_FRAME, (isTab ? 0 : DF_BLEND)|DF_DO_CORNERS);
+                   borderProfile, isTab ? WIDGET_TAB_FRAME : WIDGET_FRAME, (isTab ? 0 : DF_BLEND));
         if(gap_width>0)
             unsetCairoClipping(cr);
     }
@@ -6279,8 +6275,7 @@ static void gtkDrawCheck(GtkStyle *style, WINDOW_PARAM GtkStateType state,
                             false, ROUNDED_ALL, WIDGET_CHECKBOX);
             }
 
-            drawBorder(cr, style, state, area, x, y, opts.crSize, opts.crSize, colors, ROUNDED_ALL, BORDER_FLAT, WIDGET_CHECKBOX,
-                       (list || mnu ? 0 : DF_DO_CORNERS));
+            drawBorder(cr, style, state, area, x, y, opts.crSize, opts.crSize, colors, ROUNDED_ALL, BORDER_FLAT, WIDGET_CHECKBOX, 0);
         }
     }
 
