@@ -2617,16 +2617,16 @@ static void defaultSettings(Options *opts)
     opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
     opts->statusbarApps << "kde";
     opts->useQtFileDialogApps << "googleearth-bin";
-    opts->noMenuBgndOpacityApps << "inkscape" << "inkscape" << "sonata" << "totem";
-    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "inkscape" << "sonata" << "totem";
+    opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer";
+    opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer";
 #endif
     opts->noMenuStripeApps << "gtk" << "soffice.bin";
 #else
     opts->noBgndGradientApps=NULL;
-    opts->noBgndOpacityApps=g_strsplit("inkscape,sonata,totem",",", -1);;
+    opts->noBgndOpacityApps=g_strsplit("inkscape,sonata,totem,vmware,vmplayer",",", -1);;
     opts->noBgndImageApps=NULL;
     opts->noMenuStripeApps=g_strsplit("gtk",",", -1);
-    opts->noMenuBgndOpacityApps=g_strsplit("inkscape,sonata,totem",",", -1);
+    opts->noMenuBgndOpacityApps=g_strsplit("inkscape,sonata,totem,vmware,vmplayer",",", -1);
 /*
     opts->setDialogButtonOrder=false;
 */
