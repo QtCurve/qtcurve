@@ -1838,10 +1838,6 @@ void Style::polish(QWidget *widget)
            !widget->inherits("KFilePlacesView") && !widget->inherits("QComboBoxListView") &&
            (qobject_cast<QTreeView *>(widget) || (qobject_cast<QListView *>(widget) && QListView::IconMode!=((QListView *)widget)->viewMode())))
             itemView->setAlternatingRowColors(true);
-            
-       if(widget->parentWidget() && (!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && 
-          widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
-            setTranslucentBackground(widget);
     }
 
     if(APP_KONTACT==theThemedApp && qobject_cast<QToolButton *>(widget))
@@ -2002,11 +1998,14 @@ void Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
     }
 #endif
-    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
+    else if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
     {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
     }
+    else if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && 
+             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
+        setTranslucentBackground(widget);
 
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
@@ -2712,11 +2711,19 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         case QEvent::Timer:
         case QEvent::Move:
             return false; // just for performance - they can occur really often
-#ifdef Q_WS_X11
         case QEvent::Resize:
-        {
-            if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
-                qobject_cast<QMenuBar *>(object))
+            if(!(opts.square&SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer"))
+            {
+                QWidget *widget=static_cast<QWidget *>(object);
+                if(Utils::hasAlphaChannel(widget))
+                   widget->clearMask();
+                else
+                    widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
+                return false;
+            }
+#ifdef Q_WS_X11
+            else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&
+                    qobject_cast<QMenuBar *>(object))
             {
                 QResizeEvent *re = static_cast<QResizeEvent *>(event);
 
@@ -2724,9 +2731,8 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     emitMenuSize((QMenuBar *)object, PREVIEW_MDI==itsIsPreview || !((QMenuBar *)object)->isVisible()
                                     ? 0 : re->size().height());
             }
-            break;
-        }
 #endif
+            break;
         case QEvent::ShortcutOverride:
             if((opts.menubarHiding || opts.statusbarHiding) && qobject_cast<QMainWindow *>(object))
             {
@@ -2785,6 +2791,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                        !(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
                     {
                         QPainter p(widget);
+                        p.setClipRegion(static_cast<QPaintEvent*>(event)->region());
                         drawBackground(&p, widget, isDialog ? BGND_DIALOG : BGND_WINDOW);
                     }
                 }
@@ -2803,6 +2810,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 opt.init(widget);
                 const QColor *use(popupMenuCols(&opt));
 
+                p.setClipRegion(static_cast<QPaintEvent*>(event)->region());
                 if(!opts.popupBorder)
                 {
                     p.setRenderHint(QPainter::Antialiasing, true);
@@ -2943,6 +2951,15 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                     itsTimer.start();
                     itsProgressBarAnimateTimer = startTimer(1000 / constProgressBarFps);
                 }
+            }
+            else if(!(opts.square&SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer"))
+            {
+                QWidget *widget=static_cast<QWidget *>(object);
+                if(Utils::hasAlphaChannel(widget))
+                    widget->clearMask();
+                else
+                    widget->setMask(windowMask(widget->rect(), opts.round>ROUND_SLIGHT));
+                return false;
             }
 #ifdef Q_WS_X11
             else if((BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding&HIDE_KWIN) &&

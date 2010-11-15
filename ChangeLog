@@ -5,6 +5,7 @@
 3. Always use flat background kwin, custom background messes up some aurorae
    decorations.
 4. Update Chinese translations.
+5. Set/clear widget masks when compositing toggled.
 
 1.7.1
 -----
