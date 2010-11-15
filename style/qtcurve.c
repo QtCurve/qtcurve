@@ -3457,6 +3457,21 @@ static void createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gi
     }
 }
 
+static void clearRoundedMask(GtkWidget *widget, gboolean isToolTip)
+{
+    if(widget)
+    {
+        if((int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK"))
+        {
+            if(isToolTip)
+                gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
+            else
+                gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
+            g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)0);
+        }
+    }
+}
+
 static gboolean treeViewCellHasChildren(GtkTreeView *treeView, GtkTreePath *path)
 {
     // check treeview and path
@@ -3858,6 +3873,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
                 cairo_set_source_rgba(cr, 0, 0, 0, 1);
                 cairo_fill(cr);
+                clearRoundedMask(widget, TRUE);
             }
             else
                 createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, TRUE);
@@ -5575,10 +5591,11 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                  alpha=1.0;
         gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
                  roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS) && !nonGtk,
-                 isAlphaWidget=isRgbaWidget(widget) && compositingActive(widget),
+                 compsActive=roundedMenu && compositingActive(widget),
+                 isAlphaWidget=compsActive && isRgbaWidget(widget),
                  useAlpha=isAlphaWidget && opts.menuBgndOpacity<100,
                  useAlphaForCorners=!nonGtk && qtSettings.useAlpha && isAlphaWidget,
-                 comboMenu=useAlphaForCorners ? FALSE : isComboMenu(widget);
+                 comboMenu=useAlphaForCorners || !compsActive ? FALSE : isComboMenu(widget);
                  /* Cant round combos, unless using rgba - getting weird effects with shadow/clipping :-( */
                  /* If 'useAlphaForCorners', then dont care if its a combo menu - as it can still be rounded */
 
@@ -5592,6 +5609,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 cairo_set_source_rgba(cr, 0, 0, 0, 1);
                 cairo_fill(cr);
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+                clearRoundedMask(widget, FALSE);
             }
             else
                 createRoundedMask(cr, widget, x, y, width, height, radius-0.25, FALSE);
@@ -5811,10 +5829,11 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
         {
             gboolean square=opts.square&SQUARE_POPUP_MENUS,
                      nonGtk=square || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
-                     isAlphaWidget=!nonGtk && isRgbaWidget(widget) && compositingActive(widget),
+                     composActive=!nonGtk && compositingActive(widget),
+                     isAlphaWidget=!nonGtk && composActive && isRgbaWidget(widget),
                      useAlpha=!nonGtk && qtSettings.useAlpha && isAlphaWidget;
                  
-            if(!useAlpha || (opts.popupBorder && square))
+            if((composActive && !useAlpha) || (opts.popupBorder && square))
             {
                 drawAreaColor(cr, area, &style->base[state], x, y, width, height);
                 cairo_new_path(cr);
@@ -5824,20 +5843,21 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
             }
             else // if(!opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS))
             {
-                //if(useAlpha)
+                if(useAlpha)
                 {
                     cairo_rectangle(cr, x, y, width, height);
                     cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
                     cairo_set_source_rgba(cr, 0, 0, 0, 1);
                     cairo_fill(cr);
                     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+                    clearRoundedMask(widget, FALSE);
                 }
-                //else
-                //    createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, TRUE);
+                else
+                   createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, FALSE);
 
                 clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
                 drawAreaColor(cr, area, &style->base[state], x, y, width, height);
-                //if(useAlpha)
+                if(useAlpha)
                     cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
                 if(opts.popupBorder)
                 {

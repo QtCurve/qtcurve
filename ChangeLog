@@ -1,16 +1,18 @@
 1.7.2
 -----
-1. Allow editable combo-box popup to be rounded.
-2. Fix initial treeview highlight.
-3. Fix rounded popup border when using compositing.
-4. Add vmware and vmplayer to list of app to exclude from opacity settings. This
-   also prevents using RGBA for rounded tooltips and popup menus.
-5. Fix opacity setting of squared popup menus.
-6. Improve group-box label positioning.
-7. Fix line-style group box when text is above or below the line.
-8. Fix crash when using a tiled image for background appearance, but not for menu
-   appearance - was using wrong config item!
-9. Fix border of hovered treeview items.
+ 1. Allow editable combo-box popup to be rounded.
+ 2. Fix initial treeview highlight.
+ 3. Fix rounded popup border when using compositing.
+ 4. Add vmware and vmplayer to list of app to exclude from opacity settings. This
+    also prevents using RGBA for rounded tooltips and popup menus.
+ 5. Fix opacity setting of squared popup menus.
+ 6. Improve group-box label positioning.
+ 7. Fix line-style group box when text is above or below the line.
+ 8. Fix crash when using a tiled image for background appearance, but not for menu
+    appearance - was using wrong config item!
+ 9. Fix border of hovered treeview items.
+10. Allow combo popupmenus to be rounded if not using compositing.
+11. Set/clear widget masks when compositing toggled.
 
 1.7.1
 -----
