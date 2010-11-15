@@ -8,6 +8,8 @@
 5. Fix opacity setting of squared popup menus.
 6. Improve group-box label positioning.
 7. Fix line-style group box when text is above or below the line.
+8. Fix crash when using a tiled image for background appearance, but not for menu
+   appearance - was using wrong config item!
 
 1.7.1
 -----

@@ -2663,10 +2663,13 @@ static void drawBgndImage(cairo_t *cr, GtkStyle *style, GdkRectangle *area, gint
 //               dx=(x+(opts.crSize/2))-(pw/2),
 //               dy=(y+(opts.crSize/2))-(ph/2);
 
-    gdk_cairo_set_source_pixbuf(cr, pix, 0, 0);
-    cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
-    cairo_rectangle(cr, x, y, w, h);
-    cairo_fill(cr);
+    if(pix)
+    {
+        gdk_cairo_set_source_pixbuf(cr, pix, 0, 0);
+        cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+        cairo_rectangle(cr, x, y, w, h);
+        cairo_fill(cr);
+    }
 }
 
 #define STRIPE_OUTER(A, B, PART) (B.PART=((3*A.PART+B.PART)/4))
@@ -5603,7 +5606,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         {
             if(APPEARANCE_STRIPED==opts.menuBgndAppearance)
                 drawStripedBgnd(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
-            else if(APPEARANCE_FILE==opts.bgndAppearance)
+            else if(APPEARANCE_FILE==opts.menuBgndAppearance)
                 drawBgndImage(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], FALSE, alpha);
             else
                 drawBevelGradientAlpha(cr, style, area, x, y, width, height, &qtcPalette.menu[ORIGINAL_SHADE], GT_HORIZ==opts.menuBgndGrad,
