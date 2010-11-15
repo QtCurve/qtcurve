@@ -1,6 +1,7 @@
 1.7.2
 -----
 1. Allow editable combo-box popup to be rounded.
+2. For windows build, set FramelessWindowHint when setting WA_TranslucentBackground
 
 1.7.1
 -----

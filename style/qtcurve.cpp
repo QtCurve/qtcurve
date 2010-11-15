@@ -1660,6 +1660,16 @@ void Style::polish(QPalette &palette)
 #endif
 }
 
+static inline void setTranslucentBackground(QWidget *widget)
+{
+    widget->setAttribute(Qt::WA_TranslucentBackground);
+
+    #ifdef Q_WS_WIN
+    //FramelessWindowHint is needed on windows to make WA_TranslucentBackground work properly
+    widget->setWindowFlags(widget->windowFlags()|Qt::FramelessWindowHint);
+    #endif
+}
+
 void Style::polish(QWidget *widget)
 {
     if(!widget)
@@ -1742,7 +1752,7 @@ void Style::polish(QWidget *widget)
                 // ...unfortunately some properties are lost, among them the window icon.
                 QIcon icon(widget->windowIcon());
 
-                widget->setAttribute(Qt::WA_TranslucentBackground);
+                setTranslucentBackground(widget);
                 widget->setWindowIcon(icon);
                 // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
                 // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
@@ -1831,7 +1841,7 @@ void Style::polish(QWidget *widget)
             
        if(widget->parentWidget() && (!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && 
           widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
-            widget->setAttribute(Qt::WA_TranslucentBackground);
+            setTranslucentBackground(widget);
     }
 
     if(APP_KONTACT==theThemedApp && qobject_cast<QToolButton *>(widget))
@@ -1995,7 +2005,7 @@ void Style::polish(QWidget *widget)
     if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
     {
         widget->setBackgroundRole(QPalette::NoRole);
-        widget->setAttribute(Qt::WA_TranslucentBackground);
+        setTranslucentBackground(widget);
     }
 
     if (!widget->isWindow())
@@ -2055,7 +2065,7 @@ void Style::polish(QWidget *widget)
         {
             Utils::addEventFilter(widget, this);
             if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
-                widget->setAttribute(Qt::WA_TranslucentBackground);
+                setTranslucentBackground(widget);
         }
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
         {
@@ -2075,7 +2085,7 @@ void Style::polish(QWidget *widget)
     {
         Utils::addEventFilter(widget, this);
         if((100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
-            widget->setAttribute(Qt::WA_TranslucentBackground);
+            setTranslucentBackground(widget);
     }
 
     bool parentIsToolbar(false);
