@@ -4145,7 +4145,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 if(opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
                     drawPrimitive(PE_FrameMenu, option, painter, widget);
-                else
+                else if(opts.square&SQUARE_POPUP_MENUS)
                 {
                     const QColor *use(APP_KRUNNER==theThemedApp ? itsBackgroundCols : backgroundColors(option));
 
