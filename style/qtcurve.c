@@ -3382,7 +3382,7 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
     {
         double   xd=x+0.5,
                  yd=y+0.5,
-                 alpha=GTK_STATE_PRELIGHT==state ? 0.20 : 1.0;
+                 alpha=GTK_STATE_PRELIGHT==state || alphaMod<1.0 ? 0.20 : 1.0;
         int      xo=x, widtho=width;
     
         if(isLvSelection && !(opts.square&SQUARE_LISTVIEW_SELECTION) && ROUNDED_ALL!=round)
@@ -3733,16 +3733,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         double   alpha=1.0;
         int      selX=x,
                  selW=width,
-                 factor=0,
-                 round=!combo && detail && GTK_STATE_SELECTED==state && ROUNDED
-                            ? 0!=strstr(detail, "_start")
-                                ? ROUNDED_LEFT
-                                : 0!=strstr(detail, "_end")
-                                    ? ROUNDED_RIGHT
-                                    : 0!=strstr(detail, "_middle")
-                                        ? ROUNDED_NONE
-                                        : ROUNDED_ALL
-                            : ROUNDED_NONE;
+                 factor=0;
 
         if(GTK_STATE_SELECTED!=state || ROUNDED_NONE!=round)
             drawAreaColor(cr, area,
@@ -3802,11 +3793,25 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     */
 
         if(GTK_STATE_SELECTED==state || (!combo && alpha<1.0))
+        {
             if(combo)
                 drawAreaColorAlpha(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
                                    selX, y, selW, height, alpha);
             else
+            {
+                int round=detail && ROUNDED
+                            ? 0!=strstr(detail, "_start")
+                                ? ROUNDED_LEFT
+                                : 0!=strstr(detail, "_end")
+                                    ? ROUNDED_RIGHT
+                                    : 0!=strstr(detail, "_middle")
+                                        ? ROUNDED_NONE
+                                        : ROUNDED_ALL
+                            : ROUNDED_NONE;
+
                 drawSelection(cr, style, state, area, widget, selX, y, selW, height, round, TRUE, alpha, factor);
+            }
+        }
     }
     else if(detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED))
     {
