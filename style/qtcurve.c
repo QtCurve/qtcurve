@@ -6656,30 +6656,36 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
         }
 #endif
 
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
         if(parent && GTK_IS_LABEL(widget) && GTK_IS_FRAME(parent) && !isOnStatusBar(widget, 0))
         {
             int diff=qtcWidgetGetAllocation(widget).x-qtcWidgetGetAllocation(parent).x;
 
             if(NO_FRAME(opts.groupBox))
-                x-=MAX(0, MIN(diff, 6));
+                x-=MAX(0, MIN(diff, 8));
             else if(opts.gbLabel&GB_LBL_OUTSIDE)
+                x-=MAX(0, MIN(diff, 4));
+            else if(opts.gbLabel&GB_LBL_INSIDE)
                 x-=MAX(0, MIN(diff, 2));
             else
                 x+=5;
+#if GTK_CHECK_VERSION(2, 90, 0)
+            cairo_reset_clip(cr);
+#else
             if(area)
             {
                 area2=*area;
                 if(NO_FRAME(opts.groupBox))
-                    area2.x-=MAX(0, MIN(diff, 6));
+                    area2.x-=MAX(0, MIN(diff, 8));
                 else if(opts.gbLabel&GB_LBL_OUTSIDE)
+                    area2.x-=MAX(0, MIN(diff, 4));
+                else if(opts.gbLabel&GB_LBL_INSIDE)
                     area2.x-=MAX(0, MIN(diff, 2));
                 else
                     area2.x+=5;
                 area=&area2;
             }
-        }
 #endif
+        }
 
         if(!opts.useHighlightForMenu && (isMenuItem || mb) && GTK_STATE_INSENSITIVE!=state)
             state=GTK_STATE_NORMAL;
@@ -7708,16 +7714,10 @@ static void gtkDrawShadowGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
 
         switch(opts.groupBox)
         {
-            case FRAME_LINE:
-            {
-                GdkRectangle gap={x, y, gap_width, 1};
-                drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[STD_BORDER], area, &gap, FALSE, TRUE, TRUE);
-                drawFrame=FALSE;
-                break;
-            }
             case FRAME_NONE:
                 drawFrame=FALSE;
                 return;
+            case FRAME_LINE:
             case FRAME_SHADED:
             case FRAME_FADED:
                 if(opts.gbLabel&(GB_LBL_INSIDE|GB_LBL_OUTSIDE) && widget && GTK_IS_FRAME(widget))
@@ -7740,7 +7740,13 @@ static void gtkDrawShadowGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
                             y+=height_extra, height-=height_extra, gap_width=0;
                     }
                 }
-                if(GTK_SHADOW_NONE!=shadow_type)
+                if(FRAME_LINE==opts.groupBox)
+                {
+                    GdkRectangle gap={x, y, gap_width, 1};
+                    drawFadedLine(cr, x, y, width, 1, &qtcPalette.background[STD_BORDER], area, gap_width>0 ? &gap : NULL, FALSE, TRUE, TRUE);
+                    drawFrame=FALSE;
+                }
+                else if(GTK_SHADOW_NONE!=shadow_type)
                 {
                     int             round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
                     double          col=opts.gbFactor<0 ? 0.0 : 1.0,
