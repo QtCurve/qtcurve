@@ -3523,7 +3523,7 @@ static GtkTreePath * treeViewPathParent(GtkTreeView *treeView, GtkTreePath *path
 static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int depth, int levelIndent, int expanderSize,
                               GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column)
 {
-    int        cellIndent=levelIndent + expanderSize,// + 4,
+    int        cellIndent=levelIndent + expanderSize + 4,
                xStart=cellIndent/2,
                i,
                isLastMask=0;
@@ -3566,19 +3566,19 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
                 if(haveChildren)
                 {
                     // first vertical line
-                    cairo_move_to(cr, xCenter + 0.5 , y);
+                    cairo_move_to(cr, xCenter + 0.5, y);
                     cairo_line_to(cr, xCenter + 0.5, yCenter - (LV_SIZE-1)); // (int)(expanderSize/3));
 
                     // second vertical line
                     if(!isLastCell)
                     {
                         cairo_move_to(cr, xCenter + 0.5, y+h);
-                        cairo_line_to(cr, xCenter + 0.5, yCenter + (LV_SIZE-1)); // (int)(expanderSize/3));
+                        cairo_line_to(cr, xCenter + 0.5, yCenter + (LV_SIZE+1)); // (int)(expanderSize/3));
                     }
 
                     // horizontal line
-                    cairo_move_to(cr, xCenter + (int)(expanderSize/3), yCenter + 0.5);
-                    cairo_line_to(cr, xCenter + expanderSize*2/3, yCenter + 0.5);
+                    cairo_move_to(cr, xCenter + (int)(expanderSize/3)+1, yCenter + 0.5);
+                    cairo_line_to(cr, xCenter + expanderSize*2/3 -1, yCenter + 0.5);
                 }
                 else
                 {
@@ -3590,7 +3590,7 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
 
                     // horizontal line
                     cairo_move_to(cr, xCenter, yCenter + 0.5);
-                    cairo_line_to(cr, xCenter + expanderSize*2/3, yCenter + 0.5);
+                    cairo_line_to(cr, xCenter + expanderSize*2/3 -1, yCenter + 0.5);
                 }
             }
             else if(!isLastCell)
@@ -8228,6 +8228,7 @@ static void gtkDrawExpander(GtkStyle *style, WINDOW_PARAM GtkStateType state, AR
                     : &style->text[ARROW_STATE(state)];
 
     x-=(LV_SIZE/2.0)+0.5;
+    x+=2;
     y-=(LV_SIZE/2.0)+0.5;
 
     if(GTK_EXPANDER_COLLAPSED==expander_style)

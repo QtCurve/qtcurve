@@ -15,7 +15,8 @@
 11. Set/clear widget masks when compositing toggled.
 12. Fix treeview line end detection.
 13. Fix treeview selection, and line, corruption.
-14. Fix size of fonts in GIMPs dock.
+14. Fix treeview line dimensions.
+15. Fix size of fonts in GIMPs dock.
 
 1.7.1
 -----
