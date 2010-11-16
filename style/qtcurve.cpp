@@ -3883,7 +3883,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                          LV_SIZE+4);
                 if(/*LV_OLD==*/opts.lvLines)
                 {
-                    beforeV=ar.y();
+                    beforeV=ar.y()-1;
                     afterH=ar.x()+LV_SIZE+4;
                     afterV=ar.y()+LV_SIZE+4;
 #if 0
@@ -3926,7 +3926,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                     : widget && qobject_cast<const QTreeView *>(widget)
                                         ? ((QTreeView *)widget)->indentation() : 20;
 
-            if(opts.lvLines && (/*LV_OLD==*/opts.lvLines || (r.x()>=constStep && constStep>0)))
+            if(opts.lvLines /*&& (LV_OLD==opts.lvLines || (r.x()>=constStep && constStep>0))*/)
             {
                 painter->setPen(palette.mid().color());
                 if (state&State_Item)
