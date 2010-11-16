@@ -6,6 +6,7 @@
    decorations.
 4. Update Chinese translations.
 5. Set/clear widget masks when compositing toggled.
+6. Fix kwin custom button icon colours.
 
 1.7.1
 -----

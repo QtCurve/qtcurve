@@ -34,7 +34,7 @@
 #include <QTimer>
 #include "qtcurveclient.h"
 #include "common.h"
-
+#include <stdio.h>
 namespace KWinQtCurve
 {
 
@@ -167,41 +167,40 @@ void QtCurveButton::drawButton(QPainter *painter)
 //     if(CloseButton==type())
 //         buttonColor=midColor(QColor(180,64,32), buttonColor);
 
-    if(flags&TITLEBAR_BUTTON_COLOR)
-        switch(type())
-        {
-            case HelpButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_HELP;
-                break;
-            case MaxButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_MAX;
-                break;
-            case MinButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_MIN;
-                break;
+    switch(type())
+    {
+        case HelpButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_HELP;
+            break;
+        case MaxButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_MAX;
+            break;
+        case MinButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_MIN;
+            break;
 #if KDE_IS_VERSION(4, 3, 85)
-            case ItemCloseButton:
+        case ItemCloseButton:
 #endif
-            case CloseButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_CLOSE;
-                break;
-            case MenuButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_MENU;
-                break;
-            case OnAllDesktopsButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_ALL_DESKTOPS;
-                break;
-            case AboveButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_KEEP_ABOVE;
-                break;
-            case BelowButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_KEEP_BELOW;
-                break;
-            case ShadeButton:
-                versionHack=TBAR_VERSION_HACK+TITLEBAR_SHADE;
-            default:
-                break;
-        }
+        case CloseButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_CLOSE;
+            break;
+        case MenuButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_MENU;
+            break;
+        case OnAllDesktopsButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_ALL_DESKTOPS;
+            break;
+        case AboveButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_KEEP_ABOVE;
+            break;
+        case BelowButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_KEEP_BELOW;
+            break;
+        case ShadeButton:
+            versionHack=TBAR_VERSION_HACK+TITLEBAR_SHADE;
+        default:
+            break;
+    }
 
     if (drawFrame && (!(flags&TITLEBAR_BUTTON_ROUND) || MenuButton!=type() || !iconForMenu))
     {
@@ -268,13 +267,13 @@ void QtCurveButton::drawButton(QPainter *painter)
                 QStyleOption opt;
 
                 opt.init(this);
-                opt.version=versionHack;
                 if(userDefined)
                 {
                     versionHack+=NUM_TITLEBAR_BUTTONS;
                     if(!active)
                         versionHack+=NUM_TITLEBAR_BUTTONS;
                 }
+                opt.version=versionHack;
                 col=QColor(QRgb(Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarIconColor, &opt, 0L)));
                 customCol=true;
             }
@@ -309,7 +308,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(faded)
             col.setAlphaF(HOVER_BUTTON_ALPHA(col));
         else // If dont set an alpha level here, then (at least on intel) the background colour is used!
-            col.setAlphaF(0.99);
+            col.setAlpha(254);
 
         bP.setPen(col);
         bP.drawPixmap(dX, dY, icon);
@@ -324,7 +323,7 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
     if (size%2 == 0)
         --size;
 
-    QBitmap bitmap(size,size);
+    QBitmap bitmap(size, size);
     bitmap.fill(Qt::color0);
     QPainter p(&bitmap);
 
