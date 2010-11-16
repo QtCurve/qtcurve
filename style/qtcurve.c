@@ -8088,6 +8088,7 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
                 if(GTK_APP_GIMP==qtSettings.app && FOCUS_GLOW==opts.focus && toolbarBtn)
                     x-=2, width+=4, y-=1, height+=2;
             }
+#if 0 /* Removed in 1.7.2 */
             else
             {
                 if(FOCUS_LINE==opts.focus)
@@ -8099,6 +8100,7 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
                         y--, x--, width+=2, height+=2;
                 }
             }
+#endif
         }
         else if(FOCUS_GLOW==opts.focus && toolbarBtn)
             x-=2, width+=4, y-=2, height+=4;
@@ -8164,7 +8166,7 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
                         if(!doEtch)
                             x-=2, width+=4, y--, height+=2;
                     }
-                    else
+                    else if(!widget  || !(GTK_IS_RADIO_BUTTON(widget) || GTK_IS_CHECK_BUTTON(widget))) /* 1.7.2 - dont asjust fot check/radio */
                         x-=3, y-=3, width+=6, height+=6;
                 }
 
