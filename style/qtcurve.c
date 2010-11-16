@@ -372,10 +372,36 @@ static void shadeColors(GdkColor *base, GdkColor *vals)
 
 static gboolean isSortColumn(GtkWidget *button)
 {
-#if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
     GtkWidget *parent=NULL;
     if(button && (parent=qtcWidgetGetParent(button)) && GTK_IS_TREE_VIEW(parent))
     {
+#if GTK_CHECK_VERSION(2, 90, 0)
+        GtkWidget *box=GTK_IS_BUTTON(button) ? gtk_bin_get_child(GTK_BIN(button)) : NULL;
+        
+        if(box && GTK_IS_BOX(box))
+        {
+            GList    *children=gtk_container_get_children(GTK_CONTAINER(box)),
+                     *child;
+            gboolean found=FALSE;
+            
+            for (child = children; child && !found; child=g_list_next(child))
+                if(GTK_IS_ARROW(child->data))
+                {
+                    GValue val = {0,};
+                    
+                    g_value_init(&val, G_TYPE_INT);
+                    g_object_get_property(child->data, "arrow-type", &val);
+                    
+                    if(GTK_ARROW_NONE!=g_value_get_int(&val))
+                        found=TRUE;
+                    g_value_unset(&val);
+                }
+
+            if(children)
+                g_list_free(children);
+            return found;
+        }
+#else
         GtkWidget *sort=NULL;;
         GList     *columns=gtk_tree_view_get_columns(GTK_TREE_VIEW(parent)),
                   *column;
@@ -392,8 +418,8 @@ static gboolean isSortColumn(GtkWidget *button)
         if(columns)
             g_list_free(columns);
         return sort==button;
-    }
 #endif
+    }
     return FALSE;
 };
 
