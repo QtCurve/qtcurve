@@ -1998,14 +1998,15 @@ void Style::polish(QWidget *widget)
         Utils::addEventFilter(widget, this);
     }
 #endif
-    else if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
+    else if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
+             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
+        setTranslucentBackground(widget);
+
+    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
     {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
     }
-    else if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && 
-             widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
-        setTranslucentBackground(widget);
 
     if (!widget->isWindow())
         if (QFrame *frame = qobject_cast<QFrame *>(widget))
@@ -2502,6 +2503,7 @@ void Style::unpolish(QWidget *widget)
     {
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
+        widget->clearMask();
     }
 
     if (!widget->isWindow())
@@ -10930,8 +10932,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
     
-    if(APPEARANCE_AGUA==app && !(topTab || botTab || dwt) &&
-        (horiz ? r.height() : r.width())>AGUA_MAX)
+    if(APPEARANCE_AGUA==app && !(topTab || botTab || dwt) && (horiz ? r.height() : r.width())>AGUA_MAX)
     {
         QColor col;
         double pos=AGUA_MAX/((horiz ? r.height() : r.width())*2.0);
