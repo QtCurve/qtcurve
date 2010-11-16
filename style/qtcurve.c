@@ -3534,21 +3534,22 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
     if(useBitMask || isLast)
     {
         GtkTreePath  *p = path ? gtk_tree_path_copy(path) : NULL;
-        unsigned int index=depth-1;
+        int          index=depth-1;
 
-        while(p && gtk_tree_path_get_depth(p) > 0)
+        while(p && gtk_tree_path_get_depth(p) > 0 && index>=0)
         {
             GtkTreePath *next=treeViewPathParent(treeView, p);
             char        last=treeViewCellIsLast(treeView, p) ? 1 : 0;
             if(useBitMask)
             {
                 if(last)
-                    isLastMask|=1<<(index--);
+                    isLastMask|=1<<index;
             }
             else
                 isLast=g_byte_array_prepend(isLast, &last, 1);
             gtk_tree_path_free(p);
             p=next;
+            index--;
         }
 
         cairo_set_source_rgb(cr, CAIRO_COL(*col));
@@ -3558,7 +3559,6 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
             gboolean isLastCell=(useBitMask ? isLastMask&(1<<i) : isLast->data[i]) ? TRUE : FALSE,
                      last=i == depth -1;
             double   xCenter = xStart;
-
             if(last)
             {
                 double yCenter = (int)(y+h/2);
