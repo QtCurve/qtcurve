@@ -19,6 +19,8 @@
 15. Fix size of fonts in GIMPs dock.
 16. Fix firefox scrollbar background when using flat buttons and flat background.
 17. Fix clipping issues with full and filled focus types.
+18. For configs older than 1.7.2, disable usage of alpha channel to draw rounded
+    tooltips and popup menus. Too many issues with apps to enable this by default.
 
 1.7.1
 -----

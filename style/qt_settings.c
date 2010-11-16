@@ -2303,6 +2303,10 @@ static gboolean qtInit()
             if(excludedApp(opts.noMenuBgndOpacityApps))
                 opts.menuBgndOpacity=100, qtSettings.useAlpha=false;
             
+            /* Disable usage of alpha channel for older configs, unless app is uing opacity... */
+            if(qtSettings.useAlpha && opts.version<MAKE_VERSION3(1, 7, 2) && 100==opts.menuBgndOpacity && 100==opts.dlgOpacity && 100==opts.bgndOpacity)
+                qtSettings.useAlpha=false;
+
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
             if(opts.fixParentlessDialogs && excludedApp(opts.noDlgFixApps))
                 opts.fixParentlessDialogs=FALSE;
