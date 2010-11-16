@@ -17,6 +17,7 @@
 13. Fix treeview selection, and line, corruption.
 14. Fix treeview line dimensions.
 15. Fix size of fonts in GIMPs dock.
+16. Fix firefox scrollbar background when using flat buttons and flat background.
 
 1.7.1
 -----
