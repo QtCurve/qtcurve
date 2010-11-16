@@ -2149,7 +2149,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_STRING_LIST(noBgndImageApps)
 #ifdef CONFIG_DIALOG
             if(opts->version<MAKE_VERSION3(1, 7, 2))
-                noMenuBgndOpacityApps << "gtk";
+                opts->noMenuBgndOpacityApps << "gtk";
 #endif
 #endif 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
