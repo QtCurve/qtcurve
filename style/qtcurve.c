@@ -3759,7 +3759,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                             : &style->base[GTK_STATE_NORMAL], detail),
                           x, y, width, height);
 
-        if(!combo)
+        if(!combo && !isFixedWidget(widget))
         {
             GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
             GtkTreePath       *path;
