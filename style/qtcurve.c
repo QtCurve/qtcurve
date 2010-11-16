@@ -5596,7 +5596,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                  alpha=1.0;
         gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
                  roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS) && !nonGtk,
-                 compsActive=roundedMenu && compositingActive(widget),
+                 compsActive=compositingActive(widget),
                  isAlphaWidget=compsActive && isRgbaWidget(widget),
                  useAlpha=isAlphaWidget && opts.menuBgndOpacity<100,
                  useAlphaForCorners=!nonGtk && qtSettings.useAlpha && isAlphaWidget,
@@ -5621,11 +5621,11 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             clipPathRadius(cr, x, y, width, height, radius, ROUNDED_ALL);
         }
 
-        if(widget && /*!comboMenu && */100!=opts.menuBgndOpacity && !isFixedWidget(widget) && isRgbaWidget(widget))
-            enableBlurBehind(widget, TRUE);
-
         if(useAlpha)
         {
+            if(widget && /*!comboMenu && */100!=opts.menuBgndOpacity)
+                enableBlurBehind(widget, TRUE);
+
             alpha=opts.menuBgndOpacity/100.0;
             cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
         }
