@@ -3750,6 +3750,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                  selW=width,
                  factor=0;
 
+//                  printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  \n", __FUNCTION__, state, shadow_type, x, y, width, height, detail ? detail : "NULL");
         if(GTK_STATE_SELECTED!=state || ROUNDED_NONE!=round)
             drawAreaColor(cr, area,
                           getCellCol(haveAlternareListViewCol() &&
@@ -3762,14 +3763,18 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         if(!combo && !isFixedWidget(widget))
         {
             GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
-            GtkTreePath       *path;
-            GtkTreeViewColumn *column,
+            GtkTreePath       *path=NULL;
+            GtkTreeViewColumn *column=NULL,
                               *expanderColumn=gtk_tree_view_get_expander_column(treeView);
             int               levelIndent=0,
                               expanderSize=0,
-                              depth=0;
-
-            gtk_tree_view_get_path_at_pos(treeView, x+1, y+1, &path, &column, 0L, 0L );
+                              depth=0,
+                              pos;
+            GdkPoint          points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
+    
+            for(pos=0; pos<4 && !path; ++pos)
+                gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, &path, &column, 0L, 0L);
+        
             qtcTreeViewSetup(widget);
             if(path && qtcTreeViewIsCellHovered(widget, path, column))
             {
@@ -3786,7 +3791,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
 
                 if(opts.lvLines)
-                    drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView, path, column);
+                   drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView, path, column);
             }
             
             if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)

@@ -14,7 +14,8 @@
 10. Allow combo popupmenus to be rounded if not using compositing.
 11. Set/clear widget masks when compositing toggled.
 12. Fix treeview line end detection.
-13. Fix size of fonts in GIMPs dock.
+13. Fix treeview selection, and line, corruption.
+14. Fix size of fonts in GIMPs dock.
 
 1.7.1
 -----
