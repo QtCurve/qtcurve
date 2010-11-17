@@ -140,6 +140,7 @@ static void qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
                 gtk_tree_path_free(path);
         }
     }
+    return FALSE;
 }
 
 static gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *column)
