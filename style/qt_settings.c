@@ -2058,6 +2058,7 @@ static gboolean qtInit()
                         *tmpStr=NULL,
                         *rcFile=NULL;
             GtkSettings *settings=NULL;
+            int         mozVersion=0x30000; /* Set to 3.0 by default... */
 
             setlocale(LC_NUMERIC, "C");
             qtSettings.icons=NULL;
@@ -2179,7 +2180,6 @@ static gboolean qtInit()
 #endif
                 if(firefox || thunderbird || mozThunderbird || seamonkey)
                 {
-                    int      mozVersion=getMozillaVersion(getpid());
                     GdkColor *menu_col=SHADE_CUSTOM==opts.shadeMenubars
                                         ? &opts.customMenubarsColor
                                         : &qtSettings.colors[PAL_ACTIVE][COLOR_SELECTED];
@@ -2187,13 +2187,16 @@ static gboolean qtInit()
                                              SHADE_WINDOW_BORDER==opts.shadeMenubars ||
                                              opts.customMenuTextColor || !opts.useHighlightForMenu ||
                                              (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(*menu_col) ),
-                             add_btn_css=
+                             add_btn_css=FALSE;
+
+                    mozVersion=getMozillaVersion(getpid());
 #ifdef QTC_MODIFY_MOZILLA
-                                              mozVersion<MAKE_VERSION(3, 0) && !opts.gtkButtonOrder;
-#else
-                                              FALSE;
+                    if(mozVersion<MAKE_VERSION(3, 0) && !opts.gtkButtonOrder)
+                       add_btn_css=TRUE;
 #endif
 
+                    if(qtSettings.debug)
+                        printf(DEBUG_PREFIX"Mozilla app version:%X\n", mozVersion);
                     if(firefox)
                     {
                         processMozillaApp(mozVersion<MAKE_VERSION(3, 5) && !opts.gtkButtonOrder, add_menu_colors, "firefox", TRUE);
@@ -2615,8 +2618,8 @@ static gboolean qtInit()
             if(isMozilla())
                 gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \""RC_SETTING"Mz\"");
 
-            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app ||
-               (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()))
+            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app || (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()) ||
+               (GTK_APP_NEW_MOZILLA==qtSettings.app && mozVersion>=MAKE_VERSION(4, 0)))
                 opts.scrollbarType=SCROLLBAR_WINDOWS;
             else
             {

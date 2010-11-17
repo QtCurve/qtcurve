@@ -1,3 +1,8 @@
+1.7.3
+-----
+1. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
+2. Use windows style scrollbars for Firefox 4
+
 1.7.2
 -----
  1. Allow editable combo-box popup to be rounded.
