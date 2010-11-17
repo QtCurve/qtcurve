@@ -3635,6 +3635,15 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
     }
 }
 
+static gboolean cellIsOdd(GtkStateType state, const gchar *detail, gint y, gint height)
+{
+    /* For SWT apps, use cell position to determine if is odd, or not */
+    if(GTK_APP_JAVA_SWT!=qtSettings.app || GTK_STATE_SELECTED!=state)
+        return DETAILHAS("cell_odd");
+    else
+        return 0!=y && 0!=((y/height)%2);
+}
+
 static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, AREA_PARAM
                            GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
 {
@@ -3770,88 +3779,85 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         qtcWindowSetup(widget, GTK_IS_DIALOG(widget) ? opts.dlgOpacity : opts.bgndOpacity);
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
-        gboolean combo=isComboBoxPopupWindow(widget, 0);
-        double   alpha=1.0;
-        int      selX=x,
-                 selW=width,
-                 factor=0;
+        gboolean    isCombo=isComboBoxPopupWindow(widget, 0);
+        GtkTreeView *treeView=GTK_TREE_VIEW(widget);
 
-        drawAreaColor(cr, area,
-                        getCellCol(haveAlternareListViewCol() &&
-                        (opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget))) &&
-                        DETAILHAS("cell_odd")
-                        ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
-                        : &style->base[GTK_STATE_NORMAL], detail),
-                        x, y, width, height);
+        //if(!isCombo || GTK_STATE_SELECTED!=state)
+            drawAreaColor(cr, area,
+                          getCellCol(haveAlternareListViewCol() &&
+                          (opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(treeView)) && cellIsOdd(state, detail, y, height)
+                              ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
+                              : &style->base[GTK_STATE_NORMAL], detail),
+                          x, y, width, height);
 
-        if(!combo && !isFixedWidget(widget))
+        if(isCombo)
         {
-            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
-            GtkTreePath       *path=NULL;
-            GtkTreeViewColumn *column=NULL,
-                              *expanderColumn=gtk_tree_view_get_expander_column(treeView);
-            int               levelIndent=0,
-                              expanderSize=0,
-                              depth=0,
-                              pos;
-            GdkPoint          points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
-    
-            for(pos=0; pos<4 && !path; ++pos)
-                gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, &path, &column, 0L, 0L);
-        
-            qtcTreeViewSetup(widget);
-            if(path && qtcTreeViewIsCellHovered(widget, path, column))
-            {
-                if(GTK_STATE_SELECTED==state)
-                    factor=10;
-                else
-                    alpha=0.2;
-            }
-
-            if(column==expanderColumn)
-            {
-                gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
-                levelIndent=gtk_tree_view_get_level_indentation(treeView),
-                depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
-
-                if(opts.lvLines)
-                   drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView, path, column);
-            }
-            
-            if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)
-            {
-                int offset=3 + expanderSize * depth + ( 4 + levelIndent)*(depth-1);
-                selX += offset;
-                selW -= offset;
-            }
-            
-            if(path)
-                gtk_tree_path_free(path);
+            if(GTK_STATE_SELECTED==state)
+                drawAreaColor(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
+                              x, y, width, height);
         }
-
-    /*
-        int px, py;
-        gtk_widget_get_pointer(widget, &px, &py);
-        if(px>=x && px<(x+width) && py>y && py<(y+height))
-            state=GTK_STATE_PRELIGHT;
-    */
-
-        if(GTK_STATE_SELECTED==state || (!combo && alpha<1.0))
+        else
         {
-            if(combo)
-                drawAreaColorAlpha(cr, area, &style->base[widget && qtcWidgetHasFocus(widget) ? GTK_STATE_SELECTED : GTK_STATE_ACTIVE],
-                                   selX, y, selW, height, alpha);
-            else
+            double alpha=1.0;
+            int    selX=x,
+                   selW=width,
+                   factor=0;
+
+            if(!isFixedWidget(widget))
+            {
+                GtkTreePath       *path=NULL;
+                GtkTreeViewColumn *column=NULL,
+                                  *expanderColumn=gtk_tree_view_get_expander_column(treeView);
+                int               levelIndent=0,
+                                  expanderSize=0,
+                                  depth=0,
+                                  pos;
+                GdkPoint          points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
+
+                for(pos=0; pos<4 && !path; ++pos)
+                    gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, &path, &column, 0L, 0L);
+
+                qtcTreeViewSetup(widget);
+                if(path && qtcTreeViewIsCellHovered(widget, path, column))
+                {
+                    if(GTK_STATE_SELECTED==state)
+                        factor=10;
+                    else
+                        alpha=0.2;
+                }
+
+                if(column==expanderColumn)
+                {
+                    gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
+                    levelIndent=gtk_tree_view_get_level_indentation(treeView),
+                    depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
+
+                    if(opts.lvLines)
+                    drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView, path, column);
+                }
+
+                if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)
+                {
+                    int offset=3 + expanderSize * depth + ( 4 + levelIndent)*(depth-1);
+                    selX += offset;
+                    selW -= offset;
+                }
+
+                if(path)
+                    gtk_tree_path_free(path);
+            }
+
+            if(GTK_STATE_SELECTED==state || alpha<1.0)
             {
                 int round=detail && ROUNDED
-                            ? 0!=strstr(detail, "_start")
-                                ? ROUNDED_LEFT
-                                : 0!=strstr(detail, "_end")
-                                    ? ROUNDED_RIGHT
-                                    : 0!=strstr(detail, "_middle")
-                                        ? ROUNDED_NONE
-                                        : ROUNDED_ALL
-                            : ROUNDED_NONE;
+                                ? 0!=strstr(detail, "_start")
+                                    ? ROUNDED_LEFT
+                                    : 0!=strstr(detail, "_end")
+                                        ? ROUNDED_RIGHT
+                                        : 0!=strstr(detail, "_middle")
+                                            ? ROUNDED_NONE
+                                            : ROUNDED_ALL
+                                : ROUNDED_NONE;
 
                 drawSelection(cr, style, state, area, widget, selX, y, selW, height, round, TRUE, alpha, factor);
             }
