@@ -2,6 +2,7 @@
 -----
 1. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
 2. Use windows style scrollbars for Firefox 4
+3. Fix painting of alternate listview rows.
 
 1.7.2
 -----

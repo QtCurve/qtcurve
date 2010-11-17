@@ -3776,15 +3776,13 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                  selW=width,
                  factor=0;
 
-//                  printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  \n", __FUNCTION__, state, shadow_type, x, y, width, height, detail ? detail : "NULL");
-        if(GTK_STATE_SELECTED!=state || ROUNDED_NONE!=round)
-            drawAreaColor(cr, area,
-                          getCellCol(haveAlternareListViewCol() &&
-                          (opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget))) &&
-                          DETAILHAS("cell_odd")
-                            ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
-                            : &style->base[GTK_STATE_NORMAL], detail),
-                          x, y, width, height);
+        drawAreaColor(cr, area,
+                        getCellCol(haveAlternareListViewCol() &&
+                        (opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(GTK_TREE_VIEW(widget))) &&
+                        DETAILHAS("cell_odd")
+                        ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
+                        : &style->base[GTK_STATE_NORMAL], detail),
+                        x, y, width, height);
 
         if(!combo && !isFixedWidget(widget))
         {
