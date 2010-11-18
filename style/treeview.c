@@ -140,7 +140,6 @@ static void qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
                 gtk_tree_path_free(path);
         }
     }
-    return FALSE;
 }
 
 static gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *column)
@@ -181,6 +180,7 @@ static gboolean qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, gpoin
             gtk_widget_queue_draw_area(widget, rect.x, rect.y, rect.width, rect.height);
         }
     }
+    return FALSE;
 }
 
 static void qtcTreeViewSetup(GtkWidget *widget)
