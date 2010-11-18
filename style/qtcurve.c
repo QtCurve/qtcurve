@@ -3833,7 +3833,8 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                     depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
 
                     if(opts.lvLines)
-                    drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView, path, column);
+                        drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView,
+                                          path, column);
                 }
 
                 if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)
@@ -8137,6 +8138,35 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
                            : &qtcPalette.focus[FOCUS_SHADE(GTK_STATE_SELECTED==state)];
 
         CAIRO_BEGIN
+
+        if(GTK_APP_JAVA_SWT==qtSettings.app && view && widget && GTK_IS_TREE_VIEW(widget))
+        {
+            GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
+            GtkTreePath       *path=NULL;
+            GtkTreeViewColumn *column=NULL,
+                              *expanderColumn=gtk_tree_view_get_expander_column(treeView);
+            int               pos;
+            GdkPoint          points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
+
+            for(pos=0; pos<4 && !path; ++pos)
+                gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, &path, &column, 0L, 0L);
+
+            if(column==expanderColumn)
+            {
+                int expanderSize=0;
+                gtk_widget_style_get(widget, "expander-size", &expanderSize, NULL);
+                if(expanderSize>0)
+                {
+                    int depth=path ? (int)gtk_tree_path_get_depth(path) : 0,
+                        offset=3 + expanderSize * depth + ( 4 + gtk_tree_view_get_level_indentation(treeView))*(depth-1);
+                    x += offset;
+                    width -= offset;
+                }
+            }
+
+            if(path)
+                gtk_tree_path_free(path);
+        }
 
         if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
         {

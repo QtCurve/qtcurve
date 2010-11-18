@@ -5,6 +5,7 @@
 3. Fix painting of alternate listview rows in SWT apps. For some reason even
    selected cells are painted twice, once with the correct "cell_XX" setting,
    and then with an incorrect one!
+4. Fix size of focus indicator in treeviews iwth SWT apps.
 
 1.7.2
 -----
