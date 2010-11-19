@@ -4888,6 +4888,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 }
                 else if(opts.flatSbarButtons && WIDGET_SB_BUTTON==widgetType)
                 {
+#if !GTK_CHECK_VERSION(2, 90, 0)
                     if(isMozilla())
                     {
                     /* This section messes up Gtk3 scrollbars with custom background - and doesnt seem to be required for Gtk2 either. remove at 1.7.1 */
@@ -4905,6 +4906,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                              drawBgnd(cr, &qtcPalette.background[ORIGINAL_SHADE], widget, area, xo, yo, wo, ho);
                     }
                     }
+#endif
                 }
                 else
                 {
@@ -5353,6 +5355,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                      drawBevelGradient(cr, style, area, xo, yo, wo, ho,
                                        &qtcPalette.background[ORIGINAL_SHADE],
                                        horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+#if !GTK_CHECK_VERSION(2, 90, 0)
                /* This was the old (pre 1.7.1) else if... but it messes up Gtk3 scrollbars wheb have custom background. And dont think its needed */
                /* But re-added in 1.7.2 for Mozilla! */
               /*  else if(!CUSTOM_BGND || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
@@ -5361,6 +5364,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     drawBevelGradient(cr, style, area, xo, yo, wo, ho,
                                       &qtcPalette.background[ORIGINAL_SHADE],
                                       horiz, FALSE, opts.sbarBgndAppearance, WIDGET_SB_BGND);
+#endif
             }
 
             if(isMozilla())
