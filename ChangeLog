@@ -6,6 +6,8 @@
    selected cells are painted twice, once with the correct "cell_XX" setting,
    and then with an incorrect one!
 4. Fix size of focus indicator in treeviews iwth SWT apps.
+5. Use list style pop-up for non-editable combos when not using Gtk-style
+   combos - matches KDE behaviour.
 
 1.7.2
 -----

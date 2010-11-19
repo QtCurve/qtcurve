@@ -68,6 +68,7 @@ static Options opts;
 #include "window.c"
 #include "entry.c"
 #include "treeview.c"
+#include "combobox.c"
 #if !GTK_CHECK_VERSION(2, 90, 0)
 #include "wmmove.c"
 #endif
@@ -1111,12 +1112,10 @@ static gboolean isComboMenu(GtkWidget *widget)
     }
 }
 
-#if 0
 static gboolean isComboFrame(GtkWidget *widget)
 {
     return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && qtcWidgetGetParent(widget) && GTK_IS_COMBO_BOX(qtcWidgetGetParent(widget));
 }
-#endif
 
 static gboolean isFixedWidget(GtkWidget *widget)
 {
@@ -1588,7 +1587,8 @@ typedef enum
     DF_SUNKEN          = 0x004,
     DF_DO_BORDER       = 0x008,
     DF_VERT            = 0x010,
-    DF_HIDE_EFFECT     = 0x020
+    DF_HIDE_EFFECT     = 0x020,
+    DF_HAS_FOCUS       = 0x040
 } EDrawFlags;
 
 #define drawBorder(a, b, c, d, e, f, g, h, i, j, k, l, m) \
@@ -1915,7 +1915,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                 drawShine=DRAW_SHINE(sunken, app),
                 bevelledButton=WIDGET_BUTTON(widget) && APPEARANCE_BEVELLED==app,
                 doEtch=flags&DF_DO_BORDER && (ETCH_WIDGET(widget) || (WIDGET_COMBO_BUTTON==widget && opts.etchEntry)) && DO_EFFECT,
-                glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && qtcWidgetHasFocus(wid) &&
+                glowFocus=doEtch && USE_GLOW_FOCUS(GTK_STATE_PRELIGHT==state) && wid && ((flags&DF_HAS_FOCUS) || qtcWidgetHasFocus(wid)) &&
                           GTK_STATE_INSENSITIVE!=state && !isComboBoxEntryButton(wid) &&
                           ((WIDGET_RADIO_BUTTON!=widget && WIDGET_CHECKBOX!=widget) || GTK_STATE_ACTIVE!=state),
                 glowFocusSunkenToggle=sunken && (glowFocus || (doColouredMouseOver && MO_GLOW==opts.coloredMouseOver)) &&
@@ -4205,7 +4205,11 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
                           x+(width>>1), y+(height>>1)+(LARGE_ARR_HEIGHT-pad), FALSE, TRUE);
             }
             else
+            {
+                if(!opts.gtkComboMenus)
+                    x+=2;
                 drawArrow(WINDOW_PARAM_VAL style, arrowColor, AREA_PARAM_VAL_L,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
+            }
         }
         else
         {
@@ -4368,6 +4372,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     gboolean lvh=isListViewHeader(widget) || isEvolutionListViewHeader(widget, detail),
              sunken=btn_down || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)) ||
                     GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
+    GtkWidget *parent=NULL;
 
     if(button && GTK_IS_TOGGLE_BUTTON(widget))
     {
@@ -4811,7 +4816,34 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                         x+=2, width-=2;
                 }
 #endif
-                if(opts.unifyCombo && WIDGET_COMBO_BUTTON==widgetType)
+                if(WIDGET_COMBO==widgetType && !opts.gtkComboMenus && !isMozilla() &&
+                   ((parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent) && !GTK_IS_COMBO_BOX_ENTRY(parent)))
+                {
+                    GtkWidget *mapped=getMappedWidget(parent, 1);
+                    gboolean  changedFocus=qtcComboBoxIsFocusChanged(widget);
+                    qtcWidgetMapSetup(parent, widget, 0);
+
+                    if(parent && qtcComboBoxIsHovered(parent))
+                        state=GTK_STATE_PRELIGHT;
+
+                    drawLightBevel(cr, style, state, area, x-7, y, width+7, height, &btn_colors[bgnd], btn_colors, round,
+                                   WIDGET_TOOLBAR_BUTTON, BORDER_FLAT, (GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+
+                    if(mapped)
+                    {
+                        if(changedFocus)
+                            gtk_widget_queue_draw(mapped);
+                        else
+                        {
+                            GtkStateType mappedState=qtcWidgetGetState(mapped);
+                            if(GTK_STATE_INSENSITIVE==state && GTK_STATE_INSENSITIVE!=mappedState)
+                                state=mappedState;
+                            if(mappedState!=qtcWidgetGetState(widget) && GTK_STATE_INSENSITIVE!=mappedState && GTK_STATE_INSENSITIVE!=state)
+                                gtk_widget_set_state(mapped, state);
+                        }
+                    }
+                }
+                else if(opts.unifyCombo && WIDGET_COMBO_BUTTON==widgetType)
                 {
                     GtkWidget    *parent=widget ? qtcWidgetGetParent(widget) : NULL;
                     GtkWidget    *entry=parent ? getComboEntry(parent) : NULL;
@@ -5852,8 +5884,7 @@ static void gtkDrawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShad
             GTK_STATE_ACTIVE==state || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)));
 }
 
-static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
-                          GtkShadowType shadow_type, AREA_PARAM GtkWidget *widget,
+static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, AREA_PARAM GtkWidget *widget,
                           const gchar *detail, gint x, gint y, gint width, gint height)
 {
     sanitizeSize(window, &width, &height);
@@ -5910,12 +5941,41 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state,
         else
             drawAreaColor(cr, area, &style->base[state], x, y, width, height);
     }
-#if 0
-    else if(isComboFrame(widget))
+    else if(!opts.gtkComboMenus && !isMozilla() && isComboFrame(widget))
     {
+        GdkColor new_colors[TOTAL_SHADES+1],
+                *btn_colors;
+        int      bgnd=getFill(state, FALSE); // TODO!!! btn_down???
+        gboolean sunken=//btn_down || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)) ||
+                    GTK_STATE_ACTIVE==state || (2==bgnd || 3==bgnd);
+        GtkWidget *parent=qtcWidgetGetParent(widget),
+                  *mapped=parent ? getMappedWidget(parent, 0) : NULL;
+
+        if(parent && qtcComboBoxIsHovered(parent))
+            state=GTK_STATE_PRELIGHT;
+
+        if(QT_CUSTOM_COLOR_BUTTON(style))
+        {
+            shadeColors(&(style->bg[state]), new_colors);
+            btn_colors=new_colors;
+        }
+        else
+            btn_colors=qtcPalette.button[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE];
+
+        drawLightBevel(cr, style, state, area, x, y, width+4, height, &btn_colors[bgnd], btn_colors, ROUNDED_LEFT, WIDGET_TOOLBAR_BUTTON,
+                       BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|(qtcComboBoxHasFocus(widget, mapped) ? DF_HAS_FOCUS : 0), widget);
+                    
+        if(GTK_STATE_PRELIGHT!=state)
+        {
+            if(mapped && GTK_STATE_PRELIGHT==qtcWidgetGetState(mapped))
+                state=GTK_STATE_PRELIGHT, qtcWidgetSetState(widget, GTK_STATE_PRELIGHT);
+        }
+        if(mapped && GTK_STATE_INSENSITIVE!=qtcWidgetGetState(widget))
+            gtk_widget_queue_draw(mapped);
+ 
+        qtcWidgetMapSetup(parent, widget, 1);
+        qtcComboBoxSetup(widget, parent);
     }
-    else
-#endif
     else if(DETAIL("entry") || DETAIL("text"))
     {
         GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;

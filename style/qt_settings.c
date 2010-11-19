@@ -2153,6 +2153,7 @@ static gboolean qtInit()
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             opts.square|=SQUARE_POPUP_MENUS;
             opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
+            opts.gtkComboMenus=TRUE;
             qtSettings.useAlpha=FALSE;
 #endif
 
@@ -2617,6 +2618,8 @@ static gboolean qtInit()
             /* For some reason Firefox 3beta4 goes mad if GtkComboBoxEntry::appears-as-list = 1 !!!! */
             if(isMozilla())
                 gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \""RC_SETTING"Mz\"");
+            else if(!opts.gtkComboMenus)
+                gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBox::appears-as-list = 1 } class \"*\" style \""RC_SETTING"Mz\"");
 
             if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app || (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()) ||
                (GTK_APP_NEW_MOZILLA==qtSettings.app && mozVersion>=MAKE_VERSION(4, 0)))
