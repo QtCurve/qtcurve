@@ -1574,6 +1574,9 @@ static void checkConfig(Options *opts)
     if(opts->gbFactor<MIN_GB_FACTOR || opts->gbFactor>MAX_GB_FACTOR)
         opts->gbFactor=DEF_GB_FACTOR;
 
+    if(!opts->gtkComboMenus)
+        opts->doubleGtkComboArrow=false;
+
 #if defined __cplusplus && defined QT_VERSION && QT_VERSION < 0x040000 && !defined CONFIG_DIALOG
     opts->crSize=CR_SMALL_SIZE;
     if(SLIDER_CIRCULAR==opts->sliderStyle)
@@ -2098,10 +2101,10 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(doubleGtkComboArrow)
             CFG_READ_BOOL(stdSidebarButtons)
             CFG_READ_BOOL(toolbarTabs)
+            CFG_READ_BOOL(gtkComboMenus)
 #ifdef __cplusplus
             CFG_READ_ALIGN(titlebarAlignment)
             CFG_READ_EFFECT(titlebarEffect)
-            CFG_READ_BOOL(gtkComboMenus)
             CFG_READ_BOOL(centerTabText)
 /*
 #else
@@ -2602,8 +2605,8 @@ static void defaultSettings(Options *opts)
     opts->stdSidebarButtons=false;
     opts->toolbarTabs=false;
     opts->bgndOpacity=opts->dlgOpacity=opts->menuBgndOpacity=100;
-#ifdef __cplusplus
     opts->gtkComboMenus=false;
+#ifdef __cplusplus
     opts->customMenubarsColor.setRgb(0, 0, 0);
     opts->customSlidersColor.setRgb(0, 0, 0);
     opts->customMenuNormTextColor.setRgb(0, 0, 0);

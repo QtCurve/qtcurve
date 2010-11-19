@@ -1116,13 +1116,7 @@ typedef struct
                      gtkScrollViews,
                      stdSidebarButtons,
                      toolbarTabs,
-#ifdef __cplusplus
                      gtkComboMenus,
-/*
-#else
-                     setDialogButtonOrder,
-*/
-#endif
                      mapKdeIcons,
                      gtkButtonOrder,
                      fadeLines,
