@@ -351,9 +351,9 @@ static gboolean useButtonColor(const gchar *detail)
 
 #define QT_CUSTOM_COLOR_BUTTON(style) \
     (style && \
-    !(COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].red,(style->bg[GTK_STATE_NORMAL].red)) && \
-      COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].green,(style->bg[GTK_STATE_NORMAL].green)) && \
-      COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].blue,(style->bg[GTK_STATE_NORMAL].blue))))
+    !(COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].red,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].red)) && \
+      COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].green,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].green)) && \
+      COL_EQ(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW].blue,(style->bg[GTK_STATE_SELECTED==state ? state : GTK_STATE_NORMAL].blue))))
 
 static void shadeColors(GdkColor *base, GdkColor *vals)
 {
@@ -773,6 +773,18 @@ static gboolean isActiveOptionMenu(GtkWidget *widget)
     return FALSE;
 }
 #endif
+
+static gboolean isOnMenuItem(GtkWidget *w, int level)
+{
+    if(w)
+    {
+        if(GTK_IS_MENU_ITEM(w))
+            return TRUE;
+        else if(level<4)
+            return isOnMenuItem(qtcWidgetGetParent(w), ++level);
+    }
+    return FALSE;
+}
 
 static gboolean isSpinButton(GtkWidget *widget)
 {
@@ -6671,7 +6683,7 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
             state=GTK_STATE_NORMAL;
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
-        if(!use_text && parent && GTK_IS_LABEL(widget) && isOnOptionMenu(parent, 0))
+        if(!use_text && parent && GTK_IS_LABEL(widget) && (isOnOptionMenu(parent, 0) || (GTK_IS_BUTTON(parent) && isOnMenuItem(parent, 0))))
             use_text=TRUE;
 #endif
 

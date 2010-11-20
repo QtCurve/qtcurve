@@ -8,6 +8,8 @@
 4. Fix size of focus indicator in treeviews iwth SWT apps.
 5. Use list style pop-up for non-editable combos when not using Gtk-style
    combos - matches KDE behaviour.
+6. Fix buttons in chromiums menu - mouse over colour, and text colour when using
+   darker colour schemes.
 
 1.7.2
 -----
