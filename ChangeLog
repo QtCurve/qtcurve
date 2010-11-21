@@ -10,6 +10,9 @@
    combos - matches KDE behaviour.
 6. Fix buttons in chromiums menu - mouse over colour, and text colour when using
    darker colour schemes.
+7. Remove QTC_CAIRO_1_10_HACK cmake option. For cairo 1.10, an easier fix is to just
+   ensure there is no colour stop at 1.0. Thanks to Hugo Pereira Da Costa for
+   pointing this out.
 
 1.7.2
 -----
