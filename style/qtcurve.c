@@ -4792,7 +4792,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 }
 #endif
                 if(WIDGET_COMBO==widgetType && !opts.gtkComboMenus && !isMozilla() &&
-                   ((parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent) && !GTK_IS_COMBO_BOX_ENTRY(parent)))
+                   ((parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent) && !QTC_COMBO_ENTRY(parent)))
                 {
                     GtkWidget *mapped=getMappedWidget(parent, 1);
                     gboolean  changedFocus=qtcComboBoxIsFocusChanged(widget);
