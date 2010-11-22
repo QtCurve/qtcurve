@@ -5545,7 +5545,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     {
         GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        gboolean   active_mb=TRUE;
+        gboolean   active_mb=isMozilla() || gdk_pointer_is_grabbed();
 #else
         gboolean   active_mb=isMozilla() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE);
 
