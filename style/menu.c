@@ -122,11 +122,6 @@ static gboolean qtcMenuShellButtonPress(GtkWidget *widget, GdkEventButton *event
 }
 #endif
 
-/* Taken from glide Gtk2 engine */
-
-/***********************************************
- *   Cleanup/remove Menu Shell signals
- ***********************************************/
 static void qtcMenuShellCleanup(GtkWidget *widget)
 {
     if(GE_IS_MENU_BAR(widget))
@@ -149,27 +144,18 @@ static void qtcMenuShellCleanup(GtkWidget *widget)
     }
 }
 
-/***********************************************
- *   Style set signal to ensure menushell signals get cleaned up if the theme changes
- ***********************************************/
 static gboolean qtcMenuShellStyleSet(GtkWidget *widget, GtkStyle *previous_style, gpointer user_data)
 {
     qtcMenuShellCleanup(widget);
     return FALSE;
 }
- 
-/***********************************************
- *   Destroy signal to ensure menushell signals get cleaned if it is destroyed
- ***********************************************/
+
 static gboolean qtcMenuShellDestroy(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     qtcMenuShellCleanup(widget);
     return FALSE;
 }
 
-/***********************************************
- *   Motion signal to ensure menushell items prelight state changes on mouse move.
- ***********************************************/
 static gboolean qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     if(GE_IS_MENU_SHELL(widget))
@@ -207,10 +193,7 @@ static gboolean qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpo
  
     return FALSE;
 }
- 
-/***********************************************
- *   Leave signal to ensure menushell items normal state on mouse leave.
- ***********************************************/
+
 static gboolean qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
     if(GE_IS_MENU_SHELL(widget) && GE_IS_CONTAINER(widget))
@@ -238,13 +221,9 @@ static gboolean qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gp
             g_list_free(children);
     }
  
-  return FALSE;
+    return FALSE;
 }
- 
-/***********************************************
- *   Setup Menu Shell with signals to ensure
- *   prelight works on items
- ***********************************************/
+
 static void qtcMenuShellSetup(GtkWidget *widget)
 {
     if(GE_IS_MENU_BAR(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_MENU_SHELL_HACK_SET"))
@@ -258,6 +237,7 @@ static void qtcMenuShellSetup(GtkWidget *widget)
                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcMenuShellDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_STYLE_SET_ID",
                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcMenuShellStyleSet), NULL));
+
 #ifdef EXTEND_MENUBAR_ITEM_HACK
         g_object_set_data(G_OBJECT(widget), "QTC_MENU_SHELL_BUTTON_PRESS_ID",
                          (gpointer)g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(qtcMenuShellButtonPress), widget));
