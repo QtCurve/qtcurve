@@ -2285,6 +2285,7 @@ static gboolean qtInit()
                 if(FRAME_SHADED==opts.groupBox)
                     opts.groupBox=FRAME_PLAIN;
                 opts.gbFactor=0;
+                opts.highlightScrollViews=FALSE;
             }
                 
             if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
@@ -2742,7 +2743,7 @@ static gboolean qtInit()
 
             /* Scrolled windows */
             if((opts.square&SQUARE_SCROLLVIEW))
-                thickness=opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove ? 1 : 2;
+                thickness=!opts.highlightScrollViews && (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) ? 1 : 2;
             else if(opts.etchEntry)
                 thickness=3;
 
