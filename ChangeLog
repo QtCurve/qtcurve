@@ -1,6 +1,7 @@
 1.7.3
 -----
 1. Allow to force alternate colours for combo-box pop-up menus - matches Gtk.
+2. Fix background rings alignment on kwin borders.
 
 1.7.2
 -----

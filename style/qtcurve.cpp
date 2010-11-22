@@ -5448,7 +5448,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                     {
                         painter->save();
                         painter->setClipRect(bgnd->rect, Qt::IntersectClip);
-                        drawBackgroundImage(painter, true, bgnd->rect);
+                        drawBackgroundImage(painter, true, BGND_IMG_ON_BORDER ? bgnd->rect : bgnd->widgetRect);
                         painter->restore();
                     }
                 }
