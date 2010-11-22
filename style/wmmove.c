@@ -1,5 +1,4 @@
 #define GE_IS_CONTAINER(object) ((object)  && objectIsA((GObject*)(object), "GtkContainer"))
-#define GE_IS_SCROLLED_WINDOW(object) ((object)  && objectIsA((GObject*)(object), "GtkScrolledWindow"))
 
 static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
