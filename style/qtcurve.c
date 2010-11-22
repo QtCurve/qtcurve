@@ -3697,7 +3697,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     }
 #endif
 
-    if(!isMozilla() && opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && widget && (DETAIL("base") || DETAIL("eventbox")))
+    if(!isMozilla() && opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && widget && (DETAIL("base") || DETAIL("eventbox") || DETAIL("viewportbin")))
         qtcWMMoveSetup(widget);
         
     if(widget && ((100!=opts.bgndOpacity && GTK_IS_WINDOW(widget)) || (100!=opts.dlgOpacity && GTK_IS_DIALOG(widget))) &&
@@ -6964,8 +6964,7 @@ static void gtkDrawBoxGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                           gint gap_x, gint gap_width)
 {
     GdkColor *col1 = &qtcPalette.background[0],
-             *col2 = &qtcPalette.background[opts.borderTab ? 0 : (APPEARANCE_FLAT==opts.appearance
-                                                                    ? ORIGINAL_SHADE : FRAME_DARK_SHADOW)],
+             *col2 = &qtcPalette.background[opts.borderTab ? 0 : (APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW)],
              *outer = &qtcPalette.background[STD_BORDER];
     gboolean rev = reverseLayout(widget),
              thin = opts.thin&THIN_FRAMES;
@@ -6980,6 +6979,9 @@ static void gtkDrawBoxGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
     sanitizeSize(window, &width, &height);
     drawBoxGap(cr, style, GTK_SHADOW_OUT, state, widget, area, x, y,
                width, height, gap_side, gap_x, gap_width, opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, TRUE);
+
+    if(!isMozilla() && opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && widget && DETAIL("notebook"))
+        qtcWMMoveSetup(widget);
 
     switch(gap_side)
     {
@@ -7182,9 +7184,9 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
     {
         GtkNotebook *notebook=GTK_IS_NOTEBOOK(widget) ? GTK_NOTEBOOK(widget) : NULL;
         gboolean    highlightingEnabled=notebook && (opts.highlightFactor || opts.coloredMouseOver);
-        QtCTab      *highlightTab=highlightingEnabled ? lookupTabHash(widget, FALSE) : NULL;
         gboolean    highlight=FALSE;
-        int         dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW,
+        int         highlightedTabIndex=qtcTabCurrentHoveredIndex(widget),
+                    dark=APPEARANCE_FLAT==opts.appearance ? ORIGINAL_SHADE : FRAME_DARK_SHADOW,
                     moOffset=ROUNDED_NONE==opts.round || TAB_MO_TOP!=opts.tabMouseOver ? 1 : opts.round;
         GtkWidget   *parent=widget ? qtcWidgetGetParent(widget) : NULL;
         gboolean    firstTab=notebook ? FALSE : TRUE,
@@ -7270,7 +7272,7 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
             else if(pos==(num_children-1) || (pos==last_shown))
                 lastTab=TRUE;
 
-            if(highlightTab && pos==highlightTab->id && !active)
+            if(-1!=highlightedTabIndex && pos==highlightedTabIndex && !active)
             {
                 highlight=TRUE;
                 col=&(qtcPalette.background[SHADE_2_HIGHLIGHT]);
@@ -7285,7 +7287,7 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
             firstTab=oldLast;
         }
 
-        if(!mozTab && GTK_APP_JAVA!=qtSettings.app && !highlightTab && highlightingEnabled)
+        if(!mozTab && GTK_APP_JAVA!=qtSettings.app && -1==highlightedTabIndex && highlightingEnabled)
             qtcTabSetup(widget);
 
 /*

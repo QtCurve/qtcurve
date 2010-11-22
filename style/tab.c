@@ -34,6 +34,13 @@ static void removeFromTabHash(void *hash)
         g_hash_table_remove(tabHashTable, hash);
 }
 
+static gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget)
+{
+    QtCTab *tab=GE_IS_NOTEBOOK(widget) ? lookupTabHash(widget, FALSE) : NULL;
+
+    return tab ? tab->id : -1;
+}
+
 static void qtcTabCleanup(GtkWidget *widget)
 {
     if (widget)

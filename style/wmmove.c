@@ -57,7 +57,12 @@ static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event)
 static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
 {
     bool use=TRUE;
-    if(GE_IS_CONTAINER(widget))
+    if(GE_IS_NOTEBOOK(widget)) /* Check if there is a hovered tab */
+    {
+        if(-1!=qtcTabCurrentHoveredIndex(widget))
+            use = false;
+    }
+    else if(GE_IS_CONTAINER(widget))
     {
         GList *containers = NULL;
 
@@ -77,28 +82,30 @@ static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
                     if(GE_IS_CONTAINER(child->data))
                         containers = g_list_prepend(containers, child->data);
 
-                    /* if widget is prelight, we don't need to check where event happen,
-                       any prelight widget indicate we can't do a move */
+                    // if widget is prelight, we don't need to check where event happen,
+                    //  any prelight widget indicate we can't do a move */
                     if(GTK_STATE_PRELIGHT==qtcWidgetGetState(GTK_WIDGET(child->data)))
                         use = false;
-                    else if(GE_IS_WIDGET(child->data) && event && withinWidget(GTK_WIDGET(child->data), event)) 
+                    // if event happen in widget
+                    // check not a notebook: event in but notebook don't get it...
+                    else if(GE_IS_WIDGET(child->data) && !GE_IS_NOTEBOOK (child->data) && event && withinWidget(GTK_WIDGET(child->data), event))
                     {
-                        // widget listening to press event
-                        if(gtk_widget_get_events (GTK_WIDGET(child->data)) & GDK_BUTTON_PRESS_MASK)
+                        // here deal with notebook: widget may be not visible
+                        GdkWindow *window = gtk_widget_get_window(GTK_WIDGET(child->data));
+                        if(window && gdk_window_is_visible(window))
                         {
-                            /* here deal with notebook: widget may be not visible */
-                            GdkWindow *window = qtcWidgetGetWindow(GTK_WIDGET(child->data));
-                            if(window && gdk_window_is_visible(window))
+                            // widget listening to press event
+                            if(gtk_widget_get_events(GTK_WIDGET(child->data)) & GDK_BUTTON_PRESS_MASK)
+                                use = false;
+                            // deal with menu item, GtkMenuItem only listen to
+                            // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
+                            // so previous check are invalids :(
+                            //
+                            // same for ScrolledWindow, they do not send motion events
+                            // to parents so not usable
+                            else if(GE_IS_MENU_ITEM(G_OBJECT(child->data)) || GE_IS_SCROLLED_WINDOW(G_OBJECT(child->data)))
                                 use = false;
                         }
-                        /* deal with menu item, GtkMenuItem only listen to
-                           GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
-                           so previous check are invalids :(
-
-                           same for ScrolledWindow, they do not send motion events
-                           to parents so not usable */
-                        else if(GE_IS_MENU_ITEM(G_OBJECT(child->data)) || GE_IS_SCROLLED_WINDOW(G_OBJECT(child->data)))
-                            use = false;
                     }
                 }
             }
