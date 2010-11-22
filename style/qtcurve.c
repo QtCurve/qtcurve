@@ -75,9 +75,7 @@ static Options opts;
 #include "entry.c"
 #include "treeview.c"
 #include "combobox.c"
-#if !GTK_CHECK_VERSION(2, 90, 0)
 #include "wmmove.c"
-#endif
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -3699,6 +3697,9 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     }
 #endif
 
+    if(!isMozilla() && opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && widget && (DETAIL("base") || DETAIL("eventbox")))
+        qtcWMMoveSetup(widget);
+        
     if(widget && ((100!=opts.bgndOpacity && GTK_IS_WINDOW(widget)) || (100!=opts.dlgOpacity && GTK_IS_DIALOG(widget))) &&
        !isFixedWidget(widget) && isRgbaWidget(widget))
         enableBlurBehind(widget, TRUE);
@@ -5418,12 +5419,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             gboolean    drawGradient=GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app),
                         fillBackground=menubar && SHADE_NONE!=opts.shadeMenubars;
 
-#if !GTK_CHECK_VERSION(2, 90, 0)
-//             if(menubar)
-            if(!isMozilla())
+            if(!isMozilla() && (menubar && opts.windowDrag || (opts.windowDrag>WM_DRAG_MENUBAR)))
                 qtcWMMoveSetup(widget);
-#endif
-
+    
             if(menubar && BLEND_TITLEBAR)
             {
                 menuBarAdjust=qtcGetWindowBorderSize(FALSE).titleHeight;

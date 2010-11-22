@@ -1,6 +1,7 @@
-// #define GE_IS_TOOL_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkToolbar"))
-// #define GE_IS_STATUS_BAR(object) ((object) && objectIsA((GObject*)(object), "GtkStatusbar"))
-// #define GE_IS_LABEL(object) ((object) && objectIsA((GObject*)(object), "GtkLabel"))
+#define GE_IS_CONTAINER(object) ((object)  && objectIsA((GObject*)(object), "GtkContainer"))
+#define GE_IS_SCROLLED_WINDOW(object) ((object)  && objectIsA((GObject*)(object), "GtkScrolledWindow"))
+
+static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
 static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
 {
@@ -22,63 +23,88 @@ static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
     xev.xclient.data.l[4] = 0;
     XUngrabPointer(GDK_DISPLAY_XDISPLAY(display), CurrentTime);
 
-    XSendEvent(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(root), False,
-               SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+    XSendEvent(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(root), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+    /* force a release as some widgets miss it... */
+    qtcWMMoveButtonRelease(w, NULL, NULL);
 }
 
-// static gboolean isOnStatusBar(GtkWidget *widget, int level);
-
-static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event, int adjust)
+static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event)
 {
-    GtkAllocation alloc=qtcWidgetGetAllocation(widget);
-    int           nx=0,
-                  ny=0;
+    GdkWindow *window = gtk_widget_get_parent_window(widget);
 
-    // Need to get absolute co-ordinates...
-    alloc.x-=adjust;
-    alloc.y-=adjust;
-    alloc.width+=adjust;
-    alloc.height+=adjust;
-    gdk_window_get_origin(gtk_widget_get_parent_window(widget), &nx, &ny);
-    alloc.x+=nx;
-    alloc.y+=ny;
+    if(window)
+    {
+        GtkAllocation alloc=qtcWidgetGetAllocation(widget);
+        int           nx=0,
+                      ny=0,
+                      adjust=0; /* TODO !!! */
 
-    return alloc.x<=event->x_root && alloc.y<=event->y_root &&
-           (alloc.x+alloc.width)>event->x_root &&(alloc.y+alloc.height)>event->y_root;
+        // Need to get absolute co-ordinates...
+        alloc.x-=adjust;
+        alloc.y-=adjust;
+        alloc.width+=adjust;
+        alloc.height+=adjust;
+        gdk_window_get_origin(gtk_widget_get_parent_window(widget), &nx, &ny);
+        alloc.x+=nx;
+        alloc.y+=ny;
+
+        return alloc.x<=event->x_root && alloc.y<=event->y_root &&
+               (alloc.x+alloc.width)>event->x_root &&(alloc.y+alloc.height)>event->y_root;
+    }
+    return true;
 }
 
 static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
 {
     bool use=TRUE;
-    if(GE_IS_MENU_SHELL(widget))
+    if(GE_IS_CONTAINER(widget))
     {
-        GdkModifierType pointer_mask;
+        GList *containers = NULL;
 
-        if(GE_IS_CONTAINER(widget))
+        containers=g_list_prepend(containers, widget);
+
+        // Check all widget children for event
+        while(g_list_length(containers))
         {
-            GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
-                  *child;
-              
-            for(child = g_list_first(children); child /*&& use*/; child = g_list_next(child))
+            GtkContainer *c        = GTK_CONTAINER(g_list_nth_data(containers, 0));
+            GList        *children = gtk_container_get_children(GTK_CONTAINER(c)),
+                         *child    = NULL;
+
+            for(child = g_list_first(children); child && use; child = g_list_next(child))
             {
-                // Can only use this 'press' event if
-                //  1. There is no active menu being displayed - as the 'press' will be to cancel the menu
-                //  2. The click is not where a menu item is
-                if((child->data) && GE_IS_WIDGET(child->data) &&
-                    ((GTK_STATE_NORMAL!=qtcWidgetState(GTK_WIDGET(child->data)) &&
-                      GTK_STATE_INSENSITIVE!=qtcWidgetState(GTK_WIDGET(child->data))) ||
-                     withinWidget(GTK_WIDGET(child->data), event,
-#ifdef EXTEND_MENUBAR_ITEM_HACK
-                                 constMenuAdjust
-#else
-                                 0
-#endif
-                                 ) ) )
-                    use=FALSE;
+                if(child->data)
+                {
+                    if(GE_IS_CONTAINER(child->data))
+                        containers = g_list_prepend(containers, child->data);
+
+                    /* if widget is prelight, we don't need to check where event happen,
+                       any prelight widget indicate we can't do a move */
+                    if(GTK_STATE_PRELIGHT==qtcWidgetGetState(GTK_WIDGET(child->data)))
+                        use = false;
+                    else if(GE_IS_WIDGET(child->data) && event && withinWidget(GTK_WIDGET(child->data), event)) 
+                    {
+                        // widget listening to press event
+                        if(gtk_widget_get_events (GTK_WIDGET(child->data)) & GDK_BUTTON_PRESS_MASK)
+                        {
+                            /* here deal with notebook: widget may be not visible */
+                            GdkWindow *window = qtcWidgetGetWindow(GTK_WIDGET(child->data));
+                            if(window && gdk_window_is_visible(window))
+                                use = false;
+                        }
+                        /* deal with menu item, GtkMenuItem only listen to
+                           GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
+                           so previous check are invalids :(
+
+                           same for ScrolledWindow, they do not send motion events
+                           to parents so not usable */
+                        else if(GE_IS_MENU_ITEM(G_OBJECT(child->data)) || GE_IS_SCROLLED_WINDOW(G_OBJECT(child->data)))
+                            use = false;
+                    }
+                }
             }
-         
-            if(children)   
+            if(children)
                 g_list_free(children);
+            containers = g_list_remove(containers, c);
         }
     }
     
@@ -87,25 +113,16 @@ static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
 
 static gboolean qtcIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
 {
-    return opts.windowDrag &&
-           (!event || withinWidget(widget, event, 0)) &&
-           ((GE_IS_MENU_BAR(widget) && (!event || useEvent(widget, event)))
-//             || GE_IS_TOOL_BAR(widget)
-//             || GE_IS_STATUS_BAR(widget)
-//             || (GE_IS_LABEL(widget) && isOnStatusBar(widget, 0))
-            );
+    return opts.windowDrag && (!event || (withinWidget(widget, event) && useEvent(widget, event)));
 }
 
 static GtkWidget *dragWidget=NULL;
-// static gboolean  dragWidgetHadMouseTracking=FALSE;
 
 static gboolean qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-    if (qtcIsWindowDragWidget(widget, event))
+    if (GDK_BUTTON_PRESS==event->type && 1==event->button && qtcIsWindowDragWidget(widget, event))
     {
         dragWidget=widget;
-//         dragWidgetHadMouseTracking=gdk_window_get_events(gtk_widget_get_window(widget))&GDK_BUTTON1_MOTION_MASK;
-//         gdk_window_set_events(gtk_widget_get_window(widget), gdk_window_get_events(gtk_widget_get_window(widget))|GDK_BUTTON1_MOTION_MASK);
         return TRUE;
     }
 
@@ -116,8 +133,8 @@ static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event,
 {
     if (widget==dragWidget)
     {
-//         if(!dragWidgetHadMouseTracking);
-//             gdk_window_set_events(gtk_widget_get_window(widget), gdk_window_get_events(gtk_widget_get_window(widget))-GDK_BUTTON1_MOTION_MASK);
+        gtk_grab_remove(widget);
+        gdk_pointer_ungrab(CurrentTime);
         dragWidget=NULL;
         return TRUE;
     }
@@ -190,7 +207,7 @@ static void qtcWMMoveSetup(GtkWidget *widget)
 {
     if (qtcIsWindowDragWidget(widget, NULL) && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
     {
-        gdk_window_set_events(gtk_widget_get_window(widget), gdk_window_get_events(gtk_widget_get_window(widget))|GDK_BUTTON1_MOTION_MASK);
+        gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_BUTTON1_MOTION_MASK);
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_MOTION_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcWMMoveMotion), NULL));

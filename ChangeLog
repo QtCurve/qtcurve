@@ -13,6 +13,7 @@
 7. Remove QTC_CAIRO_1_10_HACK cmake option. For cairo 1.10, an easier fix is to just
    ensure there is no colour stop at 1.0. Thanks to Hugo Pereira Da Costa for
    pointing this out.
+8. Allow window drag in toolbars and other areas.
 
 1.7.2
 -----
