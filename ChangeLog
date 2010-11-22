@@ -2,6 +2,8 @@
 -----
 1. Allow to force alternate colours for combo-box pop-up menus - matches Gtk.
 2. Fix background rings alignment on kwin borders.
+3. If highlighting scrollviews, and allow mouse-over for entries, also allow
+   mouse-over for scrollviews.
 
 1.7.2
 -----

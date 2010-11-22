@@ -1131,7 +1131,6 @@ typedef struct
                      fillProgress,
                      comboSplitter,
                      highlightScrollViews,
-                     sunkenScrollViews,
                      etchEntry,
                      colorSliderMouseOver,
                      thinSbarGroove,

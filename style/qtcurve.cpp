@@ -1464,7 +1464,7 @@ void Style::polish(QApplication *app)
         opts.scrollbarType=SCROLLBAR_WINDOWS;
         if(APPEARANCE_FADE==opts.menuitemAppearance)
             opts.menuitemAppearance=APPEARANCE_FLAT;
-        opts.borderMenuitems=opts.etchEntry=opts.sunkenScrollViews=false;
+        opts.borderMenuitems=opts.etchEntry=false;
 
         if(opts.useHighlightForMenu && blendOOMenuHighlight(QApplication::palette(), itsHighlightCols[ORIGINAL_SHADE]))
         {
@@ -11836,7 +11836,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
     bool         enabled(state&State_Enabled),
                  entry(WIDGET_ENTRY==w || (WIDGET_SCROLLVIEW==w && opts.highlightScrollViews)),
                  hasFocus(enabled && entry && state&State_HasFocus),
-                 hasMouseOver(enabled && WIDGET_ENTRY==w && state&State_MouseOver && ENTRY_MO);
+                 hasMouseOver(enabled && entry && state&State_MouseOver && ENTRY_MO);
     const QColor *cols(enabled && hasMouseOver && opts.coloredMouseOver && entry
                         ? itsMouseOverCols
                         : enabled && hasFocus && itsFocusCols && entry
