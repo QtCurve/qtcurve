@@ -14,6 +14,7 @@
    ensure there is no colour stop at 1.0. Thanks to Hugo Pereira Da Costa for
    pointing this out.
 8. Allow window drag in toolbars and other areas.
+9. Implement hover and focus for *some* scrolled windows.
 
 1.7.2
 -----

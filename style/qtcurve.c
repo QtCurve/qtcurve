@@ -75,6 +75,7 @@ static Options opts;
 #include "entry.c"
 #include "treeview.c"
 #include "combobox.c"
+#include "scrolledwindow.c"
 #include "wmmove.c"
 #include "pixmaps.h"
 #include "config.h"
@@ -4585,6 +4586,14 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         }
 #endif
 
+        if(opts.highlightScrollViews && widget && (togglebutton || button || optionmenu))
+        {
+            GtkWidget *parent=qtcWidgetGetParent(widget);
+
+            if(parent && GTK_IS_TREE_VIEW(parent))
+                qtcScrolledWindowRegisterChild(parent);
+        }
+        
         if(tbar_button && TBTN_JOINED==opts.tbarBtns)
         {
             adjustToolbarButtons(widget, &xAdjust, &yAdjust, &wAdjust, &hAdjust, &round, horiz_tbar);
@@ -6016,11 +6025,21 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                  viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
                  drawSquare=(frame && opts.square&SQUARE_FRAME) || (!viewport && !scrolledWindow && !detail && !widget),
                  statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
-                            ? frame : isStatusBarFrame(widget);
+                            ? frame : isStatusBarFrame(widget),
+                 checkScrollViewState=opts.highlightScrollViews && widget && GTK_IS_SCROLLED_WINDOW(widget),
+                 isHovered=checkScrollViewState ? qtcScrolledWindowHovered(widget) : FALSE,
+                 hasFocus=checkScrollViewState && !isHovered ? qtcScrolledWindowHasFocus(widget) : FALSE;
+        GdkColor *cols=isHovered ? qtcPalette.mouseover
+                                 : hasFocus
+                                    ? qtcPalette.focus
+                                    : qtcPalette.background;
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height,
                                                detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 3);
+
+        if(checkScrollViewState)
+            qtcScrolledWindowSetup(widget, NULL);
 
         if(!statusBar && !drawSquare && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && ROUNDED)
         {
@@ -6028,8 +6047,8 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
             {
                 GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
-                gboolean doBorder=!viewport && !drawSquare,
-                         windowFrame=parent && !isFixedWidget(widget) && GTK_IS_FRAME(widget) && GTK_IS_WINDOW(parent);
+                gboolean  doBorder=!viewport && !drawSquare,
+                          windowFrame=parent && !isFixedWidget(widget) && GTK_IS_FRAME(widget) && GTK_IS_WINDOW(parent);
 
                 if(windowFrame)
                 {
@@ -6045,18 +6064,18 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                 if(scrolledWindow)
                 {
                     /* See code in qt_settings.c as to isMozill part */
-                    if((opts.square&SQUARE_SCROLLVIEW) || isMozillaWidget(widget))
+                    if((opts.square&SQUARE_SCROLLVIEW && !opts.highlightScrollViews) || isMozillaWidget(widget))
                     {
                         /* Flat style...
                         drawBorder(cr, style, state, area, x, y, width, height,
                                    NULL, ROUNDED_NONE, BORDER_FLAT, WIDGET_SCROLLVIEW, 0);
                         */
                         /* 3d... */
-                        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
+                        cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
                         createTLPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
                         cairo_stroke(cr);
                         if(!opts.gtkScrollViews)
-                            cairo_set_source_rgba(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), LOWER_BORDER_ALPHA);
+                            cairo_set_source_rgba(cr, CAIRO_COL(cols[STD_BORDER]), LOWER_BORDER_ALPHA);
                             //cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER_BR]));
                         createBRPath(cr, x+0.5, y+0.5, width-1, height-1, 0.0, ROUNDED_NONE);
                         cairo_stroke(cr);
@@ -6073,14 +6092,14 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
                     if(windowFrame)
-                        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
+                        cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
                     else
-                        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[ORIGINAL_SHADE]));
+                        cairo_set_source_rgb(cr, CAIRO_COL(cols[ORIGINAL_SHADE]));
                     cairo_stroke(cr);
                 }
                 else if(doBorder)
                     drawBorder(cr, style, state, area, x, y, width, height,
-                               NULL, ROUNDED_ALL, scrolledWindow ? BORDER_SUNKEN : BORDER_FLAT,
+                               cols, ROUNDED_ALL, scrolledWindow ? BORDER_SUNKEN : BORDER_FLAT,
                                scrolledWindow ? WIDGET_SCROLLVIEW : WIDGET_FRAME, DF_BLEND);
             }
         }
@@ -6113,7 +6132,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                 case GTK_SHADOW_NONE:
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
                     cairo_stroke(cr);
                     break;
                 case GTK_SHADOW_IN:
@@ -6122,33 +6141,33 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                     {
                         double c2Alpha=GTK_SHADOW_IN==shadow_type ? 1.0 : LOWER_BORDER_ALPHA,
                                c1Alpha=GTK_SHADOW_OUT==shadow_type ? 1.0 : LOWER_BORDER_ALPHA;
-                        drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), c2Alpha, x, y, width);
-                        drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), c2Alpha, x, y, height);
+                        drawHLine(cr, CAIRO_COL(cols[STD_BORDER]), c2Alpha, x, y, width);
+                        drawVLine(cr, CAIRO_COL(cols[STD_BORDER]), c2Alpha, x, y, height);
                         if(APPEARANCE_FLAT!=opts.appearance)
                         {
-                            drawHLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), c1Alpha, x, y+height-1, width);
-                            drawVLine(cr, CAIRO_COL(qtcPalette.background[STD_BORDER]), c1Alpha, x+width-1, y, height);
+                            drawHLine(cr, CAIRO_COL(cols[STD_BORDER]), c1Alpha, x, y+height-1, width);
+                            drawVLine(cr, CAIRO_COL(cols[STD_BORDER]), c1Alpha, x+width-1, y, height);
                         }
                     }
                     break;
                 case GTK_SHADOW_ETCHED_IN:
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-2);
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[c1]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(cols[c1]));
                     cairo_stroke(cr);
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+0.5, y+0.5, width-2, height-2);
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[c2]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(cols[c2]));
                     cairo_stroke(cr);
                     break;
                 case GTK_SHADOW_ETCHED_OUT:
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+1.5, y+1.5, width-2, height-2);
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[c2]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(cols[c2]));
                     cairo_stroke(cr);
                     cairo_new_path(cr);
                     cairo_rectangle(cr, x+0.5, y+0.5, width-2, height-2);
-                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.background[c1]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(cols[c1]));
                     cairo_stroke(cr);
                     break;
             }
