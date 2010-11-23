@@ -1,8 +1,26 @@
 #define GE_IS_CONTAINER(object) ((object)  && objectIsA((GObject*)(object), "GtkContainer"))
 
+static int       qtcWMMoveLastX=-1;
+static int       qtcWMMoveLastY=-1;
+static GtkWidget *qtcWMMoveDragWidget=NULL;
+
+static void qtcWMMoveReset()
+{
+    qtcWMMoveLastX=-1;
+    qtcWMMoveLastY=-1;
+    qtcWMMoveDragWidget=NULL;
+}
+
+static void qtcWMMoveStore(GtkWidget *widget, GdkEventButton *event)
+{
+    qtcWMMoveLastX=event ? event->x_root : -1;
+    qtcWMMoveLastY=event ? event->y_root : -1;
+    qtcWMMoveDragWidget=widget;
+}
+
 static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
-static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
+static void qtcWMMoveTrigger(GtkWidget *w, int x, int y)
 {
     XEvent     xev;
     GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
@@ -27,7 +45,7 @@ static void qtcTriggerWMMove(GtkWidget *w, int x, int y)
     qtcWMMoveButtonRelease(w, NULL, NULL);
 }
 
-static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event)
+static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 {
     GdkWindow *window = gtk_widget_get_parent_window(widget);
 
@@ -53,7 +71,7 @@ static gboolean withinWidget(GtkWidget *widget, GdkEventButton *event)
     return true;
 }
 
-static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
+static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 {
     bool use=TRUE;
     if(GE_IS_NOTEBOOK(widget)) /* Check if there is a hovered tab */
@@ -87,7 +105,7 @@ static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
                         use = false;
                     // if event happen in widget
                     // check not a notebook: event in but notebook don't get it...
-                    else if(GE_IS_WIDGET(child->data) && !GE_IS_NOTEBOOK (child->data) && event && withinWidget(GTK_WIDGET(child->data), event))
+                    else if(GE_IS_WIDGET(child->data) && !GE_IS_NOTEBOOK (child->data) && event && qtcWMMoveWithinWidget(GTK_WIDGET(child->data), event))
                     {
                         // here deal with notebook: widget may be not visible
                         GdkWindow *window = gtk_widget_get_window(GTK_WIDGET(child->data));
@@ -117,18 +135,21 @@ static gboolean useEvent(GtkWidget *widget, GdkEventButton *event)
     return use;
 }
 
-static gboolean qtcIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
+static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
 {
-    return opts.windowDrag && (!event || (withinWidget(widget, event) && useEvent(widget, event)));
+    if(opts.windowDrag && (!event || (qtcWMMoveWithinWidget(widget, event) && qtcWMMoveUseEvent(widget, event))))
+    {
+        qtcWMMoveStore(widget, event);
+        return TRUE;
+    }
+    return FALSE;
 }
-
-static GtkWidget *dragWidget=NULL;
 
 static gboolean qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-    if (GDK_BUTTON_PRESS==event->type && 1==event->button && qtcIsWindowDragWidget(widget, event))
+    if (GDK_BUTTON_PRESS==event->type && 1==event->button && qtcWMMoveIsWindowDragWidget(widget, event))
     {
-        dragWidget=widget;
+        qtcWMMoveDragWidget=widget;
         return TRUE;
     }
 
@@ -137,11 +158,11 @@ static gboolean qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, g
 
 static gboolean qtcWMMoveDragEnd(GtkWidget *widget)
 {
-    if (widget==dragWidget)
+    if (widget==qtcWMMoveDragWidget)
     {
         gtk_grab_remove(widget);
         gdk_pointer_ungrab(CurrentTime);
-        dragWidget=NULL;
+        qtcWMMoveReset();
         return TRUE;
     }
 
@@ -155,10 +176,10 @@ static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event,
 
 static void qtcWMMoveCleanup(GtkWidget *widget)
 {
-    if (qtcIsWindowDragWidget(widget, NULL))
+    if (g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
     {
-        if(widget==dragWidget)
-            dragWidget=NULL;
+        if(widget==qtcWMMoveDragWidget)
+            qtcWMMoveReset();
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WM_MOVE_MOTION_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
@@ -189,12 +210,13 @@ static gboolean qtcWMMoveDestroy(GtkWidget *widget, GdkEvent *event, gpointer us
 
 static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if (dragWidget==widget)
+    if (qtcWMMoveDragWidget==widget)
     {
-        qtcTriggerWMMove(widget, event->x_root, event->y_root);
-        gtk_grab_remove(widget);
-        gdk_pointer_ungrab(CurrentTime);
-        dragWidget=NULL;
+        // check displacement with respect to drag start
+        const int distance=abs(qtcWMMoveLastX - event->x_root) + abs(qtcWMMoveLastY - event->y_root);
+        if(distance < qtSettings.startDragDist)
+            return FALSE;
+        qtcWMMoveTrigger(widget, event->x_root, event->y_root);
         return TRUE;
     }
 
@@ -208,7 +230,7 @@ static gboolean qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointe
 
 static void qtcWMMoveSetup(GtkWidget *widget)
 {
-    if (widget && !isFakeGtk() && !qtcIsWindowDragWidget(widget, NULL) && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
+    if (widget && !isFakeGtk() && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
     {
         gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_BUTTON1_MOTION_MASK);
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET", (gpointer)1);

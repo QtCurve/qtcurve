@@ -198,6 +198,8 @@ struct QtData
     gboolean        qt4,
                     inactiveChangeSelectionColor,
                     useAlpha;
+    int             startDragDist,
+                    startDragTime;
     QtcDebug        debug;
 #ifdef FIX_FIREFOX_LOCATION_BAR
     gboolean        isBrowser;
@@ -340,27 +342,30 @@ static const char * italicStr(int i)
 
 enum
 {
-    RD_ACT_PALETTE       = 0x0001,
-    RD_DIS_PALETTE       = 0x0002,
-    RD_INACT_PALETTE     = 0x0004,
-    RD_FONT              = 0x0008,
-    RD_CONTRAST          = 0x0010,
-    RD_ICONS             = 0x0020,
-    RD_TOOLBAR_STYLE     = 0x0040,
-    RD_TOOLBAR_ICON_SIZE = 0x0080,
-    RD_BUTTON_ICONS      = 0x0100,
-    RD_SMALL_ICON_SIZE   = 0x0200,
-    RD_LIST_COLOR        = 0x0400,
+    RD_ACT_PALETTE       = 0x000001,
+    RD_DIS_PALETTE       = 0x000002,
+    RD_INACT_PALETTE     = 0x000004,
+    RD_FONT              = 0x000008,
+    RD_CONTRAST          = 0x000010,
+    RD_ICONS             = 0x000020,
+    RD_TOOLBAR_STYLE     = 0x000040,
+    RD_TOOLBAR_ICON_SIZE = 0x000080,
+    RD_BUTTON_ICONS      = 0x000100,
+    RD_SMALL_ICON_SIZE   = 0x000200,
+    RD_LIST_COLOR        = 0x000400,
 #ifdef QTC_STYLE_SUPPORT
-    RD_STYLE             = 0x0800,
+    RD_STYLE             = 0x000800,
 #else
-    RD_STYLE             = 0x0000,
+    RD_STYLE             = 0x000000,
 #endif
-    RD_LIST_SHADE        = 0x1000,
-    RD_KDE4_PAL          = 0x2000,
+    RD_LIST_SHADE        = 0x001000,
+    RD_KDE4_PAL          = 0x002000,
 
-    RD_MENU_FONT         = 0x4000,
-    RD_TB_FONT           = 0x8000
+    RD_MENU_FONT         = 0x004000,
+    RD_TB_FONT           = 0x008000,
+
+    RD_DRAG_DIST         = 0x010000
+    //RD_DRAG_TIME         = 0x020000
 };
 
 /*
@@ -964,6 +969,20 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                 qtSettings.buttonIcons=readBool(line, 23);
                 found|=RD_BUTTON_ICONS;
             }
+            else if (SECT_KDE==section && rd&RD_DRAG_DIST && !(found&RD_DRAG_DIST) &&
+                        0==strncmp_i(line, "StartDragDist=", 14))
+            {
+                qtSettings.startDragDist=readInt(line, 14);
+                found|=RD_DRAG_DIST;
+            }
+            /*
+            else if (SECT_KDE==section && rd&RD_DRAG_TIME && !(found&RD_DRAG_TIME) &&
+                        0==strncmp_i(line, "StartDragTime=", 14))
+            {
+                qtSettings.startDragTime=readInt(line, 14);
+                found|=RD_DRAG_TIME;
+            }
+            */
             else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
                     !kde4 && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20))
             {
@@ -2077,6 +2096,8 @@ static gboolean qtInit()
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
+            qtSettings.startDragDist=4;
+            qtSettings.startDragTime=500;
             qtSettings.debug=debugLevel();
             opts.contrast=DEFAULT_CONTRAST;
 
@@ -2111,7 +2132,8 @@ static gboolean qtInit()
             for(f=0; 0!=files[f]; ++f)
                 readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|RD_MENU_FONT|RD_TB_FONT|
                                          RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
-                                         (qtSettings.qt4 || 0==f ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE : RD_LIST_COLOR),
+                                         (qtSettings.qt4 || 0==f ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE|RD_DRAG_DIST // |RD_DRAG_TIME
+                                                                 : RD_LIST_COLOR),
                                0==f, qtSettings.qt4 || 0==f);
             }
 
