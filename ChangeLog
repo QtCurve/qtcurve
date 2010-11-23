@@ -15,7 +15,8 @@
     pointing this out.
  8. Allow window drag in toolbars and other areas.
  9. Implement hover and focus for *some* scrolled windows.
-10. Add support for KDE4 StartDragDist config item to control when window drag starts.
+10. Add support for KDE4 StartDragDist and StartDragTime config items to control when
+    window drag starts.
 
 1.7.2
 -----

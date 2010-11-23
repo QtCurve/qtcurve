@@ -1,14 +1,21 @@
-#define GE_IS_CONTAINER(object) ((object)  && objectIsA((GObject*)(object), "GtkContainer"))
-
 static int       qtcWMMoveLastX=-1;
 static int       qtcWMMoveLastY=-1;
+static int       qtcWMMoveTimer=0;
 static GtkWidget *qtcWMMoveDragWidget=NULL;
+
+static void qtcWMMoveStopTimer()
+{
+    if(qtcWMMoveTimer)
+        g_source_remove(qtcWMMoveTimer);
+    qtcWMMoveTimer=0;
+}
 
 static void qtcWMMoveReset()
 {
     qtcWMMoveLastX=-1;
     qtcWMMoveLastY=-1;
     qtcWMMoveDragWidget=NULL;
+    qtcWMMoveStopTimer();
 }
 
 static void qtcWMMoveStore(GtkWidget *widget, GdkEventButton *event)
@@ -74,12 +81,12 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 {
     bool use=TRUE;
-    if(GE_IS_NOTEBOOK(widget)) /* Check if there is a hovered tab */
+    if(GTK_IS_NOTEBOOK(widget)) /* Check if there is a hovered tab */
     {
         if(-1!=qtcTabCurrentHoveredIndex(widget))
             use = false;
     }
-    else if(GE_IS_CONTAINER(widget))
+    else if(GTK_IS_CONTAINER(widget))
     {
         GList *containers = NULL;
 
@@ -94,25 +101,27 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 
             for(child = g_list_first(children); child && use; child = g_list_next(child))
             {
-                if(child->data)
+                if(child->data && GTK_IS_WIDGET(child->data))
                 {
-                    if(GE_IS_CONTAINER(child->data))
+                    GtkWidget *childWidget=GTK_WIDGET(child->data);
+
+                    if(GTK_IS_CONTAINER(childWidget))
                         containers = g_list_prepend(containers, child->data);
 
                     // if widget is prelight, we don't need to check where event happen,
                     //  any prelight widget indicate we can't do a move */
-                    if(GTK_STATE_PRELIGHT==qtcWidgetGetState(GTK_WIDGET(child->data)))
+                    if(GTK_STATE_PRELIGHT==qtcWidgetGetState(childWidget))
                         use = false;
                     // if event happen in widget
                     // check not a notebook: event in but notebook don't get it...
-                    else if(GE_IS_WIDGET(child->data) && !GE_IS_NOTEBOOK (child->data) && event && qtcWMMoveWithinWidget(GTK_WIDGET(child->data), event))
+                    else if(!GTK_IS_NOTEBOOK(childWidget) && event && qtcWMMoveWithinWidget(childWidget, event))
                     {
                         // here deal with notebook: widget may be not visible
-                        GdkWindow *window = gtk_widget_get_window(GTK_WIDGET(child->data));
+                        GdkWindow *window = gtk_widget_get_window(GTK_WIDGET(childWidget));
                         if(window && gdk_window_is_visible(window))
                         {
                             // widget listening to press event
-                            if(gtk_widget_get_events(GTK_WIDGET(child->data)) & GDK_BUTTON_PRESS_MASK)
+                            if(gtk_widget_get_events(GTK_WIDGET(childWidget)) & GDK_BUTTON_PRESS_MASK)
                                 use = false;
                             // deal with menu item, GtkMenuItem only listen to
                             // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
@@ -120,7 +129,7 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
                             //
                             // same for ScrolledWindow, they do not send motion events
                             // to parents so not usable
-                            else if(GE_IS_MENU_ITEM(G_OBJECT(child->data)) || GE_IS_SCROLLED_WINDOW(G_OBJECT(child->data)))
+                            else if(GTK_IS_MENU_ITEM(childWidget) || GTK_IS_SCROLLED_WINDOW(childWidget))
                                 use = false;
                         }
                     }
@@ -135,11 +144,21 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
     return use;
 }
 
+static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
+{
+    if(qtcWMMoveDragWidget)
+        qtcWMMoveTrigger(qtcWMMoveDragWidget, qtcWMMoveLastX, qtcWMMoveLastY);
+}
+
 static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
 {
     if(opts.windowDrag && (!event || (qtcWMMoveWithinWidget(widget, event) && qtcWMMoveUseEvent(widget, event))))
     {
         qtcWMMoveStore(widget, event);
+        // Start timer
+        qtcWMMoveStopTimer();
+        qtcWMMoveTimer=g_timeout_add(qtSettings.startDragTime, (GSourceFunc)qtcWWMoveStartDelayedDrag, NULL);
+
         return TRUE;
     }
     return FALSE;
@@ -214,6 +233,10 @@ static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpoint
     {
         // check displacement with respect to drag start
         const int distance=abs(qtcWMMoveLastX - event->x_root) + abs(qtcWMMoveLastY - event->y_root);
+
+        if( distance > 0)
+            qtcWMMoveStopTimer();
+
         if(distance < qtSettings.startDragDist)
             return FALSE;
         qtcWMMoveTrigger(widget, event->x_root, event->y_root);

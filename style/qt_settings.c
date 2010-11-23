@@ -364,8 +364,8 @@ enum
     RD_MENU_FONT         = 0x004000,
     RD_TB_FONT           = 0x008000,
 
-    RD_DRAG_DIST         = 0x010000
-    //RD_DRAG_TIME         = 0x020000
+    RD_DRAG_DIST         = 0x010000,
+    RD_DRAG_TIME         = 0x020000
 };
 
 /*
@@ -975,14 +975,12 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                 qtSettings.startDragDist=readInt(line, 14);
                 found|=RD_DRAG_DIST;
             }
-            /*
             else if (SECT_KDE==section && rd&RD_DRAG_TIME && !(found&RD_DRAG_TIME) &&
                         0==strncmp_i(line, "StartDragTime=", 14))
             {
                 qtSettings.startDragTime=readInt(line, 14);
                 found|=RD_DRAG_TIME;
             }
-            */
             else if(rd&RD_LIST_COLOR && !(found&RD_LIST_COLOR) &&
                     !kde4 && SECT_GENERAL==section && 0==strncmp_i(line, "alternateBackground=", 20))
             {
@@ -2132,7 +2130,7 @@ static gboolean qtInit()
             for(f=0; 0!=files[f]; ++f)
                 readKdeGlobals(files[f], RD_ICONS|RD_SMALL_ICON_SIZE|RD_TOOLBAR_STYLE|RD_MENU_FONT|RD_TB_FONT|
                                          RD_TOOLBAR_ICON_SIZE|RD_BUTTON_ICONS|RD_LIST_SHADE|
-                                         (qtSettings.qt4 || 0==f ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE|RD_DRAG_DIST // |RD_DRAG_TIME
+                                         (qtSettings.qt4 || 0==f ? RD_KDE4_PAL|RD_FONT|RD_CONTRAST|RD_STYLE|RD_DRAG_DIST|RD_DRAG_TIME
                                                                  : RD_LIST_COLOR),
                                0==f, qtSettings.qt4 || 0==f);
             }
