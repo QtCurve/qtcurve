@@ -67,6 +67,12 @@ static Options opts;
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+
+static gboolean isFakeGtk()
+{
+    return isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app;
+}
+
 #include "animation.c"
 #include "menu.c"
 #include "tab.c"
@@ -77,6 +83,7 @@ static Options opts;
 #include "combobox.c"
 #include "scrolledwindow.c"
 #include "wmmove.c"
+
 #include "pixmaps.h"
 #include "config.h"
 #include <cairo.h>
@@ -3698,7 +3705,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     }
 #endif
 
-    if(!isMozilla() && opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && widget && (DETAIL("base") || DETAIL("eventbox") || DETAIL("viewportbin")))
+    if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && (DETAIL("base") || DETAIL("eventbox") || DETAIL("viewportbin")))
         qtcWMMoveSetup(widget);
         
     if(widget && ((100!=opts.bgndOpacity && GTK_IS_WINDOW(widget)) || (100!=opts.dlgOpacity && GTK_IS_DIALOG(widget))) &&
@@ -3870,7 +3877,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         GdkColor *col=&qtSettings.colors[PAL_ACTIVE][COLOR_TOOLTIP];
         
 #if GTK_CHECK_VERSION(2,9,0)
-        gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+        gboolean nonGtk=isFakeGtk(),
                  rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS),
                  useAlpha=!nonGtk && qtSettings.useAlpha && isRgbaWidget(widget) && compositingActive(widget);
 
@@ -4280,7 +4287,7 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
                     break;
             }
 
-        if(isSpinButton && isFixedWidget(widget) && (isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app))
+        if(isSpinButton && isFixedWidget(widget) && isFakeGtk())
             x--;
 
         if(isSpinButton && !DO_EFFECT)
@@ -4292,7 +4299,7 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
         if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
             state=GTK_STATE_PRELIGHT;
 
-        if(isMenuItem && GTK_ARROW_RIGHT==arrow_type && !isMozilla() && GTK_APP_OPEN_OFFICE!=qtSettings.app)
+        if(isMenuItem && GTK_ARROW_RIGHT==arrow_type && !isFakeGtk())
             x-=2;
 
         {
@@ -4375,7 +4382,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
     g_return_if_fail(style != NULL);
 
-    if(menubar && !isMozilla() && GTK_APP_JAVA!=qtSettings.app && opts.shadeMenubarOnlyWhenActive)
+    if(menubar && !isFakeGtk() && opts.shadeMenubarOnlyWhenActive)
     {
         GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
                 
@@ -4391,7 +4398,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         }
     }
 
-    if (opts.menubarMouseOver && GE_IS_MENU_SHELL(widget) && !isMozilla())
+    if (opts.menubarMouseOver && GE_IS_MENU_SHELL(widget) && !isFakeGtk())
         qtcMenuShellSetup(widget);
 
     CAIRO_BEGIN
@@ -4403,7 +4410,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             GdkRectangle *a=area,
                          b,
                          unified;
-            gboolean     ooOrMoz=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
+            gboolean     ooOrMoz=isFakeGtk();
 
             if(!a && isFixedWidget(widget) && ooOrMoz)
             {
@@ -4638,6 +4645,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 if(GTK_STATE_PRELIGHT==state)
                     drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
 
+                if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR)
+                    qtcWMMoveSetup(widget);
+    
                 if(GTK_IS_TOGGLE_BUTTON(widget))
                 {                       
                     drawArrow(WINDOW_PARAM_VAL style, &qtcPalette.background[5], area, GTK_ARROW_RIGHT,
@@ -5428,7 +5438,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             gboolean    drawGradient=GTK_SHADOW_NONE!=shadow_type && !IS_FLAT(app),
                         fillBackground=menubar && SHADE_NONE!=opts.shadeMenubars;
 
-            if(!isMozilla() && (menubar && opts.windowDrag || (opts.windowDrag>WM_DRAG_MENUBAR)))
+            if((menubar && opts.windowDrag || (opts.windowDrag>WM_DRAG_MENUBAR)))
                 qtcWMMoveSetup(widget);
     
             if(menubar && BLEND_TITLEBAR)
@@ -5545,9 +5555,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     {
         GtkMenuBar *mb=menuitem ? isMenubar(widget, 0) : NULL;
 #if GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
-        gboolean   active_mb=isMozilla() || gdk_pointer_is_grabbed();
+        gboolean   active_mb=isFakeGtk() || gdk_pointer_is_grabbed();
 #else
-        gboolean   active_mb=isMozilla() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE);
+        gboolean   active_mb=isFakeGtk() || (mb ? GTK_MENU_SHELL(mb)->active : FALSE);
 
         // The handling of 'mouse pressed' in the menubar event handler doesn't seem to set the
         // menu as active, therefore the active_mb fails. However the check below works...
@@ -5640,7 +5650,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     {
         double   radius=0.0,
                  alpha=1.0;
-        gboolean nonGtk=isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+        gboolean nonGtk=isFakeGtk(),
                  roundedMenu=/*!comboMenu &&*/ !(opts.square&SQUARE_POPUP_MENUS) && !nonGtk,
                  compsActive=compositingActive(widget),
                  isAlphaWidget=compsActive && isRgbaWidget(widget),
@@ -5694,7 +5704,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
         if(opts.menuStripe && !comboMenu)
         {
-            gboolean mozOo=GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla();
+            gboolean mozOo=isFakeGtk();
             int      stripeWidth=mozOo ? 22 : 21;
 
             // To determine stripe size, we iterate over all menuitems of this menu. If we find a GtkImageMenuItem then
@@ -5819,7 +5829,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         GdkColor *cols=qtcPalette.background;
         int      offset=opts.menuStripe && (isMozilla() || isMenuItem) ? 20 : 0;
 
-        if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
+        if(offset && isFakeGtk())
             offset+=2;
 
         if(isMenuItem && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
@@ -5878,7 +5888,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
         if(!comboList || !DETAIL("viewport"))
         {
             gboolean square=opts.square&SQUARE_POPUP_MENUS,
-                     nonGtk=square || isMozilla() || GTK_APP_OPEN_OFFICE==qtSettings.app || GTK_APP_JAVA==qtSettings.app,
+                     nonGtk=square || isFakeGtk(),
                      composActive=!nonGtk && compositingActive(widget),
                      isAlphaWidget=!nonGtk && composActive && isRgbaWidget(widget),
                      useAlpha=!nonGtk && qtSettings.useAlpha && isAlphaWidget;
@@ -6024,7 +6034,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                  scrolledWindow=DETAIL("scrolled_window"),
                  viewport=!scrolledWindow && detail && NULL!=strstr(detail, "viewport"),
                  drawSquare=(frame && opts.square&SQUARE_FRAME) || (!viewport && !scrolledWindow && !detail && !widget),
-                 statusBar=isMozilla() || GTK_APP_JAVA==qtSettings.app
+                 statusBar=isFakeGtk()
                             ? frame : isStatusBarFrame(widget),
                  checkScrollViewState=opts.highlightScrollViews && widget && GTK_IS_SCROLLED_WINDOW(widget),
                  isHovered=checkScrollViewState ? qtcScrolledWindowHovered(widget) : FALSE,
@@ -6044,7 +6054,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
         if(!statusBar && !drawSquare && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&
-               (!frame || opts.drawStatusBarFrames || (!isMozilla() && GTK_APP_JAVA!=qtSettings.app)))
+               (!frame || opts.drawStatusBarFrames || !isFakeGtk()))
             {
                 GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
                 gboolean  doBorder=!viewport && !drawSquare,
@@ -6999,7 +7009,7 @@ static void gtkDrawBoxGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
     drawBoxGap(cr, style, GTK_SHADOW_OUT, state, widget, area, x, y,
                width, height, gap_side, gap_x, gap_width, opts.borderTab ? BORDER_LIGHT : BORDER_RAISED, TRUE);
 
-    if(!isMozilla() && opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && widget && DETAIL("notebook"))
+    if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && DETAIL("notebook"))
         qtcWMMoveSetup(widget);
 
     switch(gap_side)
@@ -7966,7 +7976,7 @@ static void gtkDrawHLine(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
         int       offset=opts.menuStripe && (isMozilla() || (widget && GTK_IS_MENU_ITEM(widget))) ? 20 : 0;
         GdkColor *cols=qtcPalette.background;
 
-        if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
+        if(offset && isFakeGtk())
             offset+=2;
 
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
@@ -7976,7 +7986,7 @@ static void gtkDrawHLine(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
                         ? qtcPalette.menu
                         : qtcPalette.background;
 
-        if(offset && (GTK_APP_OPEN_OFFICE==qtSettings.app || isMozilla()))
+        if(offset && isFakeGtk())
             offset+=2;
 
         //drawHLine(cr, CAIRO_COL(qtcPalette.background[MENU_SEP_SHADE]), 1.0, x1<x2 ? x1 : x2, y, abs(x2-x1));

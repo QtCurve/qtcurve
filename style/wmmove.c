@@ -135,7 +135,7 @@ static gboolean qtcWMMoveButtonPress(GtkWidget *widget, GdkEventButton *event, g
     return FALSE;
 }
 
-static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+static gboolean qtcWMMoveDragEnd(GtkWidget *widget)
 {
     if (widget==dragWidget)
     {
@@ -146,6 +146,11 @@ static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event,
     }
 
     return FALSE;
+}
+
+static gboolean qtcWMMoveButtonRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+    return qtcWMMoveDragEnd(widget);
 }
 
 static void qtcWMMoveCleanup(GtkWidget *widget)
@@ -184,7 +189,7 @@ static gboolean qtcWMMoveDestroy(GtkWidget *widget, GdkEvent *event, gpointer us
 
 static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if (dragWidget==widget /*&& qtcIsWindowDragWidget(widget, event)*/)
+    if (dragWidget==widget)
     {
         qtcTriggerWMMove(widget, event->x_root, event->y_root);
         gtk_grab_remove(widget);
@@ -198,20 +203,12 @@ static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpoint
 
 static gboolean qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if (dragWidget==widget)
-    {
-        gtk_grab_remove(widget);
-        gdk_pointer_ungrab(CurrentTime);
-        dragWidget=NULL;
-        return TRUE;
-    }
-
-    return FALSE;
+    return qtcWMMoveDragEnd(widget);
 }
 
 static void qtcWMMoveSetup(GtkWidget *widget)
 {
-    if (qtcIsWindowDragWidget(widget, NULL) && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
+    if (widget && !isFakeGtk() && !qtcIsWindowDragWidget(widget, NULL) && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
     {
         gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_BUTTON1_MOTION_MASK);
         g_object_set_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET", (gpointer)1);
