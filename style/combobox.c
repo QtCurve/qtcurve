@@ -1,9 +1,18 @@
 #define GE_IS_EVENT_BOX(object) ((object) && objectIsA((GObject*)(object), "GtkEventBox"))
 
 /**
- * Setting appears-as-list on a non-editable combo creas a view over the 'label' which
+ * Setting appears-as-list on a non-editable combo creates a view over the 'label' which
  * is of 'base' colour. gtk_cell_view_set_background_color removes this
  */
+static gboolean qtcComboBoxCellViewHasBgnd(GtkWidget *view)
+{
+    GValue val = {0,};
+
+    g_value_init(&val, G_TYPE_BOOLEAN);
+    g_object_get_property(G_OBJECT(view), "background-set", &val);
+    return g_value_get_boolean(&val);
+}
+
 static void qtcComboBoxClearBgndColor(GtkWidget *widget)
 {
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
@@ -13,7 +22,7 @@ static void qtcComboBoxClearBgndColor(GtkWidget *widget)
     {
         GtkWidget *boxChild=(GtkWidget *)child->data;
 
-        if(GTK_IS_CELL_VIEW(boxChild))
+        if(GTK_IS_CELL_VIEW(boxChild) && qtcComboBoxCellViewHasBgnd(boxChild))
             gtk_cell_view_set_background_color(GTK_CELL_VIEW(boxChild), 0L);
     }
 
@@ -53,6 +62,13 @@ static qtcComboBoxIsHovered(GtkWidget *widget)
     return widget==qtcComboHover;
 }
 
+static gboolean qtcComboAppearsAsList(GtkWidget *widget)
+{
+    gboolean rv;
+    gtk_widget_style_get(widget, "appears-as-list", &rv, NULL);
+    return rv;
+}
+
 static void qtcComboBoxCleanup(GtkWidget *widget)
 {
     if (widget && g_object_get_data(G_OBJECT(widget), "QTC_COMBO_BOX_SET"))
@@ -67,8 +83,10 @@ static void qtcComboBoxCleanup(GtkWidget *widget)
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_ENTER_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_LEAVE_ID"));
+/*
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_STATE_CHANGE_ID"));
+*/
         g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_SET");
     }
 }
@@ -113,11 +131,13 @@ static gboolean qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, gpoin
     return FALSE;
 }
 
+/*
 static gboolean qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     if(GTK_IS_CONTAINER(widget))
         qtcComboBoxClearBgndColor(widget);
 }
+*/
 
 static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 {
@@ -126,11 +146,14 @@ static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
         GList *children = gtk_container_get_children(GTK_CONTAINER(frame)),
               *child    = children;
 
-        qtcComboBoxClearBgndColor(combo);
-
         g_object_set_data(G_OBJECT(combo), "QTC_COMBO_BOX_SET", (gpointer)1);
+
+        /*
+         * state-change is not working for me :-(
+        qtcComboBoxClearBgndColor(combo);
         g_object_set_data(G_OBJECT(combo), "QTC_COMBO_BOX_STATE_CHANGE_ID",
                          (gpointer)g_signal_connect(G_OBJECT(combo), "state-change", G_CALLBACK(qtcComboBoxStateChange), NULL));
+        */
 
         for(; child; child=child->next)
         {
@@ -154,4 +177,7 @@ static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
         if(children)
             g_list_free(children);
     }
+
+    if(combo)
+        qtcComboBoxClearBgndColor(combo);
 }
