@@ -1138,7 +1138,8 @@ static gboolean isComboMenu(GtkWidget *widget)
 
 static gboolean isComboFrame(GtkWidget *widget)
 {
-    return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && qtcWidgetGetParent(widget) && GTK_IS_COMBO_BOX(qtcWidgetGetParent(widget));
+    GtkWidget *parent=NULL;
+    return !QTC_COMBO_ENTRY(widget) && GTK_IS_FRAME(widget) && (parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent);
 }
 
 static gboolean isFixedWidget(GtkWidget *widget)

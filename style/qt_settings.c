@@ -2639,7 +2639,10 @@ static gboolean qtInit()
             if(isMozilla())
                 gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBoxEntry::appears-as-list = 0 } class \"*\" style \""RC_SETTING"Mz\"");
             else if(!opts.gtkComboMenus)
-                gtk_rc_parse_string("style \""RC_SETTING"Mz\" { GtkComboBox::appears-as-list = 1 } class \"*\" style \""RC_SETTING"Mz\"");
+            {
+                gtk_rc_parse_string("style \""RC_SETTING"Cmb\" { GtkComboBox::appears-as-list = 1 } class \"*\" style \""RC_SETTING"Cmb\"");
+                gtk_rc_parse_string("style \""RC_SETTING"Cmbf\" { xthickness=5 } widget_class \"*.GtkComboBox.GtkFrame\" style \""RC_SETTING"Cmbf\"");
+            }
 
             if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app || (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()) ||
                (GTK_APP_NEW_MOZILLA==qtSettings.app && mozVersion>=MAKE_VERSION(4, 0)))
