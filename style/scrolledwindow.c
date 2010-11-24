@@ -163,5 +163,7 @@ static void qtcScrolledWindowSetup(GtkWidget *widget)
                     qtcScrolledWindowSetupConnections(child, widget);
             }
         }
+
+        g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET", (gpointer)1);
     }
 }
