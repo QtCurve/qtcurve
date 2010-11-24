@@ -3615,15 +3615,6 @@ static void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, i
     }
 }
 
-static gboolean cellIsOdd(GtkStateType state, const gchar *detail, gint y, gint height)
-{
-    /* For SWT apps, use cell position to determine if is odd, or not */
-    if(GTK_APP_JAVA_SWT!=qtSettings.app || GTK_STATE_SELECTED!=state)
-        return DETAILHAS("cell_odd");
-    else
-        return 0!=y && 0!=((y/height)%2);
-}
-
 static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, AREA_PARAM
                            GtkWidget *widget, const gchar *detail, gint x, gint y, gint width, gint height)
 {
@@ -3764,13 +3755,38 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     {
         gboolean    isCombo=isComboBoxPopupWindow(widget, 0);
         GtkTreeView *treeView=GTK_TREE_VIEW(widget);
+        gboolean    checkRules=opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(treeView),
+                    isEven=checkRules && DETAILHAS("cell_even");
 
-        //if(!isCombo || GTK_STATE_SELECTED!=state)
+        /* SWT seems to draw a 'cell_even', and then 'cell_odd' at the same position. This causes the view painting
+         * to be messed up. Try and hack around this... */
+        if(GTK_APP_JAVA_SWT==qtSettings.app && GTK_STATE_SELECTED==state && checkRules && !isCombo && widget && detail)
+        {
+            static GtkWidget *lastWidget=NULL;
+            static int       lastEven=-1;
+
+            if(DETAILHAS("cell_even"))
+            {
+                lastWidget=widget;
+                lastEven=y;
+            }
+            else if(DETAILHAS("cell_odd"))
+            {
+                if(lastWidget==widget)
+                {
+                    if(y==lastEven)
+                        isEven=TRUE;
+                }
+                lastWidget=NULL;
+                lastEven=-1;
+            }
+        }
+
+        if(!isCombo || GTK_STATE_SELECTED!=state)
             drawAreaColor(cr, area,
-                          getCellCol(haveAlternareListViewCol() &&
-                          (opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(treeView)) && cellIsOdd(state, detail, y, height)
-                              ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
-                              : &style->base[GTK_STATE_NORMAL], detail),
+                          getCellCol(haveAlternateListViewCol() && checkRules && !isEven
+                                        ? &qtSettings.colors[PAL_ACTIVE][COLOR_LV]
+                                        : &style->base[GTK_STATE_NORMAL], detail),
                           x, y, width, height);
 
         if(isCombo)

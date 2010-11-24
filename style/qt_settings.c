@@ -235,7 +235,7 @@ struct QtData
 
 struct QtData qtSettings;
 
-static bool haveAlternareListViewCol()
+static bool haveAlternateListViewCol()
 {
     return 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].red || 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green ||
            0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue;
@@ -2839,7 +2839,7 @@ static gboolean qtInit()
                 static const char *constStrFormat="style \""RC_SETTING"Tree\" "
                                                     "{ GtkTreeView::odd-row-color = \"#%02X%02X%02X\" GtkTreeView::even-row-color = \"#%02X%02X%02X\"} "
                                                     "widget \"*GtkTreeView*\" style \""RC_SETTING"Tree\"";
-                int alt=haveAlternareListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
+                int alt=haveAlternateListViewCol() ? COLOR_LV : COLOR_BACKGROUND;
 
                 tmpStr=(char *)realloc(tmpStr, strlen(constStrFormat)+1);
                 sprintf(tmpStr, constStrFormat,
