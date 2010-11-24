@@ -6053,20 +6053,25 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                  statusBar=isFakeGtk()
                             ? frame : isStatusBarFrame(widget),
                  checkScrollViewState=opts.highlightScrollViews && widget && GTK_IS_SCROLLED_WINDOW(widget),
-                 isHovered=checkScrollViewState ? qtcScrolledWindowHovered(widget) : FALSE,
-                 hasFocus=checkScrollViewState && !isHovered ? qtcScrolledWindowHasFocus(widget) : FALSE;
-        GdkColor *cols=isHovered ? qtcPalette.mouseover
-                                 : hasFocus
-                                    ? qtcPalette.focus
-                                    : qtcPalette.background;
+                 isHovered=FALSE,
+                 hasFocus=FALSE;
+        GdkColor *cols=NULL;
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height,
                                                detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 3);
 
         if(checkScrollViewState)
-            qtcScrolledWindowSetup(widget, NULL);
+        {
+            qtcScrolledWindowSetup(widget);
+            isHovered=qtcScrolledWindowHovered(widget);
+            hasFocus=!isHovered && qtcScrolledWindowHasFocus(widget);
+        }
 
+        cols=isHovered ? qtcPalette.mouseover
+                       : hasFocus
+                            ? qtcPalette.focus
+                            : qtcPalette.background;
         if(!statusBar && !drawSquare && (frame || scrolledWindow || viewport/* || drawSquare*/)) // && ROUNDED)
         {
             if(GTK_SHADOW_NONE!=shadow_type &&

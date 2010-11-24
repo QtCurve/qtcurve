@@ -94,12 +94,12 @@ static gboolean qtcScrolledWindowFocusOut(GtkWidget *widget, GdkEventMotion *eve
     return FALSE;
 }
 
-static void qtcScrolledWindowSetup(GtkWidget *widget, GtkWidget *parent)
+static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *parent)
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET"))
     {
         if(!GTK_IS_TREE_VIEW(widget))
-            gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK);
+            gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK|GDK_FOCUS_CHANGE_MASK);
 
         g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_DESTROY_ID",
@@ -137,5 +137,31 @@ static void qtcScrolledWindowRegisterChild(GtkWidget *child)
     GtkWidget *parent=child ? qtcWidgetGetParent(child) : NULL;
 
     if(parent && GTK_IS_SCROLLED_WINDOW(parent) && g_object_get_data(G_OBJECT(parent), "QTC_SCROLLED_WINDOW_SET"))
-        qtcScrolledWindowSetup(child, parent);
+        qtcScrolledWindowSetupConnections(child, parent);
+}
+
+static void qtcScrolledWindowSetup(GtkWidget *widget)
+{
+    if (widget && GTK_IS_SCROLLED_WINDOW(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET"))
+    {
+        GtkScrolledWindow *scrolledWindow=GTK_SCROLLED_WINDOW(widget);
+        GtkWidget         *child;
+
+        if((child=gtk_scrolled_window_get_hscrollbar(scrolledWindow)))
+            qtcScrolledWindowSetupConnections(child, widget);
+        if((child=gtk_scrolled_window_get_vscrollbar(scrolledWindow)))
+            qtcScrolledWindowSetupConnections(child, widget);
+        if((child=gtk_bin_get_child(GTK_BIN(widget))))
+        {
+            if(GTK_IS_TREE_VIEW(child))
+                qtcScrolledWindowSetupConnections(child, widget);
+            else
+            {
+                const gchar *type=g_type_name(qtcWidgetType(child));
+
+                if(type && (0==strcmp(type, "ExoIconView") || 0==strcmp(type, "GeditView") || 0==strcmp(type, "FMIconContainer")))
+                    qtcScrolledWindowSetupConnections(child, widget);
+            }
+        }
+    }
 }
