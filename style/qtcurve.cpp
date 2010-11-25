@@ -6525,7 +6525,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         font.setBold(true);
 
                     painter->setFont(font);
-                    printf("Draw menu item %s\n", s.toLatin1().constData());
                     painter->drawText(vTextRect, textFlags, s.left(t));
                 }
 
