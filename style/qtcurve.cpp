@@ -26,6 +26,7 @@
 #include "qtcurve.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
+#include "shortcuthandler.h"
 #include "pixmaps.h"
 #include <iostream>
 #define CONFIG_READ
@@ -972,7 +973,8 @@ Style::Style()
 #endif
         itsSViewSBar(0L),
         itsWindowManager(new WindowManager(this)),
-        itsBlurHelper(new BlurHelper(this))
+        itsBlurHelper(new BlurHelper(this)),
+        itsShortcutHandler(new ShortcutHandler(this))
 {
     const char *env=getenv(QTCURVE_PREVIEW_CONFIG);
     if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG))
@@ -1477,7 +1479,7 @@ void Style::polish(QApplication *app)
             opts.lighterPopupMenuBgnd=1; // shade so that we dont have 3d-ish borders...
         opts.menuBgndAppearance=APPEARANCE_FLAT;
     }
-
+    
 #ifndef QTC_QT_ONLY
     if(opts.useQtFileDialogApps.contains(appName))
     {
@@ -1487,6 +1489,10 @@ void Style::polish(QApplication *app)
         qt_filedialog_save_filename_hook=0L;
     }
 #endif
+
+    BASE_STYLE::polish(app);
+    if(opts.hideShortcutUnderline)
+        Utils::addEventFilter(app, itsShortcutHandler);
 }
 
 void Style::polish(QPalette &palette)
@@ -2333,6 +2339,13 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
         if(child->parent() == viewport && QPalette::Window==child->backgroundRole())
             child->setAutoFillBackground(false);
     }
+}
+
+void Style::unpolish(QApplication *app)
+{
+    if(opts.hideShortcutUnderline)
+        app->removeEventFilter(itsShortcutHandler);
+    BASE_STYLE::unpolish(app);
 }
 
 void Style::unpolish(QWidget *widget)
@@ -3436,8 +3449,9 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_Slider_SnapToValue:
         case SH_FontDialog_SelectAssociatedText:
         case SH_Menu_MouseTracking:
-        case SH_UnderlineShortcut:
             return true;
+        case SH_UnderlineShortcut:
+            return widget && opts.hideShortcutUnderline ? itsShortcutHandler->showShortcut(widget) : true;
         case SH_GroupBox_TextLabelVerticalAlignment:
             if (const QStyleOptionGroupBox *frame = qstyleoption_cast<const QStyleOptionGroupBox *>(option))
             {
@@ -6511,6 +6525,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         font.setBold(true);
 
                     painter->setFont(font);
+                    printf("Draw menu item %s\n", s.toLatin1().constData());
                     painter->drawText(vTextRect, textFlags, s.left(t));
                 }
 

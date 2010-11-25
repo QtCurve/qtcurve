@@ -1157,7 +1157,8 @@ typedef struct
                      coloredTbarMo,
                      borderSelection,
                      stripedSbar,
-                     shadePopupMenu;
+                     shadePopupMenu,
+                     hideShortcutUnderline;
     EFrame           groupBox;
     EGlow            glowProgress;
     bool             lvLines;

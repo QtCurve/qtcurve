@@ -2079,6 +2079,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(stripedSbar)
             CFG_READ_INT_BOOL(windowDrag, WM_DRAG_MENUBAR)
             CFG_READ_BOOL(shadePopupMenu)
+            CFG_READ_BOOL(hideShortcutUnderline)
             
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(stdBtnSizes)
@@ -2587,6 +2588,7 @@ static void defaultSettings(Options *opts)
     opts->stripedSbar=false;
     opts->windowDrag=WM_DRAG_NONE;
     opts->shadePopupMenu=false;
+    opts->hideShortcutUnderline=false;
     opts->windowBorder=WINDOW_BORDER_ADD_LIGHT_BORDER|WINDOW_BORDER_FILL_TITLEBAR;
     opts->groupBox=FRAME_FADED;
     opts->gbFactor=DEF_GB_FACTOR;
@@ -3356,6 +3358,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(stripedSbar)
         CFG_WRITE_ENTRY_NUM(windowDrag)
         CFG_WRITE_ENTRY(shadePopupMenu)
+        CFG_WRITE_ENTRY(hideShortcutUnderline)
         CFG_WRITE_ENTRY_NUM(windowBorder)
         CFG_WRITE_ENTRY(tbarBtns)
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)

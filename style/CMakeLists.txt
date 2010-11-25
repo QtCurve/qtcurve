@@ -1,9 +1,9 @@
 if (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp blurhelper.cpp utils.cpp)
-    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h macmenu.h macmenu-dbus.h blurhelper.h)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp)
+    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h macmenu.h macmenu-dbus.h blurhelper.h shortcuthandler.h)
 else (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp blurhelper.cpp utils.cpp)
-    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h blurhelper.h)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp)
+    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h blurhelper.h shortcuthandler.h)
 endif (Q_WS_X11)
 
 add_definitions(-DQT_PLUGIN)

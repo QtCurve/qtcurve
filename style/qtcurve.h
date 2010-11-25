@@ -63,6 +63,7 @@ namespace QtCurve
 {
     class WindowManager;
     class BlurHelper;
+    class ShortcutHandler;
 
 class Style : public QCommonStyle
 {
@@ -150,7 +151,7 @@ class Style : public QCommonStyle
 #endif
     void polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlacesView=false) const;
 
-    void unpolish(QApplication *app) { BASE_STYLE::unpolish(app); }
+    void unpolish(QApplication *app);
     void unpolish(QWidget *widget);
     bool eventFilter(QObject *object, QEvent *event);
     void timerEvent(QTimerEvent *event);
@@ -362,6 +363,7 @@ class Style : public QCommonStyle
 #endif
     QtCurve::WindowManager             *itsWindowManager;
     QtCurve::BlurHelper                *itsBlurHelper;
+    QtCurve::ShortcutHandler           *itsShortcutHandler;
 };
 
 }
