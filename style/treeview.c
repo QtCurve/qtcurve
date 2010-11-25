@@ -150,8 +150,9 @@ static gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, G
 
 static gboolean qtcTreeViewMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if(GE_IS_TREEVIEW(widget))
+    if(event && event->window && GTK_IS_TREE_VIEW(widget) && gtk_tree_view_get_bin_window(GTK_TREE_VIEW(widget)) == event->window)
         qtcTreeViewUpdatePosition(widget, (int)event->x, (int)event->y);
+
     return FALSE;
 }
 

@@ -98,9 +98,7 @@ static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *pare
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET"))
     {
-        if(!GTK_IS_TREE_VIEW(widget))
-            gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK|GDK_FOCUS_CHANGE_MASK);
-
+        gtk_widget_add_events(widget, GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK|GDK_FOCUS_CHANGE_MASK);
         g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_DESTROY_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcScrolledWindowDestroy), parent));
