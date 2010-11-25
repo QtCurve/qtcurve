@@ -2558,6 +2558,8 @@ static gboolean qtInit()
                     g_object_set(settings, "gtk-alternative-button-order", TRUE, NULL);
 
                 gtk_settings_set_long_property(settings, "gtk-menu-popup-delay", opts.menuDelay, "KDE-Settings");
+                if(opts.hideShortcutUnderline && !opts.gtkButtonOrder && NULL==gtk_check_version(2, 20, 0))
+                    g_object_set(settings, "gtk-auto-mnemonics", TRUE, NULL);
             }
 
             if(qtSettings.fonts[FONT_GENERAL])
