@@ -724,6 +724,7 @@ typedef enum
     APPEARANCE_CUSTOM20,
     APPEARANCE_CUSTOM21,
     APPEARANCE_CUSTOM22,
+    APPEARANCE_CUSTOM23,
 
         NUM_CUSTOM_GRAD,
 
@@ -1216,7 +1217,8 @@ typedef struct
                      sunkenAppearance,
                      sbarBgndAppearance,
                      sliderFill,
-                     tooltipAppearance;
+                     tooltipAppearance,
+                     tbarBtnAppearance;
     EShade           shadeSliders,
                      shadeMenubars,
                      menuStripe,
@@ -1785,6 +1787,8 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #endif
         case WIDGET_SPIN:
             return MODIFY_AGUA(opts->appearance);
+        case WIDGET_TOOLBAR_BUTTON:
+            return APPEARANCE_NONE==opts->tbarBtnAppearance ? opts->appearance : opts->tbarBtnAppearance;
         default:
             break;
     }

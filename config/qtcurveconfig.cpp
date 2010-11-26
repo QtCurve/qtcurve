@@ -531,7 +531,7 @@ static void insertShadeEntries(QComboBox *combo, ShadeWidget sw)
         combo->insertItem(SHADE_WINDOW_BORDER, uiString(SHADE_WINDOW_BORDER, sw));
 }
 
-static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
+static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC, bool sameAsApp=false)
 {
     if(app>=APPEARANCE_CUSTOM1 && app<(APPEARANCE_CUSTOM1+NUM_CUSTOM_GRAD))
         return i18n("Custom gradient %1", (app-APPEARANCE_CUSTOM1)+1);
@@ -559,7 +559,7 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
                     return i18n("Striped");
                 default:
                 case APP_ALLOW_NONE:
-                    return i18n("None");
+                    return sameAsApp ? i18n("Same as general appearance") : i18n("None");
             }
         case APPEARANCE_FILE:
             return i18n("Tiled image");
@@ -568,7 +568,7 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC)
     }
 }
 
-static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_BASIC)
+static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_BASIC, bool sameAsApp=false)
 {
     int max=APP_ALLOW_BASIC==allow
                 ? APPEARANCE_FADE
@@ -577,7 +577,7 @@ static void insertAppearanceEntries(QComboBox *combo, EAppAllow allow=APP_ALLOW_
                     : APPEARANCE_FADE+1;
 
     for(int i=APPEARANCE_CUSTOM1; i<max; ++i)
-        combo->insertItem(i, uiString((EAppearance)i, allow));
+        combo->insertItem(i, uiString((EAppearance)i, allow, sameAsApp));
 }
 
 static void insertLineEntries(QComboBox *combo,  bool singleDot, bool dashes)
@@ -864,6 +864,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertAppearanceEntries(bgndAppearance, APP_ALLOW_STRIPED);
     insertAppearanceEntries(dwtAppearance);
     insertAppearanceEntries(tooltipAppearance);
+    insertAppearanceEntries(tbarBtnAppearance, APP_ALLOW_NONE, true);
     insertLineEntries(handles, true, true);
     insertLineEntries(sliderThumbs, true, false);
     insertLineEntries(toolbarSeparators, false, false);
@@ -1116,6 +1117,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(boldProgress, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(coloredTbarMo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(tbarBtns, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(tbarBtnAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(borderSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderProgress, SIGNAL(toggled(bool)), SLOT(borderProgressChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(fillProgressChanged()));
@@ -3065,6 +3067,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.boldProgress=boldProgress->isChecked();
     opts.coloredTbarMo=coloredTbarMo->isChecked();
     opts.tbarBtns=(ETBarBtn)tbarBtns->currentIndex();
+    opts.tbarBtnAppearance=(EAppearance)tbarBtnAppearance->currentIndex();
     opts.borderSelection=borderSelection->isChecked();
     opts.forceAlternateLvCols=forceAlternateLvCols->isChecked();
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
@@ -3326,6 +3329,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     coloredTbarMo->setChecked(opts.coloredTbarMo);
     coloredTbarMo_false->setChecked(!opts.coloredTbarMo);
     tbarBtns->setCurrentIndex(opts.tbarBtns);
+    tbarBtnAppearance->setCurrentIndex(opts.tbarBtnAppearance);
     borderSelection->setChecked(opts.borderSelection);
     forceAlternateLvCols->setChecked(opts.forceAlternateLvCols);
     titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
@@ -3714,6 +3718,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          boldProgress->isChecked()!=opts.boldProgress ||
          coloredTbarMo->isChecked()!=opts.coloredTbarMo ||
          tbarBtns->currentIndex()!=opts.tbarBtns ||
+         tbarBtnAppearance->currentIndex()!=opts.tbarBtnAppearance ||
          borderSelection->isChecked()!=opts.borderSelection ||
          forceAlternateLvCols->isChecked()!=opts.forceAlternateLvCols ||
          titlebarAlignment->currentIndex()!=opts.titlebarAlignment ||
