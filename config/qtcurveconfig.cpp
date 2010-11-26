@@ -1053,6 +1053,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(thin_menuitems, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(thin_buttons, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(thin_frames, SIGNAL(toggled(bool)), SLOT(updateChanged()));
+    connect(hideShortcutUnderline, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(customSlidersColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(customMenubarsColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
     connect(customMenuSelTextColor, SIGNAL(changed(const QColor &)), SLOT(updateChanged()));
@@ -2990,6 +2991,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.unifyCombo=unifyCombo->isChecked();
     opts.vArrows=vArrows->isChecked();
     opts.xCheck=xCheck->isChecked();
+    opts.hideShortcutUnderline=hideShortcutUnderline->isChecked();
     opts.crHighlight=crHighlight->value();
     opts.expanderHighlight=expanderHighlight->value();
     opts.crButton=crButton->isChecked();
@@ -3264,6 +3266,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     vArrows->setChecked(opts.vArrows);
     xCheck->setChecked(opts.xCheck);
     xCheck_false->setChecked(!opts.xCheck);
+    hideShortcutUnderline->setChecked(opts.hideShortcutUnderline);
     crHighlight->setValue(opts.crHighlight);
     expanderHighlight->setValue(opts.expanderHighlight);
     crButton->setChecked(opts.crButton);
@@ -3657,6 +3660,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          unifyCombo->isChecked()!=opts.unifyCombo ||
          vArrows->isChecked()!=opts.vArrows ||
          xCheck->isChecked()!=opts.xCheck ||
+         hideShortcutUnderline->isChecked()!=opts.hideShortcutUnderline ||
          crHighlight->value()!=opts.crHighlight ||
          expanderHighlight->value()!=opts.expanderHighlight ||
          crButton->isChecked()!=opts.crButton ||

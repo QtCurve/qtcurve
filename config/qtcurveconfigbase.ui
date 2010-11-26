@@ -71,15 +71,6 @@
      <attribute name="headerMinimumSectionSize">
       <number>10</number>
      </attribute>
-     <attribute name="headerDefaultSectionSize">
-      <number>10</number>
-     </attribute>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="headerMinimumSectionSize">
-      <number>10</number>
-     </attribute>
      <column>
       <property name="text">
        <string notr="true"/>
@@ -439,6 +430,13 @@
             </property>
             <property name="text">
              <string>Thinner frames, edit boxes, etc.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="hideShortcutUnderline">
+            <property name="text">
+             <string>Hide shortcut underline until 'Alt' key is pressed.</string>
             </property>
            </widget>
           </item>
@@ -4463,6 +4461,7 @@
   <tabstop>darkerBorders</tabstop>
   <tabstop>fadeLines</tabstop>
   <tabstop>thin_frames</tabstop>
+  <tabstop>hideShortcutUnderline</tabstop>
   <tabstop>round</tabstop>
   <tabstop>squareEntry</tabstop>
   <tabstop>squareProgress</tabstop>

@@ -22,6 +22,7 @@
 */
 
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 class QWidget;
 
 namespace QtCurve
@@ -37,17 +38,23 @@ class ShortcutHandler : public QObject
     virtual ~ShortcutHandler();
 
     bool hasSeenAlt(const QWidget *widget) const; 
-    bool isAltDown() const { return altDown; } 
+    bool isAltDown() const { return itsAltDown; }
     bool showShortcut(const QWidget *widget) const;
+
+    private Q_SLOTS:
+
+    void widgetDestroyed(QObject *o);
 
     protected:
 
+    void updateWidget(QWidget *w);
     bool eventFilter(QObject *watched, QEvent *event);
 
     private:
 
-    bool             altDown;
-    QList<QWidget *> seenAlt;
+    bool            itsAltDown;
+    QSet<QWidget *> itsSeenAlt,
+                    itsUpdated;
 };
 
 }

@@ -41,20 +41,34 @@ bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
         
         while(w)
         {
-            if(seenAlt.contains((QWidget *)w))
+            if(itsSeenAlt.contains((QWidget *)w))
                 return true;
             w=w->parentWidget();
         }
     }
     widget = widget->window();
-    return seenAlt.contains((QWidget *)widget);
+    return itsSeenAlt.contains((QWidget *)widget);
 }
 
 bool ShortcutHandler::showShortcut(const QWidget *widget) const
 {
-    return altDown && hasSeenAlt(widget);
+    return itsAltDown && hasSeenAlt(widget);
 }
-                
+
+void ShortcutHandler::widgetDestroyed(QObject *o)
+{
+    itsUpdated.remove(static_cast<QWidget *>(o));
+}
+
+void ShortcutHandler::updateWidget(QWidget *w)
+{
+    if(!itsUpdated.contains(w))
+    {
+        itsUpdated.insert(w);
+        w->update();
+    }
+}
+
 bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
 {
     if (!o->isWidgetType())
@@ -66,56 +80,57 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
         case QEvent::KeyPress:
             if (static_cast<QKeyEvent *>(e)->key() == Qt::Key_Alt) 
             {
-                altDown = true;
+                itsAltDown = true;
                 if(qobject_cast<QMenu *>(widget))
                 {
                     QWidget *w=widget;
                     
                     while(w)
                     {
-                        seenAlt.append(w);
-                        w->update();
+                        itsSeenAlt.insert(w);
+                        updateWidget(w);
                         w=w->parentWidget();
                     }
                     if(!widget->parentWidget())
                     {
-                        seenAlt.append(QApplication::activeWindow());
-                        QApplication::activeWindow()->update();
+                        itsSeenAlt.insert(QApplication::activeWindow());
+                        updateWidget(QApplication::activeWindow());
                     }
                 }
                 widget = widget->window();
-                seenAlt.append(widget);
-                widget->update();
+                itsSeenAlt.insert(widget);
                 QList<QWidget *> l = qFindChildren<QWidget *>(widget);
                 for (int pos=0 ; pos < l.size() ; ++pos) 
                 {
                     QWidget *w = l.at(pos);
-                    if (!(w->isWindow() || !w->isVisible() ||
-                        w->style()->styleHint(QStyle::SH_UnderlineShortcut, 0, w)))
-                        l.at(pos)->update();
+                    if (!(w->isWindow() || !w->isVisible())) // || w->style()->styleHint(QStyle::SH_UnderlineShortcut, 0, w)))
+                        updateWidget(w);
                 }
 
                 QList<QMenuBar *> m = qFindChildren<QMenuBar *>(widget);
                 for (int i = 0; i < m.size(); ++i)
-                    m.at(i)->update();
+                    updateWidget(m.at(i));
             }
             break;
         case QEvent::KeyRelease:
             if (static_cast<QKeyEvent*>(e)->key() == Qt::Key_Alt)
             {
-                altDown = false;
-                QList<QWidget *>::Iterator it(seenAlt.begin()),
-                                           end(seenAlt.end());
+                itsAltDown = false;
+                QSet<QWidget *>::ConstIterator it(itsUpdated.constBegin()),
+                                               end(itsUpdated.constEnd());
                                            
                 for (; it!=end; ++it)
                     (*it)->update();
-                seenAlt.empty();
+                itsSeenAlt.clear();
+                itsUpdated.clear();
+                // TODO: If menu is popuped up, it doesn't clear underlines...
             }
             break;
         case QEvent::Close:
             // Reset widget when closing
-            seenAlt.removeAll(widget);
-            seenAlt.removeAll(widget->window());
+            itsSeenAlt.remove(widget);
+            itsUpdated.remove(widget);
+            itsSeenAlt.remove(widget->window());
             break;
         default:
             break;
