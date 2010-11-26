@@ -2,7 +2,7 @@
 -----
  1. Add option to not display keyboard shortcurt underline until 'Alt' is
     pressed.
- 2. Add option to specify appearance of toolbar buttons.
+ 2. Add options to specify appearance of toolbar buttons.
  3. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
  4. Use windows style scrollbars for Firefox 4
  5. Fix painting of alternate listview rows in SWT apps. For some reason even

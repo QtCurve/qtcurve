@@ -1853,14 +1853,16 @@ static void drawGlowReal(cairo_t *cr, GdkRectangle *area, int x, int y, int w, i
     }
 }
 
-static void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y, int w, int h, gboolean raised,
-                     int round, EWidget wid)
+static void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, int y, int w, int h, gboolean raised, int round, EWidget wid)
 {
     double       xd=x+0.5,
                  yd=y+0.5,
                  radius=getRadius(&opts, w, h, wid, RADIUS_ETCH);
     GdkRectangle *a=area,
                  b;
+
+    if(WIDGET_TOOLBAR_BUTTON==wid && && EFFECT_ETCH==opts.tbarBtnEffect)
+        raised=FALSE;
 
     if(WIDGET_COMBO_BUTTON==wid && GTK_APP_OPEN_OFFICE==qtSettings.app && widget && isFixedWidget(qtcWidgetGetParent(widget)))
     {
