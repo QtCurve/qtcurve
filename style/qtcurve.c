@@ -4945,9 +4945,9 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                             drawFadedLine(cr, xo, yo+constSpace, 1, ho-(2*constSpace), &btn_colors[0], area, NULL, TRUE, TRUE, FALSE);
                         if(yAdjust)
                             drawFadedLine(cr, xo+constSpace, yo, wo-(2*constSpace), 1, &btn_colors[0], area, NULL, TRUE, TRUE, TRUE);
-                        if(wAdjust)
+                        if(wAdjust && ROUNDED_RIGHT!=round)
                             drawFadedLine(cr, xo+wo-1, yo+constSpace, 1, ho-(2*constSpace), &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, FALSE);
-                        if(hAdjust)
+                        if(hAdjust && ROUNDED_BOTTOM!=round)
                             drawFadedLine(cr, xo+constSpace, yo+ho-1, wo-(2*constSpace), 1, &btn_colors[STD_BORDER], area, NULL, TRUE, TRUE, TRUE);
                     }
                 }
