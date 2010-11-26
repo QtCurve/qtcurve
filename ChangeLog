@@ -1,4 +1,4 @@
-1.7.3
+1.8.0
 -----
  1. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
  2. Use windows style scrollbars for Firefox 4
