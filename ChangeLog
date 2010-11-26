@@ -2,22 +2,23 @@
 -----
  1. Add option to not display keyboard shortcurt underline until 'Alt' is
     pressed.
- 2. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
- 3. Use windows style scrollbars for Firefox 4
- 4. Fix painting of alternate listview rows in SWT apps. For some reason even
+ 2. Add option to specify appearance of toolbar buttons.
+ 3. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
+ 4. Use windows style scrollbars for Firefox 4
+ 5. Fix painting of alternate listview rows in SWT apps. For some reason even
     cells are painted twice, once with the correct "cell_XX" setting, and then
     with an incorrect one!
- 5. Fix size of focus indicator in treeviews with SWT apps.
- 6. Use list style pop-up for non-editable combos when not using Gtk-style
+ 6. Fix size of focus indicator in treeviews with SWT apps.
+ 7. Use list style pop-up for non-editable combos when not using Gtk-style
     combos - matches KDE behaviour.
- 7. Fix buttons in chromium's menu - mouse over colour, and text colour when using
+ 8. Fix buttons in chromium's menu - mouse over colour, and text colour when using
     darker colour schemes.
- 8. Remove QTC_CAIRO_1_10_HACK cmake option. For cairo 1.10, an easier fix is to just
+ 9. Remove QTC_CAIRO_1_10_HACK cmake option. For cairo 1.10, an easier fix is to just
     ensure there is no colour stop at 1.0. Thanks to Hugo Pereira Da Costa for
     pointing this out.
- 9. Allow window drag in toolbars and other areas.
-10. Implement hover and focus for *some* scrolled windows.
-11. Add support for KDE4 StartDragDist and StartDragTime config items to control when
+10. Allow window drag in toolbars and other areas.
+11. Implement hover and focus for *some* scrolled windows.
+12. Add support for KDE4 StartDragDist and StartDragTime config items to control when
     window drag starts.
 
 1.7.2
