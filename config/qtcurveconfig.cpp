@@ -559,7 +559,7 @@ static QString uiString(EAppearance app, EAppAllow allow=APP_ALLOW_BASIC, bool s
                     return i18n("Striped");
                 default:
                 case APP_ALLOW_NONE:
-                    return sameAsApp ? i18n("Same as general appearance") : i18n("None");
+                    return sameAsApp ? i18n("Same as general setting") : i18n("None");
             }
         case APPEARANCE_FILE:
             return i18n("Tiled image");
@@ -642,9 +642,9 @@ static void insertToolbarBorderEntries(QComboBox *combo)
     combo->insertItem(TB_DARK_ALL, i18n("Dark (all sides)"));
 }
 
-static void insertEffectEntries(QComboBox *combo)
+static void insertEffectEntries(QComboBox *combo, bool sameAsApp)
 {
-    combo->insertItem(EFFECT_NONE, i18n("Plain"));
+    combo->insertItem(EFFECT_NONE, sameAsApp ? i18n("Same as general setting") : i18n("Plain"));
     combo->insertItem(EFFECT_ETCH, i18n("Etched"));
     combo->insertItem(EFFECT_SHADOW, i18n("Shadowed"));
 }
@@ -875,6 +875,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertMouseOverEntries(coloredMouseOver);
     insertToolbarBorderEntries(toolbarBorders);
     insertEffectEntries(buttonEffect);
+    insertEffectEntries(tbarBtnEffect);
     insertShadingEntries(shading);
     insertStripeEntries(stripedProgress);
     insertSliderStyleEntries(sliderStyle);
@@ -1118,6 +1119,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     connect(coloredTbarMo, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(tbarBtns, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(tbarBtnAppearance, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
+    connect(tbarBtnEffect, SIGNAL(currentIndexChanged(int)), SLOT(updateChanged()));
     connect(borderSelection, SIGNAL(toggled(bool)), SLOT(updateChanged()));
     connect(borderProgress, SIGNAL(toggled(bool)), SLOT(borderProgressChanged()));
     connect(fillProgress, SIGNAL(toggled(bool)), SLOT(fillProgressChanged()));
@@ -3068,6 +3070,7 @@ void QtCurveConfig::setOptions(Options &opts)
     opts.coloredTbarMo=coloredTbarMo->isChecked();
     opts.tbarBtns=(ETBarBtn)tbarBtns->currentIndex();
     opts.tbarBtnAppearance=(EAppearance)tbarBtnAppearance->currentIndex();
+    opts.tbarBtnEffect=(EEffect)tbarBtnEffect->currentIndex();
     opts.borderSelection=borderSelection->isChecked();
     opts.forceAlternateLvCols=forceAlternateLvCols->isChecked();
     opts.titlebarAlignment=(EAlign)titlebarAlignment->currentIndex();
@@ -3330,6 +3333,7 @@ void QtCurveConfig::setWidgetOptions(const Options &opts)
     coloredTbarMo_false->setChecked(!opts.coloredTbarMo);
     tbarBtns->setCurrentIndex(opts.tbarBtns);
     tbarBtnAppearance->setCurrentIndex(opts.tbarBtnAppearance);
+    tbarBtnEffect->setCurrentIndex(opts.tbarBtnEffect);
     borderSelection->setChecked(opts.borderSelection);
     forceAlternateLvCols->setChecked(opts.forceAlternateLvCols);
     titlebarAlignment->setCurrentIndex(opts.titlebarAlignment);
@@ -3719,6 +3723,7 @@ bool QtCurveConfig::settingsChanged(const Options &opts)
          coloredTbarMo->isChecked()!=opts.coloredTbarMo ||
          tbarBtns->currentIndex()!=opts.tbarBtns ||
          tbarBtnAppearance->currentIndex()!=opts.tbarBtnAppearance ||
+         tbarBtnEffect->currentIndex()!=opts.tbarBtnEffect ||
          borderSelection->isChecked()!=opts.borderSelection ||
          forceAlternateLvCols->isChecked()!=opts.forceAlternateLvCols ||
          titlebarAlignment->currentIndex()!=opts.titlebarAlignment ||

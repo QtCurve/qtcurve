@@ -1228,7 +1228,8 @@ typedef struct
                      crColor,
                      progressColor;
     EColor           progressGrooveColor;
-    EEffect          buttonEffect;
+    EEffect          buttonEffect,
+                     tbarBtnEffect;
     EScrollbar       scrollbarType;
     EFocus           focus;
     color            customMenubarsColor,

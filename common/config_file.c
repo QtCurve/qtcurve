@@ -1955,10 +1955,14 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_TB_BORDER(toolbarBorders)
             CFG_READ_APPEARANCE(appearance, APP_ALLOW_BASIC)
             if(opts->version<MAKE_VERSION(1, 8))
+            {
                 opts->tbarBtnAppearance=APPEARANCE_NONE;
+                opts->tbarBtnEffect=EFFECT_NONE;
+            }
             else
             {
                 CFG_READ_APPEARANCE(tbarBtnAppearance, APP_ALLOW_NONE)
+                CFG_READ_EFFECT(tbarBtnEffect);
             }
             CFG_READ_APPEARANCE_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, &(opts->bgndPixmap), checkImages)
             CFG_READ_GRAD_TYPE(bgndGrad)
@@ -2509,6 +2513,7 @@ static void defaultSettings(Options *opts)
     opts->menuBgndGrad=GT_HORIZ;
     opts->appearance=APPEARANCE_SOFT_GRADIENT;
     opts->tbarBtnAppearance=APPEARANCE_NONE;
+    opts->tbarBtnEffect=EFFECT_NONE;
     opts->bgndAppearance=APPEARANCE_FLAT;
     opts->menuBgndAppearance=APPEARANCE_FLAT;
     opts->lvAppearance=APPEARANCE_BEVELLED;
@@ -3254,6 +3259,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
         CFG_WRITE_ENTRY(toolbarBorders)
         CFG_WRITE_APPEARANCE_ENTRY(appearance, APP_ALLOW_BASIC)
         CFG_WRITE_APPEARANCE_ENTRY(tbarBtnAppearance, APP_ALLOW_NONE)
+        CFG_WRITE_ENTRY(tbarBtnEffect)
         CFG_WRITE_APPEARANCE_ENTRY_PIXMAP(bgndAppearance, APP_ALLOW_STRIPED, bgndPixmap)
         CFG_WRITE_ENTRY(bgndGrad)
         CFG_WRITE_ENTRY(menuBgndGrad)

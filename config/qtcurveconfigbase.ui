@@ -3427,7 +3427,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_84">
          <property name="text">
           <string>Colored mouse-over:</string>
@@ -3440,7 +3440,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
           <number>0</number>
@@ -3472,6 +3472,20 @@
         <widget class="QComboBox" name="tbarBtnAppearance">
          <property name="toolTip">
           <string>&lt;p&gt;Defines the gradient used to draw buttons within toolbars.&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_102">
+         <property name="text">
+          <string>Button effect:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QComboBox" name="tbarBtnEffect">
+         <property name="toolTip">
+          <string>&lt;p&gt;Control what effect should be applied to buttons in toolbars.&lt;/p&gt;</string>
          </property>
         </widget>
        </item>
@@ -4670,6 +4684,8 @@
   <tabstop>toolbarSeparators</tabstop>
   <tabstop>toolbarBorders</tabstop>
   <tabstop>tbarBtns</tabstop>
+  <tabstop>tbarBtnAppearance</tabstop>
+  <tabstop>tbarBtnEffect</tabstop>
   <tabstop>coloredTbarMo_false</tabstop>
   <tabstop>coloredTbarMo</tabstop>
   <tabstop>drawStatusBarFrames</tabstop>
