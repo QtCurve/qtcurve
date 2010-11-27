@@ -127,6 +127,7 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                 // TODO: If menu is popuped up, it doesn't clear underlines...
             }
             break;
+        case QEvent::WindowDeactivate:
         case QEvent::Close:
             // Reset widget when closing
             itsSeenAlt.remove(widget);
