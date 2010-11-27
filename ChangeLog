@@ -7,6 +7,7 @@
 4. Fix background rings alignment on kwin borders.
 5. If highlighting scrollviews, and allow mouse-over for entries, also allow
    mouse-over for scrollviews.
+6. Allow rounded list-style combo popups.
 
 1.7.2
 -----

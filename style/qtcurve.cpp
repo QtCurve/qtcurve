@@ -3270,7 +3270,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
         case PM_ButtonDefaultIndicator:
             return 0;
         case PM_DefaultFrameWidth:
-            if ((!opts.popupBorder || opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
+            if ((/*!opts.popupBorder || */opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
                 return opts.gtkComboMenus ? (opts.borderMenuitems || !(opts.square&SQUARE_POPUP_MENUS) ? 2 : 1) : 0;
 
             if ((!opts.gtkScrollViews || (opts.square&SQUARE_SCROLLVIEW)) && isKateView(widget))
@@ -3492,7 +3492,7 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         case SH_ToolButton_PopupDelay:
             return 250;
         case SH_ComboBox_PopupFrameStyle:
-            return opts.popupBorder ? QFrame::StyledPanel|QFrame::Plain : QFrame::NoFrame;
+            return opts.popupBorder || !(opts.square&SQUARE_POPUP_MENUS) ? QFrame::StyledPanel|QFrame::Plain : QFrame::NoFrame;
         case SH_TabBar_Alignment:
             return Qt::AlignLeft;
         case SH_Header_ArrowAlignment:
