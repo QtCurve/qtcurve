@@ -151,7 +151,7 @@ static void qtcScrolledWindowSetup(GtkWidget *widget)
             qtcScrolledWindowSetupConnections(child, widget);
         if((child=gtk_bin_get_child(GTK_BIN(widget))))
         {
-            if(GTK_IS_TREE_VIEW(child))
+            if(GTK_IS_TREE_VIEW(child) || GTK_IS_TEXT_VIEW(child) || GTK_IS_ICON_VIEW(child))
                 qtcScrolledWindowSetupConnections(child, widget);
             else
             {
