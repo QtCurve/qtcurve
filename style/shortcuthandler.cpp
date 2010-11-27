@@ -66,6 +66,7 @@ void ShortcutHandler::updateWidget(QWidget *w)
     {
         itsUpdated.insert(w);
         w->update();
+        connect(w, SIGNAL(destroyed(QObject *)), this, SLOT(widgetDestroyed(QObject *)));
     }
 }
 
