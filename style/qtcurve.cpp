@@ -11388,7 +11388,7 @@ void Style::drawEtch(QPainter *p, const QRect &r, const QWidget *widget,  EWidge
                  br;
     QColor       col(Qt::black);
 
-    if(WIDGET_TOOLBAR_BUTTON==w && && EFFECT_ETCH==opts.tbarBtnEffect)
+    if(WIDGET_TOOLBAR_BUTTON==w && EFFECT_ETCH==opts.tbarBtnEffect)
         raised=false;
 
     buildSplitPath(r, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
