@@ -5904,15 +5904,16 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
     if(comboBoxList || comboList)
     {
-        if(!comboList || !DETAIL("viewport"))
+        gboolean square=opts.square&SQUARE_POPUP_MENUS;
+
+        if((!square || opts.popupBorder) && (!comboList || !DETAIL("viewport")))
         {
-            gboolean square=opts.square&SQUARE_POPUP_MENUS,
-                     nonGtk=square || isFakeGtk(),
+            gboolean nonGtk=square || isFakeGtk(),
                      composActive=!nonGtk && compositingActive(widget),
                      isAlphaWidget=!nonGtk && composActive && isRgbaWidget(widget),
                      useAlpha=!nonGtk && qtSettings.useAlpha && isAlphaWidget;
                  
-            if((composActive && !useAlpha) || (opts.popupBorder && square))
+            if(/*(composActive && !useAlpha) || */(opts.popupBorder && square))
             {
                 drawAreaColor(cr, area, &style->base[state], x, y, width, height);
                 cairo_new_path(cr);
@@ -5932,7 +5933,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                     clearRoundedMask(widget, FALSE);
                 }
                 else
-                   createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, FALSE);
+                    createRoundedMask(cr, widget, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, FALSE);
 
                 clipPathRadius(cr, x, y, width, height, MENU_AND_TOOLTIP_RADIUS, ROUNDED_ALL);
                 drawAreaColor(cr, area, &style->base[state], x, y, width, height);
