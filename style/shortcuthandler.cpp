@@ -26,6 +26,8 @@ namespace QtCurve
 
 ShortcutHandler::ShortcutHandler(QObject *parent)
                : QObject(parent)
+               , itsAltDown(false)
+               , itsHandlePopupsOnly(false)
 {
 }
 
@@ -46,6 +48,8 @@ bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
             w=w->parentWidget();
         }
     }
+    if(itsHandlePopupsOnly)
+        return false;
     widget = widget->window();
     return itsSeenAlt.contains((QWidget *)widget);
 }
@@ -92,25 +96,28 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                         updateWidget(w);
                         w=w->parentWidget();
                     }
-                    if(!widget->parentWidget())
+                    if(!itsHandlePopupsOnly && !widget->parentWidget())
                     {
                         itsSeenAlt.insert(QApplication::activeWindow());
                         updateWidget(QApplication::activeWindow());
                     }
                 }
-                widget = widget->window();
-                itsSeenAlt.insert(widget);
-                QList<QWidget *> l = qFindChildren<QWidget *>(widget);
-                for (int pos=0 ; pos < l.size() ; ++pos) 
+                if(!itsHandlePopupsOnly)
                 {
-                    QWidget *w = l.at(pos);
-                    if (!(w->isWindow() || !w->isVisible())) // || w->style()->styleHint(QStyle::SH_UnderlineShortcut, 0, w)))
-                        updateWidget(w);
-                }
+                    widget = widget->window();
+                    itsSeenAlt.insert(widget);
+                    QList<QWidget *> l = qFindChildren<QWidget *>(widget);
+                    for (int pos=0 ; pos < l.size() ; ++pos) 
+                    {
+                        QWidget *w = l.at(pos);
+                        if (!(w->isWindow() || !w->isVisible())) // || w->style()->styleHint(QStyle::SH_UnderlineShortcut, 0, w)))
+                            updateWidget(w);
+                    }
 
-                QList<QMenuBar *> m = qFindChildren<QMenuBar *>(widget);
-                for (int i = 0; i < m.size(); ++i)
-                    updateWidget(m.at(i));
+                    QList<QMenuBar *> m = qFindChildren<QMenuBar *>(widget);
+                    for (int i = 0; i < m.size(); ++i)
+                        updateWidget(m.at(i));
+                }
             }
             break;
         case QEvent::KeyRelease:
