@@ -1861,7 +1861,7 @@ static void drawEtch(cairo_t *cr, GdkRectangle *area, GtkWidget *widget, int x, 
     GdkRectangle *a=area,
                  b;
 
-    if(WIDGET_TOOLBAR_BUTTON==wid && && EFFECT_ETCH==opts.tbarBtnEffect)
+    if(WIDGET_TOOLBAR_BUTTON==wid && EFFECT_ETCH==opts.tbarBtnEffect)
         raised=FALSE;
 
     if(WIDGET_COMBO_BUTTON==wid && GTK_APP_OPEN_OFFICE==qtSettings.app && widget && isFixedWidget(qtcWidgetGetParent(widget)))
