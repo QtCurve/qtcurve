@@ -17,9 +17,12 @@
     ensure there is no colour stop at 1.0. Thanks to Hugo Pereira Da Costa for
     pointing this out.
 10. Allow window drag in toolbars and other areas.
-11. Implement hover and focus for *some* scrolled windows.
+11. Implement hover and focus for scrolled windows.
 12. Add support for KDE4 StartDragDist and StartDragTime config items to control when
     window drag starts.
+13. Fix rounded border of combo popups when configured to not draw border and be
+    square.
+14. Use configure-event, and not resize-request, to detect window size changes.
 
 1.7.2
 -----

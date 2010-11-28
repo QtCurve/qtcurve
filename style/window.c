@@ -5,13 +5,63 @@
 
 static GtkWidget *qtcCurrentActiveWindow=NULL;
 
+typedef struct
+{
+    int       width, 
+              height,
+              timer;
+    GtkWidget *widget;
+    gboolean  locked;
+} QtCWindow;
+
+static GHashTable *qtcWindowTable=NULL;
+
+static QtCWindow * qtcWindowLookupHash(void *hash, gboolean create)
+{
+    QtCWindow *rv=NULL;
+
+    if(!qtcWindowTable)
+        qtcWindowTable=g_hash_table_new(g_direct_hash, g_direct_equal);
+
+    rv=(QtCWindow *)g_hash_table_lookup(qtcWindowTable, hash);
+
+    if(!rv && create)
+    {
+        rv=(QtCWindow *)malloc(sizeof(QtCWindow));
+        rv->width=rv->height=rv->timer=0;
+        rv->widget=NULL;
+        rv->locked=FALSE;
+        g_hash_table_insert(qtcWindowTable, hash, rv);
+        rv=g_hash_table_lookup(qtcWindowTable, hash);
+    }
+
+    return rv;
+}
+
+static void qtcWindowRemoveFromHash(void *hash)
+{
+    if(tabHashTable)
+    {
+        QtCWindow *tv=qtcWindowLookupHash(hash, FALSE);
+        if(tv)
+        {
+            if(tv->timer)
+                g_source_remove(tv->timer);
+            g_hash_table_remove(qtcWindowTable, hash);
+        }
+    }
+}
+
 static void qtcWindowCleanup(GtkWidget *widget)
 {
     if (widget)
     {
-        if(CUSTOM_BGND)
+        if(!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
+        {
+            qtcWindowRemoveFromHash(widget);
             g_signal_handler_disconnect(G_OBJECT(widget),
-                                        (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_SIZE_REQUEST_ID"));
+                                        (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_CONFIGURE_ID"));
+        }
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_DESTROY_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
@@ -87,62 +137,100 @@ static gboolean qtcWindowIsActive(GtkWidget *widget)
     return widget && (gtk_window_is_active(GTK_WINDOW(widget)) || qtcCurrentActiveWindow==widget);
 }
 
-static gboolean qtcWindowSizeRequest(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+static gboolean qtcWindowSizeRequest(GtkWidget *widget)
 {
-    // Need to invalidate the whole of the window on a resize, as gradient needs to be redone.
     if(widget && (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type))
     {
         GtkAllocation alloc=qtcWidgetGetAllocation(widget);
-        int           size=((alloc.width&0xFFFF)<<16)+(alloc.height&0xFFFF);
-        
-        if(size!=(int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_SIZE"))
+        GdkRectangle  rect;
+
+        rect.x=0;
+        rect.y=0;
+
+        if(IS_FLAT(opts.bgndAppearance) && IMG_NONE!=opts.bgndImage.type)
         {
-            GdkRectangle  rect;
+            EPixPos pos=IMG_FILE==opts.bgndImage.type ? opts.bgndImage.pos : PP_TR;
 
-            rect.x=0;
-            rect.y=0;
+            if(IMG_FILE==opts.bgndImage.type)
+                loadBgndImage(&opts.bgndImage);
 
-            if(IS_FLAT(opts.bgndAppearance) && IMG_NONE!=opts.bgndImage.type)
+            switch(pos)
             {
-                EPixPos pos=IMG_FILE==opts.bgndImage.type ? opts.bgndImage.pos : PP_TR;
-
-                if(IMG_FILE==opts.bgndImage.type)
-                    loadBgndImage(&opts.bgndImage);
-
-                switch(pos)
-                {
-                    case PP_TL:
-                        rect.width=opts.bgndImage.width+1;
-                        rect.height=opts.bgndImage.height+1;
-                        break;
-                    case PP_TM:
-                    case PP_TR:
-                        rect.width=alloc.width;
-                        rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
-                        break;
-                    case PP_LM:
-                    case PP_BL:
-                        rect.width=opts.bgndImage.width+1;
-                        rect.height=alloc.height;
-                        break;
-                    case PP_CENTRED:
-                    case PP_BR:
-                    case PP_BM:
-                    case PP_RM:
-                        rect.width=alloc.width;
-                        rect.height=alloc.height;
-                        break;
-                }
-                if(alloc.width<rect.width)
+                case PP_TL:
+                    rect.width=opts.bgndImage.width+1;
+                    rect.height=opts.bgndImage.height+1;
+                    break;
+                case PP_TM:
+                case PP_TR:
                     rect.width=alloc.width;
-                if(alloc.height<rect.height)
+                    rect.height=(IMG_FILE==opts.bgndImage.type ? opts.bgndImage.height : RINGS_HEIGHT(opts.bgndImage.type))+1;
+                    break;
+                case PP_LM:
+                case PP_BL:
+                    rect.width=opts.bgndImage.width+1;
                     rect.height=alloc.height;
+                    break;
+                case PP_CENTRED:
+                case PP_BR:
+                case PP_BM:
+                case PP_RM:
+                    rect.width=alloc.width;
+                    rect.height=alloc.height;
+                    break;
             }
-            else
-                rect.width=alloc.width, rect.height=alloc.height;
-            gdk_window_invalidate_rect(qtcWidgetGetWindow(widget), &rect, FALSE);
-            g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_SIZE", (gpointer)size);
+            if(alloc.width<rect.width)
+                rect.width=alloc.width;
+            if(alloc.height<rect.height)
+                rect.height=alloc.height;
         }
+        else
+            rect.width=alloc.width, rect.height=alloc.height;
+        gdk_window_invalidate_rect(qtcWidgetGetWindow(widget), &rect, FALSE);
+    }
+    return FALSE;
+}
+
+static gboolean qtcWindowDelayedUpdate(gpointer user_data)
+{
+    QtCWindow *window=(QtCWindow *)user_data;
+    
+    if(window)
+    {
+        if(window->locked)
+        {
+            window->locked = FALSE;
+            return TRUE;
+        }
+        else
+        {
+            g_source_remove(window->timer);
+            window->timer=0;
+            // otherwise, trigger update
+            qtcWindowSizeRequest(window->widget);
+            return FALSE;
+        }
+    }
+    
+    return FALSE;
+}
+
+static gboolean qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
+{
+    QtCWindow *window=(QtCWindow *)user_data;
+    
+    if(window && (event->width != window->width || event->height != window->height))
+    {
+        window->width = event->width;
+        window->height = event->height;
+
+        // schedule delayed timeOut
+        if(!window->timer)
+        {
+            window->timer=g_timeout_add(50, (GSourceFunc)qtcWindowDelayedUpdate, window);
+            window->locked = FALSE;
+        }
+        else
+            window->locked = TRUE;
     }
     return FALSE;
 }
@@ -375,8 +463,19 @@ static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
     {
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET", (gpointer)1);
         if(!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type)
-            g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_SIZE_REQUEST_ID",
-                              (gpointer)g_signal_connect(G_OBJECT(widget), "size-request", G_CALLBACK(qtcWindowSizeRequest), NULL));
+        {
+            QtCWindow *window=qtcWindowLookupHash(widget, TRUE);
+            if(window)
+            {
+                GtkAllocation alloc=qtcWidgetGetAllocation(widget);
+
+                g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_CONFIGURE_ID",
+                                  (gpointer)g_signal_connect(G_OBJECT(widget), "configure-event", G_CALLBACK(qtcWindowConfigure), window));
+                window->width=alloc.width;
+                window->height=alloc.height;
+                window->widget=widget;
+            }
+        }
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_DESTROY_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcWindowDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID",
