@@ -642,7 +642,7 @@ static void insertToolbarBorderEntries(QComboBox *combo)
     combo->insertItem(TB_DARK_ALL, i18n("Dark (all sides)"));
 }
 
-static void insertEffectEntries(QComboBox *combo, bool sameAsApp)
+static void insertEffectEntries(QComboBox *combo, bool sameAsApp=false)
 {
     combo->insertItem(EFFECT_NONE, sameAsApp ? i18n("Same as general setting") : i18n("Plain"));
     combo->insertItem(EFFECT_ETCH, i18n("Etched"));
@@ -875,7 +875,7 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
     insertMouseOverEntries(coloredMouseOver);
     insertToolbarBorderEntries(toolbarBorders);
     insertEffectEntries(buttonEffect);
-    insertEffectEntries(tbarBtnEffect);
+    insertEffectEntries(tbarBtnEffect, true);
     insertShadingEntries(shading);
     insertStripeEntries(stripedProgress);
     insertSliderStyleEntries(sliderStyle);
