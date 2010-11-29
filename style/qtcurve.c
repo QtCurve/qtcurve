@@ -8358,7 +8358,7 @@ static void gtkDrawExpander(GtkStyle *style, WINDOW_PARAM GtkStateType state, AR
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state, detail ? detail : "NULL"),
                                     debugDisplayWidget(widget, 5);
 
-    gboolean isExpander=widget && GTK_IS_EXPANDER(widget),
+    gboolean isExpander=widget && (GTK_IS_EXPANDER(widget) || GTK_IS_TREE_VIEW(widget)),
              fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;
     GdkColor *col=isExpander && opts.coloredMouseOver && GTK_STATE_PRELIGHT==state
                     ? &qtcPalette.mouseover[ARROW_MO_SHADE]

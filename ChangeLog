@@ -4,27 +4,28 @@
     pressed.
  2. Add options to specify appearance of toolbar buttons.
  3. Allow to use popup menu shade factor when colouring as per menubar.
- 4. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
- 5. Use windows style scrollbars for Firefox 4
- 6. Fix painting of alternate listview rows in SWT apps. For some reason even
+ 4. Colour listview arrows on mouse-over.
+ 5. Fix scrollbar background gradient in flat scrollbar buttons with firefox.
+ 6. Use windows style scrollbars for Firefox 4
+ 7. Fix painting of alternate listview rows in SWT apps. For some reason even
     cells are painted twice, once with the correct "cell_XX" setting, and then
     with an incorrect one!
- 7. Fix size of focus indicator in treeviews with SWT apps.
- 8. Use list style pop-up for non-editable combos when not using Gtk-style
+ 8. Fix size of focus indicator in treeviews with SWT apps.
+ 9. Use list style pop-up for non-editable combos when not using Gtk-style
     combos - matches KDE behaviour.
- 9. Fix buttons in chromium's menu - mouse over colour, and text colour when using
+10. Fix buttons in chromium's menu - mouse over colour, and text colour when using
     darker colour schemes.
-10. Remove QTC_CAIRO_1_10_HACK cmake option. For cairo 1.10, an easier fix is to just
+11. Remove QTC_CAIRO_1_10_HACK cmake option. For cairo 1.10, an easier fix is to just
     ensure there is no colour stop at 1.0. Thanks to Hugo Pereira Da Costa for
     pointing this out.
-11. Allow window drag in toolbars and other areas.
-12. Implement hover and focus for scrolled windows.
-13. Add support for KDE4 StartDragDist and StartDragTime config items to control when
+12. Allow window drag in toolbars and other areas.
+13. Implement hover and focus for scrolled windows.
+14. Add support for KDE4 StartDragDist and StartDragTime config items to control when
     window drag starts.
-14. Fix rounded border of combo popups when configured to not draw border and be
+15. Fix rounded border of combo popups when configured to not draw border and be
     square.
-15. Use configure-event, and not resize-request, to detect window size changes.
-16. Fix splitter background when highlight set to 0.
+16. Use configure-event, and not resize-request, to detect window size changes.
+17. Fix splitter background when highlight set to 0.
 
 1.7.2
 -----
