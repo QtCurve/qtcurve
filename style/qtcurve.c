@@ -3761,6 +3761,9 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         gboolean    checkRules=opts.forceAlternateLvCols || gtk_tree_view_get_rules_hint(treeView),
                     isEven=checkRules && DETAILHAS("cell_even");
 
+        if(GTK_APP_JAVA_SWT==qtSettings.app)
+            area=NULL;
+
         /* SWT seems to draw a 'cell_even', and then 'cell_odd' at the same position. This causes the view painting
          * to be messed up. Try and hack around this... */
         if(GTK_APP_JAVA_SWT==qtSettings.app && GTK_STATE_SELECTED==state && checkRules && !isCombo && widget && detail)
