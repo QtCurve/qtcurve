@@ -8614,18 +8614,17 @@ static void generateColors()
             qtcPalette.check_radio=&opts.customCheckRadioColor;
     }
 
-    if(opts.shadePopupMenu)
-        memcpy(qtcPalette.menu,
-               SHADE_WINDOW_BORDER==opts.shadeMenubars
-                ? qtcPalette.wborder[0]
-                : qtcPalette.menubar, sizeof(GdkColor)*(TOTAL_SHADES+1));
-    else
     {
         GdkColor color;
+        GdkColor *cols=opts.shadePopupMenu
+                            ? SHADE_WINDOW_BORDER==opts.shadeMenubars
+                                ? qtcPalette.wborder[0]
+                                : qtcPalette.menubar
+                            : qtcPalette.background;
         if(opts.lighterPopupMenuBgnd)
-            shade(&opts, &qtcPalette.background[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
+            shade(&opts, &cols[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
         else
-            color=qtcPalette.background[ORIGINAL_SHADE];
+            color=cols[ORIGINAL_SHADE];
         shadeColors(&color, qtcPalette.menu);
     }
 
