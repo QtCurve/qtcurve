@@ -83,7 +83,7 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
     switch(e->type()) 
     {
         case QEvent::KeyPress:
-            if (static_cast<QKeyEvent *>(e)->key() == Qt::Key_Alt) 
+            if (Qt::Key_Alt==static_cast<QKeyEvent *>(e)->key()) 
             {
                 itsAltDown = true;
                 if(qobject_cast<QMenu *>(widget))
@@ -120,8 +120,9 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                 }
             }
             break;
+        case QEvent::WindowDeactivate:
         case QEvent::KeyRelease:
-            if (static_cast<QKeyEvent*>(e)->key() == Qt::Key_Alt)
+            if (QEvent::WindowDeactivate==e->type() || Qt::Key_Alt==static_cast<QKeyEvent*>(e)->key())
             {
                 itsAltDown = false;
                 QSet<QWidget *>::ConstIterator it(itsUpdated.constBegin()),
@@ -134,7 +135,6 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                 // TODO: If menu is popuped up, it doesn't clear underlines...
             }
             break;
-        case QEvent::WindowDeactivate:
         case QEvent::Close:
             // Reset widget when closing
             itsSeenAlt.remove(widget);
