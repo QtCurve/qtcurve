@@ -5856,7 +5856,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                             : itsMdiTextColor
                                         : palette.color(QPalette::WindowText)),
                            shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
-                    int    textOpt(Qt::AlignVCenter|Qt::TextShowMnemonic); // TODO: dwtPosAsPerTitleBar ?
+                    int    textOpt(Qt::AlignVCenter); // TODO: dwtPosAsPerTitleBar ?
 
                     if(opts.dwtSettings&DWT_TEXT_ALIGN_AS_PER_TITLEBAR)
                         switch(opts.titlebarAlignment)
@@ -5889,6 +5889,11 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     else
                         textOpt|=Qt::AlignLeft;
 
+                    if (!styleHint(SH_UnderlineShortcut, dwOpt, widget))
+                        textOpt|=Qt::TextHideMnemonic;
+                    else
+                        textOpt|=Qt::TextShowMnemonic;
+                
                     if((opts.dwtSettings&DWT_EFFECT_AS_PER_TITLEBAR) &&
                        EFFECT_NONE!=opts.titlebarEffect)
                     {
