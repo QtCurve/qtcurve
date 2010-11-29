@@ -127,9 +127,7 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
                             // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
                             // so previous check are invalids :(
                             //
-                            // same for ScrolledWindow, they do not send motion events
-                            // to parents so not usable
-                            else if(GTK_IS_MENU_ITEM(childWidget) || GTK_IS_SCROLLED_WINDOW(childWidget))
+                            else if(GTK_IS_MENU_ITEM(childWidget))
                                 use = false;
                         }
                     }

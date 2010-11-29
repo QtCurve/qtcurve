@@ -157,7 +157,7 @@ static void qtcScrolledWindowSetup(GtkWidget *widget)
             {
                 const gchar *type=g_type_name(qtcWidgetType(child));
 
-                if(type && (0==strcmp(type, "ExoIconView") || 0==strcmp(type, "GeditView") || 0==strcmp(type, "FMIconContainer")))
+                if(type && (0==strcmp(type, "ExoIconView") || 0==strcmp(type, "FMIconContainer")))
                     qtcScrolledWindowSetupConnections(child, widget);
             }
         }
