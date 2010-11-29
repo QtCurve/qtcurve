@@ -241,8 +241,7 @@ class Style : public QCommonStyle
     void shadeColors(const QColor &base, QColor *vals) const;
     const QColor * buttonColors(const QStyleOption *option) const;
     QColor         titlebarIconColor(const QStyleOption *option) const;
-    const QColor * popupMenuCols(const QStyleOption *option) const;
-    const QColor & popupMenuCol(int shade=ORIGINAL_SHADE) const;
+    const QColor * popupMenuCols(const QStyleOption *option=0L) const;
     const QColor * checkRadioColors(const QStyleOption *option) const;
     const QColor * sliderColors(const QStyleOption *option) const;
     const QColor * backgroundColors(const QColor &col) const;
@@ -310,6 +309,7 @@ class Style : public QCommonStyle
                                        itsMenubarCols[TOTAL_SHADES+1],
                                        itsFocusCols[TOTAL_SHADES+1],
                                        itsMouseOverCols[TOTAL_SHADES+1],
+                                       *itsPopupMenuCols,
                                        *itsSliderCols,
                                        *itsDefBtnCols,
                                        *itsComboBtnCols,
@@ -318,7 +318,6 @@ class Style : public QCommonStyle
                                        *itsOOMenuCols,
                                        *itsProgressCols,
                                        itsButtonCols[TOTAL_SHADES+1],
-                                       itsLighterPopupMenuBgndCol,
                                        itsCheckRadioCol;
     bool                               itsSaveMenuBarStatus,
                                        itsSaveStatusBarStatus,

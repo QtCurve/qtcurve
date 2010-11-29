@@ -1660,8 +1660,6 @@ static void checkConfig(Options *opts)
     if(opts->shadePopupMenu && SHADE_NONE==opts->shadeMenubars)
         opts->shadePopupMenu=false;
 
-    if(opts->shadePopupMenu)
-        opts->lighterPopupMenuBgnd=0;
 #ifdef __cplusplus
 
 #if defined QT_VERSION && QT_VERSION >= 0x040000

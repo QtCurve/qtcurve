@@ -945,7 +945,8 @@ Style::Style(const QString &name)
 #else
 Style::Style()
 #endif
-      : itsSliderCols(0L),
+      : itsPopupMenuCols(0L),
+        itsSliderCols(0L),
         itsDefBtnCols(0L),
         itsComboBtnCols(0L),
         itsCheckRadioSelCols(0L),
@@ -1287,15 +1288,10 @@ void Style::init()
 
     setMenuColors(QApplication::palette().color(QPalette::Active, QPalette::Background));
 
-    if(USE_LIGHTER_POPUP_MENU)
-        itsLighterPopupMenuBgndCol=shade(itsBackgroundCols[ORIGINAL_SHADE],
-                                         TO_FACTOR(opts.lighterPopupMenuBgnd));
-
     switch(opts.shadeCheckRadio)
     {
         default:
-            itsCheckRadioCol=QApplication::palette().color(QPalette::Active, opts.crButton
-                                                                                ? QPalette::ButtonText : QPalette::Text);
+            itsCheckRadioCol=QApplication::palette().color(QPalette::Active, opts.crButton ? QPalette::ButtonText : QPalette::Text);
             break;
         case SHADE_BLEND_SELECTED:
         case SHADE_SELECTED:
@@ -1342,10 +1338,10 @@ Style::~Style()
     if(0!=itsProgressBarAnimateTimer)
         killTimer(itsProgressBarAnimateTimer);
 
-    if(itsSidebarButtonsCols &&
-       itsSidebarButtonsCols!=itsSliderCols &&
-       itsSidebarButtonsCols!=itsDefBtnCols)
+    if(itsSidebarButtonsCols && itsSidebarButtonsCols!=itsSliderCols && itsSidebarButtonsCols!=itsDefBtnCols)
         delete [] itsSidebarButtonsCols;
+    if(itsPopupMenuCols && itsPopupMenuCols!=itsMenubarCols && itsPopupMenuCols!=itsBackgroundCols && itsProgressCols!=itsActiveMdiColors)
+        delete [] itsPopupMenuCols;
     if(itsActiveMdiColors && itsActiveMdiColors!=itsHighlightCols && itsActiveMdiColors!=itsBackgroundCols)
         delete [] itsActiveMdiColors;
     if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
@@ -1471,7 +1467,7 @@ void Style::polish(QApplication *app)
         if(opts.useHighlightForMenu && blendOOMenuHighlight(QApplication::palette(), itsHighlightCols[ORIGINAL_SHADE]))
         {
             itsOOMenuCols=new QColor [TOTAL_SHADES+1];
-            shadeColors(tint(popupMenuCol(), itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
+            shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE], itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
         }
         opts.menubarHiding=opts.statusbarHiding=HIDE_NONE;
         opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
@@ -1598,10 +1594,6 @@ void Style::polish(QPalette &palette)
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE],
                    itsButtonCols[ORIGINAL_SHADE]), itsSidebarButtonsCols);
 
-    if(USE_LIGHTER_POPUP_MENU && newGray)
-        itsLighterPopupMenuBgndCol=shade(itsBackgroundCols[ORIGINAL_SHADE],
-                                         TO_FACTOR(opts.lighterPopupMenuBgnd));
-
     switch(opts.shadeCheckRadio)
     {
         default:
@@ -1632,7 +1624,7 @@ void Style::polish(QPalette &palette)
         {
             if(!itsOOMenuCols)
                 itsOOMenuCols=new QColor [TOTAL_SHADES+1];
-            shadeColors(tint(popupMenuCol(), itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
+            shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE], itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
         }
         else if(itsOOMenuCols)
         {
@@ -2055,7 +2047,7 @@ void Style::polish(QWidget *widget)
                qobject_cast<QComboBox *>(p) && !((QComboBox *)(p))->isEditable())
             {
                 QPalette pal(widget->palette());
-                QColor   col(popupMenuCol());
+                QColor   col(popupMenuCols()[ORIGINAL_SHADE]);
 
                 if(!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS))
                     col.setAlphaF(0);
@@ -2086,7 +2078,7 @@ void Style::polish(QWidget *widget)
         {
             QPalette pal(widget->palette());
 
-            pal.setBrush(QPalette::Active, QPalette::Window, popupMenuCol());
+            pal.setBrush(QPalette::Active, QPalette::Window, popupMenuCols()[ORIGINAL_SHADE]);
             widget->setPalette(pal);
             if(opts.shadePopupMenu)
                 setMenuTextColors(widget, false);
@@ -5610,13 +5602,14 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             break;
         }
         case CE_MenuScroller:
-            painter->fillRect(r, popupMenuCol());
-
-            painter->setPen(itsBackgroundCols[STD_BORDER]);
+        {
+            const QColor *use(popupMenuCols());
+            painter->fillRect(r, use[ORIGINAL_SHADE]);
+            painter->setPen(use[STD_BORDER]);
             drawRect(painter, r);
-            drawPrimitive(((state&State_DownArrow) ? PE_IndicatorArrowDown : PE_IndicatorArrowUp),
-                           option, painter, widget);
+            drawPrimitive(((state&State_DownArrow) ? PE_IndicatorArrowDown : PE_IndicatorArrowUp), option, painter, widget);
             break;
+        }
         case CE_RubberBand: // Rubber band used in such things as iconview.
         {
             if(r.width()>0 && r.height()>0)
@@ -11742,7 +11735,7 @@ void Style::drawBackground(QPainter *p, const QWidget *widget, BackgroundType ty
             imgRect=bgndRect;
     }
 
-    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCol(), bgndRect, opacity, type,
+    drawBackground(p, isWindow ? window->palette().window().color() : popupMenuCols()[ORIGINAL_SHADE], bgndRect, opacity, type,
                    BGND_MENU!=type ? opts.bgndAppearance : opts.menuBgndAppearance);
     drawBackgroundImage(p, isWindow, imgRect);
 }
@@ -12949,16 +12942,7 @@ QColor Style::titlebarIconColor(const QStyleOption *option) const
 
 const QColor * Style::popupMenuCols(const QStyleOption *option) const
 {
-    return opts.shadePopupMenu ? menuColors(option, true) : backgroundColors(option);
-}
-
-const QColor & Style::popupMenuCol(int shade) const
-{
-    return opts.shadePopupMenu
-        ? menuColors(0L, true)[ORIGINAL_SHADE]
-        : USE_LIGHTER_POPUP_MENU
-            ? itsLighterPopupMenuBgndCol
-            : itsBackgroundCols[shade];
+    return USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu || !option ? itsPopupMenuCols : backgroundColors(option);
 }
 
 const QColor * Style::checkRadioColors(const QStyleOption *option) const
@@ -13049,6 +13033,21 @@ void Style::setMenuColors(const QColor &bgnd)
         case SHADE_WINDOW_BORDER:
             break;
     }
+
+    QColor *base=opts.shadePopupMenu
+                    ? SHADE_WINDOW_BORDER==opts.shadeMenubars
+                        ? (QColor *)getMdiColors(0L, true) // TODO: option!!!
+                        : itsMenubarCols
+                    : itsBackgroundCols;
+
+    if(USE_LIGHTER_POPUP_MENU)
+    {
+        if(!itsPopupMenuCols)
+            itsPopupMenuCols=new QColor [TOTAL_SHADES+1];
+        shadeColors(shade(base[ORIGINAL_SHADE], TO_FACTOR(opts.lighterPopupMenuBgnd)), itsPopupMenuCols);
+    }
+    else
+        itsPopupMenuCols=base;
 }
 
 void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const
@@ -13071,7 +13070,7 @@ void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const
         }
         else if(opts.shadePopupMenu)
         {
-            pal.setBrush(QPalette::Disabled, QPalette::Foreground, midColor(itsActiveMdiTextColor, popupMenuCol()));
+            pal.setBrush(QPalette::Disabled, QPalette::Foreground, midColor(itsActiveMdiTextColor, popupMenuCols()[ORIGINAL_SHADE]));
             pal.setBrush(QPalette::Disabled, QPalette::Text, pal.brush(QPalette::Disabled, QPalette::Foreground));
         }
             
@@ -13098,7 +13097,7 @@ void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const
         else if(!isMenuBar && opts.shadePopupMenu)
         {
             pal.setBrush(QPalette::Disabled, QPalette::Foreground,
-                         midColor(pal.brush(QPalette::Active, QPalette::Foreground).color(), popupMenuCol()));
+                         midColor(pal.brush(QPalette::Active, QPalette::Foreground).color(), popupMenuCols()[ORIGINAL_SHADE]));
             pal.setBrush(QPalette::Disabled, QPalette::Text, pal.brush(QPalette::Disabled, QPalette::Foreground));
         }
         widget->setPalette(pal);
@@ -13387,12 +13386,12 @@ QColor Style::menuStripeCol() const
         case SHADE_BLEND_SELECTED:
             // Hack! Use opts.customMenuStripeColor to store this setting!
             if(IS_BLACK(opts.customMenuStripeColor))
-                opts.customMenuStripeColor=midColor(itsHighlightCols[ORIGINAL_SHADE], popupMenuCol());
+                opts.customMenuStripeColor=midColor(itsHighlightCols[ORIGINAL_SHADE], popupMenuCols()[ORIGINAL_SHADE]);
             return opts.customMenuStripeColor;
         case SHADE_SELECTED:
             return itsHighlightCols[MENU_STRIPE_SHADE];
         case SHADE_DARKEN:
-            return popupMenuCol(MENU_STRIPE_SHADE);
+            return popupMenuCols()[MENU_STRIPE_SHADE];
     }
 }
 
