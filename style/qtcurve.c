@@ -3866,13 +3866,12 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
             }
         }
     }
-    else if(detail && opts.splitterHighlight && 0==strcmp(detail, QTC_PANED))
+    else if(detail && 0==strcmp(detail, QTC_PANED))
     {
         if(GTK_STATE_PRELIGHT==state && opts.splitterHighlight)
         {
             GdkColor col=shadeColor(&style->bg[state], TO_FACTOR(opts.splitterHighlight));
-            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, &col,
-                              width>height);
+            drawSelectionGradient(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, &col, width>height);
         }
     }
     else if(detail && 0==strcmp(detail, "checkbutton"))

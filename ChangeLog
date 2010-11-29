@@ -23,6 +23,7 @@
 13. Fix rounded border of combo popups when configured to not draw border and be
     square.
 14. Use configure-event, and not resize-request, to detect window size changes.
+15. Fix splitter background when highlight set to 0.
 
 1.7.2
 -----
