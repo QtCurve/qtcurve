@@ -4,11 +4,12 @@
    pressed.
 2. Add options to specify appearance of toolbar buttons.
 3. Allow to use popup menu shade factor when colouring as per menubar.
-4. Allow to force alternate colours for combo-box pop-up menus - matches Gtk.
-5. Fix background rings alignment on kwin borders.
-6. If highlighting scrollviews, and allow mouse-over for entries, also allow
+4. Colour listview arrows on mouse-over.
+5. Allow to force alternate colours for combo-box pop-up menus - matches Gtk.
+6. Fix background rings alignment on kwin borders.
+7. If highlighting scrollviews, and allow mouse-over for entries, also allow
    mouse-over for scrollviews.
-7. Allow rounded list-style combo popups.
+8. Allow rounded list-style combo popups.
 
 1.7.2
 -----

@@ -77,7 +77,7 @@
 #define FIX_DISABLED_ICONS
 
 #define MO_ARROW_X(MO, COL) (state&State_Enabled \
-                                    ? (MO_NONE!=opts.coloredMouseOver && MO \
+                                    ? (MO_NONE!=opts.coloredMouseOver && (MO) \
                                         ? itsMouseOverCols[ARROW_MO_SHADE] \
                                         : palette.color(COL)) \
                                     : palette.color(QPalette::Disabled, COL))
@@ -3933,7 +3933,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                                 ? PE_IndicatorArrowDown
                                                 : reverse
                                                     ? PE_IndicatorArrowLeft
-                                                    : PE_IndicatorArrowRight, palette.text().color());
+                                                    : PE_IndicatorArrowRight, MO_ARROW(QPalette::ButtonText));
             }
 
             const int constStep=/*LV_OLD==*/opts.lvLines
