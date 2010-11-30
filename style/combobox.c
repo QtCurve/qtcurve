@@ -83,10 +83,8 @@ static void qtcComboBoxCleanup(GtkWidget *widget)
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_ENTER_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_LEAVE_ID"));
-/*
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_STATE_CHANGE_ID"));
-*/
         g_object_steal_data(G_OBJECT(widget), "QTC_COMBO_BOX_SET");
     }
 }
@@ -131,13 +129,11 @@ static gboolean qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, gpoin
     return FALSE;
 }
 
-/*
 static gboolean qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     if(GTK_IS_CONTAINER(widget))
         qtcComboBoxClearBgndColor(widget);
 }
-*/
 
 static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 {
@@ -148,12 +144,9 @@ static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 
         g_object_set_data(G_OBJECT(combo), "QTC_COMBO_BOX_SET", (gpointer)1);
 
-        /*
-         * state-change is not working for me :-(
         qtcComboBoxClearBgndColor(combo);
         g_object_set_data(G_OBJECT(combo), "QTC_COMBO_BOX_STATE_CHANGE_ID",
-                         (gpointer)g_signal_connect(G_OBJECT(combo), "state-change", G_CALLBACK(qtcComboBoxStateChange), NULL));
-        */
+                         (gpointer)g_signal_connect(G_OBJECT(combo), "state-changed", G_CALLBACK(qtcComboBoxStateChange), NULL));
 
         for(; child; child=child->next)
         {
@@ -177,7 +170,4 @@ static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
         if(children)
             g_list_free(children);
     }
-
-    if(combo)
-        qtcComboBoxClearBgndColor(combo);
 }
