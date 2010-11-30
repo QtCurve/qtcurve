@@ -7258,7 +7258,8 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
         int         mod=active ? 1 : 0,
                     highlightOffset=opts.highlightTab && opts.round>ROUND_SLIGHT ? 2 : 1,
                     highlightBorder=(opts.round>ROUND_FULL ? 4 : 3),
-                    sizeAdjust=(!active || mozTab) && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0;
+                    sizeAdjust=(!active || mozTab) && TAB_MO_GLOW==opts.tabMouseOver ? 1 : 0,
+                    tabIndex = -1;
         GdkColor    *col=active
                             ? &(style->bg[GTK_STATE_NORMAL]) : &(qtcPalette.background[2]),
                     *selCol1=&qtcPalette.highlight[0],
@@ -7289,7 +7290,7 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
             /* Borrowed from Qt engine... */
             GList     *children=gtk_container_get_children(GTK_CONTAINER(widget));
             int       num_children=children ? g_list_length(children) : 0,
-                      i, sdiff = 10000, pos = -1,
+                      i, sdiff = 10000,
                       first_shown=-1,
                       last_shown=-1;
             GtkWidget *p=widget;
@@ -7312,7 +7313,7 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
                 if ((diff > 0) && (diff < sdiff))
                 {
                     sdiff = diff;
-                    pos=i;
+                    tabIndex=i;
                     p=tab_label;
                 }
 
@@ -7325,12 +7326,12 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
                 }
             }
 
-            if(0==pos || first_shown==pos)
+            if(0==tabIndex || first_shown==tabIndex)
                 firstTab=TRUE;
-            else if(pos==(num_children-1) || (pos==last_shown))
+            else if(tabIndex==(num_children-1) || (tabIndex==last_shown))
                 lastTab=TRUE;
 
-            if(-1!=highlightedTabIndex && pos==highlightedTabIndex && !active)
+            if(-1!=highlightedTabIndex && tabIndex==highlightedTabIndex && !active)
             {
                 highlight=TRUE;
                 col=&(qtcPalette.background[SHADE_2_HIGHLIGHT]);
@@ -7345,8 +7346,12 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
             firstTab=oldLast;
         }
 
-        if(!mozTab && GTK_APP_JAVA!=qtSettings.app && -1==highlightedTabIndex && highlightingEnabled)
-            qtcTabSetup(widget);
+        if(!mozTab && GTK_APP_JAVA!=qtSettings.app)
+        {
+            if(-1==highlightedTabIndex && highlightingEnabled)
+                qtcTabSetup(widget);
+            qtcTabUpdateRect(widget, tabIndex, x, y, width, height);
+        }
 
 /*
         gtk_style_apply_default_background(style, window, widget && !qtcWidgetNoWindow(widget),
