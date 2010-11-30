@@ -1921,7 +1921,9 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
                            gint width, gint height, GdkColor *base, GdkColor *colors, int round, EWidget widget,
                            EBorder borderProfile, int flags, GtkWidget *wid)
 {
-    EAppearance app=widgetApp(widget, &opts);
+    EAppearance app=widgetApp(APPEARANCE_NONE!=opts.tbarBtnAppearance &&
+                              (WIDGET_TOOLBAR_BUTTON==widget || (WIDGET_BUTTON(widget) && isOnToolbar(wid, NULL, 0)))
+                                ? WIDGET_TOOLBAR_BUTTON : widget, &opts);
     gboolean    sunken=flags&DF_SUNKEN,
                 doColouredMouseOver=opts.coloredMouseOver && qtcPalette.mouseover &&
                                   WIDGET_SPIN!=widget && WIDGET_SPIN_DOWN!=widget && WIDGET_SPIN_UP!=widget &&
