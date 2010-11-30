@@ -821,6 +821,20 @@ static bool isHoriz(const QStyleOption *option, EWidget w, bool joinedTBar)
            (WIDGET_BUTTON(w) && (!joinedTBar || (WIDGET_TOOLBAR_BUTTON!=w && WIDGET_NO_ETCH_BTN!=w && WIDGET_MENU_BUTTON!=w)));
 }
 
+static bool isOnToolbar(const QWidget *widget)
+{
+    const QWidget *wid=widget ? widget->parentWidget() : 0L;
+
+    while(wid)
+    {
+        if(qobject_cast<const QToolBar *>(wid) || wid->inherits("Q3ToolBar"))
+            return true;
+        wid=wid->parentWidget();
+    }
+
+    return false;
+}
+
 #define PIXMAP_DIMENSION 10
 
 /*
@@ -5524,7 +5538,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     opts=preview->opts;
 
                     drawLightBevelReal(painter, r, option, widget, ROUNDED_ALL, getFill(option, use, false, false), use,
-                                       true, WIDGET_STD_BUTTON, false, opts.round);
+                                       true, WIDGET_STD_BUTTON, false, opts.round, false);
                     opts=old;
                 }
             }
@@ -10996,8 +11010,10 @@ void Style::drawSunkenBevel(QPainter *p, const QRect &r, const QColor &col) cons
 void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *option, const QWidget *widget, int round, const QColor &fill,
                            const QColor *custom, bool doBorder, EWidget w) const
 {
+    bool onToolbar=APPEARANCE_NONE!=opts.tbarBtnAppearance && (WIDGET_TOOLBAR_BUTTON==w || (WIDGET_BUTTON(w) && isOnToolbar(widget)));
+
     if(WIDGET_PROGRESSBAR==w || WIDGET_SB_BUTTON==w || (WIDGET_SPIN==w && !opts.unifySpin)/* || !itsUsePixmapCache*/)
-        drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round);
+        drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, opts.round, onToolbar);
     else
     {
         static const int constMaxCachePixmap = 128;
@@ -11039,7 +11055,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
         int size((2*endSize)+middleSize);
 
         if(size>constMaxCachePixmap)
-            drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, realRound);
+            drawLightBevelReal(p, r, option, widget, round, fill, custom, doBorder, w, true, realRound, onToolbar);
         else
         {
             QString key;
@@ -11049,7 +11065,8 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
             uint    state(option->state&(State_Raised|State_Sunken|State_On|State_Horizontal|State_HasFocus|State_MouseOver|
                           (WIDGET_MDI_WINDOW_BUTTON==w ? State_Active : State_None)));
 
-            key.sprintf("qtc-%x-%x-%x-%x-%x-%x-%x-%x", w, round, (int)realRound, pixSize.width(), pixSize.height(), state, fill.rgba(), (int)(radius*100));
+            key.sprintf("qtc-%x-%x-%x-%x-%x-%x-%x-%x-%x", w, onToolbar ? 1 : 0, round, (int)realRound, pixSize.width(), pixSize.height(),
+                        state, fill.rgba(), (int)(radius*100));
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
                 pix=QPixmap(pixSize);
@@ -11059,7 +11076,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
                 ERound   oldRound=opts.round;
                 opts.round=realRound;
                 drawLightBevelReal(&pixPainter, QRect(0, 0, pix.width(), pix.height()), option, widget, round, fill, custom,
-                                   doBorder, w, false, realRound);
+                                   doBorder, w, false, realRound, onToolbar);
                 opts.round=oldRound;
                 pixPainter.end();
 
@@ -11099,9 +11116,10 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
 }
 
 void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOption *option, const QWidget *widget, int round,
-                               const QColor &fill, const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound) const
+                               const QColor &fill, const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound,
+                               bool onToolbar) const
 {
-    EAppearance  app(widgetApp(w, &opts, option->state&State_Active));
+    EAppearance  app(widgetApp(onToolbar ? WIDGET_TOOLBAR_BUTTON : w, &opts, option->state&State_Active));
     QRect        r(rOrig);
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
