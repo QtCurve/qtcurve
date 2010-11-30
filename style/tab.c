@@ -84,7 +84,7 @@ static void qtcTabCleanup(GtkWidget *widget)
     { 
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_MOTION_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_LEAVE_ID"));
-//         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_DESTROY_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID"));
@@ -260,8 +260,8 @@ static void qtcTabSetup(GtkWidget *widget)
                           (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcTabMotion), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcTabLeave), NULL));
-//         g_object_set_data(G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID",
-//                           (gpointer)g_signal_connect(G_OBJECT(widget), "page-addded", G_CALLBACK(qtcTabPageAdded), NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID",
+                          (gpointer)g_signal_connect(G_OBJECT(widget), "page-added", G_CALLBACK(qtcTabPageAdded), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcTabDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID",
