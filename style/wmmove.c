@@ -78,68 +78,82 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
     return true;
 }
 
-static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
+static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event)
 {
-    bool use=TRUE;
-    if(GTK_IS_NOTEBOOK(widget)) /* Check if there is a hovered tab */
-    {
-        if(-1!=qtcTabCurrentHoveredIndex(widget))
-            use = false;
-    }
-    else if(GTK_IS_CONTAINER(widget))
-    {
-        GList *containers = NULL;
+    // accept, by default
+    gboolean usable = TRUE;
 
-        containers=g_list_prepend(containers, widget);
+    // get children and check
+    GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
+          *child;
 
-        // Check all widget children for event
-        while(g_list_length(containers))
+    for(child = g_list_first(children); child && usable; child = g_list_next(child))
+    {
+        // cast child to GtkWidget
+        if(GTK_IS_WIDGET(child->data))
         {
-            GtkContainer *c        = GTK_CONTAINER(g_list_nth_data(containers, 0));
-            GList        *children = gtk_container_get_children(GTK_CONTAINER(c)),
-                         *child    = NULL;
+            GtkWidget* childWidget=GTK_WIDGET(child->data);
 
-            for(child = g_list_first(children); child && use; child = g_list_next(child))
+            // check widget state and type
+            if(GTK_STATE_PRELIGHT==gtk_widget_get_state(childWidget))
             {
-                if(child->data && GTK_IS_WIDGET(child->data))
+                // if widget is prelight, we don't need to check where event happen,
+                // any prelight widget indicate we can't do a move
+                usable = false;
+            }
+            else if(!GTK_IS_NOTEBOOK(childWidget) && event && qtcWMMoveWithinWidget(childWidget, event))
+            {
+                GdkWindow *window = gtk_widget_get_window(childWidget);
+                if(window && gdk_window_is_visible(window))
                 {
-                    GtkWidget *childWidget=GTK_WIDGET(child->data);
-
-                    if(GTK_IS_CONTAINER(childWidget))
-                        containers = g_list_prepend(containers, child->data);
-
-                    // if widget is prelight, we don't need to check where event happen,
-                    //  any prelight widget indicate we can't do a move */
-                    if(GTK_STATE_PRELIGHT==qtcWidgetGetState(childWidget))
-                        use = false;
-                    // if event happen in widget
-                    // check not a notebook: event in but notebook don't get it...
-                    else if(!GTK_IS_NOTEBOOK(childWidget) && event && qtcWMMoveWithinWidget(childWidget, event))
+                    // TODO: one could probably check here whether widget is enabled or not,
+                    // and accept if widget is disabled.
+                    if(gtk_widget_get_events(childWidget)&GDK_BUTTON_PRESS_MASK)
                     {
-                        // here deal with notebook: widget may be not visible
-                        GdkWindow *window = gtk_widget_get_window(GTK_WIDGET(childWidget));
-                        if(window && gdk_window_is_visible(window))
-                        {
-                            // widget listening to press event
-                            if(gtk_widget_get_events(GTK_WIDGET(childWidget)) & GDK_BUTTON_PRESS_MASK)
-                                use = false;
-                            // deal with menu item, GtkMenuItem only listen to
-                            // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
-                            // so previous check are invalids :(
-                            //
-                            else if(GTK_IS_MENU_ITEM(childWidget))
-                                use = false;
-                        }
+                        // widget listening to press event
+                        usable = false;
+                    }
+                    else if(GTK_IS_MENU_ITEM(childWidget))
+                    {
+                        // deal with menu item, GtkMenuItem only listen to
+                        // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
+                        // so previous check are invalids :(
+                        usable = false;
                     }
                 }
             }
-            if(children)
-                g_list_free(children);
-            containers = g_list_remove(containers, c);
+
+            // if child is a container and event has been accepted so far, also check it, recursively
+            if(usable && GTK_IS_CONTAINER(childWidget))
+                usable = qtcWMMoveChildrenUseEvent(childWidget, event);
         }
     }
-    
-    return use;
+
+    if(children)
+        g_list_free(children);
+
+    return usable;
+}
+
+static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
+{
+    if(GTK_IS_CONTAINER(widget))
+    {
+        // if widget is a notebook, accept if there is no hovered tab
+        if(GTK_IS_NOTEBOOK(widget))
+        {
+            GtkWidget *parent;
+            if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && GTK_APP_PIDGIN==qtSettings.app &&
+               (parent=qtcWidgetGetParent(widget)) && GTK_IS_BOX(parent) &&
+               (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent))
+                return FALSE;
+            return -1==qtcTabCurrentHoveredIndex(widget);
+        }
+
+        return qtcWMMoveChildrenUseEvent(widget, event);
+    }
+
+    return FALSE;
 }
 
 static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
@@ -232,7 +246,7 @@ static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpoint
         // check displacement with respect to drag start
         const int distance=abs(qtcWMMoveLastX - event->x_root) + abs(qtcWMMoveLastY - event->y_root);
 
-        if( distance > 0)
+        if(distance > 0)
             qtcWMMoveStopTimer();
 
         if(distance < qtSettings.startDragDist)

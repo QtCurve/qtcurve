@@ -143,7 +143,8 @@ typedef enum
     GTK_APP_JAVA,
     GTK_APP_JAVA_SWT,
     GTK_APP_EVOLUTION,
-    GTK_APP_FLASH_PLUGIN
+    GTK_APP_FLASH_PLUGIN,
+    GTK_APP_PIDGIN
     /*GTK_APP_GAIM*/
 } EGtkApp;
 
@@ -2259,6 +2260,8 @@ static gboolean qtInit()
                         0==strcmp(qtSettings.appName, "plugin-container") ||
                         0==strcmp(qtSettings.appName, "npviewer.bin") )
                     qtSettings.app=GTK_APP_FLASH_PLUGIN;
+                else if(0==strcmp(qtSettings.appName, "pidgin"))
+                    qtSettings.app=GTK_APP_PIDGIN;
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }
