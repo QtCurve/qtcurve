@@ -3906,8 +3906,10 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                  rounded=!nonGtk && widget && !(opts.square&SQUARE_TOOLTIPS),
                  useAlpha=!nonGtk && qtSettings.useAlpha && isRgbaWidget(widget) && compositingActive(widget);
 
+#if GTK_CHECK_VERSION(2,12,0)
         if(!nonGtk && !useAlpha && GTK_IS_WINDOW(widget))
             gtk_window_set_opacity(GTK_WINDOW(widget), 0.875);
+#endif
 
         if(rounded)
         {
