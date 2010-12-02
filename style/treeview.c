@@ -1,3 +1,5 @@
+#if GTK_CHECK_VERSION(2, 12, 0)
+
 #define GE_IS_TREEVIEW(object) ((object) && objectIsA((GObject*)(object), "GtkTreeView"))
 
 typedef struct
@@ -223,3 +225,5 @@ static void qtcTreeViewSetup(GtkWidget *widget)
             gtk_tree_view_set_enable_tree_lines(treeView, FALSE);
     }  
 }
+
+#endif // GTK_CHECK_VERSION(2, 12, 0)

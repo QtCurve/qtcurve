@@ -3810,6 +3810,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                    selW=width,
                    factor=0;
 
+#if GTK_CHECK_VERSION(2, 12, 0)
             if(!isFixedWidget(widget))
             {
                 GtkTreePath       *path=NULL;
@@ -3854,6 +3855,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 if(path)
                     gtk_tree_path_free(path);
             }
+#endif
 
             if(GTK_STATE_SELECTED==state || alpha<1.0)
             {

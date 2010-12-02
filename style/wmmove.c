@@ -95,7 +95,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
             GtkWidget* childWidget=GTK_WIDGET(child->data);
 
             // check widget state and type
-            if(GTK_STATE_PRELIGHT==gtk_widget_get_state(childWidget))
+            if(GTK_STATE_PRELIGHT==qtcWidgetGetState(childWidget))
             {
                 // if widget is prelight, we don't need to check where event happen,
                 // any prelight widget indicate we can't do a move
