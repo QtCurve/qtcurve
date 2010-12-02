@@ -2851,6 +2851,9 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 if(!(opts.square&SQUARE_POPUP_MENUS)) // && !isCombo)
                     p.setClipRegion(windowMask(r, opts.round>ROUND_SLIGHT), Qt::IntersectClip);
 
+                // In case the gradient uses alpha, we need to fill with the background colour - this makes it consistent with Gtk.
+                if(100==opts.menuBgndOpacity)
+                    p.fillRect(r, opt.palette.brush(QPalette::Background));
                 drawBackground(&p, widget, BGND_MENU);
                 if(opts.popupBorder)
                 {
@@ -11537,9 +11540,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
             if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
             {
                 pix=QPixmap(QSize(GT_HORIZ==grad ? constPixmapWidth : constPixmapHeight, GT_HORIZ==grad ? constPixmapHeight : constPixmapWidth));
-
-                if(100!=opacity)
-                    pix.fill(Qt::transparent);
+                pix.fill(Qt::transparent);
 
                 QPainter pixPainter(&pix);
 
