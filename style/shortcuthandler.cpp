@@ -91,6 +91,8 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                 {
                     itsSeenAlt.insert(widget);
                     updateWidget(widget);
+                    if(widget->parentWidget() && widget->parentWidget()->window())
+                        itsSeenAlt.insert(widget->parentWidget()->window());
                 }
                 else
                 {
@@ -124,7 +126,6 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                     widget->update();
                 itsSeenAlt.clear();
                 itsUpdated.clear();
-                // TODO: If menu is popuped up, it doesn't clear underlines...
             }
             break;
         case QEvent::Show:
@@ -138,14 +139,33 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
             }
             break;
         case QEvent::Hide:
+            if(qobject_cast<QMenu *>(widget))
+            {
+                itsSeenAlt.remove(widget);
+                itsUpdated.remove(widget);
+                itsOpenMenus.removeAll(widget);
+                if(itsAltDown)
+                {
+                    if(itsOpenMenus.count())
+                        itsOpenMenus.last()->update();
+                    else if(widget->parentWidget() && widget->parentWidget()->window())
+                        widget->parentWidget()->window()->update();
+                }
+            }
+            break;
         case QEvent::Close:
             // Reset widget when closing
             itsSeenAlt.remove(widget);
             itsUpdated.remove(widget);
             itsSeenAlt.remove(widget->window());
             itsOpenMenus.removeAll(widget);
-            if(itsAltDown && itsOpenMenus.count())
-                itsOpenMenus.last()->update();
+            if(itsAltDown)
+            {
+                if(itsOpenMenus.count())
+                    itsOpenMenus.last()->update();
+                else if(widget->parentWidget() && widget->parentWidget()->window())
+                    widget->parentWidget()->window()->update();
+            }
             break;
         default:
             break;
