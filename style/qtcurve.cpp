@@ -1502,11 +1502,7 @@ void Style::polish(QApplication *app)
 
     BASE_STYLE::polish(app);
     if(opts.hideShortcutUnderline)
-    {
-        if(APP_KWIN==theThemedApp)
-            itsShortcutHandler->setHandlePopupsOnly(true);
         Utils::addEventFilter(app, itsShortcutHandler);
-    }
 }
 
 void Style::polish(QPalette &palette)

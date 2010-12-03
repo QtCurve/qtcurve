@@ -27,7 +27,6 @@ namespace QtCurve
 ShortcutHandler::ShortcutHandler(QObject *parent)
                : QObject(parent)
                , itsAltDown(false)
-               , itsHandlePopupsOnly(false)
 {
 }
 
@@ -48,10 +47,10 @@ bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
             w=w->parentWidget();
         }
     }
-    if(itsHandlePopupsOnly)
-        return false;
-    widget = widget->window();
-    return itsSeenAlt.contains((QWidget *)widget);
+    else
+        return itsSeenAlt.contains((QWidget *)(widget->window()));
+
+    return false;
 }
 
 bool ShortcutHandler::showShortcut(const QWidget *widget) const
@@ -88,21 +87,10 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                 itsAltDown = true;
                 if(qobject_cast<QMenu *>(widget))
                 {
-                    QWidget *w=widget;
-                    
-                    while(w)
-                    {
-                        itsSeenAlt.insert(w);
-                        updateWidget(w);
-                        w=w->parentWidget();
-                    }
-                    if(!itsHandlePopupsOnly && !widget->parentWidget())
-                    {
-                        itsSeenAlt.insert(QApplication::activeWindow());
-                        updateWidget(QApplication::activeWindow());
-                    }
+                    itsSeenAlt.insert(widget);
+                    updateWidget(widget);
                 }
-                if(!itsHandlePopupsOnly)
+                else
                 {
                     widget = widget->window();
                     itsSeenAlt.insert(widget);
@@ -130,6 +118,8 @@ bool ShortcutHandler::eventFilter(QObject *o, QEvent *e)
                                            
                 for (; it!=end; ++it)
                     (*it)->update();
+                if(!itsUpdated.contains(widget))
+                    widget->update();
                 itsSeenAlt.clear();
                 itsUpdated.clear();
                 // TODO: If menu is popuped up, it doesn't clear underlines...

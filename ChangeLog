@@ -1,6 +1,8 @@
 1.8.1
 -----
-1. Fix corrupted menus when using a gradient that uses an alpha of less than
+1. Safer handling of hidden shortcut underscore in popup menus. Only keep
+   track of menu widget, not its ancestors.
+2. Fix corrupted menus when using a gradient that uses an alpha of less than
    100.
 
 1.8.0
