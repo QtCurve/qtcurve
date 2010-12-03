@@ -2,7 +2,9 @@
 -----
 1. Safer handling of hidden shortcut underscore in popup menus. Only keep
    track of menu widget, not its ancestors.
-2. Fix corrupted menus when using a gradient that uses an alpha of less than
+2. If hiding keyboard shortcut underlines: Keep track of open popup menus,
+   and only show keyboard short cut for the current one.
+3. Fix corrupted menus when using a gradient that uses an alpha of less than
    100.
 
 1.8.0

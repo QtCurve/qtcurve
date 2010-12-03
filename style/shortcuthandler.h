@@ -23,6 +23,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QList>
+
 class QWidget;
 
 namespace QtCurve
@@ -52,9 +54,10 @@ class ShortcutHandler : public QObject
 
     private:
 
-    bool            itsAltDown;
-    QSet<QWidget *> itsSeenAlt,
-                    itsUpdated;
+    bool             itsAltDown;
+    QSet<QWidget *>  itsSeenAlt,
+                     itsUpdated;
+    QList<QWidget *> itsOpenMenus;
 };
 
 }
