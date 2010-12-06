@@ -8748,7 +8748,8 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                              iconColor(textColor),
                              shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                 QStyleOption opt(*option);
-                QRect        tr(r);
+                QRect        tr(r),
+                             menuRect(subControlRect(CC_TitleBar, titleBar, SC_TitleBarSysMenu, widget));
                 ERound       round=(opts.square&SQUARE_WINDOWS && opts.round>ROUND_SLIGHT) ? ROUND_SLIGHT : opts.round;
                 QColor       borderCol(kwin && option->version==(TBAR_BORDER_VERSION_HACK+2)
                                         ? palette.color(QPalette::Active, QPalette::Shadow)
@@ -8899,16 +8900,25 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                 if(opts.titlebarButtons&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && captionRect!=r)
                 {
+                    bool menuIcon=TITLEBAR_ICON_MENU_BUTTON==opts.titlebarIcon,
+                         menuLeft=menuRect.isValid() && !titleBar->icon.isNull() && menuRect.left()<(r.left()+constWindowMargin+4);
+                    int  height=r.height()-(1+(2*constWindowMargin));
+                                    
                     adjust=1;
                     if(captionRect.left()>(r.left()+constWindowMargin))
-                        drawSunkenBevel(painter, QRect(r.left()+constWindowMargin+1, r.top()+constWindowMargin+1,
-                                                       captionRect.left()-(r.left()+(2*constWindowMargin)),
-                                                       r.height()-(1+(2*constWindowMargin))), titleCols[ORIGINAL_SHADE]);
-
+                    {
+                        int width=captionRect.left()-(r.left()+(2*constWindowMargin));
+                        
+                        if(!(menuIcon && menuLeft) || width>(height+4))
+                            drawSunkenBevel(painter, QRect(r.left()+constWindowMargin+1, r.top()+constWindowMargin+1, width, height), titleCols[ORIGINAL_SHADE]);
+                    }
                     if(captionRect.right()<(r.right()-constWindowMargin))
-                        drawSunkenBevel(painter, QRect(captionRect.right()+constWindowMargin, r.top()+constWindowMargin+1,
-                                                       r.right()-(captionRect.right()+(2*constWindowMargin)),
-                                                       r.height()-(1+(2*constWindowMargin))), titleCols[ORIGINAL_SHADE]);
+                    {
+                        int width=r.right()-(captionRect.right()+(2*constWindowMargin));
+
+                        if(!(menuIcon && !menuLeft) || width>(height+4))
+                            drawSunkenBevel(painter, QRect(captionRect.right()+constWindowMargin, r.top()+constWindowMargin+1, width, height), titleCols[ORIGINAL_SHADE]);
+                    }
                 }
 
                 bool    showIcon=TITLEBAR_ICON_NEXT_TO_TITLE==opts.titlebarIcon && !titleBar->icon.isNull();
@@ -9061,27 +9071,26 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                         if(active || hover || !(opts.titlebarButtons&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW))
                         {
-                            QRect rect = subControlRect(CC_TitleBar, titleBar, SC_TitleBarSysMenu, widget);
-                            if (rect.isValid())
+                            if (menuRect.isValid())
                             {
                                 bool sunken((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_Sunken));
                                 int  offset(sunken ? 1 : 0);
 
 //                                 if(!(opts.titlebarButtons&TITLEBAR_BUTTON_ROUND))
-//                                     drawMdiButton(painter, rect, hover, sunken,
+//                                     drawMdiButton(painter, menuRect, hover, sunken,
 //                                                   coloredMdiButtons(state&State_Active, hover)
 //                                                     ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
 
                                 if (!titleBar->icon.isNull())
-                                    titleBar->icon.paint(painter, rect.adjusted(offset, offset, offset, offset));
+                                    titleBar->icon.paint(painter, menuRect.adjusted(offset, offset, offset, offset));
                                 else
                                 {
                                     QStyleOption tool(0);
 
                                     tool.palette = palette;
-                                    tool.rect = rect;
+                                    tool.rect = menuRect;
                                     painter->save();
-                                    drawItemPixmap(painter, rect.adjusted(offset, offset, offset, offset), Qt::AlignCenter,
+                                    drawItemPixmap(painter, menuRect.adjusted(offset, offset, offset, offset), Qt::AlignCenter,
                                                    standardIcon(SP_TitleBarMenuButton, &tool, widget).pixmap(16, 16));
                                     painter->restore();
                                 }

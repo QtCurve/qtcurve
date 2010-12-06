@@ -6,6 +6,8 @@
    but not for square buttons.
 3. If drawing sunken background behind titlebar buttons, need to reduce size
    of square buttons. This already happens for circular buttons.
+4. Dont draw sunken background around icon based menu button, if it is the
+   only button on the left/right.
 
 1.8.1
 -----

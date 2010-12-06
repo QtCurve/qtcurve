@@ -106,7 +106,7 @@ class QtCurveClient :
     bool                      dropEvent(QDropEvent *e);
     int                       itemClicked(const QPoint &point, bool between=false, bool drag=false);
 #endif
-
+    bool                      onlyMenuIcon(bool left) const;
     QRect                     captionRect() const;
     void                      createSizeGrip();
     void                      deleteSizeGrip();
