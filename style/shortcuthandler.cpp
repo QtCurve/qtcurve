@@ -36,6 +36,9 @@ ShortcutHandler::~ShortcutHandler()
 
 bool ShortcutHandler::hasSeenAlt(const QWidget *widget) const
 {
+    if(widget && !widget->isEnabled())
+        return false;
+
     if(qobject_cast<const QMenu *>(widget))
         return itsOpenMenus.count() && itsOpenMenus.last()==widget;
 //     {
