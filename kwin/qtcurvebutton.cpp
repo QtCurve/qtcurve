@@ -202,7 +202,7 @@ void QtCurveButton::drawButton(QPainter *painter)
             break;
     }
 
-    if (drawFrame && (!(flags&TITLEBAR_BUTTON_ROUND) || MenuButton!=type() || !iconForMenu))
+    if (drawFrame && (/*!(flags&TITLEBAR_BUTTON_ROUND) || */MenuButton!=type() || !iconForMenu))
     {
         QStyleOption opt;
         int          offset=flags&TITLEBAR_BUTTON_ROUND && !itsClient->isToolWindow() ? 1 : 0;

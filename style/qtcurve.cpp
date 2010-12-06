@@ -9067,10 +9067,10 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                 bool sunken((titleBar->activeSubControls&SC_TitleBarSysMenu) && (titleBar->state&State_Sunken));
                                 int  offset(sunken ? 1 : 0);
 
-                                if(!(opts.titlebarButtons&TITLEBAR_BUTTON_ROUND))
-                                    drawMdiButton(painter, rect, hover, sunken,
-                                                  coloredMdiButtons(state&State_Active, hover)
-                                                    ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
+//                                 if(!(opts.titlebarButtons&TITLEBAR_BUTTON_ROUND))
+//                                     drawMdiButton(painter, rect, hover, sunken,
+//                                                   coloredMdiButtons(state&State_Active, hover)
+//                                                     ? itsTitleBarButtonsCols[TITLEBAR_MENU] : btnCols);
 
                                 if (!titleBar->icon.isNull())
                                     titleBar->icon.paint(painter, rect.adjusted(offset, offset, offset, offset));

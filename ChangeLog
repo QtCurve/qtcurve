@@ -1,6 +1,9 @@
 1.8.2
 -----
 1. When hiding shortcuts, only show these if widget is enabled.
+2. Dont draw button frame for menu button if this is where the window icon
+   is to be. This was already the case for circular buttons, but not for
+   square buttons.
 
 1.8.1
 -----
