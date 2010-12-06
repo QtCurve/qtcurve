@@ -122,11 +122,18 @@ void QtCurveToggleButton::drawButton(QPainter *painter)
 
     QRectF       ellipse(r.x()+0.5, r.y()+0.5, r.width(), r.height());
     QColor       bgnd(KDecoration::options()->color(KDecoration::ColorTitleBar, active));
+    bool         round=Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarButtons, 0L, 0L)&TITLEBAR_BUTTON_ROUND;
+    double       squareRad=round || Handler()->wStyle()->pixelMetric((QStyle::PixelMetric)QtC_Round, 0L, 0L)<ROUND_FULL ? 0.0 : 2.0;
     QPainterPath path;
-//    EEffect      effect((EEffect)(style()->pixelMetric((QStyle::PixelMetric)QtC_TitleBarEffect)));
 
     bgnd.setAlphaF(itsHover ? 0.9 : 0.4);
-    path.addEllipse(ellipse);
+    
+    
+    if(round)
+        path.addEllipse(ellipse);
+    else
+        path.addRoundedRect(ellipse, squareRad+0.5, squareRad+0.5);
+
     painter->fillPath(path, bgnd);
     if(sunken)
     {
@@ -135,21 +142,15 @@ void QtCurveToggleButton::drawButton(QPainter *painter)
         painter->fillPath(path, bgnd);
     }
     if(drawBorder)
-        painter->drawEllipse(ellipse);
-
-//    if(EFFECT_ETCH==effect)
-//        effect=EFFECT_SHADOW;
+    {
+        if(round)
+            painter->drawEllipse(ellipse);
+        else
+            painter->drawRoundedRect(ellipse, squareRad, squareRad);
+    }
 
     if(sunken)
         r.adjust(1, 1, 1, 1);
-//     else if (EFFECT_NONE!=effect && itsHover)
-//     {
-//         QColor shadow(WINDOW_SHADOW_COLOR(effect));
-// 
-//         shadow.setAlphaF(WINDOW_TEXT_SHADOW_ALPHA(effect));
-//         painter->setPen(shadow);
-//         painter->drawText(r.adjusted(1, 1, 1, 1), Qt::AlignVCenter|Qt::AlignHCenter, isMenuBar ? i18n("M") : i18n("S"));
-//     }
 
     painter->setPen(col);
     painter->drawText(r, Qt::AlignVCenter|Qt::AlignHCenter, isMenuBar ? i18n("M") : i18n("S"));

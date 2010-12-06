@@ -8,6 +8,8 @@
    of square buttons. This already happens for circular buttons.
 4. Dont draw sunken background around icon based menu button, if it is the
    only button on the left/right.
+5. Draw menubar and statusbar kwin toggle buttons square if using square
+   titlebar buttons.
 
 1.8.1
 -----
