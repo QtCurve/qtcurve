@@ -207,7 +207,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         QStyleOption opt;
         int          offset=flags&TITLEBAR_BUTTON_ROUND && !itsClient->isToolWindow() ? 1 : 0;
 
-        if(flags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND && flags&TITLEBAR_BUTTON_ROUND)
+        if(flags&TITLEBAR_BUTTON_SUNKEN_BACKGROUND) // && flags&TITLEBAR_BUTTON_ROUND)
             offset++;
         opt.init(this);
         opt.rect=QRect(offset, offset, width()-(2*offset), height()-(2*offset));
