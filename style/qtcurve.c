@@ -82,6 +82,7 @@ static gboolean isFakeGtk()
 #include "treeview.c"
 #include "combobox.c"
 #include "scrolledwindow.c"
+#include "scrollbar.c"
 #include "wmmove.c"
 
 #include "pixmaps.h"
@@ -3860,7 +3861,9 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         }
     }
 
-#if 1 // From oxygen-gtk  - required???
+    if(widget && CUSTOM_BGND && (DETAIL("base") || DETAIL("eventbox")))
+        qtcScrollbarSetup(widget);
+
     if(CUSTOM_BGND && DETAIL("viewportbin"))
     {
         GdkColor bg=style->bg[state],
@@ -3870,13 +3873,14 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         // while ccsm options list will remain white. Hope this will work as intended for other apps
         // FIXME: why default style bg isn't the same as unchanged(?) bg in GIMP? If it were, no hack would be needed
         if(bg.red/10000==defbg.red/10000 && bg.green/10000==defbg.green/10000 && bg.blue/10000==defbg.blue/10000)
+        {
             drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
+            qtcScrollbarSetup(widget);
+        }
         else
             parent_class->draw_flat_box(style, WINDOW_PARAM_VAL state, shadow_type, AREA_PARAM_VAL widget, detail, x, y, width, height);
     }
-    else
-#endif
-    if(CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) && !isMenuOrToolTipWindow &&
+    else if(CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) && !isMenuOrToolTipWindow &&
        drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height))
         qtcWindowSetup(widget, GTK_IS_DIALOG(widget) ? opts.dlgOpacity : opts.bgndOpacity);
     else if(widget && GTK_IS_TREE_VIEW(widget))
