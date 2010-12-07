@@ -6199,6 +6199,30 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
                                                detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 10);
 
+
+        if(scrolledWindow && GTK_SHADOW_IN!=shadow_type && widget && GTK_IS_SCROLLED_WINDOW(widget) &&
+           GTK_IS_TREE_VIEW(gtk_bin_get_child(GTK_BIN(widget))))
+            gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(widget), GTK_SHADOW_IN), shadow_type=GTK_SHADOW_IN;
+        else if(frame && !statusBar && GTK_IS_FRAME(widget))
+        {
+            /*
+            check for scrolled windows embedded in frames, that contain a treeview.
+            if found, change the shadowtypes for consistency with normal -sunken- scrolled windows.
+            this should improve rendering of most mandriva drake tools
+            */
+            GtkWidget *child=gtk_bin_get_child(GTK_BIN(widget));
+            if(GTK_IS_SCROLLED_WINDOW(child) && GTK_IS_TREE_VIEW(gtk_bin_get_child(GTK_BIN(child))))
+            {
+                gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_NONE);
+                shadow_type=GTK_SHADOW_NONE;
+
+                // also change scrolled window shadow if needed
+                GtkScrolledWindow *sw=GTK_SCROLLED_WINDOW(child);
+                if(GTK_SHADOW_IN!=gtk_scrolled_window_get_shadow_type(sw))
+                    gtk_scrolled_window_set_shadow_type(sw, GTK_SHADOW_IN);
+            }
+        }
+
         if(checkScrollViewState)
         {
             qtcScrolledWindowSetup(widget);

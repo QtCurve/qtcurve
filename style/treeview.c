@@ -192,6 +192,7 @@ static void qtcTreeViewSetup(GtkWidget *widget)
     {
         QtCTreeView *tv=qtcTreeViewLookupHash(widget, TRUE);
         GtkTreeView *treeView=GTK_TREE_VIEW(widget);
+        GtkWidget   *parent=qtcWidgetGetParent(widget);
 
         if(tv)
         {
@@ -223,6 +224,9 @@ static void qtcTreeViewSetup(GtkWidget *widget)
             gtk_tree_view_set_show_expanders(treeView, TRUE);
         if(gtk_tree_view_get_enable_tree_lines(treeView))
             gtk_tree_view_set_enable_tree_lines(treeView, FALSE);
+
+        if(GTK_IS_SCROLLED_WINDOW(parent) && GTK_SHADOW_IN!=gtk_scrolled_window_get_shadow_type(GTK_SCROLLED_WINDOW(parent)))
+            gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(parent), GTK_SHADOW_IN);
     }  
 }
 
