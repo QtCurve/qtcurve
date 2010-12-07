@@ -2955,13 +2955,24 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
         else
         {
             GdkRectangle  clip;
-            GtkWidget     *topLevel=topLevel=gtk_widget_get_toplevel(widget);
+            GtkWidget     *topLevel=gtk_widget_get_toplevel(widget);
             int           opacity=!topLevel || !GTK_IS_DIALOG(topLevel) ? opts.bgndOpacity : opts.dlgOpacity,
                           xmod=0, ymod=0, wmod=0, hmod=0;
             double        alpha=1.0;
             gboolean      useAlpha=opacity<100 && isRgbaWidget(topLevel) && compositingActive(topLevel),
                           flatBgnd=IS_FLAT_BGND(opts.bgndAppearance);
-
+            GdkColor      *col=NULL;
+            GtkStyle      *topStyle=qtcWidgetGetStyle(topLevel);
+            
+            if(topStyle)
+                col=&topStyle->bg[GTK_STATE_NORMAL];
+            else
+            {
+                col=getParentBgCol(widget);
+                if(!col)
+                    col=&style->bg[GTK_STATE_NORMAL];
+            }
+            
             if(!flatBgnd || BGND_IMG_ON_BORDER)
             {
                 WindowBorders borders=qtcGetWindowBorderSize(FALSE);
@@ -2982,32 +2993,24 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             }
 
             if(flatBgnd)
-            {
-                GdkColor *parent_col=getParentBgCol(widget);
-
-                if(parent_col)
-                    drawAreaColorAlpha(cr, area, parent_col, -wx, -wy, ww, wh, alpha);
-                else if(useAlpha)
-                    drawAreaColorAlpha(cr, area, &style->bg[GTK_STATE_NORMAL], -wx, -wy, ww, wh, alpha);
-            }
+                drawAreaColorAlpha(cr, area, col, -wx, -wy, ww, wh, alpha);
             else if(APPEARANCE_STRIPED==opts.bgndAppearance)
-                drawStripedBgnd(cr, style, area, -wx, -wy, ww, wh, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+                drawStripedBgnd(cr, style, area, -wx, -wy, ww, wh, col, TRUE, alpha);
             else if(APPEARANCE_FILE==opts.bgndAppearance)
             {
                 cairo_save(cr);
                 cairo_translate(cr, xmod, ymod);
-                drawBgndImage(cr, style, area, -wx, -wy, ww, wh, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+                drawBgndImage(cr, style, area, -wx, -wy, ww, wh, col, TRUE, alpha);
                 cairo_restore(cr);
             }
             else
             {
-                drawBevelGradientAlpha(cr, style, area, -wx, -wy, ww, wh+1,
-                                       &style->bg[GTK_STATE_NORMAL], GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
+                drawBevelGradientAlpha(cr, style, area, -wx, -wy, ww, wh+1, col, GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
 
                 if(GT_HORIZ==opts.bgndGrad && GB_SHINE==getGradient(opts.bgndAppearance, &opts)->border)
                 {
                     int             size=MIN(BGND_SHINE_SIZE, MIN(wh*2, ww));
-                    double          alpha=shineAlpha(&style->bg[GTK_STATE_NORMAL]);
+                    double          alpha=shineAlpha(col);
                     cairo_pattern_t *pat=NULL;
 
                     size/=BGND_SHINE_STEPS;
