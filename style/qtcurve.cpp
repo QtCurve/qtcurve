@@ -4635,6 +4635,11 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             {
                 if(r==QRect(0, 0, 14, 15)) // OO.o 3.2 =14x15?
                     rect.adjust(-1, -1, -1, -1);
+                painter->setPen(option ? option->palette.text().color() : QApplication::palette().text().color());
+                drawRect(painter, r);
+                // LibreOffice its 15x15 - and arrow is not centred, so adjust this...
+                if(r==QRect(0, 0, 15, 15))
+                    rect.adjust(-1, -1, -1, -1);
             }
             else
             {

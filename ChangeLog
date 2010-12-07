@@ -10,6 +10,7 @@
    only button on the left/right.
 5. Draw menubar and statusbar kwin toggle buttons square if using square
    titlebar buttons.
+6. Draw box around checked Libre/Open Office menu checkboxes.
 
 1.8.1
 -----
