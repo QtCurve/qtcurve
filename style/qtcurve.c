@@ -3058,7 +3058,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
         qtcEntrySetup(widget);
 
     if((doEtch || ROUND_NONE!=opts.round) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-        if(!IS_FLAT_BGND(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height))
+        if(!IS_FLAT_BGND(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height))
             ;
         else
         {
@@ -3379,7 +3379,7 @@ static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
             col=&qtcPalette.background[2];
     }
 
-    if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height)))
+    if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, window, widget, x, y, width, height)))
         && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
         drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
@@ -5028,8 +5028,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     if(GTK_STATE_INSENSITIVE==state && entry && GTK_STATE_INSENSITIVE!=entryState)
                         state=entryState;
 
-                    drawEntryField(cr, style, state, GDKWINDOW, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
-                                   WIDGET_COMBO_BUTTON);
+                    drawEntryField(cr, style, state, GDKWINDOW, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO_BUTTON);
 
                     // Get entry to redraw by setting its state...
                     // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
