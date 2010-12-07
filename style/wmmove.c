@@ -78,10 +78,10 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
     return true;
 }
 
-static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event)
+static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event, gboolean inNoteBook)
 {
     // accept, by default
-    gboolean usable = TRUE;
+    gboolean usable = true;
 
     // get children and check
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
@@ -101,14 +101,22 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                 // any prelight widget indicate we can't do a move
                 usable = false;
             }
-            else if(!GTK_IS_NOTEBOOK(childWidget) && event && qtcWMMoveWithinWidget(childWidget, event))
+            else if(GTK_IS_NOTEBOOK( childWidget ) )
+            {
+                inNoteBook = true;
+            }
+            else if(event && qtcWMMoveWithinWidget(childWidget, event))
             {
                 GdkWindow *window = gtk_widget_get_window(childWidget);
                 if(window && gdk_window_is_visible(window))
                 {
                     // TODO: one could probably check here whether widget is enabled or not,
                     // and accept if widget is disabled.
-                    if(gtk_widget_get_events(childWidget)&GDK_BUTTON_PRESS_MASK)
+                    if(objectIsA(G_OBJECT(childWidget), "GtkPizza"))
+                    {
+                        usable = false;
+                    }
+                    else if(gtk_widget_get_events(childWidget)&(GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK))
                     {
                         // widget listening to press event
                         usable = false;
@@ -120,12 +128,18 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                         // so previous check are invalids :(
                         usable = false;
                     }
+                    else if(GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus( childWidget)))
+                    {
+                        // Scrolled do not send release events
+                        // to parents so not usable
+                        usable = false;
+                    }
                 }
             }
 
             // if child is a container and event has been accepted so far, also check it, recursively
             if(usable && GTK_IS_CONTAINER(childWidget))
-                usable = qtcWMMoveChildrenUseEvent(childWidget, event);
+                usable = qtcWMMoveChildrenUseEvent(childWidget, event, inNoteBook);
         }
     }
 
@@ -137,23 +151,21 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
 
 static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 {
-    if(GTK_IS_CONTAINER(widget))
+    if(!GTK_IS_CONTAINER(widget))
+        return TRUE;
+    
+    // if widget is a notebook, accept if there is no hovered tab
+    if(GTK_IS_NOTEBOOK(widget))
     {
-        // if widget is a notebook, accept if there is no hovered tab
-        if(GTK_IS_NOTEBOOK(widget))
-        {
-            GtkWidget *parent;
-            if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && GTK_APP_PIDGIN==qtSettings.app &&
-               (parent=qtcWidgetGetParent(widget)) && GTK_IS_BOX(parent) &&
-               (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent))
-                return FALSE;
-            return -1==qtcTabCurrentHoveredIndex(widget);
-        }
-
-        return qtcWMMoveChildrenUseEvent(widget, event);
+        GtkWidget *parent;
+        if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && GTK_APP_PIDGIN==qtSettings.app &&
+            (parent=qtcWidgetGetParent(widget)) && GTK_IS_BOX(parent) &&
+            (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent))
+            return FALSE;
+        return -1==qtcTabCurrentHoveredIndex(widget);
     }
 
-    return FALSE;
+    return qtcWMMoveChildrenUseEvent(widget, event, false);
 }
 
 static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
