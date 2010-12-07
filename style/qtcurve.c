@@ -1751,12 +1751,12 @@ static void realDrawBorder(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
             case BORDER_LIGHT:
             {
                 double radiusi=getRadius(&opts, width-2, height-2, widget, RADIUS_INTERNAL),
-                    xdi=xd+1,
-                    ydi=yd+1,
-                    alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
+                       xdi=xd+1,
+                       ydi=yd+1,
+                       alpha=(hasMouseOver || hasFocus) && (WIDGET_ENTRY==widget || WIDGET_SPIN==widget || WIDGET_COMBO_BUTTON==widget)
                                 ? ENTRY_INNER_ALPHA : BORDER_BLEND_ALPHA(widget);
                 int    widthi=width-2,
-                    heighti=height-2;
+                       heighti=height-2;
 
                 if((GTK_STATE_INSENSITIVE!=state || BORDER_SUNKEN==borderProfile) /*&&
                 (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || APPEARANCE_FLAT!=app)*/)
@@ -3395,16 +3395,15 @@ static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
     /*unsetCairoClipping(cr);*/
 
     if(doEtch && opts.borderProgress)
-            drawEtch(cr, area, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
+        drawEtch(cr, area, widget, x-1, y-1, width+2, height+2, FALSE, ROUNDED_ALL, WIDGET_PBAR_TROUGH);
 
     if(opts.borderProgress)
     {
         GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
         GtkStyle  *style=widget ? qtcWidgetGetStyle(parent ? parent : widget) : NULL;
         drawBorder(cr, style, state, area, x, y, width, height, NULL, ROUNDED_ALL,
-                    IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor
-                        ? BORDER_SUNKEN : BORDER_FLAT,
-                    WIDGET_PBAR_TROUGH, DF_BLEND);
+                   IS_FLAT(opts.progressGrooveAppearance) && ECOLOR_DARK!=opts.progressGrooveColor ? BORDER_SUNKEN : BORDER_FLAT,
+                   WIDGET_PBAR_TROUGH, DF_BLEND);
     }
     else /* if(!opts.borderProgress) */
         if(horiz)
@@ -3498,10 +3497,10 @@ static void drawSelection(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkR
 
     if(opts.borderSelection && (!isLvSelection || !(opts.square&SQUARE_LISTVIEW_SELECTION)))
     {
-        double   xd=x+0.5,
-                 yd=y+0.5,
-                 alpha=GTK_STATE_PRELIGHT==state || alphaMod<1.0 ? 0.20 : 1.0;
-        int      xo=x, widtho=width;
+        double xd=x+0.5,
+               yd=y+0.5,
+               alpha=GTK_STATE_PRELIGHT==state || alphaMod<1.0 ? 0.20 : 1.0;
+        int    xo=x, widtho=width;
     
         if(isLvSelection && !(opts.square&SQUARE_LISTVIEW_SELECTION) && ROUNDED_ALL!=round)
         {
@@ -3785,11 +3784,8 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                 gtk_window_set_keep_above(GTK_WINDOW(topLevel), TRUE);
             }
             else if((GTK_WINDOW(topLevel)->modal || GTK_IS_DIALOG(topLevel) || /*GTK_APP_GAIM==qtSettings.app ||*/
-                    (GTK_APP_GIMP==qtSettings.app &&
-                     strcmp(typename, GIMP_WINDOW) &&
-                     strcmp(typename, GIMP_MAIN) ) ) &&
-                   !g_object_get_data(G_OBJECT(topLevel), MODAL_HACK) &&
-                   NULL==gtk_window_get_transient_for(GTK_WINDOW(topLevel)))
+                    (GTK_APP_GIMP==qtSettings.app && strcmp(typename, GIMP_WINDOW) && strcmp(typename, GIMP_MAIN) ) ) &&
+                   !g_object_get_data(G_OBJECT(topLevel), MODAL_HACK) && NULL==gtk_window_get_transient_for(GTK_WINDOW(topLevel)))
             {
                 g_object_set_data(G_OBJECT(topLevel), MODAL_HACK, (gpointer)1);
 
