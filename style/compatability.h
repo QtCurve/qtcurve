@@ -101,6 +101,7 @@
 
     #define WINDOW_PARAM     cairo_t *cr,
     #define WINDOW_PARAM_VAL cr,
+    #define GDKWINDOW        (widget ? gtk_widget_get_window(widget) : 0L)
     #define AREA_PARAM
     #define AREA_PARAM_VAL
     #define AREA_PARAM_VAL_L NULL
@@ -164,6 +165,7 @@
 
     #define WINDOW_PARAM     GdkWindow *window,
     #define WINDOW_PARAM_VAL window,
+    #define GDKWINDOW        window
     #define AREA_PARAM       GdkRectangle *area,
     #define AREA_PARAM_VAL   area,
     #define AREA_PARAM_VAL_L area

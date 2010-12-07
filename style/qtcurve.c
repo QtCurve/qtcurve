@@ -1473,6 +1473,13 @@ static void adjustToolbarButtons(GtkWidget *widget, int *x, int *y, int *width, 
 
 #if GTK_CHECK_VERSION(2, 90, 0)
 #define sanitizeSize(A, B, C) sanitizeSizeReal(widget, B, C)
+
+static void gdk_drawable_get_size(GdkWindow *window, gint *width, gint *height)
+{
+    *width=gdk_window_get_width(window);
+    *height=gdk_window_get_height(window);
+}
+
 static void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
 {
     if(-1==*width || -1==*height)
@@ -1482,11 +1489,11 @@ static void sanitizeSizeReal(GtkWidget *widget, gint *width, gint *height)
         if(window)
         {
             if((-1==*width) && (-1==*height))
-                gdk_window_get_size(window, width, height);
+                gdk_drawable_get_size(window, width, height);
             else if(-1==*width)
-                gdk_window_get_size(window, width, NULL);
+                gdk_drawable_get_size(window, width, NULL);
             else if(-1==*height)
-                gdk_window_get_size(window, NULL, height);
+                gdk_drawable_get_size(window, NULL, height);
         }
     }
 }
@@ -2814,8 +2821,123 @@ static void enableBlurBehind(GtkWidget *w, gboolean enable)
     }
 }
 
-static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GtkWidget *widget, gint x, gint y, gint width,
-                               gint height)
+void getTopLevelSize(GdkWindow *window, gint *w, gint *h)
+{
+    if(!(window && GDK_IS_WINDOW(window)))
+    {
+        if(w)
+            *w = -1;
+        if(h)
+            *h = -1;
+    }
+    else
+    {
+        GdkWindow *topLevel=gdk_window_get_toplevel(window);
+
+        if(topLevel)
+            gdk_drawable_get_size(topLevel, w, h);
+        else
+            gdk_drawable_get_size(window, w, h );
+    }
+}
+
+// void getTopLevelFrameSize(GdkWindow *window, gint *w, gint *h)
+// {
+//     if(!(window && GDK_IS_WINDOW(window)))
+//     {
+//         if(w)
+//             *w = -1;
+//         if(h)
+//             *h = -1;
+//     }
+//     else
+//     {
+//         GdkWindow *topLevel=gdk_window_get_toplevel(window);
+// 
+//         if(topLevel)
+//         {
+//             GdkRectangle rect = {0, 0, -1, -1};
+// 
+//             gdk_window_get_frame_extents(topLevel, &rect);
+//             if(w)
+//                 *w = rect.width;
+//             if(h)
+//                 *h = rect.height;
+//         }
+//     }
+// }
+
+void getTopLevelOrigin(GdkWindow *window, gint *x, gint *y)
+{
+    if(x)
+        *x = 0;
+    if(y)
+        *y = 0;
+    if(window)
+    {
+        while(window && GDK_IS_WINDOW(window) && gdk_window_get_window_type(window) != GDK_WINDOW_TOPLEVEL &&
+              gdk_window_get_window_type(window) != GDK_WINDOW_TEMP)
+        {
+            gint xloc;
+            gint yloc;
+            gdk_window_get_position(window, &xloc, &yloc);
+            if(x)
+                *x += xloc;
+            if(y)
+                *y += yloc;
+            window = gdk_window_get_parent(window);
+        }
+    }
+}
+
+static gboolean mapToTopLevel(GdkWindow *window, GtkWidget *widget, gint *x, gint *y, gint *w, gint *h) //, gboolean frame)
+{
+    // always initialize arguments (to invalid values)
+    if(x) *x=0;
+    if(y) *y=0;
+    if(w) *w = -1;
+    if(h) *h = -1;
+
+    if(!(window && GDK_IS_WINDOW(window)))
+    {
+        if(widget)
+        {
+            int xlocal, ylocal;
+
+            // this is an alternative way to get widget position with respect to top level window
+            // and top level window size. This is used in case the GdkWindow passed as argument is
+            // actually a 'non window' drawable
+            window = gtk_widget_get_parent_window(widget);
+//             if(frame)
+//                getTopLevelFrameSize(window, w, h);
+//             else
+                getTopLevelSize(window, w, h);
+
+            if(gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &xlocal, &ylocal))
+            {
+
+                if(x) *x=xlocal;
+                if(y) *y=ylocal;
+                return ((!w) || *w > 0) && ((!h) || *h>0);
+            }
+        }
+    }
+    else
+    {
+        // get window size and height
+//         if(frame)
+//            getTopLevelFrameSize(window, w, h);
+//         else
+            getTopLevelSize(window, w, h);
+        getTopLevelOrigin( window, x, y );
+        return ((!w) || *w > 0) && ((!h) || *h>0);
+    }
+
+    return FALSE;
+}
+
+static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWindow *window, GtkWidget *widget,
+                               gint x, gint y, gint width, gint height)
 {
     GtkWidget *parent=NULL;
     if(widget && (parent=qtcWidgetGetParent(widget)) && isOnHandlebox(parent, NULL, 0))
@@ -2823,39 +2945,33 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
 
     if(!isFixedWidget(widget) && !isGimpDockable(widget))
     {
-        GtkWidget   *window=widget;
-        int         xpos=0,
-                    ypos=0;
-        const gchar *wName=NULL;
+        int wx=0, wy=0, wh, ww;
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d  ", __FUNCTION__, x, y, width, height), debugDisplayWidget(widget, 20);
 
-        while(window && !GTK_IS_WINDOW(window))
-            window=qtcWidgetGetParent(window);
-
-        if(0==y && window && window!=widget)
-            gtk_widget_translate_coordinates(widget, window, x, y, &xpos, &ypos);
-
-        if(window && (!(wName=qtcWidgetName(window)) || strcmp(wName, "gtk-tooltip")))
+        if(!mapToTopLevel(window, widget, &wx, &wy, &ww, &wh)) //, FALSE))
+            return FALSE;
+        else
         {
             GdkRectangle  clip;
-            int           opacity=!window || !GTK_IS_DIALOG(window) ? opts.bgndOpacity : opts.dlgOpacity,
+            GtkWidget     *topLevel=topLevel=gtk_widget_get_toplevel(widget);
+            int           opacity=!topLevel || !GTK_IS_DIALOG(topLevel) ? opts.bgndOpacity : opts.dlgOpacity,
                           xmod=0, ymod=0, wmod=0, hmod=0;
             double        alpha=1.0;
-            gboolean      useAlpha=opacity<100 && isRgbaWidget(window) && compositingActive(window),
+            gboolean      useAlpha=opacity<100 && isRgbaWidget(topLevel) && compositingActive(topLevel),
                           flatBgnd=IS_FLAT_BGND(opts.bgndAppearance);
-            GtkAllocation alloc=qtcWidgetGetAllocation(window);
 
             if(!flatBgnd || BGND_IMG_ON_BORDER)
             {
                 WindowBorders borders=qtcGetWindowBorderSize(FALSE);
-                xmod=-borders.sides;
-                ymod=-borders.titleHeight;
+                xmod=borders.sides;
+                ymod=borders.titleHeight;
                 wmod=2*borders.sides;
                 hmod=borders.titleHeight+borders.bottom;
+                wy+=ymod, wx+=xmod, wh+=hmod, ww+=wmod;
             }
 
-            clip.x=x, clip.y=-ypos, clip.width=width, clip.height=alloc.height;
+            clip.x=x, clip.y=y, clip.width=width, clip.height=height;
             setCairoClipping(cr, &clip);
 
             if(useAlpha)
@@ -2869,45 +2985,39 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
                 GdkColor *parent_col=getParentBgCol(widget);
 
                 if(parent_col)
-                    drawAreaColorAlpha(cr, area, parent_col, x, -ypos, width, alloc.height, alpha);
+                    drawAreaColorAlpha(cr, area, parent_col, -wx, -wy, ww, wh, alpha);
                 else if(useAlpha)
-                    drawAreaColorAlpha(cr, area, &style->bg[GTK_STATE_NORMAL] , x, -ypos, width, alloc.height, alpha);
+                    drawAreaColorAlpha(cr, area, &style->bg[GTK_STATE_NORMAL], -wx, -wy, ww, wh, alpha);
             }
             else if(APPEARANCE_STRIPED==opts.bgndAppearance)
-                drawStripedBgnd(cr, style, area,  x+xmod, -ypos+ymod, width+wmod, alloc.height+hmod, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+                drawStripedBgnd(cr, style, area, -wx, -wy, ww, wh, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
             else if(APPEARANCE_FILE==opts.bgndAppearance)
             {
                 cairo_save(cr);
                 cairo_translate(cr, xmod, ymod);
-                drawBgndImage(cr, style, area,  x, -ypos, width+wmod, alloc.height+hmod, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
+                drawBgndImage(cr, style, area, -wx, -wy, ww, wh, &style->bg[GTK_STATE_NORMAL], TRUE, alpha);
                 cairo_restore(cr);
             }
             else
             {
-                if(GT_HORIZ==opts.bgndGrad)
-                    drawBevelGradientAlpha(cr, style, area, x+xmod, -ypos+ymod, width+wmod, alloc.height+hmod,
-                                           &style->bg[GTK_STATE_NORMAL], TRUE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
-                else
-                    drawBevelGradientAlpha(cr, style, area, -xpos+xmod, y+ymod,alloc.width+wmod, height+hmod,
-                                           &style->bg[GTK_STATE_NORMAL], FALSE, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
+                drawBevelGradientAlpha(cr, style, area, -wx, -wy, ww, wh+1,
+                                       &style->bg[GTK_STATE_NORMAL], GT_HORIZ==opts.bgndGrad, FALSE, opts.bgndAppearance, WIDGET_OTHER, alpha);
 
                 if(GT_HORIZ==opts.bgndGrad && GB_SHINE==getGradient(opts.bgndAppearance, &opts)->border)
                 {
-                    int             wwidth=alloc.width+wmod,
-                                    wheight=alloc.height+hmod,
-                                    size=MIN(BGND_SHINE_SIZE, MIN(wheight*2, wwidth));
+                    int             size=MIN(BGND_SHINE_SIZE, MIN(wh*2, ww));
                     double          alpha=shineAlpha(&style->bg[GTK_STATE_NORMAL]);
                     cairo_pattern_t *pat=NULL;
 
                     size/=BGND_SHINE_STEPS;
                     size*=BGND_SHINE_STEPS;
-                    pat=cairo_pattern_create_radial(x+xmod+(wwidth/2.0), ypos+ymod, 0, x+xmod+(wwidth/2.0), ypos+ymod, size/2.0);
+                    pat=cairo_pattern_create_radial((ww/2.0)-wx, -wy, 0, (ww/2.0)-wx, -wy, size/2.0);
                     cairo_pattern_add_color_stop_rgba(pat, 0, 1, 1, 1, alpha);
                     cairo_pattern_add_color_stop_rgba(pat, 0.5, 1, 1, 1, alpha*0.625);
                     cairo_pattern_add_color_stop_rgba(pat, 0.75, 1, 1, 1, alpha*0.175);
                     cairo_pattern_add_color_stop_rgba(pat, CAIRO_GRAD_END, 1, 1, 1, 0.0);
                     cairo_set_source(cr, pat);
-                    cairo_rectangle(cr, x+xmod+((wwidth-size)/2.0), ypos+ymod, size, size);
+                    cairo_rectangle(cr, ((ww-size)/2.0)-wx, -wy, size, size);
                     cairo_fill(cr);
                     cairo_pattern_destroy(pat);
                 }
@@ -2915,17 +3025,10 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
             if(useAlpha)
                 cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 
-            if(BGND_IMG_ON_BORDER)
-            {
-                if(IMG_FILE==opts.bgndImage.type)
-                    wmod++, hmod++;
-                else
-                    wmod=(wmod/2)+1;
-            }
-            else
-                wmod=0, hmod=0, xmod=0, ymod=0;
+            if(!BGND_IMG_ON_BORDER)
+                ww-=wmod+1, wh-=hmod, wx-=xmod, wy-=ymod;
 
-            drawBgndRings(cr, -xpos+xmod, -ypos+ymod, alloc.width+wmod-1, alloc.height+hmod-1, TRUE);
+            drawBgndRings(cr, -wx, -wy, ww, wh, TRUE);
             unsetCairoClipping(cr);
             return TRUE;
         }
@@ -2933,8 +3036,8 @@ static gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area,
     return FALSE;
 }
 
-static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkWidget *widget, GdkRectangle *area, gint x, gint y,
-                           gint width, gint height, int round, EWidget w)
+static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
+                           gint x, gint y, gint width, gint height, int round, EWidget w)
 {
     gboolean enabled=!(GTK_STATE_INSENSITIVE==state || (widget && !qtcWidgetIsSensitive(widget))),
              highlightReal=enabled && widget && qtcWidgetHasFocus(widget) && GTK_APP_JAVA!=qtSettings.app && qtcPalette.focus,
@@ -2954,7 +3057,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
         qtcEntrySetup(widget);
 
     if((doEtch || ROUND_NONE!=opts.round) && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
-        if(!IS_FLAT_BGND(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height))
+        if(!IS_FLAT_BGND(opts.bgndAppearance) && widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height))
             ;
         else
         {
@@ -2973,7 +3076,7 @@ static void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state,GtkW
         y++,  x++, height-=2,  width-=2;
 
     if(DEBUG_ALL==qtSettings.debug)  printf(DEBUG_PREFIX "%s %d %d %d %d %d %d ", __FUNCTION__, state, x, y, width, height, round),
-                                     debugDisplayWidget(widget, 3);
+                                     debugDisplayWidget(widget, 10);
 
     if(ROUNDED_ALL!=round)
     {
@@ -3255,8 +3358,8 @@ static void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWi
     }
 }
 
-static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWidget *widget, GdkRectangle *area, int x, int y, int width, int height,
-                               gboolean isList, gboolean horiz)
+static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow *window, GtkWidget *widget, GdkRectangle *area,
+                               int x, int y, int width, int height, gboolean isList, gboolean horiz)
 {
     gboolean doEtch=!isList && DO_EFFECT;
     GdkColor *col=&style->base[state];
@@ -3275,7 +3378,7 @@ static void drawProgressGroove(cairo_t *cr, GtkStyle *style, GtkStateType state,
             col=&qtcPalette.background[2];
     }
 
-    if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+    if(!isList && (IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height)))
         && (!widget || !g_object_get_data(G_OBJECT (widget), "transparent-bg-hint")))
         drawAreaColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], x, y, width, height);
 
@@ -3474,10 +3577,14 @@ static void clearRoundedMask(GtkWidget *widget, gboolean isToolTip)
     {
         if((int)g_object_get_data(G_OBJECT(widget), "QTC_WIDGET_MASK"))
         {
+    #if GTK_CHECK_VERSION(2, 90, 0)
+            gtk_widget_shape_combine_region(widget, NULL);
+    #else   
             if(isToolTip)
                 gtk_widget_shape_combine_mask(widget, NULL, 0, 0);
             else
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), NULL, 0, 0);
+    #endif
             g_object_set_data(G_OBJECT(widget), "QTC_WIDGET_MASK", (gpointer)0);
         }
     }
@@ -3630,7 +3737,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                                     isMenuWindow(widget));
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     sanitizeSize(window, &width, &height);
 
@@ -3753,8 +3860,24 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         }
     }
 
+#if 1 // From oxygen-gtk  - required???
+    if(CUSTOM_BGND && DETAIL("viewportbin"))
+    {
+        GdkColor bg=style->bg[state],
+                 defbg=gtk_widget_get_default_style()->bg[state];
+
+        // This dirty hack with 10000 makes GIMP bottom element viewportbin have correct window color
+        // while ccsm options list will remain white. Hope this will work as intended for other apps
+        // FIXME: why default style bg isn't the same as unchanged(?) bg in GIMP? If it were, no hack would be needed
+        if(bg.red/10000==defbg.red/10000 && bg.green/10000==defbg.green/10000 && bg.blue/10000==defbg.blue/10000)
+            drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
+        else
+            parent_class->draw_flat_box(style, WINDOW_PARAM_VAL state, shadow_type, AREA_PARAM_VAL widget, detail, x, y, width, height);
+    }
+    else
+#endif
     if(CUSTOM_BGND && widget && GTK_IS_WINDOW(widget) && !isMenuOrToolTipWindow &&
-       drawWindowBgnd(cr, style, area, widget, x, y, width, height))
+       drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height))
         qtcWindowSetup(widget, GTK_IS_DIALOG(widget) ? opts.dlgOpacity : opts.bgndOpacity);
     else if(widget && GTK_IS_TREE_VIEW(widget))
     {
@@ -3949,6 +4072,8 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
     }
     else if(DETAIL("icon_view_item"))
         drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
+    else if(CUSTOM_BGND && DETAIL("eventbox"))
+        drawWindowBgnd(cr, style, NULL, GDKWINDOW, widget, x, y, width, height);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
         if(GTK_STATE_PRELIGHT==state && !opts.crHighlight && 0==strcmp(detail, "checkbutton"))
@@ -3982,15 +4107,15 @@ static void gtkDrawHandle(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
     FN_CHECK
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, width, height, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     sanitizeSize(window, &width, &height);
-    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height)))
     {
 //         gtk_style_apply_default_background(style, window, widget && !qtcWidgetNoWindow(widget), state,
 //                                            area, x, y, width, height);
         if(widget && IMG_NONE!=opts.bgndImage.type)
-            drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+            drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
     }
 
     if (DETAIL("dockitem") || paf)
@@ -4185,7 +4310,7 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
 {
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow, arrow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     if(DETAIL("arrow"))
     {
@@ -4392,7 +4517,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, btn_down, state, shadow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     if(useButtonColor(detail))
     {
@@ -4491,12 +4616,12 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     }
     else if(DETAIL("spinbutton"))
     {
-        if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+        if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height)))
         {
             qtcStyleApplyDefBgnd(widget && !qtcWidgetNoWindow(widget),
                                  GTK_STATE_INSENSITIVE==state ? GTK_STATE_INSENSITIVE : GTK_STATE_NORMAL);
             if(widget && IMG_NONE!=opts.bgndImage.type)
-                drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+                drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
         }
 
         if(opts.unifySpin)
@@ -4517,7 +4642,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                 a.x=x+2, a.y=y, a.width=width-2, a.height=height;
                 setCairoClipping(cr, &a);
             }
-            drawEntryField(cr, style, state, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
+            drawEntryField(cr, style, state, GDKWINDOW, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_SPIN);
 #if !GTK_CHECK_VERSION(2, 90, 0)
             if(moz)
 #endif
@@ -4899,7 +5024,8 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                     if(GTK_STATE_INSENSITIVE==state && entry && GTK_STATE_INSENSITIVE!=entryState)
                         state=entryState;
 
-                    drawEntryField(cr, style, state, entry, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT, WIDGET_COMBO_BUTTON);
+                    drawEntryField(cr, style, state, GDKWINDOW, widget, area, x, y, width, height, rev ? ROUNDED_LEFT : ROUNDED_RIGHT,
+                                   WIDGET_COMBO_BUTTON);
 
                     // Get entry to redraw by setting its state...
                     // ...cant do a queue redraw, as then entry does for the button, else we get stuck in a loop!
@@ -4918,7 +5044,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                        GTK_IS_SCROLLED_WINDOW(qtcWidgetGetParent(widget)) && GTK_IS_NOTEBOOK(qtcWidgetGetParent(widget)->parent))
                         drawAreaModColor(cr, area, &qtcPalette.background[ORIGINAL_SHADE], TO_FACTOR(opts.tabBgnd), xo, yo, wo, ho);
                     else if(IS_FLAT_BGND(opts.bgndAppearance) || !(opts.gtkScrollViews && IS_FLAT(opts.sbarBgndAppearance) &&
-                                                              widget && drawWindowBgnd(cr, style, area, widget, xo, yo, wo, ho)))
+                                                              widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, xo, yo, wo, ho)))
                     {
                         if(!IS_FLAT(opts.sbarBgndAppearance) && SCROLLBAR_NONE!=opts.scrollbarType)
                             drawBevelGradient(cr, style, area, xo, yo, wo, ho, &qtcPalette.background[ORIGINAL_SHADE],
@@ -5241,7 +5367,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             }
         }
         else if(pbar)
-            drawProgressGroove(cr, style, state, widget, AREA_PARAM_VAL_L, x, y, width, height, list, horiz);
+            drawProgressGroove(cr, style, state, GDKWINDOW, widget, AREA_PARAM_VAL_L, x, y, width, height, list, horiz);
         else /* Scrollbars... */
         {
             int      sbarRound=ROUNDED_ALL,
@@ -5446,7 +5572,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     else if(detail && (0==strcmp(detail,"dockitem") || 0==strcmp(detail,"dockitem_bin")))
     {
         if(CUSTOM_BGND && widget)
-            drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+            drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
     }
     else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") ||
                                      0==strcmp(detail, "handlebox") ||
@@ -5480,7 +5606,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             }
 
             if(widget && (opacity!=100 || (CUSTOM_BGND && !drawGradient && !fillBackground)))
-                drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+                drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
             
             if(drawGradient)
             {
@@ -5875,16 +6001,16 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
     {
         EWidget wt=!detail && GTK_IS_TREE_VIEW(widget) ? WIDGET_PBAR_TROUGH : WIDGET_FRAME;
         clipPath(cr, x+1, y+1, width-2, height-2, WIDGET_OTHER, RADIUS_INTERNAL, round);
-        if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, widget, x+1, y+1, width-2, height-2))
+        if(IS_FLAT_BGND(opts.bgndAppearance) || !widget || !drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x+1, y+1, width-2, height-2))
         {
             drawAreaColor(cr, area, &style->bg[state], x+1, y+1, width-2, height-2);
             if(widget && IMG_NONE!=opts.bgndImage.type)
-                drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+                drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
         }
         unsetCairoClipping(cr);
         
         if(WIDGET_PBAR_TROUGH==wt)
-            drawProgressGroove(cr, style, state, widget, AREA_PARAM_VAL_L, x, y, width, height, TRUE, TRUE);
+            drawProgressGroove(cr, style, state, GDKWINDOW, widget, AREA_PARAM_VAL_L, x, y, width, height, TRUE, TRUE);
         else
             drawBorder(cr, style, state, area, x, y, width, height, NULL, 
                        menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow_type), wt, STD_BORDER);
@@ -6039,7 +6165,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
             if(!opts.unifySpin && isSpin)
                 width-=16;
 #endif
-            drawEntryField(cr, style, state, widget, area, x, y, width, height,
+            drawEntryField(cr, style, state, GDKWINDOW, widget, area, x, y, width, height,
                         combo || isSpin
                             ? rev
                                     ? ROUNDED_RIGHT
@@ -6071,7 +6197,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height,
                                                detail ? detail : "NULL"),
-                                        debugDisplayWidget(widget, 3);
+                                        debugDisplayWidget(widget, 10);
 
         if(checkScrollViewState)
         {
@@ -6264,7 +6390,7 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow_type, 
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %d %d ", __FUNCTION__, shadow_type, state, x, y, width, height, gap_x,
                                            gap_width, isTab),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     if(isTab && 0!=opts.tabBgnd)
     {
@@ -6350,7 +6476,7 @@ static void gtkDrawCheck(GtkStyle *style, WINDOW_PARAM GtkStateType state,
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height, mnu,
                                            detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     if((mnu && GTK_STATE_PRELIGHT==state) ||
        (list && GTK_STATE_ACTIVE==state))
@@ -6679,7 +6805,7 @@ static void gtkDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboo
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %s %d %d %d %d %d %s  ", __FUNCTION__, pango_layout_get_text(layout), x, y, state, use_text,
                                                IS_MENU_ITEM(widget), detail ? detail : "NULL"),
-                                        debugDisplayWidget(widget, 3);
+                                        debugDisplayWidget(widget, 10);
 
         if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==qtcWidgetState(widget))
              state=GTK_STATE_INSENSITIVE;
@@ -7000,7 +7126,7 @@ static void gtkDrawTab(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShad
     //if(DO_EFFECT)
     //    x--;
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %s  ", __FUNCTION__, state, shadow_type, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 5);
+                                    debugDisplayWidget(widget, 10);
 
 #if !GTK_CHECK_VERSION(2, 90, 0)
     if(isActiveOptionMenu(widget))
@@ -7238,7 +7364,7 @@ static void gtkDrawExtension(GtkStyle *style, WINDOW_PARAM GtkStateType state, G
 {
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, gap_side, x, y, width, height,
                                            detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     sanitizeSize(window, &width, &height);
 
@@ -7591,7 +7717,7 @@ static void gtkDrawSlider(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %d %s  ", __FUNCTION__, state, shadow_type, x, y, width, height,
                                            detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     CAIRO_BEGIN
 
@@ -7974,7 +8100,7 @@ static void gtkDrawHLine(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
     CAIRO_BEGIN
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x1, x2, y, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     if(tbar)
     {
@@ -8044,7 +8170,7 @@ static void gtkDrawVLine(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
     CAIRO_BEGIN
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %s  ", __FUNCTION__, state, x, y1, y2, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     if(!(DETAIL("vseparator") && isOnComboBox(widget, 0))) /* CPD: Combo handled in drawBox */
     {
@@ -8090,7 +8216,7 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
     sanitizeSize(window, &width, &height);
 
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %d %d %d %d %s ", __FUNCTION__, state, x, y, width, height, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 3);
+                                    debugDisplayWidget(widget, 10);
 
     {
     GtkWidget *parent=widget ? qtcWidgetGetParent(widget) : NULL;
@@ -8327,11 +8453,11 @@ static void gtkDrawResizeGrip(GtkStyle *style, WINDOW_PARAM GtkStateType state, 
     int size=SIZE_GRIP_SIZE-2;
 
     /* Clear background */
-    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, widget, x, y, width, height)))
+    if(IS_FLAT_BGND(opts.bgndAppearance) || !(widget && drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height)))
     {
 //         gtk_style_apply_default_background(style, window, FALSE, state, area, x, y, width, height);
         if(widget && IMG_NONE!=opts.bgndImage.type)
-            drawWindowBgnd(cr, style, area, widget, x, y, width, height);
+            drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
     }
 
     switch(edge)
@@ -8370,7 +8496,7 @@ static void gtkDrawExpander(GtkStyle *style, WINDOW_PARAM GtkStateType state, AR
                             const gchar *detail, gint x, gint y, GtkExpanderStyle expander_style)
 {
     if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d %s  ", __FUNCTION__, state, detail ? detail : "NULL"),
-                                    debugDisplayWidget(widget, 5);
+                                    debugDisplayWidget(widget, 10);
 
     gboolean isExpander=widget && (GTK_IS_EXPANDER(widget) || GTK_IS_TREE_VIEW(widget)),
              fill=!isExpander || opts.coloredMouseOver || GTK_STATE_PRELIGHT!=state;

@@ -1,6 +1,7 @@
 1.8.2
 -----
 1. Improve window drag code to take care of GtkPizza, and other, widgets.
+2. Use Gdk window to determine offsets when drawing background gradients.
 
 1.8.1
 -----
