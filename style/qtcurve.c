@@ -2238,7 +2238,7 @@ static void drawLightBevel(cairo_t *cr, GtkStyle *style, GtkStateType state, Gdk
     if(WIDGET_SB_SLIDER==widget && opts.stripedSbar)
     {
         clipPathRadius(cr, x, y, width, height, getRadius(&opts, width, height, WIDGET_SB_SLIDER, RADIUS_INTERNAL), round);
-        addStripes(cr, x, y, width, height, horiz);
+        addStripes(cr, x+1, y+1, width-2, height-2, horiz);
         cairo_restore(cr);
     }
 }

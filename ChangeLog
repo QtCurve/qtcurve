@@ -6,6 +6,7 @@
 4. Fix background gradients in scrollviews.
 5. When drawing background gradients, use the background colour of the top-level
    widget's style.
+6. Fix slight glitch with striped scrollbar sliders.
 
 1.8.1
 -----
