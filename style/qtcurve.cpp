@@ -12829,6 +12829,10 @@ int Style::getOpacity(const QWidget *widget, QPainter *p) const
 void Style::drawMenuOrToolBarBackground(const QWidget *widget, QPainter *p, const QRect &r, const QStyleOption *option,
                                         bool menu, bool horiz) const
 {
+    // LibreOffice - when drawMenuOrToolBarBackground is called with menuRect, this is empty!
+    if(r.width()<1 || r.height()<1)
+        return;
+
     EAppearance app=menu ? opts.menubarAppearance : opts.toolbarAppearance;
     if(!CUSTOM_BGND || !IS_FLAT(app) || (menu && SHADE_NONE!=opts.shadeMenubars))
     {
