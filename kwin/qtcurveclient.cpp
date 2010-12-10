@@ -612,7 +612,14 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
            wc==QLatin1String("W Msgcompose Thunderbird Msgcompose") ||
            wc==QLatin1String("D Msgcompose Thunderbird Msgcompose")) 
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+8;
-        else if(wc.startsWith(QLatin1String("W VCLSalFrame.DocumentWindow OpenOffice.org")) ||
+            
+        else if(
+#if 0 // Currently LibreOffice does not seem to pain menubar backgrounds for KDE - so disable check here...
+                wc.startsWith(QLatin1String("W VCLSalFrame libreoffice-")) ||
+                wc.startsWith(QLatin1String("W VCLSalFrame.DocumentWindow libreoffice-")) ||
+                //wc==QLatin1String("W soffice.bin Soffice.bin") ||
+#endif
+                wc.startsWith(QLatin1String("W VCLSalFrame.DocumentWindow OpenOffice.org")) ||
                 wc.startsWith(QLatin1String("W VCLSalFrame OpenOffice.org")) ||
                 wc==QLatin1String("W soffice.bin Soffice.bin"))
             itsMenuBarSize=QFontMetrics(QApplication::font()).height()+7;
