@@ -47,6 +47,15 @@ static void qtcTreeViewRemoveFromHash(void *hash)
     }
 }
 
+static void qtcTreeViewGetCell(GtkTreeView *treeView, GtkTreePath **path, GtkTreeViewColumn **column, int x, int y, int width, int height)
+{
+    int      pos;
+    GdkPoint points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
+
+    for(pos=0; pos<4 && !(*path); ++pos)
+        gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, path, column, 0L, 0L);
+}
+
 static void qtcTreeViewCleanup(GtkWidget *widget)
 {
     if (widget && g_object_get_data(G_OBJECT(widget), "QTC_TREE_VIEW_SET"))

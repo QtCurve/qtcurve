@@ -3944,13 +3944,9 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                                   *expanderColumn=gtk_tree_view_get_expander_column(treeView);
                 int               levelIndent=0,
                                   expanderSize=0,
-                                  depth=0,
-                                  pos;
-                GdkPoint          points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
+                                  depth=0;
 
-                for(pos=0; pos<4 && !path; ++pos)
-                    gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, &path, &column, 0L, 0L);
-
+                qtcTreeViewGetCell(treeView, &path, &column, x, y, width, height);
                 qtcTreeViewSetup(widget);
                 if(path && qtcTreeViewIsCellHovered(widget, path, column))
                 {
@@ -6467,8 +6463,24 @@ static GdkColor * getCheckRadioCol(GtkStyle *style, GtkStateType state, gboolean
                     : qtcPalette.check_radio;
 }
 
-static void gtkDrawCheck(GtkStyle *style, WINDOW_PARAM GtkStateType state,
-                         GtkShadowType shadow_type, AREA_PARAM GtkWidget *widget,
+// static gboolean isHoveredCell(GtkWidget *widget, int x, int y, int width, int height)
+// {
+//     gboolean hovered=FALSE;
+// 
+//     if(widget && GTK_IS_TREE_VIEW(widget))
+//     {
+//         GtkTreePath       *path=NULL;
+//         GtkTreeViewColumn *column=NULL;
+// 
+//         qtcTreeViewSetup(widget);
+//         qtcTreeViewGetCell(GTK_TREE_VIEW(widget), &path, &column, x, y, width, height);
+//         hovered=path && qtcTreeViewIsCellHovered(widget, path, column);
+//     }
+// 
+//     return hovered;
+// }
+                    
+static void gtkDrawCheck(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowType shadow_type, AREA_PARAM GtkWidget *widget,
                          const gchar *detail, gint x, gint y, gint width, gint height)
 {
     if(GTK_STATE_PRELIGHT==state && (GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app))
@@ -6510,6 +6522,9 @@ static void gtkDrawCheck(GtkStyle *style, WINDOW_PARAM GtkStateType state,
 
     if(mnu && isMozilla())
         x-=2;
+
+//     if(!mnu && GTK_STATE_INSENSITIVE!=state && DETAIL("cellcheck") && isHoveredCell(widget, x, y, width, height))
+//         GTK_STATE_PRELIGHT==state;
 
     if(!mnu || qtSettings.qt4)
     {
@@ -6624,6 +6639,9 @@ static void gtkDrawOption(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
     if((mnu && GTK_STATE_PRELIGHT==state) ||
        (list && GTK_STATE_ACTIVE==state))
         state=GTK_STATE_NORMAL;
+
+//     if(!mnu && GTK_STATE_INSENSITIVE!=state && DETAIL("cellradio") && isHoveredCell(widget, x, y, width, height))
+//         GTK_STATE_PRELIGHT==state;
 
     if(!qtSettings.qt4 && mnu)
         gtkDrawCheck(style, WINDOW_PARAM_VAL state, shadow_type, AREA_PARAM_VAL widget, "check", x, y, width, height);
@@ -8382,12 +8400,8 @@ static void gtkDrawFocus(GtkStyle *style, WINDOW_PARAM GtkStateType state, AREA_
             GtkTreePath       *path=NULL;
             GtkTreeViewColumn *column=NULL,
                               *expanderColumn=gtk_tree_view_get_expander_column(treeView);
-            int               pos;
-            GdkPoint          points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
 
-            for(pos=0; pos<4 && !path; ++pos)
-                gtk_tree_view_get_path_at_pos(treeView, points[pos].x, points[pos].y, &path, &column, 0L, 0L);
-
+            qtcTreeViewGetCell(treeView, &path, &column, x, y, width, height);
             if(column==expanderColumn)
             {
                 int expanderSize=0;
