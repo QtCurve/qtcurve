@@ -3865,13 +3865,9 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
 
     if(CUSTOM_BGND && DETAIL("viewportbin"))
     {
-        GdkColor bg=style->bg[state],
-                 defbg=gtk_widget_get_default_style()->bg[state];
-
-        // This dirty hack with 10000 makes GIMP bottom element viewportbin have correct window color
-        // while ccsm options list will remain white. Hope this will work as intended for other apps
-        // FIXME: why default style bg isn't the same as unchanged(?) bg in GIMP? If it were, no hack would be needed
-        if(bg.red/10000==defbg.red/10000 && bg.green/10000==defbg.green/10000 && bg.blue/10000==defbg.blue/10000)
+        GtkRcStyle *st=widget ? gtk_widget_get_modifier_style(widget) : NULL;
+        // if the app hasn't modified bg, draw background gradient
+        if(st && !(st->color_flags[state]&GTK_RC_BG))
         {
             drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
             qtcScrollbarSetup(widget);
