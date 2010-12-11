@@ -12,6 +12,7 @@
    titlebar buttons.
 6. Draw box around checked Libre/Open Office menu checkboxes.
 7. Ukrainian translation - thanks to Yuri Chornoivan
+8. Slight drawing fix for square scrollviews.
 
 1.8.1
 -----

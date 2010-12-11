@@ -11908,7 +11908,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
     if(WIDGET_TAB_BOT==w || WIDGET_TAB_TOP==w)
         cols=itsBackgroundCols;
 
-    if(!(opts.thin&THIN_FRAMES))
+    if(!(opts.thin&THIN_FRAMES) && (WIDGET_SCROLLVIEW!=w || !(opts.square&SQUARE_SCROLLVIEW) || opts.highlightScrollViews))
         switch(borderProfile)
         {
             case BORDER_FLAT:
@@ -12217,7 +12217,8 @@ void Style::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget,
                     option->palette.brush(QPalette::Base));
     else
     {
-        p->setPen(checkColour(option, QPalette::Base));
+        p->setPen(WIDGET_SCROLLVIEW!=w || !(opts.square&SQUARE_SCROLLVIEW) || opts.highlightScrollViews ? checkColour(option, QPalette::Base)
+                                                                                                        : backgroundColors(option)[ORIGINAL_SHADE]);
         p->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, round,
                               getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)));
     }
