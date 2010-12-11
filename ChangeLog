@@ -7,6 +7,7 @@
 5. When drawing background gradients, use the background colour of the top-level
    widget's style.
 6. Fix slight glitch with striped scrollbar sliders.
+7. Hacky fix for tabs in thunderbird main window.
 
 1.8.1
 -----

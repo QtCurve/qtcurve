@@ -6410,6 +6410,10 @@ static void drawBoxGap(cairo_t *cr, GtkStyle *style, GtkShadowType shadow_type, 
                                            gap_width, isTab),
                                     debugDisplayWidget(widget, 10);
 
+    // *Very* hacky fix for tabs in thunderbird main window!!!
+    if(isTab && isMozilla() && 250==gap_width && (290==width || 270==width) && 6==height)
+        return;
+
     if(isTab && 0!=opts.tabBgnd)
     {
         clipPath(cr, x-1, y-1, width+2, height+2, WIDGET_TAB_FRAME, RADIUS_EXTERNAL, ROUNDED_ALL);
@@ -7211,126 +7215,127 @@ static void gtkDrawBoxGap(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
     if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && DETAIL("notebook"))
         qtcWMMoveSetup(widget);
 
-    switch(gap_side)
-    {
-        case GTK_POS_TOP:
-            if(gap_x > 0)
-            {
-                if(!thin)
+    if(!isMozilla())
+        switch(gap_side)
+        {
+            case GTK_POS_TOP:
+                if(gap_x > 0)
                 {
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x-1, y+1, 3);
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x-1, y, 3);
+                    if(!thin)
+                    {
+                        drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x-1, y+1, 3);
+                        drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x-1, y, 3);
+                    }
+                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x-1, y, 2);
                 }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x-1, y, 2);
-            }
-            else if(!thin)
-                drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y, 2);
+                else if(!thin)
+                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y, 2);
 
-            if(rightPos >= 0)
-            {
-                if(!thin)
+                if(rightPos >= 0)
                 {
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x+gap_width-2, y+1, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y, rightPos ? 1 : 0);
+                    if(!thin)
+                    {
+                        drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x+gap_width-2, y+1, 3);
+                        drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y, rightPos ? 1 : 0);
+                    }
+                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y, 2);
                 }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y, 2);
-            }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
-                else
+                if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
+                    if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                        drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y, 2);
+                    else
+                    {
+                        drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
+                        if(gap_x>0 && !thin)
+                            drawHLine(cr, CAIRO_COL(qtcPalette.background[2]), 1.0, x+1, y, 1);
+                    }
+                break;
+            case GTK_POS_BOTTOM:
+                if(gap_x > 0)
                 {
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y, 3);
-                    if(gap_x>0 && !thin)
-                        drawHLine(cr, CAIRO_COL(qtcPalette.background[2]), 1.0, x+1, y, 1);
+                    if(!thin)
+                    {
+                        drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x-1, y+height-1, 2);
+                        drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x-1, y+height-2, 2);
+                    }
+                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x-1, y+height-1, 2);
                 }
-            break;
-        case GTK_POS_BOTTOM:
-            if(gap_x > 0)
-            {
-                if(!thin)
-                {
-                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+gap_x-1, y+height-1, 2);
-                    drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x-1, y+height-2, 2);
-                }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x-1, y+height-1, 2);
-            }
-            else if(!thin)
-                drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+height-1, 2);
+                else if(!thin)
+                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+height-1, 2);
 
-            if(rightPos >= 0)
-            {
-                if(!thin)
+                if(rightPos >= 0)
                 {
-                    drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-2, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-1, rightPos ? 1 : 0);
+                    if(!thin)
+                    {
+                        drawHLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-2, 3);
+                        drawVLine(cr, CAIRO_COL(*col2), 1.0, x+gap_x+gap_width-2, y+height-1, rightPos ? 1 : 0);
+                    }
+                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y+height-1, 2);
                 }
-                drawHLine(cr, CAIRO_COL(*outer), 1.0, x+gap_x+gap_width-1, y+height-1, 2);
-            }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
-                else
-                    drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
-            break;
-        case GTK_POS_LEFT:
-            if(gap_x>0)
-            {
-                if(!thin)
+                if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
+                    if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                        drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-2 : x+1, y+height-2, 2);
+                    else
+                        drawVLine(cr, CAIRO_COL(*outer), 1.0, rev ? x+width-1 : x, y+height-3, 3);
+                break;
+            case GTK_POS_LEFT:
+                if(gap_x>0)
                 {
-                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gap_x-1, 3);
-                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x, y+gap_x-1, 3);
+                    if(!thin)
+                    {
+                        drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gap_x-1, 3);
+                        drawVLine(cr, CAIRO_COL(*col1), 1.0, x, y+gap_x-1, 3);
+                    }
+                    drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gap_x-1, 2);
                 }
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gap_x-1, 2);
-            }
-            else if(!thin)
-                drawHLine(cr, CAIRO_COL(*col1), 1.0, x, y+1, 2);
+                else if(!thin)
+                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x, y+1, 2);
 
-            if((height-(gap_x + gap_width)) > 0)
-            {
-                if(!thin)
+                if((height-(gap_x + gap_width)) > 0)
                 {
-                    drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gap_x+gap_width-2, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x, y+gap_x+gap_width-2, 1);
+                    if(!thin)
+                    {
+                        drawVLine(cr, CAIRO_COL(*col1), 1.0, x+1, y+gap_x+gap_width-2, 3);
+                        drawVLine(cr, CAIRO_COL(*col2), 1.0, x, y+gap_x+gap_width-2, 1);
+                    }
+                    drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gap_x+gap_width-1, 2);
                 }
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x, y+gap_x+gap_width-1, 2);
-            }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y+1, 2);
-                else
+                if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
+                    if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                        drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y+1, 2);
+                    else
+                    {
+                        drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y, 3);
+                        if(gap_x>0 && !thin)
+                            drawHLine(cr, CAIRO_COL(qtcPalette.background[2]), 1.0, x, y+1, 1);
+                    }
+                break;
+            case GTK_POS_RIGHT:
+                if(gap_x>0)
                 {
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x, y, 3);
-                    if(gap_x>0 && !thin)
-                        drawHLine(cr, CAIRO_COL(qtcPalette.background[2]), 1.0, x, y+1, 1);
+                    if(!thin)
+                        drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x-1, 2);
+                    drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x-1, 2);
                 }
-            break;
-        case GTK_POS_RIGHT:
-            if(gap_x>0)
-            {
-                if(!thin)
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x-1, 2);
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x-1, 2);
-            }
-            else if(!thin)
-                drawHLine(cr, CAIRO_COL(*col1), 1.0, x+width-2, y+1, 3);
+                else if(!thin)
+                    drawHLine(cr, CAIRO_COL(*col1), 1.0, x+width-2, y+1, 3);
 
-            if((height-(gap_x + gap_width)) > 0)
-            {
-                if(!thin)
+                if((height-(gap_x + gap_width)) > 0)
                 {
-                    drawHLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-2, 3);
-                    drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-1, 2);
+                    if(!thin)
+                    {
+                        drawHLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-2, 3);
+                        drawVLine(cr, CAIRO_COL(*col2), 1.0, x+width-2, y+gap_x+gap_width-1, 2);
+                    }
+                    drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x+gap_width-1, 2);
                 }
-                drawVLine(cr, CAIRO_COL(*outer), 1.0, x+width-1, y+gap_x+gap_width-1, 2);
-            }
-            if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
-                if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
-                else
-                    drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
-            break;
-    }
+                if(!(opts.square&SQUARE_TAB_FRAME) && opts.round>ROUND_SLIGHT)
+                    if(gap_x>0 && TAB_MO_GLOW==opts.tabMouseOver)
+                        drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-2, y+1, 2);
+                    else
+                        drawHLine(cr, CAIRO_COL(*outer), 1.0, x+width-3, y, 3);
+                break;
+        }
 
     CAIRO_END
 }
