@@ -990,6 +990,9 @@ Style::Style()
         itsWindowManager(new WindowManager(this)),
         itsBlurHelper(new BlurHelper(this)),
         itsShortcutHandler(new ShortcutHandler(this))
+#ifdef QTC_STYLE_SUPPORT
+        , itsName(name)
+#endif
 {
     const char *env=getenv(QTCURVE_PREVIEW_CONFIG);
     if(env && 0==strcmp(env, QTCURVE_PREVIEW_CONFIG))
@@ -1007,33 +1010,31 @@ Style::Style()
         itsUsePixmapCache=false;
     }
     else
-#ifdef QTC_STYLE_SUPPORT
-        init(name);
-#else
-        init();
-#endif
+        init(true);
 }
 
-#ifdef QTC_STYLE_SUPPORT
-void Style::init(const QString &name)
-#else
-void Style::init()
-#endif
+void Style::init(bool initial)
 {
+    if(!initial)
+        freeColors();
+
 #if !defined QTC_QT_ONLY
-    if(KGlobal::hasMainComponent())
-        itsComponentData=KGlobal::mainComponent();
-    else
+    if(initial)
     {
-        QString name(QApplication::applicationName());
+        if(KGlobal::hasMainComponent())
+            itsComponentData=KGlobal::mainComponent();
+        else
+        {
+            QString name(QApplication::applicationName());
 
-        if(name.isEmpty())
-            name=qAppName();
+            if(name.isEmpty())
+                name=qAppName();
 
-        if(name.isEmpty())
-            name="QtApp";
+            if(name.isEmpty())
+                name="QtApp";
 
-        itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
+            itsComponentData=KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
+        }
     }
 #endif
 
@@ -1046,15 +1047,15 @@ void Style::init()
     {
 #ifdef QTC_STYLE_SUPPORT
         QString rcFile;
-        if(!name.isEmpty())
+        if(!itsName.isEmpty())
         {
-            rcFile=themeFile(kdeHome(), name);
+            rcFile=themeFile(kdeHome(), itsName);
 
             if(rcFile.isEmpty())
             {
-                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), name, useQt3Settings());
+                rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), itsName, useQt3Settings());
                 if(rcFile.isEmpty())
-                    rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), name, !useQt3Settings());
+                    rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), itsName, !useQt3Settings());
             }
         }
         readConfig(rcFile, &opts);
@@ -1063,22 +1064,25 @@ void Style::init()
 #endif
 
 #ifdef Q_WS_X11
-        QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
-                                              "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-        QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
-                                              "compositingToggled", this, SLOT(compositingToggled()));
-
-        if(!qApp || QString(qApp->argv()[0])!="kwin")
+        if(initial)
         {
-            QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                              "borderSizesChanged", this, SLOT(borderSizesChanged()));
-            if(opts.menubarHiding&HIDE_KWIN)
-                QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                      "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+            QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
+                                                "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
+            QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
+                                                "compositingToggled", this, SLOT(compositingToggled()));
 
-            if(opts.statusbarHiding&HIDE_KWIN)
+            if(!qApp || QString(qApp->argv()[0])!="kwin")
+            {
                 QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
-                                                      "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+                                                "borderSizesChanged", this, SLOT(borderSizesChanged()));
+                if(opts.menubarHiding&HIDE_KWIN)
+                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                                        "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
+
+                if(opts.statusbarHiding&HIDE_KWIN)
+                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                                                        "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
+            }
         }
 #endif
     }
@@ -1349,42 +1353,83 @@ void Style::init()
 
 Style::~Style()
 {
-    if(0!=itsProgressBarAnimateTimer)
-        killTimer(itsProgressBarAnimateTimer);
-
-    if(itsSidebarButtonsCols && itsSidebarButtonsCols!=itsSliderCols && itsSidebarButtonsCols!=itsDefBtnCols)
-        delete [] itsSidebarButtonsCols;
-    if(itsPopupMenuCols && itsPopupMenuCols!=itsMenubarCols && itsPopupMenuCols!=itsBackgroundCols && itsProgressCols!=itsActiveMdiColors)
-        delete [] itsPopupMenuCols;
-    if(itsActiveMdiColors && itsActiveMdiColors!=itsHighlightCols && itsActiveMdiColors!=itsBackgroundCols)
-        delete [] itsActiveMdiColors;
-    if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
-        delete [] itsMdiColors;
-    if(itsProgressCols && itsProgressCols!=itsHighlightCols && itsProgressCols!=itsBackgroundCols &&
-       itsProgressCols!=itsSliderCols && itsProgressCols!=itsComboBtnCols && itsProgressCols!=itsCheckRadioSelCols &&  itsProgressCols!=itsSortedLvColors)
-        delete [] itsProgressCols;
-    if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
-       itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors && 
-       itsCheckRadioSelCols!=itsButtonCols && itsCheckRadioSelCols!=itsHighlightCols)
-        delete [] itsCheckRadioSelCols;
-    if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
-       itsSortedLvColors!=itsComboBtnCols)
-        delete [] itsSortedLvColors;
-    if(itsComboBtnCols && itsComboBtnCols!=itsHighlightCols && itsComboBtnCols!=itsSliderCols)
-        delete [] itsComboBtnCols;
-    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols && itsDefBtnCols!=itsHighlightCols)
-        delete [] itsDefBtnCols;
-    if(itsSliderCols && itsSliderCols!=itsHighlightCols)
-        delete [] itsSliderCols;
-    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
-        for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
-            delete [] itsTitleBarButtonsCols[i];
-    if(itsOOMenuCols)
-        delete [] itsOOMenuCols;
+    freeColors();
 #ifdef Q_WS_X11
     if(itsDBus)
         delete itsDBus;
 #endif
+}
+
+void Style::freeColors()
+{
+    if(0!=itsProgressBarAnimateTimer)
+        killTimer(itsProgressBarAnimateTimer);
+
+    if(itsSidebarButtonsCols && itsSidebarButtonsCols!=itsSliderCols && itsSidebarButtonsCols!=itsDefBtnCols)
+    {
+        delete [] itsSidebarButtonsCols;
+        itsSidebarButtonsCols=0L;
+    }
+    if(itsPopupMenuCols && itsPopupMenuCols!=itsMenubarCols && itsPopupMenuCols!=itsBackgroundCols && itsProgressCols!=itsActiveMdiColors)
+    {
+        delete [] itsPopupMenuCols;
+        itsPopupMenuCols=0L;
+    }
+    if(itsActiveMdiColors && itsActiveMdiColors!=itsHighlightCols && itsActiveMdiColors!=itsBackgroundCols)
+    {
+        delete [] itsActiveMdiColors;
+        itsActiveMdiColors=0L;
+    }
+    if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
+    {
+        delete [] itsMdiColors;
+        itsMdiColors=0L;
+    }
+    if(itsProgressCols && itsProgressCols!=itsHighlightCols && itsProgressCols!=itsBackgroundCols &&
+       itsProgressCols!=itsSliderCols && itsProgressCols!=itsComboBtnCols && itsProgressCols!=itsCheckRadioSelCols &&  itsProgressCols!=itsSortedLvColors)
+    {
+        delete [] itsProgressCols;
+        itsProgressCols=0L;
+    }
+    if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
+       itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors && 
+       itsCheckRadioSelCols!=itsButtonCols && itsCheckRadioSelCols!=itsHighlightCols)
+    {
+        delete [] itsCheckRadioSelCols;
+        itsCheckRadioSelCols=0L;
+    }
+    if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
+       itsSortedLvColors!=itsComboBtnCols)
+    {
+        delete [] itsSortedLvColors;
+        itsSortedLvColors=0L;
+    }
+    if(itsComboBtnCols && itsComboBtnCols!=itsHighlightCols && itsComboBtnCols!=itsSliderCols)
+    {
+        delete [] itsComboBtnCols;
+        itsComboBtnCols=0L;
+    }
+    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols && itsDefBtnCols!=itsHighlightCols)
+    {
+        delete [] itsDefBtnCols;
+        itsDefBtnCols=0L;
+    }
+    if(itsSliderCols && itsSliderCols!=itsHighlightCols)
+    {
+        delete [] itsSliderCols;
+        itsSliderCols=0L;
+    }
+    if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
+        for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
+        {
+            delete [] itsTitleBarButtonsCols[i];
+            itsTitleBarButtonsCols[i]=0L;
+        }
+    if(itsOOMenuCols)
+    {
+        delete [] itsOOMenuCols;
+        itsOOMenuCols=0L;
+    }
 }
 
 static QString getFile(const QString &f)
@@ -5528,7 +5573,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     Style *that=(Style *)this;
                     opts=preview->opts;
                     checkConfig(&opts);
-                    that->init();
+                    that->init(true);
                 }
             }
             break;
@@ -13598,6 +13643,21 @@ void Style::kdeGlobalSettingsChange(int type, int)
 #else
     switch(type)
     {
+        case KGlobalSettings::StyleChanged:
+        {
+            KGlobal::config()->reparseConfiguration();
+            if(itsUsePixmapCache)
+                QPixmapCache::clear();
+            init(false);
+
+            QWidgetList                tlw=QApplication::topLevelWidgets();
+            QWidgetList::ConstIterator it(tlw.begin()),
+                                       end(tlw.end());
+
+            for(; it!=end; ++it)
+                (*it)->update();
+            break;
+        }
         case KGlobalSettings::PaletteChanged:
             KGlobal::config()->reparseConfiguration();
             applyKdeSettings(true);

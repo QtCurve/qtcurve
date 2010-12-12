@@ -132,12 +132,14 @@ class Style : public QCommonStyle
 
 #ifdef QTC_STYLE_SUPPORT
     Style(const QString &name=QString());
-    void init(const QString &name=QString());
 #else
     Style();
-    void init();
 #endif
+
     ~Style();
+    
+    void init(bool initial);
+    void freeColors();
 
     Options & options() { return opts; }
 
@@ -222,7 +224,7 @@ class Style : public QCommonStyle
                         const QColor &iconColor, const QColor *btnCols, const QColor *bgndCols) const;
     bool drawMdiButton(QPainter *painter, const QRect &r, bool hover, bool sunken, const QColor *cols) const;
     void drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bgnd, const QRect &r,
-                     bool hover, bool sunken, Icon icon, bool stdSize, bool drewFrame) const;
+                     bool hover, bool sunken, Icon iclearcon, bool stdSize, bool drewFrame) const;
     void drawIcon(QPainter *painter, const QColor &color, const QRect &r, bool sunken, Icon icon, bool stdSize=true) const;
     void drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget, const QStyleOption *option, int round,
                         bool fill, bool doEtch, EWidget w=WIDGET_ENTRY) const;
@@ -363,6 +365,9 @@ class Style : public QCommonStyle
     QtCurve::WindowManager             *itsWindowManager;
     QtCurve::BlurHelper                *itsBlurHelper;
     QtCurve::ShortcutHandler           *itsShortcutHandler;
+#ifdef QTC_STYLE_SUPPORT
+    QString                            itsName;
+#endif
 };
 
 }

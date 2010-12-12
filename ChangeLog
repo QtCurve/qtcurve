@@ -13,6 +13,7 @@
 6. Draw box around checked Libre/Open Office menu checkboxes.
 7. Ukrainian translation - thanks to Yuri Chornoivan
 8. Slight drawing fix for square scrollviews.
+9. When compiled against KDE, react to style changes.
 
 1.8.1
 -----
