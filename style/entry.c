@@ -1,12 +1,18 @@
-#define GE_IS_ENTRY(object) ((object) && objectIsA((GObject*)(object), "GtkEntry"))
+#include <gtk/gtk.h>
+#include "compatability.h"
 
-static GtkWidget *lastMoEntry=NULL;
+static GtkWidget *qtcEntryLastMo=NULL;
+
+gboolean qtcEntryIsLastMo(GtkWidget *widget)
+{
+    return qtcEntryLastMo && widget==qtcEntryLastMo;
+}
 
 static void qtcEntryCleanup(GtkWidget *widget)
 {
-    if(lastMoEntry==widget)
-        lastMoEntry=NULL;
-    if (GE_IS_ENTRY(widget))
+    if(qtcEntryLastMo==widget)
+        qtcEntryLastMo=NULL;
+    if (GTK_IS_ENTRY(widget))
     {
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID"));
@@ -36,9 +42,9 @@ static gboolean qtcEntryDestroy(GtkWidget *widget, GdkEvent *event, gpointer use
 
 static gboolean qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-    if (GE_IS_ENTRY(widget))
+    if (GTK_IS_ENTRY(widget))
     {
-        lastMoEntry=widget;
+        qtcEntryLastMo=widget;
         gtk_widget_queue_draw(widget);
     }
  
@@ -47,18 +53,18 @@ static gboolean qtcEntryEnter(GtkWidget *widget, GdkEventCrossing *event, gpoint
 
 static gboolean qtcEntryLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-    if (GE_IS_ENTRY(widget))
+    if (GTK_IS_ENTRY(widget))
     {
-        lastMoEntry=NULL;
+        qtcEntryLastMo=NULL;
         gtk_widget_queue_draw(widget);
     }
  
     return FALSE;
 }
 
-static void qtcEntrySetup(GtkWidget *widget)
+void qtcEntrySetup(GtkWidget *widget)
 {
-    if (GE_IS_ENTRY(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET"))
+    if (GTK_IS_ENTRY(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET"))
     {
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_HACK_SET", (gpointer)1);
         g_object_set_data(G_OBJECT(widget), "QTC_ENTRY_ENTER_ID",

@@ -1,7 +1,18 @@
+#include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+#include <stdlib.h>
+#include "compatability.h"
+#include "common.h"
+#include "config_file.h"
+#include "qt_settings.h"
+#include "qtcurve.h"
+#include "window.h"
+#include "menu.h"
+
+extern Options opts;
 
 static GtkWidget *qtcCurrentActiveWindow=NULL;
 
@@ -40,7 +51,7 @@ static QtCWindow * qtcWindowLookupHash(void *hash, gboolean create)
 
 static void qtcWindowRemoveFromHash(void *hash)
 {
-    if(tabHashTable)
+    if(qtcWindowTable)
     {
         QtCWindow *tv=qtcWindowLookupHash(hash, FALSE);
         if(tv)
@@ -85,9 +96,8 @@ static gboolean qtcWindowStyleSet(GtkWidget *widget, GtkStyle *previous_style, g
     return FALSE;
 }
 
-static GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level);
-static gboolean    qtcWindowToggleMenuBar(GtkWidget *widget);
-static gboolean    qtcWindowToggleStatusBar(GtkWidget *widget);
+static gboolean qtcWindowToggleMenuBar(GtkWidget *widget);
+static gboolean qtcWindowToggleStatusBar(GtkWidget *widget);
 
 static gboolean qtcWindowClientEvent(GtkWidget *widget, GdkEventClient *event, gpointer user_data)
 {
@@ -132,7 +142,7 @@ static gboolean qtcWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer us
     return FALSE;
 }
 
-static gboolean qtcWindowIsActive(GtkWidget *widget)
+gboolean qtcWindowIsActive(GtkWidget *widget)
 {
     return widget && (gtk_window_is_active(GTK_WINDOW(widget)) || qtcCurrentActiveWindow==widget);
 }
@@ -152,7 +162,7 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget)
             EPixPos pos=IMG_FILE==opts.bgndImage.type ? opts.bgndImage.pos : PP_TR;
 
             if(IMG_FILE==opts.bgndImage.type)
-                loadBgndImage(&opts.bgndImage);
+                qtcLoadBgndImage(&opts.bgndImage);
 
             switch(pos)
             {
@@ -235,7 +245,7 @@ static gboolean qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, 
     return FALSE;
 }
 
-static GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
+GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
 {
     if(level<3 && GTK_IS_CONTAINER(parent))
     {
@@ -261,7 +271,7 @@ static GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
     return NULL;
 }
 
-static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level)
+GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level)
 {
     if(level<3 && GTK_IS_CONTAINER(parent))
     {
@@ -287,7 +297,7 @@ static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level)
     return NULL;
 }
 
-static void qtcWindowMenuBarDBus(GtkWidget *widget, int size)
+void qtcWindowMenuBarDBus(GtkWidget *widget, int size)
 {
     GtkWindow    *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
     unsigned int xid=GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel)));
@@ -308,7 +318,7 @@ static void qtcWindowMenuBarDBus(GtkWidget *widget, int size)
     */
 }
 
-static void qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state)
+void qtcWindowStatusBarDBus(GtkWidget *widget, gboolean state)
 {
     GtkWindow    *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
     unsigned int xid=GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel)));
@@ -345,7 +355,7 @@ static gboolean qtcWindowToggleMenuBar(GtkWidget *widget)
             gtk_widget_show(menuBar);
         }
 
-        qtcEmitMenuSize(menuBar, size);
+        qtcMenuEmitSize(menuBar, size);
         qtcWindowMenuBarDBus(widget, size);
 
         return TRUE;
@@ -353,9 +363,7 @@ static gboolean qtcWindowToggleMenuBar(GtkWidget *widget)
     return FALSE;
 }
 
-static GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level);
-
-static gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
+gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
 {
     if(w &&!g_object_get_data(G_OBJECT(w), STATUSBAR_ATOM))
     {
@@ -442,7 +450,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
         {
             int size=qtcWidgetVisible(menuBar) ? qtcWidgetGetAllocation(menuBar).height : 0;
 
-            qtcEmitMenuSize(menuBar, size);
+            qtcMenuEmitSize(menuBar, size);
             qtcWindowMenuBarDBus(widget, size);
         }
     }
@@ -457,7 +465,7 @@ static gboolean qtcWindowMap(GtkWidget *widget, GdkEventKey *event, gpointer use
     return FALSE;
 }
 
-static gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
+gboolean qtcWindowSetup(GtkWidget *widget, int opacity)
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_WINDOW_HACK_SET"))
     {

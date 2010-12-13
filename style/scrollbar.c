@@ -1,3 +1,6 @@
+#include <gtk/gtk.h>
+#include "compatability.h"
+
 static void qtcScrollbarCleanup(GtkWidget *widget)
 {
     if (widget && g_object_get_data(G_OBJECT(widget), "QTC_SCROLLBAR_SET"))

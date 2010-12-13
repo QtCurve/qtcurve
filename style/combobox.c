@@ -1,4 +1,5 @@
-#define GE_IS_EVENT_BOX(object) ((object) && objectIsA((GObject*)(object), "GtkEventBox"))
+#include <gtk/gtk.h>
+#include "compatability.h"
 
 /**
  * Setting appears-as-list on a non-editable combo creates a view over the 'label' which
@@ -33,7 +34,7 @@ static void qtcComboBoxClearBgndColor(GtkWidget *widget)
 static GtkWidget *qtcComboFocus=NULL;
 static GtkWidget *qtcComboHover=NULL;
 
-static qtcComboBoxIsFocusChanged(GtkWidget *widget)
+gboolean qtcComboBoxIsFocusChanged(GtkWidget *widget)
 {
     if(qtcComboFocus==widget)
     {
@@ -52,12 +53,12 @@ static qtcComboBoxIsFocusChanged(GtkWidget *widget)
     return FALSE;
 }
 
-static qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped)
+gboolean qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped)
 {
     return qtcWidgetHasFocus(widget) || (mapped && mapped==qtcComboFocus);
 }
 
-static qtcComboBoxIsHovered(GtkWidget *widget)
+gboolean qtcComboBoxIsHovered(GtkWidget *widget)
 {
     return widget==qtcComboHover;
 }
@@ -103,7 +104,7 @@ static gboolean qtcComboBoxDestroy(GtkWidget *widget, GdkEvent *event, gpointer 
 
 static gboolean qtcComboBoxEnter(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if(GE_IS_EVENT_BOX(widget))
+    if(GTK_IS_EVENT_BOX(widget))
     {
         GtkWidget *widget=(GtkWidget *)user_data;
         if(qtcComboHover!=widget)
@@ -117,7 +118,7 @@ static gboolean qtcComboBoxEnter(GtkWidget *widget, GdkEventMotion *event, gpoin
 
 static gboolean qtcComboBoxLeave(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if(GE_IS_EVENT_BOX(widget))
+    if(GTK_IS_EVENT_BOX(widget))
     {
         GtkWidget *widget=(GtkWidget *)user_data;
         if(qtcComboHover==widget)
@@ -135,7 +136,7 @@ static gboolean qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event,
         qtcComboBoxClearBgndColor(widget);
 }
 
-static void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
+void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 {
     if (combo && frame && !g_object_get_data(G_OBJECT(combo), "QTC_COMBO_BOX_SET"))
     {

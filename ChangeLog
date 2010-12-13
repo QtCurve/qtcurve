@@ -9,6 +9,7 @@
 6. Fix slight glitch with striped scrollbar sliders.
 7. Hacky fix for tabs in Thunderbird main window.
 8. Better detection of toolbar buttons in Thunderbird.
+9. Slightly clean-up code.
 
 1.8.1
 -----

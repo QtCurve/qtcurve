@@ -1,6 +1,8 @@
-#if GTK_CHECK_VERSION(2, 12, 0)
+#include <gtk/gtk.h>
+#include <stdlib.h>
+#include "compatability.h"
 
-#define GE_IS_TREEVIEW(object) ((object) && objectIsA((GObject*)(object), "GtkTreeView"))
+#if GTK_CHECK_VERSION(2, 12, 0)
 
 typedef struct
 {
@@ -35,7 +37,7 @@ static QtCTreeView * qtcTreeViewLookupHash(void *hash, gboolean create)
 
 static void qtcTreeViewRemoveFromHash(void *hash)
 {
-    if(tabHashTable)
+    if(qtcTreeViewTable)
     {
         QtCTreeView *tv=qtcTreeViewLookupHash(hash, FALSE);
         if(tv)
@@ -47,7 +49,7 @@ static void qtcTreeViewRemoveFromHash(void *hash)
     }
 }
 
-static void qtcTreeViewGetCell(GtkTreeView *treeView, GtkTreePath **path, GtkTreeViewColumn **column, int x, int y, int width, int height)
+void qtcTreeViewGetCell(GtkTreeView *treeView, GtkTreePath **path, GtkTreeViewColumn **column, int x, int y, int width, int height)
 {
     int      pos;
     GdkPoint points[4]={ {x+1, y+1}, {x+1, y+height-1}, {x+width-1, y+1}, {x+width, y+height-1} };
@@ -153,7 +155,7 @@ static void qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
     }
 }
 
-static gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *column)
+gboolean qtcTreeViewIsCellHovered(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *column)
 {
     QtCTreeView *tv=qtcTreeViewLookupHash(widget, FALSE);
     return tv && (tv->fullWidth || tv->column==column) && qtcTreeViewSamePath(path, tv->path);
@@ -195,7 +197,7 @@ static gboolean qtcTreeViewLeave(GtkWidget *widget, GdkEventMotion *event, gpoin
     return FALSE;
 }
 
-static void qtcTreeViewSetup(GtkWidget *widget)
+void qtcTreeViewSetup(GtkWidget *widget)
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_TREE_VIEW_SET"))
     {

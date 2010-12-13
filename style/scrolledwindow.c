@@ -1,4 +1,8 @@
-#define GE_IS_SCROLLED_WINDOW(object) ((object) && objectIsA((GObject*)(object), "GtkScrolledWindow"))
+#include <gtk/gtk.h>
+#include "compatability.h"
+#include "common.h"
+
+extern Options opts;
 
 static void qtcScrolledWindowCleanup(GtkWidget *widget)
 {
@@ -40,12 +44,12 @@ static gboolean qtcScrolledWindowDestroy(GtkWidget *widget, GdkEvent *event, gpo
 static GtkWidget *qtcScrolledWindowFocus=NULL;
 static GtkWidget *qtcScrolledWindowHover=NULL;
 
-static qtcScrolledWindowHasFocus(GtkWidget *widget)
+gboolean qtcScrolledWindowHasFocus(GtkWidget *widget)
 {
     return widget && (qtcWidgetHasFocus(widget) || widget==qtcScrolledWindowFocus);
 }
 
-static qtcScrolledWindowHovered(GtkWidget *widget)
+gboolean qtcScrolledWindowHovered(GtkWidget *widget)
 {
     return widget && (GTK_STATE_PRELIGHT==qtcWidgetGetState(widget) || widget==qtcScrolledWindowHover);
 }
@@ -53,7 +57,7 @@ static qtcScrolledWindowHovered(GtkWidget *widget)
 static gboolean qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     GtkWidget *w=user_data ? (GtkWidget *)user_data : widget;
-    if(GE_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowHover!=w)
+    if(GTK_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowHover!=w)
     {
         qtcScrolledWindowHover=w;
         gtk_widget_queue_draw(w);
@@ -64,7 +68,7 @@ static gboolean qtcScrolledWindowEnter(GtkWidget *widget, GdkEventMotion *event,
 static gboolean qtcScrolledWindowLeave(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     GtkWidget *w=user_data ? (GtkWidget *)user_data : widget;
-    if(GE_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowHover==w)
+    if(GTK_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowHover==w)
     {
         qtcScrolledWindowHover=NULL;
         gtk_widget_queue_draw(w);
@@ -75,7 +79,7 @@ static gboolean qtcScrolledWindowLeave(GtkWidget *widget, GdkEventMotion *event,
 static gboolean qtcScrolledWindowFocusIn(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     GtkWidget *w=user_data ? (GtkWidget *)user_data : widget;
-    if(GE_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowFocus!=w)
+    if(GTK_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowFocus!=w)
     {
         qtcScrolledWindowFocus=w;
         gtk_widget_queue_draw(w);
@@ -86,7 +90,7 @@ static gboolean qtcScrolledWindowFocusIn(GtkWidget *widget, GdkEventMotion *even
 static gboolean qtcScrolledWindowFocusOut(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
     GtkWidget *w=user_data ? (GtkWidget *)user_data : widget;
-    if(GE_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowFocus==w)
+    if(GTK_IS_SCROLLED_WINDOW(w) && qtcScrolledWindowFocus==w)
     {
         qtcScrolledWindowFocus=NULL;
         gtk_widget_queue_draw(w);
@@ -130,7 +134,7 @@ static void qtcScrolledWindowSetupConnections(GtkWidget *widget, GtkWidget *pare
     }
 }
 
-static void qtcScrolledWindowRegisterChild(GtkWidget *child)
+void qtcScrolledWindowRegisterChild(GtkWidget *child)
 {
     GtkWidget *parent=child ? qtcWidgetGetParent(child) : NULL;
 
@@ -138,7 +142,7 @@ static void qtcScrolledWindowRegisterChild(GtkWidget *child)
         qtcScrolledWindowSetupConnections(child, parent);
 }
 
-static void qtcScrolledWindowSetup(GtkWidget *widget)
+void qtcScrolledWindowSetup(GtkWidget *widget)
 {
     if (widget && GTK_IS_SCROLLED_WINDOW(widget) && !g_object_get_data(G_OBJECT(widget), "QTC_SCROLLED_WINDOW_SET"))
     {

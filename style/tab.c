@@ -1,3 +1,7 @@
+#include <gtk/gtk.h>
+#include <stdlib.h>
+#include "compatability.h"
+
 typedef struct
 {
     int          id,
@@ -5,16 +9,16 @@ typedef struct
     GdkRectangle *rects;
 } QtCTab;
 
-static GHashTable *tabHashTable = NULL;
+static GHashTable *qtcTabHashTable = NULL;
 
-static QtCTab * lookupTabHash(void *hash, gboolean create)
+static QtCTab * qtcTabLookupHash(void *hash, gboolean create)
 {
     QtCTab *rv=NULL;
 
-    if(!tabHashTable)
-        tabHashTable=g_hash_table_new(g_direct_hash, g_direct_equal);
+    if(!qtcTabHashTable)
+        qtcTabHashTable=g_hash_table_new(g_direct_hash, g_direct_equal);
 
-    rv=(QtCTab *)g_hash_table_lookup(tabHashTable, hash);
+    rv=(QtCTab *)g_hash_table_lookup(qtcTabHashTable, hash);
 
     if(!rv && create)
     {
@@ -30,35 +34,35 @@ static QtCTab * lookupTabHash(void *hash, gboolean create)
             rv->rects[p].x=rv->rects[p].y=0;
             rv->rects[p].width=rv->rects[p].height=-1;
         }
-        g_hash_table_insert(tabHashTable, hash, rv);
-        rv=g_hash_table_lookup(tabHashTable, hash);
+        g_hash_table_insert(qtcTabHashTable, hash, rv);
+        rv=g_hash_table_lookup(qtcTabHashTable, hash);
     }
 
     return rv;
 }
 
-static void removeFromTabHash(void *hash)
+static void qtcTabRemoveHash(void *hash)
 {
-    if(tabHashTable)
+    if(qtcTabHashTable)
     {
-        QtCTab *tab=GTK_IS_NOTEBOOK(hash) ? lookupTabHash(hash, FALSE) : NULL;
+        QtCTab *tab=GTK_IS_NOTEBOOK(hash) ? qtcTabLookupHash(hash, FALSE) : NULL;
         
         if(tab)
             free(tab->rects);
-        g_hash_table_remove(tabHashTable, hash);
+        g_hash_table_remove(qtcTabHashTable, hash);
     }
 }
 
-static gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget)
+gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget)
 {
-    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? lookupTabHash(widget, FALSE) : NULL;
+    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
 
     return tab ? tab->id : -1;
 }
 
-static void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height)
+void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height)
 {
-    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? lookupTabHash(widget, FALSE) : NULL;
+    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
 
     if(tab && tabIndex>=0)
     {
@@ -89,7 +93,7 @@ static void qtcTabCleanup(GtkWidget *widget)
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_TAB_HACK_SET");
-        removeFromTabHash(widget);
+        qtcTabRemoveHash(widget);
     }
 }
 
@@ -126,7 +130,7 @@ static void qtcSetHoveredTab(QtCTab *tab, GtkWidget *widget, int index)
 
 static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? lookupTabHash(widget, FALSE) : NULL;
+    QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
 
     if (tab)
     {
@@ -150,7 +154,7 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
 
 static gboolean qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
 {
-    QtCTab *prevTab=GTK_IS_NOTEBOOK(widget) ? lookupTabHash(widget, FALSE) : NULL;
+    QtCTab *prevTab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
 
     if(prevTab && prevTab->id>=0)
     {
@@ -250,11 +254,11 @@ static gboolean qtcTabPageAdded(GtkWidget *widget, GdkEventCrossing *event, gpoi
     return FALSE;
 }
 
-static void qtcTabSetup(GtkWidget *widget)
+void qtcTabSetup(GtkWidget *widget)
 {
     if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_SET"))
     {
-        lookupTabHash(widget, TRUE);
+        qtcTabLookupHash(widget, TRUE);
 
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID",
                           (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcTabMotion), NULL));

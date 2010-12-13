@@ -1,39 +1,42 @@
-static GHashTable *widgetMapHashTable[2] = {NULL, NULL};
+#include <gtk/gtk.h>
+#include "compatability.h"
+
+static GHashTable *qtcWidgetMapHashTable[2] = {NULL, NULL};
 
 #define MAP_ID_X(ID_STR) "QTC_WIDGET_MAP_HACK_HACK_SET"ID_STR
 #define MAP_ID(ID) (ID ? MAP_ID_X("1") : MAP_ID_X("0"))
 
-static GtkWidget * lookupWidgetMapHash(void *hash, void *value, int map)
+static GtkWidget * qtcWidgetMapLookupHash(void *hash, void *value, int map)
 {
     GtkWidget *rv=NULL;
 
-    if(!widgetMapHashTable[map])
-        widgetMapHashTable[map]=g_hash_table_new(g_direct_hash, g_direct_equal);
+    if(!qtcWidgetMapHashTable[map])
+        qtcWidgetMapHashTable[map]=g_hash_table_new(g_direct_hash, g_direct_equal);
 
-    rv=(GtkWidget *)g_hash_table_lookup(widgetMapHashTable[map], hash);
+    rv=(GtkWidget *)g_hash_table_lookup(qtcWidgetMapHashTable[map], hash);
 
     if(!rv && value)
     {
-        g_hash_table_insert(widgetMapHashTable[map], hash, value);
+        g_hash_table_insert(qtcWidgetMapHashTable[map], hash, value);
         rv=value;
     }
 
     return rv;
 }
 
-static void removeFromWidgetMapHash(void *hash)
+static void qtcWidgetMapRemoveHash(void *hash)
 {
     int i;
 
     for(i=0; i<2; ++i)
-        if(widgetMapHashTable[i])
-            g_hash_table_remove(widgetMapHashTable[i], hash);
+        if(qtcWidgetMapHashTable[i])
+            g_hash_table_remove(qtcWidgetMapHashTable[i], hash);
 }
 
-static GtkWidget * getMappedWidget(GtkWidget *widget, int map)
+GtkWidget * qtcWidgetMapGetWidget(GtkWidget *widget, int map)
 {
     return widget && g_object_get_data(G_OBJECT(widget), MAP_ID(map))
-            ? lookupWidgetMapHash(widget, NULL, map) : NULL;
+            ? qtcWidgetMapLookupHash(widget, NULL, map) : NULL;
 }
 
 static void qtcWidgetMapCleanup(GtkWidget *widget)
@@ -48,7 +51,7 @@ static void qtcWidgetMapCleanup(GtkWidget *widget)
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID"));
         g_object_steal_data(G_OBJECT(widget), MAP_ID(0));
         g_object_steal_data(G_OBJECT(widget), MAP_ID(1));
-        removeFromWidgetMapHash(widget);
+        qtcWidgetMapRemoveHash(widget);
     }
 }
 
@@ -64,7 +67,7 @@ static gboolean qtcWidgetMapDestroy(GtkWidget *widget, GdkEvent *event, gpointer
     return FALSE;
 }
 
-static void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
+void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
 {
     if (from && to && !g_object_get_data(G_OBJECT(from), MAP_ID(map)))
     {
@@ -75,6 +78,6 @@ static void qtcWidgetMapSetup(GtkWidget *from, GtkWidget *to, int map)
                           (gpointer)g_signal_connect(G_OBJECT(from), "unrealize", G_CALLBACK(qtcWidgetMapDestroy), NULL));
         g_object_set_data(G_OBJECT(from), "QTC_WIDGET_MAP_HACK_STYLE_SET_ID",
                           (gpointer)g_signal_connect(G_OBJECT(from), "style-set", G_CALLBACK(qtcWidgetMapStyleSet), NULL));
-        lookupWidgetMapHash(from, to, map);
+        qtcWidgetMapLookupHash(from, to, map);
     }  
 }

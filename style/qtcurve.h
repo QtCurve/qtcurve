@@ -75,4 +75,30 @@ struct _QtCurveStyleClass
     GtkStyleClass parent_class;
 };
 
+typedef struct
+{
+    GdkColor background[TOTAL_SHADES+1],
+             button[2][TOTAL_SHADES+1],
+             *slider,
+             *defbtn,
+             *mouseover,
+             *combobtn,
+             *selectedcr,
+             *sortedlv,
+             *sidebar,
+             *progress,
+             *wborder[2],
+             mdi_text[2],
+             menubar[TOTAL_SHADES+1],
+             highlight[TOTAL_SHADES+1],
+             focus[TOTAL_SHADES+1],
+             menu[TOTAL_SHADES+1],
+             *check_radio;
+} QtCPalette;
+
+extern QtCPalette qtcPalette;
+
+extern gboolean isFakeGtk();
+extern void qtcShadeColors(GdkColor *base, GdkColor *vals);
+
 #endif

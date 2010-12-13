@@ -1,3 +1,15 @@
+#include <gtk/gtk.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gdk/gdkx.h>
+#include "compatability.h"
+#include "common.h"
+#include "qtcurve.h"
+#include "qt_settings.h"
+#include "menu.h"
+
+extern Options opts;
+
 static int       qtcWMMoveLastX=-1;
 static int       qtcWMMoveLastY=-1;
 static int       qtcWMMoveTimer=0;
@@ -75,13 +87,13 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
         return alloc.x<=event->x_root && alloc.y<=event->y_root &&
                (alloc.x+alloc.width)>event->x_root &&(alloc.y+alloc.height)>event->y_root;
     }
-    return true;
+    return TRUE;
 }
 
 static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event, gboolean inNoteBook)
 {
     // accept, by default
-    gboolean usable = true;
+    gboolean usable = TRUE;
 
     // get children and check
     GList *children = gtk_container_get_children(GTK_CONTAINER(widget)),
@@ -99,11 +111,11 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
             {
                 // if widget is prelight, we don't need to check where event happen,
                 // any prelight widget indicate we can't do a move
-                usable = false;
+                usable = FALSE;
             }
             else if(GTK_IS_NOTEBOOK( childWidget ) )
             {
-                inNoteBook = true;
+                inNoteBook = TRUE;
             }
             else if(event && qtcWMMoveWithinWidget(childWidget, event))
             {
@@ -114,25 +126,25 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                     // and accept if widget is disabled.
                     if(objectIsA(G_OBJECT(childWidget), "GtkPizza"))
                     {
-                        usable = false;
+                        usable = FALSE;
                     }
                     else if(gtk_widget_get_events(childWidget)&(GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK))
                     {
                         // widget listening to press event
-                        usable = false;
+                        usable = FALSE;
                     }
                     else if(GTK_IS_MENU_ITEM(childWidget))
                     {
                         // deal with menu item, GtkMenuItem only listen to
                         // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
                         // so previous check are invalids :(
-                        usable = false;
+                        usable = FALSE;
                     }
                     else if(GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus( childWidget)))
                     {
                         // Scrolled do not send release events
                         // to parents so not usable
-                        usable = false;
+                        usable = FALSE;
                     }
                 }
             }
@@ -165,7 +177,7 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
         return -1==qtcTabCurrentHoveredIndex(widget);
     }
 
-    return qtcWMMoveChildrenUseEvent(widget, event, false);
+    return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
 }
 
 static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
@@ -275,7 +287,7 @@ static gboolean qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointe
     return qtcWMMoveDragEnd(widget);
 }
 
-static void qtcWMMoveSetup(GtkWidget *widget)
+void qtcWMMoveSetup(GtkWidget *widget)
 {
     if (widget && !isFakeGtk() && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
     {
