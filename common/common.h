@@ -66,6 +66,7 @@ typedef enum
 
 #ifdef __cplusplus
 #include <qpixmap.h>
+class QColor;
 typedef QColor color;
 
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -76,6 +77,8 @@ typedef QStringList Strings;
 #endif // QT_VERSION && (QT_VERSION >= 0x040000)
 
 #else // __cplusplus
+#include <gtk/gtk.h>
+#include <gdk/gdk.h>
 typedef gboolean bool;
 typedef GdkColor color;
 typedef gchar ** Strings;
@@ -1284,6 +1287,8 @@ typedef struct
 #endif // __cplusplus
 #endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 
+extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
+extern void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v);
 #ifdef __cplusplus
 extern void qtcShade(const Options *opts, const color &ca, color *cb, double k);
 #else
@@ -1312,6 +1317,13 @@ typedef enum
 #define MIN_ROUND_MAX_WIDTH     24
 #define BGND_SHINE_SIZE 300
 #define BGND_SHINE_STEPS  8
+
+#define MIN_ROUND_FULL_SIZE     8
+#ifdef __cplusplus
+#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==(W) ? 7 : 14)
+#else // __cplusplus
+#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
+#endif // __cplusplus
 
 #if defined __cplusplus
 #define IS_MAX_ROUND_WIDGET(A) \

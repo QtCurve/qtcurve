@@ -23,6 +23,7 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
  * Boston, MA 02110-1301, USA.
  */
 #include "config.h"
+#include "common.h"
 
 #ifdef __cplusplus
 #include <qglobal.h>
@@ -44,12 +45,28 @@ static int isnan(double x)
 #endif
 
 #ifdef __cplusplus
+static inline int qtcLimit(double c)
+{
+    return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
+}
+#else
+static inline int qtcLimit(double c)
+{
+    return c < 0.0
+               ? 0
+               : c > 65535.0
+                     ? 65535
+                     : (int)c;
+}
+#endif
+
+#ifdef __cplusplus
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define FLOAT_COLOR(VAL, COL) (VAL).COL##F()
 #define TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
 #else
 #define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
-#define TO_COLOR(R, G, B) QColor(limit(R*255.0), limit(G*255.0), limit(B*255.0))
+#define TO_COLOR(R, G, B) QColor(qtcLimit(R*255.0), qtcLimit(G*255.0), qtcLimit(B*255.0))
 #endif
 #else
 #define inline
@@ -58,9 +75,9 @@ static GdkColor qtcGdkColor(double r, double g, double b)
 {
     GdkColor col;
 
-    col.red=limit(r*65535);
-    col.green=limit(g*65535);
-    col.blue=limit(b*65535);
+    col.red=qtcLimit(r*65535);
+    col.green=qtcLimit(g*65535);
+    col.blue=qtcLimit(b*65535);
 
     return col;
 }
@@ -224,7 +241,7 @@ static inline double ColorUtils_mixQreal(double a, double b, double bias)
     return a + (b - a) * bias;
 }
 
-static inline double ColorUtils_luma(const color *color)
+double ColorUtils_luma(const color *color)
 {
     return ColorUtils_HCY_luma(color);
 }
@@ -238,7 +255,7 @@ static double ColorUtils_contrastRatio(const color *c1, const color *c2)
         return (y2 + 0.05) / (y1 + 0.05);
 }
 
-static color ColorUtils_lighten(const color *color, double ky, double kc)
+color ColorUtils_lighten(const color *color, double ky, double kc)
 {
     ColorUtils_HCY c=ColorUtils_HCY_fromColor(color);
 
@@ -247,7 +264,7 @@ static color ColorUtils_lighten(const color *color, double ky, double kc)
     return ColorUtils_HCY_toColor(&c);
 }
 
-static color ColorUtils_darken(const color *color, double ky, double kc)
+color ColorUtils_darken(const color *color, double ky, double kc)
 {
     ColorUtils_HCY c=ColorUtils_HCY_fromColor(color);
     c.y = ColorUtils_normalize(c.y * (1.0 - ky));
@@ -255,7 +272,7 @@ static color ColorUtils_darken(const color *color, double ky, double kc)
     return ColorUtils_HCY_toColor(&c);
 }
 
-static color ColorUtils_shade(const color *color, double ky, double kc)
+color ColorUtils_shade(const color *color, double ky, double kc)
 {
     ColorUtils_HCY c=ColorUtils_HCY_fromColor(color);
     c.y = ColorUtils_normalize(c.y + ky);
@@ -263,7 +280,7 @@ static color ColorUtils_shade(const color *color, double ky, double kc)
     return ColorUtils_HCY_toColor(&c);
 }
 
-static color ColorUtils_mix(const color *c1, const color *c2, double bias);
+color ColorUtils_mix(const color *c1, const color *c2, double bias);
 
 static color ColorUtils_tintHelper(const color *base, const color *col, double amount)
 {
@@ -274,7 +291,7 @@ static color ColorUtils_tintHelper(const color *base, const color *col, double a
     return ColorUtils_HCY_toColor(&c);
 }
 
-static color ColorUtils_tint(const color *base, const color *col, double amount)
+color ColorUtils_tint(const color *base, const color *col, double amount)
 {
     if (amount <= 0.0) return *base;
     if (amount >= 1.0) return *col;
@@ -297,7 +314,7 @@ static color ColorUtils_tint(const color *base, const color *col, double amount)
     return result;
 }
 
-static color ColorUtils_mix(const color *c1, const color *c2, double bias)
+color ColorUtils_mix(const color *c1, const color *c2, double bias)
 {
     if (bias <= 0.0) return *c1;
     if (bias >= 1.0) return *c2;

@@ -2,9 +2,12 @@
 #include <stdarg.h>
 #include <math.h>
 #include "common.h"
+#include "colorutils.h"
 
 #ifdef __cplusplus
 #include <qglobal.h>
+#else
+#include <stdlib.h>
 #endif
 
 /* Taken from rgb->hsl routines taken from KColor
@@ -88,7 +91,7 @@ static inline void hslToRgb(double h, double s, double l, double *r, double *g, 
     *b = h2c( h - 2.0, m1, m2 );
 }
 
-static void rgbToHsv(double r, double g, double b, double *h, double *s, double *v)
+void qtcRgbToHsv(double r, double g, double b, double *h, double *s, double *v)
 {
     double min=MIN(MIN(r, g), b),
            max=MAX(MAX(r, g), b),
@@ -116,7 +119,7 @@ static void rgbToHsv(double r, double g, double b, double *h, double *s, double 
     }
 }
 
-static void hsvToRgb(double *r, double *g, double *b, double h, double s, double v)
+void qtcHsvToRgb(double *r, double *g, double *b, double h, double s, double v)
 {
     if(0==s)
         *r=*g=*b=v;
@@ -168,12 +171,12 @@ static void hsvToRgb(double *r, double *g, double *b, double h, double s, double
 }
 
 #ifdef __cplusplus
-inline int limit(double c)
+static inline int qtcLimit(double c)
 {
     return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
 }
 #else
-inline int limit(double c)
+static inline int qtcLimit(double c)
 {
     return c < 0.0
                ? 0
@@ -207,13 +210,13 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
     #ifdef __cplusplus
                 int v=(int)(255.0*(k-1.0));
 
-                cb->setRgb(limit(ca.red()+v), limit(ca.green()+v), limit(ca.blue()+v));
+                cb->setRgb(qtcLimit(ca.red()+v), qtcLimit(ca.green()+v), qtcLimit(ca.blue()+v));
     #else
                 double v=65535.0*(k-1.0);
 
-                cb->red = limit(ca->red+v);
-                cb->green = limit(ca->green+v);
-                cb->blue = limit(ca->blue+v);
+                cb->red = qtcLimit(ca->red+v);
+                cb->green = qtcLimit(ca->green+v);
+                cb->blue = qtcLimit(ca->blue+v);
     #endif
                 break;
             }
@@ -235,11 +238,11 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
                 s=normalize(s*k);
                 hslToRgb(h, s, l, &r, &g, &b);
     #ifdef __cplusplus
-                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
+                cb->setRgb(qtcLimit(r*255.0), qtcLimit(g*255.0), qtcLimit(b*255.0));
     #else
-                cb->red=limit(r*65535.0);
-                cb->green=limit(g*65535.0);
-                cb->blue=limit(b*65535.0);
+                cb->red=qtcLimit(r*65535.0);
+                cb->green=qtcLimit(g*65535.0);
+                cb->blue=qtcLimit(b*65535.0);
     #endif
                 break;
             }
@@ -256,7 +259,7 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
     #endif
                 double h, s, v;
 
-                rgbToHsv(r, g, b, &h, &s, &v);
+                qtcRgbToHsv(r, g, b, &h, &s, &v);
 
                 v*=k;
                 if (v > 1.0)
@@ -266,13 +269,13 @@ void qtcShade(const Options *opts, const color *ca, color *cb, double k)
                         s = 0;
                     v = 1.0;
                 }
-                hsvToRgb(&r, &g, &b, h, s, v);
+                qtcHsvToRgb(&r, &g, &b, h, s, v);
     #ifdef __cplusplus
-                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
+                cb->setRgb(qtcLimit(r*255.0), qtcLimit(g*255.0), qtcLimit(b*255.0));
     #else
-                cb->red=limit(r*65535.0);
-                cb->green=limit(g*65535.0);
-                cb->blue=limit(b*65535.0);
+                cb->red=qtcLimit(r*65535.0);
+                cb->green=qtcLimit(g*65535.0);
+                cb->blue=qtcLimit(b*65535.0);
     #endif
                 break;
             }
@@ -488,13 +491,6 @@ EAppearance qtcWidgetApp(EWidget w, const Options *opts)
     return opts->appearance;
 };
 
-#define MIN_ROUND_FULL_SIZE     8
-#ifdef __cplusplus
-#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==(W) ? 7 : 14)
-#else // __cplusplus
-#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
-#endif // __cplusplus
-
 #if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
 #define CAN_EXTRA_ROUND(MOD) \
@@ -705,7 +701,7 @@ void qtcCalcRingAlphas(const color *bgnd)
            h=0,
            s=0,
            v=0;
-    rgbToHsv(r, g, b, &h, &s, &v);
+    qtcRgbToHsv(r, g, b, &h, &s, &v);
     qtcRingAlpha[0]=v*0.26;
     qtcRingAlpha[1]=v*0.14;
     qtcRingAlpha[2]=v*0.55;
@@ -725,7 +721,7 @@ double qtcShineAlpha(const color *bgnd)
            h=0,
            s=0,
            v=0;
-    rgbToHsv(r, g, b, &h, &s, &v);
+    qtcRgbToHsv(r, g, b, &h, &s, &v);
     return v*0.8;
 }
 

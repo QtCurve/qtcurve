@@ -22,14 +22,12 @@
 #ifdef Q_WS_X11
 #include <QtDBus/QtDBus>
 #endif
-#define COMMON_FUNCTIONS
 #include "qtcurve.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "shortcuthandler.h"
 #include "pixmaps.h"
 #include <iostream>
-#define CONFIG_READ
 #include "config_file.h"
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin

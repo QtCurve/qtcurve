@@ -48,8 +48,6 @@ static int lstat(const char* fileName, struct stat* s)
 }
 #endif
 
-#define MAX_CONFIG_FILENAME_LEN   1024
-#define MAX_CONFIG_INPUT_LINE_LEN 256
 #define CONFIG_FILE               "stylerc"
 #define OLD_CONFIG_FILE           "qtcurvestylerc"
 #define VERSION_KEY               "version"
@@ -105,7 +103,7 @@ static int c2h(char ch)
 
 #define ATOH(str) ((c2h(*str)<<4)+c2h(*(str+1)))
 
-static void setRgb(color *col, const char *str)
+void qtcSetRgb(color *col, const char *str)
 {
     if(str && strlen(str)>6)
     {
@@ -291,7 +289,7 @@ static EShade toShade(const char *str, bool allowMenu, EShade def, bool menuShad
             return SHADE_CUSTOM;
         if('#'==str[0] && col)
         {
-            setRgb(col, str);
+            qtcSetRgb(col, str);
             return SHADE_CUSTOM;
         }
         if(0==memcmp(str, "none", 4))
@@ -611,7 +609,7 @@ static ETBarBtn toTBarBtn(const char *str, ETBarBtn def)
     return def;
 }
 
-static const char * getHome()
+const char * qtcGetHome()
 {
     static const char *home=NULL;
 
@@ -729,7 +727,7 @@ const char *qtcConfDir()
         if(env && 0==getuid())
         {
             if(!home)
-                home=getHome();
+                home=qtcGetHome();
             if(home && home!=strstr(env, home))
                 env=NULL;
         }
@@ -751,7 +749,7 @@ const char *qtcConfDir()
         if(!env)
         {
             if(!home)
-                home=getHome();
+                home=qtcGetHome();
 
             cfgDir=(char *)malloc(strlen(home)+18);
             sprintf(cfgDir, "%s/.config/qtcurve/", home);
@@ -1063,7 +1061,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
         if(sVal.isEmpty()) \
             opts->ENTRY=def->ENTRY; \
         else \
-            setRgb(&(opts->ENTRY), TO_LATIN1(sVal)); \
+            qtcSetRgb(&(opts->ENTRY), TO_LATIN1(sVal)); \
     }
 
 #define CFG_READ_IMAGE(ENTRY) \
@@ -1237,7 +1235,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
         const char *str=readStringEntry(cfg, #ENTRY); \
     \
         if(str && 0!=str[0]) \
-            setRgb(&(opts->ENTRY), str); \
+            qtcSetRgb(&(opts->ENTRY), str); \
         else \
             opts->ENTRY=def->ENTRY; \
     }
@@ -2189,7 +2187,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                     for(int i=0; it!=end; ++it, ++i)
                     {
                         QColor col;
-                        setRgb(&col, TO_LATIN1((*it)));
+                        qtcSetRgb(&col, TO_LATIN1((*it)));
                         opts->titlebarButtonColors[i]=col;
                     }
                     if(cols.count()<(NUM_TITLEBAR_BUTTONS+1))
