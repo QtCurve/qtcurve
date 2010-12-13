@@ -21,32 +21,10 @@
   Boston, MA 02110-1301, USA.
 */
 
-/* This file is quite 'hacky' as it contains lots of static function definitions - but I want to share the code
-   between Qt and Gtk, but not polute the namespace with exported functions... */
-
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
 #include "config.h"
 
 #define MAKE_VERSION(a, b) (((a) << 16) | ((b) << 8))
 #define MAKE_VERSION3(a, b, c) (((a) << 16) | ((b) << 8) | (c))
-
-#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <sys/stat.h>
-#include <float.h>
-#include <direct.h>
-
-static int isnan(double x)
-{
-    return _isnan(x);
-}
-
-static int lstat(const char* fileName, struct stat* s)
-{
-    return stat(fileName, s);
-}
-#endif
 
 /*
     The following #define disables the rounding when scrollbar type==none.
@@ -70,16 +48,20 @@ typedef enum
 
 #ifdef __cplusplus
 #include <qconfig.h>
-#ifdef CONFIG_DIALOG
 #include <qapplication.h>
-#endif
 #include <map>
 #include <set>
-#if !defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #include <QtCore/QString>
-#endif
-#else
+#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
+#else // __cplusplus
 #include <glib.h>
+#endif // __cplusplus
+
+#ifdef __cplusplus
+#define IS_BLACK(A) (0==(A).red() && 0==(A).green() && 0==(A).blue())
+#else
+#define IS_BLACK(A) (0==(A).red && 0==(A).green && 0==(A).blue)
 #endif
 
 #ifdef __cplusplus
@@ -89,21 +71,20 @@ typedef QColor color;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #include <QtCore/QSet>
 typedef QSet<QString> Strings;
-#else
+#else // QT_VERSION && (QT_VERSION >= 0x040000)
 typedef QStringList Strings;
-#endif
+#endif // QT_VERSION && (QT_VERSION >= 0x040000)
 
-#else
+#else // __cplusplus
 typedef gboolean bool;
 typedef GdkColor color;
 typedef gchar ** Strings;
 #define true TRUE
 #define false FALSE
-#endif
+#endif // __cplusplus
 
 #define SETTINGS_GROUP        "Settings"
 #define KWIN_GROUP            "KWin"
-/*#define DESCR_GROUP  "Description"*/
 
 /* qtc_<theme name>.themerc support */
 #define KDE_PREFIX(V) ((4==(V)) ? KDE4PREFIX : KDE3PREFIX)
@@ -237,10 +218,10 @@ enum
 #ifdef __cplusplus
 #define MENUBAR_DARK_LIMIT 160
 #define TOO_DARK(A) ((A).red()<MENUBAR_DARK_LIMIT || (A).green()<MENUBAR_DARK_LIMIT || (A).blue()<MENUBAR_DARK_LIMIT)
-#else
+#else // __cplusplus
 #define MENUBAR_DARK_LIMIT (160<<8)
 #define TOO_DARK(A) ((A).red<MENUBAR_DARK_LIMIT || (A).green<MENUBAR_DARK_LIMIT || (A).blue<MENUBAR_DARK_LIMIT)
-#endif
+#endif // __cplusplus
 
 #define TO_FACTOR(A) ((100.0+((double)(A)))/100.0)
 #define DEFAULT_HIGHLIGHT_FACTOR                   3
@@ -282,7 +263,7 @@ enum
 #define USE_LIGHTER_POPUP_MENU (opts.lighterPopupMenuBgnd)
 #define USE_BORDER(B)          (GB_SHINE!=(B) && GB_NONE!=(B))
 #define DRAW_MENU_BORDER       (APPEARANCE_FLAT!=opts.menuBgndAppearance && opts.version>=MAKE_VERSION(1,7) && \
-                                USE_BORDER(getGradient(opts.menuBgndAppearance, &opts)->border))
+                                USE_BORDER(qtcGetGradient(opts.menuBgndAppearance, &opts)->border))
 
 #define USE_GLOW_FOCUS(mouseOver) (FOCUS_GLOW==opts.focus && (MO_GLOW!=opts.coloredMouseOver || !(mouseOver)))
 
@@ -305,7 +286,7 @@ enum
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || IS_SLIDER((w)) || \
                         WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                         WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w) || WIDGET_MDI_WINDOW_BUTTON==(w))
-#else
+#else // __cplusplus
 #define WIDGET_BUTTON(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || \
                           WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                           WIDGET_RADIO_BUTTON==(w) || WIDGET_COMBO==(w) || WIDGET_COMBO_BUTTON==(w) || WIDGET_UNCOLOURED_MO_BUTTON==(w) || \
@@ -318,7 +299,7 @@ enum
 #define AGUA_WIDGET(w) (WIDGET_STD_BUTTON==(w) || WIDGET_DEF_BUTTON==(w) || WIDGET_TOGGLE_BUTTON==(w) || IS_SLIDER((w)) || \
                         WIDGET_CHECKBOX==(w) || WIDGET_RADIO_BUTTON==(w) || \
                         WIDGET_COMBO==(w) WIDGET_COMBO_BUTTON==(w))
-#endif
+#endif // __cplusplus
 
 #define SLIDER(w) (WIDGET_SB_SLIDER==(w) || WIDGET_SLIDER==(w))
 #define CIRCULAR_SLIDER(w) (WIDGET_SLIDER==(w) && SLIDER_CIRCULAR==opts.sliderStyle)
@@ -332,17 +313,17 @@ enum
 #define PROGRESS_CHUNK_WIDTH 10
 #define STRIPE_WIDTH 10
 #define DRAW_LIGHT_BORDER(SUKEN, WIDGET, APP) \
-    (!(SUKEN) && (GB_LIGHT==getGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=(WIDGET) && !IS_TROUGH(WIDGET) && \
+    (!(SUKEN) && (GB_LIGHT==qtcGetGradient(APP, &opts)->border) && WIDGET_MENU_ITEM!=(WIDGET) && !IS_TROUGH(WIDGET) && \
                           (WIDGET_DEF_BUTTON!=(WIDGET) || IND_COLORED!=opts.defBtnIndicator))
 
 #define DRAW_3D_FULL_BORDER(SUNKEN, APP) \
-    (!(SUNKEN) && GB_3D_FULL==getGradient((APP), &opts)->border)
+    (!(SUNKEN) && GB_3D_FULL==qtcGetGradient((APP), &opts)->border)
     
 #define DRAW_3D_BORDER(SUNKEN, APP) \
-    (!(SUNKEN) && GB_3D==getGradient((APP), &opts)->border)
+    (!(SUNKEN) && GB_3D==qtcGetGradient((APP), &opts)->border)
 
 #define DRAW_SHINE(SUNKEN, APP) \
-    (!(SUNKEN) && GB_SHINE==getGradient((APP), &opts)->border)
+    (!(SUNKEN) && GB_SHINE==qtcGetGradient((APP), &opts)->border)
 
 #define LIGHT_BORDER(APP) (APPEARANCE_DULL_GLASS==(APP) ? 1 : 0)
 
@@ -390,9 +371,9 @@ enum
 #define FOCUS_GLOW_LINE_ALPHA    0.5
 #if !defined __cplusplus
 #define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) || WIDGET_SPIN==(W) || WIDGET_COMBO_BUTTON==(W) ? 0.4 : 0.7)
-#else
+#else // !defined __cplusplus
 #define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) ? 0.45 : 0.7)
-#endif
+#endif // !defined __cplusplus
  
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
@@ -418,15 +399,15 @@ enum
 
 #if !defined __cplusplus
 #define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 3.5)
-#else
+#else // !defined __cplusplus
 #define MENU_AND_TOOLTIP_RADIUS   (opts.round>=ROUND_FULL ? 5.0 : 2.5)
-#endif
+#endif // !defined __cplusplus
 
 #define CUSTOM_BGND (!(IS_FLAT_BGND(opts.bgndAppearance)) || IMG_NONE!=opts.bgndImage.type || 100!=opts.bgndOpacity || 100!=opts.dlgOpacity)
 
 #define GLOW_PROG_ALPHA 0.55
 
-#endif
+#endif // !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
 
 #if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
 
@@ -465,9 +446,10 @@ typedef enum
 #define HOVER_BUTTON_ALPHA(A)    (DARK_WINDOW_TEXT(A) ? 0.25 : 0.65)
 #define WINDOW_TEXT_SHADOW_ALPHA(A) (EFFECT_SHADOW==(A) ? 0.10 : 0.60)
 #define WINDOW_SHADOW_COLOR(A)      (EFFECT_SHADOW==(A) ? Qt::black : Qt::white)
-#endif
 
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#endif //defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
+
+#if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define QTCURVE_PREVIEW_CONFIG      "QTCURVE_PREVIEW_CONFIG"
 #define QTCURVE_PREVIEW_CONFIG_FULL "QTCURVE_PREVIEW_CONFIG_FULL"
 
@@ -526,7 +508,7 @@ typedef enum
 #define TBAR_BORDER_VERSION_HACK (TBAR_VERSION_HACK+1000)
 
 typedef std::map<int, QColor> TBCols;
-#endif
+#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 
 typedef enum
 {
@@ -552,10 +534,10 @@ typedef struct
 #if defined __cplusplus
     QString   file;
     QPixmap   img;
-#else
+#else // __cplusplus
     const char *file;
     GdkPixbuf *img;
-#endif
+#endif // __cplusplus
 } QtCPixmap;
 
 #define BGND_IMG_ON_BORDER (IMG_FILE==opts.bgndImage.type && opts.bgndImage.onBorder)
@@ -637,11 +619,11 @@ typedef enum
     PIX_SLIDER_LIGHT,
     PIX_SLIDER_V,
     PIX_SLIDER_LIGHT_V,
-#endif
+#endif // defined QT_VERSION && (QT_VERSION < 0x040000)
     PIX_DOT
-#else
+#else // __cplusplus
     PIX_BLANK
-#endif
+#endif // __cplusplus
 } EPixmap;
 
 typedef enum
@@ -672,14 +654,14 @@ typedef enum
     WIDGET_SPIN_UP,
     WIDGET_SPIN_DOWN,
     WIDGET_UNCOLOURED_MO_BUTTON,
-#else
+#else // __cplusplus
     WIDGET_CHECKBUTTON,        // Qt4 only
     WIDGET_MDI_WINDOW,         // Qt4 only
     WIDGET_MDI_WINDOW_TITLE,   // Qt4 only
     WIDGET_MDI_WINDOW_BUTTON,  // Qt4 only
     WIDGET_DOCK_WIDGET_TITLE,
     WIDGET_DIAL,
-#endif
+#endif // __cplusplus
     WIDGET_SPIN,
     WIDGET_ENTRY,
     WIDGET_SCROLLVIEW,
@@ -744,7 +726,7 @@ typedef enum
         APPEARANCE_STRIPED = APPEARANCE_FADE, /* Only for windows  and menus */
         APPEARANCE_NONE = APPEARANCE_FADE, /* Only for titlebars */
         APPEARANCE_FILE,  /* Only for windows  and menus */
-        APPEARANCE_LV_BEVELLED, /* To be used only with getGradient */
+        APPEARANCE_LV_BEVELLED, /* To be used only with qtcGetGradient */
         APPEARANCE_AGUA_MOD,
         APPEARANCE_LV_AGUA,
     NUM_STD_APP = (APPEARANCE_LV_AGUA-NUM_CUSTOM_GRAD)+1
@@ -754,7 +736,7 @@ typedef enum
 #define IS_TROUGH(W)        (WIDGET_SLIDER_TROUGH==(W) || WIDGET_PBAR_TROUGH==(W) || WIDGET_TROUGH==(W) || WIDGET_FILLED_SLIDER_TROUGH==(W))
 #ifndef __cplusplus
 #define IS_TOGGLE_BUTTON(W) (WIDGET_TOGGLE_BUTTON==(W) || WIDGET_CHECKBOX==(W))
-#endif
+#endif // __cplusplus
 
 typedef enum
 {
@@ -960,34 +942,35 @@ typedef enum
 #endif
 
 #ifdef __cplusplus
-inline
-#else
-static
-#endif
-bool equal(double d1, double d2)
+#include <math.h>
+
+inline bool qtcEqual(double d1, double d2)
 {
     return (fabs(d1 - d2) < 0.0001);
 }
+#else // __cplusplus
+#define qtcEqual(A, B) (fabs(A - B) < 0.0001)
+#endif // __cplusplus
 
 #ifdef __cplusplus
 struct GradientStop
-#else
+#else // __cplusplus
 typedef struct
-#endif
+#endif // __cplusplus
 {
 #ifdef __cplusplus
     GradientStop(double p=0.0, double v=0.0, double a=1.0) : pos(p), val(v), alpha(a) { }
 
     bool operator==(const GradientStop &o) const
     {
-        return equal(pos, o.pos) && equal(val, o.val) && equal(alpha, o.alpha);
+        return qtcEqual(pos, o.pos) && qtcEqual(val, o.val) && qtcEqual(alpha, o.alpha);
     }
 
     bool operator<(const GradientStop &o) const
     {
-        return pos<o.pos || (equal(pos, o.pos) && (val<o.val || (equal(val, o.val) && alpha<o.alpha)));
+        return pos<o.pos || (qtcEqual(pos, o.pos) && (val<o.val || (qtcEqual(val, o.val) && alpha<o.alpha)));
     }
-#endif
+#endif //__cplusplus
 
     double pos,
            val,
@@ -995,7 +978,7 @@ typedef struct
 }
 #ifndef __cplusplus
 GradientStop
-#endif
+#endif // __cplusplus
 ;
 
 typedef enum
@@ -1044,31 +1027,29 @@ struct GradientStopCont : public std::set<GradientStop>
     }
 };
 struct Gradient
-#else
+#else // __cplusplus
 typedef struct
-#endif
+#endif // __cplusplus
 {
 #ifdef __cplusplus
     Gradient() : border(GB_3D) { }
 
-#ifdef CONFIG_DIALOG
     bool operator==(const Gradient &o) const
     {
         return border==o.border && stops==o.stops;
     }
-#endif
-#endif
+#endif // __cplusplus
     EGradientBorder  border;
 #ifdef __cplusplus
     GradientStopCont stops;
-#else
+#else // __cplusplus
     int              numStops;
     GradientStop     *stops;
-#endif
+#endif // __cplusplus
 }
 #ifndef __cplusplus
 Gradient
-#endif
+#endif // __cplusplus
 ;
 
 #define USE_CUSTOM_SHADES(A) ((A).customShades[0]>0.00001)
@@ -1077,9 +1058,9 @@ Gradient
 #ifdef __cplusplus
 typedef std::map<EAppearance, Gradient> GradientCont;
 struct Options
-#else
+#else // __cplusplus
 typedef struct
-#endif
+#endif // __cplusplus
 {
 
     int              version,
@@ -1146,12 +1127,10 @@ typedef struct
                      borderInactiveTab,
                      doubleGtkComboArrow,
                      menuIcons,
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-                     stdBtnSizes,
-#endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
+                     stdBtnSizes,
                      xbar,
-#endif
+#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
                      forceAlternateLvCols,
                      invertBotTab,
                      boldProgress,
@@ -1175,12 +1154,10 @@ typedef struct
                      dlgOpacity;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     int              dwtSettings;
-#endif
-#if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
     int              titlebarButtons;
     TBCols           titlebarButtonColors;
     ETitleBarIcon    titlebarIcon;
-#endif
+#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
     EStripe          stripedProgress;
     ESliderStyle     sliderStyle;
     EMouseOver       coloredMouseOver;
@@ -1208,7 +1185,7 @@ typedef struct
 #ifdef __cplusplus
                      titlebarButtonAppearance,
                      dwtAppearance,
-#endif
+#endif // __cplusplus
                      selectionAppearance,
                      menuStripeAppearance,
                      progressAppearance,
@@ -1247,14 +1224,14 @@ typedef struct
     EAlign           titlebarAlignment;
     EEffect          titlebarEffect;
     bool             centerTabText;
-#endif
+#endif //__cplusplus
     double           customShades[NUM_STD_SHADES],
                      customAlphas[NUM_STD_ALPHAS];
 #ifdef __cplusplus
     GradientCont     customGradient;
-#else
+#else // __cplusplus
     Gradient         *customGradient[NUM_CUSTOM_GRAD];
-#endif
+#endif // __cplusplus
     QtCPixmap        bgndPixmap;
     QtCPixmap        menuBgndPixmap;
     QtCImage         bgndImage,
@@ -1276,15 +1253,13 @@ typedef struct
                      useQtFileDialogApps,
                      windowDragWhiteList,
                      windowDragBlackList;
-#endif
+#endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 
 #ifndef __cplusplus
 } Options;
-#else
+#else // __cplusplus
 };
-#endif
-
-#ifdef COMMON_FUNCTIONS
+#endif // __cplusplus
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -1293,522 +1268,58 @@ typedef struct
 #define MAX(a, b) ((b) < (a) ? (a) : (b))
 #endif
 
-/* Taken from rgb->hsl routines taken from KColor
-    Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
-*/
-static inline double normalize(double a)
-{
-    return (a < 0.0 ? 0.0 : a > 1.0 ? 1.0 : a);
-}
-
-static inline double mix(double a, double b, double k)
-{
-    return a + ( ( b - a ) * k );
-}
-
-static inline double wrap(double a, double d)
-{
-    register double r = fmod( a, d );
-    return ( r < 0.0 ? d + r : ( r > 0.0 ? r : 0.0 ) );
-}
-
-static inline double h2c(double h, double m1, double m2)
-{
-    h = wrap( h, 6.0 );
-
-    if ( h < 1.0 )
-        return mix( m1, m2, h );
-    if ( h < 3.0 )
-        return m2;
-    if ( h < 4.0 )
-        return mix( m1, m2, 4.0 - h );
-    return m1;
-}
-
-static inline void rgbToHsl(double r, double g, double b, double *h, double *s, double *l)
-{
-    double min=MIN(MIN(r, g), b),
-           max=MAX(MAX(r, g), b);
-
-    *l = 0.5 * (max + min);
-    *s = 0.0;
-    *h = 0.0;
-
-    if (max != min)
-    {
-        double delta = max - min;
-
-        if ( *l <= 0.5 )
-            *s = delta / ( max + min );
-        else
-            *s = delta / ( 2.0 - max - min );
-
-        if ( r == max )
-            *h = ( g - b ) / delta;
-        else if ( g == max )
-            *h = 2.0 + ( b - r ) / delta;
-        else if ( b == max )
-            *h = 4.0 + ( r - g ) / delta;
-
-        *h /= 6.0;
-        if ( *h < 0.0 )
-            (*h) += 1.0;
-    }
-}
-
-static inline void hslToRgb(double h, double s, double l, double *r, double *g, double *b)
-{
-    double m1, m2;
-
-    // TODO h2rgb( h, r, g, b );
-    h *= 6.0;
-
-    if ( l <= 0.5 )
-        m2 = l * ( 1.0 + s );
-    else
-        m2 = l + s * ( 1.0 - l );
-    m1 = 2.0 * l - m2;
-
-    *r = h2c( h + 2.0, m1, m2 );
-    *g = h2c( h,       m1, m2 );
-    *b = h2c( h - 2.0, m1, m2 );
-}
-
-static void rgbToHsv(double r, double g, double b, double *h, double *s, double *v)
-{
-    double min=MIN(MIN(r, g), b),
-           max=MAX(MAX(r, g), b),
-           delta=max - min;
-
-    *v=max;
-    if(max != 0)
-        *s=delta / max;
-    else
-        *s=0;
-
-    if (*s==0.0)
-        *h = 0.0;
-    else
-    {
-        if(r == max)
-            *h=(g - b) / delta;         /* between yellow & magenta */
-        else if(g == max)
-            *h=2 + (b - r) / delta;     /* between cyan & yellow */
-        else if(b == max)
-            *h=4 + (r - g) / delta;     /* between magenta & cyan */
-        *h *= 60;                       /* degrees */
-        if(*h < 0)
-            *h += 360;
-    }
-}
-
-static void hsvToRgb(double *r, double *g, double *b, double h, double s, double v)
-{
-    if(0==s)
-        *r=*g=*b=v;
-    else
-    {
-        int    i;
-        double f,
-               p;
-
-        h /= 60;                      /* sector 0 to 5 */
-        i=(int)floor(h);
-        f=h - i;                      /* factorial part of h */
-        p=v * (1 - s);
-        switch(i)
-        {
-            case 0:
-                *r=v;
-                *g=v * (1 - s * (1 - f));
-                *b=p;
-                break;
-            case 1:
-                *r=v * (1 - s * f);
-                *g=v;
-                *b=p;
-                break;
-            case 2:
-                *r=p;
-                *g=v;
-                *b=v * (1 - s * (1 - f));
-                break;
-            case 3:
-                *r=p;
-                *g=v * (1 - s * f);
-                *b=v;
-                break;
-            case 4:
-                *r=v * (1 - s * (1 - f));
-                *g=p;
-                *b=v;
-                break;
-            /* case 5: */
-            default:
-                *r=v;
-                *g=p;
-                *b=v * (1 - s * f);
-                break;
-        }
-    }
-}
-
-#ifdef __cplusplus
-inline int limit(double c)
-{
-    return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
-}
-#else
-inline int limit(double c)
-{
-    return c < 0.0
-               ? 0
-               : c > 65535.0
-                     ? 65535
-                     : (int)c;
-}
-#endif
-
 #if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 #include <KDE/KColorUtils>
 #define tint(COLA, COLB, FACTOR) KColorUtils::tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) KColorUtils::mix((COLA), (COLB), 0.5)
-#else
-#include "colorutils.c"
+#else // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
+#include "colorutils.h"
 #ifdef __cplusplus
 #define tint(COLA, COLB, FACTOR) ColorUtils_tint(&(COLA), &(COLB), (FACTOR))
 #define midColor(COLA, COLB) ColorUtils_mix(&(COLA), &(COLB), 0.5)
 #define midColorF(COLA, COLB, FACTOR) ColorUtils_mix(&(COLA), &(COLB), FACTOR-0.5)
-#else
+#else // __cplusplus
 #define tint(COLA, COLB, FACTOR) ColorUtils_tint((COLA), (COLB), (FACTOR))
 #define midColor(COLA, COLB) ColorUtils_mix((COLA), (COLB), 0.5)
-#endif
-#endif
+#endif // __cplusplus
+#endif // QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
 
 #ifdef __cplusplus
-static void shade(const Options *opts, const color &ca, color *cb, double k)
+extern void qtcShade(const Options *opts, const color &ca, color *cb, double k);
 #else
-static void shade(const Options *opts, const color *ca, color *cb, double k)
+extern void qtcShade(const Options *opts, const color *ca, color *cb, double k);
 #endif
+
+extern void qtcAdjustPix(unsigned char *data, int numChannels, int w, int h, int stride, int ro, int go, int bo, double shade);
+extern void qtcSetupGradient(Gradient *grad, EGradientBorder border, int numStops, ...);
+extern const Gradient * qtcGetGradient(EAppearance app, const Options *opts);
+
+#ifdef __cplusplus
+extern EAppearance qtcWidgetApp(EWidget w, const Options *opts, bool active=true);
+#else
+extern EAppearance qtcWidgetApp(EWidget w, const Options *opts);
+#endif
+
+typedef enum
 {
-    if(equal(k, 1.0))
-    {
-#ifdef __cplusplus
-        *cb=ca;
-#else
-        cb->red = ca->red;
-        cb->green = ca->green;
-        cb->blue = ca->blue;
-#endif
-    }
-    else
-        switch(opts->shading)
-        {
-            case SHADING_SIMPLE:
-            {
-    #ifdef __cplusplus
-                int v=(int)(255.0*(k-1.0));
+    RADIUS_SELECTION,
+    RADIUS_INTERNAL,
+    RADIUS_EXTERNAL,
+    RADIUS_ETCH
+} ERadius;
 
-                cb->setRgb(limit(ca.red()+v), limit(ca.green()+v), limit(ca.blue()+v));
-    #else
-                double v=65535.0*(k-1.0);
-
-                cb->red = limit(ca->red+v);
-                cb->green = limit(ca->green+v);
-                cb->blue = limit(ca->blue+v);
-    #endif
-                break;
-            }
-            case SHADING_HSL:
-            {
-    #ifdef __cplusplus
-                double r(ca.red()/255.0),
-                       g(ca.green()/255.0),
-                       b(ca.blue()/255.0);
-    #else
-                double r=ca->red/65535.0,
-                       g=ca->green/65535.0,
-                       b=ca->blue/65535.0;
-    #endif
-                double h, s, l;
-
-                rgbToHsl(r, g, b, &h, &s, &l);
-                l=normalize(l*k);
-                s=normalize(s*k);
-                hslToRgb(h, s, l, &r, &g, &b);
-    #ifdef __cplusplus
-                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
-    #else
-                cb->red=limit(r*65535.0);
-                cb->green=limit(g*65535.0);
-                cb->blue=limit(b*65535.0);
-    #endif
-                break;
-            }
-            case SHADING_HSV:
-            {
-    #ifdef __cplusplus
-                double r(ca.red()/255.0),
-                       g(ca.green()/255.0),
-                       b(ca.blue()/255.0);
-    #else
-                double r=ca->red/65535.0,
-                       g=ca->green/65535.0,
-                       b=ca->blue/65535.0;
-    #endif
-                double h, s, v;
-
-                rgbToHsv(r, g, b, &h, &s, &v);
-
-                v*=k;
-                if (v > 1.0)
-                {
-                    s -= v - 1.0;
-                    if (s < 0)
-                        s = 0;
-                    v = 1.0;
-                }
-                hsvToRgb(&r, &g, &b, h, s, v);
-    #ifdef __cplusplus
-                cb->setRgb(limit(r*255.0), limit(g*255.0), limit(b*255.0));
-    #else
-                cb->red=limit(r*65535.0);
-                cb->green=limit(g*65535.0);
-                cb->blue=limit(b*65535.0);
-    #endif
-                break;
-            }
-            case SHADING_HCY:
-            {
-    #define HCY_FACTOR 0.15
-    #if defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY
-                if(k>1.0)
-                    *cb=KColorUtils::lighten(ca, (k*(1+HCY_FACTOR))-1.0, 1.0);
-                else
-                    *cb=KColorUtils::darken(ca, 1.0-(k*(1-HCY_FACTOR)), 1.0);
-    #elif defined __cplusplus
-                if(k>1.0)
-                    *cb=ColorUtils_lighten(&ca, (k*(1+HCY_FACTOR))-1.0, 1.0);
-                else
-                    *cb=ColorUtils_darken(&ca, 1.0-(k*(1-HCY_FACTOR)), 1.0);
-    #else
-                if(k>1.0)
-                    *cb=ColorUtils_lighten(ca, (k*(1+HCY_FACTOR))-1.0, 1.0);
-                else
-                    *cb=ColorUtils_darken(ca, 1.0-(k*(1-HCY_FACTOR)), 1.0);
-    #endif
-            }
-        }
-#if defined __cplusplus && defined QT_VERSION && (QT_VERSION >= 0x040000)
-    cb->setAlpha(ca.alpha());
-#endif
-#ifndef __cplusplus
-    cb->pixel = ca->pixel;
-#endif
-}
-
-#if (!defined CONFIG_DIALOG)
-static unsigned char checkBounds(int num)
-{
-    return num < 0   ? 0   :
-           num > 255 ? 255 :
-                       num;
-}
-
-static void adjustPix(unsigned char *data, int numChannels, int w, int h, int stride,
-                      int ro, int go, int bo, double shade)
-{
-    int width=w*numChannels,
-        offset=0,
-        row,
-        r=(int)((ro*shade)+0.5),
-        g=(int)((go*shade)+0.5),
-        b=(int)((bo*shade)+0.5);
-
-    for(row=0; row<h; ++row)
-    {
-        int column;
-
-        for(column=0; column<width; column+=numChannels)
-        {
-            unsigned char source=data[offset+column+1];
-
-#if defined  __cplusplus
-#if Q_BYTE_ORDER == Q_BIG_ENDIAN
-            /* ARGB */
-            data[offset+column+1] = checkBounds(r-source);
-            data[offset+column+2] = checkBounds(g-source);
-            data[offset+column+3] = checkBounds(b-source);
-#else
-            /* BGRA */
-            data[offset+column] = checkBounds(b-source);
-            data[offset+column+1] = checkBounds(g-source);
-            data[offset+column+2] = checkBounds(r-source);
-#endif
-#else
-            /* GdkPixbuf is RGBA */
-            data[offset+column] = checkBounds(r-source);
-            data[offset+column+1] = checkBounds(g-source);
-            data[offset+column+2] = checkBounds(b-source);
-#endif
-
-        }
-        offset+=stride;
-    }
-}
-#endif
-
-static void setupGradient(Gradient *grad, EGradientBorder border, int numStops, ...)
-{
-    va_list  ap;
-    int      i;
-
-    grad->border=border;
-#ifndef __cplusplus
-    grad->numStops=numStops;
-    grad->stops=malloc(sizeof(GradientStop) * numStops);
-#endif
-    va_start(ap, numStops);
-    for(i=0; i<numStops; ++i)
-    {
-        double pos=va_arg(ap, double),
-               val=va_arg(ap, double);
-#ifdef __cplusplus
-        grad->stops.insert(GradientStop(pos, val));
-#else
-        grad->stops[i].pos=pos;
-        grad->stops[i].val=val;
-        grad->stops[i].alpha=1.0;
-#endif
-    }
-    va_end(ap);
-}
-
-static const Gradient * getGradient(EAppearance app, const Options *opts)
-{
-    if(IS_CUSTOM(app))
-    {
-#ifdef __cplusplus
-        GradientCont::const_iterator grad(opts->customGradient.find(app));
-
-        if(grad!=opts->customGradient.end())
-            return &((*grad).second);
-#else
-        Gradient *grad=opts->customGradient[app-APPEARANCE_CUSTOM1];
-
-        if(grad)
-            return grad;
-#endif
-        app=APPEARANCE_RAISED;
-    }
-
-    {
-    static Gradient stdGradients[NUM_STD_APP];
-    static bool     init=false;
-
-    if(!init)
-    {
-        setupGradient(&stdGradients[APPEARANCE_FLAT-APPEARANCE_FLAT], GB_3D,2,0.0,1.0,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_RAISED-APPEARANCE_FLAT], GB_3D_FULL,2,0.0,1.0,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_DULL_GLASS-APPEARANCE_FLAT], GB_LIGHT,4,0.0,1.05,0.499,0.984,0.5,0.928,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_SHINY_GLASS-APPEARANCE_FLAT], GB_LIGHT,4,0.0,1.2,0.499,0.984,0.5,0.9,1.0,1.06);
-        setupGradient(&stdGradients[APPEARANCE_AGUA-APPEARANCE_FLAT], GB_SHINE, 2,0.0,0.6,1.0,1.1);
-        setupGradient(&stdGradients[APPEARANCE_SOFT_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.04,1.0,0.98);
-        setupGradient(&stdGradients[APPEARANCE_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.1,1.0,0.94);
-        setupGradient(&stdGradients[APPEARANCE_HARSH_GRADIENT-APPEARANCE_FLAT], GB_3D,2,0.0,1.3,1.0,0.925);
-        setupGradient(&stdGradients[APPEARANCE_INVERTED-APPEARANCE_FLAT], GB_3D,2,0.0,0.93,1.0,1.04);
-        setupGradient(&stdGradients[APPEARANCE_DARK_INVERTED-APPEARANCE_FLAT], GB_NONE,3,0.0,0.8,0.7,0.95,1.0,1.0);
-        setupGradient(&stdGradients[APPEARANCE_SPLIT_GRADIENT-APPEARANCE_FLAT], GB_3D,4,0.0,1.06,0.499,1.004,0.5,0.986,1.0,0.92);
-        setupGradient(&stdGradients[APPEARANCE_BEVELLED-APPEARANCE_FLAT], GB_3D,4,0.0,1.05,0.1,1.02,0.9,0.985,1.0,0.94);
-        setupGradient(&stdGradients[APPEARANCE_LV_BEVELLED-APPEARANCE_FLAT], GB_3D,3,0.0,1.00,0.85,1.0,1.0,0.90);
-        setupGradient(&stdGradients[APPEARANCE_AGUA_MOD-APPEARANCE_FLAT], GB_NONE,3,0.0,1.5,0.49,0.85,1.0,1.3);
-        setupGradient(&stdGradients[APPEARANCE_LV_AGUA-APPEARANCE_FLAT], GB_NONE,4,0.0,0.98,0.35,0.95,0.4,0.93,1.0,1.15);
-        init=true;
-    }
-
-    return &stdGradients[app-APPEARANCE_FLAT];
-    }
-
-    return 0L; /* Will never happen! */
-}
-
-#endif
-
-#if defined COMMON_FUNCTIONS && !defined CONFIG_DIALOG
-
-#ifdef __cplusplus
-static EAppearance widgetApp(EWidget w, const Options *opts, bool active=true)
-#else
-static EAppearance widgetApp(EWidget w, const Options *opts)
-#endif
-{
-    switch(w)
-    {
-        case WIDGET_SB_BGND:
-            return opts->sbarBgndAppearance;
-        case WIDGET_LISTVIEW_HEADER:
-            return opts->lvAppearance;
-        case WIDGET_SB_BUTTON:
-        case WIDGET_SLIDER:
-        case WIDGET_SB_SLIDER:
-            return opts->sliderAppearance;
-        case WIDGET_FILLED_SLIDER_TROUGH:
-            return opts->sliderFill;
-        case WIDGET_TAB_TOP:
-        case WIDGET_TAB_BOT:
-            return opts->tabAppearance;
-        case WIDGET_MENU_ITEM:
-            return opts->menuitemAppearance;
-        case WIDGET_PROGRESSBAR:
-#ifndef __cplusplus
-        case WIDGET_ENTRY_PROGRESSBAR:
-#endif
-            return opts->progressAppearance;
-        case WIDGET_PBAR_TROUGH:
-            return opts->progressGrooveAppearance;
-        case WIDGET_SELECTION:
-            return opts->selectionAppearance;
-#ifdef __cplusplus
-        case WIDGET_DOCK_WIDGET_TITLE:
-            return opts->dwtAppearance;
-        case WIDGET_MDI_WINDOW:
-        case WIDGET_MDI_WINDOW_TITLE:
-            return active ? opts->titlebarAppearance : opts->inactiveTitlebarAppearance;
-        case WIDGET_MDI_WINDOW_BUTTON:
-            return opts->titlebarButtonAppearance;
-        case WIDGET_DIAL:
-            return IS_FLAT(opts->appearance) ? APPEARANCE_RAISED : APPEARANCE_SOFT_GRADIENT;
-#endif
-        case WIDGET_TROUGH:
-        case WIDGET_SLIDER_TROUGH:
-            return opts->grooveAppearance;
-#ifndef __cplusplus
-        case WIDGET_SPIN_UP:
-        case WIDGET_SPIN_DOWN:
-#endif
-        case WIDGET_SPIN:
-            return MODIFY_AGUA(opts->appearance);
-        case WIDGET_TOOLBAR_BUTTON:
-            return APPEARANCE_NONE==opts->tbarBtnAppearance ? opts->appearance : opts->tbarBtnAppearance;
-        default:
-            break;
-    }
-
-    return opts->appearance;
-};
-
-#define MIN_ROUND_FULL_SIZE     8
-#ifdef __cplusplus
-#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN==(W) ? 7 : 14)
-#else
-#define MIN_ROUND_EXTRA_SIZE(W) (WIDGET_SPIN_UP==(W) || WIDGET_SPIN_DOWN==(W) || WIDGET_SPIN==(W) ? 7 : 14)
-#endif
 #define MIN_ROUND_MAX_HEIGHT    12
 #define MIN_ROUND_MAX_WIDTH     24
-
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
+#define BGND_SHINE_SIZE 300
+#define BGND_SHINE_STEPS  8
 
 #if defined __cplusplus
+#define IS_MAX_ROUND_WIDGET(A) \
+            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
+#define IS_EXTRA_ROUND_WIDGET(A) \
+            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR && \
+             A!=WIDGET_MDI_WINDOW && A!=WIDGET_MDI_WINDOW_TITLE)
+             
 #define EXTRA_INNER_RADIUS   3.5
 #define EXTRA_OUTER_RADIUS   4.5
 #define EXTRA_ETCH_RADIUS    5.5
@@ -1820,13 +1331,19 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #define SLIGHT_INNER_RADIUS  0.5
 #define SLIGHT_OUTER_RADIUS  1.5
 #define SLIGHT_ETCH_RADIUS   2.5
-#else
+#else // QT_VERSION && (QT_VERSION < 0x040600)
 #define SLIGHT_INNER_RADIUS  0.75
 #define SLIGHT_OUTER_RADIUS  1.75
 #define SLIGHT_ETCH_RADIUS   2.75
-#endif
+#endif //QT_VERSION && (QT_VERSION < 0x040600)
 
-#else
+#else // __cplusplus
+
+#define IS_MAX_ROUND_WIDGET(A) \
+            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_TOGGLE_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
+#define IS_EXTRA_ROUND_WIDGET(A) \
+            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
+
 #define EXTRA_INNER_RADIUS   4
 #define EXTRA_OUTER_RADIUS   5
 #define EXTRA_ETCH_RADIUS    6
@@ -1836,269 +1353,16 @@ static EAppearance widgetApp(EWidget w, const Options *opts)
 #define SLIGHT_INNER_RADIUS  1
 #define SLIGHT_OUTER_RADIUS  2
 #define SLIGHT_ETCH_RADIUS   3
-#endif
+
+#endif // __cplusplus
 
 #define MAX_RADIUS_INTERNAL 9.0
 #define MAX_RADIUS_EXTERNAL (MAX_RADIUS_INTERNAL+2.0)
 
-typedef enum
-{
-    RADIUS_SELECTION,
-    RADIUS_INTERNAL,
-    RADIUS_EXTERNAL,
-    RADIUS_ETCH
-} ERadius;
-
-#ifdef __cplusplus
-#define IS_MAX_ROUND_WIDGET(A) \
-            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
-#define IS_EXTRA_ROUND_WIDGET(A) \
-            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR && \
-             A!=WIDGET_MDI_WINDOW && A!=WIDGET_MDI_WINDOW_TITLE)
-#else
-#define IS_MAX_ROUND_WIDGET(A) \
-            (WIDGET_STD_BUTTON==A || WIDGET_DEF_BUTTON==A || WIDGET_TOGGLE_BUTTON==A /*|| WIDGET_MENU_BUTTON==A*/)
-#define IS_EXTRA_ROUND_WIDGET(A) \
-            (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR)
-#endif
-
-#define CAN_EXTRA_ROUND(MOD) \
-            (IS_EXTRA_ROUND_WIDGET(widget) && \
-            (IS_SLIDER(widget) || WIDGET_TROUGH==widget || \
-            ( ( (w>(MIN_ROUND_EXTRA_SIZE(widget)+MOD)) || (WIDGET_NO_ETCH_BTN==widget || WIDGET_MENU_BUTTON==widget) ) &&\
-                                             (h>(MIN_ROUND_EXTRA_SIZE(widget)+MOD)))))
-#define CAN_FULL_ROUND(MOD) (w>(MIN_ROUND_FULL_SIZE+MOD) && h>(MIN_ROUND_FULL_SIZE+MOD))
-
-// **NOTE** MUST KEEP IN SYNC WITH getRadius/RADIUS_ETCH !!!
-ERound getWidgetRound(const Options *opts, int w, int h, EWidget widget)
-{
-    ERound r=opts->round;
-
-    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && (opts->square&SQUARE_PROGRESS)) ||
-        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) ||
-        (WIDGET_SCROLLVIEW==widget && (opts->square&SQUARE_SCROLLVIEW)) )
-        return ROUND_NONE;
-
-    if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
-        r=ROUND_SLIGHT;
-
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
-       WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget)
-       return ROUND_MAX;
-#endif
-#ifndef __cplusplus
-    if(WIDGET_RADIO_BUTTON==widget)
-       return ROUND_MAX;
-#endif
-
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if(WIDGET_SLIDER==widget &&
-       (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
-        return ROUND_MAX;
-#endif
-
-    switch(r)
-    {
-        case ROUND_MAX:
-            if(IS_SLIDER(widget) || WIDGET_TROUGH==widget ||
-               (w>(MIN_ROUND_MAX_WIDTH+2) && h>(MIN_ROUND_MAX_HEIGHT+2) && IS_MAX_ROUND_WIDGET(widget)))
-                return ROUND_MAX;
-        case ROUND_EXTRA:
-            if(CAN_EXTRA_ROUND(2))
-                return ROUND_EXTRA;
-        case ROUND_FULL:
-            if(CAN_FULL_ROUND(2))
-                return ROUND_FULL;
-        case ROUND_SLIGHT:
-            return ROUND_SLIGHT;
-        case ROUND_NONE:
-            return ROUND_NONE;
-    }
-    
-    return ROUND_NONE;
-}
-
-static double getRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad)
-{
-    ERound r=opts->round;
-
-    if((WIDGET_CHECKBOX==widget || WIDGET_FOCUS==widget) && ROUND_NONE!=r)
-        r=ROUND_SLIGHT;
-
-    if( ((WIDGET_PBAR_TROUGH==widget || WIDGET_PROGRESSBAR==widget) && (opts->square&SQUARE_PROGRESS)) ||
-        (WIDGET_ENTRY==widget && (opts->square&SQUARE_ENTRY)) ||
-        (WIDGET_SCROLLVIEW==widget && (opts->square&SQUARE_SCROLLVIEW)) )
-        return 0.0;
-
-#if defined __cplusplus && (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if((WIDGET_MDI_WINDOW_BUTTON==widget && (opts->titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
-       WIDGET_RADIO_BUTTON==widget || WIDGET_DIAL==widget) 
-        return (w>h ? h : w)/2.0;
-#endif
-#ifndef __cplusplus
-    if(WIDGET_RADIO_BUTTON==widget)
-        return (w>h ? h : w)/2.0;
-#endif
-
-#if !defined __cplusplus || (defined QT_VERSION && (QT_VERSION >= 0x040000))
-    if(WIDGET_SLIDER==widget &&
-       (SLIDER_ROUND==opts->sliderStyle || SLIDER_ROUND_ROTATED==opts->sliderStyle || SLIDER_CIRCULAR==opts->sliderStyle))
-        return (w>h ? h : w)/2.0;
-#endif
-
-    if(RADIUS_EXTERNAL==rad && !opts->fillProgress && (WIDGET_PROGRESSBAR==widget
-#ifndef __cplusplus
-                                                        || WIDGET_ENTRY_PROGRESSBAR==widget
-#endif
-      ))
-        rad=RADIUS_INTERNAL;
-
-    switch(rad)
-    {
-        case RADIUS_SELECTION:
-            switch(r)
-            {
-                case ROUND_MAX:
-                case ROUND_EXTRA:
-                    if(/* (WIDGET_RUBBER_BAND==widget && w>14 && h>14) || */(w>48 && h>48))
-                        return 6.0;
-                case ROUND_FULL:
-//                     if( /*(WIDGET_RUBBER_BAND==widget && w>11 && h>11) || */(w>48 && h>48))
-//                         return 3.0;
-                    if(w>MIN_ROUND_FULL_SIZE && h>MIN_ROUND_FULL_SIZE)
-                        return 3.0;
-                case ROUND_SLIGHT:
-                    return 2.0;
-                case ROUND_NONE:
-                    return 0;
-            }
-        case RADIUS_INTERNAL:
-            switch(r)
-            {
-                case ROUND_MAX:
-                    if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
-                    {
-                        double r=((w>h ? h : w)-(WIDGET_SLIDER==widget ? 1 : 0))/2.0;
-                        return r>MAX_RADIUS_INTERNAL ? MAX_RADIUS_INTERNAL : r;
-                    }
-                    if(w>(MIN_ROUND_MAX_WIDTH-2) && h>(MIN_ROUND_MAX_HEIGHT-2) && IS_MAX_ROUND_WIDGET(widget))
-                    {
-                        double r=((w>h ? h : w)-2.0)/2.0;
-                        return r>9.5 ? 9.5 : r;
-                    }
-                case ROUND_EXTRA:
-                    if(CAN_EXTRA_ROUND(-2))
-                        return EXTRA_INNER_RADIUS;
-                case ROUND_FULL:
-                    if(CAN_FULL_ROUND(-2))
-                        return FULL_INNER_RADIUS;
-                case ROUND_SLIGHT:
-                    return SLIGHT_INNER_RADIUS;
-                case ROUND_NONE:
-                    return 0;
-            }
-        case RADIUS_EXTERNAL:
-            switch(r)
-            {
-                case ROUND_MAX:
-                    if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
-                    {
-                        double r=((w>h ? h : w)-(WIDGET_SLIDER==widget ? 1 : 0))/2.0;
-                        return r>MAX_RADIUS_EXTERNAL ? MAX_RADIUS_EXTERNAL : r;
-                    }
-                    if(w>MIN_ROUND_MAX_WIDTH && h>MIN_ROUND_MAX_HEIGHT && IS_MAX_ROUND_WIDGET(widget))
-                    {
-                        double r=((w>h ? h : w)-2.0)/2.0;
-                        return r>10.5 ? 10.5 : r;
-                    }
-                case ROUND_EXTRA:
-                    if(CAN_EXTRA_ROUND(0))
-                        return EXTRA_OUTER_RADIUS;
-                case ROUND_FULL:
-                    if(CAN_FULL_ROUND(0))
-                        return FULL_OUTER_RADIUS;
-                case ROUND_SLIGHT:
-                    return SLIGHT_OUTER_RADIUS;
-                case ROUND_NONE:
-                    return 0;
-            }
-        case RADIUS_ETCH:
-            // **NOTE** MUST KEEP IN SYNC WITH getWidgetRound !!!
-            switch(r)
-            {
-                case ROUND_MAX:
-                    if(IS_SLIDER(widget) || WIDGET_TROUGH==widget)
-                    {
-                        double r=((w>h ? h : w)-(WIDGET_SLIDER==widget ? 1 : 0))/2.0;
-                        return r>MAX_RADIUS_EXTERNAL ? MAX_RADIUS_EXTERNAL : r;
-                    }
-                    if(w>(MIN_ROUND_MAX_WIDTH+2) && h>(MIN_ROUND_MAX_HEIGHT+2) && IS_MAX_ROUND_WIDGET(widget))
-                    {
-                        double r=((w>h ? h : w)-2.0)/2.0;
-                        return r>11.5 ? 11.5 : r;
-                    }
-                case ROUND_EXTRA:
-                    if(CAN_FULL_ROUND(2))
-                        return EXTRA_ETCH_RADIUS;
-                case ROUND_FULL:
-                    if(w>(MIN_ROUND_FULL_SIZE+2) && h>(MIN_ROUND_FULL_SIZE+2))
-                        return FULL_ETCH_RADIUS;
-                case ROUND_SLIGHT:
-                    return SLIGHT_ETCH_RADIUS;
-                case ROUND_NONE:
-                    return 0;
-            }
-    }
-
-    return 0;
-}
-
-static double qtcRingAlpha[3]={0.125, 0.125, 0.5};
-
-static void calcRingAlphas(const color *bgnd)
-{
-#ifdef __cplusplus
-    double r=bgnd->red()/255.0,
-           g=bgnd->green()/255.0,
-           b=bgnd->blue()/255.0,
-#else
-    double r=bgnd->red/65535.0,
-           g=bgnd->green/65535.0,
-           b=bgnd->blue/65535.0,
-#endif
-           h=0,
-           s=0,
-           v=0;
-    rgbToHsv(r, g, b, &h, &s, &v);
-    qtcRingAlpha[0]=v*0.26;
-    qtcRingAlpha[1]=v*0.14;
-    qtcRingAlpha[2]=v*0.55;
-}
-
-#define BGND_SHINE_SIZE 300
-#define BGND_SHINE_STEPS  8
-
-static double shineAlpha(const color *bgnd)
-{
-#ifdef __cplusplus
-    double r=bgnd->red()/255.0,
-           g=bgnd->green()/255.0,
-           b=bgnd->blue()/255.0,
-#else
-    double r=bgnd->red/65535.0,
-           g=bgnd->green/65535.0,
-           b=bgnd->blue/65535.0,
-#endif
-           h=0,
-           s=0,
-           v=0;
-    rgbToHsv(r, g, b, &h, &s, &v);
-    return v*0.8;
-}
-
-#endif
-
-#endif
+extern double qtcRingAlpha[3];
+extern ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widget);
+extern double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
+extern double qtcShineAlpha(const color *bgnd);
+extern void qtcCalcRingAlphas(const color *bgnd);
 
 #endif // __COMMON_H__

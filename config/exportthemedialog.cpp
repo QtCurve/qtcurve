@@ -27,8 +27,7 @@
 #include <QDir>
 #include <QGridLayout>
 #include <QLabel>
-#define CONFIG_WRITE
-#include "config_file.c"
+#include "config_file.h"
 
 CExportThemeDialog::CExportThemeDialog(QWidget *parent)
                   : KDialog(parent)
@@ -87,7 +86,7 @@ void CExportThemeDialog::slotButtonClicked(int button)
                 cfg.group("Misc").writeEntry("Comment", themeComment->text());
                 cfg.group("KDE").writeEntry("WidgetStyle", THEME_PREFIX+name);
 
-                rv=writeConfig(&cfg, opts, opts, true);
+                rv=qtcWriteConfig(&cfg, opts, opts, true);
             }
 
             if(rv)

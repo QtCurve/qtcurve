@@ -22,7 +22,6 @@
 */
 
 #include <kdialog.h>
-#define CONFIG_DIALOG
 #include "common.h"
 
 class KUrlRequester;

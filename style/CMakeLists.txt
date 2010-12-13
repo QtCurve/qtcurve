@@ -1,10 +1,17 @@
+set(qtcurve_style_common_SRCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../common/common.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/../common/config_file.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c )
+set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
+
 if (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp ${qtcurve_style_common_SRCS})
     set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h macmenu.h macmenu-dbus.h blurhelper.h shortcuthandler.h)
 else (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp ${qtcurve_style_common_SRCS})
     set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h blurhelper.h shortcuthandler.h)
 endif (Q_WS_X11)
+
 
 add_definitions(-DQT_PLUGIN)
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR} ${QT_INCLUDE_DIR}

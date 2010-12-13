@@ -21,9 +21,6 @@
   Boston, MA 02110-1301, USA.
 */
 
-#define COMMON_FUNCTIONS
-#define CONFIG_DIALOG
-
 #include <ui_qtcurveconfigbase.h>
 #include "ui_stylepreview.h"
 #include <QMap>

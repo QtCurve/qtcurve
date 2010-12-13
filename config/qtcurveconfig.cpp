@@ -66,12 +66,11 @@
 #include <KDE/KTempDir>
 #include <KDE/KZip>
 #include <KDE/KMimeType>
+#include <KDE/KStandardDirs>
 #include <unistd.h>
 #include "config.h"
 #include "../style/qtcurve.h"
-#define CONFIG_READ
-#define CONFIG_WRITE
-#include "config_file.c"
+#include "config_file.h"
 
 #define EXTENSION                  ".qtcurve"
 #define VERSION_WITH_KWIN_SETTINGS MAKE_VERSION(1, 5)
@@ -307,9 +306,9 @@ class CGradItem : public QTreeWidgetItem
     bool operator<(const QTreeWidgetItem &i) const
     {
         return text(0).toDouble()<i.text(0).toDouble() ||
-               (equal(text(0).toDouble(), i.text(0).toDouble()) &&
+               (qtcEqual(text(0).toDouble(), i.text(0).toDouble()) &&
                (text(1).toDouble()<i.text(1).toDouble() ||
-               (equal(text(1).toDouble(), i.text(1).toDouble()) &&
+               (qtcEqual(text(1).toDouble(), i.text(1).toDouble()) &&
                (text(2).toDouble()<i.text(2).toDouble()))));
     }
 };
@@ -1216,8 +1215,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
                 defaultStyle;
 
         kwin->load(0L);
-        defaultSettings(&defaultStyle);
-        if(!readConfig(NULL, &currentStyle, &defaultStyle))
+        qtcDefaultSettings(&defaultStyle);
+        if(!qtcReadConfig(NULL, &currentStyle, &defaultStyle))
             currentStyle=defaultStyle;
 
         previewStyle=currentStyle;
@@ -1291,7 +1290,7 @@ void QtCurveConfig::save()
     else
         removeInstalledThemeFile(BGND_FILE MENU_FILE);
 
-    writeConfig(NULL, opts, presets[defaultText].opts);
+    qtcWriteConfig(NULL, opts, presets[defaultText].opts);
 
     // This is only read by KDE3...
     KConfig      k3globals(kdeHome(true)+"/share/config/kdeglobals", KConfig::CascadeConfig);
@@ -1880,7 +1879,7 @@ void QtCurveConfig::itemChanged(QTreeWidgetItem *i, int col)
     bool   ok;
     double val=i->text(col).toDouble(&ok)/100.0;
 
-    if(prev<0 || (ok && equal(val, prev)))
+    if(prev<0 || (ok && qtcEqual(val, prev)))
         return;
 
     if(!ok || ((0==col || 2==col) && (val<0.0 || val>1.0)) || (1==col && (val<0.0 || val>2.0)))
@@ -1925,9 +1924,9 @@ void QtCurveConfig::addGradStop()
                                          alpha(stopAlpha->value()/100.0);
 
         for(; it!=end; ++it)
-            if(equal(pos, (*it).pos))
+            if(qtcEqual(pos, (*it).pos))
             {
-                if(equal(val, (*it).val) && equal(alpha, (*it).alpha))
+                if(qtcEqual(val, (*it).val) && qtcEqual(alpha, (*it).alpha))
                     return;
                 else
                 {
@@ -2002,7 +2001,7 @@ void QtCurveConfig::updateGradStop()
                newVal(stopValue->value()/100.0),
                newAlpha(stopAlpha->value()/100.0);
 
-        if(!equal(newPos, curPos) || !equal(newVal, curVal) || !equal(newAlpha, curAlpha))
+        if(!qtcEqual(newPos, curPos) || !qtcEqual(newVal, curVal) || !qtcEqual(newAlpha, curAlpha))
         {
             (*cg).second.stops.erase(GradientStop(curPos, curVal, curAlpha));
             (*cg).second.stops.insert(GradientStop(newPos, newVal, newAlpha));
@@ -2198,7 +2197,7 @@ void QtCurveConfig::copyGradient(QAction *act)
         }
     }
     else
-        copy=getGradient((EAppearance)val, &previewStyle);
+        copy=qtcGetGradient((EAppearance)val, &previewStyle);
 
     if(copy)
     {
@@ -2345,7 +2344,7 @@ bool QtCurveConfig::diffShades(const Options &opts)
     if(customShading->isChecked())
     {
         for(int i=0; i<NUM_STD_SHADES; ++i)
-            if(!equal(shadeVals[i]->value(), opts.customShades[i]))
+            if(!qtcEqual(shadeVals[i]->value(), opts.customShades[i]))
                 return true;
     }
 
@@ -2356,7 +2355,7 @@ bool QtCurveConfig::diffShades(const Options &opts)
     if(customAlphas->isChecked())
     {
         for(int i=0; i<NUM_STD_ALPHAS; ++i)
-            if(!equal(alphaVals[i]->value(), opts.customAlphas[i]))
+            if(!qtcEqual(alphaVals[i]->value(), opts.customAlphas[i]))
                 return true;
     }
     return false;
@@ -2446,7 +2445,7 @@ void QtCurveConfig::setPreset()
     Preset &p(presets[presetsCombo->currentText()]);
 
     if(!p.loaded)
-        readConfig(p.fileName, &p.opts, &presets[defaultText].opts, false);
+        qtcReadConfig(p.fileName, &p.opts, &presets[defaultText].opts, false);
 
     setWidgetOptions(p.opts);
     
@@ -2509,7 +2508,7 @@ bool QtCurveConfig::savePreset(const QString &name)
     if(APPEARANCE_FILE==opts.menuBgndAppearance)
         opts.menuBgndPixmap.file=saveThemeFile(menuBgndPixmapDlg->fileName(), BGND_FILE MENU_FILE, fname);
 
-    if(writeConfig(&cfg, opts, presets[defaultText].opts, true))
+    if(qtcWriteConfig(&cfg, opts, presets[defaultText].opts, true))
     {
         kwin->save(&cfg);
 
@@ -2688,7 +2687,7 @@ void QtCurveConfig::importPreset()
 
             if(!qtcFile.isEmpty())
             {
-                if (readConfig(qtcFile, &opts, &presets[defaultText].opts, false))
+                if (qtcReadConfig(qtcFile, &opts, &presets[defaultText].opts, false))
                 {
                     name=getPresetName(i18n("Import Preset"), QString(), name, name);
                     if(!name.isEmpty())
@@ -2824,7 +2823,7 @@ void QtCurveConfig::exportPreset()
                     }
                 }
 
-                rv=writeConfig(&cfg, opts, presets[defaultText].opts, true);
+                rv=qtcWriteConfig(&cfg, opts, presets[defaultText].opts, true);
                 if(rv)
                     kwin->save(&cfg);
                 if(rv && compressed)

@@ -19,6 +19,7 @@
  */
 
 #include "common.h"
+#include "config_file.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,9 +28,24 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+#include <qglobal.h>
+#endif
+
 #ifndef _WIN32
 #include <unistd.h>
 #include <pwd.h>
+#endif
+
+#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <sys/stat.h>
+#include <float.h>
+#include <direct.h>
+
+static int lstat(const char* fileName, struct stat* s)
+{
+    return stat(fileName, s);
+}
 #endif
 
 #define MAX_CONFIG_FILENAME_LEN   1024
@@ -55,7 +71,30 @@
 
 #endif // __cplusplus
 
-#ifdef CONFIG_READ
+const char *qtcConfDir();
+
+#ifdef __cplusplus
+static QString determineFileName(const QString &file)
+{
+    if(file.startsWith("/"))
+        return file;
+    return qtcConfDir()+file;
+}
+
+#else
+static const char * determineFileName(const char *file)
+{
+    if('/'==file[0])
+        return file;
+
+    static char *filename=NULL;
+
+    filename=realloc(filename, strlen(qtcConfDir())+strlen(file)+1);
+    sprintf(filename, "%s%s", qtcConfDir(), file);
+    return filename;
+}
+#endif
+
 static int c2h(char ch)
 {
     return (ch>='0' && ch<='9') ? ch-'0' :
@@ -87,30 +126,6 @@ static void setRgb(color *col, const char *str)
         col->red=col->green=col->blue=col->pixel=0;
 #endif
 }
-
-static const char *qtcConfDir();
-
-#ifdef __cplusplus
-static QString determineFileName(const QString &file)
-{
-    if(file.startsWith("/"))
-        return file;
-    return qtcConfDir()+file;
-}
-
-#else
-static const char * determineFileName(const char *file)
-{
-    if('/'==file[0])
-        return file;
-
-    static char *filename=NULL;
-
-    filename=realloc(filename, strlen(qtcConfDir())+strlen(file)+1);
-    sprintf(filename, "%s%s", qtcConfDir(), file);
-    return filename;
-}
-#endif
 
 #ifdef __cplusplus
 static bool loadImage(const QString &file, QtCPixmap *pixmap)
@@ -595,7 +610,6 @@ static ETBarBtn toTBarBtn(const char *str, ETBarBtn def)
     }
     return def;
 }
-#endif
 
 static const char * getHome()
 {
@@ -692,7 +706,7 @@ static bool makeDir(const QString& dir, int mode)
 #endif
 #endif
 
-static const char *qtcConfDir()
+const char *qtcConfDir()
 {
     static char *cfgDir=NULL;
 
@@ -772,9 +786,9 @@ static const char *qtcConfDir()
 }
 
 #ifdef __cplusplus
-static WindowBorders qtcGetWindowBorderSize(bool force=false)
+WindowBorders qtcGetWindowBorderSize(bool force)
 #else
-static WindowBorders qtcGetWindowBorderSize(bool force)
+WindowBorders qtcGetWindowBorderSize(bool force)
 #endif
 {
     static WindowBorders def={24, 18, 4, 4};
@@ -830,21 +844,13 @@ static WindowBorders qtcGetWindowBorderSize(bool force)
 
 #if (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
 
-#define MENU_FILE_PREFIX   "menubar-"
-#define STATUS_FILE_PREFIX "statusbar-"
-
-#define qtcMenuBarHidden(A)         qtcBarHidden((A), MENU_FILE_PREFIX)
-#define qtcSetMenuBarHidden(A, H)   qtcSetBarHidden((A), (H), MENU_FILE_PREFIX)
-#define qtcStatusBarHidden(A)       qtcBarHidden((A), STATUS_FILE_PREFIX)
-#define qtcSetStatusBarHidden(A, H) qtcSetBarHidden((A), (H), STATUS_FILE_PREFIX)
-
 #ifdef __cplusplus
-static bool qtcBarHidden(const QString &app, const char *prefix)
+bool qtcBarHidden(const QString &app, const char *prefix)
 {
     return QFile::exists(QFile::decodeName(qtcConfDir())+prefix+app);
 }
 
-static void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix)
+void qtcSetBarHidden(const QString &app, bool hidden, const char *prefix)
 {
     if(!hidden)
         QFile::remove(QFile::decodeName(qtcConfDir())+prefix+app);
@@ -870,12 +876,12 @@ static char * qtcGetBarFileName(const char *app, const char *prefix)
     return filename;
 }
 
-static bool qtcBarHidden(const char *app, const char *prefix)
+bool qtcBarHidden(const char *app, const char *prefix)
 {
     return qtcFileExists(qtcGetBarFileName(app, prefix));
 }
 
-static void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
+void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
 {
     if(!hidden)
         unlink(qtcGetBarFileName(app, prefix));
@@ -894,7 +900,7 @@ static void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
 #include <QtSvg/QSvgRenderer>
 #endif // __cplusplus
 
-static void loadBgndImage(QtCImage *img)
+void qtcLoadBgndImage(QtCImage *img)
 {
     if(!img->loaded &&
         ( (img->width>16 && img->width<1024 && img->height>16 && img->height<1024) || (0==img->width && 0==img->height)) )
@@ -943,14 +949,6 @@ static void loadBgndImage(QtCImage *img)
 }
 
 #endif // (!defined QT_VERSION || QT_VERSION >= 0x040000) && !defined CONFIG_DIALOG
-
-#ifdef CONFIG_READ
-
-#ifdef __cplusplus
-#define IS_BLACK(A) (0==(A).red() && 0==(A).green() && 0==(A).blue())
-#else
-#define IS_BLACK(A) (0==(A).red && 0==(A).green && 0==(A).blue)
-#endif
 
 static void checkColor(EShade *s, color *c)
 {
@@ -1386,7 +1384,7 @@ static void checkAppearance(EAppearance *ap, Options *opts)
     }
 }
 
-static void defaultSettings(Options *opts);
+void qtcDefaultSettings(Options *opts);
 
 #ifndef __cplusplus
 static void copyGradients(Options *src, Options *dest)
@@ -1465,7 +1463,7 @@ static void freeOpts(Options *opts)
 }
 #endif
 
-static void checkConfig(Options *opts)
+void qtcCheckConfig(Options *opts)
 {
     /* **Must** check appearance first, as the rest will default to this */
     checkAppearance(&opts->appearance, opts);
@@ -1686,9 +1684,9 @@ static void checkConfig(Options *opts)
 }
 
 #ifdef __cplusplus
-static bool readConfig(const QString &file, Options *opts, Options *defOpts=0L, bool checkImages=true)
+bool qtcReadConfig(const QString &file, Options *opts, Options *defOpts, bool checkImages)
 #else
-static bool readConfig(const char *file, Options *opts, Options *defOpts)
+bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 {
 #ifdef __cplusplus
@@ -1697,7 +1695,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
         const char *env=getenv("QTCURVE_CONFIG_FILE");
 
         if(NULL!=env)
-            return readConfig(env, opts, defOpts);
+            return qtcReadConfig(env, opts, defOpts);
         else
         {
             const char *cfgDir=qtcConfDir();
@@ -1708,7 +1706,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
 
                 if(!QFile::exists(filename))
                     filename=QFile::decodeName(cfgDir)+"../"OLD_CONFIG_FILE;
-                return readConfig(filename, opts, defOpts);
+                return qtcReadConfig(filename, opts, defOpts);
             }
         }
     }
@@ -1719,7 +1717,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
         const char *env=getenv("QTCURVE_CONFIG_FILE");
 
         if(NULL!=env)
-            return readConfig(env, opts, defOpts);
+            return qtcReadConfig(env, opts, defOpts);
         else
         {
             const char *cfgDir=qtcConfDir();
@@ -1732,7 +1730,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
                 sprintf(filename, "%s"CONFIG_FILE, cfgDir);
                 if(!qtcFileExists(filename))
                     sprintf(filename, "%s../"OLD_CONFIG_FILE, cfgDir);
-                rv=readConfig(filename, opts, defOpts);
+                rv=qtcReadConfig(filename, opts, defOpts);
                 free(filename);
                 return rv;
             }
@@ -1762,7 +1760,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(defOpts)
                 newOpts=*defOpts;
             else
-                defaultSettings(&newOpts);
+                qtcDefaultSettings(&newOpts);
 
             Options *def=&newOpts;
 
@@ -1782,7 +1780,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(defOpts)
                 copyOpts(defOpts, &newOpts);
             else
-                defaultSettings(&newOpts);
+                qtcDefaultSettings(&newOpts);
             if(opts!=def)
                 copyGradients(def, opts);
 #endif
@@ -2386,7 +2384,7 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             }
 #endif
 
-            checkConfig(opts);
+            qtcCheckConfig(opts);
 
 #ifndef __cplusplus
             if(!defOpts)
@@ -2408,12 +2406,12 @@ static bool readConfig(const char *file, Options *opts, Options *defOpts)
             if(defOpts)
                 *opts=*defOpts;
             else
-                defaultSettings(opts);
+                qtcDefaultSettings(opts);
 #else
             if(defOpts)
                 copyOpts(defOpts, opts);
             else
-                defaultSettings(opts);
+                qtcDefaultSettings(opts);
 #endif
             return true;
         }
@@ -2441,7 +2439,7 @@ static const char * getSystemConfigFile()
     return NULL;
 }
 
-static void defaultSettings(Options *opts)
+void qtcDefaultSettings(Options *opts)
 {
     /* Set hard-coded defaults... */
 #ifndef __cplusplus
@@ -2451,12 +2449,12 @@ static void defaultSettings(Options *opts)
         opts->customGradient[i]=0L;
     opts->customGradient[APPEARANCE_CUSTOM1]=malloc(sizeof(Gradient));
     opts->customGradient[APPEARANCE_CUSTOM2]=malloc(sizeof(Gradient));
-    setupGradient(opts->customGradient[APPEARANCE_CUSTOM1], GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
-    setupGradient(opts->customGradient[APPEARANCE_CUSTOM2], GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
+    qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM1], GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
+    qtcSetupGradient(opts->customGradient[APPEARANCE_CUSTOM2], GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
 #else
     // Setup titlebar gradients...
-    setupGradient(&(opts->customGradient[APPEARANCE_CUSTOM1]), GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
-    setupGradient(&(opts->customGradient[APPEARANCE_CUSTOM2]), GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
+    qtcSetupGradient(&(opts->customGradient[APPEARANCE_CUSTOM1]), GB_3D,3,0.0,1.2,0.5,1.0,1.0,1.0);
+    qtcSetupGradient(&(opts->customGradient[APPEARANCE_CUSTOM2]), GB_3D,3,0.0,0.9,0.5,1.0,1.0,1.0);
 #endif
     opts->customShades[0]=1.16;
     opts->customShades[1]=1.07;
@@ -2676,7 +2674,7 @@ static void defaultSettings(Options *opts)
         systemFilename=getSystemConfigFile();
 
     if(systemFilename)
-        readConfig(systemFilename, opts, opts);
+        qtcReadConfig(systemFilename, opts, opts);
     }
 
 #if !defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION < 0x040000)
@@ -2685,9 +2683,10 @@ static void defaultSettings(Options *opts)
 #endif
 }
 
-#endif
-
 #ifdef CONFIG_WRITE
+#include <KDE/KConfig>
+#include <KDE/KConfigGroup>
+
 static const char *toStr(EDefBtnIndicator ind)
 {
     switch(ind)
@@ -3212,7 +3211,7 @@ static const char * toStr(ETBarBtn tb)
     else \
         CFG.writeEntry(#ENTRY, QStringList(opts.ENTRY.toList()).join(",")); \
 
-bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle=false)
+bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool exportingStyle)
 {
     if(!cfg)
     {
@@ -3226,7 +3225,7 @@ bool static writeConfig(KConfig *cfg, const Options &opts, const Options &def, b
             KConfig defCfg(QFile::decodeName(cfgDir)+CONFIG_FILE, false, false);
 #endif
 
-            if(writeConfig(&defCfg, opts, def, exportingStyle))
+            if(qtcWriteConfig(&defCfg, opts, def, exportingStyle))
             {
                 const char *oldFiles[]={ OLD_CONFIG_FILE, "qtcurve.gtk-icons", 0};
 

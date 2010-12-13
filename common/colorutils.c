@@ -22,8 +22,26 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+#include "config.h"
+
+#ifdef __cplusplus
+#include <qglobal.h>
+#endif
+
+#if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY)
 
 #include <math.h>
+
+#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
+#include <sys/stat.h>
+#include <float.h>
+#include <direct.h>
+
+static int isnan(double x)
+{
+    return _isnan(x);
+}
+#endif
 
 #ifdef __cplusplus
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -303,3 +321,5 @@ static color ColorUtils_mix(const color *c1, const color *c2, double bias)
 //     c.y = ColorUtils_normalize(c.y * (k>1.0 ? (k*1.1) : (k<1.0 ? (k*0.9) : k)));
 //     return ColorUtils_HCY_toColor(&c);
 // }
+
+#endif // !(defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY)

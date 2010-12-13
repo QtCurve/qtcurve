@@ -30,7 +30,7 @@
 #include "pixmaps.h"
 #include <iostream>
 #define CONFIG_READ
-#include "config_file.c"
+#include "config_file.h"
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
@@ -1058,9 +1058,9 @@ void Style::init(bool initial)
                     rcFile=themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), itsName, !useQt3Settings());
             }
         }
-        readConfig(rcFile, &opts);
+        qtcReadConfig(rcFile, &opts);
 #else
-        readConfig(QString(), &opts);
+        qtcReadConfig(QString(), &opts);
 #endif
 
 #ifdef Q_WS_X11
@@ -1333,7 +1333,7 @@ void Style::init(bool initial)
        IMG_SQUARE_RINGS==opts.bgndImage.type ||
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
        IMG_SQUARE_RINGS==opts.menuBgndImage.type)
-        calcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+        qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
     itsBlurHelper->setEnabled(100!=opts.bgndOpacity || 100!=opts.dlgOpacity || 100!=opts.menuBgndOpacity);
 
@@ -1599,7 +1599,7 @@ void Style::polish(QPalette &palette)
            IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
            IMG_SQUARE_RINGS==opts.menuBgndImage.type)
         {
-            calcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
+            qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
             if(itsUsePixmapCache)
                 QPixmapCache::clear();
         }
@@ -2898,7 +2898,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                 drawBackground(&p, widget, BGND_MENU);
                 if(opts.popupBorder)
                 {
-                    EGradientBorder border=getGradient(opts.menuBgndAppearance, &opts)->border;
+                    EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
 
                     p.setClipping(false);
                     p.setPen(use[STD_BORDER]);
@@ -4176,7 +4176,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         int          round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
                         QPainterPath path(buildPath(r, WIDGET_FRAME, round,
                                                     ROUNDED_ALL==round
-                                                        ? getRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
+                                                        ? qtcGetRadius(&opts, r.width(), r.height(), WIDGET_FRAME, RADIUS_EXTERNAL)
                                                         : 0.0));
 
                         painter->save();
@@ -4366,7 +4366,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                                                     ? QPalette::Window
                                                                     : QPalette::Base).color());
                             painter->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW, ROUNDED_ALL,
-                                                        getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW, RADIUS_INTERNAL)));
+                                                        qtcGetRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW, RADIUS_INTERNAL)));
                             painter->setRenderHint(QPainter::Antialiasing, false);
                         }
 
@@ -4474,7 +4474,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 (opts.gtkComboMenus && widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent()))))
             {
                 const QColor    *use(popupMenuCols(option));
-                EGradientBorder border=getGradient(opts.menuBgndAppearance, &opts)->border;
+                EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
                 painter->save();
                 painter->setPen(use[STD_BORDER]);
                 drawRect(painter, r);
@@ -4560,7 +4560,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 if(panel->lineWidth > 0)
                 {
                     QRect r2(r.adjusted(1, 1, -1, (DO_EFFECT ? -2 : -1)));
-                    painter->fillPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL, getRadius(&opts, r2.width(), r2.height(), WIDGET_ENTRY, RADIUS_INTERNAL)),
+                    painter->fillPath(buildPath(r2, WIDGET_ENTRY, ROUNDED_ALL, qtcGetRadius(&opts, r2.width(), r2.height(), WIDGET_ENTRY, RADIUS_INTERNAL)),
                                       palette.brush(QPalette::Base));
                     drawPrimitive(PE_FrameLineEdit, option, painter, widget);
                 }
@@ -5044,7 +5044,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                             painter->setRenderHint(QPainter::Antialiasing, true);
                             painter->drawPath(buildPath(r2, WIDGET_SELECTION, ROUNDED_ALL,
-                                                        square ? SLIGHT_INNER_RADIUS : getRadius(&opts, r2.width(), r2.height(), WIDGET_OTHER,
+                                                        square ? SLIGHT_INNER_RADIUS : qtcGetRadius(&opts, r2.width(), r2.height(), WIDGET_OTHER,
                                                                                                  FULL_FOCUS ? RADIUS_EXTERNAL : RADIUS_SELECTION)));
                         }
                         else
@@ -5457,7 +5457,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
 
                         QPainter pixPainter(&pix);
                         QRect    border(0, 0, pix.width(), pix.height());
-                        double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
+                        double   radius(qtcGetRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
 
                         pixPainter.setRenderHint(QPainter::Antialiasing, true);
                         drawBevelGradient(color, &pixPainter, border, buildPath(QRectF(border), WIDGET_OTHER, ROUNDED_ALL, radius), true,
@@ -5572,7 +5572,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 {
                     Style *that=(Style *)this;
                     opts=preview->opts;
-                    checkConfig(&opts);
+                    qtcCheckConfig(&opts);
                     that->init(true);
                 }
             }
@@ -5706,7 +5706,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     {
                         painter->save();
                         painter->setRenderHint(QPainter::Antialiasing, true);
-                        double   radius(getRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
+                        double   radius(qtcGetRadius(&opts, r.width(), r.height(), WIDGET_OTHER, RADIUS_SELECTION));
 
                         drawBevelGradient(shade(palette.background().color(), TO_FACTOR(opts.splitterHighlight)),
                                           painter, r, buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, radius),
@@ -5864,7 +5864,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                           false, opts.dwtAppearance, WIDGET_DOCK_WIDGET_TITLE);
                     else
                     {
-                        double radius(getRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
+                        double radius(qtcGetRadius(&opts, fillRect.width(), fillRect.height(), WIDGET_OTHER, RADIUS_EXTERNAL));
                         int    round=ROUNDED_ALL;
 
 #if QT_VERSION >= 0x040300
@@ -6140,7 +6140,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
             drawBevelGradient(col, painter, r, opts.borderProgress
                                 ? buildPath(r, WIDGET_PBAR_TROUGH, ROUNDED_ALL,
-                                            getRadius(&opts, r.width(), r.height(), WIDGET_PBAR_TROUGH, RADIUS_EXTERNAL))
+                                            qtcGetRadius(&opts, r.width(), r.height(), WIDGET_PBAR_TROUGH, RADIUS_EXTERNAL))
                                 : QPainterPath(),
                               horiz, false, opts.progressGrooveAppearance, WIDGET_PBAR_TROUGH);
 
@@ -7062,7 +7062,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                              drawOuterGlow(glowMo && !thin);
                 const QColor *use(backgroundColors(option));
                 QColor       fill(getTabFill(selected, mouseOver, use));
-                double       radius=getRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
+                double       radius=qtcGetRadius(&opts, r.width(), r.height(), WIDGET_TAB_TOP, RADIUS_EXTERNAL);
                 EBorder      borderProfile(selected || opts.borderInactiveTab
                                             ? opts.borderTab
                                                 ? BORDER_LIGHT
@@ -7841,7 +7841,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         {
                             painter->save();
                             painter->setRenderHint(QPainter::Antialiasing, true);
-                            double   radius(getRadius(&opts, highlightRect.width(), highlightRect.height(),
+                            double   radius(qtcGetRadius(&opts, highlightRect.width(), highlightRect.height(),
                                                       WIDGET_OTHER, RADIUS_SELECTION));
 
                             drawBevelGradient(shade(palette.background().color(), TO_FACTOR(opts.crHighlight)),
@@ -8777,7 +8777,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
             {
                 painter->save();
 
-                EAppearance  app=widgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active);
+                EAppearance  app=qtcWidgetApp(WIDGET_MDI_WINDOW_TITLE, &opts, option->state&State_Active);
                 bool         active(state&State_Active),
                              kwin(theThemedApp==APP_KWIN || titleBar->titleBarState&QtC_StateKWin);
                 const QColor *bgndCols(APPEARANCE_NONE==app
@@ -10993,7 +10993,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
                                                     (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
                                                      (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
                                                                      WIDGET_DOCK_WIDGET_TITLE==w && !dwt)));
-    const Gradient                   *grad=getGradient(app, &opts);
+    const Gradient                   *grad=qtcGetGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
                                      end(grad->stops.end());
@@ -11082,7 +11082,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
                circular( (WIDGET_MDI_WINDOW_BUTTON==w && (opts.titlebarButtons&TITLEBAR_BUTTON_ROUND)) ||
                          WIDGET_RADIO_BUTTON==w || WIDGET_DIAL==w || CIRCULAR_SLIDER(w));
         double radius=0;
-        ERound realRound=getWidgetRound(&opts, r.width(), r.height(), w);
+        ERound realRound=qtcGetWidgetRound(&opts, r.width(), r.height(), w);
 
         if(!circular)
         {
@@ -11098,7 +11098,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
                     break;
                 case ROUND_MAX:
                 {
-                    radius=getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
+                    radius=qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH);
                     endSize=SLIDER(w)
                                 ? qMax((opts.sliderWidth/2)+1, (int)(radius+1.5))
                                 : (int)(radius+2.5);
@@ -11165,7 +11165,7 @@ void Style::drawLightBevel(QPainter *p, const QRect &r, const QStyleOption *opti
             if(WIDGET_SB_SLIDER==w && opts.stripedSbar)
             {
                 QRect rx(r.adjusted(1, 1, -1, -1));
-                addStripes(p, buildPath(rx, WIDGET_SB_SLIDER, realRound, getRadius(&opts, rx.width()-1, rx.height()-1, WIDGET_SB_SLIDER,
+                addStripes(p, buildPath(rx, WIDGET_SB_SLIDER, realRound, qtcGetRadius(&opts, rx.width()-1, rx.height()-1, WIDGET_SB_SLIDER,
                                                                                    RADIUS_INTERNAL)),
                            rx, horiz);
             }
@@ -11177,7 +11177,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                                const QColor &fill, const QColor *custom, bool doBorder, EWidget w, bool useCache, ERound realRound,
                                bool onToolbar) const
 {
-    EAppearance  app(widgetApp(onToolbar ? WIDGET_TOOLBAR_BUTTON : w, &opts, option->state&State_Active));
+    EAppearance  app(qtcWidgetApp(onToolbar ? WIDGET_TOOLBAR_BUTTON : w, &opts, option->state&State_Active));
     QRect        r(rOrig);
     bool         bevelledButton((WIDGET_BUTTON(w) || WIDGET_NO_ETCH_BTN==w || WIDGET_MENU_BUTTON==w) && APPEARANCE_BEVELLED==app),
                  sunken(option->state &(/*State_Down | */State_On | State_Sunken)),
@@ -11229,8 +11229,8 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
         {
             drawBevelGradient(fill, p, WIDGET_PROGRESSBAR==w && opts.borderProgress ? r.adjusted(1, 1, -1, -1) : r,
                               doBorder
-                                ? buildPath(r, w, round, getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))
-                                : buildPath(QRectF(r), w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)),
+                                ? buildPath(r, w, round, qtcGetRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL))
+                                : buildPath(QRectF(r), w, round, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)),
                               horiz, sunken, app, w, useCache);
 
             if(!sunken || sunkenToggleMo)
@@ -11238,7 +11238,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                 {
                     p->save();
                     p->setClipPath(buildPath(r.adjusted(0, 0, 0, -1), w, round,
-                                             getRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)));
+                                             qtcGetRadius(&opts, r.width()-2, r.height()-2, w, RADIUS_INTERNAL)));
                     if(SLIDER(w))
                     {
                         int len(SB_SLIDER_MO_LEN(horiz ? r.width() : r.height())+1),
@@ -11378,7 +11378,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
     if(!colouredMouseOver && lightBorder)
     {
         p->setPen(cols[LIGHT_BORDER(app)]);
-        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
+        p->drawPath(buildPath(r, w, round, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL)));
     }
     else if(colouredMouseOver || (draw3d && option->state&State_Raised))
     {
@@ -11386,7 +11386,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
                      innerBrPath;
         int          dark(/*bevelledButton ? */2/* : 4*/);
 
-        buildSplitPath(r, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
+        buildSplitPath(r, round, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_INTERNAL),
                        innerTlPath, innerBrPath);
 
         p->setPen(border[colouredMouseOver ? MO_STD_LIGHT(w, sunken) : (sunken ? dark : 0)]);
@@ -11456,7 +11456,7 @@ void Style::drawGlow(QPainter *p, const QRect &r, EWidget w, const QColor *cols)
     p->setBrush(Qt::NoBrush);
     p->setRenderHint(QPainter::Antialiasing, true);
     p->setPen(col);
-    p->drawPath(buildPath(r, w, ROUNDED_ALL, getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH)));
+    p->drawPath(buildPath(r, w, ROUNDED_ALL, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH)));
     p->setRenderHint(QPainter::Antialiasing, false);
 }
 
@@ -11469,7 +11469,7 @@ void Style::drawEtch(QPainter *p, const QRect &r, const QWidget *widget,  EWidge
     if(WIDGET_TOOLBAR_BUTTON==w && EFFECT_ETCH==opts.tbarBtnEffect)
         raised=false;
 
-    buildSplitPath(r, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
+    buildSplitPath(r, round, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_ETCH), tl, br);
 
     col.setAlphaF(USE_CUSTOM_ALPHAS(opts) ? opts.customAlphas[ALPHA_ETCH_DARK] : ETCH_TOP_ALPHA);
     p->setBrush(Qt::NoBrush);
@@ -11619,7 +11619,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
             p->setBrushOrigin(prevOrigin);
         }
         
-        if(isWindow && APPEARANCE_STRIPED!=app && APPEARANCE_FILE!=app && GT_HORIZ==grad && GB_SHINE==getGradient(app, &opts)->border)
+        if(isWindow && APPEARANCE_STRIPED!=app && APPEARANCE_FILE!=app && GT_HORIZ==grad && GB_SHINE==qtcGetGradient(app, &opts)->border)
         {
             int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
 
@@ -11634,7 +11634,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                 pix.fill(Qt::transparent);
                 QRadialGradient gradient(QPointF(pix.width()/2.0, 0), pix.width()/2.0, QPointF(pix.width()/2.0, 0));
                 QColor          c(Qt::white);
-                double          alpha(shineAlpha(&col));
+                double          alpha(qtcShineAlpha(&col));
 
                 c.setAlphaF(alpha);
                 gradient.setColorAt(0, c);
@@ -11688,7 +11688,7 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
         case IMG_NONE:
             break;
         case IMG_FILE:
-            loadBgndImage(&img);
+            qtcLoadBgndImage(&img);
             if(!img.pixmap.img.isNull())
             {
                 switch(img.pos)
@@ -11982,7 +11982,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
 
                 QRect inner(r.adjusted(1, 1, -1, -1));
 
-                buildSplitPath(inner, round, getRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
+                buildSplitPath(inner, round, qtcGetRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
 
                 p->setPen((enabled || BORDER_SUNKEN==borderProfile) /*&&
                             (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
@@ -12015,7 +12015,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
         QColor       col(border);
 
         col.setAlphaF(LOWER_BORDER_ALPHA);
-        buildSplitPath(r, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL), topPath, botPath);
+        buildSplitPath(r, round, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL), topPath, botPath);
         p->setPen(/*enabled ? */border/* : col*/);
         p->drawPath(topPath);
 //         if(enabled)
@@ -12025,7 +12025,7 @@ void Style::drawBorder(QPainter *p, const QRect &r, const QStyleOption *option, 
     else
     {
         p->setPen(border);
-        p->drawPath(buildPath(r, w, round, getRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
+        p->drawPath(buildPath(r, w, round, qtcGetRadius(&opts, r.width(), r.height(), w, RADIUS_EXTERNAL)));
     }
 
     p->setRenderHint(QPainter::Antialiasing, false);
@@ -12258,14 +12258,14 @@ void Style::drawEntryField(QPainter *p, const QRect &rx,  const QWidget *widget,
     p->setRenderHint(QPainter::Antialiasing, true);
     if(fill)
         p->fillPath(buildPath(QRectF(r).adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, round,
-                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)),
+                              qtcGetRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)),
                     option->palette.brush(QPalette::Base));
     else
     {
         p->setPen(WIDGET_SCROLLVIEW!=w || !(opts.square&SQUARE_SCROLLVIEW) || opts.highlightScrollViews ? checkColour(option, QPalette::Base)
                                                                                                         : backgroundColors(option)[ORIGINAL_SHADE]);
         p->drawPath(buildPath(r.adjusted(1, 1, -1, -1), WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, round,
-                              getRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)));
+                              qtcGetRadius(&opts, r.width()-2, r.height()-2, WIDGET_SCROLLVIEW==w ? w : WIDGET_ENTRY, RADIUS_INTERNAL)));
     }
     p->setRenderHint(QPainter::Antialiasing, false);
 
@@ -12975,7 +12975,7 @@ void Style::colorTab(QPainter *p, const QRect &r, bool horiz, EWidget tab, int r
     end.setAlphaF(0.0);
     grad.setColorAt(0, WIDGET_TAB_TOP==tab ? start : end);
     grad.setColorAt(1, WIDGET_TAB_TOP==tab ? end : start);
-    p->fillPath(buildPath(r, tab, round, getRadius(&opts, r.width(), r.height(), tab, RADIUS_EXTERNAL)), grad);
+    p->fillPath(buildPath(r, tab, round, qtcGetRadius(&opts, r.width(), r.height(), tab, RADIUS_EXTERNAL)), grad);
     p->restore();
 }
 
@@ -13425,8 +13425,7 @@ QPixmap * Style::getPixmap(const QColor col, EPixmap p, double shade) const
             if (img.depth()<32)
                 img=img.convertToFormat(QImage::Format_ARGB32);
 
-            adjustPix(img.bits(), 4, img.width(), img.height(), img.bytesPerLine(), col.red(),
-                    col.green(), col.blue(), shade);
+            qtcAdjustPix(img.bits(), 4, img.width(), img.height(), img.bytesPerLine(), col.red(), col.green(), col.blue(), shade);
             *pix=QPixmap::fromImage(img);
         }
         itsPixmapCache.insert(key, pix, pix->depth()/8);
@@ -13492,13 +13491,13 @@ QColor Style::shade(const QColor &a, double k) const
 {
     QColor mod;
 
-    ::shade(&opts, a, &mod, k);
+    ::qtcShade(&opts, a, &mod, k);
     return mod;
 }
 
 void Style::shade(const color &ca, color *cb, double k) const
 {
-    ::shade(&opts, ca, cb, k);
+    ::qtcShade(&opts, ca, cb, k);
 }
 
 QColor Style::getLowerEtchCol(const QWidget *widget) const
