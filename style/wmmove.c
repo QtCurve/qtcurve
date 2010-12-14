@@ -144,9 +144,13 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                 {
                     // TODO: one could probably check here whether widget is enabled or not,
                     // and accept if widget is disabled.
-                    if(objectIsA(G_OBJECT(childWidget), "GtkPizza"))
+                    if(objectIsA(G_OBJECT(childWidget), "GtkPizza") || objectIsA(G_OBJECT(childWidget), "GladeDesignLayout"))
                     {
                         usable = FALSE;
+                    }
+                    else if(GTK_IS_BUTTON(childWidget) && qtcWidgetGetState(childWidget)!=GTK_STATE_INSENSITIVE)
+                    {
+                        usable = false;
                     }
                     else if(gtk_widget_get_events(childWidget)&(GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK))
                     {
