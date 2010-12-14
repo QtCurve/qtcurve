@@ -1,12 +1,12 @@
 1.8.2
 -----
  1. When hiding shortcuts, only show these if widget is enabled.
- 2. Dont draw titlebar button frame for menu button if this is where the
+ 2. Don't draw titlebar button frame for menu button if this is where the
     window icon is to be. This was already the case for circular buttons,
     but not for square buttons.
  3. If drawing sunken background behind titlebar buttons, need to reduce size
     of square buttons. This already happens for circular buttons.
- 4. Dont draw sunken background around icon based menu button, if it is the
+ 4. Don't draw sunken background around icon based menu button, if it is the
     only button on the left/right.
  5. Draw menubar and statusbar kwin toggle buttons square if using square
     titlebar buttons.
