@@ -1,5 +1,5 @@
-#ifndef __QTC_SCROLLBAR_H__
-#define __QTC_SCROLLBAR_H__
+#ifndef __QTC_PIXCACHE_H__
+#define __QTC_PIXCACHE_H__
 
 /*
   QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
@@ -21,6 +21,9 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcScrollbarSetup(GtkWidget *widget);
+#include <gdk/gdk.h>
+#include "common.h"
+
+GdkPixbuf * getPixbuf(GdkColor *widgetColor, EPixmap p, double shade);
 
 #endif

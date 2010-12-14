@@ -1,5 +1,25 @@
-#ifndef QT_SETTINGS_H_
-#define QT_SETTINGS_H_
+#ifndef __QT_SETTINGS_H__
+#define __QT_SETTINGS_H__
+
+/*
+  QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
+
+  ----
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public
+  License version 2 as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; see the file COPYING.  If not, write to
+  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+  Boston, MA 02110-1301, USA.
+ */
 
 #include <gtk/gtk.h>
 
@@ -134,7 +154,30 @@ typedef struct
 #endif
 } QtData;
 
-extern QtData qtSettings;
+typedef struct
+{
+    GdkColor background[TOTAL_SHADES+1],
+             button[2][TOTAL_SHADES+1],
+             *slider,
+             *defbtn,
+             *mouseover,
+             *combobtn,
+             *selectedcr,
+             *sortedlv,
+             *sidebar,
+             *progress,
+             *wborder[2],
+             mdi_text[2],
+             menubar[TOTAL_SHADES+1],
+             highlight[TOTAL_SHADES+1],
+             focus[TOTAL_SHADES+1],
+             menu[TOTAL_SHADES+1],
+             *check_radio;
+} QtCPalette;
+
+extern QtCPalette qtcPalette;
+extern Options    opts;
+extern QtData     qtSettings;
 
 extern gboolean qtSettingsInit();
 extern void qtSettingsSetColors(GtkStyle *style, GtkRcStyle *rc_style);

@@ -25,7 +25,6 @@
 #include "config_file.h"
 #include "colorutils.h"
 #include "qt_settings.h"
-#include "qtcurve.h"
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -37,7 +36,8 @@
 #include <errno.h>
 #include <locale.h>
 
-extern Options opts;
+QtCPalette qtcPalette;
+Options    opts;
 
 #if 0
 static gboolean drawBackgroundPng(const char *png);
@@ -108,17 +108,6 @@ static int strncmp_i(const char *s1, const char *s2, int num)
 #define MAX_LINE_LEN 1024
 
 QtData qtSettings;
-
-bool haveAlternateListViewCol()
-{
-    return 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].red || 0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].green ||
-           0!=qtSettings.colors[PAL_ACTIVE][COLOR_LV].blue;
-}
-
-gboolean isMozilla()
-{
-    return GTK_APP_MOZILLA==qtSettings.app || GTK_APP_NEW_MOZILLA==qtSettings.app;
-}
 
 static gboolean useQt3Settings()
 {
