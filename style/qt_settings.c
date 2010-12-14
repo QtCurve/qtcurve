@@ -2043,6 +2043,10 @@ gboolean qtSettingsInit()
             qtSettings.useAlpha=FALSE;
 #endif
 
+            /* Focus is messed up if not using glow focus*/
+            if(!opts.gtkComboMenus && FOCUS_GLOW!=opts.focus)
+                opts.gtkComboMenus=TRUE;
+
 /*
             if(opts.inactiveHighlight)
                 generateMidColor(&(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW]),

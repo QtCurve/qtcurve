@@ -1,15 +1,17 @@
 1.8.2
 -----
-1. Improve window drag code to take care of GtkPizza, and other, widgets.
-2. Use Gdk window to determine offsets when drawing background gradients.
-3. Use SHADOW_IN for treeviews.
-4. Fix background gradients in scrollviews.
-5. When drawing background gradients, use the background colour of the top-level
-   widget's style.
-6. Fix slight glitch with striped scrollbar sliders.
-7. Hacky fix for tabs in Thunderbird main window.
-8. Better detection of toolbar buttons in Thunderbird.
-9. Slightly clean-up code.
+ 1. Improve window drag code to take care of GtkPizza, and other, widgets.
+ 2. Use Gdk window to determine offsets when drawing background gradients.
+ 3. Use SHADOW_IN for treeviews.
+ 4. Fix background gradients in scrollviews.
+ 5. When drawing background gradients, use the background colour of the top-level
+    widget's style.
+ 6. Fix slight glitch with striped scrollbar sliders.
+ 7. Hacky fix for tabs in Thunderbird main window.
+ 8. Better detection of toolbar buttons in Thunderbird.
+ 9. Slightly clean-up code.
+10. Can only use KDE-style non-editable combo popup if also using glow focus - as
+    Gtk2 modifes the focus rect.
 
 1.8.1
 -----
