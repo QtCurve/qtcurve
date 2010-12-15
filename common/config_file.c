@@ -643,6 +643,8 @@ const char * qtcGetHome()
 #if QT_VERSION < 0x040000
 #include <qdir.h>
 #include <qfile.h>
+#else
+#include <QtCore/QDir>
 #endif
 // Take from KStandardDirs::makeDir
 static bool makeDir(const QString& dir, int mode)
@@ -896,6 +898,7 @@ void qtcSetBarHidden(const char *app, bool hidden, const char *prefix)
 
 #ifdef __cplusplus
 #include <QtSvg/QSvgRenderer>
+#include <QtGui/QPainter>
 #endif // __cplusplus
 
 void qtcLoadBgndImage(QtCImage *img)
