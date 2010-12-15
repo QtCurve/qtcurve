@@ -110,6 +110,18 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
     return TRUE;
 }
 
+static gboolean isBlackListed(GObject *object)
+{
+    static const char *widgets[]={ "GtkPizza", "GladeDesignLayout", "MetaFrames" , 0 };
+    
+    int i;
+    
+    for(i=0; widgets[i]; ++i)
+        if(objectIsA(object, widgets[i]))
+            return TRUE;
+    return FALSE;
+}
+
 static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *event, gboolean inNoteBook)
 {
     // accept, by default
@@ -144,7 +156,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                 {
                     // TODO: one could probably check here whether widget is enabled or not,
                     // and accept if widget is disabled.
-                    if(objectIsA(G_OBJECT(childWidget), "GtkPizza") || objectIsA(G_OBJECT(childWidget), "GladeDesignLayout"))
+                    if(isBlackListed(G_OBJECT(childWidget)))
                     {
                         usable = FALSE;
                     }
