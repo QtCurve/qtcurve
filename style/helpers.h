@@ -27,12 +27,9 @@
 #include "config.h"
 #include "compatability.h"
 
-#define QTC_CHECKBOX "checkbox-qtc"
-#define QTC_PANED "paned-qtc"
-#define CAIRO_COL(A) (A).red/65535.0, (A).green/65535.0, (A).blue/65535.0
-#define DETAIL(xx) ((detail) &&(!strcmp(xx, detail)))
+#define CAIRO_COL(A)  (A).red/65535.0, (A).green/65535.0, (A).blue/65535.0
+#define DETAIL(xx)    ((detail) &&(!strcmp(xx, detail)))
 #define DETAILHAS(xx) ((detail) && (strstr(detail, xx)))
-#define IS_QTC_PANED DETAIL(QTC_PANED)
 
 #ifndef GTK_IS_COMBO_BOX_ENTRY
 #define GTK_IS_COMBO_BOX_ENTRY(x) 0

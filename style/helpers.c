@@ -114,21 +114,19 @@ EBorder shadowToBorder(GtkShadowType shadow)
 gboolean useButtonColor(const gchar *detail)
 {
     return detail &&( 0==strcmp(detail, "optionmenu") ||
-                       0==strcmp(detail, "button") ||
-                       0==strcmp(detail, QTC_CHECKBOX) ||
-                       0==strcmp(detail, "buttondefault") ||
-                       0==strcmp(detail, "togglebuttondefault") ||
-                       0==strcmp(detail, "togglebutton") ||
-                       0==strcmp(detail, "hscale") ||
-                       0==strcmp(detail, "vscale") ||
-                       0==strcmp(detail, "spinbutton") ||
-                       0==strcmp(detail, "spinbutton_up") ||
-                       0==strcmp(detail, "spinbutton_down") ||
-                       0==strcmp(detail, "slider") ||
-                       0==strcmp(detail, "qtc-slider") ||
-                       (detail[1] && &detail[1]==strstr(detail, "scrollbar")) ||
-                       0==strcmp(detail, "stepper") ||
-                       0==strcmp(detail, QTC_PANED) );
+                      0==strcmp(detail, "button") ||
+                      0==strcmp(detail, "buttondefault") ||
+                      0==strcmp(detail, "togglebuttondefault") ||
+                      0==strcmp(detail, "togglebutton") ||
+                      0==strcmp(detail, "hscale") ||
+                      0==strcmp(detail, "vscale") ||
+                      0==strcmp(detail, "spinbutton") ||
+                      0==strcmp(detail, "spinbutton_up") ||
+                      0==strcmp(detail, "spinbutton_down") ||
+                      0==strcmp(detail, "slider") ||
+                      0==strcmp(detail, "qtc-slider") ||
+                      (detail[1] && &detail[1]==strstr(detail, "scrollbar")) ||
+                      0==strcmp(detail, "stepper") );
 }
 
 void qtcShadeColors(GdkColor *base, GdkColor *vals)
@@ -780,8 +778,7 @@ int getRound(const char *detail, GtkWidget *widget, int x, int y, int width, int
                 ? ROUNDED_NONE : ROUNDED_ALL;
         else if(0==strcmp(detail, "splitter") || 0==strcmp(detail, "optionmenu")  ||
                 0==strcmp(detail, "togglebutton") || 0==strcmp(detail, "hscale") ||
-                0==strcmp(detail, "vscale") || 0==strcmp(detail, QTC_CHECKBOX)
-                /* || 0==strcmp(detail, "paned") || 0==strcmp(detail, QTC_PANED)*/ )
+                0==strcmp(detail, "vscale") )
             return ROUNDED_ALL;
         else if(0==strcmp(detail, "spinbutton_up"))
             return rev ? ROUNDED_TOPLEFT : ROUNDED_TOPRIGHT;

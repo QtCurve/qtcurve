@@ -652,8 +652,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
              togglebutton=!button && DETAIL("togglebutton"),
              optionmenu=!togglebutton && DETAIL("optionmenu"),
              stepper=!optionmenu && DETAIL("stepper"),
-             checkbox=!stepper && DETAIL(QTC_CHECKBOX),
-             vscrollbar=!checkbox && detail && detail==strstr(detail, "vscrollbar"),
+             vscrollbar=!optionmenu && detail && detail==strstr(detail, "vscrollbar"),
              hscrollbar=!vscrollbar && detail && detail==strstr(detail, "hscrollbar"),
              spinUp=!hscrollbar && DETAIL("spinbutton_up"),
              spinDown=!spinUp && DETAIL("spinbutton_down"),
@@ -662,7 +661,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
              activeWindow=TRUE;
     GdkColor new_cols[TOTAL_SHADES+1],
              *btnColors;
-    int      bgnd=getFill(state, btnDown/*, DETAIL(QTC_CHECKBOX)*/),
+    int      bgnd=getFill(state, btnDown),
              round=getRound(detail, widget, x, y, width, height, rev);
     gboolean lvh=isListViewHeader(widget) || isEvolutionListViewHeader(widget, detail),
              sunken=btnDown || (GTK_IS_BUTTON(widget) && qtcButtonIsDepressed(widget)) ||
@@ -850,7 +849,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             drawArrow(WINDOW_PARAM_VAL style, &qtcPalette.background[5], area, GTK_ARROW_RIGHT,
                       x+width-((LARGE_ARR_WIDTH>>1)+4), y+((height-(LARGE_ARR_HEIGHT>>1))>>1)+1, FALSE, TRUE);
     }
-    else if(detail &&( button || togglebutton || optionmenu || checkbox || sbar || hscale || vscale || stepper || slider))
+    else if(detail &&( button || togglebutton || optionmenu || sbar || hscale || vscale || stepper || slider))
     {
         gboolean combo=0==strcmp(detail, "optionmenu") || isOnComboBox(widget, 0),
                  combo_entry=combo && isOnComboEntry(widget, 0),
@@ -889,24 +888,22 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                                 : slider
                                     ? qtcSlider ? WIDGET_SLIDER : WIDGET_SB_SLIDER
                                     : hscale||vscale
-                                    ? WIDGET_SLIDER
-                                        : lvh
-                                            ? WIDGET_LISTVIEW_HEADER
-                                            : combo || optionmenu
-                                                ? WIDGET_COMBO
-                                                : tbar_button
-                                                    ? (opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON)
-                                                    : togglebutton
-                                                        ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
-                                                        : checkbox
-                                                            ? WIDGET_CHECKBOX
-                                                                : button
-                                                                    ? defBtn || glowFocus
-                                                                        ? WIDGET_DEF_BUTTON
-                                                                        : WIDGET_STD_BUTTON
-                                                                    : stepper || sbar
-                                                                        ? WIDGET_SB_BUTTON
-                                                                        : WIDGET_OTHER;
+                                        ? WIDGET_SLIDER
+                                            : lvh
+                                                ? WIDGET_LISTVIEW_HEADER
+                                                : combo || optionmenu
+                                                    ? WIDGET_COMBO
+                                                    : tbar_button
+                                                        ? (opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON)
+                                                        : togglebutton
+                                                            ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
+                                                            : button
+                                                                ? defBtn || glowFocus
+                                                                    ? WIDGET_DEF_BUTTON
+                                                                    : WIDGET_STD_BUTTON
+                                                                : stepper || sbar
+                                                                    ? WIDGET_SB_BUTTON
+                                                                    : WIDGET_OTHER;
             int xo=x, yo=y, wo=width, ho=height, stepper=STEPPER_NONE;
 
             /* Try and guess if this button is a toolbar button... */
