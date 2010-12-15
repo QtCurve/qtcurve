@@ -1,3 +1,5 @@
+gnome-fs-directory places/folder.png
+gnome-fs-regular.png mimetypes/application-x-zerosize.png
 gtk-about actions/help-about.png places/start-here-kde.png
 gtk-add actions/list-add.png
 gtk-apply actions/dialog-ok-apply.png actions/ok-apply.png actions/apply.png
@@ -96,6 +98,7 @@ gtk-zoom-100 actions/zoom-original.png
 gtk-zoom-fit actions/zoom-fit-best.png
 gtk-zoom-in actions/zoom-in.png
 gtk-zoom-out actions/zoom-out.png
+stock_edit-bookmark actions/bookmarks-organize.png
 gimp-anchor NONE
 gimp-duplicate NONE
 gimp-edit actions/edit.png
