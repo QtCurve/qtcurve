@@ -3431,7 +3431,7 @@ void drawCheckBox(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkStyl
 
     if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
         btnColors=qtcPalette.selectedcr;
-    else if(!mnu && QT_CUSTOM_COLOR_BUTTON(style))
+    else if(!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style))
     {
         qtcShadeColors(&(style->bg[state]), newColors);
         btnColors=newColors;
@@ -3587,7 +3587,7 @@ void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shadow, GtkS
 
         if(opts.crColor && GTK_STATE_INSENSITIVE!=state && (on || tri))
             btnColors=qtcPalette.selectedcr;
-        else if(!mnu && QT_CUSTOM_COLOR_BUTTON(style))
+        else if(!mnu && !list && QT_CUSTOM_COLOR_BUTTON(style))
         {
             qtcShadeColors(&(style->bg[state]), newColors);
             btnColors=newColors;

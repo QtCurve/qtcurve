@@ -12,6 +12,7 @@
  9. Slightly clean-up code.
 10. Can only use KDE-style non-editable combo popup if also using glow focus - as
     Gtk2 modifes the focus rect.
+11. Don't recolour checks/radios in listviews when row is selected.
 
 1.8.1
 -----
