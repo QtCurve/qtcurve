@@ -4135,6 +4135,31 @@ void drawListViewHeader(cairo_t *cr, GtkStateType state, GdkColor *btnColors, in
 #endif
 }
 
+void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, gboolean sunken, GdkRectangle *area, int x, int y, int width, int height)
+{
+    if(IND_CORNER==opts.defBtnIndicator)
+    {
+        int      offset=sunken ? 5 : 4,
+                 etchOffset=DO_EFFECT ? 1 : 0;
+        GdkColor *cols=qtcPalette.focus ? qtcPalette.focus : qtcPalette.highlight,
+                 *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
+
+        cairo_new_path(cr);
+        cairo_set_source_rgb(cr, CAIRO_COL(*col));
+        cairo_move_to(cr, x+offset+etchOffset, y+offset+etchOffset);
+        cairo_line_to(cr, x+offset+6+etchOffset, y+offset+etchOffset);
+        cairo_line_to(cr, x+offset+etchOffset, y+offset+6+etchOffset);
+        cairo_fill(cr);
+    }
+    else if(IND_COLORED==opts.defBtnIndicator && (COLORED_BORDER_SIZE>2))
+    {
+        int o=COLORED_BORDER_SIZE+(DO_EFFECT ? 1 : 0); // offset needed because of etch
+
+        drawBevelGradient(cr, area, x+o, y+o, width-(2*o), height-(2*o),
+                          &btnColors[bgnd], TRUE, GTK_STATE_ACTIVE==state, opts.appearance, WIDGET_STD_BUTTON);
+    }
+}
+
 static GdkPixbuf * scaleOrRef(GdkPixbuf *src, int width, int height)
 {
     if (width == gdk_pixbuf_get_width(src) && height == gdk_pixbuf_get_height(src))
@@ -4261,4 +4286,3 @@ GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDire
 
     return stated;
 }
-

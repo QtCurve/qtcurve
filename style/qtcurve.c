@@ -889,21 +889,19 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                                     ? qtcSlider ? WIDGET_SLIDER : WIDGET_SB_SLIDER
                                     : hscale||vscale
                                         ? WIDGET_SLIDER
-                                            : lvh
-                                                ? WIDGET_LISTVIEW_HEADER
-                                                : combo || optionmenu
-                                                    ? WIDGET_COMBO
-                                                    : tbar_button
-                                                        ? (opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON)
-                                                        : togglebutton
-                                                            ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
-                                                            : button
-                                                                ? defBtn || glowFocus
-                                                                    ? WIDGET_DEF_BUTTON
-                                                                    : WIDGET_STD_BUTTON
-                                                                : stepper || sbar
-                                                                    ? WIDGET_SB_BUTTON
-                                                                    : WIDGET_OTHER;
+                                        : combo || optionmenu
+                                            ? WIDGET_COMBO
+                                            : tbar_button
+                                                ? (opts.coloredTbarMo ? WIDGET_TOOLBAR_BUTTON : WIDGET_UNCOLOURED_MO_BUTTON)
+                                                : togglebutton
+                                                    ? (glowFocus && !sunken ? WIDGET_DEF_BUTTON : WIDGET_TOGGLE_BUTTON)
+                                                    : button
+                                                        ? defBtn || glowFocus
+                                                            ? WIDGET_DEF_BUTTON
+                                                            : WIDGET_STD_BUTTON
+                                                        : stepper || sbar
+                                                            ? WIDGET_SB_BUTTON
+                                                            : WIDGET_OTHER;
             int xo=x, yo=y, wo=width, ho=height, stepper=STEPPER_NONE;
 
             /* Try and guess if this button is a toolbar button... */
@@ -1130,7 +1128,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
                                 ? getFillReal(state, btnDown, true) : bgnd;
 
                 drawLightBevel(cr, style, state, area, x, y, width, height, &cols[bg], cols, round, widgetType,
-                                BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|(lvh ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT), widget);
+                                BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|(horiz ? 0 : DF_VERT), widget);
 
                 if(tbar_button && TBTN_JOINED==opts.tbarBtns)
                 {
@@ -1169,27 +1167,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         }
 
         if(defBtn)
-            if(IND_CORNER==opts.defBtnIndicator)
-            {
-                int      offset=sunken ? 5 : 4,
-                         etchOffset=DO_EFFECT ? 1 : 0;
-                GdkColor *cols=qtcPalette.focus ? qtcPalette.focus : qtcPalette.highlight,
-                         *col=&cols[GTK_STATE_ACTIVE==state ? 0 : 4];
-
-                cairo_new_path(cr);
-                cairo_set_source_rgb(cr, CAIRO_COL(*col));
-                cairo_move_to(cr, x+offset+etchOffset, y+offset+etchOffset);
-                cairo_line_to(cr, x+offset+6+etchOffset, y+offset+etchOffset);
-                cairo_line_to(cr, x+offset+etchOffset, y+offset+6+etchOffset);
-                cairo_fill(cr);
-            }
-            else if(IND_COLORED==opts.defBtnIndicator && (COLORED_BORDER_SIZE>2))
-            {
-                int o=COLORED_BORDER_SIZE+(DO_EFFECT ? 1 : 0); // offset needed because of etch
-
-                drawBevelGradient(cr, area, x+o, y+o, width-(2*o), height-(2*o),
-                                    &btnColors[bgnd], TRUE, GTK_STATE_ACTIVE==state, opts.appearance, WIDGET_STD_BUTTON);
-            }
+            drawDefBtnIndicator(cr, state, btnColors, bgnd, sunken, area, x, y, width, height);
 
         if(opts.comboSplitter || SHADE_NONE!=opts.comboBtn)
         {
@@ -1318,8 +1296,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             }
         }
     }
-    else if(detail && (0==strcmp(detail, "buttondefault") ||
-                       0==strcmp(detail, "togglebuttondefault")))
+    else if(detail && (0==strcmp(detail, "buttondefault") || 0==strcmp(detail, "togglebuttondefault")))
     {
     }
     else if(widget && detail && (0==strcmp(detail, "trough") || detail==strstr(detail, "trough-")))
@@ -1349,8 +1326,7 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
         if(CUSTOM_BGND && widget)
             drawWindowBgnd(cr, style, area, GDKWINDOW, widget, x, y, width, height);
     }
-    else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") ||
-                                     0==strcmp(detail, "handlebox") ||
+    else if(widget && ( (detail && ( menubar || 0==strcmp(detail, "toolbar") || 0==strcmp(detail, "handlebox") ||
                                      0==strcmp(detail,"handlebox_bin") ) )
                         || WIDGET_TYPE_NAME("PanelAppletFrame")))
     {

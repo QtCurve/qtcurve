@@ -181,6 +181,7 @@ extern void drawRadioButton(cairo_t *cr, GtkStateType state, GtkShadowType shado
                             GdkRectangle *area, int x, int y, int width, int height);
 extern void drawToolbarBorders(cairo_t *cr, GtkStateType state, int x, int y, int width, int height, gboolean isActiveWindowMenubar, const char *detail);
 extern void drawListViewHeader(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, GdkRectangle *area, int x, int y, int width, int height);
+extern void drawDefBtnIndicator(cairo_t *cr, GtkStateType state, GdkColor *btnColors, int bgnd, gboolean sunken, GdkRectangle *area, int x, int y, int width, int height);
 extern GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDirection direction,
                               GtkStateType state, GtkIconSize size, GtkWidget *widget, const char *detail);
 #endif
