@@ -296,3 +296,15 @@ void qtcTabSetup(GtkWidget *widget)
         qtcTabUpdateChildren(widget);
     }  
 }
+
+gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
+{
+    int i,
+        numPages=gtk_notebook_get_n_pages(notebook);
+
+    for(i=0; i < numPages; ++i )
+        if(widget==gtk_notebook_get_tab_label(notebook, gtk_notebook_get_nth_page(notebook, i)))
+            return TRUE;
+    return FALSE;
+}
+

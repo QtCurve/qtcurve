@@ -24,5 +24,6 @@
 extern gboolean qtcTabCurrentHoveredIndex(GtkWidget *widget);
 extern void qtcTabSetup(GtkWidget *widget);
 extern void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, int height);
+extern gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget);
 
 #endif

@@ -27,6 +27,7 @@
 #include "helpers.h"
 #include "qt_settings.h"
 #include "menu.h"
+#include "tab.h"
 
 extern Options opts;
 
@@ -325,7 +326,15 @@ static gboolean qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointe
 
 void qtcWMMoveSetup(GtkWidget *widget)
 {
+    GtkWidget *parent=NULL;
+
     if(widget && GTK_IS_WINDOW(widget) && !gtk_window_get_decorated(GTK_WINDOW(widget)))
+        return;
+
+    parent=qtcWidgetGetParent(widget);
+    
+    // widgets used in tabs also must be ignored (happens, unfortunately)
+    if(GTK_IS_NOTEBOOK(parent) && qtcTabIsLabel(GTK_NOTEBOOK(parent), widget))
         return;
 
     if (widget && !isFakeGtk() && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
