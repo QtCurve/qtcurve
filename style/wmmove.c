@@ -325,6 +325,9 @@ static gboolean qtcWMMoveLeave(GtkWidget *widget, GdkEventMotion *event, gpointe
 
 void qtcWMMoveSetup(GtkWidget *widget)
 {
+    if(widget && GTK_IS_WINDOW(widget) && !gtk_window_get_decorated(GTK_WINDOW(widget)))
+        return;
+
     if (widget && !isFakeGtk() && !g_object_get_data(G_OBJECT(widget), "QTC_WM_MOVE_HACK_SET"))
     {
         gtk_widget_add_events(widget, GDK_BUTTON_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_BUTTON1_MOTION_MASK);
