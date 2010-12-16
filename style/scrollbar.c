@@ -58,6 +58,8 @@ static GtkScrolledWindow * qtcScrollbarParentScrolledWindow(GtkWidget *widget)
         if(GTK_IS_SCROLLED_WINDOW(parent))
             return GTK_SCROLLED_WINDOW(parent);
     }
+    
+    return NULL;
 }
     
 static gboolean qtcScrollbarValueChanged(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
