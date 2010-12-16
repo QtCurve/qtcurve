@@ -1,3 +1,7 @@
+1.8.3
+-----
+1. Better fix for problems with Pidgin's tabs and window dragging.
+
 1.8.2
 -----
  1. Improve window drag code to take care of GtkPizza, and other, widgets.

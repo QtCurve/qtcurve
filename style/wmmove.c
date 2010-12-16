@@ -205,14 +205,7 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
     
     // if widget is a notebook, accept if there is no hovered tab
     if(GTK_IS_NOTEBOOK(widget))
-    {
-        GtkWidget *parent;
-        if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && GTK_APP_PIDGIN==qtSettings.app &&
-            (parent=qtcWidgetGetParent(widget)) && GTK_IS_BOX(parent) &&
-            (parent=qtcWidgetGetParent(parent)) && GTK_IS_WINDOW(parent))
-            return FALSE;
         return -1==qtcTabCurrentHoveredIndex(widget);
-    }
 
     return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
 }
@@ -231,6 +224,15 @@ static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *e
         // Start timer
         qtcWMMoveStopTimer();
         qtcWMMoveTimer=g_timeout_add(qtSettings.startDragTime, (GSourceFunc)qtcWWMoveStartDelayedDrag, NULL);
+
+        /*
+        always return false for GtkNotebook to avoid conflicts
+        note: in principle it should be safe to return false anyway
+        since window drag is supposed to occur on events for which
+        nothing else is done (Hugo)
+        */
+        if( GTK_IS_NOTEBOOK( widget ) )
+            return FALSE;
 
         return TRUE;
     }

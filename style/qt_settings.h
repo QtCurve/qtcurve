@@ -89,8 +89,7 @@ typedef enum
     GTK_APP_JAVA,
     GTK_APP_JAVA_SWT,
     GTK_APP_EVOLUTION,
-    GTK_APP_FLASH_PLUGIN,
-    GTK_APP_PIDGIN
+    GTK_APP_FLASH_PLUGIN
     /*GTK_APP_GAIM*/
 } EGtkApp;
 
