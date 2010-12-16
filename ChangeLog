@@ -3,6 +3,7 @@
 1. Better fix for problems with Pidgin's tabs and window dragging.
 2. Fix crash when using background gradients/images and built using 'Release'
    build type.
+3. Fix titles in GIMP's preferences dialog.
 
 1.8.2
 -----

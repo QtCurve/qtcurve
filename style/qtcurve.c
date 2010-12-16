@@ -377,7 +377,7 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         drawToolTip(cr, widget, area, x, y, width, height);
     else if(DETAIL("icon_view_item"))
         drawSelection(cr, style, state, area, widget, x, y, width, height, ROUNDED_ALL, FALSE, 1.0, 0);
-    else if(CUSTOM_BGND && DETAIL("eventbox"))
+    else if(GTK_STATE_SELECTED!=state && CUSTOM_BGND && DETAIL("eventbox"))
         drawWindowBgnd(cr, style, NULL, GDKWINDOW, widget, x, y, width, height);
     else if(!(GTK_APP_JAVA==qtSettings.app && widget && GTK_IS_LABEL(widget)))
     {
