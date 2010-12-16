@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
+  QtCurve(C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
 
   ----
 
@@ -104,14 +104,14 @@ void qtcTabUpdateRect(GtkWidget *widget, int tabIndex, int x, int y, int width, 
 
 static void qtcTabCleanup(GtkWidget *widget)
 {
-    if (widget)
+    if(widget)
     { 
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_MOTION_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_LEAVE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_DESTROY_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_TAB_HACK_SET");
         qtcTabRemoveHash(widget);
     }
@@ -152,14 +152,14 @@ static gboolean qtcTabMotion(GtkWidget *widget, GdkEventMotion *event, gpointer 
 {
     QtCTab *tab=GTK_IS_NOTEBOOK(widget) ? qtcTabLookupHash(widget, FALSE) : NULL;
 
-    if (tab)
+    if(tab)
     {
         int px, py, t;
         gdk_window_get_pointer(qtcWidgetGetWindow(widget), &px, &py, NULL);
 
-        for(t=0; t < tab->numRects; t++ )
+        for(t=0; t < tab->numRects; t++)
         {
-            if(tab->rects[t].x<=px && tab->rects[t].y<=py && (tab->rects[t].x+tab->rects[t].width)>px && (tab->rects[t].y+tab->rects[t].height)>py)
+            if(tab->rects[t].x<=px && tab->rects[t].y<=py &&(tab->rects[t].x+tab->rects[t].width)>px &&(tab->rects[t].y+tab->rects[t].height)>py)
             {
                 qtcSetHoveredTab(tab, widget, t);
                 return FALSE;
@@ -187,14 +187,14 @@ static gboolean qtcTabLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer
 
 static void qtcTabUnRegisterChild(GtkWidget *widget)
 {
-    if (widget && g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_CHILD_SET"))
+    if(widget && g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_CHILD_SET"))
     {
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_C_ENTER_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_C_LEAVE_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_C_DESTROY_ID"));
-        g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_C_STYLE_SET_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_C_ENTER_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_C_LEAVE_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_C_DESTROY_ID"));
+        g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_C_STYLE_SET_ID"));
         if(GTK_IS_CONTAINER(widget))
-            g_signal_handler_disconnect(G_OBJECT(widget), (gint)g_object_steal_data (G_OBJECT(widget), "QTC_TAB_C_ADD_ID"));
+            g_signal_handler_disconnect(G_OBJECT(widget),(gint)g_object_steal_data(G_OBJECT(widget), "QTC_TAB_C_ADD_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_TAB_HACK_CHILD_SET");
     }
 }
@@ -227,23 +227,23 @@ static gboolean qtcTabChildAdd(GtkWidget *widget, GdkEventCrossing *event, gpoin
 
 static void qtcTabRegisterChild(GtkWidget *notebook, GtkWidget *widget)
 {
-    if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_CHILD_SET"))
+    if(widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_CHILD_SET"))
     {
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_C_ENTER_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "enter-notify-event", G_CALLBACK(qtcTabChildMotion), notebook));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "enter-notify-event", G_CALLBACK(qtcTabChildMotion), notebook));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_C_LEAVE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcTabChildMotion), notebook));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcTabChildMotion), notebook));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_C_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy", G_CALLBACK(qtcTabChildDestroy), notebook));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "destroy", G_CALLBACK(qtcTabChildDestroy), notebook));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_C_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcTabChildStyleSet), notebook));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcTabChildStyleSet), notebook));
         if(GTK_IS_CONTAINER(widget))
         {
             GList *children=gtk_container_get_children(GTK_CONTAINER(widget)),
                   *child;
 
             g_object_set_data(G_OBJECT(widget), "QTC_TAB_C_ADD_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "add", G_CALLBACK(qtcTabChildAdd), notebook));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "add", G_CALLBACK(qtcTabChildAdd), notebook));
             for(child = g_list_first(children); child; child = g_list_next(child))
                 qtcTabRegisterChild(notebook, GTK_WIDGET(child->data));
 
@@ -276,23 +276,23 @@ static gboolean qtcTabPageAdded(GtkWidget *widget, GdkEventCrossing *event, gpoi
 
 void qtcTabSetup(GtkWidget *widget)
 {
-    if (widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_SET"))
+    if(widget && !g_object_get_data(G_OBJECT(widget), "QTC_TAB_HACK_SET"))
     {
         qtcTabLookupHash(widget, TRUE);
 
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_MOTION_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcTabMotion), NULL));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(qtcTabMotion), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_LEAVE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcTabLeave), NULL));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "leave-notify-event", G_CALLBACK(qtcTabLeave), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_PAGE_ADDED_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "page-added", G_CALLBACK(qtcTabPageAdded), NULL));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "page-added", G_CALLBACK(qtcTabPageAdded), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_DESTROY_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcTabDestroy), NULL));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "destroy-event", G_CALLBACK(qtcTabDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_UNREALIZE_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(qtcTabDestroy), NULL));
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "unrealize", G_CALLBACK(qtcTabDestroy), NULL));
         g_object_set_data(G_OBJECT(widget), "QTC_TAB_STYLE_SET_ID",
-                          (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcTabStyleSet), NULL));
-        g_object_set_data(G_OBJECT(widget), "QTC_TAB_HACK_SET", (gpointer)1);
+                         (gpointer)g_signal_connect(G_OBJECT(widget), "style-set", G_CALLBACK(qtcTabStyleSet), NULL));
+        g_object_set_data(G_OBJECT(widget), "QTC_TAB_HACK_SET",(gpointer)1);
         qtcTabUpdateChildren(widget);
     }  
 }
@@ -302,9 +302,88 @@ gboolean qtcTabIsLabel(GtkNotebook *notebook, GtkWidget *widget)
     int i,
         numPages=gtk_notebook_get_n_pages(notebook);
 
-    for(i=0; i < numPages; ++i )
+    for(i=0; i < numPages; ++i)
         if(widget==gtk_notebook_get_tab_label(notebook, gtk_notebook_get_nth_page(notebook, i)))
             return TRUE;
     return FALSE;
 }
 
+GdkRectangle qtcTabGetTabbarRect(GtkNotebook *notebook)
+{
+    GdkRectangle  rect, empty;
+    GtkAllocation pageAllocation;
+    guint         borderWidth;
+    int           pageIndex;
+    GtkWidget     *page;
+
+    rect.x=rect.y=0;
+    rect.width=rect.height=-1;
+    empty=rect;
+
+    // check tab visibility
+    if(!(gtk_notebook_get_show_tabs(notebook) && gtk_container_get_children(GTK_CONTAINER(notebook))))
+        return empty;
+    
+    // get full rect
+    rect=qtcWidgetGetAllocation(GTK_WIDGET(notebook));
+
+    // adjust to account for borderwidth
+    borderWidth=gtk_container_get_border_width(GTK_CONTAINER(notebook));
+
+    rect.x += borderWidth;
+    rect.y += borderWidth;
+    rect.height -= 2*borderWidth;
+    rect.width -= 2*borderWidth;
+
+    // get current page
+    pageIndex=gtk_notebook_get_current_page(notebook);
+
+    if(!(pageIndex >= 0 && pageIndex < gtk_notebook_get_n_pages(notebook)))
+        return empty;
+    page=gtk_notebook_get_nth_page(notebook, pageIndex);
+    if(!page)
+        return empty;
+
+    // removes page allocated size from rect, based on tabwidget orientation
+    pageAllocation=qtcWidgetGetAllocation(page);
+    switch(gtk_notebook_get_tab_pos(notebook))
+    {
+        case GTK_POS_BOTTOM:
+            rect.y += pageAllocation.height;
+            rect.height -= pageAllocation.height;
+            break;
+        case GTK_POS_TOP:
+            rect.height -= pageAllocation.height;
+            break;
+        case GTK_POS_RIGHT:
+            rect.x += pageAllocation.width;
+            rect.width -= pageAllocation.width;
+            break;
+        case GTK_POS_LEFT:
+            rect.width -= pageAllocation.width;
+            break;
+    }
+
+    return rect;
+}
+
+gboolean qtcTabHasVisibleArrows(GtkNotebook *notebook)
+{
+    int i;
+
+    if(gtk_notebook_get_show_tabs(notebook))
+    {
+        int i,
+            numPages=gtk_notebook_get_n_pages(notebook);
+
+        for(i = 0; i<numPages; ++i)
+        {
+            GtkWidget *label=gtk_notebook_get_tab_label(notebook, gtk_notebook_get_nth_page(notebook, i));
+            
+            if(label && !gtk_widget_get_mapped(label))
+                return TRUE;
+        }
+    }
+
+    return FALSE;
+}

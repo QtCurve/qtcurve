@@ -144,7 +144,7 @@ typedef struct
     gboolean        qt4,
                     inactiveChangeSelectionColor,
                     useAlpha;
-    int             startDragDist,
+    int             //startDragDist,
                     startDragTime;
     QtcDebug        debug;
 #ifdef FIX_FIREFOX_LOCATION_BAR

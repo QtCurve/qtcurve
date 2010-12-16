@@ -832,12 +832,12 @@ static void readKdeGlobals(const char *rc, int rd, bool first, bool kde4)
                 qtSettings.buttonIcons=readBool(line, 23);
                 found|=RD_BUTTON_ICONS;
             }
-            else if (SECT_KDE==section && rd&RD_DRAG_DIST && !(found&RD_DRAG_DIST) &&
-                        0==strncmp_i(line, "StartDragDist=", 14))
-            {
-                qtSettings.startDragDist=readInt(line, 14);
-                found|=RD_DRAG_DIST;
-            }
+//             else if (SECT_KDE==section && rd&RD_DRAG_DIST && !(found&RD_DRAG_DIST) &&
+//                         0==strncmp_i(line, "StartDragDist=", 14))
+//             {
+//                 qtSettings.startDragDist=readInt(line, 14);
+//                 found|=RD_DRAG_DIST;
+//             }
             else if (SECT_KDE==section && rd&RD_DRAG_TIME && !(found&RD_DRAG_TIME) &&
                         0==strncmp_i(line, "StartDragTime=", 14))
             {
@@ -1958,7 +1958,7 @@ gboolean qtSettingsInit()
 #endif
             qtSettings.inactiveChangeSelectionColor=FALSE;
             qtSettings.appName=NULL;
-            qtSettings.startDragDist=4;
+//             qtSettings.startDragDist=4;
             qtSettings.startDragTime=500;
             qtSettings.debug=debugLevel();
             opts.contrast=DEFAULT_CONTRAST;

@@ -91,17 +91,12 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 
     if(window)
     {
-        GtkAllocation alloc=qtcWidgetGetAllocation(widget);
+        GtkAllocation alloc=GTK_IS_NOTEBOOK(widget) ? qtcTabGetTabbarRect(GTK_NOTEBOOK(widget)) : qtcWidgetGetAllocation(widget);
         int           nx=0,
-                      ny=0,
-                      adjust=0; /* TODO !!! */
+                      ny=0;
 
         // Need to get absolute co-ordinates...
-        alloc.x-=adjust;
-        alloc.y-=adjust;
-        alloc.width+=adjust;
-        alloc.height+=adjust;
-        gdk_window_get_origin(gtk_widget_get_parent_window(widget), &nx, &ny);
+        gdk_window_get_origin(window, &nx, &ny);
         alloc.x+=nx;
         alloc.y+=ny;
 
@@ -205,7 +200,7 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
     
     // if widget is a notebook, accept if there is no hovered tab
     if(GTK_IS_NOTEBOOK(widget))
-        return -1==qtcTabCurrentHoveredIndex(widget);
+        return !qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
 
     return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
 }
@@ -224,16 +219,6 @@ static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *e
         // Start timer
         qtcWMMoveStopTimer();
         qtcWMMoveTimer=g_timeout_add(qtSettings.startDragTime, (GSourceFunc)qtcWWMoveStartDelayedDrag, NULL);
-
-        /*
-        always return false for GtkNotebook to avoid conflicts
-        note: in principle it should be safe to return false anyway
-        since window drag is supposed to occur on events for which
-        nothing else is done (Hugo)
-        */
-        if( GTK_IS_NOTEBOOK( widget ) )
-            return FALSE;
-
         return TRUE;
     }
     return FALSE;
@@ -312,8 +297,8 @@ static gboolean qtcWMMoveMotion(GtkWidget *widget, GdkEventMotion *event, gpoint
         if(distance > 0)
             qtcWMMoveStopTimer();
 
-        if(distance < qtSettings.startDragDist)
-            return FALSE;
+//         if(distance < qtSettings.startDragDist)
+//             return FALSE;
         qtcWMMoveTrigger(widget, event->x_root, event->y_root);
         return TRUE;
     }
@@ -331,6 +316,9 @@ void qtcWMMoveSetup(GtkWidget *widget)
     GtkWidget *parent=NULL;
 
     if(widget && GTK_IS_WINDOW(widget) && !gtk_window_get_decorated(GTK_WINDOW(widget)))
+        return;
+
+    if(GTK_IS_EVENT_BOX(widget) && gtk_event_box_get_above_child(GTK_EVENT_BOX(widget)))
         return;
 
     parent=qtcWidgetGetParent(widget);
