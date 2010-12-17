@@ -480,6 +480,10 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
 
         if(isOnComboBox(widget, 0) && !onComboEntry)
         {
+            if (GTK_STATE_ACTIVE==state)
+                state=GTK_STATE_PRELIGHT;
+            
+            {
             GdkColor *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
                                                                             ? PAL_DISABLED : PAL_ACTIVE]
                                                                        [COLOR_BUTTON_TEXT]);
@@ -507,17 +511,25 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
                     x+=2;
                 drawArrow(WINDOW_PARAM_VAL style, arrowColor, AREA_PARAM_VAL_L,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
             }
+            }
         }
         else
         {
-            GdkColor *col=onComboEntry || isOnCombo(widget, 0) || isOnListViewHeader(widget, 0) ||
-                                                  isOnButton(widget, 0, 0L)
-                                            ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
-                                                                [COLOR_BUTTON_TEXT]
-                                            : &style->text[ARROW_STATE(state)];
-            if(onComboEntry && GTK_STATE_ACTIVE==state && opts.unifyCombo)
+            gboolean combo=onComboEntry || isOnCombo(widget, 0);
+            int      origState=state;
+
+            if (combo && GTK_STATE_ACTIVE==state)
+                state=GTK_STATE_PRELIGHT;
+
+            {
+            GdkColor *col=combo || isOnListViewHeader(widget, 0) || isOnButton(widget, 0, 0L)
+                                ? &qtSettings.colors[GTK_STATE_INSENSITIVE==state ? PAL_DISABLED : PAL_ACTIVE]
+                                                    [COLOR_BUTTON_TEXT]
+                                : &style->text[ARROW_STATE(state)];
+            if(onComboEntry && GTK_STATE_ACTIVE==origState && opts.unifyCombo)
                 x--, y--;
             drawArrow(WINDOW_PARAM_VAL style, MO_ARROW(false, col), AREA_PARAM_VAL_L,  arrow_type, x+(width>>1), y+(height>>1), FALSE, TRUE);
+            }
         }
     }
     else

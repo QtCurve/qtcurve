@@ -1,7 +1,8 @@
 1.8.4
 -----
 1. Fix issues with image based backgrounds.
-2. Dont start draw on widget tab labels.
+2. Don't start drag on widget tab labels.
+3. Don't remove mouse over colour for pressed combo buttons.
 
 1.8.3
 -----
