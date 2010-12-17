@@ -2700,25 +2700,25 @@ void QtCurveConfig::importPreset()
                             if(IMG_FILE==opts.bgndImage.type)
                             {
                                 QString fileName(name+BGND_FILE IMAGE_FILE+getExt(opts.bgndImage.pixmap.file));
-                                QFile::copy(tmpDir->name()+'/'+opts.bgndImage.pixmap.file, qtcDir+fileName);
+                                saveThemeFile(tmpDir->name()+'/'+fileName, BGND_FILE IMAGE_FILE, name);
                                 opts.bgndImage.pixmap.file=fileName;
                             }
                             if(IMG_FILE==opts.menuBgndImage.type)
                             {
                                 QString fileName(name+BGND_FILE MENU_FILE IMAGE_FILE+getExt(opts.menuBgndImage.pixmap.file));
-                                QFile::copy(tmpDir->name()+'/'+opts.menuBgndImage.pixmap.file, qtcDir+fileName);
+                                saveThemeFile(tmpDir->name()+'/'+fileName, BGND_FILE MENU_FILE IMAGE_FILE, name);
                                 opts.menuBgndImage.pixmap.file=fileName;
                             }
                             if(APPEARANCE_FILE==opts.bgndAppearance)
                             {
                                 QString fileName(name+BGND_FILE+getExt(opts.bgndPixmap.file));
-                                QFile::copy(tmpDir->name()+'/'+opts.bgndPixmap.file, qtcDir+fileName);
                                 opts.bgndPixmap.file=fileName;
+                                saveThemeFile(tmpDir->name()+'/'+fileName, BGND_FILE, name);
                             }
                             if(APPEARANCE_FILE==opts.menuBgndAppearance)
                             {
                                 QString fileName(name+BGND_FILE MENU_FILE+getExt(opts.menuBgndPixmap.file));
-                                QFile::copy(tmpDir->name()+'/'+opts.menuBgndPixmap.file, qtcDir+fileName);
+                                saveThemeFile(tmpDir->name()+'/'+fileName, BGND_FILE MENU_FILE, name);
                                 opts.menuBgndPixmap.file=fileName;
                             }
                         }

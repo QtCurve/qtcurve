@@ -1,3 +1,7 @@
+1.8.3
+-----
+1. Fix import of ZIP qtcurve files.
+
 1.8.2
 -----
  1. When hiding shortcuts, only show these if widget is enabled.
