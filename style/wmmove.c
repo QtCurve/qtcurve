@@ -156,9 +156,13 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                     {
                         usable = FALSE;
                     }
+                    else if(GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget), childWidget))
+                    {
+                        usable = FALSE;
+                    }
                     else if(GTK_IS_BUTTON(childWidget) && qtcWidgetGetState(childWidget)!=GTK_STATE_INSENSITIVE)
                     {
-                        usable = false;
+                        usable = FALSE;
                     }
                     else if(gtk_widget_get_events(childWidget)&(GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK))
                     {

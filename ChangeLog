@@ -1,6 +1,7 @@
 1.8.4
 -----
 1. Fix issues with image based backgrounds.
+2. Dont start draw on widget tab labels.
 
 1.8.3
 -----
