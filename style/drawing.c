@@ -1398,8 +1398,8 @@ gboolean drawWindowBgnd(cairo_t *cr, GtkStyle *style, GdkRectangle *area, GdkWin
             else if(APPEARANCE_FILE==opts.bgndAppearance)
             {
                 cairo_save(cr);
-                cairo_translate(cr, xmod, ymod);
-                drawBgndImage(cr, style, area, -wx, -wy, ww, wh, col, TRUE, alpha);
+                cairo_translate(cr, -wx, -wy);
+                drawBgndImage(cr, style, area, 0, 0, ww, wh, col, TRUE, alpha);
                 cairo_restore(cr);
             }
             else
