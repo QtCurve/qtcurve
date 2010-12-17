@@ -35,6 +35,9 @@ static int       qtcWMMoveLastX=-1;
 static int       qtcWMMoveLastY=-1;
 static int       qtcWMMoveTimer=0;
 static GtkWidget *qtcWMMoveDragWidget=NULL;
+//! keep track of the last rejected button event to reject it again if passed to some parent widget
+/*! this spares some time (by not processing the same event twice), and prevents some bugs */
+ GdkEventButton *qtcWMMoveLastRejectedEvent=NULL;
 
 static void qtcWMMoveStopTimer()
 {
@@ -48,6 +51,7 @@ static void qtcWMMoveReset()
     qtcWMMoveLastX=-1;
     qtcWMMoveLastY=-1;
     qtcWMMoveDragWidget=NULL;
+    qtcWMMoveLastRejectedEvent=NULL;
     qtcWMMoveStopTimer();
 }
 
@@ -199,14 +203,23 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
 
 static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 {
+    if(qtcWMMoveLastRejectedEvent && qtcWMMoveLastRejectedEvent==event)
+        return FALSE;
+
     if(!GTK_IS_CONTAINER(widget))
         return TRUE;
     
+    {
+    gboolean use=TRUE;
     // if widget is a notebook, accept if there is no hovered tab
     if(GTK_IS_NOTEBOOK(widget))
-        return !qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
-
-    return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
+        use=!qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
+    else
+        use=qtcWMMoveChildrenUseEvent(widget, event, FALSE);
+    if(!use)
+        qtcWMMoveLastRejectedEvent=event;
+    return use;
+    }
 }
 
 static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
