@@ -112,7 +112,7 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 
 static gboolean isBlackListed(GObject *object)
 {
-    static const char *widgets[]={ "GtkPizza", "GladeDesignLayout", "MetaFrames" , 0 };
+    static const char *widgets[]={ "GtkPizza", "GladeDesignLayout", "MetaFrames", "SPHRuler", "SPVRuler", 0 };
     
     int i;
     
