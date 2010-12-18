@@ -91,7 +91,7 @@ static void qtcWMMoveTrigger(GtkWidget *w, int x, int y)
 
 static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 {
-    GdkWindow *window = gtk_widget_get_parent_window(widget);
+    GdkWindow *window = gtk_widget_get_window(widget);
 
     if(window)
     {
@@ -99,10 +99,14 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
         int           nx=0,
                       ny=0;
 
-        // Need to get absolute co-ordinates...
-        gdk_window_get_origin(window, &nx, &ny);
-        alloc.x+=nx;
-        alloc.y+=ny;
+        // translate to current window
+        gdk_window_get_geometry(window, &nx, &ny, 0L, 0L, 0L);
+        alloc.x -= nx;
+        alloc.y -= ny;
+        // translate absolute coordinates
+        gdk_window_get_origin(window, &nx, &ny );
+        alloc.x += nx;
+        alloc.y += ny;
 
         return alloc.x<=event->x_root && alloc.y<=event->y_root &&
                (alloc.x+alloc.width)>event->x_root &&(alloc.y+alloc.height)>event->y_root;
@@ -110,7 +114,7 @@ static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
     return TRUE;
 }
 
-static gboolean isBlackListed(GObject *object)
+static gboolean qtcWMMoveIsBlackListed(GObject *object)
 {
     static const char *widgets[]={ "GtkPizza", "GladeDesignLayout", "MetaFrames", "SPHRuler", "SPVRuler", 0 };
     
@@ -136,7 +140,8 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
         // cast child to GtkWidget
         if(GTK_IS_WIDGET(child->data))
         {
-            GtkWidget* childWidget=GTK_WIDGET(child->data);
+            GtkWidget *childWidget=GTK_WIDGET(child->data);
+            GdkWindow *window=NULL;
 
             // check widget state and type
             if(GTK_STATE_PRELIGHT==qtcWidgetGetState(childWidget))
@@ -144,49 +149,29 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
                 // if widget is prelight, we don't need to check where event happen,
                 // any prelight widget indicate we can't do a move
                 usable = FALSE;
+                continue;
             }
-            else if(GTK_IS_NOTEBOOK( childWidget ) )
+
+            window = gtk_widget_get_window(childWidget);
+            if(!(window && gdk_window_is_visible(window)))
+                continue;
+
+            if(GTK_IS_NOTEBOOK(childWidget))
+                inNoteBook = true;
+
+            if(!(event && qtcWMMoveWithinWidget(childWidget, event)))
+                continue;
+
+            // check special cases for which grab should not be enabled
+            if(
+                (qtcWMMoveIsBlackListed(G_OBJECT(childWidget))) ||
+                (GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget), childWidget)) ||
+                (GTK_IS_BUTTON(childWidget) && gtk_widget_get_state(childWidget) != GTK_STATE_INSENSITIVE) ||
+                (gtk_widget_get_events(childWidget) & (GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK)) ||
+                (GTK_IS_MENU_ITEM(childWidget)) ||
+                (GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus(childWidget))))
             {
-                inNoteBook = TRUE;
-            }
-            else if(event && qtcWMMoveWithinWidget(childWidget, event))
-            {
-                GdkWindow *window = gtk_widget_get_window(childWidget);
-                if(window && gdk_window_is_visible(window))
-                {
-                    // TODO: one could probably check here whether widget is enabled or not,
-                    // and accept if widget is disabled.
-                    if(isBlackListed(G_OBJECT(childWidget)))
-                    {
-                        usable = FALSE;
-                    }
-                    else if(GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget), childWidget))
-                    {
-                        usable = FALSE;
-                    }
-                    else if(GTK_IS_BUTTON(childWidget) && qtcWidgetGetState(childWidget)!=GTK_STATE_INSENSITIVE)
-                    {
-                        usable = FALSE;
-                    }
-                    else if(gtk_widget_get_events(childWidget)&(GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK))
-                    {
-                        // widget listening to press event
-                        usable = FALSE;
-                    }
-                    else if(GTK_IS_MENU_ITEM(childWidget))
-                    {
-                        // deal with menu item, GtkMenuItem only listen to
-                        // GDK_BUTTON_PRESS_MASK when state == GTK_STATE_PRELIGHT
-                        // so previous check are invalids :(
-                        usable = FALSE;
-                    }
-                    else if(GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus( childWidget)))
-                    {
-                        // Scrolled do not send release events
-                        // to parents so not usable
-                        usable = FALSE;
-                    }
-                }
+                usable = false;
             }
 
             // if child is a container and event has been accepted so far, also check it, recursively
