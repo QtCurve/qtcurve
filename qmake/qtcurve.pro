@@ -3,24 +3,39 @@ CONFIG  += plugin
 CONFIG  += debug_and_release build_all
 DESTDIR  = $(QTDIR)/plugins/styles
 CONFIG(debug, debug|release) {
-  TARGET   = qtcurved
+  TARGET = qtcurved
 }
 else {
-  TARGET   = qtcurve
+  TARGET = qtcurve
 }
-QT += svg
-unix:QT += dbus
-INCLUDEPATH += . .. ../common ../config
+QT *= svg
+unix:QT *= dbus
+INCLUDEPATH *= . .. ../common ../config
 HEADERS += \
-           ../style/qtcurve.h \
-           ../style/windowmanager.h \
+           ../common/colorutils.h \
+           ../common/common.h \
+           ../common/config_file.h \
            ../style/blurhelper.h \
-           ../style/utils.h
+           ../style/dialogpixmaps.h \
+           ../style/fixx11h.h \
+           ../style/pixmaps.h \
+           ../style/qtcurve.h \
+           ../style/shortcuthandler.h \
+           ../style/utils.h \
+           ../style/windowmanager.h \
 
 SOURCES += \
-           ../style/qtcurve.cpp \
-           ../style/windowmanager.cpp \
+           ../common/colorutils.c \
+           ../common/common.c \
+           ../common/config_file.c \
            ../style/blurhelper.cpp \
-           ../style/utils.cpp
+           ../style/qtcurve.cpp \
+           ../style/shortcuthandler.cpp \
+           ../style/utils.cpp \
+           ../style/windowmanager.cpp \
 
-win32-msvc200*:QMAKE_CXXFLAGS += -wd4996
+win32-msvc*:DEFINES *= _CRT_SECURE_NO_WARNINGS
+
+# Force C++ language
+*g++*:QMAKE_CFLAGS *= -x c++
+*msvc*:QMAKE_CFLAGS *= -TP
