@@ -194,17 +194,11 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
     if(!GTK_IS_CONTAINER(widget))
         return TRUE;
     
-    {
-    gboolean use=TRUE;
     // if widget is a notebook, accept if there is no hovered tab
     if(GTK_IS_NOTEBOOK(widget))
-        use=!qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
+        return !qtcTabHasVisibleArrows(GTK_NOTEBOOK(widget)) && -1==qtcTabCurrentHoveredIndex(widget) && qtcWMMoveChildrenUseEvent(widget, event, FALSE);
     else
-        use=qtcWMMoveChildrenUseEvent(widget, event, FALSE);
-    if(!use)
-        qtcWMMoveLastRejectedEvent=event;
-    return use;
-    }
+        return qtcWMMoveChildrenUseEvent(widget, event, FALSE);
 }
 
 static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
@@ -223,6 +217,7 @@ static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *e
         qtcWMMoveTimer=g_timeout_add(qtSettings.startDragTime, (GSourceFunc)qtcWWMoveStartDelayedDrag, NULL);
         return TRUE;
     }
+    qtcWMMoveLastRejectedEvent=event;
     return FALSE;
 }
 
