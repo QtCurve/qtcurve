@@ -4225,19 +4225,19 @@ GdkPixbuf * renderIcon(GtkStyle *style, const GtkIconSource *source, GtkTextDire
     if(widget && gtk_widget_has_screen(widget))
     {
         screen = gtk_widget_get_screen(widget);
-        settings = gtk_settings_get_for_screen(screen);
+        settings = screen ? gtk_settings_get_for_screen(screen) : NULL;
     }
 #if GTK_CHECK_VERSION(2, 90, 0)
     else if (style->visual)
     {
         screen = gdk_visual_get_screen(style->visual);
-        settings = gtk_settings_get_for_screen(screen);
+        settings = screen ? gtk_settings_get_for_screen(screen) : NULL;
     }
 #else
     else if(style->colormap)
     {
         screen = gdk_colormap_get_screen(style->colormap);
-        settings = gtk_settings_get_for_screen(screen);
+        settings = screen ? gtk_settings_get_for_screen(screen) : NULL;
     }
 #endif
     else
