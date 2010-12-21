@@ -2186,6 +2186,7 @@ void QtCurveConfig::updatePreview()
     // Very hacky way to pass preview options to style!!!
     QtCurve::Style::PreviewOption styleOpt;
     styleOpt.opts=previewStyle;
+    
     style->drawControl((QStyle::ControlElement)QtCurve::Style::CE_QtC_SetOptions, &styleOpt, 0L, this);
        
     setStyleRecursive(mdiWindow ? (QWidget *)previewFrame : (QWidget *)stylePreview, style);
@@ -3166,7 +3167,8 @@ void QtCurveConfig::setOptions(Options &opts)
 
     if(IMG_FILE==opts.bgndImage.type)
     {
-        opts.bgndImage.pixmap.file=getThemeFile(bgndImageDlg->fileName());
+        if((&opts) == (&previewStyle))
+            opts.bgndImage.pixmap.file=getThemeFile(bgndImageDlg->fileName());
 //         printf("SET OP BGND:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData()); 
         opts.bgndImage.width=bgndImageDlg->imgWidth();
         opts.bgndImage.height=bgndImageDlg->imgHeight();
@@ -3182,7 +3184,8 @@ void QtCurveConfig::setOptions(Options &opts)
     }
     if(IMG_FILE==opts.menuBgndImage.type)
     {
-        opts.menuBgndImage.pixmap.file=getThemeFile(menuBgndImageDlg->fileName());
+        if((&opts) == (&previewStyle))
+            opts.menuBgndImage.pixmap.file=getThemeFile(menuBgndImageDlg->fileName());
 //         printf("SET OP MENU:%s\n", opts.menuBgndImage.pixmap.file.toLatin1().constData()); 
         opts.menuBgndImage.width=menuBgndImageDlg->imgWidth();
         opts.menuBgndImage.height=menuBgndImageDlg->imgHeight();
