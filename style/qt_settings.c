@@ -2429,8 +2429,6 @@ gboolean qtSettingsInit()
                     g_object_set(settings, "gtk-alternative-button-order", TRUE, NULL);
 
                 gtk_settings_set_long_property(settings, "gtk-menu-popup-delay", opts.menuDelay, "KDE-Settings");
-                if(opts.hideShortcutUnderline && NULL==gtk_check_version(2, 20, 0))
-                    g_object_set(settings, "gtk-auto-mnemonics", TRUE, NULL);
             }
 
             if(qtSettings.fonts[FONT_GENERAL])
@@ -2817,7 +2815,10 @@ gboolean qtSettingsInit()
             }
 
             if(!opts.menuIcons)
-                gtk_rc_parse_string("gtk-menu-images = 0");
+                gtk_rc_parse_string("gtk-menu-images=0");
+            
+            if(opts.hideShortcutUnderline)
+                gtk_rc_parse_string("gtk-auto-mnemonics=1");
             
             if(LINE_1DOT==opts.splitters)
                 gtk_rc_parse_string("style \""RC_SETTING"Spl\" { GtkPaned::handle_size=7 GtkPaned::handle_width = 7 } "
