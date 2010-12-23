@@ -2655,7 +2655,7 @@ void QtCurveConfig::importPreset()
     if(!file.isEmpty())
     {
         KMimeType::Ptr mimeType=KMimeType::findByFileContent(file);;
-        bool           compressed(mimeType && mimeType->is("application/zip"));
+        bool           compressed(mimeType && !mimeType->is("text/plain"));
         QString        fileName(getFileName(file)),
                        baseName(fileName.remove(EXTENSION).replace(' ', '_')),
                        name(QString(baseName).replace('_', ' '));
