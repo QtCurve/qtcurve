@@ -4,6 +4,7 @@
 2. Don't start drag on widget tab labels.
 3. Don't remove mouse over colour for pressed combo buttons.
 4. Use gtk_rc_parse_string to hide shortcuts, and not GtkSettings
+5. Fix KDE style non-editable combos which have has-frame set to FALSE.
 
 1.8.3
 -----

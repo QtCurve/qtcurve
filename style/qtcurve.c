@@ -514,7 +514,8 @@ static void gtkDrawArrow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkSh
             }
             else
             {
-                if(!opts.gtkComboMenus)
+                GtkWidget *parent=NULL;
+                if(!opts.gtkComboMenus && !((parent=qtcWidgetGetParent(widget)) && (parent=qtcWidgetGetParent(parent)) && !qtcComboHasFrame(parent)))
                     x+=2;
                 drawArrow(WINDOW_PARAM_VAL style, arrowColor, AREA_PARAM_VAL_L,  GTK_ARROW_DOWN, x+(width>>1), y+(height>>1), FALSE, TRUE);
             }
@@ -1043,15 +1044,26 @@ static void drawBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkShadowT
             if(WIDGET_COMBO==widgetType && !opts.gtkComboMenus && !isMozilla() &&
                 ((parent=qtcWidgetGetParent(widget)) && GTK_IS_COMBO_BOX(parent) && !QTC_COMBO_ENTRY(parent)))
             {
-                GtkWidget *mapped=qtcWidgetMapGetWidget(parent, 1);
-                gboolean  changedFocus=qtcComboBoxIsFocusChanged(widget);
-                qtcWidgetMapSetup(parent, widget, 0);
+                GtkWidget *mapped=NULL;
+                gboolean  changedFocus=FALSE,
+                          draw=TRUE;
+                int       mod=7;
 
-                if(parent && qtcComboBoxIsHovered(parent))
-                    state=GTK_STATE_PRELIGHT;
+                if(!opts.gtkComboMenus && !qtcComboHasFrame(parent))
+                    mod=0, draw=GTK_STATE_ACTIVE==state || GTK_STATE_PRELIGHT==state, qtcComboBoxSetup(NULL, parent);
+                else
+                {
+                    changedFocus=qtcComboBoxIsFocusChanged(widget);
+                    mapped=qtcWidgetMapGetWidget(parent, 1);
+                    qtcWidgetMapSetup(parent, widget, 0);
 
-                drawLightBevel(cr, style, state, area, x-7, y, width+7, height, &btnColors[bgnd], btnColors, round,
-                                WIDGET_TOOLBAR_BUTTON, BORDER_FLAT, (GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
+                    if(parent && qtcComboBoxIsHovered(parent))
+                        state=GTK_STATE_PRELIGHT;
+                }
+
+                if(draw)
+                    drawLightBevel(cr, style, state, area, x-mod, y, width+mod, height, &btnColors[bgnd], btnColors, round,
+                                   WIDGET_TOOLBAR_BUTTON, BORDER_FLAT, (GTK_STATE_ACTIVE==state ? DF_SUNKEN : 0)|DF_DO_BORDER, widget);
 
                 if(mapped)
                 {
@@ -1550,7 +1562,7 @@ static void gtkDrawShadow(GtkStyle *style, WINDOW_PARAM GtkStateType state, GtkS
 
         drawLightBevel(cr, style, state, area, x, y, width+4, height, &btnColors[bgnd], btnColors, ROUNDED_LEFT, WIDGET_TOOLBAR_BUTTON,
                        BORDER_FLAT, (sunken ? DF_SUNKEN : 0)|DF_DO_BORDER|(qtcComboBoxHasFocus(widget, mapped) ? DF_HAS_FOCUS : 0), widget);
-                    
+
         if(GTK_STATE_PRELIGHT!=state)
         {
             if(mapped && GTK_STATE_PRELIGHT==qtcWidgetGetState(mapped))

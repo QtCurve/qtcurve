@@ -158,37 +158,48 @@ static gboolean qtcComboBoxStateChange(GtkWidget *widget, GdkEventMotion *event,
 
 void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo)
 {
-    if (combo && frame && !g_object_get_data(G_OBJECT(combo), "QTC_COMBO_BOX_SET"))
+    if (combo && (frame || !qtcComboHasFrame(combo)) && !g_object_get_data(G_OBJECT(combo), "QTC_COMBO_BOX_SET"))
     {
-        GList *children = gtk_container_get_children(GTK_CONTAINER(frame)),
-              *child    = children;
-
         g_object_set_data(G_OBJECT(combo), "QTC_COMBO_BOX_SET", (gpointer)1);
 
         qtcComboBoxClearBgndColor(combo);
         g_object_set_data(G_OBJECT(combo), "QTC_COMBO_BOX_STATE_CHANGE_ID",
                          (gpointer)g_signal_connect(G_OBJECT(combo), "state-changed", G_CALLBACK(qtcComboBoxStateChange), NULL));
 
-        for(; child; child=child->next)
+        if(frame)
         {
-            GtkWidget *boxChild=(GtkWidget *)child->data;
-
-            if(GTK_IS_EVENT_BOX(boxChild))
+            GList *children = gtk_container_get_children(GTK_CONTAINER(frame)),
+                  *child    = children;
+                
+            for(; child; child=child->next)
             {
-                g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_DESTROY_ID",
-                                (gpointer)g_signal_connect(G_OBJECT(boxChild), "destroy-event", G_CALLBACK(qtcComboBoxDestroy), NULL));
-                g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_UNREALIZE_ID",
-                                (gpointer)g_signal_connect(G_OBJECT(boxChild), "unrealize", G_CALLBACK(qtcComboBoxDestroy), NULL));
-                g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_STYLE_SET_ID",
-                                (gpointer)g_signal_connect(G_OBJECT(boxChild), "style-set", G_CALLBACK(qtcComboBoxStyleSet), NULL));
-                g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_ENTER_ID",
-                                (gpointer)g_signal_connect(G_OBJECT(boxChild), "enter-notify-event", G_CALLBACK(qtcComboBoxEnter), combo));
-                g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_LEAVE_ID",
-                                (gpointer)g_signal_connect(G_OBJECT(boxChild), "leave-notify-event", G_CALLBACK(qtcComboBoxLeave), combo));
-            }
-        }
+                GtkWidget *boxChild=(GtkWidget *)child->data;
 
-        if(children)
-            g_list_free(children);
+                if(GTK_IS_EVENT_BOX(boxChild))
+                {
+                    g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_DESTROY_ID",
+                                    (gpointer)g_signal_connect(G_OBJECT(boxChild), "destroy-event", G_CALLBACK(qtcComboBoxDestroy), NULL));
+                    g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_UNREALIZE_ID",
+                                    (gpointer)g_signal_connect(G_OBJECT(boxChild), "unrealize", G_CALLBACK(qtcComboBoxDestroy), NULL));
+                    g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_STYLE_SET_ID",
+                                    (gpointer)g_signal_connect(G_OBJECT(boxChild), "style-set", G_CALLBACK(qtcComboBoxStyleSet), NULL));
+                    g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_ENTER_ID",
+                                    (gpointer)g_signal_connect(G_OBJECT(boxChild), "enter-notify-event", G_CALLBACK(qtcComboBoxEnter), combo));
+                    g_object_set_data(G_OBJECT(boxChild), "QTC_COMBO_BOX_LEAVE_ID",
+                                    (gpointer)g_signal_connect(G_OBJECT(boxChild), "leave-notify-event", G_CALLBACK(qtcComboBoxLeave), combo));
+                }
+            }
+
+            if(children)
+                g_list_free(children);
+        }
     }
+}
+
+gboolean qtcComboHasFrame(GtkWidget *widget)
+{
+    GValue val = { 0 };
+    g_value_init(&val, G_TYPE_BOOLEAN);
+    g_object_get_property(G_OBJECT(widget), "has-frame", &val);
+    return g_value_get_boolean(&val);
 }

@@ -25,5 +25,6 @@ extern gboolean qtcComboBoxIsFocusChanged(GtkWidget *widget);
 extern gboolean qtcComboBoxIsHovered(GtkWidget *widget);
 extern gboolean qtcComboBoxHasFocus(GtkWidget *widget, GtkWidget *mapped);
 extern void qtcComboBoxSetup(GtkWidget *frame, GtkWidget *combo);
+extern gboolean qtcComboHasFrame(GtkWidget *widget);
 
 #endif
