@@ -293,10 +293,12 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
         }
         else
         {
-            double alpha=1.0;
-            int    selX=x,
-                   selW=width,
-                   factor=0;
+            double   alpha=1.0;
+            int      selX=x,
+                     selW=width,
+                     factor=0;
+            gboolean forceCellStart=FALSE,
+                     forceCellEnd=FALSE;
 
 #if GTK_CHECK_VERSION(2, 12, 0)
             if(!isFixedWidget(widget))
@@ -324,10 +326,13 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
                     levelIndent=gtk_tree_view_get_level_indentation(treeView),
                     depth=path ? (int)gtk_tree_path_get_depth(path) : 0;
 
+                    forceCellStart=TRUE;
                     if(opts.lvLines)
                         drawTreeViewLines(cr, &style->mid[GTK_STATE_ACTIVE], x, y, height, depth, levelIndent, expanderSize, treeView,
                                           path, column);
                 }
+                else if(column && qtcTreeViewCellIsLeftOfExpanderColumn(treeView, column))
+                    forceCellEnd=TRUE;
 
                 if((GTK_STATE_SELECTED==state || alpha<1.0) && column==expanderColumn)
                 {
@@ -344,13 +349,15 @@ static void gtkDrawFlatBox(GtkStyle *style, WINDOW_PARAM GtkStateType state, Gtk
             if(GTK_STATE_SELECTED==state || alpha<1.0)
             {
                 int round=detail && ROUNDED
-                                ? 0!=strstr(detail, "_start")
-                                    ? ROUNDED_LEFT
-                                    : 0!=strstr(detail, "_end")
-                                        ? ROUNDED_RIGHT
-                                        : 0!=strstr(detail, "_middle")
-                                            ? ROUNDED_NONE
-                                            : ROUNDED_ALL
+                                ? forceCellStart && forceCellEnd
+                                    : ROUNDED_ALL
+                                    ? forceCellStart || 0!=strstr(detail, "_start")
+                                        ? ROUNDED_LEFT
+                                        : forceCellEnd || 0!=strstr(detail, "_end")
+                                            ? ROUNDED_RIGHT
+                                            : 0!=strstr(detail, "_middle")
+                                                ? ROUNDED_NONE
+                                                : ROUNDED_ALL
                                 : ROUNDED_NONE;
 
                 drawSelection(cr, style, state, area, widget, selX, y, selW, height, round, TRUE, alpha, factor);

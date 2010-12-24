@@ -125,7 +125,7 @@ static void qtcTreeViewUpdatePosition(GtkWidget *widget, int x, int y)
             GtkTreePath       *path=NULL;
             GtkTreeViewColumn *column=NULL;
 
-            gtk_tree_view_get_path_at_pos(treeView, x, y, &path, &column, 0L, 0L );
+            gtk_tree_view_get_path_at_pos(treeView, x, y, &path, &column, 0L, 0L);
 
             if(!qtcTreeViewSamePath(tv->path, path))
             {
@@ -259,6 +259,47 @@ void qtcTreeViewSetup(GtkWidget *widget)
         if(GTK_IS_SCROLLED_WINDOW(parent) && GTK_SHADOW_IN!=gtk_scrolled_window_get_shadow_type(GTK_SCROLLED_WINDOW(parent)))
             gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(parent), GTK_SHADOW_IN);
     }  
+}
+
+gboolean qtcTreeViewCellIsLeftOfExpanderColumn(GtkTreeView *treeView, GtkTreeViewColumn *column)
+{
+    // check expander column
+    GtkTreeViewColumn *expanderColumn=gtk_tree_view_get_expander_column(treeView);
+
+    if(!expanderColumn || column == expanderColumn)
+        return FALSE;
+    else
+    {
+        gboolean found=FALSE,
+                 isLeft=FALSE;
+
+        // get all columns
+        GList *columns=gtk_tree_view_get_columns(treeView),
+              *child;
+
+        for(child = g_list_first(columns); child; child = g_list_next(child))
+        {
+            if(!GTK_IS_TREE_VIEW_COLUMN(child->data))
+                continue;
+            else
+            {
+                GtkTreeViewColumn *childCol=GTK_TREE_VIEW_COLUMN(child->data);
+                if(childCol == expanderColumn)
+                {
+                    if(found)
+                        isLeft = TRUE;
+                }
+                else if(found)
+                    break;
+                else if(column == childCol)
+                    found = TRUE;
+            }
+        }
+
+        if(columns)
+            g_list_free(columns);
+        return isLeft;
+    }
 }
 
 #endif // GTK_CHECK_VERSION(2, 12, 0)

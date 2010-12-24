@@ -2412,7 +2412,7 @@ void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int dept
                               GtkTreeView *treeView, GtkTreePath *path, GtkTreeViewColumn *column)
 {
     int        cellIndent=levelIndent + expanderSize + 4,
-               xStart=cellIndent/2,
+               xStart=x + (cellIndent/2),
                i,
                isLastMask=0;
     gboolean   haveChildren=treeViewCellHasChildren(treeView, path),
