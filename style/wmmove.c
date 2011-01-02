@@ -91,25 +91,41 @@ static void qtcWMMoveTrigger(GtkWidget *w, int x, int y)
 
 static gboolean qtcWMMoveWithinWidget(GtkWidget *widget, GdkEventButton *event)
 {
-    GdkWindow *window = gtk_widget_get_window(widget);
+    // get top level widget
+    GtkWidget *topLevel=gtk_widget_get_toplevel(widget);;
+    GdkWindow *window = topLevel ? gtk_widget_get_window(topLevel) : NULL;
 
     if(window)
     {
-        GtkAllocation alloc=GTK_IS_NOTEBOOK(widget) ? qtcTabGetTabbarRect(GTK_NOTEBOOK(widget)) : qtcWidgetGetAllocation(widget);
-        int           nx=0,
-                      ny=0;
+        GtkAllocation allocation;
+        int           wx=0, wy=0, nx=0, ny=0;
 
-        // translate to current window
-        gdk_window_get_geometry(window, &nx, &ny, 0L, 0L, 0L);
-        alloc.x -= nx;
-        alloc.y -= ny;
-        // translate absolute coordinates
-        gdk_window_get_origin(window, &nx, &ny );
-        alloc.x += nx;
-        alloc.y += ny;
+        // translate widget position to topLevel
+        gtk_widget_translate_coordinates(widget, topLevel, wx, wy, &wx, &wy);
 
-        return alloc.x<=event->x_root && alloc.y<=event->y_root &&
-               (alloc.x+alloc.width)>event->x_root &&(alloc.y+alloc.height)>event->y_root;
+        // translate to absolute coordinates
+        gdk_window_get_origin(window, &nx, &ny);
+        wx += nx;
+        wy += ny;
+
+        // get widget size.
+        // for notebooks, only consider the tabbar rect
+        if(GTK_IS_NOTEBOOK(widget))
+        {
+            GtkAllocation widgetAlloc=qtcWidgetGetAllocation(widget);
+            allocation=qtcTabGetTabbarRect(GTK_NOTEBOOK(widget));
+            allocation.x += wx - widgetAlloc.x;
+            allocation.y += wy - widgetAlloc.y;
+        }
+        else
+        {
+            allocation = qtcWidgetGetAllocation(widget);
+            allocation.x = wx;
+            allocation.y = wy;
+        }
+
+        return allocation.x<=event->x_root && allocation.y<=event->y_root &&
+               (allocation.x+allocation.width)>event->x_root &&(allocation.y+allocation.height)>event->y_root;
     }
     return TRUE;
 }
