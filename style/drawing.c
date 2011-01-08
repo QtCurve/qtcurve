@@ -2375,7 +2375,7 @@ void createRoundedMask(cairo_t *cr, GtkWidget *widget, gint x, gint y, gint widt
             cairo_set_source_rgba(crMask, 0, 0, 0, 1);
             cairo_fill(crMask);
             if(isToolTip)
-                gtk_widget_shape_combine_mask(widget, mask, 0, 0);
+                gtk_widget_shape_combine_mask(widget, mask, x, y);
             else
                 gdk_window_shape_combine_mask(gtk_widget_get_parent_window(widget), mask, 0, 0);
             cairo_destroy(crMask);
