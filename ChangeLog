@@ -1,6 +1,6 @@
 1.8.5
 -----
-1. Fix compile against Gtk2 older than 2.20
+1. Fix compilation against Gtk2 older than 2.20
 2. Remove some Gtk3 hacks.
 3. Dont draw frame when shadow is set to NONE.
 
