@@ -379,8 +379,12 @@ gboolean qtcTabHasVisibleArrows(GtkNotebook *notebook)
         for(i = 0; i<numPages; ++i)
         {
             GtkWidget *label=gtk_notebook_get_tab_label(notebook, gtk_notebook_get_nth_page(notebook, i));
-            
+
+#if GTK_CHECK_VERSION(2, 20, 0)
             if(label && !gtk_widget_get_mapped(label))
+#else
+            if(label && !GTK_WIDGET_MAPPED(label))
+#endif
                 return TRUE;
         }
     }
