@@ -186,13 +186,6 @@
     #define QTC_KEY_s                       GDK_s
     #define QTC_KEY_S                       GDK_S
 
-    #define WINDOW_PARAM     GdkWindow *window,
-    #define WINDOW_PARAM_VAL window,
-    #define GDKWINDOW        window
-    #define AREA_PARAM       GdkRectangle *area,
-    #define AREA_PARAM_VAL   area,
-    #define AREA_PARAM_VAL_L area
-
 #endif
 
 #endif

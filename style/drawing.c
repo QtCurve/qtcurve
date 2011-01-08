@@ -1561,7 +1561,7 @@ void drawEntryField(cairo_t *cr, GtkStyle *style, GtkStateType state, GdkWindow 
         gtk_entry_set_invisible_char(GTK_ENTRY(widget), opts.passwordChar);
 }
 
-void setProgressStripeClipping(cairo_t *cr, AREA_PARAM int x, int y, int width, int height, int animShift, gboolean horiz)
+void setProgressStripeClipping(cairo_t *cr, GdkRectangle *area, int x, int y, int width, int height, int animShift, gboolean horiz)
 {
     int stripeOffset;
 
@@ -1703,7 +1703,7 @@ void drawProgress(cairo_t *cr, GtkStyle *style, GtkStateType state, GtkWidget *w
             }
             else
             {
-                setProgressStripeClipping(cr, AREA_PARAM_VAL xo, yo, wo, ho, animShift, horiz);
+                setProgressStripeClipping(cr, area, xo, yo, wo, ho, animShift, horiz);
                 drawLightBevel(cr, style, new_state, NULL, x, y, width, height, &itemCols[1],
                                qtcPalette.highlight, ROUNDED_ALL, wid, BORDER_FLAT,
                                (opts.fillProgress || !opts.borderProgress ? 0 : DF_DO_BORDER)|(horiz ? 0 : DF_VERT), widget);
@@ -2497,7 +2497,7 @@ void drawTreeViewLines(cairo_t *cr, GdkColor *col, int x, int y, int h, int dept
     }
 }
 
-void drawPolygon(WINDOW_PARAM GtkStyle *style, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
+void drawPolygon(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GdkPoint *points, int npoints, gboolean fill)
 {
 #if (defined QTC_USE_CAIRO_FOR_ARROWS) || GTK_CHECK_VERSION(2, 90, 0)
     CAIRO_BEGIN
@@ -2540,7 +2540,7 @@ void drawPolygon(WINDOW_PARAM GtkStyle *style, GdkColor *col, GdkRectangle *area
 #endif
 }
 
-void drawArrow(WINDOW_PARAM GtkStyle *style, GdkColor *col, GdkRectangle *area, GtkArrowType arrow_type,
+void drawArrow(GdkWindow *window, GtkStyle *style, GdkColor *col, GdkRectangle *area, GtkArrowType arrow_type,
                gint x, gint y, gboolean small, gboolean fill)
 {
     if(small)
@@ -2549,25 +2549,25 @@ void drawArrow(WINDOW_PARAM GtkStyle *style, GdkColor *col, GdkRectangle *area, 
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+2,y},  {x,y-2},  {x-2,y},   {x-2,y+1}, {x,y-1}, {x+2,y+1}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+2,y},  {x,y+2},  {x-2,y},   {x-2,y-1}, {x,y+1}, {x+2,y-1}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x,y-2},  {x+2,y},  {x,y+2},   {x-1,y+2}, {x+1,y}, {x-1,y-2}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x,y-2},  {x-2,y},  {x,y+2},   {x+1,y+2}, {x-1,y}, {x+1,y-2}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 6 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 6 : 3, fill);
                 break;
             }
             default:
@@ -2579,25 +2579,25 @@ void drawArrow(WINDOW_PARAM GtkStyle *style, GdkColor *col, GdkRectangle *area, 
             case GTK_ARROW_UP:
             {
                 GdkPoint a[]={{x+3,y+1},  {x,y-2},  {x-3,y+1},    {x-3, y+2},  {x-2, y+2}, {x,y},  {x+2, y+2}, {x+3,y+2}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_DOWN:
             {
                 GdkPoint a[]={{x+3,y-1},  {x,y+2},  {x-3,y-1},   {x-3,y-2},  {x-2, y-2}, {x,y}, {x+2, y-2}, {x+3,y-2}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_RIGHT:
             {
                 GdkPoint a[]={{x-1,y+3},  {x+2,y},  {x-1,y-3},   {x-2,y-3}, {x-2, y-2},  {x,y}, {x-2, y+2},  {x-2,y+3}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             case GTK_ARROW_LEFT:
             {
                 GdkPoint a[]={{x+1,y-3},  {x-2,y},  {x+1,y+3},   {x+2,y+3}, {x+2, y+2},  {x,y}, {x+2, y-2},  {x+2,y-3}};
-                drawPolygon(WINDOW_PARAM_VAL style, col, area, a, opts.vArrows ? 8 : 3, fill);
+                drawPolygon(window, style, col, area, a, opts.vArrows ? 8 : 3, fill);
                 break;
             }
             default:
@@ -2666,7 +2666,7 @@ static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int 
         cairo_translate(cr, x, y);
 }
 
-void qtcDrawLayout(GtkStyle *style, WINDOW_PARAM GtkStateType state, gboolean use_text, AREA_PARAM gint x, gint y, PangoLayout *layout)
+void qtcDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, gint x, gint y, PangoLayout *layout)
 {
     CAIRO_BEGIN
     gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);

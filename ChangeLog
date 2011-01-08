@@ -1,6 +1,7 @@
 1.8.5
 -----
 1. Fix compile against Gtk2 older than 2.20
+2. Remove some Gtk3 hacks.
 
 1.8.4
 -----
