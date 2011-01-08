@@ -1778,10 +1778,13 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
             switch(shadow)
             {
                 case GTK_SHADOW_NONE:
-                    cairo_new_path(cr);
-                    cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
-                    cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
-                    cairo_stroke(cr);
+                    if(!frame)
+                    {
+                        cairo_new_path(cr);
+                        cairo_rectangle(cr, x+0.5, y+0.5, width-1, height-1);
+                        cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
+                        cairo_stroke(cr);
+                    }
                     break;
                 case GTK_SHADOW_IN:
                 case GTK_SHADOW_OUT:
