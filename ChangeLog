@@ -1,3 +1,7 @@
+1.8.4
+-----
+1. Fix saving of custom alpha values.
+
 1.8.3
 -----
 1. Fix import of ZIP qtcurve files.

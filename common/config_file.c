@@ -3513,6 +3513,30 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         else
             CFG.deleteEntry("customShades");
 
+        if(opts.customAlphas[0]==0 ||
+           exportingStyle ||
+           opts.customAlphas[0]!=def.customAlphas[0] ||
+           opts.customAlphas[1]!=def.customAlphas[1])
+        {
+            QString     shadeVal;
+#if QT_VERSION >= 0x040000
+            QTextStream str(&shadeVal);
+#else
+            QTextStream str(&shadeVal, IO_WriteOnly);
+#endif
+            if(0==opts.customAlphas[0])
+                 str << 0;
+            else
+                for(int i=0; i<NUM_STD_ALPHAS; ++i)
+                    if(0==i)
+                        str << opts.customAlphas[i];
+                    else
+                        str << ',' << opts.customAlphas[i];
+            CFG.writeEntry("customAlphas", shadeVal);
+        }
+        else
+            CFG.deleteEntry("customAlphas");
+
         // Removed from 1.5 onwards...
         CFG.deleteEntry("colorTitlebarOnly");
         CFG.deleteEntry("titlebarBorder");
