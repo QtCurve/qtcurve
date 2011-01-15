@@ -2900,14 +2900,14 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
         GdkColor *bgnd=qtcPalette.menubar && mb && !isMozilla() && GTK_APP_JAVA!=qtSettings.app
                         ? &qtcPalette.menubar[ORIGINAL_SHADE] : NULL;
         int      round=mb
-                            ? active_mb && opts.roundMbTopOnly
-                                ? ROUNDED_TOP
-                                : ROUNDED_ALL
-                            : ROUNDED_ALL,
-                    new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
+                        ? active_mb && opts.roundMbTopOnly
+                            ? ROUNDED_TOP
+                            : ROUNDED_ALL
+                        : ROUNDED_ALL,
+                 new_state=GTK_STATE_PRELIGHT==state ? GTK_STATE_NORMAL : state;
         gboolean stdColors=!mb || (SHADE_BLEND_SELECTED!=opts.shadeMenubars && SHADE_SELECTED!=opts.shadeMenubars);
         int      fillVal=grayItem ? 4 : ORIGINAL_SHADE,
-                    borderVal=opts.borderMenuitems ? 0 : fillVal;
+                 borderVal=opts.borderMenuitems ? 0 : fillVal;
 
         if(grayItem && mb && !active_mb && !opts.colorMenubarMouseOver &&
             (opts.borderMenuitems || !IS_FLAT(opts.menuitemAppearance)))
