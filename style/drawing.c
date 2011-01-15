@@ -2916,6 +2916,13 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
         if(mb && !opts.roundMbTopOnly && !(opts.square&SQUARE_POPUP_MENUS))
             x++, y++, width-=2, height-=2;
 
+        if(grayItem && !mb && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
+            itemCols=SHADE_WINDOW_BORDER==opts.shadeMenubars
+                    ? qtcPalette.wborder[0]
+                    : qtcPalette.menu
+                        ? qtcPalette.menu
+                        : qtcPalette.background;
+                        
         if(!mb && APPEARANCE_FADE==opts.menuitemAppearance)
         {
             gboolean        reverse=FALSE; /* TODO !!! */

@@ -3,6 +3,8 @@
 1. Fix compilation against Gtk2 older than 2.20
 2. Remove some Gtk3 hacks.
 3. Dont draw frame when shadow is set to NONE.
+4. Use correct shade for highlighted menuitems when not using the highlight
+   colour, and the popup is shaded.
 
 1.8.4
 -----
