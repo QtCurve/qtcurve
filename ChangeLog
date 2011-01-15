@@ -5,6 +5,8 @@
 3. Dont draw frame when shadow is set to NONE.
 4. Use correct shade for highlighted menuitems when not using the highlight
    colour, and the popup is shaded.
+5. If using custom menu colours, when drawing selected menuitems always draw as
+   such - even if not using the highlight colour.
 
 1.8.4
 -----

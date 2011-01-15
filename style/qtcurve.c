@@ -1877,7 +1877,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 #else
         gboolean     activeMb=mb ? GTK_MENU_SHELL(mb)->active : FALSE;
 #endif
-        gboolean     selectedText=opts.useHighlightForMenu && isMenuItem &&
+        gboolean     selectedText=(opts.useHighlightForMenu || opts.customMenuTextColor) && isMenuItem &&
                                   (opts.colorMenubarMouseOver
                                       ? GTK_STATE_PRELIGHT==state
                                       : ((!mb || activeMb) && GTK_STATE_PRELIGHT==state)),
