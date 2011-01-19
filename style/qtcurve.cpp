@@ -1368,7 +1368,7 @@ void Style::freeColors()
         delete [] itsSidebarButtonsCols;
         itsSidebarButtonsCols=0L;
     }
-    if(itsPopupMenuCols && itsPopupMenuCols!=itsMenubarCols && itsPopupMenuCols!=itsBackgroundCols && itsProgressCols!=itsActiveMdiColors)
+    if(itsPopupMenuCols && itsPopupMenuCols!=itsMenubarCols && itsPopupMenuCols!=itsBackgroundCols && itsPopupMenuCols!=itsActiveMdiColors)
     {
         delete [] itsPopupMenuCols;
         itsPopupMenuCols=0L;

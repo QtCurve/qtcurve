@@ -1,6 +1,7 @@
 1.8.4
 -----
 1. Fix saving of custom alpha values.
+2. Fix crash upon exit - due to double free.
 
 1.8.3
 -----
