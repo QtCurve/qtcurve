@@ -182,7 +182,7 @@ static gboolean qtcWMMoveChildrenUseEvent(GtkWidget *widget, GdkEventButton *eve
             if(
                 (qtcWMMoveIsBlackListed(G_OBJECT(childWidget))) ||
                 (GTK_IS_NOTEBOOK(widget) && qtcTabIsLabel(GTK_NOTEBOOK(widget), childWidget)) ||
-                (GTK_IS_BUTTON(childWidget) && gtk_widget_get_state(childWidget) != GTK_STATE_INSENSITIVE) ||
+                (GTK_IS_BUTTON(childWidget) && qtcWidgetGetState(childWidget) != GTK_STATE_INSENSITIVE) ||
                 (gtk_widget_get_events(childWidget) & (GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK)) ||
                 (GTK_IS_MENU_ITEM(childWidget)) ||
                 (GTK_IS_SCROLLED_WINDOW(childWidget) && (!inNoteBook || gtk_widget_is_focus(childWidget))))

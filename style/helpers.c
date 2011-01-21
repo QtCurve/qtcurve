@@ -1125,7 +1125,7 @@ void getEntryParentBgCol(GtkWidget *widget, GdkColor *color)
     style=qtcWidgetGetStyle(parent);
 
     if(style)
-        *color = style->bg[qtcWidgetState(parent)];
+        *color = style->bg[qtcWidgetGetState(parent)];
 }
 
 gboolean compositingActive(GtkWidget *widget)

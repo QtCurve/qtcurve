@@ -194,7 +194,7 @@ static gboolean qtcMenuShellMotion(GtkWidget *widget, GdkEventMotion *event, gpo
             for(child = g_list_first(children); child; child = g_list_next(child))
             {
                 if((child->data) && GTK_IS_WIDGET(child->data) &&
-                   (qtcWidgetState(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
+                   (qtcWidgetGetState(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
                 {
                     GtkAllocation alloc=qtcWidgetGetAllocation(GTK_WIDGET(child->data));
 
@@ -224,7 +224,7 @@ static gboolean qtcMenuShellLeave(GtkWidget *widget, GdkEventCrossing *event, gp
         for(child = g_list_first(children); child; child = g_list_next(child))
         {
             if((child->data) && GTK_IS_MENU_ITEM(child->data) &&
-               (qtcWidgetState(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
+               (qtcWidgetGetState(GTK_WIDGET(child->data)) != GTK_STATE_INSENSITIVE))
             {
                 GtkWidget *submenu  = qtcMenuItemGetSubMenu(GTK_MENU_ITEM(child->data)),
                           *topLevel = submenu ? qtcMenuGetTopLevel(submenu) : NULL;

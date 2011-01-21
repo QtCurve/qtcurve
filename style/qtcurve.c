@@ -437,7 +437,7 @@ static void gtkDrawHandle(GtkStyle *style, GdkWindow *window, GtkStateType state
             DETAIL("dockitem") || paf)
     {
         if(widget && GTK_STATE_INSENSITIVE!=state)
-            state=qtcWidgetState(widget);
+            state=qtcWidgetGetState(widget);
 
         if(paf)  /* The paf here is expected to be on the gnome panel */
             if(height<width)
@@ -1901,7 +1901,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                                                IS_MENU_ITEM(widget), detail ? detail : "NULL"),
                                         debugDisplayWidget(widget, 10);
 
-        if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==qtcWidgetState(widget))
+        if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==qtcWidgetGetState(widget))
              state=GTK_STATE_INSENSITIVE;
              
 #ifndef READ_INACTIVE_PAL /* If we reead the inactive palette, then there is no need for the following... */
