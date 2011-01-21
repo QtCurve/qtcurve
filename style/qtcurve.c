@@ -1383,7 +1383,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                     qtcWindowMenuBarDBus(widget, height);
             }
 
-            if(widget && (opacity!=100 || (CUSTOM_BGND && !drawGradient && !fillBackground)))
+            if(widget && (opacity!=100 || CUSTOM_BGND))
                 drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
             
             if(drawGradient)
