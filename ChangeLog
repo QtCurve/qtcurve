@@ -1,3 +1,7 @@
+1.8.5
+-----
+1. Fix fill of bottom corners of kwin decoration when not compositing.
+
 1.8.4
 -----
 1. Fix saving of custom alpha values.

@@ -749,10 +749,10 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
         {
             // For some reason, on Jaunty drawing directly is *hideously* slow on intel graphics card!
             QPixmap pix(32, 32);
+            pix.fill(Qt::transparent);
             QPainter p2(&pix);
             p2.setRenderHint(QPainter::Antialiasing, true);
             opt.rect=QRect(0, 0, pix.width(), pix.height());
-            p2.fillRect(opt.rect, fillCol);
             Handler()->wStyle()->drawPrimitive(QStyle::PE_FrameWindow, &opt, &p2, widget());
             p2.end();
             painter.drawTiledPixmap(r.x(), r.y()+10, 2, r.height()-18, pix.copy(0, 8, 2, 16));
