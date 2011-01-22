@@ -841,8 +841,9 @@ void QtCurveClient::paintEvent(QPaintEvent *e)
              menuOnlyRight=menuIcon && !menuOnlyLeft && onlyMenuIcon(false);
         
         if(!menuOnlyLeft && buttonsLeftWidth()>(titleBarHeight-2*hOffset))
-            drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust+edgePad, r.top()+vOffset+edgePad,
-                                            buttonsLeftWidth()-hOffset, titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
+            drawSunkenBevel(&painter, QRect(r.left()+hOffset+posAdjust+edgePad+(compositing ? 0 : -1), r.top()+vOffset+edgePad,
+                                            buttonsLeftWidth()-hOffset+(compositing ? 0 : 2), 
+                                            titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
         if(!menuOnlyRight && buttonsRightWidth()>(titleBarHeight-2*hOffset))
             drawSunkenBevel(&painter, QRect(r.right()-(buttonsRightWidth()+posAdjust+edgePad), r.top()+vOffset+edgePad,
                                             buttonsRightWidth(), titleBarHeight-2*(vOffset+edgePad)), col, buttonFlags&TITLEBAR_BUTTON_ROUND, round);
