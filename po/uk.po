@@ -7,45 +7,45 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kde-style-qtcurve\n"
-"Report-Msgid-Bugs-To: http://sourceforge."
-"net/tracker/?group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2010-12-11 15:06+0200\n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
+"group_id=50231&atid=459007\n"
+"POT-Creation-Date: 2011-01-23 21:03+0000\n"
 "PO-Revision-Date: 2010-12-11 16:59+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2010-06-27 08:44+0000\n"
 "X-Generator: Lokalize 1.1\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Language: uk"
 
-#: config/exportthemedialog.cpp:41
+#: config/exportthemedialog.cpp:40
 msgid "Export Theme"
 msgstr "Експортування теми"
 
-#: config/exportthemedialog.cpp:44
+#: config/exportthemedialog.cpp:43
 msgid "Name:"
 msgstr "Назва:"
 
-#: config/exportthemedialog.cpp:45
+#: config/exportthemedialog.cpp:44
 msgid "Comment:"
 msgstr "Коментар:"
 
-#: config/exportthemedialog.cpp:46
+#: config/exportthemedialog.cpp:45
 msgid "Destination folder:"
 msgstr "Тека призначення:"
 
-#: config/exportthemedialog.cpp:48
+#: config/exportthemedialog.cpp:47
 msgid "QtCurve based theme"
 msgstr "Тема, заснована на QtCurve"
 
-#: config/exportthemedialog.cpp:76
+#: config/exportthemedialog.cpp:75
 msgid "Name is empty!"
 msgstr "Назва є порожньою."
 
-#: config/exportthemedialog.cpp:96
+#: config/exportthemedialog.cpp:95
 msgid ""
 "Succesfully created:\n"
 "%1"
@@ -53,7 +53,7 @@ msgstr ""
 "Успішно створено:\n"
 "%1"
 
-#: config/exportthemedialog.cpp:99
+#: config/exportthemedialog.cpp:98
 msgid "Failed to create file: %1"
 msgstr "Не вдалося створити файл: %1"
 
@@ -66,12 +66,10 @@ msgid "Top middle"
 msgstr "Вгорі посередині"
 
 #: config/imagepropertiesdialog.cpp:39
-#| msgid "Left to right"
 msgid "Top right"
 msgstr "Вгорі праворуч"
 
 #: config/imagepropertiesdialog.cpp:40
-#| msgid "Button effect:"
 msgid "Bottom left"
 msgstr "Внизу ліворуч"
 
@@ -80,12 +78,10 @@ msgid "Bottom middle"
 msgstr "Внизу посередині"
 
 #: config/imagepropertiesdialog.cpp:42
-#| msgid "Left to right"
 msgid "Bottom right"
 msgstr "Внизу праворуч"
 
 #: config/imagepropertiesdialog.cpp:43
-#| msgid "Left aligned"
 msgid "Left middle"
 msgstr "Ліворуч посередині"
 
@@ -94,7 +90,6 @@ msgid "Right middle"
 msgstr "Праворуч посередині"
 
 #: config/imagepropertiesdialog.cpp:45
-#| msgid "Centre aligned"
 msgid "Centred"
 msgstr "За центром"
 
@@ -102,644 +97,634 @@ msgstr "За центром"
 msgid "Edit %1"
 msgstr "Зміна %1"
 
-#: config/qtcurveconfig.cpp:204 kwin/qtcurveclient.cpp:298
+#: config/qtcurveconfig.cpp:215 kwin/qtcurveclient.cpp:298
 msgid "QtCurve"
 msgstr "QtCurve"
 
-#: config/qtcurveconfig.cpp:205
+#: config/qtcurveconfig.cpp:216
 msgid "Unified widget style."
 msgstr "Уніфікований стиль віджетів."
 
-#: config/qtcurveconfig.cpp:207
-msgid "(C) Craig Drummond, 2003-2010"
+#: config/qtcurveconfig.cpp:218
+#, fuzzy
+msgid "(C) Craig Drummond, 2003-2011"
 msgstr "© Craig Drummond, 2003–2010"
 
-#: config/qtcurveconfig.cpp:222
+#: config/qtcurveconfig.cpp:233
 msgid "Preview Window"
 msgstr "Вікно перегляду"
 
-#: config/qtcurveconfig.cpp:270
+#: config/qtcurveconfig.cpp:281
 msgid "Select Password Character"
 msgstr "Вибір символів приховування паролів"
 
 #. i18n: file: config/qtcurveconfigbase.ui:2474
 #. i18n: ectx: property (text), widget (QLabel, label_94)
-#: config/qtcurveconfig.cpp:493 config/qtcurveconfig.cpp:943 po/rc.cpp:968
+#: config/qtcurveconfig.cpp:504 config/qtcurveconfig.cpp:954 po/rc.cpp:968
 #: rc.cpp:968
 msgid "Background"
 msgstr "Тло"
 
 #. i18n: file: config/stylepreview.ui:132
 #. i18n: ectx: property (text), widget (QPushButton, PushButton1)
-#: config/qtcurveconfig.cpp:496 po/rc.cpp:1601 rc.cpp:1601
+#: config/qtcurveconfig.cpp:507 po/rc.cpp:1601 rc.cpp:1601
 msgid "Button"
 msgstr "Кнопка"
 
-#: config/qtcurveconfig.cpp:498
+#: config/qtcurveconfig.cpp:509
 msgid "Text"
 msgstr "Текст"
 
-#: config/qtcurveconfig.cpp:502 config/qtcurveconfig.cpp:562
-#: config/qtcurveconfig.cpp:585 config/qtcurveconfig.cpp:638
-#: config/qtcurveconfig.cpp:742 config/qtcurveconfig.cpp:750
+#: config/qtcurveconfig.cpp:513 config/qtcurveconfig.cpp:573
+#: config/qtcurveconfig.cpp:596 config/qtcurveconfig.cpp:649
+#: config/qtcurveconfig.cpp:753 config/qtcurveconfig.cpp:761
 #: kwinconfig/qtcurvekwinconfig.cpp:54
 msgid "None"
 msgstr "Немає"
 
-#: config/qtcurveconfig.cpp:505 config/qtcurveconfig.cpp:567
+#: config/qtcurveconfig.cpp:516 config/qtcurveconfig.cpp:578
 msgid "<unknown>"
 msgstr "<невідомо>"
 
-#: config/qtcurveconfig.cpp:507 kwinconfig/qtcurvekwinconfig.cpp:36
+#: config/qtcurveconfig.cpp:518 kwinconfig/qtcurvekwinconfig.cpp:36
 msgid "Custom:"
 msgstr "Нетипове:"
 
-#: config/qtcurveconfig.cpp:509
+#: config/qtcurveconfig.cpp:520
 msgid "Selected background"
 msgstr "Вибране тло"
 
-#: config/qtcurveconfig.cpp:511
+#: config/qtcurveconfig.cpp:522
 msgid "Blended selected background"
 msgstr "Змішане вибране тло"
 
-#: config/qtcurveconfig.cpp:513
+#: config/qtcurveconfig.cpp:524
 msgid "Menu background"
 msgstr "Тло меню"
 
-#: config/qtcurveconfig.cpp:513 config/qtcurveconfig.cpp:604
+#: config/qtcurveconfig.cpp:524 config/qtcurveconfig.cpp:615
 msgid "Darken"
 msgstr "Затемнити"
 
-#: config/qtcurveconfig.cpp:515 kwinconfig/qtcurvekwinconfig.cpp:34
+#: config/qtcurveconfig.cpp:526 kwinconfig/qtcurvekwinconfig.cpp:34
 msgid "Titlebar"
 msgstr "Смужка заголовка"
 
-#: config/qtcurveconfig.cpp:537 config/qtcurveconfig.cpp:2246
+#: config/qtcurveconfig.cpp:548 config/qtcurveconfig.cpp:2264
 msgid "Custom gradient %1"
 msgstr "Нетиповий градієнт %1"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1052
 #. i18n: ectx: property (text), widget (QCheckBox, flatSbarButtons)
-#: config/qtcurveconfig.cpp:541 po/rc.cpp:408 rc.cpp:408
+#: config/qtcurveconfig.cpp:552 po/rc.cpp:408 rc.cpp:408
 msgid "Flat"
 msgstr "Нейтральний"
 
-#: config/qtcurveconfig.cpp:542 config/qtcurveconfig.cpp:816
+#: config/qtcurveconfig.cpp:553 config/qtcurveconfig.cpp:827
 msgid "Raised"
 msgstr "Піднятий"
 
-#: config/qtcurveconfig.cpp:543
+#: config/qtcurveconfig.cpp:554
 msgid "Dull glass"
 msgstr "Матове скло"
 
-#: config/qtcurveconfig.cpp:544
+#: config/qtcurveconfig.cpp:555
 msgid "Shiny glass"
 msgstr "Блискуче скло"
 
-#: config/qtcurveconfig.cpp:545
+#: config/qtcurveconfig.cpp:556
 msgid "Agua"
 msgstr "Agua"
 
-#: config/qtcurveconfig.cpp:546
+#: config/qtcurveconfig.cpp:557
 msgid "Soft gradient"
 msgstr "М’який градієнт"
 
-#: config/qtcurveconfig.cpp:547
+#: config/qtcurveconfig.cpp:558
 msgid "Standard gradient"
 msgstr "Стандартний градієнт"
 
-#: config/qtcurveconfig.cpp:548
+#: config/qtcurveconfig.cpp:559
 msgid "Harsh gradient"
 msgstr "Грубий градієнт"
 
-#: config/qtcurveconfig.cpp:549
+#: config/qtcurveconfig.cpp:560
 msgid "Inverted gradient"
 msgstr "Інвертований градієнт"
 
-#: config/qtcurveconfig.cpp:550
+#: config/qtcurveconfig.cpp:561
 msgid "Dark inverted gradient"
 msgstr "Темний інвертований градієнт"
 
-#: config/qtcurveconfig.cpp:551
+#: config/qtcurveconfig.cpp:562
 msgid "Split gradient"
 msgstr "Розділений градієнт"
 
-#: config/qtcurveconfig.cpp:552
+#: config/qtcurveconfig.cpp:563
 msgid "Bevelled"
 msgstr "З фаскою"
 
-#: config/qtcurveconfig.cpp:557
+#: config/qtcurveconfig.cpp:568
 msgid "Fade out (popup menuitems)"
 msgstr "Згасання (пункти контекстних меню)"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1110
 #. i18n: ectx: property (text), widget (QCheckBox, stripedSbar)
-#: config/qtcurveconfig.cpp:559 po/rc.cpp:435 rc.cpp:435
+#: config/qtcurveconfig.cpp:570 po/rc.cpp:435 rc.cpp:435
 msgid "Striped"
 msgstr "Зі смужками"
 
-#: config/qtcurveconfig.cpp:562 config/qtcurveconfig.cpp:647
-#| msgid "General setting:"
+#: config/qtcurveconfig.cpp:573 config/qtcurveconfig.cpp:658
 msgid "Same as general setting"
 msgstr "Така сама, що і для загального параметра"
 
-#: config/qtcurveconfig.cpp:565
+#: config/qtcurveconfig.cpp:576
 msgid "Tiled image"
 msgstr "Зображення плиткою"
 
-#: config/qtcurveconfig.cpp:586
+#: config/qtcurveconfig.cpp:597
 msgid "Sunken lines"
 msgstr "Занурені лінії"
 
-#: config/qtcurveconfig.cpp:587
+#: config/qtcurveconfig.cpp:598
 msgid "Flat lines"
 msgstr "Плоскі лінії"
 
-#: config/qtcurveconfig.cpp:588
+#: config/qtcurveconfig.cpp:599
 msgid "Dots"
 msgstr "Крапки"
 
-#: config/qtcurveconfig.cpp:591
+#: config/qtcurveconfig.cpp:602
 msgid "Single dot"
 msgstr "Одна крапка"
 
-#: config/qtcurveconfig.cpp:593
+#: config/qtcurveconfig.cpp:604
 msgid "Dashes"
 msgstr "Пунктир"
 
-#: config/qtcurveconfig.cpp:599
+#: config/qtcurveconfig.cpp:610
 msgid "Corner indicator"
 msgstr "Кутова позначка"
 
-#: config/qtcurveconfig.cpp:600
+#: config/qtcurveconfig.cpp:611
 msgid "Font color thin border"
 msgstr "Кольоровий тонкий контур написів"
 
-#: config/qtcurveconfig.cpp:601
+#: config/qtcurveconfig.cpp:612
 msgid "Selected background thick border"
 msgstr "Товста рамка позначеного тла"
 
-#: config/qtcurveconfig.cpp:602
+#: config/qtcurveconfig.cpp:613
 msgid "Selected background tinting"
 msgstr "Вибране тонування тла"
 
-#: config/qtcurveconfig.cpp:603
+#: config/qtcurveconfig.cpp:614
 msgid "A slight glow"
 msgstr "Легке сяйво"
 
-#: config/qtcurveconfig.cpp:605
+#: config/qtcurveconfig.cpp:616
 msgid "Use selected background color"
 msgstr "Використовувати колір позначеного тла"
 
-#: config/qtcurveconfig.cpp:606
+#: config/qtcurveconfig.cpp:617
 msgid "No indicator"
 msgstr "Без індикатора"
 
-#: config/qtcurveconfig.cpp:611
+#: config/qtcurveconfig.cpp:622
 msgid "KDE"
 msgstr "KDE"
 
-#: config/qtcurveconfig.cpp:612
+#: config/qtcurveconfig.cpp:623
 msgid "MS Windows"
 msgstr "MS Windows"
 
-#: config/qtcurveconfig.cpp:613
+#: config/qtcurveconfig.cpp:624
 msgid "Platinum"
 msgstr "Platinum"
 
-#: config/qtcurveconfig.cpp:614
+#: config/qtcurveconfig.cpp:625
 msgid "NeXT"
 msgstr "NeXT"
 
-#: config/qtcurveconfig.cpp:615
+#: config/qtcurveconfig.cpp:626
 msgid "No buttons"
 msgstr "Без кнопок"
 
-#: config/qtcurveconfig.cpp:620
+#: config/qtcurveconfig.cpp:631
 msgid "Square"
 msgstr "Квадрат"
 
-#: config/qtcurveconfig.cpp:621
+#: config/qtcurveconfig.cpp:632
 msgid "Slightly rounded"
 msgstr "Трохи округлений"
 
-#: config/qtcurveconfig.cpp:622
+#: config/qtcurveconfig.cpp:633
 msgid "Fully rounded"
 msgstr "Повністю заокруглено"
 
-#: config/qtcurveconfig.cpp:623
+#: config/qtcurveconfig.cpp:634
 msgid "Extra rounded"
 msgstr "Додатково заокруглено"
 
-#: config/qtcurveconfig.cpp:624
+#: config/qtcurveconfig.cpp:635
 msgid "Max rounded"
 msgstr "Повністю заокруглено"
 
-#: config/qtcurveconfig.cpp:629
+#: config/qtcurveconfig.cpp:640
 msgid "No coloration"
 msgstr "Без розфарбування"
 
-#: config/qtcurveconfig.cpp:630
+#: config/qtcurveconfig.cpp:641
 msgid "Color border"
 msgstr "Кольорова рамка"
 
-#: config/qtcurveconfig.cpp:631
+#: config/qtcurveconfig.cpp:642
 msgid "Thick color border"
 msgstr "Товста кольорова рамка"
 
-#: config/qtcurveconfig.cpp:632
+#: config/qtcurveconfig.cpp:643
 msgid "Plastik style"
 msgstr "Стиль Plastik"
 
-#: config/qtcurveconfig.cpp:633 config/qtcurveconfig.cpp:692
+#: config/qtcurveconfig.cpp:644 config/qtcurveconfig.cpp:703
 msgid "Glow"
 msgstr "Сяйво"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1691
 #. i18n: ectx: property (text), widget (QRadioButton, borderTab)
-#: config/qtcurveconfig.cpp:639 kwinconfig/qtcurvekwinconfig.cpp:56
+#: config/qtcurveconfig.cpp:650 kwinconfig/qtcurvekwinconfig.cpp:56
 #: po/rc.cpp:658 rc.cpp:658
 msgid "Light"
 msgstr "Світла"
 
-#: config/qtcurveconfig.cpp:640 kwinconfig/qtcurvekwinconfig.cpp:55
+#: config/qtcurveconfig.cpp:651 kwinconfig/qtcurvekwinconfig.cpp:55
 msgid "Dark"
 msgstr "Темна"
 
-#: config/qtcurveconfig.cpp:641
+#: config/qtcurveconfig.cpp:652
 msgid "Light (all sides)"
 msgstr "Світла (з усіх боків)"
 
-#: config/qtcurveconfig.cpp:642
+#: config/qtcurveconfig.cpp:653
 msgid "Dark (all sides)"
 msgstr "Темна (з усіх боків)"
 
-#: config/qtcurveconfig.cpp:647 config/qtcurveconfig.cpp:662
-#: config/qtcurveconfig.cpp:670
+#: config/qtcurveconfig.cpp:658 config/qtcurveconfig.cpp:673
+#: config/qtcurveconfig.cpp:681
 msgid "Plain"
 msgstr "Звичайна"
 
-#: config/qtcurveconfig.cpp:648
+#: config/qtcurveconfig.cpp:659
 msgid "Etched"
 msgstr "З краями"
 
-#: config/qtcurveconfig.cpp:649
+#: config/qtcurveconfig.cpp:660
 msgid "Shadowed"
 msgstr "З затіненням"
 
-#: config/qtcurveconfig.cpp:654
+#: config/qtcurveconfig.cpp:665
 msgid "Simple"
 msgstr "Проста"
 
-#: config/qtcurveconfig.cpp:655
+#: config/qtcurveconfig.cpp:666
 msgid "Use HSL color space"
 msgstr "Використовувати простір кольорів ВНЯ"
 
-#: config/qtcurveconfig.cpp:656
+#: config/qtcurveconfig.cpp:667
 msgid "Use HSV color space"
 msgstr "Використовувати простір кольорів ВНЗ"
 
-#: config/qtcurveconfig.cpp:657
+#: config/qtcurveconfig.cpp:668
 msgid "Use HCY color space"
 msgstr "Використовувати простір кольорів HCY"
 
-#: config/qtcurveconfig.cpp:663
+#: config/qtcurveconfig.cpp:674
 msgid "Stripes"
 msgstr "Смуги"
 
-#: config/qtcurveconfig.cpp:664
+#: config/qtcurveconfig.cpp:675
 msgid "Diagonal stripes"
 msgstr "Діагональні смужки"
 
-#: config/qtcurveconfig.cpp:665
+#: config/qtcurveconfig.cpp:676
 msgid "Faded stripes"
 msgstr "Притлумлені смужки"
 
-#: config/qtcurveconfig.cpp:671
+#: config/qtcurveconfig.cpp:682
 msgid "Round"
 msgstr "З заокругленнями"
 
-#: config/qtcurveconfig.cpp:672
+#: config/qtcurveconfig.cpp:683
 msgid "Plain - rotated"
 msgstr "Простий повернутий"
 
-#: config/qtcurveconfig.cpp:673
+#: config/qtcurveconfig.cpp:684
 msgid "Round - rotated"
 msgstr "З заокругленнями повернутий"
 
-#: config/qtcurveconfig.cpp:674
+#: config/qtcurveconfig.cpp:685
 msgid "Triangular"
 msgstr "Трикутна"
 
 #. i18n: file: config/qtcurveconfigbase.ui:2327
 #. i18n: ectx: property (text), widget (QCheckBox, titlebarButtons_round)
-#: config/qtcurveconfig.cpp:675 po/rc.cpp:887 rc.cpp:887
+#: config/qtcurveconfig.cpp:686 po/rc.cpp:887 rc.cpp:887
 msgid "Circular"
 msgstr "Кругове"
 
-#: config/qtcurveconfig.cpp:680
+#: config/qtcurveconfig.cpp:691
 msgid "Base color"
 msgstr "Базовий колір"
 
-#: config/qtcurveconfig.cpp:681
+#: config/qtcurveconfig.cpp:692
 msgid "Background color"
 msgstr "Колір тла"
 
-#: config/qtcurveconfig.cpp:682
+#: config/qtcurveconfig.cpp:693
 msgid "Darkened background color"
 msgstr "Затемнений колір тла"
 
-#: config/qtcurveconfig.cpp:687
+#: config/qtcurveconfig.cpp:698
 msgid "Standard (dotted)"
 msgstr "Стандартний (з крапками)"
 
-#: config/qtcurveconfig.cpp:688
+#: config/qtcurveconfig.cpp:699
 msgid "Highlight color"
 msgstr "Колір підсвічування"
 
-#: config/qtcurveconfig.cpp:689
+#: config/qtcurveconfig.cpp:700
 msgid "Highlight color (full size)"
 msgstr "Колір підсвічування (повний розмір)"
 
-#: config/qtcurveconfig.cpp:690
+#: config/qtcurveconfig.cpp:701
 msgid "Highlight color, and fill"
 msgstr "Колір підсвічування і заповнення"
 
-#: config/qtcurveconfig.cpp:691
+#: config/qtcurveconfig.cpp:702
 msgid "Line drawn with highlight color"
 msgstr "Лінія, намальована кольором підсвічування"
 
-#: config/qtcurveconfig.cpp:697 config/qtcurveconfig.cpp:792
+#: config/qtcurveconfig.cpp:708 config/qtcurveconfig.cpp:803
 msgid "No border"
 msgstr "Без рамки"
 
-#: config/qtcurveconfig.cpp:698
+#: config/qtcurveconfig.cpp:709
 msgid "Light border"
 msgstr "Тонка рамка"
 
-#: config/qtcurveconfig.cpp:699
+#: config/qtcurveconfig.cpp:710
 msgid "3D border (light only)"
 msgstr "Просторова рамка (лише світла)"
 
-#: config/qtcurveconfig.cpp:700
+#: config/qtcurveconfig.cpp:711
 msgid "3D border (dark and light)"
 msgstr "Просторова рамка (тінь і світло)"
 
-#: config/qtcurveconfig.cpp:701
+#: config/qtcurveconfig.cpp:712
 msgid "Shine"
 msgstr "Сяйво"
 
-#: config/qtcurveconfig.cpp:706
+#: config/qtcurveconfig.cpp:717
 msgid "Left"
 msgstr "Ліворуч"
 
-#: config/qtcurveconfig.cpp:707
+#: config/qtcurveconfig.cpp:718
 msgid "Center (between controls)"
 msgstr "Посередині (між елементами керування)"
 
-#: config/qtcurveconfig.cpp:708
+#: config/qtcurveconfig.cpp:719
 msgid "Center (full width)"
 msgstr "Посередині (на всю ширину)"
 
-#: config/qtcurveconfig.cpp:709
+#: config/qtcurveconfig.cpp:720
 msgid "Right"
 msgstr "Праворуч"
 
-#: config/qtcurveconfig.cpp:721
+#: config/qtcurveconfig.cpp:732
 msgid "Do not show"
 msgstr "Не показувати"
 
-#: config/qtcurveconfig.cpp:722
+#: config/qtcurveconfig.cpp:733
 msgid "Place on menu button"
 msgstr "Розташувати на кнопці меню"
 
-#: config/qtcurveconfig.cpp:723
+#: config/qtcurveconfig.cpp:734
 msgid "Place next to title"
 msgstr "Розташувати поряд з заголовком"
 
-#: config/qtcurveconfig.cpp:728
+#: config/qtcurveconfig.cpp:739
 msgid "Highlight on top"
 msgstr "Підсвічування згори"
 
-#: config/qtcurveconfig.cpp:729
+#: config/qtcurveconfig.cpp:740
 msgid "Highlight on bottom"
 msgstr "Підсвічування знизу"
 
-#: config/qtcurveconfig.cpp:730
+#: config/qtcurveconfig.cpp:741
 msgid "Add a slight glow"
 msgstr "Додати невеличке сяйво"
 
-#: config/qtcurveconfig.cpp:735
+#: config/qtcurveconfig.cpp:746
 msgid "Top to bottom"
 msgstr "Згори вниз"
 
-#: config/qtcurveconfig.cpp:736
+#: config/qtcurveconfig.cpp:747
 msgid "Left to right"
 msgstr "Зліва праворуч"
 
-#: config/qtcurveconfig.cpp:743
+#: config/qtcurveconfig.cpp:754
 msgid "New style (KDE and Gtk2 similar)"
 msgstr "Новий стиль (KDE і Gtk2 — подібні)"
 
-#: config/qtcurveconfig.cpp:744
+#: config/qtcurveconfig.cpp:755
 msgid "Old style (KDE and Gtk2 different)"
 msgstr "Старий стиль (KDE і Gtk2 — різні)"
 
-#: config/qtcurveconfig.cpp:751
+#: config/qtcurveconfig.cpp:762
 msgid "Bordered rings"
 msgstr "Кільця з рамкою"
 
-#: config/qtcurveconfig.cpp:752
+#: config/qtcurveconfig.cpp:763
 msgid "Plain rings"
 msgstr "Звичайні кільця"
 
-#: config/qtcurveconfig.cpp:753
+#: config/qtcurveconfig.cpp:764
 msgid "Square rings"
 msgstr "Квадратні кільця"
 
-#: config/qtcurveconfig.cpp:754
-#| msgid "Fill"
+#: config/qtcurveconfig.cpp:765
 msgid "File"
 msgstr "Файл"
 
-#: config/qtcurveconfig.cpp:759
+#: config/qtcurveconfig.cpp:770
 msgid "No glow"
 msgstr "Без сяйва"
 
-#: config/qtcurveconfig.cpp:760
+#: config/qtcurveconfig.cpp:771
 msgid "Add glow at the start"
 msgstr "Додати сяйво на початку"
 
-#: config/qtcurveconfig.cpp:761
+#: config/qtcurveconfig.cpp:772
 msgid "Add glow in the middle"
 msgstr "Додати сяйво усередині"
 
-#: config/qtcurveconfig.cpp:762
+#: config/qtcurveconfig.cpp:773
 msgid "Add glow at the end"
 msgstr "Додати сяйво наприкінці"
 
-#: config/qtcurveconfig.cpp:767
+#: config/qtcurveconfig.cpp:778
 msgid "Small (%1 pixels)"
 msgstr "Мала (%1 пікселів)"
 
-#: config/qtcurveconfig.cpp:768
+#: config/qtcurveconfig.cpp:779
 msgid "Large (%1 pixels)"
 msgstr "Велика (%1 пікселів)"
 
-#: config/qtcurveconfig.cpp:783
+#: config/qtcurveconfig.cpp:794
 msgid "Titlebar only"
 msgstr "Лише смужка заголовка"
 
-#: config/qtcurveconfig.cpp:784
+#: config/qtcurveconfig.cpp:795
 msgid "Titlebar and menubar"
 msgstr "Смужка заголовка і меню"
 
-#: config/qtcurveconfig.cpp:785
+#: config/qtcurveconfig.cpp:796
 msgid "Titlebar, menubar, and toolbars"
 msgstr "Смужка заголовка, панель меню і панелі інструментів"
 
-#: config/qtcurveconfig.cpp:786
+#: config/qtcurveconfig.cpp:797
 msgid "All empty areas"
 msgstr "Всі порожні області"
 
-#: config/qtcurveconfig.cpp:793
-#| msgid "Standard gradient"
+#: config/qtcurveconfig.cpp:804
 msgid "Standard frame border"
 msgstr "Стандартний градієнт"
 
-#: config/qtcurveconfig.cpp:794
+#: config/qtcurveconfig.cpp:805
 msgid "Single separator line"
 msgstr "Одинарна лінія-роздільник"
 
-#: config/qtcurveconfig.cpp:795
-#| msgid "Shade background by:"
+#: config/qtcurveconfig.cpp:806
 msgid "Shaded background"
 msgstr "Затінене тло"
 
-#: config/qtcurveconfig.cpp:796
-#| msgid "Shade background by:"
+#: config/qtcurveconfig.cpp:807
 msgid "Faded background"
 msgstr "Затінене тло"
 
-#: config/qtcurveconfig.cpp:808
-#| msgid "Tab widget frames"
+#: config/qtcurveconfig.cpp:819
 msgid "Outside frame"
 msgstr "Ззовні рамки"
 
-#: config/qtcurveconfig.cpp:809
-#| msgid "General frames"
+#: config/qtcurveconfig.cpp:820
 msgid "On frame"
 msgstr "На рамці"
 
-#: config/qtcurveconfig.cpp:810
-#| msgid "Tab widget frames"
+#: config/qtcurveconfig.cpp:821
 msgid "Inside frame"
 msgstr "Всередині рамки"
 
-#: config/qtcurveconfig.cpp:815
-#| msgid "Standard gradient"
+#: config/qtcurveconfig.cpp:826
 msgid "Standard (auto-raise)"
 msgstr "Стандартна (автопідняття)"
 
-#: config/qtcurveconfig.cpp:817
+#: config/qtcurveconfig.cpp:828
 msgid "Raised and joined"
 msgstr "Піднята і з’єднана"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1097
 #. i18n: ectx: property (suffix), widget (KIntNumInput, sliderWidth)
-#: config/qtcurveconfig.cpp:931 po/rc.cpp:429 rc.cpp:429
+#: config/qtcurveconfig.cpp:942 po/rc.cpp:429 rc.cpp:429
 msgid " pixels"
 msgstr " пікселів"
 
-#: config/qtcurveconfig.cpp:944
-#| msgid "Menu background"
+#: config/qtcurveconfig.cpp:955
 msgid "Menu Background"
 msgstr "Тло меню"
 
-#: config/qtcurveconfig.cpp:945
-#| msgid "Background image:"
+#: config/qtcurveconfig.cpp:956
 msgid "Background Image"
 msgstr "Зображення у тлі"
 
-#: config/qtcurveconfig.cpp:949
+#: config/qtcurveconfig.cpp:960
 msgid "Menu Image"
 msgstr "Зображення меню"
 
-#: config/qtcurveconfig.cpp:1688
+#: config/qtcurveconfig.cpp:1705
 msgid "Presets and Preview"
 msgstr "Набори і перегляд"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:30
 #. i18n: ectx: attribute (title), widget (QWidget, generalTab)
-#: config/qtcurveconfig.cpp:1689 po/rc.cpp:1766 rc.cpp:1766
+#: config/qtcurveconfig.cpp:1706 po/rc.cpp:1766 rc.cpp:1766
 msgid "General"
 msgstr "Загальне"
 
-#: config/qtcurveconfig.cpp:1690
+#: config/qtcurveconfig.cpp:1707
 msgid "Rounding"
 msgstr "Заокруглення"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:209
 #. i18n: ectx: attribute (title), widget (QWidget, opacityTab)
-#: config/qtcurveconfig.cpp:1691 po/rc.cpp:1832 rc.cpp:1832
+#: config/qtcurveconfig.cpp:1708 po/rc.cpp:1832 rc.cpp:1832
 msgid "Opacity"
 msgstr "Непрозорість"
 
-#: config/qtcurveconfig.cpp:1692
+#: config/qtcurveconfig.cpp:1709
 msgid "Group Boxes"
 msgstr "Групові панелі"
 
-#: config/qtcurveconfig.cpp:1693
+#: config/qtcurveconfig.cpp:1710
 msgid "Combos"
 msgstr "Спадні списки"
 
-#: config/qtcurveconfig.cpp:1694
+#: config/qtcurveconfig.cpp:1711
 msgid "Spin Buttons"
 msgstr "Кнопки лічильників"
 
-#: config/qtcurveconfig.cpp:1695
+#: config/qtcurveconfig.cpp:1712
 msgid "Splitters"
 msgstr "Роздільники"
 
-#: config/qtcurveconfig.cpp:1696
+#: config/qtcurveconfig.cpp:1713
 msgid "Sliders and Scrollbars"
 msgstr "Повзунки і смужки гортання"
 
 #. i18n: file: config/qtcurveconfigbase.ui:496
 #. i18n: ectx: property (text), widget (QCheckBox, squareProgress)
-#: config/qtcurveconfig.cpp:1697 po/rc.cpp:173 rc.cpp:173
+#: config/qtcurveconfig.cpp:1714 po/rc.cpp:173 rc.cpp:173
 msgid "Progressbars"
 msgstr "Смужки поступу"
 
-#: config/qtcurveconfig.cpp:1698
+#: config/qtcurveconfig.cpp:1715
 msgid "Default Button"
 msgstr "Типова кнопка"
 
-#: config/qtcurveconfig.cpp:1699
+#: config/qtcurveconfig.cpp:1716
 msgid "Mouse-over"
 msgstr "При наведення вказівника"
 
-#: config/qtcurveconfig.cpp:1700
+#: config/qtcurveconfig.cpp:1717
 msgid "Item Views"
 msgstr "Панелі з пунктами"
 
-#: config/qtcurveconfig.cpp:1701
+#: config/qtcurveconfig.cpp:1718
 msgid "Scrollviews"
 msgstr "Списки з гортанням"
 
-#: config/qtcurveconfig.cpp:1702
+#: config/qtcurveconfig.cpp:1719
 msgid "Tabs"
 msgstr "Вкладки"
 
-#: config/qtcurveconfig.cpp:1703
+#: config/qtcurveconfig.cpp:1720
 msgid "Checks and Radios"
 msgstr "Позначки варіантів"
 
-#: config/qtcurveconfig.cpp:1704
+#: config/qtcurveconfig.cpp:1721
 msgid "Windows"
 msgstr "Вікна"
 
-#: config/qtcurveconfig.cpp:1711
+#: config/qtcurveconfig.cpp:1728
 msgid ""
 "<p><b>NOTE:</b><i>The settings here affect the borders drawn around "
 "application windows and dialogs - and not internal (or MDI) windows. "
@@ -751,85 +736,85 @@ msgstr ""
 "вікон (MDI). Тому вказані параметри <b>не</b> змінять вигляду сторінки "
 "попереднього перегляду.</i></p>"
 
-#: config/qtcurveconfig.cpp:1717
+#: config/qtcurveconfig.cpp:1734
 msgid "Window Manager"
 msgstr "Керування вікнами"
 
-#: config/qtcurveconfig.cpp:1719
+#: config/qtcurveconfig.cpp:1736
 msgid "Window buttons"
 msgstr "Кнопки вікон"
 
-#: config/qtcurveconfig.cpp:1720
+#: config/qtcurveconfig.cpp:1737
 msgid "Window button colors"
 msgstr "Кольори кнопок вікон"
 
-#: config/qtcurveconfig.cpp:1721
+#: config/qtcurveconfig.cpp:1738
 msgid "Menubars"
 msgstr "Смужки меню"
 
 #. i18n: file: config/qtcurveconfigbase.ui:571
 #. i18n: ectx: property (text), widget (QCheckBox, squarePopupMenus)
-#: config/qtcurveconfig.cpp:1722 po/rc.cpp:212 rc.cpp:212
+#: config/qtcurveconfig.cpp:1739 po/rc.cpp:212 rc.cpp:212
 msgid "Popup menus"
 msgstr "Контекстні меню"
 
-#: config/qtcurveconfig.cpp:1723
+#: config/qtcurveconfig.cpp:1740
 msgid "Toolbars"
 msgstr "Панелі інструментів"
 
-#: config/qtcurveconfig.cpp:1724
+#: config/qtcurveconfig.cpp:1741
 msgid "Statusbars"
 msgstr "Смужки стану"
 
-#: config/qtcurveconfig.cpp:1725
+#: config/qtcurveconfig.cpp:1742
 msgid "Dock windows"
 msgstr "Пришвартовані вікна"
 
-#: config/qtcurveconfig.cpp:1726
+#: config/qtcurveconfig.cpp:1743
 msgid "Advanced Settings"
 msgstr "Додаткові параметри"
 
-#: config/qtcurveconfig.cpp:1727
+#: config/qtcurveconfig.cpp:1744
 msgid "Applications"
 msgstr "Програми"
 
-#: config/qtcurveconfig.cpp:1728
+#: config/qtcurveconfig.cpp:1745
 msgid "Legacy"
 msgstr "Застаріле"
 
-#: config/qtcurveconfig.cpp:1729
+#: config/qtcurveconfig.cpp:1746
 msgid "Custom Gradients"
 msgstr "Нетипові градієнти"
 
-#: config/qtcurveconfig.cpp:1730
+#: config/qtcurveconfig.cpp:1747
 msgid "Custom Shades"
 msgstr "Нетипові тіні"
 
-#: config/qtcurveconfig.cpp:1747
+#: config/qtcurveconfig.cpp:1764
 msgid "Save"
 msgstr "Зберегти"
 
-#: config/qtcurveconfig.cpp:1748
+#: config/qtcurveconfig.cpp:1765
 msgid "Delete"
 msgstr "Вилучити"
 
-#: config/qtcurveconfig.cpp:1749
+#: config/qtcurveconfig.cpp:1766
 msgid "Import..."
 msgstr "Імпортувати…"
 
-#: config/qtcurveconfig.cpp:1750
+#: config/qtcurveconfig.cpp:1767
 msgid "Export..."
 msgstr "Експортувати..."
 
-#: config/qtcurveconfig.cpp:1754
+#: config/qtcurveconfig.cpp:1771
 msgid "(Current)"
 msgstr "(Поточна)"
 
-#: config/qtcurveconfig.cpp:1755
+#: config/qtcurveconfig.cpp:1772
 msgid "(Default)"
 msgstr "(Типова)"
 
-#: config/qtcurveconfig.cpp:2044
+#: config/qtcurveconfig.cpp:2061
 msgid ""
 "Export your current KDE4 color palette, and font, so that they can be used "
 "by KDE3 applications?"
@@ -837,7 +822,7 @@ msgstr ""
 "Експортувати поточну палітру кольорів і шрифти KDE4 так, щоб ними можна було "
 "скористатися у програмах KDE3?"
 
-#: config/qtcurveconfig.cpp:2090
+#: config/qtcurveconfig.cpp:2107
 msgid ""
 "Export your current KDE4 color palette, and font, so that they can be used "
 "by pure-Qt3 applications?"
@@ -845,7 +830,7 @@ msgstr ""
 "Експортувати поточну палітру кольорів і шрифти KDE4 так, щоб ними можна було "
 "скористатися у програмах на чистому Qt3?"
 
-#: config/qtcurveconfig.cpp:2143
+#: config/qtcurveconfig.cpp:2160
 msgid ""
 "<p>Set the following config items so that window titlebar and menubars "
 "appear blended?</p><ul><li>Menubar, titlebar, and inactive titlebar gradient "
@@ -859,61 +844,61 @@ msgstr ""
 "смужки заголовка у колір тла»</li><li>Встановити розфарбування панелі меню "
 "«%2»</li><li>Дозволити перетягування вікна за панель меню.</li>"
 
-#: config/qtcurveconfig.cpp:2215
+#: config/qtcurveconfig.cpp:2233
 msgid "Reattach"
 msgstr "Повторно приєднати"
 
 #. i18n: file: config/qtcurveconfigbase.ui:218
 #. i18n: ectx: property (text), widget (QPushButton, previewControlButton)
-#: config/qtcurveconfig.cpp:2232 po/rc.cpp:55 rc.cpp:55
+#: config/qtcurveconfig.cpp:2250 po/rc.cpp:55 rc.cpp:55
 msgid "Detach"
 msgstr "Відокремити"
 
-#: config/qtcurveconfig.cpp:2251
+#: config/qtcurveconfig.cpp:2269
 msgid "Copy settings from another gradient"
 msgstr "Копіювати параметри з іншого градієнта"
 
-#: config/qtcurveconfig.cpp:2265
+#: config/qtcurveconfig.cpp:2283
 msgid "Add"
 msgstr "Додати"
 
-#: config/qtcurveconfig.cpp:2266
+#: config/qtcurveconfig.cpp:2284
 msgid "Remove"
 msgstr "Вилучити"
 
-#: config/qtcurveconfig.cpp:2267
+#: config/qtcurveconfig.cpp:2285
 msgid "Update"
 msgstr "Оновити"
 
-#: config/qtcurveconfig.cpp:2479
+#: config/qtcurveconfig.cpp:2497
 msgid "Save Preset"
 msgstr "Зберегти шаблон"
 
-#: config/qtcurveconfig.cpp:2479
+#: config/qtcurveconfig.cpp:2497
 msgid "Please enter a name for the preset:"
 msgstr "Будь ласка, введіть назву шаблона:"
 
-#: config/qtcurveconfig.cpp:2481
+#: config/qtcurveconfig.cpp:2499
 msgid "New preset"
 msgstr "Новий набір"
 
-#: config/qtcurveconfig.cpp:2484 config/qtcurveconfig.cpp:2568
-#: config/qtcurveconfig.cpp:2582 config/qtcurveconfig.cpp:2595
+#: config/qtcurveconfig.cpp:2502 config/qtcurveconfig.cpp:2586
+#: config/qtcurveconfig.cpp:2600 config/qtcurveconfig.cpp:2613
 msgid "%1 New"
 msgstr "%1 новий"
 
-#: config/qtcurveconfig.cpp:2487
+#: config/qtcurveconfig.cpp:2505
 msgid "Sorry, failed to save preset"
 msgstr "Вибачте, не вдалося зберегти набір"
 
-#: config/qtcurveconfig.cpp:2566
+#: config/qtcurveconfig.cpp:2584
 msgid ""
 "<p>You cannot use the name \"%1\".</p><p>Please enter a different name:<p>"
 msgstr ""
 "<p>Назву «%1» не можна використовувати.</p><p>Будь ласка, введіть іншу назву:"
 "<p>"
 
-#: config/qtcurveconfig.cpp:2580
+#: config/qtcurveconfig.cpp:2598
 msgid ""
 "<p>A system defined preset named\"%1\" aleady exists.</p><p>Please enter a "
 "new name:<p>"
@@ -921,35 +906,35 @@ msgstr ""
 "<p>У системі вже існує набір з назвою «%1».</p><p>Будь ласка, введіть нову "
 "назву:<p>"
 
-#: config/qtcurveconfig.cpp:2587
+#: config/qtcurveconfig.cpp:2605
 msgid ""
 "<p>A preset named \"%1\" aleady exists.</p><p>Do you wish to overwrite this?"
 "<p>"
 msgstr "<p>Набір з назвою «%1» вже існує.</p><p>Бажаєте його перезаписати?<p>"
 
-#: config/qtcurveconfig.cpp:2594
+#: config/qtcurveconfig.cpp:2612
 msgid "<p>Please enter a new name:<p>"
 msgstr "<p>Будь ласка, введіть нову назву:<p>"
 
-#: config/qtcurveconfig.cpp:2612
+#: config/qtcurveconfig.cpp:2630
 msgid "<p>Are you sure you wish to delete:</p><p><b>%1</b></p>"
 msgstr "</p>Ви справді бажаєте вилучити :</p><p><b>%1 ?</b></p>"
 
-#: config/qtcurveconfig.cpp:2622
+#: config/qtcurveconfig.cpp:2640
 msgid "<p>Sorry, failed to remove the preset file:</p><p><i>%1</i></p>"
 msgstr "<p>Вибачте, не вдалося вилучити файл набору:</p><p><i>%1</i></p>"
 
-#: config/qtcurveconfig.cpp:2634 config/qtcurveconfig.cpp:2777
+#: config/qtcurveconfig.cpp:2652 config/qtcurveconfig.cpp:2798
 msgid "*"
 msgstr "*"
 
-#: config/qtcurveconfig.cpp:2647
+#: config/qtcurveconfig.cpp:2665
 msgid "<p>Sorry, failed to load file.</p><p><i>Empty preset name?</i></p>"
 msgstr ""
 "<p>Вибачте, не вдалося завантажити файл.</p><p><i>Порожня назва набору?</i></"
 "p>"
 
-#: config/qtcurveconfig.cpp:2649
+#: config/qtcurveconfig.cpp:2667
 msgid ""
 "<p>Sorry, failed to load file.</p><p><i>Cannot have a preset named \"%1\"</"
 "i></p>"
@@ -957,12 +942,11 @@ msgstr ""
 "<p>Вибачте, не вдалося завантажити файл.</p><p><i>Назва набору «%1» є "
 "неприпустимою</i></p>"
 
-#: config/qtcurveconfig.cpp:2661
-#| msgid "Sorry, failed to load file."
+#: config/qtcurveconfig.cpp:2679
 msgid "Sorry, failed to open compressed file."
 msgstr "Вибачте, не вдалося відкрити стиснений файл."
 
-#: config/qtcurveconfig.cpp:2682
+#: config/qtcurveconfig.cpp:2700
 msgid ""
 "Invalid compressed settings file.\n"
 "(Could not locate settings file.)"
@@ -970,7 +954,7 @@ msgstr ""
 "Некоректний стиснений файл параметрів.\n"
 "(Не вдалося виявити файл параметрів.)"
 
-#: config/qtcurveconfig.cpp:2685
+#: config/qtcurveconfig.cpp:2703
 msgid ""
 "Invalid compressed settings file.\n"
 "(Could not list ZIP contents.)"
@@ -978,15 +962,15 @@ msgstr ""
 "Некоректний стиснений файл параметрів.\n"
 "(Не вдалося побудувати список вмісту ZIP.)"
 
-#: config/qtcurveconfig.cpp:2693
+#: config/qtcurveconfig.cpp:2711
 msgid "Import Preset"
 msgstr "Імпортувати набір"
 
-#: config/qtcurveconfig.cpp:2747
+#: config/qtcurveconfig.cpp:2768
 msgid "Sorry, failed to load file."
 msgstr "Вибачте, не вдалося завантажити файл."
 
-#: config/qtcurveconfig.cpp:2759
+#: config/qtcurveconfig.cpp:2780
 msgid ""
 "<p>In which format would you like to export the QtCurve settings?"
 "<ul><li><i>QtCurve settings file</i> - a file to be imported via this config "
@@ -998,19 +982,19 @@ msgstr ""
 "діалогового вікна налаштувань.</li><li><i>Окрема тема</i> — стиль, який "
 "користувач може вибрати за допомогою панелі стилів KDE.</li></ul></p>"
 
-#: config/qtcurveconfig.cpp:2764
+#: config/qtcurveconfig.cpp:2785
 msgid "Export Settings"
 msgstr "Параметри експорту"
 
-#: config/qtcurveconfig.cpp:2765
+#: config/qtcurveconfig.cpp:2786
 msgid "QtCurve Settings File"
 msgstr "Файл параметрів QtCurve"
 
-#: config/qtcurveconfig.cpp:2765
+#: config/qtcurveconfig.cpp:2786
 msgid "Standalone Theme"
 msgstr "Окрема тема"
 
-#: config/qtcurveconfig.cpp:2852
+#: config/qtcurveconfig.cpp:2878
 msgid ""
 "Could not write to file:\n"
 "%1"
@@ -1073,7 +1057,6 @@ msgid "Oversized"
 msgstr "Найбільший"
 
 #: kwinconfig/qtcurvekwinconfig.cpp:57
-#| msgid "Shadows"
 msgid "Shadow"
 msgstr "Тінь"
 
@@ -1109,25 +1092,23 @@ msgstr "Вмикання/Вимикання смужки меню"
 msgid "Toggle Statusbar"
 msgstr "Увімкнути/Вимкнути смужку стану"
 
-#: kwin/qtcurvetogglebutton.cpp:155
+#: kwin/qtcurvetogglebutton.cpp:156
 msgid "M"
 msgstr "M"
 
-#: kwin/qtcurvetogglebutton.cpp:155
+#: kwin/qtcurvetogglebutton.cpp:156
 msgid "S"
 msgstr "S"
 
 #. i18n: file: config/imageproperties.ui:14
 #. i18n: ectx: property (windowTitle), widget (QWidget, ImageProperties)
 #: po/rc.cpp:3 rc.cpp:3
-#| msgid "Form1"
 msgid "Form"
 msgstr "Форма"
 
 #. i18n: file: config/imageproperties.ui:20
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: po/rc.cpp:6 rc.cpp:6
-#| msgid "Fill"
 msgid "File:"
 msgstr "Файл:"
 
@@ -1140,7 +1121,6 @@ msgstr "Масштаб:"
 #. i18n: file: config/imageproperties.ui:52
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: po/rc.cpp:12 rc.cpp:12
-#| msgid "px"
 msgid "x"
 msgstr "x"
 
@@ -1159,7 +1139,6 @@ msgstr "Позиція:"
 #. i18n: file: config/imageproperties.ui:76
 #. i18n: ectx: property (text), widget (QLabel, onBorderLabel)
 #: po/rc.cpp:18 rc.cpp:18
-#| msgid "No inner border"
 msgid "On window border:"
 msgstr "На межі вікна:"
 
@@ -1242,14 +1221,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:144
 #. i18n: ectx: property (toolTip), widget (KPushButton, saveButton)
 #: po/rc.cpp:40 rc.cpp:40
-#| msgid "Save the current settings to be retrieved later."
 msgid "<p>Save the current settings to be retrieved later.</p>"
 msgstr "<p>Зберегти поточні параметри для подальшого використання.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:151
 #. i18n: ectx: property (toolTip), widget (KPushButton, deleteButton)
 #: po/rc.cpp:43 rc.cpp:43
-#| msgid "Delete a previously stored setting."
 msgid "<p>Delete a previously stored setting.</p>"
 msgstr "<p>Вилучити збережені раніше параметри.</p>"
 
@@ -1266,23 +1243,20 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:165
 #. i18n: ectx: property (toolTip), widget (KPushButton, exportButton)
 #: po/rc.cpp:49 rc.cpp:49
-#| msgid ""
-#| "Export the currently defined settings to a file, so that these may be "
-#| "shared with others."
 msgid ""
 "<p>Export the currently defined settings to a file, so that these may be "
 "shared with others.</p>"
 msgstr ""
-"<p>Експортувати поточні визначені параметри до файла так, щоб ними можна було "
-"поділитися з іншими користувачами.</p>"
+"<p>Експортувати поточні визначені параметри до файла так, щоб ними можна "
+"було поділитися з іншими користувачами.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:183
 #. i18n: ectx: property (title), widget (QGroupBox, previewGroupBox)
-#. i18n: file: config/qtcurveconfigbase.ui:4210
+#. i18n: file: config/qtcurveconfigbase.ui:4207
 #. i18n: ectx: property (title), widget (QGroupBox, gradPreviewBox)
 #. i18n: file: config/qtcurveconfigbase.ui:183
 #. i18n: ectx: property (title), widget (QGroupBox, previewGroupBox)
-#. i18n: file: config/qtcurveconfigbase.ui:4210
+#. i18n: file: config/qtcurveconfigbase.ui:4207
 #. i18n: ectx: property (title), widget (QGroupBox, gradPreviewBox)
 #: po/rc.cpp:52 po/rc.cpp:1548 rc.cpp:52 rc.cpp:1548
 msgid "Preview"
@@ -1312,9 +1286,6 @@ msgstr "Вигляд:"
 #. i18n: file: config/qtcurveconfigbase.ui:248
 #. i18n: ectx: property (toolTip), widget (QComboBox, appearance)
 #: po/rc.cpp:61 rc.cpp:61
-#| msgid ""
-#| "The setting here affects the general appearance - and will be applied to "
-#| "buttons, combo boxes, and spin buttons."
 msgid ""
 "<p>The setting here affects the general appearance - and will be applied to "
 "buttons, combo boxes, and spin buttons.</p>"
@@ -1371,7 +1342,6 @@ msgstr "…"
 #. i18n: file: config/qtcurveconfigbase.ui:280
 #. i18n: ectx: property (toolTip), widget (QComboBox, bgndGrad)
 #: po/rc.cpp:73 rc.cpp:73
-#| msgid "Control the orientation of the background gradient."
 msgid "<p>Control the orientation of the background gradient.</p>"
 msgstr "<p>Керування орієнтацією градієнта тла.</p>"
 
@@ -1399,8 +1369,8 @@ msgstr ""
 "<p>За допомогою цього пункту можна додати зображення тла у верхню праву "
 "частину діалогових та звичайних вікон.\n"
 "            <ul><li>Немає — без зображення</li><li>Кільця з рамкою — подібні "
-"до кілець «Air» кільця з рамками</li><li>Звичайні кільця — кільця, подібні до "
-"кілець «Air», але без рамок.</li><li>Квадратні кільця — 3 простих "
+"до кілець «Air» кільця з рамками</li><li>Звичайні кільця — кільця, подібні "
+"до кілець «Air», але без рамок.</li><li>Квадратні кільця — 3 простих "
 "заокруглених квадрати.</li></ul></p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:313
@@ -1412,8 +1382,6 @@ msgstr "Вигляд натиснутих:"
 #. i18n: file: config/qtcurveconfigbase.ui:320
 #. i18n: ectx: property (toolTip), widget (QComboBox, sunkenAppearance)
 #: po/rc.cpp:89 rc.cpp:89
-#| msgid ""
-#| "Define the gradient to be used for sunken widgets - e.g. pressed buttons."
 msgid ""
 "<p>Define the gradient to be used for sunken widgets - e.g. pressed buttons."
 "</p>"
@@ -1436,7 +1404,6 @@ msgstr "Ефект кнопок:"
 #. i18n: file: config/qtcurveconfigbase.ui:334
 #. i18n: ectx: property (toolTip), widget (QComboBox, buttonEffect)
 #: po/rc.cpp:95 rc.cpp:95
-#| msgid "Control what effect should be applied to buttons, combo boxes, etc."
 msgid ""
 "<p>Control what effect should be applied to buttons, combo boxes, etc.</p>"
 msgstr ""
@@ -1445,7 +1412,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:341
 #. i18n: ectx: property (toolTip), widget (QCheckBox, thin_buttons)
 #: po/rc.cpp:98 rc.cpp:98
-#| msgid "Make buttons, and other widgets, slightly thinner."
 msgid "<p>Make buttons, and other widgets, slightly thinner.</p>"
 msgstr "<p>Зробити кнопки та інші віджети трохи тоншими.</p>"
 
@@ -1458,10 +1424,6 @@ msgstr "Тонші кнопки"
 #. i18n: file: config/qtcurveconfigbase.ui:351
 #. i18n: ectx: property (toolTip), widget (QCheckBox, etchEntry)
 #: po/rc.cpp:104 rc.cpp:104
-#| msgid ""
-#| "When the 'Button effect' is set to etched or shadowed, then this option "
-#| "controls whether line-edits and scrollviews (such as listviews and "
-#| "treeviews) should have an etched look."
 msgid ""
 "<p>When the 'Button effect' is set to etched or shadowed, then this option "
 "controls whether line-edits and scrollviews (such as listviews and "
@@ -1487,12 +1449,10 @@ msgstr "Рамка фокусування:"
 #. i18n: file: config/qtcurveconfigbase.ui:368
 #. i18n: ectx: property (toolTip), widget (QComboBox, focus)
 #: po/rc.cpp:113 rc.cpp:113
-#| msgid "Controls how QtCurve indicates that a widget has keyboard focus."
 msgid "<p>Controls how QtCurve indicates that a widget has keyboard focus.</p>"
 msgstr ""
 "<p>Визначає спосіб, у який QtCurve позначає віджет, у який спрямовуються "
-"дані, "
-"отримані з клавіатури.</p>"
+"дані, отримані з клавіатури.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:375
 #. i18n: ectx: property (text), widget (QLabel, label_tt)
@@ -1503,16 +1463,12 @@ msgstr "Підказки:"
 #. i18n: file: config/qtcurveconfigbase.ui:382
 #. i18n: ectx: property (toolTip), widget (QComboBox, tooltipAppearance)
 #: po/rc.cpp:119 rc.cpp:119
-#| msgid "Control the orientation of the background gradient."
 msgid "<p>Controls the appearance of tooltip backgrounds.</p>"
 msgstr "<p>Керування виглядом тла підказок.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:398
 #. i18n: ectx: property (toolTip), widget (QCheckBox, vArrows)
 #: po/rc.cpp:122 rc.cpp:122
-#| msgid ""
-#| "QtCurve supports 2 arrows types; plain (i.e. triangular) and the more "
-#| "modern looking 'V' style arrows."
 msgid ""
 "<p>QtCurve supports 2 arrows types; plain (i.e. triangular) and the more "
 "modern looking 'V' style arrows.</p>"
@@ -1548,7 +1504,6 @@ msgstr "Стандартні кнопки для бічних панелей"
 #. i18n: file: config/qtcurveconfigbase.ui:418
 #. i18n: ectx: property (toolTip), widget (QCheckBox, darkerBorders)
 #: po/rc.cpp:134 rc.cpp:134
-#| msgid "Darkens the borders of frames, buttons, etc."
 msgid "<p>Darkens the borders of frames, buttons, etc.</p>"
 msgstr "<p>Затемнити рамки, кнопки тощо.</p>"
 
@@ -1561,15 +1516,12 @@ msgstr "Темніші рамки"
 #. i18n: file: config/qtcurveconfigbase.ui:428
 #. i18n: ectx: property (toolTip), widget (QCheckBox, fadeLines)
 #: po/rc.cpp:140 rc.cpp:140
-#| msgid ""
-#| "Controls whether horizontal and vertical lines should be drawn with "
-#| "fading ends."
 msgid ""
 "<p>Controls whether horizontal and vertical lines should be drawn with "
 "fading ends.</p>"
 msgstr ""
-"<p>Визначає, чи слід притлумлювати кінці горизонтальних та вертикальних ліній."
-"</p>"
+"<p>Визначає, чи слід притлумлювати кінці горизонтальних та вертикальних "
+"ліній.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:431
 #. i18n: ectx: property (text), widget (QCheckBox, fadeLines)
@@ -1580,9 +1532,6 @@ msgstr "Притлумлювати лінії"
 #. i18n: file: config/qtcurveconfigbase.ui:438
 #. i18n: ectx: property (toolTip), widget (QCheckBox, thin_frames)
 #: po/rc.cpp:146 rc.cpp:146
-#| msgid ""
-#| "Controls whether horizontal and vertical lines should be drawn with "
-#| "fading ends."
 msgid ""
 "<p>Controls whether the internal 3d part of frames, etc, should be drawn.</p>"
 msgstr ""
@@ -1610,9 +1559,6 @@ msgstr "Загальні параметри:"
 #. i18n: file: config/qtcurveconfigbase.ui:469
 #. i18n: ectx: property (toolTip), widget (QComboBox, round)
 #: po/rc.cpp:158 rc.cpp:158
-#| msgid ""
-#| "Set how 'rounded' widgets can be. The 'max' round setting only applies to "
-#| "buttons."
 msgid ""
 "<p>Set how 'rounded' widgets can be. The 'max' round setting only applies to "
 "buttons.</p>"
@@ -1629,9 +1575,6 @@ msgstr "Не заокруглювати:"
 #. i18n: file: config/qtcurveconfigbase.ui:483
 #. i18n: ectx: property (toolTip), widget (QCheckBox, squareEntry)
 #: po/rc.cpp:164 rc.cpp:164
-#| msgid ""
-#| "Controls whether text entry fields should respect the general round "
-#| "setting, or always be square."
 msgid ""
 "<p>Controls whether text entry fields should respect the general round "
 "setting, or always be square.</p>"
@@ -1648,28 +1591,22 @@ msgstr "Поля записів"
 #. i18n: file: config/qtcurveconfigbase.ui:493
 #. i18n: ectx: property (toolTip), widget (QCheckBox, squareProgress)
 #: po/rc.cpp:170 rc.cpp:170
-#| msgid ""
-#| "Controls whether progress bars should respect the general round setting, "
-#| "or always be square."
 msgid ""
 "<p>Controls whether progress bars should respect the general round setting, "
 "or always be square.</p>"
 msgstr ""
-"<p>Визначає, слід враховувати при малюванні смужок поступу загальні параметри "
-"заокруглення чи завжди малювати прямокутні кути.</p>"
+"<p>Визначає, слід враховувати при малюванні смужок поступу загальні "
+"параметри заокруглення чи завжди малювати прямокутні кути.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:503
 #. i18n: ectx: property (toolTip), widget (QCheckBox, squareScrollViews)
 #: po/rc.cpp:176 rc.cpp:176
-#| msgid ""
-#| "Controls whether the frame of a scrollview should respect the general "
-#| "round setting, or always be square."
 msgid ""
 "<p>Controls whether the frame of a scrollview should respect the general "
 "round setting, or always be square.</p>"
 msgstr ""
-"<p>Визначає, слід враховувати при малюванні рамки панелі з гортанням загальні "
-"параметри заокруглення чи завжди малювати прямокутні кути.</p>"
+"<p>Визначає, слід враховувати при малюванні рамки панелі з гортанням "
+"загальні параметри заокруглення чи завжди малювати прямокутні кути.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:506
 #. i18n: ectx: property (text), widget (QCheckBox, squareScrollViews)
@@ -1680,9 +1617,6 @@ msgstr "Вікна з гортанням"
 #. i18n: file: config/qtcurveconfigbase.ui:513
 #. i18n: ectx: property (toolTip), widget (QCheckBox, squareLvSelection)
 #: po/rc.cpp:182 rc.cpp:182
-#| msgid ""
-#| "If enabled, then selected items in listviews and treeviews will be drawn "
-#| "with square edges, regardless of the general round setting."
 msgid ""
 "<p>If enabled, then selected items in listviews and treeviews will be drawn "
 "with square edges, regardless of the general round setting.</p>"
@@ -1700,9 +1634,6 @@ msgstr "Вибір у списках"
 #. i18n: file: config/qtcurveconfigbase.ui:523
 #. i18n: ectx: property (toolTip), widget (QCheckBox, squareTabFrame)
 #: po/rc.cpp:188 rc.cpp:188
-#| msgid ""
-#| "Controls whether the frames of tab widgets should respect the general "
-#| "round setting, or always be square."
 msgid ""
 "<p>Controls whether the frames of tab widgets should respect the general "
 "round setting, or always be square.</p>"
@@ -1719,16 +1650,12 @@ msgstr "Рамки віджетів вкладок"
 #. i18n: file: config/qtcurveconfigbase.ui:533
 #. i18n: ectx: property (toolTip), widget (QCheckBox, squareFrame)
 #: po/rc.cpp:194 rc.cpp:194
-#| msgid ""
-#| "Controls whether general frames should respect the general round setting, "
-#| "or always be square."
 msgid ""
 "<p>Controls whether general frames should respect the general round setting, "
 "or always be square.</p>"
 msgstr ""
 "<p>Визначає, слід враховувати при малюванні загальних рамок загальні "
-"параметри "
-"заокруглення чи завжди малювати прямокутні кути.</p>"
+"параметри заокруглення чи завжди малювати прямокутні кути.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:536
 #. i18n: ectx: property (text), widget (QCheckBox, squareFrame)
@@ -1751,29 +1678,26 @@ msgstr "Повзунки смужок гортання"
 #. i18n: file: config/qtcurveconfigbase.ui:557
 #. i18n: ectx: property (text), widget (QCheckBox, squareWindows)
 #: po/rc.cpp:206 rc.cpp:206
-#| msgid "3D border (light only)"
 msgid "Window borders (will use slight round)"
 msgstr "Межі вікон (використовуватиметься незначне заокруглення)"
 
 #. i18n: file: config/qtcurveconfigbase.ui:564
 #. i18n: ectx: property (text), widget (QCheckBox, squareTooltips)
 #: po/rc.cpp:209 rc.cpp:209
-#| msgid "Toolbars"
 msgid "Tooltips"
 msgstr "Підказки"
 
 #. i18n: file: config/qtcurveconfigbase.ui:587
 #. i18n: ectx: property (text), widget (QLabel, label_47a)
 #: po/rc.cpp:215 rc.cpp:215
-#| msgid "Windows"
 msgid "Windows:"
 msgstr "Вікна:"
 
 #. i18n: file: config/qtcurveconfigbase.ui:594
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, bgndOpacity)
 #: po/rc.cpp:218 rc.cpp:218
-#| msgid "Sets the opacity of window backgrounds when using deskop effects."
-msgid "<p>Sets the opacity of window backgrounds when using deskop effects.</p>"
+msgid ""
+"<p>Sets the opacity of window backgrounds when using deskop effects.</p>"
 msgstr ""
 "<p>Встановлює рівень непрозорості тла вікон у разі використання ефектів "
 "стільниці.</p>"
@@ -1855,15 +1779,14 @@ msgstr "%"
 #. i18n: file: config/qtcurveconfigbase.ui:604
 #. i18n: ectx: property (text), widget (QLabel, label_47x)
 #: po/rc.cpp:225 rc.cpp:225
-#| msgid "Dialog buttons:"
 msgid "Dialogs:"
 msgstr "Діалогові вікна:"
 
 #. i18n: file: config/qtcurveconfigbase.ui:611
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, dlgOpacity)
 #: po/rc.cpp:228 rc.cpp:228
-#| msgid "Sets the opacity of dialog backgrounds when using deskop effects."
-msgid "<p>Sets the opacity of dialog backgrounds when using deskop effects.</p>"
+msgid ""
+"<p>Sets the opacity of dialog backgrounds when using deskop effects.</p>"
 msgstr ""
 "<p>Встановлює рівень непрозорості тла діалогових вікон у разі використання "
 "ефектів стільниці.</p>"
@@ -1871,14 +1794,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:621
 #. i18n: ectx: property (text), widget (QLabel, label_yy)
 #: po/rc.cpp:235 rc.cpp:235
-#| msgid "Popup menus"
 msgid "Pop-up menus:"
 msgstr "Контекстні меню:"
 
 #. i18n: file: config/qtcurveconfigbase.ui:628
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, menuBgndOpacity)
 #: po/rc.cpp:238 rc.cpp:238
-#| msgid "Sets the opacity of popup menus when using deskop effects."
 msgid "<p>Sets the opacity of popup menus when using deskop effects.</p>"
 msgstr ""
 "<p>Встановлює рівень непрозорості контекстних меню у разі використання "
@@ -1895,18 +1816,17 @@ msgid ""
 "<p><b>NOTE:</b><i><b>DON'T</b> use opacity settings when using the compiz "
 "window manager.</i></p>"
 msgstr ""
-"<p><b>ЗАУВАЖЕННЯ.</b> <i>Визначення параметрів прозорості доволі <b>"
-"ризикована справа</b>, воно може призвести до аварійного завершення роботи "
-"деяких програм (здебільшого програм Gtk2). Якщо ви користуєтеся такими "
-"програмами, скористайтеся сторінкою «Програми», щоб вимкнути параметри "
-"прозорості для цих програм.</i></p>\n"
-"<p><b>ЗАУВАЖЕННЯ.</b><i><b>Не</b> використовуйте параметри прозорості разом з "
-"інструментом керування вікнами compiz.</i></p>"
+"<p><b>ЗАУВАЖЕННЯ.</b> <i>Визначення параметрів прозорості доволі "
+"<b>ризикована справа</b>, воно може призвести до аварійного завершення "
+"роботи деяких програм (здебільшого програм Gtk2). Якщо ви користуєтеся "
+"такими програмами, скористайтеся сторінкою «Програми», щоб вимкнути "
+"параметри прозорості для цих програм.</i></p>\n"
+"<p><b>ЗАУВАЖЕННЯ.</b><i><b>Не</b> використовуйте параметри прозорості разом "
+"з інструментом керування вікнами compiz.</i></p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:680
 #. i18n: ectx: property (text), widget (QLabel, label_98)
 #: po/rc.cpp:249 rc.cpp:249
-#| msgid "Frameless"
 msgid "Frame type:"
 msgstr "Тип рамки:"
 
@@ -1928,9 +1848,6 @@ msgstr "Мітка:"
 #. i18n: file: config/qtcurveconfigbase.ui:707
 #. i18n: ectx: property (toolTip), widget (QCheckBox, gbLabel_bold)
 #: po/rc.cpp:262 rc.cpp:262
-#| msgid ""
-#| "Controls whether group-boxes should have an outer frame, or just an "
-#| "emboldened title."
 msgid ""
 "<p>Controls whether group boxes should use a bold for for their title.</p>"
 msgstr ""
@@ -1940,7 +1857,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:710
 #. i18n: ectx: property (text), widget (QCheckBox, gbLabel_bold)
 #: po/rc.cpp:265 rc.cpp:265
-#| msgid "Bold font"
 msgid "Use bold font"
 msgstr "Напівжирний шрифт"
 
@@ -1953,9 +1869,6 @@ msgstr "<p>Визначає вертикальне розташування те
 #. i18n: file: config/qtcurveconfigbase.ui:724
 #. i18n: ectx: property (toolTip), widget (QCheckBox, gbLabel_centred)
 #: po/rc.cpp:271 rc.cpp:271
-#| msgid ""
-#| "Controls whether group-boxes should have an outer frame, or just an "
-#| "emboldened title."
 msgid ""
 "<p>Controls whether a group boxe's label should be centred, or left/right "
 "aligned.</p>"
@@ -1976,9 +1889,6 @@ msgstr "Кнопка:"
 #. i18n: file: config/qtcurveconfigbase.ui:745
 #. i18n: ectx: property (toolTip), widget (QComboBox, comboBtn)
 #: po/rc.cpp:280 rc.cpp:280
-#| msgid ""
-#| "Controls the coloration of the button part (i.e. the part with the arrow) "
-#| "of combo boxes."
 msgid ""
 "<p>Controls the coloration of the button part (i.e. the part with the arrow) "
 "of combo boxes.</p>"
@@ -1995,23 +1905,18 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:945
 #. i18n: ectx: property (toolTip), widget (KColorButton, customSlidersColor)
 #: po/rc.cpp:283 po/rc.cpp:356 rc.cpp:283 rc.cpp:356
-#| msgid "Sets the custom color."
 msgid "<p>Sets the custom color.</p>"
 msgstr "<p>Встановлює нетиповий колір.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:765
 #. i18n: ectx: property (toolTip), widget (QCheckBox, comboSplitter)
 #: po/rc.cpp:286 rc.cpp:286
-#| msgid ""
-#| "This option controls whether a line is drawn near non-editable combo box "
-#| "arrow buttons."
 msgid ""
 "<p>This option controls whether a line is drawn near non-editable combo box "
 "arrow buttons.</p>"
 msgstr ""
 "<p>Цей пункт керує тим, чи буде намальовано лінію поряд зі стрілочками "
-"спадного "
-"списку, у якому не передбачено можливості редагування.</p>"
+"спадного списку, у якому не передбачено можливості редагування.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:768
 #. i18n: ectx: property (text), widget (QCheckBox, comboSplitter)
@@ -2028,16 +1933,12 @@ msgstr "Стиль «придатний для редагування»:"
 #. i18n: file: config/qtcurveconfigbase.ui:782
 #. i18n: ectx: property (toolTip), widget (QCheckBox, unifyCombo)
 #: po/rc.cpp:295 rc.cpp:295
-#| msgid ""
-#| "Controls whether the combo box button, of editable combos, should appear "
-#| "as a button or an arrow within the edit field."
 msgid ""
 "<p>Controls whether the combo box button, of editable combos, should appear "
 "as a button or an arrow within the edit field.</p>"
 msgstr ""
 "<p>Визначає спосіб показу кнопки розкриття спадних списків: звичайна кнопка "
-"чи "
-"стрілочка у полі редагування.</p>"
+"чи стрілочка у полі редагування.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:785
 #. i18n: ectx: property (text), widget (QCheckBox, unifyCombo)
@@ -2054,9 +1955,6 @@ msgstr "Стиль «непридатний для редагування»:"
 #. i18n: file: config/qtcurveconfigbase.ui:799
 #. i18n: ectx: property (toolTip), widget (QCheckBox, gtkComboMenus)
 #: po/rc.cpp:304 rc.cpp:304
-#| msgid ""
-#| "In Gtk, the list that is attached to a combo-box appears in the same "
-#| "style as a popup-menu. KDE4 has the ability to mimic this look."
 msgid ""
 "<p>In Gtk, the list that is attached to a combo-box appears in the same "
 "style as a popup-menu. KDE4 has the ability to mimic this look.</p>"
@@ -2073,9 +1971,6 @@ msgstr "Стиль GTK+"
 #. i18n: file: config/qtcurveconfigbase.ui:809
 #. i18n: ectx: property (toolTip), widget (QCheckBox, doubleGtkComboArrow)
 #: po/rc.cpp:310 rc.cpp:310
-#| msgid ""
-#| "Controls whether a single down arrow, or a up and down arrow, should be "
-#| "drawn on non-editable combo boxes."
 msgid ""
 "<p>Controls whether a single down arrow, or a up and down arrow, should be "
 "drawn on non-editable combo boxes.</p>"
@@ -2092,9 +1987,6 @@ msgstr "Малювати подвійну стрілочку для стилю G
 #. i18n: file: config/qtcurveconfigbase.ui:836
 #. i18n: ectx: property (toolTip), widget (QCheckBox, unifySpinBtns)
 #: po/rc.cpp:316 rc.cpp:316
-#| msgid ""
-#| "Controls whether the up and down buttons should appear as individual "
-#| "buttons, or be combined."
 msgid ""
 "<p>Controls whether the up and down buttons should appear as individual "
 "buttons, or be combined.</p>"
@@ -2111,15 +2003,12 @@ msgstr "Комбінувати обидві кнопки"
 #. i18n: file: config/qtcurveconfigbase.ui:846
 #. i18n: ectx: property (toolTip), widget (QCheckBox, unifySpin)
 #: po/rc.cpp:322 rc.cpp:322
-#| msgid ""
-#| "Controls whether the up and down buttons should appear as buttons, or "
-#| "just arrows within the edit field."
 msgid ""
 "<p>Controls whether the up and down buttons should appear as buttons, or "
 "just arrows within the edit field.</p>"
 msgstr ""
-"<p>Визначає, слід показувати елементи «вгору» і «вниз» як окремі кнопки чи як "
-"прості стрілочки у полі редагування.</p>"
+"<p>Визначає, слід показувати елементи «вгору» і «вниз» як окремі кнопки чи "
+"як прості стрілочки у полі редагування.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:849
 #. i18n: ectx: property (text), widget (QCheckBox, unifySpin)
@@ -2136,7 +2025,6 @@ msgstr "Розмітка:"
 #. i18n: file: config/qtcurveconfigbase.ui:883
 #. i18n: ectx: property (toolTip), widget (QComboBox, splitters)
 #: po/rc.cpp:331 rc.cpp:331
-#| msgid "Sets the marking used to indicate that the widget is a splitter."
 msgid "<p>Sets the marking used to indicate that the widget is a splitter.</p>"
 msgstr "<p>Визначає спосіб позначення того, що віджет є роздільником.</p>"
 
@@ -2155,9 +2043,6 @@ msgstr "Підсвічування тла при наведенні вказів
 #. i18n: file: config/qtcurveconfigbase.ui:897
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, splitterHighlight)
 #: po/rc.cpp:337 rc.cpp:337
-#| msgid ""
-#| "Defines by how much the theme should brighen (or darken) the background "
-#| "of the splitter when the mouse hovers over."
 msgid ""
 "<p>Defines by how much the theme should brighen (or darken) the background "
 "of the splitter when the mouse hovers over.</p>"
@@ -2168,7 +2053,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:918
 #. i18n: ectx: property (toolTip), widget (QComboBox, sliderAppearance)
 #: po/rc.cpp:347 rc.cpp:347
-#| msgid "Controls the appearance of both scrollbar sliders and other sliders."
 msgid ""
 "<p>Controls the appearance of both scrollbar sliders and other sliders.</p>"
 msgstr "<p>Керує виглядом повзунків смужок гортання та інших повзунків.</p>"
@@ -2201,8 +2085,6 @@ msgstr "Розфарбовування:"
 #. i18n: file: config/qtcurveconfigbase.ui:932
 #. i18n: ectx: property (toolTip), widget (QComboBox, shadeSliders)
 #: po/rc.cpp:353 rc.cpp:353
-#| msgid ""
-#| "Controls the color setting of both scrollbar sliders and other sliders."
 msgid ""
 "<p>Controls the color setting of both scrollbar sliders and other sliders.</"
 "p>"
@@ -2212,9 +2094,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:955
 #. i18n: ectx: property (toolTip), widget (QCheckBox, colorSliderMouseOver)
 #: po/rc.cpp:359 rc.cpp:359
-#| msgid ""
-#| "Controls whether the coloration happens all the time, or only when the "
-#| "mouse hovers over the slider."
 msgid ""
 "<p>Controls whether the coloration happens all the time, or only when the "
 "mouse hovers over the slider.</p>"
@@ -2237,9 +2116,6 @@ msgstr "Стиль:"
 #. i18n: file: config/qtcurveconfigbase.ui:972
 #. i18n: ectx: property (toolTip), widget (QComboBox, sliderStyle)
 #: po/rc.cpp:368 rc.cpp:368
-#| msgid ""
-#| "Controls the appearance of standard sliders - i.e. not scrollbar sliders. "
-#| "'Triangular' is very similar to plastik's sliders."
 msgid ""
 "<p>Controls the appearance of standard sliders - i.e. not scrollbar sliders. "
 "'Triangular' is very similar to plastik's sliders.</p>"
@@ -2256,9 +2132,6 @@ msgstr "Заповнення області за повзунком:"
 #. i18n: file: config/qtcurveconfigbase.ui:986
 #. i18n: ectx: property (toolTip), widget (QCheckBox, fillSlider)
 #: po/rc.cpp:374 rc.cpp:374
-#| msgid ""
-#| "Indicates whether the used part of a slider's groove should be filled or "
-#| "not. (Does not affect scrollbar sliders)."
 msgid ""
 "<p>Indicates whether the used part of a slider's groove should be filled or "
 "not. (Does not affect scrollbar sliders).</p>"
@@ -2275,9 +2148,6 @@ msgstr "Заповнення"
 #. i18n: file: config/qtcurveconfigbase.ui:996
 #. i18n: ectx: property (toolTip), widget (QComboBox, sliderFill)
 #: po/rc.cpp:380 rc.cpp:380
-#| msgid ""
-#| "Controls the gradient setting used for the used part of a standard "
-#| "sliders' groove."
 msgid ""
 "<p>Controls the gradient setting used for the used part of a standard "
 "sliders' groove.</p>"
@@ -2287,36 +2157,29 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1003
 #. i18n: ectx: property (text), widget (QLabel, label_30)
 #: po/rc.cpp:383 rc.cpp:383
-#| msgid "Groove appearance:"
 msgid "<p>Groove appearance:</p>"
 msgstr "<p>Вигляд канавки:</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1010
 #. i18n: ectx: property (toolTip), widget (QComboBox, grooveAppearance)
 #: po/rc.cpp:386 rc.cpp:386
-#| msgid ""
-#| "Controls the gradient setting used for both scrollbar sliders, and other "
-#| "sliders."
 msgid ""
 "<p>Controls the gradient setting used for both scrollbar sliders, and other "
 "sliders.</p>"
 msgstr ""
-"<p>Керує параметром градієнта повзунків смужок гортання та інших повзунків.<"
-"/p>"
+"<p>Керує параметром градієнта повзунків смужок гортання та інших повзунків.</"
+"p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1017
 #. i18n: ectx: property (toolTip), widget (QCheckBox, thinSbarGroove)
 #: po/rc.cpp:389 rc.cpp:389
-#| msgid ""
-#| "Controls whether scrollbar slider grooves should be the same thickness as "
-#| "the slider, or be thinner (and more like the groove of a standard slider)."
 msgid ""
 "<p>Controls whether scrollbar slider grooves should be the same thickness as "
 "the slider, or be thinner (and more like the groove of a standard slider).</"
 "p>"
 msgstr ""
-"<p>Визначає, дорівнює ширина канавок повзунків ширині повзунка чи є меншою за "
-"це значення (подібною до канавки фізичних повзунків).</p>"
+"<p>Визначає, дорівнює ширина канавок повзунків ширині повзунка чи є меншою "
+"за це значення (подібною до канавки фізичних повзунків).</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1020
 #. i18n: ectx: property (text), widget (QCheckBox, thinSbarGroove)
@@ -2362,16 +2225,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1049
 #. i18n: ectx: property (toolTip), widget (QCheckBox, flatSbarButtons)
 #: po/rc.cpp:405 rc.cpp:405
-#| msgid ""
-#| "If enabled, then scrollbar buttons are not drawn and only the arrows will "
-#| "appear."
 msgid ""
 "<p>If enabled, then scrollbar buttons are not drawn and only the arrows will "
 "appear.</p>"
 msgstr ""
 "<p>Якщо буде позначено, кнопки смужок гортання не буде показано, "
-"малюватимуться "
-"лише стрілочки.</p>"
+"малюватимуться лише стрілочки.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1059
 #. i18n: ectx: property (text), widget (QLabel, label_32)
@@ -2382,9 +2241,6 @@ msgstr "Тло:"
 #. i18n: file: config/qtcurveconfigbase.ui:1066
 #. i18n: ectx: property (toolTip), widget (QComboBox, sbarBgndAppearance)
 #: po/rc.cpp:414 rc.cpp:414
-#| msgid ""
-#| "Configures the background gradient to be used with 'Flat' scrollbar "
-#| "buttons."
 msgid ""
 "<p>Configures the background gradient to be used with 'Flat' scrollbar "
 "buttons.</p>"
@@ -2399,16 +2255,12 @@ msgstr "Регулятор повзунка:"
 #. i18n: file: config/qtcurveconfigbase.ui:1080
 #. i18n: ectx: property (toolTip), widget (QComboBox, sliderThumbs)
 #: po/rc.cpp:420 rc.cpp:420
-#| msgid ""
-#| "Defines what markings should be placed in the center of scrollbar sliders "
-#| "(and plain style sliders)."
 msgid ""
 "<p>Defines what markings should be placed in the center of scrollbar sliders "
 "(and plain style sliders).</p>"
 msgstr ""
 "<p>Визначає позначки, які буде розташовано за центром повзунків смужок "
-"гортання "
-"(та повзунків звичайного стилю).</p>"
+"гортання (та повзунків звичайного стилю).</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1087
 #. i18n: ectx: property (text), widget (QLabel, label_15a)
@@ -2419,15 +2271,14 @@ msgstr "Ширина повзунка:"
 #. i18n: file: config/qtcurveconfigbase.ui:1094
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, sliderWidth)
 #: po/rc.cpp:426 rc.cpp:426
-#| msgid "Controls the width of scrollbar sliders, and plain style sliders."
-msgid "<p>Controls the width of scrollbar sliders, and plain style sliders.</p>"
+msgid ""
+"<p>Controls the width of scrollbar sliders, and plain style sliders.</p>"
 msgstr ""
 "<p>Керує шириною повзунків смужок гортання та повзунків звичайного стилю.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1107
 #. i18n: ectx: property (toolTip), widget (QCheckBox, stripedSbar)
 #: po/rc.cpp:432 rc.cpp:432
-#| msgid "If enabled, a fading stripe will be added."
 msgid "<p>If enabled, a fading stripe will be added.</p>"
 msgstr ""
 "<p>Якщо буде позначено цей пункт, буде додано розмиті на краях стрічки.</p>"
@@ -2441,33 +2292,26 @@ msgstr "Смужка:"
 #. i18n: file: config/qtcurveconfigbase.ui:1131
 #. i18n: ectx: property (toolTip), widget (QComboBox, progressAppearance)
 #: po/rc.cpp:441 rc.cpp:441
-#| msgid ""
-#| "Defines the gradient to be used for the progress part of a progressbar."
 msgid ""
 "<p>Defines the gradient to be used for the progress part of a progressbar.</"
 "p>"
 msgstr ""
-"<p>Визначає градієнт, який буде використано для позначення поступу на смужках "
-"поступу.</p>"
+"<p>Визначає градієнт, який буде використано для позначення поступу на "
+"смужках поступу.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1138
 #. i18n: ectx: property (toolTip), widget (QComboBox, stripedProgress)
 #: po/rc.cpp:444 rc.cpp:444
-#| msgid ""
-#| "Defines the stripe type to be used for the progress part of a progressbar."
 msgid ""
 "<p>Defines the stripe type to be used for the progress part of a progressbar."
 "</p>"
 msgstr ""
 "<p>Визначає тип смужок, який буде використано для позначення поступу на "
-"смужках "
-"поступу.</p>"
+"смужках поступу.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1145
 #. i18n: ectx: property (toolTip), widget (QCheckBox, animatedProgress)
 #: po/rc.cpp:447 rc.cpp:447
-#| msgid ""
-#| "Determines if the sripes on progressbars should be aninmated, or not."
 msgid ""
 "<p>Determines if the sripes on progressbars should be aninmated, or not.</p>"
 msgstr "<p>Визначає, чи слід анімувати смужки на смужках поступу.</p>"
@@ -2481,15 +2325,12 @@ msgstr "Анімація"
 #. i18n: file: config/qtcurveconfigbase.ui:1155
 #. i18n: ectx: property (toolTip), widget (QComboBox, glowProgress)
 #: po/rc.cpp:453 rc.cpp:453
-#| msgid "Add a white 'glow' to progressbars."
 msgid "<p>Add a white 'glow' to progressbars.</p>"
 msgstr "<p>Додати біле «сяйво» смужок поступу.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1168
 #. i18n: ectx: property (toolTip), widget (QCheckBox, fillProgress)
 #: po/rc.cpp:456 rc.cpp:456
-#| msgid ""
-#| "Enable this option to remove the 1 pixel border around the filled element."
 msgid ""
 "<p>Enable this option to remove the 1 pixel border around the filled element."
 "</p>"
@@ -2512,8 +2353,6 @@ msgstr "Виступ:"
 #. i18n: file: config/qtcurveconfigbase.ui:1185
 #. i18n: ectx: property (toolTip), widget (QComboBox, progressGrooveAppearance)
 #: po/rc.cpp:465 rc.cpp:465
-#| msgid ""
-#| "Defines the gradient to be used for the groove part of a progressbar."
 msgid ""
 "<p>Defines the gradient to be used for the groove part of a progressbar.</p>"
 msgstr ""
@@ -2522,7 +2361,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1192
 #. i18n: ectx: property (toolTip), widget (QComboBox, progressGrooveColor)
 #: po/rc.cpp:468 rc.cpp:468
-#| msgid "Defines the color to be used for the groove part of a progressbar."
 msgid ""
 "<p>Defines the color to be used for the groove part of a progressbar.</p>"
 msgstr ""
@@ -2531,9 +2369,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1205
 #. i18n: ectx: property (toolTip), widget (QCheckBox, borderProgress)
 #: po/rc.cpp:471 rc.cpp:471
-#| msgid ""
-#| "Eanble this option to have a border around the progress bar groove and "
-#| "contents."
 msgid ""
 "<p>Enable this option to have a border around the progress bar groove and "
 "contents.</p>"
@@ -2562,15 +2397,12 @@ msgstr "Текст:"
 #. i18n: file: config/qtcurveconfigbase.ui:1236
 #. i18n: ectx: property (toolTip), widget (QRadioButton, boldProgress_false)
 #: po/rc.cpp:480 rc.cpp:480
-#| msgid ""
-#| "If enabled, the text on a progressbar will use the general widget font."
 msgid ""
 "<p>If enabled, the text on a progressbar will use the general widget font.</"
 "p>"
 msgstr ""
 "<p>Якщо позначити цей пункт, для тексту смужки поступу буде використано "
-"типовий "
-"шрифт віджетів.</p>"
+"типовий шрифт віджетів.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1239
 #. i18n: ectx: property (text), widget (QRadioButton, boldProgress_false)
@@ -2581,7 +2413,6 @@ msgstr "Типовий шрифт"
 #. i18n: file: config/qtcurveconfigbase.ui:1246
 #. i18n: ectx: property (toolTip), widget (QRadioButton, boldProgress)
 #: po/rc.cpp:486 rc.cpp:486
-#| msgid "If enabled, the text on a progressbar will use a bold font."
 msgid "<p>If enabled, the text on a progressbar will use a bold font.</p>"
 msgstr ""
 "<p>Якщо позначити цей пункт, для тексту смужки поступу буде використано "
@@ -2602,9 +2433,6 @@ msgstr "Позначати за допомогою ефекту:"
 #. i18n: file: config/qtcurveconfigbase.ui:1275
 #. i18n: ectx: property (toolTip), widget (QComboBox, defBtnIndicator)
 #: po/rc.cpp:495 rc.cpp:495
-#| msgid ""
-#| "Defines the way in which the theme indicates which button is the "
-#| "'default' button."
 msgid ""
 "<p>Defines the way in which the theme indicates which button is the "
 "'default' button.</p>"
@@ -2613,16 +2441,14 @@ msgstr "<p>Визначає спосіб, у який темою познача�
 #. i18n: file: config/qtcurveconfigbase.ui:1282
 #. i18n: ectx: property (toolTip), widget (QCheckBox, embolden)
 #: po/rc.cpp:498 rc.cpp:498
-#| msgid ""
-#| "If enabled, the text of the 'default' button will be drawn twice - the "
-#| "second time will be 1 pixel to the left. This gives it a more 'bold' look."
 msgid ""
 "<p>If enabled, the text of the 'default' button will be drawn twice - the "
 "second time will be 1 pixel to the left. This gives it a more 'bold' look.</"
 "p>"
 msgstr ""
-"<p>Якщо буде позначено, текст «типової» кнопки буде намальовано двічі, другий "
-"раз зсунутим на 1 піксель ліворуч. Це надасть напису «жирного» вигляду.</p>"
+"<p>Якщо буде позначено, текст «типової» кнопки буде намальовано двічі, "
+"другий раз зсунутим на 1 піксель ліворуч. Це надасть напису «жирного» "
+"вигляду.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1285
 #. i18n: ectx: property (text), widget (QCheckBox, embolden)
@@ -2633,9 +2459,6 @@ msgstr "Робити текст жирним"
 #. i18n: file: config/qtcurveconfigbase.ui:1303
 #. i18n: ectx: property (toolTip), widget (QComboBox, coloredMouseOver)
 #: po/rc.cpp:507 rc.cpp:507
-#| msgid ""
-#| "Defines how the theme can use color to indicate which active widget is "
-#| "under the mouse."
 msgid ""
 "<p>Defines how the theme can use color to indicate which active widget is "
 "under the mouse.</p>"
@@ -2647,15 +2470,12 @@ msgstr ""
 #. i18n: ectx: property (toolTip), widget (QLabel, textLabel1_8)
 #: po/rc.cpp:511 rc.cpp:511
 #, no-c-format
-#| msgid ""
-#| "This controls the % that widgets will be highlighted by when the mouse "
-#| "hovers over them."
 msgid ""
 "<p>This controls the % that widgets will be highlighted by when the mouse "
 "hovers over them.</p>"
 msgstr ""
-"<p>Цей пункт визначає підсвічування віджетів під вказівником миші у відсотках."
-"</p>"
+"<p>Цей пункт визначає підсвічування віджетів під вказівником миші у "
+"відсотках.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1313
 #. i18n: ectx: property (text), widget (QLabel, textLabel1_8)
@@ -2666,9 +2486,6 @@ msgstr "Підсвічувати на:"
 #. i18n: file: config/qtcurveconfigbase.ui:1323
 #. i18n: ectx: property (toolTip), widget (QSpinBox, highlightFactor)
 #: po/rc.cpp:517 rc.cpp:517
-#| msgid ""
-#| "Defines by how much the theme should brighen (or darken) the color of the "
-#| "active widget under the mouse."
 msgid ""
 "<p>Defines by how much the theme should brighen (or darken) the color of the "
 "active widget under the mouse.</p>"
@@ -2685,8 +2502,6 @@ msgstr "Вигляд заголовка:"
 #. i18n: file: config/qtcurveconfigbase.ui:1347
 #. i18n: ectx: property (toolTip), widget (QComboBox, lvAppearance)
 #: po/rc.cpp:527 rc.cpp:527
-#| msgid ""
-#| "Defines the gradient to be used in the header of listviews and treeviews."
 msgid ""
 "<p>Defines the gradient to be used in the header of listviews and treeviews."
 "</p>"
@@ -2697,16 +2512,13 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1360
 #. i18n: ectx: property (toolTip), widget (QCheckBox, lvButton)
 #: po/rc.cpp:530 rc.cpp:530
-#| msgid ""
-#| "If enabled, headers will be drawn using the button color, otherwise the "
-#| "standard window background color will be used."
 msgid ""
 "<p>If enabled, headers will be drawn using the button color, otherwise the "
 "standard window background color will be used.</p>"
 msgstr ""
-"<p>Якщо буде позначено цей пункт, заголовки буде намальовано кольором кнопок. "
-"Якщо пункт не буде позначено, буде використано стандартний колір тла вікон.<"
-"/p>"
+"<p>Якщо буде позначено цей пункт, заголовки буде намальовано кольором "
+"кнопок. Якщо пункт не буде позначено, буде використано стандартний колір тла "
+"вікон.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1363
 #. i18n: ectx: property (text), widget (QCheckBox, lvButton)
@@ -2723,16 +2535,12 @@ msgstr "Тінь заголовка стовпчика-ключа впорядк
 #. i18n: file: config/qtcurveconfigbase.ui:1377
 #. i18n: ectx: property (toolTip), widget (QComboBox, sortedLv)
 #: po/rc.cpp:539 rc.cpp:539
-#| msgid ""
-#| "Controls the coloration to be applied to the header of the currently "
-#| "sorted column."
 msgid ""
 "<p>Controls the coloration to be applied to the header of the currently "
 "sorted column."
 msgstr ""
 "<p>Керує розфарбуванням заголовка стовпчика, за яким відбувається "
-"впорядкування "
-"списків."
+"впорядкування списків."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1393
 #. i18n: ectx: property (toolTip), widget (KColorButton, customSortedLvColor)
@@ -2756,7 +2564,6 @@ msgstr ""
 #. i18n: ectx: property (toolTip), widget (KColorButton, customMenuStripeColor)
 #: po/rc.cpp:542 po/rc.cpp:727 po/rc.cpp:788 po/rc.cpp:1049 po/rc.cpp:1195
 #: rc.cpp:542 rc.cpp:727 rc.cpp:788 rc.cpp:1049 rc.cpp:1195
-#| msgid "Sets the custom color."
 msgid "<p>Sets the custom color."
 msgstr "<p>Встановлює нетиповий колір."
 
@@ -2769,10 +2576,6 @@ msgstr "Рядків:"
 #. i18n: file: config/qtcurveconfigbase.ui:1407
 #. i18n: ectx: property (toolTip), widget (QCheckBox, forceAlternateLvCols)
 #: po/rc.cpp:548 rc.cpp:548
-#| msgid ""
-#| "If this is enabled, QtCurve will attempt to make all listviews and "
-#| "treeviews have alternating row colors - regardless of whether the "
-#| "application author has enabled this or not."
 msgid ""
 "<p>If this is enabled, QtCurve will attempt to make all listviews and "
 "treeviews have alternating row colors - regardless of whether the "
@@ -2797,7 +2600,6 @@ msgstr "Вигляд позначеного:"
 #. i18n: file: config/qtcurveconfigbase.ui:1427
 #. i18n: ectx: property (toolTip), widget (QComboBox, selectionAppearance)
 #: po/rc.cpp:557 rc.cpp:557
-#| msgid "Defines the gradient to be used when selecting items."
 msgid "<p>Defines the gradient to be used when selecting items."
 msgstr ""
 "<p>Визначає градієнт, який буде використано під час позначення елементів."
@@ -2805,9 +2607,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1434
 #. i18n: ectx: property (toolTip), widget (QCheckBox, borderSelection)
 #: po/rc.cpp:560 rc.cpp:560
-#| msgid ""
-#| "If enabled, then selected items in listviews and treeviews will be drawn "
-#| "with bordered edges - but only if they are set to be rounded as well."
 msgid ""
 "<p>If enabled, then selected items in listviews and treeviews will be drawn "
 "with bordered edges - but only if they are set to be rounded as well."
@@ -2825,7 +2624,6 @@ msgstr "Лінії між елементами:"
 #. i18n: file: config/qtcurveconfigbase.ui:1451
 #. i18n: ectx: property (toolTip), widget (QCheckBox, lvLines)
 #: po/rc.cpp:569 rc.cpp:569
-#| msgid "Controls the style of lines drawn between items in a treeview."
 msgid "<p>Controls the style of lines drawn between items in a treeview."
 msgstr ""
 "<p>Керує стилем ліній, які буде намальовано між пунктами у ієрархічних "
@@ -2834,9 +2632,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1465
 #. i18n: ectx: property (toolTip), widget (QCheckBox, gtkScrollViews)
 #: po/rc.cpp:575 rc.cpp:575
-#| msgid ""
-#| "Controls whether the scrollbars should be detached from the scrollview (i."
-#| "e. on the outside), or embedded within the scrollview."
 msgid ""
 "<p>Controls whether the scrollbars should be detached from the scrollview (i."
 "e. on the outside), or embedded within the scrollview."
@@ -2853,16 +2648,12 @@ msgstr "Смужки гортання зовні"
 #. i18n: file: config/qtcurveconfigbase.ui:1475
 #. i18n: ectx: property (toolTip), widget (QCheckBox, highlightScrollViews)
 #: po/rc.cpp:581 rc.cpp:581
-#| msgid ""
-#| "Controls whether the active scrollview should be highlighted as per line-"
-#| "edits."
 msgid ""
 "<p>Controls whether the active scrollview should be highlighted as per line-"
 "edits."
 msgstr ""
 "<p>Визначає, чи буде підсвічено активну панель з гортанням, подібно до "
-"панелей "
-"з порядковим редагуванням."
+"панелей з порядковим редагуванням."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1478
 #. i18n: ectx: property (text), widget (QCheckBox, highlightScrollViews)
@@ -2879,7 +2670,6 @@ msgstr "Вигляд активної вкладки:"
 #. i18n: file: config/qtcurveconfigbase.ui:1509
 #. i18n: ectx: property (toolTip), widget (QComboBox, activeTabAppearance)
 #: po/rc.cpp:590 rc.cpp:590
-#| msgid "Defines the gradient to be used for the currently active tab."
 msgid "<p>Defines the gradient to be used for the currently active tab."
 msgstr ""
 "<p>Визначає градієнт, який буде використано для поточної активної вкладки."
@@ -2887,16 +2677,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:1516
 #. i18n: ectx: property (toolTip), widget (QCheckBox, highlightTab)
 #: po/rc.cpp:593 rc.cpp:593
-#| msgid ""
-#| "This will cause a colored stripe to be drawn at the top/bottom of the "
-#| "current tab."
 msgid ""
 "<p>This will cause a colored stripe to be drawn at the top/bottom of the "
 "current tab."
 msgstr ""
 "<p>За допомогою цього пункту можна наказати системі малювати кольорову "
-"стрічку "
-"у верхній/нижній частині поточної вкладки."
+"стрічку у верхній/нижній частині поточної вкладки."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1519
 #. i18n: ectx: property (text), widget (QCheckBox, highlightTab)
@@ -2907,17 +2693,13 @@ msgstr "Підсвічування"
 #. i18n: file: config/qtcurveconfigbase.ui:1526
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, colorSelTab)
 #: po/rc.cpp:599 rc.cpp:599
-#| msgid ""
-#| "Controls the amount of tinting applied to the active tab. The active tab "
-#| "is tinted by blending the 'highlight' color with the background color."
 msgid ""
 "<p>Controls the amount of tinting applied to the active tab. The active tab "
 "is tinted by blending the 'highlight' color with the background color."
 msgstr ""
 "<p>Визначає степінь зміни відтінку, яку слід застосовувати до активної "
-"вкладки. "
-"Активну вкладку буде розфарбовано у відтінок, отриманий змішуванням кольору "
-"підсвічування з кольором тла."
+"вкладки. Активну вкладку буде розфарбовано у відтінок, отриманий змішуванням "
+"кольору підсвічування з кольором тла."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1532
 #. i18n: ectx: property (prefix), widget (KIntNumInput, colorSelTab)
@@ -2934,7 +2716,6 @@ msgstr "Вигляд неактивної вкладки:"
 #. i18n: file: config/qtcurveconfigbase.ui:1546
 #. i18n: ectx: property (toolTip), widget (QComboBox, tabAppearance)
 #: po/rc.cpp:612 rc.cpp:612
-#| msgid "Defines the gradient to be used for the inactive tabs."
 msgid "<p>Defines the gradient to be used for the inactive tabs."
 msgstr "<p>Визначає градієнт, який буде використано для неактивної вкладки."
 
@@ -2947,19 +2728,14 @@ msgstr "При наведення вказівника:"
 #. i18n: file: config/qtcurveconfigbase.ui:1560
 #. i18n: ectx: property (toolTip), widget (QComboBox, tabMouseOver)
 #: po/rc.cpp:618 rc.cpp:618
-#| msgid ""
-#| "Controls the mouse-over effect applied to the tab currently under the "
-#| "mouse. Note, if 'glow' is selected, then 'Round tabs' will be set to "
-#| "'All' - and this creates a 2 pixel gap between tabs."
 msgid ""
 "<p>Controls the mouse-over effect applied to the tab currently under the "
 "mouse. Note, if 'glow' is selected, then 'Round tabs' will be set to 'All' - "
 "and this creates a 2 pixel gap between tabs."
 msgstr ""
 "<p>Визначає ефект при наведені вказівника миші. Зауважте, що якщо буде "
-"вибрано "
-"варіант «сяйво», значення параметра «Заокруглення вкладок» буде змінено на "
-"«Всі», а це додасть проміжок у 2 пікселі між вкладками."
+"вибрано варіант «сяйво», значення параметра «Заокруглення вкладок» буде "
+"змінено на «Всі», а це додасть проміжок у 2 пікселі між вкладками."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1567
 #. i18n: ectx: property (text), widget (QLabel, label_49)
@@ -2970,7 +2746,6 @@ msgstr "Змінити тло на:"
 #. i18n: file: config/qtcurveconfigbase.ui:1574
 #. i18n: ectx: property (toolTip), widget (KIntSpinBox, tabBgnd)
 #: po/rc.cpp:624 rc.cpp:624
-#| msgid "Lightens, or darkens, the background of the whole tab widget."
 msgid "<p>Lightens, or darkens, the background of the whole tab widget."
 msgstr "<p>Підсвічувати або затемнювати тло всього віджета вкладки."
 
@@ -2983,16 +2758,13 @@ msgstr "Округлення вкладок:"
 #. i18n: file: config/qtcurveconfigbase.ui:1618
 #. i18n: ectx: property (toolTip), widget (QRadioButton, roundAllTabs_false)
 #: po/rc.cpp:634 rc.cpp:634
-#| msgid ""
-#| "If enabled, only the active tab is rounded - and all the inactive tabs "
-#| "appear closer together."
 msgid ""
 "<p>If enabled, only the active tab is rounded - and all the inactive tabs "
 "appear closer together."
 msgstr ""
-"<p>Якщо буде позначено цей пункт, заокруглено буде лише краї активної вкладки."
-" "
-"Таким чином, всі неактивні вкладки буде показано ближче одна до одної."
+"<p>Якщо буде позначено цей пункт, заокруглено буде лише краї активної "
+"вкладки. Таким чином, всі неактивні вкладки буде показано ближче одна до "
+"одної."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1621
 #. i18n: ectx: property (text), widget (QRadioButton, roundAllTabs_false)
@@ -3003,17 +2775,13 @@ msgstr "Лише позначені"
 #. i18n: file: config/qtcurveconfigbase.ui:1631
 #. i18n: ectx: property (toolTip), widget (QRadioButton, roundAllTabs)
 #: po/rc.cpp:640 rc.cpp:640
-#| msgid ""
-#| "If enabled, all tabs are rounded - there will be a 2 pixel gap between "
-#| "each tab if 'glow' is selected as the general colored mouse over style."
 msgid ""
 "<p>If enabled, all tabs are rounded - there will be a 2 pixel gap between "
 "each tab if 'glow' is selected as the general colored mouse over style."
 msgstr ""
 "<p>Якщо позначити цей пункт, заокруглено буде кути всіх вкладок. Між "
-"вкладками "
-"буде додано проміжки у 2 пікселі, якщо для загального стилю розфарбування "
-"при наведенні миші було вибрано «сяйво»."
+"вкладками буде додано проміжки у 2 пікселі, якщо для загального стилю "
+"розфарбування при наведенні миші було вибрано «сяйво»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1634
 #. i18n: ectx: property (text), widget (QRadioButton, roundAllTabs)
@@ -3036,10 +2804,6 @@ msgstr "Рамка:"
 #. i18n: file: config/qtcurveconfigbase.ui:1678
 #. i18n: ectx: property (toolTip), widget (QRadioButton, borderTab_false)
 #: po/rc.cpp:649 rc.cpp:649
-#| msgid ""
-#| "If enabled, the tabs and the tab widget will have a 3D style border - "
-#| "with a light shade on the top and left, and a dark shade on the bottom "
-#| "and right."
 msgid ""
 "<p>If enabled, the tabs and the tab widget will have a 3D style border - "
 "with a light shade on the top and left, and a dark shade on the bottom and "
@@ -3058,16 +2822,12 @@ msgstr "Стандартний"
 #. i18n: file: config/qtcurveconfigbase.ui:1688
 #. i18n: ectx: property (toolTip), widget (QRadioButton, borderTab)
 #: po/rc.cpp:655 rc.cpp:655
-#| msgid ""
-#| "If enabled, the tabs and tab widget will have an outer dak border, and a "
-#| "light inner border."
 msgid ""
 "<p>If enabled, the tabs and tab widget will have an outer dak border, and a "
 "light inner border."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, на вкладках і віджетах вкладок буде "
-"показано "
-"зовнішню темну межу та внутрішню світлу."
+"показано зовнішню темну межу та внутрішню світлу."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1704
 #. i18n: ectx: property (text), widget (QLabel, label_62)
@@ -3078,8 +2838,6 @@ msgstr "Внутрішня рамка неактивної вкладки:"
 #. i18n: file: config/qtcurveconfigbase.ui:1735
 #. i18n: ectx: property (toolTip), widget (QRadioButton, borderInactiveTab)
 #: po/rc.cpp:664 rc.cpp:664
-#| msgid ""
-#| "If enabled, inactive tabs will have a border as per the 'Border' setting."
 msgid ""
 "<p>If enabled, inactive tabs will have a border as per the 'Border' setting."
 msgstr ""
@@ -3095,7 +2853,6 @@ msgstr "Така сама, як активна вкладки"
 #. i18n: file: config/qtcurveconfigbase.ui:1748
 #. i18n: ectx: property (toolTip), widget (QRadioButton, borderInactiveTab_false)
 #: po/rc.cpp:670 rc.cpp:670
-#| msgid "If enabled, inactive tabs will have no inner border."
 msgid "<p>If enabled, inactive tabs will have no inner border."
 msgstr ""
 "<p>Якщо позначено, не малювати внутрішньої рамки для неактивних вкладок."
@@ -3115,11 +2872,6 @@ msgstr "Тінь від нижніх вкладок:"
 #. i18n: file: config/qtcurveconfigbase.ui:1789
 #. i18n: ectx: property (toolTip), widget (QRadioButton, invertBotTab_false)
 #: po/rc.cpp:679 rc.cpp:679
-#| msgid ""
-#| "If enabled, tabs on the bottom will use the same gradient as tabs on the "
-#| "top. i.e. if the top tabs shades from light to the background color, then "
-#| "the bottom tabs will go from the background color to light - this can "
-#| "sometimes give the appearance that the bottom tabs are sticking out."
 msgid ""
 "<p>If enabled, tabs on the bottom will use the same gradient as tabs on the "
 "top. i.e. if the top tabs shades from light to the background color, then "
@@ -3127,12 +2879,11 @@ msgid ""
 "sometimes give the appearance that the bottom tabs are sticking out."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, для малювання вкладок у нижній частині "
-"вікна "
-"буде використано такий самий градієнт, як і для вкладок у верхній частині "
-"вікна. Тобто, якщо вкладки у верхній частині вікна змінюють колір від "
-"світлого до кольору тла, вкладки у нижній частині вікна змінюватимуть колір "
-"від кольору тла до світлого кольору. Іноді така зміна кольору може створити "
-"враження відокремленості вкладок у нижній частині вікна."
+"вікна буде використано такий самий градієнт, як і для вкладок у верхній "
+"частині вікна. Тобто, якщо вкладки у верхній частині вікна змінюють колір "
+"від світлого до кольору тла, вкладки у нижній частині вікна змінюватимуть "
+"колір від кольору тла до світлого кольору. Іноді така зміна кольору може "
+"створити враження відокремленості вкладок у нижній частині вікна."
 
 #. i18n: file: config/qtcurveconfigbase.ui:1792
 #. i18n: ectx: property (text), widget (QRadioButton, invertBotTab_false)
@@ -3143,18 +2894,13 @@ msgstr "Те саме, що і верхні вкладки"
 #. i18n: file: config/qtcurveconfigbase.ui:1799
 #. i18n: ectx: property (toolTip), widget (QRadioButton, invertBotTab)
 #: po/rc.cpp:685 rc.cpp:685
-#| msgid ""
-#| "If enabled, tabs on the bottom will use the an inverted gradient to tabs "
-#| "on the top. i.e. if the top tabs shades from light to the background "
-#| "color, then  bottom tabs will go from the background color to dark."
 msgid ""
 "<p>If enabled, tabs on the bottom will use the an inverted gradient to tabs "
 "on the top. i.e. if the top tabs shades from light to the background color, "
 "then  bottom tabs will go from the background color to dark."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, для малювання вкладок у нижній частині "
-"вікна "
-"буде використано інвертований відносно вкладок у верхній частині вікна "
+"вікна буде використано інвертований відносно вкладок у верхній частині вікна "
 "градієнт. Тобто, якщо вкладки у верхній частині вікна змінюють колір від "
 "світлого до кольору тла, вкладки у нижній частині вікна змінюватимуть колір "
 "від кольору тла до темного кольору."
@@ -3180,7 +2926,6 @@ msgstr "Вкладки на панелях інструментів:"
 #. i18n: file: config/qtcurveconfigbase.ui:1891
 #. i18n: ectx: property (toolTip), widget (QRadioButton, centerTabText_false)
 #: po/rc.cpp:694 po/rc.cpp:709 rc.cpp:694 rc.cpp:709
-#| msgid "If enabled, tabs that are within toolbars will be drawn as normal."
 msgid "<p>If enabled, tabs that are within toolbars will be drawn as normal."
 msgstr ""
 "<p>Якщо позначено, вкладки на панелях інструментів буде показано як звичайні."
@@ -3200,9 +2945,6 @@ msgstr "Малювати як стандартні вкладки"
 #. i18n: file: config/qtcurveconfigbase.ui:1901
 #. i18n: ectx: property (toolTip), widget (QRadioButton, centerTabText)
 #: po/rc.cpp:700 po/rc.cpp:715 rc.cpp:700 rc.cpp:715
-#| msgid ""
-#| "If enabled, tabs that are within toolbars will be drawn the same as "
-#| "sidebar buttons."
 msgid ""
 "<p>If enabled, tabs that are within toolbars will be drawn the same as "
 "sidebar buttons."
@@ -3231,9 +2973,6 @@ msgstr "Вирівнювання за центром"
 #. i18n: file: config/qtcurveconfigbase.ui:1928
 #. i18n: ectx: property (toolTip), widget (QComboBox, shadeCheckRadio)
 #: po/rc.cpp:724 rc.cpp:724
-#| msgid ""
-#| "Controls the color of the indicator part of a check or radio - ie. the "
-#| "'dot' or 'check' mark."
 msgid ""
 "<p>Controls the color of the indicator part of a check or radio - ie. the "
 "'dot' or 'check' mark."
@@ -3249,9 +2988,6 @@ msgstr "Позначки:"
 #. i18n: file: config/qtcurveconfigbase.ui:1982
 #. i18n: ectx: property (toolTip), widget (QRadioButton, xCheck_false)
 #: po/rc.cpp:733 rc.cpp:733
-#| msgid ""
-#| "If enabled, checkboxes with have a 'tick' to indicate that they are "
-#| "selected."
 msgid ""
 "<p>If enabled, checkboxes with have a 'tick' to indicate that they are "
 "selected."
@@ -3268,9 +3004,6 @@ msgstr "Галочка"
 #. i18n: file: config/qtcurveconfigbase.ui:1995
 #. i18n: ectx: property (toolTip), widget (QRadioButton, xCheck)
 #: po/rc.cpp:739 rc.cpp:739
-#| msgid ""
-#| "If enabled, checkboxes with have a 'cross' (or 'X') to indicate that they "
-#| "are selected."
 msgid ""
 "<p>If enabled, checkboxes with have a 'cross' (or 'X') to indicate that they "
 "are selected."
@@ -3293,9 +3026,6 @@ msgstr "«Точка» варіанта:"
 #. i18n: file: config/qtcurveconfigbase.ui:2039
 #. i18n: ectx: property (toolTip), widget (QRadioButton, smallRadio_false)
 #: po/rc.cpp:748 rc.cpp:748
-#| msgid ""
-#| "If enabled, radio buttons with have a large 'dot' to indicate that they "
-#| "are selected."
 msgid ""
 "<p>If enabled, radio buttons with have a large 'dot' to indicate that they "
 "are selected."
@@ -3306,9 +3036,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:2049
 #. i18n: ectx: property (toolTip), widget (QRadioButton, smallRadio)
 #: po/rc.cpp:754 rc.cpp:754
-#| msgid ""
-#| "If enabled, radio buttons with have a small 'dot' to indicate that they "
-#| "are selected."
 msgid ""
 "<p>If enabled, radio buttons with have a small 'dot' to indicate that they "
 "are selected."
@@ -3325,18 +3052,14 @@ msgstr "Малий"
 #. i18n: file: config/qtcurveconfigbase.ui:2069
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, crHighlight)
 #: po/rc.cpp:763 rc.cpp:763
-#| msgid ""
-#| "Defines by how much the theme should brighen (or darken) the background "
-#| "of the text associated with a checkbox, or radio button, when the mouse "
-#| "hovers over it."
 msgid ""
 "<p>Defines by how much the theme should brighen (or darken) the background "
 "of the text associated with a checkbox, or radio button, when the mouse "
 "hovers over it."
 msgstr ""
-"<p>Визначає степінь, на яку у темі має бути зроблено світлішим (або темнішим) "
-"тло тексту, пов’язано з пунктом позначки або варіанта при наведення "
-"вказівника миші."
+"<p>Визначає степінь, на яку у темі має бути зроблено світлішим (або "
+"темнішим) тло тексту, пов’язано з пунктом позначки або варіанта при "
+"наведення вказівника миші."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2079
 #. i18n: ectx: property (text), widget (QLabel, label_70)
@@ -3347,9 +3070,6 @@ msgstr "Емблема:"
 #. i18n: file: config/qtcurveconfigbase.ui:2086
 #. i18n: ectx: property (toolTip), widget (QCheckBox, crButton)
 #: po/rc.cpp:773 rc.cpp:773
-#| msgid ""
-#| "Controls whether the background of the checkbox, or radio button, should "
-#| "appear sunken like or button like."
 msgid ""
 "<p>Controls whether the background of the checkbox, or radio button, should "
 "appear sunken like or button like."
@@ -3372,16 +3092,12 @@ msgstr "Розмір:"
 #. i18n: file: config/qtcurveconfigbase.ui:2103
 #. i18n: ectx: property (toolTip), widget (QComboBox, crSize)
 #: po/rc.cpp:782 rc.cpp:782
-#| msgid "Configures the size of checkboxes and radio buttons."
 msgid "<p>Configures the size of checkboxes and radio buttons."
 msgstr "<p>Визначає розмір полів для позначок та полів варіантів."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2110
 #. i18n: ectx: property (toolTip), widget (QComboBox, crColor)
 #: po/rc.cpp:785 rc.cpp:785
-#| msgid ""
-#| "Sets the color of selected checkboxes and radio buttons when these are "
-#| "set to 'button like'."
 msgid ""
 "<p>Sets the color of selected checkboxes and radio buttons when these are "
 "set to 'button like'."
@@ -3404,7 +3120,6 @@ msgstr "Вигляд активної:"
 #. i18n: file: config/qtcurveconfigbase.ui:2142
 #. i18n: ectx: property (toolTip), widget (QComboBox, titlebarAppearance)
 #: po/rc.cpp:797 rc.cpp:797
-#| msgid "Controls the gradient applied to the titlebar of active windows."
 msgid "<p>Controls the gradient applied to the titlebar of active windows."
 msgstr ""
 "<p>Керує градієнтом, який буде застосовано до смужки заголовка активного "
@@ -3419,7 +3134,6 @@ msgstr "Вигляд неактивної:"
 #. i18n: file: config/qtcurveconfigbase.ui:2156
 #. i18n: ectx: property (toolTip), widget (QComboBox, inactiveTitlebarAppearance)
 #: po/rc.cpp:803 rc.cpp:803
-#| msgid "Controls the gradient applied to the titlebar of inactive windows."
 msgid "<p>Controls the gradient applied to the titlebar of inactive windows."
 msgstr ""
 "<p>Керує градієнтом, який буде застосовано до смужки заголовка неактивного "
@@ -3434,11 +3148,6 @@ msgstr "Вирівнювання тексту:"
 #. i18n: file: config/qtcurveconfigbase.ui:2170
 #. i18n: ectx: property (toolTip), widget (QComboBox, titlebarAlignment)
 #: po/rc.cpp:809 rc.cpp:809
-#| msgid ""
-#| "Controls the alignment of the titlebar text. 'Center (full width)' means "
-#| "that the text is centered in the middle of the complete titlebar, whereas "
-#| "with 'Center (between controls)' the text is centered between the window "
-#| "controls to the left and right."
 msgid ""
 "<p>Controls the alignment of the titlebar text. 'Center (full width)' means "
 "that the text is centered in the middle of the complete titlebar, whereas "
@@ -3446,11 +3155,10 @@ msgid ""
 "controls to the left and right."
 msgstr ""
 "<p>Визначає вирівнювання тексту смужки заголовка. «Посередині (на повну "
-"ширину)» "
-"означає, що текст буде показано посередині повної довжини смужки заголовка, "
-"а варіант «Посередині (між елементами керування)» означає, що текст буде "
-"показано посередині між елементами керування, розташованими ліворуч і "
-"праворуч."
+"ширину)» означає, що текст буде показано посередині повної довжини смужки "
+"заголовка, а варіант «Посередині (між елементами керування)» означає, що "
+"текст буде показано посередині між елементами керування, розташованими "
+"ліворуч і праворуч."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2177
 #. i18n: ectx: property (text), widget (QLabel, label_74)
@@ -3461,16 +3169,12 @@ msgstr "Ефект тексту/піктограм:"
 #. i18n: file: config/qtcurveconfigbase.ui:2184
 #. i18n: ectx: property (toolTip), widget (QComboBox, titlebarEffect)
 #: po/rc.cpp:815 rc.cpp:815
-#| msgid ""
-#| "Controls the 'effect' applied to the text and icons - shadow, etching, or "
-#| "none."
 msgid ""
 "<p>Controls the 'effect' applied to the text and icons - shadow, etching, or "
 "none."
 msgstr ""
 "<p>Визначає ефект, який буде застосовано до тексту і піктограм: тінь, краї "
-"або "
-"жодного ефекту."
+"або жодного ефекту."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2191
 #. i18n: ectx: property (text), widget (QLabel, label_43)
@@ -3481,10 +3185,6 @@ msgstr "Піктограма програми:"
 #. i18n: file: config/qtcurveconfigbase.ui:2198
 #. i18n: ectx: property (toolTip), widget (QComboBox, titlebarIcon)
 #: po/rc.cpp:821 rc.cpp:821
-#| msgid ""
-#| "Controls where the application's icon should be drawn on the titlebar. If "
-#| "'Place on menu button' is selected, then the icon takes place of the menu "
-#| "button."
 msgid ""
 "<p>Controls where the application's icon should be drawn on the titlebar. If "
 "'Place on menu button' is selected, then the icon takes place of the menu "
@@ -3497,15 +3197,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:2212
 #. i18n: ectx: property (toolTip), widget (QCheckBox, windowBorder_colorTitlebarOnly)
 #: po/rc.cpp:827 rc.cpp:827
-#| msgid ""
-#| "If enabled, only the titlebar, and not the border, of windows will be "
-#| "colored."
 msgid ""
 "<p>If enabled, only the titlebar, and not the border, of windows will be "
 "colored."
 msgstr ""
-"<p>Якщо позначити цей пункт, буде розфарбовано лише смужку заголовка вікон, а "
-"не рамку."
+"<p>Якщо позначити цей пункт, буде розфарбовано лише смужку заголовка вікон, "
+"а не рамку."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2215
 #. i18n: ectx: property (text), widget (QCheckBox, windowBorder_colorTitlebarOnly)
@@ -3516,9 +3213,6 @@ msgstr "Розфарбовувати лише смужку заголовка"
 #. i18n: file: config/qtcurveconfigbase.ui:2222
 #. i18n: ectx: property (toolTip), widget (QCheckBox, windowBorder_blend)
 #: po/rc.cpp:833 rc.cpp:833
-#| msgid ""
-#| "If enabled, the background color will be used as the last part of the "
-#| "titlebar gradient."
 msgid ""
 "<p>If enabled, the background color will be used as the last part of the "
 "titlebar gradient."
@@ -3551,15 +3245,12 @@ msgstr "Заповнити кольором тло смужки заголовк
 #. i18n: file: config/qtcurveconfigbase.ui:2242
 #. i18n: ectx: property (toolTip), widget (QCheckBox, windowBorder_menuColor)
 #: po/rc.cpp:845 rc.cpp:845
-#| msgid ""
-#| "If enabled, the the configured menubar color will be used for windows "
-#| "that have menubars."
 msgid ""
 "<p>If enabled, the the configured menubar color will be used for windows "
 "that have menubars."
 msgstr ""
-"<p>Якщо буде позначено цей пункт, для вікон зі смужками меню буде використано "
-"налаштований колір смужки меню."
+"<p>Якщо буде позначено цей пункт, для вікон зі смужками меню буде "
+"використано налаштований колір смужки меню."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2245
 #. i18n: ectx: property (text), widget (QCheckBox, windowBorder_menuColor)
@@ -3576,9 +3267,6 @@ msgstr "Додавання світлої рамки:"
 #. i18n: file: config/qtcurveconfigbase.ui:2259
 #. i18n: ectx: property (toolTip), widget (QCheckBox, windowBorder_addLightBorder)
 #: po/rc.cpp:854 rc.cpp:854
-#| msgid ""
-#| "If enabled, a 1 pixel light border is added to the top and left of the "
-#| "window."
 msgid ""
 "<p>If enabled, a 1 pixel light border is added to the top and left of the "
 "window."
@@ -3595,7 +3283,6 @@ msgstr "Малювати у активних вікнах роздільник:"
 #. i18n: file: config/qtcurveconfigbase.ui:2276
 #. i18n: ectx: property (toolTip), widget (QCheckBox, windowBorder_separator)
 #: po/rc.cpp:863 rc.cpp:863
-#| msgid "If enabled, a separator is drawn between the titlebar and window."
 msgid "<p>If enabled, a separator is drawn between the titlebar and window."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, між смужкою заголовка і вікном буде "
@@ -3616,7 +3303,6 @@ msgstr "Кнопки:"
 #. i18n: file: config/qtcurveconfigbase.ui:2307
 #. i18n: ectx: property (toolTip), widget (QComboBox, titlebarButtonAppearance)
 #: po/rc.cpp:875 rc.cpp:875
-#| msgid "Defines the gradient used to fill the titlebar buttons."
 msgid "<p>Defines the gradient used to fill the titlebar buttons."
 msgstr ""
 "<p>Визначає градієнт, який буде використано для заливання кнопок смужки "
@@ -3625,9 +3311,8 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:2314
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_noFrame)
 #: po/rc.cpp:878 rc.cpp:878
-#| msgid ""
-#| "If enabled, only the symbol is drawn - and not the button background."
-msgid "<p>If enabled, only the symbol is drawn - and not the button background."
+msgid ""
+"<p>If enabled, only the symbol is drawn - and not the button background."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, буде намальовано лише символ, а не тло "
 "кнопки."
@@ -3641,9 +3326,6 @@ msgstr "Показувати лише символи"
 #. i18n: file: config/qtcurveconfigbase.ui:2324
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_round)
 #: po/rc.cpp:884 rc.cpp:884
-#| msgid ""
-#| "If enabled, the buttons will have a circular background - regardless of "
-#| "the general round setting."
 msgid ""
 "<p>If enabled, the buttons will have a circular background - regardless of "
 "the general round setting."
@@ -3654,9 +3336,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:2334
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_hoverFrame)
 #: po/rc.cpp:890 rc.cpp:890
-#| msgid ""
-#| "If enabled, the button background (or frame) will only be shown when "
-#| "under the mouse."
 msgid ""
 "<p>If enabled, the button background (or frame) will only be shown when "
 "under the mouse."
@@ -3673,9 +3352,6 @@ msgstr "Показувати рамку при наведенні вказівн
 #. i18n: file: config/qtcurveconfigbase.ui:2344
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_hoverSymbol)
 #: po/rc.cpp:896 rc.cpp:896
-#| msgid ""
-#| "If enabled, the icon will only be shown at full strength when under the "
-#| "mouse - otherwise it will be blended with the background."
 msgid ""
 "<p>If enabled, the icon will only be shown at full strength when under the "
 "mouse - otherwise it will be blended with the background."
@@ -3693,9 +3369,6 @@ msgstr "Підсвічувати символ при наведення вказ
 #. i18n: file: config/qtcurveconfigbase.ui:2354
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_button)
 #: po/rc.cpp:902 rc.cpp:902
-#| msgid ""
-#| "If enabled, the titlebar buttons will be drawn using the standard button "
-#| "color - otherwise the titlebar color will be used."
 msgid ""
 "<p>If enabled, the titlebar buttons will be drawn using the standard button "
 "color - otherwise the titlebar color will be used."
@@ -3713,15 +3386,12 @@ msgstr "Стандартний колір кнопок"
 #. i18n: file: config/qtcurveconfigbase.ui:2364
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_custom)
 #: po/rc.cpp:908 rc.cpp:908
-#| msgid ""
-#| "If enabled, the titlebar buttons will be drawn using the cusom colors "
-#| "defined in the next page."
 msgid ""
 "<p>If enabled, the titlebar buttons will be drawn using the cusom colors "
 "defined in the next page."
 msgstr ""
-"<p>Якщо буде позначено цей пункт, кнопки смужки заголовка буде намальовано за "
-"допомогою нетипових кольорів, визначених на наступній сторінці."
+"<p>Якщо буде позначено цей пункт, кнопки смужки заголовка буде намальовано "
+"за допомогою нетипових кольорів, визначених на наступній сторінці."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2367
 #. i18n: ectx: property (text), widget (QCheckBox, titlebarButtons_custom)
@@ -3732,9 +3402,6 @@ msgstr "Використовувати нетипові кольори тла"
 #. i18n: file: config/qtcurveconfigbase.ui:2374
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_colorOnMouseOver)
 #: po/rc.cpp:914 rc.cpp:914
-#| msgid ""
-#| "If enabled, the colors will only be used when the button is under the "
-#| "mouse."
 msgid ""
 "<p>If enabled, the colors will only be used when the button is under the "
 "mouse."
@@ -3751,7 +3418,6 @@ msgstr "Розфарбовувати лише при наведенні вказ
 #. i18n: file: config/qtcurveconfigbase.ui:2384
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_useHover)
 #: po/rc.cpp:920 rc.cpp:920
-#| msgid "If enabled, the symbol will not be drawn unless under the mouse."
 msgid "<p>If enabled, symbols will use the KDE4 hover color when moused-over."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, для пунктів під час наведення на них "
@@ -3760,14 +3426,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:2387
 #. i18n: ectx: property (text), widget (QCheckBox, titlebarButtons_useHover)
 #: po/rc.cpp:923 rc.cpp:923
-#| msgid "Use color only for mouse-over"
 msgid "Use hover color for mouse-over of symbols"
 msgstr "Кольори наведення при наведенні вказівника на пункти"
 
 #. i18n: file: config/qtcurveconfigbase.ui:2394
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_sunkenBackground)
 #: po/rc.cpp:926 rc.cpp:926
-#| msgid "If enabled, a sunken background is drawn behind the buttons."
 msgid "<p>If enabled, a sunken background is drawn behind the buttons."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, між кнопками буде намальовано занурене тло."
@@ -3781,7 +3445,6 @@ msgstr "Занурене тло"
 #. i18n: file: config/qtcurveconfigbase.ui:2404
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_arrowMinMax)
 #: po/rc.cpp:932 rc.cpp:932
-#| msgid "If enabled, arrows are drawn as the icons for min and max buttons."
 msgid "<p>If enabled, arrows are drawn as the icons for min and max buttons."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, замість кнопок мінімізації та максимізації "
@@ -3796,9 +3459,6 @@ msgstr "Використовувати стрілочки для кнопок м
 #. i18n: file: config/qtcurveconfigbase.ui:2414
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_hideOnInactiveWindow)
 #: po/rc.cpp:938 rc.cpp:938
-#| msgid ""
-#| "If enabled, buttons on inactive windows are only drawn when the mouse "
-#| "hovers over them."
 msgid ""
 "<p>If enabled, buttons on inactive windows are only drawn when the mouse "
 "hovers over them."
@@ -3821,9 +3481,6 @@ msgstr "Нетипові кольори:"
 #. i18n: file: config/qtcurveconfigbase.ui:2431
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_colorSymbolsOnly)
 #: po/rc.cpp:947 rc.cpp:947
-#| msgid ""
-#| "If enabled, custom colors will be applied to the symbols, otherwise they "
-#| "will be applied to the button background."
 msgid ""
 "<p>If enabled, custom colors will be applied to the symbols, otherwise they "
 "will be applied to the button background."
@@ -3841,9 +3498,6 @@ msgstr "Використовувати лише для символів"
 #. i18n: file: config/qtcurveconfigbase.ui:2441
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_colorInactive)
 #: po/rc.cpp:953 rc.cpp:953
-#| msgid ""
-#| "If enabled, custom colors will be applied to active and inactive windows, "
-#| "otherwise they will only be applied to active windows."
 msgid ""
 "<p>If enabled, custom colors will be applied to active and inactive windows, "
 "otherwise they will only be applied to active windows."
@@ -3861,12 +3515,10 @@ msgstr "Застосовувати також до неактивних віко
 #. i18n: file: config/qtcurveconfigbase.ui:2451
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_hoverSymbolFull)
 #: po/rc.cpp:959 rc.cpp:959
-#| msgid "If enabled, the symbol will not be drawn unless under the mouse."
 msgid "<p>If enabled, the symbol will not be drawn unless under the mouse."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, символ не буде показано, якщо ви не "
-"наведете "
-"вказівник миші."
+"наведете вказівник миші."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2454
 #. i18n: ectx: property (text), widget (QCheckBox, titlebarButtons_hoverSymbolFull)
@@ -3895,21 +3547,18 @@ msgstr "Неактивна піктограма"
 #. i18n: file: config/qtcurveconfigbase.ui:2501
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorClose)
 #: po/rc.cpp:977 rc.cpp:977
-#| msgid "Sets the custom color for 'Close' buttons."
 msgid "<p>Sets the custom color for 'Close' buttons."
 msgstr "<p>Нетиповий колір для кнопок «Закрити»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2514
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorMin)
 #: po/rc.cpp:980 rc.cpp:980
-#| msgid "Sets the custom color for 'Minimise' buttons."
 msgid "<p>Sets the custom color for 'Minimise' buttons."
 msgstr "<p>Встановлює нетиповий колір для кнопок «Мінімізувати»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2527
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorMax)
 #: po/rc.cpp:983 rc.cpp:983
-#| msgid "Sets the custom color for 'Maximise', and 'Restore, buttons."
 msgid "<p>Sets the custom color for 'Maximise', and 'Restore, buttons."
 msgstr ""
 "<p>Встановлює нетиповий колір для кнопок «Максимізувати» та «Відновити»."
@@ -3917,42 +3566,36 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:2540
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorHelp)
 #: po/rc.cpp:986 rc.cpp:986
-#| msgid "Sets the custom color for 'Help' buttons."
 msgid "<p>Sets the custom color for 'Help' buttons."
 msgstr "<p>Нетиповий колір для кнопок «Довідка»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2553
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorMenu)
 #: po/rc.cpp:989 rc.cpp:989
-#| msgid "Sets the custom color for 'Menu' buttons."
 msgid "<p>Sets the custom color for 'Menu' buttons."
 msgstr "<p>Нетиповий колір для кнопок «Меню»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2566
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorShade)
 #: po/rc.cpp:992 rc.cpp:992
-#| msgid "Sets the custom color for 'Shade', and 'Un-Shade', buttons."
 msgid "<p>Sets the custom color for 'Shade', and 'Un-Shade', buttons."
 msgstr "<p>Нетиповий колір для кнопок «Згорнути» і «Розгорнути»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2579
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorAllDesktops)
 #: po/rc.cpp:995 rc.cpp:995
-#| msgid "Sets the custom color for 'On All Desktop' buttons."
 msgid "<p>Sets the custom color for 'On All Desktop' buttons."
 msgstr "<p>Нетиповий колір для кнопок «На всіх стільницях»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2592
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorKeepAbove)
 #: po/rc.cpp:998 rc.cpp:998
-#| msgid "Sets the custom color for 'Keep Above' buttons."
 msgid "<p>Sets the custom color for 'Keep Above' buttons."
 msgstr "<p>Нетиповий колір для кнопок «Тримати зверху»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2605
 #. i18n: ectx: property (toolTip), widget (KColorButton, titlebarButtons_colorKeepBelow)
 #: po/rc.cpp:1001 rc.cpp:1001
-#| msgid "Sets the custom color for 'Keep Below' buttons."
 msgid "<p>Sets the custom color for 'Keep Below' buttons."
 msgstr "<p>Нетиповий колір для кнопок «Тримати знизу»."
 
@@ -4013,7 +3656,6 @@ msgstr "Тримати знизу:"
 #. i18n: file: config/qtcurveconfigbase.ui:2924
 #. i18n: ectx: property (toolTip), widget (QComboBox, menubarAppearance)
 #: po/rc.cpp:1034 rc.cpp:1034
-#| msgid "Defines the gradient used for the background of menubars."
 msgid "<p>Defines the gradient used for the background of menubars."
 msgstr "<p>Визначає градієнт, який буде використано для тла смуг меню."
 
@@ -4036,23 +3678,18 @@ msgstr "Злиття зі смужкою заголовка"
 #. i18n: file: config/qtcurveconfigbase.ui:2951
 #. i18n: ectx: property (toolTip), widget (QComboBox, shadeMenubars)
 #: po/rc.cpp:1046 rc.cpp:1046
-#| msgid "Defines the color applied to the background of menubars."
 msgid "<p>Defines the color applied to the background of menubars."
 msgstr "<p>Визначає колір, який буде використано для тла смуг меню."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2974
 #. i18n: ectx: property (toolTip), widget (QCheckBox, shadeMenubarOnlyWhenActive)
 #: po/rc.cpp:1052 rc.cpp:1052
-#| msgid ""
-#| "Defines whether the background coloration should be applied to all "
-#| "menubars, or just those in active windows."
 msgid ""
 "<p>Defines whether the background coloration should be applied to all "
 "menubars, or just those in active windows."
 msgstr ""
 "<p>Визначає, буде розфарбування тла застосовано до всіх смужок меню чи лише "
-"до "
-"активних вікон."
+"до активних вікон."
 
 #. i18n: file: config/qtcurveconfigbase.ui:2977
 #. i18n: ectx: property (text), widget (QCheckBox, shadeMenubarOnlyWhenActive)
@@ -4069,16 +3706,13 @@ msgstr "Текст смужки меню:"
 #. i18n: file: config/qtcurveconfigbase.ui:2997
 #. i18n: ectx: property (toolTip), widget (QCheckBox, customMenuTextColor)
 #: po/rc.cpp:1061 rc.cpp:1061
-#| msgid ""
-#| "If enabled, then the following to color boxes are used to set the text "
-#| "color to be used for normal and selected menubar items."
 msgid ""
 "<p>If enabled, then the following to color boxes are used to set the text "
 "color to be used for normal and selected menubar items."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, наступні два пункти кольорів буде "
-"використано "
-"для встановлення кольору тексту звичайних і позначених пунктів меню."
+"використано для встановлення кольору тексту звичайних і позначених пунктів "
+"меню."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3000
 #. i18n: ectx: property (text), widget (QCheckBox, customMenuTextColor)
@@ -4089,14 +3723,12 @@ msgstr "Нетипові кольори (звичайний/позначений
 #. i18n: file: config/qtcurveconfigbase.ui:3013
 #. i18n: ectx: property (toolTip), widget (KColorButton, customMenuNormTextColor)
 #: po/rc.cpp:1067 rc.cpp:1067
-#| msgid "Sets the text color of normal menubar items."
 msgid "<p>Sets the text color of normal menubar items."
 msgstr "<p>Встановлює колір тексту звичайних пунктів смужки меню."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3029
 #. i18n: ectx: property (toolTip), widget (KColorButton, customMenuSelTextColor)
 #: po/rc.cpp:1070 rc.cpp:1070
-#| msgid "Sets the text color of selected menubar items."
 msgid "<p>Sets the text color of selected menubar items."
 msgstr "<p>Встановлює колір тексту позначених пунктів смужки меню."
 
@@ -4109,7 +3741,6 @@ msgstr "Пункти смужки меню:"
 #. i18n: file: config/qtcurveconfigbase.ui:3046
 #. i18n: ectx: property (toolTip), widget (QComboBox, menuitemAppearance)
 #: po/rc.cpp:1076 rc.cpp:1076
-#| msgid "Defines the gradient to be applied to selected menubar items."
 msgid "<p>Defines the gradient to be applied to selected menubar items."
 msgstr ""
 "<p>Визначає градієнт, який буде використано для градієнт позначених пунктів "
@@ -4118,9 +3749,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:3053
 #. i18n: ectx: property (toolTip), widget (QCheckBox, menubarMouseOver)
 #: po/rc.cpp:1079 rc.cpp:1079
-#| msgid ""
-#| "If enabled, menubar items will have their background gradient applied "
-#| "when the mouse hovers over them."
 msgid ""
 "<p>If enabled, menubar items will have their background gradient applied "
 "when the mouse hovers over them."
@@ -4137,19 +3765,14 @@ msgstr "Увімкнути наведення вказівника"
 #. i18n: file: config/qtcurveconfigbase.ui:3063
 #. i18n: ectx: property (toolTip), widget (QCheckBox, colorMenubarMouseOver)
 #: po/rc.cpp:1085 rc.cpp:1085
-#| msgid ""
-#| "If enabled, when the mouse hovers over a menubar item (and 'Enable mouse-"
-#| "over' is enabled) then it will also be colored, otherwise it wll use a "
-#| "shade of the background color."
 msgid ""
 "<p>If enabled, when the mouse hovers over a menubar item (and 'Enable mouse-"
 "over' is enabled) then it will also be colored, otherwise it wll use a shade "
 "of the background color."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, після наведення вказівника миші на пункт "
-"меню "
-"(якщо позначено пункт «Увімкнути наведення вказівника»), пункт меню буде "
-"розфарбовано. Якщо пункт не буде позначено, буде використано колір тла."
+"меню (якщо позначено пункт «Увімкнути наведення вказівника»), пункт меню "
+"буде розфарбовано. Якщо пункт не буде позначено, буде використано колір тла."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3066
 #. i18n: ectx: property (text), widget (QCheckBox, colorMenubarMouseOver)
@@ -4160,9 +3783,6 @@ msgstr "Розфарбовувати при наведенні вказівни�
 #. i18n: file: config/qtcurveconfigbase.ui:3073
 #. i18n: ectx: property (toolTip), widget (QCheckBox, roundMbTopOnly)
 #: po/rc.cpp:1091 rc.cpp:1091
-#| msgid ""
-#| "If enabled, only the top (and not bottom) of selected menubar items will "
-#| "be rounded."
 msgid ""
 "<p>If enabled, only the top (and not bottom) of selected menubar items will "
 "be rounded."
@@ -4191,16 +3811,13 @@ msgstr "Приховування:"
 #. i18n: file: config/qtcurveconfigbase.ui:3090
 #. i18n: ectx: property (toolTip), widget (QCheckBox, menubarHiding_keyboard)
 #: po/rc.cpp:1100 rc.cpp:1100
-#| msgid ""
-#| "If enabled, menubars may be hidden (and re-shown), by using the 'Ctrl-Alt-"
-#| "M' key combination."
 msgid ""
 "<p>If enabled, menubars may be hidden (and re-shown), by using the 'Ctrl-Alt-"
 "M' key combination."
 msgstr ""
 "<p>Якщо позначити цей пункт, смужки меню можна буде приховувати (і "
-"відновлювати "
-"їх показ) за допомогою натискання комбінації клавіш «Ctrl-Alt-M»."
+"відновлювати їх показ) за допомогою натискання комбінації клавіш «Ctrl-Alt-"
+"M»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3093
 #. i18n: ectx: property (text), widget (QCheckBox, menubarHiding_keyboard)
@@ -4211,16 +3828,13 @@ msgstr "Використовувати Ctrl-Alt-M (тестова можливі
 #. i18n: file: config/qtcurveconfigbase.ui:3100
 #. i18n: ectx: property (toolTip), widget (QCheckBox, menubarHiding_kwin)
 #: po/rc.cpp:1106 rc.cpp:1106
-#| msgid ""
-#| "If enabled, menubars may be hidden (and re-shown), by using a special "
-#| "button in the QtCurve kwin decoration."
 msgid ""
 "<p>If enabled, menubars may be hidden (and re-shown), by using a special "
 "button in the QtCurve kwin decoration."
 msgstr ""
 "<p>Якщо позначити цей пункт, смужки меню можна буде приховувати (і "
-"відновлювати "
-"їх показ) за допомогою особливої кнопки на обрамленні kwin QtCurve."
+"відновлювати їх показ) за допомогою особливої кнопки на обрамленні kwin "
+"QtCurve."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3103
 #. i18n: ectx: property (text), widget (QCheckBox, menubarHiding_kwin)
@@ -4237,9 +3851,6 @@ msgstr "Кнопка смужки меню вікон (тестування)"
 #. i18n: file: config/qtcurveconfigbase.ui:3110
 #. i18n: ectx: property (toolTip), widget (QCheckBox, xbar)
 #: po/rc.cpp:1112 rc.cpp:1112
-#| msgid ""
-#| "If enabled, the theme will support embedding the menubar of KDE4 "
-#| "applications in Bespin's XBar."
 msgid ""
 "<p>If enabled, the theme will support embedding the menubar of KDE4 "
 "applications in Bespin's XBar."
@@ -4262,20 +3873,15 @@ msgstr "Пункти меню:"
 #. i18n: file: config/qtcurveconfigbase.ui:3138
 #. i18n: ectx: property (toolTip), widget (QCheckBox, borderMenuitems)
 #: po/rc.cpp:1124 rc.cpp:1124
-#| msgid ""
-#| "If enabled, selcted menuitems will be drawn with a border around the "
-#| "gradient. This will cause them to have a rounded look if the general "
-#| "round setting is not set to none."
 msgid ""
 "<p>If enabled, selcted menuitems will be drawn with a border around the "
 "gradient. This will cause them to have a rounded look if the general round "
 "setting is not set to none."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, позначені пункти меню буде показано з "
-"рамкою "
-"навколо градієнта. Таким чином, ці пункти виглядатимуть заокругленими, "
-"навіть якщо на загальному рівні заокруглення не буде встановлено або буде "
-"вимкнено."
+"рамкою навколо градієнта. Таким чином, ці пункти виглядатимуть "
+"заокругленими, навіть якщо на загальному рівні заокруглення не буде "
+"встановлено або буде вимкнено."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3141
 #. i18n: ectx: property (text), widget (QCheckBox, borderMenuitems)
@@ -4286,9 +3892,6 @@ msgstr "Рамка"
 #. i18n: file: config/qtcurveconfigbase.ui:3148
 #. i18n: ectx: property (toolTip), widget (QCheckBox, useHighlightForMenu)
 #: po/rc.cpp:1130 rc.cpp:1130
-#| msgid ""
-#| "If enabled, selected menuitems will be drawn using the 'highlight' color, "
-#| "otherwise a darkened shade of the background color will be used instead."
 msgid ""
 "<p>If enabled, selected menuitems will be drawn using the 'highlight' color, "
 "otherwise a darkened shade of the background color will be used instead."
@@ -4306,7 +3909,6 @@ msgstr "Використовувати колір «підсвічування»
 #. i18n: file: config/qtcurveconfigbase.ui:3158
 #. i18n: ectx: property (toolTip), widget (QCheckBox, thin_menuitems)
 #: po/rc.cpp:1136 rc.cpp:1136
-#| msgid "Enable this to reduce the height of menuitems."
 msgid "<p>Enable this to reduce the height of menuitems."
 msgstr "<p>Позначте, щоб зменшити висоту пунктів меню."
 
@@ -4319,10 +3921,6 @@ msgstr "Тонше"
 #. i18n: file: config/qtcurveconfigbase.ui:3168
 #. i18n: ectx: property (toolTip), widget (QCheckBox, menuIcons)
 #: po/rc.cpp:1142 rc.cpp:1142
-#| msgid ""
-#| "If enabled, then icons associated with menuitems will be drawn, otherwise "
-#| "they will be hidden (but the space they would have occupied will still be "
-#| "there)."
 msgid ""
 "<p>If enabled, then icons associated with menuitems will be drawn, otherwise "
 "they will be hidden (but the space they would have occupied will still be "
@@ -4353,27 +3951,22 @@ msgstr "Затінювати тло на:"
 #. i18n: file: config/qtcurveconfigbase.ui:3746
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, expanderHighlight)
 #: po/rc.cpp:1151 po/rc.cpp:1396 rc.cpp:1151 rc.cpp:1396
-#| msgid ""
-#| "Defines the amount by which the popup menu background will be lightened "
-#| "(or darkened)."
 msgid ""
 "<p>Defines the amount by which the popup menu background will be lightened "
 "(or darkened)."
 msgstr ""
-"<p>Визначає величину, на яку буде підсвічено (або затемнено) тло контекстного "
-"меню."
+"<p>Визначає величину, на яку буде підсвічено (або затемнено) тло "
+"контекстного меню."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3204
 #. i18n: ectx: property (toolTip), widget (QComboBox, menuBgndAppearance)
 #: po/rc.cpp:1161 rc.cpp:1161
-#| msgid "Defines the gradient applied to the background of the popup menus."
 msgid "<p>Defines the gradient applied to the background of the popup menus."
 msgstr "<p>Визначає градієнт, який буде використано для тла контекстних меню."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3220
 #. i18n: ectx: property (toolTip), widget (QComboBox, menuBgndGrad)
 #: po/rc.cpp:1167 rc.cpp:1167
-#| msgid "Defines background gradient orientation."
 msgid "<p>Defines background gradient orientation."
 msgstr "<p>Визначає орієнтацію градієнта тла."
 
@@ -4389,8 +3982,8 @@ msgstr ""
 "<p>За допомогою цього пункту можна додати зображення тла до контекстного "
 "меню.\n"
 "            <ul><li>Немає — без зображення</li><li>Кільця з рамкою — подібні "
-"до кілець «Air» кільця з рамками</li><li>Звичайні кільця — кільця, подібні до "
-"кілець «Air», але без рамок.</li><li>Квадратні кільця — 3 простих "
+"до кілець «Air» кільця з рамками</li><li>Звичайні кільця — кільця, подібні "
+"до кілець «Air», але без рамок.</li><li>Квадратні кільця — 3 простих "
 "заокруглених квадрати.</li></ul></p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3253
@@ -4402,7 +3995,6 @@ msgstr "Затримка появи підменю:"
 #. i18n: file: config/qtcurveconfigbase.ui:3260
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, menuDelay)
 #: po/rc.cpp:1183 rc.cpp:1183
-#| msgid "Defines the delay before a sub-menu appears."
 msgid "<p>Defines the delay before a sub-menu appears."
 msgstr "<p>Визначає затримку перед появою підменю."
 
@@ -4421,9 +4013,6 @@ msgstr "Стрічка:"
 #. i18n: file: config/qtcurveconfigbase.ui:3280
 #. i18n: ectx: property (toolTip), widget (QComboBox, menuStripe)
 #: po/rc.cpp:1192 rc.cpp:1192
-#| msgid ""
-#| "Defines the coloration of the menu-stripe that will be drawn on the left "
-#| "of poup menus - but only if this option is not set to 'none'."
 msgid ""
 "<p>Defines the coloration of the menu-stripe that will be drawn on the left "
 "of poup menus - but only if this option is not set to 'none'."
@@ -4434,7 +4023,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:3306
 #. i18n: ectx: property (toolTip), widget (QComboBox, menuStripeAppearance)
 #: po/rc.cpp:1198 rc.cpp:1198
-#| msgid "Defines the gradient to be used for the menu stripe."
 msgid "<p>Defines the gradient to be used for the menu stripe."
 msgstr "<p>Визначає градієнт, який буде використано для стрічок меню."
 
@@ -4447,10 +4035,6 @@ msgstr "Рамки контекстних меню:"
 #. i18n: file: config/qtcurveconfigbase.ui:3320
 #. i18n: ectx: property (toolTip), widget (QCheckBox, popupBorder)
 #: po/rc.cpp:1204 rc.cpp:1204
-#| msgid ""
-#| "If enabled, the whole popup menu will have a border, otherwise no border "
-#| "will be drawn. This option should be enabled unless you have also enabled "
-#| "shadows in your window manager."
 msgid ""
 "<p>If enabled, the whole popup menu will have a border, otherwise no border "
 "will be drawn. This option should be enabled unless you have also enabled "
@@ -4470,7 +4054,6 @@ msgstr "Використовувати параметри кольорів см�
 #. i18n: file: config/qtcurveconfigbase.ui:3358
 #. i18n: ectx: property (toolTip), widget (QComboBox, toolbarAppearance)
 #: po/rc.cpp:1219 rc.cpp:1219
-#| msgid "Defines the gradient used to draw the background of toolbars."
 msgid "<p>Defines the gradient used to draw the background of toolbars."
 msgstr ""
 "<p>Визначає градієнт, який буде використано для тла панелей інструментів."
@@ -4484,7 +4067,6 @@ msgstr "Елементи керування:"
 #. i18n: file: config/qtcurveconfigbase.ui:3375
 #. i18n: ectx: property (toolTip), widget (QComboBox, handles)
 #: po/rc.cpp:1225 rc.cpp:1225
-#| msgid "Defines the look of the toolbar handles."
 msgid "<p>Defines the look of the toolbar handles."
 msgstr "<p>Визначає вигляд елементів керування панелями інструментів."
 
@@ -4497,7 +4079,6 @@ msgstr "Роздільники:"
 #. i18n: file: config/qtcurveconfigbase.ui:3392
 #. i18n: ectx: property (toolTip), widget (QComboBox, toolbarSeparators)
 #: po/rc.cpp:1231 rc.cpp:1231
-#| msgid "Defines the style used to draw toolbar separators."
 msgid "<p>Defines the style used to draw toolbar separators."
 msgstr ""
 "<p>Визначає стиль, який буде використано для роздільників елементів панелей "
@@ -4506,9 +4087,6 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:3409
 #. i18n: ectx: property (toolTip), widget (QComboBox, toolbarBorders)
 #: po/rc.cpp:1237 rc.cpp:1237
-#| msgid ""
-#| "Defines the border type drawn around the toolbar. (This setting also "
-#| "affects menubars)."
 msgid ""
 "<p>Defines the border type drawn around the toolbar. (This setting also "
 "affects menubars)."
@@ -4519,14 +4097,12 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:3416
 #. i18n: ectx: property (text), widget (QLabel, textLabel1_4b)
 #: po/rc.cpp:1240 rc.cpp:1240
-#| msgid "Buttons:"
 msgid "Button style:"
 msgstr "Стиль кнопок:"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3426
 #. i18n: ectx: property (toolTip), widget (QComboBox, tbarBtns)
 #: po/rc.cpp:1243 rc.cpp:1243
-#| msgid "Defines the style used to draw toolbar separators."
 msgid "<p>Defines the style used for toolbar buttons."
 msgstr "<p>Визначає стиль кнопок панелі інструментів."
 
@@ -4551,26 +4127,24 @@ msgstr "Для всіх стилів наведення вказівника"
 #. i18n: file: config/qtcurveconfigbase.ui:3467
 #. i18n: ectx: property (text), widget (QLabel, label_78)
 #: po/rc.cpp:1255 rc.cpp:1255
-#| msgid "Button appearance"
 msgid "Button appearance:"
 msgstr "Вигляд кнопок:"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3474
 #. i18n: ectx: property (toolTip), widget (QComboBox, tbarBtnAppearance)
 #: po/rc.cpp:1258 rc.cpp:1258
-#| msgid "Defines the gradient used to draw the background of toolbars."
 msgid "<p>Defines the gradient used to draw buttons within toolbars.</p>"
 msgstr ""
-"<p>Визначає градієнт, який буде використано для кнопок панелей інструментів.<"
-"/p>"
+"<p>Визначає градієнт, який буде використано для кнопок панелей інструментів."
+"</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3488
 #. i18n: ectx: property (toolTip), widget (QComboBox, tbarBtnEffect)
 #: po/rc.cpp:1264 rc.cpp:1264
-#| msgid "Control what effect should be applied to buttons, combo boxes, etc."
 msgid "<p>Control what effect should be applied to buttons in toolbars.</p>"
 msgstr ""
-"<p>Керує ефектами, які буде застосовано до кнопок на панелях інструментів.</p>"
+"<p>Керує ефектами, які буде застосовано до кнопок на панелях інструментів.</"
+"p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3499
 #. i18n: ectx: property (text), widget (QLabel, label_90)
@@ -4581,12 +4155,11 @@ msgstr "Рамка навколо пунктів:"
 #. i18n: file: config/qtcurveconfigbase.ui:3506
 #. i18n: ectx: property (toolTip), widget (QCheckBox, drawStatusBarFrames)
 #: po/rc.cpp:1270 rc.cpp:1270
-#| msgid ""
-#| "Controls whether QtCurve should draw frames around items in statusbars."
 msgid ""
 "<p>Controls whether QtCurve should draw frames around items in statusbars."
 msgstr ""
-"<p>Визначає, чи слід QtCurve малювати рамки навколо елементів на смужці стану."
+"<p>Визначає, чи слід QtCurve малювати рамки навколо елементів на смужці "
+"стану."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3509
 #. i18n: ectx: property (text), widget (QCheckBox, drawStatusBarFrames)
@@ -4597,15 +4170,13 @@ msgstr "Видима"
 #. i18n: file: config/qtcurveconfigbase.ui:3523
 #. i18n: ectx: property (toolTip), widget (QCheckBox, statusbarHiding_keyboard)
 #: po/rc.cpp:1279 rc.cpp:1279
-#| msgid ""
-#| "If enabled, statusbars may be hidden (and re-shown), by using the 'Ctrl-"
-#| "Alt-S' key combination."
 msgid ""
 "<p>If enabled, statusbars may be hidden (and re-shown), by using the 'Ctrl-"
 "Alt-S' key combination."
 msgstr ""
 "<p>Якщо позначити цей пункт, смужки стану можна буде приховувати (і "
-"відновлювати їх показ) за допомогою натискання комбінації клавіш «Ctrl-Alt-S»."
+"відновлювати їх показ) за допомогою натискання комбінації клавіш «Ctrl-Alt-"
+"S»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3526
 #. i18n: ectx: property (text), widget (QCheckBox, statusbarHiding_keyboard)
@@ -4616,9 +4187,6 @@ msgstr "Використовувати Ctrl-Alt-S (тестова можливі
 #. i18n: file: config/qtcurveconfigbase.ui:3533
 #. i18n: ectx: property (toolTip), widget (QCheckBox, statusbarHiding_kwin)
 #: po/rc.cpp:1285 rc.cpp:1285
-#| msgid ""
-#| "If enabled, statusbars may be hidden (and re-shown), by using a special "
-#| "button in the QtCurve kwin decoration."
 msgid ""
 "<p>If enabled, statusbars may be hidden (and re-shown), by using a special "
 "button in the QtCurve kwin decoration."
@@ -4636,9 +4204,6 @@ msgstr "Вигляд смужки заголовка:"
 #. i18n: file: config/qtcurveconfigbase.ui:3554
 #. i18n: ectx: property (toolTip), widget (QComboBox, dwtAppearance)
 #: po/rc.cpp:1294 rc.cpp:1294
-#| msgid ""
-#| "Defines the gradient used to draw the background of the 'title' part of a "
-#| "dock windows."
 msgid ""
 "<p>Defines the gradient used to draw the background of the 'title' part of a "
 "dock windows."
@@ -4649,16 +4214,13 @@ msgstr ""
 #. i18n: file: config/qtcurveconfigbase.ui:3561
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtRoundTopOnly)
 #: po/rc.cpp:1297 rc.cpp:1297
-#| msgid ""
-#| "If enabled, only the top (for horizontal dock windows), or left (for "
-#| "vertial dock windows) will be rounded."
 msgid ""
 "<p>If enabled, only the top (for horizontal dock windows), or left (for "
 "vertial dock windows) will be rounded."
 msgstr ""
-"<p>Якщо позначити цей пункт, заокруглено буде лише верхні (для горизонтальних "
-"пришвартованих вікон) або ліві (для вертикальних пришвартованих вікон) кути "
-"вікон."
+"<p>Якщо позначити цей пункт, заокруглено буде лише верхні (для "
+"горизонтальних пришвартованих вікон) або ліві (для вертикальних "
+"пришвартованих вікон) кути вікон."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3564
 #. i18n: ectx: property (text), widget (QCheckBox, dwtRoundTopOnly)
@@ -4675,21 +4237,16 @@ msgstr "Використовувати параметри вікна для:"
 #. i18n: file: config/qtcurveconfigbase.ui:3578
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtBtnAsPerTitleBar)
 #: po/rc.cpp:1306 rc.cpp:1306
-#| msgid ""
-#| "If enabled, the buttons on dock windows will have a similar appearance "
-#| "(and behaviour) to the buttons on standard windows, otherwise they will "
-#| "only have their symbols drawn until the mouse hovers over (when the "
-#| "button background will be drawn)."
 msgid ""
 "<p>If enabled, the buttons on dock windows will have a similar appearance "
 "(and behaviour) to the buttons on standard windows, otherwise they will only "
 "have their symbols drawn until the mouse hovers over (when the button "
 "background will be drawn)."
 msgstr ""
-"<p>Якщо буде позначено цей пункт, на пришвартованих вікнах буде показано такі "
-"самі кнопки (які працюватимуть так само), що і на звичайних вікнах. Якщо "
-"пункт не буде позначено, символи кнопок буде показано лише у відповідь на "
-"наведення вказівника миші (буде показано тло кнопок)."
+"<p>Якщо буде позначено цей пункт, на пришвартованих вікнах буде показано "
+"такі самі кнопки (які працюватимуть так само), що і на звичайних вікнах. "
+"Якщо пункт не буде позначено, символи кнопок буде показано лише у відповідь "
+"на наведення вказівника миші (буде показано тло кнопок)."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3581
 #. i18n: ectx: property (text), widget (QCheckBox, dwtBtnAsPerTitleBar)
@@ -4700,10 +4257,6 @@ msgstr "Вигляд кнопок"
 #. i18n: file: config/qtcurveconfigbase.ui:3588
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtColAsPerTitleBar)
 #: po/rc.cpp:1312 rc.cpp:1312
-#| msgid ""
-#| "If enabled, the background of dock window titlebars will have use the "
-#| "color settings of standard windows, otherwise they will use the standard "
-#| "background color."
 msgid ""
 "<p>If enabled, the background of dock window titlebars will have use the "
 "color settings of standard windows, otherwise they will use the standard "
@@ -4723,16 +4276,13 @@ msgstr "Кольори тла"
 #. i18n: file: config/qtcurveconfigbase.ui:3598
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtFontAsPerTitleBar)
 #: po/rc.cpp:1318 rc.cpp:1318
-#| msgid ""
-#| "If enabled, the font of dock window titlebars will have use the font "
-#| "settings of standard windows, otherwise they will use the standard font."
 msgid ""
 "<p>If enabled, the font of dock window titlebars will have use the font "
 "settings of standard windows, otherwise they will use the standard font."
 msgstr ""
-"<p>Якщо буде позначено цей пункт меню, для показу шрифту пришвартованих вікон "
-"буде використано параметри шрифтів звичайних вікон. Якщо пункт позначено не "
-"буде, для показу використовуватиметься звичайний шрифт."
+"<p>Якщо буде позначено цей пункт меню, для показу шрифту пришвартованих "
+"вікон буде використано параметри шрифтів звичайних вікон. Якщо пункт "
+"позначено не буде, для показу використовуватиметься звичайний шрифт."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3601
 #. i18n: ectx: property (text), widget (QCheckBox, dwtFontAsPerTitleBar)
@@ -4743,10 +4293,6 @@ msgstr "Шрифт"
 #. i18n: file: config/qtcurveconfigbase.ui:3608
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtTextAsPerTitleBar)
 #: po/rc.cpp:1324 rc.cpp:1324
-#| msgid ""
-#| "If enabled, the text of dock window titlebars will have use the text "
-#| "alignment settings of standard windows, otherwise they will be left "
-#| "aligned."
 msgid ""
 "<p>If enabled, the text of dock window titlebars will have use the text "
 "alignment settings of standard windows, otherwise they will be left aligned."
@@ -4764,10 +4310,6 @@ msgstr "Вирівнювання тексту"
 #. i18n: file: config/qtcurveconfigbase.ui:3618
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtEffectAsPerTitleBar)
 #: po/rc.cpp:1330 rc.cpp:1330
-#| msgid ""
-#| "If enabled, the text of dock window titlebars will have use the text "
-#| "effect settings of standard windows, otherwise they will be drawn with no "
-#| "effect."
 msgid ""
 "<p>If enabled, the text of dock window titlebars will have use the text "
 "effect settings of standard windows, otherwise they will be drawn with no "
@@ -4787,18 +4329,14 @@ msgstr "Текстові ефекти"
 #. i18n: file: config/qtcurveconfigbase.ui:3628
 #. i18n: ectx: property (toolTip), widget (QCheckBox, dwtIconColAsPerTitleBar)
 #: po/rc.cpp:1336 rc.cpp:1336
-#| msgid ""
-#| "If enabled, the background of dock window titlebars will have use the "
-#| "color settings of standard windows, otherwise they will use the standard "
-#| "background color."
 msgid ""
 "<p>If enabled, the icons of dock window titlebars will have use the colors "
 "of standard window icons, otherwise they will use the text colour setting."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, для малювання піктограм заголовків "
-"пришвартованих вікон буде використано кольори піктограм звичайних "
-"вікон. Якщо пункт позначено не буде, для малювання використовуватиметься "
-"звичайний колір тексту."
+"пришвартованих вікон буде використано кольори піктограм звичайних вікон. "
+"Якщо пункт позначено не буде, для малювання використовуватиметься звичайний "
+"колір тексту."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3631
 #. i18n: ectx: property (text), widget (QCheckBox, dwtIconColAsPerTitleBar)
@@ -4815,18 +4353,13 @@ msgstr "Кнопки діалогових вікон:"
 #. i18n: file: config/qtcurveconfigbase.ui:3649
 #. i18n: ectx: property (toolTip), widget (QCheckBox, gtkButtonOrder)
 #: po/rc.cpp:1345 rc.cpp:1345
-#| msgid ""
-#| "If enabled, dialogs will use the 'Cancel / OK' button order as used in "
-#| "the GNOME ond OSX desktops, otherwise the 'OK / Cancel' order will be "
-#| "used."
 msgid ""
 "<p>If enabled, dialogs will use the 'Cancel / OK' button order as used in "
 "the GNOME ond OSX desktops, otherwise the 'OK / Cancel' order will be used."
 msgstr ""
 "<p>Якщо буде позначено цей пункт, у діалогових вікнах буде використано "
-"порядок "
-"кнопок «Скасувати / Гаразд», використаний у GNOME та OSX. Якщо пункт не буде "
-"позначено, використовуватиметься порядок «Гаразд / Скасувати»."
+"порядок кнопок «Скасувати / Гаразд», використаний у GNOME та OSX. Якщо пункт "
+"не буде позначено, використовуватиметься порядок «Гаразд / Скасувати»."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3652
 #. i18n: ectx: property (text), widget (QCheckBox, gtkButtonOrder)
@@ -4884,9 +4417,6 @@ msgstr "Піктограми Gtk"
 #. i18n: file: config/qtcurveconfigbase.ui:3687
 #. i18n: ectx: property (toolTip), widget (QCheckBox, mapKdeIcons)
 #: po/rc.cpp:1367 rc.cpp:1367
-#| msgid ""
-#| "Eanble this option so that QtCurve can attempt to map from the KDE icon "
-#| "names to their Gtk equivalant for Gtk applications."
 msgid ""
 "<p>Enable this option so that QtCurve can attempt to map from the KDE icon "
 "names to their Gtk equivalant for Gtk applications."
@@ -4952,7 +4482,6 @@ msgstr "Символ для паролів:"
 #. i18n: file: config/qtcurveconfigbase.ui:3732
 #. i18n: ectx: property (toolTip), widget (QPushButton, passwordChar)
 #: po/rc.cpp:1390 rc.cpp:1390
-#| msgid "Sets the character used to hide password entries."
 msgid "<p>Sets the character used to hide password entries."
 msgstr "<p>Встановлює символ, використаний для приховування символів паролів."
 
@@ -4971,18 +4500,14 @@ msgstr "Без градієнта тла:"
 #. i18n: file: config/qtcurveconfigbase.ui:3769
 #. i18n: ectx: property (toolTip), widget (KLineEdit, noBgndGradientApps)
 #: po/rc.cpp:1406 rc.cpp:1406
-#| msgid ""
-#| "<p>Comma seperated list of names of applications which should not use the "
-#| "background gradient setting. </p><p>Use <i>gtk</i> to disable for all "
-#| "Gtk2 applications.</p>"
 msgid ""
 "<p>Comma separated list of names of applications which should not use the "
 "background gradient setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
 "applications.</p>"
 msgstr ""
 "<p>Відокремлений комами список назв програм, у яких не слід використовувати "
-"параметр градієнта тла.</p><p>Вкажіть <i>gtk</i>, щоб вимкнути цей "
-"параметр для всіх програм Gtk2.</p>"
+"параметр градієнта тла.</p><p>Вкажіть <i>gtk</i>, щоб вимкнути цей параметр "
+"для всіх програм Gtk2.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3776
 #. i18n: ectx: property (text), widget (QLabel, label_82)
@@ -4993,18 +4518,14 @@ msgstr "Без зображення тла:"
 #. i18n: file: config/qtcurveconfigbase.ui:3783
 #. i18n: ectx: property (toolTip), widget (KLineEdit, noBgndImageApps)
 #: po/rc.cpp:1412 rc.cpp:1412
-#| msgid ""
-#| "<p>Comma seperated list of names of applications which should not use the "
-#| "background image setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
-#| "applications.</p>"
 msgid ""
 "<p>Comma separated list of names of applications which should not use the "
 "background image setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
 "applications.</p>"
 msgstr ""
 "<p>Відокремлений комами список назв програм, у яких не слід використовувати "
-"параметр зображення тла.</p><p>Вкажіть <i>gtk</i>, щоб вимкнути цей "
-"параметр для всіх програм Gtk2.</p>"
+"параметр зображення тла.</p><p>Вкажіть <i>gtk</i>, щоб вимкнути цей параметр "
+"для всіх програм Gtk2.</p>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3790
 #. i18n: ectx: property (text), widget (QLabel, label_81b)
@@ -5015,10 +4536,6 @@ msgstr "Без непрозорості тла:"
 #. i18n: file: config/qtcurveconfigbase.ui:3797
 #. i18n: ectx: property (toolTip), widget (KLineEdit, noBgndOpacityApps)
 #: po/rc.cpp:1418 rc.cpp:1418
-#| msgid ""
-#| "<p>Comma seperated list of names of applications which should not use the "
-#| "background opacity setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
-#| "applications.</p>"
 msgid ""
 "<p>Comma separated list of names of applications which should not use the "
 "background opacity setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
@@ -5037,10 +4554,6 @@ msgstr "Без прозорості у меню (і без альфа-канал
 #. i18n: file: config/qtcurveconfigbase.ui:3811
 #. i18n: ectx: property (toolTip), widget (KLineEdit, noMenuBgndOpacityApps)
 #: po/rc.cpp:1424 rc.cpp:1424
-#| msgid ""
-#| "<p>Comma seperated list of names of applications which should not use the "
-#| "menu opacity setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
-#| "applications.</p>"
 msgid ""
 "<p>Comma separated list of names of applications which should not use the "
 "menu opacity setting.<p><i>For Gtk2, this option also disables using an "
@@ -5062,10 +4575,6 @@ msgstr "Без смужки меню:"
 #. i18n: file: config/qtcurveconfigbase.ui:3825
 #. i18n: ectx: property (toolTip), widget (KLineEdit, noMenuStripeApps)
 #: po/rc.cpp:1430 rc.cpp:1430
-#| msgid ""
-#| "<p>Comma seperated list of names of applications which should not use the "
-#| "menu stripe setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
-#| "applications.</p>"
 msgid ""
 "<p>Comma separated list of names of applications which should not use the "
 "menu stripe setting. </p><p>Use <i>gtk</i> to disable for all Gtk2 "
@@ -5084,16 +4593,12 @@ msgstr "Використовувати діалогове вікно файлі�
 #. i18n: file: config/qtcurveconfigbase.ui:3839
 #. i18n: ectx: property (toolTip), widget (KLineEdit, useQtFileDialogApps)
 #: po/rc.cpp:1436 rc.cpp:1436
-#| msgid ""
-#| "Comma seperated list of names of Qt4 applications which should not use "
-#| "the KDE4 file dialog."
 msgid ""
 "<p>Comma separated list of names of Qt4 applications which should not use "
 "the KDE4 file dialog."
 msgstr ""
 "<p>Відокремлений комами список назв програм Qt4, у яких не слід "
-"використовувати "
-"діалогові вікна роботи з файлами KDE4."
+"використовувати діалогові вікна роботи з файлами KDE4."
 
 #. i18n: file: config/qtcurveconfigbase.ui:3846
 #. i18n: ectx: property (text), widget (QLabel, label_83a)
@@ -5104,11 +4609,6 @@ msgstr "Зберігати видимість смужки меню:"
 #. i18n: file: config/qtcurveconfigbase.ui:3853
 #. i18n: ectx: property (toolTip), widget (KLineEdit, menubarApps)
 #: po/rc.cpp:1442 rc.cpp:1442
-#| msgid ""
-#| "<p>Comma seperated list of names of KDE4 applications where QtCurve needs "
-#| "to manually save whether the menubar is hidden or not.</p><p>Use <i>kde</"
-#| "i> to set for all KDE applications. The menubar state of Gtk2 "
-#| "applications is always manually saved.</p>"
 msgid ""
 "<p>Comma separated list of names of KDE4 applications where QtCurve needs to "
 "manually save whether the menubar is hidden or not.</p><p>Use <i>kde</i> to "
@@ -5129,11 +4629,6 @@ msgstr "Зберігати видимість смужки поступу:"
 #. i18n: file: config/qtcurveconfigbase.ui:3867
 #. i18n: ectx: property (toolTip), widget (KLineEdit, statusbarApps)
 #: po/rc.cpp:1448 rc.cpp:1448
-#| msgid ""
-#| "<p>Comma seperated list of names of KDE4 applications where QtCurve needs "
-#| "to manually save whether the statusbar is hidden or not.</p><p>Use "
-#| "<i>kde</i> to set for all KDE applications. The statusbar state of Gtk2 "
-#| "applications is always manually saved.</p>"
 msgid ""
 "<p>Comma separated list of names of KDE4 applications where QtCurve needs to "
 "manually save whether the statusbar is hidden or not.</p><p>Use <i>kde</i> "
@@ -5154,11 +4649,6 @@ msgstr "Не застосовувати виправлення для немод
 #. i18n: file: config/qtcurveconfigbase.ui:3881
 #. i18n: ectx: property (toolTip), widget (KLineEdit, noDlgFixApps)
 #: po/rc.cpp:1454 rc.cpp:1454
-#| msgid ""
-#| "<p>Comma seperated list of names of applications where QtCurve should not "
-#| "attempt to fix parent-less dialogs.</p><p>Use <i>gtk</i> to disable for "
-#| "all Gtk2 applications, and <i>kde</i> to disable for all KDE "
-#| "applications</p>"
 msgid ""
 "<p>Comma separated list of names of applications where QtCurve should not "
 "attempt to fix parent-less dialogs.</p><p>Use <i>gtk</i> to disable for all "
@@ -5188,23 +4678,17 @@ msgstr ""
 "<i><p>У наведених вище списках вам слід вказати назву виконуваного файла, "
 "наприклад, для «Google планета Земля» це буде «googleearth-bin». Ви можете "
 "скористатися назвою «gtk2» для вимикання ефекту для всіх програм Gtk2 або "
-"«kde» для вимикання ефекту для всіх програм KDE/Qt.</"
-"p>\n"
+"«kde» для вимикання ефекту для всіх програм KDE/Qt.</p>\n"
 "<p>Визначити назву, яка потрібна QtCurve, ви можете спробувати запустити "
 "програму з вікна Konsole з використанням такої синтаксичної конструкції "
 "(приклад для Firefox):</p>\n"
 "<p><code>QTCURVE_DEBUG=1 firefox</code></p>\n"
-"<p>У результаті система покаже визначену назву процесу, ось так:"
-"</p>\n"
+"<p>У результаті система покаже визначену назву процесу, ось так:</p>\n"
 "<p><code>QtCurve: Application name: \"firefox\"</code></p></i>"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3927
 #. i18n: ectx: property (toolTip), widget (KPushButton, exportKde3Button)
 #: po/rc.cpp:1464 rc.cpp:1464
-#| msgid ""
-#| "Exports your current color palette and font settings so that they may be "
-#| "used by KDE3 applications. This creates the relevant entries within the "
-#| "KDE3 kdeglobals file."
 msgid ""
 "<p>Exports your current color palette and font settings so that they may be "
 "used by KDE3 applications. This creates the relevant entries within the KDE3 "
@@ -5223,10 +4707,6 @@ msgstr "Експортувати кольори і шрифти для прог�
 #. i18n: file: config/qtcurveconfigbase.ui:3937
 #. i18n: ectx: property (toolTip), widget (KPushButton, exportQt3Button)
 #: po/rc.cpp:1470 rc.cpp:1470
-#| msgid ""
-#| "Exports your current color palette and font settings so that they may be "
-#| "used by pure-Qt3 applications. This creates the relevant entries within "
-#| "the Qt3 ~/.qt/qtrc file."
 msgid ""
 "<p>Exports your current color palette and font settings so that they may be "
 "used by pure-Qt3 applications. This creates the relevant entries within the "
@@ -5245,7 +4725,6 @@ msgstr "Експортувати кольори і шрифти для Qt3-пр�
 #. i18n: file: config/qtcurveconfigbase.ui:3964
 #. i18n: ectx: property (toolTip), widget (QComboBox, gradCombo)
 #: po/rc.cpp:1476 rc.cpp:1476
-#| msgid "Select the custom gradient to be configured."
 msgid "<p>Select the custom gradient to be configured."
 msgstr "<p>Вкажіть нетиповий градієнт, який слід налаштувати."
 
@@ -5338,9 +4817,6 @@ msgstr "Прозорість:"
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, stopPosition)
 #: po/rc.cpp:1520 rc.cpp:1520
 #, no-c-format
-#| msgid ""
-#| "Set the position of the gradient value. 0% means the top of horizontal "
-#| "gradients, and the left for vertical gradients."
 msgid ""
 "<p>Set the position of the gradient value. 0% means the top of horizontal "
 "gradients, and the left for vertical gradients."
@@ -5352,10 +4828,6 @@ msgstr ""
 #. i18n: ectx: property (toolTip), widget (KIntNumInput, stopValue)
 #: po/rc.cpp:1528 rc.cpp:1528
 #, no-c-format
-#| msgid ""
-#| "Sets the strength of the gradient at the defined position. 110% would "
-#| "lighten a color by 10%, 90% would darken it by 10%, and 100% would be the "
-#| "original color."
 msgid ""
 "<p>Sets the strength of the gradient at the defined position. 110% would "
 "lighten a color by 10%, 90% would darken it by 10%, and 100% would be the "
@@ -5389,36 +4861,34 @@ msgstr ""
 "120% робить колір світлішим на 20%, а значення у 80% відповідає затемненню "
 "на 20%</i></p>"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4225
+#. i18n: file: config/qtcurveconfigbase.ui:4222
 #. i18n: ectx: property (toolTip), widget (KColorButton, previewColor)
 #: po/rc.cpp:1551 rc.cpp:1551
-#| msgid "Set the color to be used in the preview."
 msgid "<p>Set the color to be used in the preview."
 msgstr ""
 "<p>Визначає колір, який буде використано у області попереднього перегляду."
 
-#. i18n: file: config/qtcurveconfigbase.ui:4240
+#. i18n: file: config/qtcurveconfigbase.ui:4237
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: po/rc.cpp:1554 rc.cpp:1554
 msgid "Shading routine:"
 msgstr "Спосіб створення відтінків:"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4253
+#. i18n: file: config/qtcurveconfigbase.ui:4250
 #. i18n: ectx: property (toolTip), widget (QComboBox, shading)
 #: po/rc.cpp:1557 rc.cpp:1557
-#| msgid "Sets the color space that is used when shading a color."
 msgid "<p>Sets the color space that is used when shading a color."
 msgstr ""
 "<p>Визначає простір кольорів, який буде використано для створення відтінків "
 "кольору."
 
-#. i18n: file: config/qtcurveconfigbase.ui:4260
+#. i18n: file: config/qtcurveconfigbase.ui:4257
 #. i18n: ectx: property (title), widget (QGroupBox, customShading)
 #: po/rc.cpp:1560 rc.cpp:1560
 msgid "Use Custom Shades"
 msgstr "Використовувати нетипові тіні"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4287
+#. i18n: file: config/qtcurveconfigbase.ui:4284
 #. i18n: ectx: property (text), widget (QLabel, label_4)
 #: po/rc.cpp:1563 rc.cpp:1563
 msgid ""
@@ -5449,8 +4919,8 @@ msgstr ""
 "<li>Використовується для світлих частин «просторових» елементів, зокрема "
 "рамок віджетів вкладок.</li>\n"
 "<li>Використовується для світліших елементів смужок поступу.</li>\n"
-"<li>Використовується для темних частин «просторових» елементів, зокрема рамок "
-"віджетів вкладок.</li>\n"
+"<li>Використовується для темних частин «просторових» елементів, зокрема "
+"рамок віджетів вкладок.</li>\n"
 "<li>Використовується для зафарбування рамок пунктів позначення та варіантів, "
 "рамок панелей інструментів (якщо для них встановлено темний колір), темної "
 "частини занурених/піднятих елементів керування повзунками тощо.</li>\n"
@@ -5459,27 +4929,21 @@ msgstr ""
 "<li>Використовується для малювання рамок більшості віджетів.</li>\n"
 "</ol></p></i>"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4369
+#. i18n: file: config/qtcurveconfigbase.ui:4366
 #. i18n: ectx: property (title), widget (QGroupBox, customAlphas)
 #: po/rc.cpp:1574 rc.cpp:1574
 msgid "Use Custom Alpha Values"
 msgstr "Нетипові значення каналу прозорості"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4378
+#. i18n: file: config/qtcurveconfigbase.ui:4375
 #. i18n: ectx: property (text), widget (QLabel, label_light_alpha)
 #: po/rc.cpp:1577 rc.cpp:1577
 msgid "Light:"
 msgstr "Світлий:"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4404
+#. i18n: file: config/qtcurveconfigbase.ui:4401
 #. i18n: ectx: property (text), widget (QLabel, label_4b)
 #: po/rc.cpp:1580 rc.cpp:1580
-#| msgid ""
-#| "<i><p>QtCurve uses dark/light borders to create etch and shadow effects. "
-#| "By default QtCurve tries to lighten (or darken) the parent's background "
-#| "to achieve this - if no parent can be found, then white/black is used "
-#| "with an alpha value set. This behavious maybe overriden, and alpha values "
-#| "always used, by checking the option above.</p>"
 msgid ""
 "<i><p>QtCurve uses dark/light borders to create etch and shadow effects. By "
 "default QtCurve tries to lighten (or darken) the parent's background to "
@@ -5494,7 +4958,7 @@ msgstr ""
 "поведінку може бути змінено (так, щоб значення каналу прозорості "
 "використовувалися завжди) за допомогою позначення пункту наведеного вище.</p>"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4417
+#. i18n: file: config/qtcurveconfigbase.ui:4414
 #. i18n: ectx: property (text), widget (QLabel, label_dark_alpha)
 #: po/rc.cpp:1583 rc.cpp:1583
 msgid "Dark:"
@@ -5868,16 +5332,12 @@ msgstr "Вилучати з максимізованих вікон"
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:82
 #. i18n: ectx: property (text), widget (QLabel, outerBorder_label)
 #: po/rc.cpp:1790 rc.cpp:1790
-#| msgid "Titlebar border"
 msgid "Outer border:"
 msgstr "Зовнішня рамка:"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:89
 #. i18n: ectx: property (whatsThis), widget (QComboBox, outerBorder)
 #: po/rc.cpp:1793 rc.cpp:1793
-#| msgid ""
-#| "If enabled, a 1 pixel dark border will be drawn around the outside of "
-#| "windows. This is useful if you are not using desktop effects."
 msgid ""
 "Adds 1 pixel border around the outside of windows. This is useful if you are "
 "not using desktop effects."
@@ -5889,17 +5349,12 @@ msgstr ""
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:96
 #. i18n: ectx: property (text), widget (QLabel, innerBorder_label)
 #: po/rc.cpp:1796 rc.cpp:1796
-#| msgid "No inner border"
 msgid "Inner border:"
 msgstr "Внутрішня межа:"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:103
 #. i18n: ectx: property (whatsThis), widget (QComboBox, innerBorder)
 #: po/rc.cpp:1799 rc.cpp:1799
-#| msgid ""
-#| "If enabled, a 1 pixel dark border will be drawn between the window "
-#| "contents and the decoration. This is useful if you are using transparent "
-#| "decorations."
 msgid ""
 "Adds a 1 pixel dark border between the window contents and the decoration. "
 "This is useful if you are using transparent decorations."
@@ -5927,23 +5382,20 @@ msgstr ""
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:127
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: po/rc.cpp:1811 rc.cpp:1811
-#| msgid "Titlebar padding:"
 msgid "Titlebar text padding:"
 msgstr "Фаска тексту заголовка:"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:134
 #. i18n: ectx: property (whatsThis), widget (KIntSpinBox, titleBarPad)
 #: po/rc.cpp:1814 rc.cpp:1814
-#| msgid ""
-#| "Controls the amount of extra padding added to the top and bottom of the "
-#| "titlebar."
 msgid ""
 "Controls the amount of extra padding added to the top and bottom of the "
 "titlebar text height. Changing this will affect the height of the titlebar "
 "and its buttons. "
 msgstr ""
-"Визначає ширину додаткової фаски у верхній і нижній частинах текстової смужки "
-"заголовка. Зміна цього значення вплине на висоту смужки заголовка і її кнопок."
+"Визначає ширину додаткової фаски у верхній і нижній частинах текстової "
+"смужки заголовка. Зміна цього значення вплине на висоту смужки заголовка і "
+"її кнопок."
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:137
 #. i18n: ectx: property (suffix), widget (KIntSpinBox, titleBarPad)
@@ -5960,16 +5412,12 @@ msgstr "пк"
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:144
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: po/rc.cpp:1820 rc.cpp:1820
-#| msgid "Titlebar padding:"
 msgid "Titlebar border padding:"
 msgstr "Фаска смужки заголовка:"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:151
 #. i18n: ectx: property (whatsThis), widget (KIntSpinBox, edgePad)
 #: po/rc.cpp:1823 rc.cpp:1823
-#| msgid ""
-#| "Controls the amount of extra padding added to the top and bottom of the "
-#| "titlebar."
 msgid ""
 "Controls the amount of extra padding added to the titlebar border. Changing "
 "this will only affect the height of the titlebar, and not the buttons. "
@@ -6060,7 +5508,8 @@ msgid ""
 msgstr ""
 "<p><b>ЗАУВАЖЕННЯ.</b><i> Якщо встановити для наведених вище параметрів "
 "значення 100%, прозорість смужки заголовка вікна (і рамки) буде керуватися "
-"параметрами вікна стилю і параметрами прозорості тла діалогових вікон.</i></p>"
+"параметрами вікна стилю і параметрами прозорості тла діалогових вікон.</i></"
+"p>"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:343
 #. i18n: ectx: attribute (title), widget (QWidget, shadowTab)

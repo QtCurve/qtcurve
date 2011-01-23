@@ -6,46 +6,46 @@ msgstr ""
 "Project-Id-Version: QtCurve-KDE4 1.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=50231&atid=459007\n"
-"POT-Creation-Date: 2010-11-28 22:39+0000\n"
+"POT-Creation-Date: 2011-01-23 21:03+0000\n"
 "PO-Revision-Date: 2010-11-15 17:30+0800\n"
 "Last-Translator: 绿色圣光 <lishaohui.qd@163.com>\n"
 "Language-Team: 绿色圣光 <lishaohui.qd@163.com>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 
-#: config/exportthemedialog.cpp:41
+#: config/exportthemedialog.cpp:40
 msgid "Export Theme"
 msgstr "导出主题"
 
-#: config/exportthemedialog.cpp:44
+#: config/exportthemedialog.cpp:43
 msgid "Name:"
 msgstr "名称："
 
-#: config/exportthemedialog.cpp:45
+#: config/exportthemedialog.cpp:44
 msgid "Comment:"
 msgstr "注释："
 
-#: config/exportthemedialog.cpp:46
+#: config/exportthemedialog.cpp:45
 msgid "Destination folder:"
 msgstr "目标文件夹："
 
-#: config/exportthemedialog.cpp:48
+#: config/exportthemedialog.cpp:47
 msgid "QtCurve based theme"
 msgstr "QtCurve 基本主题"
 
-#: config/exportthemedialog.cpp:76
+#: config/exportthemedialog.cpp:75
 msgid "Name is empty!"
 msgstr "文件名为空！"
 
-#: config/exportthemedialog.cpp:96
+#: config/exportthemedialog.cpp:95
 msgid ""
 "Succesfully created:\n"
 "%1"
 msgstr "创建 %1 成功~"
 
-#: config/exportthemedialog.cpp:99
+#: config/exportthemedialog.cpp:98
 msgid "Failed to create file: %1"
 msgstr "创建 %1 失败..."
 
@@ -89,634 +89,635 @@ msgstr "正中方"
 msgid "Edit %1"
 msgstr "编辑 %1"
 
-#: config/qtcurveconfig.cpp:204 kwin/qtcurveclient.cpp:298
+#: config/qtcurveconfig.cpp:215 kwin/qtcurveclient.cpp:298
 msgid "QtCurve"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:205
+#: config/qtcurveconfig.cpp:216
 msgid "Unified widget style."
 msgstr "统一部件风格。"
 
-#: config/qtcurveconfig.cpp:207
-msgid "(C) Craig Drummond, 2003-2010"
+#: config/qtcurveconfig.cpp:218
+#, fuzzy
+msgid "(C) Craig Drummond, 2003-2011"
 msgstr "© Craig Drummond, 2003-2010"
 
-#: config/qtcurveconfig.cpp:222
+#: config/qtcurveconfig.cpp:233
 msgid "Preview Window"
 msgstr "预览窗口"
 
-#: config/qtcurveconfig.cpp:270
+#: config/qtcurveconfig.cpp:281
 msgid "Select Password Character"
 msgstr "选择密码符号"
 
 #. i18n: file: config/qtcurveconfigbase.ui:2474
 #. i18n: ectx: property (text), widget (QLabel, label_94)
-#: config/qtcurveconfig.cpp:493 config/qtcurveconfig.cpp:943 po/rc.cpp:968
+#: config/qtcurveconfig.cpp:504 config/qtcurveconfig.cpp:954 po/rc.cpp:968
 #: rc.cpp:968
 msgid "Background"
 msgstr "背景"
 
 #. i18n: file: config/stylepreview.ui:132
 #. i18n: ectx: property (text), widget (QPushButton, PushButton1)
-#: config/qtcurveconfig.cpp:496 po/rc.cpp:1601 rc.cpp:1601
+#: config/qtcurveconfig.cpp:507 po/rc.cpp:1601 rc.cpp:1601
 msgid "Button"
 msgstr "按钮"
 
-#: config/qtcurveconfig.cpp:498
+#: config/qtcurveconfig.cpp:509
 msgid "Text"
 msgstr "文本"
 
-#: config/qtcurveconfig.cpp:502 config/qtcurveconfig.cpp:562
-#: config/qtcurveconfig.cpp:585 config/qtcurveconfig.cpp:638
-#: config/qtcurveconfig.cpp:742 config/qtcurveconfig.cpp:750
+#: config/qtcurveconfig.cpp:513 config/qtcurveconfig.cpp:573
+#: config/qtcurveconfig.cpp:596 config/qtcurveconfig.cpp:649
+#: config/qtcurveconfig.cpp:753 config/qtcurveconfig.cpp:761
 #: kwinconfig/qtcurvekwinconfig.cpp:54
 msgid "None"
 msgstr "无"
 
-#: config/qtcurveconfig.cpp:505 config/qtcurveconfig.cpp:567
+#: config/qtcurveconfig.cpp:516 config/qtcurveconfig.cpp:578
 msgid "<unknown>"
 msgstr "<未知>"
 
-#: config/qtcurveconfig.cpp:507 kwinconfig/qtcurvekwinconfig.cpp:36
+#: config/qtcurveconfig.cpp:518 kwinconfig/qtcurvekwinconfig.cpp:36
 msgid "Custom:"
 msgstr "自定义"
 
-#: config/qtcurveconfig.cpp:509
+#: config/qtcurveconfig.cpp:520
 msgid "Selected background"
 msgstr "选中背景"
 
-#: config/qtcurveconfig.cpp:511
+#: config/qtcurveconfig.cpp:522
 msgid "Blended selected background"
 msgstr "融合选中背景"
 
-#: config/qtcurveconfig.cpp:513
+#: config/qtcurveconfig.cpp:524
 msgid "Menu background"
 msgstr "菜单背景"
 
-#: config/qtcurveconfig.cpp:513 config/qtcurveconfig.cpp:604
+#: config/qtcurveconfig.cpp:524 config/qtcurveconfig.cpp:615
 msgid "Darken"
 msgstr "暗化"
 
-#: config/qtcurveconfig.cpp:515 kwinconfig/qtcurvekwinconfig.cpp:34
+#: config/qtcurveconfig.cpp:526 kwinconfig/qtcurvekwinconfig.cpp:34
 msgid "Titlebar"
 msgstr "标题栏"
 
-#: config/qtcurveconfig.cpp:537 config/qtcurveconfig.cpp:2246
+#: config/qtcurveconfig.cpp:548 config/qtcurveconfig.cpp:2264
 msgid "Custom gradient %1"
 msgstr "自定义渐变度%1"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1052
 #. i18n: ectx: property (text), widget (QCheckBox, flatSbarButtons)
-#: config/qtcurveconfig.cpp:541 po/rc.cpp:408 rc.cpp:408
+#: config/qtcurveconfig.cpp:552 po/rc.cpp:408 rc.cpp:408
 msgid "Flat"
 msgstr "平面"
 
-#: config/qtcurveconfig.cpp:542 config/qtcurveconfig.cpp:816
+#: config/qtcurveconfig.cpp:553 config/qtcurveconfig.cpp:827
 msgid "Raised"
 msgstr "突升"
 
-#: config/qtcurveconfig.cpp:543
+#: config/qtcurveconfig.cpp:554
 msgid "Dull glass"
 msgstr "暗色玻璃"
 
-#: config/qtcurveconfig.cpp:544
+#: config/qtcurveconfig.cpp:555
 msgid "Shiny glass"
 msgstr "亮色玻璃"
 
-#: config/qtcurveconfig.cpp:545
+#: config/qtcurveconfig.cpp:556
 msgid "Agua"
 msgstr "圆润"
 
-#: config/qtcurveconfig.cpp:546
+#: config/qtcurveconfig.cpp:557
 msgid "Soft gradient"
 msgstr "柔缓渐变凸出"
 
-#: config/qtcurveconfig.cpp:547
+#: config/qtcurveconfig.cpp:558
 msgid "Standard gradient"
 msgstr "常规渐变凸出"
 
-#: config/qtcurveconfig.cpp:548
+#: config/qtcurveconfig.cpp:559
 msgid "Harsh gradient"
 msgstr "强烈渐变凸出"
 
-#: config/qtcurveconfig.cpp:549
+#: config/qtcurveconfig.cpp:560
 msgid "Inverted gradient"
 msgstr "反向渐变凹下"
 
-#: config/qtcurveconfig.cpp:550
+#: config/qtcurveconfig.cpp:561
 msgid "Dark inverted gradient"
 msgstr "暗色渐变凹下"
 
-#: config/qtcurveconfig.cpp:551
+#: config/qtcurveconfig.cpp:562
 msgid "Split gradient"
 msgstr "岩石风格凸出"
 
-#: config/qtcurveconfig.cpp:552
+#: config/qtcurveconfig.cpp:563
 msgid "Bevelled"
 msgstr "锥形"
 
-#: config/qtcurveconfig.cpp:557
+#: config/qtcurveconfig.cpp:568
 msgid "Fade out (popup menuitems)"
 msgstr "淡出（弹出菜单）"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1110
 #. i18n: ectx: property (text), widget (QCheckBox, stripedSbar)
-#: config/qtcurveconfig.cpp:559 po/rc.cpp:435 rc.cpp:435
+#: config/qtcurveconfig.cpp:570 po/rc.cpp:435 rc.cpp:435
 msgid "Striped"
 msgstr "条纹"
 
-#: config/qtcurveconfig.cpp:562 config/qtcurveconfig.cpp:647
+#: config/qtcurveconfig.cpp:573 config/qtcurveconfig.cpp:658
 #, fuzzy
 msgid "Same as general setting"
 msgstr "常规设置："
 
-#: config/qtcurveconfig.cpp:565
+#: config/qtcurveconfig.cpp:576
 msgid "Tiled image"
 msgstr "平铺图片"
 
-#: config/qtcurveconfig.cpp:586
+#: config/qtcurveconfig.cpp:597
 msgid "Sunken lines"
 msgstr "凹线条"
 
-#: config/qtcurveconfig.cpp:587
+#: config/qtcurveconfig.cpp:598
 msgid "Flat lines"
 msgstr "平线条"
 
-#: config/qtcurveconfig.cpp:588
+#: config/qtcurveconfig.cpp:599
 msgid "Dots"
 msgstr "多点"
 
-#: config/qtcurveconfig.cpp:591
+#: config/qtcurveconfig.cpp:602
 msgid "Single dot"
 msgstr "单点"
 
-#: config/qtcurveconfig.cpp:593
+#: config/qtcurveconfig.cpp:604
 msgid "Dashes"
 msgstr "虚线"
 
-#: config/qtcurveconfig.cpp:599
+#: config/qtcurveconfig.cpp:610
 msgid "Corner indicator"
 msgstr "拐角指示"
 
-#: config/qtcurveconfig.cpp:600
+#: config/qtcurveconfig.cpp:611
 msgid "Font color thin border"
 msgstr "字体颜色细边"
 
-#: config/qtcurveconfig.cpp:601
+#: config/qtcurveconfig.cpp:612
 msgid "Selected background thick border"
 msgstr "选中背景粗框"
 
-#: config/qtcurveconfig.cpp:602
+#: config/qtcurveconfig.cpp:613
 msgid "Selected background tinting"
 msgstr "选中背景着色"
 
-#: config/qtcurveconfig.cpp:603
+#: config/qtcurveconfig.cpp:614
 msgid "A slight glow"
 msgstr "轻微光芒"
 
-#: config/qtcurveconfig.cpp:605
+#: config/qtcurveconfig.cpp:616
 msgid "Use selected background color"
 msgstr "使用选中背景色"
 
-#: config/qtcurveconfig.cpp:606
+#: config/qtcurveconfig.cpp:617
 msgid "No indicator"
 msgstr "无指示"
 
-#: config/qtcurveconfig.cpp:611
+#: config/qtcurveconfig.cpp:622
 msgid "KDE"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:612
+#: config/qtcurveconfig.cpp:623
 msgid "MS Windows"
 msgstr "微软Windows"
 
-#: config/qtcurveconfig.cpp:613
+#: config/qtcurveconfig.cpp:624
 msgid "Platinum"
 msgstr "铂金"
 
-#: config/qtcurveconfig.cpp:614
+#: config/qtcurveconfig.cpp:625
 msgid "NeXT"
 msgstr "倒转"
 
-#: config/qtcurveconfig.cpp:615
+#: config/qtcurveconfig.cpp:626
 msgid "No buttons"
 msgstr "无按钮"
 
-#: config/qtcurveconfig.cpp:620
+#: config/qtcurveconfig.cpp:631
 msgid "Square"
 msgstr "方形"
 
-#: config/qtcurveconfig.cpp:621
+#: config/qtcurveconfig.cpp:632
 msgid "Slightly rounded"
 msgstr "轻微圆滑"
 
-#: config/qtcurveconfig.cpp:622
+#: config/qtcurveconfig.cpp:633
 msgid "Fully rounded"
 msgstr "完全圆滑"
 
-#: config/qtcurveconfig.cpp:623
+#: config/qtcurveconfig.cpp:634
 msgid "Extra rounded"
 msgstr "相当圆滑"
 
-#: config/qtcurveconfig.cpp:624
+#: config/qtcurveconfig.cpp:635
 msgid "Max rounded"
 msgstr "最最圆滑"
 
-#: config/qtcurveconfig.cpp:629
+#: config/qtcurveconfig.cpp:640
 msgid "No coloration"
 msgstr "无着色"
 
-#: config/qtcurveconfig.cpp:630
+#: config/qtcurveconfig.cpp:641
 msgid "Color border"
 msgstr "有色边框"
 
-#: config/qtcurveconfig.cpp:631
+#: config/qtcurveconfig.cpp:642
 msgid "Thick color border"
 msgstr "浓色边框"
 
-#: config/qtcurveconfig.cpp:632
+#: config/qtcurveconfig.cpp:643
 msgid "Plastik style"
 msgstr "塑料风格"
 
-#: config/qtcurveconfig.cpp:633 config/qtcurveconfig.cpp:692
+#: config/qtcurveconfig.cpp:644 config/qtcurveconfig.cpp:703
 msgid "Glow"
 msgstr "光晕绚烂"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1691
 #. i18n: ectx: property (text), widget (QRadioButton, borderTab)
-#: config/qtcurveconfig.cpp:639 kwinconfig/qtcurvekwinconfig.cpp:56
+#: config/qtcurveconfig.cpp:650 kwinconfig/qtcurvekwinconfig.cpp:56
 #: po/rc.cpp:658 rc.cpp:658
 msgid "Light"
 msgstr "光亮"
 
-#: config/qtcurveconfig.cpp:640 kwinconfig/qtcurvekwinconfig.cpp:55
+#: config/qtcurveconfig.cpp:651 kwinconfig/qtcurvekwinconfig.cpp:55
 msgid "Dark"
 msgstr "深暗"
 
-#: config/qtcurveconfig.cpp:641
+#: config/qtcurveconfig.cpp:652
 msgid "Light (all sides)"
 msgstr "光亮（所有边）"
 
-#: config/qtcurveconfig.cpp:642
+#: config/qtcurveconfig.cpp:653
 msgid "Dark (all sides)"
 msgstr "深暗（所有边）"
 
-#: config/qtcurveconfig.cpp:647 config/qtcurveconfig.cpp:662
-#: config/qtcurveconfig.cpp:670
+#: config/qtcurveconfig.cpp:658 config/qtcurveconfig.cpp:673
+#: config/qtcurveconfig.cpp:681
 msgid "Plain"
 msgstr "朴素"
 
-#: config/qtcurveconfig.cpp:648
+#: config/qtcurveconfig.cpp:659
 msgid "Etched"
 msgstr "蚀刻"
 
-#: config/qtcurveconfig.cpp:649
+#: config/qtcurveconfig.cpp:660
 msgid "Shadowed"
 msgstr "阴影"
 
-#: config/qtcurveconfig.cpp:654
+#: config/qtcurveconfig.cpp:665
 msgid "Simple"
 msgstr "简单"
 
-#: config/qtcurveconfig.cpp:655
+#: config/qtcurveconfig.cpp:666
 msgid "Use HSL color space"
 msgstr "使用HSL颜色空间"
 
-#: config/qtcurveconfig.cpp:656
+#: config/qtcurveconfig.cpp:667
 msgid "Use HSV color space"
 msgstr "使用HSV颜色空间"
 
-#: config/qtcurveconfig.cpp:657
+#: config/qtcurveconfig.cpp:668
 msgid "Use HCY color space"
 msgstr "使用HCY颜色空间"
 
-#: config/qtcurveconfig.cpp:663
+#: config/qtcurveconfig.cpp:674
 msgid "Stripes"
 msgstr "条纹"
 
-#: config/qtcurveconfig.cpp:664
+#: config/qtcurveconfig.cpp:675
 msgid "Diagonal stripes"
 msgstr "斜纹"
 
-#: config/qtcurveconfig.cpp:665
+#: config/qtcurveconfig.cpp:676
 msgid "Faded stripes"
 msgstr "凋纹"
 
-#: config/qtcurveconfig.cpp:671
+#: config/qtcurveconfig.cpp:682
 msgid "Round"
 msgstr "圆滑"
 
-#: config/qtcurveconfig.cpp:672
+#: config/qtcurveconfig.cpp:683
 msgid "Plain - rotated"
 msgstr "朴素（转向）"
 
-#: config/qtcurveconfig.cpp:673
+#: config/qtcurveconfig.cpp:684
 msgid "Round - rotated"
 msgstr "圆滑（转向）"
 
-#: config/qtcurveconfig.cpp:674
+#: config/qtcurveconfig.cpp:685
 msgid "Triangular"
 msgstr "三角"
 
 #. i18n: file: config/qtcurveconfigbase.ui:2327
 #. i18n: ectx: property (text), widget (QCheckBox, titlebarButtons_round)
-#: config/qtcurveconfig.cpp:675 po/rc.cpp:887 rc.cpp:887
+#: config/qtcurveconfig.cpp:686 po/rc.cpp:887 rc.cpp:887
 msgid "Circular"
 msgstr "圆形"
 
-#: config/qtcurveconfig.cpp:680
+#: config/qtcurveconfig.cpp:691
 msgid "Base color"
 msgstr "基本颜色"
 
-#: config/qtcurveconfig.cpp:681
+#: config/qtcurveconfig.cpp:692
 msgid "Background color"
 msgstr "背景颜色"
 
-#: config/qtcurveconfig.cpp:682
+#: config/qtcurveconfig.cpp:693
 msgid "Darkened background color"
 msgstr "深暗背景颜色"
 
-#: config/qtcurveconfig.cpp:687
+#: config/qtcurveconfig.cpp:698
 msgid "Standard (dotted)"
 msgstr "常规（点缀）"
 
-#: config/qtcurveconfig.cpp:688
+#: config/qtcurveconfig.cpp:699
 msgid "Highlight color"
 msgstr "高亮色"
 
-#: config/qtcurveconfig.cpp:689
+#: config/qtcurveconfig.cpp:700
 msgid "Highlight color (full size)"
 msgstr "高亮色（完整大小）"
 
-#: config/qtcurveconfig.cpp:690
+#: config/qtcurveconfig.cpp:701
 msgid "Highlight color, and fill"
 msgstr "高亮色并填充"
 
-#: config/qtcurveconfig.cpp:691
+#: config/qtcurveconfig.cpp:702
 msgid "Line drawn with highlight color"
 msgstr "高亮色线条突出"
 
-#: config/qtcurveconfig.cpp:697 config/qtcurveconfig.cpp:792
+#: config/qtcurveconfig.cpp:708 config/qtcurveconfig.cpp:803
 msgid "No border"
 msgstr "无边框"
 
-#: config/qtcurveconfig.cpp:698
+#: config/qtcurveconfig.cpp:709
 msgid "Light border"
 msgstr "亮边框"
 
-#: config/qtcurveconfig.cpp:699
+#: config/qtcurveconfig.cpp:710
 msgid "3D border (light only)"
 msgstr "3D边框（亮边框）"
 
-#: config/qtcurveconfig.cpp:700
+#: config/qtcurveconfig.cpp:711
 msgid "3D border (dark and light)"
 msgstr "3D边框（暗亮边框）"
 
-#: config/qtcurveconfig.cpp:701
+#: config/qtcurveconfig.cpp:712
 msgid "Shine"
 msgstr "阳光"
 
-#: config/qtcurveconfig.cpp:706
+#: config/qtcurveconfig.cpp:717
 msgid "Left"
 msgstr "居左"
 
-#: config/qtcurveconfig.cpp:707
+#: config/qtcurveconfig.cpp:718
 msgid "Center (between controls)"
 msgstr "控制按钮间居中"
 
-#: config/qtcurveconfig.cpp:708
+#: config/qtcurveconfig.cpp:719
 msgid "Center (full width)"
 msgstr "标题栏整体居中"
 
-#: config/qtcurveconfig.cpp:709
+#: config/qtcurveconfig.cpp:720
 msgid "Right"
 msgstr "居右"
 
-#: config/qtcurveconfig.cpp:721
+#: config/qtcurveconfig.cpp:732
 msgid "Do not show"
 msgstr "不显示"
 
-#: config/qtcurveconfig.cpp:722
+#: config/qtcurveconfig.cpp:733
 msgid "Place on menu button"
 msgstr "在菜单按钮上"
 
-#: config/qtcurveconfig.cpp:723
+#: config/qtcurveconfig.cpp:734
 msgid "Place next to title"
 msgstr "在标题旁"
 
-#: config/qtcurveconfig.cpp:728
+#: config/qtcurveconfig.cpp:739
 msgid "Highlight on top"
 msgstr "顶部高亮"
 
-#: config/qtcurveconfig.cpp:729
+#: config/qtcurveconfig.cpp:740
 msgid "Highlight on bottom"
 msgstr "底部高亮"
 
-#: config/qtcurveconfig.cpp:730
+#: config/qtcurveconfig.cpp:741
 msgid "Add a slight glow"
 msgstr "增添一个轻微的光晕"
 
-#: config/qtcurveconfig.cpp:735
+#: config/qtcurveconfig.cpp:746
 msgid "Top to bottom"
 msgstr "从上到下"
 
-#: config/qtcurveconfig.cpp:736
+#: config/qtcurveconfig.cpp:747
 msgid "Left to right"
 msgstr "从左到右"
 
-#: config/qtcurveconfig.cpp:743
+#: config/qtcurveconfig.cpp:754
 msgid "New style (KDE and Gtk2 similar)"
 msgstr "新风格（KDE跟Gtk2相似）"
 
-#: config/qtcurveconfig.cpp:744
+#: config/qtcurveconfig.cpp:755
 msgid "Old style (KDE and Gtk2 different)"
 msgstr "旧风格（KDE跟Gtk2不同）"
 
-#: config/qtcurveconfig.cpp:751
+#: config/qtcurveconfig.cpp:762
 msgid "Bordered rings"
 msgstr "框环"
 
-#: config/qtcurveconfig.cpp:752
+#: config/qtcurveconfig.cpp:763
 msgid "Plain rings"
 msgstr "素环"
 
-#: config/qtcurveconfig.cpp:753
+#: config/qtcurveconfig.cpp:764
 msgid "Square rings"
 msgstr "方环"
 
-#: config/qtcurveconfig.cpp:754
+#: config/qtcurveconfig.cpp:765
 msgid "File"
 msgstr "自定义"
 
-#: config/qtcurveconfig.cpp:759
+#: config/qtcurveconfig.cpp:770
 msgid "No glow"
 msgstr "无光晕"
 
-#: config/qtcurveconfig.cpp:760
+#: config/qtcurveconfig.cpp:771
 msgid "Add glow at the start"
 msgstr "在始端添加光晕"
 
-#: config/qtcurveconfig.cpp:761
+#: config/qtcurveconfig.cpp:772
 msgid "Add glow in the middle"
 msgstr "在中间添加光晕"
 
-#: config/qtcurveconfig.cpp:762
+#: config/qtcurveconfig.cpp:773
 msgid "Add glow at the end"
 msgstr "在后端添加光晕"
 
-#: config/qtcurveconfig.cpp:767
+#: config/qtcurveconfig.cpp:778
 msgid "Small (%1 pixels)"
 msgstr "小（%1像素）"
 
-#: config/qtcurveconfig.cpp:768
+#: config/qtcurveconfig.cpp:779
 msgid "Large (%1 pixels)"
 msgstr "大（%1像素）"
 
-#: config/qtcurveconfig.cpp:783
+#: config/qtcurveconfig.cpp:794
 msgid "Titlebar only"
 msgstr "仅标题栏"
 
-#: config/qtcurveconfig.cpp:784
+#: config/qtcurveconfig.cpp:795
 msgid "Titlebar and menubar"
 msgstr "标题栏和菜单栏"
 
-#: config/qtcurveconfig.cpp:785
+#: config/qtcurveconfig.cpp:796
 msgid "Titlebar, menubar, and toolbars"
 msgstr "标题栏，菜单栏和工具栏"
 
-#: config/qtcurveconfig.cpp:786
+#: config/qtcurveconfig.cpp:797
 msgid "All empty areas"
 msgstr "所有的空白区域"
 
-#: config/qtcurveconfig.cpp:793
+#: config/qtcurveconfig.cpp:804
 msgid "Standard frame border"
 msgstr "常规框架边框"
 
-#: config/qtcurveconfig.cpp:794
+#: config/qtcurveconfig.cpp:805
 msgid "Single separator line"
 msgstr "单分隔线"
 
-#: config/qtcurveconfig.cpp:795
+#: config/qtcurveconfig.cpp:806
 msgid "Shaded background"
 msgstr "加深背景"
 
-#: config/qtcurveconfig.cpp:796
+#: config/qtcurveconfig.cpp:807
 msgid "Faded background"
 msgstr "渐变背景"
 
-#: config/qtcurveconfig.cpp:808
+#: config/qtcurveconfig.cpp:819
 msgid "Outside frame"
 msgstr "在框架外"
 
-#: config/qtcurveconfig.cpp:809
+#: config/qtcurveconfig.cpp:820
 msgid "On frame"
 msgstr "在框架上"
 
-#: config/qtcurveconfig.cpp:810
+#: config/qtcurveconfig.cpp:821
 msgid "Inside frame"
 msgstr "在框架内"
 
-#: config/qtcurveconfig.cpp:815
+#: config/qtcurveconfig.cpp:826
 msgid "Standard (auto-raise)"
 msgstr "常规（自动突升）"
 
-#: config/qtcurveconfig.cpp:817
+#: config/qtcurveconfig.cpp:828
 msgid "Raised and joined"
 msgstr "突升并合并"
 
 #. i18n: file: config/qtcurveconfigbase.ui:1097
 #. i18n: ectx: property (suffix), widget (KIntNumInput, sliderWidth)
-#: config/qtcurveconfig.cpp:931 po/rc.cpp:429 rc.cpp:429
+#: config/qtcurveconfig.cpp:942 po/rc.cpp:429 rc.cpp:429
 msgid " pixels"
 msgstr " 像素"
 
-#: config/qtcurveconfig.cpp:944
+#: config/qtcurveconfig.cpp:955
 msgid "Menu Background"
 msgstr "菜单背景"
 
-#: config/qtcurveconfig.cpp:945
+#: config/qtcurveconfig.cpp:956
 msgid "Background Image"
 msgstr "背景图像："
 
-#: config/qtcurveconfig.cpp:949
+#: config/qtcurveconfig.cpp:960
 msgid "Menu Image"
 msgstr "菜单图像"
 
-#: config/qtcurveconfig.cpp:1688
+#: config/qtcurveconfig.cpp:1705
 msgid "Presets and Preview"
 msgstr "预设和预览"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:30
 #. i18n: ectx: attribute (title), widget (QWidget, generalTab)
-#: config/qtcurveconfig.cpp:1689 po/rc.cpp:1766 rc.cpp:1766
+#: config/qtcurveconfig.cpp:1706 po/rc.cpp:1766 rc.cpp:1766
 msgid "General"
 msgstr "常规"
 
-#: config/qtcurveconfig.cpp:1690
+#: config/qtcurveconfig.cpp:1707
 msgid "Rounding"
 msgstr "圆角"
 
 #. i18n: file: kwinconfig/qtcurvekwinconfigwidget.ui:209
 #. i18n: ectx: attribute (title), widget (QWidget, opacityTab)
-#: config/qtcurveconfig.cpp:1691 po/rc.cpp:1832 rc.cpp:1832
+#: config/qtcurveconfig.cpp:1708 po/rc.cpp:1832 rc.cpp:1832
 msgid "Opacity"
 msgstr "透明"
 
-#: config/qtcurveconfig.cpp:1692
+#: config/qtcurveconfig.cpp:1709
 msgid "Group Boxes"
 msgstr "分组"
 
-#: config/qtcurveconfig.cpp:1693
+#: config/qtcurveconfig.cpp:1710
 msgid "Combos"
 msgstr "组合框"
 
-#: config/qtcurveconfig.cpp:1694
+#: config/qtcurveconfig.cpp:1711
 msgid "Spin Buttons"
 msgstr "微调按钮"
 
-#: config/qtcurveconfig.cpp:1695
+#: config/qtcurveconfig.cpp:1712
 msgid "Splitters"
 msgstr "分隔线"
 
-#: config/qtcurveconfig.cpp:1696
+#: config/qtcurveconfig.cpp:1713
 msgid "Sliders and Scrollbars"
 msgstr "滑块和滚动条"
 
 #. i18n: file: config/qtcurveconfigbase.ui:496
 #. i18n: ectx: property (text), widget (QCheckBox, squareProgress)
-#: config/qtcurveconfig.cpp:1697 po/rc.cpp:173 rc.cpp:173
+#: config/qtcurveconfig.cpp:1714 po/rc.cpp:173 rc.cpp:173
 msgid "Progressbars"
 msgstr "进度条"
 
-#: config/qtcurveconfig.cpp:1698
+#: config/qtcurveconfig.cpp:1715
 msgid "Default Button"
 msgstr "默认按钮"
 
-#: config/qtcurveconfig.cpp:1699
+#: config/qtcurveconfig.cpp:1716
 msgid "Mouse-over"
 msgstr "鼠标滑过"
 
-#: config/qtcurveconfig.cpp:1700
+#: config/qtcurveconfig.cpp:1717
 msgid "Item Views"
 msgstr "项目视图"
 
-#: config/qtcurveconfig.cpp:1701
+#: config/qtcurveconfig.cpp:1718
 msgid "Scrollviews"
 msgstr "滚动条视图"
 
-#: config/qtcurveconfig.cpp:1702
+#: config/qtcurveconfig.cpp:1719
 msgid "Tabs"
 msgstr "标签"
 
-#: config/qtcurveconfig.cpp:1703
+#: config/qtcurveconfig.cpp:1720
 msgid "Checks and Radios"
 msgstr "复选框和单选钮"
 
-#: config/qtcurveconfig.cpp:1704
+#: config/qtcurveconfig.cpp:1721
 msgid "Windows"
 msgstr "窗口"
 
-#: config/qtcurveconfig.cpp:1711
+#: config/qtcurveconfig.cpp:1728
 msgid ""
 "<p><b>NOTE:</b><i>The settings here affect the borders drawn around "
 "application windows and dialogs - and not internal (or MDI) windows. "
@@ -726,97 +727,97 @@ msgstr ""
 "<p><b>注意：</b><i>这里的设置会影响周围应用程序窗口和对话框的边框，而不是内部"
 "（或MDI）窗口。因此，这些设置将<b>不会</b>在预览中显示出来</i></p>"
 
-#: config/qtcurveconfig.cpp:1717
+#: config/qtcurveconfig.cpp:1734
 msgid "Window Manager"
 msgstr "窗口管理器"
 
-#: config/qtcurveconfig.cpp:1719
+#: config/qtcurveconfig.cpp:1736
 msgid "Window buttons"
 msgstr "窗口按钮"
 
-#: config/qtcurveconfig.cpp:1720
+#: config/qtcurveconfig.cpp:1737
 msgid "Window button colors"
 msgstr "窗口按钮颜色"
 
-#: config/qtcurveconfig.cpp:1721
+#: config/qtcurveconfig.cpp:1738
 msgid "Menubars"
 msgstr "菜单栏"
 
 #. i18n: file: config/qtcurveconfigbase.ui:571
 #. i18n: ectx: property (text), widget (QCheckBox, squarePopupMenus)
-#: config/qtcurveconfig.cpp:1722 po/rc.cpp:212 rc.cpp:212
+#: config/qtcurveconfig.cpp:1739 po/rc.cpp:212 rc.cpp:212
 msgid "Popup menus"
 msgstr "弹出菜单"
 
-#: config/qtcurveconfig.cpp:1723
+#: config/qtcurveconfig.cpp:1740
 msgid "Toolbars"
 msgstr "工具栏"
 
-#: config/qtcurveconfig.cpp:1724
+#: config/qtcurveconfig.cpp:1741
 msgid "Statusbars"
 msgstr "状态栏"
 
-#: config/qtcurveconfig.cpp:1725
+#: config/qtcurveconfig.cpp:1742
 msgid "Dock windows"
 msgstr "停靠窗口"
 
-#: config/qtcurveconfig.cpp:1726
+#: config/qtcurveconfig.cpp:1743
 msgid "Advanced Settings"
 msgstr "高级设置"
 
-#: config/qtcurveconfig.cpp:1727
+#: config/qtcurveconfig.cpp:1744
 msgid "Applications"
 msgstr "应用程序"
 
-#: config/qtcurveconfig.cpp:1728
+#: config/qtcurveconfig.cpp:1745
 msgid "Legacy"
 msgstr "向下兼容"
 
-#: config/qtcurveconfig.cpp:1729
+#: config/qtcurveconfig.cpp:1746
 msgid "Custom Gradients"
 msgstr "自定义渐变度"
 
-#: config/qtcurveconfig.cpp:1730
+#: config/qtcurveconfig.cpp:1747
 msgid "Custom Shades"
 msgstr "自定义色调"
 
-#: config/qtcurveconfig.cpp:1747
+#: config/qtcurveconfig.cpp:1764
 msgid "Save"
 msgstr "保存"
 
-#: config/qtcurveconfig.cpp:1748
+#: config/qtcurveconfig.cpp:1765
 msgid "Delete"
 msgstr "删除"
 
-#: config/qtcurveconfig.cpp:1749
+#: config/qtcurveconfig.cpp:1766
 msgid "Import..."
 msgstr "导入..."
 
-#: config/qtcurveconfig.cpp:1750
+#: config/qtcurveconfig.cpp:1767
 msgid "Export..."
 msgstr "导出..."
 
-#: config/qtcurveconfig.cpp:1754
+#: config/qtcurveconfig.cpp:1771
 msgid "(Current)"
 msgstr "当前"
 
-#: config/qtcurveconfig.cpp:1755
+#: config/qtcurveconfig.cpp:1772
 msgid "(Default)"
 msgstr "默认"
 
-#: config/qtcurveconfig.cpp:2044
+#: config/qtcurveconfig.cpp:2061
 msgid ""
 "Export your current KDE4 color palette, and font, so that they can be used "
 "by KDE3 applications?"
 msgstr "要导出您当前的调色板和字体设置，以便它们可以应用于KDE3应用程序？"
 
-#: config/qtcurveconfig.cpp:2090
+#: config/qtcurveconfig.cpp:2107
 msgid ""
 "Export your current KDE4 color palette, and font, so that they can be used "
 "by pure-Qt3 applications?"
 msgstr "要导出您当前的调色板和字体设置，以便它们可以应用于纯Qt3应用程序？"
 
-#: config/qtcurveconfig.cpp:2143
+#: config/qtcurveconfig.cpp:2160
 msgid ""
 "<p>Set the following config items so that window titlebar and menubars "
 "appear blended?</p><ul><li>Menubar, titlebar, and inactive titlebar gradient "
@@ -828,101 +829,101 @@ msgstr ""
 "题栏和非活动标题栏融合到“%1”</li><li>不启用“将标题栏颜色与背景色融合”。</"
 "li><li>将菜单栏着色设置成与“%2”相同。</li><li>把窗口拖拽延伸到菜单栏。</li>"
 
-#: config/qtcurveconfig.cpp:2215
+#: config/qtcurveconfig.cpp:2233
 msgid "Reattach"
 msgstr "回归"
 
 #. i18n: file: config/qtcurveconfigbase.ui:218
 #. i18n: ectx: property (text), widget (QPushButton, previewControlButton)
-#: config/qtcurveconfig.cpp:2232 po/rc.cpp:55 rc.cpp:55
+#: config/qtcurveconfig.cpp:2250 po/rc.cpp:55 rc.cpp:55
 msgid "Detach"
 msgstr "漂移"
 
-#: config/qtcurveconfig.cpp:2251
+#: config/qtcurveconfig.cpp:2269
 msgid "Copy settings from another gradient"
 msgstr "复制其他的渐变设置"
 
-#: config/qtcurveconfig.cpp:2265
+#: config/qtcurveconfig.cpp:2283
 msgid "Add"
 msgstr "添加"
 
-#: config/qtcurveconfig.cpp:2266
+#: config/qtcurveconfig.cpp:2284
 msgid "Remove"
 msgstr "删除"
 
-#: config/qtcurveconfig.cpp:2267
+#: config/qtcurveconfig.cpp:2285
 msgid "Update"
 msgstr "更新"
 
-#: config/qtcurveconfig.cpp:2479
+#: config/qtcurveconfig.cpp:2497
 msgid "Save Preset"
 msgstr "保存预设"
 
-#: config/qtcurveconfig.cpp:2479
+#: config/qtcurveconfig.cpp:2497
 msgid "Please enter a name for the preset:"
 msgstr "请键入预设的名字"
 
-#: config/qtcurveconfig.cpp:2481
+#: config/qtcurveconfig.cpp:2499
 msgid "New preset"
 msgstr "新预设"
 
-#: config/qtcurveconfig.cpp:2484 config/qtcurveconfig.cpp:2568
-#: config/qtcurveconfig.cpp:2582 config/qtcurveconfig.cpp:2595
+#: config/qtcurveconfig.cpp:2502 config/qtcurveconfig.cpp:2586
+#: config/qtcurveconfig.cpp:2600 config/qtcurveconfig.cpp:2613
 msgid "%1 New"
 msgstr "新%1"
 
-#: config/qtcurveconfig.cpp:2487
+#: config/qtcurveconfig.cpp:2505
 msgid "Sorry, failed to save preset"
 msgstr "抱歉，保存预设失败..."
 
-#: config/qtcurveconfig.cpp:2566
+#: config/qtcurveconfig.cpp:2584
 msgid ""
 "<p>You cannot use the name \"%1\".</p><p>Please enter a different name:<p>"
 msgstr "<p>您不能使用“%1”这个名字。</p><p>请再换一个试试：<p>"
 
-#: config/qtcurveconfig.cpp:2580
+#: config/qtcurveconfig.cpp:2598
 msgid ""
 "<p>A system defined preset named\"%1\" aleady exists.</p><p>Please enter a "
 "new name:<p>"
 msgstr "<p>一个名为“%1”的系统预设已经存在。</p><p>请换一个新名字：<p>"
 
-#: config/qtcurveconfig.cpp:2587
+#: config/qtcurveconfig.cpp:2605
 msgid ""
 "<p>A preset named \"%1\" aleady exists.</p><p>Do you wish to overwrite this?"
 "<p>"
 msgstr "<p>一个名为“%1”的预设已经存在。</p><p>您确定要覆盖它吗？<p>"
 
-#: config/qtcurveconfig.cpp:2594
+#: config/qtcurveconfig.cpp:2612
 msgid "<p>Please enter a new name:<p>"
 msgstr "<p>请输入一个新名字：<p>"
 
-#: config/qtcurveconfig.cpp:2612
+#: config/qtcurveconfig.cpp:2630
 msgid "<p>Are you sure you wish to delete:</p><p><b>%1</b></p>"
 msgstr "<p>您确定要删除这个预设？</p><p><b>%1</b></p>"
 
-#: config/qtcurveconfig.cpp:2622
+#: config/qtcurveconfig.cpp:2640
 msgid "<p>Sorry, failed to remove the preset file:</p><p><i>%1</i></p>"
 msgstr "<p>抱歉，无法删除以下预设文件：</p><p><i>%1</i></p>"
 
-#: config/qtcurveconfig.cpp:2634 config/qtcurveconfig.cpp:2777
+#: config/qtcurveconfig.cpp:2652 config/qtcurveconfig.cpp:2798
 msgid "*"
 msgstr ""
 
-#: config/qtcurveconfig.cpp:2647
+#: config/qtcurveconfig.cpp:2665
 msgid "<p>Sorry, failed to load file.</p><p><i>Empty preset name?</i></p>"
 msgstr "<p>抱歉，载入文件失败。</p><p><i>预设名为空？</i></p>"
 
-#: config/qtcurveconfig.cpp:2649
+#: config/qtcurveconfig.cpp:2667
 msgid ""
 "<p>Sorry, failed to load file.</p><p><i>Cannot have a preset named \"%1\"</"
 "i></p>"
 msgstr "<p>抱歉，载入文件失败。</p><p><i>不能将预设命名为“%1”。</i></p>"
 
-#: config/qtcurveconfig.cpp:2661
+#: config/qtcurveconfig.cpp:2679
 msgid "Sorry, failed to open compressed file."
 msgstr "抱歉，打开压缩文件失败。"
 
-#: config/qtcurveconfig.cpp:2682
+#: config/qtcurveconfig.cpp:2700
 msgid ""
 "Invalid compressed settings file.\n"
 "(Could not locate settings file.)"
@@ -930,7 +931,7 @@ msgstr ""
 "无效的压缩配置文件。\n"
 "（找不到配置文件。）"
 
-#: config/qtcurveconfig.cpp:2685
+#: config/qtcurveconfig.cpp:2703
 msgid ""
 "Invalid compressed settings file.\n"
 "(Could not list ZIP contents.)"
@@ -938,15 +939,15 @@ msgstr ""
 "无效的压缩配置文件。\n"
 "（无法列出压缩内容。）"
 
-#: config/qtcurveconfig.cpp:2693
+#: config/qtcurveconfig.cpp:2711
 msgid "Import Preset"
 msgstr "导入预设"
 
-#: config/qtcurveconfig.cpp:2747
+#: config/qtcurveconfig.cpp:2768
 msgid "Sorry, failed to load file."
 msgstr "抱歉，导入文件失败。"
 
-#: config/qtcurveconfig.cpp:2759
+#: config/qtcurveconfig.cpp:2780
 msgid ""
 "<p>In which format would you like to export the QtCurve settings?"
 "<ul><li><i>QtCurve settings file</i> - a file to be imported via this config "
@@ -957,19 +958,19 @@ msgstr ""
 "过本配置对话框导入</li><li><i>独立主题文件</i>——可以从KDE风格面板中选择</"
 "li></ul></p>"
 
-#: config/qtcurveconfig.cpp:2764
+#: config/qtcurveconfig.cpp:2785
 msgid "Export Settings"
 msgstr "导出配置"
 
-#: config/qtcurveconfig.cpp:2765
+#: config/qtcurveconfig.cpp:2786
 msgid "QtCurve Settings File"
 msgstr "QtCurve配置文件"
 
-#: config/qtcurveconfig.cpp:2765
+#: config/qtcurveconfig.cpp:2786
 msgid "Standalone Theme"
 msgstr "独立主题文件"
 
-#: config/qtcurveconfig.cpp:2852
+#: config/qtcurveconfig.cpp:2878
 msgid ""
 "Could not write to file:\n"
 "%1"
@@ -1065,11 +1066,11 @@ msgstr "菜单栏开关"
 msgid "Toggle Statusbar"
 msgstr "状态栏开关"
 
-#: kwin/qtcurvetogglebutton.cpp:155
+#: kwin/qtcurvetogglebutton.cpp:156
 msgid "M"
 msgstr ""
 
-#: kwin/qtcurvetogglebutton.cpp:155
+#: kwin/qtcurvetogglebutton.cpp:156
 msgid "S"
 msgstr ""
 
@@ -1219,11 +1220,11 @@ msgstr "<p>把您当前的配置导出到一个文件中，以便与他人共享
 
 #. i18n: file: config/qtcurveconfigbase.ui:183
 #. i18n: ectx: property (title), widget (QGroupBox, previewGroupBox)
-#. i18n: file: config/qtcurveconfigbase.ui:4210
+#. i18n: file: config/qtcurveconfigbase.ui:4207
 #. i18n: ectx: property (title), widget (QGroupBox, gradPreviewBox)
 #. i18n: file: config/qtcurveconfigbase.ui:183
 #. i18n: ectx: property (title), widget (QGroupBox, previewGroupBox)
-#. i18n: file: config/qtcurveconfigbase.ui:4210
+#. i18n: file: config/qtcurveconfigbase.ui:4207
 #. i18n: ectx: property (title), widget (QGroupBox, gradPreviewBox)
 #: po/rc.cpp:52 po/rc.cpp:1548 rc.cpp:52 rc.cpp:1548
 msgid "Preview"
@@ -3833,7 +3834,7 @@ msgid ""
 msgstr "<p>定义工具栏周围的边框样式。（该设置同时会影响到菜单栏）"
 
 #. i18n: file: config/qtcurveconfigbase.ui:3416
-#. i18n: ectx: property (text), widget (QLabel, textLabel1_4)
+#. i18n: ectx: property (text), widget (QLabel, textLabel1_4b)
 #: po/rc.cpp:1240 rc.cpp:1240
 msgid "Button style:"
 msgstr "按钮样式："
@@ -4541,31 +4542,31 @@ msgstr ""
 "<p><i><u>变化值</u>是从0%到200%的一系列值——120%的值表示亮化20%，而80%的值表示"
 "暗化20%。</i></p>"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4225
+#. i18n: file: config/qtcurveconfigbase.ui:4222
 #. i18n: ectx: property (toolTip), widget (KColorButton, previewColor)
 #: po/rc.cpp:1551 rc.cpp:1551
 msgid "<p>Set the color to be used in the preview."
 msgstr "<p>设置预览时使用的颜色。"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4240
+#. i18n: file: config/qtcurveconfigbase.ui:4237
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: po/rc.cpp:1554 rc.cpp:1554
 msgid "Shading routine:"
 msgstr "着色程序："
 
-#. i18n: file: config/qtcurveconfigbase.ui:4253
+#. i18n: file: config/qtcurveconfigbase.ui:4250
 #. i18n: ectx: property (toolTip), widget (QComboBox, shading)
 #: po/rc.cpp:1557 rc.cpp:1557
 msgid "<p>Sets the color space that is used when shading a color."
 msgstr "<p>设置当暗化一种颜色时使用的颜色空间"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4260
+#. i18n: file: config/qtcurveconfigbase.ui:4257
 #. i18n: ectx: property (title), widget (QGroupBox, customShading)
 #: po/rc.cpp:1560 rc.cpp:1560
 msgid "Use Custom Shades"
 msgstr "使用自定义色调"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4287
+#. i18n: file: config/qtcurveconfigbase.ui:4284
 #. i18n: ectx: property (text), widget (QLabel, label_4)
 #: po/rc.cpp:1563 rc.cpp:1563
 msgid ""
@@ -4600,19 +4601,19 @@ msgstr ""
 "<li>用于大部分部件的边框。</li>\n"
 "</ol></p></i>"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4369
+#. i18n: file: config/qtcurveconfigbase.ui:4366
 #. i18n: ectx: property (title), widget (QGroupBox, customAlphas)
 #: po/rc.cpp:1574 rc.cpp:1574
 msgid "Use Custom Alpha Values"
 msgstr "使用自定义α值"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4378
+#. i18n: file: config/qtcurveconfigbase.ui:4375
 #. i18n: ectx: property (text), widget (QLabel, label_light_alpha)
 #: po/rc.cpp:1577 rc.cpp:1577
 msgid "Light:"
 msgstr "光亮："
 
-#. i18n: file: config/qtcurveconfigbase.ui:4404
+#. i18n: file: config/qtcurveconfigbase.ui:4401
 #. i18n: ectx: property (text), widget (QLabel, label_4b)
 #: po/rc.cpp:1580 rc.cpp:1580
 msgid ""
@@ -4626,7 +4627,7 @@ msgstr ""
 "图通过亮化（或暗化）父窗口来实现这个——如果没有父窗口，则会使用带有α值的白色或"
 "黑色。这种行为可能会被重写，而α值会通过检测上面的选项一直使用。</p>"
 
-#. i18n: file: config/qtcurveconfigbase.ui:4417
+#. i18n: file: config/qtcurveconfigbase.ui:4414
 #. i18n: ectx: property (text), widget (QLabel, label_dark_alpha)
 #: po/rc.cpp:1583 rc.cpp:1583
 msgid "Dark:"
