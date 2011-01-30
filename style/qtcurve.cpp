@@ -7668,10 +7668,12 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             int iconExtent = pixelMetric(PM_ToolBarIconSize);
                             iconSize = QSize(iconExtent, iconExtent);
                         }
+                        /* Not required?
                         else if(iconSize.width()>iconSize.height())
                             iconSize.setWidth(iconSize.height());
                         else if(iconSize.width()<iconSize.height())
                             iconSize.setHeight(iconSize.width());
+                        */
 
                         if(iconSize.width()>tb->rect.size().width())
                             iconSize=QSize(tb->rect.size().width(), tb->rect.size().width());
