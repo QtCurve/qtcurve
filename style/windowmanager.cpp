@@ -352,13 +352,13 @@ namespace QtCurve
 
         // all accepted default types
         if(
-            ( widget->inherits( "QDialog" ) && widget->isWindow() ) ||
-            ( widget->inherits( "QMainWindow" ) && widget->isWindow() ) ||
-            widget->inherits( "QGroupBox" ) ||
-            widget->inherits( "QMenuBar" ) ||
-            widget->inherits( "QTabBar" ) ||
-            widget->inherits( "QStatusBar" ) ||
-            widget->inherits( "QToolBar" ) )
+            ( qobject_cast<QDialog*>( widget ) && widget->isWindow() ) ||
+            ( qobject_cast<QMainWindow*>( widget ) && widget->isWindow() ) ||
+            qobject_cast<QGroupBox*>( widget ) ||
+            qobject_cast<QMenuBar*>( widget ) ||
+            qobject_cast<QTabBar*>( widget ) ||
+            qobject_cast<QStatusBar*>( widget ) ||
+            qobject_cast<QToolBar*>( widget ) )
         { return true; }
 
         if( widget->inherits( "KScreenSaver" ) && widget->inherits( "KCModule" ) )
@@ -399,7 +399,7 @@ namespace QtCurve
             QWidget* parent = label->parentWidget();
             while( parent )
             {
-                if( parent->inherits( "QStatusBar" ) ) return true;
+                if( qobject_cast<QStatusBar*>( parent ) ) return true;
                 parent = parent->parentWidget();
             }
         }
@@ -434,7 +434,6 @@ namespace QtCurve
     bool WindowManager::isWhiteListed( QWidget* widget ) const
     {
 
-        //foreach( const QString& className, blackList_ )
         QString appName( qApp->applicationName() );
         foreach( const ExceptionId& id, whiteList_ )
         {
@@ -482,8 +481,8 @@ namespace QtCurve
         even if mousePress/Move has been passed to the parent
         */
         if( child && (
-          child->inherits( "QComboBox" ) ||
-          child->inherits( "QProgressBar" ) ) )
+          qobject_cast<QComboBox*>(child ) ||
+          qobject_cast<QProgressBar*>( child ) ) )
         { return false; }
 
         // tool buttons
@@ -521,7 +520,7 @@ namespace QtCurve
         */
         if( dragMode() < WM_DRAG_ALL )
         {
-            if( widget->inherits( "QToolBar" ) ) return true;
+            if( qobject_cast<QToolBar*>( widget ) ) return true;
             else return false;
         }
 
@@ -571,7 +570,10 @@ namespace QtCurve
 
         // abstract item views
         QAbstractItemView* itemView( NULL );
-        if( ( itemView = qobject_cast<QListView*>( widget->parentWidget() ) ) )
+        if(
+            ( itemView = qobject_cast<QListView*>( widget->parentWidget() ) ) ||
+            ( itemView = qobject_cast<QTreeView*>( widget->parentWidget() ) ) )
+        )
         {
             if( widget == itemView->viewport() )
             {
