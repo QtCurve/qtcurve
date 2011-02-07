@@ -195,7 +195,7 @@ namespace QtCurve
 
         blackList_.clear();
         blackList_.insert( ExceptionId( "CustomTrackView@kdenlive" ) );
-
+        blackList_.insert( ExceptionId( "MuseScore" ) );
         foreach( const QString& exception, list )
         {
             ExceptionId id( exception );

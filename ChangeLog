@@ -3,6 +3,7 @@
 1. Fix fill of bottom corners of kwin decoration when not compositing.
 2. Fix sunken left background of kwin decoration when not compositing.
 3. Don't force toolbar icons to be square.
+4. Fix drag issue with MusicScore.
 
 1.8.4
 -----
