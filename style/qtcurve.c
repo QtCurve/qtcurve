@@ -1908,7 +1908,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
              state=GTK_STATE_SELECTED;
 #endif
             
-        if(opts.shadeMenubarOnlyWhenActive)
+        if(mb && opts.shadeMenubarOnlyWhenActive)
             activeWindow=qtcWindowIsActive(gtk_widget_get_toplevel(widget));
 
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
