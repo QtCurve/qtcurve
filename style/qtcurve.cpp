@@ -5538,7 +5538,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 painter->setRenderHint(QPainter::Antialiasing, true);
             if(haveAlpha)
                 col.setAlphaF(0.875);
-            drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_OTHER, !haveAlpha);
+            drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_TOOLTIP, !haveAlpha);
             if(IS_FLAT(opts.tooltipAppearance))
             {
                 painter->setPen(QPen(palette.toolTipText(), 0));
@@ -10992,7 +10992,8 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
                                      titleBar(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR &&
                                                     (WIDGET_MDI_WINDOW==w || WIDGET_MDI_WINDOW_TITLE==w ||
                                                      (opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR &&
-                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt)));
+                                                                     WIDGET_DOCK_WIDGET_TITLE==w && !dwt))),
+                                     reverse(Qt::RightToLeft==QApplication::layoutDirection());
     const Gradient                   *grad=qtcGetGradient(app, &opts);
     QLinearGradient                  g(r.topLeft(), horiz ? r.bottomLeft() : r.topRight());
     GradientStopCont::const_iterator it(grad->stops.begin()),
@@ -11014,13 +11015,13 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             else
             {
                 col=base;
-                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd && Qt::RightToLeft!=QApplication::layoutDirection()) || dwt)
+                if((sel /*&& CUSTOM_BGND*/ && 0==opts.tabBgnd && !reverse) || dwt)
                     col.setAlphaF(0.0);
             }
         }
         else
             shade(base, &col, botTab && opts.invertBotTab ? qMax(INVERT_SHADE((*it).val), 0.9) : (*it).val);
-        if((*it).alpha<1.0)
+        if(WIDGET_TOOLTIP!=w && (*it).alpha<1.0)
             col.setAlphaF(col.alphaF()*(*it).alpha);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }

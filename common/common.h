@@ -674,6 +674,7 @@ typedef enum
     WIDGET_MENU_BUTTON,        // Qt4 only
     WIDGET_FOCUS,
     WIDGET_TAB_FRAME,
+    WIDGET_TOOLTIP,
     WIDGET_OTHER
 } EWidget;
 

@@ -4,6 +4,7 @@
 2. Fix sunken left background of kwin decoration when not compositing.
 3. Don't force toolbar icons to be square.
 4. Fix drag issue with MusicScore.
+5. Don't use gradient alpha settings for tooltips.
 
 1.8.4
 -----
