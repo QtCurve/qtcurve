@@ -37,12 +37,16 @@
 #include "utils.h"
 
 #include <QtGui/QApplication>
+#include <QtGui/QComboBox>
+#include <QtGui/QDialog>
 #include <QtGui/QDockWidget>
 #include <QtGui/QGroupBox>
 #include <QtGui/QLabel>
 #include <QtGui/QListView>
+#include <QtGui/QMainWindow>
 #include <QtGui/QMenuBar>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QStatusBar>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleOptionGroupBox>
 #include <QtGui/QTabBar>
@@ -573,7 +577,6 @@ namespace QtCurve
         if(
             ( itemView = qobject_cast<QListView*>( widget->parentWidget() ) ) ||
             ( itemView = qobject_cast<QTreeView*>( widget->parentWidget() ) ) )
-        )
         {
             if( widget == itemView->viewport() )
             {
