@@ -2917,11 +2917,7 @@ void drawMenuItem(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *w
             x++, y++, width-=2, height-=2;
 
         if(grayItem && !mb && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
-            itemCols=SHADE_WINDOW_BORDER==opts.shadeMenubars
-                    ? qtcPalette.wborder[0]
-                    : qtcPalette.menu
-                        ? qtcPalette.menu
-                        : qtcPalette.background;
+            itemCols=qtcPalette.menu;
                         
         if(!mb && APPEARANCE_FADE==opts.menuitemAppearance)
         {
@@ -3082,9 +3078,6 @@ void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widge
 
     if(opts.popupBorder)
     {
-        GdkColor        *cols=USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu
-                            ? qtcPalette.menu
-                            : qtcPalette.background;
         EGradientBorder border=qtcGetGradient(opts.menuBgndAppearance, &opts)->border;
 
         if(roundedMenu && !comboMenu)
@@ -3094,7 +3087,7 @@ void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widge
             cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
         cairo_new_path(cr);
-        cairo_set_source_rgb(cr, CAIRO_COL(cols[STD_BORDER]));
+        cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.menu[STD_BORDER]));
             /*For now dont round combos - getting weird effects with shadow/clipping :-( */
         if(roundedMenu && !comboMenu)
             createPath(cr, x+0.5, y+0.5, width-1, height-1, radius-1, ROUNDED_ALL);
@@ -3108,12 +3101,12 @@ void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widge
                 if(GB_3D!=border)
                 {
                     cairo_new_path(cr);
-                    cairo_set_source_rgb(cr, CAIRO_COL(cols[0]));
+                    cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.menu[0]));
                     createTLPath(cr, x+1.5, y+1.5, width-3, height-3, radius-2, ROUNDED_ALL);
                     cairo_stroke(cr);
                 }
                 cairo_new_path(cr);
-                cairo_set_source_rgb(cr, CAIRO_COL(cols[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]));
+                cairo_set_source_rgb(cr, CAIRO_COL(qtcPalette.menu[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]));
                 createBRPath(cr, x+1.5, y+1.5, width-3, height-3, radius-2, ROUNDED_ALL);
                 cairo_stroke(cr);
             }
@@ -3121,11 +3114,11 @@ void drawMenu(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widge
             {
                 if(GB_3D!=border)
                 {
-                    drawHLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, width-2);
-                    drawVLine(cr, CAIRO_COL(cols[0]), 1.0, x+1, y+1, height-2);
+                    drawHLine(cr, CAIRO_COL(qtcPalette.menu[0]), 1.0, x+1, y+1, width-2);
+                    drawVLine(cr, CAIRO_COL(qtcPalette.menu[0]), 1.0, x+1, y+1, height-2);
                 }
-                drawHLine(cr, CAIRO_COL(cols[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]), 1.0, x+1, y+height-2, width-2);
-                drawVLine(cr, CAIRO_COL(cols[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
+                drawHLine(cr, CAIRO_COL(qtcPalette.menu[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]), 1.0, x+1, y+height-2, width-2);
+                drawVLine(cr, CAIRO_COL(qtcPalette.menu[GB_LIGHT==border ? 0 : FRAME_DARK_SHADOW]), 1.0, x+width-2, y+1, height-2);
             }
         }
     }

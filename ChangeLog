@@ -5,6 +5,7 @@
    gradient uses alpha.
 3. Fix highlighted menu items when shading poup menus.
 4. Don't use gradient alpha settings for tooltips or rulers.
+5. Fix background of popup menus when set to be shaded as per menubars.
 
 1.8.5
 -----

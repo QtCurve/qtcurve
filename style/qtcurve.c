@@ -1441,11 +1441,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
             offset+=2;
 
         if(isMenuItem && (USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu))
-            cols=SHADE_WINDOW_BORDER==opts.shadeMenubars
-                    ? qtcPalette.wborder[0]
-                    : qtcPalette.menu
-                        ? qtcPalette.menu
-                        : qtcPalette.background;
+            cols=qtcPalette.menu;
 
         drawFadedLine(cr, x+1+offset, y+(height>>1), width-(1+offset), 1, &cols[isMenuItem ? MENU_SEP_SHADE : STD_BORDER], area, NULL,
                       TRUE, TRUE, TRUE);
@@ -2343,11 +2339,7 @@ static void gtkDrawHLine(GtkStyle *style, GdkWindow *window, GtkStateType state,
             offset+=2;
 
         if(USE_LIGHTER_POPUP_MENU || opts.shadePopupMenu)
-            cols=SHADE_WINDOW_BORDER==opts.shadeMenubars
-                    ? qtcPalette.wborder[0]
-                    : qtcPalette.menu
-                        ? qtcPalette.menu
-                        : qtcPalette.background;
+            cols=qtcPalette.menu;
 
         if(offset && isFakeGtk())
             offset+=2;

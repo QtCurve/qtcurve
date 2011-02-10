@@ -1599,9 +1599,7 @@ void generateColors()
     {
         GdkColor color;
         GdkColor *cols=opts.shadePopupMenu
-                            ? SHADE_WINDOW_BORDER==opts.shadeMenubars
-                                ? qtcPalette.wborder[0]
-                                : qtcPalette.menubar
+                            ? menuColors(TRUE)
                             : qtcPalette.background;
         if(opts.lighterPopupMenuBgnd)
             qtcShade(&opts, &cols[ORIGINAL_SHADE], &color, TO_FACTOR(opts.lighterPopupMenuBgnd));
