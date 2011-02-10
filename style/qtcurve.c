@@ -1890,7 +1890,6 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         GtkNotebook *nb=mb || isMenuItem || !GTK_IS_LABEL(widget) || !parent || !GTK_IS_NOTEBOOK(parent) ? NULL : GTK_NOTEBOOK(parent);
 #endif
         GdkColor      prevColors[NUM_GCS];
-        gboolean      activeWindow=TRUE;
         int           i=0;
 
         if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %s %d %d %d %d %d %s  ", __FUNCTION__, pango_layout_get_text(layout), x, y, state, use_text,
@@ -1908,9 +1907,6 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
              state=GTK_STATE_SELECTED;
 #endif
             
-        if(mb && opts.shadeMenubarOnlyWhenActive)
-            activeWindow=qtcWindowIsActive(gtk_widget_get_toplevel(widget));
-
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
@@ -1951,6 +1947,8 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else if(isMenuItem)
         {
+            gboolean activeWindow=mb && opts.shadeMenubarOnlyWhenActive && widget ? qtcWindowIsActive(gtk_widget_get_toplevel(widget)) : TRUE;
+
             if((opts.shadePopupMenu && GTK_STATE_PRELIGHT==state) || (mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
             {
                 if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
