@@ -3,6 +3,8 @@
 1. Fix compilation against Gtk2 older than 2.20 - yet again!
 2. Fix drawing of background underneath menubars - noticeable if menubar
    gradient uses alpha.
+3. Fix highlighted menu items when shading poup menus.
+4. Don't use gradient alpha settings for tooltips.
 
 1.8.5
 -----

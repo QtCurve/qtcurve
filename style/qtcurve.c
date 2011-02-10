@@ -1955,7 +1955,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         else if(isMenuItem)
         {
-            if(/*opts.shadePopupMenu || */(mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
+            if((opts.shadePopupMenu && GTK_STATE_PRELIGHT==state) || (mb && (activeWindow || SHADE_WINDOW_BORDER==opts.shadeMenubars)))
             {
                 if(SHADE_WINDOW_BORDER==opts.shadeMenubars)
                 {

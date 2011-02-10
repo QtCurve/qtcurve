@@ -199,7 +199,7 @@ void drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y, int w
                 pos=0.999;
 #endif
             cairo_pattern_add_color_stop_rgba(pt, pos,
-                                              CAIRO_COL(col), alpha*grad->stops[i].alpha);
+                                              CAIRO_COL(col), WIDGET_TOOLTIP==w ? alpha : alpha*grad->stops[i].alpha);
         }
 
         if(APPEARANCE_AGUA==app && !(topTab || botTab) && (horiz ? height : width)>AGUA_MAX)
@@ -2765,7 +2765,7 @@ void drawToolTip(cairo_t *cr, GtkWidget *widget, GdkRectangle *area, int x, int 
     if(useAlpha)
         cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
-    drawBevelGradientAlpha(cr, area, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_OTHER, useAlpha ? 0.875 : 1.0);
+    drawBevelGradientAlpha(cr, area, x, y, width, height, col, true, FALSE, opts.tooltipAppearance, WIDGET_TOOLTIP, useAlpha ? 0.875 : 1.0);
 #if GTK_CHECK_VERSION(2,9,0)
     if(!rounded)
 #endif
