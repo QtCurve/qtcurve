@@ -2666,7 +2666,7 @@ static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int 
         cairo_translate(cr, x, y);
 }
 
-void qtcDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, gint x, gint y, PangoLayout *layout)
+void drawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state, gboolean use_text, GdkRectangle *area, gint x, gint y, PangoLayout *layout)
 {
     CAIRO_BEGIN
     gdk_cairo_set_source_color(cr, use_text || GTK_STATE_INSENSITIVE==state ? &style->text[state] : &style->fg[state]);

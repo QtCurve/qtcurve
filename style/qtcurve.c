@@ -1862,7 +1862,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
                           const gchar *detail, gint x, gint y, PangoLayout *layout)
 {
     if(IS_PROGRESS)
-        qtcDrawLayout(style, window, state, use_text, area, x, y, layout);
+        drawLayout(style, window, state, use_text, area, x, y, layout);
     else
     {
         QtCurveStyle *qtcurveStyle=(QtCurveStyle *)style;
@@ -2066,12 +2066,10 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(!opts.useHighlightForMenu && (isMenuItem || mb) && GTK_STATE_INSENSITIVE!=state)
             state=GTK_STATE_NORMAL;
 
-        qtcDrawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area,
-                      x, y, layout);
+        drawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area, x, y, layout);
 
         if(opts.embolden && def_but)
-            qtcDrawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area,
-                          x+1, y, layout);
+            drawLayout(style, window, selectedText ? GTK_STATE_SELECTED : state, use_text || selectedText, area, x+1, y, layout);
 
         if(swapColors)
             for(i=0; i<5; ++i)
