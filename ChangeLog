@@ -4,7 +4,7 @@
 2. Fix drawing of background underneath menubars - noticeable if menubar
    gradient uses alpha.
 3. Fix highlighted menu items when shading poup menus.
-4. Don't use gradient alpha settings for tooltips.
+4. Don't use gradient alpha settings for tooltips or rulers.
 
 1.8.5
 -----

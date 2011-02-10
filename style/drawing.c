@@ -199,7 +199,7 @@ void drawBevelGradientAlpha(cairo_t *cr, GdkRectangle *area, int x, int y, int w
                 pos=0.999;
 #endif
             cairo_pattern_add_color_stop_rgba(pt, pos,
-                                              CAIRO_COL(col), WIDGET_TOOLTIP==w ? alpha : alpha*grad->stops[i].alpha);
+                                              CAIRO_COL(col), WIDGET_TOOLTIP==w || WIDGET_LISTVIEW_HEADER==w ? alpha : alpha*grad->stops[i].alpha);
         }
 
         if(APPEARANCE_AGUA==app && !(topTab || botTab) && (horiz ? height : width)>AGUA_MAX)
