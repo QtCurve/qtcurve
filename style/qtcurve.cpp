@@ -233,6 +233,7 @@ static enum
     APP_KONTACT,
     APP_ARORA,
     APP_REKONQ,
+    APP_OPERA,
     APP_QTDESIGNER,
     APP_QTCREATOR,
     APP_KDEVELOP,
@@ -1478,6 +1479,8 @@ void Style::polish(QApplication *app)
         opts.forceAlternateLvCols=false;
     else if("konsole"==appName)
         theThemedApp=APP_KONSOLE;
+    else if("Kde4ToolkitLibrary"==appName)
+        theThemedApp=APP_OPERA;
 
     if(NULL!=getenv("QTCURVE_DEBUG"))
     {
@@ -2062,7 +2065,7 @@ void Style::polish(QWidget *widget)
              widget->inherits("QComboBoxPrivateContainer") && !widget->testAttribute(Qt::WA_TranslucentBackground))
         setTranslucentBackground(widget);
 
-    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
+    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
     {
         widget->setBackgroundRole(QPalette::NoRole);
         setTranslucentBackground(widget);
@@ -2566,7 +2569,7 @@ void Style::unpolish(QWidget *widget)
     else if(opts.boldProgress && "CE_CapacityBar"==widget->objectName())
         unSetBold(widget);
 
-    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance))
+    if(widget->inherits("QTipLabel") && !IS_FLAT(opts.tooltipAppearance) && APP_OPERA!=theThemedApp)
     {
         widget->setAttribute(Qt::WA_PaintOnScreen, false);
         widget->setAttribute(Qt::WA_NoSystemBackground, false);
@@ -5528,8 +5531,8 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
         // case PE_IndicatorProgressChunk:
         case PE_PanelTipLabel:
         {
-            bool         haveAlpha=Utils::hasAlphaChannel(widget),
-                         rounded=!(opts.square&SQUARE_TOOLTIPS);
+            bool         haveAlpha=Utils::hasAlphaChannel(widget)  && APP_OPERA!=theThemedApp,
+                         rounded=!(opts.square&SQUARE_TOOLTIPS) && APP_OPERA!=theThemedApp;
             QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 

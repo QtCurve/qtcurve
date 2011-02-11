@@ -5,6 +5,7 @@
 3. Don't force toolbar icons to be square.
 4. Fix drag issue with MusicScore.
 5. Don't use gradient alpha settings for tooltips.
+6. Don't do rounded/semi-transparent tooltips for opera.
 
 1.8.4
 -----
