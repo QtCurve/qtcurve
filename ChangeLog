@@ -9,6 +9,7 @@
    using inactive and not active titlebar colour!
 6. When drawing popup text, where shaded as per titlebar, no need to check
    if window is active - it always is.
+7. Improve window drag code.
 
 1.8.5
 -----
