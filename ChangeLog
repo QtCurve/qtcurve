@@ -1,6 +1,8 @@
 1.8.7
 -----
 1. Fix some segfaults with evolution under Fedora 14.
+2. Don't force widnows style scrollbars for Firefox4 - this workaround
+   is no longer required.
 
 1.8.6
 -----

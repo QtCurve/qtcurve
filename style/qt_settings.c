@@ -2515,8 +2515,7 @@ gboolean qtSettingsInit()
                 gtk_rc_parse_string("style \""RC_SETTING"Cmbf\" { xthickness=5 } widget_class \"*.GtkComboBox.GtkFrame\" style \""RC_SETTING"Cmbf\"");
             }
 
-            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app || (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()) ||
-               (GTK_APP_NEW_MOZILLA==qtSettings.app && mozVersion>=MAKE_VERSION(4, 0)))
+            if(GTK_APP_MOZILLA==qtSettings.app || GTK_APP_JAVA==qtSettings.app || (SCROLLBAR_NONE==opts.scrollbarType && isMozilla()))
                 opts.scrollbarType=SCROLLBAR_WINDOWS;
             else
             {
