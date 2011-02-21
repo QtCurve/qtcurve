@@ -4,10 +4,15 @@ set(qtcurve_style_common_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/../common/colorutils.c )
         
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/common ${CMAKE_BINARY_DIR} )
-set(CMAKE_C_FLAGS "${GTK_CFLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GTK_CFLAGS}")
 set(qtcurve_SRCS qtcurve.c qt_settings.c drawing.c helpers.c pixcache.c animation.c combobox.c entry.c menu.c scrollbar.c scrolledwindow.c tab.c treeview.c widgetmap.c window.c wmmove.c ${qtcurve_style_common_SRCS})
 add_library(qtcurve MODULE ${qtcurve_SRCS})
 add_definitions(-DQTC_MOZILLA_DIR=\\\"${GTK_THEME_DIR}/mozilla\\\")
+
+# The following fixes odd segfaults with evolution under Fedora 14.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=676837
+add_definitions(-Dopts=qtcurve_gtk2_opts)
+
 target_link_libraries(qtcurve ${GTK_LINK_FLAGS} -lm -lX11)
 
 if (CMAKE_SYSTEM_NAME MATCHES Linux OR CMAKE_SYSTEM_NAME STREQUAL GNU)

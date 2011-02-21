@@ -1,3 +1,7 @@
+1.8.7
+-----
+1. Fix some segfaults with evolution under Fedora 14.
+
 1.8.6
 -----
 1. Fix compilation against Gtk2 older than 2.20 - yet again!
