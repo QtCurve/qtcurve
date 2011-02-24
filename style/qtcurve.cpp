@@ -1803,7 +1803,8 @@ void Style::polish(QWidget *widget)
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
                    widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") || 
-                   widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint))
+                   widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
+                   !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
                     break;
 
                 // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old

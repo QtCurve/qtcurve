@@ -1,3 +1,8 @@
+1.8.6
+-----
+1. Fix potential crash when using translucency and the raster engine.
+   (Fix taken from oxygen-transparent)
+
 1.8.5
 -----
 1. Fix fill of bottom corners of kwin decoration when not compositing.
