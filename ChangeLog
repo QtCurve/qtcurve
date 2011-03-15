@@ -2,6 +2,8 @@
 -----
 1. Fix potential crash when using translucency and the raster engine.
    (Fix taken from oxygen-transparent)
+2. Fix crash when changing QtCurve settings - handle free'ing of colours
+   better.
 
 1.8.5
 -----

@@ -1359,65 +1359,43 @@ Style::~Style()
 #endif
 }
 
+void Style::freeColor(QSet<QColor *> &freedColors, QColor **cols)
+{
+    if(!freedColors.contains(*cols) &&
+        *cols!=itsHighlightCols &&
+        *cols!=itsBackgroundCols &&
+        *cols!=itsMenubarCols &&
+        *cols!=itsFocusCols &&
+        *cols!=itsMouseOverCols &&
+        *cols!=itsButtonCols &&
+        *cols!=itsColoredButtonCols &&
+        *cols!=itsColoredBackgroundCols &&
+        *cols!=itsColoredHighlightCols)
+    {
+        freedColors.insert(*cols);
+        delete [] *cols;
+    }
+    *cols=0L;
+}
+
 void Style::freeColors()
 {
     if(0!=itsProgressBarAnimateTimer)
         killTimer(itsProgressBarAnimateTimer);
 
-    if(itsSidebarButtonsCols && itsSidebarButtonsCols!=itsSliderCols && itsSidebarButtonsCols!=itsDefBtnCols)
-    {
-        delete [] itsSidebarButtonsCols;
-        itsSidebarButtonsCols=0L;
-    }
-    if(itsPopupMenuCols && itsPopupMenuCols!=itsMenubarCols && itsPopupMenuCols!=itsBackgroundCols && itsPopupMenuCols!=itsActiveMdiColors)
-    {
-        delete [] itsPopupMenuCols;
-        itsPopupMenuCols=0L;
-    }
-    if(itsActiveMdiColors && itsActiveMdiColors!=itsHighlightCols && itsActiveMdiColors!=itsBackgroundCols)
-    {
-        delete [] itsActiveMdiColors;
-        itsActiveMdiColors=0L;
-    }
-    if(itsMdiColors && itsMdiColors!=itsBackgroundCols)
-    {
-        delete [] itsMdiColors;
-        itsMdiColors=0L;
-    }
-    if(itsProgressCols && itsProgressCols!=itsHighlightCols && itsProgressCols!=itsBackgroundCols &&
-       itsProgressCols!=itsSliderCols && itsProgressCols!=itsComboBtnCols && itsProgressCols!=itsCheckRadioSelCols &&  itsProgressCols!=itsSortedLvColors)
-    {
-        delete [] itsProgressCols;
-        itsProgressCols=0L;
-    }
-    if(itsCheckRadioSelCols && itsCheckRadioSelCols!=itsDefBtnCols && itsCheckRadioSelCols!=itsSliderCols &&
-       itsCheckRadioSelCols!=itsComboBtnCols && itsCheckRadioSelCols!=itsSortedLvColors && 
-       itsCheckRadioSelCols!=itsButtonCols && itsCheckRadioSelCols!=itsHighlightCols)
-    {
-        delete [] itsCheckRadioSelCols;
-        itsCheckRadioSelCols=0L;
-    }
-    if(itsSortedLvColors && itsSortedLvColors!=itsHighlightCols && itsSortedLvColors!=itsSliderCols &&
-       itsSortedLvColors!=itsComboBtnCols)
-    {
-        delete [] itsSortedLvColors;
-        itsSortedLvColors=0L;
-    }
-    if(itsComboBtnCols && itsComboBtnCols!=itsHighlightCols && itsComboBtnCols!=itsSliderCols)
-    {
-        delete [] itsComboBtnCols;
-        itsComboBtnCols=0L;
-    }
-    if(itsDefBtnCols && itsDefBtnCols!=itsSliderCols && itsDefBtnCols!=itsFocusCols && itsDefBtnCols!=itsHighlightCols)
-    {
-        delete [] itsDefBtnCols;
-        itsDefBtnCols=0L;
-    }
-    if(itsSliderCols && itsSliderCols!=itsHighlightCols)
-    {
-        delete [] itsSliderCols;
-        itsSliderCols=0L;
-    }
+    QSet<QColor *> freedColors;
+
+    freeColor(freedColors, &itsSidebarButtonsCols);
+    freeColor(freedColors, &itsPopupMenuCols);
+    freeColor(freedColors, &itsActiveMdiColors);
+    freeColor(freedColors, &itsMdiColors);
+    freeColor(freedColors, &itsProgressCols);
+    freeColor(freedColors, &itsCheckRadioSelCols);
+    freeColor(freedColors, &itsSortedLvColors);
+    freeColor(freedColors, &itsComboBtnCols);
+    freeColor(freedColors, &itsDefBtnCols);
+    freeColor(freedColors, &itsSliderCols);
+
     if(opts.titlebarButtons&TITLEBAR_BUTTON_COLOR)
         for(int i=0; i<NUM_TITLEBAR_BUTTONS; ++i)
         {

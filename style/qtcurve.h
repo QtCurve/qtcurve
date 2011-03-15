@@ -139,6 +139,7 @@ class Style : public QCommonStyle
     ~Style();
     
     void init(bool initial);
+    void freeColor(QSet<QColor *> &freedColors, QColor **cols);
     void freeColors();
 
     Options & options() { return opts; }
