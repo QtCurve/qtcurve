@@ -2,6 +2,8 @@
 -----
 1. Fix QtDesigner crash when using transparent background - thanks to
    Friedemann Kleint.
+2. When installing background images, need to remove and previous files
+   first (as QFile::copy will not overwrite files)
 
 1.8.6
 -----

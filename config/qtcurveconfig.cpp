@@ -121,6 +121,22 @@ static QString getThemeFile(const QString &file)
     return QString(file).replace("//", "/");
 }
 
+static void removeFile(const QString &f)
+{
+    if(QFile::exists(f))
+        QFile::remove(f);
+}
+
+static void copyFile(const QString &src, const QString &dest)
+{
+    if(QFile::exists(src))
+    {
+        // QFile::copy will not overwrite existing files. If destination exists, it needs to be removed first.
+        removeFile(dest);
+        QFile::copy(src, dest);
+    }
+}
+
 static QString installThemeFile(const QString &src, const QString &dest)
 {
     QString source(getThemeFile(src)),
@@ -129,7 +145,7 @@ static QString installThemeFile(const QString &src, const QString &dest)
 
 //     printf("INST THM \"%s\" \"%s\"", source.toLatin1().constData(), destination.toLatin1().constData());
     if(source!=destination)
-        QFile::copy(source, destination);
+        copyFile(source, destination);
 
     return name;
 }
@@ -142,17 +158,14 @@ static QString saveThemeFile(const QString &src, const QString &dest, const QStr
 
 //     printf("SAVE THM \"%s\" \"%s\"", source.toLatin1().constData(), destination.toLatin1().constData());
     if(source!=destination)
-        QFile::copy(source, destination);
+        copyFile(source, destination);
 
     return destination;
 }
 
 static void removeInstalledThemeFile(const QString &file)
 {
-    QString f(qtcConfDir()+QLatin1String(THEME_IMAGE_PREFIX)+file);
-
-    if(QFile::exists(f))
-        QFile::remove(f);
+    removeFile(qtcConfDir()+QLatin1String(THEME_IMAGE_PREFIX)+file);
 }
 
 static void removeThemeImages(const QString &themeFile)
