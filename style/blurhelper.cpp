@@ -86,11 +86,14 @@ namespace QtCurve
             case QEvent::Hide:
             {
                 QWidget* widget( qobject_cast<QWidget*>( object ) );
-                if( widget && isOpaque( widget ) && isTransparent( widget->window() ) )
+                if( widget && isOpaque( widget ) )
                 {
                     QWidget* window( widget->window() );
-                    _pendingWidgets.insert( window, window );
-                    delayedUpdate();
+                    if (window && isTransparent(window) && !_pendingWidgets.contains(window) )
+                    {
+                        _pendingWidgets.insert( window, window );
+                        delayedUpdate();
+                    }
                 }
                 break;
 
