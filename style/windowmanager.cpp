@@ -79,7 +79,7 @@ namespace QtCurve
 
 #if QT_VERSION < 0x040600
     QtCPointer & QtCPointer::operator=(QWidget *w)
-    {
+{
         widget_=w;
         if(widget_)
             Utils::addEventFilter(widget_, this);
@@ -104,28 +104,28 @@ namespace QtCurve
     //_____________________________________________________________
     WindowManager::WindowManager( QObject* parent ):
         QObject( parent ),
-        enabled_( true ),
+        _enabled( true ),
 #ifdef Q_WS_X11
-        useWMMoveResize_( true ),
+        _useWMMoveResize( true ),
 #else
-        useWMMoveResize_( false ),
+        _useWMMoveResize( false ),
 #endif
-        dragMode_( WM_DRAG_NONE ),
+        _dragMode( WM_DRAG_NONE ),
 #ifdef QTC_QT_ONLY
-        dragDistance_( QApplication::startDragDistance() ),
+        _dragDistance( QApplication::startDragDistance() ),
 #else
-        dragDistance_( KGlobalSettings::dndEventDelay() ),
+        _dragDistance( KGlobalSettings::dndEventDelay() ),
 #endif
-        dragDelay_( QApplication::startDragTime() ),
-        dragAboutToStart_( false ),
-        dragInProgress_( false ),
-        locked_( false ),
-        cursorOverride_( false )
+        _dragDelay( QApplication::startDragTime() ),
+        _dragAboutToStart( false ),
+        _dragInProgress( false ),
+        _locked( false ),
+        _cursorOverride( false )
     {
 
         // install application wise event filter
-        appEventFilter_ = new AppEventFilter( this );
-        qApp->installEventFilter( appEventFilter_ );
+        _appEventFilter = new AppEventFilter( this );
+        qApp->installEventFilter( _appEventFilter );
 
     }
 
@@ -178,18 +178,18 @@ namespace QtCurve
     void WindowManager::initializeWhiteList( const QStringList &list )
     {
 
-        whiteList_.clear();
+        _whiteList.clear();
 
         // add user specified whitelisted classnames
-        whiteList_.insert( ExceptionId( "MplayerWindow" ) );
-        whiteList_.insert( ExceptionId( "ViewSliders@kmix" ) );
-        whiteList_.insert( ExceptionId( "Sidebar_Widget@konqueror" ) );
+        _whiteList.insert( ExceptionId( "MplayerWindow" ) );
+        _whiteList.insert( ExceptionId( "ViewSliders@kmix" ) );
+        _whiteList.insert( ExceptionId( "Sidebar_Widget@konqueror" ) );
 
         foreach( const QString& exception, list )
         {
             ExceptionId id( exception );
             if( !id.className().isEmpty() )
-            { whiteList_.insert( exception ); }
+            { _whiteList.insert( exception ); }
         }
     }
 
@@ -197,15 +197,16 @@ namespace QtCurve
     void WindowManager::initializeBlackList( const QStringList &list )
     {
 
-        blackList_.clear();
-        blackList_.insert( ExceptionId( "CustomTrackView@kdenlive" ) );
-        blackList_.insert( ExceptionId( "MuseScore" ) );
+        _blackList.clear();
+        _blackList.insert( ExceptionId( "CustomTrackView@kdenlive" ) );
+        _blackList.insert( ExceptionId( "MuseScore" ) );
         foreach( const QString& exception, list )
         {
             ExceptionId id( exception );
             if( !id.className().isEmpty() )
-            { blackList_.insert( exception ); }
+            { _blackList.insert( exception ); }
         }
+
     }
 
     //_____________________________________________________________
@@ -220,11 +221,11 @@ namespace QtCurve
             break;
 
             case QEvent::MouseMove:
-                if ( object == target_.data() ) return mouseMoveEvent( object, event );
+                if ( object == _target.data() ) return mouseMoveEvent( object, event );
             break;
 
             case QEvent::MouseButtonRelease:
-                if ( target_ ) return mouseReleaseEvent( object, event );
+                if ( _target ) return mouseReleaseEvent( object, event );
             break;
 
             default:
@@ -240,11 +241,11 @@ namespace QtCurve
     void WindowManager::timerEvent( QTimerEvent* event )
     {
 
-        if( event->timerId() == dragTimer_.timerId() )
+        if( event->timerId() == _dragTimer.timerId() )
         {
-            dragTimer_.stop();
-            if( target_ )
-            { startDrag( target_.data(), globalDragPoint_ ); }
+            _dragTimer.stop();
+            if( _target )
+            { startDrag( _target.data(), _globalDragPoint ); }
 
         } else {
 
@@ -279,14 +280,14 @@ namespace QtCurve
         if( !canDrag( widget, child, position ) ) return false;
 
         // save target and drag point
-        target_ = widget;
-        dragPoint_ = position;
-        globalDragPoint_ = mouseEvent->globalPos();
-        dragAboutToStart_ = true;
+        _target = widget;
+        _dragPoint = position;
+        _globalDragPoint = mouseEvent->globalPos();
+        _dragAboutToStart = true;
 
         // send a move event to the current child with same position
         // if received, it is caught to actually start the drag
-        QPoint localPoint( dragPoint_ );
+        QPoint localPoint( _dragPoint );
         if( child ) localPoint = child->mapFrom( widget, localPoint );
         else child = widget;
         QMouseEvent localMouseEvent( QEvent::MouseMove, localPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier );
@@ -304,34 +305,34 @@ namespace QtCurve
         Q_UNUSED( object );
 
         // stop timer
-        if( dragTimer_.isActive() ) dragTimer_.stop();
+        if( _dragTimer.isActive() ) _dragTimer.stop();
 
         // cast event and check drag distance
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>( event );
-        if( !dragInProgress_ )
+        if( !_dragInProgress )
         {
 
-            if( dragAboutToStart_ )
+            if( _dragAboutToStart )
             {
-                if( mouseEvent->globalPos() == globalDragPoint_ )
+                if( mouseEvent->globalPos() == _globalDragPoint )
                 {
                     // start timer,
-                    dragAboutToStart_ = false;
-                    if( dragTimer_.isActive() ) dragTimer_.stop();
-                    dragTimer_.start( dragDelay_, this );
+                    _dragAboutToStart = false;
+                    if( _dragTimer.isActive() ) _dragTimer.stop();
+                    _dragTimer.start( _dragDelay, this );
 
                 } else resetDrag();
 
-            } else if( QPoint( mouseEvent->globalPos() - globalDragPoint_ ).manhattanLength() >= dragDistance_ )
-            { dragTimer_.start( 0, this ); }
+            } else if( QPoint( mouseEvent->globalPos() - _globalDragPoint ).manhattanLength() >= _dragDistance )
+            { _dragTimer.start( 0, this ); }
             return true;
 
         } else if( !useWMMoveResize() ) {
 
             // use QWidget::move for the grabbing
             /* this works only if the sending object and the target are identical */
-            QWidget* window( target_.data()->window() );
-            window->move( window->pos() + mouseEvent->pos() - dragPoint_ );
+            QWidget* window( _target.data()->window() );
+            window->move( window->pos() + mouseEvent->pos() - _dragPoint );
             return true;
 
         } else return false;
@@ -354,15 +355,19 @@ namespace QtCurve
         // check widget
         if( !widget ) return false;
 
-        // all accepted default types
+        // accepted default types
         if(
             ( qobject_cast<QDialog*>( widget ) && widget->isWindow() ) ||
             ( qobject_cast<QMainWindow*>( widget ) && widget->isWindow() ) ||
-            qobject_cast<QGroupBox*>( widget ) ||
-            qobject_cast<QMenuBar*>( widget ) ||
+            qobject_cast<QGroupBox*>( widget ) )
+        { return true; }
+
+        // more accepted types, provided they are not dock widget titles
+        if( ( qobject_cast<QMenuBar*>( widget ) ||
             qobject_cast<QTabBar*>( widget ) ||
             qobject_cast<QStatusBar*>( widget ) ||
-            qobject_cast<QToolBar*>( widget ) )
+            qobject_cast<QToolBar*>( widget ) ) &&
+            !isDockWidgetTitle( widget ) )
         { return true; }
 
         if( widget->inherits( "KScreenSaver" ) && widget->inherits( "KCModule" ) )
@@ -418,7 +423,7 @@ namespace QtCurve
 
         // list-based blacklisted widgets
         QString appName( qApp->applicationName() );
-        foreach( const ExceptionId& id, blackList_ )
+        foreach( const ExceptionId& id, _blackList )
         {
             if( !id.appName().isEmpty() && id.appName() != appName ) continue;
             if( id.className() == "*" && !id.appName().isEmpty() )
@@ -439,7 +444,7 @@ namespace QtCurve
     {
 
         QString appName( qApp->applicationName() );
-        foreach( const ExceptionId& id, whiteList_ )
+        foreach( const ExceptionId& id, _whiteList )
         {
             if( !id.appName().isEmpty() && id.appName() != appName ) continue;
             if( widget->inherits( id.className().toLatin1() ) ) return true;
@@ -585,8 +590,8 @@ namespace QtCurve
                 else if(
                     itemView->selectionMode() != QAbstractItemView::NoSelection &&
                     itemView->selectionMode() != QAbstractItemView::SingleSelection &&
-                    itemView->model()->rowCount() ) return false;
-                else if( itemView->indexAt( position ).isValid() ) return false;
+                    itemView->model() && itemView->model()->rowCount() ) return false;
+                else if( itemView->model() && itemView->indexAt( position ).isValid() ) return false;
             }
 
         } else if( ( itemView = qobject_cast<QAbstractItemView*>( widget->parentWidget() ) ) ) {
@@ -619,19 +624,19 @@ namespace QtCurve
     void WindowManager::resetDrag( void )
     {
 
-        if( (!useWMMoveResize() ) && target_ && cursorOverride_ ) {
+        if( (!useWMMoveResize() ) && _target && _cursorOverride ) {
 
           qApp->restoreOverrideCursor();
-          cursorOverride_ = false;
+          _cursorOverride = false;
 
         }
 
-        target_.clear();
-        if( dragTimer_.isActive() ) dragTimer_.stop();
-        dragPoint_ = QPoint();
-        globalDragPoint_ = QPoint();
-        dragAboutToStart_ = false;
-        dragInProgress_ = false;
+        _target.clear();
+        if( _dragTimer.isActive() ) _dragTimer.stop();
+        _dragPoint = QPoint();
+        _globalDragPoint = QPoint();
+        _dragAboutToStart = false;
+        _dragInProgress = false;
 
     }
 
@@ -677,14 +682,14 @@ namespace QtCurve
 
         if( !useWMMoveResize() )
         {
-            if( !cursorOverride_ )
+            if( !_cursorOverride )
             {
                 qApp->setOverrideCursor( Qt::SizeAllCursor );
-                cursorOverride_ = true;
+                _cursorOverride = true;
             }
         }
 
-        dragInProgress_ = true;
+        _dragInProgress = true;
 
         return;
 
@@ -703,6 +708,20 @@ namespace QtCurve
     }
 
     //____________________________________________________________
+    bool WindowManager::isDockWidgetTitle( const QWidget* widget ) const
+    {
+
+        if( !widget ) return false;
+        if( const QDockWidget* dockWidget = qobject_cast<const QDockWidget*>( widget->parent() ) )
+        {
+
+            return widget == dockWidget->titleBarWidget();
+
+        } else return false;
+
+    }
+
+    //____________________________________________________________
     bool WindowManager::AppEventFilter::eventFilter( QObject* object, QEvent* event )
     {
 
@@ -710,23 +729,23 @@ namespace QtCurve
         {
 
             // stop drag timer
-            if( parent_->dragTimer_.isActive() )
-            { parent_->resetDrag(); }
+            if( _parent->_dragTimer.isActive() )
+            { _parent->resetDrag(); }
 
             // unlock
-            if( parent_->isLocked() )
-            { parent_->setLocked( false ); }
+            if( _parent->isLocked() )
+            { _parent->setLocked( false ); }
 
         }
 
-        if( !parent_->enabled() ) return false;
+        if( !_parent->enabled() ) return false;
 
         /*
         if a drag is in progress, the widget will not receive any event
         we trigger on the first MouseMove or MousePress events that are received
         by any widget in the application to detect that the drag is finished
         */
-        if( parent_->useWMMoveResize() && parent_->dragInProgress_ && parent_->target_ && ( event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress ) )
+        if( _parent->useWMMoveResize() && _parent->_dragInProgress && _parent->_target && ( event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress ) )
         { return appMouseEvent( object, event ); }
 
         return false;
@@ -740,14 +759,14 @@ namespace QtCurve
         Q_UNUSED( object );
 
         // store target window (see later)
-        QWidget* window( parent_->target_.data()->window() );
+        QWidget* window( _parent->_target.data()->window() );
 
         /*
         post some mouseRelease event to the target, in order to counter balance
         the mouse press that triggered the drag. Note that it triggers a resetDrag
         */
-        QMouseEvent mouseEvent( QEvent::MouseButtonRelease, parent_->dragPoint_, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier );
-        qApp->sendEvent( parent_->target_.data(), &mouseEvent );
+        QMouseEvent mouseEvent( QEvent::MouseButtonRelease, _parent->_dragPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier );
+        qApp->sendEvent( _parent->_target.data(), &mouseEvent );
 
         if( event->type() == QEvent::MouseMove )
         {

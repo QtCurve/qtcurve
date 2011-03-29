@@ -46,7 +46,7 @@ namespace QtCurve
 {
 #if QT_VERSION < 0x040600
     class QtCPointer : public QObject
-    {
+{
         public:
         QtCPointer(QWidget *w=0L) : widget_(w) {}
         QtCPointer & operator=(QWidget *w);
@@ -107,35 +107,35 @@ namespace QtCurve
 
         //! enable state
         bool enabled( void ) const
-        { return enabled_; }
+        { return _enabled; }
 
         //! enable state
         void setEnabled( bool value )
-        { enabled_ = value; }
+        { _enabled = value; }
 
         //! returns true if window manager is used for moving
         bool useWMMoveResize( void ) const
-        { return supportWMMoveResize() && useWMMoveResize_; }
+        { return supportWMMoveResize() && _useWMMoveResize; }
 
         //! use window manager for moving, when available
         void setUseWMMoveResize( bool value )
-        { useWMMoveResize_ = value; }
+        { _useWMMoveResize = value; }
 
         //! drag mode
         int dragMode( void ) const
-        { return dragMode_; }
+        { return _dragMode; }
 
         //! drag mode
         void setDragMode( int value )
-        { dragMode_ = value; }
+        { _dragMode = value; }
 
         //! drag distance (pixels)
         void setDragDistance( int value )
-        { dragDistance_ = value; }
+        { _dragDistance = value; }
 
         //! drag delay (msec)
         void setDragDelay( int value )
-        { dragDelay_ = value; }
+        { _dragDelay = value; }
 
         //! set list of whiteListed widgets
         /*!
@@ -179,36 +179,39 @@ namespace QtCurve
         /*! right now this is true only for X11 */
         bool supportWMMoveResize( void ) const;
 
+        //! utility function
+        bool isDockWidgetTitle( const QWidget* ) const;
+
         //!@name lock
         //@{
 
         void setLocked( bool value )
-        { locked_ = value; }
+        { _locked = value; }
 
         //! lock
         bool isLocked( void ) const
-        { return locked_; }
+        { return _locked; }
 
         //@}
 
         private:
 
         //! enability
-        bool enabled_;
+        bool _enabled;
 
         //! use WM moveResize
-        bool useWMMoveResize_;
+        bool _useWMMoveResize;
 
         //! drag mode
-        int dragMode_;
+        int _dragMode;
 
         //! drag distance
         /*! this is copied from kwin::geometry */
-        int dragDistance_;
+        int _dragDistance;
 
         //! drag delay
         /*! this is copied from kwin::geometry */
-        int dragDelay_;
+        int _dragDelay;
 
         //! wrapper for exception id
         class ExceptionId: public QPair<QString, QString>
@@ -240,48 +243,47 @@ namespace QtCurve
         it is read from options and is used to adjust
         per-app window dragging issues
         */
-        ExceptionSet whiteList_;
+        ExceptionSet _whiteList;
 
         //! list of black listed special widgets
         /*!
         it is read from options and is used to adjust
         per-app window dragging issues
         */
-        ExceptionSet blackList_;
+        ExceptionSet _blackList;
 
         //! drag point
-        QPoint dragPoint_;
-        QPoint globalDragPoint_;
+        QPoint _dragPoint;
+        QPoint _globalDragPoint;
 
         //! drag timer
-        QBasicTimer dragTimer_;
-
+        QBasicTimer _dragTimer;
 
         //! target being dragged
         /*! QWeakPointer is used in case the target gets deleted while drag is in progress */
 #if QT_VERSION < 0x040600
-        QtCPointer target_;
+        QtCPointer _target;
 #else
-        QWeakPointer<QWidget> target_;
+        QWeakPointer<QWidget> _target;
 #endif
 
         //! true if drag is about to start
-        bool dragAboutToStart_;
+        bool _dragAboutToStart;
 
         //! true if drag is in progress
-        bool dragInProgress_;
+        bool _dragInProgress;
 
         //! true if drag is locked
-        bool locked_;
+        bool _locked;
 
         //! cursor override
         /*! used to keep track of application cursor being overridden when dragging in non-WM mode */
-        bool cursorOverride_;
+        bool _cursorOverride;
 
         //! provide application-wise event filter
         /*!
         it us used to unlock dragging and make sure event look is properly restored
-        after a drag has occured
+        after a drag has occurred
         */
         class AppEventFilter: public QObject
         {
@@ -291,7 +293,7 @@ namespace QtCurve
             //! constructor
             AppEventFilter( WindowManager* parent ):
                 QObject( parent ),
-                parent_( parent )
+                _parent( parent )
             {}
 
             //! event filter
@@ -306,12 +308,12 @@ namespace QtCurve
             private:
 
             //! parent
-            WindowManager* parent_;
+            WindowManager* _parent;
 
         };
 
         //! application event filter
-        AppEventFilter* appEventFilter_;
+        AppEventFilter* _appEventFilter;
 
         //! allow access of all private members to the app event filter
         friend class AppEventFilter;

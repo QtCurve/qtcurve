@@ -4,6 +4,8 @@
    Friedemann Kleint.
 2. When installing background images, need to remove and previous files
    first (as QFile::copy will not overwrite files)
+3. Fix incorrent window-drag trigger when dragging dock widget title
+   widgets (set via QDockWidget::setTitleBarWidget() )
 
 1.8.6
 -----
