@@ -235,7 +235,9 @@ static gboolean qtcWindowDelayedUpdate(gpointer user_data)
             g_source_remove(window->timer);
             window->timer=0;
             // otherwise, trigger update
+            gdk_threads_enter();
             qtcWindowSizeRequest(window->widget);
+            gdk_threads_leave();
             return FALSE;
         }
     }

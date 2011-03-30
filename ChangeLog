@@ -1,3 +1,8 @@
+1.8.8
+-----
+1. Make timer callbacks threadsafe. Fixes
+   https://bugzilla.redhat.com/show_bug.cgi?id=669155
+
 1.8.7
 -----
 1. Fix some segfaults with evolution under Fedora 14.

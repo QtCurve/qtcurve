@@ -241,7 +241,11 @@ static gboolean qtcWMMoveUseEvent(GtkWidget *widget, GdkEventButton *event)
 static gboolean qtcWWMoveStartDelayedDrag(gpointer data)
 {
     if(qtcWMMoveDragWidget)
+    {
+        gdk_threads_enter();
         qtcWMMoveTrigger(qtcWMMoveDragWidget, qtcWMMoveLastX, qtcWMMoveLastY);
+        gdk_threads_leave();
+    }
 }
 
 static gboolean qtcWMMoveIsWindowDragWidget(GtkWidget *widget, GdkEventButton *event)
