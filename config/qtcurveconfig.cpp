@@ -1251,6 +1251,8 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
         setupGradientsTab();
         setupPresets(currentStyle, defaultStyle);
         setupPreview();
+        readyForPreview=true;
+        updatePreview();
     }
     else
     {
@@ -1258,9 +1260,6 @@ QtCurveConfig::QtCurveConfig(QWidget *parent)
         titleLabel->setVisible(false);
         stackList->setVisible(false);
     }
-
-    readyForPreview=true;
-    updatePreview();
     // KMainWindow dereferences KGlobal when it closes. When KGlobal's refs get to 0 it quits!
     // ...running kcmshell4 style does not seem to increase ref count of KGlobal - therefore we
     // do it here - otherwse kcmshell4 would exit immediately after QtCurve's config dialog was
