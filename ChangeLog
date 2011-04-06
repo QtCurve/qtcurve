@@ -1,7 +1,9 @@
 1.8.8
 -----
-1. Fix crash when opening style config dialog whilst kwin config dialog is 
+1. Fix crash when opening style config dialog whilst kwin config dialog is
    open.
+2. Allow scrollbar sliders to be as thin as 5 pixels. At this setting, sliders
+   will be squared.
 
 1.8.7
 -----

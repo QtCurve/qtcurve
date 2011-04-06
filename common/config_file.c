@@ -1555,6 +1555,12 @@ void qtcCheckConfig(Options *opts)
     if(opts->sliderWidth<MIN_SLIDER_WIDTH || opts->sliderWidth>MAX_SLIDER_WIDTH)
         opts->sliderWidth=DEFAULT_SLIDER_WIDTH;
 
+    if(opts->sliderWidth<MIN_SLIDER_WIDTH_ROUND)
+        opts->square|=SQUARE_SB_SLIDER;
+
+    if(opts->sliderWidth<MIN_SLIDER_WIDTH_THIN_GROOVE)
+        opts->thinSbarGroove=false;
+
     if(opts->sliderWidth<DEFAULT_SLIDER_WIDTH)
         opts->sliderThumbs=LINE_NONE;
 

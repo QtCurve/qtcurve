@@ -257,9 +257,11 @@ enum
 #define MIN_MENU_DELAY       0
 #define MAX_MENU_DELAY     500
 
-#define DEFAULT_SLIDER_WIDTH 15
-#define MIN_SLIDER_WIDTH     11
-#define MAX_SLIDER_WIDTH     31
+#define DEFAULT_SLIDER_WIDTH  15
+#define MIN_SLIDER_WIDTH_ROUND 7
+#define MIN_SLIDER_WIDTH_THIN_GROOVE 9
+#define MIN_SLIDER_WIDTH       5
+#define MAX_SLIDER_WIDTH      31
 
 #define SIZE_GRIP_SIZE 12
 
