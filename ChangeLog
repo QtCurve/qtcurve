@@ -1,3 +1,9 @@
+1.8.8
+-----
+1. Disable window dragging from QGraphicsView.
+2. Respect "_kde_no_window_grab" property to disable window drag for
+   certain widgets.
+
 1.8.7
 -----
 1. Fix QtDesigner crash when using transparent background - thanks to

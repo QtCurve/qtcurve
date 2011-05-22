@@ -393,8 +393,8 @@ namespace QtCurve
         if( QTreeView* treeView = qobject_cast<QTreeView*>( widget->parentWidget() ) )
         { if( treeView->viewport() == widget && !isBlackListed( treeView ) ) return true; }
 
-        if( QGraphicsView* graphicsView = qobject_cast<QGraphicsView*>( widget->parentWidget() ) )
-        { if( graphicsView->viewport() == widget && !isBlackListed( graphicsView ) ) return true; }
+        //if( QGraphicsView* graphicsView = qobject_cast<QGraphicsView*>( widget->parentWidget() ) )
+        //{ if( graphicsView->viewport() == widget && !isBlackListed( graphicsView ) ) return true; }
 
         /*
         catch labels in status bars.
@@ -420,6 +420,10 @@ namespace QtCurve
     //_____________________________________________________________
     bool WindowManager::isBlackListed( QWidget* widget )
     {
+
+        // check against noAnimations propery
+        QVariant propertyValue( widget->property( "_kde_no_window_grab" ) );
+        if( propertyValue.isValid() && propertyValue.toBool() ) return true;
 
         // list-based blacklisted widgets
         QString appName( qApp->applicationName() );
