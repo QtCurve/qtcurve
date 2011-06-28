@@ -1794,7 +1794,22 @@ void Style::polish(QWidget *widget)
                 // WORKAROUND: somehow the window gets repositioned to <1,<1 and thus always appears in the upper left corner
                 // we just move it faaaaar away so kwin will take back control and apply smart placement or whatever
                 if(!widget->isVisible())
-                    widget->move(900000, 900000);
+                {
+                    QWidget *pw=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)
+                                        ? widget->parentWidget() 
+                                            ? widget->parentWidget()->topLevelWidget()
+                                            : QApplication::activeWindow()
+                                        : 0L;
+
+                    if(pw && pw!=widget)
+                    {
+                        widget->adjustSize();
+                        widget->move(pw->pos()+QPoint((pw->size().width()-widget->size().width())/2,
+                                                      (pw->size().height()-widget->size().height())/2));
+                    }
+                    else
+                        widget->move(900000, 900000);
+                }
 
                 // PE_Widget is not called for transparent widgets, so need event filter here...
                 Utils::addEventFilter(widget, this);

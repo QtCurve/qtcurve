@@ -3,6 +3,10 @@
 1. Disable window dragging from QGraphicsView.
 2. Respect "_kde_no_window_grab" property to disable window drag for
    certain widgets.
+3. Workaround dialog placement issues when using transparent dialogs.
+   Attempt to place dialog in centre of its parent - if it has one.
+   This only works for dialogs, windows will still (unfortunately)
+   be moved to top left :-(
 
 1.8.7
 -----
