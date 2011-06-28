@@ -1,3 +1,8 @@
+1.8.9
+-----
+1. Disable resize grips in Ubuntu 11.04
+2. Remove GimpDock font settings from gtkrc
+
 1.8.8
 -----
 1. Make timer callbacks threadsafe. Fixes

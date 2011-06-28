@@ -281,14 +281,23 @@ widget_class "*.GeditNotebook.GtkHBox.GtkButton" style "qtcurve-tabbutton"
 widget_class "*MenuBar*MenuItem" style "qtcurve-menubaritem"
 widget_class "*Dialog.*Separator" style "qtcurve-dlgsep"
 
-style "qtcurve-gimp-scale"
-{
-    # this ensures that toolpanels fonts in gimp is identical
-    # to default font (which otherwise is ugly
-    GimpDock::font-scale = 1.01
-}
+# This seems to crash Gimp 2.7 (well with oxygen anyway), so remove...
+#style "qtcurve-gimp-scale"
+#{
+#    # this ensures that toolpanels fonts in gimp is identical
+#    # to default font (which otherwise is ugly
+#    GimpDock::font-scale = 1.01
+#}
+#
+#class "*" style "qtcurve-gimp-scale"
 
-class "*" style "qtcurve-gimp-scale"
+# Disable Ubuntu resize grips. See: http://www.omgubuntu.co.uk/2011/05/disable-the-resize-grip-in-ubuntu-11-04/
+style "qtcurve-resizegrip" = "qtcurve-default"
+{
+    GtkWindow::resize-grip-height = 0
+    GtkWindow::resize-grip-width = 0
+}
+class "GtkWidget" style "qtcurve-resizegrip"
 
 # Seems to fix issues with pidgin where some buttons have icons, and others not.
 # Messes other widgets up :-(
