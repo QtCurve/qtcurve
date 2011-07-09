@@ -1,3 +1,7 @@
+1.8.9
+-----
+1. Dont force alternate listview colours for KAboutApplicationDialog
+
 1.8.8
 -----
 1. Disable window dragging from QGraphicsView.

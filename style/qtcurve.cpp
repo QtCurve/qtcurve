@@ -64,6 +64,7 @@
 #include <KDE/KActionCollection>
 #include <KDE/KIconEffect>
 #include <KDE/KMenu>
+#include <KDE/KAboutApplicationDialog>
 
 #if QT_VERSION >= 0x040500
 #include <KDE/KIcon>
@@ -1706,6 +1707,22 @@ static inline void setTranslucentBackground(QWidget *widget)
     #endif
 }
 
+static QWidget *getParent(QWidget *w, int level)
+{
+    QWidget *wid=w;
+    for(int i=0; i<level && wid; ++i)
+        wid=wid->parentWidget();
+    return wid;
+}
+
+#ifdef QTC_QT_ONLY
+static bool parentIs(QWidget *w, int level, const char *className)
+{
+    QWidget *wid=getParent(w, level);
+    return wid && wid->inherits(className);
+}
+#endif
+
 void Style::polish(QWidget *widget)
 {
     if(!widget)
@@ -1892,7 +1909,12 @@ void Style::polish(QWidget *widget)
            !(opts.gtkComboMenus && widget->inherits("QComboBoxListView") && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
              qobject_cast<QComboBox *>(widget->parentWidget()->parentWidget()) &&
              !static_cast<QComboBox *>(widget->parentWidget()->parentWidget())->isEditable()) &&
-             
+           // Exclude KAboutDialog...
+#ifdef QTC_QT_ONLY
+           !parentIs(widget, 5, "KAboutApplicationDialog") &&
+#else
+           !qobject_cast<KAboutApplicationDialog *>(getParent(widget, 5)) &&
+#endif
            (qobject_cast<QTreeView *>(widget) || (qobject_cast<QListView *>(widget) && QListView::IconMode!=((QListView *)widget)->viewMode())))
             itemView->setAlternatingRowColors(true);
     }
