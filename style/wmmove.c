@@ -85,6 +85,13 @@ static void qtcWMMoveStore(GtkWidget *widget, GdkEventButton *event)
     qtcWMMoveDragWidget=widget;
 }
 
+#if !GTK_CHECK_VERSION(2, 12, 0)
+GdkWindow *gtk_widget_get_window(GtkWidget *widget)
+{
+    return widget->window;
+}
+#endif
+
 static void qtcWMMoveTrigger(GtkWidget *w, int x, int y)
 {
     XEvent     xev;

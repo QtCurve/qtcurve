@@ -2644,6 +2644,7 @@ static void setGapClip(cairo_t *cr, GdkRectangle *area, GtkPositionType gapSide,
 
 static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int x, int y)
 {
+#if GTK_CHECK_VERSION(2, 12, 0)
     const PangoMatrix *matrix;
 
     matrix = pango_context_get_matrix(pango_layout_get_context(layout));
@@ -2663,6 +2664,7 @@ static void ge_cairo_transform_for_layout(cairo_t *cr, PangoLayout *layout, int 
         cairo_set_matrix(cr, &cairo_matrix);
     }
     else
+#endif
         cairo_translate(cr, x, y);
 }
 

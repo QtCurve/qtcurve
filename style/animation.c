@@ -35,6 +35,7 @@
 #include "common.h"
 #include "compatability.h"
 
+#if GTK_CHECK_VERSION(2, 12, 0)
 struct _AnimationInfo {
     GTimer *timer;
 
@@ -267,17 +268,19 @@ static gint qtcAnimationFindSignalInfo(gconstpointer signal_info, gconstpointer 
         return 1;
 }
 
-
+#endif
 /* external interface */
 
 /* adds a progress bar */
 void qtcAnimationAddProgressBar(GtkWidget *progressbar, gboolean isEntry)
 {
+#if GTK_CHECK_VERSION(2, 12, 0)
     gdouble fraction = isEntry ? gtk_entry_get_progress_fraction(GTK_ENTRY(progressbar))
                                : gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(progressbar));
 
     if(fraction < 1.0 && fraction > 0.0)
         qtcAnimationAdd((GtkWidget*) progressbar, 0.0);
+#endif
 }
 
 /* hooks up the signals for check and radio buttons */
@@ -303,24 +306,31 @@ static void qtcAnimationConnectCheckbox(GtkWidget *widget)
 /* returns TRUE if the widget is animated, and FALSE otherwise */
 static gboolean qtcAnimationIsAnimated(GtkWidget *widget)
 {
+#if GTK_CHECK_VERSION(2, 12, 0)
     return qtcAnimationLookupInfo(widget) != NULL ? TRUE : FALSE;
+#else
+    return FALSE;
+#endif
 }
 
 /* returns the elapsed time for the animation */
 gdouble qtcAnimationElapsed(gpointer data)
 {
+#if GTK_CHECK_VERSION(2, 12, 0)
     AnimationInfo *animation_info = qtcAnimationLookupInfo(data);
 
     if(animation_info)
         return   g_timer_elapsed(animation_info->timer, NULL)
                - animation_info->start_modifier;
     else
+#endif
         return 0.0;
 }
 
 /* cleans up all resources of the animation system */
 void qtcAnimationCleanup()
 {
+#if GTK_CHECK_VERSION(2, 12, 0)
     qtcAnimationDisconnect();
 
     if(animated_widgets != NULL)
@@ -330,4 +340,5 @@ void qtcAnimationCleanup()
     }
 
     qtcAnimationStopTimer();
+#endif
 }

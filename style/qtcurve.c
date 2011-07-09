@@ -2536,6 +2536,8 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         CAIRO_BEGIN
 
+
+#if GTK_CHECK_VERSION(2, 12, 0)
         if(GTK_APP_JAVA_SWT==qtSettings.app && view && widget && GTK_IS_TREE_VIEW(widget))
         {
             GtkTreeView       *treeView=GTK_TREE_VIEW(widget);
@@ -2560,6 +2562,7 @@ static void gtkDrawFocus(GtkStyle *style, GdkWindow *window, GtkStateType state,
             if(path)
                 gtk_tree_path_free(path);
         }
+#endif
 
         if(FOCUS_LINE==opts.focus || FOCUS_GLOW==opts.focus)
         {
