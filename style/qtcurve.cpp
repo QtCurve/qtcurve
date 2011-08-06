@@ -8178,7 +8178,9 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #endif
                 }
 
-                bool         drawMenu=raised || (mflags & (State_Sunken | State_On | State_Raised)),
+                bool         drawMenu=TBTN_JOINED==opts.tbarBtns
+                                        ? mflags & (State_Sunken | State_On)
+                                        : raised || (mflags & (State_Sunken | State_On | State_Raised)),
                              drawnBevel=false;
                 QStyleOption tool(0);
                 tool.palette = toolbutton->palette;
@@ -8250,9 +8252,9 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                             if((reverse && leftAdjust) || (!reverse && rightAdjust))
                                 mRound=ROUNDED_NONE;
                             if(reverse)
-                                tool.rect.adjust(1, 1, 0, -1);
+                                tool.rect.adjust(1, 0, 0, 0);
                             else
-                                tool.rect.adjust(0, 1, -1, -1);
+                                tool.rect.adjust(0, 0, -1, 0);
                         }
                         else
                             tool.rect = menuarea;

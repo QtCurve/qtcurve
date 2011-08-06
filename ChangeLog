@@ -1,7 +1,9 @@
 1.8.9
 -----
 1. Dont force alternate listview colours for KAboutApplicationDialog
-
+2. Fix issues with konqueror style menu toolbar buttons and the joined
+   toolbar button style.
+   
 1.8.8
 -----
 1. Disable window dragging from QGraphicsView.
