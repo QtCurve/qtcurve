@@ -37,6 +37,7 @@
 
 #ifdef Q_WS_X11
 #include "macmenu.h"
+#include "shadowhelper.h"
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include "fixx11h.h"
@@ -985,6 +986,7 @@ Style::Style()
         itsHoverWidget(0L),
 #ifdef Q_WS_X11
         itsDBus(0),
+        itsShadowHelper(new ShadowHelper(this)),
 #endif
         itsSViewSBar(0L),
         itsWindowManager(new WindowManager(this)),
@@ -1749,6 +1751,9 @@ void Style::polish(QWidget *widget)
     }
 
     itsWindowManager->registerWidget(widget);
+#ifdef Q_WS_X11
+    itsShadowHelper->registerWidget(widget);
+#endif
 
     // Need to register all widgets to blur helper, in order to have proper blur_behind region set have proper regions removed for opaque widgets.
     // Note: that the helper does nothing as long as compositing and ARGB are not enabled
@@ -2428,6 +2433,9 @@ void Style::unpolish(QWidget *widget)
     }
 
     itsWindowManager->unregisterWidget(widget);
+#ifdef Q_WS_X11
+    itsShadowHelper->unregisterWidget(widget);
+#endif
     itsBlurHelper->unregisterWidget(widget);
     unregisterArgbWidget(widget);
 
@@ -5552,6 +5560,10 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             QPainterPath path=rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
             QColor       col=palette.toolTipBase().color();
 
+            #ifdef Q_WS_X11
+            if(widget && widget->window())
+                itsShadowHelper->registerWidget(widget->window());
+            #endif
             painter->save();
             if(rounded)
                 painter->setRenderHint(QPainter::Antialiasing, true);

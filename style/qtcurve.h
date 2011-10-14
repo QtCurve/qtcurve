@@ -64,6 +64,9 @@ namespace QtCurve
     class WindowManager;
     class BlurHelper;
     class ShortcutHandler;
+#ifdef Q_WS_X11
+    class ShadowHelper;
+#endif
 
 class Style : public QCommonStyle
 {
@@ -356,7 +359,7 @@ class Style : public QCommonStyle
     QWidget                            *itsHoverWidget;
 #ifdef Q_WS_X11
     QDBusInterface                     *itsDBus;
-    QList<QWidget *>                   itsPendingBlurUpdates;
+    QtCurve::ShadowHelper              *itsShadowHelper;
 #endif
     mutable QScrollBar                 *itsSViewSBar;
     mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;

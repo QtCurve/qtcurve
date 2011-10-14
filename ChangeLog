@@ -3,6 +3,7 @@
 1. Dont force alternate listview colours for KAboutApplicationDialog
 2. Fix issues with konqueror style menu toolbar buttons and the joined
    toolbar button style.
+3. Implement shadows for KDE SC4.7
    
 1.8.8
 -----

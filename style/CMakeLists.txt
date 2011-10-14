@@ -5,8 +5,8 @@ set(qtcurve_style_common_SRCS
 set_source_files_properties(${qtcurve_style_common_SRCS} PROPERTIES LANGUAGE CXX)
 
 if (Q_WS_X11)
-    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp ${qtcurve_style_common_SRCS})
-    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h macmenu.h macmenu-dbus.h blurhelper.h shortcuthandler.h)
+    set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp macmenu.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp shadowhelper.cpp ${qtcurve_style_common_SRCS})
+    set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h macmenu.h macmenu-dbus.h blurhelper.h shortcuthandler.h shadowhelper.h)
 else (Q_WS_X11)
     set(qtcurve_SRCS qtcurve.cpp windowmanager.cpp blurhelper.cpp utils.cpp shortcuthandler.cpp ${qtcurve_style_common_SRCS})
     set(qtcurve_MOC_HDRS qtcurve.h windowmanager.h blurhelper.h shortcuthandler.h)
