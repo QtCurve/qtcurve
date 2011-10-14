@@ -47,6 +47,7 @@
 #include "helpers.h"
 #include "drawing.h"
 #include "pixcache.h"
+#include "shadowhelper.h"
 #include "config.h"
 #include <cairo.h>
 
@@ -2874,6 +2875,7 @@ GType qtcurve_type_style = 0;
 
 static void qtcurve_style_init(QtCurveStyle *style)
 {
+    qtcShadowInitialize();
 }
 
 void qtcurve_style_register_type(GTypeModule *module)

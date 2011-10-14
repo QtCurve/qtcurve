@@ -108,3 +108,5 @@ To regenerate this, run the following:
 
     gdk-pixbuf-csource --raw --name check_on check_on.png >> pixmaps.h
     gdk-pixbuf-csource --raw --name check_x_on check_x_on.png >> pixmaps.h
+    
+    for n in `seq 0 7` ; do gdk-pixbuf-csource --raw --name shadow$n shadow$n.png >> shadow.h ; done

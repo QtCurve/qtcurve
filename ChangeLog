@@ -1,6 +1,7 @@
 1.8.10
 ------
 1. Fix compilation against Gtk 2.11
+2. Implement shadows for KDE SC4.7
 
 1.8.9
 -----

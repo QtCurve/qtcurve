@@ -5,7 +5,7 @@ set(qtcurve_style_common_SRCS
         
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/common ${CMAKE_BINARY_DIR} )
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GTK_CFLAGS}")
-set(qtcurve_SRCS qtcurve.c qt_settings.c drawing.c helpers.c pixcache.c animation.c combobox.c entry.c menu.c scrollbar.c scrolledwindow.c tab.c treeview.c widgetmap.c window.c wmmove.c ${qtcurve_style_common_SRCS})
+set(qtcurve_SRCS qtcurve.c qt_settings.c drawing.c helpers.c pixcache.c animation.c combobox.c entry.c menu.c scrollbar.c scrolledwindow.c tab.c treeview.c widgetmap.c window.c wmmove.c shadowhelper.c ${qtcurve_style_common_SRCS})
 add_library(qtcurve MODULE ${qtcurve_SRCS})
 add_definitions(-DQTC_MOZILLA_DIR=\\\"${GTK_THEME_DIR}/mozilla\\\")
 
