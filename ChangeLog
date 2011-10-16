@@ -1,3 +1,7 @@
+1.8.11
+------
+1. Fix broken titlebars in GIMP, etc.
+
 1.8.10
 ------
 1. Fix compilation against Gtk 2.11

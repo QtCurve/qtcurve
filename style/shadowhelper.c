@@ -132,7 +132,7 @@ static gboolean acceptWidget(GtkWidget* widget)
 {
     if(widget && GTK_IS_WINDOW(widget))
     {
-        if(GTK_APP_OPEN_OFFICE!=qtSettings.app)
+        if(GTK_APP_OPEN_OFFICE==qtSettings.app)
             return TRUE;
         else
         {
