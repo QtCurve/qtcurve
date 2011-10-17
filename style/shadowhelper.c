@@ -34,6 +34,7 @@ static int shadowSize=0;
 static guint realizeSignalId=0;
 static gulong realizeHookId=0;
 static Atom shadowAtom=0;
+static GList *registeredWidgets = NULL;
 
 static Pixmap createPixmap(const guint8 *pix)
 {
@@ -152,6 +153,8 @@ static gboolean shadowDestroy(GtkWidget* widget, gpointer data)
 {
     if (g_object_get_data(G_OBJECT(widget), "QTC_SHADOW_SET"))
     {
+        if(registeredWidgets)
+            registeredWidgets=g_list_remove(registeredWidgets, widget);
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_SHADOW_DESTROY_ID"));
         g_object_steal_data(G_OBJECT(widget), "QTC_SHADOW_SET");
@@ -172,6 +175,8 @@ static gboolean registerWidget(GtkWidget* widget)
 
     // try install shadows
     installX11Shadows(widget);
+
+    registeredWidgets=g_list_append(registeredWidgets, widget);
 
     g_object_set_data(G_OBJECT(widget), "QTC_SHADOW_SET", (gpointer)1);
     g_object_set_data(G_OBJECT(widget), "QTC_SHADOW_DESTROY_ID",
@@ -218,4 +223,10 @@ void qtcShadowInitialize()
     }
 
     qtcShadowReset();
+    if(registeredWidgets)
+    {
+        GList *entry;
+        for(entry = g_list_first(registeredWidgets); entry; entry = g_list_next(entry))
+            installX11Shadows(GTK_WIDGET(entry->data));
+    }
 }
