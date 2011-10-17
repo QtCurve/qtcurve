@@ -1,6 +1,7 @@
 1.8.12
 ------
 1. Fix first shown menu not having a shadow in firefox.
+2. Fix eclipse crash due to resetting of shadows.
 
 1.8.11
 ------

@@ -21,7 +21,6 @@
   Boston, MA 02110-1301, USA.
  */
 
-extern void qtcShadowReset();
 extern void qtcShadowInitialize();
 
 #endif
