@@ -191,7 +191,10 @@ static gboolean realizeHook(GSignalInvocationHint *sih, guint x, const GValue* p
 
 void qtcShadowInitialize()
 {
-    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s\n", __FUNCTION__);
+#if !GTK_CHECK_VERSION(2, 12, 0)
+    if(GTK_APP_JAVA_SWT==qtSettings.app) return;  // Getting crashes with old Gtk and eclipse :-(
+#endif
+    if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, qtSettings.app);
     if(!realizeSignalId)
     {
         realizeSignalId = g_signal_lookup("realize", GTK_TYPE_WIDGET);

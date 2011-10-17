@@ -2,6 +2,7 @@
 ------
 1. Fix first shown menu not having a shadow in firefox.
 2. Fix eclipse crash due to resetting of shadows.
+3. Disable shadows for SWT where Gtk<2.12.
 
 1.8.11
 ------
