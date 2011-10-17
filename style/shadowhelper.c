@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <cairo-xlib.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
