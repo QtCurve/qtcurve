@@ -28,6 +28,7 @@
 #include "common.h"
 #include "qt_settings.h"
 #include "shadow.h"
+#include "compatability.h"
 
 #define NUM_SHADOW_PIXMAPS 8
 static unsigned long shadowPixmaps[NUM_SHADOW_PIXMAPS];
@@ -132,12 +133,14 @@ static gboolean acceptWidget(GtkWidget* widget)
         else
         {
             GdkWindowTypeHint hint=gtk_window_get_type_hint(GTK_WINDOW(widget));
+            if(DEBUG_ALL==qtSettings.debug) printf(DEBUG_PREFIX "%s %d\n", __FUNCTION__, (int)hint);
             return
                 hint == GDK_WINDOW_TYPE_HINT_MENU ||
                 hint == GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU ||
                 hint == GDK_WINDOW_TYPE_HINT_POPUP_MENU ||
                 hint == GDK_WINDOW_TYPE_HINT_COMBO ||
-                hint == GDK_WINDOW_TYPE_HINT_TOOLTIP;
+                hint == GDK_WINDOW_TYPE_HINT_TOOLTIP ||
+                (hint == GDK_WINDOW_TYPE_HINT_UTILITY && !qtcWidgetGetParent(widget) && isMozilla()) ; // Firefox URL combo
         }
     }
     return FALSE;
