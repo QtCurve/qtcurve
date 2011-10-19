@@ -2062,7 +2062,7 @@ gboolean qtSettingsInit()
                 gboolean firefox=isMozApp(qtSettings.appName, "firefox") || isMozApp(qtSettings.appName, "iceweasel") ||
                                  isMozApp(qtSettings.appName, "swiftfox") || isMozApp(qtSettings.appName, "xulrunner") ||
                                  isMozApp(qtSettings.appName, "abrowser"),
-                         thunderbird=!firefox && isMozApp(qtSettings.appName, "thunderbird"),
+                         thunderbird=!firefox && (isMozApp(qtSettings.appName, "thunderbird") || isMozApp(qtSettings.appName, "icedove")),
                          mozThunderbird=!thunderbird && !firefox && isMozApp(qtSettings.appName, "mozilla-thunderbird"),
                          seamonkey=!thunderbird && !firefox && !mozThunderbird && isMozApp(qtSettings.appName, "seamonkey");
 
