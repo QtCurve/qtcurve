@@ -7712,11 +7712,12 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             iconSize=QSize(tb->rect.size().height(), tb->rect.size().height());
 
                         pm=getIconPixmap(tb->icon, iconSize, mode, state);
-                        pmSize = tb->icon.actualSize(iconSize, mode);
-                        if(pmSize.width()<pm.width())
+                        pmSize = pm.size(); // tb->icon.actualSize(iconSize, mode);
+                        /*if(pmSize.width()<pm.width())
                             pr.setX(pr.x()+((pm.width()-pmSize.width())));
                         if(pmSize.height()<pm.height())
                             pr.setY(pr.y()+((pm.height()-pmSize.height())));
+                        */
                     }
 
                     if (Qt::ToolButtonIconOnly!=tb->toolButtonStyle)
