@@ -30,7 +30,7 @@
 
 /* #define CHECK_ANIMATION_TIME 0.5 */
 
-#include <glib/gtimer.h>
+#include <glib.h>
 #include <gtk/gtk.h>
 #include "common.h"
 #include "compatability.h"

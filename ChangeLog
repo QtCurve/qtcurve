@@ -1,3 +1,7 @@
+1.8.13
+------
+1. Fix builing with newer glibs - only glib.h itself can be included.
+
 1.8.12
 ------
 1. Fix first shown menu not having a shadow in firefox.
