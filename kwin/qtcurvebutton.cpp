@@ -50,7 +50,7 @@ QtCurveButton::QtCurveButton(ButtonType type, QtCurveClient *parent)
 //     setFocusPolicy(Qt::NoFocus);
 //     setAttribute(Qt::WA_OpaquePaintEvent, false);
 //     setAttribute(Qt::WA_Hover, true);
-    setCursor(Qt::ArrowCursor); 
+    setCursor(Qt::ArrowCursor);
     reset(DecorationReset);
 }
 
@@ -121,20 +121,36 @@ void QtCurveButton::leaveEvent(QEvent *e)
 
 void QtCurveButton::paintEvent(QPaintEvent *ev)
 {
-    QPainter p(this);
-    p.setClipRect(rect().intersected(ev->rect()));
-    drawButton(&p);
+    if (itsClient->compositingActive())
+    {
+        QPainter p(this);
+        p.setClipRect(rect().intersected(ev->rect()));
+        drawButton(&p);
+    }
+    else
+    {
+        QPixmap pixmap(size());
+        {
+            QPainter p(&pixmap);
+            p.setRenderHints(QPainter::Antialiasing);
+            parentWidget()->render(&p, QPoint(), geometry(), QWidget::DrawWindowBackground);
+            drawButton(&p);
+        }
+        QPainter p(this);
+        p.setClipRect(ev->rect());
+        p.drawPixmap(QPoint(), pixmap);
+    }
 }
 
 // inline int limit(double c)
 // {
 //     return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
 // }
-// 
+//
 // inline QColor midColor(const QColor &a, const QColor &b, double factor=1.0)
 // {
-//     return QColor((a.red()+limit(b.red()*factor))>>1, 
-//                   (a.green()+limit(b.green()*factor))>>1, 
+//     return QColor((a.red()+limit(b.red()*factor))>>1,
+//                   (a.green()+limit(b.green()*factor))>>1,
 //                   (a.blue()+limit(b.blue()*factor))>>1);
 // }
 
@@ -261,7 +277,7 @@ void QtCurveButton::drawButton(QPainter *painter)
         if(itsHover || !(flags&TITLEBAR_BUTTON_HOVER_SYMBOL))
         {
             bool userDefined=flags&TITLEBAR_BUTTON_ICON_COLOR;
-            
+
             if(userDefined || (flags&TITLEBAR_BUTTON_COLOR && flags&TITLEBAR_BUTTON_COLOR_SYMBOL))
             {
                 QStyleOption opt;
@@ -278,7 +294,7 @@ void QtCurveButton::drawButton(QPainter *painter)
                 customCol=true;
             }
         }
-    
+
         if(sunken)
         {
             dY++;

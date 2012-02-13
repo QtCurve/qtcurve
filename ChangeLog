@@ -2,6 +2,7 @@
 ------
 1. Fix some toolbutton icon clipping.
 2. Korean translation - thanks to YoungUk Kim.
+3. Fix kwin button corruption when compositing is disabled under KDE SC4.8
 
 1.8.9
 -----
@@ -9,7 +10,7 @@
 2. Fix issues with konqueror style menu toolbar buttons and the joined
    toolbar button style.
 3. Implement shadows for KDE SC4.7
-   
+
 1.8.8
 -----
 1. Disable window dragging from QGraphicsView.
@@ -668,7 +669,7 @@
           bgndImage.file=/path/to/svg/file.svg
           bgndImage.width=120
           bgndImage.height=160
-          
+
           (Use menuBgndImage for menus)
 
 48. Added option to add a 'glow' to progressbars.
@@ -782,9 +783,9 @@
    appearance of KPackageKit.
 8. Workaround some issues with window style and compositing - where parts of the frame
    are not updated.
-9. Speed up background gradients by drawing into a 16*256 size pixmap, scaling        
+9. Speed up background gradients by drawing into a 16*256 size pixmap, scaling
    this to the correct height, and then tiling the pixmap.
-   
+
 0.68.0
 ------
 1. New options:
@@ -1146,7 +1147,7 @@
 1. Dont draw focus for combobox listviews.
 2. When menubars have a border, adjust the menubar items accordingly.
 3. Reduce menubar margins.
-4. When filling the used part of a slider groove, use the slider colour 
+4. When filling the used part of a slider groove, use the slider colour
    if set, otherwise use the highlight colour.
 
 0.62.2
