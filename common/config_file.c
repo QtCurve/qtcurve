@@ -1057,7 +1057,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
     if(!ok && strings.size())
         list[0]=0;
 }
-            
+
 #define CFG_READ_COLOR(ENTRY) \
     { \
         QString sVal(cfg.readEntry(#ENTRY)); \
@@ -1107,7 +1107,7 @@ static void readDoubleList(QtCConfig &cfg, const char *key, double *list, int co
 #endif
 
 #else
-         
+
 static char * lookupCfgHash(GHashTable **cfg, char *key, char *val)
 {
     char *rv=NULL;
@@ -1230,7 +1230,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
             list[0]=0;
     }
 }
-            
+
 #define TO_LATIN1(A) A
 
 #define CFG_READ_COLOR(ENTRY) \
@@ -1291,7 +1291,7 @@ static void readDoubleList(GHashTable *cfg, char *key, double *list, int count)
         opts->ENTRY=DEF; \
     else \
         opts->ENTRY=readNumEntry(cfg, #ENTRY, def->ENTRY);
-    
+
 #define CFG_READ_TB_BORDER(ENTRY) \
     opts->ENTRY=toTBarBorder(TO_LATIN1(readStringEntry(cfg, #ENTRY)), def->ENTRY);
 
@@ -1450,7 +1450,7 @@ static void freeOpts(Options *opts)
         opts->noDlgFixApps=NULL
 #endif
         if(opts->noMenuStripeApps)
-            g_strfreev(opts->noMenuStripeApps); 
+            g_strfreev(opts->noMenuStripeApps);
         opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
         for(i=0; i<NUM_CUSTOM_GRAD; ++i)
             if(opts->customGradient[i])
@@ -1546,7 +1546,9 @@ void qtcCheckConfig(Options *opts)
         opts->expanderHighlight=DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
 #endif
 
-    if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
+    if(0==opts->menuDelay) /* Qt seems to have issues if delay is 0 - so set this to 1 :-) */
+        opts->menuDelay=MIN_MENU_DELAY;
+    else if(opts->menuDelay<MIN_MENU_DELAY || opts->menuDelay>MAX_MENU_DELAY)
         opts->menuDelay=DEFAULT_MENU_DELAY;
 
     if(0==opts->sliderWidth%2)
@@ -1758,7 +1760,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
         {
 #endif
             int     i;
-            
+
             opts->version=readVersionEntry(cfg, VERSION_KEY);
 
 #ifdef __cplusplus
@@ -1783,7 +1785,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             opts->noBgndGradientApps=opts->noBgndOpacityApps=opts->noMenuBgndOpacityApps=opts->noBgndImageApps=opts->noMenuStripeApps=NULL;
             for(i=0; i<NUM_CUSTOM_GRAD; ++i)
                 opts->customGradient[i]=NULL;
-            
+
             if(defOpts)
                 copyOpts(defOpts, &newOpts);
             else
@@ -1792,7 +1794,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
                 copyGradients(def, opts);
 #endif
 
-            /* Check if the config file expects old default values... */           
+            /* Check if the config file expects old default values... */
             if(opts->version<MAKE_VERSION(1, 6))
             {
                 bool framelessGroupBoxes=readBoolEntry(cfg, "framelessGroupBoxes", true),
@@ -2093,7 +2095,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_INT_BOOL(windowDrag, WM_DRAG_MENUBAR)
             CFG_READ_BOOL(shadePopupMenu)
             CFG_READ_BOOL(hideShortcutUnderline)
-            
+
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             CFG_READ_BOOL(stdBtnSizes)
             CFG_READ_INT(titlebarButtons)
@@ -2168,7 +2170,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             if(opts->version<MAKE_VERSION3(1, 7, 2))
                 opts->noMenuBgndOpacityApps << "gtk";
 #endif
-#endif 
+#endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
             CFG_READ_STRING_LIST(menubarApps)
             CFG_READ_STRING_LIST(statusbarApps)
@@ -2178,7 +2180,7 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #endif
             readDoubleList(cfg, "customShades", opts->customShades, NUM_STD_SHADES);
             readDoubleList(cfg, "customAlphas", opts->customAlphas, NUM_STD_ALPHAS);
-            
+
 #ifdef __cplusplus
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000))
             if(opts->titlebarButtons&TITLEBAR_BUTTON_COLOR || opts->titlebarButtons&TITLEBAR_BUTTON_ICON_COLOR)

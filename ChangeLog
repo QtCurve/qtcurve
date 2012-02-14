@@ -3,6 +3,7 @@
 1. Fix some toolbutton icon clipping.
 2. Korean translation - thanks to YoungUk Kim.
 3. Fix kwin button corruption when compositing is disabled under KDE SC4.8
+4. Minimum 1ms delay for sub menus.
 
 1.8.9
 -----

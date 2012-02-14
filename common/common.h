@@ -254,7 +254,7 @@ enum
 #define MAX_TAB_BGND         5
 
 #define DEFAULT_MENU_DELAY 225
-#define MIN_MENU_DELAY       0
+#define MIN_MENU_DELAY       1
 #define MAX_MENU_DELAY     500
 
 #define DEFAULT_SLIDER_WIDTH  15
@@ -323,7 +323,7 @@ enum
 
 #define DRAW_3D_FULL_BORDER(SUNKEN, APP) \
     (!(SUNKEN) && GB_3D_FULL==qtcGetGradient((APP), &opts)->border)
-    
+
 #define DRAW_3D_BORDER(SUNKEN, APP) \
     (!(SUNKEN) && GB_3D==qtcGetGradient((APP), &opts)->border)
 
@@ -379,7 +379,7 @@ enum
 #else // !defined __cplusplus
 #define BORDER_BLEND_ALPHA(W)    (WIDGET_ENTRY==(W) || WIDGET_SCROLLVIEW==(W) ? 0.45 : 0.7)
 #endif // !defined __cplusplus
- 
+
 #define ETCH_TOP_ALPHA           0.055
 #define ETCH_BOTTOM_ALPHA        0.1
 // #if defined QT_VERSION && (QT_VERSION >= 0x040000)
@@ -1029,7 +1029,7 @@ struct GradientStopCont : public std::set<GradientStop>
             if((*last).pos<0.999)
                 c.insert(GradientStop(1.0, 1.0));
         }
-        return c;                                  
+        return c;
     }
 };
 struct Gradient
@@ -1334,7 +1334,7 @@ typedef enum
 #define IS_EXTRA_ROUND_WIDGET(A) \
             (A!=WIDGET_MENU_ITEM && A!=WIDGET_TAB_FRAME && A!=WIDGET_PBAR_TROUGH && A!=WIDGET_PROGRESSBAR && \
              A!=WIDGET_MDI_WINDOW && A!=WIDGET_MDI_WINDOW_TITLE)
-             
+
 #define EXTRA_INNER_RADIUS   3.5
 #define EXTRA_OUTER_RADIUS   4.5
 #define EXTRA_ETCH_RADIUS    5.5
