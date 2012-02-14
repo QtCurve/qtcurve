@@ -2,6 +2,7 @@
 ------
 1. Fix builing with newer glibs - only glib.h itself can be included.
 2. Use squared menus and tooltips if using XRender
+3. Minimum 1ms delay for sub menus.
 
 1.8.12
 ------
