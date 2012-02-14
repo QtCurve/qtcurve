@@ -35,9 +35,93 @@
 #include <dirent.h>
 #include <errno.h>
 #include <locale.h>
+#include <gmodule.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <pwd.h>
+#include <sys/types.h>
+
+#define strcmp_i(A, B) strncmp_i(A, B, -1)
 
 QtCPalette qtcPalette;
 Options    opts;
+
+#define MAX_APP_NAME_LEN 32
+
+#define KDE_CFG_DIR         "/share/config/"
+#define KDEGLOBALS_FILE     KDE_CFG_DIR"kdeglobals"
+#define KDEGLOBALS_SYS_FILE KDE_CFG_DIR"system.kdeglobals"
+
+static char * getKdeHome()
+{
+    static char *kdeHome=NULL;
+
+    if(!kdeHome)
+        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --expandvars --localprefix"
+                                                    : "kde-config --expandvars --localprefix", &kdeHome, NULL, NULL, NULL))
+        {
+            int len=strlen(kdeHome);
+
+            if(len>1 && kdeHome[len-1]=='\n')
+                kdeHome[len-1]='\0';
+        }
+        else
+            kdeHome=0L;
+
+    if(!kdeHome)
+    {
+        char *env=getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
+
+        if(env)
+            kdeHome=env;
+        else
+        {
+            static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN+1];
+
+            const char *home=qtcGetHome();
+
+            if(home && strlen(home)<(MAX_CONFIG_FILENAME_LEN-5))
+            {
+                sprintf(kdeHomeStr, "%s/.kde", home);
+                kdeHome=kdeHomeStr;
+            }
+        }
+    }
+
+    return kdeHome;
+}
+
+static const char * kdeFile(const char *f)
+{
+    static char kg[MAX_CONFIG_FILENAME_LEN+1]={'\0'};
+
+    char *kdehome=getKdeHome();
+
+    if(kdehome && strlen(kdehome)<(MAX_CONFIG_FILENAME_LEN-(strlen(KDE_CFG_DIR)+strlen(f))))
+        sprintf(kg, "%s"KDE_CFG_DIR"%s", kdehome, f);
+
+    return kg;
+}
+
+static const char * kdeGlobals()
+{
+    return kdeFile(KDEGLOBALS_FILE);
+}
+
+static const char * kwinrc()
+{
+    return kdeFile("kwinrc");
+}
+
+#define HICOLOR_ICONS           "hicolor"
+#define HICOLOR_LEN             7
+#define ICON_FOLDER             "/share/icons/"
+#define ICON_FOLDER_SLEN        13
+#define DEFAULT_ICON_PREFIX     "/usr/share/icons"
+#define DEFAULT_ICON_PREFIX_LEN 16
 
 #if 0
 static gboolean drawBackgroundPng(const char *png);
@@ -78,17 +162,6 @@ static int strncmp_i(const char *s1, const char *s2, int num)
     }
     return (int)c2-(int)c1;
 }
-
-#define strcmp_i(A, B) strncmp_i(A, B, -1)
-
-#include <gmodule.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <pwd.h>
-#include <sys/types.h>
 
 #define DEFAULT_KDE_ACT_PAL \
 "active=#000000^e#dddfe4^e#ffffff^e#ffffff^e#555555^e#c7c7c7^e#000000^e#ffffff^e#000000^e#ffffff^e#efefef^e#000000^e#678db2^e#ffffff^e#0000ee^e#52188b^e"
@@ -160,13 +233,13 @@ enum
 
     SECT_KDE4_COL_WM          =0x008000,
 
-    SECT_QT
+    SECT_KWIN_COMPOS          =0x010000
 };
 
 #define ALL_KDE4_PAL_SETTINGS (SECT_KDE4_COL_BUTTON|SECT_KDE4_COL_SEL|SECT_KDE4_COL_TOOLTIP|SECT_KDE4_COL_VIEW| \
                                SECT_KDE4_COL_WINDOW|SECT_KDE4_EFFECT_DISABLED|SECT_KDE4_EFFECT_INACTIVE|SECT_KDE4_COL_WM)
 /*
-  Qt uses the following predefined weights: 
+  Qt uses the following predefined weights:
     Light    = 25,
     Normal   = 50,
     DemiBold = 63,
@@ -272,7 +345,7 @@ static int getMozillaVersion(int pid)
                     char *minor=&dot[1];
                     char *major=0L;
                     int  i=0;
-                    
+
                     for(i=-1; (&dot[i])!=version; i--)
                         if(!isdigit(dot[i]))
                         {
@@ -289,45 +362,6 @@ static int getMozillaVersion(int pid)
     }
 
     return ver;
-}
-
-static char * getKdeHome()
-{
-    static char *kdeHome=NULL;
-
-    if(!kdeHome)
-        if(g_spawn_command_line_sync(qtSettings.qt4 ? "kde4-config --expandvars --localprefix"
-                                                    : "kde-config --expandvars --localprefix", &kdeHome, NULL, NULL, NULL))
-        {
-            int len=strlen(kdeHome);
-
-            if(len>1 && kdeHome[len-1]=='\n')
-                kdeHome[len-1]='\0';
-        }
-        else
-            kdeHome=0L;
-
-    if(!kdeHome)
-    {
-        char *env=getenv(getuid() ? "KDEHOME" : "KDEROOTHOME");
-
-        if(env)
-            kdeHome=env;
-        else
-        {
-            static char kdeHomeStr[MAX_CONFIG_FILENAME_LEN+1];
-
-            const char *home=qtcGetHome();
-
-            if(home && strlen(home)<(MAX_CONFIG_FILENAME_LEN-5))
-            {
-                sprintf(kdeHomeStr, "%s/.kde", home);
-                kdeHome=kdeHomeStr;
-            }
-        }
-    }
-
-    return kdeHome;
 }
 
 static char * themeFileSub(const char *prefix, const char *name, char **tmpStr, const char *sub)
@@ -439,7 +473,7 @@ typedef enum  // Taken from "kcolorscheme.cpp"
     ContrastFade = 1,
     ContrastTint = 2
 } ColAdjustEffects;
-    
+
 typedef struct
 {
     double           amount;
@@ -655,6 +689,36 @@ GdkColor mixColors(const GdkColor *c1, const GdkColor *c2, double bias)
     col.blue=(int)(65535.0*MIX(b1, b2, bias));
 
     return col;
+    }
+}
+
+static void readKwinrc()
+{
+    FILE *f=fopen(kwinrc(), "r");
+
+    if(f)
+    {
+        int  section=SECT_NONE;
+        char line[MAX_CONFIG_INPUT_LINE_LEN+1];
+
+        if(qtSettings.debug)
+            printf(DEBUG_PREFIX"Reading kwinrc\n");
+
+        while(NULL!=fgets(line, MAX_CONFIG_INPUT_LINE_LEN, f))
+            if(line[0]=='[')
+            {
+                if(0==strncmp_i(line, "[Compositing]", 13))
+                    section=SECT_KWIN_COMPOS;
+                else
+                    section=SECT_NONE;
+            }
+            else if (SECT_KWIN_COMPOS==section && 0==strncmp_i(line, "Backend=", 8))
+            {
+                if (strstr(line, "=XRender"))
+                    opts.square|=SQUARE_POPUP_MENUS|SQUARE_TOOLTIPS;
+                break;
+            }
+        fclose(f);
     }
 }
 
@@ -1254,31 +1318,6 @@ static void readQtRc(const char *rc, int rd, gboolean absolute, gboolean setDefa
 
 static int qt_refs=0;
 
-#define MAX_APP_NAME_LEN 32
-
-#define KDE_CFG_DIR         "/share/config/"
-#define KDEGLOBALS_FILE     KDE_CFG_DIR"kdeglobals"
-#define KDEGLOBALS_SYS_FILE KDE_CFG_DIR"system.kdeglobals"
-
-static const char * kdeGlobals()
-{
-    static char kg[MAX_CONFIG_FILENAME_LEN+1]={'\0'};
-
-    char *kdehome=getKdeHome();
-
-    if(kdehome && strlen(kdehome)<(MAX_CONFIG_FILENAME_LEN-strlen(KDEGLOBALS_FILE)))
-        sprintf(kg, "%s"KDEGLOBALS_FILE, kdehome);
-
-    return kg;
-}
-
-#define HICOLOR_ICONS           "hicolor"
-#define HICOLOR_LEN             7
-#define ICON_FOLDER             "/share/icons/"
-#define ICON_FOLDER_SLEN        13
-#define DEFAULT_ICON_PREFIX     "/usr/share/icons"
-#define DEFAULT_ICON_PREFIX_LEN 16
-
 static const char * kdeIconsPrefix()
 {
     static char *kdeIcons=NULL;
@@ -1604,12 +1643,12 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
             std=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
         else if(opts.customMenuTextColor)
             std=&opts.customMenuNormTextColor;
-        else if(SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars || 
+        else if(SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
                 (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
             std=&qtSettings.colors[PAL_ACTIVE][COLOR_TEXT_SELECTED];
         else
             std=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_TEXT];
-  
+
         if(opts.customMenuTextColor)
             active=&opts.customMenuSelTextColor;
         else if(opts.useHighlightForMenu)
@@ -1750,7 +1789,7 @@ static void processUserChromeCss(char *file, gboolean add_btn_css, gboolean add_
         }
         free(contents);
     }
-    
+
     if(menu_text_str)
         free(menu_text_str);
 }
@@ -1792,7 +1831,7 @@ static void processMozillaApp(gboolean add_btn_css, gboolean add_menu_colors, ch
                     {
                         char  *line=NULL;
                         size_t len=0;
-                        
+
                         while(-1!=getline(&line, &len, userJs))
                             if(NULL!=strstr(line, "browser.preferences.instantApply"))
                             {
@@ -2178,7 +2217,7 @@ gboolean qtSettingsInit()
                 opts.gbFactor=0;
                 opts.highlightScrollViews=FALSE;
             }
-                
+
             if(!IS_FLAT(opts.bgndAppearance) && excludedApp(opts.noBgndGradientApps))
                 opts.bgndAppearance=APPEARANCE_FLAT;
 
@@ -2191,13 +2230,13 @@ gboolean qtSettingsInit()
                 opts.bgndOpacity=opts.dlgOpacity=opts.menuBgndOpacity=100;
                 qtSettings.useAlpha=false;
             }
-            
+
             if(excludedApp(opts.noBgndOpacityApps))
                 opts.bgndOpacity=opts.dlgOpacity=100;
 
             if(excludedApp(opts.noMenuBgndOpacityApps))
                 opts.menuBgndOpacity=100, qtSettings.useAlpha=false;
-            
+
             /* Disable usage of alpha channel for older configs, unless app is uing opacity... */
             if(qtSettings.useAlpha && opts.version<MAKE_VERSION3(1, 7, 2) && 100==opts.menuBgndOpacity && 100==opts.dlgOpacity && 100==opts.bgndOpacity)
                 qtSettings.useAlpha=false;
@@ -2209,7 +2248,7 @@ gboolean qtSettingsInit()
 
             if(opts.menuStripe && excludedApp(opts.noMenuStripeApps))
                 opts.menuStripe=SHADE_NONE;
-            
+
             /*if(isMozilla() || GTK_APP_JAVA==qtSettings.app)*/
             if(GTK_APP_JAVA!=qtSettings.app)
             {
@@ -2311,15 +2350,15 @@ gboolean qtSettingsInit()
 //                                           "{base[ACTIVE]=\"#%02X%02X%02X\"}"
 //                                           //" text[ACTIVE]=\"#%02X%02X%02X\"}"
 //                                           "class \"*\" style \""RC_SETTING"HlFix\"";
-// 
+//
 //                 tmpStr=(char *)realloc(tmpStr, strlen(format));
-// 
+//
 //                 if(tmpStr)
 //                 {
 //                     sprintf(tmpStr, format, toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].red),
 //                                             toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].green),
 //                                             toQtColor(qtSettings.colors[PAL_INACTIVE][COLOR_SELECTED].blue));
-// 
+//
 //                     // KDE4 does not set the text colour...
 //                     /*
 //                                             toQtColor(qtSettings.colors[PAL_ACTIVE][COLOR_TEXT].red),
@@ -2345,7 +2384,7 @@ gboolean qtSettingsInit()
                 sprintf(tmpStr, constFormat, qtSettings.icons);
                 gtk_rc_parse_string(tmpStr);
             }
-            
+
             if(opts.mapKdeIcons && (path=getIconPath()))
             {
                 const char *iconTheme=qtSettings.icons ? qtSettings.icons : "XX";
@@ -2749,12 +2788,12 @@ gboolean qtSettingsInit()
             }
 
             /* Mozilla seems to assume that all scrolledviews are square :-(
-               So, set the xthickness and ythickness to 1, and in qtcurve.c draw these as sqare */
+               So, set the xthickness and ythickness to 1, and in qtcurve.c draw these as square */
             if(isMozilla())
                 gtk_rc_parse_string("style \""RC_SETTING"SVm\""
                                     " { xthickness=1 ythickness=1 } "
                                     "widget_class \"GtkWindow.GtkFixed.GtkScrolledWindow\" style \""RC_SETTING"SVm\"");
-            
+
             if(TAB_MO_GLOW==opts.tabMouseOver)
                 gtk_rc_parse_string("style \""RC_SETTING"Tab\" { GtkNotebook::tab-overlap = 0 } class \"*GtkNotebook\" style \""RC_SETTING"Tab\"");
 
@@ -2815,10 +2854,10 @@ gboolean qtSettingsInit()
 
             if(!opts.menuIcons)
                 gtk_rc_parse_string("gtk-menu-images=0");
-            
+
             if(opts.hideShortcutUnderline)
                 gtk_rc_parse_string("gtk-auto-mnemonics=1");
-            
+
             if(LINE_1DOT==opts.splitters)
                 gtk_rc_parse_string("style \""RC_SETTING"Spl\" { GtkPaned::handle_size=7 GtkPaned::handle_width = 7 } "
                                     "class \"*GtkWidget\" style \""RC_SETTING"Spl\"");
@@ -2859,6 +2898,11 @@ gboolean qtSettingsInit()
             if(opts.shadeMenubarOnlyWhenActive && SHADE_WINDOW_BORDER==opts.shadeMenubars &&
                EQUAL_COLOR(qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER], qtSettings.colors[PAL_INACTIVE][COLOR_WINDOW_BORDER]))
                 opts.shadeMenubarOnlyWhenActive=false;
+
+            if (!(opts.square&SQUARE_POPUP_MENUS) || !(opts.square&SQUARE_TOOLTIPS))
+            {
+                readKwinrc();
+            }
             setlocale(LC_NUMERIC, locale);
         }
         return TRUE;
@@ -2903,7 +2947,7 @@ static void qtSettingsExit()
 
 #define SET_COLOR_X(st, rc, itm, ITEM, state, QTP_COL, USE_DIS) \
     SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE, USE_DIS)
-    
+
 #define SET_COLOR(st, rc, itm, ITEM, state, QTP_COL) \
     SET_COLOR_PAL(st, rc, itm, ITEM, state, QTP_COL, PAL_ACTIVE, TRUE)
 

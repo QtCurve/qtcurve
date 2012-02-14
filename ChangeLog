@@ -1,6 +1,7 @@
 1.8.13
 ------
 1. Fix builing with newer glibs - only glib.h itself can be included.
+2. Use squared menus and tooltips if using XRender
 
 1.8.12
 ------
