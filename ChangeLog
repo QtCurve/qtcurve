@@ -1,6 +1,7 @@
 1.8.14
 ------
 1. Fix reading of KDE settings.
+2. Fix button on editable combos with Gtk 2.24
 
 1.8.13
 ------

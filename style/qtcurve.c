@@ -125,7 +125,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             // so register ur own error handler, and then unregister afterwards...
             guint id=g_log_set_handler("Gtk", G_LOG_LEVEL_CRITICAL, qtcLogHandler, NULL);
             g_object_set_data(G_OBJECT(topLevel), BUTTON_HACK, (gpointer)1);
-            
+
             gtk_dialog_set_alternative_button_order(GTK_DIALOG(topLevel), GTK_RESPONSE_HELP,
                                                     GTK_RESPONSE_OK, GTK_RESPONSE_YES, GTK_RESPONSE_ACCEPT, GTK_RESPONSE_APPLY,
                                                     GTK_RESPONSE_REJECT, GTK_RESPONSE_CLOSE, GTK_RESPONSE_NO, GTK_RESPONSE_CANCEL, -1);
@@ -177,11 +177,11 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
     if(opts.windowDrag>WM_DRAG_MENU_AND_TOOLBAR && (DETAIL("base") || DETAIL("eventbox") || DETAIL("viewportbin")))
         qtcWMMoveSetup(widget);
-        
+
     if(widget && ((100!=opts.bgndOpacity && GTK_IS_WINDOW(widget)) || (100!=opts.dlgOpacity && GTK_IS_DIALOG(widget))) &&
        !isFixedWidget(widget) && isRgbaWidget(widget))
         enableBlurBehind(widget, TRUE);
-    
+
     if ((opts.menubarHiding || opts.statusbarHiding || BLEND_TITLEBAR || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR) &&
         widget && GTK_IS_WINDOW(widget) && !isFixedWidget(widget) && !isGimpDockable(widget) && !isMenuOrToolTipWindow)
     {
@@ -200,7 +200,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
 
                 if(BLEND_TITLEBAR || opts.menubarHiding&HIDE_KWIN || opts.windowBorder&WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
                     qtcMenuEmitSize(menuBar, hiddenMenubar ? 0 : alloc.height);
-                    
+
                 if(opts.menubarHiding&HIDE_KWIN)
                     qtcWindowMenuBarDBus(widget, hiddenMenubar ? 0 : alloc.height);
             }
@@ -212,7 +212,7 @@ static void gtkDrawFlatBox(GtkStyle *style, GdkWindow *window, GtkStateType stat
             if(statusBar && gtk_statusbar_get_has_resize_grip(GTK_STATUSBAR(statusBar)))
                 gtk_statusbar_set_has_resize_grip(GTK_STATUSBAR(statusBar), FALSE);
 #endif
-                
+
             if(opts.statusbarHiding && statusBar)
             {
                 gboolean hiddenStatusBar=qtcStatusBarHidden(qtSettings.appName);
@@ -490,7 +490,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
         {
             if (GTK_STATE_ACTIVE==state)
                 state=GTK_STATE_PRELIGHT;
-            
+
             {
             GdkColor *arrowColor=MO_ARROW(false, &qtSettings.colors[GTK_STATE_INSENSITIVE==state
                                                                             ? PAL_DISABLED : PAL_ACTIVE]
@@ -630,7 +630,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
 
         if(opts.unifySpin && isSpinButton && !opts.vArrows && GTK_ARROW_DOWN==arrow_type)
             y--;
- 
+
         if(GTK_STATE_ACTIVE==state && (sbar  || isSpinButton) && MO_GLOW==opts.coloredMouseOver)
             state=GTK_STATE_PRELIGHT;
 
@@ -649,7 +649,7 @@ static void gtkDrawArrow(GtkStyle *style, GdkWindow *window, GtkStateType state,
                 col=&qtSettings.colors[PAL_ACTIVE][COLOR_WINDOW_BORDER_TEXT];
             else if(opts.customMenuTextColor)
                 col=&opts.customMenuNormTextColor;
-            else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars || 
+            else if (SHADE_BLEND_SELECTED==opts.shadeMenubars || SHADE_SELECTED==opts.shadeMenubars ||
                         (SHADE_CUSTOM==opts.shadeMenubars && TOO_DARK(qtcPalette.menubar[ORIGINAL_SHADE])))
                 col=&style->text[GTK_STATE_SELECTED];
         }
@@ -717,7 +717,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
     if(menubar && !isFakeGtk() && opts.shadeMenubarOnlyWhenActive)
     {
         GtkWindow *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(widget));
-                
+
         if(topLevel && GTK_IS_WINDOW(topLevel))
         {
             #define SHADE_ACTIVE_MB_HACK_SET "QTC_SHADE_ACTIVE_MB_HACK_SET"
@@ -818,7 +818,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 #endif
             {
                 GdkRectangle a;
-                
+
                 a.x=x+2, a.y=y, a.width=width-2, a.height=height;
                 setCairoClipping(cr, &a);
             }
@@ -894,7 +894,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
             bgnd=4;
         }
 #endif
-        
+
         if(tbar_button && TBTN_JOINED==opts.tbarBtns)
         {
             adjustToolbarButtons(widget, &xAdjust, &yAdjust, &wAdjust, &hAdjust, &round, horiz_tbar);
@@ -1295,7 +1295,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                         int          bg=SHADE_DARKEN==opts.comboBtn ||
                                             (GTK_STATE_INSENSITIVE==state && SHADE_NONE!=opts.comboBtn)
                                         ? getFillReal(state, btnDown, true) : bgnd;
-                                        
+
                         btn.x=vx+(rev ? LARGE_ARR_WIDTH+4 : 0),
                         btn.y=y, btn.width=20+3, btn.height=height;
 
@@ -1376,7 +1376,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
             if((menubar && opts.windowDrag || (opts.windowDrag>WM_DRAG_MENUBAR)))
                 qtcWMMoveSetup(widget);
-    
+
             if(menubar && BLEND_TITLEBAR)
             {
                 menuBarAdjust=qtcGetWindowBorderSize(FALSE).titleHeight;
@@ -1386,7 +1386,7 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
 
             if(widget && (opacity!=100 || CUSTOM_BGND))
                 drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
-            
+
             if(drawGradient)
             {
                 drawBevelGradientAlpha(cr, area, x, y-menuBarAdjust, width, height+menuBarAdjust, col,
@@ -1460,11 +1460,11 @@ static void drawBox(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkS
                 drawWindowBgnd(cr, style, area, window, widget, x, y, width, height);
         }
         unsetCairoClipping(cr);
-        
+
         if(WIDGET_PBAR_TROUGH==wt)
             drawProgressGroove(cr, style, state, window, widget, area, x, y, width, height, TRUE, TRUE);
         else
-            drawBorder(cr, style, state, area, x, y, width, height, NULL, 
+            drawBorder(cr, style, state, area, x, y, width, height, NULL,
                        menuScroll || opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL, shadowToBorder(shadow), wt, STD_BORDER);
     }
     CAIRO_END
@@ -1498,7 +1498,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                      composActive=!nonGtk && compositingActive(widget),
                      isAlphaWidget=!nonGtk && composActive && isRgbaWidget(widget),
                      useAlpha=!nonGtk && qtSettings.useAlpha && isAlphaWidget;
-                 
+
             if(/*(composActive && !useAlpha) || */(opts.popupBorder && square))
             {
                 drawAreaColor(cr, area, &style->base[state], x, y, width, height);
@@ -1567,7 +1567,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
         }
         if(mapped && GTK_STATE_INSENSITIVE!=qtcWidgetGetState(widget))
             gtk_widget_queue_draw(mapped);
- 
+
         qtcWidgetMapSetup(parent, widget, 1);
         qtcComboBoxSetup(widget, parent);
     }
@@ -1586,7 +1586,7 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
                          rev=reverseLayout(widget) || (combo && parent && reverseLayout(parent));
             GtkWidget    *btn=NULL;
             GtkStateType savedState=state;
-        
+
 #if GTK_CHECK_VERSION(2, 16, 0)
 #if !GTK_CHECK_VERSION(2, 90, 0) /* Gtk3:TODO !!! */
             if(isSpin && widget && width==qtcWidgetGetAllocation(widget).width)
@@ -1827,20 +1827,20 @@ static void gtkDrawShadow(GtkStyle *style, GdkWindow *window, GtkStateType state
 // static gboolean isHoveredCell(GtkWidget *widget, int x, int y, int width, int height)
 // {
 //     gboolean hovered=FALSE;
-// 
+//
 //     if(widget && GTK_IS_TREE_VIEW(widget))
 //     {
 //         GtkTreePath       *path=NULL;
 //         GtkTreeViewColumn *column=NULL;
-// 
+//
 //         qtcTreeViewSetup(widget);
 //         qtcTreeViewGetCell(GTK_TREE_VIEW(widget), &path, &column, x, y, width, height);
 //         hovered=path && qtcTreeViewIsCellHovered(widget, path, column);
 //     }
-// 
+//
 //     return hovered;
 // }
-                    
+
 static void gtkDrawCheck(GtkStyle *style, GdkWindow *window, GtkStateType state, GtkShadowType shadow, GdkRectangle *area, GtkWidget *widget,
                          const gchar *detail, gint x, gint y, gint width, gint height)
 {
@@ -1899,7 +1899,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
 
         if(DETAIL("cellrenderertext") && widget && GTK_STATE_INSENSITIVE==qtcWidgetGetState(widget))
              state=GTK_STATE_INSENSITIVE;
-             
+
 #ifndef READ_INACTIVE_PAL /* If we reead the inactive palette, then there is no need for the following... */
         /* The following fixes the text in list views... if not used, when an item is selected it
            gets the selected text color - but when the window changes focus it gets the normal
@@ -1907,7 +1907,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
          if(DETAIL("cellrenderertext") && GTK_STATE_ACTIVE==state)
              state=GTK_STATE_SELECTED;
 #endif
-            
+
         if(!isMenuItem && GTK_STATE_PRELIGHT==state)
             state=GTK_STATE_NORMAL;
 
@@ -1928,7 +1928,7 @@ static void gtkDrawLayout(GtkStyle *style, GdkWindow *window, GtkStateType state
             if(req.height<qtcWidgetGetAllocation(widget).height && req.height%2)
                 y++;
         }
-        
+
         but= but || isOnComboBox(widget, 0);
 
         if(isOnListViewHeader(widget, 0))
@@ -2176,7 +2176,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         GdkColor newColors[TOTAL_SHADES+1],
                 *btnColors;
         int      min=MIN_SLIDER_SIZE(opts.sliderThumbs);
-    
+
     #ifdef INCREASE_SB_SLIDER
         if(scrollbar)
             lastSlider.widget=NULL;
@@ -2223,7 +2223,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
         if(scrollbar && GTK_STATE_ACTIVE==state)
             state=GTK_STATE_PRELIGHT;
 #endif
-                
+
         drawBox(style, window, state, shadow, area, widget, !scrollbar ? "qtc-slider" : "slider", x, y, width, height, FALSE);
 
        /* Orientation is always vertical with Mozilla, why? Anyway this hack should be OK - as we only draw
@@ -2236,7 +2236,7 @@ static void gtkDrawSlider(GtkStyle *style, GdkWindow *window, GtkStateType state
                                 ? qtcPalette.mouseover
                                 : */btnColors;
             gboolean horiz=GTK_ORIENTATION_HORIZONTAL==orientation;
-                              
+
             if(LINE_SUNKEN==opts.sliderThumbs)
                 if(horiz)
                     y--, height++;
@@ -2803,7 +2803,7 @@ static guint qtcurve_rc_style_parse(GtkRcStyle *rc_style, GtkSettings *settings,
         switch(token)
         {
             default:
-                g_scanner_get_next_token(scanner); 
+                g_scanner_get_next_token(scanner);
                 token = G_TOKEN_RIGHT_CURLY;
         }
 
@@ -2910,7 +2910,7 @@ static void qtcurve_rc_style_init(QtCurveRcStyle *qtcurve_rc)
         {
             GdkScreen   *screen = gdk_screen_get_default();
             GdkColormap *colormap = screen ? gdk_screen_get_rgba_colormap(screen) : NULL;
- 
+
             if (colormap)
             {
                 gtk_widget_push_colormap(colormap);
