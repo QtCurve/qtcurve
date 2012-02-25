@@ -1,3 +1,7 @@
+1.8.14
+------
+1. Fix reading of KDE settings.
+
 1.8.13
 ------
 1. Fix builing with newer glibs - only glib.h itself can be included.
@@ -131,7 +135,7 @@
  1. Allow editable combo-box popup to be rounded.
  2. Fix initial treeview highlight.
  3. Fix rounded popup border when using compositing.
- 4. Add vmware, vmplayer, and gtk to list of app to exclude from opacity settings. 
+ 4. Add vmware, vmplayer, and gtk to list of app to exclude from opacity settings.
     This also prevents using RGBA for rounded tooltips and popup menus.
  5. Fix opacity setting of squared popup menus.
  6. Improve group-box label positioning.
@@ -396,7 +400,7 @@
 17. Fix calculation of alpha values for square rings.
 18. Fix progressbar glow central position.
 19. Draw more frames.
-20. Fix image/gradient background issues with wxWidgets applications. 
+20. Fix image/gradient background issues with wxWidgets applications.
     (Use gtk_widget_translate_coordinates to translate widgets coordinates
      relative to window.)
 
@@ -474,7 +478,7 @@
           bgndImage.file=/path/to/svg/file.svg
           bgndImage.width=120
           bgndImage.height=160
-          
+
           (Use menuBgndImage for menus)
 
 28. Added option to add a 'glow' to progressbars.
@@ -836,7 +840,7 @@
 3. Improve appearance GtkCombo poup menu (even though this is actually
    a deprecated widget!)
 4. When menubars have a border, adjust the menubar items accordingly.
-5. When filling the used part of a slider groove, use the slider colour 
+5. When filling the used part of a slider groove, use the slider colour
    if set, otherwise use the highlight colour.
 
 0.62.2
@@ -844,7 +848,7 @@
 1. Improve appearance of progressbars in listviews (such as in d4x)
 2. Call kde-config (KDE3) / kde4-config (KDE4) to determine location
    of system icons for creating icon map.
- 
+
 0.62.1
 ------
 1. Use highlight colour for unselected focused view items.
@@ -876,7 +880,7 @@
         Line focus
         Extra rounded (only applies to Gtk2 and KDE4 variants)
  5. Allow all bar flat and raised tabs to bol coloured.
- 6. Only save appearance settings if different from default. 
+ 6. Only save appearance settings if different from default.
  7. If a gradient does not define the values for positions 0 and 100, then add these.
  8. Better colouring of selected tab.
  9. Added new focus options - full and line.
@@ -910,7 +914,7 @@
 ------
 1. Allow QtCurve's colours to be overriden if the style name
    starts with the application name. Fixes Pidgin's tab labels.
-   
+
 0.61.2
 ------
 1. Fix setting of options if no qtcurvestylerc is found!
@@ -1321,7 +1325,7 @@
 2. If KDE_SESSION_VERSION is set to >=4, then read settings from
    $XDG_CONFIG_HOME/Trolltech.conf
 3. Lighten focus rectangle.
-4. Fixed tab shift for GTK 2.10.11. Possibly should be applied to an earlier 
+4. Fixed tab shift for GTK 2.10.11. Possibly should be applied to an earlier
     version, but not sure.
 5. When run under KDE4, allow radio buttons in menus.
 6. Add /usr/share/icons into icon search path
@@ -1522,7 +1526,7 @@
  4. Seperate specification of scollbar slider, and range slider, settings.
  5. Option to specify menubar text colours.
  6. New 'flat' appearance.
- 7. Dont create custom gcs per widget class, use globals instead - should 
+ 7. Dont create custom gcs per widget class, use globals instead - should
     use less resources.
  8. Options to use a coloured border for mouse-over.
  9. Mouse over for tabs!
@@ -1536,7 +1540,7 @@
 3. Fix firefox menu colours when C locale indicates to use a comma
    as decimal separator - patch supplied by Valentine Sinitsyn
 4. Fix striped progressbar bleeding in Mozilla apps.
-5. More GIMP dialog hackery if --enable-parentless-dialogs-fix is 
+5. More GIMP dialog hackery if --enable-parentless-dialogs-fix is
    specified.
 6. Treat SiftFox the same as FireFox
 
@@ -2066,7 +2070,7 @@
 0.13
 ----
 1. ALL: New V3 style - has rounded buttons, and uses gradient effect on buttons, tabs,
-        scrollbars, etc. 
+        scrollbars, etc.
 2. ALL: Code clean-up.
 
 0.12
@@ -2112,7 +2116,7 @@
 0.06
 ----
 1. GTK: Make combo-boxes thinner.
-2. GTK: Allow ussage of GTK1 font substitution file, either 
+2. GTK: Allow ussage of GTK1 font substitution file, either
         /etc/X11/qt_gtk_fnt2fntrc or ~/.qt/gtk_fnt2fntrc, and format:
 
         <replace from> <with>

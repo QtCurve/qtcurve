@@ -52,8 +52,9 @@ Options    opts;
 #define MAX_APP_NAME_LEN 32
 
 #define KDE_CFG_DIR         "/share/config/"
-#define KDEGLOBALS_FILE     KDE_CFG_DIR"kdeglobals"
-#define KDEGLOBALS_SYS_FILE KDE_CFG_DIR"system.kdeglobals"
+#define KDE4_SYS_CFG_DIR    "/share/kde4/config/"
+#define KDEGLOBALS_FILE     "kdeglobals"
+#define KDEGLOBALS_SYS_FILE "system.kdeglobals"
 
 static char * getKdeHome()
 {
@@ -2027,8 +2028,8 @@ gboolean qtSettingsInit()
                                  "/etc/kderc",
                                  qtSettings.qt4 ? "/etc/kde4/kdeglobals" : "/etc/kde3/kdeglobals",
                                  qtSettings.qt4 ? "/etc/kde4rc" : "/etc/kde3rc",
-                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_FILE : KDE3PREFIX KDEGLOBALS_FILE,
-                                 qtSettings.qt4 ? KDE4PREFIX KDEGLOBALS_SYS_FILE : KDE3PREFIX KDEGLOBALS_SYS_FILE,
+                                 qtSettings.qt4 ? KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_FILE : KDE3PREFIX KDE_CFG_DIR KDEGLOBALS_FILE,
+                                 qtSettings.qt4 ? KDE4PREFIX KDE4_SYS_CFG_DIR KDEGLOBALS_SYS_FILE : KDE3PREFIX KDE_CFG_DIR KDEGLOBALS_SYS_FILE,
                                  kdeGlobals(),
                                  0L};
 
