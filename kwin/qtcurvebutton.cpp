@@ -354,12 +354,6 @@ QBitmap IconEngine::icon(ButtonIcon icon, int size, QStyle *style)
     else if (r.width() > 4)
         lwTitleBar = 2;
 
-    int lwArrow = 1;
-    if (r.width() > 16)
-        lwArrow = 4;
-    else if (r.width() > 7)
-        lwArrow = 2;
-
     switch(icon)
     {
 #if KDE_IS_VERSION(4, 3, 85)

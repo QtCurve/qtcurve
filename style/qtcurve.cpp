@@ -256,8 +256,8 @@ static bool blendOOMenuHighlight(const QPalette &pal, const QColor &highlight)
 {
     QColor text(pal.text().color()),
            hl(pal.highlightedText().color());
- 
-    return (text.red()<50) && (text.green()<50) && (text.blue()<50) && 
+
+    return (text.red()<50) && (text.green()<50) && (text.blue()<50) &&
            (hl.red()>127) && (hl.green()>127) && (hl.blue()>127) &&
            TOO_DARK(highlight);
 }
@@ -294,7 +294,7 @@ static void setBold(QWidget *widget)
     if(!prop.isValid() || !prop.toBool())
     {
         QFont font(widget->font());
-        
+
         if(!font.bold())
         {
             font.setBold(true);
@@ -311,7 +311,7 @@ static void unSetBold(QWidget *widget)
     if(prop.isValid() && prop.toBool())
     {
         QFont font(widget->font());
-        
+
         font.setBold(false);
         widget->setFont(font);
         widget->setProperty(constBoldProperty, false);
@@ -695,11 +695,11 @@ static QString themeFile(const QString &dir, const QString &n, bool kde3=false)
 class QtCurveDockWidgetTitleBar : public QWidget
 {
     public:
-        
+
     QtCurveDockWidgetTitleBar(QWidget* parent) : QWidget(parent) { }
     virtual ~QtCurveDockWidgetTitleBar() { }
     QSize sizeHint() const { return QSize(0, 0); }
-}; 
+};
 
 class StylePlugin : public QStylePlugin
 {
@@ -713,7 +713,7 @@ class StylePlugin : public QStylePlugin
         QSet<QString> styles;
         styles.insert("QtCurve");
 
-#ifdef QTC_STYLE_SUPPORT        
+#ifdef QTC_STYLE_SUPPORT
         getStyles(kdeHome(), styles);
         getStyles(KDE_PREFIX(useQt3Settings() ? 3 : 4), styles);
         getStyles(KDE_PREFIX(useQt3Settings() ? 4 : 3), styles);
@@ -1330,7 +1330,7 @@ void Style::init(bool initial)
         }
     else
         opts.titlebarButtons&=~TITLEBAR_BUTTON_COLOR;
-    
+
     if(IMG_PLAIN_RINGS==opts.bgndImage.type || IMG_BORDERED_RINGS==opts.bgndImage.type ||
        IMG_SQUARE_RINGS==opts.bgndImage.type ||
        IMG_PLAIN_RINGS==opts.menuBgndImage.type || IMG_BORDERED_RINGS==opts.menuBgndImage.type ||
@@ -1516,7 +1516,7 @@ void Style::polish(QApplication *app)
             opts.lighterPopupMenuBgnd=1; // shade so that we dont have 3d-ish borders...
         opts.menuBgndAppearance=APPEARANCE_FLAT;
     }
-    
+
 #ifndef QTC_QT_ONLY
     if(opts.useQtFileDialogApps.contains(appName))
     {
@@ -1560,7 +1560,7 @@ void Style::polish(QPalette &palette)
          newComboBtn(itsComboBtnCols && itsHighlightCols!=itsComboBtnCols && itsSliderCols!=itsComboBtnCols &&
                      SHADE_BLEND_SELECTED==opts.comboBtn &&
                      (newButton || newHighlight)),
-         newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsDefBtnCols!=itsSortedLvColors && 
+         newSortedLv(itsSortedLvColors && ( (SHADE_BLEND_SELECTED==opts.sortedLv && itsDefBtnCols!=itsSortedLvColors &&
                                             itsSliderCols!=itsSortedLvColors && itsComboBtnCols!=itsSortedLvColors) ||
                                              SHADE_DARKEN==opts.sortedLv) &&
                      (newContrast || (opts.lvButton ? newButton : newGray))),
@@ -1654,7 +1654,7 @@ void Style::polish(QPalette &palette)
 
     if(newProgressCols)
         shadeColors(midColor(itsHighlightCols[ORIGINAL_SHADE], itsBackgroundCols[ORIGINAL_SHADE]), itsProgressCols);
-    
+
     if(APP_OPENOFFICE==theThemedApp && opts.useHighlightForMenu && (newGray || newHighlight))
     {
         if(blendOOMenuHighlight(palette, itsHighlightCols[ORIGINAL_SHADE]))
@@ -1739,7 +1739,7 @@ void Style::polish(QWidget *widget)
         printf("\n");
     }
     */
-        
+
     // 'Fix' konqueror's large menubar...
     if(!opts.xbar && APP_KONQUEROR==theThemedApp && widget->parentWidget() && qobject_cast<QToolButton*>(widget) && qobject_cast<QMenuBar*>(widget->parentWidget()))
         widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
@@ -1802,7 +1802,7 @@ void Style::polish(QWidget *widget)
 #endif
                 if(100==opacity || !widget->isWindow() || Qt::Desktop==widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
                    widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                   widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") || 
+                   widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits( "QTipLabel") ||
                    widget->inherits( "QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
                    !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
                     break;
@@ -1818,7 +1818,7 @@ void Style::polish(QWidget *widget)
                 if(!widget->isVisible())
                 {
                     QWidget *pw=Qt::Dialog==(widget->windowFlags() & Qt::WindowType_Mask)
-                                        ? widget->parentWidget() 
+                                        ? widget->parentWidget()
                                             ? widget->parentWidget()->topLevelWidget()
                                             : QApplication::activeWindow()
                                         : 0L;
@@ -1861,7 +1861,7 @@ void Style::polish(QWidget *widget)
 
     if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
         widget->setAttribute(Qt::WA_StyledBackground);
-        
+
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
         Utils::addEventFilter(widget, this);
@@ -2022,7 +2022,7 @@ void Style::polish(QWidget *widget)
 #endif
          )
             ((QLabel *)widget)->setTextInteractionFlags(((QLabel *)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
-            
+
     }
     else if(/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget))
     {
@@ -2060,7 +2060,7 @@ void Style::polish(QWidget *widget)
         widget->setPalette(pal);
         widget->setMask(QRegion(widget->rect().adjusted(0, 0, -6, -6))+QRegion(widget->rect().adjusted(6, 6, 0, 0)));
     }
-    else if(qobject_cast<QDockWidget *>(widget) && 
+    else if(qobject_cast<QDockWidget *>(widget) &&
             widget->parentWidget() &&
             widget->parentWidget()->parentWidget() &&
             widget->parentWidget()->parentWidget()->parentWidget() &&
@@ -2164,7 +2164,7 @@ void Style::polish(QWidget *widget)
         }
     }
 
-    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && 
+    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
         widget->inherits("QComboBoxPrivateContainer"))
     {
         Utils::addEventFilter(widget, this);
@@ -2173,7 +2173,7 @@ void Style::polish(QWidget *widget)
     }
 
     bool parentIsToolbar(false);
-    
+
     // Using dark menubars - konqueror's combo box texts get messed up. Seems to be when a plain QWidget has widget->setBackgroundRole(QPalette::Window);
     // and widget->setAutoFillBackground(false); set (below). These onyl happen if 'parentIsToolbar' - so dont bather detecting this if the widget
     // is a plain QWidget
@@ -2215,7 +2215,7 @@ void Style::polish(QWidget *widget)
 
     if(parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
         widget->setFont(QApplication::font());
-    
+
     if (qobject_cast<QMenuBar *>(widget) || widget->inherits("Q3ToolBar") || qobject_cast<QToolBar *>(widget) || parentIsToolbar)
         widget->setBackgroundRole(QPalette::Window);
 
@@ -2253,10 +2253,10 @@ void Style::polish(QWidget *widget)
         widget->layout()->setSpacing(0);
         widget->layout()->setMargin(0);
     }
-    
+
 #ifdef Q_WS_X11
     QWidget *window=widget->window();
-    
+
     if((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
        (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask)) )
     {
@@ -2383,11 +2383,11 @@ void Style::polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlaces
     if(!scrollArea)
         return;
 
-    // HACK: add exception for KPIM transactionItemView, which is an overlay widget and must have filled background. This is a temporary workaround 
+    // HACK: add exception for KPIM transactionItemView, which is an overlay widget and must have filled background. This is a temporary workaround
     // until a more robust solution is found.
     if(scrollArea->inherits("KPIM::TransactionItemView"))
     {
-        // also need to make the scrollarea background plain (using autofill background) so that optional vertical scrollbar background is not 
+        // also need to make the scrollarea background plain (using autofill background) so that optional vertical scrollbar background is not
         // transparent either.
         // TODO: possibly add an event filter to use the "normal" window background instead of something flat.
         scrollArea->setAutoFillBackground(true);
@@ -2462,7 +2462,7 @@ void Style::unpolish(QWidget *widget)
 
     if(itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
         widget->setAttribute(Qt::WA_StyledBackground, false);
-        
+
     if(opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget())
     {
         widget->removeEventFilter(this);
@@ -2573,7 +2573,7 @@ void Style::unpolish(QWidget *widget)
             }
         }
     }
-    else if(qobject_cast<QDockWidget *>(widget) && 
+    else if(qobject_cast<QDockWidget *>(widget) &&
             ((QDockWidget *)widget)->titleBarWidget() &&
             dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
             widget->parentWidget() &&
@@ -2642,7 +2642,7 @@ void Style::unpolish(QWidget *widget)
             widget->setPalette(QApplication::palette());
     }
 
-    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) && 
+    if((!IS_FLAT_BGND(opts.menuBgndAppearance) || 100!=opts.menuBgndOpacity || !(opts.square&SQUARE_POPUP_MENUS)) &&
         widget->inherits("QComboBoxPrivateContainer"))
     {
         widget->removeEventFilter(this);
@@ -2659,7 +2659,7 @@ void Style::unpolish(QWidget *widget)
         widget->setBackgroundRole(QPalette::Button);
 #ifdef Q_WS_X11
     QWidget *window=widget->window();
-    
+
     if((100!=opts.bgndOpacity && Qt::Window==(window->windowFlags() & Qt::WindowType_Mask)) ||
        (100!=opts.dlgOpacity && Qt::Dialog==(window->windowFlags() & Qt::WindowType_Mask)) )
     {
@@ -2724,7 +2724,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
         view->setPalette(palette);
         object->removeEventFilter(this);
     }
-        
+
     if((!opts.gtkScrollViews &&  ::qobject_cast<QAbstractScrollArea *>(object)) || isSViewCont)
     {
         QPoint pos;
@@ -2876,7 +2876,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             if(CUSTOM_BGND)
             {
                 QWidget *widget=qobject_cast<QWidget *>(object);
-                
+
                 if(widget && widget->testAttribute(Qt::WA_StyledBackground) &&
                    (widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window|Qt::Dialog)) &&
                     widget->testAttribute(Qt::WA_TranslucentBackground)))
@@ -2997,7 +2997,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
                                     ? QRect(frame->rect().x(), frame->rect().y()+ (frame->rect().height()/2), frame->rect().width(), 1)
                                     : QRect(frame->rect().x()+(frame->rect().width()/2),  frame->rect().y(), 1, frame->rect().height()));
 
-                        drawFadedLine(&painter, r, backgroundColors(frame->palette().window().color())[STD_BORDER], true, true, 
+                        drawFadedLine(&painter, r, backgroundColors(frame->palette().window().color())[STD_BORDER], true, true,
                                       QFrame::HLine==frame->frameShape());
                         return true;
                     }
@@ -3188,7 +3188,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
             {
                 QDialog *dlg=(QDialog *)object;
 
-                // The parent->isHidden is needed for KWord. It's insert picture file dialog is a child of the insert picture dialog - but the file 
+                // The parent->isHidden is needed for KWord. It's insert picture file dialog is a child of the insert picture dialog - but the file
                 // dialog is shown *before* the picture dialog!
                 if(dlg && dlg->windowFlags()&Qt::WindowType_Mask && (!dlg->parentWidget() || dlg->parentWidget()->isHidden()))
                 {
@@ -3934,7 +3934,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                                     ? QIcon::Active
                                     : QIcon::Normal
                                 : QIcon::Disabled);
-                                
+
             if (!(state&State_Raised) && !(state&State_Sunken) && !(state&QStyle::State_Selected))
                 mode = QIcon::Disabled;
 
@@ -4195,7 +4195,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                 {
                     if(opts.gbLabel&GB_LBL_OUTSIDE)
                         r.adjust(0, 2, 0, 0);
-                        
+
                     if(FRAME_SHADED==opts.groupBox || FRAME_FADED==opts.groupBox)
                     {
                         int          round=opts.square&SQUARE_FRAME ? ROUNDED_NONE : ROUNDED_ALL;
@@ -4842,7 +4842,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
             else
             {
                 bool menu(state&STATE_MENU);
-                int  x(r.x()), y(r.y());                
+                int  x(r.x()), y(r.y());
 
                 painter->save();
 
@@ -5174,7 +5174,7 @@ void Style::drawPrimitive(PrimitiveElement element, const QStyleOption *option, 
                         use=itsTitleBarButtonsCols[TITLEBAR_SHADE];
                 }
             }
-            
+
             if(isKWin)
                 opt.state|=STATE_KWIN_BUTTON;
 
@@ -5985,7 +5985,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                         textOpt|=Qt::TextHideMnemonic;
                     else
                         textOpt|=Qt::TextShowMnemonic;
-                
+
                     if((opts.dwtSettings&DWT_EFFECT_AS_PER_TITLEBAR) &&
                        EFFECT_NONE!=opts.titlebarEffect)
                     {
@@ -6243,7 +6243,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     qint64 progress = qMax<qint64>(bar->progress, bar->minimum); // workaround for bug in QProgressBar
                     double pg = ((progress - qint64(bar->minimum)) /
                                 qMax(double(1.0), double(qint64(bar->maximum) - qint64(bar->minimum))));
-            
+
                     if(vertical)
                     {
                         int height(qMin(r.height(), (int)(pg * r.height())));
@@ -6316,7 +6316,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 int                  progressIndicatorPos = (bar->progress - qreal(bar->minimum)) /
                                                              qMax(qreal(1.0), qreal(bar->maximum) - bar->minimum) * r.width();
-                bool                 flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) || 
+                bool                 flip((!vertical && (((Qt::RightToLeft==bar->direction) && !inverted) ||
                                                         ((Qt::LeftToRight==bar->direction) && inverted))) ||
                                           (vertical && ((!inverted && !bottomToTop) || (inverted && bottomToTop))));
                 QRect                leftRect;
@@ -6350,7 +6350,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     else
                         painter->setPen(palette.brush(cg, QPalette::Text).color());
                 }
-                    
+
                 QString text = bar->fontMetrics.elidedText(bar->text, Qt::ElideRight, r.width());
 
                 rightRect = rightRect.subtracted(leftRect);
@@ -6432,7 +6432,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     else if(APPEARANCE_FADE==opts.menuitemAppearance)
                         r.adjust(1, 0, -1, 0);
                 }
-                    
+
                 painter->save();
 
                 if (QStyleOptionMenuItem::Separator==menuItem->menuItemType)
@@ -6442,7 +6442,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                     if(doStripe)
                         drawBevelGradient(menuStripeCol(), painter, QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(),
-                                                                          stripeWidth, r.height()), 
+                                                                          stripeWidth, r.height()),
                                           false, false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                     if(!menuItem->text.isEmpty())
@@ -6486,7 +6486,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 
                 if(opts.menuStripe && !comboMenu)
                     drawBevelGradient(menuStripeCol(), painter,
-                                      QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth, r.height()), 
+                                      QRect(reverse ? r.right()-stripeWidth : r.x(), r.y(), stripeWidth, r.height()),
                                       false, false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                 if (selected && enabled)
@@ -6550,7 +6550,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 // Text and icon, ripped from windows style
                 bool  dis(!(state&State_Enabled)),
                       act(state&State_Selected);
-                QRect vCheckRect(visualRect(option->direction, menuItem->rect, 
+                QRect vCheckRect(visualRect(option->direction, menuItem->rect,
                                             QRect(menuItem->rect.x(), menuItem->rect.y(), checkcol, menuItem->rect.height())));
 
                 if (opts.menuIcons && !menuItem->icon.isNull())
@@ -6636,13 +6636,13 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                                 ? palette.highlightedText().color()
                                 : palette.text().color());
                 }
-                
+
                 if(isOO)
                 {
                     painter->setPen(use[STD_BORDER]);
                     painter->drawLine(rx.topLeft(), rx.bottomLeft());
                     painter->drawLine(rx.topRight(), rx.bottomRight());
-                }                
+                }
                 painter->restore();
             }
             break;
@@ -6763,7 +6763,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                 // The following is mainly for DejaVu Sans 11...
                 if(button->fontMetrics.height()==19 && r.height()==(23+((opts.thin&THIN_BUTTONS) ? 0 : 2)))
                     r.translate(0, 1);
-   
+
                 if (button->features&QStyleOptionButton::HasMenu)
                 {
                     int mbi(pixelMetric(PM_MenuButtonIndicator, button, widget));
@@ -7111,7 +7111,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                     else if(!isDialog && 100!=opts.bgndOpacity)
                         fill.setAlphaF(opts.bgndOpacity/150.0);
                 }
-                
+
                 switch(tab->shape)
                 {
                     case QTabBar::RoundedNorth:
@@ -7136,7 +7136,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             painter->setClipRect(r2.adjusted(-1, 0, 1, -1));
                         else
                             painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(sizeAdjust, 0, -sizeAdjust, 4), option, round, glowMo ? itsMouseOverCols : 0L, 
+                        drawBorder(painter, r.adjusted(sizeAdjust, 0, -sizeAdjust, 4), option, round, glowMo ? itsMouseOverCols : 0L,
                                    WIDGET_TAB_TOP, borderProfile, false);
                         if(drawOuterGlow)
                             drawGlow(painter, r.adjusted(0, -1, 0, 5), WIDGET_TAB_TOP);
@@ -7227,7 +7227,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             painter->setClipRect(r2.adjusted(0, 1, 0, 0));
                         else
                             painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(sizeAdjust, -4, -sizeAdjust, 0), option, round, glowMo ? itsMouseOverCols : 0L, 
+                        drawBorder(painter, r.adjusted(sizeAdjust, -4, -sizeAdjust, 0), option, round, glowMo ? itsMouseOverCols : 0L,
                                    WIDGET_TAB_BOT, borderProfile, false);
                         if(thin)
                             painter->setClipping(false);
@@ -7312,7 +7312,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             painter->setClipRect(r2.adjusted(0, 0, -1, 0));
                         else
                             painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(0, sizeAdjust, 4, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, 
+                        drawBorder(painter, r.adjusted(0, sizeAdjust, 4, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L,
                                    WIDGET_TAB_TOP, borderProfile, false);
                         if(thin)
                             painter->setClipping(false);
@@ -7390,7 +7390,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             painter->setClipRect(r2.adjusted(1, 0, 0, 0));
                         else
                             painter->setClipping(false);
-                        drawBorder(painter, r.adjusted(-4, sizeAdjust, 0, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L, 
+                        drawBorder(painter, r.adjusted(-4, sizeAdjust, 0, -sizeAdjust), option, round, glowMo ? itsMouseOverCols : 0L,
                                    WIDGET_TAB_BOT, borderProfile, false);
                         if(thin)
                             painter->setClipping(false);
@@ -7764,7 +7764,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
                             drawTbArrow(this, tb, pr, painter, widget);
                         else
                         {
-                            if (!(tb->subControls&SC_ToolButtonMenu) && tb->features&QStyleOptionToolButton::HasMenu && 
+                            if (!(tb->subControls&SC_ToolButtonMenu) && tb->features&QStyleOptionToolButton::HasMenu &&
                                 pr.width()>pm.width() && ((pr.width()-pm.width())>LARGE_ARR_WIDTH))
                                 pr.adjust(-LARGE_ARR_WIDTH, 0, 0, 0);
                             drawItemPixmap(painter, pr, Qt::AlignCenter, pm);
@@ -8046,7 +8046,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                         ? ICN_SHADE
                                         : ICN_UNSHADE;
                         }
-                        
+
                         QColor        shadow(WINDOW_SHADOW_COLOR(opts.titlebarEffect));
                         const QColor *bgndCols((opts.dwtSettings&DWT_COLOR_AS_PER_TITLEBAR)
                                                 ? getMdiColors(option, state&State_Active)
@@ -8056,7 +8056,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                                                     ? buttonColors(option)
                                                     : getMdiColors(option, state&State_Active)
                                                 : bgndCols);
-   
+
                         drawDwtControl(painter, state, r.adjusted(-1, -1, 1, 1), btn, icon, option->palette.color(QPalette::WindowText), btnCols,
                                        bgndCols);
                         break;
@@ -8166,7 +8166,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     else
                         raised=false;
                 }
-                
+
                 if (!(bflags&State_Enabled))
                     bflags &= ~(State_MouseOver/* | State_Raised*/);
 
@@ -8210,7 +8210,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                     if(raised && TBTN_JOINED==opts.tbarBtns && !horizTBar)
                         tool.state &= ~State_Horizontal;
-                            
+
                     tool.rect.adjust(0, 0, -widthAdjust, -heightAdjust);
                     if(!(bflags&State_Sunken) && (mflags&State_Sunken))
                         tool.state &= ~State_MouseOver;
@@ -8271,7 +8271,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         }
                         else
                             tool.rect = menuarea;
-                        
+
                         drawLightBevel(painter, tool.rect, &tool, widget, mRound, getFill(&tool, use), use, true,
                                        MO_GLOW==opts.coloredMouseOver ? WIDGET_MENU_BUTTON : WIDGET_NO_ETCH_BTN);
                         if(raised && TBTN_JOINED==opts.tbarBtns)
@@ -8422,8 +8422,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                     QStyleOptionQ3ListViewItem item(lv->items.at(0));
                     int                        y(r.y()),
-                                               c,
-                                               offset(0);
+                                               c;
                     QPolygon                   lines;
 
                     painter->save();
@@ -8443,7 +8442,6 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         int linetop(0),
                             linebot(0);
                         // each branch needs at most two lines, ie. four end points
-                        offset = (item.itemY + item.height - y) % 2;
                         lines.resize(item.childCount * 4);
                         c = 0;
 
@@ -8854,7 +8852,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                             tr.adjust(0, 0, 0, menuBar->rect().height());
                     }
                 }
-                
+
                 opt.state=State_Horizontal|State_Enabled|State_Raised|(active ? State_Active : State_None);
 
 #ifdef QTC_QT_ONLY
@@ -8873,7 +8871,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 #endif
                 if(!kwin && !CUSTOM_BGND)
                     painter->fillRect(tr, borderCol);
-                
+
                 painter->setRenderHint(QPainter::Antialiasing, true);
 
                 if(kwin && (state&QtC_StateKWinFillBgnd))
@@ -8893,7 +8891,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                         light.setAlphaF(1.0);
                         dark.setAlphaF(1.0);
                     }
-                    
+
                     if(addLight)
                     {
                         painter->setPen(light);
@@ -8987,12 +8985,12 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     bool menuIcon=TITLEBAR_ICON_MENU_BUTTON==opts.titlebarIcon,
                          menuLeft=menuRect.isValid() && !titleBar->icon.isNull() && menuRect.left()<(r.left()+constWindowMargin+4);
                     int  height=r.height()-(1+(2*constWindowMargin));
-                                    
+
                     adjust=1;
                     if(captionRect.left()>(r.left()+constWindowMargin))
                     {
                         int width=captionRect.left()-(r.left()+(2*constWindowMargin));
-                        
+
                         if(!(menuIcon && menuLeft) || width>(height+4))
                             drawSunkenBevel(painter, QRect(r.left()+constWindowMargin+1, r.top()+constWindowMargin+1, width, height), titleCols[ORIGINAL_SHADE]);
                     }
@@ -9224,7 +9222,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                 // For OO.o 3.2 need to fill widget background!
                 if(isOOWidget(widget))
                     painter->fillRect(r, palette.brush(QPalette::Window));
-                
+
                 if(reverse && horiz)
                 {
                     bool tmp(atMin);
@@ -9265,7 +9263,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                 painter->save();
 
-                bool needsBaseBgnd=(opts.thinSbarGroove || opts.flatSbarButtons) && 
+                bool needsBaseBgnd=(opts.thinSbarGroove || opts.flatSbarButtons) &&
                                    widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                                    (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")/* ||
                                     !opts.gtkScrollViews && widget->parentWidget()->parentWidget()->inherits("QAbstractScrollArea")*/);
@@ -9463,7 +9461,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                     const QImage *img=getImage(painter);
 
                     isOO31=!img || img->rect()!=r;
-                
+
                     if(isOO31)
                         frame.adjust(0, 0, 0, -2), arrow.adjust(0, 0, 0, -2), field.adjust(0, 0, 0, -2);
                     else
@@ -9508,7 +9506,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
 
                     //if(opts.coloredMouseOver && frameOpt.state&State_MouseOver && comboBox->editable && !sunken)
                     //    frame.adjust(reverse ? 0 : 1, 0, reverse ? 1 : 0, 0);
-                        
+
                     drawLightBevel(painter, frame, &frameOpt, widget,
                                    comboBox->editable ? (reverse ? ROUNDED_LEFT : ROUNDED_RIGHT) : ROUNDED_ALL,
                                    getFill(&frameOpt, cols, false,
@@ -9534,7 +9532,7 @@ void Style::drawComplexControl(ComplexControl control, const QStyleOptionComplex
                             field.adjust(reverse ? -4 : -3, -1, reverse ? 3 : 4, 1);
                         else
                             field.adjust(reverse ? -4 : -2, -1, reverse ? 2 : 4, 1);
-                        drawEntryField(painter, field, widget, option, opts.unifyCombo ? ROUNDED_ALL : reverse ? ROUNDED_RIGHT : ROUNDED_LEFT, 
+                        drawEntryField(painter, field, widget, option, opts.unifyCombo ? ROUNDED_ALL : reverse ? ROUNDED_RIGHT : ROUNDED_LEFT,
                                        true, false);
                     }
                     else if(opts.comboSplitter && !(SHADE_DARKEN==opts.comboBtn || itsComboBtnCols))
@@ -9833,7 +9831,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
 
             if(!opts.etchEntry && DO_EFFECT && editable)
                 newSize.rheight()-=2;
-            // KWord's zoom combo clips 'Fit Page Width' without the following... 
+            // KWord's zoom combo clips 'Fit Page Width' without the following...
             if(editable)
                 newSize.rwidth()+=6;
             break;
@@ -9861,7 +9859,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                 }
                 int maxpmw = mi->maxIconWidth,
                     tabSpacing = 20;
-                    
+
                 if (mi->text.contains(QLatin1Char('\t')))
                     w += tabSpacing;
                 else if (mi->menuItemType == QStyleOptionMenuItem::SubMenu)
@@ -9881,7 +9879,7 @@ QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, con
                 w += checkcol + windowsRightBorder + 10;
                 newSize.setWidth(w);
                 // ....
-                
+
                 int h(newSize.height()-8); // Fix mainly for Qt4.4
 
                 if (QStyleOptionMenuItem::Separator==mi->menuItemType && mi->text.isEmpty())
@@ -10016,7 +10014,7 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
                                                             (tabV2.state & State_Enabled) ? QIcon::Normal
                                                             : QIcon::Disabled);
                     int offset = 4;
-                    
+
                     if (!opts.centerTabText && tabV2.leftButtonSize.isNull())
                         offset += 2;
 
@@ -11033,7 +11031,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
     GradientStopCont::const_iterator it(grad->stops.begin()),
                                      end(grad->stops.end());
     int                              numStops(grad->stops.size());
-  
+
     for(int i=0; it!=end; ++it, ++i)
     {
         QColor col;
@@ -11059,7 +11057,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
             col.setAlphaF(col.alphaF()*(*it).alpha);
         g.setColorAt(botTab ? 1.0-(*it).pos : (*it).pos, col);
     }
-    
+
     if(APPEARANCE_AGUA==app && !(topTab || botTab || dwt) && (horiz ? r.height() : r.width())>AGUA_MAX)
     {
         QColor col;
@@ -11068,7 +11066,7 @@ void Style::drawBevelGradientReal(const QColor &base, QPainter *p, const QRect &
         g.setColorAt(pos, col);
         g.setColorAt(1.0-pos, col);
     }
-    
+
     //p->fillRect(r, base);
     if(path.isEmpty())
         p->fillRect(r, QBrush(g));
@@ -11255,7 +11253,7 @@ void Style::drawLightBevelReal(QPainter *p, const QRect &rOrig, const QStyleOpti
         doBorder=false;
 
     p->setRenderHint(QPainter::Antialiasing, true);
-    
+
     if(r.width()>0 && r.height()>0)
     {
         if(WIDGET_PROGRESSBAR==w && STRIPE_NONE!=opts.stripedProgress)
@@ -11559,7 +11557,7 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
 
     key.sprintf("qtc-stripes-%x", col.rgba());
     if(!itsUsePixmapCache || !QPixmapCache::find(key, pix))
-    {        
+    {
         pix=QPixmap(QSize(64, 64));
 
         if(100!=opacity)
@@ -11594,7 +11592,7 @@ QPixmap Style::drawStripes(const QColor &color, int opacity) const
         if(itsUsePixmapCache)
             QPixmapCache::insert(key, pix);
     }
-    
+
     return pix;
 }
 
@@ -11607,7 +11605,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
     {
         static const int constPixmapWidth  = 16;
         static const int constPixmapHeight = 512;
-            
+
         QColor    col(bgnd);
         QPixmap   pix;
         QSize     scaledSize;
@@ -11653,7 +11651,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                                 ? pix : pix.scaled(scaledSize, Qt::IgnoreAspectRatio)));
             p->setBrushOrigin(prevOrigin);
         }
-        
+
         if(isWindow && APPEARANCE_STRIPED!=app && APPEARANCE_FILE!=app && GT_HORIZ==grad && GB_SHINE==qtcGetGradient(app, &opts)->border)
         {
             int size=qMin(BGND_SHINE_SIZE, qMin(r.height()*2, r.width()));
@@ -11685,7 +11683,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
                 if(itsUsePixmapCache)
                     QPixmapCache::insert(key, pix);
             }
-            
+
             p->drawPixmap(r.x()+((r.width()-pix.width())/2), r.y(), pix);
         }
     }
@@ -11710,7 +11708,7 @@ void Style::drawBackground(QPainter *p, const QColor &bgnd, const QRect &r, int 
 void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) const
 {
     QtCImage &img=isWindow || (opts.bgndImage.type==opts.menuBgndImage.type &&
-                              (IMG_FILE!=opts.bgndImage.type || 
+                              (IMG_FILE!=opts.bgndImage.type ||
                                 (opts.bgndImage.height==opts.bgndImage.height &&
                                  opts.bgndImage.width==opts.bgndImage.width &&
                                  opts.bgndImage.pixmap.file==opts.menuBgndImage.pixmap.file)))
@@ -11812,7 +11810,7 @@ void Style::drawBackgroundImage(QPainter *p, bool isWindow, const QRect &r) cons
                 pixPainter.end();
             }
             p->drawPixmap(r.right()-img.pixmap.img.width(), r.y()+1, img.pixmap.img);
-            break;    
+            break;
     }
 }
 
@@ -12074,7 +12072,7 @@ void Style::drawMdiControl(QPainter *p, const QStyleOptionTitleBar *titleBar, Su
 
     if(!activeWindow && !hover && opts.titlebarButtons&TITLEBAR_BUTTOM_HIDE_ON_INACTIVE_WINDOW)
         return;
-     
+
     QRect rect(subControlRect(CC_TitleBar, titleBar, sc, widget));
 
     if (rect.isValid())
@@ -12168,7 +12166,7 @@ void Style::drawMdiIcon(QPainter *painter, const QColor &color, const QColor &bg
 
             if(EFFECT_ETCH==opts.titlebarEffect && drewFrame)
                 effect=EFFECT_SHADOW;
-                            
+
             drawIcon(painter, blendColors(WINDOW_SHADOW_COLOR(effect), bgnd, WINDOW_TEXT_SHADOW_ALPHA(effect)),
                      EFFECT_SHADOW==effect
                         ? r.adjusted(1, 1, 1, 1)
@@ -12205,7 +12203,7 @@ void Style::drawIcon(QPainter *painter, const QColor &color, const QRect &r, boo
                 iconSize.width(), iconSize.height());
     if(sunken)
         br.adjust(1, 1, 1, 1);
- 
+
     switch(icon)
     {
         case ICN_MIN:
@@ -12488,7 +12486,7 @@ void Style::drawArrow(QPainter *p, const QRect &rx, PrimitiveElement pe, QColor 
         default:
             return;
     }
-        
+
     a.translate((r.x()+(r.width()>>1)), (r.y()+(r.height()>>1)));
 
 #ifdef QTC_OLD_NVIDIA_ARROW_FIX
@@ -12558,7 +12556,7 @@ void Style::drawSbSliderHandle(QPainter *p, const QRect &rOrig, const QStyleOpti
                 r.adjust(-1, 0, 0, 0);
         else
             r.adjust(horiz ? 1 : 0, horiz ? 0 : 1, 0, 0);
-    
+
         switch(opts.sliderThumbs)
         {
             case LINE_1DOT:
@@ -12584,7 +12582,7 @@ void Style::drawSliderHandle(QPainter *p, const QRect &r, const QStyleOptionSlid
 
     if(!(option->activeSubControls&SC_SliderHandle) || !(opt.state&State_Enabled))
         opt.state&=~State_MouseOver;
-        
+
     if(SLIDER_TRIANGULAR==opts.sliderStyle)
     {
         if(r.width()>r.height())
@@ -13192,7 +13190,7 @@ void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const
             pal.setBrush(QPalette::Disabled, QPalette::Foreground, midColor(itsActiveMdiTextColor, popupMenuCols()[ORIGINAL_SHADE]));
             pal.setBrush(QPalette::Disabled, QPalette::Text, pal.brush(QPalette::Disabled, QPalette::Foreground));
         }
-            
+
         widget->setPalette(pal);
     }
     else if(opts.customMenuTextColor || SHADE_BLEND_SELECTED==opts.shadeMenubars ||
@@ -13355,7 +13353,7 @@ void Style::readMdiPositions() const
         {
             QString left=grp.readEntry("ButtonsOnLeft"),
                     right=grp.readEntry("ButtonsOnRight");
-                    
+
             if(!left.isEmpty() || !right.isEmpty())
                 itsMdiButtons[0].clear(), itsMdiButtons[1].clear();
 
@@ -13543,7 +13541,7 @@ QColor Style::getLowerEtchCol(const QWidget *widget) const
         col.setAlphaF(opts.customAlphas[ALPHA_ETCH_LIGHT]);
         return col;
     }
-    
+
     if(IS_FLAT_BGND(opts.bgndAppearance))
     {
         bool doEtch=widget && widget->parentWidget() && !theNoEtchWidgets.contains(widget);
@@ -13574,7 +13572,7 @@ int Style::getFrameRound(const QWidget *widget) const
 {
     if(opts.square&SQUARE_FRAME)
         return ROUNDED_NONE;
-        
+
     const QWidget *window=widget ? widget->window() : 0L;
 
     if(window)
@@ -13822,7 +13820,7 @@ void Style::toggleMenuBar(QMainWindow *window)
         QWidget *menubar=window->menuWidget();
         if(itsSaveMenuBarStatus)
             qtcSetMenuBarHidden(appName, menubar->isVisible());
-    
+
         window->menuWidget()->setHidden(menubar->isVisible());
     }
 }
@@ -13866,7 +13864,7 @@ void Style::toggleStatusBar(QMainWindow *window)
         }
     }
 }
-                        
+
 #ifdef Q_WS_X11
 void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
 {
