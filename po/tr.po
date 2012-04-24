@@ -3255,7 +3255,7 @@ msgstr "Yan çubuklarda standart düğme görünümü"
 #: po/rc.cpp:908 rc.cpp:908
 #, fuzzy
 msgid ""
-"<p>If enabled, the titlebar buttons will be drawn using the cusom colors "
+"<p>If enabled, the titlebar buttons will be drawn using the custom colors "
 "defined in the next page."
 msgstr ""
 "Bu ayar fare üzerlerine geldiğinde gereçlerin yüzde kaç oranda "
@@ -4654,7 +4654,7 @@ msgid ""
 "<i><p>QtCurve uses dark/light borders to create etch and shadow effects. By "
 "default QtCurve tries to lighten (or darken) the parent's background to "
 "achieve this - if no parent can be found, then white/black is used with an "
-"alpha value set. This behaviour maybe overriden, and alpha values always "
+"alpha value set. This behaviour maybe overridden, and alpha values always "
 "used, by checking the option above.</p>"
 msgstr ""
 

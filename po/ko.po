@@ -3194,7 +3194,7 @@ msgstr "표준 버튼 색상(&T)"
 #. i18n: ectx: property (toolTip), widget (QCheckBox, titlebarButtons_custom)
 #: po/rc.cpp:908 rc.cpp:908
 msgid ""
-"<p>If enabled, the titlebar buttons will be drawn using the cusom colors "
+"<p>If enabled, the titlebar buttons will be drawn using the custom colors "
 "defined in the next page."
 msgstr "<p>이것이 사용되면, 제목 표시줄 버튼은 다음 페이지에 정의된 사용자 정의 색상을 사용하여 그려집니다."
 
@@ -4629,7 +4629,7 @@ msgid ""
 "<i><p>QtCurve uses dark/light borders to create etch and shadow effects. By "
 "default QtCurve tries to lighten (or darken) the parent's background to "
 "achieve this - if no parent can be found, then white/black is used with an "
-"alpha value set. This behaviour maybe overriden, and alpha values always "
+"alpha value set. This behaviour maybe overridden, and alpha values always "
 "used, by checking the option above.</p>"
 msgstr ""
 "<i><p>QtCurve는 선명하고 어두운 효과를 만들기 위해 어두운/밝은 테두리를 사용합니다. "

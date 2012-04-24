@@ -1440,7 +1440,7 @@ msgstr "常規按鈕顔色"
 
 #: build/config/ui_qtcurveconfigbase.h:4190
 msgid ""
-"<p>If enabled, the titlebar buttons will be drawn using the cusom colors "
+"<p>If enabled, the titlebar buttons will be drawn using the custom colors "
 "defined in the next page."
 msgstr "<p>如果啓用該項，標題列按鈕會用下一頁中的自訂顔色繪制。"
 
@@ -2493,7 +2493,7 @@ msgid ""
 "<i><p>QtCurve uses dark/light borders to create etch and shadow effects. By "
 "default QtCurve tries to lighten (or darken) the parent's background to "
 "achieve this - if no parent can be found, then white/black is used with an "
-"alpha value set. This behaviour maybe overriden, and alpha values always "
+"alpha value set. This behaviour maybe overridden, and alpha values always "
 "used, by checking the option above.</p>"
 msgstr ""
 "<i><p>QtCurve使用“深暗/光亮”邊框來實現蝕刻和陰影效果。默認情況下，QtCurve會試"
