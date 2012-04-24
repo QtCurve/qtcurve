@@ -1,3 +1,9 @@
+1.8.12
+------
+1. Dont setup KDE4 fonts/colours in constructor - seems to mess things up when
+   using proxy styles.
+   See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638629
+
 1.8.11
 ------
 1. Fix flashing of clementine's position slider tooltip.

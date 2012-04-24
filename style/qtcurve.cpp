@@ -1100,9 +1100,11 @@ void Style::init(bool initial)
     // Set defaults for Hover and Focus, these will be changed when KDE4 palette is applied...
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsFocusCols);
     shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
-#if !defined QTC_QT_ONLY
-    setupKde4();
-#endif
+// Dont setup KDE4 fonts/colours here - seems to mess things up when using proxy styles.
+// See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638629
+//#if !defined QTC_QT_ONLY
+//    setupKde4();
+//#endif
 
     itsWindowManager->initialize(opts.windowDrag, opts.windowDragWhiteList.toList(), opts.windowDragBlackList.toList());
 
