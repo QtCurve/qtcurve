@@ -1,3 +1,9 @@
+1.8.15
+------
+1. Fix tab activation (via mouse) when configured to drag windows from all
+   empty areas and either highlight is set to 0% or coloured mousr over is set
+   to none.
+
 1.8.14
 ------
 1. Fix reading of KDE settings.

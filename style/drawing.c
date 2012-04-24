@@ -3811,7 +3811,7 @@ void drawTab(cairo_t *cr, GtkStateType state, GtkStyle *style, GtkWidget *widget
 
     if(!mozTab && GTK_APP_JAVA!=qtSettings.app)
     {
-        if(-1==highlightedTabIndex && highlightingEnabled)
+        if(-1==highlightedTabIndex && (highlightingEnabled || opts.windowDrag>=WM_DRAG_ALL))
             qtcTabSetup(widget);
         qtcTabUpdateRect(widget, tabIndex, x, y, width, height);
     }
