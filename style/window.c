@@ -37,7 +37,7 @@ static GtkWidget *qtcCurrentActiveWindow=NULL;
 
 typedef struct
 {
-    int       width, 
+    int       width,
               height,
               timer;
     GtkWidget *widget;
@@ -95,7 +95,7 @@ static void qtcWindowCleanup(GtkWidget *widget)
         g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_DESTROY_ID"));
         g_signal_handler_disconnect(G_OBJECT(widget),
-                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID"));               
+                                    (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_STYLE_SET_ID"));
         if((opts.menubarHiding&HIDE_KEYBOARD) || (opts.statusbarHiding&HIDE_KEYBOARD))
             g_signal_handler_disconnect(G_OBJECT(widget),
                                     (gint)g_object_steal_data(G_OBJECT(widget), "QTC_WINDOW_KEY_RELEASE_ID"));
@@ -222,7 +222,7 @@ static gboolean qtcWindowSizeRequest(GtkWidget *widget)
 static gboolean qtcWindowDelayedUpdate(gpointer user_data)
 {
     QtCWindow *window=(QtCWindow *)user_data;
-    
+
     if(window)
     {
         if(window->locked)
@@ -241,14 +241,14 @@ static gboolean qtcWindowDelayedUpdate(gpointer user_data)
             return FALSE;
         }
     }
-    
+
     return FALSE;
 }
 
 static gboolean qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
 {
     QtCWindow *window=(QtCWindow *)user_data;
-    
+
     if(window && (event->width != window->width || event->height != window->height))
     {
         window->width = event->width;
@@ -266,9 +266,14 @@ static gboolean qtcWindowConfigure(GtkWidget *widget, GdkEventConfigure *event, 
     return FALSE;
 }
 
+static bool canGetChildren(GtkWidget *widget)
+{
+    return GTK_APP_GHB!=qtSettings.app || 0!=strcmp(g_type_name(qtcWidgetType(widget)), "GhbCompositor") || qtcWidgetRealized(widget);
+}
+
 GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
 {
-    if(level<3 && GTK_IS_CONTAINER(parent))
+    if(level<3 && GTK_IS_CONTAINER(parent) && canGetChildren(parent) /* && qtcWidgetRealized(parent)*/)
     {
         GtkWidget *rv       = NULL;
         GList     *children = gtk_container_get_children(GTK_CONTAINER(parent)),
@@ -294,7 +299,7 @@ GtkWidget * qtcWindowGetMenuBar(GtkWidget *parent, int level)
 
 GtkWidget * qtcWindowGetStatusBar(GtkWidget *parent, int level)
 {
-    if(level<3 && GTK_IS_CONTAINER(parent))
+    if(level<3 && GTK_IS_CONTAINER(parent) && canGetChildren(parent) /* && qtcWidgetRealized(parent)*/)
     {
         GtkWidget *rv       = NULL;
         GList     *children = gtk_container_get_children(GTK_CONTAINER(parent)),
@@ -390,7 +395,7 @@ gboolean qtcWindowSetStatusBarProp(GtkWidget *w)
     {
         GtkWindow  *topLevel=GTK_WINDOW(gtk_widget_get_toplevel(w));
         GdkDisplay *display=gtk_widget_get_display(GTK_WIDGET(topLevel));
-    
+
         unsigned short setting=1;
         g_object_set_data(G_OBJECT(w), STATUSBAR_ATOM, (gpointer)1);
         XChangeProperty(GDK_DISPLAY_XDISPLAY(display), GDK_WINDOW_XID(qtcWidgetGetWindow(GTK_WIDGET(topLevel))),

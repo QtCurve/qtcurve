@@ -2170,6 +2170,8 @@ gboolean qtSettingsInit()
                         0==strcmp(qtSettings.appName, "plugin-container") ||
                         0==strcmp(qtSettings.appName, "npviewer.bin") )
                     qtSettings.app=GTK_APP_FLASH_PLUGIN;
+                else if(0==strcmp(qtSettings.appName, "ghb"))
+                    qtSettings.app=GTK_APP_GHB;
                 /*else if(app==strstr(qtSettings.appName, "gaim"))
                     qtSettings.app=GTK_APP_GAIM;*/
             }

@@ -3,6 +3,9 @@
 1. Fix tab activation (via mouse) when configured to drag windows from all
    empty areas and either highlight is set to 0% or coloured mousr over is set
    to none.
+2. Check widget is realized before attempting to find menubar/statusbar in
+   GhbCompositor class. Fixes startup crash wih Handbrake when menu/statusbar
+   hiding is enabled.
 
 1.8.14
 ------
